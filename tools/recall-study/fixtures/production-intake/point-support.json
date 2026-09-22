@@ -1,0 +1,92 @@
+{
+  "coordinate": {
+    "axis": {
+      "bundle": "bundle:ed9014047880",
+      "edition": {
+        "status": "present",
+        "value": "synthetic-composed"
+      },
+      "extent": {
+        "end_exclusive_tick": "80",
+        "start_tick": "0",
+        "status": "playback-ticks",
+        "timebase": {
+          "denominator": "10",
+          "numerator": "1"
+        }
+      },
+      "fingerprint": "69a7cb0bbb055f6988c3dc2b26741d2edf3f5ed1c1701f65ba3eeadbdef9aa10",
+      "id": "axis:2f9cc8e80fa7",
+      "kind": "EditionPlayback",
+      "origin": {
+        "status": "present",
+        "value": "0"
+      },
+      "source_kind": {
+        "status": "FilmEdition"
+      },
+      "timebase": {
+        "status": "present",
+        "value": {
+          "denominator": "10",
+          "numerator": "1"
+        }
+      }
+    },
+    "bundle": "fd924963e5a9e2c64ab5fb7e51391bfcbec13d322497cfea761f0dad48d121ac",
+    "occurrence": {
+      "status": "present",
+      "value": {
+        "occurrence": "part-1",
+        "source": {
+          "axis": "axis:125b5c61c2c0",
+          "end_exclusive_tick": "40",
+          "start_tick": "0"
+        },
+        "target": {
+          "axis": "axis:2f9cc8e80fa7",
+          "end_exclusive_tick": "80",
+          "start_tick": "40"
+        }
+      }
+    }
+  },
+  "derivation": "supplied-temporal-support/v1",
+  "nodes": [
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "present",
+        "value": {
+          "axis": "axis:2f9cc8e80fa7",
+          "display_bounds": {
+            "maximum": "70",
+            "minimum": "70"
+          },
+          "intervals": [],
+          "points": [
+            "70"
+          ]
+        }
+      },
+      "state": "Available",
+      "supplied_identity": {
+        "status": "present",
+        "value": "3216a182bfdf7686e9d6fe5e46c568a9d74b87d01e1c56e2b8a8ca5f719fc4a3"
+      },
+      "target": "sit:e8"
+    }
+  ],
+  "schemaVersion": "temporal-support/v0.1",
+  "selection": {
+    "mapping": "02e38ef2271e625e366bc985c90adbeb32faeab93ab8906264111163c1fdc004",
+    "occurrence": "part-1",
+    "status": "occurrence"
+  },
+  "source_digest": "caec512609542deebe2500d4e0d5deaf2d90b115a6331e5de780e74d477a5c41",
+  "target": "sit:e8",
+  "unavailable_descendants": [],
+  "unlocated_descendants": []
+}

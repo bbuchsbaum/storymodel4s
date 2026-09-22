@@ -382,6 +382,7 @@ lazy val pipeline = project
     document.jvm,
     story.jvm,
     codec.jvm,
+    corpusIntake,
     fixtures.jvm % Test
   )
 
@@ -448,7 +449,7 @@ lazy val corpusIntake = project
       "io.circe" %% "circe-parser" % circeV
     )
   )
-  .dependsOn(corpus.jvm, core.jvm)
+  .dependsOn(corpus.jvm, core.jvm, recall.jvm)
 
 /** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples,
   * interview example.

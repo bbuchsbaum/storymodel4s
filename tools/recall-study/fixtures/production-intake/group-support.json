@@ -1,0 +1,128 @@
+{
+  "coordinate": {
+    "axis": {
+      "bundle": "bundle:ca1afe5a7c6b",
+      "edition": {
+        "status": "present",
+        "value": "part-a"
+      },
+      "extent": {
+        "end_exclusive_tick": "40",
+        "start_tick": "0",
+        "status": "playback-ticks",
+        "timebase": {
+          "denominator": "10",
+          "numerator": "1"
+        }
+      },
+      "fingerprint": "83b183aab16201d4c9e098f2804c4927d562a5f4a3b4e5fb9ae01afa391a4eb9",
+      "id": "axis:371b1b1220a4",
+      "kind": "EditionPlayback",
+      "origin": {
+        "status": "present",
+        "value": "0"
+      },
+      "source_kind": {
+        "status": "FilmEdition"
+      },
+      "timebase": {
+        "status": "present",
+        "value": {
+          "denominator": "10",
+          "numerator": "1"
+        }
+      }
+    },
+    "bundle": "7c026582f5f4659930818eb0087b1c146fbe606e88706c9ecab629d19de7a677",
+    "occurrence": {
+      "status": "absent"
+    }
+  },
+  "derivation": "supplied-temporal-support/v1",
+  "nodes": [
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "present",
+        "value": {
+          "axis": "axis:371b1b1220a4",
+          "display_bounds": {
+            "maximum": "20",
+            "minimum": "10"
+          },
+          "intervals": [
+            {
+              "axis": "axis:371b1b1220a4",
+              "end_exclusive_tick": "20",
+              "start_tick": "10"
+            }
+          ],
+          "points": []
+        }
+      },
+      "state": "Available",
+      "supplied_identity": {
+        "status": "present",
+        "value": "52d27fe1878fa1467e20adef46768b9b7044e081a94b5220387bd325a372c1cc"
+      },
+      "target": "seg:g1"
+    },
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "present",
+        "value": {
+          "axis": "axis:371b1b1220a4",
+          "display_bounds": {
+            "maximum": "20",
+            "minimum": "10"
+          },
+          "intervals": [
+            {
+              "axis": "axis:371b1b1220a4",
+              "end_exclusive_tick": "20",
+              "start_tick": "10"
+            }
+          ],
+          "points": []
+        }
+      },
+      "state": "Available",
+      "supplied_identity": {
+        "status": "present",
+        "value": "52d27fe1878fa1467e20adef46768b9b7044e081a94b5220387bd325a372c1cc"
+      },
+      "target": "sit:e2"
+    },
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "absent"
+      },
+      "state": "Unlocated",
+      "supplied_identity": {
+        "status": "absent"
+      },
+      "target": "sit:e4"
+    }
+  ],
+  "schemaVersion": "temporal-support/v0.1",
+  "selection": {
+    "bundle": "7c026582f5f4659930818eb0087b1c146fbe606e88706c9ecab629d19de7a677",
+    "status": "part"
+  },
+  "source_digest": "caec512609542deebe2500d4e0d5deaf2d90b115a6331e5de780e74d477a5c41",
+  "target": "seg:g1",
+  "unavailable_descendants": [
+    "sit:e4"
+  ],
+  "unlocated_descendants": [
+    "sit:e4"
+  ]
+}

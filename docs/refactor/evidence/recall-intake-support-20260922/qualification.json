@@ -1,0 +1,4894 @@
+{
+  "schema": "storymodel4s.recall-intake-support-qualification/v1",
+  "base": "6de00cfd",
+  "implementation": "7c9f9f04",
+  "candidate": "621a7249f0c1fb3b62c4e3ca95ddea331edab3a2",
+  "executableInputsUnchangedDuringGate": true,
+  "commandReceipt": {
+    "schema_version": 1,
+    "started_utc": "2026-09-22T22:47:47.501684+00:00",
+    "finished_utc": "2026-09-22T23:07:41.204224+00:00",
+    "duration_seconds": 1193.657489,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+      "checkAll",
+      "scalafmtCheckAll",
+      "pipeline/runMain storymodel4s.pipeline.recallTimingIntake tools/recall-study/fixtures/production-intake/job.json /private/tmp/recall-intake-evidence/exact-result",
+      "codecJVM/Test/runMain storymodel4s.codec.TemporalSupportFixture"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable",
+    "log": "/private/tmp/recall-intake-evidence/checkAll-candidate.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 10800.0,
+    "log_bytes": 290059
+  },
+  "logSha256": "35c4606503c74618f585a5fff139dbd0eaf5a40ee1b40d9ba9ec7f1a198f5ad2",
+  "tasks": [
+    {
+      "task": "coreJVM/test",
+      "total": 231,
+      "failed": 0,
+      "errors": 0,
+      "passed": 231,
+      "skipped": 0
+    },
+    {
+      "task": "coreJS/test",
+      "total": 231,
+      "failed": 0,
+      "errors": 0,
+      "passed": 231,
+      "skipped": 0
+    },
+    {
+      "task": "coreNative/test",
+      "total": 231,
+      "failed": 0,
+      "errors": 0,
+      "passed": 231,
+      "skipped": 0
+    },
+    {
+      "task": "propositionJVM/test",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "task": "propositionJS/test",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "task": "propositionNative/test",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "task": "amrInteropJVM/test",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "task": "amrInteropJS/test",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "task": "amrInteropNative/test",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "task": "featuresJVM/test",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "task": "featuresJS/test",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "task": "featuresNative/test",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "task": "acquireJVM/test",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "task": "acquireJS/test",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "task": "acquireNative/test",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "task": "storyJVM/test",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "task": "storyJS/test",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "task": "storyNative/test",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "task": "documentJVM/test",
+      "total": 188,
+      "failed": 0,
+      "errors": 0,
+      "passed": 188,
+      "skipped": 0
+    },
+    {
+      "task": "documentJS/test",
+      "total": 185,
+      "failed": 0,
+      "errors": 0,
+      "passed": 185,
+      "skipped": 0
+    },
+    {
+      "task": "documentNative/test",
+      "total": 185,
+      "failed": 0,
+      "errors": 0,
+      "passed": 185,
+      "skipped": 0
+    },
+    {
+      "task": "recallJVM/test",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "recallJS/test",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "recallNative/test",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "alignJVM/test",
+      "total": 469,
+      "failed": 0,
+      "errors": 0,
+      "passed": 469,
+      "skipped": 0
+    },
+    {
+      "task": "alignJS/test",
+      "total": 469,
+      "failed": 0,
+      "errors": 0,
+      "passed": 469,
+      "skipped": 0
+    },
+    {
+      "task": "alignNative/test",
+      "total": 469,
+      "failed": 0,
+      "errors": 0,
+      "passed": 469,
+      "skipped": 0
+    },
+    {
+      "task": "interviewJVM/test",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "task": "interviewJS/test",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "task": "interviewNative/test",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "task": "embedCoreJVM/test",
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "task": "embedCoreJS/test",
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "task": "embedCoreNative/test",
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "task": "viewJVM/test",
+      "total": 119,
+      "failed": 0,
+      "errors": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    {
+      "task": "viewJS/test",
+      "total": 119,
+      "failed": 0,
+      "errors": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    {
+      "task": "viewNative/test",
+      "total": 119,
+      "failed": 0,
+      "errors": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    {
+      "task": "codecJVM/test",
+      "total": 269,
+      "failed": 0,
+      "errors": 0,
+      "passed": 269,
+      "skipped": 0
+    },
+    {
+      "task": "codecJS/test",
+      "total": 268,
+      "failed": 0,
+      "errors": 0,
+      "passed": 268,
+      "skipped": 0
+    },
+    {
+      "task": "codecNative/test",
+      "total": 268,
+      "failed": 0,
+      "errors": 0,
+      "passed": 268,
+      "skipped": 0
+    },
+    {
+      "task": "corpusJVM/test",
+      "total": 114,
+      "failed": 0,
+      "errors": 0,
+      "passed": 114,
+      "skipped": 0
+    },
+    {
+      "task": "corpusJS/test",
+      "total": 114,
+      "failed": 0,
+      "errors": 0,
+      "passed": 114,
+      "skipped": 0
+    },
+    {
+      "task": "corpusNative/test",
+      "total": 114,
+      "failed": 0,
+      "errors": 0,
+      "passed": 114,
+      "skipped": 0
+    },
+    {
+      "task": "fixturesJVM/test",
+      "total": 130,
+      "failed": 0,
+      "errors": 0,
+      "passed": 130,
+      "skipped": 0
+    },
+    {
+      "task": "fixturesJS/test",
+      "total": 125,
+      "failed": 0,
+      "errors": 0,
+      "passed": 125,
+      "skipped": 0
+    },
+    {
+      "task": "fixturesNative/test",
+      "total": 125,
+      "failed": 0,
+      "errors": 0,
+      "passed": 125,
+      "skipped": 0
+    },
+    {
+      "task": "lawsJVM/test",
+      "total": 115,
+      "failed": 0,
+      "errors": 0,
+      "passed": 115,
+      "skipped": 0
+    },
+    {
+      "task": "lawsJS/test",
+      "total": 115,
+      "failed": 0,
+      "errors": 0,
+      "passed": 115,
+      "skipped": 0
+    },
+    {
+      "task": "lawsNative/test",
+      "total": 115,
+      "failed": 0,
+      "errors": 0,
+      "passed": 115,
+      "skipped": 0
+    },
+    {
+      "task": "providerParser/test",
+      "total": 98,
+      "failed": 0,
+      "errors": 0,
+      "passed": 98,
+      "skipped": 0
+    },
+    {
+      "task": "providerAgent/test",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 76,
+      "skipped": 1
+    },
+    {
+      "task": "embedGrakern/test",
+      "total": 28,
+      "failed": 0,
+      "errors": 0,
+      "passed": 28,
+      "skipped": 0
+    },
+    {
+      "task": "embedOnnx/test",
+      "total": 6,
+      "failed": 0,
+      "errors": 0,
+      "passed": 6,
+      "skipped": 0
+    },
+    {
+      "task": "embedBench/test",
+      "total": 140,
+      "failed": 0,
+      "errors": 0,
+      "passed": 139,
+      "skipped": 1
+    },
+    {
+      "task": "media/test",
+      "total": 52,
+      "failed": 0,
+      "errors": 0,
+      "passed": 49,
+      "skipped": 3
+    },
+    {
+      "task": "pipeline/test",
+      "total": 62,
+      "failed": 0,
+      "errors": 0,
+      "passed": 62,
+      "skipped": 0
+    },
+    {
+      "task": "corpusIntake/test",
+      "total": 147,
+      "failed": 0,
+      "errors": 0,
+      "passed": 147,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "total": 8020,
+    "failed": 0,
+    "errors": 0,
+    "passed": 8015,
+    "skipped": 5
+  },
+  "freshJUnitReports": [
+    {
+      "path": "media/target/test-reports/TEST-storymodel4s.media.BoundarySearchSuite.xml",
+      "sha256": "c64d6c9f2bd729e773b09cfffc01ade7e4c401b0c8ff861e1ff48b7b2b2250b1",
+      "tests": 14,
+      "skipped": 1
+    },
+    {
+      "path": "media/target/test-reports/TEST-storymodel4s.media.CaptionSearchSuite.xml",
+      "sha256": "6713e6eb30f01ab240590748c0363d59a512c90d98ac46739dfb501522f7f3cf",
+      "tests": 9,
+      "skipped": 1
+    },
+    {
+      "path": "media/target/test-reports/TEST-storymodel4s.media.F1ExcerptSuite.xml",
+      "sha256": "e21fbefdc44f2119ba1130c31114eec9f2f69fdd7e06befa1ea4aff3163d859b",
+      "tests": 6,
+      "skipped": 1
+    },
+    {
+      "path": "media/target/test-reports/TEST-storymodel4s.media.VerifiedProbeSuite.xml",
+      "sha256": "976d65f2c739ec07dba448aab7548fd9491c2c9c45494e1322e031adb4f1d415",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "media/target/test-reports/TEST-storymodel4s.media.MediaProbeSuite.xml",
+      "sha256": "f839b1d88779c1d3927acfcefa9eca185e4904606b0ed28708ae6f3f35492a80",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.ReviewFixesSuite.xml",
+      "sha256": "22f0afaff7ac04703677ded9acf08afde0a864b1fae3a4ddf3066a998a807205",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.RelationsSuite.xml",
+      "sha256": "afeff2e7ba0a876c5aa1011350825be82dd474eae221eab82d53322214fbf4f0",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.D1aEnvelopeSuite.xml",
+      "sha256": "809986f9578206d0b4016bfe335b90dffe1a77db80b94be529b8500ac16b89a3",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.ValidatorSuite.xml",
+      "sha256": "f80a0088ec3fc32313409aea5bea396011a2c85660cc00044411dae74120007f",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.probes.D1aTextWitnessSuite.xml",
+      "sha256": "a94f0de049ebe14ebc0fabdb55820da508c54201f2b89c34cf79381b72ce041e",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.probes.D1aAlignmentBoundarySuite.xml",
+      "sha256": "0e9e89d91a0b6c9e0027194ebd07d76f3fd52a031026d22b3787c44788a215e3",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.probes.D1aAlignmentConstructorSuite.xml",
+      "sha256": "9cb6432a0bf1fb496affb629d49b9419760d95e6a347e6bce3949d92b97f9d83",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.D1aAlignmentSourceSuite.xml",
+      "sha256": "b8ff02edbc583bb11f3918a39ad5b1497bb04e4fafb2efb04a02dd29472fa069",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.D1aTextBoundarySuite.xml",
+      "sha256": "240173d9ecf1b371c41a6306a0e1a1b124b6ba5fbb0da9ab2d24b2a400c920c1",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.probes.StoryModelUnforgeableSuite.xml",
+      "sha256": "60b5f114c287d6b16cacb91a396e5dbd7b3fc113604d0c298a641a0c833c1de9",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.GraphSuite.xml",
+      "sha256": "2453f6e7b868ced7fbb84c3e7fdf33fcd0fdd238b83c802f8d279af51fcba580",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.probes.D1aGraphBoundarySuite.xml",
+      "sha256": "b08328aff6ae70d9d9b1ece7e2c84cb4b3659710fbc1dbb6221b30beabb13240",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.CoveringSuite.xml",
+      "sha256": "ca7ca01825067ef0a65ef2d63be441b71c8a381ebb3ae35a4fde79a5f0f49207",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.D1aOrderingSuite.xml",
+      "sha256": "ff0478c8b6f6bf6fecf6409b2c2a4821d57492129bdc26689f63b7334eca656b",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.probes.D1aModelConstructorSuite.xml",
+      "sha256": "cd8fc42affdc372ae98cf82e1b3a04a06f73ac57b48f2878f3fd252a213c28ee",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "story/.jvm/target/test-reports/TEST-storymodel4s.story.D1aEnvelopeAdmissionSuite.xml",
+      "sha256": "3f9b1c90395520e05c3c38ea3fc9ecfccb81f5f53ef32f5a1cc4a18bea547d01",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.ReviewFixesSuite.xml",
+      "sha256": "3ded16175068a156f0d19447f93522bd2eada38e29396e26b57e193646b1c6b0",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.RelationsSuite.xml",
+      "sha256": "61fe9c507f775f67455ec4d950670e2f7481116ccee41f1e79994b73b49b8635",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.D1aEnvelopeSuite.xml",
+      "sha256": "4f2655e02f108183f8e53e8501e8ae459559c0a3f46185929a90c72cd4ddbcc8",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.ValidatorSuite.xml",
+      "sha256": "0c7914f8850ed7e4278423bf006c2ca400424b4619a745a15c88f8b3686e946c",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.probes.D1aTextWitnessSuite.xml",
+      "sha256": "b340b953199f3395d28d5862ec8ca65c9249fdc6cec75aa660c89155832c1187",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.probes.D1aAlignmentBoundarySuite.xml",
+      "sha256": "83f2644e5e93bfbddae70be8c340a6e1557bf97df22da787091372793454e97b",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.probes.D1aAlignmentConstructorSuite.xml",
+      "sha256": "4f068edb2c8af4c7041c19e501313f500f4119adf0840a96a6019becc7c2cf0e",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.D1aAlignmentSourceSuite.xml",
+      "sha256": "12eca3f730bf19a994da25129a3c9775c87cf6a6e60bbb53ecce16e01e851a85",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.D1aTextBoundarySuite.xml",
+      "sha256": "f66180f7799e1fe7f3fb03b5c20750831737e75f508a5a3d86eca3b98468dc93",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.probes.StoryModelUnforgeableSuite.xml",
+      "sha256": "6b1aa943158c7ff666e65c1ab562bf80c8a4b8be84b1f8adea2701a334a7fd1f",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.GraphSuite.xml",
+      "sha256": "d1af3ebfbad57138edddfa5e6a49a611459c7b8eaaabd3f224ad7fc0dd8779e2",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.probes.D1aGraphBoundarySuite.xml",
+      "sha256": "08c0e5ca0cae2d6fa1a17c99d90f8bb3e13f83b81cd951902dcae23a581acc24",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.CoveringSuite.xml",
+      "sha256": "3ee21b1d60f561cac133350b809adf8eb713596b7a76cfbcb9df70f56a3d904e",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.D1aOrderingSuite.xml",
+      "sha256": "57c828da0e2bde685d588a49387c1bc327d498bb6c5e76643fda7a48e009f49d",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.probes.D1aModelConstructorSuite.xml",
+      "sha256": "b0a8facae48b005e57e36b0140cab97cbda61cf59981bd512a0f2a3284a5b6af",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "story/.js/target/test-reports/TEST-storymodel4s.story.D1aEnvelopeAdmissionSuite.xml",
+      "sha256": "d5edf986a6739cd36468c2534a68d2e4d93c50373220586407aeac24cbca26c9",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.ReviewFixesSuite.xml",
+      "sha256": "49dedfbbb485e969739ec6397b5cd0f56ca673834d2f4b25c6aaf55db183c1f5",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.RelationsSuite.xml",
+      "sha256": "8f54dd5eb68e89dac603193537492fe9d3a20784712e329b44606869fea47bd0",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.D1aEnvelopeSuite.xml",
+      "sha256": "71612ce092fb4239d7c83631110bdf754ea03ecf27e9b902eeba438228af6e43",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.ValidatorSuite.xml",
+      "sha256": "c4fd02143d578b1e29a11058eb3c4da4785f70a97f126aac02c599e969949587",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.probes.D1aTextWitnessSuite.xml",
+      "sha256": "fc7f2601fcab50feac40cec86f58b4a439b0a32f339c4862baeca7b0a04b349c",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.probes.D1aAlignmentBoundarySuite.xml",
+      "sha256": "69911603108b4c20c8c4699734eaf612f56a2662e8e8526a4d8ba55f814ea1b0",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.probes.D1aAlignmentConstructorSuite.xml",
+      "sha256": "abed86235634fb9ebc80848552f5e2463791e64af378d014ed8a7508ad207cef",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.D1aAlignmentSourceSuite.xml",
+      "sha256": "6f82e5d931ba42fd79479b7076281dc00a9eca45532a29eedd34b5b1182cafe9",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.D1aTextBoundarySuite.xml",
+      "sha256": "adadc3f88c3539f798a7467e5b08518508105544203e824e082aa9b958180429",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.probes.StoryModelUnforgeableSuite.xml",
+      "sha256": "9751a27e392e4834baa784b9a28859db9850b65024e10d623150b49e21237f1c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.GraphSuite.xml",
+      "sha256": "58467f64ef1aaccae837efc498b3f11b1cb4206725705069c2c77143eb2c2f57",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.probes.D1aGraphBoundarySuite.xml",
+      "sha256": "74922d4bcab9d6a33e9d7fe3fc3e3f4ecd67a740c3dd1c555abe86043bcc7e8a",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.CoveringSuite.xml",
+      "sha256": "30c00df101206c9e7c098150e44e4d6f47c6542c17f5f0871f5ec880898e5af8",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.D1aOrderingSuite.xml",
+      "sha256": "d84c59a014fabed2b3f782b035795c044d88a1922f68c45efb48ea184f52d903",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.probes.D1aModelConstructorSuite.xml",
+      "sha256": "5eb8bae5386f815688970883f83c03f20a1df773e6a91ce332c23674da224fc4",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "story/.native/target/test-reports/TEST-storymodel4s.story.D1aEnvelopeAdmissionSuite.xml",
+      "sha256": "0b3c615a8e73442665b8402b90046dddeaac4d7f8ebe960071d2fdd2ceb005e0",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parser.RemoteRuntimeSuite.xml",
+      "sha256": "0f55d4034a5a65f93ccc2cc66d2b21f20646a155445c67024c60f28011caf77b",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parserprobe.ConstructionBoundarySuite.xml",
+      "sha256": "3b032d521c37b8ddab1bd68c081480f63ea969eec043602e3193571a8f3836c6",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parser.CacheSuite.xml",
+      "sha256": "a1a37f5563c44e10fab93f6e074c8215587092cf81bd3dbf39db2c6ba6b3674d",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parser.EnvelopeSuite.xml",
+      "sha256": "02feafabb9f3952ff44141e0e8578cd143bda20f57717b2537ef5086d0e09e44",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parser.ContractSuite.xml",
+      "sha256": "a9bb517e23a24bc0adb6b1442251d971bd61db4e9a6eb186e71f8e437fc80e50",
+      "tests": 27,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parser.DeterminismSuite.xml",
+      "sha256": "7b8a03083c6b520704174368aa2ffa80de5bac6e9905b9e8df5de59bcef1be4e",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "provider-parser/target/test-reports/TEST-storymodel4s.provider.parser.ConformingSuite.xml",
+      "sha256": "d39acc69d9c4a1e1798ac0fc484eb9bfa1e3c565afc36ed6883b3bd3cdbc7264",
+      "tests": 34,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite.xml",
+      "sha256": "15ea2d6bfebd23531dea5993f66a7ba0716e743d797946dfcde0638b6682b842",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.TaskSuite.xml",
+      "sha256": "cff9dfa34a9740f77b2265ab396bfb2f506608e6bc857da8397535ed495afe67",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.OutputSuite.xml",
+      "sha256": "ac8b25bd0c8126dee1eb847d98b1a9e201bb01fa86145e4dd0fab7510670e057",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquireprobe.ConstructionProbeSuite.xml",
+      "sha256": "1920f4925e4a456b6d6b8dd1c9278fe3d73862977cf904fe5fcee6e8356c6b3c",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.ProposalSuite.xml",
+      "sha256": "8d8e414608cb619283b3fe3e285845ca636e3c54ca1bbc9874dc77ea481944f3",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.D1aAcquireSupportSuite.xml",
+      "sha256": "342ddc3545e9776e38cc88fb224d3580b898abbb9d780f09226d115db57385fa",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.PatchSuite.xml",
+      "sha256": "cbd0a32803f942895e3849ec1f36df43b8f609d7347e220b755031e0e2de54b6",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.D1aTaskReferencesSuite.xml",
+      "sha256": "e8bbc9ceacf98ec1a5d7d0b1cbf03bf7af8b939eafeee42e8fd43626682b5135",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.FoilSuite.xml",
+      "sha256": "f170431fd812e43cb5c5bf84a499fbcb25f371e7e25d9d8f2ac2bf049bf9127c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.D1aTextResolverParitySuite.xml",
+      "sha256": "0359f80b6bdf1e97b3413563dce2ea511fe1bb0edf78672fff0d4aefbb350de0",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.PromptSuite.xml",
+      "sha256": "b88dbd26aae561f61683836e8d58df512ace203f49e29b5ca9d979c3308f10f1",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquireprobe.ConstructionBoundarySuite.xml",
+      "sha256": "3a167c4c3319d7234703e7861a6d52827195566d964e1973f095e27f4f083426",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.ResolveSuite.xml",
+      "sha256": "cef8b295a3e4139bf9e59c5d259d8f36ebe4314d85ce3f423e7b0cf21bcff2fd",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.consumerattack.OutputConstructionProbeSuite.xml",
+      "sha256": "65ad057b41d55b2d16e2e61a0ddbcdc34566690cfb139dc42a88235c1c2ca0dc",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.CacheSuite.xml",
+      "sha256": "f66353d1b9dd2d851d8868c9b493733ac4fe7a550bbfde28e1d89c7eb14b6df0",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.jvm/target/test-reports/TEST-storymodel4s.acquire.OrchestrateSuite.xml",
+      "sha256": "36e10d8c2ef5dad49b7c4231dc38ca731ad0e7b589bd7a92f175231de92b2d64",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite.xml",
+      "sha256": "f278d5ec87afc7c36cfafb2155b67d2f27e230e52c4c806731e47b5cb147ff5a",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.TaskSuite.xml",
+      "sha256": "db26fedcfc8a5095cfe7a148ee0b93f46e185fb31b85dd587e8f940d66d98710",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.OutputSuite.xml",
+      "sha256": "934d1016baf3e6821c4f22144f65b10e327306d76368b298f25b5ea2abad5191",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquireprobe.ConstructionProbeSuite.xml",
+      "sha256": "a768d0ecadd7ed4fd67a3042520e464f1cc2480d57e1af75293490acb2f2364e",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.ProposalSuite.xml",
+      "sha256": "a1c067a80b3524ba7a7f025716abb92888e031c981e639748866ee187c515ce9",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.D1aAcquireSupportSuite.xml",
+      "sha256": "965df1672f3f692295c3fd6c0e2f9435151761a35245d4c9e47d44220e81e6f7",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.PatchSuite.xml",
+      "sha256": "eff2a9f39f99bcc4c3ff784e6e324294409c519beaf45df33b889ff332250fb6",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.D1aTaskReferencesSuite.xml",
+      "sha256": "210321a936bf2e1322118113d09b16f4c09facabed012b77c9982a84faffd758",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.FoilSuite.xml",
+      "sha256": "c5a7b14b941bceb0987b5c2063293c48060ece0b31855d19be8844cf62740b4c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.D1aTextResolverParitySuite.xml",
+      "sha256": "439538a08842f5d45b42aaeb0382e6fd5ce405fabf1e15af6a9c7c9db0f61b5d",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.PromptSuite.xml",
+      "sha256": "b62a2bb9e1eaa7a9e099c16750b295588c30875383e9e0f418d8e3ea05bd1c4d",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquireprobe.ConstructionBoundarySuite.xml",
+      "sha256": "d01d7c165dfd385d31b6d64eae91e588ce6a5c8e207e1e81f671c6b3d0c3c10b",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.ResolveSuite.xml",
+      "sha256": "6035daa1b530b7423454b6af2f5a6f1e6e65cf31f858170e623e1518b9b04bc8",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.consumerattack.OutputConstructionProbeSuite.xml",
+      "sha256": "f15d9d0cf4e41b6958f7d44dbb37c2d170a76c8cabbd06c10dbea2d6f7fec504",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.CacheSuite.xml",
+      "sha256": "3c064a3ff192a946ba8e8f857028f58d712fe711adcdaf8019c440f0ec0c695a",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.js/target/test-reports/TEST-storymodel4s.acquire.OrchestrateSuite.xml",
+      "sha256": "e9880b767af920477d1a22d5870889cb55f40954ad7e0c021c26b8dcdeb9a6cf",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite.xml",
+      "sha256": "91a871a8258b1951072d52c3249eb461725ae854c2f4b6aa94d860d9bbd96a30",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.TaskSuite.xml",
+      "sha256": "3932b0affa7fd4bc390f7aa8cbf31eb57e144e2a38d3bab788f078a77cf257a2",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.OutputSuite.xml",
+      "sha256": "5acc36c398e7894d05929c50315a79849dc8ee32f83a16a14e0be2341e7d8f39",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquireprobe.ConstructionProbeSuite.xml",
+      "sha256": "1083be25065e4f51c2742dbbd1cdfaa121d503ad622832f573531b22decd6d88",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.ProposalSuite.xml",
+      "sha256": "b7271a6a862c479ba7117d9f00fcbeee20baf150df9e33a57534e8f58e64bbc5",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.D1aAcquireSupportSuite.xml",
+      "sha256": "77176fe1066f4ed58e8ea25fbf3da824591187e97e33ad184627c00f3e1a4167",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.PatchSuite.xml",
+      "sha256": "d42c9baa0e4a6cdf9fae2908a23563e7ce8be216c20dff5b4453d0af039013d9",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.D1aTaskReferencesSuite.xml",
+      "sha256": "b469816a63daaa1fbfc66ec30a9ece5dc3bbd0c54e759820bd659521f58aed65",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.FoilSuite.xml",
+      "sha256": "d41a3515d760d1a85ac9e3ea3b7eb1c101ebee092e49580ffb0e08891317552e",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.D1aTextResolverParitySuite.xml",
+      "sha256": "208dd3a4200beb6eae7cc0538580f705b301274f53465a463538a79e963e0b24",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.PromptSuite.xml",
+      "sha256": "5c11dd317ce99149f004042c232708a02f5a43a2206d7338094c6c4c85ba35c2",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquireprobe.ConstructionBoundarySuite.xml",
+      "sha256": "510d3471b892a05f58d466d2cc6685f540af800f03a724684b58974edd411128",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.ResolveSuite.xml",
+      "sha256": "ed154910a0816a3647c59aafba822d872002cfb5c192618c3edcbd03a3f3e8a6",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.consumerattack.OutputConstructionProbeSuite.xml",
+      "sha256": "bdcbe37e31bd14464d6591041e94567529596149896bcee8da6cf5d01225ab45",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.CacheSuite.xml",
+      "sha256": "e0d3c246e41ec3eb302e010b4e92776066458dbbf3e38723601d23288a6f651d",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "acquire/.native/target/test-reports/TEST-storymodel4s.acquire.OrchestrateSuite.xml",
+      "sha256": "82a8b1a47bf03281db79bbc6e5ce133851bed6a4eace90191eef57047860db60",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite.xml",
+      "sha256": "70ee8aee7dffbe5a9b2e1269c90dbaba7d0f96840cb4209a6bc0590df42100db",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.interview.PrivacyFixtureSuite.xml",
+      "sha256": "246b3de43288e424aaa29104b4dc7b77b8524a57afb0a1487c05d0a66a64f64a",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+      "sha256": "96c23d5cb7e9155ef38f75daf9020011b6db25ecb2416d7398ece14e91619c87",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.ChartProposalCourtSuite.xml",
+      "sha256": "bc94e4874ab6449f182404f5d64e4db9b7104065102d1ab5ce52b504348a429c",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsInitializationSuite.xml",
+      "sha256": "c5d10eefad2cca8db3411ededc0bc4fc4986dd1ffa2b2bd3fef8a5301a4fadf2",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite.xml",
+      "sha256": "66792eaf49e70c4b06631a58ca5e6c62ce58ee0ef22f004225dd3d15e1a1372f",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite.xml",
+      "sha256": "05fae38ffea0df16803c5760ec3d899fcc2a8549604d2e80fca49ab94166fc8e",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+      "sha256": "4f22073850f6b2d60cd3789e1730b8e3108781152922453ba9d497981e691117",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite.xml",
+      "sha256": "4db49537a07e22910d03bdb7f05ae9f9f6f37004b6e376db74f95d05dd94e5ea",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsSuite.xml",
+      "sha256": "719708de1b8c7c86d1df1274301d171883c1bffca7cfbf8d71c32221e821e0c2",
+      "tests": 31,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite.xml",
+      "sha256": "36cafdd2337edfb52b15df440a1fe2adb3a94874c2152e70a8799e11bf4a622f",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.interview.BirthdayInterviewSuite.xml",
+      "sha256": "40196953b73f658f1efd22b1e18127a899d3d8921798fe593a31a59fcfbb5726",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.jvm/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite.xml",
+      "sha256": "ee2cc61ff7892ec6fd72af4617d7f5cae333be8508686c66167266ef2819aa05",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite.xml",
+      "sha256": "2f5f46089a81e3fe8d2e48ac03e53b3fb6b1f6594daa4da6c402ec2b050ad2b4",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.interview.PrivacyFixtureSuite.xml",
+      "sha256": "6b3f57bd32b5007bdf2808839f3411f98876f405a246eb6086b7cbe4f24e52c4",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+      "sha256": "9f1024d1d323e1025e13e56568b9e7b41cfaa0bc8e3bb6d91ea25099b710287b",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.ChartProposalCourtSuite.xml",
+      "sha256": "902b41f1569068c6fbcd4cd20f32e7da542db53855bd6c9004929e1a546c7dd0",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite.xml",
+      "sha256": "a14b3a04f9eaefb9763f989f29be8cd687df020574f5eeda16388502b407cf07",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+      "sha256": "82223caf3ab2d4e6bf29af10708268d34310f4f3ae91d73fe107c209161d63ec",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite.xml",
+      "sha256": "f110688377e17fad36dbf8746bcd90fd1b73e7bea7967d44d5b0eacb8f648c5a",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsSuite.xml",
+      "sha256": "6f92238e2e460bcda07f31dc97619f2776fb2905f669446531262ad01396fc23",
+      "tests": 31,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite.xml",
+      "sha256": "711242e506e9aa4a49f37cd912835acd802c461e4dc7a03055470cd6cacc867b",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.interview.BirthdayInterviewSuite.xml",
+      "sha256": "e6d6d0016ab2b49287c2b4cab6b11ccae73a4ef238c9aa9efd83e925d48e3edf",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.js/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite.xml",
+      "sha256": "298be169d6aec307fee068d1b7e4aa32fc3fee3aaa5dd39770176674bafdd2cd",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite.xml",
+      "sha256": "fcde4696e13070853dc019d88c6b88befd8a1d39ee5f28e0c33c349ba8329290",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.interview.PrivacyFixtureSuite.xml",
+      "sha256": "aa2e6481762f49a8272442a7df7fa9280f88ddaeb40d02d40a962d1c4c75f3e9",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+      "sha256": "032c2533f12023c83e325170b44cbeace80996eac26fd0f5c0b8cc0dbe45cb38",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.ChartProposalCourtSuite.xml",
+      "sha256": "9af42102e1d66a6638fd4e87934075dfdec62cfe52c8bf9b5f47467bf7f53edd",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite.xml",
+      "sha256": "118fdb3b000b3711b02c7c95f34136eef9f32c62df9ac60d0f07a9f62bd387ce",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+      "sha256": "4660f5ad33878811e4b9157fe2bbf4eb6bcc0acca22e0c070d2d25c7ba70c3d4",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite.xml",
+      "sha256": "2c10544c6716ff594c52bee1dad4c71de8e2efe6c3b6964429b175bd9375a7b5",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsSuite.xml",
+      "sha256": "f78965670499e483ce9c69bc3149c120ebda6238be0ca5575d6650738c35f224",
+      "tests": 31,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite.xml",
+      "sha256": "9ae78e5505a3cfec38507520ed34b5a90ceef80fa7ef0b14e1dab9c1a9b88fe6",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.interview.BirthdayInterviewSuite.xml",
+      "sha256": "caaf74a4d6ec5098a53807143b81b8c5073152fe107fd261b83ad30976e47e16",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "fixtures/.native/target/test-reports/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite.xml",
+      "sha256": "0ab1fae71666e56603eb8819dc78d2c3632bb2d441b4ccb8fada93fa55f7dc2f",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.probes.PropositionChartUnforgeableSuite.xml",
+      "sha256": "66d8fa96a195700151c61c9d99a28926359d4e37ba96478035981bed5afdddc3",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.OrderLawsSuite.xml",
+      "sha256": "2a966f706e5b4bcabcd0a89a7f3d059617294a01ac253e560cd0346ab085bea5",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.IdentityHardSuite.xml",
+      "sha256": "57275eab4c1cafce0840649c29e78390af5e02b9390906353e28f7ed53d0edec",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.GlossSuite.xml",
+      "sha256": "676046b73be8097f44597c15d0a90b4d65aaf5ecb87e1804a420f6d229270a5c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.ValidateSuite.xml",
+      "sha256": "9c75f2d205b33e15a28db49b27da8c74b0378e03ad1719b5d7d62d895b7cad90",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.CompatSuite.xml",
+      "sha256": "939c50ddce9c809ba0d1dd0e6d3131003b41be5cee982c905b6ee2c836556d26",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.ValidateRolesSuite.xml",
+      "sha256": "c8dd577270927ca083422a0eeb02678bc38829ed5e1d241ffd6bda69e623cb52",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.jvm/target/test-reports/TEST-storymodel4s.proposition.IdentitySuite.xml",
+      "sha256": "898d2818898eb867433b240a6dab4cefd722dab993c63730d01b16ff2c0420a7",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.probes.PropositionChartUnforgeableSuite.xml",
+      "sha256": "1f3c9f17591c4141aabbfff739b8baadc58a8de8df3bf813188862dad2bb29e8",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.OrderLawsSuite.xml",
+      "sha256": "e6a849f75ac248b62060714869f0f591ad73271c460e40bb0a42decf34f9ef46",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.IdentityHardSuite.xml",
+      "sha256": "d81a19f6270cdef26073964b63f346b102c25ea2127353a8331bedd4ecab81f0",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.GlossSuite.xml",
+      "sha256": "d9a26f2458b3c43c77abd879d63a554943186af1e8e36ce6e8290af685518c4c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.ValidateSuite.xml",
+      "sha256": "3868e516af491d753d6c1e796918a06dd28fce538c79e07340c3135666c0ced9",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.CompatSuite.xml",
+      "sha256": "a2f50e351b9fb41da35823f40b08a478f21a42a66ccc77887ab6564618c31806",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.ValidateRolesSuite.xml",
+      "sha256": "5ac49521d75cafde9c2366e51951150130bd213e1b158afcf54377e263777b50",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.js/target/test-reports/TEST-storymodel4s.proposition.IdentitySuite.xml",
+      "sha256": "c96848f2fa11a8bf8bec26c15bd4638b8b4b7b9a223cf0c8cf6f47b03a5efa8f",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.probes.PropositionChartUnforgeableSuite.xml",
+      "sha256": "b2cdd0cfaf0659b2c9eff6527148d19aee3dd90297afaddc2c6e619c5dfc202e",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.OrderLawsSuite.xml",
+      "sha256": "89dee57b4724a5bce1110ef7f15e2cfc70898ce4aa7d5885501e477801ed53d7",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.IdentityHardSuite.xml",
+      "sha256": "546ed98b99480360740bd4ebf5db3c83f684d17f562a3f0ea4c8a9c12bb2be0d",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.GlossSuite.xml",
+      "sha256": "3c3cb514d9d228b30c0d005213e8b38bf4d6a186348dd619f5a05aeed989499c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.ValidateSuite.xml",
+      "sha256": "796ff19971e7e77cd4a96fbde91b9680b7119b999aa4b6b62f9335adcf108e23",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.CompatSuite.xml",
+      "sha256": "b030ad0f35aba63f0cc7cc7a782e9a7240b039bbd0f726f5e81efcf4224c9fe3",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.ValidateRolesSuite.xml",
+      "sha256": "f986f52875e6d2487ac64858498fb496e15babd25238f33a0b0d1de4ea4e4a33",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "proposition/.native/target/test-reports/TEST-storymodel4s.proposition.IdentitySuite.xml",
+      "sha256": "6dc5cd3502afbc595de33abe7af73e740661397c3243744b70af61a23ac1ab5b",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.BaselineSuite.xml",
+      "sha256": "b62f819040e7c1a0f9f40cd7c93d4f084cf1154c4c1c5c561a762da9c1fed625",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.DigestPrivacySuite.xml",
+      "sha256": "005e71b6ff0423ba352c49a1326559fca218a1bf1f3d821be2a4edd3f0de383a",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embedprobe.ConstructionProbeSuite.xml",
+      "sha256": "fb93691ec973cc3d6f8df170ca126673ddcaccacb8ad342a278efab844210611",
+      "tests": 29,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.ReceiptDigestSuite.xml",
+      "sha256": "d2a5fec5d38adce8eacaea1005116463eac17b02f80530c6cb9feb341e0bcd1e",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.VectorSuite.xml",
+      "sha256": "8fd512c574021f9ce21fd0160f17b1a881af88ce2fa7f3c93922290f0469ac8a",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.ContractSuite.xml",
+      "sha256": "f8e455de02b4b6de03c8d686433b2fb53ae3d4ca01993c832729881339a17b83",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.IdentitySuite.xml",
+      "sha256": "b0121c35fa4b402944d83173a8924496e3ab10f3b4957ccda256bc859bb86a98",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.jvm/target/test-reports/TEST-storymodel4s.embed.PrivacySuite.xml",
+      "sha256": "3cc4a16a5c5d181632984b0efc295cb73f4a2062d71cec8f88fe9d60d84f0c3e",
+      "tests": 31,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.BaselineSuite.xml",
+      "sha256": "be87235dbea70d612cb6f76359a387252898d60cab2620fb126f232c583b1231",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.DigestPrivacySuite.xml",
+      "sha256": "b1ffe6ea262cd45008448b250405f7a953844cd489005ab8f81c3b7bd37e17f9",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embedprobe.ConstructionProbeSuite.xml",
+      "sha256": "562e439f5da684a4b3874ae74900bea8d98027eba4470d614b9f28f61d9048c1",
+      "tests": 29,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.ReceiptDigestSuite.xml",
+      "sha256": "884ccf4afca09587c20bff7ce820ce51f184ba9198a03dfb76d2a71244908ba3",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.VectorSuite.xml",
+      "sha256": "8da0c140e36a435c41560dd72b70e7f79d278b6c5b2b0002e025ab06e6416bb1",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.ContractSuite.xml",
+      "sha256": "71cd59f49fdb6262c30d0583ecbbbd9274438bbb9bc77ac86d5badbbe117e990",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.IdentitySuite.xml",
+      "sha256": "122239bd9ba6541257fa0f3b4b051f227a5921e9ef6a603a5d6cf02c85b42299",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.js/target/test-reports/TEST-storymodel4s.embed.PrivacySuite.xml",
+      "sha256": "2e3a3e582acdc6fbe28f25b8ce7aa98818671988c39b0ec124d11bcbef7d4694",
+      "tests": 31,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.BaselineSuite.xml",
+      "sha256": "bc20c95405fc1e05f82c27bbc85784fc4f526eb4fcb3359962a139532afde4ac",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.DigestPrivacySuite.xml",
+      "sha256": "156845f97bcef7d4b7f348af1213d23b8f9ad101d98f757bea19f7b20fdede61",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embedprobe.ConstructionProbeSuite.xml",
+      "sha256": "5cc04635f594075fe489094232983820a710cd0305a2eb5d7f04f8eb6b0668a3",
+      "tests": 29,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.ReceiptDigestSuite.xml",
+      "sha256": "5afff03e6cb99c65f259d0337fe7973bb061da1d7bb1c5792b1609fba6dbdc06",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.VectorSuite.xml",
+      "sha256": "12630a8612dd799b69828f04f8c6b03ed9d8640f4f7d8d547e7b1900cceaaadb",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.ContractSuite.xml",
+      "sha256": "6fdbaf48cbf275b512d07029f3725f8e83ac498b070f683aae70c723c1033303",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.IdentitySuite.xml",
+      "sha256": "105e9338a8ffba2ee5ea6ecf6cdab3d6597d3f7f9afbdb02519148a2ed7bd5d4",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-core/.native/target/test-reports/TEST-storymodel4s.embed.PrivacySuite.xml",
+      "sha256": "cd4f14b5384d8cd6416744fa6589127621c35e11918cc73c4d4f8b8e9293294c",
+      "tests": 31,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.DraftCodexSuite.xml",
+      "sha256": "c5114a098f578f5d45373da8974c4b3df3e40d743d16b259814f66f46eef026c",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.viewprobe.ConstructionProbeSuite.xml",
+      "sha256": "817d975864fedaa123cff6e2c5974d920c16810d4022a05ab884d6a4929af587",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.CompiledAtlasSuite.xml",
+      "sha256": "d148e247d4896d53703c88595f3d15a576d192d0c4223fbf881a337ea079ebac",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.VoyageSuite.xml",
+      "sha256": "4084267c6a226a68c1d508bf4e112ce0544b0e116c93b42be5008c2511643d29",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.OutputSuite.xml",
+      "sha256": "c51824001b07e70f501d8626d0f51ce4ed09c93c8f12ed179865f72665f2d368",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.ViewRefSuite.xml",
+      "sha256": "8672dd1f526e97b234d800c777107dc29642fac578ae94170b478a4c159f231e",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.AtlasSuite.xml",
+      "sha256": "0fc13b6312c46fb3d8313d9269d716eeb9f7f6012817dee87217ff4c8b7096e5",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.viewprobe.OutputConstructionProbeSuite.xml",
+      "sha256": "784e8eb0dd36d6de678fa1d0624c814a985930ce9e7c24512c2d09a96ead147f",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.FeatureSelectionSuite.xml",
+      "sha256": "6fcaa6e65313e5dc518b885d9ccf7eeed6a314a4c1149631fc07741ac8cb398e",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.VisibilitySuite.xml",
+      "sha256": "ec23516b3ae8c74c5582608da19c1296e68b167466455bf31ef6db09d60aed93",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.CodexCompilerSuite.xml",
+      "sha256": "3dd00e820c6c5ca7ec23903d89be5aab4bb3ed90ea762a3d5cbc1ce7180462e8",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.CodexFlowSuite.xml",
+      "sha256": "ee8cd6973a294bd7712194266fc348f3d4af716e0c1992391b82385eb9bf60ee",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "view/.jvm/target/test-reports/TEST-storymodel4s.view.DraftAtlasSuite.xml",
+      "sha256": "bf46a657414a926f701a845d2e32d2bd37d2628e7c70d4950ade6f2abfa5656d",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.DraftCodexSuite.xml",
+      "sha256": "c374c8e20a282e2e0e510d5c8c742388b7ccfce6ef3bdbdba59bd0769f07c91c",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.viewprobe.ConstructionProbeSuite.xml",
+      "sha256": "f4e4252be81b476f28631b84a9ecb572951cdf8df96136f52ade38acfaddca6c",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.CompiledAtlasSuite.xml",
+      "sha256": "95fd60cd5f5793d63a469fb8f1391f025427df3194af067bd83082b44a5d6661",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.VoyageSuite.xml",
+      "sha256": "ef97a2aa200ddb1d22df75622d3d19a3e96957b05e1dd937cc0d45287f736a11",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.OutputSuite.xml",
+      "sha256": "931139ef6c1b50e722276d9374292f333519efe75cc6e36677ee2c5fa38678d4",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.ViewRefSuite.xml",
+      "sha256": "f4148f4d76a375a1bceb61e334947b06f69522bc8ebda5ca7c92fc3c38bb1ee0",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.AtlasSuite.xml",
+      "sha256": "b5a2776635b6f16802238f12197b18eb812118afc462c85eb19c04d102a887d9",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.viewprobe.OutputConstructionProbeSuite.xml",
+      "sha256": "ca6690f9e0dab8fc3acf239d2577bd85a0ad9c75e95ea667c071427e87dd70ca",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.FeatureSelectionSuite.xml",
+      "sha256": "c3303e6d0e8e1a7731f21dbedcd499da2578f194bc5afddac6ba58a937714cfc",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.VisibilitySuite.xml",
+      "sha256": "ab9bf8ec90ffa924dec2d6a9af1968bb71074078cc0a0a3c03930d9e2b42e813",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.CodexCompilerSuite.xml",
+      "sha256": "0e6adddef1e9a8dcee42b42223c7c944816f52e3483f8cc4bc851d569eb8bdc6",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.CodexFlowSuite.xml",
+      "sha256": "b4b3f4b02cdec53444fe51c55ee27be0d8a580ca1ed6f02bb6ad33e1a28f05f9",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "view/.js/target/test-reports/TEST-storymodel4s.view.DraftAtlasSuite.xml",
+      "sha256": "70d3456a52d68ee01296161eb91b1d680d45c7d8e179a0e29baf469cd80763d9",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.DraftCodexSuite.xml",
+      "sha256": "df94cd1c825a566b2b47da6aacb6390076ac9de68a3439be4c3b29dff0f485d4",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.viewprobe.ConstructionProbeSuite.xml",
+      "sha256": "e40a4776f545808432f60f6ac114f1e849c390c6d2ffa0467296a2a6ecf575ab",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.CompiledAtlasSuite.xml",
+      "sha256": "f39405ab8e6277467522035a2889e57810232a9b7810f5e1e8bd7e2663042a1d",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.VoyageSuite.xml",
+      "sha256": "3cffe461bc29123ccc5dafd57f073bf7a935142cc6a6c9100a71897ada82b595",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.OutputSuite.xml",
+      "sha256": "ccfc16f639ec448d959e9c6ebd74ec9076f5ef015b979a490e8179613c9bd2e5",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.ViewRefSuite.xml",
+      "sha256": "7a7cbdc7575a94958681d33cc320229125d46a8dacc49b8d70788fa188496012",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.AtlasSuite.xml",
+      "sha256": "0a2153dfd235900ae5f9706d948ce0e7a330fbc5af7b1cfe89eb4a970e82575f",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.viewprobe.OutputConstructionProbeSuite.xml",
+      "sha256": "12b81682576625dc393ac83d6b10b4a5ef0ba32f85f92061493562b892a467f8",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.FeatureSelectionSuite.xml",
+      "sha256": "40b66e688c63b7bc3df9127707c119ebeac5c2de3a075d9b224a0d1484b85188",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.VisibilitySuite.xml",
+      "sha256": "484b74055d05e118d0c307d522e259f21aa7619f9d914b9b37ebbb357b2f3905",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.CodexCompilerSuite.xml",
+      "sha256": "88b329b84859d5332b4da34a39ef5134aa9e0446f790f455d22f2006d591598c",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.CodexFlowSuite.xml",
+      "sha256": "e306f74acb25a6fcbdeed33d0aa71f979b0bad3331921de2419ac0fb06282a7b",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "view/.native/target/test-reports/TEST-storymodel4s.view.DraftAtlasSuite.xml",
+      "sha256": "bc9f490783f26a3cf1f0fe40f761b34f9074cef6421f0f5d15f7b10d89545ae9",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "embed-onnx/target/test-reports/TEST-storymodel4s.embed.onnx.OnnxSentenceEmbedderSuite.xml",
+      "sha256": "b2ba8922896d2e8fc3838bce3ea88a44c6560f6a8545a735920b38b1f38f01e6",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interviewprobe.ConstructionBoundarySuite.xml",
+      "sha256": "319d3749c4f9c216919952a73256e086b4a1c120078b2eb1dbc69e9e203b4aed",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.InterviewPhenomenologySuite.xml",
+      "sha256": "68a33caa1638db8ba8048a338f259d6f5219a43b261ed90ff2d18dfb5f27e196",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.ResolutionSuite.xml",
+      "sha256": "96dbc7e4cd79334fa760326211ef9f1f6bfa81daef6ab53a905a4d6efbe41c1a",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.InterviewSuite.xml",
+      "sha256": "d3711b0cf152571b4f15e65faaf0caa4a3d4d9ea494c4900c7e4f0a874b5dfd5",
+      "tests": 36,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.InterviewInductionSuite.xml",
+      "sha256": "76585b3abbc7b5b576c7e10f08897da7a2fbb8266e112e9170b664b591b3f7dd",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.InterviewProfileSuite.xml",
+      "sha256": "47d872e7b19cffbe9276de49a53fdf97666ec85f3cf18abf49da3bcb89c21421",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.AmbiguousPlacementSuite.xml",
+      "sha256": "9ecd76d022f813ebfaaece7cc86a9f8d177e5dac1969b95f6fafd74485d022f8",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.interview.scoring.PlacementProducerSuite.xml",
+      "sha256": "c7e74f9eff87a36c3504f948e9c5545a6196437f498498a54419de993fec1021",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.jvm/target/test-reports/TEST-storymodel4s.probes.PlacementResolutionRemedySuite.xml",
+      "sha256": "8a5407454c74ddf726fb5d6160460334ad4471a06798eb785aa5e42d238d8961",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interviewprobe.ConstructionBoundarySuite.xml",
+      "sha256": "df4eb87554e9b9127967bae62a00d1db4b9300a3049b2562cdaa26cb09165c5b",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.InterviewPhenomenologySuite.xml",
+      "sha256": "de840c69c9b0edefabc6d663be825633d673c0849fe9f003e8d1bb08ed02f21f",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.ResolutionSuite.xml",
+      "sha256": "757e0f6459dc1c692522498295bb1f6a777ab4427cc921a4d851c372a20dc5f8",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.InterviewSuite.xml",
+      "sha256": "ca118c0651bfe57652ea1cddfc693b4cf11871240f6028ba25b07fa92589d9ac",
+      "tests": 36,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.InterviewInductionSuite.xml",
+      "sha256": "db7da83541148acb786772f4366921e05b76945fafe0e34fe699ccb5ffe0228a",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.InterviewProfileSuite.xml",
+      "sha256": "11fc2a49638f0b97b3717d5185c9f84e01dc467334b0589b49f0f1f16f268e21",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.AmbiguousPlacementSuite.xml",
+      "sha256": "86082a8b1cc167c1e159dd8e8844f768619e178c58d15c4ada6d22bc35b8b715",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.interview.scoring.PlacementProducerSuite.xml",
+      "sha256": "6dbda3b2af0ec7abe6fc4c265fcf38495b68cee5aad6830a2d88194b8801320a",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.js/target/test-reports/TEST-storymodel4s.probes.PlacementResolutionRemedySuite.xml",
+      "sha256": "f0cfeb339f87009f1513c2826c95c5d09e70861b2469949557300b1513be3497",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interviewprobe.ConstructionBoundarySuite.xml",
+      "sha256": "009fc049bc4d5c0c28107ab066ad6acda6cd5eeb9a2c943237ac6ea5d63b1db2",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.InterviewPhenomenologySuite.xml",
+      "sha256": "5b7ef963aafed319e83ef2306cafb87953f517db23db9585e0c4a6bc61e9f4c1",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.ResolutionSuite.xml",
+      "sha256": "57abb9e429f1b8c5d7de28c3b6eefb4fb3eb8f707dd281d9979a48e13790a5f1",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.InterviewSuite.xml",
+      "sha256": "3060c51b5b9d312ee71ee0d90d44fe6f6abe94fccf0218e0acef7c1260cdd76d",
+      "tests": 36,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.InterviewInductionSuite.xml",
+      "sha256": "1e2f2e2d78655f0a495bc6561810e066c80f97401496e2fa53590053792aed4b",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.InterviewProfileSuite.xml",
+      "sha256": "62466228bd3d7b552faebf07b2ec0aed59df953cefc2349b386a36a3d1a8cd5c",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.AmbiguousPlacementSuite.xml",
+      "sha256": "3f6938aa6eb7cb08fd171625ed7119b28822adb1d08785165fd284877f15cf4c",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.interview.scoring.PlacementProducerSuite.xml",
+      "sha256": "3b56d68b4feee96a872deb56b7856ba449212e49b56793a06b7e81cee31e8e26",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "interview/.native/target/test-reports/TEST-storymodel4s.probes.PlacementResolutionRemedySuite.xml",
+      "sha256": "97df0decd020f57319fe9d90a31492834c0f630e603be5371ac8cb5b40c0079d",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.InteropLossSuite.xml",
+      "sha256": "4dcdf31fba595a94aba23c5120d0609dced79ea7116a0cdaf443cb92a72ef788",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.ZZStressProbe.xml",
+      "sha256": "01427b4c03f420f7bfce65a143281d7aba69b4ce62bfc389acf85178d9e2e318",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.CanonicalFormSuite.xml",
+      "sha256": "0f8986c95f5232d767c6736c46f7935cef883f90e653a278064fcb0c9ca030fc",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.InteropSuite.xml",
+      "sha256": "9a46baa9a4faf755eca35a47a6e42b6537436a540307013437527158b3a99351",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.probes.AmrGraphUnforgeableSuite.xml",
+      "sha256": "7184651718bc30444df498e40d37197a5cc028f72167d2998e67b5bf4056e514",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.GraphSuite.xml",
+      "sha256": "f474a4c5d117f860c2f7fad41856f59ad7dce083d4b1992b515c84cae78d2a24",
+      "tests": 25,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.ParserTotalitySuite.xml",
+      "sha256": "9632e31220aabd2fb884e757bd7c2100ee6429153f284ec9849046e694b2084c",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.jvm/target/test-reports/TEST-storymodel4s.amr.PenmanSuite.xml",
+      "sha256": "2f9e53373e02bfee4a672392dc556cbfd783325100559dbc29f825376a457be3",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.InteropLossSuite.xml",
+      "sha256": "af8f271d00e598e5f16f1e15baca7c199d323b0e7ed607dbb484b33bda81a411",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.ZZStressProbe.xml",
+      "sha256": "f4dd227009f61fc758f21751b72bc06ef700e5d42b0fac618c39f036dca62f21",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.CanonicalFormSuite.xml",
+      "sha256": "37a427f3b40826d55da17ab45e66a9ee8f742d11f387501fe30f1fee36f58ddc",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.InteropSuite.xml",
+      "sha256": "2219d2b82336f341d60945da17e3d1d4a104680da2d97adca34254469618ddba",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.probes.AmrGraphUnforgeableSuite.xml",
+      "sha256": "a7ebcb77cd926c05e3087cbc75ae45805a660187a7ec9baaba09b8ace273acf8",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.GraphSuite.xml",
+      "sha256": "64c4e686ac31b8425dfcc903f1827483fe86aa7ddf8df8d0348c6eaabe3f3fde",
+      "tests": 25,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.ParserTotalitySuite.xml",
+      "sha256": "54ef50bb472598f50c0fa06f7d55b2e71f74200b0efeeb99b84855c2173ba245",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.js/target/test-reports/TEST-storymodel4s.amr.PenmanSuite.xml",
+      "sha256": "45de62b48355671af8fc488268ed6008213a603af3be5dd8f09e3cd2cff85e71",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.InteropLossSuite.xml",
+      "sha256": "052a5a626a09ccfe6f725f87fa73e1e698ffd562bcb96affac039c67c0c0a011",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.ZZStressProbe.xml",
+      "sha256": "24a059d76c142670151e7309528338ce4fce32b8796de7177ecb1d2278b4911c",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.CanonicalFormSuite.xml",
+      "sha256": "633d72f8008da718c27c68fda951812660e5ae186bdd710e1927d64501d8faca",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.InteropSuite.xml",
+      "sha256": "260268596f6fd6a7da736ddc1f47b5c9aa22b149b614910231dffbdff34d64dc",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.probes.AmrGraphUnforgeableSuite.xml",
+      "sha256": "9623a3c2d2b0d1b05d55766af25895662f6c674744fb3a6180eb35d481e6e349",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.GraphSuite.xml",
+      "sha256": "99109855811e6dec61b3a82ab4757b5c2bd21847f675b644dd539fd6f3d62698",
+      "tests": 25,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.ParserTotalitySuite.xml",
+      "sha256": "35c2414437f2f0d2102909715a3be351ab08f52f4ecc92672a13b570546fa145",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "amr-interop/.native/target/test-reports/TEST-storymodel4s.amr.PenmanSuite.xml",
+      "sha256": "264da716aa859eda9530bfc9f4d9bd1d67bfa47e7d79e2e362ae79fdc1b216ad",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SupportProducerBoundarySuite.xml",
+      "sha256": "b3bb08bc2f25836c3e5e79a9c84ed7c6811e846c4b5b184cbb702cd5df9c9d00",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.LayerUseSuite.xml",
+      "sha256": "943f2d08e7fd88868099d551375993393c0a756007f05f97a7e14558f03f50c3",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.WireSuite.xml",
+      "sha256": "1979ec46bd50ccc4bf03fbfe614b32b5cc854c71bf457a3292d682882b96336f",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.AnnaFixtureSuite.xml",
+      "sha256": "c1e65065c62feac4a1f659b997e623611a8c0f2a2bea045044a84ada8e931359",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.TransitionFeaturesSuite.xml",
+      "sha256": "cf821b681101ec351ca487e653292d4ed9e031c86d6469ec4feb65ee452dad84",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.MappingOutcomeSuite.xml",
+      "sha256": "36cb6b56d94b1618a08e1c78915893c89377c03cc6c787b7517cd17cffc0411f",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.consumer.AlignBoundarySuite.xml",
+      "sha256": "94f436a9e560f4bc2998238eafe0e8dd144c90c5f1503781d4f70ce85ed2e02d",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.attack.MappingMeasuresPackageAttackSuite.xml",
+      "sha256": "f02ca958b405f2ed2845eb63db78f7a19d78467906dad4da1f7dfbafecc9ba0c",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SupportAssessmentSuite.xml",
+      "sha256": "c81f3ef9d87a3199f7406c38c58b28c462a1728c4c875c16a264ffc5abdc25fb",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.MappingVocabularySuite.xml",
+      "sha256": "9b1a13cee552c2868b00699522f4595773ed742fa2890c60b6f5439df21fce8a",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SourceRepresentationSnapshotSuite.xml",
+      "sha256": "b0e6ee63a779945b45ebb4699d9afdcbaab36028077cf3e45a4aae5715845a94",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.FeaturesIntegrationSuite.xml",
+      "sha256": "3b34ea36463b3f0c85dd9418348dc372346ef299b895a01722329486d40f791d",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SensoryAbsenceSuite.xml",
+      "sha256": "80c46775ae240cc4ab10113f647e5143ab13842e371df582fc5a2a987cd9aa14",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.MappingResultSuite.xml",
+      "sha256": "c8c39c5755b3989e0aa7b53e4f029b820c2598f817219148991bee6d60d256b0",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.DirectedCausalSuite.xml",
+      "sha256": "6c5ba9a9fb6e0db11079e2b3d8f715170c6889661a16e3e87f8f352048450f36",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.EvidenceSuite.xml",
+      "sha256": "92ad4eb869691950b14898f6d4c91644842654b073fe677d8bdc9af345d9d881",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.StructuralReductionSuite.xml",
+      "sha256": "e93bf84b25df5ccb6ded18b8dad2b46b5240d4c91e98730a7685a1162d3cf943",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.MappingOutcomeUnforgeableSuite.xml",
+      "sha256": "80d00e3d0ac93c8468cbdd2d263a7570cc4e38a5b435b273758cb28f07e2d3ed",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.CalibrationSuite.xml",
+      "sha256": "0a74eba8303818f08448f318b452e9a0f73a0aa39625bcdfcd415135a66cb076",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.WorkedExampleSuite.xml",
+      "sha256": "ad37ea042ad88e80f1613f989972e9bff548ec887462b68abaa83d132a236aeb",
+      "tests": 24,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.MappingVocabularyUnforgeableSuite.xml",
+      "sha256": "f0a03d0503014fa8e628e1e4c27143c35a342b97eef9a0f749532ddb7852595d",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.D1bScoringPositionSuite.xml",
+      "sha256": "0fb5a60cc413f0fcb3bf51073431a4b78d3df6b4881981be455c70c94a7cd54f",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.SupportAssessmentUnforgeableSuite.xml",
+      "sha256": "5db39b70770c23bc1424d817c6eb7d9fe952cda59f9f0a5684276e1f825f1f4c",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.attack.MappingOutcomePackageAttackSuite.xml",
+      "sha256": "7c72a91db713eaf507985686fa51cb09cf9cc5d594db454cc7475b7b33cc0923",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SinkhornSuite.xml",
+      "sha256": "5295297438a124853fa425a7adc6340dc2dbed9980527fcc08050b4d891a9a82",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.CellCoordinatesUnforgeableSuite.xml",
+      "sha256": "4c29ac33cfb4a85f22e151118119eada9a147a926065b3b0bf76f1bfc06eb158",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.probes.D1bResultBoundarySuite.xml",
+      "sha256": "b6cb56045ada9c4d3e83995347ea3cf49c7619c076800efd8af9ceb77af00a4c",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.TraceSuite.xml",
+      "sha256": "b4d658592f2dfe4d551f6e228312e176e584fca5b4967bb8c20cf491b16d51ed",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.MappingMeasuresUnforgeableSuite.xml",
+      "sha256": "60a5d7d626019d1e99716206a3d55d72a139547e9d9aad60ff8a577dea9d07b0",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.PopulationSuite.xml",
+      "sha256": "59d622845eafcf1704bd2df0941b6666a88892330666c4487170d71752a0fca0",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.MappingPresenceSuite.xml",
+      "sha256": "85750a242ea759fedad68ab038677308f80c1c7ee0f596996ddc9e43351d6468",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.PropositionalScopeSuite.xml",
+      "sha256": "ab4bddfc375f93e8854f9ab321638a2d3d6dbea33adbd8c97f124dbb1c308b28",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.MappingHistoricalSuite.xml",
+      "sha256": "6ebdaa2e1b35be4186682a0b68afc43dc9f823d5c01102b610d53936b2ce3499",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SignatureSuite.xml",
+      "sha256": "1ab79ea13a398de5040f41b08bf75f102f291b3aea432e2b23331e64438488e4",
+      "tests": 36,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.CostSuite.xml",
+      "sha256": "7dfd8c17dd684de2eb016104c352086daeb9fe88d850ff5aab6aeebc1e0d6927",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.SourceRepresentationUnforgeableSuite.xml",
+      "sha256": "45f9b09b94c4bb4e2f6d8e3542a0cd39b84d5d7fbae1d89284c06060a77f8e47",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.MappingMeasuresSuite.xml",
+      "sha256": "04f8f8e3b51304755127d8a925519102dfc7834bdc048136f3cd589f2da01520",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.attack.MappingResultPackageAttackSuite.xml",
+      "sha256": "1fa25940717c95a2592e9dfa11d22e22c1baafe84f64825ff52f60d4709e2fcb",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.SourceRepresentationSuite.xml",
+      "sha256": "7bcf3508217e9e107a2717ece1b21d9ce33057dbaacc769feab2ded682e78cd0",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.StructuralChannelUnforgeableSuite.xml",
+      "sha256": "6926652b17a10588833e687092c9c7481d5bf34125ecaf3e87c5b2826b9a4afe",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.PropertySuite.xml",
+      "sha256": "3e31b7b70cbb8060090a66bef71c8d2aff63dc49d2f18e86d51e010dd6ef7d1c",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.GateProofSuite.xml",
+      "sha256": "5e86f1bfce298bf0b688ff3103ec6922794b842afcc93d9b9189c2fad3e5e51f",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.RefSuite.xml",
+      "sha256": "6786aeab255a3829bfb64355a783687ec91249acfb03683f89d7d574f9386cbe",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.TemporalSupportSuite.xml",
+      "sha256": "bd22ef24e48109a47cd3ddac29ac1a4e68b002d90c9fb0b7f23b8ba86fa6f167",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.D1aStorySourceBoundarySuite.xml",
+      "sha256": "de7739584d77706ca8f015326a2462538fdc4f6c38800a503b57815c6312066a",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.probes.MappingResultUnforgeableSuite.xml",
+      "sha256": "fea8d51cbf228cf2b22c3cd3839b770c0842347855dea926d69ad978c28c5fee",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.consumer.PopulationBoundarySuite.xml",
+      "sha256": "af580d04322cf6695a23ac75df9fd8a21fdd68033045233557525f8bab904f84",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.attack.SourceRepresentationPackageAttackSuite.xml",
+      "sha256": "e5d7a92b2e12c8e348865735ca6a3fb1fa897259604d745c5f4d0874b49b2118",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.jvm/target/test-reports/TEST-storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.xml",
+      "sha256": "e63f9eb6d72f929ec83ffed2052a64497d0edd9a66bc6b219bc12211598ec76e",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SupportProducerBoundarySuite.xml",
+      "sha256": "8677d4e60c89ff0aeb0245093ce5cf559679b3b09579427920072ea3578340ef",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.LayerUseSuite.xml",
+      "sha256": "1de608bc3fb27c837665ce82348b6baf997de97b3a6dee0d767f8c6613460f5a",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.WireSuite.xml",
+      "sha256": "57e491edb30d392a58aece56886dc9866e5fc624d535a24bbf8978185e47d957",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.AnnaFixtureSuite.xml",
+      "sha256": "746ae8fcae83986b511feb720514fe6143e3f8b2c3c4210ada4fbfdb38fefaf3",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.TransitionFeaturesSuite.xml",
+      "sha256": "f84a23ee0ade6b55cabee58b76b866c8c9cb9b41930215e94fbc2c9e9abd35bd",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.MappingOutcomeSuite.xml",
+      "sha256": "6e406ed8be424608c4ead30e563de0823509b16c370b9dae30a454117e7cb837",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.consumer.AlignBoundarySuite.xml",
+      "sha256": "87548b2770a0eb71d05de638411bd0433177e0af5cd5639459d99255e53fae3b",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.attack.MappingMeasuresPackageAttackSuite.xml",
+      "sha256": "fc5cf54819e8d178d66547c7b0d05c4836714c4d26a431a41883169cd39e4db4",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SupportAssessmentSuite.xml",
+      "sha256": "3872cbd37ae1ca6e2e2caae3395039e9bf335285a9e38b4e08f878182e835951",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.MappingVocabularySuite.xml",
+      "sha256": "04107faa14495cf3fcd458dfd40d14b2cae25a85f3d4565383e345bd4c48eeaa",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SourceRepresentationSnapshotSuite.xml",
+      "sha256": "e998f57f10dd91f18b02f3f3e2a4bdccd0d196133e9b52939fbd8f82397f2ce0",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.FeaturesIntegrationSuite.xml",
+      "sha256": "8093c8c67f2b78bff94b0c555cc08c74b33bb1280264d2d9a8a24389d550d37a",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SensoryAbsenceSuite.xml",
+      "sha256": "57065e3295de29720673ffa0a5d8ac35e0eaca8379f654b3fdd6adb00c63ae32",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.MappingResultSuite.xml",
+      "sha256": "6513652a5f7320944b4e17a9dc72af7c1ec2e1d38394c4a70146630b1cf99656",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.DirectedCausalSuite.xml",
+      "sha256": "31feabf4a6dca727db51b71b4be5f6bbe4a5d40751e6e325fc347f555a82ad0d",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.EvidenceSuite.xml",
+      "sha256": "490e6047d1770672afbddd98a02bfdb1636ff1b57e73a279f75393865cfdb52f",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.StructuralReductionSuite.xml",
+      "sha256": "99c2f211d5650cdd0e775c5020c89ce1695dfa60b5c354673dc649f6936320d9",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.MappingOutcomeUnforgeableSuite.xml",
+      "sha256": "45e63c526bd565a8c60c4236c4099b890ded89b4d3d9b6669c1f056a248cee83",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.CalibrationSuite.xml",
+      "sha256": "c86fcc73178fbb40eba9370b6db0b8b2bdf72e8bf29315ad8be12f77cb8b3600",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.WorkedExampleSuite.xml",
+      "sha256": "d18cb4cc2612d0d192c60db4437aaa85fdf37d82b0f3afe21167cb3f2dc9e6c6",
+      "tests": 24,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.MappingVocabularyUnforgeableSuite.xml",
+      "sha256": "5b270013dca60b3440637590b864eaaae50f54838dd3d5ec9c7126a5cfcc7f10",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.D1bScoringPositionSuite.xml",
+      "sha256": "e9eca05c1b28684da6e3b4977a9b9fa45a9dd1dfba9251e3f1d9898307e60e7a",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.SupportAssessmentUnforgeableSuite.xml",
+      "sha256": "eeaff01ec22d32fd56109b78df7e755fc8944f7f73374dbe38088a80725b4709",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.attack.MappingOutcomePackageAttackSuite.xml",
+      "sha256": "8b7b7de82970760ab3baf467f6b527422bfd9bfa9da6636c40ecb2542ef9c901",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SinkhornSuite.xml",
+      "sha256": "45c519187596e2152a440a24e99e4a7f37f302453ec3146bf79c19255268c04d",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.CellCoordinatesUnforgeableSuite.xml",
+      "sha256": "5805f44b3c3d89ab1ad097cf2d336ac1e3dbd9dc3e497b7ac9b8e853ff4c629e",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.probes.D1bResultBoundarySuite.xml",
+      "sha256": "0f2cf6f5915142f03877b98d7146cf4a9ef59317be8a04a2c260b3ab6199524e",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.TraceSuite.xml",
+      "sha256": "d9f5cde6164f2a51df0a981e1b254497c940304faf59b56d5c5c63beb8c6558a",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.MappingMeasuresUnforgeableSuite.xml",
+      "sha256": "39e548e39340128d3df83018db3c53738f44be2509864822677ddf0341cda0e7",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.PopulationSuite.xml",
+      "sha256": "4960ec92d57cbf690ded1fae05483a6893dadafa3dd5ba6c9d1a50b75a6a51a1",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.MappingPresenceSuite.xml",
+      "sha256": "c49bacc99bbc56e17ea0b37a916b36516ac8292e873b268706eb718af32105f5",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.PropositionalScopeSuite.xml",
+      "sha256": "03d0ec14b99102e8bac35d2024b2dc7720f127cedad5c4a79e46ee7d8ad27836",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.MappingHistoricalSuite.xml",
+      "sha256": "944672fd09e8d4b216cf528bd72151daaa398fdfb6ca13a7b6c2e4fdf3af200e",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SignatureSuite.xml",
+      "sha256": "cebbe7b02115268eb812c6d92920ee365633131dce26ca84195d7a51d4e6e806",
+      "tests": 36,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.CostSuite.xml",
+      "sha256": "fa13448c60ad50dfadb002881dfa7fd7c7921a833f2ca1eb0934fb73769a96ff",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.SourceRepresentationUnforgeableSuite.xml",
+      "sha256": "1da44a8aea0545e22f49fb9bcd15d64bdc6ec674d72cafd8f29f16bc74759634",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.MappingMeasuresSuite.xml",
+      "sha256": "a3404d05eee34617649f9a1b252733410dcca4020f4d63aed2471c20446ff05d",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.attack.MappingResultPackageAttackSuite.xml",
+      "sha256": "8bb9ee3411e7eea2062cdf31c3ca7759252fa4702ca908f19fc001f40bd6d841",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.SourceRepresentationSuite.xml",
+      "sha256": "f035dc5b47db6d8d4a68234e44e7bc4e4faa45deee9787b22e72bea48dfe9912",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.StructuralChannelUnforgeableSuite.xml",
+      "sha256": "0632a310e01cca21b66ec84aceca3ddf3e0845882451b86e0ce64f37e4c8d665",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.PropertySuite.xml",
+      "sha256": "9e769da012c0bf90666d68cbab957ad95ce31ca38b7c30ead7ca2ca779dc43a8",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.GateProofSuite.xml",
+      "sha256": "b07a5f9a8e08a095d7ec39f6bd8c1c45483f6f04f241285d48a1d966d98fd415",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.RefSuite.xml",
+      "sha256": "85af7608313f0b4b1de9e62b38056b200c13cf8788374588626dc15bc476e518",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.TemporalSupportSuite.xml",
+      "sha256": "ad578b20579002e1f42cb81e0b3d2a372645b807e91c8973254fcdd711c684fc",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.D1aStorySourceBoundarySuite.xml",
+      "sha256": "d3ca7c2f77c794f24b0a86092a84f0038d573f6bec8530f59294f717d7654f0f",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.probes.MappingResultUnforgeableSuite.xml",
+      "sha256": "f9a8614092d469546d707b3e30a1131a2ea900684dff2902cf345acb761f468c",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.consumer.PopulationBoundarySuite.xml",
+      "sha256": "c6c7890944c28fe4934d8b28c4b4e872c3fb1cfb75ac4cbe9c1fa73f79b5c84d",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.attack.SourceRepresentationPackageAttackSuite.xml",
+      "sha256": "424036dc5d7b5c93ef3b2cf76126c8087912fb1e736e0d1dce1a763f08bdb32c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.js/target/test-reports/TEST-storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.xml",
+      "sha256": "d8269fc06f0a4276be50d2e4691b8a5d8ea353ea1ac0b6c293d58377c6661e1a",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SupportProducerBoundarySuite.xml",
+      "sha256": "aad659ede473fe2370a8dcf7c43fa7c0645413c8488d664a7c3d9dabdd5291e8",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.LayerUseSuite.xml",
+      "sha256": "665f211c922a784317d9b04f0637e2909e11acacd39e499918e6704b488be2a9",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.WireSuite.xml",
+      "sha256": "51611dd377cfd84141a56656bbf792986b9c63370e60b340665580623f3ee782",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.AnnaFixtureSuite.xml",
+      "sha256": "095398e8c1bbdff17b2a22d941b386ca3425ed4f918250d9de030546988a74fb",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.TransitionFeaturesSuite.xml",
+      "sha256": "949eafafdb9a64c359fb887f9b6a48b63551b3cb5256de8fffc754581a817237",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.MappingOutcomeSuite.xml",
+      "sha256": "f017e04fe121c13ace6209084e4ddff803cb5f59260131fbda0a35f4ae400dbf",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.consumer.AlignBoundarySuite.xml",
+      "sha256": "2dbb84f02dc1216b381fee1b1a54949bbdb0538753254428dc4d23183d8b5eef",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.attack.MappingMeasuresPackageAttackSuite.xml",
+      "sha256": "10dd73b3725500d58d41b1f2872828003d454ae1c6ec4eb4edfca1767641cade",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SupportAssessmentSuite.xml",
+      "sha256": "7f9b7678977482f3e923a7a8d980a4e63d1efc12fac49f1e87784ab0c9e5ae28",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.MappingVocabularySuite.xml",
+      "sha256": "6e2c9c9265a8ae328369993ca3e2bab35efaa4caeb01b85ddc6ca5453c0e4bf2",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SourceRepresentationSnapshotSuite.xml",
+      "sha256": "853053502daf2dce22644dbb068d50ed3af0f5645eb96d36f4e9e1b6b84e3c75",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.FeaturesIntegrationSuite.xml",
+      "sha256": "7ceb047a6bf9037fee5475758a267bef2568a4685a0aace75975482974269645",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SensoryAbsenceSuite.xml",
+      "sha256": "000ab92c151c8dfd5b83dc543392c2ca0380c3e2248966a18a77a9a78425a707",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.MappingResultSuite.xml",
+      "sha256": "014d7fc4f76f7fe73814b40e18d0cf80e4aa258bd87ebee1cee16378c6669c53",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.DirectedCausalSuite.xml",
+      "sha256": "d982b9736fdaaf4ad71a95dc59d92d9a756ee8c34f062894ac483cdc369995ce",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.EvidenceSuite.xml",
+      "sha256": "9f5bee04b2ead5313bc9a28c37b8e8910d65bb60360ebcd5f39c0e1e60ce38a8",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.StructuralReductionSuite.xml",
+      "sha256": "9aedfdb23dc80feecf3836697002481f4a7ddca1e0dbf064acc4eda97f216ab8",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.MappingOutcomeUnforgeableSuite.xml",
+      "sha256": "ded84d7d276b58b5a2d2ac8a11be3abd9c577758f115d61221eabae3b13200cd",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.CalibrationSuite.xml",
+      "sha256": "278b171b9964cf05afad0d1d235e7e313f277661a460b12de95fba4664e6fe99",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.WorkedExampleSuite.xml",
+      "sha256": "c00ae24e6829b246188e5ea8c0b936aee7ba514521eba50e2a1761115b9390c7",
+      "tests": 24,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.MappingVocabularyUnforgeableSuite.xml",
+      "sha256": "0a50773469fdda80f88ee5262fba4e691a62eb0e4dd9cceb4f6378bfcf66423a",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.D1bScoringPositionSuite.xml",
+      "sha256": "6aac44827e8d8ad7d66aaffbe1ace99ae3cdc7b6c700487175e73f3f77e60ee3",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.SupportAssessmentUnforgeableSuite.xml",
+      "sha256": "d52863963b14f8117c0dcbbbf807be577b6adf7a4a6af13cd49501f06b443c13",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.attack.MappingOutcomePackageAttackSuite.xml",
+      "sha256": "69cd1c5e97d6170933d9bbacffa51de967b7fed3f218686715afe2a22a180874",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SinkhornSuite.xml",
+      "sha256": "8a10a3b4dcf26a51e7e289ed9d43752bcc29ac55a0194b3ec343056363255147",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.CellCoordinatesUnforgeableSuite.xml",
+      "sha256": "2bc313e0abfd9578f035990e59b94923f0abe03dfe47abce3e57b55346b56c02",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.probes.D1bResultBoundarySuite.xml",
+      "sha256": "676e309300c3216105336d9999686c9a7ee8f431bb5fa7ebb67d7972a62aaa5d",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.TraceSuite.xml",
+      "sha256": "4469898b4280403f1eba18122e8e43ac43d446b4c4304bfb39fed9f85e6c695d",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.MappingMeasuresUnforgeableSuite.xml",
+      "sha256": "1401a2572d446ed29a7c9a8c94e40c30c58e54a135bd0126e7c18e04280d49c3",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.PopulationSuite.xml",
+      "sha256": "8045640b2b782a4731e857e71968c8a9b6b14b9d0300f4c6ff2cf05d7f66d6d7",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.MappingPresenceSuite.xml",
+      "sha256": "9f221ff973fefdd8a616f3eb0f9ba381a072c587834fd88cc6e09544239ab5f6",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.PropositionalScopeSuite.xml",
+      "sha256": "99fac5b9dd5e9d8d844b5be302f8b44598dc11744018cd728696f776377b604a",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.MappingHistoricalSuite.xml",
+      "sha256": "0e888f55493350e4b1e586b0d20e2bf277ce24b2cce5b420faf41d3ae68338fa",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SignatureSuite.xml",
+      "sha256": "3202366c92a0c562d4f55a15f200a6762e3ca067de1051f45a969fee5fb9f542",
+      "tests": 36,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.CostSuite.xml",
+      "sha256": "0db003d75a671a7536d554de3d85abb65ceef09bafc7561033bb8ebc0d6a75cf",
+      "tests": 19,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.SourceRepresentationUnforgeableSuite.xml",
+      "sha256": "3d428f62ced52084104ea3eb9b51021c439daff3cdb7ea1b4adf70a67c335e39",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.MappingMeasuresSuite.xml",
+      "sha256": "59bbe0f6261baa8e7536cc34f1c32d4f011f1b9b3d755e6a1546ee7083822047",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.attack.MappingResultPackageAttackSuite.xml",
+      "sha256": "aadad2b99c1beb6dc0b1e06bd83f99788d30d4c047754c105c722d4bfbd61b48",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.SourceRepresentationSuite.xml",
+      "sha256": "9fcbd4d2e17b451e57c27d79073e1cf5a6fbf150b996f44e7edf0b88c4d955a3",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.StructuralChannelUnforgeableSuite.xml",
+      "sha256": "f506bd83780a0ecedfe571dfb2bdf7980c5f557d0f43cdf14caccb2d25f2d9a0",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.PropertySuite.xml",
+      "sha256": "5ad0a3d7be32430e72f31c3634e0476e9b57fc40e73c13521c3b47a35a881877",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.GateProofSuite.xml",
+      "sha256": "cd6dda020ea4ed333ca70a1eaa5a5e1e81e852022ed7e994195d94db2534e225",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.RefSuite.xml",
+      "sha256": "bee56b55406ac62f0001cd492b246d3cf872077058860580b203bfe3562a1b3c",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.TemporalSupportSuite.xml",
+      "sha256": "14c5002139e56d51f0782e5577c2c9feac14cd0ad9f6bb8b4fb0c08110afd5e5",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.D1aStorySourceBoundarySuite.xml",
+      "sha256": "01fab8a43864902a661d5f87e8407252d2b92a8d47589aef5b6511c10770eea6",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.probes.MappingResultUnforgeableSuite.xml",
+      "sha256": "8c6a0ea63451ca07b4899d7e1bd904cf88a4edb92aec546417a44e62afb29f71",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.consumer.PopulationBoundarySuite.xml",
+      "sha256": "a3b4b5eefe4e2a383cb06eb911cbcdc50cac1d993b671b5a6795000673a95f58",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.attack.SourceRepresentationPackageAttackSuite.xml",
+      "sha256": "1225c50dcb87ee506b661c01e55dffe16d87c5d9a56aa86050b03db07743f0dc",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "align/.native/target/test-reports/TEST-storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.xml",
+      "sha256": "06e225335150f4042ea49495c0ad9fb91dc587417b76f4cd026452e208c92667",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.recall.SegmenterSuite.xml",
+      "sha256": "dee643d651d8d56dd0c8cdd06e4ecc8a70a1fba5826fbb09b2cdfe71f34bec53",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.recall.RecallTimingSuite.xml",
+      "sha256": "45efbd6b2fc83a04842945ccbec22f18f47c1ed32785a4af278de0725a684c0a",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.recall.attack.RecallTimingBoundarySuite.xml",
+      "sha256": "1fc97dc055e6ada6ea17f57c0798b9b576f2a1035487cec3f9f20deb4e0ac47d",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.recall.GraphSuite.xml",
+      "sha256": "dd80918dc0ecc82d167d81b8dc910a9a7e49e0b550c2dbd353b635a80eedc4a1",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.probes.RecallGraphUnforgeableSuite.xml",
+      "sha256": "c9096db188eaa38929dc7c41588b4adae6374e43209f446698f8383a17d9a80a",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.probes.RecallInventoryUnforgeableSuite.xml",
+      "sha256": "e1e33861affc4d3ec1f409ec51590688ae9ca4966d8255b4eb8abfc0a6765ff2",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.xml",
+      "sha256": "f9ed557a5c9e4d694718add64cacff618ef45e236a713fde1add50ea07abc7f2",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.jvm/target/test-reports/TEST-storymodel4s.recall.RecallInventorySuite.xml",
+      "sha256": "33a84f015894e9530771406c20e14c196c5996e70b41d7738a3d4d8dd9c6bab5",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.recall.SegmenterSuite.xml",
+      "sha256": "1d21569df75bb3a0e4465bdc20e9433f81bbed6a3d46a0f6dfeb94c64510b812",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.recall.RecallTimingSuite.xml",
+      "sha256": "84b812a756c0e2eb2037872689feae4f0b8dfa041bad6c36298760b490d88095",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.recall.attack.RecallTimingBoundarySuite.xml",
+      "sha256": "fb21d2a50772e4a054420ebe5a884f98d403311a87df04bfd14e2e912559b1ea",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.recall.GraphSuite.xml",
+      "sha256": "1ae2e048537e983c6c3d7a87ee172675993957aea42d605628b4a8e27f29beeb",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.probes.RecallGraphUnforgeableSuite.xml",
+      "sha256": "3144e1857bcaf7229418844014b70eb50f35d2d3db6508fb54a59dd8d95e6475",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.probes.RecallInventoryUnforgeableSuite.xml",
+      "sha256": "7e41104d1942a63564e1a5ecf55d5c07ef9d8c9e456e09ca719de18d590bac9b",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.xml",
+      "sha256": "3aad7712cdbd67e92bfbfb1e29bf3f4b112b6c81a45cb0840194e5dde58c84c3",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.js/target/test-reports/TEST-storymodel4s.recall.RecallInventorySuite.xml",
+      "sha256": "fd1c3f21b221208391e606945b83064998851e9fa1ab8a828c7658c9d3235cc5",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.recall.SegmenterSuite.xml",
+      "sha256": "19b96f120f3ca27ec7cdff3a0af92468480cf13d3a0505a779e288929ec60629",
+      "tests": 26,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.recall.RecallTimingSuite.xml",
+      "sha256": "daaef95ead8a9eb485fb612698fea044aaee58c96b175b245811349b76d47884",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.recall.attack.RecallTimingBoundarySuite.xml",
+      "sha256": "dc70bb1dab4f488dd8427f567d519751a1fb4fda584fa62cbb04fdb5481e2f28",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.recall.GraphSuite.xml",
+      "sha256": "fc0b4fbe5e87f0d864ae62da0350a368598226b45f920b95ff7426b82189daaa",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.probes.RecallGraphUnforgeableSuite.xml",
+      "sha256": "52076446aac893fb5bba56b43cdf095bab767e9aa8a21227047f40a0e926365c",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.probes.RecallInventoryUnforgeableSuite.xml",
+      "sha256": "626604830baf52a8e3786412d4245f58108fb18123c22fe803f0b72469f0731a",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.xml",
+      "sha256": "92b6eb9d33c72be17425c0adcdd94defcd9b8a0e2aea97f731a11dd9cead2b1c",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "recall/.native/target/test-reports/TEST-storymodel4s.recall.RecallInventorySuite.xml",
+      "sha256": "0321ae33be1452cc848198d217e34901cffd9b6342fb2736c9bc9562afd6c4ce",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.OpenAiExchangeSuite.xml",
+      "sha256": "9befdb7735356e9d4d2d6fa6a162cc300f70c83bacc2609b74f7503bef60e0a5",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.RecordedReplaySuite.xml",
+      "sha256": "b9de14c324a6731ab2167dcd7286343c329ea9a12fa10e46b0f068e351947af9",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.LiveSmokeSuite.xml",
+      "sha256": "6779885dab9b3dc4d2604b0143073276929ff8fb41252975d5c8a0c5de941248",
+      "tests": 1,
+      "skipped": 1
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.RecordingsSuite.xml",
+      "sha256": "7cec691cececec16dd3f58ccf9f521f04fb0a3fefa7a2092871a6ab271cd6af0",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.EnvelopeSuite.xml",
+      "sha256": "0f827ad9c8752570ac91e861218683f86225096a2c97ef3702db913d51f65906",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.CredentialsSuite.xml",
+      "sha256": "d38b175912dbe89e41db1de60ca32686bc3ce9dc3cdeb94f9845aa02537e1b05",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "provider-agent/target/test-reports/TEST-storymodel4s.provider.agent.MutationSuite.xml",
+      "sha256": "f81ec18ffcd22e4726cebf3af5ad4b30bf50c845a7ccb164a96f48f13039cea3",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.DocRefSuite.xml",
+      "sha256": "29aca0910ea0e69a051a18001e0ec820112f02eeee987636f341a36df9753bcf",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.MentionFormSuite.xml",
+      "sha256": "be42c0c01ebf363cc7b2501a9541f1c42726b4139516514e3ab94de6b4a2b91e",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.documentprobe.ConstructionBoundarySuite.xml",
+      "sha256": "aa5102b9f5ec0d49d1e240f1fb35a096187d1142b6062651a41a7bf2f460e5ed",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.ChartProposalProviderSuite.xml",
+      "sha256": "c613d81ce10a87d4e91fc29caa5ba3624e1f71ca4903d72b0e778fcba9a76026",
+      "tests": 33,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.ParticipantCalibrationSuite.xml",
+      "sha256": "c4dae11b0907bd8b8ad59fc52c83c073dbdb0a6b02a759de9eee247cffd5720e",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.CompilerSuite.xml",
+      "sha256": "ccf9abe0ff02badaedb8b5c93374cd8b0342e76bfc55051d20260c710ac90049",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.ReferentialitySuite.xml",
+      "sha256": "310a9935c0c9c63035e5b16ae54d27b9f5a546c8d8fa0a13261a60f096833e86",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.DocumentSuite.xml",
+      "sha256": "83a7b34362afbd1919cce7b2b2a7aa4b3ff06586afb4438af9f0030c9d0bb3a3",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.TrajectoryCompilerSuite.xml",
+      "sha256": "1fb329a611b605ebd40a50cb2371b8c8c7af2090331ce845d3518c8665087f3f",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.EntityIdentitySuite.xml",
+      "sha256": "291f8499f811744b02aed67af45932ade161dfeb9baa2d0226602dd2d03df354",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.ContextPlacementSuite.xml",
+      "sha256": "0692e09dfcdb235d3aa9094d8cbe10b5b23910f6f60310f0ec072947520ede21",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.documentprobe.CalibrationBoundarySuite.xml",
+      "sha256": "ca9d9ef2f75e70eaeaf1d2e3a20f1f9ddae291a848512554d4fda6b8a34bd7fe",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.CoordinatedRootSuite.xml",
+      "sha256": "f09cd6b91ebe9d77340dcab506520835c4271224c21004981bcb91fbca376fac",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "document/.jvm/target/test-reports/TEST-storymodel4s.document.ChartProposalStaticCourtSuite.xml",
+      "sha256": "ea715f1878db315b07a50b87151e0a5fac3a40f9ceb1ae4bc3869553dbc1159a",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.DocRefSuite.xml",
+      "sha256": "8c6a6be177d37d02f7698ae4975ccae25005c1af53ecd908cc761e09aa70eec7",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.MentionFormSuite.xml",
+      "sha256": "7d29c6c635b4065f6da657426c4144053d35fea71e601b7c017a75cd23f37db8",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.documentprobe.ConstructionBoundarySuite.xml",
+      "sha256": "5846cb3cc4edd6b996cd004985316f64d35246809f8d76ddc2788b3cc7381879",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.ChartProposalProviderSuite.xml",
+      "sha256": "72e83daae7f3e88ca4530702acab7fd9849296393f9742d2991b6d661b32049c",
+      "tests": 33,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.ParticipantCalibrationSuite.xml",
+      "sha256": "d9dbbdf0ebdbd9c7158d5af9c57d36fff57af0df442c687e84fe991eb81173dc",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.CompilerSuite.xml",
+      "sha256": "365bc6bee1f93357d19a76bc871dad6474df3ba2e2f519f51afbdb8bac7a7071",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.ReferentialitySuite.xml",
+      "sha256": "5f208e00fe8f95aa0ae336a4af5199affc801d3e4561ee711b8494961534dbbc",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.DocumentSuite.xml",
+      "sha256": "0b302180e375708c7ba7456aa5d681f1eb1f2adc12538d650faee6fff0f352ab",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.TrajectoryCompilerSuite.xml",
+      "sha256": "cb4610edfd9fb89e21ea613b117c1e0a13c047ca3d5bdcd50a3877b48ef1020b",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.EntityIdentitySuite.xml",
+      "sha256": "55811b42fa9272cf8f085e12bfda04d764884deb626918d14a899527c3e7956c",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.ContextPlacementSuite.xml",
+      "sha256": "20a95534ae7f42d4f080f8d8ec695f4ebadc7b846b3b0565dcd23b5fa1fb98e6",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.documentprobe.CalibrationBoundarySuite.xml",
+      "sha256": "117de4e5dbae3ba7d2a37fdc48d2a97e9119bc3e5dc94bfdce07ae46defeec13",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "document/.js/target/test-reports/TEST-storymodel4s.document.CoordinatedRootSuite.xml",
+      "sha256": "b81fe5c9bd697b6993f3387ef07a2c1b0e181cf78b9b8e387aa44d42a365f8ab",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.DocRefSuite.xml",
+      "sha256": "3881d2fa3d65b185bc17aee62d41e5358ff4c980601f553e9ff35b0c2dd5a35a",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.MentionFormSuite.xml",
+      "sha256": "695fbb2a2741c8fd9ad8e711888e7a5d0350eebddd1b457897ccd10886b20246",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.documentprobe.ConstructionBoundarySuite.xml",
+      "sha256": "3b6e87e83573ea281e4cb627c4c028e68bec886463c0786b0005391731681ab9",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.ChartProposalProviderSuite.xml",
+      "sha256": "a6a983b24343024713ab7a096e7105ee296db0fb5ce0f663d0b24e1e9db1369a",
+      "tests": 33,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.ParticipantCalibrationSuite.xml",
+      "sha256": "fb0ebe703e80123f59dd8e52cd13594cb4b86661d15c9bd5d4b53d7dc38c4118",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.CompilerSuite.xml",
+      "sha256": "baabe38cad88a363c3113270eafede9aea5773a01698665497ce5aa9627fcdcb",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.ReferentialitySuite.xml",
+      "sha256": "4743b4b3162c3a8106c74f10126ac0438587cd8b7de0dd8f9c1dde736faca700",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.DocumentSuite.xml",
+      "sha256": "3030f8cc05dbeb6770696334d8fb70c8e41e27a357d6c67ef3b05848459aa670",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.TrajectoryCompilerSuite.xml",
+      "sha256": "dd83809d37fe4a6fda1c975074e0c1e27d8c79f7c19cee88d633107e23590c27",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.EntityIdentitySuite.xml",
+      "sha256": "a1671a54129687d05be4d10e5b58ad2b30869ef6da528c54be4927f5cfc09e59",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.ContextPlacementSuite.xml",
+      "sha256": "b8dc7d1779ab2046e9f8f715b9bf750d934413aa34b83aaaae51b93f48a58e76",
+      "tests": 18,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.documentprobe.CalibrationBoundarySuite.xml",
+      "sha256": "699e4d21f86cff6c45142dce8695807bb067eb7f3f767e12106f34ab140158eb",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "document/.native/target/test-reports/TEST-storymodel4s.document.CoordinatedRootSuite.xml",
+      "sha256": "33cef411a79ceb24e1c5f63eedb967665b4f523afa7e66adefa4e5dc388d2b68",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "embed-grakern/target/test-reports/TEST-storymodel4s.embed.grakern.DistanceSuite.xml",
+      "sha256": "0ea0cbc5eb0cdf1e2c0330cd5527b53f7b869f5fa0e1b521e6883eba6b09c1b4",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "embed-grakern/target/test-reports/TEST-storymodel4s.embed.grakern.IntegrationSuite.xml",
+      "sha256": "6e081495285a1d569703db838c109e039e057da411b3b779537ceca7d0ad3315",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "embed-grakern/target/test-reports/TEST-storymodel4s.grakernprobe.StructuralProgramBoundarySuite.xml",
+      "sha256": "5679afaaa8dc4fde7f8a214194889685bdfd333acca6089690032f33904ca423",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "embed-grakern/target/test-reports/TEST-storymodel4s.embed.grakern.PinnedApiSuite.xml",
+      "sha256": "51346eaedf6424f2387aaa9748075c5b3e477e80cd26fe057b2d17f787892e38",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "embed-grakern/target/test-reports/TEST-storymodel4s.embed.grakern.ReificationSuite.xml",
+      "sha256": "7511113351abb48e95e133414e09dfcbfefc5b3b622844761de180339e0fd9ee",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "features/.jvm/target/test-reports/TEST-storymodel4s.features.WindowSuite.xml",
+      "sha256": "93463f515a7af39daa828b354a2ae6c0181bff66cf36a1e6d8d7c892cdd14991",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "path": "features/.jvm/target/test-reports/TEST-storymodel4s.features.MeasureSuite.xml",
+      "sha256": "8fd1ac11b628a4262cf2b7806e410f4435f5e33a667ec50aabf0928ae70e6662",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "features/.jvm/target/test-reports/TEST-storymodel4s.features.StructureSuite.xml",
+      "sha256": "14e62489cf97b6b4fcac38af66dddd8b0808520fc324292e300e308e08e59580",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "features/.jvm/target/test-reports/TEST-storymodel4s.featuresprobe.ConstructionBoundarySuite.xml",
+      "sha256": "96218572343ca542e99e2e46edfe82527f92ad4055bd73e9b0e3d0a3023fa3fc",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "features/.jvm/target/test-reports/TEST-storymodel4s.featuresprobe.CoverageBoundarySuite.xml",
+      "sha256": "1f05f9626976e6c7c144fb11f27fea928373010b50ded54707844acf6c36f95b",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "features/.js/target/test-reports/TEST-storymodel4s.features.WindowSuite.xml",
+      "sha256": "bb257052aec30f43517876f43cf9db1ef8fccc208222571c406d6491df7f8394",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "path": "features/.js/target/test-reports/TEST-storymodel4s.features.MeasureSuite.xml",
+      "sha256": "6673f15b9de537dbf586e7153cc09bc4ad201e4080c6d665da4c5cf1b328f5ad",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "features/.js/target/test-reports/TEST-storymodel4s.features.StructureSuite.xml",
+      "sha256": "f923b2359dd96bbbd5eb7f95f68173368c07d1422527eab65351eaa02fd7f9db",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "features/.js/target/test-reports/TEST-storymodel4s.featuresprobe.ConstructionBoundarySuite.xml",
+      "sha256": "0083ba035cc9daa16c284006e39c7561ab2e6e07477b0e9dfe82c0b82d4740b0",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "features/.js/target/test-reports/TEST-storymodel4s.featuresprobe.CoverageBoundarySuite.xml",
+      "sha256": "3eec70baeb2dfd5f2fc7c0fa77dccdf01708f2666d5ecaad40a3a9b49ca90da9",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "features/.native/target/test-reports/TEST-storymodel4s.features.WindowSuite.xml",
+      "sha256": "c796fca41729cbfffa9dbb3fa842ab568fbf313e5fccb64208a086ee5796a7ee",
+      "tests": 30,
+      "skipped": 0
+    },
+    {
+      "path": "features/.native/target/test-reports/TEST-storymodel4s.features.MeasureSuite.xml",
+      "sha256": "6673f15b9de537dbf586e7153cc09bc4ad201e4080c6d665da4c5cf1b328f5ad",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "features/.native/target/test-reports/TEST-storymodel4s.features.StructureSuite.xml",
+      "sha256": "987ae02707ff48072aab51cdf5b46f389e49a9f391a48153ba204257cb676ca4",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "features/.native/target/test-reports/TEST-storymodel4s.featuresprobe.ConstructionBoundarySuite.xml",
+      "sha256": "4dfa0f6bb5d4296cc979a01955be62ae93e971467cfce607d0ab610668e71a76",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "features/.native/target/test-reports/TEST-storymodel4s.featuresprobe.CoverageBoundarySuite.xml",
+      "sha256": "3eec70baeb2dfd5f2fc7c0fa77dccdf01708f2666d5ecaad40a3a9b49ca90da9",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.jvm/target/test-reports/TEST-storymodel4s.laws.SourceLawsSuite.xml",
+      "sha256": "ef9e2523f76b66f4ede48ca2ab1ab9eaaf503a6606bfd3bc7fb09b09dbcb4372",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.jvm/target/test-reports/TEST-storymodel4s.laws.LawsSuite.xml",
+      "sha256": "972ff45381e6c36dd8f02c0a0fb537897562a3701c32785cc26179b48a63818e",
+      "tests": 87,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.jvm/target/test-reports/TEST-storymodel4s.laws.MappingContractSuite.xml",
+      "sha256": "3f283107f74dd0079bddf60821c874f232a889180e940678bc99a0fe254439ea",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.js/target/test-reports/TEST-storymodel4s.laws.SourceLawsSuite.xml",
+      "sha256": "16695acbc2d8af6de321cad9f737871acb44b766bedd42524f063f4611fd7bce",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.js/target/test-reports/TEST-storymodel4s.laws.LawsSuite.xml",
+      "sha256": "d475525982e97cb9f8d4e7553913ffab2fdef88b37e09042baf6bee175f17311",
+      "tests": 87,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.js/target/test-reports/TEST-storymodel4s.laws.MappingContractSuite.xml",
+      "sha256": "7b0709d2aacdc7f52a89aaf40cd041591a939e45174d8eaf59935724cdc3db83",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.native/target/test-reports/TEST-storymodel4s.laws.SourceLawsSuite.xml",
+      "sha256": "12388dffa258a8907588483c960924a955194ff0da16a920baaa2a8e33933cc2",
+      "tests": 17,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.native/target/test-reports/TEST-storymodel4s.laws.LawsSuite.xml",
+      "sha256": "7d7ed3504937ba9e67e1b6ed74c8b394eb89564c8d27e9a6dc731e0997bea60c",
+      "tests": 87,
+      "skipped": 0
+    },
+    {
+      "path": "laws/.native/target/test-reports/TEST-storymodel4s.laws.MappingContractSuite.xml",
+      "sha256": "b1a222cadb08d82f2be15139365b8e4d14c94d84c0826e0756e818babff9ff71",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.StoryModelCodecSuite.xml",
+      "sha256": "53708be977b1dff7430d5bb59aa16519e6efcbca9b197e39ddec4c6693658b26",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.D1aGapWireSuite.xml",
+      "sha256": "c7edb544a03a3fdab0a8b0592460c720c2c42a0520817c32a16e9b8fe3481b59",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.CodecSuite.xml",
+      "sha256": "c312b395c49bbccb98aeb3a02362593459ba3ff18565d91ae3942a8c3c2b2ea9",
+      "tests": 72,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.SidecarSuite.xml",
+      "sha256": "54f5a33cb3f992aa7ecd292c902a8b84aacf7fef9bfdf5311accff40fc72609c",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.MappingMiniatureDigestSuite.xml",
+      "sha256": "31e6872b9a81b007ce8138e70020e076c14fdddb8030000e8a919f6646f061b4",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.SurfaceAtlasArtifactCodecSuite.xml",
+      "sha256": "0cd04690928c19b2bef7e96a2001221f3c268eb89e1cd3917bb11fd405820cec",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.RecallTimingCodecSuite.xml",
+      "sha256": "f897a7ce4669256ef548dbbf0859035fee2e8fe98d756e3b87f888fdee25d55c",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.MappingCodecDigestSuite.xml",
+      "sha256": "4cd2d0ed71f7cbf1627be06a60dd88b628917bdf0ad8cec9b1798fef4dfcbcf7",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.D1aTypedSupportCodecSuite.xml",
+      "sha256": "eda9dc8a9aab85f0734d8a4942ce4cb5e8ce0dcdff343203bc4a921f8d79bfdd",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.FeatureMaterializerSuite.xml",
+      "sha256": "6696ff1b170736bd358c533043b5d2160748b0fd846abfec3dbb0b1925c114a7",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.OutputCodecSuite.xml",
+      "sha256": "2cddd4039d64df845c74fe5278471f4649f7e3acb27db4025bb43f3ed1f064c5",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.probes.D1aCodecWitnessSuite.xml",
+      "sha256": "e37ab02d6eae5a1f2d9ee1fbd5086a8a780452c81171d13e363959c410cd8d92",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite.xml",
+      "sha256": "47610415484e7cdc264bc2d202bc4339a191b3e400f5050a045be8ef24396eb8",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codecprobe.ConstructionProbeSuite.xml",
+      "sha256": "e21f775212dd2863304b1b18df8a3ac44c12810cc762c6577cd40032b62e87c9",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.DerivationRecordCodecSuite.xml",
+      "sha256": "90db5b3579499fca4eb004ede9ed43456c60e9432acaa0bc8b1704810c718d5f",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.VoyageCodecSuite.xml",
+      "sha256": "d4c3d8d740a167c97230b41277d539723135822b014a94e08a47301de2181a47",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.EvidenceSupportCodecSuite.xml",
+      "sha256": "0c0521b793f25ed057b0ff96444b9d2dd56a329770fe691bd08ca47405e8eb0a",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codecprobe.MappingCodecProbeSuite.xml",
+      "sha256": "9d45b8c38eb4f524578f6cf31ef8f72392e456d2e22618089317f759a31bb3e9",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.TemporalSupportCodecSuite.xml",
+      "sha256": "aad34eb2b2a28d809859a25196d72068b4e6fb999512ba09d1388de93ea90e51",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.D1bPointCodecSuite.xml",
+      "sha256": "c7ab30daa9ba2b476ee02fe410046013b5b8abcfff98f757edf9b2e6f972dad9",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.AlignCodecSuite.xml",
+      "sha256": "71b065bc01ee83ec6214a40bcdeb85ec7562d19c8dab3626d4197980655f9cc6",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.MappingCodecSuite.xml",
+      "sha256": "31ae2128ac1ba67b79b43dacf8b6061f6484ecefd02f02f0f10cc0497c2a18cf",
+      "tests": 32,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.jvm/target/test-reports/TEST-storymodel4s.codec.FeaturesCodecSuite.xml",
+      "sha256": "055bb25ef4402648e66c3a29a398de9e9992f41511a6018a316672cce380c859",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.StoryModelCodecSuite.xml",
+      "sha256": "0a5dc0903bc202bf6848c48a791917a71a71f99684728aac5188c2e81e5f3442",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.D1aGapWireSuite.xml",
+      "sha256": "c23836c29c5c0cfc3d6d08993aed8a184560aa2ff288dbc95d2b11af3bc44dce",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.CodecSuite.xml",
+      "sha256": "fd2e5b8659b8d9cbc7298eb05b0510b01343c21615f9ff0df5dd4583236ce44b",
+      "tests": 72,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.SidecarSuite.xml",
+      "sha256": "0bda46d908d577ae61131b16ee19d2686af806146eadb20f19e7e002aa934692",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.SurfaceAtlasArtifactCodecSuite.xml",
+      "sha256": "1468e5095908dd3e979b3b3b3ac778d8ad182f4920c7205c9063d85dfa1d609f",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.RecallTimingCodecSuite.xml",
+      "sha256": "3c3b1bc04583ae4d419d6b576144d56dd2073700da181854a839e1ddcea30b7f",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.MappingCodecDigestSuite.xml",
+      "sha256": "d8a44b534c62cc993e97d87d043802aaa727eaae9422919a0b9037815c8e25eb",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.D1aTypedSupportCodecSuite.xml",
+      "sha256": "12d0d38b612c79885d9166a247ea781815d6930848d2e44ec421dfab0cdd66e6",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.FeatureMaterializerSuite.xml",
+      "sha256": "08d84c6b42d55b8e17ad14a6c776471a8aebc693f7ccbcef9fbe1f05ccd58ce0",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.OutputCodecSuite.xml",
+      "sha256": "3a6131a2cc1039687e8d8b3ec06f58662dc3cea2a3faf007e8031b965273fc77",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.probes.D1aCodecWitnessSuite.xml",
+      "sha256": "d63211c67c5915fca7f18a00af9e82fae3288f32b8f3a0dd7bd70b766f08e042",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite.xml",
+      "sha256": "be3880021a415c8ee77e417270b20a7e26d53e2ca931ae832236216459aea911",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codecprobe.ConstructionProbeSuite.xml",
+      "sha256": "0202b3d167bf86ee41ca70e6a53e3a1289116521c05f00899b582700842b7da6",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.DerivationRecordCodecSuite.xml",
+      "sha256": "54d54327494febc7438dd511f8b459a502ff17a7ef1d3b145b20e816db567230",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.VoyageCodecSuite.xml",
+      "sha256": "bc5246ec288397241313d93c62e66f92b95db850c6de97c9a84a1dd28767a954",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.EvidenceSupportCodecSuite.xml",
+      "sha256": "58ca86d5253e7e6131ab073532a9418eccfdd597208412ebc68d2b5376fe7a88",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codecprobe.MappingCodecProbeSuite.xml",
+      "sha256": "c3efa8570275f6571d4469d0556498580c3594583eb574af7aaf2c6d454f3ab4",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.TemporalSupportCodecSuite.xml",
+      "sha256": "6e4176103c60b806346e0f2ebceadf4619f4fd1fa469432d70b2f49606a27dc0",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.D1bPointCodecSuite.xml",
+      "sha256": "e3dfe78e70c7712215c076bb2b63dd176ff76085c129c085a453b5c08f2584e8",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.AlignCodecSuite.xml",
+      "sha256": "2ee1009a69500482b436c907ff91ba587d5ae6170f1457fa79e2e46e850f7200",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.MappingCodecSuite.xml",
+      "sha256": "79b049039a39a5e68e09c72e1d653b2907e3aa3b280158f302ff12a27d6a652c",
+      "tests": 32,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.js/target/test-reports/TEST-storymodel4s.codec.FeaturesCodecSuite.xml",
+      "sha256": "c3ba12f14764b55e5001633c795f9ccf672c2a4b331b9d91f1980d5aed95b19a",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.StoryModelCodecSuite.xml",
+      "sha256": "9da39917bb64c0c87deacbf55eb6b19fc742d0192b11299233be4cad044c48dd",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.D1aGapWireSuite.xml",
+      "sha256": "6eaa52a42647c67f9f69b3d4e48492b08a1c73e3a1b26dc46693c5213f1fd9eb",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.CodecSuite.xml",
+      "sha256": "92bb337edfa4831d35504fb7b97b66af6689b46ba941fb0372811c90c66cc10d",
+      "tests": 72,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.SidecarSuite.xml",
+      "sha256": "533ee9781455e8a4872e724c6e39d1af5249005d8a0e92a8f531efe415e98e3e",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.SurfaceAtlasArtifactCodecSuite.xml",
+      "sha256": "ab84747a4283147c056890c93319a202d8ff156afcb3f8ccfd1bd04f5f5cffee",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.RecallTimingCodecSuite.xml",
+      "sha256": "c7a7d346fb318412e112c4b4922b54b81c7d71695142a7cc1bc257c26d3e764d",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.MappingCodecDigestSuite.xml",
+      "sha256": "4380e29090f4cb9a3d20dfcafc0c76dc78db619042542597aa7134d20efa0d7c",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.D1aTypedSupportCodecSuite.xml",
+      "sha256": "9038fe1172b0d4019ef57892d43836f8db19e18baaffe6caaa3faa5963bfdb9b",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.FeatureMaterializerSuite.xml",
+      "sha256": "8c7c69c80e0ec054fcb8e9d68434f9825ccad1051430e2093a18a24e1c4cccd7",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.OutputCodecSuite.xml",
+      "sha256": "afdd01185f130a8bc6cb2decc836f0d145533f08068caf91773e1acf36a34eb7",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.probes.D1aCodecWitnessSuite.xml",
+      "sha256": "bb20f8fcbd0b407d1fa864d322ba1241013cf8b4f43498a09f0df2e57be9c009",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite.xml",
+      "sha256": "a45ccae6650a7cf6ebb7cc573e03ebf33430c4b44e9285153a2a1baf4002a7e7",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codecprobe.ConstructionProbeSuite.xml",
+      "sha256": "2d217aa53538c67a3b8b778ab35739817026b57836545d5e0b6da09bbf9d5a85",
+      "tests": 12,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.DerivationRecordCodecSuite.xml",
+      "sha256": "112269c1ace06a6cf1f3f20f1c2faea9c62b1c4ea8cd3c7014a3af1e4d7f6fdc",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.VoyageCodecSuite.xml",
+      "sha256": "60ff3fe6b4076c0175648d8c5326cbfafa74db0be2172ec739fc5573c901b2ee",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.EvidenceSupportCodecSuite.xml",
+      "sha256": "78cbf1f7d746f09a871915a8ce3e45b671ed778786e8d77a3c2b0076999c0657",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codecprobe.MappingCodecProbeSuite.xml",
+      "sha256": "02e703c6d772e369760a48576f426f5c0f5cf8e1312f53db264a7785b8647559",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.TemporalSupportCodecSuite.xml",
+      "sha256": "24cc363185839353855a2cd22c943f301faddb68b354ddf7de6abd43e639eddd",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.D1bPointCodecSuite.xml",
+      "sha256": "70c8329e0e28d1730a0149291f19d0f1a9b759e609d8b52e316889c5563b2900",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.AlignCodecSuite.xml",
+      "sha256": "387c53994221979a01e84710d2caa4f8a34dccc93c2e6a51bd5a5c5d401715c4",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.MappingCodecSuite.xml",
+      "sha256": "33a3cddc237f0c93adb28de284e51219675aad6dc55bfaff17180c1c3aa54ae7",
+      "tests": 32,
+      "skipped": 0
+    },
+    {
+      "path": "codec/.native/target/test-reports/TEST-storymodel4s.codec.FeaturesCodecSuite.xml",
+      "sha256": "2538c3e2bf6eac77de177c84de7c84aa588a0d14969e286d50a205fcecda2c03",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.consumer.CorpusCarrierProbeSuite.xml",
+      "sha256": "d4315b8abee03e6b33bbef2ec76ebad340fbbd541f5224f9bdb69d7a86691f1e",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.SidecarSuite.xml",
+      "sha256": "35e50ca9a4ddc82ed1b018d2c2d605c397a7330b1fb8ebaa1416edb866e9ac65",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.SegmentLinkSuite.xml",
+      "sha256": "77859859fd05cd24dd2e9ffccbeb1ae5f844ee43f899f58d58ec614dc625ce77",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.CodedSuite.xml",
+      "sha256": "a9926a2a46df151c80110043898cb44b8aabaae93c89b96117611c37ce57aaef",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.SegmentLinkCompositionSuite.xml",
+      "sha256": "513c16d019d98b243790968cd8619c4af994563fab0366b04616b763056450c4",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.NormalizeSuite.xml",
+      "sha256": "ee930826b876e10ec0ddeec7fcaefe27fbdc0eaa56cdbcfbe697757d48d437ee",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.CellSuite.xml",
+      "sha256": "300efebc66da7afb566d3feb1d15c0938ee97798e3134ff86ecf3d8611d38cd7",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.VerifySuite.xml",
+      "sha256": "87b6185ece7e819248197e9841e9a7527a83a987c42c77d18966bf3603cf510e",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.ArtifactSuite.xml",
+      "sha256": "bdc10e1633348ad7c6cd68db2c42b6ae5e35a9e1cf6d908afddc8b550a917dcc",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.jvm/target/test-reports/TEST-storymodel4s.corpus.CoordinateSuite.xml",
+      "sha256": "f95f108b2512a0187edb868db2f6e288bc12d38aac104afd218ed45823dabfe1",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.consumer.CorpusCarrierProbeSuite.xml",
+      "sha256": "ba096dab05866f089ca3872e8c8da50ac087d4c45211bf7a7a2f8d4d92bc96fd",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.SidecarSuite.xml",
+      "sha256": "ce3fa94d315eafa40d1c6955b2ca9a7575502dd664999bae64d7a36d9c0cc217",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.SegmentLinkSuite.xml",
+      "sha256": "da09a23a67411239b718dc905c1c6159696d196e7a795eec3266d495dcab43eb",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.CodedSuite.xml",
+      "sha256": "9b099ff6277f103711be4ec413f824424a6d6052c73d83e7ab4cc467d90e8ac2",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.SegmentLinkCompositionSuite.xml",
+      "sha256": "56b0fd91fa1cf4b9ee747f8a200728f7c9622c546c9756fd16e007f0298d64ea",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.NormalizeSuite.xml",
+      "sha256": "0c223960c999cf789ac129674ecc0932d80845ec08ff2a545ab845c7307dfb67",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.CellSuite.xml",
+      "sha256": "6c4a93fae370840da70d5636b08febac9ab6ff7c389a04f79d00177ae65d4712",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.VerifySuite.xml",
+      "sha256": "000eac883c9a99d2f9c5cfcd9cc34988126beaceeb283a5c89afb4f5dc768aa1",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.ArtifactSuite.xml",
+      "sha256": "8bff7c4591a5c84b92bdf12b44ddcb291401f541093fbcd904348709b0b2dd95",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.js/target/test-reports/TEST-storymodel4s.corpus.CoordinateSuite.xml",
+      "sha256": "c108b7f944975629475e2c4e00b0b411559f15dd2d915d4a809ff23cfa2e56f8",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.consumer.CorpusCarrierProbeSuite.xml",
+      "sha256": "ba096dab05866f089ca3872e8c8da50ac087d4c45211bf7a7a2f8d4d92bc96fd",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.SidecarSuite.xml",
+      "sha256": "ce3fa94d315eafa40d1c6955b2ca9a7575502dd664999bae64d7a36d9c0cc217",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.SegmentLinkSuite.xml",
+      "sha256": "cc817bd7d270e84d1e66108cc7ec194a7218026a154eadd2ff218eb4f9bf502c",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.CodedSuite.xml",
+      "sha256": "9b099ff6277f103711be4ec413f824424a6d6052c73d83e7ab4cc467d90e8ac2",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.SegmentLinkCompositionSuite.xml",
+      "sha256": "56b0fd91fa1cf4b9ee747f8a200728f7c9622c546c9756fd16e007f0298d64ea",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.NormalizeSuite.xml",
+      "sha256": "0c223960c999cf789ac129674ecc0932d80845ec08ff2a545ab845c7307dfb67",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.CellSuite.xml",
+      "sha256": "0666503c34ede989e024c28cbff44ad64528b728d89e9a4ac9916294d6765748",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.VerifySuite.xml",
+      "sha256": "000eac883c9a99d2f9c5cfcd9cc34988126beaceeb283a5c89afb4f5dc768aa1",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.ArtifactSuite.xml",
+      "sha256": "8bff7c4591a5c84b92bdf12b44ddcb291401f541093fbcd904348709b0b2dd95",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "corpus/.native/target/test-reports/TEST-storymodel4s.corpus.CoordinateSuite.xml",
+      "sha256": "c108b7f944975629475e2c4e00b0b411559f15dd2d915d4a809ff23cfa2e56f8",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.sherlock.SherlockGoldRuleSuite.xml",
+      "sha256": "73127da31e04167df9245aaa9db82fabb69304568d679d7abd92956f9afbca6c",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.MetricsSuite.xml",
+      "sha256": "327834aa07726705fee2f98170b990808db63a7937644bde766dd216099ad460",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.LeakageSuite.xml",
+      "sha256": "8f8b7b4764f4a99f1d06236849861a51842d3ef5fb0376efe845cbab8ca21ea6",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.video.WorldOrderInputSuite.xml",
+      "sha256": "96e70f524c0317acddb415933f2601b11f8a5d77dc578b61ae34d74b2e6664fd",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.LabelSuite.xml",
+      "sha256": "46b203562bd581e1a1c49d00bd08126e9ba7a377e4df8d5a08d86358b2a351d5",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.video.LadderSuite.xml",
+      "sha256": "ff2c3f8f9c1cbf8458c3bfcb7a2503b489f8867e09f746415509d1399d4ad2a8",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.video.LexicalBlendSuite.xml",
+      "sha256": "14ec70635b5a86fbfe1c668f30f96380f1846907500eebf3baa5fdffaa26ee3f",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.nfrd.NfrdBaseballSuite.xml",
+      "sha256": "cd553bff1307d8d619c153bc7439decca54c13a03b483f818a0a7139c35b6f7a",
+      "tests": 16,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "sha256": "c76277c37a6ccd84ee1b8a40895462611d8b19b7ac950e8217ba0a0c33686497",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.video.StageTraceSuite.xml",
+      "sha256": "a861ba0788a98e320b53dd58728eaad5a76b683324aeeddd580e48e3a20d99ae",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.benchprobe.ConstructionProbeSuite.xml",
+      "sha256": "80744ad496fb4091b1d10fe860b663ab05378aa704eb5fd85bcfbad73c003da2",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.ProtocolSuite.xml",
+      "sha256": "fe096d6ed01a1d7f238fd7d6a91a2c8a620da1083f5ea8e6dc094469cd71fdc6",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.consumer.NfrdIntakePublicSuite.xml",
+      "sha256": "d3d6471a2ca04ab629883f005a1195fcdbb5605b1bb429e242b6ca2b3e6705ed",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.video.RecallToVideoSuite.xml",
+      "sha256": "b6f1d63b83b17b7248dc86b2aaf8665e2aeb1e60e93775d295c9f934157b3730",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.sherlock.SherlockRecallMappingSuite.xml",
+      "sha256": "7972dbd5c08d1baa5adb22cbe3b429914462f7186a03578b18e2844a48c3007d",
+      "tests": 10,
+      "skipped": 1
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.WogDiagnosticSuite.xml",
+      "sha256": "c479e16e1ef2c5eee6e6907ccfc531a0676aced8eed5dd8432275e5f0ef10c3c",
+      "tests": 22,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.bench.video.MonotoneSceneSuite.xml",
+      "sha256": "2f27c7062f0c230beb5858affd39bacebf83fc4f9e6e1ccfb2d99131b1c6a436",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "embed-bench/target/test-reports/TEST-storymodel4s.consumer.MetricObservationPublicSuite.xml",
+      "sha256": "afb85de0904f2450dceac60ea60c26b9478596614f5042b106170693687fdba4",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.D1aProjectionSuite.xml",
+      "sha256": "883f1155790c56b94ed97007bb40eb21e475e6055016b33ae27cbd370b0dfb4b",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.coreprobe.SourceConstructionBoundarySuite.xml",
+      "sha256": "43886187881ab05c5f6279cfdc6256ac7f0ab77db2b27e0a0bcf5e7f57284e0e",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.QuoteSuite.xml",
+      "sha256": "9837a2ffe0c969cf072a2c7fe40a9ec44e11470fbab2250879e9ac487102bede",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.QuotationSuite.xml",
+      "sha256": "86c0a3bb6bb0eea3c37d4d3eea4c305dc593c52949ae5e912aa2777d5e1ee479",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.D1bPointSupportSuite.xml",
+      "sha256": "9fda6612da66c425a85ab6e7c7501f484b1d4de8f5b4c1a4197ecfa769d210f2",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.TranscriptSuite.xml",
+      "sha256": "4c42eb8d8f2729648623c7ad9350b0e71f107cd6dfd9ae9f67765ecf8562101a",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.coreprobe.AtlasConstructionBoundarySuite.xml",
+      "sha256": "54ff705c3b70ad737368c881d90218396a299aa1dda6773f7330bf4f06932e5d",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.AtlasSuite.xml",
+      "sha256": "b7ab155bfb6231734b53545797ecf4d4d9066d64ec932f827958d89dce42f7a0",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.SpanSuite.xml",
+      "sha256": "87e76ae9693949258b631c0f417dea15193c576cfecef9b8f670b7eb705536fe",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.D1aSupportSuite.xml",
+      "sha256": "590d9950d87fb6b5d3c661b5c807937ea134dcc01f47d242a3986f962ec9bd6f",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.SourceBundleSuite.xml",
+      "sha256": "3565b92399a7ffc99218252cf80a742921c658f66a0ed0eaba604b3384a6e961",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.HashSuite.xml",
+      "sha256": "6ec7f2bbdc55b4506f1aee7ffc14634227ff54f1886fd6cb841061853593fb2e",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.SurfaceAtlasConformanceSuite.xml",
+      "sha256": "5e45c6df1c821c5b429823dbbb770d0e7d96bf865ceda93aae2178814084aca3",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.coreprobe.D1aConstructionBoundarySuite.xml",
+      "sha256": "39030409b61836010051b46162138458bfefb635133194200f2d6b55790c1a63",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.ClaimSuite.xml",
+      "sha256": "d2a2440f5ba6edbedcc8d5e64579a3a901fc6caf8c9b73dab1093a0ca14d88e7",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.AnnotationAxisSuite.xml",
+      "sha256": "22e38e84bc05954893c1aa75d476dae974619fc8528220c96d9917f09727edf6",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.AddressSuite.xml",
+      "sha256": "a31eb825a536c4f79e5062205a9d1e7bb2032cc5923a905cfddaadac66b89858",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.D1aAtlasSuite.xml",
+      "sha256": "c6324f7b55a4e2733e4ceb0c1f66a6f2b710d4513b7e43517cc48924db09ac14",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite.xml",
+      "sha256": "eeb6563a31416e5e93648169c9577e3ef9b1aa562a3ac9c2fd7937fe109df750",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.coreprobe.ConstructionProbeSuite.xml",
+      "sha256": "b20cf7174500577b0bd857c4bc1d3072950c8494b5147652f79ab08cc1932dfa",
+      "tests": 28,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.SplitterEdgeSuite.xml",
+      "sha256": "dc80f99df3a8f60ef6e6620ba5cc4ff6de2415c1bcad2bc4589ae9653fac4998",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.IdsSuite.xml",
+      "sha256": "2a5553e292f409a91073ab45f62253c965e9e3559461e7854f3e2728c648b3d2",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "core/.jvm/target/test-reports/TEST-storymodel4s.core.SurfaceSuite.xml",
+      "sha256": "051ae57753c8f1521b2f8918a04dc6c97e0cccb13ca1848b39bf698d7b484993",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.D1aProjectionSuite.xml",
+      "sha256": "4af5968c2033d83639e084744b402171c1312763c35c867327dfc2f207c2091c",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.coreprobe.SourceConstructionBoundarySuite.xml",
+      "sha256": "bd05f4f663126de8b892a7d39ec8b68f1a25e2536983f43691b496f1273025dd",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.QuoteSuite.xml",
+      "sha256": "8d65e8acf8b58e84a004e9a6b214f557c707ab4d609d3a45177b1b1800ca639e",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.QuotationSuite.xml",
+      "sha256": "e68864bdaa8b4850d601599c0f860da0756c5f0e325d7584974ab53d2e7481d9",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.D1bPointSupportSuite.xml",
+      "sha256": "70f1f215d08c46ef4613e6049f04f13c91886e97cb2eae13aad014183b4f1354",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.TranscriptSuite.xml",
+      "sha256": "d07de846726adfb0cadb198826ecf075efdbfecb4f5da80fb6f5e37d9ca12737",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.coreprobe.AtlasConstructionBoundarySuite.xml",
+      "sha256": "767195e6deb839d0cd0ea2a155d810a5ba94303c0933864e095205a2f988fb79",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.AtlasSuite.xml",
+      "sha256": "08d25686354a47b9c60a3a0ef512534b3ba7a903e1b788b31d5dffc7adcebc1b",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.SpanSuite.xml",
+      "sha256": "7262daf37774458edf1a35ed54fc5a6079770c7e8f825759097819717b8a5b1d",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.D1aSupportSuite.xml",
+      "sha256": "0f8fc4911848818d4dd72404dd80aa937ffa08249449c87fdcf82ac42f1248b0",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.SourceBundleSuite.xml",
+      "sha256": "1772f7c51eecc6292d6a4f20649db464071974590d910498c61555b7b964490f",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.HashSuite.xml",
+      "sha256": "604d015e8a79a3118ef2e8bf9cd7a7d75d5d646fc9dbf68bf9588adf6e9660da",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.SurfaceAtlasConformanceSuite.xml",
+      "sha256": "9b81d6b4cc5d8c2664e6e033c90b2ab2005506935bb9f108fec93d5641050e2a",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.coreprobe.D1aConstructionBoundarySuite.xml",
+      "sha256": "08960f9b562c7fa772de78f6c6e088aa868098d5c627f77412038cee6383d306",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.ClaimSuite.xml",
+      "sha256": "9eb5c2da2ea03d8a0921905ab22fa13acd47dfac3ec9ffa22c1cd51191abfcd4",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.AnnotationAxisSuite.xml",
+      "sha256": "55cbe5becabfedc0d04e9fa90d33894f3e1044980f9a6c6b484ad3b73c523645",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.AddressSuite.xml",
+      "sha256": "ce8681298fa28e747d38c74c4fbc009f806cc00cbac7ed5851304a1e168b2628",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.D1aAtlasSuite.xml",
+      "sha256": "faf824e6aa3924cda6814171d313376612d68b019bd8b9e3c947f169c1734c1f",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite.xml",
+      "sha256": "a27ce3fa742ab71f9afc0bedb9280f897a4f20894d1c1cb7ff6720fc310b14b1",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.coreprobe.ConstructionProbeSuite.xml",
+      "sha256": "3865557336a8bfff36cf83f03c5e065271ec7882ee3d752a1b70ec0c25ce1871",
+      "tests": 28,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.SplitterEdgeSuite.xml",
+      "sha256": "b9b0236d2f2f8979bede7419d737d91cbae12861ce193ad3e5fa89bb1b3d111b",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.IdsSuite.xml",
+      "sha256": "9f1e3834e4efd374a918187a73132017d8ce5d7fe920b5a0cdadb30c68a59dea",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "core/.js/target/test-reports/TEST-storymodel4s.core.SurfaceSuite.xml",
+      "sha256": "a7ae6d71b35251120f89c816ea063cad297bcc4ea22612c1b142657c4d5fd508",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.D1aProjectionSuite.xml",
+      "sha256": "a84ea1269152b77ae23e012e8c3ad81805ed138e1774b32321295665b5b89643",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.coreprobe.SourceConstructionBoundarySuite.xml",
+      "sha256": "437bbe40c65c55dd3e9e0cdd712052fba5beeeaac545e9c7ea03f34b47f52172",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.QuoteSuite.xml",
+      "sha256": "11a0bc5b187580695e8381668c38c89fef378a77b39fe0834d651975616b436a",
+      "tests": 1,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.QuotationSuite.xml",
+      "sha256": "3e0fac5436b0b533be2b0417b5b762a66d41d8887ac7745c435d2711d7b6f141",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.D1bPointSupportSuite.xml",
+      "sha256": "8db0acfa28e2f3b087da34be81885194ec4a80b8e1053f3edb9dd3d6e9168bb5",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.TranscriptSuite.xml",
+      "sha256": "c789f892896ee68c3a47329a153ec31d34a915931fe133556f574d9e0b8be5c4",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.coreprobe.AtlasConstructionBoundarySuite.xml",
+      "sha256": "f31a9d7704a99fb5a46c5bc223acd333173d7b2e7021fe3ec258bff0fb830d6c",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.AtlasSuite.xml",
+      "sha256": "4c94d18bbd3daacfb12f9c6494ae2e0e3b4792a71c5f7816d629f48b8e62e1c6",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.SpanSuite.xml",
+      "sha256": "daa83acab6ed3fe688fc21718600801e34bd913acab6f5f45d52e81f7129054e",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.D1aSupportSuite.xml",
+      "sha256": "7c263c319565c9cc209d64cd91c2abae88c4199cbc5652fbb585aa6b56adfa9f",
+      "tests": 20,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.SourceBundleSuite.xml",
+      "sha256": "be9fd0f0fe3cb7bd861d7cbb17f75af789d647a25c80b369e427ce696552837f",
+      "tests": 15,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.HashSuite.xml",
+      "sha256": "cf221d5022a5e97f7e9788e705df23b72991c2a3bfa1b14aa066923f5cb3dde5",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.SurfaceAtlasConformanceSuite.xml",
+      "sha256": "0d69fbf5e60f842fed28623c0c261d268d7e49a95144ab684a7f4384463589e8",
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.coreprobe.D1aConstructionBoundarySuite.xml",
+      "sha256": "72df7cbb5f6b94a16cb992bc8adab4d69c2ad2d1124883bf19e45b7a9171b3c8",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.ClaimSuite.xml",
+      "sha256": "32fbe818107a90063be2590e064d9746793d9b5ddbbf0621739f45aaaaf4eb20",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.AnnotationAxisSuite.xml",
+      "sha256": "d911db47816727d284510230405c4fe5b5b7240cb440b0fcbd27e728ef115995",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.AddressSuite.xml",
+      "sha256": "18c8cfeeb7377628feff306513ae902c7b812fd154c4a73cba727b7bb62e3073",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.D1aAtlasSuite.xml",
+      "sha256": "c2c09f1f6eff261963a8216ff69ec685090d21b531d5e5cc0cd84891ade5ca4e",
+      "tests": 9,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite.xml",
+      "sha256": "8af86015345363e925949951552f9057f3334b2d36782cbd152d5b42461e68a0",
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.coreprobe.ConstructionProbeSuite.xml",
+      "sha256": "2e801f8581d5182c711bdb435b3bd32fde484a831c2c515615921e6f5d199f7a",
+      "tests": 28,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.SplitterEdgeSuite.xml",
+      "sha256": "280ab379e5b0f0e8ad0ca8ba1b69199a0952ecf88e8a6ddf00757fa10e78cdec",
+      "tests": 7,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.IdsSuite.xml",
+      "sha256": "c54eea5e3c52816c0c7bd45598abdaa5954600eaef58ad5f3e3666ee49dcc0e7",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "core/.native/target/test-reports/TEST-storymodel4s.core.SurfaceSuite.xml",
+      "sha256": "9f0c78afe0f65b809ac6c2be55f7453948c2c11dc503af63e2e11c46423d4551",
+      "tests": 14,
+      "skipped": 0
+    },
+    {
+      "path": "pipeline/target/test-reports/TEST-storymodel4s.pipeline.FeatureStageSuite.xml",
+      "sha256": "01a66d7d46e0e245662713fe4bf3857fd7a80bae0af783e7d23df2813d471ad7",
+      "tests": 5,
+      "skipped": 0
+    },
+    {
+      "path": "pipeline/target/test-reports/TEST-storymodel4s.pipeline.WarOfTheGhostsDraftAtlasSuite.xml",
+      "sha256": "81be9cac3bba88589d24e0b7eb2ec3eccb6324bd157223ae0d0ee86614b9cbd2",
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "path": "pipeline/target/test-reports/TEST-storymodel4s.pipeline.StoryBuildSuite.xml",
+      "sha256": "4c05c4da07d5c8f470ab8091ceb6c6598e9963dbf404131542eea8f8d628a399",
+      "tests": 21,
+      "skipped": 0
+    },
+    {
+      "path": "pipeline/target/test-reports/TEST-storymodel4s.pipeline.TextParitySuite.xml",
+      "sha256": "4f7286dcfe70b742e972658c8c6707ca2c0dfc13db43e178a5e078189c4f8752",
+      "tests": 8,
+      "skipped": 0
+    },
+    {
+      "path": "pipeline/target/test-reports/TEST-storymodel4s.pipeline.RecallTimingBuildSuite.xml",
+      "sha256": "3da83034d3b058d0dadc0e3feac8092b5376e28aacb2ef5bef4665f0e25c5784",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "pipeline/target/test-reports/TEST-storymodel4s.pipeline.WarOfTheGhostsDraftCodexSuite.xml",
+      "sha256": "b5c30e0a7a7203dcf3f036a94271e81e8deae7641a3fc0768689bfa231d6fe58",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.DescriptorSuite.xml",
+      "sha256": "609ec577cf5604e24023e48a856dac94527f9cf78a92208371e8cf11b240c131",
+      "tests": 4,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.MigrationSuite.xml",
+      "sha256": "7b0839f9b3a6e797542a9cd6a864f0d156f28d5477c150577a8373df12970f75",
+      "tests": 11,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.XlsxSuite.xml",
+      "sha256": "c4146d8699a3771c492a7cda35252d352e38f46162ae0950eca8434e97d7db23",
+      "tests": 10,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.TimebaseRepairSuite.xml",
+      "sha256": "a2901c1fc32632d449426fb7e7a068391379740788cf3e96732b72e99b0c5887",
+      "tests": 70,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.SherlockAnnotationsSuite.xml",
+      "sha256": "b5c5ef9f6d795f343f5e12ff74f097d1b07b37aa83aaa47495fb108aa8a19a37",
+      "tests": 23,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.RecallTimingIntakeSuite.xml",
+      "sha256": "07d1bd14712a0be402b4676e3343359188e2255dc9e878dd77e2f78bc7373e01",
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "path": "corpus-intake/target/test-reports/TEST-storymodel4s.corpus.intake.CorpusReaderSuite.xml",
+      "sha256": "62116885fb051da40b9135141b02d8c19daa25a3278a8f0f722c4fd22101a60b",
+      "tests": 23,
+      "skipped": 0
+    }
+  ],
+  "mutations": {
+    "count": 10,
+    "baselineExit": 0,
+    "restoredExit": 0,
+    "receiptsSha256": "a555546943f131bf9a18013653e9b1d2f32b357718874e0ce92d0c0c6ab169ba"
+  },
+  "independent": [
+    {
+      "command": [
+        "python3",
+        "tools/recall-study/check_recall_intake.py",
+        "/private/tmp/recall-intake-evidence/exact-result"
+      ],
+      "exit": 0,
+      "result": {
+        "manifestSha256": "631f88fd92e6ef3095ea265f34d4db59ec01fb327977386041ae18dd26a6cd86",
+        "negativeControls": 4,
+        "oracle": "independent-reader-and-Fraction",
+        "records": 5,
+        "status": "pass",
+        "units": 2,
+        "words": 4
+      },
+      "scriptSha256": "06bd80f8adee66912f96d7b507fa7ba2b0a3b14cb5a339fb52a33c2022b6be16"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/recall-study/check_temporal_support.py",
+        "/private/tmp/recall-intake-evidence/checkAll-candidate.log"
+      ],
+      "exit": 0,
+      "result": {
+        "checks": [
+          "transitive-missingness",
+          "occurrence-extents",
+          "point-not-interval",
+          "exact-large-tick-times-timebase"
+        ],
+        "fixtures": 3,
+        "negativeControls": 1,
+        "status": "pass"
+      },
+      "scriptSha256": "aecfe256767c0f1acef886561bcf342fba508376e25ab0c45def32b95fa66e96"
+    }
+  ],
+  "scope": "Synthetic input/support contracts only; no scanner linkage, time allocation, calibration, held-out efficacy or Atlas completion."
+}

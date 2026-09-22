@@ -75,7 +75,7 @@ private[codec] object MappingSourceWire:
     case StreamKind.Custom(ns, label) =>
       tagged("custom", "namespace" -> str(ns), "label" -> str(label))
     case other => tagged(other.toString)
-  private def axis(value: PresentationAxis): Json = obj(
+  def axis(value: PresentationAxis): Json = obj(
     "id" -> str(value.id.value),
     "bundle" -> str(value.bundle.value),
     "edition" -> optional(value.edition)(id => str(id.value)),
@@ -105,7 +105,7 @@ private[codec] object MappingSourceWire:
     "identity" -> str(value.identity.hex),
     "binding_identity" -> str(value.bindingIdentity.hex)
   )
-  private def interval(value: PlaybackInterval): Json = obj(
+  def interval(value: PlaybackInterval): Json = obj(
     "axis" -> str(value.axis.value),
     "start_tick" -> long(value.start),
     "end_exclusive_tick" -> long(value.endExclusive)

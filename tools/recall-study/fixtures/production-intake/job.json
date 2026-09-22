@@ -1,0 +1,45 @@
+{
+  "schemaVersion" : "recall-timing-intake-job/v0.1",
+  "csv" : {
+    "path" : "words.csv",
+    "sha256" : "8555a5468ff1854bf15b58feffd49ce5de0d59d6d9faf44c3952e3d740f07ff3"
+  },
+  "graph" : {
+    "path" : "recall-graph.json",
+    "sha256" : "64cfbd7b059b57e53c18d1217a873d8cf2b354e99269e54c76b1d1c5ffcbdcd6"
+  },
+  "parserArtifact" : "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f",
+  "inventoryDigest" : "1a4915caa8d45c063ec7d5bcd452e0e684eae24ea08056335a82545028fe71b3",
+  "wordSpans" : [
+    {
+      "start" : 0,
+      "endExclusive" : 4
+    },
+    {
+      "start" : 5,
+      "endExclusive" : 13
+    },
+    {
+      "start" : 14,
+      "endExclusive" : 17
+    },
+    {
+      "start" : 18,
+      "endExclusive" : 23
+    }
+  ],
+  "columns" : {
+    "header" : [
+      "Words",
+      "princeton-word-onset-seconds",
+      "princeton-tr-number",
+      "princeton-tr-onset-seconds",
+      "openneuro-word-onset-seconds",
+      "openneuro-tr-number",
+      "openneuro-tr-onset-seconds"
+    ],
+    "word" : 0,
+    "onset" : 4,
+    "clock" : "openneuro-word-onset-seconds"
+  }
+}

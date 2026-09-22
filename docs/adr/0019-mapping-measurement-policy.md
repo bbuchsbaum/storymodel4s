@@ -325,3 +325,31 @@ timestamps, deriving word onset from unit annotations, and calling interval end
 the last word onset. The Bell profile deliberately uses a higher external cost
 to exercise actual source-winning posterior rows; this is a synthetic fixture
 control and establishes no scientific efficacy.
+
+Production intake/support decision (2026-09-22): add the JVM adapter
+`RecallTimingIntake` to `corpus-intake` with a dependency on `recall.jvm`, and connect
+it from `pipeline` through a `corpusIntake` dependency. No new module or third-party
+dependency. The adapter verifies caller-pinned bytes, an explicit exact header and
+selected onset column, and replays the existing named word correspondence against
+a checked graph and inventory. Retain every CSV data record, including excluded
+blank word fields and their observations. Reject malformed quoting/UTF-8 and any
+canonicalization or word-span mismatch. The stricter CSV parser is separately
+versioned. Reject importing the bench parser, which splits quoted fields and picks
+the historical clock, or accepting the independent Python envelope as full mapping
+authority. The offline `recallTimingIntake` pipeline command reconstructs the
+inventory from the existing canonical recall graph and explicit parser spans,
+compares its declared inventory digest, and emits the existing timing sidecar plus
+an intake receipt and a completion manifest. Recording linkage stays unestablished.
+
+`TemporalSupport.read` and contextual `temporal-support/v0.1` are additive support
+query outputs over the existing `SourceRepresentation`, not a second source
+dictionary. Select a full-identity part or a mapping-qualified occurrence; read only
+supplied geometry on that axis. Preserve exact interval unions, points, and geometry
+excluded by an occurrence window. No implicit native-to-composed projection,
+duration, kernel or allocation. Traverse descendants with cycle rejection and
+publish both unlocated and selected-coordinate-unavailable descendants. These are
+locus-accounting lists, not a claim of parent containment or probability coverage.
+The legacy `supportCoverage` field only examines immediate children; changing it
+would change existing source/mapping digests. Reject silently changing that wire
+meaning: temporal consumers use this named transitive derivation, while migration
+of the legacy producer field remains a compatibility task.
