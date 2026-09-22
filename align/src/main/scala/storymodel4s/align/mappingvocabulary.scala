@@ -33,6 +33,7 @@ enum MappingRefusal:
   case DuplicateTarget(ref: SourceNodeRef)
   case PhysicalInventoryMismatch
   case ForeignBundle(identity: Checksum)
+  case AmbiguousBundle(id: SourceBundleId)
   case ForeignAxis(axis: PresentationAxisId)
   case AmbiguousAxis(axis: PresentationAxisId)
   case InvalidComposition(detail: String)

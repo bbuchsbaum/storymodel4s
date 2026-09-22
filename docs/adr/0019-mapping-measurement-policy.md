@@ -91,6 +91,12 @@ tokens; segmentation includes canonical text alongside the legacy text checksum.
 hash-only transcript binding and lossy token hashing. This is local to the new identity
 contract and does not migrate existing core IDs, fingerprints or wire artifacts.
 
+G1 multipart decision (2026-09-22): a legacy `SourceBundleId` does not identify a full
+coordinate-bearing bundle. `SourceRepresentation.of` refuses `AmbiguousBundle` when
+one published part ID would name different full identities, and cross-part detection
+counts resolved primary axes. Reject deduplication by legacy ID: an executed witness
+admitted two different coordinate parts as one. Composition remains explicitly declared.
+
 The Memento task and seal (2026-09-21) use the same shared guard with fixed corpus paths.
 The independent population rule retains 123 participants; the owner chose 63 test and 60
 development, stratified 14/17/15/17 test across conditions, with seed 20260921. SHA-256 ranking

@@ -196,6 +196,13 @@ object SourceRepresentation:
     ) ++ composition.toVector.map(c => c.composed.primaryAxis.id -> BundleRole.Composition)
     val duplicateRefs =
       refs.groupBy(identity).collect { case (ref, xs) if xs.size > 1 => ref }.toVector.sorted
+    val ambiguousBundleIds = parts
+      .groupBy(_.id)
+      .collect {
+        case (id, entries) if entries.map(_.identity).distinct.size > 1 => id
+      }
+      .toVector
+      .sortBy(_.value)
     val duplicateAxes = axisRoles
       .groupBy(_._1)
       .collect { case (axis, xs) if xs.size > 1 => axis }
@@ -211,6 +218,8 @@ object SourceRepresentation:
         )
       else if nodes.exists(n => n.parent.exists(p => !refs.contains(p))) then
         Left(MappingRefusal.UnknownTarget(nodes.flatMap(_.parent).find(p => !refs.contains(p)).get))
+      else if ambiguousBundleIds.nonEmpty then
+        Left(MappingRefusal.AmbiguousBundle(ambiguousBundleIds.head))
       else if duplicateAxes.nonEmpty then Left(MappingRefusal.AmbiguousAxis(duplicateAxes.head))
       else if texts.distinct.size != texts.size then Left(MappingRefusal.InvalidTextSource)
       else Right(())
@@ -255,8 +264,8 @@ object SourceRepresentation:
                             case _                 => Left(MappingRefusal.AmbiguousAxis(axis))
                         }
                         .flatMap { entries =>
-                          val nativeParts = entries.collect { case (_, BundleRole.Part(id)) =>
-                            id
+                          val nativeParts = entries.collect { case (axis, BundleRole.Part(_)) =>
+                            axis
                           }.distinct
                           if nativeParts.size > 1 && composition.isEmpty then
                             Left(MappingRefusal.CrossPartWithoutComposition(node.ref))

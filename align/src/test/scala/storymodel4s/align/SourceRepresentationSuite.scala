@@ -45,20 +45,25 @@ class SourceRepresentationSuite extends FunSuite:
     assert(SourceRepresentation.of(view, bundles, Some(composition), physical(true)).isRight)
   }
   test("ambiguous axis refuses") {
+    val oneView = view.copy(nodes = Vector(nodes.head))
+    val onePhysical = Map(e(1) -> physical(false)(e(1)))
     assertEquals(
       SourceRepresentation
         .of(
-          view,
+          oneView,
           NonEmptyVector.of(BundleEntry.media(a), BundleEntry.media(a)),
           None,
-          physical(false)
+          onePhysical
         )
-        .swap
-        .toOption
-        .get,
-      MappingRefusal.AmbiguousAxis(a.primaryAxis.id)
+        .left
+        .toOption,
+      Some(MappingRefusal.AmbiguousAxis(a.primaryAxis.id))
     )
-    assert(SourceRepresentation.of(view, bundles, None, physical(false)).isRight)
+    assert(
+      SourceRepresentation
+        .of(oneView, NonEmptyVector.one(BundleEntry.media(a)), None, onePhysical)
+        .isRight
+    )
   }
   test("composition covers exactly its parts") {
     compositionRefused(DeclaredComposition.of(composed, NonEmptyVector.one(a)))
@@ -207,5 +212,77 @@ class SourceRepresentationSuite extends FunSuite:
     assertEquals(
       SourceRepresentation.of(view, bundles, None, physical).swap.toOption.get,
       MappingRefusal.InvalidTextSource
+    )
+  }
+
+  test("distinct parts sharing a legacy bundle ID refuse") {
+    val variantAxis = SourceBundle
+      .editionPlaybackAxis(a.edition.get, a.streams, a.authorityTracks, 0L, 80L, timebase)
+      .toOption
+      .get
+    val segment = CompositionSegment
+      .of(
+        PlaybackInterval.on(a.primaryAxis, 0L, 40L).toOption.get,
+        PlaybackInterval.on(variantAxis, 0L, 40L).toOption.get,
+        OccurrenceId.unsafe("same-id-part")
+      )
+      .toOption
+      .get
+    val receipt = SourceDerivationReceipt
+      .of("same-id-witness/v1", "different coordinates", Vector(a.identity))
+      .toOption
+      .get
+    val mapping =
+      TrackComposition.of(a.primaryAxis.id, variantAxis.id, Vector(segment), receipt).toOption.get
+    val variant = SourceBundle
+      .of(a.edition, a.sourceKind, a.streams, variantAxis, a.authorityTracks, Vector(mapping))
+      .toOption
+      .get
+    assertEquals(a.id, variant.id)
+    assertNotEquals(a.identity, variant.identity)
+    assertNotEquals(a.primaryAxis.id, variant.primaryAxis.id)
+    val evidence = EvidenceSupport
+      .of(
+        variant,
+        Vector(
+          EvidenceAnchor.MediaTime(
+            variant.id,
+            a.streams.head.id,
+            a.primaryAxis.id,
+            PlaybackIntervalSet.one(PlaybackInterval.on(a.primaryAxis, 0L, 10L).toOption.get)
+          ),
+          EvidenceAnchor.MediaTime(
+            variant.id,
+            a.streams.head.id,
+            variant.primaryAxis.id,
+            PlaybackIntervalSet.one(PlaybackInterval.on(variant.primaryAxis, 0L, 10L).toOption.get)
+          )
+        )
+      )
+      .toOption
+      .get
+    val oneView = view.copy(nodes = Vector(nodes.head))
+    val physical = Map(e(1) -> SourceSupportStatus.located(TypedSupport.Anchored(evidence)))
+    assertEquals(
+      SourceRepresentation
+        .of(
+          oneView,
+          NonEmptyVector.of(BundleEntry.media(a), BundleEntry.media(variant)),
+          None,
+          physical
+        )
+        .left
+        .toOption,
+      Some(MappingRefusal.AmbiguousBundle(a.id))
+    )
+    assert(
+      SourceRepresentation
+        .of(
+          oneView,
+          NonEmptyVector.one(BundleEntry.media(a)),
+          None,
+          Map(e(1) -> SherlockShapedSource.physical(false)(e(1)))
+        )
+        .isRight
     )
   }
