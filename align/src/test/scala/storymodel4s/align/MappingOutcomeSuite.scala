@@ -45,12 +45,16 @@ class MappingOutcomeSuite extends FunSuite:
       .toOption
       .get
 
+  private def assertMass(value: DecodedTargetMass, expected: Double): Unit = value match
+    case mass: DecodedTargetMass.InCandidateSupport => assertEquals(mass.value, expected)
+    case _                                          => fail("expected in-candidate support")
+
   test("p3 keeps e7's value") {
     val row = outcome(Map(e3 -> 0.9, e7 -> 0.4), DecisionRequest.ExternalDecode(e7, policy))
     val decision = row.decision.get
     assertEquals(decision.rawArgmax, Some(e3 -> 0.9))
     assertEquals(decision.chosen, Some(e7))
-    assertEquals(decision.decodedMass, DecodedTargetMass.InCandidateSupport(0.4))
+    assertMass(decision.decodedMass, 0.4)
     assertEquals(decision.origin, DecisionOrigin.StructuredDecode(policy))
     assertEquals(row.localization, LocalizationStatus.Located)
     assertEquals(outcome(Map(e3 -> 0.9, e7 -> 0.4)).decision.get.chosen, Some(e3))
@@ -60,13 +64,13 @@ class MappingOutcomeSuite extends FunSuite:
       outcome(Map(e3 -> 0.9, e7 -> 0.4), DecisionRequest.ExternalDecode(e8, policy)).decision.get
     assertEquals(decision.origin, DecisionOrigin.GapFill(policy))
     assertEquals(decision.chosen, Some(e8))
-    assertEquals(decision.decodedMass, DecodedTargetMass.OutsideCandidateSupport)
+    assert(decision.decodedMass.isInstanceOf[DecodedTargetMass.OutsideCandidateSupport])
   }
   test("in-support zero stays") {
     val decision =
       outcome(Map(e3 -> 1.0, e7 -> 0.0), DecisionRequest.ExternalDecode(e7, policy)).decision.get
     assertEquals(decision.origin, DecisionOrigin.StructuredDecode(policy))
-    assertEquals(decision.decodedMass, DecodedTargetMass.InCandidateSupport(0.0))
+    assertMass(decision.decodedMass, 0.0)
   }
   test("listed fill target is still GapFill") {
     val row = outcome(
@@ -76,7 +80,7 @@ class MappingOutcomeSuite extends FunSuite:
     )
     assertEquals(row.links.map(_.destination).toSet, Set(e3, e7, e8))
     assertEquals(row.decision.get.origin, DecisionOrigin.GapFill(policy))
-    assertEquals(row.decision.get.decodedMass, DecodedTargetMass.OutsideCandidateSupport)
+    assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.OutsideCandidateSupport])
   }
   test("agreeing decode stays StructuredDecode") {
     val decision =
@@ -105,7 +109,7 @@ class MappingOutcomeSuite extends FunSuite:
         assertEquals(row.decision.get.chosen, None)
         assertEquals(row.decision.get.rawArgmax, None)
         assertEquals(row.decision.get.origin, DecisionOrigin.Abstention("EmptyDecisionBasis"))
-        assertEquals(row.decision.get.decodedMass, DecodedTargetMass.NoDecision)
+        assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
         assertEquals(row.localization, LocalizationStatus.Unranked)
         assertEquals(row.links.map(_.destination), Vector(e8))
     }
@@ -116,7 +120,7 @@ class MappingOutcomeSuite extends FunSuite:
     assertEquals(row.localization, LocalizationStatus.NotComputed)
     assertEquals(row.decision.get.chosen, None)
     assertEquals(row.decision.get.rawArgmax, Some(e3 -> 0.9))
-    assertEquals(row.decision.get.decodedMass, DecodedTargetMass.NoDecision)
+    assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
     assertEquals(row.decision.get.origin, DecisionOrigin.Abstention("decoder declined"))
     assertEquals(row.decision.get.policy, Some(policy))
     assertEquals(row.stages, Some(stages))
@@ -132,7 +136,7 @@ class MappingOutcomeSuite extends FunSuite:
   test("raw direction is respected including negative scores") {
     val row = outcome(Map(e3 -> -0.9, external -> -1.2), direction = ScoreDirection.LowerIsBetter)
     assertEquals(row.decision.get.rawArgmax, Some(external -> -1.2))
-    assertEquals(row.decision.get.decodedMass, DecodedTargetMass.InCandidateSupport(-1.2))
+    assertMass(row.decision.get.decodedMass, -1.2)
   }
   test("failed and excluded units carry no invented decision or measures") {
     val failure = ProcessingFailure.ProviderFailure("synthetic refusal")
@@ -218,8 +222,10 @@ class MappingOutcomeSuite extends FunSuite:
       Some(MappingRefusal.Reserved("calibrated"))
     )
     assertEquals(
-      outcome(Map(e3 -> 0.9)).decision.get.calibration,
-      DecisionCalibration.Unavailable(DecisionCalibrationUnavailableReason.NoCalibrationArtifact)
+      outcome(Map(e3 -> 0.9)).decision.get.calibration
+        .asInstanceOf[DecisionCalibration.Unavailable]
+        .reason,
+      DecisionCalibrationUnavailableReason.NoCalibrationArtifact
     )
   }
   test("empty abstention reason refuses") {
@@ -271,7 +277,7 @@ class MappingOutcomeSuite extends FunSuite:
         )
         .toOption
         .get
-      assertEquals(row.decision.get.decodedMass, DecodedTargetMass.InCandidateSupport(value))
+      assertMass(row.decision.get.decodedMass, value)
     }
   }
 

@@ -46,7 +46,7 @@ class MappingOutcomeUnforgeableSuite extends FunSuite:
     assertEquals(dependencies.size, 4)
     assert(
       typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.recall.*; new UnitDecision(??? : DecisionBasis, None, DecisionOrigin.RawArgmax, None, DecodedTargetMass.NoDecision, DecisionCalibration.Unavailable(DecisionCalibrationUnavailableReason.NoCalibrationArtifact), None)"""
+        """import storymodel4s.align.*; import storymodel4s.recall.*; new UnitDecision(??? : DecisionBasis, None, DecisionOrigin.RawArgmax, None, ??? : DecodedTargetMass, ??? : DecisionCalibration, None)"""
       ).nonEmpty
     )
     assert(
@@ -83,6 +83,80 @@ class MappingOutcomeUnforgeableSuite extends FunSuite:
     assert(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.recall.*; summon[scala.deriving.Mirror.ProductOf[DecisionBasis]]"""
+      ).nonEmpty
+    )
+  }
+  test("decoded mass components have no caller construction") {
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; new DecodedTargetMass.InCandidateSupport(Double.NaN)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; DecodedTargetMass.InCandidateSupport.derived(Double.NaN)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; new DecodedTargetMass.OutsideCandidateSupport()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; DecodedTargetMass.OutsideCandidateSupport.derived()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; new DecodedTargetMass.NoDecision()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; DecodedTargetMass.NoDecision.derived()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; DecodedTargetMass.InCandidateSupport(Double.NaN)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; (x: DecodedTargetMass.InCandidateSupport) => x.copy(value = Double.NaN)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[DecodedTargetMass.InCandidateSupport]]"""
+      ).nonEmpty
+    )
+  }
+  test("calibration status has no caller construction") {
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; new DecisionCalibration.Unavailable(DecisionCalibrationUnavailableReason.NoCalibrationArtifact)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; DecisionCalibration.Unavailable.derived()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; DecisionCalibration.Unavailable(DecisionCalibrationUnavailableReason.NoCalibrationArtifact)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; (x: DecisionCalibration.Unavailable) => x.copy()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[DecisionCalibration.Unavailable]]"""
       ).nonEmpty
     )
   }

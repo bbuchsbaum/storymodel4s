@@ -65,22 +65,16 @@ enum DecisionOrigin:
   case GapFill(policy: DecisionPolicyId)
   case Abstention(reason: String)
 
-enum DecodedTargetMass:
-  case InCandidateSupport(value: Double)
-  case OutsideCandidateSupport
-  case NoDecision
+type DecodedTargetMass = UnitOutcome.DecodedMass
+object DecodedTargetMass:
+  export UnitOutcome.DecodedMass.{InCandidateSupport, OutsideCandidateSupport, NoDecision}
 
 enum DecisionCalibrationUnavailableReason:
   case NoCalibrationArtifact
 
-sealed trait DecisionCalibration
+type DecisionCalibration = UnitOutcome.Calibration
 object DecisionCalibration:
-  final case class Unavailable(reason: DecisionCalibrationUnavailableReason)
-      extends DecisionCalibration
-
-  /** Reserved: no construction door in G1. */
-  final class Calibrated private (val probability: CalibratedProbability)
-      extends DecisionCalibration
+  export UnitOutcome.Calibration.{Unavailable, Calibrated}
 
 type UnitDecision = UnitOutcome.Decision
 
@@ -95,6 +89,32 @@ final class UnitOutcome private (
     val stages: Option[UnitStageRefs]
 )
 object UnitOutcome:
+  sealed trait DecodedMass
+  object DecodedMass:
+    final class InCandidateSupport private (val value: Double) extends DecodedMass
+    object InCandidateSupport:
+      private[UnitOutcome] def derived(value: Double): InCandidateSupport = new InCandidateSupport(
+        value
+      )
+    final class OutsideCandidateSupport private () extends DecodedMass
+    object OutsideCandidateSupport:
+      private[UnitOutcome] def derived(): OutsideCandidateSupport = new OutsideCandidateSupport()
+    final class NoDecision private () extends DecodedMass
+    object NoDecision:
+      private[UnitOutcome] def derived(): NoDecision = new NoDecision()
+
+  sealed trait Calibration
+  object Calibration:
+    final class Unavailable private (val reason: DecisionCalibrationUnavailableReason)
+        extends Calibration
+    object Unavailable:
+      private[UnitOutcome] def derived(): Unavailable = new Unavailable(
+        DecisionCalibrationUnavailableReason.NoCalibrationArtifact
+      )
+
+    /** Reserved: no construction door in G1. */
+    final class Calibrated private (val probability: CalibratedProbability) extends Calibration
+
   /** Constructed only after the actual basis, link inventory and unit bindings agree. */
   final class Decision private[UnitOutcome] (
       val basis: DecisionBasis,
@@ -153,14 +173,14 @@ object UnitOutcome:
                   (
                     None,
                     DecisionOrigin.Abstention(reason),
-                    DecodedTargetMass.NoDecision,
+                    DecodedMass.NoDecision.derived(),
                     LocalizationStatus.NotComputed
                   )
                 case _ if values.isEmpty =>
                   (
                     None,
                     DecisionOrigin.Abstention("EmptyDecisionBasis"),
-                    DecodedTargetMass.NoDecision,
+                    DecodedMass.NoDecision.derived(),
                     LocalizationStatus.Unranked
                   )
                 case _ =>
@@ -168,8 +188,8 @@ object UnitOutcome:
                     case DecisionRequest.ExternalDecode(value, _) => value
                     case _                                        => argmax.get._1
                   val mass = values.get(destination) match
-                    case Some(value) => DecodedTargetMass.InCandidateSupport(value)
-                    case None        => DecodedTargetMass.OutsideCandidateSupport
+                    case Some(value) => DecodedMass.InCandidateSupport.derived(value)
+                    case None        => DecodedMass.OutsideCandidateSupport.derived()
                   val provenance = request match
                     case DecisionRequest.ExternalDecode(_, p) =>
                       if values.contains(destination) then DecisionOrigin.StructuredDecode(p)
@@ -186,8 +206,7 @@ object UnitOutcome:
                 origin,
                 argmax,
                 decodedMass,
-                DecisionCalibration
-                  .Unavailable(DecisionCalibrationUnavailableReason.NoCalibrationArtifact),
+                Calibration.Unavailable.derived(),
                 policy
               )
               Right(
