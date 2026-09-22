@@ -1,0 +1,33 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 7,
+  "source": "ef931ae2",
+  "focused": {
+    "alignPerBackend": 25,
+    "lawsPerBackend": 6,
+    "backends": [
+      "JVM",
+      "JS",
+      "Native"
+    ],
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 19,
+    "compiledRuns": 21,
+    "behavioral": 18,
+    "construction": "One compound package-visibility edit fails the result and bound derivation probes on each backend; clean Compile/Test before mutant and restored control.",
+    "scopeRefusalWitness": "Skipping the Assessed scope guard produces a later BindingMismatch, still refusing the record. This mutation proves the required typed ScopeUndeclared diagnosis; the separate scope-binding mutation demonstrates invalid admission."
+  },
+  "interruption": "One filesystem-full run has no test total and is retained as inconclusive. Removed only task-owned Native compiler/linker scratch, then resumed the same source at mutation 4; no source or evidence deleted.",
+  "review": {
+    "reviewer": "m1_support_review",
+    "source": "ef931ae2",
+    "scope": "G1 revision 4 slice7 / AC5; immutable-commit read-only source and test review",
+    "findings": [],
+    "conclusion": "Exact ordered coverage, failure retention, target universe and grain, ledger, segmentation, normalization and single binding checks implement the specified joins. Digest includes published fields, failure reasons, original requests and derivation origins. Constructors remain closed. Public miniature preserves all eight packets, seven unassigned separators and authored disagreement.",
+    "limits": "No reviewer builds or mutation execution. Binding proves content identity, not estimator execution."
+  },
+  "archiveSha256": "d7cb7381c9d530e2164f7750e6ff6a2ff93b492e4c75fa8823bc48159472cc53",
+  "limits": "Local contract qualification only. No calibrated probabilities, estimator execution or full G1/M1 acceptance. Initial test expectation incorrectly counted the four-unit Anna fixture as three, corrected before source commit. Existing clang-15 warning retained."
+}

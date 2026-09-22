@@ -1,0 +1,299 @@
+[
+  {
+    "name": "missing-unit-accepted",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "90315ffe355ed057725c81a56a9511673715d26b98799cd2168fb0ce401e58a0",
+    "expectedFailures": [
+      "missing unit refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "outcome-order-ignored",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "a96dfbec41cb30319a8e0133731e8569dab8b67c4a65964f7edc92ab6afeb608",
+    "expectedFailures": [
+      "reordered outcomes refuse"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "failed-outcomes-filtered",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "67ccbcecea39f91fd60ab2b8b4ca3e57076b39cc0fd3741d35579148b68ca041",
+    "expectedFailures": [
+      "failed outcomes are retained and counted"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "unknown-target-accepted",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "4f8b5f6fca8561467ca0ebe05a3a741a147dcce9cdb13bb444a69b1062b4462b",
+    "expectedFailures": [
+      "universe outside dictionary refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "universe-subset-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "70e2eefc0b5420fe94d0f853540da93b74e7ee73188b9e8cb1fe828751c3aa2f",
+    "expectedFailures": [
+      "measured targets outside the declared universe refuse while externals are exempt"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "target-grain-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "59183e41feccb396fc2e69d44e960d3a7d6008c0419ff56605669f0066028f4e",
+    "expectedFailures": [
+      "the target universe agrees with actual target levels"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "roles-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "36ea038e56ae63a3a48cdce9d7e8f29125ebdb095b2e06dd17d02f82defab260",
+    "expectedFailures": [
+      "roles are bound to the inventory segmentation"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "normalized-universe-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "05448113c86cfdcdce578a125823884014bf9cb072a7bf06729fe8549915a0da",
+    "expectedFailures": [
+      "normalized mass matches universe and prior"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "normalized-prior-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "cb705fe18e6e72aa7aad172ca3f7375e830fc6a0e25cac369900cd7ea317ae6c",
+    "expectedFailures": [
+      "normalized mass matches universe and prior"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "measure-stage-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "f46cc021f04e51118edcfb9be88028c5ab2998edb3c1847cd7442c98129b9d1e",
+    "expectedFailures": [
+      "unknown stage entry refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "outcome-stage-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "ce450f8294db4ea0a3555f4e3afb9b7c535515a263e39b0e9c414989cae078ae",
+    "expectedFailures": [
+      "empty computed rows retain and validate their stage references"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "scope-refusal-skipped",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "39be462d284944610f66eed637bc1840099468f3132c380e11ab04c4936970f4",
+    "expectedFailures": [
+      "Assessed on a non-Declared target refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "multiple-bindings-accepted",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "bb5d0ddf36e4f74521f3f5f45a9f515912ac9b9c9f4dccfaa9ec25c566640e73",
+    "expectedFailures": [
+      "record mixing two results refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "inventory-binding-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "52b3598732e198c537bb92977d91072df8071ecb994f0a5b578c37826f55fe7e",
+    "expectedFailures": [
+      "foreign inventory binding refuses even when unit ids and segmentation match"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "source-binding-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "6a60e38b212af95db38bdd50405c4855a47dcb7fdb9e03ef1018f09fdb533668",
+    "expectedFailures": [
+      "bound values refuse a different source fingerprint"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "scope-binding-unchecked",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "30b747c4e2192f31973ba6b884947a2e32993389c62e2a2db5774dfa7b7b82f2",
+    "expectedFailures": [
+      "bound values refuse a different source scope"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "truncation-demoted",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "55b07982cf7dfb5b918370b7369fddeea2325a4d715a92ee5f4d3e8073a1c3e6",
+    "expectedFailures": [
+      "Truncated(8) is retained"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "request-identity-dropped",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "223e409b510c9d064f176049f90ffb7de3b8e45c714e6fd9385111f97285faa9",
+    "expectedFailures": [
+      "record digest distinguishes values, failure reasons and request identity"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "package-construction-doors",
+    "platform": "JVM",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "e1c9c3fc571846498e866f8f3614252f84a974ea400c229280f43ef997f9c4fc",
+    "expectedFailures": [
+      "result has no unchecked construction",
+      "bound derivation is owner constructed"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 6, Failed 2, Errors 0, Passed 4"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "name": "package-construction-doors",
+    "platform": "JS",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "e1c9c3fc571846498e866f8f3614252f84a974ea400c229280f43ef997f9c4fc",
+    "expectedFailures": [
+      "result has no unchecked construction",
+      "bound derivation is owner constructed"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 6, Failed 2, Errors 0, Passed 4"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "name": "package-construction-doors",
+    "platform": "Native",
+    "sourceSha256": "69afd7163d2f9aad081e79c8eb12715aaca33ff6367df6be060c519460d471fe",
+    "mutantSha256": "e1c9c3fc571846498e866f8f3614252f84a974ea400c229280f43ef997f9c4fc",
+    "expectedFailures": [
+      "result has no unchecked construction",
+      "bound derivation is owner constructed"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 6, Failed 2, Errors 0, Passed 4"
+    ],
+    "cleanCompileAndTest": true
+  }
+]
