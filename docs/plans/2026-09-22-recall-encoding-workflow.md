@@ -803,3 +803,35 @@ live skips; 18 new tests pass on each backend, ten named mutations are killed,
 and independent exact Python answers agree. G2 timing remains open for producer intake, source-support
 integration and its downstream temporal contracts; scanner and StoryAtlas temporal
 acceptance remain separate.
+
+
+## 14. Production intake and supplied-support checkpoint — 22 September 2026
+
+The implementation at `7c9f9f04` on `solo/recall-intake-support` adds
+[offline production intake and support queries](../recall-timing-intake.md).
+`corpus-intake` verifies exact CSV bytes, explicit clock/columns and complete
+record-to-word replay against a checked graph/inventory. The `pipeline`
+`recallTimingIntake` command reconstructs that context and emits the existing
+canonical timing sidecar, a complete correspondence receipt, and an atomic
+completion manifest. Original parser and external timing identities remain distinct.
+
+`TemporalSupport.read` selects a declared part or mapping-qualified occurrence,
+retains supplied interval unions/points and excluded geometry, and derives
+transitive missing-locus/coordinate accounting. Cycles and foreign-stream evidence
+on overlapping occurrence mappings refuse. The new contextual support query codec
+leaves mapping-record/v0.1 and source-representation/v1 unchanged; the latter's
+legacy immediate-child coverage field is not authority for temporal allocation.
+
+Focused JVM and synthetic CLI checks pass. Independent Python intake/word-clock
+and exact Fraction answers agree; corrupted outputs are rejected. Separate cold
+review repaired occurrence provenance and partial completion-marker publication.
+Ten named compiled mutations were caught and restored controls passed all 23 focused
+JVM tests. The full exact-source portability gate is pending at this checkpoint;
+qualification evidence will record its actual outcome before landing.
+
+Next: integrate these checked inputs with the separately owned temporal query and
+exchange/facade contracts, preserving allocation-free bounds and unavailable mass.
+Scanner work still requires independently verified recording/subject/run bindings;
+StoryAtlas consumes the provider's checked results after its M1 handoff. This
+checkpoint does not infer exposure from onsets, project missing source coordinates,
+allocate posterior mass, establish scanner alignment or qualify fine localization.

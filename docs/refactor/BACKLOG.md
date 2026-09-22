@@ -243,8 +243,12 @@ Mote: `bd-01M2WVH1DC8ZPDC992G4MX3TXG` · doing · lane `next` · priority 1.
 
 2026-09-22 checkpoint: checked portable word timing and contextual sidecar are
 [qualified](evidence/recall-timing-portable-20260922/README.md) at `be121883`.
-Production timing intake and occurrence-qualified source-support integration remain
-open; temporal queries and scanner transforms retain their separate owners.
+Production timing intake and occurrence-qualified source-support readouts are implemented
+on `solo/recall-intake-support` at `7c9f9f04`, with focused JVM and independent-reader
+checks passing; ten compiled mutations were caught with restored controls green.
+Full portability qualification is pending.
+See [intake/support guide](../recall-timing-intake.md). Temporal queries, scanner
+transforms and exchange/facade composition retain their separate owners.
 
 Prerequisites: `bd-01M2WVENSB0P955Y0B603CC20Y`.
 

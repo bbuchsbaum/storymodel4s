@@ -1,0 +1,120 @@
+{
+  "coordinate": {
+    "axis": {
+      "bundle": "bundle:ee99d82953e9",
+      "edition": {
+        "status": "present",
+        "value": "synthetic-large-ticks"
+      },
+      "extent": {
+        "end_exclusive_tick": "9007199254741003",
+        "start_tick": "0",
+        "status": "playback-ticks",
+        "timebase": {
+          "denominator": "9007199254740993",
+          "numerator": "1"
+        }
+      },
+      "fingerprint": "3037cc02d2c5d91434b482eca3c6c10f6eb40e3a8d1f07e6879acef2e9c783fc",
+      "id": "axis:bef738250164",
+      "kind": "EditionPlayback",
+      "origin": {
+        "status": "present",
+        "value": "0"
+      },
+      "source_kind": {
+        "status": "FilmEdition"
+      },
+      "timebase": {
+        "status": "present",
+        "value": {
+          "denominator": "9007199254740993",
+          "numerator": "1"
+        }
+      }
+    },
+    "bundle": "3c1215d2de4d8ff7a8267af9f4e92d49ba3f87a6a775db47fd45ce1c8f2dfe10",
+    "occurrence": {
+      "status": "absent"
+    }
+  },
+  "derivation": "supplied-temporal-support/v1",
+  "nodes": [
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "present",
+        "value": {
+          "axis": "axis:bef738250164",
+          "display_bounds": {
+            "maximum": "9007199254740993",
+            "minimum": "9007199254740993"
+          },
+          "intervals": [],
+          "points": [
+            "9007199254740993"
+          ]
+        }
+      },
+      "state": "Available",
+      "supplied_identity": {
+        "status": "present",
+        "value": "a1c4a2ac21383f0839ad1e1c8f21f146b52138a72fe8624ef8bf1c2d233bb17f"
+      },
+      "target": "seg:g1"
+    },
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "present",
+        "value": {
+          "axis": "axis:bef738250164",
+          "display_bounds": {
+            "maximum": "9007199254740993",
+            "minimum": "9007199254740993"
+          },
+          "intervals": [],
+          "points": [
+            "9007199254740993"
+          ]
+        }
+      },
+      "state": "Available",
+      "supplied_identity": {
+        "status": "present",
+        "value": "a1c4a2ac21383f0839ad1e1c8f21f146b52138a72fe8624ef8bf1c2d233bb17f"
+      },
+      "target": "sit:e2"
+    },
+    {
+      "excluded": {
+        "status": "absent"
+      },
+      "included": {
+        "status": "absent"
+      },
+      "state": "Unlocated",
+      "supplied_identity": {
+        "status": "absent"
+      },
+      "target": "sit:e4"
+    }
+  ],
+  "schemaVersion": "temporal-support/v0.1",
+  "selection": {
+    "bundle": "3c1215d2de4d8ff7a8267af9f4e92d49ba3f87a6a775db47fd45ce1c8f2dfe10",
+    "status": "part"
+  },
+  "source_digest": "b4d640414bea9b234ddb4ff0f2f0d1cc4e07488932c3fd9d9571ed8216fd58c4",
+  "target": "seg:g1",
+  "unavailable_descendants": [
+    "sit:e4"
+  ],
+  "unlocated_descendants": [
+    "sit:e4"
+  ]
+}
