@@ -1,0 +1,732 @@
+{
+  "schema": "workspace-m1-formalization/v1",
+  "date": "2026-09-22",
+  "scope": "Tracker and documentation setup only; no runtime implementation or test qualification",
+  "actor": "codex-workspace-milestone-20260922",
+  "ids": {
+    "support": "bd-01M19956MFSG7076QE4J66T7E9",
+    "records": "bd-01M2WVENSB0P955Y0B603CC20Y",
+    "adoption": "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ",
+    "interaction": "bd-01M16KDH0TM7DF2BC0K08TH0TT",
+    "goal": "bd-01M34J9FS10B14WQA309K0P6V8",
+    "packet": "bd-01M34JAX5KKWECCY72KD4ZV0BW",
+    "atlas_goal": "bd-01M34JJ6QAW89VD68MNJKEWTMB",
+    "loader": "bd-01M34JJ6YR2K714HPAPT8YTES6",
+    "save_export": "bd-01M34JJ77XECH5T7J2K1ZKGFV8",
+    "acceptance": "bd-01M34JJ7A88WEAR1MX61B5Q3J9"
+  },
+  "stores": {
+    "model": {
+      "root": "/Users/bbuchsbaum/code/scala/storymodel4s",
+      "headAtSetup": "182d74aeed3b5a8bcd013de51e7024cc426c544b",
+      "issues": [
+        {
+          "key": "goal",
+          "id": "bd-01M34J9FS10B14WQA309K0P6V8",
+          "title": "M1: one reproducible source-plus-recall investigation",
+          "status": "open",
+          "bodySha256": "6f9e22a2ea013a679ccdab4bd60138dff96fa57b013a571e7c494ea217afd650",
+          "dependencies": [],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+            }
+          ]
+        },
+        {
+          "key": "support",
+          "id": "bd-01M19956MFSG7076QE4J66T7E9",
+          "title": "G1: honest support assessment before shared evidence and confidence",
+          "status": "open",
+          "bodySha256": "94b5a90023e46956b18367a1f068f3c2275e7bc70a297e4edc74e2ba82d5bf41",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+            },
+            {
+              "kind": "parent",
+              "parent": "bd-01M34J9FS10B14WQA309K0P6V8"
+            }
+          ]
+        },
+        {
+          "key": "records",
+          "id": "bd-01M2WVENSB0P955Y0B603CC20Y",
+          "title": "G1: checked mapping records, stage provenance and versioned codec",
+          "status": "open",
+          "bodySha256": "6291b0fddb64af5e9d6d6a67898f4614280772e3245c5ab05da1b81f38d2b67f",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+            },
+            {
+              "kind": "blocks",
+              "parent": "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+            },
+            {
+              "kind": "parent",
+              "parent": "bd-01M34J9FS10B14WQA309K0P6V8"
+            }
+          ]
+        },
+        {
+          "key": "packet",
+          "id": "bd-01M34JAX5KKWECCY72KD4ZV0BW",
+          "title": "[M1] Publish checked workspace packet, fixed-cut matrix and acceptance fixtures",
+          "status": "open",
+          "bodySha256": "26e432151fec00a7ae53d2dd73ee6c36af1df7ba21d3807af88e2083baf3028e",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M2WVENSB0P955Y0B603CC20Y"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M34J9FS10B14WQA309K0P6V8"
+            }
+          ]
+        }
+      ],
+      "readyExecutionIds": [
+        "bd-01M19956MFSG7076QE4J66T7E9"
+      ],
+      "localDependencyGraphAcyclic": true,
+      "bodiesReadBack": true,
+      "doctor": {
+        "actor": "codex-workspace-milestone-20260922",
+        "actor_ok": true,
+        "actor_source": "flag",
+        "format": {
+          "error": null,
+          "ok": true,
+          "schema_version": 1
+        },
+        "fsck": {
+          "bad_filename": [],
+          "bad_hash": [],
+          "bad_json": [],
+          "bad_op_shape": [],
+          "ops_checked": 14445,
+          "tmp_cleaned": 0,
+          "tmp_total": 0
+        },
+        "fsck_clean": true,
+        "fsck_error": null,
+        "git_backing": {
+          "as_of_ts": "2026-09-22T12:51:05.489734Z",
+          "deleted_op_count": 0,
+          "head": "182d74aeed3b5a8bcd013de51e7024cc426c544b",
+          "mode": "git_backed",
+          "modified_op_count": 0,
+          "oldest_uncommitted_age_s": 89083,
+          "oldest_uncommitted_op_ts": "2026-09-21T12:06:22.642095Z",
+          "repository_root": "/Users/bbuchsbaum/code/scala/storymodel4s",
+          "staged_op_count": 0,
+          "tracked_op_count": 14423,
+          "uncommitted_op_count": 22,
+          "unparseable_uncommitted_count": 0,
+          "untracked_op_count": 22,
+          "working_op_count": 14445
+        },
+        "layout": {
+          "local": true,
+          "ops": true,
+          "root": true,
+          "tmp": true
+        },
+        "ok": true,
+        "store_root": "/Users/bbuchsbaum/code/scala/storymodel4s/.mote",
+        "warnings": [
+          "git-backed op store has 22 uncommitted operation(s); oldest is 1d00h44m; clones populated from Git cannot observe them; synchronize the op files before asking those producers to refresh"
+        ]
+      },
+      "newOperationFiles": [
+        {
+          "path": ".mote/ops/20260922T124343.777982Z-p30953-c0000-rf22f-h345169.json",
+          "sha256": "3f9b5885951a610ca5dae7d38f9d14b2b0edc5ffc02a738f44e26d9df5c48c52"
+        },
+        {
+          "path": ".mote/ops/20260922T124343.792967Z-p30953-c0001-r947e-h5b08c9.json",
+          "sha256": "7a58856ecd5641a4beebc700a5d564de72b91bdc2c2632700b6d7b5248e3629a"
+        },
+        {
+          "path": ".mote/ops/20260922T124343.805032Z-p30953-c0002-ra511-hc5c43f.json",
+          "sha256": "5c44204306a4b3607f22d3720821ef7279af82869902fd80993e8d5ce14281e4"
+        },
+        {
+          "path": ".mote/ops/20260922T124430.259448Z-p31697-c0000-r1ef4-hbdb640.json",
+          "sha256": "f69f54339d3fa1794e22a6799a581d5f884b39f308ce77f3bf36fc743fefbbb0"
+        },
+        {
+          "path": ".mote/ops/20260922T124430.283864Z-p31697-c0001-r526c-hf0dc6e.json",
+          "sha256": "c10c7422fd7cf486f3dca7b7ea0277bd3b295117169738580c3cc732072873ba"
+        },
+        {
+          "path": ".mote/ops/20260922T124430.302821Z-p31697-c0002-r9c59-hd25cb0.json",
+          "sha256": "72ccc54d0b963fb078ad19d29071968987cde825cc2a7f82aeecd2b61426c955"
+        },
+        {
+          "path": ".mote/ops/20260922T124430.312745Z-p31697-c0003-ra7df-h08322a.json",
+          "sha256": "dc39501c4afeb70afaf49b35da39e9088a7c3d921ea3ebc86773c61d5c7e916f"
+        },
+        {
+          "path": ".mote/ops/20260922T124440.618402Z-p31891-c0000-rd63c-hd75ecb.json",
+          "sha256": "324f8e6fbe3d561a6ce74b75b47a0d0bb8281abac8309a8a77baaaf220e8192b"
+        },
+        {
+          "path": ".mote/ops/20260922T124450.440819Z-p32799-c0000-r76fd-h44187c.json",
+          "sha256": "ee880d6d3bdcd1f865cd7c50be356a1d3304569a5a1d204cf3273228550708a3"
+        },
+        {
+          "path": ".mote/ops/20260922T124500.003915Z-p32870-c0000-r2a27-h93c610.json",
+          "sha256": "77efd671d200decae743df98cd785415ad99cc23edc7c65b349d394756bb8b6d"
+        },
+        {
+          "path": ".mote/ops/20260922T124509.429860Z-p32893-c0000-re720-ha04b05.json",
+          "sha256": "b1fcd3ef0f4e6e43470b822a4c7800673011d4875e89738ac9709979d957beea"
+        },
+        {
+          "path": ".mote/ops/20260922T124518.816906Z-p32919-c0000-re6c4-h3d6c1d.json",
+          "sha256": "17480274dedb7ad4c99a74c859c9e7a09ab8ad01add49a7c29b19f4bbfa5a50b"
+        },
+        {
+          "path": ".mote/ops/20260922T124523.593718Z-p32919-c0001-r80e7-h3d7408.json",
+          "sha256": "ba764b752ec771b2898d55cfe9240bc8d56d25c7c72cf41b2afa2c4e2a081056"
+        },
+        {
+          "path": ".mote/ops/20260922T124533.040163Z-p32951-c0000-rc584-h4e641b.json",
+          "sha256": "21fe2e9fdafb50f06810f3c52587f4d8a3de949e4e9879c389bf7889dd3888f6"
+        },
+        {
+          "path": ".mote/ops/20260922T124537.723829Z-p32951-c0001-rb3da-h3ead91.json",
+          "sha256": "fb3093ce8ea5f3e31d625fed33244695f435d546992418e76b1d0968e943c874"
+        },
+        {
+          "path": ".mote/ops/20260922T124547.446019Z-p32980-c0000-r8d89-h336ee5.json",
+          "sha256": "f9817f2bc259b9a95bda0a37142c501851a0396632bc313c4b0461b51fb60451"
+        },
+        {
+          "path": ".mote/ops/20260922T124557.729024Z-p33268-c0000-r7048-hef906a.json",
+          "sha256": "a89c7e2b4bd78e82ce643de03ccc3476b1a0df414600f7ac70bab35b47cf0245"
+        },
+        {
+          "path": ".mote/ops/20260922T124854.862084Z-p34560-c0000-r9e60-h926c08.json",
+          "sha256": "5d49ff741274d2ecac64951be8d7fe2d81610e670cf6c1cf292731b967114b36"
+        }
+      ],
+      "gitDiffCheck": true,
+      "gitReplayEquivalentM1Fields": [
+        "id",
+        "title",
+        "body",
+        "status",
+        "deps",
+        "relations",
+        "tags"
+      ]
+    },
+    "atlas": {
+      "root": "/Users/bbuchsbaum/code/scala/storyatlas4s",
+      "headAtSetup": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+      "issues": [
+        {
+          "key": "atlas_goal",
+          "id": "bd-01M34JJ6QAW89VD68MNJKEWTMB",
+          "title": "M1: inspect, save and reopen one joined source-recall workspace",
+          "status": "open",
+          "bodySha256": "544a3decd8a3e0eb96b6a686ae474f9354b92ac7372033d9e73b1e1b270a7ce1",
+          "dependencies": [],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M1C2A5HGJ0MM1X7N8Z5EAZBD"
+            }
+          ]
+        },
+        {
+          "key": "adoption",
+          "id": "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ",
+          "title": "[M1] Adopt the checked workspace provider packet at an exact pin",
+          "status": "blocked",
+          "bodySha256": "2660f774bece0d9ff39cad742bef1a6539c11db0b8d7adb5c14ed2a0c9ba4453",
+          "dependencies": [],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M1C2A5HGJ0MM1X7N8Z5EAZBD"
+            },
+            {
+              "kind": "parent",
+              "parent": "bd-01M34JJ6QAW89VD68MNJKEWTMB"
+            }
+          ]
+        },
+        {
+          "key": "loader",
+          "id": "bd-01M34JJ6YR2K714HPAPT8YTES6",
+          "title": "[M1] Open checked source-recall bundles without rebuilding app.js",
+          "status": "open",
+          "bodySha256": "8fe1bdf4754c0e94e68705accb7dab2a81d856cf40d5064751ebcc95ac22587f",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M34JJ6QAW89VD68MNJKEWTMB"
+            }
+          ]
+        },
+        {
+          "key": "interaction",
+          "id": "bd-01M16KDH0TM7DF2BC0K08TH0TT",
+          "title": "[M1] Share selection, matrix and exact source-recall evidence",
+          "status": "open",
+          "bodySha256": "e0dcacb7638eb580edfac266d29aaee5ce81292886c5b195fec935e3f6398c20",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M34JJ6YR2K714HPAPT8YTES6"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M1C2A5HGJ0MM1X7N8Z5EAZBD"
+            },
+            {
+              "kind": "parent",
+              "parent": "bd-01M34JJ6QAW89VD68MNJKEWTMB"
+            }
+          ]
+        },
+        {
+          "key": "save_export",
+          "id": "bd-01M34JJ77XECH5T7J2K1ZKGFV8",
+          "title": "[M1] Save, reopen and export an identity-bound investigation",
+          "status": "open",
+          "bodySha256": "07932da37b6024274185c4ef5635c05dee5bc3d2b77ba96df7a33c94c17017d9",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M16KDH0TM7DF2BC0K08TH0TT"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M34JJ6QAW89VD68MNJKEWTMB"
+            }
+          ]
+        },
+        {
+          "key": "acceptance",
+          "id": "bd-01M34JJ7A88WEAR1MX61B5Q3J9",
+          "title": "[M1] Qualify the complete two-fixture researcher journey",
+          "status": "open",
+          "bodySha256": "aed064e34eac6f6675fad62bd8181b42e2ad24bef744b05203d817a65e0e877a",
+          "dependencies": [
+            {
+              "kind": "blocks",
+              "parent": "bd-01M34JJ77XECH5T7J2K1ZKGFV8"
+            }
+          ],
+          "relations": [
+            {
+              "kind": "parent",
+              "parent": "bd-01M34JJ6QAW89VD68MNJKEWTMB"
+            }
+          ]
+        }
+      ],
+      "readyExecutionIds": [],
+      "localDependencyGraphAcyclic": true,
+      "bodiesReadBack": true,
+      "doctor": {
+        "actor": "codex-workspace-milestone-20260922",
+        "actor_ok": true,
+        "actor_source": "flag",
+        "format": {
+          "error": null,
+          "ok": true,
+          "schema_version": 1
+        },
+        "fsck": {
+          "bad_filename": [],
+          "bad_hash": [],
+          "bad_json": [],
+          "bad_op_shape": [],
+          "ops_checked": 671,
+          "tmp_cleaned": 0,
+          "tmp_total": 0
+        },
+        "fsck_clean": true,
+        "fsck_error": null,
+        "git_backing": {
+          "as_of_ts": "2026-09-22T12:52:25.308012Z",
+          "deleted_op_count": 0,
+          "head": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+          "mode": "git_backed",
+          "modified_op_count": 0,
+          "oldest_uncommitted_age_s": 2080989,
+          "oldest_uncommitted_op_ts": "2026-08-29T10:49:16.790521Z",
+          "repository_root": "/Users/bbuchsbaum/code/scala/storyatlas4s",
+          "staged_op_count": 0,
+          "tracked_op_count": 5,
+          "uncommitted_op_count": 666,
+          "unparseable_uncommitted_count": 0,
+          "untracked_op_count": 666,
+          "working_op_count": 671
+        },
+        "layout": {
+          "local": true,
+          "ops": true,
+          "root": true,
+          "tmp": true
+        },
+        "ok": true,
+        "store_root": "/Users/bbuchsbaum/code/scala/storyatlas4s/.mote",
+        "warnings": [
+          "git-backed op store has 666 uncommitted operation(s); oldest is 24d02h03m; clones populated from Git cannot observe them; synchronize the op files before asking those producers to refresh"
+        ]
+      },
+      "newOperationFiles": [
+        {
+          "path": ".mote/ops/20260922T124829.418065Z-p34505-c0000-r44ec-he6ee2e.json",
+          "sha256": "7274d1509ddd3a1b7efa5480beb0e9b1898c8f928bae26abfb8a1773158ef611"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.445803Z-p34505-c0001-rebf4-h925df3.json",
+          "sha256": "1b6550a4a3e808df98951ae6156cd58f895b567168b111484ef9f17e9c07468d"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.463892Z-p34505-c0002-rd65a-h529b1e.json",
+          "sha256": "99d311b4053f0469e53c0ccff7820c2dcc1c638010c63b8562a8e932c1a032e7"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.534335Z-p34506-c0000-rf4a5-h6a5b4f.json",
+          "sha256": "5ba36616473bd981995242020b255eec2e9e0c31d240f9bdb6268486e4c42235"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.583870Z-p34507-c0000-rd1b4-h4875a3.json",
+          "sha256": "14f53c4560424e6be4895270af41a051deba8c28f33b948ccf6958b186134c01"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.606784Z-p34507-c0001-re132-h19ffba.json",
+          "sha256": "139dfc5be4fab8d056422b788143aefe4e4d8693b7eabb455adcb8d019bd8898"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.656082Z-p34508-c0000-rf27a-h6ce632.json",
+          "sha256": "0eb5982a24ca6ce66428ad35c12231647c359c7c8a8e4c5cdaf7c5461f971813"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.664960Z-p34508-c0001-rb0ec-h0cec1a.json",
+          "sha256": "a463643b1bafe9ec4c3d75040ccaa8cbd0e7bcd8681dc3c4572a772479b11b30"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.674791Z-p34508-c0002-re7c7-h29172c.json",
+          "sha256": "63482432be3eee3ac27001087857de9f07f131f18dc80a485ce7e431e1565b52"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.682818Z-p34508-c0003-rba5b-h521946.json",
+          "sha256": "78860680cdf7d97db75b68a697229f0e9ed4d8a2d2748727333d3572b6f3455a"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.745250Z-p34509-c0000-rfe28-h14632e.json",
+          "sha256": "f58d6ecba106f383a491b01fe4ad28d3dcbeda1a51431a9a98a33caceef3150f"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.788932Z-p34510-c0000-rd596-h2d826a.json",
+          "sha256": "c52174a306ed6d91c50cb490dfba7e6f7a16d251ee35fe3cdd4777a12e61ae1d"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.811551Z-p34510-c0001-r8a21-h0f60b1.json",
+          "sha256": "1ce903cb2a73cb0003032d4a2c45e36bcf91fd7c72721a3508f1654f4e5b745e"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.855666Z-p34511-c0000-rec36-h71892d.json",
+          "sha256": "91ad5461be36bc60813a444c74342965bbc197dff2eda74593f3e5890a781e24"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.902581Z-p34512-c0000-rc130-h2f36f9.json",
+          "sha256": "df15253c3a8a2221f238cfc929e94000f5478c92d4a78c12017e7a4f0b01c594"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.949883Z-p34514-c0000-r597d-h741ecd.json",
+          "sha256": "7f422d5a7a722550c8941443c67aca8f41959c9946eed83a0bae9da89a72bd88"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.959901Z-p34514-c0001-rb873-hbe105d.json",
+          "sha256": "f1a409af6d4211b3b2803c9bc893570d06c16e2f88e557d18e13a3ad4f21fba2"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.969337Z-p34514-c0002-r664d-hf5945b.json",
+          "sha256": "b176c224862d9fabd1eb11e49a9cd50604562c0349c034638bba77d467708b6a"
+        },
+        {
+          "path": ".mote/ops/20260922T124829.977764Z-p34514-c0003-r6d55-h602aa4.json",
+          "sha256": "256a0a7a7c6d1e87b7bbf7e3b2f9f27b80bb692995d9be805e12871a807ecc80"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.024572Z-p34517-c0000-rb6f1-hdd2e8a.json",
+          "sha256": "c73afad4621adc0a7dfb04a28ca5fdd938875a42e82e4f5667b43f1109a2058c"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.032784Z-p34517-c0001-rb986-h77cfd3.json",
+          "sha256": "2cedeb8a3cd9ea42f36a551acf70a5ecbc788e9d796cdc3f0c28894b6ec7a045"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.041848Z-p34517-c0002-r462e-ha219d0.json",
+          "sha256": "447560143944f1505cca4636ebbd04d132872513d3e7423a575909f1c1d84ecd"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.050846Z-p34517-c0003-r1c13-h84cb04.json",
+          "sha256": "86bd6f72a3ddacd669c17e269b9b3f14372dead5d68d801bbf2b9095d9fa143d"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.095959Z-p34521-c0000-rcbf8-hac52ed.json",
+          "sha256": "83f8ff9220174e837dfa4bac210873d128b217aa610813b168ed5f3f43beebe0"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.146757Z-p34524-c0000-rf828-h3cc275.json",
+          "sha256": "8c74f8e2d4a03510775180a124c5516257d885f2d99fba7eaa4d5b7b25d9d93e"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.193236Z-p34526-c0000-r3fb9-h975edc.json",
+          "sha256": "eb15b995b327537ea580f04f5b36f0e19a7452a5a1f370806053874be6a9d006"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.240592Z-p34527-c0000-r6519-h5024c6.json",
+          "sha256": "c0908a3d2dcd768cb909c7caed7081a0e86c417c8ae81497030418fa8ffcb1c1"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.285885Z-p34528-c0000-r99cc-h60efb4.json",
+          "sha256": "f440fb80bc48ffb5d3f7f8e68ea2528af210d665d7c5848c11e36e15f7433b9a"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.334447Z-p34529-c0000-r0a4d-h912a06.json",
+          "sha256": "3d218e05500e2347eae46e699205a407809cbe2085b5f360ddc11b705238445a"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.381760Z-p34530-c0000-rd666-h6fdd29.json",
+          "sha256": "a08c64d8d1d53ece148b9a936ee3aedf8406b20c8580cacbc952a36747449f07"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.428521Z-p34531-c0000-r9f84-h42cc52.json",
+          "sha256": "44a27213c50be05dfa7bfbabb8d4d9faf06ae5f2be75403291c0f520d95196be"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.473655Z-p34532-c0000-rbf4e-hdb23b3.json",
+          "sha256": "ec3247ba093fd8a4f5b614bf0f159518df711cfee8cd74d4d7ade9c952e81aa5"
+        },
+        {
+          "path": ".mote/ops/20260922T124830.518269Z-p34533-c0000-r3fa2-h33ba91.json",
+          "sha256": "6736abbb93bc28dedd4f1a9bf7d7cffa25fba1d743201e724c313faf999bf5ad"
+        },
+        {
+          "path": ".mote/ops/20260922T125202.290809Z-p35957-c0000-r0314-heb97d9.json",
+          "sha256": "535fe491661b88fa53d3ae72f841d9a0703eb1846e2cc98d0909d9d113e6a942"
+        },
+        {
+          "path": ".mote/ops/20260922T125202.361921Z-p35958-c0000-r7a1b-h35fb75.json",
+          "sha256": "067272c040e6a20abee67615f705d6ce1d8aeadb5c3b3e5a7ad26b3ee15e7300"
+        },
+        {
+          "path": ".mote/ops/20260922T125202.426516Z-p35959-c0000-r1b9b-hc4f064.json",
+          "sha256": "8d4aba943adcabbbdd6f4c5c08dad5c96a0db1badd32d20ae27e273f80a9d926"
+        },
+        {
+          "path": ".mote/ops/20260922T125202.498901Z-p35960-c0000-r686d-h5157b0.json",
+          "sha256": "8d70d4037a959d30ba29f89d1dd70777b2b22e793289a1e4065eab5f160b5b97"
+        }
+      ],
+      "gitDiffCheck": true,
+      "requiredExistingOperationFiles": [
+        {
+          "path": ".mote/ops/20260829T111029.914840Z-p92937-c0000-r9ab2-hdfc980.json",
+          "sha256": "78a05ed97e9e3d2663111f05665b0d9c6355b27a2fdd1a659ebb19341a79002e",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260829T111029.953005Z-p92937-c0001-r07ae-h0c1bf1.json",
+          "sha256": "aadd38148332d248af335f8f6c93cfd36ee414e05874c238b22153e0bd408b92",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260829T111029.966101Z-p92937-c0002-r883b-h748dea.json",
+          "sha256": "ecb32f6444da26b52d30666daac76b1506f6d73dcd2503f73554575234e4b1ec",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260829T111106.218909Z-p93996-c0001-r0f6f-h552b91.json",
+          "sha256": "2795b982082241453d14b4351726bd56dedfd50db92abee3584125e0bc28d5fe",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260829T112110.431932Z-p34547-c0000-rb681-he620d2.json",
+          "sha256": "e3eaf847e1352556a3b8558ed0fc58529748d2c7b68aab70a40f6c0a9ba47c52",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T140700.656866Z-p59195-c0000-r66c7-h281bd2.json",
+          "sha256": "ab64a191d141c338726820e96fab552d59a2ddfd95c8cd48dd2b802848da979d",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T140700.672685Z-p59195-c0001-r61f7-h357ed9.json",
+          "sha256": "1c0ec8f227aad39fb1f1d9f75f57bdadb4709388b222a2287ddd0077e9358ff3",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T140700.683620Z-p59195-c0002-r140f-h04ad18.json",
+          "sha256": "59bc9d118ed1c9e196687c78d30a8c86383ad172f2dbee921879f095b1a0cb29",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T140700.692565Z-p59195-c0003-r6a68-hdfe6dc.json",
+          "sha256": "338053d7e0e1d2c5aefa38a9acdf5cdc5bbc343cd5f99b03e79c9a6b2dbfafca",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T140700.702603Z-p59195-c0004-re655-h565967.json",
+          "sha256": "d11bb67f1581afe9a631efef7cb461611dd8f543ae179adda19f3120eb820b0f",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141606.969954Z-p70693-c0000-rfc10-h73e7bb.json",
+          "sha256": "2bbf27846c5ae7de483d141296cddeb30f33ec17289c641e5331884106411369",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141606.979973Z-p70693-c0001-rb2b3-h8d2696.json",
+          "sha256": "437890722ee96ad9ca2b30daafced472797f434a2e43a0ebc12288818462cc44",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141606.989756Z-p70693-c0002-rd1a3-hfd2ac1.json",
+          "sha256": "647ab2f0a7e1bd63e09b086c203d14403d499a3bb8420a19dee7f0cc98f6f566",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.000115Z-p70693-c0003-raa75-h6a0ce6.json",
+          "sha256": "8d7eb327b0c91898cd2f0032066ecf8a562aba3042ea4f3f8156930caf659450",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.009770Z-p70693-c0004-r195c-hb4aa3d.json",
+          "sha256": "8057611b0d6037b550c6e3067f4e8fc9d9877a3c64dc04a867bec78a220d6cec",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.303597Z-p70700-c0000-r53cd-h9bd8e0.json",
+          "sha256": "56ff94c2106ece3b00e14eacb9bb77b15bd127752bd2bc6fa360d631755bd8e8",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.468519Z-p70701-c0000-rbebb-hb25384.json",
+          "sha256": "f8b1f27833648a687fe1f57058e02a978ae5bf3b7177001d24d4b87819d3f595",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.477428Z-p70701-c0001-r74fe-hc4e4d1.json",
+          "sha256": "04146928eb2a504a13cd175a8b95ed17c00a459bf4c187878493fbb9b8770654",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.486436Z-p70701-c0002-r977d-h7138fe.json",
+          "sha256": "56d9ce4d67f0587f30d47c3ce21da43849054c86ae335023bddd4cb7163809c9",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.494399Z-p70701-c0003-r9bfd-hb21230.json",
+          "sha256": "2761bd5e004cc1670d0ae7b008e184a2fcf18e3880182953380bb33de792af76",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141607.503383Z-p70701-c0004-r6fc5-h4d821b.json",
+          "sha256": "8092f001bb9496b45a262777ed1f5aa62160a6aae8e7a2f29e9e260ec49840ce",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141719.960360Z-p71891-c0000-r64ed-h4728d4.json",
+          "sha256": "fa4422323111dbcaa3d7b4809cace3fdde07946cba94cf4be6ff6e4ff7f718ee",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141720.376627Z-p71894-c0000-r2308-h7f25a8.json",
+          "sha256": "1d306a003d133a9d6cdb30d11a30397b50965afefbf054fd6392137b833aaac9",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141721.322850Z-p71901-c0000-rbf09-ha89532.json",
+          "sha256": "fedbed66a9a5710b6261972f799ae54ec7fd7dada25e989bbc771b3a4163a4f4",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141722.150843Z-p71907-c0000-r9a6e-h09fecf.json",
+          "sha256": "8854b9e571a989955286e42ea752a06db9d314076e96a37a04cb2d38f12b9e30",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T141722.432180Z-p71909-c0000-rfd28-h03e77b.json",
+          "sha256": "634dde4ba2f049752fdbdd7d8a1cde49fda8974a887cbffb89469025a09d91af",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T142033.859810Z-p75419-c0000-rd4f7-h0843cd.json",
+          "sha256": "5f1a9643acb3d49193b15345ecbac6be036e8952127885098d7e79a09e33562a",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        },
+        {
+          "path": ".mote/ops/20260831T142034.007880Z-p75443-c0000-re4ec-h57ef92.json",
+          "sha256": "40fd789a66c7a465a3c8d95143c2852018c72d2473890dfb3deeb9bd292087ea",
+          "reason": "Original ordinary ticket metadata required to replay reused tickets and replaced dependency edges"
+        }
+      ],
+      "gitReplayEquivalentM1Fields": [
+        "id",
+        "title",
+        "body",
+        "status",
+        "deps",
+        "relations",
+        "tags"
+      ]
+    }
+  },
+  "crossStoreGate": {
+    "consumer": "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ",
+    "provider": "bd-01M34JAX5KKWECCY72KD4ZV0BW",
+    "mechanism": "Explicit blocked local adoption; reopen only when exact producer commit, generator, schema/digests and receipts exist; consumer gate required before closure"
+  },
+  "finalAcceptance": "bd-01M34JJ7A88WEAR1MX61B5Q3J9",
+  "secondNarrativeAcceptancePreserved": true,
+  "charterLocalLinksExist": true,
+  "coldReview": {
+    "reviewer": "fresh-context m1_plan_review agent",
+    "outcome": "No blocking finding",
+    "advisory": "Clarify early-ticket test scope to avoid requiring the completed workflow before adoption",
+    "resolution": "Updated adoption, loader, interaction and export tickets: current-slice tests only; complete M1 journey belongs to final acceptance",
+    "limits": "Plan review only; live bodies/edges/readiness independently checked by parent; no runtime courts"
+  }
+}

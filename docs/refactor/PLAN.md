@@ -6,6 +6,16 @@ Baseline: `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. This is the active deliver
 The [backlog](BACKLOG.md) gives live Mote IDs, ticket acceptance criteria and scheduling lanes;
 the [reconciliation](RECONCILIATION.json) accounts for every previously unfinished ticket.
 
+## Active product milestone: M1 (22 September 2026)
+
+The owner has activated [one reproducible source-plus-recall investigation](goals/source-recall-workspace-m1-20260922.md),
+Mote `bd-01M34J9FS10B14WQA309K0P6V8`. Its execution sequence is support honesty -> G1 records -> checked
+producer packet -> StoryAtlas adoption/loading -> shared selection/matrix/evidence -> saved-state
+replay/export and exact-pair acceptance. This bounded integration of the existing viewer supersedes
+the earlier deferral of viewer work for this milestone only. The reference-measurement, film and
+release commitments below remain in force on their own lanes and do not all gate M1.
+Live Mote and the goal's explicit dependency/receipt handoffs supersede older next-task prose.
+
 ## 1. Assessment
 
 The project needs a correction at its inference-to-analysis boundary, not a rewrite. Keep the
