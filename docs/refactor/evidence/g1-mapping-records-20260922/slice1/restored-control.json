@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "schema_version": 1,
+    "started_utc": "2026-09-22T14:39:18.921894+00:00",
+    "finished_utc": "2026-09-22T14:39:35.323723+00:00",
+    "duration_seconds": 16.401555,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+      "codecJVM/testOnly storymodel4s.codec.MappingMiniatureDigestSuite"
+    ],
+    "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+    "log": "/private/tmp/workspace-m1-evidence/g1/slice1-mutations/restored-control.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 900.0,
+    "log_bytes": 1672
+  },
+  "logSha256": "6590061d01a029a7fc056f51e8733a949193a8dff8498d785a4bf4e20b133432",
+  "totals": [
+    "[info] Passed: Total 1, Failed 0, Errors 0, Passed 1"
+  ],
+  "failures": [],
+  "sourceSha256": "26b912bf3735973a6ae0452abccb969ad3f41cf7031db0bb16384cdcd67d3ee0",
+  "cleanCompileAndTest": false
+}

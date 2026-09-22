@@ -1,0 +1,17 @@
+{
+  "schema": "storymodel4s.plan-cold-review/v1",
+  "reviewer": "m1_g1_plan_review",
+  "base": "6de935f1",
+  "reviewedRevision": 3,
+  "correctedRevision": 4,
+  "verdict": "design accepted for implementation after explicit factory wording corrections; no further review round requested",
+  "findings": [
+    "Input identities do not distinguish different HsmmResults: add result-content identity and recompute at all three derived factories.",
+    "Derived rows must retain unit; binding must retain inventory digest.",
+    "Source and recall optional predicate/outcome/cause None versus Some(empty) require presence-sensitive supplemental digests.",
+    "Link constructors need explicit checked candidate ID, recomputed at outcome construction.",
+    "Owner-created components require nesting or fully checked factories, never unchecked package access.",
+    "Universe restriction applies to Target destinations; externals remain accepted."
+  ],
+  "verification": "Separate read-only fresh-context review and correction readback; no builds or executable claims. Slice courts remain mandatory."
+}

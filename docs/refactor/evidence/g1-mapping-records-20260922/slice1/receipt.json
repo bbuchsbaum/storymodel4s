@@ -1,0 +1,9 @@
+{
+  "base": "bad36f95",
+  "scope": "G1 Slice 1 independent miniature transcription",
+  "fixtureSha256": "be3f8c3d8b4595cd4e58ba0ef8135f26b702cc9c470f4d0a0b2ed8f17d742fc3",
+  "control": "one JVM digest/equality test passed; laws JS and Native compiled",
+  "mutations": "two compiled production-data mutants killed by transcription equals fixture; restored one-test control passed",
+  "environment": "initial sandbox denied sbt boot lock before build; authorized rerun passed",
+  "archiveSha256": "13dd7eaaa5ecb0d5f72a4b00187bb4ad99a2d8a25585cac2dd952d4ccf7b8f2c"
+}

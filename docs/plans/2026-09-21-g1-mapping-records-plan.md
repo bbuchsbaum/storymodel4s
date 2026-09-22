@@ -1,4 +1,4 @@
-# G1 mapping records: implementation plan (revision 3)
+# G1 mapping records: implementation plan (revision 4)
 
 Mote `bd-01M2WVENSB0P955Y0B603CC20Y`. **Plan only.** Nothing named below exists yet. Type, file
 and suite names are acceptance specifications, not implemented or executed code. Governing
@@ -6,6 +6,17 @@ documents: [PLAN](../refactor/PLAN.md) §§2–3, [ADR 0019](../adr/0019-mapping
 and the [analysis contract](../refactor/ANALYSIS_CONTRACT.md) ("the contract"). Code references
 are `path:line` at main `f49bec1b`; support-honesty references are at `solo/support-honesty`
 `b8d02822`.
+
+**Revision 4 (2026-09-22).** The required cold re-review of revision 3 found that
+N1 was incomplete. A binding must identify the actual result, inventory, originating
+unit and presence-sensitive fidelity inputs, not just the legacy input fingerprints.
+The corrections below preserve the ten slices and reserved-authority boundary.
+Support honesty is now landed at `bad36f95`, qualified at `6de935f1`.
+
+Construction rule: owner-created components use nesting inside their enclosing
+owner (public type aliases may expose them), or a complete public checked factory.
+An unrelated companion cannot call a bare-private constructor. Never repair that
+by adding an unchecked `private[align]` or `private[recall]` producer.
 
 **Revision 3 (2026-09-21).** Folds [cold review 2](../refactor/evidence/g1-mapping-records-plan-20260921/cold-review-2.json)
 of revision 2 (`990c162d`): N1–N15 plus the residuals it lists under `priorFindings`. §12 maps
@@ -77,7 +88,7 @@ conflations; a decomposition detector; calibration; new modules.
 | No decision | `decoded_target_mass = {"status":"no-decision"}` and no `decoded_target_id` | Contract has no form (N4) |
 | Fidelity | `fidelity_status` / `fidelity_facets` come only from `FidelityReport`. The new `gate_outcome` field holds the ModeGate result. The unit-level `fidelity_assessment_status` is the chosen link's status. | ANALYSIS_CONTRACT.md:118 |
 | Content-term support | Required, tagged `term_support` (`evaluated` + hsmm/v4 assessment \| `not-computed` + reason) replaces the undefined `assessment_support_id` | D1, D4 |
-| Derivation binding | New mandatory `derivation_source`: `none` \| `bound` + `recall_checksum`, `view_fingerprint`, `scope_digest` | N1 |
+| Derivation binding | New mandatory `derivation_source`: `none` \| `bound` + `recall_checksum`, `recall_supplement`, `inventory_digest`, `view_fingerprint`, `scope_digest`, `result_digest`; bound rows also retain `unit` | N1, revision 4 |
 | Optional values | Every optional value is a tagged object; the codec never emits an absent key. This includes policy absences, the asserted receipt, and the timebase (`PresentationAxis.timebase` is `Option`, `core/.../source.scala:576`). | Coordinator ruling: absence carries a reason |
 | Axis origin | The contract's axis `origin` is the playback extent's start tick (decimal string); a text axis's origin is character 0 | `AxisExtent.PlaybackTicks.start`; no core "origin" field |
 | Target identity | `target_id` = `SourceNodeRef.key` under `target-id/source-node-ref/v1` | D4; opaque IDs are the reference ticket's |
@@ -170,13 +181,14 @@ object UnitOutcome:
 New file `mappingmeasures.scala`:
 
 ```scala
-final class DerivationBinding private (val recallChecksum: Checksum, val viewFingerprint: ViewFingerprint, val scopeDigest: Checksum)
+final class DerivationBinding private (val recallChecksum: Checksum, val recallSupplement: Checksum,
+    val inventoryDigest: Checksum, val viewFingerprint: ViewFingerprint, val scopeDigest: Checksum, val resultDigest: Checksum)
 object DerivationBinding:
-  def of(recall: RecallGraph[Checked], inventory: RecallInventory, view: SourceView, source: SourceRepresentation)
+  def of(result: HsmmResult, recall: RecallGraph[Checked], inventory: RecallInventory, view: SourceView, source: SourceRepresentation)
       : Either[MappingRefusal, DerivationBinding]
   // requires inventory.describes(recall), ViewFingerprint.of(view) == source.viewFingerprint,
   // and the view's scope digest == source.scopeDigest
-sealed trait MeasureDerivation   // Supplied | FromResult(binding)
+sealed trait MeasureDerivation   // Supplied | FromResult(binding, unit)
 enum MeasureKind { case RawScore, NormalizedScoreMass, TransportMass, ModelPosterior, CalibratedProbability }
 enum ScoreDirection { case HigherIsBetter, LowerIsBetter }
 final class RawScores private (val channel: String, val direction: ScoreDirection, val scale: String,
@@ -187,7 +199,7 @@ object RawScores:
 final class NormalizedScoreMass private (val universe: TargetUniverseId, val prior: ReferencePriorId, val temperature: Double,
     val mass: Map[Destination, Double], val stage: StageEntryId)    // Σ = 1 within MappingTolerance.RowSum = 1e-9
 final class TransportMass private (val rowBudget: Double, val mass: Map[Destination, Double], val stage: StageEntryId)
-final class ModelPosterior private (val mass: Map[AlignState, Double], val stage: StageEntryId, val binding: DerivationBinding)
+final class ModelPosterior private (val unit: RecallUnitId, val mass: Map[AlignState, Double], val stage: StageEntryId, val binding: DerivationBinding)
 object ModelPosterior:
   def of(result: HsmmResult, unit: RecallUnitId, binding: DerivationBinding, stage: StageEntryId): Either[MappingRefusal, ModelPosterior]
 sealed trait CalibratedEvent     // ChosenDecisionCorrect(policy)
@@ -199,23 +211,47 @@ sealed trait FidelityStatus      // NotAssessed(reason), NotApplicable | Assesse
 sealed trait TermSupportStatus   // NotComputed(NoCostBreakdown) | Evaluated(SupportAssessment) [derived only]
 final class MappingLink private (val destination: Destination, val gate: GateOutcome, val fidelity: FidelityStatus,
     val termSupport: TermSupportStatus, val inferenceStage: StageEntryId, val candidateSet: CandidateSetId,
-    val binding: Option[DerivationBinding]) // Some iff gated/Evaluated; the wire never shows an absent key
+    val derivation: MeasureDerivation) // bound links retain their originating unit
 object MappingLink:
-  def ungated(destination: Destination, stages: UnitStageRefs): MappingLink // NotGated, NotAssessed(NoGateEvaluation), NotComputed
+  def ungated(destination: Destination, stages: UnitStageRefs, candidateSet: CandidateSetId): MappingLink // NotGated, NotAssessed(NoGateEvaluation), NotComputed
   def fromResult(result: HsmmResult, binding: DerivationBinding, recall: RecallGraph[Checked], view: SourceView,
-      source: SourceRepresentation, unit: RecallUnitId, state: AlignState, stages: UnitStageRefs): Either[MappingRefusal, MappingLink]
+      source: SourceRepresentation, unit: RecallUnitId, state: AlignState, stages: UnitStageRefs,
+      candidateSet: CandidateSetId): Either[MappingRefusal, MappingLink]
 ```
 
 **Binding (N1).** `ModelPosterior.of`, `RawScores.fromCosts` and `MappingLink.fromResult` refuse
 unless `result.recallChecksum == binding.recallChecksum` and
 `result.viewFingerprint == binding.viewFingerprint`, as `CellCoordinates.of` does
 (`align/.../trace.scala:108-132`). `fromResult` also requires that `recall` and `view` hash to the
-binding.
+binding. All three producers (`ModelPosterior.of`, `RawScores.fromCosts`, and
+`MappingLink.fromResult`) recompute and compare `resultDigest`; passing result B
+with result A's binding refuses separately at each factory. B with its own binding
+is the accepting control. `DerivationBinding.of` first checks the supplied result's
+legacy recall/view fingerprints against the supplied recall/view before minting the
+binding. `UnitOutcome.computed` refuses a
+derived measure or link whose originating unit differs from the outcome unit.
+`MappingResult.checked` compares the binding's inventory digest with its inventory.
+
+The result-content digest is derived in align from every HsmmResult field exported
+or consulted by G1 (including posterior, costs/support, admissibility and state/mode
+identity). Two validated results over identical inputs with different posterior or
+cost values must have different bindings. This is content identity, not inference
+authority, and does not change the existing HSMM wire.
 
 `ViewFingerprint.of` does not render `NodeSummary.propositional` (`align/.../wire.scala:85-152`).
-The binding's scope digest closes that gap: it is sorted by ref key over each target's scope. At
-Slice 5 start, confirm that every other `NodeSummary` field `FidelityFacets.assess` reads is
-rendered; any that is not joins the scope digest.
+The binding's scope digest closes that gap: it is sorted by ref key over each target's
+full scope, including `Undeclared(reason)`, and tagged optional predicate/outcome/cause.
+The legacy source and recall renders collapse `None` and `Some("")` for these three
+fields, whereas fidelity distinguishes them. A recall supplement therefore includes
+the corresponding tagged optional values for every unit. Keep both legacy formats
+unchanged. At Slice 5 start, check every fidelity input for faithful rendering, not
+merely presence in a render. Six independent None/Some-empty controls must show
+different reports and G1 bindings, and refusal under the other context.
+
+Link factories accept a checked `CandidateSetId.of(candidatesStage, unit, basisKeys)`.
+`computed` recomputes it from its actual decision basis and refuses a link carrying
+another unit's or another basis's ID. Factories cannot infer this ID from a link's
+destination or the union of all measures.
 
 **Gate and fidelity.**
 - The gate comes from `result.admissibility` (`hsmm.scala:299`) for the link's own unit and anchor.
@@ -392,12 +428,13 @@ object MappingResult:
 
 `checked` refuses each of the following, with a specific `MappingRefusal` case:
 1. outcomes that are not exactly the inventory's units, in order;
-2. destinations outside `policies.universe`, or a universe not contained in the representation;
+2. `Destination.Target` values outside `policies.universe`, or a universe not contained in the
+   representation; explicit external destinations are permitted;
 3. dangling, duplicate, non-canonical or non-recomputing ledger and candidate-set IDs;
 4. `roles` whose `SegmentationId` is not the inventory's (N13);
 5. a `NormalizedScoreMass` whose universe or prior differs from `policies` (N13);
 6. **binding (N1)** — more than one distinct binding among derived values; any bound value while
-   the inventory and representation disagree with the binding; `Assessed` on a target whose
+   the inventory digest and representation disagree with the binding; `Assessed` on a target whose
    representation scope is not `Declared`.
 
 The derivation source is derived: `Bound(b)` when any value is bound, otherwise
@@ -435,7 +472,8 @@ control (N7).
    - `context.inventory.describes(recall)`;
    - the context view's fingerprint and scope digest equal the representation's;
    - `result.recallChecksum` and `result.viewFingerprint` equal the wire's `recall_checksum` and
-     `view_fingerprint`.
+     `view_fingerprint`; re-derive and compare every revision-4 binding field, including
+     result identity and presence-sensitive recall supplement, and every derived row's unit.
 5. Re-derive each authority value.
 6. Finish through `MappingResult.checked`.
 7. Apply the canonical guard.
@@ -445,7 +483,7 @@ control (N7).
 | Posterior rows | Must equal `ModelPosterior.of(result, …)` bit for bit |
 | Gated `gate_outcome`, `Assessed` | Must equal `MappingLink.fromResult(result, binding, recall, view, source, …)` |
 | `term_support` `evaluated` | Must equal `Evaluated(result.costs(unit)(state).support)` |
-| `term_support` `not-computed` | Only on a link equal to `MappingLink.ungated(destination, stages)`. A missing key refuses. |
+| `term_support` `not-computed` | Only on a link equal to `MappingLink.ungated(destination, stages, candidateSet)`. A missing key refuses. |
 | `derived`, `calibrated`, reserved statuses, `measurement_compatibility` | `Reserved` |
 | `Unknown(reason, asserted)` | Decoded exactly |
 
@@ -460,7 +498,7 @@ object HistoricalMapping:
 enum HistoricalDecode { case ArgmaxOnly; case Decoded(chosen: Map[RecallUnitId, Option[SourceNodeRef]], label: String) }
 ```
 
-**Binding.** The binding comes from `DerivationBinding.of(recall, inventory, view, source)`. That
+**Binding.** The binding comes from `DerivationBinding.of(result, recall, inventory, view, source)`. That
 covers the source-built-from-view and same-recall checks (m6, N1). The result must also match the
 binding, and `Decoded` must cover exactly the recall's units.
 
@@ -572,6 +610,14 @@ Rules for every slice:
 
 **Rough size:** 1,900–2,300 main lines and 2,800–3,400 test lines. Slices 4, 5 and 9 are the
 largest.
+
+Revision-4 additions to the existing slice courts: Slice 5 tests distinct result content
+over identical inputs, all six optional-presence collisions, and checked link IDs;
+Slice 6 swaps unequal derived rows between units with identical candidate keys and
+rejects foreign-unit/basis candidate IDs; Slice 7 rejects a foreign inventory binding
+and a mixed-result record; Slice 9 round-trips each unmixed record with its own context
+and refuses the other. Mutations remove each new guard in its owning slice. Positive
+public-construction controls accompany the external and descendant-package probes.
 
 ## 9. Evidence and gates
 

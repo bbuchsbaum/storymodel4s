@@ -1,0 +1,78 @@
+[
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:38:45.781360+00:00",
+      "finished_utc": "2026-09-22T14:39:02.405857+00:00",
+      "duration_seconds": 16.624215,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "codecJVM/testOnly storymodel4s.codec.MappingMiniatureDigestSuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice1-mutations/coordinate-altered.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 2432
+    },
+    "logSha256": "a34c42ca0ddc03db006602456dffd0d0fe91723ad75a7c82efe7cb2a582632a8",
+    "totals": [
+      "[error] Failed: Total 1, Failed 1, Errors 0, Passed 0"
+    ],
+    "failures": [
+      "==> X storymodel4s.codec.MappingMiniatureDigestSuite.transcription equals fixture 0.12s munit.ComparisonFailException: codec/.jvm/src/test/scala/storymodel4s/codec/MappingMiniatureDigestSuite.scala:100"
+    ],
+    "name": "coordinate-altered",
+    "sourceSha256": "26b912bf3735973a6ae0452abccb969ad3f41cf7031db0bb16384cdcd67d3ee0",
+    "mutantSha256": "a1998edf2d81ffde9a9665e473ce5c27aedfff70983315c66cd77c27979100cb",
+    "command": [
+      "codecJVM/testOnly storymodel4s.codec.MappingMiniatureDigestSuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "transcription equals fixture"
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:39:02.513857+00:00",
+      "finished_utc": "2026-09-22T14:39:18.815483+00:00",
+      "duration_seconds": 16.301355,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "codecJVM/testOnly storymodel4s.codec.MappingMiniatureDigestSuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice1-mutations/failure-packet-dropped.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 2524
+    },
+    "logSha256": "6e4670cfa29df9a0cd6b30461be7f095550e1a96643421e322034ae98ac57424",
+    "totals": [
+      "[error] Failed: Total 1, Failed 1, Errors 0, Passed 0"
+    ],
+    "failures": [
+      "==> X storymodel4s.codec.MappingMiniatureDigestSuite.transcription equals fixture 0.116s munit.ComparisonFailException: codec/.jvm/src/test/scala/storymodel4s/codec/MappingMiniatureDigestSuite.scala:100"
+    ],
+    "name": "failure-packet-dropped",
+    "sourceSha256": "26b912bf3735973a6ae0452abccb969ad3f41cf7031db0bb16384cdcd67d3ee0",
+    "mutantSha256": "8668c9dc31aef38e06fd93d480e49e69d40207b654d2f0dbba9cf88488d57cf2",
+    "command": [
+      "codecJVM/testOnly storymodel4s.codec.MappingMiniatureDigestSuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "transcription equals fixture"
+  }
+]

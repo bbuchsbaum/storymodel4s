@@ -70,6 +70,21 @@ ordinary integrity checks, rewriting historical seal digests, and treating an im
 reader scan as proof of guarded access. This adds no Scala module or dependency and does
 not establish the future release-manifest content contract.
 
+G1 construction decision (2026-09-22): implement revision 4 of the mapping-record plan
+in existing recall/align/codec modules. `MappingMiniature` is experimental test support
+in the published laws artifact; its public plain data transcribes the admitted synthetic
+fixture and carries no scientific authority. Bind derived mapping rows to their unit,
+inventory, source, presence-sensitive recall and source fidelity inputs, and the actual
+HsmmResult content. Each derived producer checks the supplied result against that binding.
+Reject an input-only binding: two caller-validated results over identical inputs can
+carry different values. Keep existing HSMM fingerprints and wire bytes unchanged.
+Checked candidate-set IDs are explicit link inputs and are recomputed from the actual
+decision basis by the outcome factory. Owner-created private components use enclosing
+owner nesting or complete checked factories; reject package-visible unchecked producers.
+The later slices add the detailed vocabulary and interchange amendments in the same
+G1 landing. `Derived`, calibrated probabilities and calibrated decisions remain reserved
+with no construction door; identity does not establish that inference executed.
+
 The Memento task and seal (2026-09-21) use the same shared guard with fixed corpus paths.
 The independent population rule retains 123 participants; the owner chose 63 test and 60
 development, stratified 14/17/15/17 test across conditions, with seed 20260921. SHA-256 ranking
