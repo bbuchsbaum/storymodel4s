@@ -26,7 +26,7 @@ object MappingMatrix:
   ):
     def cell(destination: Destination): Option[Cell] = cells.find(_.destination == destination)
 
-  /** A dictionary coordinate can exist without a supplied value. Some(0) is a measured zero; None
+  /** A dictionary coordinate can exist without a supplied value. Some(0) is a supplied zero; None
     * is absence. The posterior vector must never be collapsed to one target probability. Raw
     * measure objects preserve channel, scale, direction, stage and derivation identity.
     */

@@ -192,3 +192,11 @@ all supplied external destinations, original measure metadata and separate poste
 fidelity states. Missing values remain absent; literal zero remains zero. Reject a display
 cut that recomputes child or parent values, renormalizes a cropped row, or turns a processing
 failure into an external probability. Presentation selection does not alter this projection.
+
+`WorkspaceArchive` and `WorkspaceArchiveCodec` provide the M1 single-file offline UTF-8
+transport. They verify the manifest and the actual capability artifact before returning
+inspectable contents or serializing a packet. The owner declaration binds exact model,
+recall and declaration-receipt bytes, with no default grants. Unknown/duplicate fields and
+malformed UTF-8 refuse with content-free diagnostics. This is byte and permission admission,
+not the semantic join. Reject a permissive generic archive decoder or byte repair; binary
+sidecar transport is outside this first version and needs its own declared encoding.
