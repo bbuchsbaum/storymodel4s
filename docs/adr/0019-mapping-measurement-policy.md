@@ -172,3 +172,16 @@ projection API follows G1 and its own checked implementation; this planning reco
 adds no module, dependency or implemented Scala type. StoryAtlas consumes the same
 checked queries and exports as Python/R, preserving measure units, missingness and
 semantic identity under zoom, selection and replay.
+
+M1 workspace packet decision (2026-09-22): a joined investigation uses a thin
+`WorkspaceManifest` in `view`, with existing `ArtifactRef`, `ArtifactRole`, `BundlePath`
+and checksum primitives. `WorkspaceRole`, `WorkspaceDisposition`, `WorkspaceEntry` and
+content-free `WorkspaceRefusal` distinguish mandatory source/model, recall, inventory,
+mappings, derivation, capabilities and receipts from optional features. Supplied bytes
+must match every identity exactly; unavailable roles carry no payload. Reject wrapping
+this in `BundleManifest` by inventing an acquisition result or a local-open preview
+certification: that existing manifest describes a story-build output profile.
+`WorkspaceCapabilities` is an explicit, artifact-bound owner declaration with separate
+inspection/export grants, not an authenticated license and never an inference from a
+checksum. Checked scientific joins and permission enforcement remain separate from byte
+admission. This adds no module or dependency and leaves G1 authority reservations intact.
