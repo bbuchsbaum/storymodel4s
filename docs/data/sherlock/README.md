@@ -77,6 +77,12 @@ Those stages must consume the identities and coordinate semantics here. They may
 infer source edition, repair clocks from filenames, collapse aliases, or promote the
 30-event diagnostic into accepted narrative structure.
 
+The [recall-clock intake oracle](../../../tools/recall-study/README.md#explicit-recall-clock-intake)
+now checks a selected CSV against `recall-lineage.json`, explicitly selects either
+released clock and optionally verifies `alias-map.json`. It emits content-free
+numeric records and provenance for adapter validation. A scanner-run crosswalk,
+canonical word-inventory join and word offsets remain explicitly unavailable.
+
 Primary public sources are the
 [Chen lab timestamped-transcript release](https://github.com/jchenlab-jhu/Word-timestamped-transcripts),
 its [Zenodo release](https://doi.org/10.5281/zenodo.8208709), and the

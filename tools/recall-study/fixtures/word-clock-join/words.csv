@@ -1,0 +1,6 @@
+Words,princeton-word-onset-seconds,princeton-tr-number,princeton-tr-onset-seconds,openneuro-word-onset-seconds,openneuro-tr-number,openneuro-tr-onset-seconds
+Anna,0,1,0,,6,7.5
+,1,2,1.5,8.5,7,9
+arrived.,1.25,2,1.5,8.75,7,9
+Bob,2.5,3,3,10,8,10.5
+left.,3.5,4,4.5,9,9,12

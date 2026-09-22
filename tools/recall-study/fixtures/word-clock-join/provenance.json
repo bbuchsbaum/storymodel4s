@@ -1,0 +1,12 @@
+{
+  "schema": "storymodel4s.word-clock-fixture-provenance/v1",
+  "producerSource": "b7d908a8",
+  "producerEvidence": "80d4fbd2",
+  "producerArtifact": "historical.json",
+  "localFixture": "g1-historical.json",
+  "sha256": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7",
+  "expectedSource": "codec/src/test/scala/storymodel4s/codec/MappingCodecFixture.scala",
+  "generator": "codec/.jvm/src/test/scala/storymodel4s/codec/MappingCodecArtifacts.scala",
+  "timingCsvOrigin": "original synthetic; independently authored after producer record",
+  "meaning": "real G1 synthetic mapping record, invented external onsets; no participant or accuracy claim"
+}

@@ -1,0 +1,308 @@
+{
+  "binding": {
+    "clockSource": {
+      "alias": {
+        "status": "not-requested"
+      },
+      "artifactSetId": "synthetic-word-clock-join-v1",
+      "csvByteLength": 267,
+      "csvSha256": "8555a5468ff1854bf15b58feffd49ce5de0d59d6d9faf44c3952e3d740f07ff3",
+      "lineageSha256": "63e568c8c31f2ae41269db38bec02311409ec796f550e8f0e82d2ed8cdd80f01",
+      "sourceId": "recall-source-06"
+    },
+    "declaredMappingRecordDigest": "50089af8b939848e8c0d44180095eddd7ffae2f3c010c5a89f8a29deb91c9790",
+    "inventoryDigest": "1a4915caa8d45c063ec7d5bcd452e0e684eae24ea08056335a82545028fe71b3",
+    "mappingFileSha256": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7",
+    "mappingSchemaVersion": "mapping-record/v0.1",
+    "segmentationId": "4ee23d2170137829779e39ef9d83f60246d1189adfad082310c0a584be29b8c7",
+    "transcriptChecksum": "4b8d9d501b96b4568c5a61b54afb37cab155afd8cd2bc7f180aeb28ec2e8709e",
+    "wordIdPolicy": {
+      "input_artifact": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f",
+      "name": "input-artifact-sha256+zero-based-parsed-word-index/v1"
+    }
+  },
+  "capabilities": {
+    "scannerAlignment": {
+      "reason": "no-verified-run-crosswalk",
+      "status": "unavailable"
+    },
+    "temporalInterpolation": {
+      "reason": "no-exposure-policy",
+      "status": "unavailable"
+    },
+    "wordOffsets": {
+      "reason": "onsets-only",
+      "status": "unavailable"
+    }
+  },
+  "clock": {
+    "appliedOffset": "0",
+    "basis": "declared-release-export",
+    "column": "openneuro-word-onset-seconds",
+    "selection": "openneuro",
+    "unit": "seconds"
+  },
+  "counts": {
+    "excludedRecords": 1,
+    "missingWordOnsets": 1,
+    "records": 5,
+    "unassignedWords": 0,
+    "units": 2,
+    "words": 4
+  },
+  "producer": {
+    "intakeSha256": "11be103a55a81a76fade42de3a6c3d186c66b7617f4f9b82b698d3198793f607",
+    "readerSha256": "9c6777d02a610841f505c3ae5b6667100bd0318eb26a82f87814e21c7255c29f"
+  },
+  "recipe": "external-clock-exact-replay/v1",
+  "records": [
+    {
+      "correspondence": {
+        "status": "matched",
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:0"
+      },
+      "record": 1,
+      "selectedOnset": {
+        "reason": "blank-cell",
+        "status": "missing"
+      }
+    },
+    {
+      "correspondence": {
+        "reason": "empty-after-java-trim",
+        "status": "excluded"
+      },
+      "record": 2,
+      "selectedOnset": {
+        "decimal": "8.5",
+        "status": "observed"
+      }
+    },
+    {
+      "correspondence": {
+        "status": "matched",
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1"
+      },
+      "record": 3,
+      "selectedOnset": {
+        "decimal": "8.75",
+        "status": "observed"
+      }
+    },
+    {
+      "correspondence": {
+        "status": "matched",
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2"
+      },
+      "record": 4,
+      "selectedOnset": {
+        "decimal": "10",
+        "status": "observed"
+      }
+    },
+    {
+      "correspondence": {
+        "status": "matched",
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+      },
+      "record": 5,
+      "selectedOnset": {
+        "decimal": "9",
+        "status": "observed"
+      }
+    }
+  ],
+  "schema": "storymodel4s.recall-word-clock-join/v1",
+  "timingMeaning": "external-csv-record-onsets-transferred-through-exact-word-correspondence",
+  "units": [
+    {
+      "coverage": {
+        "missingOnsets": 1,
+        "observedOnsets": 1,
+        "status": "partial",
+        "totalWords": 2
+      },
+      "duration": {
+        "reason": "onsets-do-not-establish-duration",
+        "status": "unavailable"
+      },
+      "firstMeasuredOnset": {
+        "onset": {
+          "decimal": "8.75",
+          "status": "observed"
+        },
+        "record": 3,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1"
+      },
+      "firstMember": {
+        "onset": {
+          "reason": "blank-cell",
+          "status": "missing"
+        },
+        "record": 1,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:0"
+      },
+      "lastMeasuredOnset": {
+        "onset": {
+          "decimal": "8.75",
+          "status": "observed"
+        },
+        "record": 3,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1"
+      },
+      "lastMember": {
+        "onset": {
+          "decimal": "8.75",
+          "status": "observed"
+        },
+        "record": 3,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1"
+      },
+      "onsetOrder": {
+        "backwardPairs": [],
+        "equalPairs": 0,
+        "observedPairs": 0,
+        "possiblePairs": 1,
+        "scope": "adjacent-member-words-in-transcript-order",
+        "unobservedPairs": 1
+      },
+      "ordinal": 0,
+      "unitId": "u0",
+      "wordIds": [
+        "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:0",
+        "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1"
+      ]
+    },
+    {
+      "coverage": {
+        "missingOnsets": 0,
+        "observedOnsets": 2,
+        "status": "complete",
+        "totalWords": 2
+      },
+      "duration": {
+        "reason": "onsets-do-not-establish-duration",
+        "status": "unavailable"
+      },
+      "firstMeasuredOnset": {
+        "onset": {
+          "decimal": "10",
+          "status": "observed"
+        },
+        "record": 4,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2"
+      },
+      "firstMember": {
+        "onset": {
+          "decimal": "10",
+          "status": "observed"
+        },
+        "record": 4,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2"
+      },
+      "lastMeasuredOnset": {
+        "onset": {
+          "decimal": "9",
+          "status": "observed"
+        },
+        "record": 5,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+      },
+      "lastMember": {
+        "onset": {
+          "decimal": "9",
+          "status": "observed"
+        },
+        "record": 5,
+        "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+      },
+      "onsetOrder": {
+        "backwardPairs": [
+          {
+            "fromWord": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2",
+            "toWord": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+          }
+        ],
+        "equalPairs": 0,
+        "observedPairs": 1,
+        "possiblePairs": 1,
+        "scope": "adjacent-member-words-in-transcript-order",
+        "unobservedPairs": 0
+      },
+      "ordinal": 1,
+      "unitId": "u1",
+      "wordIds": [
+        "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2",
+        "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+      ]
+    }
+  ],
+  "validation": {
+    "fullMappingContextValidation": "not-performed",
+    "recordingIdentityBinding": "not-verified-by-this-reader",
+    "sameInputArtifact": false,
+    "structuralCorrespondence": "verified-exact-replay"
+  },
+  "words": [
+    {
+      "endExclusiveUtf16": 4,
+      "index": 0,
+      "membership": {
+        "status": "member",
+        "unit": "u0"
+      },
+      "onset": {
+        "reason": "blank-cell",
+        "status": "missing"
+      },
+      "record": 1,
+      "startUtf16": 0,
+      "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:0"
+    },
+    {
+      "endExclusiveUtf16": 13,
+      "index": 1,
+      "membership": {
+        "status": "member",
+        "unit": "u0"
+      },
+      "onset": {
+        "decimal": "8.75",
+        "status": "observed"
+      },
+      "record": 3,
+      "startUtf16": 5,
+      "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1"
+    },
+    {
+      "endExclusiveUtf16": 17,
+      "index": 2,
+      "membership": {
+        "status": "member",
+        "unit": "u1"
+      },
+      "onset": {
+        "decimal": "10",
+        "status": "observed"
+      },
+      "record": 4,
+      "startUtf16": 14,
+      "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2"
+    },
+    {
+      "endExclusiveUtf16": 23,
+      "index": 3,
+      "membership": {
+        "status": "member",
+        "unit": "u1"
+      },
+      "onset": {
+        "decimal": "9",
+        "status": "observed"
+      },
+      "record": 5,
+      "startUtf16": 18,
+      "wordId": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+    }
+  ]
+}
