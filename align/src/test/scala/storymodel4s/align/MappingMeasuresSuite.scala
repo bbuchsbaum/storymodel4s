@@ -96,12 +96,17 @@ class MappingMeasuresSuite extends FunSuite:
     }
   }
   test("raw costs retain their originating unit and binding") {
-    val value = RawScores.fromCosts(result, unit, bind(), scoring).toOption.get
-    assertEquals(value.values, result.costs(unit).map((s, c) => Destination.of(s) -> c.total))
-    assertEquals(value.direction, ScoreDirection.LowerIsBetter)
-    val derived = value.derivation.asInstanceOf[MeasureDerivation.FromResult]
-    assertEquals(derived.unit, unit)
-    assertEquals(derived.binding, bind())
+    recall.ordered.foreach { recalled =>
+      val value = RawScores.fromCosts(result, recalled.id, bind(), scoring).toOption.get
+      assertEquals(
+        value.values,
+        result.costs(recalled.id).map((s, c) => Destination.of(s) -> c.total)
+      )
+      assertEquals(value.direction, ScoreDirection.LowerIsBetter)
+      val derived = value.derivation.asInstanceOf[MeasureDerivation.FromResult]
+      assertEquals(derived.unit, recalled.id)
+      assertEquals(derived.binding, bind())
+    }
   }
   test("fidelity on the link's own unit") {
     val reports = recall.ordered.flatMap { u =>
@@ -247,4 +252,124 @@ class MappingMeasuresSuite extends FunSuite:
     val value = UnitMeasures.of(Vector(raw), None, None, Some(posterior)).toOption.get
     assertEquals(value.destinations, raw.values.keySet ++ posterior.mass.keys.map(Destination.of))
     invalid(UnitMeasures.of(Vector(raw, raw), None, None, None), "unitMeasures.raw")
+  }
+
+  test("fidelity consumes the checked inventory instead of an unbound lookup") {
+    val id = AnnaFixture.u2.id
+    val state = AlignState.Source(AnnaFixture.e5)
+    val ordinary =
+      link(id, state).toOption.get.fidelity.asInstanceOf[FidelityStatus.Assessed].report
+    val misleading = new SourceView:
+      def nodes: Vector[NodeSummary] = view.nodes
+      def node(ref: SourceNodeRef): Option[NodeSummary] =
+        view.node(ref).map(_.copy(predicate = Some("foreign-action")))
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        view.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
+      def scoringLength: Int = view.scoringLength
+    val value = MappingLink
+      .fromResult(
+        result,
+        bind(),
+        recall,
+        misleading,
+        source(view),
+        id,
+        state,
+        stages,
+        candidate(id)
+      )
+      .toOption
+      .get
+    assertEquals(value.fidelity.asInstanceOf[FidelityStatus.Assessed].report, ordinary)
+    assertEquals(ordinary(Facet.Action), FacetVerdict.Correct)
+  }
+  test("binding checks and fidelity consume one captured node inventory") {
+    val id = AnnaFixture.u2.id
+    val state = AlignState.Source(AnnaFixture.e5)
+    var reads = 0
+    val changing = new SourceView:
+      def nodes: Vector[NodeSummary] =
+        reads += 1
+        if reads == 1 then view.nodes
+        else view.nodes.map(_.copy(predicate = Some("changed-after-snapshot")))
+      def node(ref: SourceNodeRef): Option[NodeSummary] = view.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        view.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
+      def scoringLength: Int = view.scoringLength
+    val value = MappingLink.fromResult(
+      result,
+      bind(),
+      recall,
+      changing,
+      source(view),
+      id,
+      state,
+      stages,
+      candidate(id)
+    )
+    assert(value.isRight, value.toString)
+    assertEquals(reads, 1)
+    assertEquals(
+      value.toOption.get.fidelity.asInstanceOf[FidelityStatus.Assessed].report(Facet.Action),
+      FacetVerdict.Correct
+    )
+  }
+
+  test("binding construction consumes one captured node inventory") {
+    var reads = 0
+    val changing = new SourceView:
+      def nodes: Vector[NodeSummary] =
+        reads += 1
+        if reads == 1 then view.nodes
+        else view.nodes.map(_.copy(predicate = Some("changed-after-snapshot")))
+      def node(ref: SourceNodeRef): Option[NodeSummary] = view.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        view.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
+      def scoringLength: Int = view.scoringLength
+    assert(DerivationBinding.of(result, recall, inventory(recall), changing, source(view)).isRight)
+    assertEquals(reads, 1)
+  }
+  test("binding refuses a foreign inventory") {
+    val changed = RecallGraph
+      .validated(
+        recall.copy(
+          units = recall.units.map(u => u.copy(id = RecallUnitId.unsafe("foreign-" + u.id.value))),
+          relations = RecallRelations.empty
+        )
+      )
+      .toOption
+      .get
+    assertEquals(
+      DerivationBinding.of(result, recall, inventory(changed), view, source(view)).left.toOption,
+      Some(MappingRefusal.BindingMismatch("inventoryDigest"))
+    )
+    assert(DerivationBinding.of(result, recall, inventory(recall), view, source(view)).isRight)
+  }
+
+  test("snapshot preserves explicitly empty hierarchy adjacency") {
+    val withoutHierarchy = new SourceView:
+      val nodes: Vector[NodeSummary] = view.nodes
+      def node(ref: SourceNodeRef): Option[NodeSummary] = view.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        if layer == RelationLayer.Hierarchy then Map.empty else view.adjacency(layer)
+      val worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
+      val scoringLength: Int = view.scoringLength
+    assert(withoutHierarchy.nodes.exists(_.parent.nonEmpty))
+    assert(withoutHierarchy.adjacency(RelationLayer.Hierarchy).isEmpty)
+    val result = GraphHsmm
+      .infer(recall, withoutHierarchy, AnnaFixture.candidates, AnnaFixture.costModel)
+      .toOption
+      .get
+    val value = DerivationBinding.of(
+      result,
+      recall,
+      inventory(recall),
+      withoutHierarchy,
+      source(withoutHierarchy)
+    )
+    assert(value.isRight, value.toString)
+    assertEquals(value.toOption.get.viewFingerprint, ViewFingerprint.of(withoutHierarchy))
   }

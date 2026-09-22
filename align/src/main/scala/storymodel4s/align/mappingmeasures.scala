@@ -250,9 +250,10 @@ object MappingLink:
       stages: UnitStageRefs,
       candidateSet: CandidateSetId
   ): Either[MappingRefusal, MappingLink] =
+    val checkedView = MappingBindingRender.snapshot(view)
     for
       derivation <- MeasureDerivation.fromResult(result, unit, binding)
-      _ <- binding.checkContext(recall, view, source)
+      _ <- binding.checkContext(recall, checkedView, source)
       recalled <- recall.byId.get(unit).toRight(MappingRefusal.UnknownUnit(unit))
       cost <- result.costs
         .get(unit)
@@ -270,7 +271,7 @@ object MappingLink:
         case Some(ref) =>
           for
             target <- source.target(ref).toRight(MappingRefusal.UnknownTarget(ref))
-            node <- view.node(ref).toRight(MappingRefusal.UnknownTarget(ref))
+            node <- checkedView.node(ref).toRight(MappingRefusal.UnknownTarget(ref))
             admitted <- result.admissibility
               .get(unit)
               .flatMap(_.get(ref))

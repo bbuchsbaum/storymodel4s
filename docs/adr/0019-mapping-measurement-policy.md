@@ -97,6 +97,11 @@ one published part ID would name different full identities, and cross-part detec
 counts resolved primary axes. Reject deduplication by legacy ID: an executed witness
 admitted two different coordinate parts as one. Composition remains explicitly declared.
 
+G1 assessment decision (2026-09-22): capture a source view's node inventory and relation
+coordinates once, then validate and assess that immutable snapshot. Reject a later lookup
+as fidelity input: an executed counterexample changed Action from Correct to Wrong under
+an unchanged binding. This changes no inference or existing source-view contract.
+
 The Memento task and seal (2026-09-21) use the same shared guard with fixed corpus paths.
 The independent population rule retains 123 participants; the owner chose 63 test and 60
 development, stratified 14/17/15/17 test across conditions, with seed 20260921. SHA-256 ranking

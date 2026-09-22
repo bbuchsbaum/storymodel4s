@@ -64,15 +64,16 @@ object DerivationBinding:
       view: SourceView,
       source: SourceRepresentation
   ): Either[MappingRefusal, DerivationBinding] =
+    val checkedView = MappingBindingRender.snapshot(view)
     if result.recallChecksum != AlignWire.recallChecksum(recall) then
       Left(MappingRefusal.BindingMismatch("recallChecksum"))
     else if !inventory.describes(recall) then
       Left(MappingRefusal.BindingMismatch("inventoryDigest"))
     else if result.viewFingerprint != ViewFingerprint.of(
-        view
+        checkedView
       ) || source.viewFingerprint != result.viewFingerprint
     then Left(MappingRefusal.BindingMismatch("viewFingerprint"))
-    else if MappingSourceRender.scope(view.nodes) != source.scopeDigest then
+    else if MappingSourceRender.scope(checkedView.nodes) != source.scopeDigest then
       Left(MappingRefusal.BindingMismatch("scopeDigest"))
     else
       Right(
@@ -112,6 +113,23 @@ object MeasureDerivation:
   */
 private[align] object MappingBindingRender:
   import MappingRender.{sequence, optional}
+
+  /** Capture each exposed coordinate once; later validation and assessment read this value. */
+  def snapshot(view: SourceView): SourceView =
+    val capturedNodes = view.nodes
+    val capturedAdjacency =
+      RelationLayer.values.toVector.map(layer => layer -> view.adjacency(layer)).toMap
+    val capturedWorldOrder = view.worldOrder
+    val capturedScoringLength = view.scoringLength
+    new SourceView:
+      val nodes: Vector[NodeSummary] = capturedNodes
+      private val index = nodes.map(n => n.ref -> n).toMap
+      def node(ref: SourceNodeRef): Option[NodeSummary] = index.get(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        capturedAdjacency(layer)
+      val worldOrder: Option[Map[SourceNodeRef, Int]] = capturedWorldOrder
+      val scoringLength: Int = capturedScoringLength
+
   private def number(v: Double): String = CanonicalDouble.render(v)
   private def state(v: AlignState): String = sequence(AlignState.keyParts(v))
   private def weighted(values: Map[AlignState, Double]): String = sequence(
