@@ -3,7 +3,7 @@ package storymodel4s.view
 import java.nio.charset.StandardCharsets
 import munit.FunSuite
 import storymodel4s.core.*
-import storymodel4s.acquire.MediaTypeId
+import storymodel4s.acquire.{MediaTypeId, OutputLabel, OutputNamespace}
 
 class WorkspaceManifestSuite extends FunSuite:
   private val mapping = WorkspaceRole.Mapping(ArtifactId.unsafe("policy-a"))
@@ -37,6 +37,36 @@ class WorkspaceManifestSuite extends FunSuite:
     assertEquals(result.entries.map(_.role.key), roles.map(_.key).sorted)
     entries.foreach(e => assertEquals(result.bytes(e.role), files.get(e.path)))
     assertEquals(result.mappings, Vector(mapping))
+  }
+  test("mapping and feature roles admit the full ArtifactId length without throwing") {
+    val id = ArtifactId.unsafe("x" * 256)
+    Vector(
+      WorkspaceRole.Mapping(id) -> "mapping",
+      WorkspaceRole.Features(id) -> "features"
+    ).foreach { (role, label) =>
+      val expected = ArtifactRole.Custom(
+        OutputNamespace.unsafe("workspace"),
+        OutputLabel.unsafe(label),
+        id
+      )
+      assertEquals(role.artifactRole, expected)
+      val path = BundlePath.unsafe("long-id.json")
+      val bytes = "long-id-payload".getBytes(StandardCharsets.UTF_8).toVector
+      val extra = WorkspaceEntry(
+        role,
+        path,
+        WorkspaceDisposition.Supplied(
+          ArtifactRef.fromBytes(
+            ArtifactId.unsafe("long-id-artifact"),
+            expected,
+            MediaTypeId.unsafe("application/json"),
+            None,
+            bytes.toArray
+          )
+        )
+      )
+      assert(admit(entries :+ extra, files.updated(path, bytes)).isRight)
+    }
   }
   test("unsupported version refuses before any body admission") {
     assertEquals(

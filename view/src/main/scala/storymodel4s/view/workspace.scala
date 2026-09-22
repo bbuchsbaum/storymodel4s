@@ -23,7 +23,10 @@ enum WorkspaceRole:
     case other       =>
       ArtifactRole.Custom(
         OutputNamespace.unsafe("workspace"),
-        OutputLabel.unsafe(other.key),
+        OutputLabel.unsafe(other match
+          case Mapping(_)  => "mapping"
+          case Features(_) => "features"
+          case _           => other.key),
         other match
           case Mapping(id)  => id
           case Features(id) => id
