@@ -317,3 +317,86 @@ class WorkspaceJoinSuite extends FunSuite:
       true
     )
   }
+
+  test("a foreign model interpretation with unchanged story, text and local IDs refuses") {
+    val first = model.graph.situations.toVector.collectFirst {
+      case (id, SituationNode.Event(event)) => id -> event
+    }.get
+    val graph = model.graph.copy(situations =
+      model.graph.situations.updated(
+        first._1,
+        SituationNode.Event(
+          first._2.copy(description = "A synthetic spaceship carries a telescope")
+        )
+      )
+    )
+    val foreign = StoryModel
+      .draftText(
+        model.atlas,
+        graph,
+        model.hierarchy,
+        model.trajectory,
+        model.featureSpaces,
+        model.sidecars,
+        model.featureRefs,
+        model.descriptors,
+        model.hypotheses,
+        model.sensoryProfiles,
+        model.receipt,
+        model.schemaVersion
+      )
+      .toOption
+      .get
+    assert(StoryValidator.validate(foreign).validated.isDefined)
+    assertEquals(foreign.source, model.source)
+    assertEquals(foreign.graph.situations.keySet, model.graph.situations.keySet)
+    assertEquals(create(m = foreign), Left(WorkspaceRefusal.SemanticJoinMismatch))
+  }
+
+  test("historical results are contextually decoded and cannot float to changed recall semantics") {
+    val view = pair._1
+    val result = GraphHsmm
+      .infer(
+        recall,
+        view,
+        Candidates.of(recall.ordered.map(u => u.id -> Vector(target, other)).toMap),
+        DefaultLocalCostModel(semantic = SemanticDistance.lexicalJaccard)
+      )
+      .toOption
+      .get
+    val historical = HistoricalMapping
+      .of(result, recall, view, inventory, source, HistoricalDecode.ArgmaxOnly)
+      .toOption
+      .get
+    val input = WorkspaceMappingInput(ArtifactId.unsafe("historical"), historical, Some(result))
+    val opened = create(records = Vector(input)).toOption.get
+    assertEquals(opened.policies.head.record.digest, historical.digest)
+    assertEquals(opened.policies.head.record.policies.inference, historical.policies.inference)
+    opened.policies.head.matrix.rows.foreach { row =>
+      assertEquals(row.cells.flatMap(_.posterior).toMap, result.posterior.row(row.unit.id).get.mass)
+    }
+    assertEquals(
+      create(records = Vector(input.copy(result = None))),
+      Left(WorkspaceRefusal.SemanticJoinMismatch)
+    )
+    assertEquals(
+      create(records = Vector(mapping.copy(result = Some(result)))),
+      Left(WorkspaceRefusal.SemanticJoinMismatch)
+    )
+    val changedUnits = recall.ordered.updated(
+      0,
+      recall.ordered.head.copy(
+        proposition =
+          recall.ordered.head.proposition.copy(cause = Some("changed semantic annotation"))
+      )
+    )
+    val foreign = RecallGraph
+      .validated(recall.transcript, recall.atlas, changedUnits, recall.relations)
+      .toOption
+      .get
+    assertEquals(inventoryFor(foreign).digest, inventory.digest)
+    assertEquals(
+      create(r = foreign, records = Vector(input)),
+      Left(WorkspaceRefusal.SemanticJoinMismatch)
+    )
+  }
