@@ -69,6 +69,8 @@ def pieces(values, text):
 
 
 def verify(directory, revision):
+    global checks
+    checks = 0
     index = json.loads((directory / "index.json").read_bytes())
     check(index["producerRevision"] == revision, "exact producer revision")
     check(len(index["artifacts"]) == 18, "18 fixture artifacts")
