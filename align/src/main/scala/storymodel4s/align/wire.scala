@@ -315,12 +315,15 @@ object AlignWire:
     )
     b.digest
 
-  /** Rebuild a [[CostBreakdown]] from its parts (fields mirrored exactly).
+  /** Rebuild a [[CostBreakdown]] from its parts (fields mirrored exactly). This is the only public
+    * construction door for a cost record with content; it refuses malformed values, incoherent
+    * terms, receipts and exclusions, and support that disagrees with the record it describes.
     *
-    * Stated residual: `total` is a **cached value, not verified on the wire** — the weights and the
-    * function prior that produced it are not on the record, so the factory checks only that it is
-    * finite and nonnegative. A consumer that needs the total re-derivable must carry the
-    * `CostWeights`/`FunctionPrior` alongside the wire and recompute.
+    * Stated residual: `total` is a **cached value, not verified on the wire** — the function prior
+    * and the pricing rule that produced it are not on the record, so the factory checks only that
+    * it is finite and nonnegative. The support basis carries the eligible weights, but it is an
+    * accounting record, not proof that a model priced `total` with them: that binding is
+    * bd-01M1DA6NJXYT4NEA18745FM3KY.
     */
   def costBreakdown(
       terms: Map[CostTerm, Double],
@@ -330,33 +333,49 @@ object AlignWire:
       missingTerms: Set[CostTerm],
       sourceChartCoverage: Option[StructuralCoverage],
       reductions: Map[CostTerm, StructuralReductionReceipt],
-      // NO DEFAULT, deliberately. A default lets a caller omit the field and fabricate maximal
-      // support, which is exactly how the laws round-trip site compiled while dropping it. Making
-      // it required turns every reconstruction into a compile error the author must answer.
-      supportWeight: Double,
+      // NO DEFAULT, deliberately. An omitted support would force the factory to invent either a
+      // number or an epistemic status, and both are scientific claims: a default of full support is
+      // exactly how `hsmm/v2` published "fully supported" for cells that measured nothing.
+      support: SupportAssessment,
       // NO DEFAULT, same reasoning: "nothing was imputed" is the flattering answer, and an omitted
       // field here would reconstruct an imputed cell as a measured one - erasing exactly the
       // distinction this carrier exists to record.
       imputedTerms: Map[CostTerm, MissingReason]
   ): Either[AlignError, CostBreakdown] =
+    CostBreakdown.checked(
+      terms,
+      mode,
+      exclusion,
+      total,
+      missingTerms,
+      sourceChartCoverage,
+      reductions,
+      support,
+      imputedTerms
+    )
+
+  /** The validation half of [[costBreakdown]]. It returns an error or nothing — never a record — so
+    * it grants no construction capability to anything in `align` that can call it.
+    */
+  private[align] def costBreakdownError(
+      terms: Map[CostTerm, Double],
+      mode: Option[FidelityMode],
+      exclusion: Option[Exclusion],
+      total: Double,
+      missingTerms: Set[CostTerm],
+      sourceChartCoverage: Option[StructuralCoverage],
+      reductions: Map[CostTerm, StructuralReductionReceipt],
+      support: SupportAssessment,
+      imputedTerms: Map[CostTerm, MissingReason]
+  ): Option[AlignError] =
     val r = "CostBreakdown"
     val badTerm = terms.toVector.sortBy(_._1.ordinal).collectFirst {
       case (t, v) if !finite(v) || v < 0.0 => bad(r, s"term $t is not finite and nonnegative")
     }
     val checks: Vector[Option[AlignError]] = Vector(
-      // Explicit finiteness rather than a comparison against 0: `NaN <= 0.0` is false, so a bare
-      // range guard would FAIL OPEN and admit a NaN support (AGENTS.md rule 7).
-      // Range is [0, 1], NOT (0, 1]. ZERO IS A PRODUCIBLE AND HONEST VALUE: a cell where nothing
-      // eligible was measured rests on no support at all, and supportOf returns exactly 0 for it.
-      // Refusing zero would mean the producer can emit a value its own checked constructor rejects
-      // - and the alternative, making supportOf return 1.0 when nothing was measured, would
-      // fabricate FULL support for a cell that measured nothing, which is the defect this whole
-      // change exists to remove. Finiteness is tested explicitly because NaN fails every
-      // comparison and a bare range check would admit it (AGENTS.md rule 7).
-      Option.when(!finite(supportWeight) || supportWeight < 0.0 || supportWeight > 1.0)(
-        bad(r, "supportWeight must be finite and in [0, 1]")
-      ),
       badTerm,
+      // Explicit finiteness rather than a comparison against 0: `NaN < 0.0` is false, so a bare
+      // range guard would FAIL OPEN and admit a NaN (AGENTS.md rule 7).
       Option.when(!finite(total) || total < 0.0)(bad(r, "total is not finite and nonnegative")),
       Option.when(!missingTerms.subsetOf(MayBeMissing))(
         bad(r, "missingTerms may name only terms that can lack evidence")
@@ -419,21 +438,80 @@ object AlignWire:
       reductions.toVector.sortBy(_._1.ordinal).collectFirst {
         case (t, rc) if !sourceChartCoverage.contains(rc.sourceChartCoverage) =>
           bad(r, s"the $t receipt's sourceChartCoverage differs from the breakdown's")
-      }
+      },
+      supportError(terms, mode, exclusion, support, imputedTerms)
     )
-    checks.flatten.headOption.toLeft(
-      CostBreakdown(
-        terms,
-        mode,
-        exclusion,
-        total,
-        missingTerms,
-        sourceChartCoverage,
-        reductions,
-        supportWeight,
-        imputedTerms
-      )
-    )
+    checks.flatten.headOption
+
+  /** SUPPORT MUST DESCRIBE THE RECORD IT SITS ON. The support value itself is already derived — no
+    * caller can pick a share or a reason — so what remains is whether the right KIND of support
+    * sits on the right kind of record, and whether its basis is this record's basis:
+    *
+    *   - a ranked source record is a content comparison: its support is Assessed with a positive
+    *     share, or Unestablished; its measured population is exactly the priced terms that were not
+    *     imputed, and every priced term is eligible;
+    *   - an Unassessable exclusion rests on no weighted measurement: its assessed share is exactly
+    *     0, or it has no denominator at all;
+    *   - an Unreachable exclusion measured nothing: NotApplicable(Unreachable), with no basis;
+    *   - an external record is not a content comparison: NotApplicable(ExternalState), with no
+    *     basis. Before `hsmm/v4` it published support 1.0 with zero terms.
+    */
+  private def supportError(
+      terms: Map[CostTerm, Double],
+      mode: Option[FidelityMode],
+      exclusion: Option[Exclusion],
+      support: SupportAssessment,
+      imputedTerms: Map[CostTerm, MissingReason]
+  ): Option[AlignError] =
+    val r = "CostBreakdown"
+    def boundTo(basis: CellSupportBasis): Option[AlignError] =
+      if basis.measuredTerms.toSet != terms.keySet -- imputedTerms.keySet then
+        Some(
+          bad(r, "support's measured terms must be exactly the priced terms that were not imputed")
+        )
+      else if !terms.keySet.subsetOf(basis.eligibleTerms.toSet) then
+        Some(bad(r, "every priced term must be eligible in the support basis"))
+      else None
+    def notApplicable(reason: SupportNotApplicableReason): Boolean = support match
+      case value: SupportAssessment.NotApplicable => value.reason == reason
+      case _                                      => false
+    (mode, exclusion) match
+      case (Some(_), None) =>
+        support match
+          // ZERO ASSESSED SUPPORT IS AN EXCLUSION, NOT A PRICE - the producer's own rule
+          // (CostBreakdown.derived). A ranked cell that measured no weighted term would be priced
+          // at its function prior, below the external floor, and win for having measured nothing.
+          case assessed: SupportAssessment.Assessed if assessed.share == 0.0 =>
+            Some(bad(r, "a record with zero assessed support must be excluded as Unassessable"))
+          case assessed: SupportAssessment.Assessed           => boundTo(assessed.basis)
+          case unestablished: SupportAssessment.Unestablished => boundTo(unestablished.basis)
+          case _: SupportAssessment.NotApplicable             =>
+            Some(bad(r, "a ranked source record is a content comparison; support must apply"))
+      case (None, Some(Exclusion.Unassessable)) =>
+        support match
+          case assessed: SupportAssessment.Assessed if assessed.share == 0.0 => None
+          case _: SupportAssessment.Assessed                                 =>
+            Some(bad(r, "an unassessable record must carry exactly zero assessed support"))
+          case _: SupportAssessment.Unestablished => None
+          case _: SupportAssessment.NotApplicable =>
+            Some(bad(r, "an unassessable record is a source cell; support must apply"))
+      case (None, Some(Exclusion.Unreachable)) =>
+        Option.unless(notApplicable(SupportNotApplicableReason.Unreachable))(
+          bad(
+            r,
+            "an unreachable record measured nothing; support must be NotApplicable(Unreachable)"
+          )
+        )
+      case (None, None) =>
+        Option.unless(notApplicable(SupportNotApplicableReason.ExternalState))(
+          bad(
+            r,
+            "an external record is not a content comparison; support must be NotApplicable(ExternalState)"
+          )
+        )
+      // A mode AND an exclusion is refused above as "an excluded state carries neither terms nor a
+      // mode"; there is no support to judge on a record that is already malformed.
+      case (Some(_), Some(_)) => None
 
   /** The cost model's clamp of an optional term into `[0, 1]` (`DefaultLocalCostModel.clamp`). */
   private def clamp(x: Double): Double =

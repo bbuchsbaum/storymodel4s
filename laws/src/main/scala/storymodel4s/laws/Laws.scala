@@ -514,17 +514,30 @@ object WireLaws extends Laws:
           r.costs.values.flatMap(_.values).filter(_.mode.nonEmpty).forall { b =>
             // the generated cases carry no charts: every optional receipt reduces to nothing, so a
             // present optional term, or an unrecorded missing one, contradicts its receipt
-            val present = AlignWire.costBreakdown(
-              b.terms.updated(CostTerm.Chart, 0.25),
-              b.mode,
-              b.exclusion,
-              b.total,
-              b.missingTerms - CostTerm.Chart,
-              b.sourceChartCoverage,
-              b.reductions,
-              b.supportWeight,
-              b.imputedTerms
-            )
+            // Support is re-derived with Chart measured and eligible, so the record is coherent in
+            // every respect but the receipt, and only the receipt rule can refuse it.
+            val presentSupport = SupportAssessment.basisOf(b.support).map { basis =>
+              val weights = basis.eligibleWeights.toMap + (CostTerm.Chart -> 0.5)
+              SupportAssessment.fromEvidence(
+                basis.measuredTerms.toSet + CostTerm.Chart,
+                weights.keySet,
+                weights
+              )
+            }
+            val present = presentSupport match
+              case Some(Right(support)) =>
+                AlignWire.costBreakdown(
+                  b.terms.updated(CostTerm.Chart, 0.25),
+                  b.mode,
+                  b.exclusion,
+                  b.total,
+                  b.missingTerms - CostTerm.Chart,
+                  b.sourceChartCoverage,
+                  b.reductions,
+                  support,
+                  b.imputedTerms
+                )
+              case _ => Right(b) // a ranked record always has a basis; fail the law otherwise
             val unrecorded = AlignWire.costBreakdown(
               b.terms,
               b.mode,
@@ -533,7 +546,7 @@ object WireLaws extends Laws:
               b.missingTerms - CostTerm.Structural,
               b.sourceChartCoverage,
               b.reductions,
-              b.supportWeight,
+              b.support,
               b.imputedTerms
             )
             present.isLeft && unrecorded.isLeft
@@ -551,7 +564,7 @@ object WireLaws extends Laws:
               b.missingTerms,
               b.sourceChartCoverage,
               b.reductions,
-              b.supportWeight,
+              b.support,
               b.imputedTerms
             ) == Right(b) &&
             b.reductions.values.forall { rc =>

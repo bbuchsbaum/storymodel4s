@@ -1,7 +1,7 @@
 package storymodel4s.codec
 
 import cats.data.NonEmptySet
-import io.circe.{Decoder, DecodingFailure, Encoder, Json}
+import io.circe.{Decoder, DecodingFailure, Encoder, HCursor, Json}
 import io.circe.syntax.*
 import scala.collection.immutable.SortedSet
 import storymodel4s.align.*
@@ -25,7 +25,7 @@ enum HsmmCodecError:
   def message: String = this match
     case Wire(error)        => error.message
     case Rejected(error)    => error.message
-    case UnsupportedSupport => "hsmm/v3 requires canonical text support and scoring coordinates"
+    case UnsupportedSupport => "hsmm/v4 requires canonical text support and scoring coordinates"
 
 /** Canonical JSON for a gated [[HsmmResult]].
   *
@@ -47,18 +47,27 @@ object HsmmResultCodec:
     *
     * v3 adds a REQUIRED `imputedTerms` to every cost breakdown: the terms that were PRICED from a
     * declared constant rather than measured, with the provider's reason. Same no-migration
-    * reasoning, and for the same shape of defect. A v2 artifact records that a cell had, say,
-    * 0.9552 support without recording that the highest-weighted term in it was substituted; the
-    * only value a migration could invent is "nothing was imputed", which is precisely the false
-    * claim THE CHECKED WIRE REFUSES. Deliberately not "makes unrepresentable": CostBreakdown is a
-    * case class with a private[align] constructor, so its derived Mirror.fromProduct rebuilds it
-    * outside align and bypasses every check here. The invariant is enforced by AlignWire, not by
-    * the type, and the difference matters to anyone reading this as a guarantee
-    * (bd-01M17ZNXY6AS1CMBQJRH3JMNVX). Note what v2 could not distinguish: two cells competing for
-    * the SAME ranked unit, one with a measured semantic distance and one with an abstained
-    * provider, were byte-identical in every published field.
+    * reasoning, and for the same shape of defect: the only value a migration could invent is
+    * "nothing was imputed", which is precisely the false claim the checked wire refuses. Note what
+    * v2 could not distinguish: two cells competing for the SAME ranked unit, one with a measured
+    * semantic distance and one with an abstained provider, were byte-identical in every published
+    * field.
+    *
+    * v4 replaces the numeric `supportWeight` with a REQUIRED tagged `support`
+    * (bd-01M19956MFSG7076QE4J66T7E9). A v3 `supportWeight` of `1.0` meant BOTH "every eligible term
+    * was measured" and "nothing was eligible" — on the WOG golden every external cell published it
+    * with zero terms — so no converter could tell which of `Assessed`, `Unestablished` or
+    * `NotApplicable` a v3 cell was without inventing the evidence. A v3 artifact is therefore
+    * refused with the typed [[CodecError.UnsupportedSchema]] and is re-derived from its inputs,
+    * never upgraded. `Assessed` carries its basis (`measuredTerms`, `eligibleTerms`,
+    * `eligibleWeights`) and a REDUNDANT `share` that decoding recomputes from that basis and
+    * compares bit for bit; `Unestablished` carries the basis and a `reason` that decoding
+    * recomputes; `NotApplicable` carries only its `reason` and refuses every measurement field. The
+    * wire never supplies a share or a reason that the decoder does not derive for itself.
+    * `CostBreakdown` itself is sealed (non-case, bare-private constructor), so the checked
+    * [[AlignWire.costBreakdown]] is the only door a decoded record can come through.
     */
-  val SchemaVersion: String = "hsmm/v3"
+  val SchemaVersion: String = "hsmm/v4"
 
   private final case class StateMassWire(state: AlignState, mass: Double)
   private final case class RowWire(unit: RecallUnitId, mass: Vector[StateMassWire])
@@ -103,9 +112,30 @@ object HsmmResultCodec:
       missingTerms: Vector[CostTerm],
       sourceChartCoverage: Option[StructuralCoverage],
       reductions: Vector[ReductionWire],
-      supportWeight: Double,
+      support: SupportWire,
       imputedTerms: Vector[ImputedWire]
   )
+
+  /** The exact weight of one eligible term in a cell's support basis. */
+  private final case class WeightWire(term: CostTerm, weight: Double)
+
+  /** The tagged support of one cost record, as carried on the wire. Every field is EVIDENCE for the
+    * decoder to re-derive from, never a claim it adopts: the share and reasons are recomputed.
+    */
+  private enum SupportWire:
+    case Assessed(
+        share: Double,
+        measuredTerms: Vector[CostTerm],
+        eligibleTerms: Vector[CostTerm],
+        eligibleWeights: Vector[WeightWire]
+    )
+    case Unestablished(
+        reason: SupportUnestablishedReason,
+        measuredTerms: Vector[CostTerm],
+        eligibleTerms: Vector[CostTerm],
+        eligibleWeights: Vector[WeightWire]
+    )
+    case NotApplicable(reason: SupportNotApplicableReason)
   private final case class StateCostWire(state: AlignState, cost: CostBreakdownWire)
   private final case class UnitCostsWire(unit: RecallUnitId, costs: Vector[StateCostWire])
   private final case class CandidateAnchorsWire(
@@ -143,10 +173,10 @@ object HsmmResultCodec:
     if !view.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)
     else
       Canonical
-        .decode[Wire](text)
+        .parse(text)
         .left
         .map(HsmmCodecError.Wire.apply)
-        .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
+        .flatMap(decodeSupported(_, recall, view))
 
   /** Decode a JSON value only after revalidating it against `recall` and `view`. */
   def decodeJson(
@@ -155,12 +185,26 @@ object HsmmResultCodec:
       view: SourceView
   ): Either[HsmmCodecError, HsmmResult] =
     if !view.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)
-    else
-      Canonical
-        .decodeJson[Wire](json)
-        .left
-        .map(HsmmCodecError.Wire.apply)
-        .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
+    else decodeSupported(json, recall, view)
+
+  /** The schema tag is judged BEFORE the body: an `hsmm/v3` (or any other) artifact is refused as
+    * [[CodecError.UnsupportedSchema]], a typed answer a caller can act on ("re-derive it"), rather
+    * than as whichever field of the old body the new decoder happens to trip over first.
+    */
+  private def decodeSupported(
+      json: Json,
+      recall: RecallGraph[Checked],
+      view: SourceView
+  ): Either[HsmmCodecError, HsmmResult] =
+    json.hcursor.get[String]("schemaVersion") match
+      case Right(version) if version != SchemaVersion =>
+        Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema(version, Vector(SchemaVersion))))
+      case _ =>
+        Canonical
+          .decodeJson[Wire](json)
+          .left
+          .map(HsmmCodecError.Wire.apply)
+          .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
   private[codec] given Encoder[SourceNodeRef] = Encoder.instance {
     case SourceNodeRef.Situation(id) =>
       Json.obj("type" -> "Situation".asJson, "id" -> id.asJson)
@@ -392,6 +436,132 @@ object HsmmResultCodec:
     yield ReductionWire(term, receipt)
   }
 
+  private given Encoder[SupportUnestablishedReason] = enumEncoder(_.toString)
+  private given Decoder[SupportUnestablishedReason] =
+    enumDecoder("SupportUnestablishedReason", SupportUnestablishedReason.values, _.toString)
+  private given Encoder[SupportNotApplicableReason] = enumEncoder(_.toString)
+  private given Decoder[SupportNotApplicableReason] =
+    enumDecoder("SupportNotApplicableReason", SupportNotApplicableReason.values, _.toString)
+
+  private given Encoder[WeightWire] = Encoder.instance { entry =>
+    Json.obj("term" -> entry.term.asJson, "weight" -> entry.weight.asJson)
+  }
+  private given Decoder[WeightWire] = Decoder.instance { c =>
+    for
+      _ <- onlyFields(c, "eligible weight", Set("term", "weight"))
+      term <- field[CostTerm](c, "term")
+      weight <- field[Double](c, "weight")
+    yield WeightWire(term, weight)
+  }
+
+  /** The exact field sets of the artifact and its cost records (`mode`, `exclusion` and
+    * `sourceChartCoverage` are optional). A field outside them is refused, not ignored: an ignored
+    * field is a claim the artifact makes and the decoder never checked — a v3 `supportWeight` of
+    * `1.0` beside a v4 `NotApplicable`, read by anyone but this decoder, still says "fully
+    * supported".
+    */
+  private val ArtifactFields: Set[String] = Set(
+    "schemaVersion",
+    "posterior",
+    "flow",
+    "viterbi",
+    "logLikelihood",
+    "costs",
+    "candidateAnchors",
+    "admissibilityEcho",
+    "viewFingerprint",
+    "recallChecksum",
+    "refinementPasses"
+  )
+  private val CostFields: Set[String] = Set(
+    "terms",
+    "mode",
+    "exclusion",
+    "total",
+    "missingTerms",
+    "sourceChartCoverage",
+    "reductions",
+    "support",
+    "imputedTerms"
+  )
+
+  private def onlyFields(c: HCursor, record: String, allowed: Set[String]): Decoder.Result[Unit] =
+    val extra = c.keys.map(_.toSet -- allowed).getOrElse(Set.empty).toVector.sorted
+    if extra.isEmpty then Right(())
+    else Left(DecodingFailure(s"$record carries unknown ${extra.mkString(", ")}", c.history))
+
+  private val BasisFields: Set[String] = Set("measuredTerms", "eligibleTerms", "eligibleWeights")
+  private val AssessedFields: Set[String] = BasisFields ++ Set("type", "share")
+  private val UnestablishedFields: Set[String] = BasisFields ++ Set("type", "reason")
+  private val NotApplicableFields: Set[String] = Set("type", "reason")
+
+  private given Encoder[SupportWire] = Encoder.instance {
+    case SupportWire.Assessed(share, measured, eligible, weights) =>
+      Json.obj(
+        "type" -> "Assessed".asJson,
+        "share" -> share.asJson,
+        "measuredTerms" -> measured.asJson,
+        "eligibleTerms" -> eligible.asJson,
+        "eligibleWeights" -> weights.asJson
+      )
+    case SupportWire.Unestablished(reason, measured, eligible, weights) =>
+      Json.obj(
+        "type" -> "Unestablished".asJson,
+        "reason" -> reason.asJson,
+        "measuredTerms" -> measured.asJson,
+        "eligibleTerms" -> eligible.asJson,
+        "eligibleWeights" -> weights.asJson
+      )
+    case SupportWire.NotApplicable(reason) =>
+      Json.obj("type" -> "NotApplicable".asJson, "reason" -> reason.asJson)
+  }
+
+  /** Each variant has an EXACT field set. A share on a variant that makes no numeric claim, or a
+    * basis on a `NotApplicable` record, is refused here rather than silently ignored — an ignored
+    * field is a claim the artifact makes and the decoder never checked.
+    */
+  private given Decoder[SupportWire] = Decoder.instance { c =>
+    def exactly(tag: String, expected: Set[String]): Decoder.Result[Unit] =
+      val present = c.keys.map(_.toSet).getOrElse(Set.empty)
+      val extra = (present -- expected).toVector.sorted
+      val absent = (expected -- present).toVector.sorted
+      if extra.contains("share") then
+        Left(DecodingFailure(s"$tag support cannot carry a numeric claim (share)", c.history))
+      else if extra.nonEmpty then
+        Left(
+          DecodingFailure(s"$tag support carries unexpected ${extra.mkString(", ")}", c.history)
+        )
+      else if absent.nonEmpty then
+        Left(DecodingFailure(s"$tag support is missing ${absent.mkString(", ")}", c.history))
+      else Right(())
+    def basis(c: HCursor) =
+      for
+        measured <- field[Vector[CostTerm]](c, "measuredTerms")
+        eligible <- field[Vector[CostTerm]](c, "eligibleTerms")
+        weights <- field[Vector[WeightWire]](c, "eligibleWeights")
+      yield (measured, eligible, weights)
+    field[String](c, "type").flatMap {
+      case tag @ "Assessed" =>
+        for
+          _ <- exactly(tag, AssessedFields)
+          share <- field[Double](c, "share")
+          (measured, eligible, weights) <- basis(c)
+        yield SupportWire.Assessed(share, measured, eligible, weights)
+      case tag @ "Unestablished" =>
+        for
+          _ <- exactly(tag, UnestablishedFields)
+          reason <- field[SupportUnestablishedReason](c, "reason")
+          (measured, eligible, weights) <- basis(c)
+        yield SupportWire.Unestablished(reason, measured, eligible, weights)
+      case tag @ "NotApplicable" =>
+        for
+          _ <- exactly(tag, NotApplicableFields)
+          reason <- field[SupportNotApplicableReason](c, "reason")
+        yield SupportWire.NotApplicable(reason)
+      case other => Left(DecodingFailure(s"unknown SupportAssessment $other", c.history))
+    }
+  }
+
   private given Encoder[CostBreakdownWire] = Encoder.instance { cost =>
     obj(
       "terms" -> cost.terms.asJson,
@@ -401,12 +571,13 @@ object HsmmResultCodec:
       "missingTerms" -> cost.missingTerms.asJson,
       "sourceChartCoverage" -> opt(cost.sourceChartCoverage),
       "reductions" -> cost.reductions.asJson,
-      "supportWeight" -> cost.supportWeight.asJson,
+      "support" -> cost.support.asJson,
       "imputedTerms" -> cost.imputedTerms.asJson
     )
   }
   private given Decoder[CostBreakdownWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "cost", CostFields)
       terms <- field[Vector[TermWire]](c, "terms")
       mode <- field[Option[FidelityMode]](c, "mode")
       exclusion <- field[Option[Exclusion]](c, "exclusion")
@@ -414,7 +585,7 @@ object HsmmResultCodec:
       missing <- field[Vector[CostTerm]](c, "missingTerms")
       sourceCoverage <- field[Option[StructuralCoverage]](c, "sourceChartCoverage")
       reductions <- field[Vector[ReductionWire]](c, "reductions")
-      supportWeight <- field[Double](c, "supportWeight")
+      support <- field[SupportWire](c, "support")
       imputed <- field[Vector[ImputedWire]](c, "imputedTerms")
     yield CostBreakdownWire(
       terms,
@@ -424,7 +595,7 @@ object HsmmResultCodec:
       missing,
       sourceCoverage,
       reductions,
-      supportWeight,
+      support,
       imputed
     )
   }
@@ -434,6 +605,7 @@ object HsmmResultCodec:
   }
   private given Decoder[StateCostWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "state cost", Set("state", "cost"))
       state <- field[AlignState](c, "state")
       cost <- field[CostBreakdownWire](c, "cost")
     yield StateCostWire(state, cost)
@@ -444,6 +616,7 @@ object HsmmResultCodec:
   }
   private given Decoder[UnitCostsWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "unit costs", Set("unit", "costs"))
       unit <- field[RecallUnitId](c, "unit")
       costs <- field[Vector[StateCostWire]](c, "costs")
     yield UnitCostsWire(unit, costs)
@@ -476,12 +649,10 @@ object HsmmResultCodec:
   }
   private given Decoder[Wire] = Decoder.instance { c =>
     for
-      version <- field[String](c, "schemaVersion")
-      _ <- Either.cond(
-        version == SchemaVersion,
-        (),
-        DecodingFailure(s"unsupported HSMM schema $version; expected $SchemaVersion", c.history)
-      )
+      // The value is judged before the body is decoded (see `decodeSupported`); the field is
+      // still required here, so an artifact without a schema tag is a wire error.
+      _ <- field[String](c, "schemaVersion")
+      _ <- onlyFields(c, "HSMM artifact", ArtifactFields)
       posterior <- field[Vector[RowWire]](c, "posterior")
       flow <- field[Vector[FlowStepWire]](c, "flow")
       viterbi <- field[Vector[AlignState]](c, "viterbi")
@@ -555,8 +726,28 @@ object HsmmResultCodec:
         cost.reductions.toVector.sortBy(_._1.ordinal).map { case (term, receipt) =>
           ReductionWire(term, ReductionReceiptWire.from(receipt))
         },
-        cost.supportWeight,
+        SupportWire.from(cost.support),
         cost.imputedTerms.toVector.sortBy(_._1.ordinal).map(ImputedWire.apply)
+      )
+
+  private object SupportWire:
+    def from(support: SupportAssessment): SupportWire = support match
+      case assessed: SupportAssessment.Assessed =>
+        val (measured, eligible, weights) = basis(assessed.basis)
+        SupportWire.Assessed(assessed.share, measured, eligible, weights)
+      case unestablished: SupportAssessment.Unestablished =>
+        val (measured, eligible, weights) = basis(unestablished.basis)
+        SupportWire.Unestablished(unestablished.reason, measured, eligible, weights)
+      case notApplicable: SupportAssessment.NotApplicable =>
+        SupportWire.NotApplicable(notApplicable.reason)
+
+    private def basis(
+        basis: CellSupportBasis
+    ): (Vector[CostTerm], Vector[CostTerm], Vector[WeightWire]) =
+      (
+        basis.measuredTerms.toVector.sortBy(_.ordinal),
+        basis.eligibleTerms.toVector.sortBy(_.ordinal),
+        basis.eligibleWeights.toVector.sortBy(_._1.ordinal).map(WeightWire.apply)
       )
 
   private object ReductionReceiptWire:
@@ -650,6 +841,7 @@ object HsmmResultCodec:
           "CostBreakdown.imputedTerms",
           wire.imputedTerms.map(i => i.term -> i.reason)
         )
+        support <- wire.support.materialize
         cost <- AlignWire.costBreakdown(
           terms,
           wire.mode,
@@ -658,10 +850,77 @@ object HsmmResultCodec:
           missingTerms,
           wire.sourceChartCoverage,
           reductionMap,
-          wire.supportWeight,
+          support,
           imputedTerms
         )
       yield cost
+
+  extension (wire: SupportWire)
+    /** Re-derive support from the carried basis and hold the carried share or reason to it. The
+      * share is compared bit for bit: an artifact claiming `0.5` for a basis whose every eligible
+      * term was measured (which derives exactly `1.0`) is refused, not adopted.
+      */
+    private def materialize: Either[AlignError, SupportAssessment] =
+      val r = "SupportAssessment"
+      def derived(
+          measured: Vector[CostTerm],
+          eligible: Vector[CostTerm],
+          weights: Vector[WeightWire]
+      ) =
+        for
+          measuredSet <- uniqueSet(s"$r.measuredTerms", measured)
+          eligibleSet <- uniqueSet(s"$r.eligibleTerms", eligible)
+          weightMap <- uniqueMap(s"$r.eligibleWeights", weights.map(w => w.term -> w.weight))
+          support <- SupportAssessment.fromEvidence(measuredSet, eligibleSet, weightMap)
+        yield support
+      wire match
+        case SupportWire.Assessed(share, measured, eligible, weights) =>
+          derived(measured, eligible, weights).flatMap {
+            case assessed: SupportAssessment.Assessed
+                if java.lang.Double.doubleToRawLongBits(assessed.share) ==
+                  java.lang.Double.doubleToRawLongBits(share) =>
+              Right(assessed)
+            case assessed: SupportAssessment.Assessed =>
+              Left(
+                AlignError.MalformedRecord(
+                  r,
+                  s"carried share $share is not the share its basis derives (${assessed.share})"
+                )
+              )
+            case unestablished: SupportAssessment.Unestablished =>
+              Left(
+                AlignError.MalformedRecord(
+                  r,
+                  s"an Assessed share over a basis that establishes none (${unestablished.reason})"
+                )
+              )
+          }
+        case SupportWire.Unestablished(reason, measured, eligible, weights) =>
+          derived(measured, eligible, weights).flatMap {
+            case unestablished: SupportAssessment.Unestablished if unestablished.reason == reason =>
+              Right(unestablished)
+            case unestablished: SupportAssessment.Unestablished =>
+              Left(
+                AlignError.MalformedRecord(
+                  r,
+                  s"carried reason $reason is not the reason its basis derives " +
+                    s"(${unestablished.reason})"
+                )
+              )
+            case assessed: SupportAssessment.Assessed =>
+              Left(
+                AlignError.MalformedRecord(
+                  r,
+                  s"an Unestablished tag over a basis that derives the share ${assessed.share}"
+                )
+              )
+          }
+        case SupportWire.NotApplicable(reason) =>
+          // Which reason applies is derived from the record's own shape by AlignWire.costBreakdown
+          // (external vs unreachable); a mismatch is refused there.
+          Right(reason match
+            case SupportNotApplicableReason.ExternalState => SupportAssessment.externalState
+            case SupportNotApplicableReason.Unreachable   => SupportAssessment.unreachable)
 
   extension (wire: ReductionReceiptWire)
     private def materialize: Either[AlignError, StructuralReductionReceipt] =

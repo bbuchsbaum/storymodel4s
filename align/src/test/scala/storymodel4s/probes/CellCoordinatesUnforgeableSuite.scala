@@ -21,11 +21,20 @@ class CellCoordinatesUnforgeableSuite extends FunSuite:
   test("no product door reconstructs the type from outside align") {
     // POSITIVE CONTROLS FIRST, same shape as the negatives: `typeChecks` returns false when a
     // snippet fails for ANY reason, so a negative probe without a matching positive proves nothing.
+    // The control used to be CostBreakdown, which was a case class until hsmm/v4 sealed it
+    // (bd-01M19956MFSG7076QE4J66T7E9). It is now a refusal below, and the control moved to a case
+    // class that is MEANT to be constructible, so the court can still prove it is able to pass.
     assert(
       typeChecks(
-        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[CostBreakdown]]"
+        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[FunctionPrior]]"
       ),
       "control: a case class in align DOES derive a Mirror from here, so the probe mechanism works"
+    )
+    assert(
+      !typeChecks(
+        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[CostBreakdown]]"
+      ),
+      "CostBreakdown derives a Mirror again; fromProduct would rebuild a cost record unchecked"
     )
     assert(
       typeChecks("import storymodel4s.align.*; classOf[CellCoordinates]"),

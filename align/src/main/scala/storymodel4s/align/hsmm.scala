@@ -364,7 +364,9 @@ object HsmmResult:
     * derivation ([[AlignError.GateDrift]] otherwise); (e) the gate — every anchored state that
     * appears as a key of a posterior row, of a flow step (either endpoint), of a cost map, or as a
     * Viterbi step (key presence, not positive mass) has its anchor nominated for that unit and is
-    * admitted in exactly that mode by the derived record. External states are never gated.
+    * admitted in exactly that mode by the derived record. External states are never gated. (f) key
+    * support — an external key's record has `NotApplicable(ExternalState)` support and an anchored
+    * key's record is never `NotApplicable(Unreachable)`.
     *
     * `viewFingerprint` and `recallChecksum` are set here from the view and recall in hand, so a
     * serialized result can only be decoded with both, and the decoder compares them to the wire's
@@ -580,9 +582,28 @@ object HsmmResult:
             )
           )
         else None
+      // SUPPORT MUST BE TRUE OF THE KEY, NOT ONLY OF THE RECORD. The mode check above passes an
+      // excluded record under any key it was dropped from, so two support claims need the key:
+      //  - an external key carries external support, readable or not - it has no anchor to be
+      //    unassessable or unreachable about, so without this a dropped external state could carry
+      //    an assessed share;
+      //  - an anchored key is never Unreachable: nomination has proved its anchor is a node of this
+      //    view, so NotApplicable(Unreachable) would be a false reason. (GraphHsmm never emits it.)
+      // hsmm/v4, bd-01M19956MFSG7076QE4J66T7E9.
+      def keySupport(u: RecallUnitId, s: AlignState, b: CostBreakdown): Option[AlignError] =
+        def reason(r: SupportNotApplicableReason): Boolean = b.support match
+          case value: SupportAssessment.NotApplicable => value.reason == r
+          case _                                      => false
+        def refused(detail: String) =
+          AlignError.MalformedRecord("CostBreakdown", s"unit ${u.value}, state ${s.key}: $detail")
+        if s.isExternal && (b.excluded || !reason(SupportNotApplicableReason.ExternalState)) then
+          Some(refused("an external state's support must be NotApplicable(ExternalState)"))
+        else if !s.isExternal && reason(SupportNotApplicableReason.Unreachable) then
+          Some(refused("a nominated anchor is a node of the view, so it is not Unreachable"))
+        else None
       val costV = costs.toVector.sortBy(_._1.value).iterator.flatMap { (u, m) =>
         m.toVector.sortBy(_._1.key).iterator.flatMap { (s, b) =>
-          check(u, s, "cost entry").orElse(coherent(u, s, b))
+          check(u, s, "cost entry").orElse(coherent(u, s, b)).orElse(keySupport(u, s, b))
         }
       }
       val pathV = rows.zip(viterbi).iterator.flatMap { (r, s) => check(r.unit, s, "viterbi step") }
@@ -740,7 +761,7 @@ object GraphHsmm:
           else AlignState.externals
         val ext = externals.map {
           case s @ AlignState.External(x) =>
-            s -> CostBreakdown(Map.empty, None, None, costModel.externalCost(u, x))
+            s -> CostBreakdown.external(costModel.externalCost(u, x))
           case s => s -> CostBreakdown.unreachable
         }
         (sources ++ ext).toMap
