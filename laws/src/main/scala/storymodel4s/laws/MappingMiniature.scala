@@ -1,5 +1,10 @@
 package storymodel4s.laws
 
+import cats.data.NonEmptyVector
+import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+
 /** Experimental, project-authored diagnostic data. This transcription is checked against the
   * admitted JSON fixture; its alternatives are authored controls, not model estimates.
   */
@@ -80,3 +85,204 @@ object MappingMiniature:
   val disagreementMeaning = "deliberately different reconstruction choice; not a second observation"
   val partialSupportTarget = "g1"
   val ambiguousPacket = "p7"
+
+  /** Build a fresh, checked record using only public producers. No estimator or media is run. */
+  def record: MappingResult =
+    def target(id: String): SourceNodeRef = SourceNodeRef.Situation(SituationId.unsafe(id))
+    val group = SourceNodeRef.Segment(SegmentId.unsafe(groupId))
+    val bundles = parts.map { part =>
+      part.id -> SourceBundle
+        .filmEdition(
+          EditionId.unsafe(part.id),
+          Checksum.ofText(s"synthetic-${part.id}"),
+          0L,
+          part.durationTicks.toLong,
+          RationalTimebase.of(1L, part.ticksPerSecond.toLong).toOption.get
+        )
+        .toOption
+        .get
+    }.toMap
+    val nodes = events.map { event =>
+      NodeSummary(
+        target(event.id),
+        0,
+        Option.when(groupMembers.contains(event.id))(group),
+        event.order - 1,
+        SpanSet.one(TextSpan.unsafe(event.order - 1, event.order)),
+        None,
+        Vector.empty,
+        ContextTag.NarratedWorld,
+        PolarityTag.Unknown,
+        ModalityTag.Unknown,
+        Vector.empty,
+        Set.empty
+      )
+    } :+ NodeSummary(
+      group,
+      1,
+      None,
+      1,
+      SpanSet.one(TextSpan.unsafe(1, 4)),
+      None,
+      Vector.empty,
+      ContextTag.NarratedWorld,
+      PolarityTag.Unknown,
+      ModalityTag.Unknown,
+      Vector.empty,
+      Set.empty
+    )
+    val view = InMemorySourceView(nodes, Map.empty, None, events.size)
+    val physical = loci.map { locus =>
+      val status = locus.part match
+        case None     => SourceSupportStatus.unlocated(UnlocatedReason.NoLocusInSource)
+        case Some(id) =>
+          val bundle = bundles(id)
+          val start = locus.startTick.get.toLong
+          val end = locus.endTick.get.toLong
+          val anchor =
+            if start == end then
+              EvidenceAnchor.MediaPoint(
+                bundle.id,
+                bundle.streams.head.id,
+                PlaybackInstant.on(bundle.primaryAxis, start).toOption.get
+              )
+            else
+              EvidenceAnchor.MediaTime(
+                bundle.id,
+                bundle.streams.head.id,
+                bundle.primaryAxis.id,
+                PlaybackIntervalSet.one(
+                  PlaybackInterval.on(bundle.primaryAxis, start, end).toOption.get
+                )
+              )
+          SourceSupportStatus.located(
+            TypedSupport.Anchored(EvidenceSupport.of(bundle, Vector(anchor)).toOption.get)
+          )
+      target(locus.event) -> status
+    }.toMap
+    val source = SourceRepresentation
+      .of(
+        view,
+        NonEmptyVector.fromVector(parts.map(p => BundleEntry.media(bundles(p.id)))).get,
+        None,
+        physical.updated(group, physical(target("e2")))
+      )
+      .toOption
+      .get
+
+    // Separators are parsed words deliberately outside every unit: the inventory retains them.
+    val separator = "\n|\n"
+    val recallText = packets.map(_.text).mkString(separator)
+    val transcript = StorySource.fromText(recallText).toOption.get
+    val atlas = SurfaceAnalyzer.analyze(transcript)
+    val starts = packets
+      .scanLeft(0)((offset, packet) => offset + packet.text.length + separator.length)
+      .dropRight(1)
+    val units = packets.zip(starts).zipWithIndex.map { case ((packet, start), ordinal) =>
+      RecallUnit(
+        RecallUnitId.unsafe(packet.id),
+        ordinal,
+        SpanSet.one(TextSpan.unsafe(start, start + packet.text.length)),
+        packet.text,
+        DiscourseFunction.EpisodicAssertion,
+        ExpressedUncertainty.Unmarked,
+        PropositionSketch(
+          None,
+          Vector.empty,
+          PolarityTag.Unknown,
+          ModalityTag.Unknown,
+          Vector.empty,
+          Vector.empty,
+          Vector.empty,
+          Set.empty
+        ),
+        None
+      )
+    }
+    val recall = RecallGraph.validated(transcript, atlas, units, RecallRelations.empty).toOption.get
+    val inventory = RecallInventory
+      .of(
+        recall,
+        "\\S+".r
+          .findAllMatchIn(recallText)
+          .map(m => TextSpan.unsafe(m.start, m.end))
+          .toVector,
+        WordIdPolicy.inputArtifact(Checksum.ofText(recallText))
+      )
+      .toOption
+      .get
+    val ledger = StageLedger
+      .of(Stage.values.toVector.map { stage =>
+        StageEntry
+          .of(stage, StageProvenance.unknown(UnknownProvenanceReason.NotRun, None))
+          .toOption
+          .get
+      })
+      .toOption
+      .get
+    def stage(value: Stage): StageEntryId = ledger.at(value).head.id
+    val stages = UnitStageRefs
+      .of(ledger, stage(Stage.Inference), stage(Stage.Candidates), stage(Stage.Decision))
+      .toOption
+      .get
+    val policy = DecisionPolicyId.unsafe("synthetic-authored-choice/v1")
+    val grain = TargetGrain.Hierarchy(Vector(0, 1))
+    val universe = DeclaredUniverse.of(nodes.map(_.ref), grain).toOption.get
+    val policies = MappingPolicies
+      .of(
+        InferencePolicy.Unspecified("Authored synthetic controls; no estimator"),
+        ContextPolicy.Unspecified("No context model"),
+        CandidatePolicy.Declared(
+          CandidatePolicyId.unsafe("synthetic-authored-alternatives/v1"),
+          CandidateCoverage.Unknown("Nomination recall is unmeasured")
+        ),
+        ReferencePrior.NotApplicable("Authored raw scores"),
+        DecisionPolicy.Declared(policy),
+        universe
+      )
+      .toOption
+      .get
+    val roles = UnitRoles
+      .of(
+        AnalysisGrain.InferenceUnit(inventory.segmentation),
+        AnalysisGrain.InferenceUnit(inventory.segmentation),
+        AnalysisGrain.Targets(grain)
+      )
+      .toOption
+      .get
+    val basis = DecisionBasis.of(MeasureKind.RawScore, Some("authored-control")).toOption.get
+    val outcomes = packets.map { packet =>
+      val unit = RecallUnitId.unsafe(packet.id)
+      if packet.id == failurePacket then
+        UnitOutcome.failed(unit, ProcessingFailure.ProviderFailure("Synthetic failure control"))
+      else
+        val values: Map[Destination, Double] = packet.id match
+          case `disagreementPacket` =>
+            Map(
+              Destination.Target(target(argmax)) -> 0.9,
+              Destination.Target(target(decoded)) -> 0.4
+            )
+          case `ambiguousPacket` =>
+            packet.admissible.map(id => Destination.Target(target(id)) -> 0.5).toMap
+          case `externalPacket` => Map(Destination.External(ExternalState.Intrusion) -> 1.0)
+          case _ => packet.admissible.map(id => Destination.Target(target(id)) -> 1.0).toMap
+        val scores = RawScores
+          .of(
+            "authored-control",
+            ScoreDirection.HigherIsBetter,
+            "arbitrary synthetic control",
+            values,
+            stage(Stage.Scoring)
+          )
+          .toOption
+          .get
+        val measures = UnitMeasures.of(Vector(scores), None, None, None).toOption.get
+        val candidates = CandidateSetId.of(stages.candidates, unit, values.keySet)
+        val links = values.keys.toVector.sorted.map(MappingLink.ungated(_, stages, candidates))
+        val request =
+          if packet.id == disagreementPacket then
+            DecisionRequest.ExternalDecode(Destination.Target(target(decoded)), policy)
+          else DecisionRequest.RawArgmax
+        UnitOutcome.computed(unit, measures, links, basis, request, stages).toOption.get
+    }
+    MappingResult.checked(inventory, source, policies, roles, ledger, outcomes).toOption.get

@@ -181,7 +181,7 @@ private[align] object MappingBindingRender:
       )
     )
   )
-  private def support(value: SupportAssessment): String = value match
+  def support(value: SupportAssessment): String = value match
     case s: SupportAssessment.Assessed =>
       sequence(Vector("assessed", number(s.share), basis(s.basis)))
     case s: SupportAssessment.Unestablished =>
