@@ -1,0 +1,11 @@
+{
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "f573087e6bed8b19555be5ca790433c2acaf50f0",
+    "HEAD"
+  ],
+  "exitCode": 0,
+  "revision": "02c5309cf4ba4d36c876c0e14b1ca83dfb17f31e",
+  "sha256": "93cb1ffb7c46516c3ff7aaa2ecf73c212dd0a3d7003b217469c8c00bc048119b"
+}

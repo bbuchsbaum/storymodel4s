@@ -1,0 +1,32 @@
+{
+  "schema": "storymodel4s.support-honesty-qualification/v1",
+  "base": "f573087e6bed8b19555be5ca790433c2acaf50f0",
+  "producer": "6de935f1f0d3d3f78174da5ce0f86797fa78b89a",
+  "consumer": "39be6b7b6b5555c369a36578125e240d86e89829",
+  "intaglio": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+  "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "provider": {
+    "Total": 7220,
+    "Passed": 7215,
+    "Failed": 0,
+    "Errors": 0,
+    "Skipped": 5,
+    "Ignored": 0
+  },
+  "consumerCounts": {
+    "Total": 245,
+    "Passed": 245,
+    "Failed": 0,
+    "Errors": 0,
+    "Skipped": 0,
+    "Ignored": 0
+  },
+  "mutationKills": 6,
+  "review": "review.json",
+  "goldenParity": "golden-parity.json",
+  "scope": "scope.json",
+  "ownerScope": "Support-share only; no TypedSupport in hsmm/v4; no inference-number movement on the named WOG courts.",
+  "qualification": "local; no push, browser journey or scientific calibration claim",
+  "warnings": "Existing clang/Java toolchain warnings; unused import in untouched NfrdBaseballSuite and value discards in untouched MigrationSuite. Existing Atlas source/test warnings retained in consumer receipt.",
+  "skips": "Five optional/live producer cases are named in provider-gate.json; no hosted model call or external model installation was attempted."
+}

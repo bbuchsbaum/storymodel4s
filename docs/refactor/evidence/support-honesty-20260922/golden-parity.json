@@ -1,0 +1,14 @@
+[
+  {
+    "platform": "JVM/JS",
+    "baselineSha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+    "currentSha256": "6ee06ebbb90709ebe323e7bd98e99f9c839809489a780e113d4c2441b7abf1e6",
+    "allNonSupportFieldsEqual": true
+  },
+  {
+    "platform": "Native",
+    "baselineSha256": "ccb0b98f21c7c2e1c9d5d81bad3f0858ed4c2f5d4f4c3ac671a6f45b152af012",
+    "currentSha256": "12a263119a8799cac9e548b65238ffad2f29f1dc23234a86e57b22f752398a8d",
+    "allNonSupportFieldsEqual": true
+  }
+]

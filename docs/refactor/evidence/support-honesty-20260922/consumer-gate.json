@@ -1,0 +1,235 @@
+{
+  "codeRevision": "39be6b7b6b5555c369a36578125e240d86e89829",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-workspace-m1-20260922",
+    "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-m1-intaglio-20260922",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "app/fastLinkJS"
+  ],
+  "cwd": "/private/tmp/storyatlas4s-workspace-m1-20260922",
+  "cleanTrackedTreeAfter": true,
+  "exitCode": 0,
+  "commandReceipt": {
+    "schema_version": 1,
+    "started_utc": "2026-09-22T14:23:26.360786+00:00",
+    "finished_utc": "2026-09-22T14:25:52.873863+00:00",
+    "duration_seconds": 146.51198,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-workspace-m1-20260922",
+      "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-m1-intaglio-20260922",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+      "compileAll",
+      "testAll",
+      "scalafmtCheckAll",
+      "app/fastLinkJS"
+    ],
+    "cwd": "/private/tmp/storyatlas4s-workspace-m1-20260922",
+    "log": "/private/tmp/workspace-m1-evidence/support/consumer-gate.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 2400.0,
+    "log_bytes": 22115
+  },
+  "logSha256": "75b1267b3e9dd963dd6bf51633859aff840a16fb8c67176afb9b9d1470ad139d",
+  "testTotals": [
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22",
+    "[info] Passed: Total 26, Failed 0, Errors 0, Passed 26",
+    "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+    "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+    "[info] Passed: Total 57, Failed 0, Errors 0, Passed 57",
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22"
+  ],
+  "aggregateTestCounts": {
+    "Total": 245,
+    "Passed": 245,
+    "Failed": 0,
+    "Errors": 0,
+    "Skipped": 0,
+    "Ignored": 0
+  },
+  "skips": [],
+  "warnings": [
+    "[warn] -- [E175] Potential Issue Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/intaglio/src/main/scala/storyatlas4s/intaglio/VoyageLowering.scala:140:39 ",
+    "[warn] 140 |      if legal then out.appendCodePoint(cp)",
+    "[warn]     |                    ^^^^^^^^^^^^^^^^^^^^^^^",
+    "[warn]     |discarded non-Unit value of type StringBuilder. Add `: Unit` to discard silently.",
+    "[warn] one warning found",
+    "[warn] -- [E175] Potential Issue Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/intaglio/src/main/scala/storyatlas4s/intaglio/VoyageLowering.scala:140:39 ",
+    "[warn] 140 |      if legal then out.appendCodePoint(cp)",
+    "[warn]     |                    ^^^^^^^^^^^^^^^^^^^^^^^",
+    "[warn]     |discarded non-Unit value of type StringBuilder. Add `: Unit` to discard silently.",
+    "[warn] one warning found",
+    "[warn] -- [E175] Potential Issue Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/cli/src/main/scala/storyatlas4s/cli/CodexHtml.scala:252:19 ",
+    "[warn] 249 |          out",
+    "[warn] 250 |            .append(\"<span class=\\\"sel\\\">\")",
+    "[warn] 251 |            .append(escapeText(text.substring(from, to)))",
+    "[warn] 252 |            .append(\"</span>\")",
+    "[warn]     |          ^",
+    "[warn]     |discarded non-Unit value of type StringBuilder. Add `: Unit` to discard silently.",
+    "[warn] -- [E198] Unused Symbol Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/cli/src/main/scala/storyatlas4s/cli/Workspace.scala:3:28 ",
+    "[warn] 3 |import _root_.intaglio.svg.{SvgOptions, SvgRenderer}",
+    "[warn]   |                            ^^^^^^^^^^",
+    "[warn]   |                            unused import",
+    "[warn] -- [E198] Unused Symbol Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/cli/src/main/scala/storyatlas4s/cli/Workspace.scala:3:40 ",
+    "[warn] 3 |import _root_.intaglio.svg.{SvgOptions, SvgRenderer}",
+    "[warn]   |                                        ^^^^^^^^^^^",
+    "[warn]   |                                        unused import",
+    "[warn] -- [E198] Unused Symbol Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/cli/src/main/scala/storyatlas4s/cli/Workspace.scala:4:23 ",
+    "[warn] 4 |import cats.syntax.all.*",
+    "[warn]   |                       ^",
+    "[warn]   |                       unused import",
+    "[warn] -- [E198] Unused Symbol Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/cli/src/main/scala/storyatlas4s/cli/Workspace.scala:6:29 ",
+    "[warn] 6 |import storyatlas4s.intaglio.PagedCodexLowering",
+    "[warn]   |                             ^^^^^^^^^^^^^^^^^^",
+    "[warn]   |                             unused import",
+    "[warn] 5 warnings found",
+    "[warn] -- [E029] Pattern Match Exhaustivity Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/intaglio/src/test/scala/storyatlas4s/intaglio/PlateCraftSuite.scala:167:8 ",
+    "[warn] 167 |        case ig.DeviceElement.Group(n, _, _, children) =>",
+    "[warn]     |        ^",
+    "[warn]     | match may not be exhaustive.",
+    "[warn]     |",
+    "[warn]     | It would fail on pattern case: intaglio.DeviceElement.Annotated(_, _)",
+    "[warn]     |",
+    "[warn]     | longer explanation available when compiling with `-explain`",
+    "[warn] -- [E029] Pattern Match Exhaustivity Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/intaglio/src/test/scala/storyatlas4s/intaglio/WarOfTheGhostsLoweringSuite.scala:72:8 ",
+    "[warn] 72 |        case ig.DeviceElement.Group(Some(name), _, _, children) if name.value == wanted =>",
+    "[warn]    |        ^",
+    "[warn]    |   match may not be exhaustive.",
+    "[warn]    |",
+    "[warn]    |   It would fail on pattern case: intaglio.DeviceElement.Annotated(_, _)",
+    "[warn]    |",
+    "[warn]    | longer explanation available when compiling with `-explain`",
+    "[warn] two warnings found",
+    "[warn] -- [E029] Pattern Match Exhaustivity Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/intaglio/src/test/scala/storyatlas4s/intaglio/PlateCraftSuite.scala:167:8 ",
+    "[warn] 167 |        case ig.DeviceElement.Group(n, _, _, children) =>",
+    "[warn]     |        ^",
+    "[warn]     | match may not be exhaustive.",
+    "[warn]     |",
+    "[warn]     | It would fail on pattern case: intaglio.DeviceElement.Annotated(_, _)",
+    "[warn]     |",
+    "[warn]     | longer explanation available when compiling with `-explain`",
+    "[warn] -- [E029] Pattern Match Exhaustivity Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/intaglio/src/test/scala/storyatlas4s/intaglio/WarOfTheGhostsLoweringSuite.scala:72:8 ",
+    "[warn] 72 |        case ig.DeviceElement.Group(Some(name), _, _, children) if name.value == wanted =>",
+    "[warn]    |        ^",
+    "[warn]    |   match may not be exhaustive.",
+    "[warn]    |",
+    "[warn]    |   It would fail on pattern case: intaglio.DeviceElement.Annotated(_, _)",
+    "[warn]    |",
+    "[warn]    | longer explanation available when compiling with `-explain`",
+    "[warn] two warnings found",
+    "[warn] -- [E198] Unused Symbol Warning: /private/tmp/storyatlas4s-workspace-m1-20260922/cli/src/test/scala/storyatlas4s/cli/WorkspaceSuite.scala:7:27 ",
+    "[warn] 7 |import storyatlas4s.layout.*",
+    "[warn]   |                           ^",
+    "[warn]   |                           unused import",
+    "[warn] one warning found"
+  ],
+  "junit": [
+    {
+      "path": "app/target/test-reports/TEST-storyatlas4s.app.AppCompilerSuite.xml",
+      "sha256": "10c221e0fa3a9675ad966f74fff06fc6035ec7f8054e07a5ca2aabfa7c2e0ee2"
+    },
+    {
+      "path": "app/target/test-reports/TEST-storyatlas4s.app.SemanticZoomSuite.xml",
+      "sha256": "afa793f6b8c72a24a8643477b821d544f172a7cbe576df30e39b85cc0791c8b4"
+    },
+    {
+      "path": "app/target/test-reports/TEST-storyatlas4s.app.SvgDomSuite.xml",
+      "sha256": "ac07481afacc55c13eb93c4014687afb42eb72e16603d548d0c7e40b42e10c35"
+    },
+    {
+      "path": "cli/target/test-reports/TEST-storyatlas4s.cli.CodexHtmlSuite.xml",
+      "sha256": "e90a7917f805a7207c2d4d515d703b14ddc0e168f6053f21c7e46cffaef38ff4"
+    },
+    {
+      "path": "cli/target/test-reports/TEST-storyatlas4s.cli.EditionSuite.xml",
+      "sha256": "57df99835c8444f8fde1b1d4d801edb4ea3dfb54c2f5a05eee908c787e099591"
+    },
+    {
+      "path": "cli/target/test-reports/TEST-storyatlas4s.cli.ModelInputSuite.xml",
+      "sha256": "a377758e111e3de5661c68f24a22decfff7a08a3dd7b0d1a77243055ec5660f8"
+    },
+    {
+      "path": "cli/target/test-reports/TEST-storyatlas4s.cli.VoyageEditionSuite.xml",
+      "sha256": "6a4d12e3a73b1a2899b17db010ead1d38fc5b80e76025f47b4fe2289ae9fee44"
+    },
+    {
+      "path": "cli/target/test-reports/TEST-storyatlas4s.cli.WorkspaceSuite.xml",
+      "sha256": "4e307d620993ba16fc68831eede038f770e6dcd905d650730d882f91a7615b90"
+    },
+    {
+      "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+      "sha256": "70177039fb62405049d752b6c4e7b0610561301d8b0263638d5a52711d966e3c"
+    },
+    {
+      "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+      "sha256": "3014ab55b51ff1d753b4b5a8087eba583a073536441466699401b94caf03dbf0"
+    },
+    {
+      "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+      "sha256": "8331844aec0f5484128ffa8298c3f9b2ae515dcf913d765b63d82e66de154570"
+    },
+    {
+      "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+      "sha256": "6d929272815c4f8ab210db57a1975abbfb7120e4225cdcc3183f52e0e78c917e"
+    },
+    {
+      "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+      "sha256": "4de94ab44a39d96042650c4dfc488a641255ce5282c3e3cbb3044710407e993f"
+    },
+    {
+      "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+      "sha256": "0dae3a5852ef295cee49b57042d794172af87473190e97bab8872c4b6e0965a1"
+    },
+    {
+      "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+      "sha256": "e72cbf080a212a9f48ffae48b02e7060e73f42736bdd4697aed7f93733139eaa"
+    },
+    {
+      "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+      "sha256": "eb6c3af15ec525d0cc3298e12fc43a2249b4a7cc85d026786bbae2215893bde1"
+    },
+    {
+      "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+      "sha256": "7194bc8b56ab404748cb2633e0eb2d75a48718fcce24f09510e1e90305805fa0"
+    },
+    {
+      "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+      "sha256": "4aadef4115f7934e3f19499950303d85eaf3993f3da5c74b39933fae9822d118"
+    },
+    {
+      "path": "layout/.js/target/test-reports/TEST-storyatlas4s.layout.DomMeasurerSuite.xml",
+      "sha256": "64153e6d862772ac1975396b3ea18598ee9ff2553f63d682e8282983b2b55947"
+    },
+    {
+      "path": "layout/.js/target/test-reports/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+      "sha256": "a7948000ddaedc3081c14718d51a3d787032852aad4d3a70a67859974c4821b8"
+    },
+    {
+      "path": "layout/.js/target/test-reports/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+      "sha256": "c4584aa36eca0f8335653628c3c0437ec4a559cfc408b9d7d9bffb9b2b7ec7ff"
+    },
+    {
+      "path": "layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.AwtMeasurerSuite.xml",
+      "sha256": "6fc4d1458e2f5c9d4f17429a06878dc248809c4d9afbff05a483580c6ea7e50e"
+    },
+    {
+      "path": "layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+      "sha256": "57f55f54bee9a626aa1e2cee19d5bf0cfcc540fa1f320497feb04555c6ce943b"
+    },
+    {
+      "path": "layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+      "sha256": "fc945d1139ec23020ef8e9ca2bc3d920b6c113fd4fc1290e53162b4c89d991b7"
+    }
+  ],
+  "archive": "consumer-gate.tar.gz",
+  "archiveSha256": "745186b75b13204ebc85bc4106c8a8258a34f58129e82159665d6dc59b21203a"
+}

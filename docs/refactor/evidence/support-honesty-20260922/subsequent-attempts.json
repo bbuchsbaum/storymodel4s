@@ -1,0 +1,22 @@
+{
+  "failedGateRevision": "02c5309c",
+  "failure": "One JS message assertion expected (1.0) but the correct refusal rendered (1); 60 focused codec checks passed across JVM/JS/Native after correction.",
+  "files": [
+    {
+      "path": "check-all-final.log",
+      "sha256": "bf64be4fda4dea49ec962a11b7ec88daf2e63dde9a842c3082aa5c5023122a8d"
+    },
+    {
+      "path": "check-all-final.log.meta.json",
+      "sha256": "c87cc2a2ec7c72796e754de8a41041a4d76d7c45e6e3fbaa2c7854c495d7d84a"
+    },
+    {
+      "path": "codec-portability.log",
+      "sha256": "8ed4324660b61311fe7dde7cb620b35b231271c346a29d7b00a72b3e325b0bc5"
+    },
+    {
+      "path": "codec-portability.log.meta.json",
+      "sha256": "64545ea978eb6c0b256f93c4d65bbad7d9da51f7660c2af630f3fddb1361ec89"
+    }
+  ]
+}
