@@ -519,7 +519,7 @@ asserts no receipts; this is the M4 witness that replaces the uncompilable `Deri
 policy is `HistoricalReconstruction(label)` with `CandidatePolicy.Unknown`, `ReferencePrior` and
 `DecisionPolicy` both `NotApplicable`, and a declared universe.
 
-**Measures and links.** `ModelPosterior.of` and `RawScores.fromCosts` (channel `local-cost`,
+**Measures and links.** `ModelPosterior.of` and `RawScores.fromCosts` (channel `hsmm.local-cost`,
 `LowerIsBetter`) supply the measures; links come from `fromResult`. A state with no breakdown
 refuses.
 
