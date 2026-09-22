@@ -39,7 +39,7 @@ enum MappingCodecError:
 private[codec] object MappingJson:
   type Result[A] = Either[MappingCodecError, A]
   // ASCII escaping preserves even unmatched UTF-16 code units through a UTF-8 file boundary.
-  private val printer = Canonical.printer.copy(escapeNonAscii = true)
+  private val printer = Canonical.printer.copy(escapeNonAscii = true, dropNullValues = false)
   def print(value: Json): String = printer.print(value)
   def obj(fields: (String, Json)*): Json = Json.obj(fields*)
   def str(value: String): Json = Json.fromString(value)
