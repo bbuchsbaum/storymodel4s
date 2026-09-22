@@ -623,6 +623,7 @@ object OutputCodecs:
     case ViewBasis.ResearcherReviewedFixture => tagged("researcher_reviewed_fixture")
     case ViewBasis.DraftBuild                => tagged("draft_build")
     case ViewBasis.AlignmentRun              => tagged("alignment_run")
+    case ViewBasis.SuppliedAlignmentArtifact => tagged("supplied_alignment_artifact")
   }
   given Decoder[ViewBasis] = Decoder.instance { c =>
     field[String](c, "status").flatMap {
@@ -631,6 +632,7 @@ object OutputCodecs:
       case "researcher_reviewed_fixture" => Right(ViewBasis.ResearcherReviewedFixture)
       case "draft_build"                 => Right(ViewBasis.DraftBuild)
       case "alignment_run"               => Right(ViewBasis.AlignmentRun)
+      case "supplied_alignment_artifact" => Right(ViewBasis.SuppliedAlignmentArtifact)
       case other                         => unknown(c, "ViewBasis", other)
     }
   }

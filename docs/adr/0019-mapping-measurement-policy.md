@@ -242,6 +242,23 @@ retain their distinct authority. The writer takes an explicit producer revision 
 byte digests, archives and selected subsets. It adds no process spawning, remote inference,
 public user-file workflow, module or dependency.
 
+The timed M1 Voyage witness adds optional `PresentationClocks` with
+`WorkspaceClockInput` and checked `WorkspaceClocksCodec` admission. It binds exact
+model/recall bytes, inventory and source representation, a complete fixed-cut declared
+source timeline, independent `RecallTiming` word observations, a recall extent and a
+declaration identity. Missing clocks leave ordinary inspection intact. No unit
+presentation annotation is converted to word timing; rational word coordinates remain
+exact and a legacy projection must refuse unrepresentable seconds. Closed source spans
+are declared presentation support, with recording correspondence explicitly unestablished.
+No media, word-duration or scanner authority is inferred.
+
+The legacy Voyage adapter may use only original compatible model-posterior decisions;
+unsupported outcomes retain explicit dispositions in the complete shared inventory.
+`ViewBasis.SuppliedAlignmentArtifact` records unknown execution provenance and has no
+admitted scientific authority. Reject labeling a historical record as an executed stage
+merely because its posterior is contextually bound, or relabeling an incompatible G1
+decision to fit an older Voyage origin.
+
 The first executable clock slice (2026-09-22) is an independent standard-library
 Python intake oracle in `tools/recall-study/recall_clock.py`. Its experimental
 `storymodel4s.sherlock.recall-clock-intake/v1` artifact binds declared lineage and

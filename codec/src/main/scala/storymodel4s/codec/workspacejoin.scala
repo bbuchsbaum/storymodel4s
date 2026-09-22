@@ -102,6 +102,7 @@ object WorkspaceCodecs:
       val source: SourceRepresentation,
       val policies: Vector[Policy],
       val timing: Map[RecallUnitId, WorkspaceTiming],
+      val clocks: Option[WorkspaceClocksCodec.Checked],
       val origin: WorkspaceOrigin,
       val producerRevision: String
   ):
@@ -430,6 +431,22 @@ object WorkspaceCodecs:
       receiptJson <- parse(receiptText)
       receipt <- readReceipt(receiptJson, archive.manifest.entries)
       _ <- checkFeatures(archive, model)
+      clocks <- archive.manifest
+        .bytes(WorkspaceRole.PresentationClocks)
+        .traverse(bytes =>
+          WorkspaceArchiveCodec
+            .utf8(bytes)
+            .flatMap(t =>
+              WorkspaceClocksCodec.decode(
+                t,
+                archive.manifest.artifact(WorkspaceRole.SourceModel).get.checksum,
+                archive.manifest.artifact(WorkspaceRole.Recall).get.checksum,
+                inventory,
+                source,
+                policies.head.record.policies.universe
+              )
+            )
+        )
     yield new Investigation(
       archive,
       DraftModel.of(model, validation, derivation),
@@ -439,6 +456,7 @@ object WorkspaceCodecs:
       source,
       policies,
       timing,
+      clocks,
       receipt._1,
       receipt._2
     )
@@ -456,7 +474,8 @@ object WorkspaceCodecs:
       origin: WorkspaceOrigin,
       producerRevision: String,
       inspection: WorkspaceContentGrant,
-      exportPermission: WorkspaceContentGrant
+      exportPermission: WorkspaceContentGrant,
+      clocks: Option[WorkspaceClockInput] = None
   ): Result[SourceRecallWorkspace] =
     if inspection != WorkspaceContentGrant.Granted || exportPermission != WorkspaceContentGrant.Granted
     then Left(WorkspaceRefusal.PermissionDenied)
@@ -479,7 +498,18 @@ object WorkspaceCodecs:
           WorkspaceRole.Derivation -> MappingJson.print(
             derivationJson(compilation.map(DerivationRecordCodec.encode), results)
           )
-        ) ++ mappings.map(m => WorkspaceRole.Mapping(m.id) -> MappingCodecs.encode(m.record))
+        ) ++ mappings.map(m => WorkspaceRole.Mapping(m.id) -> MappingCodecs.encode(m.record)) ++
+          clocks.toVector.map(value =>
+            WorkspaceRole.PresentationClocks -> MappingJson.print(
+              WorkspaceClocksCodec.toJson(
+                value,
+                Checksum.ofText(MappingJson.print(modelJson)),
+                Checksum.ofText(MappingJson.print(recallJson)),
+                inventory,
+                mappings.head.record.source
+              )
+            )
+          )
         base = contents.sortBy(_._1.key).zipWithIndex.map { case ((role, content), i) =>
           member(role, s"member-$i.json", content)
         }
@@ -489,7 +519,15 @@ object WorkspaceCodecs:
             BundlePath.unsafe(s"feature-$i.json"),
             WorkspaceDisposition.Absent
           )
-        }
+        } ++ Option
+          .when(clocks.isEmpty)(
+            WorkspaceEntry(
+              WorkspaceRole.PresentationClocks,
+              BundlePath.unsafe("presentation-clocks.json"),
+              WorkspaceDisposition.Absent
+            )
+          )
+          .toVector
         receiptText = MappingJson.print(
           receiptJson(origin, producerRevision, base.map(_._1) ++ features)
         )

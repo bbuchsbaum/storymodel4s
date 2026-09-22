@@ -8,7 +8,7 @@ class WorkspaceConstructionProbeSuite extends FunSuite:
     val errors = Vector(
       typeCheckErrors("new storymodel4s.codec.WorkspaceArchive(null, null)"),
       typeCheckErrors(
-        "new storymodel4s.codec.WorkspaceCodecs.Investigation(null, null, null, null, null, null, null, null, null, \"revision\")"
+        "new storymodel4s.codec.WorkspaceCodecs.Investigation(null, null, null, null, null, null, null, null, null, null, \"revision\")"
       ),
       typeCheckErrors("new storymodel4s.codec.WorkspaceCodecs.Policy(null, null)"),
       typeCheckErrors("new storymodel4s.codec.WorkspaceSubsetCodec.Payload(\"\", \"\", \"\", \"\")")

@@ -6,6 +6,7 @@ import storymodel4s.acquire.{OutputLabel, OutputNamespace}
 /** Artifact roles in a joined investigation, distinct from a story-build output profile. */
 enum WorkspaceRole:
   case SourceModel, Recall, Inventory, Derivation, Capabilities, Receipt
+  case PresentationClocks
   case Mapping(id: ArtifactId)
   case Features(id: ArtifactId)
 
@@ -15,8 +16,8 @@ enum WorkspaceRole:
     case other        => other.toString
 
   def required: Boolean = this match
-    case Features(_) => false
-    case _           => true
+    case Features(_) | PresentationClocks => false
+    case _                                => true
 
   def artifactRole: ArtifactRole = this match
     case SourceModel => ArtifactRole.SemanticModel

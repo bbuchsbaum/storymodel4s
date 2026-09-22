@@ -113,9 +113,10 @@ object WorkspaceArchiveCodec:
     case other                      => obj("kind" -> str(other.toString))
   private def readRole(json: Json): Result[WorkspaceRole] =
     field[String](json, "kind").flatMap {
-      case "Mapping"  => field[ArtifactId](json, "id").map(WorkspaceRole.Mapping(_))
-      case "Features" => field[ArtifactId](json, "id").map(WorkspaceRole.Features(_))
-      case other      =>
+      case "Mapping"            => field[ArtifactId](json, "id").map(WorkspaceRole.Mapping(_))
+      case "Features"           => field[ArtifactId](json, "id").map(WorkspaceRole.Features(_))
+      case "PresentationClocks" => Right(WorkspaceRole.PresentationClocks)
+      case other                =>
         WorkspaceManifest.Required
           .find(_.toString == other)
           .toRight(WorkspaceRefusal.UnsupportedContent)

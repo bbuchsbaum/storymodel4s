@@ -117,6 +117,9 @@ object WorkspaceSubsetCodec:
             "mapping_version" -> str(MappingCodecs.SchemaVersion),
             "selection" -> Json.fromValues(selectedAddresses.map(str)),
             "mapping_context" -> context,
+            "presentation_clocks" -> workspace.clocks.fold[Json](obj("status" -> str("absent")))(
+              c => obj("status" -> str("supplied"), "value" -> c.json)
+            ),
             "outcomes" -> Json.fromValues(selectedOutcomes),
             "recall_evidence" -> Json.fromValues(recallEvidence),
             "source_evidence" -> Json.fromValues(sourceEvidence)
