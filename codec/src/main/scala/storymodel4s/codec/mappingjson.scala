@@ -103,6 +103,52 @@ private[codec] object MappingJson:
       enumValue(value.drop(4), ExternalState.values.toVector, "destination")
         .map(Destination.External(_))
     else sourceRef(value).map(Destination.Target(_))
+
+  /** Call only after JSON syntax validation. Object-key spelling is decoded before comparison, so
+    * escaped aliases cannot disappear in the parser's last-key-wins object representation.
+    */
+  def uniqueObjectKeys(text: String): Result[Unit] =
+    final class ObjectFrame:
+      val keys = scala.collection.mutable.HashSet.empty[String]
+      var expectingKey = true
+    var frames = List.empty[Option[ObjectFrame]]
+    var index = 0
+    var refusal = Option.empty[MappingCodecError]
+    while index < text.length && refusal.isEmpty do
+      text.charAt(index) match
+        case '{' =>
+          frames = Some(new ObjectFrame) :: frames
+          index += 1
+        case '[' =>
+          frames = None :: frames
+          index += 1
+        case '}' | ']' =>
+          frames = frames.tail
+          index += 1
+        case ',' =>
+          frames.headOption.flatten.foreach(_.expectingKey = true)
+          index += 1
+        case '"' =>
+          val start = index
+          index += 1
+          while text.charAt(index) != '"' do
+            if text.charAt(index) == '\\' then index += 2 else index += 1
+          index += 1
+          frames.headOption.flatten.filter(_.expectingKey).foreach { frame =>
+            Canonical
+              .parse(text.substring(start, index))
+              .flatMap(Canonical.decodeJson[String]) match
+              case Left(error) => refusal = Some(MappingCodecError.Wire(error))
+              case Right(key)  =>
+                if !frame.keys.add(key) then
+                  refusal = Some(
+                    MappingCodecError.Wire(CodecError.Decode("$", s"duplicate object key: $key"))
+                  )
+                frame.expectingKey = false
+          }
+        case _ => index += 1
+    refusal.toLeft(())
+
   def capture(view: SourceView): SourceView =
     val capturedNodes = view.nodes
     val capturedAdjacency =

@@ -27,6 +27,7 @@ object MappingCodecs:
       )
       schema <- field[String](json, "schema")
       _ <- Either.cond(schema == Schema, (), MappingCodecError.ValueMismatch("schema"))
+      _ <- uniqueObjectKeys(text)
       _ <- reserved(json)
       inventory <- field[Json](json, "inventory")
       inventoryDigest <- field[String](inventory, "digest")

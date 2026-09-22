@@ -365,7 +365,7 @@ class MappingCodecSuite extends FunSuite:
         )
         .toOption
         .get
-    val labels = Vector("a😀é", "a\ud800", "a\ud801", "a\udc00")
+    val labels = Vector("a😀é", "a\ud800", "a\ud801", "a\udc00", """a"\{},[]:b""")
     val records = labels.map(withLabel)
     assertEquals(records.map(_.digest).distinct.size, labels.size)
     records.zip(labels).foreach { (record, label) =>
@@ -609,4 +609,34 @@ class MappingCodecSuite extends FunSuite:
       .toSet
     assertEquals(encodedStates, expectedStates)
 
+  }
+  test("duplicate object keys refuse before parser normalization can erase them") {
+    val encoded = MappingCodecs.encode(miniature)
+    val examples = Vector(
+      encoded.replace(
+        "\"schemaVersion\":",
+        "\"schemaVersion\":\"mapping-record/v0.1\",\"schemaVersion\":"
+      ),
+      encoded.replace(
+        "\"schemaVersion\":",
+        "\"schemaVersion\":\"mapping-record/v0.2\",\"schemaVersion\":"
+      ),
+      encoded.replace("\"policies\":{", "\"policies\":{\"context_policy_id\":null,"),
+      encoded.replace(
+        "\"schemaVersion\":",
+        "\"schema\\u0056ersion\":\"mapping-record/v0.1\",\"schemaVersion\":"
+      )
+    )
+    examples.foreach { text =>
+      assertNotEquals(text, encoded)
+      MappingCodecs.decode(text, context(miniature)) match
+        case Left(MappingCodecError.Wire(CodecError.Decode("$", detail))) =>
+          assert(detail.startsWith("duplicate object key:"))
+        case other => fail(s"expected duplicate-key refusal, got ${other.left.toOption}")
+    }
+  }
+  test("the same key in different nested objects remains legal") {
+    val encoded = MappingCodecs.encode(miniature)
+    assert(encoded.sliding("\"status\"".length).count(_ == "\"status\"") > 10)
+    roundTrip(miniature, context(miniature))
   }

@@ -152,3 +152,10 @@ links and decisions before a canonical full-record match. Reject trusting a carr
 checksum alone or accepting a serialized assessment as its own authority. Mapping-only
 ASCII JSON escaping preserves all UTF-16 code units through byte serialization; the
 existing HSMM and generic canonical formats are unchanged.
+
+G1 JSON admission correction (2026-09-22): mapping printing retains nulls so unknown
+null-valued fields cannot disappear before the full-record comparison. A portable,
+mapping-private scan of syntax-validated input refuses duplicate object keys, including
+escaped spellings of the same key, before the parsed object can silently discard them.
+Both defects have executed before/after witnesses. Reject changing the shared legacy
+printer or treating last-key-wins parsing as evidence that the original record was unique.
