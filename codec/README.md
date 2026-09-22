@@ -46,6 +46,50 @@ with its own golden. On every platform, the portable guarantee is byte-exact dec
 of one artifact after contextual validation. The schema does not claim cross-runtime inference
 bit-identity.
 
+## Checked mapping records
+
+`MappingCodecs` writes the separate `mapping-record/v0.1` schema. It does not replace
+StoryModel or the text-only `hsmm/v4` format. Construct a `MappingResult` with public checked
+factories, then use:
+
+```scala
+val json: String = MappingCodecs.encode(mapping)
+val expected = ExpectedMappingContext(mapping.inventory, mapping.source)
+val restored: Either[MappingCodecError, MappingResult] = MappingCodecs.decode(json, expected)
+```
+
+For a record with result-bound values, supply
+`expected.copy(derivation = Some(DerivationContext(result, checkedRecall, sourceView)))`.
+Decode checks the full inventory/source identities, all six binding coordinates, per-row units
+and the actual result identity. It re-derives posterior values, gates, fidelity and term support
+through the same checked producers. Supplying a context proves a content join; it does not
+certify that an estimator executed. There is no context-free Circe decoder.
+
+Raw scores, normalized score mass, transport mass and model posteriors keep distinct types,
+normalization scopes and decision bases. Every requested outcome is retained, including failures,
+exclusions, abstention and external destinations. A missing candidate is not a measured zero.
+`Derived` stage authority, calibrated quantities and measurement compatibility remain reserved.
+Historical adaptation uses `Unknown(HistoricalArtifact)` with no invented execution receipts.
+
+Unlike the legacy generic format, every mapping optional value is explicitly tagged, long
+coordinates and rational integers are decimal strings, and authoritative Doubles must retain
+canonical IEEE-754 hex values. The mapping printer uses ASCII escapes to preserve all UTF-16
+code units. Whitespace and object-key order may vary on input; missing fields, duplicate keys
+(including escaped aliases), unknown fields (including null values), numeric tick tokens and
+unsupported versions refuse. Errors distinguish JSON/schema errors, contract refusals, reserved
+authority, missing context and digest/value mismatches.
+
+The source section carries complete multipart identities, declared composition, exact physical
+support and partial/unlocated status. It cannot infer cross-part order without a composition or
+turn a parent assignment into child values. The mapping record contains no display permission
+capability or file-publication manifest; those belong to the checked M1 provider packet.
+
+Portable fixtures pin the authored miniature, composed source and large coordinates identically.
+A locally inferred historical fixture pins JVM/JS and Native separately: one published posterior
+leaf differs by one ULP, with corresponding result/record identity changes. This is preserved
+exactly, not rounded. The existing WOG `hsmm/v4` goldens remain unchanged. See the
+[G1 codec evidence](../docs/refactor/evidence/g1-mapping-records-20260922/slice9/receipt.json).
+
 ## Numeric sidecars
 
 `SidecarCodec` preserves the original full-fetch `SM4SFT01` format: a 16-byte header (eight-byte

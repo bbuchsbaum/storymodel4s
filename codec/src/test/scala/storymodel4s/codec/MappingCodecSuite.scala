@@ -640,3 +640,42 @@ class MappingCodecSuite extends FunSuite:
     assert(encoded.sliding("\"status\"".length).count(_ == "\"status\"") > 10)
     roundTrip(miniature, context(miniature))
   }
+
+  test("decoded mapping owns its snapshot after mutable context changes") {
+    val f = MappingCodecFixture
+    val original = f.record()
+    val expectedEncoding = MappingCodecs.encode(original)
+    val backing = f.view.nodes.toArray
+    var reads = 0
+    val changing = new SourceView:
+      def nodes: Vector[NodeSummary] =
+        reads += 1
+        if reads == 1 then backing.toVector
+        else backing.toVector.map(_.copy(predicate = Some("changed")))
+      def node(ref: SourceNodeRef): Option[NodeSummary] = f.view.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        f.view.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = f.view.worldOrder
+      def scoringLength: Int = f.view.scoringLength
+    val decoded = MappingCodecs
+      .decode(expectedEncoding, f.context(v = changing))
+      .fold(e => fail(e.message), identity)
+    assertEquals(reads, 1)
+    def values(record: MappingResult) = record.outcomes.map(row =>
+      row.measures.posterior.get.mass.toVector
+        .sortBy(_._1)
+        .map((state, value) => state -> java.lang.Double.doubleToLongBits(value))
+    )
+    val independentValues = values(original)
+    val independentTargets =
+      original.source.targets.map(t => (t.ref, t.level, t.parent, t.sourceSupport, t.propositional))
+    backing.indices.foreach(i =>
+      backing(i) = backing(i).copy(predicate = Some("mutated"), level = 99)
+    )
+    assertEquals(values(decoded), independentValues)
+    assertEquals(
+      decoded.source.targets.map(t => (t.ref, t.level, t.parent, t.sourceSupport, t.propositional)),
+      independentTargets
+    )
+    assertEquals(MappingCodecs.encode(decoded), expectedEncoding)
+  }

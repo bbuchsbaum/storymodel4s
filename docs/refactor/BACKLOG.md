@@ -9,7 +9,7 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 ## What to do first
 
 The active next product milestone is [M1: one reproducible source-plus-recall investigation](goals/source-recall-workspace-m1-20260922.md),
-Mote `bd-01M34J9FS10B14WQA309K0P6V8`. Finish the active G1 revision 3 slice, then the checked
+Mote `bd-01M34J9FS10B14WQA309K0P6V8`. Finish the active G1 revision 4 slice, then the checked
 provider packet and StoryAtlas's local adoption/loading/interaction/replay chain. Use the `workspace-m1`
 and `execution` tags for the bounded queue. One implementation slice and one heavy gate at a time.
 
@@ -154,9 +154,16 @@ Boundary: align mapping result, recall unit inventory, codec mapping codec.
 4. Preview represents multipart sources with explicit bundle inventory and per-target/axis membership, not a fabricated single bundle; canonical StoryModel remains one bundle under D1A. Long ticks/rational integers survive wire as decimal strings.
 5. External-package probes refuse Mirror/copy/alias forgery, foreign identities/axes, duplicates and missing units; independent miniature round-trips. Mutating chosen confidence to raw argmax confidence and dropping failure rows each fail.
 
-Validation: `proposed MappingContractSuite / MappingCodecSuite on JVM, JS, Native; public consumer construction probes`.
+Implementation: revision 4 is on `solo/workspace-m1-g1`; [slice evidence](evidence/g1-mapping-records-20260922/)
+records the public consumer, authority probes, exact codec and mutation courts. Live Mote owns
+completion status; the clean full G1 landing gate is still required.
 
-0.x mapping schema, separate from StoryModel and HSMM schemas; no new module.
+Validation: `MappingContractSuite`, `MappingCodecSuite`, `MappingCodecDigestSuite`, external/package
+construction probes and scoped recall/align suites on JVM, JS and Native, followed by `sbt -batch checkAll`.
+
+`mapping-record/v0.1` is separate from StoryModel and HSMM schemas; no new module. `Derived`,
+calibration and measurement compatibility are reserved. Historical output remains unknown provenance.
+This ticket does not supply M1 loading, capability-aware provider packets, replay or browser acceptance.
 
 ### G1: extract shared local mapping evidence and receipted scoring channels
 

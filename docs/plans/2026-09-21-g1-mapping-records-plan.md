@@ -1,7 +1,9 @@
 # G1 mapping records: implementation plan (revision 4)
 
-Mote `bd-01M2WVENSB0P955Y0B603CC20Y`. **Plan only.** Nothing named below exists yet. Type, file
-and suite names are acceptance specifications, not implemented or executed code. Governing
+Mote `bd-01M2WVENSB0P955Y0B603CC20Y`. **Implementation in qualification.** Slices 1–9 are
+implemented with [focused evidence](../refactor/evidence/g1-mapping-records-20260922/);
+Slice 10 and the clean full landing gate remain open. Live Mote owns completion status.
+The sections below retain the accepted design and its required falsifiers. Governing
 documents: [PLAN](../refactor/PLAN.md) §§2–3, [ADR 0019](../adr/0019-mapping-measurement-policy.md),
 and the [analysis contract](../refactor/ANALYSIS_CONTRACT.md) ("the contract"). Code references
 are `path:line` at main `f49bec1b`; support-honesty references are at `solo/support-honesty`
@@ -464,7 +466,9 @@ control (N7).
 - **Schema.** `"schema": "storymodel4s.mapping-record"`, `"schemaVersion": "mapping-record/v0.1"`.
   The version is checked first (`UnsupportedSchema`). There is no migration.
 - **Canonical form.** Canonical printing and exact hex Doubles (`canonical.scala:22-37,79`).
-  Text that does not re-encode identically is refused (`VoyageCodecs.decode`, `voyage.scala:40`).
+  Whitespace and object-key order are normalized; the parsed record must re-encode identically
+  (`VoyageCodecs.decode`, `voyage.scala:40`). Unknown fields, including null-valued ones, and
+  duplicate object keys are refused. Mapping-only ASCII escaping preserves UTF-16 code units.
   `encode(r): String` is total.
 - **Exact integers.** Ticks, rationals, extents and `Long` IDs are decimal strings; a JSON number
   is refused by the tick decoder with `NumericTick`. The golden round-trips `"9007199254740993"`
@@ -474,7 +478,7 @@ control (N7).
   - `axes`: id, bundle, kind, extent, `origin` (§2.1), tagged `timebase`;
   - `coordinate_mappings`: composition segments, occurrence, receipt;
   - `targets`: `support_status`, `source_support` with `support_relation`, `support_coverage`, scope;
-  - `inventory`, `policies`, `roles`, `ledger`, `derivation_source`, `outcomes`.
+  - `inventory`, `policies`, `roles`, `stage_assumption_receipts`, `derivation_source`, `outcomes`.
 
 **Contextual decode order:** `decode(text, context: ExpectedMappingContext)`.
 1. Check the version.
@@ -584,9 +588,12 @@ Specific probes assert:
 Positive controls come first, with `classOf` dependencies (`CellCoordinatesUnforgeableSuite.scala`;
 `ConstructionProbeSuite.scala`).
 
-**Aliasing** (mutable arrays; ADR 0018:102, `VerifySuite.scala:60-183`). Mutate every accessor
-result, then compare re-read values against an independent snapshot plus a fresh canonical
-re-encoding, never a cached `digest`.
+**Aliasing** (mutable arrays; ADR 0018:102, `VerifySuite.scala:60-183`). Mutate every mutable
+accessor result, then compare re-read values against an independent snapshot plus a fresh
+canonical re-encoding, never a cached `digest`. G1 exposes immutable collections, not array
+accessors. Its actual mutable input seam is `SourceView`: the consumer codec court changes
+an array-backed view after decode and checks retained values/support and fresh encoding;
+a changing-view witness also kills rereading that input during contextual reconstruction.
 
 **Consumer suite.** `laws/src/test/scala/storymodel4s/laws/MappingContractSuite.scala` runs outside
 align on all three platforms, using `MappingMiniature.record`. It asserts accounting; `p6`
@@ -603,7 +610,7 @@ Rules for every slice:
 - Each commit is green with its focused totals on JVM, JS and Native unless stated.
 - Each mutation is a compiled production edit whose named test fails while the slice's accepting
   control passes.
-- Refusal tests assert the specific `MappingRefusal` or `CodecError` case.
+- Refusal tests assert the specific `MappingRefusal` or `MappingCodecError` case (including wrapped `CodecError`).
 - Before each compile-door mutant, and before its restored control, run `Compile/clean` and
   `Test/clean` on every platform (N14; `CellCoordinatesUnforgeableSuite.scala:64-67`).
 

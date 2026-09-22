@@ -1,6 +1,48 @@
 # Recall Mapping: proposed analysis contract
 
-**Status:** accepted design direction, not an implemented API. Prepared against `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`; amended 19 September 2026 by [PLAN.md](PLAN.md) and [ADR 0019](../adr/0019-mapping-measurement-policy.md). Version the preview independently of the existing story and HSMM schemas. This document specifies meanings first; reuse existing checked types wherever their meanings agree.
+**Status:** accepted design direction; the bounded G1 subset below is implemented and in qualification. The remaining contract is not an implemented API. Prepared against `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`; amended 19 September 2026 by [PLAN.md](PLAN.md) and [ADR 0019](../adr/0019-mapping-measurement-policy.md). Version the preview independently of the existing story and HSMM schemas. This document specifies meanings first; reuse existing checked types wherever their meanings agree.
+
+## G1 implementation boundary (22 September 2026)
+
+The checked subset is named `MappingResult` and uses `mapping-record/v0.1`; the broader
+`MappingRun` envelope, exchange tables, timing, reference inference and compatibility readouts
+remain downstream. The [revision 4 implementation plan](../plans/2026-09-21-g1-mapping-records-plan.md)
+and its [qualification evidence](evidence/g1-mapping-records-20260922/) specify this boundary.
+Live Mote, not this section, records whether the complete G1 landing gate has passed.
+
+G1 fixes word identities under one segmentation and retains unassigned words; stability across
+resegmentation and timing are not yet supplied. Every unit carries
+`NotAssessed(NoDecompositionDetector)`. This discloses missing decomposition evidence without
+claiming single-reference certainty. Only evidence support is implemented as a support relation.
+A source preview is a checked bundle inventory plus per-target/per-axis membership and optional
+explicit composition; canonical StoryModel remains one bundle.
+
+The wire groups policies, roles and `stage_assumption_receipts`, flattens typed alternatives
+into `mapping_links`, and uses `SourceNodeRef.key` under `target-id/source-node-ref/v1` for target
+identity. `fidelity_status` and facets come from assessed fidelity; `gate_outcome` is separate.
+The chosen link supplies unit-level `fidelity_assessment_status`. Required tagged `term_support`
+(`evaluated` or `not-computed` with a reason) replaces the undefined `assessment_support_id`.
+Physical `support_status`/`source_support` and group `support_coverage` retain distinct meanings.
+
+A decision retains its explicit measure basis, original request, raw argmax, selected destination,
+candidate-support flag, policy and calibration status. No decision has a tagged `no-decision`
+quantity and tagged absent target. Outside-support numeric zero is a flagged sentinel, including
+for raw-score decisions; an actual inside-support zero remains distinct. Empty external decode
+is Unranked; explicit abstention is NotComputed. Neither becomes an intrusion probability.
+
+The six-field `derivation_source` binds recall checksum/supplement, inventory, view, scope and
+actual result identity; each derived row retains its unit. All optional fields are tagged.
+Axis origin is the playback extent start or text character zero. Exact integers use decimal
+strings; authoritative numeric measures retain IEEE-754 bits. Duplicate keys, unknown fields,
+missing required values and incompatible contexts refuse. Schema errors use `MappingCodecError`
+wrappers rather than changing the shared `CodecError` vocabulary.
+
+`partial`, `ambiguous`, `manual-review`, non-evidence support relations and
+`measurement_compatibility` remain reserved here. Derived stage authority, calibrated decisions
+and calibrated probabilities have no construction door. Historical reconstruction stays
+`Unknown(HistoricalArtifact)` without asserted receipts. Caller-supplied receipts remain
+explicitly Unknown and never certify reference measurement. No transition readout, calibration,
+independent empirical recovery or full M1 workspace is established by this checked subset.
 
 ## 1. The artifact and its unit of inference
 

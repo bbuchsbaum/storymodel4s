@@ -107,6 +107,31 @@ errors rather than silently ignored.
 There is no converter: a v3 `supportWeight` of `1.0` cannot say which support
 state applied, so a v3 artifact is re-derived from its inputs, not upgraded.
 
+## Additive mapping-record API
+
+G1 adds `RecallInventory` in `recall`, checked mapping/source/measure/decision records in
+`align`, and contextual `MappingCodecs` in `codec`. It adds no module or dependency and changes
+no existing story/HSMM schema or inference arithmetic. `MappingMiniature` in `laws` is
+experimental public test support with authored alternatives, not measured model output.
+
+`MappingResult.checked` requires one ordered outcome for every inventory unit and one coherent
+source, target universe, policy set and stage ledger. Result-derived values share one
+`DerivationBinding`: recall checksum, presence-sensitive recall supplement, inventory digest,
+view fingerprint, scope digest and actual result digest. Binding does not certify execution.
+The historical adapter preserves unknown stage provenance and unavailable calibration.
+
+Use `SourceRepresentation.of` for multipart preview support. Equal legacy bundle IDs cannot
+hide different full coordinate identities. Targets retain exact checked physical coordinates
+and explicit unlocated/partial status; this type grants no permission to reveal source text.
+Ordering independent parts requires a checked declared composition.
+
+The authority-bearing components have no unchecked `apply`, `copy`, `Product` or `Mirror` route.
+`StageProvenance.Derived`, `CalibratedProbability` and calibrated decisions have no construction
+door in this version. Mapping schema `mapping-record/v0.1` refuses their tags rather than
+promoting caller declarations. Decode requires expected inventory/source and, for bound values,
+the original checked recall, view and HSMM result; it re-derives values and compares exact records.
+This wire supports checked physical mapping support without widening the text-only HSMM wire.
+
 ## Qualification boundary
 
 Frozen text JSON, per-backend WOG HSMM bytes, complete Sherlock row coordinates,
