@@ -1,0 +1,68 @@
+{
+  "schema": "storymodel4s.g1-integration-checkpoint/v1",
+  "slice": 10,
+  "source": "cb2a2d410b065d05ec1a10b4169978037aecc3a1",
+  "mainBase": "a2723c7f20d48f4e674f528542e2bd252aa3c224",
+  "status": "partial-awaiting-final-native-and-checkAll",
+  "focused": {
+    "JVM": {
+      "consumer": 11,
+      "mapping": 40,
+      "existingCodec": 20,
+      "failures": 0
+    },
+    "JS": {
+      "consumer": 11,
+      "mapping": 40,
+      "existingCodec": 20,
+      "failures": 0
+    },
+    "Native": {
+      "earlierConsumer": 11,
+      "earlierUnusedImportWarning": "removed and recompiled on JVM/JS",
+      "finalSnapshotAndWarningCleanup": "not yet run"
+    }
+  },
+  "snapshotMutation": {
+    "killed": true,
+    "compiledRuns": 1,
+    "restoredControl": 32,
+    "sourceSha256": "911b3ee2ab390400ffd8b77fa550ed82f8328670725c93fe0028379441c237e3",
+    "mutantSha256": "89d93cc5cd8312d845ae47517d77dd836ce28b06d0bcee83c20aa27a535e5a18"
+  },
+  "aliasing": "G1 records expose immutable collections, no array accessors. The exercised mutable seam is an array-backed SourceView: capture once, then mutate it and compare independent values, target coordinates and fresh canonical encoding.",
+  "review": {
+    "source": "cb2a2d41",
+    "base": "88735ee9",
+    "reviewer": "m1_g1_plan_review",
+    "findings": [],
+    "conclusion": "Specific public refusal assertions and accepting controls; snapshot test checks one context read, retained values and fresh encoding. API documentation agrees with implementation and preserves pending gates and downstream scope.",
+    "wordingCorrections": [
+      "Qualify partial/ambiguous/manual-review as outcome statuses; SupportCoverage.Partial is implemented.",
+      "Slice 3 introduces vocabulary/policies; measure records are Slice 5."
+    ],
+    "limits": "Read-only immutable review; no builds. Final Native, snapshot mutation and checkAll were not yet established by this review."
+  },
+  "scopeChecker": {
+    "base": "a2723c7f",
+    "candidate": "cb2a2d410b065d05ec1a10b4169978037aecc3a1",
+    "exitCode": 0,
+    "log": "slice10-reference-scope.log",
+    "conclusion": "All consuming modules are included; final checkAll remains required."
+  },
+  "blocker": {
+    "kind": "disk-space",
+    "observed": "Disk filled during shell heredoc creation after the consumer gate had completed; earlier slice7 also had a disk-full interrupted gate.",
+    "latestFree": "695 MiB at last observed check",
+    "cleanup": "Only task-owned completed Native compiler scratch and .native/target caches removed. Source, git refs, artifacts and gate logs retained.",
+    "ownerRequest": "Asked owner to free at least 5 GB or identify a disposable cache; no other session cache removed.",
+    "resolvedAtResume": "2026-09-22: free space recovered to 9.5 GiB; qualification can resume. The earlier disk interruption remains recorded."
+  },
+  "archiveSha256": "ebe5928da0ca0eab79a52e6dfa7b42cf13da7014125001f5976187bb54e1680e",
+  "remaining": [
+    "Final Native consumer and codec checks",
+    "Clean exact-merge-result sbt -batch checkAll with bound totals/skips/exit",
+    "G1 landing and Mote closure; M1 producer packet and Atlas chain follow"
+  ],
+  "limits": "Checkpoint, not completed G1 qualification or M1 acceptance. No main landing, push, browser claim, calibration or reference-measurement claim."
+}

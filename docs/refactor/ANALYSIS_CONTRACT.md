@@ -37,8 +37,9 @@ strings; authoritative numeric measures retain IEEE-754 bits. Duplicate keys, un
 missing required values and incompatible contexts refuse. Schema errors use `MappingCodecError`
 wrappers rather than changing the shared `CodecError` vocabulary.
 
-`partial`, `ambiguous`, `manual-review`, non-evidence support relations and
-`measurement_compatibility` remain reserved here. Derived stage authority, calibrated decisions
+The outcome-status spellings `partial`, `ambiguous` and `manual-review`, non-evidence support
+relations and `measurement_compatibility` remain reserved here. This does not reserve group
+`SupportCoverage.Partial`, which is implemented. Derived stage authority, calibrated decisions
 and calibrated probabilities have no construction door. Historical reconstruction stays
 `Unknown(HistoricalArtifact)` without asserted receipts. Caller-supplied receipts remain
 explicitly Unknown and never certify reference measurement. No transition readout, calibration,

@@ -12,13 +12,14 @@ The receipts distinguish typed-refusal changes from mutations that actually admi
 |---|---|
 | [1](slice1/) | Independent miniature transcription |
 | [2](slice2/) | Word inventory and lossless segmentation identity |
-| [3](slice3/) | Typed measures/policies and unknown stage provenance |
+| [3](slice3/) | Typed vocabulary/policies and unknown stage provenance |
 | [4](slice4/) | Multipart source, exact support and explicit composition |
 | [5](slice5/) | Result binding, measures and assessed links |
 | [6](slice6/) | Complete outcomes and original decision requests |
 | [7](slice7/) | One checked record and public miniature construction |
 | [8](slice8/) | Honest historical HSMM adaptation |
 | [9](slice9/) | Contextual canonical codec and unchanged HSMM byte controls |
+| [10 checkpoint](slice10/) | Consumer integration; final Native and full gate pending |
 
 Source snapshot repairs are also recorded beside the slice receipts. The full merge-result
 `checkAll` receipt, final consumer checks and landing reconciliation remain required.
