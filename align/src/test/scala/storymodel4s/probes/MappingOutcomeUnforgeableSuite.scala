@@ -46,7 +46,7 @@ class MappingOutcomeUnforgeableSuite extends FunSuite:
     assertEquals(dependencies.size, 4)
     assert(
       typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.recall.*; new UnitDecision(??? : DecisionBasis, None, DecisionOrigin.RawArgmax, None, ??? : DecodedTargetMass, ??? : DecisionCalibration, None)"""
+        """import storymodel4s.align.*; import storymodel4s.recall.*; new UnitDecision(??? : DecisionBasis, None, DecisionOrigin.RawArgmax, None, ??? : DecodedTargetMass, ??? : DecisionCalibration, None, ??? : DecisionRequest)"""
       ).nonEmpty
     )
     assert(

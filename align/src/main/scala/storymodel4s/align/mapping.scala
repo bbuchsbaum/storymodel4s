@@ -123,7 +123,8 @@ object UnitOutcome:
       val rawArgmax: Option[(Destination, Double)],
       val decodedMass: DecodedTargetMass,
       val calibration: DecisionCalibration,
-      val policy: Option[DecisionPolicyId]
+      val policy: Option[DecisionPolicyId],
+      val request: DecisionRequest
   )
 
   def computed(
@@ -207,7 +208,8 @@ object UnitOutcome:
                 argmax,
                 decodedMass,
                 Calibration.Unavailable.derived(),
-                policy
+                policy,
+                request
               )
               Right(
                 new UnitOutcome(

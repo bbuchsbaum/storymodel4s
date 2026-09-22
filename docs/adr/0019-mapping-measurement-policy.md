@@ -124,7 +124,9 @@ the displaced column to remain empty. Preserve the superseded audit in local evi
 model output or split allocation informed this correction.
 
 G1 outcome decision (2026-09-22): retain stage references on every computed outcome and the
-declared decision policy even on abstention. Reject dropping these as display-only details:
+declared decision policy even on abstention, plus the original request. An empty external decode
+must replay as Unranked while an explicit abstention remains NotComputed. Reject dropping these
+as display-only details:
 an empty or abstained row still needs ledger validation and reproducible policy identity.
 Outcomes derive choices, candidate-support status and localization from an explicit measure
 basis; a listed alternative in another measure does not join that basis. No new module or

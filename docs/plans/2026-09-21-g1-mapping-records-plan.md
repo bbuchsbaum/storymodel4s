@@ -285,12 +285,14 @@ sealed trait DecodedTargetMass   // InCandidateSupport(value) | OutsideCandidate
 sealed trait DecisionCalibration // Unavailable(reason) | Calibrated(p) [no door in G1]
 final class UnitDecision private (val basis: DecisionBasis, val chosen: Option[Destination], val origin: DecisionOrigin,
     val rawArgmax: Option[(Destination, Double)], val decodedMass: DecodedTargetMass, val calibration: DecisionCalibration,
-    val policy: Option[DecisionPolicyId])
+    val policy: Option[DecisionPolicyId], val request: DecisionRequest)
 ```
 
 Implementation clarification (Slice 6): computed outcomes retain `Some(stages)`; failed/excluded
 outcomes retain `None`. Decisions retain the requested policy, including abstentions; raw argmax
-has no policy. This makes later ledger validation and codec replay possible even for empty rows.
+has no policy. Retain the original `DecisionRequest` as well: an empty external decode and an
+explicit abstention have different localization, so policy and a missing choice alone cannot
+reconstruct them. This supports later ledger validation and codec replay even for empty rows.
 No caller supplies derived decision fields.
 
 **Candidate support** is the `Destination` projection of the basis measure's keys, externals

@@ -408,3 +408,33 @@ class MappingOutcomeSuite extends FunSuite:
       Some(MappingRefusal.BindingMismatch("outcome.inferenceStage"))
     )
   }
+
+  test("the original decision request survives empty and nonempty rows for replay") {
+    val requests = Vector(
+      DecisionRequest.RawArgmax,
+      DecisionRequest.ExternalDecode(e7, policy),
+      DecisionRequest.Abstain(policy, "decoder declined")
+    )
+    Vector(Map.empty[Destination, Double], Map(e3 -> 0.9, e7 -> 0.4)).foreach { values =>
+      requests.foreach { request =>
+        val row = outcome(values, request)
+        val decision = row.decision.get
+        assertEquals(decision.request, request)
+        val replay = UnitOutcome
+          .computed(
+            row.unit,
+            row.measures,
+            row.links,
+            decision.basis,
+            decision.request,
+            row.stages.get
+          )
+          .toOption
+          .get
+        assertEquals(replay.localization, row.localization)
+        assertEquals(replay.decision.get.chosen, decision.chosen)
+        assertEquals(replay.decision.get.origin, decision.origin)
+        assertEquals(replay.decision.get.policy, decision.policy)
+      }
+    }
+  }
