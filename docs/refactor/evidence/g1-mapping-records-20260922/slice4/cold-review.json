@@ -1,0 +1,15 @@
+{
+  "reviewer": "m1_g1_plan_review",
+  "initial": "db1f42cf",
+  "repair": "Refuse different full part identities under one legacy ID and count resolved primary axes for cross-part membership.",
+  "finding": "Distinct coordinate-bearing parts can share a legacy SourceBundleId; deduplicating by it bypassed the cross-part refusal.",
+  "executedWitness": {
+    "log": "slice4-legacy-id-witness-before.log",
+    "total": 16,
+    "failed": 1,
+    "passed": 15,
+    "actual": "accepted",
+    "expected": "AmbiguousBundle"
+  },
+  "followup": "Resolved at 72b7a59e; no further finding in bounded repair. Part(id) is now unambiguous. Read-only review, no reviewer-run builds."
+}

@@ -1,0 +1,158 @@
+[
+  {
+    "mutation": "foreign-axis-admitted",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "513222b85a628d1cba44d303d2f33a5f2e2b3023c8fb1a75d9c942d967df4278",
+    "test": "axis outside inventory refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "ambiguous-first-match",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "ef15b3248580dbbf6c37c27a59db3908f9f7509c4c37dc0934cc241dbe7cf205",
+    "test": "ambiguous axis refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "anchor-bundle-used-as-part",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "d2d4ccffb751cf453308429fb4410cc6ce80997b31c9ec70aa61231be893a359",
+    "test": "Sherlock-shaped rows resolve to part bundles",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "composition-coverage-skipped",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "00622ba18fb351a93f7be0ad5069ae4ffd208c23b04003cb9b5399b269d502a9",
+    "test": "composition covers exactly its parts",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "composition-recheck-skipped",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "0b9fa9873fd75ad0b441b955ee8a169f93dc7acfaefe16c09177231ca1789569",
+    "test": "composition over an unlisted part refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "cross-part-admitted",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "e9a5b008f09939cc2d9df7edc8dffbe6a06ae1bc9c6cf425a72e73f75bc52c6f",
+    "test": "cross-part target refuses without composition",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "part-id-implies-order",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "bbab4c899d5506510578711316c274670d18ec7717b3e08ee4f6e929dbd5adda",
+    "test": "e2 to e7 Incomparable without declaration and Before under composition",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "duplicate-target-admitted",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "e70fa3b1a479514523736f2081be4d68f40ed93df8aa17230b092cb27d83f654",
+    "test": "duplicate target ref refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "missing-child-fabricated-covered",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "0a4bcb4e7c41467cc57a84034fb4fe656d57551b813db70cc8a77cbd44eaf2e0",
+    "test": "g1 is Partial and does not fabricate e4 support",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "unlocated-leaf-complete",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "7fc9e1391619e99e318f6effbc43c45f27dabdfa82c0e2cb377881dfef867935",
+    "test": "unlocated leaf is Unknown",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "view-order-digest",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "b4eafbc8dda95b0cbf20b9a17714f96974b71629eac898a9b87c043e6af49ffe",
+    "test": "permuted view has same digest",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "scope-digest-omitted",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "c7dbded5c1c3f19d97dce3b2d1d591bfe0518b0cbb44c17ab35b75c7c08ff85f",
+    "test": "Declared twin changes scopeDigest",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 2, Errors 0, Passed 24"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  },
+  {
+    "mutation": "legacy-bundle-id-collapses-parts",
+    "sourceSha256": "8a907980653673bc351bbfe7cd14c6a4d0090339978ee28124cb74e8f7dffc0f",
+    "mutantSha256": "bb5733f76653fed9cef59487f26e6d4e55ed368ef26098a4f262111f4f6204c9",
+    "test": "distinct parts sharing a legacy bundle ID refuse",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 26, Failed 1, Errors 0, Passed 25"
+    ],
+    "platform": "JVM",
+    "control": "slice4-last-mutation-retry/restored-control.json"
+  }
+]

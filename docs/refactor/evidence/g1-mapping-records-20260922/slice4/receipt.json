@@ -1,0 +1,36 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 4,
+  "initial": "db1f42cf",
+  "source": "72b7a59e",
+  "focused": {
+    "JVM": 26,
+    "JS": 26,
+    "Native": 26,
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 13,
+    "compiledRuns": 13,
+    "runtimePlatform": "JVM",
+    "unqualifiedAttempt": "last mutation initially stopped at dependency project loading with NoClassDefFoundError; no test total, no claimed kill; raw attempt retained; only that mutation rerun",
+    "finalRestored": "26 passed on each backend"
+  },
+  "review": {
+    "reviewer": "m1_g1_plan_review",
+    "initial": "db1f42cf",
+    "repair": "Refuse different full part identities under one legacy ID and count resolved primary axes for cross-part membership.",
+    "finding": "Distinct coordinate-bearing parts can share a legacy SourceBundleId; deduplicating by it bypassed the cross-part refusal.",
+    "executedWitness": {
+      "log": "slice4-legacy-id-witness-before.log",
+      "total": 16,
+      "failed": 1,
+      "passed": 15,
+      "actual": "accepted",
+      "expected": "AmbiguousBundle"
+    },
+    "followup": "Resolved at 72b7a59e; no further finding in bounded repair. Part(id) is now unambiguous. Read-only review, no reviewer-run builds."
+  },
+  "archiveSha256": "ac73a6b5f7b87424aaddb52017bc231c6ce4e9913e1fc446ff2a1e961a804152",
+  "limits": "Checked identities and support declarations, not media correspondence or executed scientific authority. Text checksum declarations still require the later workspace byte join. Existing clang-15 warning retained. Full G1 landing gate remains pending."
+}
