@@ -116,7 +116,7 @@ class WorkspaceManifestSuite extends FunSuite:
     assertEquals(admit(entries :+ entries.head), Left(WorkspaceRefusal.DuplicateRole))
     val extra = WorkspaceEntry(
       WorkspaceRole.Features(ArtifactId.unsafe("optional-features")),
-      BundlePath.unsafe(entries.head.path.value.toUpperCase(java.util.Locale.ROOT)),
+      BundlePath.unsafe("ARTIFACT-0.JSON"),
       WorkspaceDisposition.Absent
     )
     assertEquals(admit(entries :+ extra), Left(WorkspaceRefusal.DuplicatePath))

@@ -89,7 +89,10 @@ object WorkspaceManifest:
       case WorkspaceEntry(role, path, WorkspaceDisposition.Supplied(ref)) => (role, path, ref)
     }
     val roles = entries.map(_.role)
-    val paths = entries.map(_.path.value.toLowerCase(java.util.Locale.ROOT))
+    // BundlePath permits ASCII only. Explicit folding is independent of platform/locale.
+    val paths = entries.map(
+      _.path.value.map(c => if c >= 'A' && c <= 'Z' then (c.toInt + ('a' - 'A')).toChar else c)
+    )
     val ids = supplied.map(_._3.id)
     if schemaVersion != SchemaVersion then Left(WorkspaceRefusal.UnsupportedVersion)
     else if roles.distinct.size != roles.size then Left(WorkspaceRefusal.DuplicateRole)
