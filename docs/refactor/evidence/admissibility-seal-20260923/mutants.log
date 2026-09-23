@@ -1,0 +1,11 @@
+TIP=f9c9b04efbadede4acc1c84fba3ab625cc49f09b CLEAN=0
+M1 Admissibility back to a case class: exit=1 compile_error=False clean_recompile=True totals=['Failed: Total 67, Failed 1, Errors 0, Passed 66'] failed=['scala:49 Admissibility derives a Mirror; fromProduct would rebuild a self-contradicting record']
+M2 StructuralCoverage back to a case class: exit=1 compile_error=False clean_recompile=True totals=['Failed: Total 67, Failed 1, Errors 0, Passed 66'] failed=['scala:74 StructuralCoverage derives a Mirror; fromProduct would admit (0, 2, 1)']
+M3 factory guard removed: exit=1 compile_error=False clean_recompile=False totals=['Failed: Total 67, Failed 3, Errors 0, Passed 64'] failed=['scala:102 more evidenced members than members', 'scala:184 assertion failed', 'scala:266 assertion failed']
+M4 counted miscounts evidence: exit=1 compile_error=False clean_recompile=False totals=['Failed: Total 67, Failed 5, Errors 0, Passed 62'] failed=['scala:108', 'scala:127', 'scala:169', 'scala:171', 'scala:187']
+M5 faithful hard-wired: exit=1 compile_error=False clean_recompile=False totals=['Failed: Total 67, Failed 5, Errors 0, Passed 62'] failed=['scala:119 assertion failed', 'scala:142 the role-reversed unit must be gated on e5', 'scala:159 expected a gate violation, got Right(HsmmResult(units=1, steps=0, logLikelihood=-5.07184749240052, p', 'scala:203', 'scala:619 assertion failed']
+M6 distortion dropped: exit=1 compile_error=False clean_recompile=False totals=['Failed: Total 67, Failed 6, Errors 0, Passed 61'] failed=['\x1b[91m==> X \x1b[0m\x1b[91mstorymodel4s.align.GateProofSuite\x1b[0m.\x1b[91ma cost record whose mode or exclusion disagrees', '\x1b[91m==> X \x1b[0m\x1b[91mstorymodel4s.align.GateProofSuite\x1b[0m.\x1b[91ma distorted state with a facet set the gate did', 'scala:120 Admissibility(RoleReversal)', 'scala:134 Admissibility(PolarityConflict)', 'scala:204', 'scala:623']
+M7 dedup removed: exit=1 compile_error=False clean_recompile=False totals=['Failed: Total 67, Failed 1, Errors 0, Passed 66'] failed=['scala:618']
+BASELINE restored (clean): exit=0 totals=['Passed: Total 67, Failed 0, Errors 0, Passed 67'] failed=[]
+MUTATE_EXIT=0
+POST_CLEAN=0
