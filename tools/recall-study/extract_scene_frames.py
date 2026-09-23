@@ -72,15 +72,20 @@ def ordered_parts(parts, order=PART_ORDER):
 def allocate(durations, per):
     """Frames per part: one each first, the rest by duration with largest remainders.
 
-    Exact rational arithmetic; a remainder tie goes to the part that comes first in timeline order.
+    Durations must be exact positive rationals (see `decimal_seconds`); a remainder tie then goes
+    to the part that comes first in timeline order, as it would on the annotation's own decimals.
     """
     n = len(durations)
     if n == 0:
         raise PlanRefusal("scene has no parts")
     if per < n:
         raise PlanRefusal(f"{per} frames cannot cover {n} parts")
+    exact = []
+    for d in durations:
+        if not (isinstance(d, Fraction) and d > 0):
+            raise PlanRefusal(f"duration {d!r} is not a positive exact rational")
+        exact.append(d)
     spare = per - n
-    exact = [Fraction(d) for d in durations]
     total = sum(exact)
     quotas = [spare * d / total for d in exact]
     alloc = [1 + math.floor(q) for q in quotas]
@@ -95,6 +100,15 @@ def allocate(durations, per):
     return alloc
 
 
+def decimal_seconds(x):
+    """The decimal a float time was parsed from, as an exact rational.
+
+    `Fraction(0.2)` is the binary float nearest 0.2, not 0.2, so equal-looking decimal quotas would
+    stop tying; `repr` recovers the shortest decimal that round-trips, which is the annotation text.
+    """
+    return Fraction(repr(x))
+
+
 def check_extent(start, end):
     """Only a finite, non-negative, positive-length extent can be sampled inside itself."""
     if math.isfinite(start) and math.isfinite(end) and start >= 0 and end - start > 0:
@@ -107,17 +121,26 @@ def check_extent(start, end):
 def plan_scene(parts, per, order=PART_ORDER):
     """Per-part sampling plan: [(part, extent, count, offsets)] in timeline order.
 
-    Offsets sit at the centres of `count` equal slices of the part's own extent, so they are always
-    strictly inside it. For a single-part extent of at least 0.5 s they equal v1's offsets exactly.
+    Offsets sit at the centres of `count` equal slices of the part's own extent. Where float
+    resolution cannot place them strictly inside it (an extent too short for its magnitude), the
+    scene refuses rather than sampling on a bound. For a single-part extent of at least 0.5 s they
+    equal v1's offsets exactly. Seek rounding in `grab` is outside this claim.
     """
     chosen = ordered_parts(parts, order)
     for _, d in chosen:
         check_extent(d["start"], d["end"])
-    counts = allocate([d["end"] - d["start"] for _, d in chosen], per)
+    counts = allocate(
+        [decimal_seconds(d["end"]) - decimal_seconds(d["start"]) for _, d in chosen],
+        per,
+    )
     plan = []
     for (part, d), m in zip(chosen, counts):
         lo, hi = d["start"], d["end"]
         offsets = [lo + (hi - lo) * (k + 0.5) / m for k in range(m)]
+        if not all(lo < o < hi for o in offsets):
+            raise PlanRefusal(
+                f"extent {lo!r}-{hi!r} is too short to sample {m} frames inside it"
+            )
         plan.append({"part": part, "extent": d, "count": m, "offsets": offsets})
     return plan
 

@@ -61,6 +61,30 @@ CASES = [
         "            continue\n",
         "test_refusal_happens_before_any_frame_is_extracted",
     ),
+    (
+        "binary-float-durations",
+        "    return Fraction(repr(x))\n",
+        "    return Fraction(x)\n",
+        "test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats",
+    ),
+    (
+        "allocate-accepts-inexact-or-nonpositive",
+        "        if not (isinstance(d, Fraction) and d > 0):\n",
+        "        if False:\n",
+        "test_allocate_refuses_what_it_cannot_divide_exactly",
+    ),
+    (
+        "undeclared-part-dropped",
+        "    if unknown:\n",
+        "    if False:\n",
+        "test_timeline_order_is_declared_not_lexical",
+    ),
+    (
+        "sample-on-extent-bound",
+        "        if not all(lo < o < hi for o in offsets):\n",
+        "        if False:\n",
+        "test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound",
+    ),
 ]
 
 

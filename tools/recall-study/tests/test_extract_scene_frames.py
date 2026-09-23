@@ -4,6 +4,7 @@ These tests cover generality: the frozen Sherlock manifest records no straddling
 them reproduces a measured historical Sherlock failure. Exact seek/media correspondence is outside
 their claim.
 """
+from fractions import Fraction as F
 import importlib.util
 import json
 import os
@@ -53,13 +54,26 @@ class SceneFramesSuite(unittest.TestCase):
         self.assertEqual([p["count"] for p in esf.plan_scene(tiny, 8)], [1, 7])
         for per in range(2, 13):
             for da in (0.01, 0.5, 1.0, 3.0, 7.25, 50.0):
-                counts = esf.allocate([da, 10.0], per)
+                counts = esf.allocate([esf.decimal_seconds(da), F(10)], per)
                 self.assertEqual(sum(counts), per, (per, da))
                 self.assertTrue(all(c >= 1 for c in counts), (per, da, counts))
 
     def test_remainder_tie_goes_to_the_earlier_part(self):
-        self.assertEqual(esf.allocate([5.0, 5.0], 3), [2, 1])
-        self.assertEqual(esf.allocate([5.0, 5.0, 5.0], 5), [2, 2, 1])
+        self.assertEqual(esf.allocate([F(5), F(5)], 3), [2, 1])
+        self.assertEqual(esf.allocate([F(5), F(5), F(5)], 5), [2, 2, 1])
+
+    def test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats(self):
+        # 0.2 s and 2.2 s with 6 spare frames: quotas 6*0.2/2.4 = 0.5 and 6*2.2/2.4 = 5.5 exactly,
+        # a tie that goes to the earlier part -> [1+0+1, 1+5] = [2, 6]. Built from binary floats,
+        # 0.2 and 2.2 do not tie and the later part wins instead ([1, 7]).
+        parts = {A: extent(10.0, 10.2, [1]), B: extent(0.0, 2.2, [2])}
+        self.assertEqual([p["count"] for p in esf.plan_scene(parts, 8)], [2, 6])
+        self.assertEqual(esf.allocate([F("0.2"), F("2.2")], 8), [2, 6])
+
+    def test_allocate_refuses_what_it_cannot_divide_exactly(self):
+        for durations in ([0.2, 2.2], [F(-1), F(3)], [F(0), F(1)]):
+            with self.assertRaises(esf.PlanRefusal, msg=durations):
+                esf.allocate(durations, 4)
 
     def test_timeline_order_is_declared_not_lexical(self):
         order = ("z-opening", "a-closing")
@@ -73,8 +87,16 @@ class SceneFramesSuite(unittest.TestCase):
         )
         # the tie on equal durations therefore favours the declared-first part
         self.assertEqual([p["count"] for p in esf.plan_scene(parts, 3, order)], [2, 1])
+        # an undeclared part beside a declared one must refuse, not be silently dropped
         with self.assertRaises(esf.PlanRefusal):
-            esf.plan_scene({"undeclared": extent(0.0, 1.0, [1])}, 3, order)
+            esf.plan_scene(
+                {
+                    "z-opening": extent(0.0, 1.0, [1]),
+                    "undeclared": extent(0.0, 1.0, [2]),
+                },
+                3,
+                order,
+            )
 
     def test_single_part_offsets_equal_v1_from_half_a_second_up(self):
         for lo, hi in [(0.0, 0.5), (12.25, 40.0), (1234.5, 1300.75)]:
@@ -88,7 +110,15 @@ class SceneFramesSuite(unittest.TestCase):
         lo, hi, per = 20.0, 20.2, 8
         v1 = [lo + max(hi - lo, 0.5) * (k + 0.5) / per for k in range(per)]
         self.assertTrue(any(o > hi for o in v1))  # the legacy formula leaves the extent
-        (p,) = esf.plan_scene({A: extent(lo, hi, [0])}, per)
+        try:
+            (p,) = esf.plan_scene({A: extent(lo, hi, [0])}, per)
+        except esf.PlanRefusal as e:
+            self.fail(
+                f"a 0.2 s extent is samplable and must be sampled, not refused: {e}"
+            )
+        self.assertEqual(
+            p["offsets"], [lo + (hi - lo) * (k + 0.5) / per for k in range(per)]
+        )
         self.assertTrue(all(lo < o < hi for o in p["offsets"]))
 
     def test_unsamplable_extents_and_budgets_refuse(self):
@@ -106,6 +136,15 @@ class SceneFramesSuite(unittest.TestCase):
                 esf.plan_scene({A: extent(lo, hi, [0])}, 8)
         with self.assertRaises(esf.PlanRefusal):
             esf.plan_scene(STRADDLE, 1)
+
+    def test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound(self):
+        lo, hi = 1e9, 1e9 + 1e-6
+        naive = [lo + (hi - lo) * (k + 0.5) / 8 for k in range(8)]
+        self.assertFalse(
+            all(lo < o < hi for o in naive)
+        )  # the hazard exists at this magnitude
+        with self.assertRaises(esf.PlanRefusal):
+            esf.plan_scene({A: extent(lo, hi, [0])}, 8)
 
     def run_main(self, scenes, per=8, w=4, h=2):
         calls = []
