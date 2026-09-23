@@ -19,3 +19,15 @@ Author-run (LocallyObserved), clone .worktrees/storymodel-export, branch claude-
   shared-id variants, and refuses 21 rehashed corruptions, each for its own reason.
 - Reviews: codex-temporal (Fray #59 seq531 design APPROVE; #61 typed-id objection, fixed
   f74a30f5/6a1195be); a fresh-context Claude cold review (findings fixed in f74a30f5).
+
+## Scoped gate (author-run, LocallyObserved)
+
+- `scoped-gate-69a8e754.log.gz`: exact tip 69a8e754 in a standalone clone, clean tracked tree.
+  Raw log sha256 5109114fbf992b7dcce74910393c23147a99894ffeb8d5abfefcf536fee204a4.
+- Command: `sbt -batch -Dstorymodel4s.grakern.build=~/code/scala/grakern "set ThisBuild / tlFatalWarnings := true"`
+  plus the 18 JVM modules from `tools/reference-scope.sh` and `codecJS/test; codecNative/test`,
+  unpiped; then `scalafmtCheckAll` separately.
+- Result: GATE_EXIT=0, FMT_EXIT=0, 20 `Passed: Total` lines, 3327 tests / 3322 passed / 5 skipped /
+  0 failed, zero `[error]` lines. 2026-09-23T12:45:48Z to 12:53:14Z.
+- Qualification: Grakern came from the local override at 8efc5efa (clean), not the build.sbt pin.
+  This is not a pinned-dependency pass; the integrator's combined gate uses the pin.
