@@ -477,6 +477,41 @@ runs and validates one source snapshot. This is the engine identity, not yet the
 shared-evidence identity of mote `bd-01M2TACM78289S4TECE91GT5K2`: channel and provider
 receipts (AC2) still have to bind before a run may claim shared evidence.
 
+**Candidate tie policy** (agreed with the P1 lead on Fray #55, 2026-09-23). The historical
+per-level cut `sortBy((distance, ref.key)).take(perLevel)` chooses between equal scores by
+identifier. The lexical channel also ranks its hits in identifier order. A strict reference must
+not depend on identifiers (measured: `LocalEvidenceIsolationSuite` law (c)). Candidate generation
+therefore declares a `CandidateTiePolicy`, which is part of the candidate identity and of the
+Candidates stage receipt.
+
+- `TieComplete(budget)` is the policy for new strict profiles. Every candidate whose score
+  equals the k-th score at the cut is kept. Equality is exact equality of finite canonical
+  values in v1. A non-finite score is refused, never tied. Tied candidates share a dense rank,
+  and lexical hits carry no identifier-derived rank.
+- The budget is explicit profile configuration, either `Unbounded` or `AtMost(n)`. There is no
+  default: a value is chosen only after tie-size diagnostics have been measured. It applies to
+  the union of channels at a level, so lexical hits count too.
+- When a union would exceed `AtMost(n)`, the result is a typed `TieOverflow(level, size, n)`.
+  In the reference path this makes the unit's outcome an accounted reference refusal. The
+  remaining levels may be kept as diagnostics, but nothing is normalized over the silently
+  reduced target universe.
+- A successfully computed score is evidence, even when it is zero overlap or equal to every
+  other candidate. Such a level is flagged as uninformative and uncalibrated, not treated as
+  absent. Only a channel's typed no-measurement outcome may omit a score. A numeric floor or a
+  fixture default never implies absence.
+- `HistoricalKeyOrder` is kept by name so the frozen Sherlock preset reproduces byte for byte.
+  Its receipt records that it depends on identifiers, and it can never satisfy a reference
+  profile.
+- Tie-size diagnostics (level, cut rank, tie size, channel) are separate telemetry and never
+  enter historical mapper outputs.
+
+Rejected alternatives:
+- Dropping all candidates tied at the cut. Tie frequency correlates with how vague a recall
+  unit is, which would bias the estimand.
+- A seeded random or content-hash tie-break. Both are arbitrary: a hidden prior.
+- Treating no-overlap scores as missing. That confuses low support with no value.
+- A default budget with no measurement behind it.
+
 **Inference profiles.** An `InferenceProfile` is a versioned declaration with exactly one kind.
 
 - `LocalReference` is the strict reference operation. It declares the target universe and
