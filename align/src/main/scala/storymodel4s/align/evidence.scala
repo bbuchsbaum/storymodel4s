@@ -2,6 +2,7 @@ package storymodel4s.align
 
 import cats.syntax.all.*
 import storymodel4s.core.Checksum
+import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
@@ -9,9 +10,9 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   * before any sequence inference.
   *
   * Why: local reference measurement and [[GraphHsmm]] must read the same nominations and the same
-  * local costs, so that any difference between their outputs is attributable to inference and
-  * never to re-pricing. Only [[LocalEvidence.compute]] builds one. It records the recall, the
-  * view, and whether the mode gate ran, and [[GraphHsmm]] refuses evidence bound to anything else.
+  * local costs, so that any difference between their outputs is attributable to inference and never
+  * to re-pricing. Only [[LocalEvidence.compute]] builds one. It records the recall, the view, and
+  * whether the mode gate ran, and [[GraphHsmm]] refuses evidence bound to anything else.
   *
   * Candidates that are not nodes of the view are dropped here, exactly as inference always did:
   * they are neither priced nor nominated.
@@ -21,6 +22,7 @@ final class LocalEvidence private (
     val viewFingerprint: ViewFingerprint,
     val gated: Boolean,
     val units: Vector[RecallUnitId],
+    val candidates: Vector[CandidateSet],
     val nominated: Vector[Vector[SourceNodeRef]],
     val admissibility: Vector[Map[SourceNodeRef, Admissibility]],
     val breakdowns: Vector[Map[AlignState, CostBreakdown]]
@@ -30,19 +32,21 @@ final class LocalEvidence private (
   def states: Vector[Vector[AlignState]] =
     breakdowns.map(m => m.toVector.collect { case (s, b) if !b.excluded => s }.sortBy(_.key))
 
-  override def equals(that: Any): Boolean = that match
-    case o: LocalEvidence =>
-      recallChecksum == o.recallChecksum && viewFingerprint == o.viewFingerprint &&
-      gated == o.gated && units == o.units && nominated == o.nominated &&
-      admissibility == o.admissibility && breakdowns == o.breakdowns
-    case _ => false
+  /** The engine evidence identity: a content digest of everything above, derived here and never
+    * accepted from a caller. It does NOT identify the cost model, render, or scoring providers that
+    * produced the prices; those receipts bind in the mapping-run envelope.
+    */
+  lazy val identity: LocalEvidenceId = LocalEvidenceId.derive(this)
 
-  override def hashCode: Int =
-    (recallChecksum, viewFingerprint, gated, units, nominated, admissibility, breakdowns).hashCode
+  override def equals(that: Any): Boolean = that match
+    case o: LocalEvidence => identity == o.identity
+    case _                => false
+
+  override def hashCode: Int = identity.hashCode
 
   override def toString: String =
     s"LocalEvidence(units=${units.size}, gated=$gated, " +
-      s"view=${viewFingerprint.checksum.short()}, recall=${recallChecksum.short()})"
+      s"view=${viewFingerprint.checksum.short()}, id=${identity.checksum.short()})"
 
 object LocalEvidence:
 
@@ -99,6 +103,7 @@ object LocalEvidence:
           ViewFingerprint.of(view),
           gate,
           ids,
+          ids.map(candidates.set),
           nominated,
           admissibility,
           b
@@ -115,10 +120,71 @@ object LocalEvidence:
     def refuse(detail: String) = Left(AlignError.InconsistentResult(s"local evidence $detail"))
     if evidence.gated != gate then
       refuse(s"was computed with gate=${evidence.gated}; this inference requires gate=$gate")
-    else if evidence.units != recall.ordered.map(_.id) then
-      refuse("covers different recall units")
+    else if evidence.units != recall.ordered.map(_.id) then refuse("covers different recall units")
     else if evidence.recallChecksum != AlignWire.recallChecksum(recall) then
       refuse("was computed for a different recall")
     else if evidence.viewFingerprint != ViewFingerprint.of(view) then
       refuse("was computed for a different source view")
     else Right(())
+
+/** Content identity of a [[LocalEvidence]]. Only [[LocalEvidence]] derives one: there is no public
+  * way to turn a checksum into an identity, so a caller cannot assert that two computations shared
+  * evidence. It can only compare identities the library derived.
+  */
+object LocalEvidenceId:
+  opaque type LocalEvidenceId = Checksum
+
+  extension (id: LocalEvidenceId) def checksum: Checksum = id
+
+  private[align] def derive(e: LocalEvidence): LocalEvidenceId =
+    import MappingRender.{optional, sequence}
+    def number(d: Double): String = CanonicalDouble.render(d)
+    def nomination(n: Nomination): String = sequence(
+      Vector(
+        n.ref.key,
+        n.channel,
+        n.rank.toString,
+        optional(n.rawScore.map(number)),
+        optional(n.space),
+        optional(n.receipt)
+      )
+    )
+    def admissibility(ref: SourceNodeRef, a: Admissibility): String = sequence(
+      Vector(
+        ref.key,
+        sequence(a.contradictions.map(_.toString)),
+        a.faithful.toString,
+        sequence(a.facets.toVector.sorted.map(_.toString))
+      )
+    )
+    val perUnit = e.units.indices.toVector.map { i =>
+      val set = e.candidates(i)
+      sequence(
+        Vector(
+          e.units(i).value,
+          set.abstained.toString,
+          sequence(
+            set.nominations.map(nomination).sorted
+          ),
+          sequence(e.nominated(i).map(_.key)),
+          sequence(e.admissibility(i).toVector.sortBy(_._1.key).map(admissibility)),
+          sequence(
+            e.breakdowns(i).toVector.sortBy(_._1.key).map { (state, cost) =>
+              sequence(
+                Vector(sequence(AlignState.keyParts(state)), MappingBindingRender.cost(cost))
+              )
+            }
+          )
+        )
+      )
+    }
+    MappingRender.digest(
+      Vector(
+        "local-evidence/v1",
+        e.recallChecksum.hex,
+        e.viewFingerprint.checksum.hex,
+        e.gated.toString
+      ) ++ perUnit
+    )
+
+type LocalEvidenceId = LocalEvidenceId.LocalEvidenceId

@@ -227,7 +227,7 @@ private[align] object MappingBindingRender:
       value.observedEstimateCoverage.observed.toString
     )
   )
-  private def cost(value: CostBreakdown): String = sequence(
+  private[align] def cost(value: CostBreakdown): String = sequence(
     Vector(
       number(value.total),
       optional(value.mode.map(_.render)),
