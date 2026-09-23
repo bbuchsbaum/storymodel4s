@@ -2,6 +2,14 @@
 
 Reconciled 19 September 2026 against `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. Governing direction: [PLAN.md](PLAN.md).
 
+**22 September 2026 re-scope.** Every open bead was reviewed against the code, and owner
+decisions were applied in Mote at `408178ef`. The 1.0 gate is `bd-01M2TAMJ95K9D7H248A8387YW4`,
+with acceptance journey `bd-01M35P83TCNHBSDY6NSK13Q3K0`. The film compiler and organization
+analyses moved to the 1.1 containers `bd-01M35MK5N6F0EWJE2EYT3D8Y9M` and
+`bd-01M35P2EKWC52PZTMN2R5NMDFR`, and research beads moved to P3. See PLAN.md "Operative 1.0
+scope". Where the tables below list a G3/G4 or film ticket as a 1.0 prerequisite, live Mote
+edges govern instead.
+
 **Planning checkpoint (historical):** applied and verified through Mote CLI. Reconciled 136 existing issues; closed 27 with explicit dispositions; added nine active tickets and superseded one duplicate. That checkpoint had 118 open, 234 closed, none doing/review/blocked. All 87 dependency/relationship/tag operations were accepted. See [execution receipt](EXECUTION_RECEIPT.json); live Mote and the completion evidence below supersede those status counts.
 
 The 30 consultant TA keys are crosswalk references, not another set of tickets. Nine new active tickets cover genuine gaps. A tenth clock ticket was superseded after a concurrent intake filing was discovered; the existing C1 ticket is retained. Existing mapper, film, scoring, reliability and release tickets retain their identities. Broad context-sensitive measurement and joint inference stay deferred in PLAN rather than gaining speculative subtasks.
