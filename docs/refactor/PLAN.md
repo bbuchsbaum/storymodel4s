@@ -62,24 +62,26 @@ localization and empirical calibration do not gate the basic workflow.
 
 ## Execution handoff (23 September 2026)
 
-The current integration candidate is `7469d3d7f49dd04df2d2bc76504fbef1202a703b`.
-Its final strict pinned-dependency `checkAll` is running; it is not yet landed.
-The preceding full gate at `03569d1a` failed 13 obsolete WOG expectations.
-The independently reviewed repair preserves explicit missing-proposal refusal,
-retains the historical S0 golden with an explained three-hash delta, and passes
-the complete affected JVM pipeline court (120/120) before this broad gate.
-The [integration evidence](evidence/p1-integration-20260923/README.md) retains both
-failed full gates, repairs, independent exchange readers and exact dependency
-bindings. Local execution is distinct from the still-required hosted CI receipt.
+The reviewed P1 batch landed locally at `577ebfdb0f9348f235ef75706167ddbbd6684cec`.
+Its executable inputs match the tested `7469d3d7f49dd04df2d2bc76504fbef1202a703b`;
+the merge adds only documentation, tracker records and a script comment.
+The complete strict pinned-dependency `checkAll` passed: **8,570 passed, 5 skipped,
+0 failed**. The sibling StoryAtlas consumer at `ef08425759840b84c5b6c4a5ecb8626bc5401265`
+passed **402 tests**, strict compilation, formatting and JavaScript linking.
+That consumer includes a separately reviewed two-line test traversal repair.
+The [integration evidence](evidence/p1-integration-20260923/README.md) preserves
+failed attempts, fixes, final command receipts, exact dependency identities and
+merge equivalence. These local gates do not replace hosted CI or browser acceptance.
 
 The owner decisions and earlier landings close the CI-runner choice, exact-directory
 disk cleanup, stability-boundary decision, strict-warning repair and Sherlock
 re-scoring tickets. Existing GitHub-hosted runners remain the chosen route; the
 stable boundary in [api-stability.md](../api-stability.md) is approved, not frozen.
-The current reviewed batch adds the real-text compiler repair, declared-lossy
-StoryModel export, deterministic offline text source, strict tie policy and
-part-correct frame planning. The latter three are bounded slices of open tickets,
-not completion of their entire workflows.
+The new landing completes the real-text compiler repair and declared-lossy
+StoryModel export. It also lands deterministic offline text-source construction,
+strict tie policy and part-correct frame planning as bounded slices of open
+workflows. The ordinary-file facade, content-only scorer/registered channels,
+and checked video acquisition remain explicit next steps.
 
 Fray threads 68 and 70 record the accepted next handoff. Mote claims and exact
 path reservations govern implementation; this table does not replace them.

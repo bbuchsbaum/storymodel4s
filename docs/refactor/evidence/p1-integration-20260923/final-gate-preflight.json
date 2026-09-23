@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-23T14:10:10.326820+00:00",
+  "source": {
+    "path": "/private/tmp/storymodel-p1-integration-20260923",
+    "sha": "7469d3d7f49dd04df2d2bc76504fbef1202a703b",
+    "tree": "ff35ebf703821ea90d918819b705560e70cf9ad9",
+    "tracked_tree_clean": true
+  },
+  "grakern": {
+    "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+    "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+    "tracked_tree_clean": true
+  },
+  "gale": {
+    "path": "/Users/bbuchsbaum/.sbt/1.0/staging/c6b5fe94c20cf0d05b05/gale",
+    "sha": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+    "tree": "4b5537accb5cf0fd2fbb3f9b0c0a54739e3ecc07",
+    "tracked_tree_clean": true
+  },
+  "graph4s": {
+    "path": "/Users/bbuchsbaum/.sbt/1.0/staging/8d03f2d14a9e2c9f6990/graph4s",
+    "sha": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+    "tree": "23759745a9ff76cd4b00b365790dedabf9c82afc",
+    "tracked_tree_clean": true
+  }
+}

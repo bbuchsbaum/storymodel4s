@@ -1,10 +1,11 @@
 # P1 integration evidence (2026-09-23)
 
-Status: reviewed compiler, strict tie-policy, declared-lossy export and offline
-text-source changes are assembled on the integration branch. They are not landed.
-The first full pinned-dependency gate failed one Native test timeout; its bounded
-repair now passes a Native control and a discriminating JVM mutation. Final
-combined `checkAll` remains required.
+Status: landed locally on StoryModel `577ebfdb0f9348f235ef75706167ddbbd6684cec`.
+The exact tested code is `7469d3d7f49dd04df2d2bc76504fbef1202a703b`.
+The complete strict pinned gate passed 8,570 tests, skipped 5, and failed none.
+StoryAtlas `ef08425759840b84c5b6c4a5ecb8626bc5401265` passed all 402 consumer tests,
+strict compilation, formatting and JavaScript linking. No hosted CI run or browser
+smoke is claimed. Earlier sections below retain the failed attempts as history.
 
 The compiler candidate is `10290a125adf600b85cf3fad5535f59f302998ee`, with
 ADR-first commit `b9b23952`. Independent cold review (Fray49 seq505) found that
@@ -116,5 +117,26 @@ the same model; both views display those laws and refuse a crossed receipt.
 `pipeline-repair-qualification.json` records independent cold-review GO and the
 complete affected JVM court: 120/120 pass with fatal warnings and formatting.
 The first test-only encoder compilation error is retained alongside the repaired
-run. The final strict pinned `checkAll` is running on this clean committed tree;
-its result is still required before landing.
+run. The final strict pinned `checkAll` subsequently passed on this clean committed tree.
+
+
+## Final receipts and consumer seam
+
+`final-checkAll-qualification.json` binds 56 task summaries: 8,575 total,
+8,570 passed, 5 skipped, zero failures or errors. `final-checkAll.meta.json`
+records the exact command and exit 0; the compressed full log is retained.
+Pinned dependencies and unchanged tracked trees are checked before and after.
+`merge-equivalence.json` lists every delta from tested code to the landed merge;
+all executable inputs are identical, including the non-comment lines of
+`tools/reference-scope.sh`.
+
+The first Atlas consumer attempt failed strict test compilation because
+`PlateCraftSuite` did not traverse `DeviceElement.Annotated`. The failed log and
+metadata are retained as `atlas-seam-failed.*`. Independently approved
+`ef08425759840b84c5b6c4a5ecb8626bc5401265` adds recursion through those children,
+retaining the enclosing group name and all leader geometry/count assertions.
+The complete rerun passed 402/402 across 10 test tasks, followed by both formatting
+checks and `app/fastLinkJS`. `atlas-seam-qualification.json` and
+`atlas-seam.meta.json` bind the results, exact Atlas/StoryModel/Intaglio/Grakern
+inputs and exit 0. `atlas-seam-preflight.json` records the initial attempt's inputs;
+the successful receipt names the repaired Atlas SHA explicitly.

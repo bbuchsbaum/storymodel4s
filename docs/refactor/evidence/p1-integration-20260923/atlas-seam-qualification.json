@@ -1,0 +1,42 @@
+{
+  "postGateInputs": {
+    "atlas": {
+      "path": "/private/tmp/storyatlas-p1-seam-20260923",
+      "sha": "ef08425759840b84c5b6c4a5ecb8626bc5401265",
+      "tree": "e9c746b0ab6fec1ea62fc9aab81adb01ab1eb405",
+      "trackedTreeClean": true
+    },
+    "model": {
+      "path": "/private/tmp/storymodel-p1-integration-20260923",
+      "sha": "7469d3d7f49dd04df2d2bc76504fbef1202a703b",
+      "tree": "ff35ebf703821ea90d918819b705560e70cf9ad9",
+      "trackedTreeClean": true
+    },
+    "intaglio": {
+      "path": "/private/tmp/intaglio-p1-seam-20260923",
+      "sha": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "tree": "0d87e0cac9cef841f45d51e89435fabe17ba59fe",
+      "trackedTreeClean": true
+    },
+    "grakern": {
+      "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+      "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+      "trackedTreeClean": true
+    }
+  },
+  "testTaskSummaries": 10,
+  "total": 402,
+  "failed": 0,
+  "errors": 0,
+  "passed": 402,
+  "skipped": 0,
+  "rawLogSha256": "0877d02afc0ed041e1ba1c8ded4a0c11c9106a29e354ffef97a89724b627ee0e",
+  "rawLogBytes": 17831,
+  "independentReview": {
+    "reviewer": "p1_cleanup_review",
+    "verdict": "GO",
+    "sha": "ef08425759840b84c5b6c4a5ecb8626bc5401265"
+  },
+  "qualification": "Local strict compileAll/testAll/scalafmtCheckAll/scalafmtSbtCheck/app-fastLinkJS against exact inputs. No browser smoke or hosted CI run."
+}

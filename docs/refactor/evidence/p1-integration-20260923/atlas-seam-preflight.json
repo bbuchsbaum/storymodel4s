@@ -1,0 +1,23 @@
+{
+  "started_utc": "2026-09-23T14:32:52.892359+00:00",
+  "atlas": {
+    "path": "/private/tmp/storyatlas-p1-seam-20260923",
+    "sha": "900925ccb71d13fe7e686681e222f38c05fe5383",
+    "tree": "2eec0b6f09970db202e2bce582aa2082c0d9cfbe"
+  },
+  "model": {
+    "path": "/private/tmp/storymodel-p1-integration-20260923",
+    "sha": "7469d3d7f49dd04df2d2bc76504fbef1202a703b",
+    "tree": "ff35ebf703821ea90d918819b705560e70cf9ad9"
+  },
+  "intaglio": {
+    "path": "/private/tmp/intaglio-p1-seam-20260923",
+    "sha": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+    "tree": "0d87e0cac9cef841f45d51e89435fabe17ba59fe"
+  },
+  "grakern": {
+    "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+    "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33"
+  }
+}
