@@ -1,0 +1,37 @@
+[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)
+[info] loading settings for project b52b-export-build from plugins.sbt...
+[info] loading project definition from /private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/3fd85613-4c5f-408e-b4ec-c28f4ef2a4ff/scratchpad/b52b-export/project
+[info] loading settings for project root from build.sbt...
+[info] loading settings for project grakern-build from plugins.sbt...
+[info] loading project definition from /Users/bbuchsbaum/code/scala/grakern/project
+[info] loading settings for project root from build.sbt...
+[info] loading settings for project gale-build from plugins.sbt...
+[info] loading project definition from /Users/bbuchsbaum/.sbt/1.0/staging/c6b5fe94c20cf0d05b05/gale/project
+[info] loading settings for project root from build.sbt...
+[info] loading settings for project graph4s-build from plugins.sbt...
+[info] loading project definition from /Users/bbuchsbaum/.sbt/1.0/staging/8d03f2d14a9e2c9f6990/graph4s/project
+[info] loading settings for project root from build.sbt...
+[info] resolving key references (115124 settings) ...
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+[info] set current project to root (in build file:/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/3fd85613-4c5f-408e-b4ec-c28f4ef2a4ff/scratchpad/b52b-export/)
+[info] compiling 23 Scala sources to /private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/3fd85613-4c5f-408e-b4ec-c28f4ef2a4ff/scratchpad/b52b-export/core/.jvm/target/scala-3.7.4/test-classes ...
+[info] done compiling
+Test run [36mstorymodel4s.core.TextSourceSuite[0m started
+[32mstorymodel4s.core.TextSourceSuite[0m: finished [90m0.211s[0m
+Test run [36mstorymodel4s.core.TextSourceSuite[0m finished: 0 failed, 0 ignored, 16 total [90m0.221s[0m
+[info] Passed: Total 16, Failed 0, Errors 0, Passed 16
+[success] Total time: 10 s, completed Sep 23, 2026, 9:09:15 a.m.
