@@ -1,0 +1,25 @@
+  scene 01/2 good                               media-part-a     0.0-   10.0s
+
+8 frames, 1 scenes, sha256 e3b0c44298fc1c14, straddling 0
+wrote /var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmptzr3sr1c/scene-frames.bgr and scene-manifest.json
+test_refusal_happens_before_any_frame_is_extracted (__main__.SceneFramesSuite.test_refusal_happens_before_any_frame_is_extracted) ... /var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/scene-frames-mutants-i3ew5ltk/extract-before-refusal.py:316: ResourceWarning: unclosed file <_io.BufferedReader name='/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmptzr3sr1c/scene-frames.bgr'>
+  digest = hashlib.sha256(open(raw_path, "rb").read()).hexdigest()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/scene-frames-mutants-i3ew5ltk/extract-before-refusal.py:317: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmptzr3sr1c/scene-manifest.json' mode='w' encoding='UTF-8'>
+  json.dump(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+
+======================================================================
+FAIL: test_refusal_happens_before_any_frame_is_extracted (__main__.SceneFramesSuite.test_refusal_happens_before_any_frame_is_extracted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 244, in test_refusal_happens_before_any_frame_is_extracted
+    with self.assertRaises(SystemExit):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: SystemExit not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (failures=1)

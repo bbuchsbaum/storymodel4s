@@ -1,0 +1,28 @@
+test_timeline_order_is_declared_not_lexical (__main__.SceneFramesSuite.test_timeline_order_is_declared_not_lexical) ... FAIL
+
+======================================================================
+FAIL: test_timeline_order_is_declared_not_lexical (__main__.SceneFramesSuite.test_timeline_order_is_declared_not_lexical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 155, in test_timeline_order_is_declared_not_lexical
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        [p["part"] for p in esf.plan_scene(parts, 3, order)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ["z-opening", "a-closing"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: Lists differ: ['a-closing', 'z-opening'] != ['z-opening', 'a-closing']
+
+First differing element 0:
+'a-closing'
+'z-opening'
+
+- ['a-closing', 'z-opening']
++ ['z-opening', 'a-closing']
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
