@@ -51,7 +51,7 @@ ThisBuild / githubWorkflowArtifactUpload := false
 ThisBuild / tlCiHeaderCheck := false
 ThisBuild / tlCiDependencyGraphJob := false
 
-// The independent readers must reject semantic corruptions in generated CI as well as locally.
+// Run the independent exchange readers and synthetic media planner courts in generated CI.
 ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
   List(
     """set -eu
@@ -60,9 +60,10 @@ ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
       |sbt -batch "pipeline/Test/runMain storymodel4s.pipeline.TextSourceExchangeWitness $text_source_court/witness"
       |python3 tools/check_text_source_exchange.py --suite "$text_source_court/witness"
       |python3 examples/storymodel-export/check_export.py examples/storymodel-export/war-of-the-ghosts
+      |python3 tools/recall-study/tests/test_extract_scene_frames.py -v
       |""".stripMargin.trim
   ),
-  name = Some("Check independent source and export readers"),
+  name = Some("Check source exports and scene frame planning"),
   cond = Some("matrix.project == 'rootJVM' && matrix.java == 'temurin@17'")
 )
 
