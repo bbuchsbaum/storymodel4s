@@ -1140,3 +1140,49 @@ complete derivation, and `HumanAdjudicated` requires an adjudication record for 
 claim. A adds no license basis and requires no component-version or wire change for licensing.
 This note records the decision and does not amend the term. F4 implements this rule; the decision
 itself implements nothing.
+
+### 2026-09-23 — `media`: sampled frame sets for captioning (video-only source, AC4 slice S1)
+
+Bead `bd-01M35JG7DXD7NSEE4WVEKT3CSF` (AC4, slice S1; steward approval on Fray #86, seq 749). The
+captioning lane of 2026-09-02 admits frames only through the one decode of 2026-09-01, which binds
+**every** presented packet of one picture stream. Describing a scene needs a few frames, not all of
+them. On a feature-length edition the full decode is tens of gigabytes, spent to caption a few
+hundred frames. Seek-based sampling (`-ss`) is not an alternative, because nothing binds the frame it
+returns to a packet. `media` therefore gains:
+
+- `SampledFrameSet`: frames of **one** picture stream of **one** probed file, selected by
+  **presentation ordinal** from that stream's `PacketIndex`. It carries the probe, stream, index,
+  geometry and bytes digest, and a nonempty, strictly increasing **selected ordinal set**. Each
+  sample has two coordinates, named separately and never interchangeable:
+  - its **presentation ordinal** (its position among the stream's presented packets, which is what
+    the index and PTS are keyed by);
+  - its **sample index** (its position in the sampled bytes, which is what a caption request's
+    ordinals address).
+  The join refuses unless:
+  - every selected ordinal is in the index;
+  - the byte length is exactly one frame at the declared geometry per selected ordinal.
+  PTS is looked up in the index by presentation ordinal and is never computed from a rate or a
+  seek time (§3.1). Geometry is the stream's own; S1 admits no scaling or cropping. Any later
+  resampling is a recorded transformation, not a silent one. Authority is `Draft`.
+- `CaptionSearch.join` becomes polymorphic over the full decode (`FrameSet`, semantics unchanged)
+  and a `SampledFrameSet`, and takes an **expected edition**; it refuses when the frames' edition is
+  another. On a sampled set, a request or result ordinal that names no sample refuses: a caption
+  for a frame that was not sampled is not admitted. An extent is closed on its **own** samples'
+  PTS: first sample to last sample plus that packet's duration. The extent says which instants the
+  model was shown; it does not say the model saw everything between them. Unsampled spans are
+  unavailable, not absent. Nothing here constructs a negative or semantic-absence claim (law 10).
+
+This slice establishes the checked **data** relation (samples ↔ index ↔ PTS) on declared inputs. It
+does **not** establish that a tool run produced those samples. That execution correspondence is
+S3's court: an executed synthetic witness linking each emitted frame's ordinal and PTS to the
+`PacketIndex`, with selection and any transformation recorded. Multi-part editions and the disk
+loader are S2.
+
+Rejected alternatives:
+1. Relaxing `FrameSet.join`'s one-frame-per-packet rule. That would silently change the meaning of
+   the admitted decode for every existing consumer.
+2. Admitting seek-sampled frames with their requested seek times as PTS. The seek time is an
+   intention, not an observation.
+3. Rerouting the bench sidecar (`SherlockAnnotationView.sceneCaptions`) through the new join. That
+   would change the frozen Sherlock-development AV arm. It stays as documented legacy, and the
+   checked path is additive.
