@@ -52,13 +52,14 @@ object ChartCompatibility:
       b: PropositionChart[B]
   ): CompatibilityReport =
     val r = CompareCore.compare(ChartView(a), ChartView(b), TiePolicy.Historical)
+    val g = r.certain // Historical: the one reading
     CompatibilityReport(
       r.conceptMatch,
       r.argumentMatch,
       r.partialityPenalty,
-      r.roleReversal,
-      r.polarityConflict,
-      r.embeddingConflict,
+      g.roleReversal,
+      g.polarityConflict,
+      g.embeddingConflict,
       r.matched
     )
 
@@ -138,11 +139,38 @@ private[proposition] final case class CoreReport[NA, NB](
     conceptMatch: Double,
     argumentMatch: Double,
     partialityPenalty: Double,
+    gateReadings: Set[GateReading],
+    matched: Vector[(NA, NB)]
+):
+  /** Each gate raised in every best reading. A singleton set under [[TiePolicy.Historical]]. */
+  def certain: GateReading = gateReadings.reduce(_ & _)
+
+/** One combination of the three contradiction gates, under one best reading of a comparison.
+  *
+  * Why a plain case class: the gates are independent, and all eight combinations are lawful
+  * readings, so no combination of field values is false (the rule 8 Cartesian-product test).
+  */
+final case class GateReading(
     roleReversal: Boolean,
     polarityConflict: Boolean,
-    embeddingConflict: Boolean,
-    matched: Vector[(NA, NB)]
-)
+    embeddingConflict: Boolean
+):
+  def gated: Boolean = roleReversal || polarityConflict || embeddingConflict
+  def |(o: GateReading): GateReading =
+    GateReading(
+      roleReversal || o.roleReversal,
+      polarityConflict || o.polarityConflict,
+      embeddingConflict || o.embeddingConflict
+    )
+  def &(o: GateReading): GateReading =
+    GateReading(
+      roleReversal && o.roleReversal,
+      polarityConflict && o.polarityConflict,
+      embeddingConflict && o.embeddingConflict
+    )
+
+object GateReading:
+  val None: GateReading = GateReading(false, false, false)
 
 /** The one implementation of chart comparison. [[ChartCompatibility]] runs it over charts in
   * storage order and [[SemanticCompatibility]] over projected graphs, so the two cannot drift.
@@ -239,7 +267,7 @@ private[proposition] object CompareCore:
     val ha = va.heads
     val hb = vb.heads
     if ha.isEmpty || hb.isEmpty then
-      return CoreReport(0.0, 0.0, 0.0, false, false, false, Vector.empty)
+      return CoreReport(0.0, 0.0, 0.0, Set(GateReading.None), Vector.empty)
 
     // Evaluate every head pair once, then choose for each head of `a` the partner offering the
     // best reading: highest concept score, then best argument agreement, then fewest gates. The
@@ -279,9 +307,7 @@ private[proposition] object CompareCore:
       conceptMatch,
       argumentMatch,
       partiality,
-      reversal,
-      polarityConflict,
-      embeddingConflict,
+      Set(GateReading(reversal, polarityConflict, embeddingConflict)),
       matched.map(m => (m._1, m._2))
     )
 
@@ -427,11 +453,12 @@ private[proposition] object CompareCore:
   /** [[directional]] without the view order. Each head of `a` takes every partner that is best by
     * (concept, argument agreement, fewest gates, fewest filler mismatches). Those partners agree on
     * every graded quantity, since `argTotal` is fixed by the head of `a`, so the graded report is
-    * unique. They can still differ in WHICH gate they raise; the flags are then the union over
-    * them, the conservative reading: a contradiction present under some best reading is reported.
-    * `gated` is unaffected, because tied partners raise equally many gates. Every tied partner is
-    * listed in `matched`, so the matched SET does not depend on order; the view order only sorts
-    * it.
+    * unique. They can still differ in WHICH gate they raise. That is an ambiguity, not a fact, so
+    * it is kept: `gateReadings` holds the gate combination of every choice of best partners (at
+    * most eight). Picking one would read the order; unioning them would report conflicts that no
+    * single best reading has. Either every reading is gated or none is, because tied partners raise
+    * equally many gates. Every tied partner is listed in `matched`, so the matched SET does not
+    * depend on order; the view order only sorts it.
     */
   private def directionalOrderFree[NA, RA, NB, RB](
       va: CompareView[NA, RA],
@@ -440,7 +467,7 @@ private[proposition] object CompareCore:
     val ha = va.heads
     val hb = vb.heads
     if ha.isEmpty || hb.isEmpty then
-      return CoreReport(0.0, 0.0, 0.0, false, false, false, Vector.empty)
+      return CoreReport(0.0, 0.0, 0.0, Set(GateReading.None), Vector.empty)
 
     val chosen = ha.map { pa =>
       val evals = hb.map(pb => pb -> evalPairOrderFree(va, vb, pa, pb))
@@ -457,18 +484,16 @@ private[proposition] object CompareCore:
     var argTotal = 0
     var argSum10 = 0L
     var unknownMismatch = 0
-    var reversal = false
-    var polarityConflict = false
-    var embeddingConflict = false
+    var readings = Set(GateReading.None)
 
     matched.foreach { (_, tied) =>
       val e = tied.head._2
       argTotal += e.argTotal
       argSum10 += e.argSum10
       unknownMismatch += e.unknownMismatch
-      reversal ||= tied.exists(_._2.reversal)
-      polarityConflict ||= tied.exists(_._2.polarityConflict)
-      embeddingConflict ||= tied.exists(_._2.embeddingConflict)
+      val alternatives =
+        tied.map((_, t) => GateReading(t.reversal, t.polarityConflict, t.embeddingConflict)).toSet
+      readings = for r <- readings; a <- alternatives yield r | a
     }
 
     val argumentMatch = if argTotal == 0 then conceptMatch else argSum10.toDouble / 10 / argTotal
@@ -478,9 +503,7 @@ private[proposition] object CompareCore:
       conceptMatch,
       argumentMatch,
       partiality,
-      reversal,
-      polarityConflict,
-      embeddingConflict,
+      readings,
       pairs.sorted(using Ordering.Tuple2(using va.order, vb.order))
     )
 
@@ -497,9 +520,7 @@ private[proposition] object CompareCore:
       (ab.conceptMatch + ba.conceptMatch) / 2,
       (ab.argumentMatch + ba.argumentMatch) / 2,
       (ab.partialityPenalty + ba.partialityPenalty) / 2,
-      ab.roleReversal || ba.roleReversal,
-      ab.polarityConflict || ba.polarityConflict,
-      ab.embeddingConflict || ba.embeddingConflict,
+      for x <- ab.gateReadings; y <- ba.gateReadings yield x | y,
       ab.matched
     )
 

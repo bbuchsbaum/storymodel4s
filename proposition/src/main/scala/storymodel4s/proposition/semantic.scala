@@ -126,6 +126,11 @@ object SemanticProjection:
 /** Result of comparing two [[SemanticGraph]]s: the graded parts and gates of a
   * [[CompatibilityReport]], with whether any head matched instead of which heads did.
   *
+  * Gates can be ambiguous. When equally good partner choices raise different gates, `gateReadings`
+  * holds each resulting combination. A flag means the gate is raised under EVERY best reading, so
+  * an ambiguous conflict never looks established. `gated` is exact either way: tied partners raise
+  * equally many gates, so either every reading is gated or none is.
+  *
   * Why not `CompatibilityReport`: its matched pairs are concept ids, which a content scorer must
   * not see. Why not a case class: the fields are one computation's joint output (`matched` and
   * `conceptMatch` are related), so it is minted only by [[SemanticCompatibility.compare]].
@@ -134,27 +139,32 @@ final class ContentCompatibilityReport private[proposition] (
     val conceptMatch: Double,
     val argumentMatch: Double,
     val partialityPenalty: Double,
-    val roleReversal: Boolean,
-    val polarityConflict: Boolean,
-    val embeddingConflict: Boolean,
+    val gateReadings: Set[GateReading],
     val matched: Boolean
 ):
+  private def certain: GateReading = gateReadings.reduce(_ & _)
+
+  /** Role reversal under every best reading. */
+  def roleReversal: Boolean = certain.roleReversal
+
+  /** Polarity conflict under every best reading. */
+  def polarityConflict: Boolean = certain.polarityConflict
+
+  /** Embedding conflict under every best reading. */
+  def embeddingConflict: Boolean = certain.embeddingConflict
+
+  /** Whether equally good readings disagree on which gates are raised. */
+  def gatesAmbiguous: Boolean = gateReadings.size > 1
+
   /** Graded compatibility in `[0, 1]`, excluding gates; the same formula as the chart report. */
   def structuralScore: Double =
     CompareCore.structuralScore(conceptMatch, argumentMatch, partialityPenalty)
 
-  def gated: Boolean = roleReversal || polarityConflict || embeddingConflict
+  /** Some contradiction holds under every best reading. */
+  def gated: Boolean = gateReadings.forall(_.gated)
 
   private def parts: Product =
-    (
-      conceptMatch,
-      argumentMatch,
-      partialityPenalty,
-      roleReversal,
-      polarityConflict,
-      embeddingConflict,
-      matched
-    )
+    (conceptMatch, argumentMatch, partialityPenalty, gateReadings, matched)
 
   override def equals(that: Any): Boolean = that match
     case r: ContentCompatibilityReport => parts == r.parts
@@ -178,9 +188,7 @@ object SemanticCompatibility:
       r.conceptMatch,
       r.argumentMatch,
       r.partialityPenalty,
-      r.roleReversal,
-      r.polarityConflict,
-      r.embeddingConflict,
+      r.gateReadings,
       r.matched.nonEmpty
     )
 

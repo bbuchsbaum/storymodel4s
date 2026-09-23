@@ -680,9 +680,13 @@ with the lemma of a concept that scores nothing.
   objective: most argument agreement, then most roles matched, then fewest filler-status
   mismatches. Scores are summed in integer tenths.
 - For each head, every partner that is best by (concept, argument agreement, fewest gates, fewest
-  mismatches) is kept. Tied partners agree on every graded quantity. Their gate flags are the
-  union, because a contradiction under some best reading is reported. `gated` is unchanged by
-  this, since tied partners raise equally many gates. All tied partners are listed as matched.
+  mismatches) is kept. Tied partners agree on every graded quantity. They can disagree on which
+  gate they raise, so the report keeps `gateReadings`, the set of gate combinations over every
+  choice of best partners (at most eight). A gate flag means "raised under every best reading",
+  and `gatesAmbiguous` says the readings differ. `gated` is exact, since tied partners raise
+  equally many gates: every reading is gated or none is. All tied partners are listed as matched.
 - Rejected: a content-hash tie-break, which is a hidden prior; pick-first, which depends on
-  order; greedy assignment, which depends on order even without ties; and refusing on a
-  gate-divergent tie, which would turn a representable ambiguity into missing evidence.
+  order; greedy assignment, which depends on order even without ties; a union of the tied gates,
+  which reports as established a conflict that no single best reading has (codex-pair-0923's
+  BLOCK on 88675d29, Fray #107 seq 870); and refusing on a gate-divergent tie, which would turn a
+  measurable, typed ambiguity into missing evidence.

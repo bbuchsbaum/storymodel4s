@@ -290,11 +290,83 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
     assertEquals(gates(ChartCompatibility.compare(gateA, gateB("b2", "b1"))), (true, false))
   }
 
-  test("on the same head tie, the canonical path reports the union of the tied partners' gates") {
+  test("on the same head tie, the canonical path keeps both readings and certifies neither gate") {
+    val polarityOnly = GateReading(false, true, false)
+    val reversalOnly = GateReading(true, false, false)
     for (neg, rev) <- Vector(("b1", "b2"), ("b2", "b1")) do
       val r = SemanticCompatibility.compare(canon(gateA), canon(gateB(neg, rev)))
-      assertEquals((r.polarityConflict, r.roleReversal), (true, true))
+      assertEquals(r.gateReadings, Set(polarityOnly, reversalOnly))
+      assert(r.gatesAmbiguous)
+      // neither conflict holds under every best reading, but some conflict does
+      assertEquals((r.polarityConflict, r.roleReversal), (false, false))
       assert(r.gated)
+  }
+
+  /** b: two negated run-01s about other fillers. Against `pa` both tie with the same one gate. */
+  private val gateSameB = checked(
+    PropositionChart.unchecked(
+      Some(id("n1")),
+      Map(
+        id("n1") -> Concept.predicate("run", run1),
+        id("n2") -> Concept.predicate("run", run1),
+        id("cat") -> Concept.entity("cat"),
+        id("bird") -> Concept.entity("bird"),
+        id("fox") -> Concept.entity("fox"),
+        id("owl") -> Concept.entity("owl")
+      ),
+      Vector(
+        PropositionRelation(id("n1"), RoleAssignment.arg(0), ConceptTarget.Node(id("cat"))),
+        PropositionRelation(id("n1"), RoleAssignment.arg(1), ConceptTarget.Node(id("bird"))),
+        PropositionRelation(id("n2"), RoleAssignment.arg(0), ConceptTarget.Node(id("fox"))),
+        PropositionRelation(id("n2"), RoleAssignment.arg(1), ConceptTarget.Node(id("owl")))
+      ),
+      polarity = Map(id("n1") -> Polarity.Negative, id("n2") -> Polarity.Negative)
+    )
+  )
+
+  test("positive control: a head tie whose partners raise the same gate is one certain reading") {
+    val core =
+      CompareCore.compare(GraphView(canon(gateA)), GraphView(canon(gateSameB)), TiePolicy.OrderFree)
+    assertEquals(core.matched.size, 4, "precondition: pa and pa2 each tie with both n1 and n2")
+    val r = SemanticCompatibility.compare(canon(gateA), canon(gateSameB))
+    assertEquals(r.gateReadings, Set(GateReading(false, true, false)))
+    assert(!r.gatesAmbiguous)
+    assert(r.polarityConflict)
+    assert(r.gated)
+  }
+
+  test("gate readings are symmetric: the tie's readings survive swapping the arguments") {
+    // b -> a raises no gate here, so a report that kept one direction only would lose them.
+    val (a, b) = (canon(gateA), canon(gateB("b1", "b2")))
+    assertEquals(
+      SemanticCompatibility.compare(b, a).gateReadings,
+      SemanticCompatibility.compare(a, b).gateReadings
+    )
+  }
+
+  property("gate readings are symmetric") {
+    forAll(chart, chart) { (a, b) =>
+      (SemanticProjection.canonical(a), SemanticProjection.canonical(b)) match
+        case (Right(ga), Right(gb)) =>
+          Prop(
+            SemanticCompatibility.compare(ga, gb).gateReadings ==
+              SemanticCompatibility.compare(gb, ga).gateReadings
+          )
+        case _ => Prop.undecided
+    }
+  }
+
+  property("gated is exact: every best reading is gated, or none is") {
+    forAll(chart, chart) { (a, b) =>
+      (SemanticProjection.canonical(a), SemanticProjection.canonical(b)) match
+        case (Right(ga), Right(gb)) =>
+          val r = SemanticCompatibility.compare(ga, gb)
+          Prop(
+            r.gateReadings.nonEmpty &&
+              r.gateReadings.forall(_.gated) == r.gateReadings.exists(_.gated)
+          )
+        case _ => Prop.undecided
+    }
   }
 
   // --- gloss twins: the default identity cannot order them, the canonical graph must ----------
