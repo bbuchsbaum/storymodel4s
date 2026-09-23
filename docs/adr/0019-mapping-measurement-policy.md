@@ -457,3 +457,75 @@ prints `workspace-mapping-export-receipt/v0.1` JSON binding `input_sha256`,
 `policy_id`, `mapping_digest` and `manifest_sha256`. Refusals produce content-free
 error JSON on stderr and exit 2. The command delegates to the same checked producer;
 it neither performs inference nor promises the unfinished study-preparation facade.
+
+### 2026-09-23 — engine local evidence, inference profiles and mapping runs
+
+Status: proposed for peer review on Fray (#49, #18). No code yet beyond the first item.
+
+**Engine local evidence (landed at `29e85a0c`).** `LocalEvidence.compute` gates and prices
+every nominated anchor once, before any inference, and both `GraphHsmm` and the reference path
+consume that one immutable object. `LocalEvidenceId` is derived only inside `align`. It covers:
+
+- the recall and source, including the supplements that separate absent from explicitly
+  empty proposition fields;
+- the full nominations;
+- admissibility;
+- every priced state.
+
+It does not identify the cost model, the renderer or the scoring providers. Inference binds,
+runs and validates one source snapshot. This is the engine identity, not yet the complete
+shared-evidence identity of mote `bd-01M2TACM78289S4TECE91GT5K2`: channel and provider
+receipts (AC2) still have to bind before a run may claim shared evidence.
+
+**Inference profiles.** An `InferenceProfile` is a versioned declaration with exactly one kind.
+
+- `LocalReference` is the strict reference operation. It declares the target universe and
+  grain, the prior, the temperature, the normalization and the external alternatives. It has
+  no transitions, refinement, monotone decode or fill. Its measure is normalized local score
+  mass.
+- `StructuredReconstruction(preset)` names a versioned preset. The preset declares
+  persistence, order, hierarchy, refinement and fill. The historical Sherlock preset stays
+  reachable by name. Its measure is a model posterior.
+- `Weighted(lambda)` sets the structural strength. `lambda` is an exact rational in the
+  closed interval [0, 1], carried as a decimal string, never a `Double`; out-of-range and
+  non-finite values are refused. At `0 < lambda < 1` the transition log-weights are tempered,
+  `log A_lambda(s, .) = lambda * log A(s, .) - log Z_lambda(s)`, which renormalizes every row,
+  and forward-backward runs over the same evidence. The measure is a model posterior at every
+  `lambda`. Refinement, monotone decode and fill belong to the named reconstruction presets
+  and are not applied at intermediate `lambda`.
+- The endpoints are dispatch, not limits. `Weighted(0)` runs `LocalReference` and
+  `Weighted(1)` runs the declared reconstruction preset. A law states that the tempered
+  posterior approaches the reference mass as `lambda -> 0`, within a frozen tolerance. That
+  law is a test; it is not an identity collapse.
+
+`InferenceProfileId` is the content digest of the whole declaration, derived only by the
+library. Any parameter that can change a result is part of it.
+
+**Mapping runs.** A `MappingRun` pairs `sharedEvidence` with `members`, a list of
+`(InferenceProfileId, MappingResult)` pairs. Its checked constructor refuses a run when:
+
+- the members have differing inventory or source digests;
+- a member's stage ledger does not bind the run's evidence identity at the Candidates,
+  Rendering and Scoring stages;
+- two members use the same profile;
+- the run is empty.
+
+In 1.0 a run offers localization, temporal and exchange projections only. It offers no
+organization or order readouts. Those arrive with compatibility in 1.1: a `lambda > 0` or
+reconstruction member is `ModelDependentOnly` for them, and `LocalReference` is the only
+member that can satisfy a strict request. Exchange serializes a run as a manifest over the
+unchanged single-record packages (`profile_id`, `kind`, `lambda`, record and bundle digests),
+with `shared_evidence_id` and `profile_id` on member rows. The exchange owns that codec. It
+consumes these types and does not define its own.
+
+**Rejected alternatives:**
+
+- A convex mixture of the reference and reconstruction outputs. It would add a normalized
+  score mass to a model posterior, which this ADR forbids, and give the result no measure
+  type.
+- Treating `priorScale = 0` as the reference. That is already rejected above.
+- A `Double` `lambda`. Two runs whose `lambda` values print alike could carry different
+  identities.
+- Letting the caller label a member's profile. That would be caller-asserted identity.
+- Applying fill or monotone decode at intermediate `lambda`. That would carry
+  reconstruction-only decisions into a weighted run.
