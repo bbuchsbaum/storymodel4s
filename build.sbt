@@ -1,4 +1,4 @@
-import org.typelevel.sbt.gha.JavaSpec
+import org.typelevel.sbt.gha.{JavaSpec, WorkflowStep}
 
 val Scala3 = "3.7.4"
 val catsV = "2.13.0"
@@ -50,6 +50,21 @@ ThisBuild / tlCiReleaseTags := false
 ThisBuild / githubWorkflowArtifactUpload := false
 ThisBuild / tlCiHeaderCheck := false
 ThisBuild / tlCiDependencyGraphJob := false
+
+// The independent readers must reject semantic corruptions in generated CI as well as locally.
+ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
+  List(
+    """set -eu
+      |text_source_court=$(mktemp -d)
+      |trap 'rm -rf "$text_source_court"' EXIT
+      |sbt -batch "pipeline/Test/runMain storymodel4s.pipeline.TextSourceExchangeWitness $text_source_court/witness"
+      |python3 tools/check_text_source_exchange.py --suite "$text_source_court/witness"
+      |python3 examples/storymodel-export/check_export.py examples/storymodel-export/war-of-the-ghosts
+      |""".stripMargin.trim
+  ),
+  name = Some("Check independent source and export readers"),
+  cond = Some("matrix.project == 'rootJVM' && matrix.java == 'temurin@17'")
+)
 
 lazy val commonSettings = Seq(
   scalacOptions ++= Seq(

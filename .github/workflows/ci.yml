@@ -98,3 +98,13 @@ jobs:
       - name: Generate API documentation
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
+
+      - name: Check independent source and export readers
+        if: matrix.project == 'rootJVM' && matrix.java == 'temurin@17'
+        run: |
+          set -eu
+          text_source_court=$(mktemp -d)
+          trap 'rm -rf "$text_source_court"' EXIT
+          sbt -batch "pipeline/Test/runMain storymodel4s.pipeline.TextSourceExchangeWitness $text_source_court/witness"
+          python3 tools/check_text_source_exchange.py --suite "$text_source_court/witness"
+          python3 examples/storymodel-export/check_export.py examples/storymodel-export/war-of-the-ghosts
