@@ -3,7 +3,7 @@ repo = pathlib.Path(sys.argv[1]); log = pathlib.Path(sys.argv[2])
 src = repo / "codec/src/main/scala/storymodel4s/codec/storymodelexport.scala"
 orig = src.read_text()
 names = re.findall(r'Loss\(\s*"([a-z-]+)"', orig)
-assert len(names) == 16, names
+assert len(names) == 17, names
 def delete(text, name):
     start = re.search(r'\n\s*Loss\(\s*"' + re.escape(name) + '"', text).start()
     i = text.index("Loss(", start) + 4; depth = 0
