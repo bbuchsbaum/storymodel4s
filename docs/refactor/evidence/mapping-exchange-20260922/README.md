@@ -18,6 +18,13 @@ writes. The first JVM attempt exposed an incorrect test witness: identical sourc
 and inventory remain a valid context across different measure policies. The test
 now supplies an actually foreign source.
 
-Pending: the committed three-mutation runner, JS/Native and full clean merge gate,
-and the facade's paired reference/reconstruction/lambda envelope. This branch must
+All three compiling mutants were subsequently killed by named tests, with passing
+before/after controls and exact restored source hashes. See [controls.json](controls.json)
+and [mutation-logs.tar.gz](mutation-logs.tar.gz). A final cold review also exposed
+the Python CSV default field limit; a 152,891-character structured-cell witness
+now fails under that old default and passes the repaired reader. The previous
+independent fixture and corruption controls still pass.
+
+Pending: JS/Native and the full clean merge gate, plus the facade's paired
+reference/reconstruction/lambda envelope. This branch must
 not be presented as the completed exchange ticket or a 1.0 release.

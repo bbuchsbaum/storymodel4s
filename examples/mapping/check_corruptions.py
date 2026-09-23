@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import sys
 
-from read_mapping import TABLES, cell_type, expected_rows, read
+from read_mapping import TABLES, cell_type, expected_rows, read, read_tsv
 import hashlib
 
 
@@ -91,7 +91,26 @@ def main():
     changed["manifest.json"] = render(manifest)
     rejects("rehashed-changed-score", changed, "table differs from record")
 
-    print(json.dumps({"status": "pass", "rejected": killed}))
+    large_words = ["a" * 64 + ":word:" + str(i) for i in range(2000)]
+    large_cell = render(large_words)
+    require_size = len(large_cell)
+    assert require_size > 131072
+    content = io.StringIO(newline="")
+    csv.writer(content, delimiter="\t", quoting=csv.QUOTE_ALL, lineterminator="\n").writerow(["words", large_cell])
+    previous = csv.field_size_limit()
+    try:
+        csv.field_size_limit(131072)
+        try:
+            list(csv.reader(io.StringIO(content.getvalue(), newline=""), delimiter="\t", strict=True))
+        except csv.Error as error:
+            assert "field larger than field limit" in str(error)
+        else:
+            raise AssertionError("large-cell default-limit failure witness did not fail")
+    finally:
+        csv.field_size_limit(previous)
+    assert json.loads(read_tsv(content.getvalue())[0][1]) == large_words
+    assert csv.field_size_limit() == previous
+    print(json.dumps({"status": "pass", "rejected": killed, "largeStructuredCellCharacters": require_size}))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,208 @@
+{
+  "schema": "mapping-exchange-controls/v1",
+  "mutations": [
+    {
+      "name": "before",
+      "head": "051c5a6753dc1bc1943898af19fe6590ae19cf3a",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "codecJVM/testOnly *MappingExchangeSuite"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 12.053780317306519,
+      "totals": [
+        [
+          "7",
+          "0",
+          "0",
+          "7"
+        ]
+      ],
+      "killed": false,
+      "expected_failure": null,
+      "failure_lines": []
+    },
+    {
+      "name": "ignore-file-content",
+      "head": "051c5a6753dc1bc1943898af19fe6590ae19cf3a",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "codecJVM/testOnly *MappingExchangeSuite"
+      ],
+      "exit": 1,
+      "elapsed_seconds": 14.4585120677948,
+      "totals": [
+        [
+          "7",
+          "1",
+          "0",
+          "6"
+        ]
+      ],
+      "killed": true,
+      "expected_failure": "rehashed table corruption still refuses against the checked record",
+      "failure_lines": [
+        "==> X storymodel4s.codec.MappingExchangeSuite.rehashed table corruption still refuses against the checked record 0.054s munit.FailException: codec/src/test/scala/storymodel4s/codec/MappingExchangeSuite.scala:104 assertion failed"
+      ],
+      "file": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+      "original_sha256": "b439b76f3719394c603c5c4977421c4b45289f3ba4fb330098f75dacf7c8f618",
+      "mutant_sha256": "9762f27165ee858cd87213aa0cb72e4ff3aa102cd711ef9f44f5b56ddb64d2ae"
+    },
+    {
+      "name": "replace-invalid-utf16",
+      "head": "051c5a6753dc1bc1943898af19fe6590ae19cf3a",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "codecJVM/testOnly *MappingExchangeSuite"
+      ],
+      "exit": 1,
+      "elapsed_seconds": 14.551997900009155,
+      "totals": [
+        [
+          "7",
+          "1",
+          "0",
+          "6"
+        ]
+      ],
+      "killed": true,
+      "expected_failure": "direct quoted Unicode identifiers roundtrip and unmatched UTF16 refuses before byte hashing",
+      "failure_lines": [
+        "==> X storymodel4s.codec.MappingExchangeSuite.direct quoted Unicode identifiers roundtrip and unmatched UTF16 refuses before byte hashing 0.076s munit.ComparisonFailException: codec/src/test/scala/storymodel4s/codec/MappingExchangeSuite.scala:176"
+      ],
+      "file": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+      "original_sha256": "b439b76f3719394c603c5c4977421c4b45289f3ba4fb330098f75dacf7c8f618",
+      "mutant_sha256": "3fe2a3a8dcb218cb56e33631b6b38166ef725b9bf33ed27ed6271759babb9139"
+    },
+    {
+      "name": "omit-failed-outcome",
+      "head": "051c5a6753dc1bc1943898af19fe6590ae19cf3a",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "codecJVM/testOnly *MappingExchangeSuite"
+      ],
+      "exit": 1,
+      "elapsed_seconds": 14.689297199249268,
+      "totals": [
+        [
+          "7",
+          "2",
+          "0",
+          "5"
+        ]
+      ],
+      "killed": true,
+      "expected_failure": "all outcomes, unassigned words, exact support and original decisions roundtrip",
+      "failure_lines": [
+        "==> X storymodel4s.codec.MappingExchangeSuite.all outcomes, unassigned words, exact support and original decisions roundtrip 0.483s munit.FailException: codec/src/test/scala/storymodel4s/codec/MappingExchangeSuite.scala:34 assertion failed",
+        "==> X storymodel4s.codec.MappingExchangeSuite.rehashed table corruption still refuses against the checked record 0.051s munit.FailException: codec/src/test/scala/storymodel4s/codec/MappingExchangeSuite.scala:104 assertion failed"
+      ],
+      "file": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+      "original_sha256": "b439b76f3719394c603c5c4977421c4b45289f3ba4fb330098f75dacf7c8f618",
+      "mutant_sha256": "48bf2b805458bf46a7af3b8c1f9815a5bc61b8af4a7b668ce2f8b9a6673803bf"
+    },
+    {
+      "name": "after",
+      "head": "051c5a6753dc1bc1943898af19fe6590ae19cf3a",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "codecJVM/testOnly *MappingExchangeSuite"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 14.58874773979187,
+      "totals": [
+        [
+          "7",
+          "0",
+          "0",
+          "7"
+        ]
+      ],
+      "killed": false,
+      "expected_failure": null,
+      "failure_lines": []
+    }
+  ],
+  "readerSha256": "fb47f23eafe09a504bf18ebc6180bb48274799197132ec32fe22d08537e77781",
+  "controlsSha256": "43d957f040c269ffbc27d1556066dae22b7c4b31dea344b9391d789573f9fcb2",
+  "independent": [
+    {
+      "command": [
+        "python3",
+        "examples/mapping/read_mapping.py",
+        "--fixture-log",
+        "/private/tmp/mapping-exchange-evidence/focused-2.log"
+      ],
+      "exit": 0,
+      "result": {
+        "status": "pass",
+        "fixtures": [
+          "large-ticks",
+          "normalized",
+          "raw"
+        ],
+        "knownAnswers": "raw scores, normalized mass, outcomes, half-open support and exact points/ticks"
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "examples/mapping/check_corruptions.py",
+        "/private/tmp/mapping-exchange-evidence/focused-2.log"
+      ],
+      "exit": 0,
+      "result": {
+        "status": "pass",
+        "rejected": [
+          "missing-outcomes-file",
+          "missing-failed-unit",
+          "dangling-link-stage",
+          "foreign-word-membership",
+          "duplicate-alternative-key",
+          "numeric-authoritative-tick",
+          "rehashed-changed-score"
+        ],
+        "largeStructuredCellCharacters": 152891
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "examples/mapping/read_mapping.py",
+        "--directory",
+        "examples/mapping/miniature"
+      ],
+      "exit": 0,
+      "result": {
+        "status": "pass",
+        "mapping": "b6e93bde68f64065da65bf5e79379ff9e2b46a8cb3149fd85dd4eb07939d5ad0",
+        "units": 8,
+        "qualification": "package/schema/projection checks; not contextual derivation admission"
+      }
+    }
+  ],
+  "pending": [
+    "JS/Native and clean checkAll qualification",
+    "paired facade envelope"
+  ]
+}

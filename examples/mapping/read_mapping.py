@@ -75,6 +75,17 @@ def expected_rows(record, path):
     return value
 
 
+def read_tsv(content):
+    # The complete table is already in memory; csv's unrelated 128 KiB default
+    # must not truncate an admitted unit's word list or a large support union.
+    previous = csv.field_size_limit()
+    try:
+        csv.field_size_limit(max(previous, len(content)))
+        return list(csv.reader(io.StringIO(content, newline=""), delimiter="\t", strict=True))
+    finally:
+        csv.field_size_limit(previous)
+
+
 def read(files):
     manifest = parse(files["manifest.json"])
     require(set(manifest) == {"schemaVersion", "mapping_digest", "inventory_digest", "source_digest", "transcript_checksum", "segmentation_id", "policies", "roles", "capabilities", "files"}, "manifest fields")
@@ -106,7 +117,7 @@ def read(files):
         descriptor = entry["table"]
         require(set(descriptor) == {"status", "columns", "rows"} and descriptor["status"] == "present", "table descriptor")
         require(descriptor["columns"] == [{"name": n, "type": cell_type(n)} for n in names], "column schema")
-        parsed = list(csv.reader(io.StringIO(content, newline=""), delimiter="\t", strict=True))
+        parsed = read_tsv(content)
         require(parsed and parsed[0] == names, "TSV header")
         # Fix quoting and terminators independently from the producer implementation.
         canonical = io.StringIO(newline="")
