@@ -420,3 +420,25 @@ to faithful posterior cells or labeling supplied measures as an executed aligner
 A full scene awaits the neutral provenance vocabulary on the workspace M1 branch;
 its current text-only packet also needs media-aware source admission before these
 queries can be joined. A separate declared display timeline is not media support.
+
+### 2026-09-22 — base mapping exchange component
+
+`MappingExchange` packages one checked `MappingResult` as the authoritative
+`mapping-record/v0.1` plus lossless, quoted UTF-8 TSV projections and a byte-hashed
+`mapping-exchange/v0.1` manifest. Its decoder requires `ExpectedMappingContext`,
+rechecks the record, then regenerates the entire package. Matching file hashes alone
+was rejected as insufficient: a rehashed table must not change the record's meaning.
+Integer coordinates remain exact decimal strings, binary64 measures keep canonical
+IEEE bits, and nested support/missingness/state records retain canonical JSON.
+Direct TSV strings with malformed UTF-16 refuse publication; escaped JSON retains
+the existing wire semantics. No transcript column is added, but caller-provided
+labels, reasons and receipts are preserved, so the package is not anonymized.
+
+`MappingExchangeBuild` owns local file I/O and publishes the completed manifest
+only after every payload is written. Partial directories are explicitly incomplete.
+The independent Python consumer validates package/schema/projection joins; it does
+not claim the Scala contextual derivation check. Temporal, scanner, organization,
+calibration and paired-profile capabilities remain explicitly unavailable in this
+base component. The facade owns the later reference/reconstruction/lambda envelope
+and shared evidence identity; the exchange must not invent those semantics. This
+component therefore does not close the complete paired exchange acceptance ticket.
