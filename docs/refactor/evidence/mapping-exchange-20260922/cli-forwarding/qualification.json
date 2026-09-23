@@ -1,0 +1,122 @@
+{
+  "source_commit": "55376a9baa8813feeedda53223a4af8c076412a1",
+  "focused_command": {
+    "schema_version": 1,
+    "started_utc": "2026-09-23T02:29:31.409044+00:00",
+    "finished_utc": "2026-09-23T02:30:19.955155+00:00",
+    "duration_seconds": 48.538596,
+    "command": [
+      "sbt",
+      "-J-Xmx2G",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+      "pipeline/scalafmt",
+      "pipeline/Test/scalafmt",
+      "pipeline/testOnly *MappingExchangeBuildSuite *WorkspaceMappingExportSuite *MappingExchangeCliSuite",
+      "export pipeline/Runtime/fullClasspath",
+      "export pipeline/Test/fullClasspath"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable",
+    "log": "/private/tmp/mapping-exchange-evidence/combined-cli-focused.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 600.0,
+    "log_bytes": 747362
+  },
+  "totals": [
+    [
+      "11",
+      "0",
+      "0",
+      "11"
+    ]
+  ],
+  "mutations": [
+    {
+      "name": "before",
+      "head": "da49db20c9cd7283ad6f95fd9310f3ed507245ae",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *MappingExchangeCliSuite"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 32.88897156715393,
+      "totals": [
+        [
+          "4",
+          "0",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": false,
+      "expected_failure": null,
+      "failure_lines": []
+    },
+    {
+      "name": "cli-forwards-wrong-policy",
+      "head": "da49db20c9cd7283ad6f95fd9310f3ed507245ae",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *MappingExchangeCliSuite"
+      ],
+      "exit": 1,
+      "elapsed_seconds": 22.249359130859375,
+      "totals": [
+        [
+          "4",
+          "3",
+          "0",
+          "1"
+        ]
+      ],
+      "killed": true,
+      "expected_failure": "explicit second policy produces exact output and a receipt only on stdout",
+      "failure_lines": [
+        "==> X storymodel4s.pipeline.MappingExchangeCliSuite.explicit second policy produces exact output and a receipt only on stdout 3.671s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingExchangeCliSuite.scala:50",
+        "==> X storymodel4s.pipeline.MappingExchangeCliSuite.invalid argument shapes and identifiers cannot reach the file boundary 0.003s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingExchangeCliSuite.scala:93",
+        "==> X storymodel4s.pipeline.MappingExchangeCliSuite.unknown policy refuses without output or leaked input text 0.761s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingExchangeCliSuite.scala:106"
+      ],
+      "file": "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeCli.scala",
+      "original_sha256": "5bb79621410834c824ddda5b28f0205ce9a85d4ebbd8c681c8b2d98c3da49a33",
+      "mutant_sha256": "c9921ad7fddb7a9e39b0219b0d66c71b08e34a02e5de6e7385a900427bd9336c"
+    },
+    {
+      "name": "after",
+      "head": "da49db20c9cd7283ad6f95fd9310f3ed507245ae",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *MappingExchangeCliSuite"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 26.64325785636902,
+      "totals": [
+        [
+          "4",
+          "0",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": false,
+      "expected_failure": null,
+      "failure_lines": []
+    }
+  ],
+  "archive_sha256": "9b4d0b1e4cdf176467f57d9879899c2874b603999b9a995169998cb51e132512"
+}
