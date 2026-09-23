@@ -79,6 +79,8 @@ class AdmissibilityUnforgeableSuite extends FunSuite:
       typeChecks("import storymodel4s.align.*; FunctionPrior(Map.empty)"),
       "control does not compile"
     )
+    assert(typeChecks("AdmissibilityShape(Vector.empty)"), "same-signature control")
+    assert(typeChecks("CoverageShape(0, 2, 1)"), "same-signature control")
     assert(
       !typeChecks("import storymodel4s.align.*; Admissibility(Vector.empty)"),
       "Admissibility apply is open"
@@ -94,6 +96,8 @@ class AdmissibilityUnforgeableSuite extends FunSuite:
       typeChecks("import storymodel4s.align.*; new FunctionPrior(Map.empty)"),
       "control does not compile"
     )
+    assert(typeChecks("new AdmissibilityShape(Vector.empty)"), "same-signature control")
+    assert(typeChecks("new CoverageShape(0, 2, 1)"), "same-signature control")
     assert(
       !typeChecks("import storymodel4s.align.*; new Admissibility(Vector.empty)"),
       "Admissibility new is open"
@@ -115,6 +119,7 @@ class AdmissibilityUnforgeableSuite extends FunSuite:
       ),
       "visibility"
     )
+    assert(typeChecks("CoverageShape.counted(0, Vector(true))"), "same-signature control")
     assert(
       !typeChecks("import storymodel4s.align.*; StructuralCoverage.counted(0, Vector(true))"),
       "the by-construction builder is visible outside align"
@@ -144,3 +149,15 @@ class AdmissibilityUnforgeableSuite extends FunSuite:
       StructuralCoverage.of(1, 2, 3).map(_.hashCode)
     )
   }
+
+/** Same-signature positive controls for the apply, new and counted probes (AGENTS rule 8): each
+  * refusal above is paired with a snippet of identical shape that is meant to compile, so a refusal
+  * cannot pass because of an argument-shape error.
+  */
+final case class AdmissibilityShape(contradictions: Vector[storymodel4s.align.Contradiction])
+
+final case class CoverageShape(level: Int, membersWithEvidence: Int, members: Int)
+
+object CoverageShape:
+  def counted(level: Int, evidenced: Vector[Boolean]): CoverageShape =
+    CoverageShape(level, evidenced.count(identity), evidenced.size)

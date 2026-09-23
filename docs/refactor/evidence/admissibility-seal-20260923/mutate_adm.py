@@ -12,13 +12,13 @@ M = [
   ("M7 dedup removed", cost, "new Admissibility(contradictions.distinct)", "new Admissibility(contradictions)", False),
 ]
 sbt = ["sbt", "-batch", "-Dstorymodel4s.grakern.build=" + str(pathlib.Path.home() / "code/scala/grakern")]
-tests = "alignJVM/testOnly storymodel4s.probes.AdmissibilityUnforgeableSuite storymodel4s.align.GateProofSuite storymodel4s.align.EvidenceSuite storymodel4s.align.WireSuite storymodel4s.align.StructuralReductionSuite"
+tests = "alignJVM/testOnly storymodel4s.probes.AdmissibilityUnforgeableSuite storymodel4s.align.GateProofSuite storymodel4s.align.EvidenceSuite storymodel4s.align.WireSuite storymodel4s.align.StructuralReductionSuite; codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.MappingCodecDigestSuite"
 out = []
 def run(clean):
-    cmds = (["alignJVM/clean"] if clean else []) + [tests]
+    cmds = (["alignJVM/clean", "codecJVM/clean"] if clean else []) + [tests]
     r = subprocess.run(sbt + cmds, cwd=repo, capture_output=True, text=True)
     t = r.stdout + r.stderr
-    failed = sorted(set(l.split("Suite.", 1)[-1].strip()[:110] for l in t.splitlines() if "==> X" in l))
+    failed = sorted(set(re.sub(r"\x1b\[[0-9;]*m", "", l).split("==> X",1)[-1].strip()[:120] for l in t.splitlines() if "==> X" in l))
     totals = re.findall(r"(?:Passed|Failed): Total \d+[^\n]*", t)
     return r.returncode, "Compilation failed" in t or "[error] -- " in t and not totals, totals, failed
 for name, f, old, new, clean in M:

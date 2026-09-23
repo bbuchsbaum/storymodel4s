@@ -15,3 +15,9 @@ Ticket bd-01M17ZNXY6AS1CMBQJRH3JMNVX. Branch claude-sm/admissibility-seal, code 
 | M7 de-duplication removed | 1 | derived-field law (GateProofSuite dedup assertion) |
 
 After the mutants, a clean baseline passed 67/67. Digests are untouched by construction: every digest renderer (AlignWire.admissibilityEcho, mappingbinding) reads the same accessors, and they return the same values.
+
+## Rerun at 3cc516f4 and the probe controls (after cold review)
+
+- `mutants-3cc516f4.log`: the same 7 mutants after the per-door probe split; clean before and after. M1 and M2 each fail exactly the two doors a case class reopens (Mirror and companion fromProduct); copy, apply and new stay closed even in the mutant, as they should for a bare-private constructor. Baseline 70/70 align plus 25/25 codec.
+- The mutant runs chain align before codec, so codec suites did not run under the mutants. `adm-mutant-m3-codec.log` reruns M3 (factory guard removed) against codecJVM AlignCodecSuite alone: the named decode-refusal test fails and 20 sibling tests pass; the baseline is 21/21.
+- The lead's BLOCK (Fray #98) is addressed in the next commit: identical-signature local controls for apply, new and counted (AdmissibilityShape, CoverageShape, CoverageShape.counted). Probe 8/8 after a clean recompile.
