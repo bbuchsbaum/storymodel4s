@@ -1,6 +1,6 @@
 # Fleet-mode governance and liveness history
 
-Moved verbatim from `AGENTS.md` at `50a07f69` on 2026-09-23 (owner directive: refactor
+Moved verbatim from `AGENTS.md` as of `main` `604080fc` on 2026-09-23 (owner directive: refactor
 AGENTS.md). Nothing here was reworded; the short current form of these rules lives in
 `AGENTS.md`, which links here. These sections describe the fleet protocol (chief, candidates, reservations, board check-ins) and the single-developer mode that replaced it on 2026-09-01. As of 2026-09-23 the operating mode is multi-agent via Fray (see `AGENTS.md`); ids L1-L10, SD1-SD8 and governance items 1-7 remain citable here.
 
@@ -239,6 +239,8 @@ salvage used.
 
 ## Coordination and governance
 
+> *(Archived 2026-09-23: the operating mode is now multi-agent via Fray; see `AGENTS.md`.)*
+>
 > **Fleet mode only. This whole section is suspended as of 2026-09-01** — see
 > **Single-developer mode** above, which says which of these rules survive and
 > what replaces the rest. Items 5 and 7 are suspended outright; items 1 and 3
@@ -469,6 +471,9 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
+4. **Evidence discipline** applies in every mode. Its full text moved to
+   [docs/EVIDENCE.md](../EVIDENCE.md).
+
 5. **Actors and reservations.** **A grep over a name is not an actor filter — parse
    the field.** Matching `"<actor>"` anywhere in an op file also matches the actor's
    name inside the BODY of messages written *to* them, so chasing someone makes your
@@ -551,8 +556,10 @@ was set by the owner on 2026-08-28 (sticky decision
 
 ## Appendix: pre-refactor intro, Layout, Build and test, and Style (verbatim)
 
-These sections were rewritten in the current `AGENTS.md`; the original text is kept here so no
-line of the pre-refactor file (`50a07f69`) exists only in git history.
+These sections were rewritten in the current `AGENTS.md`. The original text is kept here, so every
+line of the pre-refactor file on `main` (`604080fc`) survives verbatim in some file. The only
+exception is a T1-T7 draft that never reached `main`; its rules appear, condensed, in
+`AGENTS.md`.
 
 # AGENTS.md
 

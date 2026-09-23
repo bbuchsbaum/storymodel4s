@@ -1,6 +1,6 @@
 # Design contract: full text and case record
 
-Moved verbatim from `AGENTS.md` at `50a07f69` on 2026-09-23 (owner directive: refactor
+Moved verbatim from `AGENTS.md` as of `main` `604080fc` on 2026-09-23 (owner directive: refactor
 AGENTS.md). Nothing here was reworded; the short current form of these rules lives in
 `AGENTS.md`, which links here. The numbered rules 1-14 are unchanged and binding; this file keeps the measured cases and rationale behind them.
 

@@ -8,7 +8,9 @@ The design record is `NARRATIVE_PROCESS_ALIGNMENT_NOTES.md`. The delivery index 
 This file is the short, current guide. Longer rationale and the measured cases behind each rule
 live in linked documents. **Rule ids are stable, so cite them:** L1-L10, T1-T7, SD1-SD8, design
 rules 1-14 and governance items 1-7. The text before the 2026-09-23 refactor is
-`git show 50a07f69:AGENTS.md`.
+`git show 604080fc:AGENTS.md`, which is on `main`. "§4" in older documents means rule 4
+(evidence), and "§5" and "§7" mean governance items 5 and 7. Section headings here are unnumbered
+so they don't collide with those ids.
 
 | Read | For |
 |---|---|
@@ -18,7 +20,7 @@ rules 1-14 and governance items 1-7. The text before the 2026-09-23 refactor is
 | [docs/design/unforgeable-types.md](docs/design/unforgeable-types.md) | the working pattern for rule 8 |
 | [docs/governance/fleet-mode.md](docs/governance/fleet-mode.md) | fleet protocol, liveness history, single-developer mode (archived) |
 
-## 1. How work runs (operating mode, owner decision 2026-09-23)
+## How work runs (operating mode, owner decision 2026-09-23)
 
 Several agents work in parallel. The owner sets the mode and the lead; nobody else does.
 
@@ -36,14 +38,19 @@ Several agents work in parallel. The owner sets the mode and the lead; nobody el
   role has a substitute ladder when its holder goes idle (L10).
 - **Heavy gates are serialized** through the Fray gate-lock card (#16): claim it, gate, release
   it. JS and Native runs always need the lock. Scoped JVM-only test runs in your own clone do
-  not.
+  not, unless the disk has less than 10 GiB free.
 - **Announce edits to shared governing files** (`AGENTS.md`, `build.sbt`, `README.md`,
   `docs/refactor/PLAN.md`) on Fray before making them. ADRs may be edited paragraph-disjoint
-  (item 5).
+  (governance item 5 in [fleet-mode.md](docs/governance/fleet-mode.md)).
+- **Do not close a bead that holds another actor's live reservations** (governance item 1). Ask the
+  holder to finish it (`mote done`) instead.
+- **Working together** (governance item 6). Keep work committed and clean. Don't step on other
+  agents' toes. Discuss design choices on the board before they harden, and disagree with
+  evidence.
 - **The audit trail is git.** A commit message carries what changed, the evidence, and what the
   evidence does not establish.
 
-## 2. Liveness and throughput
+## Liveness and throughput
 
 Every other rule in this file catches bad work landing. None of them fires when nothing lands.
 The rules in this section do, and they outrank the others.
@@ -52,9 +59,10 @@ The rules in this section do, and they outrank the others.
   merge path comes before any review.
 - **L2. A landable slice has a named lander within an hour.** "I will not land my own work" is
   always followed by who will.
-- **L3. A block is priced.** A BLOCK carries a patch, or a named owner with a deadline. Otherwise
-  it is marked *advisory, not blocking*, and it expires after 4 hours.
-- **L4. Reap the ledger before reading it.** Landed and superseded rows do not block anything.
+- **L3. A block is priced.** A BLOCK carries a patch, or a named owner who has accepted the fix,
+  with a deadline. Otherwise it is marked *advisory, not blocking*, and it expires after 4 hours.
+- **L4. Reap the ledger before reading it.** Superseded, abandoned, landed and
+  landed-out-of-band rows emit no blocking reasons and stay out of the default queue.
 - **L5. A design thread terminates.** Within 50 posts or 24 hours it produces a landed change, a
   bead with an owner, or a written "not doing this".
 - **L6. No disclaimer rituals.** State what you are doing, and omit what you are not.
@@ -67,23 +75,23 @@ The rules in this section do, and they outrank the others.
   measured with `tools/who-is-live.sh`, never with a presence lease. A recut that only swaps a
   stale role-holder is bookkeeping, not a new proposal.
 - **T1. Size beads to land.** A bead is about a day of work with one acceptance criterion. Split
-  epics into child beads, close each child when its exact SHA lands, and let parents close
+  epics into child beads before starting them, close each child when its exact SHA lands, and let parents close
   with their children.
 - **T2. Land reviewed slices promptly.** Don't batch many slices behind one gate. Changes that
   touch only docs or `.mote` are gate-inert: they need review and a format check, not a full
   gate.
 - **T3. Tier the gate.** A bounded slice lands on the `tools/reference-scope.sh` modules, run on
   every platform they build, under the lock, with bound totals. The full `checkAll` with CI's
-  fatal warnings runs on `main` on a schedule. Red on `main` is a P0.
+  fatal warnings runs on `main` on a schedule. Red on `main` is a P0 that preempts new work.
 - **T4. Price every review finding** as BLOCK or FOLLOW-UP.
   - BLOCK means correctness, forgeability, measurement validity, or a failing witness.
   - Only a BLOCK holds a landing.
-  - A FOLLOW-UP becomes its own bead.
+  - A FOLLOW-UP becomes its own bead, and the reviewed slice lands.
 - **T5. Waiting is the main cost.** An agent who owns a reviewable or blocking item runs
   `fray drive`, or checks `fray inbox --addressed-to-me --unresolved` at every boundary.
   Objections arrive as separate linked cards. Answer a direct question within about 30 minutes,
   or say when you will.
-- **T6. Agree the seam, then build in parallel.** Post the contract and a failing consumer test,
+- **T6. Agree the seam, then build in parallel.** For cross-owner work, post the contract and a failing consumer test,
   written from outside the module, first (see the `fray-seam` skill).
 - **T7. Count what passed.** Report sbt's `Passed`, `Failed` and skipped counts. `Total`
   includes skipped tests.
@@ -91,25 +99,30 @@ The rules in this section do, and they outrank the others.
 The measured cases behind L1-L10 are in `fleet-mode.md`. T1-T7 came from 2026-09-22/23: 111
 commits landed and 49 more waited reviewed on an integration branch, while few beads closed.
 
-## 3. Standing rules carried over from single-developer mode
+## Standing rules carried over from single-developer mode
 
 - **SD1. A mechanism replaces confidence.** A claim that needs a reviewer also needs a runnable
   falsifier. Mutation is the default: delete the guard, watch a *named* test fail, restore it.
-- **SD2. Landing authority is a green gate on the exact merge result**, with bound test totals
-  and command receipts. It is scoped per T3. The gate log must contain totals: a run with no
-  totals did not run.
+- **SD2. Landing authority** has three parts:
+  - a green gate, scoped per T3, on the exact merge result;
+  - a clean merge-result tree over exactly the touched paths;
+  - bound test totals and command receipts, plus an independent reviewer's verdict on the exact
+    SHA.
+
+  The lead lands. The gate log must contain totals: a run with no totals did not run.
 - **SD3. Uncommitted is lost, and unreferenced is invisible.**
   - Commit to a branch as soon as the code compiles.
   - Never let a scratch clone or `/tmp` be the only copy of anything, including drafts.
   - Before you conclude that work is gone, sweep `git fsck --dangling`.
 - **SD5. ADRs gate vocabulary.** No new module, dependency or public vocabulary without an ADR
-  line that records the rejected alternative. The lead, or the owner, decides.
+  line that records the rejected alternative. The owner decides ADRs. The lead may accept
+  amendments within scope the owner has approved, as it did for the S2 section on 2026-09-23.
 - **SD6. Read your work cold, in a separate pass,** with a fresh-context agent or reviewer. Never
   approve in the same breath as authoring. Rereading catches prose. Only measurement catches a
   wrong number or a wrong object.
 - SD4, SD7 and SD8 governed the one-developer protocol. They are archived in `fleet-mode.md`.
 
-## 4. Layout
+## Layout
 
 Flat module directories, `CrossType.Pure`, cross-built for JVM, Scala.js and Native unless the
 row says JVM-only. The namespace is flat: `storymodel4s.<module>`.
@@ -141,7 +154,7 @@ row says JVM-only. The namespace is flat: `storymodel4s.<module>`.
 | `laws`      | `storymodel4s.laws`       | Published Discipline law suites and ScalaCheck generators |
 | `embed-bench` | `storymodel4s.bench`    | **JVM-only** evaluation harness against checksum-verified frozen gold; no portable module depends on it |
 
-## 5. Build, test and mechanised checks
+## Build, test and mechanised checks
 
 - The toolchain is Scala 3.7.4, sbt 1.12.14 and sbt-typelevel 0.8.7. Tests use munit and
   munit-scalacheck, and the laws use discipline-munit. `Test / parallelExecution := false`.
@@ -151,22 +164,24 @@ row says JVM-only. The namespace is flat: `storymodel4s.<module>`.
   `'set ThisBuild / tlFatalWarnings := true'`: keep `-Wunused:all -Wvalue-discard` clean. After
   touching build settings, run `sbt githubWorkflowGenerate`.
 - **sbt does not build in a linked git worktree** (jgit raises `NoWorkTreeException`). Gate in a
-  standalone clone (`git clone --shared`) or in a `git archive <sha>` export. Never gate the
+  standalone clone (`git clone --shared`) or in a `git archive <sha>` export. A `--shared` clone
+  borrows the primary repository's objects, so `git fsck` inside it cannot prove a commit is
+  safe: check the primary repository (SD3). Never gate the
   shared primary tree: it contains other agents' untracked files.
 - `embed-grakern` clones its pinned grakern revision unless `-Dstorymodel4s.grakern.build`, or
   `STORYMODEL4S_GRAKERN_BUILD`, names a local checkout.
 - **Scripts. Run these instead of re-deriving the rules by eye:**
   - `tools/reference-scope.sh`: the modules and exact command a gate must cover. It exits 3
     rather than emit an empty command.
-  - `tools/premerge-check.sh`: merge-result tree and gate-log totals checks. Its fleet checks are
-    inert.
+  - `tools/premerge-check.sh`: merge-result tree and gate-log totals checks. Checks 4 (live
+    reservations) and 6 (board re-read) apply again while reservations and the board are in use.
   - `tools/nan-polarity.sh`: a survey of fail-open and fail-closed numeric guards (rule 7).
   - `tools/who-is-live.sh`: who actually acted recently. Run it before assigning work or waiting
     on someone.
 - When a rule has caught a real break more than once, the next step is a script, not a firmer
   sentence.
 
-## 6. Design contract (non-negotiable)
+## Design contract (non-negotiable)
 
 Rules 1-14 bind every change. The measured cases behind them are in
 [design-contract-notes.md](docs/design/design-contract-notes.md).
@@ -190,16 +205,19 @@ Rules 1-14 bind every change. The measured cases behind them are in
    then ask which published field differs between them.
    - **No default licence.** An unmeasurable value never gets a plausible number, and an
      unestablished status never gets a confident one. When the licence cannot be established,
-     take the conservative truthful status.
+     take the conservative truthful status, and file the typed basis as its own bead.
    - **Typing a conflated quantity launders it.** Use one coordinate per meaning, never one
-     wrapper over both. A map key is a comparability claim.
+     wrapper over both. A map key is a comparability claim. Such a migration is not sliceable: a
+     half-done one is an undone one that looks done.
    - **NaN polarity.** Prefer the fail-closed shape, `if x > 0 then compute else safe`. A NaN
      finding has three separate questions: polarity, reachability, and what actually comes out,
-     which must be run. Validate finiteness at the source of a weight or score.
+     which must be run. Validate finiteness at the source of a weight or score. A type that
+     advertises checked construction must refuse non-finite input.
    - **An empty-guard constant declares its class:** forced, delete-sentinel,
      conservative-as-1.0, conservative-as-0.0 or flattering. Do not unify the constants.
 8. **Unforgeable boundaries.** Invalid states are unrepresentable where rules are stable
-   (phantom states, smart constructors).
+   (phantom states, smart constructors). Where the ontology is open, use validated and versioned
+   data (PropBank frames).
    - A private constructor on a `case` class is not a boundary: `fromProduct`, `Mirror` and a
      qualified-private `copy` all remain.
    - A validating type is a `final` non-case class with explicit accessors, structural
@@ -211,8 +229,11 @@ Rules 1-14 bind every change. The measured cases behind them are in
    - The checked factory must take enough context to prove the relation, and a court must kill
      removal of the check.
    - Courts compile-refuse `apply`, `copy`, `fromProduct` and `Mirror.ProductOf`, each with its
-     own same-shape positive control. They probe from *outside* the defining package, or from a
-     subpackage for `private[x]`.
+     own same-shape positive control. Prove the boundary from *outside* the defining package: a
+     probe inside it, or inside a subpackage of a `private[x]` scope, cannot fail on private-scoped
+     access. A subpackage probe only shows that a door is closed even to the package itself.
+   - Scala privacy is enforced by the compiler, not the JVM. This buys soundness for Scala
+     consumers only.
    - A validator whose return type is its own argument type, on a publicly constructible type,
      signals a missing boundary.
    - See [unforgeable-types.md](docs/design/unforgeable-types.md).
@@ -225,13 +246,15 @@ Rules 1-14 bind every change. The measured cases behind them are in
     proposals with evidence. Only the deterministic resolver accepts claims. Unresolved and
     alternative outcomes are legitimate results.
 14. **Fixture policy.**
-    - (a) AMR gold comes only from published guideline examples or licensed corpora.
+    - (a) AMR gold comes only from published guideline examples, or from licensed corpora in
+      authorized environments.
     - (b) Project charts are machine-generated silver with receipts.
     - (c) War of the Ghosts is a researcher-reviewed narrative acceptance fixture, never
       hand-authored AMR.
     - (d) No story text, recall transcript or excerpt enters the repository before it passes
-      `docs/design/story-text-admission-checklist.md`. Participant recall is barred until the
-      owner records an REB basis.
+      `docs/design/story-text-admission-checklist.md`. The answers live in the text file's own
+      header and are checked by someone other than the proposer. Participant recall is barred
+      until the owner records an REB basis; pseudonymization is a technical control, not consent.
 
 Two more principles belong with these rules:
 - **An impossibility claim needs more scrutiny than a positive one.** Ask whether any
@@ -239,7 +262,7 @@ Two more principles belong with these rules:
 - **An identity or class is derived from what it describes, never asserted by the caller.** Ask:
   if the caller lied here, what would catch it?
 
-## 7. Evidence discipline (rule 4)
+## Evidence discipline (rule 4)
 
 Rule 4 has 35 sub-rules, all in [docs/EVIDENCE.md](docs/EVIDENCE.md). Its core:
 
@@ -288,7 +311,7 @@ Rule 4 has 35 sub-rules, all in [docs/EVIDENCE.md](docs/EVIDENCE.md). Its core:
   - No value and low support are different failures.
   - Dropping a term from a normalized aggregate rescales the rest.
 
-## 8. Integration and landing
+## Integration and landing
 
 The lead holds these rules when integrating, and authors hold them when preparing a slice. The
 full text is governance item 3 in `fleet-mode.md`.
@@ -299,15 +322,25 @@ full text is governance item 3 in `fleet-mode.md`.
   over any ledger: run `git merge-base --is-ancestor` rather than trusting a status string.
 - **A conflict-free merge is not a working merge.** When two changes touch one file, test the
   merged tree.
-- **Reference scope is the union** across a stacked candidate's commits, test sources included.
+- **Reference scope.** The gate covers every module that references the changed type, found by a
+  grep across main and test sources, not only the module that contains it. Run
+  `tools/reference-scope.sh` in a clone checked out at the candidate, passing the merge base. For
+  a stacked candidate, take the union across its commits.
 - **Stale bases.** A delta that is gate-inert (touching only docs, `AGENTS.md` or `.mote`)
-  never invalidates a gate. A delta that touches a gated input does.
-- **Sibling seam.** `storyatlas4s` builds this repository from source. When `main` changes
-  anything it consumes, compile and run its tests before the landing is final.
+  never invalidates a gate. A delta that touches a gated input does; gated inputs are a `.scala`
+  file in a gated module, `build.sbt` and `project/`.
+  - If the delta touches the same file as the candidate, the author rebases and re-gates.
+  - If it touches different modules, the lead gates the merged tree.
+- **Sibling seam.** `storyatlas4s` builds this repository from source. For a change to anything
+  it consumes, compiling and running its tests is part of the gate: it runs before landing, not
+  as a follow-up. Landing first and checking after is how `04fdf6b` broke the sibling app.
+- **Re-read the board immediately before the merge commit.** A hold or a correction can arrive
+  inside the gate window. Check both whether you may still merge and whether the commit message
+  is still true.
 - **Commit narrowly.** Use `git commit --only <paths>` in shared trees, and check the whole
   `git status --short` first. Record a landing where it is tracked before announcing it.
 
-## 9. Style
+## Style
 
 - scalafmt 3.10.7, `maxColumn = 100`.
 - Every public type has Scaladoc with a one-line "why", not just "what".
