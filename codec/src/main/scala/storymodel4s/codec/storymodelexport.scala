@@ -311,7 +311,8 @@ object StoryModelExport:
               i.toString,
               ev.id.value,
               ev.stage.value,
-              json(Json.fromValues(ev.upstream.toVector.map(_.value).sorted.map(Json.fromString))),
+              // An empty set is a measured "no upstream claims", so it is present, not absent.
+              present(Json.fromValues(ev.upstream.toVector.map(_.value).sorted.map(Json.fromString))),
               ev.spans.fold(0)(_.refs.length).toString
             )
           }
