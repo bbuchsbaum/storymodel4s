@@ -7,7 +7,9 @@ Owner: codex-temporal; Mote `bd-01M35PB1H5PDD55YVKR4TQ8M66`.
 
 `TextSourcePackage` is a checked, portable source for alignment without a narrative
 model. It binds an existing `StorySource`, a checked `SurfaceAtlas`, and a named
-`TextSegmentationProfile`. It is not a `StoryModel` and asserts no entities,
+`TextSegmentationProfile`. It exposes the existing `TextNarrativeAtlas.of(atlas)`
+and its `SourceBundle` as the common checked text/media source seam; it introduces
+no second axis system. It is not a `StoryModel` and asserts no entities,
 predicates, contexts, causal relations, salience or world chronology.
 
 Two profiles have different, visible authority:
@@ -26,6 +28,10 @@ Two profiles have different, visible authority:
 `TextSourceSegment` exposes the non-token units with content-addressed target IDs.
 IDs use the full SHA-256 of profile, canonical source checksum, kind and exact
 span. Caller-selected story/unit IDs and ordinals do not define target identity.
+The preimage is UTF-8 of NUL-joined `text-source-segment/v1`, profile tag,
+canonical checksum hex, case-sensitive `SurfaceUnitKind.toString`, start and
+end-exclusive (canonical decimal integers). IDs prefix the full digest with
+`text-segment:`. These fields cannot contain NUL.
 Original surface unit IDs remain available separately for evidence joins. Package
 serialization binds the entire atlas, including its parent links and ordering;
 equal physical target IDs do not assert equal hierarchy or equal packages.
@@ -33,11 +39,13 @@ equal physical target IDs do not assert equal hierarchy or equal packages.
 All spans are half-open UTF-16 code-unit offsets into `StorySource.canonicalText`.
 The input's raw text and checksum are retained alongside canonical text and its
 checksum. `story-source/v1` canonicalization names the existing normalization:
-CRLF/CR become LF, trailing horizontal whitespace is removed, runs of more than
+CRLF/CR become LF, trailing space and tab are removed, runs of more than
 two newlines collapse, and leading/trailing blank lines are removed. Unicode
 normalization is not performed; an input BOM is retained as content. Raw-file
 byte offsets, Unicode code-point offsets and canonical UTF-16 offsets are not
 interchangeable. This slice does not provide a raw-to-canonical offset crosswalk.
+Readers use plain UTF-8, not `utf-8-sig`/`UTF-8-BOM`: stripping the BOM would move
+every following offset. A BOM-only or BOM-and-whitespace input is refused.
 
 Construction rejects malformed UTF-8, unpaired UTF-16 surrogates, empty segment
 inventories, empty spans, negative ordinals, and boundaries inside surrogate
@@ -57,6 +65,9 @@ Selecting an absent granularity fails explicitly.
 `text-source/v1` JSON carries source, atlas, profile, derived segments and explicit
 capabilities. `segments.tsv` includes the canonical checksum, offset unit, kind,
 original surface ID, target ID, ordinal, parent surface ID and exact text. A
+Each TSV row carries its profile as well as its surface kind. Generated Clause
+rows are labeled `surface-semicolon/v1:Clause`, making the heuristic provenance
+visible even when a reader opens the table without the manifest. A
 manifest hashes the exact exported files. The independent Python reader checks
 hashes, UTF-16 slicing and target identities rather than trusting producer labels.
 
