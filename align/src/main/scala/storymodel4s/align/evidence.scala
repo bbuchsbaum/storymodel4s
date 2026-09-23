@@ -96,12 +96,7 @@ object LocalEvidence:
       else if bound.units.exists(u => strict.get(u).isEmpty) then refuse("are missing a unit")
       else Right(())
     check.flatMap { _ =>
-      val sets = bound.units.map(u => strict.get(u).get)
-      val provenance = new CandidateProvenance.Strict(
-        strict.policy,
-        sets.map(_.overflow),
-        sets.map(_.uniformSemantic)
-      )
+      val provenance = CandidateProvenance.Strict.of(strict, bound.units)
       build(recall, snapshot, strict.candidates, provenance, costModel, gate = true)
     }
 
@@ -259,7 +254,7 @@ sealed trait CandidateProvenance
 object CandidateProvenance:
   case object Unattested extends CandidateProvenance
 
-  final class Strict private[align] (
+  final class Strict private (
       val policy: CandidateTiePolicy,
       val overflow: Vector[Vector[TieOverflow]],
       val uniformSemantic: Vector[Vector[UniformSemanticScores]]
@@ -272,6 +267,14 @@ object CandidateProvenance:
       case _ => false
     override def hashCode: Int = (policy, overflow, uniformSemantic).hashCode
     override def toString: String = s"Strict($policy)"
+
+  object Strict:
+    /** Derived from strict candidates, which only checked generation can issue, for `units` in
+      * order. The caller has already checked that every unit is present.
+      */
+    private[align] def of(strict: StrictCandidates, units: Vector[RecallUnitId]): Strict =
+      val sets = units.flatMap(strict.get)
+      new Strict(strict.policy, sets.map(_.overflow), sets.map(_.uniformSemantic))
 
   private[align] def render(p: CandidateProvenance): String =
     import MappingRender.sequence

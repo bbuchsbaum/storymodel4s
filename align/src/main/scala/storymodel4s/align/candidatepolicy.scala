@@ -138,7 +138,7 @@ object StrictCandidateConfig:
     else Left(CandidateRefusal.NonPositivePerLevel(perLevel))
 
 /** One unit's strict candidates: the nominations, plus what the policy withheld or observed. */
-final class StrictCandidateSet private[align] (
+final class StrictCandidateSet private (
     val set: CandidateSet,
     val overflow: Vector[TieOverflow],
     val uniformSemantic: Vector[UniformSemanticScores]
@@ -189,7 +189,7 @@ object StrictBinding:
   * them. It deliberately has no `without` or `fuse`, so the policy cannot be lost by recombining
   * sets, and it holds exactly one entry per unit of the bound recall.
   */
-final class StrictCandidates private[align] (
+final class StrictCandidates private (
     val policy: CandidateTiePolicy,
     val binding: StrictBinding,
     val byUnit: Map[RecallUnitId, StrictCandidateSet]
@@ -204,31 +204,12 @@ final class StrictCandidates private[align] (
 
   override def toString: String = s"StrictCandidates($policy, units=${byUnit.size})"
 
-/** Strict candidate generation: semantic candidates per hierarchy level, cut tie-complete with
-  * dense ranks, unioned with lexical hits and bounded by the union-wide budget.
-  */
-final class StrictCandidateGenerator(
-    val semantic: SemanticDistance,
-    val config: StrictCandidateConfig
-):
+object StrictCandidateSet:
 
-  /** Generate for every unit of `recall` over one snapshot of `source`, and bind the result to
-    * both.
-    */
-  def generate(
-      recall: RecallGraph[Checked],
-      source: SourceView
-  ): Either[CandidateRefusal, StrictCandidates] =
-    val view = MappingBindingRender.snapshot(source)
-    recall.ordered
-      .foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
-        Right(Vector.empty)
-      ) { (acc, u) => acc.flatMap(done => forUnit(u, view).map(s => done :+ (u.id -> s))) }
-      .map(pairs =>
-        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap)
-      )
-
-  private def forUnit(
+  /** Checked generation for one unit over `view`: the only way to obtain a strict set. */
+  private[align] def generated(
+      semantic: SemanticDistance,
+      config: StrictCandidateConfig,
       unit: RecallUnit,
       view: SourceView
   ): Either[CandidateRefusal, StrictCandidateSet] =
@@ -282,3 +263,44 @@ final class StrictCandidateGenerator(
         else CandidateSet(nominations, abstained = false)
       new StrictCandidateSet(set, perLevel.flatMap(_._2), perLevel.flatMap(_._3))
     }
+
+object StrictCandidates:
+
+  /** Checked generation for every unit of `recall` over one snapshot of `source`: the only way to
+    * obtain strict candidates. There is no factory that accepts caller-supplied sets or bindings.
+    */
+  private[align] def generated(
+      semantic: SemanticDistance,
+      config: StrictCandidateConfig,
+      recall: RecallGraph[Checked],
+      source: SourceView
+  ): Either[CandidateRefusal, StrictCandidates] =
+    val view = MappingBindingRender.snapshot(source)
+    recall.ordered
+      .foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
+        Right(Vector.empty)
+      ) { (acc, u) =>
+        acc.flatMap(done =>
+          StrictCandidateSet.generated(semantic, config, u, view).map(s => done :+ (u.id -> s))
+        )
+      }
+      .map(pairs =>
+        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap)
+      )
+
+/** Strict candidate generation: semantic candidates per hierarchy level, cut tie-complete with
+  * dense ranks, unioned with lexical hits and bounded by the union-wide budget.
+  */
+final class StrictCandidateGenerator(
+    val semantic: SemanticDistance,
+    val config: StrictCandidateConfig
+):
+
+  /** Generate for every unit of `recall` over one snapshot of `source`, and bind the result to
+    * both.
+    */
+  def generate(
+      recall: RecallGraph[Checked],
+      source: SourceView
+  ): Either[CandidateRefusal, StrictCandidates] =
+    StrictCandidates.generated(semantic, config, recall, source)
