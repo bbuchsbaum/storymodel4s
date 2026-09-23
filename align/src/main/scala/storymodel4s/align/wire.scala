@@ -241,6 +241,8 @@ object AlignWire:
   private def bad(record: String, detail: String): AlignError =
     AlignError.MalformedRecord(record, detail)
 
+  // The count half is now guaranteed by StructuralCoverage's own construction and cannot fire; it
+  // stays as defence in depth. The level range is live: the type does not hold it (source.scala).
   private def coverageOk(c: StructuralCoverage): Boolean =
     c.level >= 0 && c.members >= 0 && c.membersWithEvidence >= 0 &&
       c.membersWithEvidence <= c.members

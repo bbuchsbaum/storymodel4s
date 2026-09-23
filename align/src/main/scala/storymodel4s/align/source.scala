@@ -1,6 +1,6 @@
 package storymodel4s.align
 
-import storymodel4s.core.{Credence, SegmentId, SituationId, SpanSet, TypedSupport}
+import storymodel4s.core.{Credence, DomainError, SegmentId, SituationId, SpanSet, TypedSupport}
 import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.proposition.PropositionEvidence
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
@@ -20,13 +20,55 @@ object SegmentEvidence:
   * a segment `members` is the number of leaves under it and `membersWithEvidence` how many of them
   * carry a chart. Chart-based distances on a segment are computed over the covered leaves only and
   * reported with this coverage, never as if the segment were fully charted.
+  *
+  * Why a non-case class: the counts stand in a relation (`0 <= membersWithEvidence <= members`)
+  * that `coverage` relies on, and a public case class let any caller build `(0, 2, 1)` and throw
+  * from `Coverage.unsafe` at read time, or hand `CostBreakdown` a record only its enclosing check
+  * refused (design rule 8, api-stability "Signature closure"). The count relation is held by the
+  * type. `level >= 0` is a single-field range still enforced by `AlignWire`, because a `SourceView`
+  * may carry any node level.
   */
-final case class StructuralCoverage(level: Int, membersWithEvidence: Int, members: Int):
+final class StructuralCoverage private (
+    val level: Int,
+    val membersWithEvidence: Int,
+    val members: Int
+):
   def coverage: Coverage = Coverage.unsafe(members, membersWithEvidence)
+  // Empty guard, delete-sentinel class: `members == 0` only for a node absent from the view, and
+  // readers gate on `isEmpty` before using the fraction.
   def fraction: Double =
-    if members <= 0 then 0.0 else membersWithEvidence.toDouble / members.toDouble
+    if members > 0 then membersWithEvidence.toDouble / members.toDouble else 0.0
   def isComplete: Boolean = members > 0 && membersWithEvidence == members
   def isEmpty: Boolean = membersWithEvidence == 0
+
+  override def equals(other: Any): Boolean = other match
+    case that: StructuralCoverage =>
+      level == that.level && membersWithEvidence == that.membersWithEvidence &&
+      members == that.members
+    case _ => false
+  override def hashCode(): Int = (level, membersWithEvidence, members).hashCode()
+  override def toString: String = s"StructuralCoverage($level, $membersWithEvidence, $members)"
+
+object StructuralCoverage:
+  /** Checked construction from decoded or caller-supplied counts. */
+  def of(
+      level: Int,
+      membersWithEvidence: Int,
+      members: Int
+  ): Either[DomainError, StructuralCoverage] =
+    if membersWithEvidence >= 0 && membersWithEvidence <= members then
+      Right(new StructuralCoverage(level, membersWithEvidence, members))
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "StructuralCoverage",
+          s"requires 0 <= membersWithEvidence <= members, got $membersWithEvidence of $members"
+        )
+      )
+
+  /** Coverage counted from the members themselves, so the relation holds by construction. */
+  private[align] def counted(level: Int, evidenced: Vector[Boolean]): StructuralCoverage =
+    new StructuralCoverage(level, evidenced.count(identity), evidenced.size)
 
 /** An alignable source node: an atomic situation or a composite segment (scene, episode, root). */
 enum SourceNodeRef:
@@ -461,11 +503,10 @@ trait SourceView:
     */
   def structuralCoverage(ref: SourceNodeRef): StructuralCoverage =
     node(ref) match
-      case Some(n) if n.isLeaf => StructuralCoverage(0, if n.hasEvidence then 1 else 0, 1)
+      case Some(n) if n.isLeaf => StructuralCoverage.counted(0, Vector(n.hasEvidence))
       case Some(n)             =>
-        val leaves = structuralMembers(ref)
-        StructuralCoverage(n.level, leaves.count(_.hasEvidence), leaves.size)
-      case None => StructuralCoverage(0, 0, 0)
+        StructuralCoverage.counted(n.level, structuralMembers(ref).map(_.hasEvidence))
+      case None => StructuralCoverage.counted(0, Vector.empty)
 
   private lazy val leavesIndex: Map[SourceNodeRef, Vector[SourceNodeRef]] =
     nodes.map { n =>

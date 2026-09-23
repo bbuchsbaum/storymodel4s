@@ -1,0 +1,15 @@
+== control base 577ebfdb alignNative MappingHistoricalSuite sha=577ebfdb0f9348f235ef75706167ddbbd6684cec exit=1 secs=36
+== candidate alignNative MappingHistoricalSuite sha=280a993143069571573a4a25bf1f9a886171f946 exit=1 secs=202
+  ==> X storymodel4s.align.MappingHistoricalSuite.Declared and undeclared twins require their own scope and preserve missingness 31.473s java.util.concurrent.TimeoutException: test timed out after 30 seconds
+  storymodel4s.align.MappingHistoricalSuite: finished 147.336s
+  [error] Failed: Total 14, Failed 1, Errors 0, Passed 13
+== candidate remaining 12 Native tasks sha=280a993143069571573a4a25bf1f9a886171f946 exit=1 secs=542
+  [info] Passed: Total 317, Failed 0, Errors 0, Passed 317
+  [info] Passed: Total 250, Failed 0, Errors 0, Passed 250
+  [info] Passed: Total 114, Failed 0, Errors 0, Passed 114
+  [info] Passed: Total 186, Failed 0, Errors 0, Passed 186
+  [info] Passed: Total 144, Failed 0, Errors 0, Passed 144
+  ==> X storymodel4s.fixtures.WorkspaceJoinSuite.historical results are contextually decoded and cannot float to changed recall semantics 33.964s java.util.concurrent.TimeoutException: test timed out after 30 seconds
+  [error] Failed: Total 160, Failed 1, Errors 0, Passed 159
+DONE
+PY_EXIT=0

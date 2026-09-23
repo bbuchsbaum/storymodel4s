@@ -15,6 +15,9 @@ import storymodel4s.recall.RecallGraphStatus.{
   * heuristics; segments report coverage and never get a fabricated chart.
   */
 class EvidenceSuite extends FunSuite:
+  private def coverageOf(level: Int, withEvidence: Int, members: Int): StructuralCoverage =
+    StructuralCoverage.of(level, withEvidence, members).fold(e => fail(e.message), identity)
+
   import AnnaFixture.*
 
   private def checkedRecall(g: RecallGraph[RecallUnchecked]): RecallGraph[RecallChecked] =
@@ -165,9 +168,9 @@ class EvidenceSuite extends FunSuite:
     val v = viewWith(Map(e5 -> straight))
     val members = v.leavesUnder(sc2).size
     assert(members >= 2, members)
-    assertEquals(v.structuralCoverage(sc2), StructuralCoverage(1, 1, members))
-    assertEquals(v.structuralCoverage(e5), StructuralCoverage(0, 1, 1))
-    assertEquals(v.structuralCoverage(e4), StructuralCoverage(0, 0, 1))
+    assertEquals(v.structuralCoverage(sc2), coverageOf(1, 1, members))
+    assertEquals(v.structuralCoverage(e5), coverageOf(0, 1, 1))
+    assertEquals(v.structuralCoverage(e4), coverageOf(0, 0, 1))
     assertEquals(v.segmentEvidence(sc2).members, Vector(straight))
     assert(v.node(sc2).get.evidence.isEmpty, "a segment never carries a chart of its own")
   }
@@ -180,7 +183,7 @@ class EvidenceSuite extends FunSuite:
     val breakdown = costModel.cost(u2Chart, v.node(sc2).get, FidelityMode.Faithful, v)
     assertEquals(
       breakdown.sourceChartCoverage,
-      Some(StructuralCoverage(1, 1, v.leavesUnder(sc2).size))
+      Some(coverageOf(1, 1, v.leavesUnder(sc2).size))
     )
   }
 
