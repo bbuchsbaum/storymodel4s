@@ -44,11 +44,14 @@ wire for analysis tables; a second wire would split every downstream reader.
    feature refs, descriptors, hypotheses, sensory profiles, scoped attributes, mentions, resolved
    alternatives, resolved-value claims (entity labels, segment summaries: the value is exported,
    its own claim is not), claim credence and provenance, evidence extractors, and the build
-   receipt. Accounting law: exported claims plus claims counted in loss records equal
+   receipt. Counts come only from structures observable in the input: an optional input that was
+   never supplied (a model with no build receipt) is recorded as `not-supplied`, not as zero
+   dropped. Accounting law: exported claims plus claims counted in loss records equal
    `model.claims`.
 7. **No embedded lossless copy.** Unlike `mapping.json` in the mapping exchange, the bundle does not
    carry `storymodel.json`; it binds the model by digest. Users who need the full model keep the
-   build output beside the export.
+   build output beside the export. The manifest declares this as the `canonical_model` capability,
+   `unavailable`, so no reader can claim to re-derive the model from the tables.
 8. **Pure encoder in `codec`, publication in `pipeline`**, with the mapping exchange's publication
    discipline (new directory, `CREATE_NEW` payloads, manifest linked last as the completion
    marker) and a separate `storyModelExport MODEL OUTPUT` main. The TSV helpers are copied rather
