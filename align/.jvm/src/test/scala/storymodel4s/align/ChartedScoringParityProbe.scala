@@ -13,10 +13,11 @@ import storymodel4s.proposition.CheckState.Checked
   * The fixture includes a member chart with two same-lemma predicates (one negated, one embedded
   * under speech), and a segment whose leaves both carry charts.
   *
-  * Measured 2026-09-23: `compare` breaks equal head keys by `ConceptId`, but renaming the tied
-  * predicates did not change the report. `compare` is the symmetric OR of two directions, and the
-  * reverse direction evaluates every head, so gate flags do not depend on the head choice; that
-  * choice is visible only in `matchedPredicates`. `twin` witnesses the gate-count key there.
+  * Measured 2026-09-23: `compare` breaks equal head keys by `ConceptId`, and renaming the tied
+  * predicates in THIS fixture did not change the report, because the reverse direction raised the
+  * same flags. That is not true in general: when the tied heads carry different gates and the
+  * reverse direction raises none, the ids choose the flag (`SemanticCompatibilitySuite`, "teeth: on
+  * a head tie"). `twin` witnesses the gate-count key in `matchedPredicates`.
   */
 class ChartedScoringParityProbe extends FunSuite:
   import AnnaFixture.*
