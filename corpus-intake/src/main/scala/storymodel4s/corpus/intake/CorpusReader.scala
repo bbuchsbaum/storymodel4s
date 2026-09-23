@@ -80,8 +80,8 @@ object CorpusReader:
       s"OpenCorpus(${verified.manifest.corpus.value}, ${sheets.size} sheets, " +
         s"profile ${profile.identity.short()})"
 
-  /** How many cell refusals one sheet reports before it stops collecting them. Bounded so that a
-    * systematically misdeclared column cannot turn one read into 27,777 error objects.
+  /** How many cell refusals one sheet retains. Bounded so that a systematically misdeclared
+    * column cannot leave 27,777 error objects in the opened sheet.
     */
   val RefusalCap: Int = 100
 
@@ -161,16 +161,33 @@ object CorpusReader:
                 .map(c => OpenRefusal.ColumnNotInHeader(artifact, sheet, c))
               indexLetters = binding.indexColumns.flatMap(letters.get)
               body = Xlsx.trimTrailing(raw.filter(_.number > binding.headerRow), indexLetters)
-              read = body.map(r => openRow(r, binding, letters))
-              rows = read.map(_._1)
-              found = read.flatMap(_._2)
+              opened = openRows(body, binding, letters)
             yield new OpenSheet(
               artifact,
               sheet,
-              rows,
-              found.take(RefusalCap),
-              found.size
+              opened._1,
+              opened._2,
+              opened._3
             )
+
+  /** Retain only the first diagnostic cap while still counting every refusal and returning every
+    * readable row. One row's refusals are transient; they never accumulate across the sheet.
+    */
+  private def openRows(
+      body: Vector[Xlsx.RawRow],
+      binding: SheetBinding,
+      letters: Map[String, String]
+  ): (Vector[OpenRow], Vector[CellRefusal], Int) =
+    val rows = Vector.newBuilder[OpenRow]
+    val kept = Vector.newBuilder[CellRefusal]
+    var seen = 0
+    body.foreach { raw =>
+      val (row, refusals) = openRow(raw, binding, letters)
+      rows.addOne(row)
+      kept ++= refusals.take((RefusalCap - seen).max(0))
+      seen += refusals.size
+    }
+    (rows.result(), kept.result(), seen)
 
   /** Reads one row, returning it alongside any cell refusals rather than instead of it. */
   private def openRow(

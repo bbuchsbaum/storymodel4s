@@ -221,6 +221,31 @@ class CorpusReaderSuite extends FunSuite:
     assertEquals(badRow.context.valueOf("Time"), ColumnValue.Undeclared)
   }
 
+  test("a many-error sheet keeps the first 100 refusals while counting and reading every row") {
+    val header = row(1, "A1" -> "EventModelNum", "B1" -> "Time", "C1" -> "RecallType")
+    val badRows = (2 to 131).map { n =>
+      row(n, s"A$n" -> (n - 1).toString, s"B$n" -> "bad-serial", s"C$n" -> "bad-code")
+    }
+    val oc = CorpusReader
+      .open(verifiedOf(wb(header + badRows.mkString)), profile)
+      .fold(r => fail(r.message), identity)
+    val sheet = oc.sheet(art, "Narr").get
+    assertEquals(sheet.rows.size, 130)
+    assertEquals(sheet.rows.last.number, 131)
+    assertEquals(sheet.refusalsSeen, 260)
+    assertEquals(oc.refusalsSeen, 260)
+    assertEquals(sheet.refusals.size, CorpusReader.RefusalCap)
+    assert(sheet.refusalsTruncated)
+    assertEquals(
+      sheet.refusals.map(_.coordinate.row),
+      (2 to 51).flatMap(n => Vector(n, n)).toVector
+    )
+    assertEquals(sheet.refusals.map(_.coordinate.column).toSet, Set("B", "C"))
+    assert(sheet.refusals.exists(_.isInstanceOf[CellRefusal.NotFinite]))
+    assert(sheet.refusals.exists(_.isInstanceOf[CellRefusal.NotAnInteger]))
+    assertEquals(sheet.rows.last.context.valueOf("Time"), ColumnValue.Undeclared)
+  }
+
   test("a clean sheet reports no refusals") {
     val oc = CorpusReader.open(verifiedOf(payload), profile).fold(r => fail(r.message), identity)
     assert(oc.sheet(art, "Narr").get.isClean)
