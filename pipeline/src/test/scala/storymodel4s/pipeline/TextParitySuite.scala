@@ -14,6 +14,7 @@ import storymodel4s.document.{ChartProposalProvider, NarrativeCompiler}
 import storymodel4s.fixtures.wog.WarOfTheGhostsText
 import storymodel4s.provider.agent.*
 import storymodel4s.view.*
+import storymodel4s.story.TextValidationOutcome
 
 /** S0 freezes the existing JVM text path before D1A changes its support vocabulary. These are
   * compatibility witnesses, not assertions that the machine interpretation is correct. The complete
@@ -123,8 +124,8 @@ class TextParitySuite extends FunSuite:
       )
     )
 
-  private lazy val view =
-    val draft = DraftModel.of(model, compilation.validation, derivation.record)
+  private def viewWith(validation: TextValidationOutcome): NarrativeScene =
+    val draft = DraftModel.of(model, validation, derivation.record)
     val state = CommonViewState.empty
     val spec =
       AtlasSpec(ZoomLevel(NarrativeLevel.Scene, SurfaceDetail.Hidden), ThreadPolicy.Selected)
@@ -134,6 +135,8 @@ class TextParitySuite extends FunSuite:
     AtlasCompiler(provenance)
       .compileDraft(draft, state, spec)
       .fold(error => fail(error.message), identity)
+
+  private lazy val view = viewWith(compilation.validation)
 
   private lazy val historical =
     val dir = resource("/runs/2026-09-02-wog-record-1")
@@ -176,7 +179,12 @@ class TextParitySuite extends FunSuite:
     case "historicalReceipts" => historical
     case other                => fail(s"unknown parity section: $other")
 
-  private lazy val expected = json(read(resource("/golden/d1a-s0-text-parity.json")))
+  private lazy val historicalExpected = json(read(resource("/golden/d1a-s0-text-parity.json")))
+  // ADR 0005 §11 changes validation, hence the compilation fingerprint, its derivation binding,
+  // and the view's promotion/law marks. All other S0 bytes remain frozen in the original file.
+  private lazy val expected = historicalExpected.deepMerge(
+    json(read(resource("/golden/d1a-s0-abstention-delta.json")))
+  )
 
   for section <- Vector("compile", "exemplars", "nodeOrders", "view", "historicalReceipts") do
     test(s"S0 text parity: $section") {
@@ -185,6 +193,39 @@ class TextParitySuite extends FunSuite:
         expected.hcursor.downField(section).focus.getOrElse(fail(section))
       )
     }
+
+  test("the S0 delta is exactly validation, its fingerprint binding and the rendered laws") {
+    val missing = WogMissingProposalFixture
+      .compile(input)
+      .fold(error => fail(error.message), identity)
+    assertEquals(missing.validated, None)
+    assertEquals(missing.validation.report.errors.size, 3)
+    assertEquals(missing.draft, compilation.draft)
+    val previous = missing.validation
+    val previousFingerprint = compilerRender(
+      "fingerprint",
+      input,
+      compilation.derivation,
+      model.graph,
+      model.hierarchy,
+      model.trajectory,
+      previous
+    ).asInstanceOf[Checksum]
+    val oldCompile = historicalExpected.hcursor.downField("compile")
+    assertEquals(oldCompile.get[String]("fingerprint"), Right(previousFingerprint.hex))
+    // Replace only the receipt binding; the canonical file must recover the historical digest.
+    val previousDerivation = json(read(built.files.derivation)).mapObject(
+      _.add("compilationFingerprint", previousFingerprint.hex.asJson)
+    )
+    assertEquals(
+      oldCompile.get[String]("derivationFileSha256"),
+      Right(Checksum.ofText(Canonical.print(previousDerivation)).hex)
+    )
+    assertEquals(
+      historicalExpected.hcursor.downField("view").get[String]("sha256"),
+      Right(Checksum.ofText(viewWith(previous).textualTwin).hex)
+    )
+  }
 
   test("historical receipts remain a receipt-only record") {
     assertEquals(
@@ -199,9 +240,10 @@ class TextParitySuite extends FunSuite:
     assertEquals(model.graph.entities.size, 23)
     assertEquals(model.graph.contexts.size, 6)
     assertEquals(model.graph.segments.size, 1)
-    assertEquals(compilation.validated, None)
+    assert(compilation.validated.nonEmpty, compilation.validation.report.render)
+    assert(compilation.isPartial)
     assertEquals(compilation.derivation.gaps.size, 84)
-    assertEquals(compilation.validation.report.violations.size, 3)
+    assertEquals(compilation.validation.report.violations.size, 0)
     assertEquals(built.fingerprint, compilation.fingerprint)
     assertEquals(built.candidateSet, compilation.derivation.candidateSet)
     assertEquals(built.encodingDigest, StoryModelCodec.contentChecksum(model))

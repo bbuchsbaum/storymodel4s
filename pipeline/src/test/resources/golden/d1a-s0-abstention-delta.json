@@ -1,0 +1,9 @@
+{
+  "compile": {
+    "fingerprint": "ab023f0c90102f78c384bf032a4cc4bad974493966ec0d3316d68f3f35d43e7f",
+    "derivationFileSha256": "9bb5b067e9d92b48c1c50676077d47fcafdb487962ba3cee7efa1b3a647b6886"
+  },
+  "view": {
+    "sha256": "99ee1a792428282896930fa1f24ec7f7fd3b69696c8a45d680e474223d867a2b"
+  }
+}

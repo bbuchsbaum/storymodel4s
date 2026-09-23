@@ -62,7 +62,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
 
   /** The whole replay, run once: parse, propose, compile, and bind the draft to its own evidence.
     */
-  private lazy val compiled: (NarrativeCompilation, DraftModel) =
+  private lazy val compiled: (NarrativeCompilation, DraftModel, DraftModel) =
     val dir = work("wog-draft-codex")
     val textPath = dir.resolve("war-of-the-ghosts.txt")
     Files.write(textPath, WarOfTheGhostsText.text.getBytes(StandardCharsets.UTF_8)): Unit
@@ -81,10 +81,22 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
       compilation.validation,
       DerivationRecord.Reported(compilation.derivation.gaps, proposals.coverage)
     )
-    (compilation, draft)
+    val missing = WogMissingProposalFixture
+      .compile(input)
+      .fold(error => fail(error.message), identity)
+    assertEquals(missing.validated, None)
+    assertEquals(missing.validation.report.errors.size, 3)
+    assertEquals(missing.draft, compilation.draft)
+    val rejected = DraftModel.of(
+      missing.draft,
+      missing.validation,
+      DerivationRecord.Reported(missing.derivation.gaps, proposals.coverage)
+    )
+    (compilation, draft, rejected)
 
   private def compilation: NarrativeCompilation = compiled._1
   private def draft: DraftModel = compiled._2
+  private def rejected: DraftModel = compiled._3
 
   private val state = CommonViewState.empty
   private val spec = CodexSpec
@@ -141,28 +153,45 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     assertEquals(compilation.draft.graph.entities.size, 23)
     assertEquals(compilation.draft.graph.contexts.size, 6)
     // The root segment, derived from its members and unsummarized because no title was stated
-    // (ADR 0005 §10); 84 gaps, one of them the summary; the abstained sentence's 3 violations.
+    // (ADR 0005 §10); 84 gaps, one of them the summary. Explicit abstention is not a violation.
     assertEquals(compilation.draft.graph.segments.size, 1)
     assertEquals(
       compilation.draft.graph.segments.values.map(_.summary).toVector,
       Vector(SegmentSummary.Unsummarized(SummaryGap.NotProposed))
     )
     assertEquals(compilation.draft.hierarchy.containment.size, 65)
-    assertEquals(compilation.validated, None)
+    assert(compilation.validated.nonEmpty, compilation.validation.report.render)
     assertEquals(compilation.derivation.gaps.size, 84)
-    assertEquals(compilation.validation.report.violations.size, 3)
+    assertEquals(compilation.validation.report.violations.size, 0)
   }
 
   test("the receipt states the promotion the reading view renders, and refuses the other path") {
     val promotion = flow.provenance.draft.getOrElse(fail("a draft flow carries a promotion"))
     assertEquals(flow.provenance.basis, ViewBasis.DraftBuild)
-    assertEquals(promotion.promoted, false)
+    assertEquals(promotion.promoted, true)
     assertEquals(promotion.gapCount, Some(84))
-    assertEquals(promotion.violationCount, 3)
+    assertEquals(promotion.violationCount, 0)
     assertEquals(
       flow.provenance.modelReceiptChecksum,
       compilation.draft.receipt.map(_.contentChecksum)
     )
+  }
+
+  test("missing proposals refuse promotion and remain visible as unplaced laws") {
+    val refused = flowFrom(rejected, state, spec)
+    val promotion = refused.provenance.draft.getOrElse(fail("missing draft promotion"))
+    assertEquals(promotion.promoted, false)
+    assertEquals(promotion.violationCount, 3)
+    val ledger = ledgerOf(refused)
+    assertEquals(ledger.total, 88)
+    val laws = ledger.unplaced.filter(_.absence.kind == AnnotationKind.UnsatisfiedLaw)
+    assertEquals(laws.size, 3)
+    assert(laws.forall(_.reason == NoPositionReason.WholeWork))
+    assert(laws.forall(_.absence.channel == EpistemicChannel.Bracket))
+    assert(refused.textualTwin.contains("compiler.required-derivation Error x3"))
+    assertEquals(marks(refused).filter(_.kind == AnnotationKind.UnsatisfiedLaw), Vector.empty)
+    val crossed = CodexCompiler(flow.provenance).compileDraft(rejected, state, spec)
+    assert(crossed.isLeft, "a receipt for the promoted model must refuse the rejected outcome")
   }
 
   test("the annotation census: 244 marks on the words, of which 84 are failures") {
@@ -225,12 +254,11 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         compilation.validation.report.violations.size
     assertEquals(draft.absences.size, expected)
     assertEquals(ledger.total, expected)
-    assertEquals(ledger.total, 88)
+    assertEquals(ledger.total, 85)
     assertEquals(ledger.marked, marks(flow).map(_.id).sorted)
 
-    // Four absences concern no words and say so, rather than being dropped from the reading view
-    // or borrowing a sentence they do not describe: the summary gap and the three derivation laws.
-    assertEquals(ledger.unplaced.size, 4)
+    // The summary gap concerns the whole work and must not borrow a sentence's position.
+    assertEquals(ledger.unplaced.size, 1)
     assertEquals(
       ledger.unplaced
         .groupBy(entry => (entry.absence.kind.wireName, entry.reason.render))
@@ -238,7 +266,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         .mapValues(_.size)
         .toVector
         .sorted,
-      Vector((("gap", "whole-work"), 1), (("unsatisfied-law", "whole-work"), 3))
+      Vector((("gap", "whole-work"), 1))
     )
 
     // The one unplaced gap is the story summary: it concerns the whole work, so borrowing the first
@@ -263,9 +291,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
       }
     }
 
-    // No law is placed: the three remaining violations name a chart candidate with no address,
-    // and the sixty-five reachability laws that used to cite their situation's own words were the
-    // cost of a root segment waiting on its summary, retired by ADR 0005 §10.
+    // Explicit abstention leaves gaps, but the emitted model violates no law (ADR 0005 §11).
     assertEquals(marks(flow).filter(_.kind == AnnotationKind.UnsatisfiedLaw), Vector.empty)
     assertEquals(
       ledgerOf(flow).unplaced.count(_.absence.kind == AnnotationKind.UnsatisfiedLaw),
@@ -405,8 +431,8 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     val twin = flow.textualTwin
     assert(twin.startsWith("Narrative Codex\n"), twin.take(120))
     assert(twin.contains("Basis: draft build\n"), "the twin states the basis")
-    assert(twin.contains("promotable: false; derivation gaps: 84; violations: 3\n"))
-    assert(twin.contains("  - compiler.required-derivation Error x3\n"))
+    assert(twin.contains("promotable: true; derivation gaps: 84; violations: 0\n"))
+    assert(!twin.contains("compiler.required-derivation"))
     assert(!twin.contains("hierarchy."), "no hierarchy law is unsatisfied since ADR 0005 §10")
     assert(
       twin.contains(
@@ -428,11 +454,10 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
       )
     )
 
-    // Every absence with no discourse position is listed too, so the twin accounts for all 88:
-    // the summary gap and the three derivation laws, which sit on no words.
+    // The twin accounts for all 85 absences, including the unplaced summary gap.
     assert(twin.contains("Unplaced absences\n"))
-    assertEquals(lines("- ").count(_.contains("at=unplaced:whole-work")), 4)
-    assertEquals(lines("- ").count(_.contains("unsatisfied-law")), 3)
+    assertEquals(lines("- ").count(_.contains("at=unplaced:whole-work")), 1)
+    assertEquals(lines("- ").count(_.contains("unsatisfied-law")), 0)
   }
 
   test("the draft flow is deterministic, and relation layers add no absence and lose none") {
@@ -452,8 +477,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
   test("a model that arrives without its derivation record draws a smaller, still honest view") {
     // A derivation gap is a statement about the derivation, not about the story, so a consumer
     // holding only a decoded `storymodel.json` has none. Re-validating independently finds no
-    // violation: the root segment exists and every situation is under it (ADR 0005 §10), and the
-    // three `compiler.required-derivation` errors only the compiler can raise.
+    // violation: the root segment exists and every situation is under it (ADR 0005 §10).
     val revalidated = StoryValidator.validate(compilation.draft)
     assertEquals(revalidated.report.violations, Vector.empty)
     val alone = DraftModel.withoutDerivationRecord(compilation.draft, revalidated)

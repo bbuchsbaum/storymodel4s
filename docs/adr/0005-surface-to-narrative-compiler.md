@@ -1176,7 +1176,13 @@ The fifty captured *War of the Ghosts* replies exercise this distinction: s43's 
 abstains, and its situation, context, membership, and participant-coverage attempts have no
 accepted value. The three required-family gaps remain in the report; they do not become
 `compiler.required-derivation` errors. All other emitted situations still pass the structural
-validator. The exact Text S0 bytes and recording keys stay fixed.
+validator. The model bytes, candidate-set digest, exemplars, node order, historical receipts,
+and recording keys stay fixed. Three derived S0 hashes change: the compilation fingerprint
+includes the validation violations, the derivation artifact binds that fingerprint, and the view
+renders promotion and unsatisfied laws. `d1a-s0-text-parity.json` remains the historical baseline;
+`d1a-s0-abstention-delta.json` declares only those three new hashes. `TextParitySuite` reconstructs
+the previous validation outcome from a missing-proposal control and recovers all three old hashes,
+so the delta cannot silently absorb another model, evidence, or rendering change.
 
 *Rejected: exempting every `NoProposal` gap.* That would make a provider that never ran, an
 unsupported premise, and an explicit abstention indistinguishable at promotion.
