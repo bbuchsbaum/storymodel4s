@@ -5,8 +5,11 @@ them reproduces a measured historical Sherlock failure. Exact seek/media corresp
 their claim.
 """
 from fractions import Fraction as F
+import csv
 import importlib.util
+import io
 import json
+import math
 import os
 from pathlib import Path
 import tempfile
@@ -22,8 +25,32 @@ spec.loader.exec_module(esf)
 A, B = "media-part-a", "media-part-b"
 
 
+def exact(x):
+    """Synthetic times as the parser would produce them: exact rationals of their decimal text.
+
+    Non-finite floats are passed through unchanged so the planner's own refusal is what is tested.
+    """
+    return F(repr(x)) if isinstance(x, float) and math.isfinite(x) else x
+
+
 def extent(start, end, rows):
-    return {"start": start, "end": end, "rows": list(rows)}
+    return {"start": exact(start), "end": exact(end), "rows": list(rows)}
+
+
+HEADER = ["Scene Segments", "Start Time (s) ", "End Time (s) "]
+
+
+def tsv(rows):
+    """Annotation-shaped TSV text read back through csv, as scenes() reads the real file."""
+    buf = io.StringIO()
+    csv.writer(buf, delimiter="\t").writerows([HEADER] + rows)
+    return csv.reader(io.StringIO(buf.getvalue()), delimiter="\t")
+
+
+def parsed_counts(rows, per, part_a_last_row):
+    with patch.object(esf, "PART_A_LAST_ROW", part_a_last_row):
+        order, sc = esf.parse_scenes(tsv(rows))
+    return [p["count"] for p in esf.plan_scene(sc[order[0]], per)]
 
 
 # A scene that crosses the part boundary: 10 s at the end of part A (2 rows) and 30 s at the start
@@ -54,7 +81,7 @@ class SceneFramesSuite(unittest.TestCase):
         self.assertEqual([p["count"] for p in esf.plan_scene(tiny, 8)], [1, 7])
         for per in range(2, 13):
             for da in (0.01, 0.5, 1.0, 3.0, 7.25, 50.0):
-                counts = esf.allocate([esf.decimal_seconds(da), F(10)], per)
+                counts = esf.allocate([exact(da), F(10)], per)
                 self.assertEqual(sum(counts), per, (per, da))
                 self.assertTrue(all(c >= 1 for c in counts), (per, da, counts))
 
@@ -69,6 +96,50 @@ class SceneFramesSuite(unittest.TestCase):
         parts = {A: extent(10.0, 10.2, [1]), B: extent(0.0, 2.2, [2])}
         self.assertEqual([p["count"] for p in esf.plan_scene(parts, 8)], [2, 6])
         self.assertEqual(esf.allocate([F("0.2"), F("2.2")], 8), [2, 6])
+
+    def test_parser_decides_ties_on_source_decimal_text(self):
+        # Through the real TSV parser, row 0 in part A and row 1 in part B, 8 frames.
+        # 0.2 s and 2.2 s: exact quotas 0.5 and 5.5 tie -> earlier part -> [2, 6]; parsing via
+        # float gives [1, 7].
+        self.assertEqual(
+            parsed_counts([["s", "10.0", "10.2"], ["", "0", "2.2"]], 8, 0), [2, 6]
+        )
+        # 2.20000000000000001 is not 2.2: exact quotas no longer tie -> [1, 7]; parsing via
+        # float and repr collapses it to 2.2 and gives [2, 6].
+        self.assertEqual(
+            parsed_counts(
+                [["s", "10.0", "10.2"], ["", "0", "2.20000000000000001"]], 8, 0
+            ),
+            [1, 7],
+        )
+
+    def test_parser_refuses_each_invalid_row_before_aggregating(self):
+        # a token Fraction() would accept but the annotation grammar does not, first; then the
+        # reviewer's witness: a later nan row inside a finite scene
+        for bad in (
+            ["", "1e1", "12"],
+            ["", "nan", "nan"],
+            ["", "", "3"],
+            ["", "-1", "3"],
+        ):
+            with self.assertRaises(esf.PlanRefusal, msg=bad):
+                esf.parse_scenes(tsv([["s", "0", "1"], bad]))
+        with self.assertRaises(esf.PlanRefusal):
+            esf.parse_scenes(tsv([["s", "0", "1"], ["", "5", "4"]]))  # end before start
+        with self.assertRaises(esf.PlanRefusal):
+            esf.parse_scenes(
+                tsv([["s", "0", "1"], [""]])
+            )  # time cells missing entirely
+
+    def test_parser_admits_the_real_annotation_shape(self):
+        # integer cells and a zero-length row (Sherlock row 12 is 45-45) inside a longer scene
+        order, sc = esf.parse_scenes(
+            tsv([["s", "40", "45"], ["", "45", "45"], ["t", "45", "50"]])
+        )
+        self.assertEqual(order, ["s", "t"])
+        a = sc["s"][A]
+        self.assertEqual((a["start"], a["end"], a["rows"]), (F(40), F(45), [0, 1]))
+        self.assertTrue(all(isinstance(x, F) for x in (a["start"], a["end"])))
 
     def test_allocate_refuses_what_it_cannot_divide_exactly(self):
         for durations in ([0.2, 2.2], [F(-1), F(3)], [F(0), F(1)]):

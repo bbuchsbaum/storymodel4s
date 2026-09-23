@@ -27,6 +27,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 
@@ -100,18 +101,28 @@ def allocate(durations, per):
     return alloc
 
 
-def decimal_seconds(x):
-    """The decimal a float time was parsed from, as an exact rational.
+TIME_TOKEN = re.compile(r"[0-9]+(?:\.[0-9]+)?")
 
-    `Fraction(0.2)` is the binary float nearest 0.2, not 0.2, so equal-looking decimal quotas would
-    stop tying; `repr` recovers the shortest decimal that round-trips, which is the annotation text.
+
+def exact_seconds(text, where):
+    """An annotation time cell as the exact rational its decimal text names.
+
+    Parsing through float first would lose the source decimal (2.20000000000000001 reads as 2.2),
+    so ties would be decided on a value the annotation never wrote. Anything but a plain
+    non-negative decimal (empty, nan, inf, exponent, sign) refuses with its location.
     """
-    return Fraction(repr(x))
+    token = text.strip() if isinstance(text, str) else ""
+    if not TIME_TOKEN.fullmatch(token):
+        raise PlanRefusal(
+            f"{where}: time cell {text!r} is not a plain non-negative decimal"
+        )
+    return Fraction(token)
 
 
 def check_extent(start, end):
-    """Only a finite, non-negative, positive-length extent can be sampled inside itself."""
-    if math.isfinite(start) and math.isfinite(end) and start >= 0 and end - start > 0:
+    """Only an exact, non-negative, positive-length extent can be sampled inside itself."""
+    exact = isinstance(start, Fraction) and isinstance(end, Fraction)
+    if exact and start >= 0 and end - start > 0:
         return
     raise PlanRefusal(
         f"extent {start!r}-{end!r} is not finite, non-negative and positive"
@@ -129,13 +140,10 @@ def plan_scene(parts, per, order=PART_ORDER):
     chosen = ordered_parts(parts, order)
     for _, d in chosen:
         check_extent(d["start"], d["end"])
-    counts = allocate(
-        [decimal_seconds(d["end"]) - decimal_seconds(d["start"]) for _, d in chosen],
-        per,
-    )
+    counts = allocate([d["end"] - d["start"] for _, d in chosen], per)
     plan = []
     for (part, d), m in zip(chosen, counts):
-        lo, hi = d["start"], d["end"]
+        lo, hi = float(d["start"]), float(d["end"])
         offsets = [lo + (hi - lo) * (k + 0.5) / m for k in range(m)]
         if not all(lo < o < hi for o in offsets):
             raise PlanRefusal(
@@ -155,34 +163,44 @@ def ffmpeg_bin():
     return REALIZED_FFMPEG if os.path.isfile(REALIZED_FFMPEG) else "ffmpeg"
 
 
+def parse_scenes(rows):
+    """Scene extents per part from the annotation's rows (header first), with exact times.
+
+    Every row inside a scene is validated before it is aggregated: a missing or non-decimal time
+    cell, or an end before its start, refuses the whole parse with the row index rather than being
+    skipped or hidden by min/max. A zero-length row is admitted (the scene extent is checked later).
+    """
+    rows = iter(rows)
+    hdr = next(rows)
+    si, st, en = (
+        hdr.index("Scene Segments"),
+        hdr.index("Start Time (s) "),
+        hdr.index("End Time (s) "),
+    )
+    out, order, cur = {}, [], None
+    for i, r in enumerate(rows):
+        v = r[si].strip() if len(r) > si else ""
+        if v:
+            cur = v
+            if v not in order:
+                order.append(v)
+        if cur is None:
+            continue
+        a = exact_seconds(r[st] if len(r) > st else None, f"row {i} start")
+        b = exact_seconds(r[en] if len(r) > en else None, f"row {i} end")
+        if b < a:
+            raise PlanRefusal(f"row {i}: end {b} precedes start {a}")
+        part = "media-part-a" if i <= PART_A_LAST_ROW else "media-part-b"
+        d = out.setdefault(cur, {})
+        p = d.setdefault(part, {"rows": [], "start": a, "end": b})
+        p["rows"].append(i)
+        p["start"], p["end"] = min(p["start"], a), max(p["end"], b)
+    return order, out
+
+
 def scenes():
     with open(ANNOTATION, encoding="utf-8", errors="replace") as fh:
-        rd = csv.reader(fh, delimiter="\t")
-        hdr = next(rd)
-        si, st, en = (
-            hdr.index("Scene Segments"),
-            hdr.index("Start Time (s) "),
-            hdr.index("End Time (s) "),
-        )
-        out, order, cur = {}, [], None
-        for i, r in enumerate(rd):
-            v = r[si].strip() if len(r) > si else ""
-            if v:
-                cur = v
-                if v not in order:
-                    order.append(v)
-            if cur is None:
-                continue
-            try:
-                a, b = float(r[st]), float(r[en])
-            except (ValueError, IndexError):
-                continue
-            part = "media-part-a" if i <= PART_A_LAST_ROW else "media-part-b"
-            d = out.setdefault(cur, {})
-            p = d.setdefault(part, {"rows": [], "start": a, "end": b})
-            p["rows"].append(i)
-            p["start"], p["end"] = min(p["start"], a), max(p["end"], b)
-    return order, out
+        return parse_scenes(csv.reader(fh, delimiter="\t"))
 
 
 def grab(binary, src, seconds, width, height, scratch):
@@ -238,7 +256,10 @@ def main(argv):
     os.makedirs(out_dir, exist_ok=True)
     binary = ffmpeg_bin()
 
-    order, sc = scenes()
+    try:
+        order, sc = scenes()
+    except PlanRefusal as e:
+        raise SystemExit(f"refused before extraction: {e}")
     plans = []
     for label in order:
         try:
@@ -263,8 +284,8 @@ def main(argv):
                 part_rows.append(
                     {
                         "part": p["part"],
-                        "startSeconds": d["start"],
-                        "endSeconds": d["end"],
+                        "startSeconds": float(d["start"]),
+                        "endSeconds": float(d["end"]),
                         "rows": [min(d["rows"]), max(d["rows"])],
                         "frameOrdinals": [next_ordinal, next_ordinal + p["count"] - 1],
                     }

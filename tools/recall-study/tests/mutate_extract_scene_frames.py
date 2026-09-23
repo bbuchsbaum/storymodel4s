@@ -21,8 +21,8 @@ CASES = [
     ),
     (
         "union-span-offsets",
-        '        lo, hi = d["start"], d["end"]\n',
-        '        lo, hi = min(x["start"] for _, x in chosen), max(x["end"] for _, x in chosen)\n',
+        '        lo, hi = float(d["start"]), float(d["end"])\n',
+        '        lo, hi = float(min(x["start"] for _, x in chosen)), float(max(x["end"] for _, x in chosen))\n',
         "test_straddling_scene_samples_every_part_inside_its_own_extent",
     ),
     (
@@ -45,7 +45,7 @@ CASES = [
     ),
     (
         "skip-extent-check",
-        "    if math.isfinite(start) and math.isfinite(end) and start >= 0 and end - start > 0:\n",
+        "    if exact and start >= 0 and end - start > 0:\n",
         "    if True:\n",
         "test_unsamplable_extents_and_budgets_refuse",
     ),
@@ -62,10 +62,28 @@ CASES = [
         "test_refusal_happens_before_any_frame_is_extracted",
     ),
     (
-        "binary-float-durations",
-        "    return Fraction(repr(x))\n",
-        "    return Fraction(x)\n",
-        "test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats",
+        "parse-times-through-float",
+        "    return Fraction(token)\n",
+        "    return Fraction(float(token))\n",
+        "test_parser_decides_ties_on_source_decimal_text",
+    ),
+    (
+        "parse-times-through-float-repr",
+        "    return Fraction(token)\n",
+        "    return Fraction(repr(float(token)))\n",
+        "test_parser_decides_ties_on_source_decimal_text",
+    ),
+    (
+        "accept-any-fraction-token",
+        "    if not TIME_TOKEN.fullmatch(token):\n",
+        "    if False:\n",
+        "test_parser_refuses_each_invalid_row_before_aggregating",
+    ),
+    (
+        "admit-reversed-row",
+        "        if b < a:\n",
+        "        if False:\n",
+        "test_parser_refuses_each_invalid_row_before_aggregating",
     ),
     (
         "allocate-accepts-inexact-or-nonpositive",
