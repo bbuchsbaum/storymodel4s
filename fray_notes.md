@@ -175,3 +175,15 @@ an agent communication failure in this instance, not evidence of a lost message.
   oracle plus a platform court changed the implementation and identity contract
   where hand-picked roundtrips had passed. Keep the failed gate and the first
   insufficient repair visible; a review is not a one-pass ceremony.
+
+- The reviewer then ran 300,000 cases against the compiled repaired class, not
+  only a transcription, and supplied a hash-bound receipt archive. Our platform
+  court separately confirmed JVM/JS/Native identity. The two parties supplied
+  complementary evidence instead of treating each other's passing test as a
+  reason to repeat it.
+- Build-slot ownership helped during a real repair: I released the failed gate's
+  slot; the lead used the gap for a bounded Native regression; I reclaimed it for
+  the repaired source. The lead then explicitly took the expanded 20-module
+  final gate, avoiding a duplicate broad run immediately before integration.
+  A shared execution needs a named owner and an exact acceptance receipt, not
+  merely a promise that someone will eventually run everything.
