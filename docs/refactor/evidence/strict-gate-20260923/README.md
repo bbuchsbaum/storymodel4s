@@ -7,7 +7,9 @@ discards the `Files.deleteIfExists` result explicitly at three cleanup sites in
 
 **The strict full gate passed on `36174e31`: `GATE_EXIT=0`, 56 test tasks,
 8,371 total tests = 8,366 passed, 5 skipped, 0 failures or errors, 0 `[error]`
-lines.** Because `checkAll` compiles every module's main and test sources on
+lines.** That run used a local grakern override (below), so it is **not a full
+pinned-dependency pass**; the pinned-module run is separate evidence and does
+not upgrade it. The next combined full gate uses the repository pin. Because `checkAll` compiles every module's main and test sources on
 every platform, the strict run also shows that main had no further strict-only
 warnings beyond these three.
 
