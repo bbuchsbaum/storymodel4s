@@ -1179,122 +1179,42 @@ final case class DefaultLocalCostModel(
       mode: FidelityMode,
       view: SourceView
   ): CostBreakdown =
-    val sketch = unit.proposition
-    // The provider's own answer is kept, not collapsed to a Double, so that "abstained" survives to
-    // the receipt. The PRICE is unchanged - `missingSemantic` is still substituted, and the M0
-    // decision at cost.scala:705 stands - but the substitution is now recorded rather than silent.
-    val semEstimate = semantic(unit, node)
-    val dSem = clamp(semEstimate.toOption.getOrElse(missingSemantic))
-    val semImputed: Map[CostTerm, MissingReason] = semEstimate match
-      case Estimate.Missing(reason) => Map(CostTerm.Semantic -> reason)
-      case _                        => Map.empty
-    val dProp = (sketch.predicate, node.predicate) match
-      case (Some(a), Some(b)) => if a == b then 0.0 else 1.0
-      case _                  => 0.5
-    val specified = sketch.participants.filter(_.specified)
-    // Role-aware: a name found in the same role earns full credit, in another role half credit.
-    val dEnt =
-      if specified.isEmpty then 0.5
-      else
-        val credit = specified.map { p =>
-          if node.byRole(p.role).exists(n => Names.overlap(p.names, n.names)) then 1.0
-          else if Names.overlap(p.names, node.allNames) then 0.5
-          else 0.0
-        }.sum
-        1.0 - credit / specified.size.toDouble
-    val dSens =
-      if sketch.sensoryTerms.isEmpty then Estimate.missing(MissingReason.AllMissing)
-      else
-        val hits = sketch.sensoryTerms.count(t => node.lemmas.contains(Lexical.stem(t)))
-        Estimate.observed(1.0 - hits.toDouble / sketch.sensoryTerms.size.toDouble)
-    // Preferred abstraction level: summaries want a scene, thematic/evaluative remarks want the
-    // global level, predicate-bearing assertions want a leaf, predicate-less ones a scene.
-    val preferred = unit.function match
-      case DiscourseFunction.Summary                                    => 1
-      case DiscourseFunction.Association | DiscourseFunction.Evaluation => view.maxLevel
-      case _ if sketch.predicate.isEmpty && sketch.participants.isEmpty => 1
-      case _                                                            => 0
-    val dGran = math.min(1.0, 0.5 * math.abs(node.level - preferred))
-    // The distortion term: `distortionPenalty` per contradicted facet, weighted by
-    // `contradiction`. It separates a distorted anchor from a faithful one at equal content
-    // match and must stay below the external floor so a well-matched distorted anchor is
-    // preferred to intrusion (design record §9). Provisional until W4 calibration.
-    val dDist = distortionPenalty * mode.facetSet.size.toDouble
-    // Optional evidence-backed terms: present only when charts exist on both sides (and, for
-    // `d_wl`, a provider answered). Absent terms are inert and recorded, never substituted.
+    // Providers and receipt identities stay outside the content scorer. Their typed outcomes are
+    // supplied to the single deterministic price calculation after Source-order projection.
+    val semanticEstimate = semantic(unit, node)
     val chartReduction = ChartDistance.reduction(unit, node, view)
     val structuralReduction = ChartDistance.structuralReduction(structural, unit, node, view)
-    val dChart = chartReduction.estimate
-    val dWl = structuralReduction.estimate
-    val always = Vector(
-      CostTerm.Semantic -> dSem,
-      CostTerm.Propositional -> dProp,
-      CostTerm.Entity -> dEnt,
-      CostTerm.Granularity -> dGran,
-      CostTerm.Distortion -> dDist
+    val (u, t, grain) = ContentProjection.source(unit, node, view)
+    val price = ContentCostScoring.terms(
+      u,
+      t,
+      grain,
+      mode,
+      semanticEstimate,
+      chartReduction.estimate,
+      structuralReduction.estimate,
+      structural != StructuralDistance.missing,
+      missingSemantic,
+      distortionPenalty
     )
-    val optional =
-      Vector(CostTerm.Chart -> dChart, CostTerm.Structural -> dWl, CostTerm.Sensory -> dSens)
-    val present = optional.collect { case (t, Estimate.Observed(v, _)) => t -> clamp(v) }
-    val missing = optional.collect { case (t, Estimate.Missing(_)) => t }.toSet
-    val terms = (always ++ present).toMap
-    // ELIGIBILITY IS PER-CELL, not per-view. A chartless node in a mixed view could never have been
-    // chart-compared, so treating it as a missed measurement would invent a dimension that cell
-    // cannot have — the same error as scaling over all terms, which collapsed every row to External.
-    // Chart eligibility must be asked of the function that PRODUCES the term. `dChart` comes from
-    // ChartDistance.reduction, which measures over `view.structuralMembers(node.ref)` — the leaves.
-    // It does NOT come from ChartDistance.report, whose `(unit, node)` signature genuinely does
-    // need a chart on each side. Testing `node.evidence` here applied report's contract to
-    // reduction's term: identical on a leaf, wrong on a segment, because StorySourceView gives a
-    // segment no chart of its own ("segments never get a fabricated chart") while its leaves carry
-    // the charts actually compared. Chart then came out present-but-not-eligible, wPresent exceeded
-    // wEligible, and the blend multiplied the cost DOWN while the old numeric support's clamp
-    // reported the over-unity ratio as full support. `leavesUnder` returns the node itself for a leaf, so this
-    // predicate is a strict generalization and no leaf cell moves.
-    //
-    // Structural has the SAME defect mirrored, found by scout on this candidate. It is produced by
-    // ChartDistance.structuralReduction, which reads the same structuralMembers population, but its
-    // eligibility asked only whether a provider was configured and the unit had evidence — never
-    // whether the source had a chart to compare against. On a chartless cell the term is absent
-    // either way, yet CONFIGURATION ALONE moved (support, total) from (0.9552, 1.37045) to
-    // (0.8312, 1.575): a 15% cost inflation for a measurement that cell could never have had,
-    // biasing chartless cells toward External. That is exactly the error the paragraph above warns
-    // about, in the term I did not check. Both now ask the population the measurement reads.
-    val chartedMembers = view.structuralMembers(node.ref).exists(_.hasEvidence)
-    val chartEligible = unit.evidence.nonEmpty && chartedMembers
-    val structuralEligible =
-      structural != StructuralDistance.missing && unit.evidence.nonEmpty && chartedMembers
-    val eligible = always.map(_._1).toSet ++
-      Set(CostTerm.Sensory) ++
-      Option.when(chartEligible)(CostTerm.Chart) ++
-      Option.when(structuralEligible)(CostTerm.Structural)
-    // SUPPORT COUNTS MEASURED WEIGHT, NOT PRICED WEIGHT. An imputed term stays in `terms` (it is
-    // priced) and stays in `eligible` (the comparison was possible), so it leaves the numerator
-    // only. That is exactly the gap the two-cell court measures: support must differ between a
-    // measured and an imputed cell by semanticWeight / eligibleWeight, and nothing else may move.
-    // The factory derives the measured population from `terms -- semImputed` itself, so the
-    // support basis cannot disagree with the record it describes.
-    //
-    // ZERO ASSESSED SUPPORT IS AN EXCLUSION, NOT A PRICE (see CostBreakdown.derived). Excluding it
-    // drops the state from the space entirely (hsmm.scala builds states from `!b.excluded`), which
-    // says the true thing: we have no basis to rank this anchor, rather than a very good one. The
-    // total is by-name and is not computed for such a cell.
     CostBreakdown
       .derived(
-        terms,
+        price.values,
         mode,
-        missing,
+        price.missing,
         Some(view.structuralCoverage(node.ref)),
         Map(
           CostTerm.Chart -> chartReduction.receipt,
           CostTerm.Structural -> structuralReduction.receipt
         ),
-        semImputed,
-        eligible,
+        price.semanticImputed,
+        price.eligible,
         weights,
-        DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function), eligible)
+        DefaultLocalCostModel.blend(
+          price.values,
+          weights,
+          functionPrior(u.function),
+          price.eligible
+        )
       )
       .fold(e => throw new IllegalStateException(e.message), identity)
-
-  private def clamp(x: Double): Double =
-    if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))
