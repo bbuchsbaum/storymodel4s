@@ -1,0 +1,108 @@
+{
+  "schema": "mapping-exchange-focused-evidence/v1",
+  "sourceCommit": "f408a4357ade5fc79495c2b523124e806ba3f248",
+  "sourceHashes": {
+    "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala": "b439b76f3719394c603c5c4977421c4b45289f3ba4fb330098f75dacf7c8f618",
+    "codec/src/test/scala/storymodel4s/codec/MappingExchangeSuite.scala": "493153ddcf2f47ddfc5a35cde168ed1c52c2dd3eb0df9ad6fdfc52e46171dd11",
+    "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeBuild.scala": "c09f5dc7c9c5b9620ea93e07250d5644a18a570c212fd017b3f9ac499d26ff21",
+    "pipeline/src/test/scala/storymodel4s/pipeline/MappingExchangeBuildSuite.scala": "f24d213bb27081621adeaad559604d87b9f44544e31fb0255ef4d48173b00588"
+  },
+  "commandReceipt": {
+    "schema_version": 1,
+    "started_utc": "2026-09-23T00:52:48.459938+00:00",
+    "finished_utc": "2026-09-23T00:53:08.177482+00:00",
+    "duration_seconds": 19.717355,
+    "command": [
+      "sbt",
+      "-J-Xmx2G",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+      "scalafmtAll",
+      "codecJVM/testOnly storymodel4s.codec.MappingExchangeSuite",
+      "pipeline/testOnly storymodel4s.pipeline.MappingExchangeBuildSuite",
+      "codecJVM/Test/runMain storymodel4s.codec.MappingExchangeFixture"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable",
+    "log": "/private/tmp/mapping-exchange-evidence/focused-2.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 600.0,
+    "log_bytes": 363649
+  },
+  "runContext": "Focused dirty-tree run; unchanged compiled sources subsequently committed. Not an exact clean full-gate claim.",
+  "totals": {
+    "codecJVM": 7,
+    "pipeline": 3,
+    "failures": 0
+  },
+  "logSha256": "934d08f42950b999a45959d56340b47c242b6971fc2945631b7eb764ae28cf7c",
+  "independent": [
+    {
+      "command": [
+        "python3",
+        "examples/mapping/read_mapping.py",
+        "--fixture-log",
+        "/private/tmp/mapping-exchange-evidence/focused-2.log"
+      ],
+      "exit": 0,
+      "result": {
+        "status": "pass",
+        "fixtures": [
+          "large-ticks",
+          "normalized",
+          "raw"
+        ],
+        "knownAnswers": "raw scores, normalized mass, outcomes, half-open support and exact points/ticks"
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "examples/mapping/check_corruptions.py",
+        "/private/tmp/mapping-exchange-evidence/focused-2.log"
+      ],
+      "exit": 0,
+      "result": {
+        "status": "pass",
+        "rejected": [
+          "missing-outcomes-file",
+          "missing-failed-unit",
+          "dangling-link-stage",
+          "foreign-word-membership",
+          "duplicate-alternative-key",
+          "numeric-authoritative-tick",
+          "rehashed-changed-score"
+        ]
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "examples/mapping/read_mapping.py",
+        "--directory",
+        "examples/mapping/miniature"
+      ],
+      "exit": 0,
+      "result": {
+        "status": "pass",
+        "mapping": "b6e93bde68f64065da65bf5e79379ff9e2b46a8cb3149fd85dd4eb07939d5ad0",
+        "units": 8,
+        "qualification": "package/schema/projection checks; not contextual derivation admission"
+      }
+    },
+    {
+      "control": "unexpected-directory",
+      "exit": 1,
+      "refusal": "unsupported directory entry"
+    }
+  ],
+  "pending": [
+    "compiled mutation controls",
+    "portable JS/Native qualification",
+    "exact clean checkAll/scalafmt gate",
+    "paired facade envelope with shared evidence/profile identities"
+  ]
+}
