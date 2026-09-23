@@ -18,7 +18,7 @@ def main():
     parser.add_argument('--grakern', required=True)
     parser.add_argument('--staging', required=True)
     parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--suite', choices=['record', 'workspace'], default='record')
+    parser.add_argument('--suite', choices=['record', 'workspace', 'cli'], default='record')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]
     args.out.mkdir(parents=True, exist_ok=False)
@@ -36,6 +36,16 @@ def main():
         expected_failures = {
             'inspection-allows-export': 'valid inspection-only workspace refuses before output creation',
             'implicit-first-policy': 'unknown policy is refused without silently selecting the first record',
+        }
+    elif args.suite == 'cli':
+        baseline_task = 'pipeline/testOnly *MappingExchangeCliSuite'
+        mutants = [('cli-forwards-wrong-policy',
+                    'pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeCli.scala',
+                    'ArtifactId.from(policy)',
+                    'ArtifactId.from(if policy.nonEmpty then "authored-a" else policy)',
+                    baseline_task)]
+        expected_failures = {
+            'cli-forwards-wrong-policy': 'explicit second policy produces exact output and a receipt only on stdout'
         }
     originals = {name: (root / name).read_bytes() for name in sorted({m[1] for m in mutants})}
     for name, data in originals.items():
