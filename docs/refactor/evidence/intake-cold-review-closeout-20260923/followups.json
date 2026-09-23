@@ -1,0 +1,14 @@
+[
+  {
+    "key": "mapping-equivalence",
+    "id": "bd-01M37D5S1F94RT8MVWK58B5575",
+    "title": "SegmentLink.sameMappingAs must compare endpoint content identities",
+    "body": "At b737b14f, corpus/link.scala:233 compares names and ordinal maps but omits fromIdentity/toIdentity. No production caller found. Add the fresh-review counterexample: two target segmentations named b with onsets0/10/20 versus5000/6000/7000 and identical ordinal maps must compare unequal. Same endpoint content with different declared/composed evidence remains equal. Repair endpoint comparisons and kill their removal with named tests. Source-derived finding; proposed witness has not yet been executed.\n\nIndependent review: docs/refactor/evidence/intake-cold-review-closeout-20260923/README.md; replacement review ticket bd-01M2WTPDBB4MQBXEJ181Q85ZG2. These are separate findings, not a reconstruction of the missing historical A3."
+  },
+  {
+    "key": "refusal-cap",
+    "id": "bd-01M37D6APTEQTVVSMSC195Z184",
+    "title": "CorpusReader refusal cap must accurately describe or bound diagnostic collection",
+    "body": "At b737b14f, corpus/intake/CorpusReader.scala:164-172 retains all per-row refusals, flattens them, then takes RefusalCap. Output and total counts are correct, but collection memory is not bounded by100. Clarify the documented bound or accumulate total refusals while retaining only the first100 diagnostics. If implementation changes, preserve error order, exact totals and all existing refusal distinctions with a many-error synthetic court. No measured memory exhaustion or production impact claimed.\n\nIndependent review: docs/refactor/evidence/intake-cold-review-closeout-20260923/README.md; replacement review ticket bd-01M2WTPDBB4MQBXEJ181Q85ZG2. These are separate findings, not a reconstruction of the missing historical A3."
+  }
+]

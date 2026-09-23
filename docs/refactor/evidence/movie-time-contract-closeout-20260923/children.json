@@ -1,0 +1,58 @@
+[
+  {
+    "key": "unknown-duration",
+    "id": "bd-01M37CVCBTS7VNRMDJMGSP7M74",
+    "title": "Movie-time court: distinguish unknown final duration from zero and verify mutation",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Existing packet parser tests cover absent/zero/negative durations, but do not establish the complete edition/final-frame unknown-duration contract. Add a synthetic positive/negative control and kill a compiling mutation that turns unknown duration into a coordinate or zero extent.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "negative-origin",
+    "id": "bd-01M37CWFA32F41ZZ988GKKATYK",
+    "title": "Movie-time court: preserve signed nonzero origins through checked projection",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Existing F1 edit-list observation records negative PTS but expressly does not represent the origin. Add synthetic admitted nonzero/negative-origin projection and a named mutation that erases or rebases it silently.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "epoch-wrap",
+    "id": "bd-01M37CXDDQP2Q6KQ0DVVCTRYN1",
+    "title": "Movie-time court: refuse epoch, wrap and reset identity collisions",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Add synthetic equal tick values from distinct epoch/wrap/reset identities; prove they cannot alias or compose without an explicit mapping. Kill the identity-check removal with a same-shape lawful control.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "rational-oracle",
+    "id": "bd-01M37CYNJP89JQQ1T6998ZSCJC",
+    "title": "Movie-time court: independent overflow-safe rational projection oracle",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Existing ExactRescaler examples test overflow refusal and exact/inexact conversion. Add independent arbitrary-precision expected answers across cancellation/limits and a compiling arithmetic/rounding mutation; preserve exact or explicitly quantized outcomes.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "nontransitive-tolerance",
+    "id": "bd-01M37CZM6JPR62F6TYJTQ8AZGQ",
+    "title": "Movie-time court: tolerance never becomes equality or interval membership",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Use an independently authored nontransitive closeness triple and half-open interval boundaries. Establish that fit/admission tolerance does not alter identity/equality/membership; kill the corresponding conflation mutation.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "audio-only-interval",
+    "id": "bd-01M37D13JF20FXCB363VJ92E6A",
+    "title": "Movie-time court: retain edition intervals without picture samples",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Existing audio packet tiling does not prove edition extent. Add a synthetic edition interval with continuing admitted audio and absent picture; preserve playback support and authority-track semantics. Kill a mutation that drops or invents picture support.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "segment-coalescing",
+    "id": "bd-01M37D2BSHBX37W71GCEQK07S6",
+    "title": "Movie-time court: canonical identity for equivalent affine segment coalescing",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Existing mapping-equivalence mutant covers ordering, not contiguous collinear affine segment coalescing. Add semantically equivalent split/coalesced and genuinely distinct seam controls; prove canonical relation identity without erasing occurrence/seam distinctions and kill its mutation.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  },
+  {
+    "key": "set-valued-reverse",
+    "id": "bd-01M37D374F3YQANKPM3G69G6EW",
+    "title": "Movie-time court: retain all occurrence-qualified reverse preimages",
+    "body": "Existing missing court from bd-01M199ABAG5SXR9C6Y0G4X6J2T; its 2026-09-22 disposition requires an explicit film child per uncovered court. This records existing 1.1 film qualification scope, not a new 1.0 prerequisite.\n\nAcceptance: Existing TemporalSupport repeated-occurrence tests perform forward selection, not set-valued inverse. Add many-to-one/repeated-occurrence reverse controls that preserve every preimage or typed ambiguity; conditional round-trip laws and a mutation collapsing alternatives are required.\n\nEvidence: exact source SHA, independent answers where numeric, named compiling mutant/control, scoped portable gate and independent review. No licensed media or participant data required.\n\nCoverage audit: docs/refactor/evidence/movie-time-contract-closeout-20260923/README.md.",
+    "relationAdded": true
+  }
+]
