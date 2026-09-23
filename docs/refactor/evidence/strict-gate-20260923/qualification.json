@@ -1,0 +1,50 @@
+{
+  "control-unfixed-corpusIntake.log": {
+    "gate_exit": 1,
+    "test_total_lines": 0,
+    "total": 0,
+    "passed": 0,
+    "failed_or_errors": 0,
+    "skipped": 0,
+    "error_lines": 4,
+    "e175_warnings": 3,
+    "raw_sha256": "ed5e4f97782349716e097af1c58eebde6bb9b48c664a4710478757ca81538ca8",
+    "gz_sha256": "2e9fe4949ea1319670160712782d74510682cf9df8c845a6de00dcedfaedd928"
+  },
+  "fixed-corpusIntake.log": {
+    "gate_exit": 0,
+    "test_total_lines": 0,
+    "total": 0,
+    "passed": 0,
+    "failed_or_errors": 0,
+    "skipped": 0,
+    "error_lines": 0,
+    "e175_warnings": 0,
+    "raw_sha256": "16ca52e1a0d09b404668b1f2a95e369af1a7c67c8bf7a9bc128360c88a7a3aa8",
+    "gz_sha256": "1775129f8413fcc00e15e62e5deb493c170d9adb1a8fa727ff88bfdd5f49b18d"
+  },
+  "pin-embedGrakern-clean.log": {
+    "gate_exit": 0,
+    "test_total_lines": 1,
+    "total": 28,
+    "passed": 28,
+    "failed_or_errors": 0,
+    "skipped": 0,
+    "error_lines": 0,
+    "e175_warnings": 0,
+    "raw_sha256": "94fcd04d7da5b25d50a8ca48388a6624fea91bee9608f4d345591f385698a85f",
+    "gz_sha256": "a7f36edaa5e51affb38c72768856fd9fe3db08166e6ac42aedb8cbaaaeeb7afb"
+  },
+  "strict-checkAll.log": {
+    "gate_exit": 0,
+    "test_total_lines": 56,
+    "total": 8371,
+    "passed": 8366,
+    "failed_or_errors": 0,
+    "skipped": 5,
+    "error_lines": 0,
+    "e175_warnings": 0,
+    "raw_sha256": "69013a82c5c8a0960e9851f09ecb66bdd2c081ec0d0d35137bf0548078b001dc",
+    "gz_sha256": "0b635ca8d88a17d87cf91ddc2a590d6bc43897908617a915ec5365217c01c06f"
+  }
+}
