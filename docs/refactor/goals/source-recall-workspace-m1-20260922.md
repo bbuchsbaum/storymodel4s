@@ -8,6 +8,12 @@ Live Mote owns status; this charter owns the goal, scope and completion boundary
 StoryModel goal: `bd-01M34J9FS10B14WQA309K0P6V8`. StoryAtlas execution container: `bd-01M34JJ6QAW89VD68MNJKEWTMB`.
 Both are non-blocking containers; implementation dependencies are between executable tickets.
 
+The subsequent 1.0 boundary is the [operative scope in PLAN](../PLAN.md#operative-10-scope-owner-decisions-22-september-2026)
+and release gate `bd-01M2TAMJ95K9D7H248A8387YW4`: ordinary-file text/video mapping, local reference
+and named reconstruction results, exchange and temporal/OpenNeuro export. The owner's later
+22 September decisions moved film compilation and organization/recovery analyses to 1.1.
+Those changes do not enlarge or weaken this M1 completion boundary.
+
 ## Goal and completion boundary
 
 A researcher opens generated source, recall and mapping artifacts in the same application,
@@ -69,8 +75,14 @@ The final consumer acceptance receipt names both exact commits and artifacts. Cl
 container only after that receipt passes; verify it from the StoryModel goal before closing that
 goal. This explicit receipt handoff is the cross-store gate, not a hidden status synchronization.
 
-One implementation slice and one heavy build at a time. No fleet claims, reservations, candidate
-protocol or named dormant reviewer is introduced. Support honesty was the next executable task
+The owner subsequently authorized parallel work through the shared StoryAtlas Fray board
+(decision thread 11). Keep one writer per path and one heavy build at a time. Fray carries
+coordination and the shared build-resource lease; Mote remains the scope, acceptance and evidence
+record. No fleet candidate protocol or named dormant reviewer is introduced. The accepted lanes
+are M1 integration and later prepare/CLI, controlled Voyage, mapping core/facade, temporal/exchange/
+OpenNeuro, and Atlas design/acceptance reconciliation. Their bounded handoffs preserve the
+exact-pair gate above; a worker's absence permits reassignment through the same record.
+Support honesty was the next executable task
 at setup; the live queries below identify the current executable work. The 22 September
 [workflow reconciliation](../../plans/2026-09-22-recall-encoding-workflow.md) preserves active
 G1/M1 scope and places temporal-query work downstream.

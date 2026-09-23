@@ -16,6 +16,33 @@ the earlier deferral of viewer work for this milestone only. The reference-measu
 release commitments below remain in force on their own lanes and do not all gate M1.
 Live Mote and the goal's explicit dependency/receipt handoffs supersede older next-task prose.
 
+## Operative 1.0 scope (owner decisions, 22 September 2026)
+
+These decisions supersede any conflicting prose below, including ruling E and the G3/G4 rows of
+§4. The live record is the release gate `bd-01M2TAMJ95K9D7H248A8387YW4` and its dependency
+closure; the tracker reconciliation landed at `408178ef`.
+
+- **1.0 delivers** ingestion of stories, videos and their recalls from ordinary files; mapping
+  that publishes both the local reference result and the named structured reconstruction, with an
+  explicit reference/reconstruction weight λ; exchange tables with an independent reader;
+  temporal queries; the OpenNeuro ds001132 export; a public CLI; and a freshly scored Sherlock
+  development reproduction. "Stories alone" means offline text to a deterministic segmented
+  source, with a narrative StoryModel from `storyBuild` plus a tabular StoryModel export. "Videos
+  alone" means a checked timed source built from shots and captions with media receipts.
+- **1.0 acceptance** is the mapping journey `bd-01M35P83TCNHBSDY6NSK13Q3K0`. It runs Sherlock
+  annotations-only and annotations+video, plus a text story, through the public path.
+- **Moved to 1.1:**
+  - The film compiler (video to narrative StoryModel), D1A-film, D1B end-to-end proofs, V1 and E0
+    (container `bd-01M35MK5N6F0EWJE2EYT3D8Y9M`). Film-capable public types stay in 1.0.
+  - Organization analyses: compatibility, organization counts, G3 synthetic recovery and the
+    organization preview (container `bd-01M35P2EKWC52PZTMN2R5NMDFR`). Until then the facade
+    offers no organization readouts.
+- **Post-1.0 research (P3):** the benchmark, LLM-arm and human-ceiling work from the mapper
+  roadmap.
+- **Division of labor** is agreed on the shared Fray board (storyatlas4s home, thread #11). Mote
+  claims remain authoritative. There is one writer per bead and module, and heavy sbt gates are
+  serialized through the Fray "sbt-gate lock" card.
+
 The [recall-to-encoding workflow plan](../plans/2026-09-22-recall-encoding-workflow.md)
 extends this delivery toward reusable temporal queries, uncertainty maps, structured
 analysis exports and dynamic StoryAtlas views, with OpenNeuro Sherlock as the first
@@ -27,7 +54,8 @@ M1 workspace through the same checked producer contracts and exact-pair acceptan
 The 22 September workflow reconciliation is indexed in [BACKLOG.md](BACKLOG.md).
 Base mapping exchange no longer waits for organization statistics. Transition-table
 production, independent reader checks and tiny-answer validation belong together
-to the full G2 preview, whose organization/compatibility/recovery gates remain.
+to the full G2 preview, whose organization/compatibility/recovery gates remain (1.1 since
+22 September; see the operative scope above).
 Temporal queries, raw-BIDS scan alignment and the post-M1 StoryAtlas temporal
 consumer have distinct execution tickets. Optional video acquisition, fine
 localization and empirical calibration do not gate the basic workflow.
@@ -62,7 +90,7 @@ as the rationale for that work, not a fresh build or empirical reanalysis.
 | Assumption provenance is partial | `LayerUse` in `align/hsmm.scala` explicitly excludes refinement | Derive stage receipts for retrieval, rendering, scoring, context, refinement, inference, decision and projection. |
 | Scorer discards outcomes | Executed synthetic `gold_scene.load_arm` probe: 3 input units (mapped, abstaining, untimed), 1 loaded unit. No corpus gold read | Repair unit identity and fixed eligibility before any further efficacy comparison. Timing-dependent gold eligibility must be distinguished from transcript-order eligibility. |
 | General product logic remains in bench | `RecallToVideo.scala` owns `TimedSourceView`, configuration/orchestration; sidecars distinguish raw and decoded choices | Extract into existing modules and keep historical serializers as parity witnesses. |
-| Film library migration remains real work | Approved D1A S0–S4c plan; current `StorySourceView` is text based | Preserve ruling E: compiled film API + D1B proofs remain on the stable 1.0 path. |
+| Film library migration remains real work | Approved D1A S0–S4c plan; current `StorySourceView` is text based | *Superseded 22 September:* compiled film API + D1B proofs moved to 1.1; film-capable types stay in 1.0. |
 | Tracker state misrepresents activity | Live snapshot: 119 unfinished (96 open, 12 doing, 11 review), 206 closed; no active claims/reservations | Reconcile existing issues, remove obsolete fleet authority, and expose a small working queue. |
 | Push premise is stale | Local HEAD, tracking ref and live `git ls-remote origin refs/heads/main` agree at the baseline | No remaining 75-commit push backlog. Retain only unresolved CI action. |
 | CI did not execute | [CI run 35406786299](https://github.com/bbuchsbaum/storymodel4s/actions/runs/35406786299), empty job steps; check annotation says account payments/spending limit prevented startup | Account/runner action, not a demonstrated Scala failure. Local qualification can proceed; reproducible release still needs its declared gate. |
@@ -118,9 +146,9 @@ continues on its own lane and cannot gate ordinary library extraction or film en
    `explicitlyNotUsed`, and `doesNotCertify`; refuse unsupported semantic declarations and retain
    explanatory prose without treating it as executable policy. Validate row coverage, part joins,
    exact rates/extents and tails. Require integral, representable ticks; never round.
-6. **Scope stays bounded.** Annotated-source preview first; D1A-types, D1A-film and D1B remain
-   required for stable 1.0. V1 full film-model wire and E0 corpus-specific film terminal stay 1.x.
-   Ruling E remains in force; the unadopted P1 alternatives are parked, not silently accepted.
+6. **Scope stays bounded.** Annotated-source preview first. *Superseded 22 September:* P1a was
+   adopted, so D1A-types (landed) and the film-capable types are 1.0, while D1A-film, D1B
+   end-to-end, V1 and E0 are 1.1. See the operative scope above.
 7. **No new top-level module.** `align` owns pure evidence/inference/readouts; `recall` owns
    inference units and word/timing membership; `corpus-intake` owns file adapters; `codec` owns
    checked interchange; `pipeline` owns I/O/config/public execution; bench consumes these APIs.
@@ -208,9 +236,9 @@ affected code, falsifier, artifacts and completion boundary.
 |---|---|---|---|
 | G0: trustworthy baseline | Freeze existing mapping inputs/config/outputs; correct scorer; S0 text pins; clock integration | Stable identity/denominator mutations; captured commands; same-input legacy report byte parity; wrong-axis/missing-repair refusal | No new efficacy claim through old scorer. Failed parity is investigated, never blessed away. |
 | G1: shared evidence | Checked mapping records with stage policies; reusable local evidence and independent reference profile | External-consumer construction and codec probes; shared evidence identity; packet/target-order/ID equivariance; no sequence call in reference path | No reference label for HSMM ablations or unknown provenance. |
-| G2: usable analysis preview | Typed facade, safe publication, reference + reconstruction views, organization readouts, one Python/R reader | Independently authored tiny answers; no gap bridging/word inflation; all outcomes accounted; offline replay; interruption/corruption refusal | A researcher can run source + recall to interpretable tables without bench imports. Explicitly uncalibrated where applicable. |
-| G3: behavioral recovery | Frozen synthetic forward/reverse/revisit/ambiguity/unequal-quality court, then independent human annotations | Recovery bias, group-effect attenuation, reversal sensitivity, candidate coverage, specificity and uncertainty; frozen tolerances; failures retained | Architectural compliance permits exploratory use; empirical claims require the corresponding recovery evidence. |
-| G4: compiled-film API | Approved D1A S0–S4c, film phase plan/compiler, D1B typed signatures and end-to-end proofs | Existing text pins; exact film support/identity refusals; shared mapping contract; explicit annotation/caption origin | No 1.0 completion by relabeling the annotation preview as film compilation. |
+| G2: usable analysis preview | Typed facade, safe publication, reference + reconstruction views and λ, one Python/R reader (organization readouts: 1.1) | Independently authored tiny answers; no gap bridging/word inflation; all outcomes accounted; offline replay; interruption/corruption refusal | A researcher can run source + recall to interpretable tables without bench imports. Explicitly uncalibrated where applicable. |
+| G3: behavioral recovery (1.1) | Frozen synthetic forward/reverse/revisit/ambiguity/unequal-quality court, then independent human annotations | Recovery bias, group-effect attenuation, reversal sensitivity, candidate coverage, specificity and uncertainty; frozen tolerances; failures retained | Architectural compliance permits exploratory use; empirical claims require the corresponding recovery evidence. |
+| G4: compiled-film API (1.1) | Approved D1A S0–S4c, film phase plan/compiler, D1B typed signatures and end-to-end proofs | Existing text pins; exact film support/identity refusals; shared mapping contract; explicit annotation/caption origin | No 1.0 completion by relabeling the annotation preview as film compilation. |
 | G5: stable delivery | Release evidence, public examples, migration/stability table, runnable CI route | Clean exact-SHA gates with bound totals; docs and consumer replay; resolved readiness | Publish only capabilities actually demonstrated. Superiority and certification are separate claim gates. |
 
 Implementation order:
