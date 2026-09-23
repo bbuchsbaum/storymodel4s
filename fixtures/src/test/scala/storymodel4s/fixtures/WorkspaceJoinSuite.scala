@@ -357,49 +357,81 @@ class WorkspaceJoinSuite extends FunSuite:
   }
 
   test("historical results are contextually decoded and cannot float to changed recall semantics") {
+    // One unit retains its disjoint spans and both targets; the join does not need unrelated rows.
+    val singleRecall = RecallGraph
+      .validated(
+        recall.transcript,
+        recall.atlas,
+        Vector(recall.ordered.head),
+        RecallRelations.empty
+      )
+      .toOption
+      .get
+    val singleInventory = inventoryFor(singleRecall)
+    val singleTiming = timing.filter((id, _) => id == singleRecall.ordered.head.id)
+    def open(records: Vector[WorkspaceMappingInput], r: RecallGraph[Checked] = singleRecall) =
+      create(r = r, inv = singleInventory, records = records, clocks = singleTiming)
     val view = pair._1
     val result = GraphHsmm
       .infer(
-        recall,
+        singleRecall,
         view,
-        Candidates.of(recall.ordered.map(u => u.id -> Vector(target, other)).toMap),
+        Candidates.of(singleRecall.ordered.map(u => u.id -> Vector(target, other)).toMap),
         DefaultLocalCostModel(semantic = SemanticDistance.lexicalJaccard)
       )
       .toOption
       .get
     val historical = HistoricalMapping
-      .of(result, recall, view, inventory, source, HistoricalDecode.ArgmaxOnly)
+      .of(result, singleRecall, view, singleInventory, source, HistoricalDecode.ArgmaxOnly)
       .toOption
       .get
     val input = WorkspaceMappingInput(ArtifactId.unsafe("historical"), historical, Some(result))
-    val opened = create(records = Vector(input)).toOption.get
+    val opened = open(Vector(input)).toOption.get
     assertEquals(opened.policies.head.record.digest, historical.digest)
     assertEquals(opened.policies.head.record.policies.inference, historical.policies.inference)
+    assertEquals(
+      opened.policies.head.matrix.rows.map(_.unit.id),
+      Vector(singleRecall.ordered.head.id)
+    )
     opened.policies.head.matrix.rows.foreach { row =>
       assertEquals(row.cells.flatMap(_.posterior).toMap, result.posterior.row(row.unit.id).get.mass)
     }
     assertEquals(
-      create(records = Vector(input.copy(result = None))),
+      open(Vector(input.copy(result = None))),
       Left(WorkspaceRefusal.SemanticJoinMismatch)
     )
+    val singleRoles = UnitRoles
+      .of(
+        AnalysisGrain.InferenceUnit(singleInventory.segmentation),
+        AnalysisGrain.InferenceUnit(singleInventory.segmentation),
+        AnalysisGrain.Targets(grain)
+      )
+      .toOption
+      .get
+    val raw = MappingResult
+      .checked(singleInventory, source, policies, singleRoles, ledger, Vector(outcomes.head))
+      .toOption
+      .get
+    val rawInput = WorkspaceMappingInput(policyId, raw, None)
+    assert(open(Vector(rawInput)).isRight)
     assertEquals(
-      create(records = Vector(mapping.copy(result = Some(result)))),
+      open(Vector(rawInput.copy(result = Some(result)))),
       Left(WorkspaceRefusal.SemanticJoinMismatch)
     )
-    val changedUnits = recall.ordered.updated(
+    val changedUnits = singleRecall.ordered.updated(
       0,
-      recall.ordered.head.copy(
+      singleRecall.ordered.head.copy(
         proposition =
-          recall.ordered.head.proposition.copy(cause = Some("changed semantic annotation"))
+          singleRecall.ordered.head.proposition.copy(cause = Some("changed semantic annotation"))
       )
     )
     val foreign = RecallGraph
-      .validated(recall.transcript, recall.atlas, changedUnits, recall.relations)
+      .validated(singleRecall.transcript, singleRecall.atlas, changedUnits, singleRecall.relations)
       .toOption
       .get
-    assertEquals(inventoryFor(foreign).digest, inventory.digest)
+    assertEquals(inventoryFor(foreign).digest, singleInventory.digest)
     assertEquals(
-      create(r = foreign, records = Vector(input)),
+      open(Vector(input), r = foreign),
       Left(WorkspaceRefusal.SemanticJoinMismatch)
     )
   }

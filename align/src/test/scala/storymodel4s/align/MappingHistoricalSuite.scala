@@ -144,19 +144,39 @@ class MappingHistoricalSuite extends FunSuite:
     )
   }
   test("Declared and undeclared twins require their own scope and preserve missingness") {
+    // Scope is a per-target contract; one recall unit keeps every target without unrelated rows.
+    val singleRecall = RecallGraph
+      .validated(
+        recall.copy(units = Vector(recall.ordered.head), relations = RecallRelations.empty)
+      )
+      .toOption
+      .get
+    val singleResult = GraphHsmm
+      .infer(singleRecall, view, AnnaFixture.candidates, AnnaFixture.costModel)
+      .toOption
+      .get
     val twin = view.copy(nodes =
       view.nodes.map(
         _.copy(propositional = PropositionalScope.Undeclared(MissingReason.ProviderAbstained))
       )
     )
-    assertEquals(adapt(v = twin).left.toOption, Some(MappingRefusal.BindingMismatch("scopeDigest")))
-    val record = adapt(v = twin, representation = MappingMeasureFixture.source(twin)).toOption.get
+    assertEquals(
+      adapt(singleResult, singleRecall, v = twin).left.toOption,
+      Some(MappingRefusal.BindingMismatch("scopeDigest"))
+    )
+    val record = adapt(
+      singleResult,
+      singleRecall,
+      v = twin,
+      representation = MappingMeasureFixture.source(twin)
+    ).toOption.get
+    assertEquals(record.outcomes.map(_.unit), Vector(singleRecall.ordered.head.id))
     val links =
       record.outcomes.flatMap(_.links).filter(_.destination.isInstanceOf[Destination.Target])
     assert(links.nonEmpty)
     assert(links.forall(_.fidelity.isInstanceOf[FidelityStatus.NotAssessed]))
     assert(
-      adapt().toOption.get.outcomes
+      adapt(singleResult, singleRecall).toOption.get.outcomes
         .flatMap(_.links)
         .exists(_.fidelity.isInstanceOf[FidelityStatus.Assessed])
     )
