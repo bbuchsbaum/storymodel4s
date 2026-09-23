@@ -1,0 +1,61 @@
+{
+  "schema": "wog-author-observations/v1",
+  "issue": "bd-01M35JHB8QV2A8T2WJY4EVR0A2",
+  "author": "codex-storymodel-0923",
+  "working_directory": "/private/tmp/storymodel-wog-codex-0923",
+  "candidate": "10290a125adf600b85cf3fad5535f59f302998ee",
+  "qualification": "Author-reported original commands and process exits from the interactive tool responses. The older log files contain test totals but do not embed command, exit or a clean-tree SHA. This sidecar does not turn those runs into exact-SHA gate receipts.",
+  "runs": [
+    {
+      "name": "baseline",
+      "log": "baseline.log.gz",
+      "raw_log_sha256": "46b09ea6a46bc7dbf2325c461eece5ecac2bda394472fdd969ec52d09bce1690",
+      "archive_sha256": "a9d03ce7fbac28af0694aa79f97be2db213664764abacfce5b18d743d1baf6e5",
+      "sbt_command": "sbt \"documentJVM/testOnly storymodel4s.document.CompilerSuite\" \"pipeline/testOnly storymodel4s.pipeline.StoryBuildSuite\"",
+      "process_exit_observed_by_author": 1,
+      "observed_result": "CompilerSuite 30 passed, 1 failed: explicit abstention remains a gap without blocking promotion; unsupported still blocks. The pipeline task did not run after the first task failed.",
+      "source_binding": {
+        "head_at_run": "b9b23952",
+        "compiler_from_base": "1395ce2c:document/src/main/scala/storymodel4s/document/compiler.scala",
+        "compiler_git_blob": "e8227ee0b577dfe5d04289c50392869d05df7281",
+        "tests": "Uncommitted new assertions before scalafmtAll; no exact tree or test-file hash was captured at invocation.",
+        "exact_tree_sha": null
+      }
+    },
+    {
+      "name": "focused",
+      "log": "focused.log.gz",
+      "raw_log_sha256": "5f817e88f3a6a4fda9ae9782c0c39f2bef680fb7b40a44efb81da9701010a1ff",
+      "archive_sha256": "d8e9e984c148e1ef10fc7efbacd858264fae7ed9b07c5effd32ba9ef097c02e4",
+      "sbt_command": "sbt scalafmtAll \"documentJVM/testOnly storymodel4s.document.CompilerSuite\" \"pipeline/testOnly storymodel4s.pipeline.StoryBuildSuite\"",
+      "process_exit_observed_by_author": 0,
+      "observed_result": "CompilerSuite 31/31 and StoryBuildSuite 21/21 passed, including the offline fifty-recording WOG replay.",
+      "source_binding": {
+        "head_at_run": "b9b23952",
+        "subsequent_commit": "10290a125adf600b85cf3fad5535f59f302998ee",
+        "author_observation": "scalafmtAll ran before both tests in the same sbt process; no source edit was made between that process and the subsequent code/test commit",
+        "compiler_sha256_in_subsequent_commit": "82eafd28a10c98ca1954f1e8042bfa316164c0bd01d23aa6d125009051a64708",
+        "exact_tree_sha_at_invocation": null
+      }
+    },
+    {
+      "name": "mutant",
+      "log": "mutant.log.gz",
+      "raw_log_sha256": "f036ee448480b23246062b9cbdecf0f381ec81e3cd7df67128d81fdc1361a876",
+      "archive_sha256": "b2578ae3060c0b5b78c05f30b0cad19027b41ed5fd3f578e34a58d3593e82ddb",
+      "sbt_command": "sbt \"documentJVM/testOnly storymodel4s.document.CompilerSuite\"",
+      "process_exit_observed_by_author": 1,
+      "observed_result": "CompilerSuite 30 passed, 1 failed: explicit abstention remains a gap without blocking promotion; unsupported still blocks. The three original compiler.required-derivation errors returned.",
+      "source_binding": {
+        "committed_base": "10290a125adf600b85cf3fad5535f59f302998ee",
+        "changed_path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+        "single_replacement_before": "explicitlyAbstainedTargets(gap.target)) =>",
+        "single_replacement_after": "(explicitlyAbstainedTargets(gap.target) && false)) =>",
+        "replacement_count": 1,
+        "mutated_compiler_sha256_reconstructed": "04d6c9f790502c9809077a075c69b6ecae54166b843a9ae7e094b783530ca3d9",
+        "restored_after_run": true,
+        "exact_mutant_tree_sha": null
+      }
+    }
+  ]
+}
