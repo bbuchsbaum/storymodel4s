@@ -142,6 +142,9 @@ private[proposition] final case class CoreReport[NA, NB](
     gateReadings: Set[GateReading],
     matched: Vector[(NA, NB)]
 ):
+  // Every comparison has at least one best reading; an empty set would have none to interpret.
+  require(gateReadings.nonEmpty, "a compare report needs at least one gate reading")
+
   /** Each gate raised in every best reading. A singleton set under [[TiePolicy.Historical]]. */
   def certain: GateReading = gateReadings.reduce(_ & _)
 

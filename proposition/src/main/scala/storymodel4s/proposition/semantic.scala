@@ -142,6 +142,8 @@ final class ContentCompatibilityReport private[proposition] (
     val gateReadings: Set[GateReading],
     val matched: Boolean
 ):
+  require(gateReadings.nonEmpty, "a compare report needs at least one gate reading")
+
   private def certain: GateReading = gateReadings.reduce(_ & _)
 
   /** Role reversal under every best reading. */
