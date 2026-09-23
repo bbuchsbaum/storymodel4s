@@ -1,0 +1,68 @@
+{
+  "landed_revision": "29e85a0c6e0027d0d7b56158321e0b0008a622a3",
+  "status": "landed-with-strict-gate-blocker",
+  "source_binding": "Operator Git note and Fray handoff; raw logs do not themselves record exact argv and source SHA. This archive preserves the evidence and its limitation; it is not a new command-bound full-gate receipt.",
+  "runs": [
+    {
+      "file": "land-checkAll.log.gz",
+      "reported_source_revision": "5daedc277e813c32b1caa9d74267d8262be158df",
+      "purpose": "initial strict run; stopped on unused import",
+      "raw_bytes": 314346,
+      "raw_sha256": "33e2332d11fb29c7c1266eead4943c72ea51587f229ebb35ced6370452d5c4c1",
+      "archive_sha256": "96598f36d82d004b1c6329e975f427081206918987b362b5cd7fb00c279199c8",
+      "test_task_summaries": 52,
+      "totals": {
+        "total": 7943,
+        "failed": 0,
+        "errors": 0,
+        "passed": 7942,
+        "skipped": 1
+      },
+      "gate_exit": 1
+    },
+    {
+      "file": "land2-checkAll.log.gz",
+      "reported_source_revision": "29e85a0c6e0027d0d7b56158321e0b0008a622a3",
+      "purpose": "strict rerun; stopped on MigrationSuite E175 warnings",
+      "raw_bytes": 1053529,
+      "raw_sha256": "56feffb204dcc80d4cf9185ba276b03cc3c56633f27a897d96865bdf24e99ae5",
+      "archive_sha256": "a09dd9b908bddc135b97a2d21e3de62c0d238df4a172d9a2b16d9cf328c9c867",
+      "test_task_summaries": 55,
+      "totals": {
+        "total": 8213,
+        "failed": 0,
+        "errors": 0,
+        "passed": 8208,
+        "skipped": 5
+      },
+      "gate_exit": 1
+    },
+    {
+      "file": "land3-rest.log.gz",
+      "reported_source_revision": "29e85a0c6e0027d0d7b56158321e0b0008a622a3",
+      "purpose": "remaining corpusIntake tests and formatting under standard settings",
+      "raw_bytes": 21982,
+      "raw_sha256": "eb56bc2da0b066f433ca21acf23468bb36233ec09a0599afe9b1575aca2c64fa",
+      "archive_sha256": "0a62219d99fe9cc98915fbb03e50a93bda4b9e1a247654e5381d5c62111a8016",
+      "test_task_summaries": 1,
+      "totals": {
+        "total": 158,
+        "failed": 0,
+        "errors": 0,
+        "passed": 158,
+        "skipped": 0
+      },
+      "gate_exit": 0
+    }
+  ],
+  "combined_final_revision": {
+    "test_tasks": 56,
+    "total": 8371,
+    "passed": 8366,
+    "skipped": 5,
+    "failed": 0,
+    "errors": 0
+  },
+  "strict_gate_blocker": "bd-01M365FPGWS0XTXXNHNPFKGWZ7",
+  "operator_note_correction": "The retained operator Git note labels the strict rerun count as 8213 passed; raw summaries give 8213 total, 8208 passed, 5 skipped. Adding the remaining 158 gives 8371 total, 8366 passed, 5 skipped. The Fray handoff called the combined 8371 a passed count."
+}
