@@ -112,12 +112,22 @@ enum ViewBasis:
     */
   case AlignmentRun
 
+  /** A supplied posterior artifact whose execution provenance is not established here. No
+    * researcher-review, scientific admission or executed-stage authority follows from this basis.
+    */
+  case SuppliedAlignmentArtifact
+  case SuppliedAlignmentSyntheticPresentation
+
   def label: String = this match
     case ValidatedBuild            => "validated build"
     case HumanAdjudicated          => "human-adjudicated model"
     case ResearcherReviewedFixture => "researcher-reviewed narrative acceptance fixture"
     case DraftBuild                => "draft build"
     case AlignmentRun              => "aligner run, raw posterior"
+    case SuppliedAlignmentArtifact =>
+      "supplied alignment artifact with declared presentation clocks; execution provenance and recording correspondence unestablished"
+    case SuppliedAlignmentSyntheticPresentation =>
+      "supplied alignment artifact with synthetic presentation clocks; execution provenance and recording correspondence unestablished"
 
 /** Reproducibility record for a view without pretending a source checksum hashes the full model.
   *
@@ -171,7 +181,9 @@ object ViewProvenance:
       )
     else
       basis match
-        case ViewBasis.ResearcherReviewedFixture | ViewBasis.DraftBuild | ViewBasis.AlignmentRun =>
+        case ViewBasis.ResearcherReviewedFixture | ViewBasis.DraftBuild | ViewBasis.AlignmentRun |
+            ViewBasis.SuppliedAlignmentArtifact |
+            ViewBasis.SuppliedAlignmentSyntheticPresentation =>
           Right(built())
         case ViewBasis.ValidatedBuild | ViewBasis.HumanAdjudicated =>
           modelReceiptChecksum match

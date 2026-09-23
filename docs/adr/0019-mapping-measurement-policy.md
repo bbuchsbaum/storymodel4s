@@ -173,6 +173,92 @@ adds no module, dependency or implemented Scala type. StoryAtlas consumes the sa
 checked queries and exports as Python/R, preserving measure units, missingness and
 semantic identity under zoom, selection and replay.
 
+M1 workspace packet decision (2026-09-22): a joined investigation uses a thin
+`WorkspaceManifest` in `view`, with existing `ArtifactRef`, `ArtifactRole`, `BundlePath`
+and checksum primitives. `WorkspaceRole`, `WorkspaceDisposition`, `WorkspaceEntry` and
+content-free `WorkspaceRefusal` distinguish mandatory source/model, recall, inventory,
+mappings, derivation, capabilities and receipts from optional features. Supplied bytes
+must match every identity exactly; unavailable roles carry no payload. Reject wrapping
+this in `BundleManifest` by inventing an acquisition result or a local-open preview
+certification: that existing manifest describes a story-build output profile.
+`WorkspaceCapabilities` is an explicit, artifact-bound owner declaration with separate
+inspection/export grants, not an authenticated license and never an inference from a
+checksum. Checked scientific joins and permission enforcement remain separate from byte
+admission. This adds no module or dependency and leaves G1 authority reservations intact.
+
+The M1 `MappingMatrix` projection in `view` uses exactly the checked record's declared
+target universe. Its private-construction rows and cells retain every inventory outcome,
+all supplied external destinations, original measure metadata and separate posterior
+fidelity states. Missing values remain absent; literal zero remains zero. Reject a display
+cut that recomputes child or parent values, renormalizes a cropped row, or turns a processing
+failure into an external probability. Presentation selection does not alter this projection.
+
+`WorkspaceArchive` and `WorkspaceArchiveCodec` provide the M1 single-file offline UTF-8
+transport. They verify the manifest and the actual capability artifact before returning
+inspectable contents or serializing a packet. The owner declaration binds exact model,
+recall and declaration-receipt bytes, with no default grants. Unknown/duplicate fields and
+malformed UTF-8 refuse with content-free diagnostics. This is byte and permission admission,
+not the semantic join. Packet serialization is content export and requires the export grant;
+inspection-only admission never licenses packet writing. Reject a permissive generic archive decoder or byte repair; binary
+sidecar transport is outside this first version and needs its own declared encoding.
+
+`WorkspaceCodecs` owns the checked `SourceRecallWorkspace` construction door. Its text
+decoder revalidates the actual model and recall, rebuilds the word inventory and source
+dictionary, contextually decodes each G1 mapping and its optional HSMM result, and checks
+one target cut plus a receipt over every member. `WorkspaceMappingInput` is only unchecked
+packaging input. Structural validation licenses the existing source bridge, not scientific
+completeness: `DraftModel` retains the actual derivation record, gaps and abstentions. This
+version refuses structurally unpromotable source models rather than manufacturing a source
+view. `WorkspaceTiming` preserves untimed, onset-only and interval annotations on each unit;
+`WorkspaceOrigin` records authored-fixture versus imported-artifact provenance. Qualified
+`core.Address` values bind model and recall artifact checksums, independently of mapping
+policy. Exact evidence queries preserve each SpanRef and inverse queries retain repeated
+references. Reject unchecked source dictionaries, local-ID-only joins, estimator execution
+inside decode, inferred recall clocks and silent partial-to-complete promotion.
+
+`WorkspaceSubsetCodec.selected` is the provider-owned deterministic export query. A selected
+source expands to every referring recall row; selected recall rows retain every supplied
+alternative. An empty selection exports zero outcomes. The subset carries the unchanged
+mapping context and original record digest under its own schema, never impersonating a
+complete G1 record. CSV and accessible text retain missingness, measure/scale, processing,
+decision origin and exact evidence. A receipt binds the archive, policy, query, selection and
+all three exported payload digests. Export permission is checked before returning any payload.
+Reject UI-side row arithmetic, selected-only normalization and silent export-all defaults.
+Selected recall evidence retains the tagged recall clock in JSON and the CSV
+`unit_presentation_seconds` column, including explicit untimed and onset-only cases. Clock
+coordinates use the same lossless IEEE-754 encoding as the admitted inventory.
+These are supplied **unit presentation annotations**, tagged
+`declared-unit-presentation/v1` in inventory, subset JSON and CSV. Nonnegative
+binary seconds and closed, possibly zero-width intervals retain the existing view
+convention. They establish no observation basis, clock origin, recording linkage
+or scanner correspondence. They are distinct from exact rational word observations
+in `RecallTiming`; no conversion from its unit summaries is supplied or licensed.
+Lossless encoding preserves a supplied binary value, not an original decimal measurement.
+
+`WorkspaceFixtures` and the JVM-only `writeWorkspaceFixtures` main in the existing
+fixtures module produce the WOG and structurally different bell/clock product courts.
+Authored controls, partial derivation, and optional offline lexical HSMM reconstruction
+retain their distinct authority. The writer takes an explicit producer revision and emits
+byte digests, archives and selected subsets. It adds no process spawning, remote inference,
+public user-file workflow, module or dependency.
+
+The timed M1 Voyage witness adds optional `PresentationClocks` with
+`WorkspaceClockInput` and checked `WorkspaceClocksCodec` admission. It binds exact
+model/recall bytes, inventory and source representation, a complete fixed-cut declared
+source timeline, independent `RecallTiming` word observations, a recall extent and a
+declaration identity. Missing clocks leave ordinary inspection intact. No unit
+presentation annotation is converted to word timing; rational word coordinates remain
+exact and a legacy projection must refuse unrepresentable seconds. Closed source spans
+are declared presentation support, with recording correspondence explicitly unestablished.
+No media, word-duration or scanner authority is inferred.
+
+The legacy Voyage adapter may use only original compatible model-posterior decisions;
+unsupported outcomes retain explicit dispositions in the complete shared inventory.
+`ViewBasis.SuppliedAlignmentArtifact` records unknown execution provenance and has no
+admitted scientific authority. Reject labeling a historical record as an executed stage
+merely because its posterior is contextually bound, or relabeling an incompatible G1
+decision to fit an older Voyage origin.
+
 The first executable clock slice (2026-09-22) is an independent standard-library
 Python intake oracle in `tools/recall-study/recall_clock.py`. Its experimental
 `storymodel4s.sherlock.recall-clock-intake/v1` artifact binds declared lineage and
@@ -219,6 +305,26 @@ Reject changing mapping-record/v0.1, accepting a digest as its own inventory pro
 or letting unknown/null/duplicate fields disappear. Reuse the proven mapping JSON
 printer and duplicate-key scan without changing legacy codecs. Interval union,
 queries and scan transformations remain separate work. No new dependency or module.
+
+M1 legacy projection decision (2026-09-22): `WorkspaceVoyage` adapts only supplied
+model-posterior decisions whose declared argmax agrees with the legacy source
+argmax. Every inventory unit retains a `UnitDisposition`; incompatible decisions,
+failed rows, and unsupported clocks stay in the common matrix and inspector.
+The complete fixed-cut timeline is retained even when a row cannot project.
+`WorkspaceClockOrigin.RecallStart` explicitly binds a supplied clock origin
+reference; unestablished and arbitrary origins remain lawful workspace data but
+do not license the recall-clock axis. `WorkspaceClockKind` distinguishes synthetic
+presentation from other declarations. The emitted document visibly declares
+synthetic clocks through `ViewBasis.SuppliedAlignmentSyntheticPresentation`, or
+uses `SuppliedAlignmentArtifact` for other declared presentation; neither has an
+admitted scientific-authority construction path. Configuration provenance binds
+the original mapping and clock payload. Rejected: promoting unknown historical
+execution to an alignment-run receipt, translating arbitrary decode semantics,
+substituting the first available word for a missing first member, rounding exact
+timestamps, deriving word onset from unit annotations, and calling interval end
+the last word onset. The Bell profile deliberately uses a higher external cost
+to exercise actual source-winning posterior rows; this is a synthetic fixture
+control and establishes no scientific efficacy.
 
 Production intake/support decision (2026-09-22): add the JVM adapter
 `RecallTimingIntake` to `corpus-intake` with a dependency on `recall.jvm`, and connect

@@ -1,0 +1,29 @@
+Source and recall investigation
+Policy: authored-a
+Origin: AuthoredFixture
+Source: promotable; 0 unsatisfied laws (0 violations); 0 derivation gaps
+Inference: Unspecified(Authored synthetic values; no inference executed)
+Candidate coverage: Unknown(Omitted candidate probability is unknown)
+Selection query: selected-recall-and-inverse-source/v1
+Values retain their original measure, scale and normalization. Missing values are not zero.
+
+Recall m1:u0 (ordinal 0)
+Processing: Complete
+Localization: Located
+Supplied unit presentation annotation (seconds; closed interval): Untimed
+Exact recall [0,12): A bell rang.
+Exact recall [57,71): It rang again.
+Exact source sit:bell:sit:quiet [13,39): The clock remained silent.
+Exact source sit:bell:sit:ring [0,12): A bell rang.
+Exact source sit:bell:sit:ring [40,60): The bell rang again.
+
+Complete fixed-cut values (CSV; IEEE-754 value encoding):
+"unit","address","unit_presentation_seconds","destination","measure","channel","state","value_ieee754","scale","direction","normalization","processing","localization","decision_origin","chosen","candidate_coverage"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","seg:bell:story","NotSupplied","","","","","","","Complete","Located","StructuredDecode(authored-second-target)","false","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","sit:bell:sit:quiet","RawScore","authored","","0x3fd999999999999a","synthetic arbitrary units","HigherIsBetter","not-normalized","Complete","Located","StructuredDecode(authored-second-target)","true","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","sit:bell:sit:quiet","NormalizedScoreMass","","","0x3fd0000000000000","normalized-score-mass","","{""prior"":""authored-fixture-mass"",""temperature"":""0x3ff0000000000000"",""universe"":""68c21306c1ba484fe360a180b87bd358aa6da17f55b5c09dbf9ee44c88c5b0de""}","Complete","Located","StructuredDecode(authored-second-target)","true","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","sit:bell:sit:ring","RawScore","authored","","0x3feccccccccccccd","synthetic arbitrary units","HigherIsBetter","not-normalized","Complete","Located","StructuredDecode(authored-second-target)","false","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","sit:bell:sit:ring","NormalizedScoreMass","","","0x3fd0000000000000","normalized-score-mass","","{""prior"":""authored-fixture-mass"",""temperature"":""0x3ff0000000000000"",""universe"":""68c21306c1ba484fe360a180b87bd358aa6da17f55b5c09dbf9ee44c88c5b0de""}","Complete","Located","StructuredDecode(authored-second-target)","false","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","ext:Association","NotSupplied","","","","","","","Complete","Located","StructuredDecode(authored-second-target)","false","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","ext:Intrusion","RawScore","authored","","0x3fc999999999999a","synthetic arbitrary units","HigherIsBetter","not-normalized","Complete","Located","StructuredDecode(authored-second-target)","false","Unknown(Omitted candidate probability is unknown)"
+"m1:u0","workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030","{""semantics"":""declared-unit-presentation/v1"",""status"":""untimed""}","ext:Intrusion","NormalizedScoreMass","","","0x3fe0000000000000","normalized-score-mass","","{""prior"":""authored-fixture-mass"",""temperature"":""0x3ff0000000000000"",""universe"":""68c21306c1ba484fe360a180b87bd358aa6da17f55b5c09dbf9ee44c88c5b0de""}","Complete","Located","StructuredDecode(authored-second-target)","false","Unknown(Omitted candidate probability is unknown)"

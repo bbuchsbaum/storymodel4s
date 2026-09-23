@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "workspace-fixture-answers/v0.1",
+  "fixtures": {
+    "bell": {
+      "first": "sit:bell:sit:ring",
+      "second": "sit:bell:sit:quiet",
+      "recall": [
+        "A bell rang.",
+        "It rang again."
+      ],
+      "source": {
+        "sit:bell:sit:ring": [
+          "A bell rang.",
+          "The bell rang again."
+        ],
+        "sit:bell:sit:quiet": [
+          "The clock remained silent."
+        ]
+      },
+      "target_count": 3,
+      "units": [
+        "m1:u0",
+        "m1:u1",
+        "m1:u2",
+        "m1:u3"
+      ],
+      "voyage": [
+        "Untimed",
+        "Plotted",
+        "Plotted",
+        "Untimed"
+      ],
+      "raw_a": [
+        0.9,
+        0.4,
+        0.2
+      ],
+      "raw_b": [
+        0.1,
+        0.8,
+        0.1
+      ],
+      "mass_a": [
+        0.25,
+        0.25,
+        0.5
+      ],
+      "mass_b": [
+        0.1,
+        0.6,
+        0.3
+      ]
+    },
+    "wog": {
+      "first": "sit:wog:sit:hunt-seals",
+      "second": "sit:wog:sit:hear-war-cries",
+      "recall": [
+        "Two men hunted.",
+        "They heard cries."
+      ],
+      "source": {
+        "sit:wog:sit:hunt-seals": [
+          "One night two young men went to hunt seals."
+        ],
+        "sit:wog:sit:hear-war-cries": [
+          "While they were paddling they heard war-cries."
+        ]
+      },
+      "target_count": 84,
+      "units": [
+        "m1:u0",
+        "m1:u1",
+        "m1:u2",
+        "m1:u3"
+      ],
+      "voyage": [
+        "Unsupported(ClocksNotSupplied)",
+        "Unsupported(ClocksNotSupplied)",
+        "Unsupported(ClocksNotSupplied)",
+        "Unsupported(ClocksNotSupplied)"
+      ],
+      "raw_a": [
+        0.9,
+        0.4,
+        0.2
+      ],
+      "raw_b": [
+        0.1,
+        0.8,
+        0.1
+      ],
+      "mass_a": [
+        0.25,
+        0.25,
+        0.5
+      ],
+      "mass_b": [
+        0.1,
+        0.6,
+        0.3
+      ]
+    }
+  }
+}

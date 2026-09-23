@@ -1,0 +1,70 @@
+{
+  "schemaVersion" : "workspace-fixture-voyage/v0.1",
+  "workspace_sha256" : "a604b0062f7353cece27fe3c552efa8420f4de9a2a1e45a0f25d55b9debc1ef1",
+  "policy" : "historical-lexical",
+  "mapping_digest" : "4d96e65369dd7dfdb066458593972f81e286f8d7a810d671c09619e6ccbd9191",
+  "units" : [
+    {
+      "unit" : "m1:u0",
+      "ordinal" : 0,
+      "disposition" : "Untimed"
+    },
+    {
+      "unit" : "m1:u1",
+      "ordinal" : 1,
+      "disposition" : "Plotted"
+    },
+    {
+      "unit" : "m1:u2",
+      "ordinal" : 2,
+      "disposition" : "Plotted"
+    },
+    {
+      "unit" : "m1:u3",
+      "ordinal" : 3,
+      "disposition" : "Untimed"
+    }
+  ],
+  "addresses" : [
+    {
+      "legacy" : "align/cell/m1:u1/situation/bell:sit:ring",
+      "qualified" : [
+        "workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750031",
+        "workspace/source-situation/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/00620065006c006c003a007300690074003a00720069006e0067"
+      ]
+    },
+    {
+      "legacy" : "align/cell/m1:u2/situation/bell:sit:ring",
+      "qualified" : [
+        "workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750032",
+        "workspace/source-situation/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/00620065006c006c003a007300690074003a00720069006e0067"
+      ]
+    },
+    {
+      "legacy" : "recall/unit/m1:u0",
+      "qualified" : [
+        "workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750030"
+      ]
+    },
+    {
+      "legacy" : "recall/unit/m1:u1",
+      "qualified" : [
+        "workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750031",
+        "workspace/source-situation/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/00620065006c006c003a007300690074003a00710075006900650074"
+      ]
+    },
+    {
+      "legacy" : "recall/unit/m1:u2",
+      "qualified" : [
+        "workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750032",
+        "workspace/source-situation/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/00620065006c006c003a007300690074003a00710075006900650074"
+      ]
+    },
+    {
+      "legacy" : "recall/unit/m1:u3",
+      "qualified" : [
+        "workspace/recall-unit/90ef6744f39b0bf623986522f823b93aa7f8ea02e7241e06208c7828bbeee7b4/9c2f3a043ac984fc2e531746df29fad4e01f7514684d90b42b145bd9b0b8511f/006d0031003a00750033"
+      ]
+    }
+  ]
+}
