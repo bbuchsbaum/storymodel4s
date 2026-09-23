@@ -480,8 +480,8 @@ class StoryBuildSuite extends FunSuite:
       Map("op1" -> 15, "op2" -> 15, "snt1" -> 1, "snt2" -> 1)
     )
 
-    // The three errors are the one abstained anchor and nothing else: the situation, context and
-    // membership families have no proposal there and are required derivations. The gaps are
+    // The three required-family gaps belong to the one explicitly abstained anchor; no claim is
+    // emitted there. The gaps are
     // those four plus the open references of ADR 0012: 26 pronouns that no rule could tie to one
     // entity (22 with several candidates, 4 first- or second-person), the 27 participant edges
     // they would have filled, and the 26 situation coverages those edges belong to.
@@ -530,9 +530,9 @@ class StoryBuildSuite extends FunSuite:
         "ParticipantCoverage" -> 27
       )
     )
-    assertEquals(summary.errors, 3)
+    assertEquals(summary.errors, 0)
     assertEquals(summary.warnings, 0)
-    assertEquals(summary.validated, false)
+    assertEquals(summary.validated, true)
     assertEquals(
       rows(report, "validation", "violations")
         .map(row => field(row, "law") -> field(row, "severity"))
@@ -540,11 +540,24 @@ class StoryBuildSuite extends FunSuite:
         .view
         .mapValues(_.size)
         .toMap,
-      Map(("compiler.required-derivation", "error") -> 3)
+      Map.empty[(String, String), Int]
+    )
+    val record = derivation(summary)
+    assert(record.coverage.exists {
+      case storymodel4s.document.SentenceCoverage.Abstained(anchor, _) =>
+        anchor.sentence.value == s"$WogStory:s43"
+      case _ => false
+    })
+    assertEquals(
+      record.gaps.count(g =>
+        g.target.render.contains(s"$WogStory:s43") &&
+          Set("SituationMention", "ContextAssignment", "SegmentMembership")(g.family.toString)
+      ),
+      3
     )
     // Complete, not Incomplete: the exit status reports whether every sentence reached the court,
-    // and every one of the fifty did. That the draft does not validate is what `validated` and the
-    // three required-derivation errors say.
+    // and every one of the fifty did. The typed s43 absence stays in the derivation record even
+    // though the emitted model validates.
     assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
 
     // Which closed admission rule produced each root. This is the one assertion that names the
@@ -1473,12 +1486,11 @@ class StoryBuildSuite extends FunSuite:
       1
     )
     // The summary's absence is recorded where it belongs, on the root segment (ADR 0005 §10):
-    // the segment is derived from its members and does not wait for a description. So the
-    // untitled build fails to promote for the same three errors as the titled one, the abstained
-    // sentence's, and none of them is about the summary. The fix for the gap itself is still a
-    // summary rule that reads the story.
-    assertEquals(summary.validated, false)
-    assertEquals(summary.errors, 3)
+    // the segment is derived from its members and does not wait for a description. Neither the
+    // missing title nor the explicitly abstained sentence blocks promotion of the emitted model.
+    // The fix for the summary gap itself is still a rule that reads the story.
+    assertEquals(summary.validated, true)
+    assertEquals(summary.errors, 0)
     val decoded = StoryModelCodec
       .decode(read(summary.files.model))
       .fold(error => fail(error.toString), identity)

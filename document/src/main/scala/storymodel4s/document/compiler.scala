@@ -2209,8 +2209,15 @@ object NarrativeCompiler:
       ClaimFamily.SegmentMembership,
       ClaimFamily.DiscourseTrajectory
     )
+    val explicitlyAbstainedTargets: Set[NarrativeCandidateAddress] =
+      contextRecords.filter(r => explicitlyAbstained(r.bundle)).map(_.target).toSet ++
+        situationRecords.filter(r => explicitlyAbstained(r.bundle)).map(_.target) ++
+        membershipRecords.filter(r => explicitlyAbstained(r.bundle)).map(_.target)
     val compilerViolations = gapVec.collect {
-      case gap if promotionBlockingFamilies(gap.family) =>
+      case gap
+          if promotionBlockingFamilies(gap.family) &&
+            !(gap.reason == DerivationGapReason.Unresolved(ResolutionFailure.NoProposal) &&
+              explicitlyAbstainedTargets(gap.target)) =>
         Violation(
           "compiler.required-derivation",
           storymodel4s.story.Severity.Error,
@@ -2547,6 +2554,10 @@ object NarrativeCompiler:
   ): DerivationGap =
     val evidence = bundle.proposals.flatMap(_.evidence).distinctBy(_.evidenceId)
     DerivationGap(Stage, family, target, reason, upstream, evidence)
+
+  private def explicitlyAbstained[A](bundle: EvidenceBundle[A]): Boolean =
+    bundle.proposals.nonEmpty &&
+      bundle.proposals.forall(_.disposition == ProposalDisposition.Abstained)
 
   private def gapReason(state: ResolutionState[?]): DerivationGapReason = state match
     case ResolutionState.Alternatives(_)   => DerivationGapReason.Alternatives
