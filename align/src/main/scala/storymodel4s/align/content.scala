@@ -35,8 +35,11 @@ final class UnitContent[O <: GraphOrder] private[align] (
     val outcome: Option[String],
     val sensoryTerms: Vector[String],
     val lemmas: Set[String],
-    val graph: Option[SemanticGraph[O]]
+    graphOf: => Option[SemanticGraph[O]]
 ):
+  /** The chart as a graph; projected on first read, since several scorers never read it. */
+  lazy val graph: Option[SemanticGraph[O]] = graphOf
+
   def byRole(role: SketchRole): Option[ParticipantContent] = participants.find(_.role == role)
 
   private def parts: Product =
@@ -74,9 +77,12 @@ final class TargetContent[O <: GraphOrder] private[align] (
     val outcome: Option[String],
     val lemmas: Set[String],
     val hasEvidence: Boolean,
-    val graph: Option[SemanticGraph[O]],
+    graphOf: => Option[SemanticGraph[O]],
     val members: Members[O]
 ):
+  /** The chart as a graph; projected on first read, since several scorers never read it. */
+  lazy val graph: Option[SemanticGraph[O]] = graphOf
+
   def isLeaf: Boolean = level == 0
   def byRole(role: SketchRole): Option[ParticipantContent] = participants.find(_.role == role)
 
@@ -217,7 +223,7 @@ object ContentProjection:
   private def unitOf[O <: GraphOrder](
       unit: RecallUnit,
       sorted: Boolean,
-      g: Option[SemanticGraph[O]]
+      g: => Option[SemanticGraph[O]]
   ): UnitContent[O] =
     val s = unit.proposition
     new UnitContent[O](
@@ -235,7 +241,7 @@ object ContentProjection:
   private def targetOf[O <: GraphOrder](
       n: NodeSummary,
       sorted: Boolean,
-      g: Option[SemanticGraph[O]],
+      g: => Option[SemanticGraph[O]],
       members: Members[O]
   ): TargetContent[O] =
     new TargetContent[O](
