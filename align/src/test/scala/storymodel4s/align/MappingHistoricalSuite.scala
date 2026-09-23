@@ -200,13 +200,27 @@ class MappingHistoricalSuite extends FunSuite:
     }
   }
   test("a supplied in-support decode remains StructuredDecode") {
-    val choices = result.posterior.rows
+    val singleRecall = RecallGraph
+      .validated(
+        recall.copy(units = Vector(recall.ordered.head), relations = RecallRelations.empty)
+      )
+      .toOption
+      .get
+    val singleResult = GraphHsmm
+      .infer(singleRecall, view, AnnaFixture.candidates, AnnaFixture.costModel)
+      .toOption
+      .get
+    val choices = singleResult.posterior.rows
       .map(row => row.unit -> row.mass.keys.toVector.flatMap(_.anchor).sorted.headOption)
       .toMap
-    val record =
-      adapt(decode = HistoricalDecode.Decoded(choices, "synthetic-decoder/v1")).toOption.get
-    assert(choices.values.exists(_.nonEmpty))
-    record.outcomes.filter(r => choices(r.unit).nonEmpty).foreach { row =>
+    val record = adapt(
+      singleResult,
+      singleRecall,
+      decode = HistoricalDecode.Decoded(choices, "synthetic-decoder/v1")
+    ).toOption.get
+    assertEquals(record.outcomes.map(_.unit), Vector(singleRecall.ordered.head.id))
+    assert(choices(singleRecall.ordered.head.id).nonEmpty)
+    record.outcomes.foreach { row =>
       assert(row.decision.get.origin.isInstanceOf[DecisionOrigin.StructuredDecode])
       val chosen = row.decision.get.chosen.get
       val expected = row.measures.posterior.get.mass.collectFirst {

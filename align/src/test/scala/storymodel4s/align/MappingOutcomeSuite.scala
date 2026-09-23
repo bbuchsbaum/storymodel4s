@@ -347,14 +347,15 @@ class MappingOutcomeSuite extends FunSuite:
     val measure = UnitMeasures.of(Vector(own), None, None, None).toOption.get
     val basis = DecisionBasis.of(MeasureKind.RawScore, Some(own.channel)).toOption.get
     val candidateId = CandidateSetId.of(stages.candidates, second, own.values.keySet)
-    def linksFrom(id: RecallUnitId) = derivedResult.costs(id).keys.toVector.map { state =>
+    val source = MappingMeasureFixture.source(MappingMeasureFixture.view)
+    def linkFrom(id: RecallUnitId, state: AlignState) =
       MappingLink
         .fromResult(
           derivedResult,
           binding,
           MappingMeasureFixture.recall,
           MappingMeasureFixture.view,
-          MappingMeasureFixture.source(MappingMeasureFixture.view),
+          source,
           id,
           state,
           stages,
@@ -362,9 +363,21 @@ class MappingOutcomeSuite extends FunSuite:
         )
         .toOption
         .get
-    }
+    val states = derivedResult.costs(second).keys.toVector
+    val ownLinks = states.map(linkFrom(second, _))
+    val targetIndex = states.indexWhere(_.anchor.nonEmpty)
+    assert(targetIndex >= 0)
+    assertNotEquals(first, second)
+    val foreignLink = linkFrom(first, states(targetIndex))
+    assertEquals(foreignLink.destination, ownLinks(targetIndex).destination)
+    assertEquals(foreignLink.candidateSet, ownLinks(targetIndex).candidateSet)
+    assertEquals(foreignLink.derivation.asInstanceOf[MeasureDerivation.FromResult].unit, first)
+    assertEquals(
+      ownLinks(targetIndex).derivation.asInstanceOf[MeasureDerivation.FromResult].unit,
+      second
+    )
     assert(
-      computedDerived(second, measure, basis, own.values.keySet, Some(linksFrom(second))).isRight
+      computedDerived(second, measure, basis, own.values.keySet, Some(ownLinks)).isRight
     )
     assertEquals(
       computedDerived(
@@ -372,7 +385,7 @@ class MappingOutcomeSuite extends FunSuite:
         measure,
         basis,
         own.values.keySet,
-        Some(linksFrom(first))
+        Some(ownLinks.updated(targetIndex, foreignLink))
       ).left.toOption,
       Some(MappingRefusal.BindingMismatch("outcome.unit"))
     )
