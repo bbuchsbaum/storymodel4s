@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T18:56:15.470261+00:00",
+  "finished_utc": "2026-09-23T18:56:16.358105+00:00",
+  "duration_seconds": 0.887759,
+  "command": [
+    "env",
+    "-u",
+    "STORYMODEL4S_GRAKERN_BUILD",
+    "sbt",
+    "-batch",
+    "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+    "set ThisBuild / tlFatalWarnings := true",
+    "amrInteropJVM/test"
+  ],
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "log": "/private/tmp/admissibility-amr-jvm-2981b6b0.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 1377
+}

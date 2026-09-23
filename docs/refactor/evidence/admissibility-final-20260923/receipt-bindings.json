@@ -1,0 +1,36 @@
+{
+  "final_source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+  "receipts": {
+    "author280a9931-unaffected-tasks": {
+      "source_sha": "280a993143069571573a4a25bf1f9a886171f946",
+      "expected_raw_sha256": "d6a21337a17857bb430bce8b53faaa7da841324d2f926c7b0e87a45d310ebb06",
+      "source_binding": "Raw log records SHA, clean tree, task argv and dependency override; independent source-diff review.",
+      "reuse_reason": "Only unchanged successful tasks; exclude changed align/fixtures/media and both grakern consumers."
+    },
+    "pinned713d0175": {
+      "source_sha": "713d0175a0da26b99285cbcbc0a46197a311b78e",
+      "expected_raw_sha256": "a2aa202d1402d955fe917f0a80024bc08e13278cd3ceb7914433c42111fa9e3f",
+      "source_binding": "pinned-jvm-qualification.json records clean before/after inputs.",
+      "reuse_reason": "Only later changes are three test files and documentation; no production/build delta."
+    },
+    "fixture-jvm2981b6b0": {
+      "source_sha": "2981b6b09eea888c0bebf8ab2c47f11ee3ccff26",
+      "expected_raw_sha256": "479c93e6caa2797545f9bc86d7c4be8c3f1a72a0d177506d8fb0d403ed5f38a8",
+      "source_binding": "Run followed committed2981b6b0; clean clone observed; explicit argv/exit metadata.",
+      "reuse_reason": "Select fixturesJVM only; its sources are unchanged afterward."
+    },
+    "fixture-jvm27033f47": {
+      "source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+      "expected_raw_sha256": "e848dcfa7dfa189d33acf8c62222c4b9dcb594a46096091bd830f93aab9f66b5",
+      "source_binding": "Formatted test source was committed without subsequent edits as27033f47 after this run. The separate cold review checked that exact commit; post-mutation restoration was checked clean.",
+      "reuse_reason": ""
+    },
+    "platforms27033f47": {
+      "source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+      "source_tree": "6e219054626ee264f8cb13e881d89dd24c21fb0b",
+      "expected_raw_sha256": "73460fe528eee54be60f76bb5eee8804c6ad840cc4da7b35fe6e5026eb91328b",
+      "source_binding": "Clean exact27033f47 observed before and after the run; no untracked Scala or sbt files. Explicit argv, raw totals and zero actual exit retained.",
+      "reuse_reason": ""
+    }
+  }
+}

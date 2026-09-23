@@ -1,0 +1,41 @@
+{
+  "candidate": "c9522693838152443a0a871c16fcc2df47e593d1",
+  "base": "b6f4887115a57daef100c5c1394c078e73c25987",
+  "tested": "23f35516",
+  "mergeTree": "0cdd580a70b6f61b652eb65e1f4525b86d777fe5",
+  "main": "eb5463b35bb54b763cb4807975925db564533405",
+  "additionalPaths": [
+    ".mote/ops/20260923T120817.911808Z-p91216-c0000-rc2b1-h0bf53c.json",
+    ".mote/ops/20260923T120822.816802Z-p91216-c0001-rcf09-hf7a7bf.json",
+    ".mote/ops/20260923T120828.028422Z-p91216-c0002-rb9b4-h7d6750.json",
+    ".mote/ops/20260923T120833.289913Z-p91216-c0003-r4b3e-h37eba6.json",
+    ".mote/ops/20260923T125409.035563Z-p20036-c0000-r75ae-hd4b8d5.json",
+    ".mote/ops/20260923T130645.368638Z-p49587-c0000-rf864-h72b353.json",
+    ".mote/ops/20260923T142732.894519Z-p5819-c0000-r06eb-hca2d2f.json",
+    ".mote/ops/20260923T142744.022609Z-p6100-c0000-r87b6-h83a8bf.json",
+    ".mote/ops/20260923T142813.407467Z-p6758-c0000-rfa1f-hf51956.json",
+    ".mote/ops/20260923T142823.213657Z-p7033-c0000-rfde2-he0c323.json",
+    ".mote/ops/20260923T144609.795413Z-p51696-c0000-rd1ff-hb1fcc3.json",
+    ".mote/ops/20260923T144615.920238Z-p51696-c0001-rc025-hd09933.json",
+    ".mote/ops/20260923T144625.697142Z-p51696-c0002-r9b10-heaee1d.json",
+    ".mote/ops/20260923T144635.619228Z-p51696-c0003-re83a-h2f8d40.json",
+    ".mote/ops/20260923T144718.683949Z-p58011-c0000-r1c03-hbb15c3.json",
+    ".mote/ops/20260923T144730.778189Z-p58011-c0001-r36e7-h49329d.json",
+    ".mote/ops/20260923T144737.225578Z-p58011-c0002-rc81d-h4e0fe1.json",
+    ".mote/ops/20260923T144742.446314Z-p58011-c0003-r3d1f-hae926b.json",
+    ".mote/ops/20260923T145210.059824Z-p87457-c0000-re4c0-h7e2a3d.json",
+    ".mote/ops/20260923T145455.069805Z-p97800-c0000-r998a-hcc114f.json",
+    ".mote/ops/20260923T145508.921845Z-p99352-c0000-r559d-h6aa1d8.json",
+    ".mote/ops/20260923T145520.828941Z-p99954-c0000-r5d3d-h84f66f.json",
+    ".mote/ops/20260923T145530.356188Z-p0420-c0000-r2131-h814336.json"
+  ],
+  "gate": {
+    "total": 63,
+    "passed": 60,
+    "skipped": 3,
+    "failed": 0,
+    "testExit": 0,
+    "formatExit": 0
+  },
+  "independentReview": "p1_cleanup_review GO c9522693"
+}

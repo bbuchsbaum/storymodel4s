@@ -1,0 +1,521 @@
+{
+  "schema": "storymodel4s.scoped-qualification.v1",
+  "source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+  "qualification": "composed task coverage, not one full checkAll run; source equivalence separately reviewed",
+  "task_count": 51,
+  "totals": {
+    "total": 8308,
+    "passed": 8303,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "tasks": {
+    "acquireJS/test": {
+      "total": 138,
+      "passed": 138,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "acquireJVM/test": {
+      "total": 138,
+      "passed": 138,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "acquireNative/test": {
+      "total": 138,
+      "passed": 138,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "alignJS/test": {
+      "total": 522,
+      "passed": 522,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "alignJVM/test": {
+      "total": 525,
+      "passed": 525,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "fixture-jvm27033f47"
+    },
+    "alignNative/test": {
+      "total": 522,
+      "passed": 522,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "amrInteropJS/test": {
+      "total": 92,
+      "passed": 92,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "amrInteropJVM/test": {
+      "total": 92,
+      "passed": 92,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "fixture-jvm27033f47"
+    },
+    "amrInteropNative/test": {
+      "total": 92,
+      "passed": 92,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "codecJS/test": {
+      "total": 317,
+      "passed": 317,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "codecJVM/test": {
+      "total": 318,
+      "passed": 318,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "codecNative/test": {
+      "total": 317,
+      "passed": 317,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "coreJS/test": {
+      "total": 250,
+      "passed": 250,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "coreJVM/test": {
+      "total": 250,
+      "passed": 250,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "coreNative/test": {
+      "total": 250,
+      "passed": 250,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "corpusIntake/test": {
+      "total": 158,
+      "passed": 158,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "corpusJS/test": {
+      "total": 114,
+      "passed": 114,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "corpusJVM/test": {
+      "total": 114,
+      "passed": 114,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "corpusNative/test": {
+      "total": 114,
+      "passed": 114,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "documentJS/test": {
+      "total": 186,
+      "passed": 186,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "documentJVM/test": {
+      "total": 189,
+      "passed": 189,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "documentNative/test": {
+      "total": 186,
+      "passed": 186,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "embedBench/test": {
+      "total": 140,
+      "passed": 139,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 1,
+      "status": "Passed",
+      "receipt": "pinned713d0175"
+    },
+    "embedCoreJS/test": {
+      "total": 144,
+      "passed": 144,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "embedCoreJVM/test": {
+      "total": 144,
+      "passed": 144,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "embedCoreNative/test": {
+      "total": 144,
+      "passed": 144,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "embedGrakern/test": {
+      "total": 28,
+      "passed": 28,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "pinned713d0175"
+    },
+    "fixturesJS/test": {
+      "total": 160,
+      "passed": 160,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "fixturesJVM/test": {
+      "total": 165,
+      "passed": 165,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "fixture-jvm2981b6b0"
+    },
+    "fixturesNative/test": {
+      "total": 160,
+      "passed": 160,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "interviewJS/test": {
+      "total": 104,
+      "passed": 104,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "interviewJVM/test": {
+      "total": 104,
+      "passed": 104,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "interviewNative/test": {
+      "total": 104,
+      "passed": 104,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "lawsJS/test": {
+      "total": 115,
+      "passed": 115,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "lawsJVM/test": {
+      "total": 115,
+      "passed": 115,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "lawsNative/test": {
+      "total": 115,
+      "passed": 115,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "media/test": {
+      "total": 63,
+      "passed": 60,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 3,
+      "status": "Passed",
+      "receipt": "pinned713d0175"
+    },
+    "pipeline/test": {
+      "total": 120,
+      "passed": 120,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "propositionJS/test": {
+      "total": 51,
+      "passed": 51,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "propositionJVM/test": {
+      "total": 51,
+      "passed": 51,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "propositionNative/test": {
+      "total": 51,
+      "passed": 51,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "providerAgent/test": {
+      "total": 77,
+      "passed": 76,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 1,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "recallJS/test": {
+      "total": 77,
+      "passed": 77,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "recallJVM/test": {
+      "total": 77,
+      "passed": 77,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "recallNative/test": {
+      "total": 77,
+      "passed": 77,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "storyJS/test": {
+      "total": 167,
+      "passed": 167,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "storyJVM/test": {
+      "total": 167,
+      "passed": 167,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "storyNative/test": {
+      "total": 167,
+      "passed": 167,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    },
+    "viewJS/test": {
+      "total": 133,
+      "passed": 133,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "viewJVM/test": {
+      "total": 133,
+      "passed": 133,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "author280a9931-unaffected-tasks"
+    },
+    "viewNative/test": {
+      "total": 133,
+      "passed": 133,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "status": "Passed",
+      "receipt": "platforms27033f47"
+    }
+  },
+  "receipts": [
+    {
+      "label": "author280a9931-unaffected-tasks",
+      "path": "admissibility-seal-20260923/slice-gate-280a9931.log.gz",
+      "raw_sha256": "d6a21337a17857bb430bce8b53faaa7da841324d2f926c7b0e87a45d310ebb06",
+      "completed_summaries": 36,
+      "source_sha": "280a993143069571573a4a25bf1f9a886171f946",
+      "source_binding": "Raw log records SHA, clean tree, task argv and dependency override; independent source-diff review.",
+      "reuse_reason": "Only unchanged successful tasks; exclude changed align/fixtures/media and both grakern consumers."
+    },
+    {
+      "label": "pinned713d0175",
+      "path": "admissibility-final-20260923/pinned-jvm.log.gz",
+      "raw_sha256": "a2aa202d1402d955fe917f0a80024bc08e13278cd3ceb7914433c42111fa9e3f",
+      "completed_summaries": 3,
+      "source_sha": "713d0175a0da26b99285cbcbc0a46197a311b78e",
+      "source_binding": "pinned-jvm-qualification.json records clean before/after inputs.",
+      "reuse_reason": "Only later changes are three test files and documentation; no production/build delta."
+    },
+    {
+      "label": "fixture-jvm2981b6b0",
+      "path": "admissibility-final-20260923/admissibility-fixture-jvm-2981b6b0.log.gz",
+      "raw_sha256": "479c93e6caa2797545f9bc86d7c4be8c3f1a72a0d177506d8fb0d403ed5f38a8",
+      "completed_summaries": 2,
+      "source_sha": "2981b6b09eea888c0bebf8ab2c47f11ee3ccff26",
+      "source_binding": "Run followed committed2981b6b0; clean clone observed; explicit argv/exit metadata.",
+      "reuse_reason": "Select fixturesJVM only; its sources are unchanged afterward."
+    },
+    {
+      "label": "fixture-jvm27033f47",
+      "path": "admissibility-final-20260923/admissibility-fixture-second-jvm.log.gz",
+      "raw_sha256": "e848dcfa7dfa189d33acf8c62222c4b9dcb594a46096091bd830f93aab9f66b5",
+      "completed_summaries": 2,
+      "source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+      "source_binding": "Formatted test source was committed without subsequent edits as27033f47 after this run. The separate cold review checked that exact commit; post-mutation restoration was checked clean.",
+      "reuse_reason": ""
+    },
+    {
+      "label": "platforms27033f47",
+      "path": "admissibility-final-20260923/admissibility-final-platforms-27033f47.log.gz",
+      "raw_sha256": "73460fe528eee54be60f76bb5eee8804c6ad840cc4da7b35fe6e5026eb91328b",
+      "completed_summaries": 17,
+      "source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+      "source_binding": "Clean exact27033f47 observed before and after the run; no untracked Scala or sbt files. Explicit argv, raw totals and zero actual exit retained.",
+      "reuse_reason": ""
+    }
+  ]
+}

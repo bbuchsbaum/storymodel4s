@@ -1,0 +1,9 @@
+{
+  "observed_utc": "2026-09-23T19:14:59.153949+00:00",
+  "java_processes": [
+    "39921 39845   0.0       05:29 /usr/bin/java",
+    "50173 50169 279.6       00:03 /usr/bin/java",
+    "90346     1   0.0 02-07:20:52 /usr/bin/java"
+  ],
+  "qualification": "Point observation after six Native module tasks, not continuous isolation proof."
+}

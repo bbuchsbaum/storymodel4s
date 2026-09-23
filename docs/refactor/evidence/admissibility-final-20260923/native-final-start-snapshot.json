@@ -1,0 +1,10 @@
+{
+  "observed_utc": "2026-09-23T19:27:14.075628+00:00",
+  "java_processes": [
+    "39921 39845   0.0       17:44 /usr/bin/java",
+    "78697 78696 405.5       00:24 /usr/bin/java",
+    "90346     1   0.0 02-07:33:07 /usr/bin/java"
+  ],
+  "phase": "alignNative begins after15successful task summaries",
+  "qualification": "Point observation, not continuous isolation proof."
+}

@@ -1,0 +1,54 @@
+{
+  "admissibility-fixture-jvm-2981b6b0.log.gz": {
+    "raw_sha256": "479c93e6caa2797545f9bc86d7c4be8c3f1a72a0d177506d8fb0d403ed5f38a8",
+    "gzip_sha256": "074d14e04e9f570757e550a7f7592a9c843e4c74e5a457d81114bbe8a9c9ce90"
+  },
+  "admissibility-fixture-scope-binding-omitted.log.gz": {
+    "raw_sha256": "548897ac8c0091f3197b3ff4fe6564ca742256d2eb19d6103cda59deb929a497",
+    "gzip_sha256": "d2db9c9a942ed2e57156b5a2f01be5976472c6636c5c2d70444c14f7866abe47"
+  },
+  "admissibility-fixture-semantic-cause-omitted.log.gz": {
+    "raw_sha256": "a6f0ca1c576f7a762cecb9fdea01adaa48d190c199ebff54e1f162bfff3015d5",
+    "gzip_sha256": "73b648876b0aa1e22229638637d9353be05eb0f905e29f38d6e8598175e55b6e"
+  },
+  "admissibility-fixture-foreign-neutralized.log.gz": {
+    "raw_sha256": "df43fac59b8dba8c0431f5856cde089e1e496b6aa2d6d599490e9af8ca9771a5",
+    "gzip_sha256": "25b030e7b7f423f7160ecc2d531a1fa68ae33b35b1b28b6443eb1e4988d8bb8b"
+  },
+  "admissibility-fixture-restored.log.gz": {
+    "raw_sha256": "a93ac233bc23f93407ac512f8778d9bf0145052d680ef5bc4881a397b728faba",
+    "gzip_sha256": "6011a20d16e66916cb92be489197f9b309bc2e9252ab3a6b617b4121c99d9a7d"
+  },
+  "admissibility-final-platforms-2981b6b0.log.gz": {
+    "raw_sha256": "592090f6e7f6967d9c27d2bb8e36b0d40814ff6b1b5718efaf20e859090729ff",
+    "gzip_sha256": "e58bd208fb2a4170d89a6fef2e21772b2d041f43b8ff5e3960fc9244ad974329"
+  },
+  "admissibility-amr-jvm-2981b6b0.log.gz": {
+    "raw_sha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b",
+    "gzip_sha256": "c9633d987d63831ae67a28e866d27d4eb52e49b815f53f32de02e981d8182e5c"
+  },
+  "admissibility-platform-followup-2981b6b0.log.gz": {
+    "raw_sha256": "fcdca0e15b0949fb0570f92b99bada690aef2c3bfc54a89cae05b36cf3af6b06",
+    "gzip_sha256": "593cd0b04b1a126ade8e3f02676c15ba8998e41a36efbf89c10f98c2d42b943e"
+  },
+  "admissibility-fixture-second-jvm.log.gz": {
+    "raw_sha256": "e848dcfa7dfa189d33acf8c62222c4b9dcb594a46096091bd830f93aab9f66b5",
+    "gzip_sha256": "90eca7cb1314721e2198d1261310606c998edbd4d884c0ae1f07907cb7ed161f"
+  },
+  "admissibility-fixture-second-foreign-link-guard-omitted.log.gz": {
+    "raw_sha256": "339b4e3b066801e1c7595d7a50f350f8b007e5275b5b1d88df11d53fa87aeb07",
+    "gzip_sha256": "f1b387ded8d9201d44c228fca048acb32cfc85489a73ebd5308f0bbce1091d07"
+  },
+  "admissibility-fixture-second-supported-decode-as-gapfill.log.gz": {
+    "raw_sha256": "99c9773eec80461ccb974f0ff69decb8844f39b5ebe2ca1b1e02d2b14b0fc0be",
+    "gzip_sha256": "7bf65cbbe41759e08c73a49c69de4308a7d5eed68e364ab1cc323040c3d29fb2"
+  },
+  "admissibility-fixture-second-restored.log.gz": {
+    "raw_sha256": "a4881d4384186d5e5cfcdb030473ce9ed510f4a722b662737308c131591d2cbf",
+    "gzip_sha256": "82dd56d66bc48620f837204421c6f6fc246b2d948d3a05d7c5a6cb26c8988ff9"
+  },
+  "admissibility-final-platforms-27033f47.log.gz": {
+    "raw_sha256": "73460fe528eee54be60f76bb5eee8804c6ad840cc4da7b35fe6e5026eb91328b",
+    "gzip_sha256": "a8c89de06d62c81aef360a8c53d2aaad710044553e78e38b4bfaf032f353b017"
+  }
+}

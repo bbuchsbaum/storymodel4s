@@ -1,0 +1,18 @@
+{
+  "main_before": "85e29c358ce101f6bc9230b8738fb7a43c5dfe38",
+  "candidate": "27033f4725c99c7146219697db1ed73280af66a8",
+  "merge_tree": "8af7cadc0a79b9686f16dbeaa26eb4973b9868f4",
+  "delta_from_tested_candidate": [
+    ".mote/ops/20260923T183131.750908Z-p90226-c0000-r0d94-h679d85.json",
+    ".mote/ops/20260923T190818.032358Z-p36354-c0000-r8013-h151ecb.json",
+    ".mote/ops/20260923T190828.121439Z-p36354-c0001-rf831-hf8c3b0.json",
+    "docs/refactor/PLAN.md",
+    "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/README.md",
+    "docs/refactor/evidence/review-receipts-20260923/README.md",
+    "docs/refactor/evidence/review-receipts-20260923/offline-text-source-b52b26a0/Diff.java",
+    "docs/refactor/evidence/review-receipts-20260923/offline-text-source-b52b26a0/RECEIPT.md",
+    "docs/refactor/evidence/review-receipts-20260923/offline-text-source-b52b26a0/coreJVM-TextSourceSuite.log",
+    "docs/refactor/evidence/review-receipts-20260923/offline-text-source-ee076a47/Canon2.java"
+  ],
+  "all_delta_is_docs_or_mote": true
+}

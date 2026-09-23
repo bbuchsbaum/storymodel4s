@@ -1,0 +1,56 @@
+[
+  {
+    "mutant": "foreign-link-guard-omitted",
+    "exit": 1,
+    "seconds": 45.02857708930969,
+    "log": "/private/tmp/admissibility-fixture-second-foreign-link-guard-omitted.log",
+    "command": [
+      "env",
+      "-u",
+      "STORYMODEL4S_GRAKERN_BUILD",
+      "sbt",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingOutcomeSuite"
+    ],
+    "source_sha": "27033f4725c99c7146219697db1ed73280af66a8"
+  },
+  {
+    "mutant": "supported-decode-as-gapfill",
+    "exit": 1,
+    "seconds": 53.31508731842041,
+    "log": "/private/tmp/admissibility-fixture-second-supported-decode-as-gapfill.log",
+    "command": [
+      "env",
+      "-u",
+      "STORYMODEL4S_GRAKERN_BUILD",
+      "sbt",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingHistoricalSuite"
+    ],
+    "source_sha": "27033f4725c99c7146219697db1ed73280af66a8"
+  },
+  {
+    "mutant": "restored",
+    "exit": 0,
+    "seconds": 49.994328022003174,
+    "log": "/private/tmp/admissibility-fixture-second-restored.log",
+    "command": [
+      "env",
+      "-u",
+      "STORYMODEL4S_GRAKERN_BUILD",
+      "sbt",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingOutcomeSuite storymodel4s.align.MappingHistoricalSuite"
+    ],
+    "source_sha": "27033f4725c99c7146219697db1ed73280af66a8"
+  }
+]

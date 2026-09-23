@@ -1,0 +1,62 @@
+{
+  "inputs": {
+    "candidate": {
+      "path": "/private/tmp/storymodel-p1-integration-20260923",
+      "sha": "713d0175a0da26b99285cbcbc0a46197a311b78e",
+      "trackedCleanAfter": true
+    },
+    "grakern": {
+      "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+      "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "trackedCleanAfter": true
+    },
+    "gale": {
+      "path": "/private/tmp/p1-closeout-sbt-staging-20260923/c6b5fe94c20cf0d05b05/gale",
+      "sha": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "trackedCleanAfter": true
+    },
+    "graph4s": {
+      "path": "/private/tmp/p1-closeout-sbt-staging-20260923/8d03f2d14a9e2c9f6990/graph4s",
+      "sha": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "trackedCleanAfter": true
+    }
+  },
+  "rawSha256": "a2aa202d1402d955fe917f0a80024bc08e13278cd3ceb7914433c42111fa9e3f",
+  "gzipSha256": "ed10d37c3b622ed7ccc55bf5a696b736ace03436c77b87d294a0921714580be9",
+  "tasks": [
+    "embedGrakern/test",
+    "embedBench/test",
+    "media/test"
+  ],
+  "totals": [
+    [
+      28,
+      0,
+      0,
+      28,
+      0
+    ],
+    [
+      140,
+      0,
+      0,
+      139,
+      1
+    ],
+    [
+      63,
+      0,
+      0,
+      60,
+      3
+    ]
+  ],
+  "columns": [
+    "total",
+    "failed",
+    "errors",
+    "passed",
+    "skipped"
+  ],
+  "exit": 0
+}

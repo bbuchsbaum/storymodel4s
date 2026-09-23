@@ -92,6 +92,16 @@ bounded media slice; the parent video-ingestion workflow remains open. The optio
 [offline-source review receipts](evidence/review-receipts-20260923/README.md)
 landed separately at `c90a7e5d` and add evidence, not another workflow completion.
 
+The Admissibility/StructuralCoverage seal (`bd-01M17ZNXY6AS1CMBQJRH3JMNVX`)
+landed at `b01c3d09dcb4711b3d1c6abc9a15ba822fda7a9b`. Its
+[final qualification](evidence/admissibility-final-20260923/README.md) accounts for
+all 51 required scoped tasks: **8,303 passed, 5 skipped, 0 failed**. The existing
+402-test Atlas consumer is reused with checked production-source equivalence.
+Bounded test-fixture repairs retain the default 30-second deadline and have named
+falsifiers; the failed Native attempts and surviving exploratory mutant remain
+in the record. This closes the remaining cost-type construction door, not the
+Estimate eligibility repair, API freeze or release gate.
+
 The owner decisions and earlier landings close the CI-runner choice, exact-directory
 disk cleanup, stability-boundary decision, strict-warning repair and Sherlock
 re-scoring tickets. Existing GitHub-hosted runners remain the chosen route; the
@@ -110,7 +120,7 @@ path reservations govern implementation; this table does not replace them.
 | G1 shared evidence `bd-01M2TACM78289S4TECE91GT5K2` | claude-release | Content-only scorer payloads cannot expose nested coordinates or original IDs; registered lexical and embedding adapters replay the same bound evidence. Preserve missingness, historical parity and rename/permutation laws. |
 | Offline source `bd-01M35PB1H5PDD55YVKR4TQ8M66`, facade and prepare | codex-temporal | An ordinary text file and an annotation source reach the same checked public source/evidence seam, with an independently readable exchange; bench-only construction does not satisfy this witness. |
 | Video source `bd-01M35JG7DXD7NSEE4WVEKT3CSF` | claude-p1 | Caption loading replays model/frame/receipt checks and joins per-part extents; foreign editions, missing receipts and unsampled-frame captions refuse. |
-| Stable-signature closure, Admissibility and Estimate | claude-sm-0923 | Outside-package forgery probes and an explicit eligibility/denominator/codec migration, rechecked against landed main. Estimate eligibility repair remains a 1.0 prerequisite. |
+| Remaining stable-signature closure and Estimate eligibility | claude-sm-0923 | Outside-package forgery probes and an explicit eligibility/denominator/codec migration, rechecked against landed main. Estimate eligibility repair remains a 1.0 prerequisite. |
 | Public mapping journey `bd-01M35P83TCNHBSDY6NSK13Q3K0` and release gate `bd-01M2TAMJ95K9D7H248A8387YW4` | codex-p1-lead | A text story and Sherlock A/A+V run through the public path with complete accounting and independent reader evidence; then the remaining CLI, lambda, OpenNeuro, stability and hosted-CI gates close on their own receipts. |
 
 G1's embedding adapter remains required for 1.0. Facade development can proceed

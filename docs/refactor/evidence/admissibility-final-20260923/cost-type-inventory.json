@@ -1,0 +1,25 @@
+{
+  "source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+  "path": "align/src/main/scala/storymodel4s/align/cost.scala",
+  "plain_final_class_line": {
+    "StructuralMemberEstimate": [
+      429
+    ],
+    "StructuralMemberExclusion": [
+      448
+    ],
+    "StructuralReductionReceipt": [
+      470
+    ],
+    "StructuralReduction": [
+      498
+    ],
+    "CostBreakdown": [
+      527
+    ],
+    "Admissibility": [
+      1040
+    ]
+  },
+  "qualification": "Declaration inventory for the historical six-type ticket; external construction probes are in the gated suites."
+}

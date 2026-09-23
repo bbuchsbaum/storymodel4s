@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T19:01:02.078612+00:00",
+  "finished_utc": "2026-09-23T19:03:19.061123+00:00",
+  "duration_seconds": 136.981107,
+  "command": [
+    "env",
+    "-u",
+    "STORYMODEL4S_GRAKERN_BUILD",
+    "sbt",
+    "-batch",
+    "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+    "set ThisBuild / tlFatalWarnings := true",
+    "scalafmtAll",
+    "alignJVM/test",
+    "amrInteropJVM/test",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "log": "/private/tmp/admissibility-fixture-second-jvm.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 18246
+}

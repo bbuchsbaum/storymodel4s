@@ -1,0 +1,105 @@
+types defined by this candidate:
+  Admissibility
+  AdmissibilityEcho
+  AdmissibilityShape
+  AdmissibilityUnforgeableSuite
+  AlignCodecSuite
+  AlignWire
+  Assessed
+  CandidateAnchorsWire
+  CellSupportBasis
+  ChartDistance
+  ContextTag
+  Contradiction
+  ContradictionDetector
+  CostBreakdown
+  CostBreakdownWire
+  CostTerm
+  CostWeights
+  CoverageShape
+  DefaultLocalCostModel
+  EvidenceSuite
+  Exclusion
+  ExternalStates
+  Fixture
+  FlowStepWire
+  FunctionPrior
+  GateProofSuite
+  HsmmCodecError
+  HsmmResultCodec
+  ImportanceWeight
+  ImputedWire
+  InMemorySourceView
+  LocalCostModel
+  MappingHistoricalSuite
+  MemberEstimateWire
+  MemberExclusionWire
+  ModeGate
+  Names
+  NodeSummary
+  NotApplicable
+  ParticipantSummary
+  Parts
+  PropositionalScope
+  ReductionReceiptWire
+  ReductionWire
+  RelationLayer
+  Render
+  RowWire
+  ScoringPosition
+  SegmentEvidence
+  SemanticDistance
+  SourceNodeRef
+  SourceView
+  StateCostWire
+  StateMassWire
+  StructuralCoverage
+  StructuralDistance
+  StructuralMemberEstimate
+  StructuralMemberExclusion
+  StructuralReducer
+  StructuralReduction
+  StructuralReductionReceipt
+  StructuralReductionSuite
+  SupportAssessment
+  SupportNotApplicableReason
+  SupportUnestablishedReason
+  TermWire
+  Tokens
+  TransitionMassWire
+  Unestablished
+  UnitCostsWire
+  ViewFingerprint
+  Wire
+  WireSuite
+  WorkspaceJoinSuite
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  amr-interop
+  codec
+  core
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  embed-core
+  embed-grakern
+  fixtures
+  interview
+  laws
+  media
+  pipeline
+  proposition
+  provider-agent
+  recall
+  story
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedCoreJVM/test; embedGrakern/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; recallJVM/test; storyJVM/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

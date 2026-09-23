@@ -1,0 +1,36 @@
+[
+  {
+    "mutant": "scope-binding-omitted",
+    "exit": 1,
+    "seconds": 37.10949993133545,
+    "log": "/private/tmp/admissibility-fixture-scope-binding-omitted.log",
+    "command": [
+      "env",
+      "-u",
+      "STORYMODEL4S_GRAKERN_BUILD",
+      "sbt",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingHistoricalSuite"
+    ]
+  },
+  {
+    "mutant": "semantic-cause-omitted",
+    "exit": 0,
+    "seconds": 46.391201972961426,
+    "log": "/private/tmp/admissibility-fixture-semantic-cause-omitted.log",
+    "command": [
+      "env",
+      "-u",
+      "STORYMODEL4S_GRAKERN_BUILD",
+      "sbt",
+      "-batch",
+      "-Dsbt.global.staging=/private/tmp/p1-closeout-sbt-staging-20260923",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+      "set ThisBuild / tlFatalWarnings := true",
+      "fixturesJVM/testOnly storymodel4s.fixtures.WorkspaceJoinSuite"
+    ]
+  }
+]

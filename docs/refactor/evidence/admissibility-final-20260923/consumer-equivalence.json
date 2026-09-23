@@ -1,0 +1,15 @@
+{
+  "schema": "storymodel4s.review.source-equivalence.v1",
+  "final_source_sha": "27033f4725c99c7146219697db1ed73280af66a8",
+  "atlas_consumer_sha": "39b7f278",
+  "consumer_tested_model_sha": "c57d0ac726a685acd5b24bd60d55f898c562fe91",
+  "consumer_changed_main_paths": [
+    "align/src/main/scala/storymodel4s/align/wire.scala",
+    "media/src/main/scala/storymodel4s/media/boundary.scala",
+    "media/src/main/scala/storymodel4s/media/caption.scala",
+    "media/src/main/scala/storymodel4s/media/frames.scala"
+  ],
+  "wire_comment_only": true,
+  "other_main_and_build_files_identical": true,
+  "media_excluded_reason": "Atlas does not depend on the JVM media adapter; S1 separately qualified."
+}
