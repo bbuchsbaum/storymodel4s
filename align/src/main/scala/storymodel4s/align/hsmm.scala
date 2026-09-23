@@ -1,6 +1,5 @@
 package storymodel4s.align
 
-import cats.syntax.all.*
 import storymodel4s.core.{Checksum, TypedSupport}
 import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
@@ -687,10 +686,13 @@ object GraphHsmm:
     */
   def infer(
       recall: RecallGraph[Checked],
-      view: SourceView,
+      source: SourceView,
       evidence: LocalEvidence,
       config: HsmmConfig
   ): Either[AlignError, HsmmResult] =
+    // One snapshot is bound, inferred over and validated, so a view that answers differently on a
+    // later read cannot pass the binding check with one source and be inferred over with another.
+    val view = MappingBindingRender.snapshot(source)
     LocalEvidence.bound(evidence, recall, view, gate = true).flatMap { _ =>
       run(recall.ordered, recall, view, evidence, config).flatMap {
         case (post, flow, path, logZ, costs, adm, passes) =>
@@ -724,9 +726,10 @@ object GraphHsmm:
       costModel: LocalCostModel,
       config: HsmmConfig = HsmmConfig.default
   ): Either[AlignError, AblationResult] =
+    val snapshot = MappingBindingRender.snapshot(view)
     for
-      evidence <- LocalEvidence.compute(recall, view, candidates, costModel, gate = false)
-      out <- run(recall.ordered, recall, view, evidence, config)
+      evidence <- LocalEvidence.compute(recall, snapshot, candidates, costModel, gate = false)
+      out <- run(recall.ordered, recall, snapshot, evidence, config)
     yield
       val (post, _, path, logZ, _, _, _) = out
       AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ, config.layerUse)
