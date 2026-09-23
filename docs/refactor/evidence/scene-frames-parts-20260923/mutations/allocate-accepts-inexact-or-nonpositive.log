@@ -4,7 +4,7 @@ test_allocate_refuses_what_it_cannot_divide_exactly (__main__.SceneFramesSuite.t
 FAIL: test_allocate_refuses_what_it_cannot_divide_exactly (__main__.SceneFramesSuite.test_allocate_refuses_what_it_cannot_divide_exactly)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 75, in test_allocate_refuses_what_it_cannot_divide_exactly
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 146, in test_allocate_refuses_what_it_cannot_divide_exactly
     with self.assertRaises(esf.PlanRefusal, msg=durations):
          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AssertionError: PlanRefusal not raised : [0.2, 2.2]

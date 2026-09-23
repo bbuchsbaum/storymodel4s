@@ -1,0 +1,15 @@
+test_parser_refuses_each_invalid_row_before_aggregating (__main__.SceneFramesSuite.test_parser_refuses_each_invalid_row_before_aggregating) ... FAIL
+
+======================================================================
+FAIL: test_parser_refuses_each_invalid_row_before_aggregating (__main__.SceneFramesSuite.test_parser_refuses_each_invalid_row_before_aggregating)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 125, in test_parser_refuses_each_invalid_row_before_aggregating
+    with self.assertRaises(esf.PlanRefusal, msg=bad):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PlanRefusal not raised : ['', '1e1', '12']
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

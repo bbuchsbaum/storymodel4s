@@ -4,7 +4,7 @@ test_timeline_order_is_declared_not_lexical (__main__.SceneFramesSuite.test_time
 FAIL: test_timeline_order_is_declared_not_lexical (__main__.SceneFramesSuite.test_timeline_order_is_declared_not_lexical)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 84, in test_timeline_order_is_declared_not_lexical
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 155, in test_timeline_order_is_declared_not_lexical
     self.assertEqual(
     ~~~~~~~~~~~~~~~~^
         [p["part"] for p in esf.plan_scene(parts, 3, order)],

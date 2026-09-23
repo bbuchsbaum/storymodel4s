@@ -4,7 +4,7 @@ test_straddling_scene_samples_every_part_inside_its_own_extent (__main__.SceneFr
 FAIL: test_straddling_scene_samples_every_part_inside_its_own_extent (__main__.SceneFramesSuite.test_straddling_scene_samples_every_part_inside_its_own_extent)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 43, in test_straddling_scene_samples_every_part_inside_its_own_extent
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 70, in test_straddling_scene_samples_every_part_inside_its_own_extent
     self.assertEqual([p["part"] for p in plan], [A, B])
     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AssertionError: Lists differ: ['media-part-b'] != ['media-part-a', 'media-part-b']

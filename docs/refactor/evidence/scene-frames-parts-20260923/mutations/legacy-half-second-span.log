@@ -4,10 +4,10 @@ test_short_extent_control_v1_sampled_outside_v2_stays_inside (__main__.SceneFram
 FAIL: test_short_extent_control_v1_sampled_outside_v2_stays_inside (__main__.SceneFramesSuite.test_short_extent_control_v1_sampled_outside_v2_stays_inside)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 114, in test_short_extent_control_v1_sampled_outside_v2_stays_inside
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 185, in test_short_extent_control_v1_sampled_outside_v2_stays_inside
     (p,) = esf.plan_scene({A: extent(lo, hi, [0])}, per)
            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/scene-frames-mutants-1rput5k5/legacy-half-second-span.py", line 141, in plan_scene
+  File "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/scene-frames-mutants-i3ew5ltk/legacy-half-second-span.py", line 149, in plan_scene
     raise PlanRefusal(
         f"extent {lo!r}-{hi!r} is too short to sample {m} frames inside it"
     )
@@ -16,7 +16,7 @@ extract_scene_frames.PlanRefusal: extent 20.0-20.2 is too short to sample 8 fram
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 116, in test_short_extent_control_v1_sampled_outside_v2_stays_inside
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 187, in test_short_extent_control_v1_sampled_outside_v2_stays_inside
     self.fail(
     ~~~~~~~~~^
         f"a 0.2 s extent is samplable and must be sampled, not refused: {e}"
