@@ -43,9 +43,10 @@ differs from a declared empty history. A stored sample can be censored; padding 
 no stored-volume identity or invented sample time. Sample points do not imply
 measured acquisition windows, and no HRF, interpolation or lag shift is applied.
 
-Sherlock/OpenNeuro qualification still needs pinned dataset/header evidence,
-recording-to-participant/run joins, task-event/full-media origins and transformation
-receipts. Full-part alignment retains the introductory cartoon; episode-only views
+The pinned OpenNeuro release and development header observations are now recorded
+in [the local acquisition receipt](data/sherlock/openneuro-local-acquisition.md).
+Qualification still needs recording-to-participant/run joins, task-event/full-media
+origins and transformation receipts. Full-part alignment retains the introductory cartoon; episode-only views
 need separate transition evidence. The historical clock discrepancies are regression
 witnesses, not reusable corrections. This generic synthetic workflow does not close
 that dataset acceptance gate.

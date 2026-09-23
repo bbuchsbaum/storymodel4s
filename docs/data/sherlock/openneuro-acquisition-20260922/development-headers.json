@@ -1,0 +1,127 @@
+{
+  "schema": "local-openneuro-header-observation/v1",
+  "dataset": "ds001132",
+  "release": "1.0.0",
+  "revision": "fc91edbbe1b8117f96b40bb4d1f5df43aa1afdce",
+  "participant": "sub-03",
+  "runs": [
+    {
+      "task": "freerecall",
+      "image": "sub-03/func/sub-03_task-freerecall_bold.nii.gz",
+      "imageSha256": "2991d3e964dea74b9bda7b39934f3524042bb53438eb7e6ca6a399f8a5483a26",
+      "header348Sha256": "308dfc8e026f9f2c7a57aa53448cc94a48bb448527141de222df3bbf88421a61",
+      "dimensions": [
+        4,
+        64,
+        64,
+        27,
+        716,
+        1,
+        1,
+        1
+      ],
+      "pixdim": [
+        -1.0,
+        3.0,
+        3.0,
+        3.9999990463256836,
+        1.5,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "xyztUnits": 10,
+      "timeOffset": 0.0,
+      "sidecar": "task-freerecall_bold.json",
+      "sidecarSha256": "8b96e1fe2abc0b26540bacc627fc680ecbb57ef28d0d524284c60c3846328889",
+      "sidecarRepetitionTime": 1.5,
+      "events": "sub-03/func/sub-03_task-freerecall_events.tsv",
+      "eventsSha256": "d35fa46d027bba2a3f3e6f931001c0b0a5c3b4ff196db7f01e040bcc7feda4ab",
+      "taskEvents": [
+        {
+          "onset": "9",
+          "duration": "1060.5"
+        }
+      ]
+    },
+    {
+      "task": "sherlockPart1",
+      "image": "sub-03/func/sub-03_task-sherlockPart1_bold.nii.gz",
+      "imageSha256": "c53a1480fa783f419c114917d03e2302692e2541fcb6aceced45a302ce7c0971",
+      "header348Sha256": "d222e222a5c806296278656054572f40f0dbd158e88b1ad6c4afd74bc3e336a2",
+      "dimensions": [
+        4,
+        64,
+        64,
+        27,
+        972,
+        1,
+        1,
+        1
+      ],
+      "pixdim": [
+        -1.0,
+        3.0,
+        3.0,
+        3.9999990463256836,
+        1.5,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "xyztUnits": 10,
+      "timeOffset": 0.0,
+      "sidecar": "task-sherlockPart1_bold.json",
+      "sidecarSha256": "d22304e42c6d0e165d813437017dffdc114bc7667bc3f6585bbc34786404582a",
+      "sidecarRepetitionTime": 1.5,
+      "events": "sub-03/func/sub-03_task-sherlockPart1_events.tsv",
+      "eventsSha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9",
+      "taskEvents": [
+        {
+          "onset": "0",
+          "duration": "1419"
+        }
+      ]
+    },
+    {
+      "task": "sherlockPart2",
+      "image": "sub-03/func/sub-03_task-sherlockPart2_bold.nii.gz",
+      "imageSha256": "492229cd4a09dd580988b308ac4c9eef384b2e8f0571cf061d30cbafe057e14f",
+      "header348Sha256": "e3e58ba6ffb5a8b9ed7f722a4b2bd4b4b74d949e4c011917570ea4aa9a5ad1a2",
+      "dimensions": [
+        4,
+        64,
+        64,
+        27,
+        1057,
+        1,
+        1,
+        1
+      ],
+      "pixdim": [
+        -1.0,
+        3.0,
+        3.0,
+        3.9999990463256836,
+        1.5,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "xyztUnits": 10,
+      "timeOffset": 0.0,
+      "sidecar": "task-sherlockPart2_bold.json",
+      "sidecarSha256": "5f51927448ded19a11617cb47b85cbfe729973b8eacea34a2478712c3d62153a",
+      "sidecarRepetitionTime": 1.5,
+      "events": "sub-03/func/sub-03_task-sherlockPart2_events.tsv",
+      "eventsSha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c",
+      "taskEvents": [
+        {
+          "onset": "0",
+          "duration": "1545"
+        }
+      ]
+    }
+  ],
+  "scope": "Development header/task-event observations only. No voxel analysis, transcript identity, video origin, crop application or scanner alignment admitted."
+}

@@ -49,9 +49,9 @@ crosswalk and never uses a guessed cartoon offset.
 projects their contributions to marks and mapping-qualified local navigation.
 Exact regions, atoms, interval gaps, support-only bounds, unavailable mass and
 omitted top-k weight survive unchanged. There is no second scientific JSON schema.
-The Atlas scene/packet adapter still needs M1's neutral supplied-artifact provenance
-and a source package with actual media support. Its text-only source and separate
-display timeline cannot establish that join.
+M1 now supplies neutral artifact provenance. The Atlas scene/packet adapter still
+needs a checked source package with actual media support; the current text-only
+source admission and separate display timeline cannot establish that join.
 
 For callers already holding a checked mapping, the production API is:
 

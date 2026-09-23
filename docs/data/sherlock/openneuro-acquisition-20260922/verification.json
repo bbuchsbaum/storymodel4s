@@ -1,0 +1,750 @@
+{
+  "schema": "local-openneuro-download-verification/v1",
+  "dataset": "ds001132",
+  "release": "1.0.0",
+  "commit": "fc91edbbe1b8117f96b40bb4d1f5df43aa1afdce",
+  "source": "https://github.com/OpenNeuroDatasets/ds001132",
+  "root": "/Volumes/My Passport for Mac/data/openneuro/ds001132-1.0.0",
+  "annexFiles": [
+    {
+      "file": "derivatives/PCC_481vox_3mm.nii",
+      "annexKey": "MD5E-s1086884--c3a0333691c9bde1fe7583c754352f96.nii",
+      "bytes": 1086884,
+      "md5": "c3a0333691c9bde1fe7583c754352f96",
+      "sha256": "5d1b1dd379056d2d41a1c0723790d8e1fd70e4da60d5b31b226b885968ebd955"
+    },
+    {
+      "file": "sub-01/anat/sub-01_T1w.nii.gz",
+      "annexKey": "MD5E-s13632830--0587a52b8c9d3481dd080392eecbad82.nii.gz",
+      "bytes": 13632830,
+      "md5": "0587a52b8c9d3481dd080392eecbad82",
+      "sha256": "cbeb5590848c137deb2814c352629af85b4cfc63869ece206c0fc3bbb88d6342"
+    },
+    {
+      "file": "sub-01/func/sub-01_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s70954024--66a38d44cdae33d4f56c87cdfa80cd5a.nii.gz",
+      "bytes": 70954024,
+      "md5": "66a38d44cdae33d4f56c87cdfa80cd5a",
+      "sha256": "f71341998e1431a3f38f0c7f76506e6ab1a3a79bdf5fe6d98e27d3ceafeab5c5"
+    },
+    {
+      "file": "sub-01/func/sub-01_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s133253428--78ed546ec4965548a44edf2d63f6b8f9.nii.gz",
+      "bytes": 133253428,
+      "md5": "78ed546ec4965548a44edf2d63f6b8f9",
+      "sha256": "7d9ec3eedc06b3bbb5414327aeccfe9ae1af6bcf4bf2761db38beaf01dd05231"
+    },
+    {
+      "file": "sub-01/func/sub-01_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s144393390--df4df67b8936d5ffdc5bdd3269c77eb6.nii.gz",
+      "bytes": 144393390,
+      "md5": "df4df67b8936d5ffdc5bdd3269c77eb6",
+      "sha256": "851075a31cf9aa4e7cb76c99d9083573d5689ff12610c3dfdfc558d78e8dc084"
+    },
+    {
+      "file": "sub-02/anat/sub-02_T1w.nii.gz",
+      "annexKey": "MD5E-s13104604--0a8db118ccd9b11eee5baf07ddcfdd3c.nii.gz",
+      "bytes": 13104604,
+      "md5": "0a8db118ccd9b11eee5baf07ddcfdd3c",
+      "sha256": "7493565acf552c0ead5b5745486f5ab1f43997e53487b5a8163640f88b627e96"
+    },
+    {
+      "file": "sub-02/func/sub-02_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s126220967--06e97ff34bcfb6339e05dfb4a7fe8d62.nii.gz",
+      "bytes": 126220967,
+      "md5": "06e97ff34bcfb6339e05dfb4a7fe8d62",
+      "sha256": "e5029456a6af1177d82b12f743adefe4d0125d9d6d33efae5c79717d7dd0ddb5"
+    },
+    {
+      "file": "sub-02/func/sub-02_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s132076139--2b461b463c7c27ecdd2479fd842211e9.nii.gz",
+      "bytes": 132076139,
+      "md5": "2b461b463c7c27ecdd2479fd842211e9",
+      "sha256": "3d5187f879c2b756ddac53f4626e7490ea3e710924ca930a4b8f173f6d54953f"
+    },
+    {
+      "file": "sub-02/func/sub-02_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s144168786--c8d17677d3ce37ea30e788486e2e729e.nii.gz",
+      "bytes": 144168786,
+      "md5": "c8d17677d3ce37ea30e788486e2e729e",
+      "sha256": "5cba6f6a00e2273f20cabda698420f084ea86815b0e98402c4ec35135df4814c"
+    },
+    {
+      "file": "sub-03/anat/sub-03_T1w.nii.gz",
+      "annexKey": "MD5E-s12221757--6d0586e7904511b25cf3f25b9ec16433.nii.gz",
+      "bytes": 12221757,
+      "md5": "6d0586e7904511b25cf3f25b9ec16433",
+      "sha256": "7709a94332cbc29bdb7a939c2283ec7a84c31e0f7eb58073f01c9c6a22526fe5"
+    },
+    {
+      "file": "sub-03/func/sub-03_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s92871350--a3407d170fc31af645ac46d3c677b4ca.nii.gz",
+      "bytes": 92871350,
+      "md5": "a3407d170fc31af645ac46d3c677b4ca",
+      "sha256": "2991d3e964dea74b9bda7b39934f3524042bb53438eb7e6ca6a399f8a5483a26"
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s127184838--2225b350e16ecc8110b279f482588ab7.nii.gz",
+      "bytes": 127184838,
+      "md5": "2225b350e16ecc8110b279f482588ab7",
+      "sha256": "c53a1480fa783f419c114917d03e2302692e2541fcb6aceced45a302ce7c0971"
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s138769977--4d92c4355576b4fc9766595b6eb2f143.nii.gz",
+      "bytes": 138769977,
+      "md5": "4d92c4355576b4fc9766595b6eb2f143",
+      "sha256": "492229cd4a09dd580988b308ac4c9eef384b2e8f0571cf061d30cbafe057e14f"
+    },
+    {
+      "file": "sub-04/anat/sub-04_T1w.nii.gz",
+      "annexKey": "MD5E-s12684276--403d6fbc2a96e0805135571a6113b16a.nii.gz",
+      "bytes": 12684276,
+      "md5": "403d6fbc2a96e0805135571a6113b16a",
+      "sha256": "3fa155356bde4f91dfbb47e1f05310379264bbfcd58485283e1d4e62dd2a2650"
+    },
+    {
+      "file": "sub-04/func/sub-04_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s62806169--f1f4e50b7aceb2c775d6ee2a72eb677c.nii.gz",
+      "bytes": 62806169,
+      "md5": "f1f4e50b7aceb2c775d6ee2a72eb677c",
+      "sha256": "8c0738e3389f212df4593fd49dec11f2ad5f7a3fba9a65ac024867ffa0324854"
+    },
+    {
+      "file": "sub-04/func/sub-04_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s138396053--adc8b5e7e1e81906064f2d76f455c442.nii.gz",
+      "bytes": 138396053,
+      "md5": "adc8b5e7e1e81906064f2d76f455c442",
+      "sha256": "8acade05e5b3a3358ee483aad3ce7258249bef7dbae34482d065b003aef17bf1"
+    },
+    {
+      "file": "sub-04/func/sub-04_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s149318050--00ee85e52b2795a9de91cceb4e10d529.nii.gz",
+      "bytes": 149318050,
+      "md5": "00ee85e52b2795a9de91cceb4e10d529",
+      "sha256": "bb7b457c37f4dd0af2b72cfaca8998ad421ef5bb45adcb0e0cf0b83bd69af1c1"
+    },
+    {
+      "file": "sub-05/anat/sub-05_T1w.nii.gz",
+      "annexKey": "MD5E-s12558293--64d7fd183769ef11212a0689c31b418a.nii.gz",
+      "bytes": 12558293,
+      "md5": "64d7fd183769ef11212a0689c31b418a",
+      "sha256": "e0ac5c2f41b586934c1113536731aa039dac12c798670fc73207c2248db78c8d"
+    },
+    {
+      "file": "sub-05/func/sub-05_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s126240409--9ebcd3a732bdd7fffa9bac8f78a71060.nii.gz",
+      "bytes": 126240409,
+      "md5": "9ebcd3a732bdd7fffa9bac8f78a71060",
+      "sha256": "c91d602fa5a411fac6b72c2744e5085e2cb74ffac3d78c144432b446acc7e639"
+    },
+    {
+      "file": "sub-05/func/sub-05_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s139722082--6e4ddb2bcb9ecef71b21394dffd97c3e.nii.gz",
+      "bytes": 139722082,
+      "md5": "6e4ddb2bcb9ecef71b21394dffd97c3e",
+      "sha256": "798423d52bf03a8d3469da484d8ef89fdca9de1e20e9ab11b2e080c11d5f92bd"
+    },
+    {
+      "file": "sub-05/func/sub-05_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s151908099--0096b54c5133f1f31dd2ca9d8a8c2c13.nii.gz",
+      "bytes": 151908099,
+      "md5": "0096b54c5133f1f31dd2ca9d8a8c2c13",
+      "sha256": "5c7067f94d1a0bbd57f8bdee9b64d243536b06e1f30ecacda8bfe1fd96acb388"
+    },
+    {
+      "file": "sub-06/anat/sub-06_T1w.nii.gz",
+      "annexKey": "MD5E-s14160960--ed7491c535bc1d5a1b690bbfc7b6a5a6.nii.gz",
+      "bytes": 14160960,
+      "md5": "ed7491c535bc1d5a1b690bbfc7b6a5a6",
+      "sha256": "a1742c6d4b74a69ab0c55cf47bac05ed1b127e4c5c30d9ca41d3b509f43a9e2a"
+    },
+    {
+      "file": "sub-06/func/sub-06_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s95289549--3578a30b0fe567e47cf0e37e964b7176.nii.gz",
+      "bytes": 95289549,
+      "md5": "3578a30b0fe567e47cf0e37e964b7176",
+      "sha256": "bbf9580c35aecaff78d5e3892aca5476669930084e22d95c2f40446e1799ad92"
+    },
+    {
+      "file": "sub-06/func/sub-06_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s137577830--73376e99bf4611b1fd076457cb90f237.nii.gz",
+      "bytes": 137577830,
+      "md5": "73376e99bf4611b1fd076457cb90f237",
+      "sha256": "63e54455d06d47d96963d9dd9c3ab068d14287b0d82fa02d2515291885eedab5"
+    },
+    {
+      "file": "sub-06/func/sub-06_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s149873682--bee3c1f99e2fc6721d8fd1ac61a70c60.nii.gz",
+      "bytes": 149873682,
+      "md5": "bee3c1f99e2fc6721d8fd1ac61a70c60",
+      "sha256": "b5df85baf6af46bc229b88bbcb6612da85fcc89a9d5874f12e66704adb93000f"
+    },
+    {
+      "file": "sub-07/anat/sub-07_T1w.nii.gz",
+      "annexKey": "MD5E-s11605982--95857b705f4090d8a0f81b47599039b7.nii.gz",
+      "bytes": 11605982,
+      "md5": "95857b705f4090d8a0f81b47599039b7",
+      "sha256": "8c1d10ff2ae2568020380b4eb803365c70967aeed26378b53f0e6eac962eb7cb"
+    },
+    {
+      "file": "sub-07/func/sub-07_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s128609190--6c95a55250689300f8c75be8e4a8aa1a.nii.gz",
+      "bytes": 128609190,
+      "md5": "6c95a55250689300f8c75be8e4a8aa1a",
+      "sha256": "0ddf98047e0d3f27dbfa0c9bd2f4720a631dd0b186ca25dbc6c4b47f41657894"
+    },
+    {
+      "file": "sub-07/func/sub-07_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s125703809--af5e2b8910a10c5fc68b77911696d148.nii.gz",
+      "bytes": 125703809,
+      "md5": "af5e2b8910a10c5fc68b77911696d148",
+      "sha256": "3d96efe7a16b2d0aca304295d9491789d5b172490c60957301a048046d829c4d"
+    },
+    {
+      "file": "sub-07/func/sub-07_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s136969242--23a5810168913c757c2ef1beeb3f47b2.nii.gz",
+      "bytes": 136969242,
+      "md5": "23a5810168913c757c2ef1beeb3f47b2",
+      "sha256": "75dc403daabf80c50d9bb7e4ab81456a7b2656c29a670fd97e64430d74082a27"
+    },
+    {
+      "file": "sub-08/anat/sub-08_T1w.nii.gz",
+      "annexKey": "MD5E-s14624860--bfeed159c786af407466ac30e4bc1ce8.nii.gz",
+      "bytes": 14624860,
+      "md5": "bfeed159c786af407466ac30e4bc1ce8",
+      "sha256": "4bdc03dab594006c5d0230e039a323cd86072510f6372bb60369919b4e078ca1"
+    },
+    {
+      "file": "sub-08/func/sub-08_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s95616424--f0808658647b71f605eb1ec07fead6bb.nii.gz",
+      "bytes": 95616424,
+      "md5": "f0808658647b71f605eb1ec07fead6bb",
+      "sha256": "48d263c26f61bb2eca03bc25a40bfa29bb99a3b8be71a42f119cab5c405bd734"
+    },
+    {
+      "file": "sub-08/func/sub-08_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s135249900--a369c9acd9847beb39630d41405937ab.nii.gz",
+      "bytes": 135249900,
+      "md5": "a369c9acd9847beb39630d41405937ab",
+      "sha256": "716a4368e5132ffcfd9fb46cd4dbcc844cbc4f18c4d7f0c53597a8707216f597"
+    },
+    {
+      "file": "sub-08/func/sub-08_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s147568427--6f81e55b377e6c7b3cd7de21a24095d6.nii.gz",
+      "bytes": 147568427,
+      "md5": "6f81e55b377e6c7b3cd7de21a24095d6",
+      "sha256": "1c53b5285c48872b74a13238f134cba080cf98a5b86ae7a1918be88f59f040ae"
+    },
+    {
+      "file": "sub-09/anat/sub-09_T1w.nii.gz",
+      "annexKey": "MD5E-s10676484--9e7a318deb27467a075d27ac7183bd22.nii.gz",
+      "bytes": 10676484,
+      "md5": "9e7a318deb27467a075d27ac7183bd22",
+      "sha256": "26847bc8ba8863ff46bf7b470e10103bfe9e8d394db5207ea58a2895047f5137"
+    },
+    {
+      "file": "sub-09/func/sub-09_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s114470729--4f8761804385ecf3d2e35aada3750c09.nii.gz",
+      "bytes": 114470729,
+      "md5": "4f8761804385ecf3d2e35aada3750c09",
+      "sha256": "e42acee55b293729adb990465387d0ee7da404fa96915553fce6144256d34732"
+    },
+    {
+      "file": "sub-09/func/sub-09_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s132807371--e5f61a6d7d2348c94b6b65a475be8cbd.nii.gz",
+      "bytes": 132807371,
+      "md5": "e5f61a6d7d2348c94b6b65a475be8cbd",
+      "sha256": "04c60294bc9b12e38548ec63605a6a39bbcaadca979ef74541187b0cb3f36a65"
+    },
+    {
+      "file": "sub-09/func/sub-09_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s144169456--478e72fdfad962af9dedf4abc8b60e27.nii.gz",
+      "bytes": 144169456,
+      "md5": "478e72fdfad962af9dedf4abc8b60e27",
+      "sha256": "f1290f2e646bfa7ecec2e1514272a358dd20cf7fd23c666d29f370c3889ca831"
+    },
+    {
+      "file": "sub-10/anat/sub-10_T1w.nii.gz",
+      "annexKey": "MD5E-s11950298--adf85f88f455f80720cb839b1de7e7f9.nii.gz",
+      "bytes": 11950298,
+      "md5": "adf85f88f455f80720cb839b1de7e7f9",
+      "sha256": "c83e2c7895da0351c872e272318a5f1599cfbf6c3d782ca3694ac9a2305c8e06"
+    },
+    {
+      "file": "sub-10/func/sub-10_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s69100294--4df34103a4fb17575d2001b8343564f4.nii.gz",
+      "bytes": 69100294,
+      "md5": "4df34103a4fb17575d2001b8343564f4",
+      "sha256": "a0e289f02868eb346c987da5a3b64726d3cec6e0e01aaa61fd39b6b137ce98bf"
+    },
+    {
+      "file": "sub-10/func/sub-10_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s129831197--919e98832d308fad64dfa46a48eb2d44.nii.gz",
+      "bytes": 129831197,
+      "md5": "919e98832d308fad64dfa46a48eb2d44",
+      "sha256": "942e07626d4316a63fc7ff99f69ba405c6bb50953c057b704b29ea935984ac2e"
+    },
+    {
+      "file": "sub-10/func/sub-10_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s141532420--a8f3d28804d48a5a05e9e454871f65db.nii.gz",
+      "bytes": 141532420,
+      "md5": "a8f3d28804d48a5a05e9e454871f65db",
+      "sha256": "c3e3f4d2f7ead282a1751506dc05f96caffaeebc9b2f0b5ea0425ab5b73c26d9"
+    },
+    {
+      "file": "sub-11/anat/sub-11_T1w.nii.gz",
+      "annexKey": "MD5E-s12376195--0f1d86a520f238adfb0f87e3f98d38ae.nii.gz",
+      "bytes": 12376195,
+      "md5": "0f1d86a520f238adfb0f87e3f98d38ae",
+      "sha256": "e6abc87869f278c5ce66dc6fc04aa2ed8570716f62fad209d77d3c1676dee992"
+    },
+    {
+      "file": "sub-11/func/sub-11_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s159702957--30a9664e2ab80f1f743beaa94c41be07.nii.gz",
+      "bytes": 159702957,
+      "md5": "30a9664e2ab80f1f743beaa94c41be07",
+      "sha256": "14a52c859c12a83edeb535ee1d1a54241f8a42a9f90ca114bd886acaec1243c7"
+    },
+    {
+      "file": "sub-11/func/sub-11_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s129170577--6a18f398ef9248ae3e545ae90cd5e863.nii.gz",
+      "bytes": 129170577,
+      "md5": "6a18f398ef9248ae3e545ae90cd5e863",
+      "sha256": "0acbb7f6a915ab08462b6b270a498f903fb485ccc661074dec27ab42f59ec037"
+    },
+    {
+      "file": "sub-11/func/sub-11_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s141527288--6b352f8ecb13bd43dd42ee733961faf4.nii.gz",
+      "bytes": 141527288,
+      "md5": "6b352f8ecb13bd43dd42ee733961faf4",
+      "sha256": "bceee2d984c24b4b144e75e7eda399a66e2eabf089edf7e0b028c58b1e668fcb"
+    },
+    {
+      "file": "sub-12/anat/sub-12_T1w.nii.gz",
+      "annexKey": "MD5E-s13303129--20592fe5e097e7601fce3502d53d4514.nii.gz",
+      "bytes": 13303129,
+      "md5": "20592fe5e097e7601fce3502d53d4514",
+      "sha256": "09bba94b54297fd4eabac91394bf6ae50e76b586bc043d2809e8aa06190377b3"
+    },
+    {
+      "file": "sub-12/func/sub-12_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s240516514--103466c22cd33e299b91b8fc37c647e4.nii.gz",
+      "bytes": 240516514,
+      "md5": "103466c22cd33e299b91b8fc37c647e4",
+      "sha256": "77fcb2bb4950ae0d66d51d6714827aafe7b357960787956be25d09cac9afd84d"
+    },
+    {
+      "file": "sub-12/func/sub-12_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s131194092--3924573f31dec4bc8b016f5cb9f225a4.nii.gz",
+      "bytes": 131194092,
+      "md5": "3924573f31dec4bc8b016f5cb9f225a4",
+      "sha256": "8e4d5d14dcf0283486efe658734a27670509b045c248611c82eac4228cedb684"
+    },
+    {
+      "file": "sub-12/func/sub-12_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s143352711--7780ab4a002beb4bce711dfb68012d7f.nii.gz",
+      "bytes": 143352711,
+      "md5": "7780ab4a002beb4bce711dfb68012d7f",
+      "sha256": "f0603d8d0a77a2b9a4c0aa3f09f7cb74e0449cb83a2121d3767c162dcafdb5d6"
+    },
+    {
+      "file": "sub-13/anat/sub-13_T1w.nii.gz",
+      "annexKey": "MD5E-s14573657--33660564f3a7f95d451df9b1a5ba093c.nii.gz",
+      "bytes": 14573657,
+      "md5": "33660564f3a7f95d451df9b1a5ba093c",
+      "sha256": "11bf6b47b590bfad02208a9b402df042d12561097d9cf6c4b150c4481583c16c"
+    },
+    {
+      "file": "sub-13/func/sub-13_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s179614375--0aa5a479398c1526b91c724b46ce8ae2.nii.gz",
+      "bytes": 179614375,
+      "md5": "0aa5a479398c1526b91c724b46ce8ae2",
+      "sha256": "fc4e937d08a9088aeae99d86e7a016f75a8e3141f08cae9adac4bf4dead6c25f"
+    },
+    {
+      "file": "sub-13/func/sub-13_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s140775186--d07c926ba13e8232a32c45ff1254f060.nii.gz",
+      "bytes": 140775186,
+      "md5": "d07c926ba13e8232a32c45ff1254f060",
+      "sha256": "0dd7b766f73382a205efe06de5d9b16ba3bd82bca1eb2b01bb798868c7a6873a"
+    },
+    {
+      "file": "sub-13/func/sub-13_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s153312925--285f075d9215489c134470550cc66f7e.nii.gz",
+      "bytes": 153312925,
+      "md5": "285f075d9215489c134470550cc66f7e",
+      "sha256": "565534da907b4004ecca11b021ec82666ec489b11d7ee3f67a21ef8c9a009160"
+    },
+    {
+      "file": "sub-14/anat/sub-14_T1w.nii.gz",
+      "annexKey": "MD5E-s13519347--a5d4b751520ad44e586d5b6db4279f5c.nii.gz",
+      "bytes": 13519347,
+      "md5": "a5d4b751520ad44e586d5b6db4279f5c",
+      "sha256": "a90d6d59b5580aeaeed06f73d7b828da469821878a72c3fa0bb34b3de66ded5c"
+    },
+    {
+      "file": "sub-14/func/sub-14_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s112922107--3005b2551e1f570011b6fbba76d6e45d.nii.gz",
+      "bytes": 112922107,
+      "md5": "3005b2551e1f570011b6fbba76d6e45d",
+      "sha256": "e6d19bafe158ec16c5c59f1c065029580261e6414320f605aec48dacffd73ddf"
+    },
+    {
+      "file": "sub-14/func/sub-14_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s136553238--6d4f5ebd14ad3364a5611c690bf9c3d5.nii.gz",
+      "bytes": 136553238,
+      "md5": "6d4f5ebd14ad3364a5611c690bf9c3d5",
+      "sha256": "6d28795c5ad5a6fe89b3710d5735c7a69c4a0b7cacdcef6d506bdd81b0733fdb"
+    },
+    {
+      "file": "sub-14/func/sub-14_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s146242942--b355487bb5c3d7d4ed6443a6cd967293.nii.gz",
+      "bytes": 146242942,
+      "md5": "b355487bb5c3d7d4ed6443a6cd967293",
+      "sha256": "8602042e59e9f4781cbd3fc42ef496c20c64d34d64a0d6805624d19b9b9a1960"
+    },
+    {
+      "file": "sub-15/anat/sub-15_T1w.nii.gz",
+      "annexKey": "MD5E-s11696184--18931059c9eb114e807cd080a3ee4eb2.nii.gz",
+      "bytes": 11696184,
+      "md5": "18931059c9eb114e807cd080a3ee4eb2",
+      "sha256": "6b2f434d13e6dfd9860fc2bb17120ad61e12f869cdfa0f302728f8382628a13b"
+    },
+    {
+      "file": "sub-15/func/sub-15_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s108736548--fd730e08f5f5c52ed66d690d7ddd5e63.nii.gz",
+      "bytes": 108736548,
+      "md5": "fd730e08f5f5c52ed66d690d7ddd5e63",
+      "sha256": "042d99f460622f8734481755aa130b27cdf3d438433ba998107d573176b6d6d3"
+    },
+    {
+      "file": "sub-15/func/sub-15_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s123042624--afd9f995216f6007aa20a0674c392d92.nii.gz",
+      "bytes": 123042624,
+      "md5": "afd9f995216f6007aa20a0674c392d92",
+      "sha256": "f881dccddafa1b50b3379eae7fe7cb1ee1198d4295019446f438c023e1382c73"
+    },
+    {
+      "file": "sub-15/func/sub-15_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s134122367--6f631404f4fc14dddd939c0ab410a81c.nii.gz",
+      "bytes": 134122367,
+      "md5": "6f631404f4fc14dddd939c0ab410a81c",
+      "sha256": "d0e02bb6e43e1e84b6fedad9fa5a3934e2726819c1d4627b215b781bd699489f"
+    },
+    {
+      "file": "sub-16/anat/sub-16_T1w.nii.gz",
+      "annexKey": "MD5E-s13529449--8d8d69e8813d20fbae89a5cf58d3f000.nii.gz",
+      "bytes": 13529449,
+      "md5": "8d8d69e8813d20fbae89a5cf58d3f000",
+      "sha256": "54c4710452ab8ddb2cd3a1454cf9bc3af2c7fef6bda1467d1100bb86d5167cfa"
+    },
+    {
+      "file": "sub-16/func/sub-16_task-freerecall_bold.nii.gz",
+      "annexKey": "MD5E-s187473232--a961359bf70133445e481e7f78034d78.nii.gz",
+      "bytes": 187473232,
+      "md5": "a961359bf70133445e481e7f78034d78",
+      "sha256": "919c1a143c63e5aa94adbf6826c31b825dc94bd42f25b4b49e057634b729f2d8"
+    },
+    {
+      "file": "sub-16/func/sub-16_task-sherlockPart1_bold.nii.gz",
+      "annexKey": "MD5E-s128530163--1825fd3f54773ea70b1d6434a89c7899.nii.gz",
+      "bytes": 128530163,
+      "md5": "1825fd3f54773ea70b1d6434a89c7899",
+      "sha256": "a6a0f842032b39ff906ff0d849cf8e44540432333504c48a60a2460fba962a0c"
+    },
+    {
+      "file": "sub-16/func/sub-16_task-sherlockPart2_bold.nii.gz",
+      "annexKey": "MD5E-s140025252--1b34bae06b464df629a8d163fb0bfac7.nii.gz",
+      "bytes": 140025252,
+      "md5": "1b34bae06b464df629a8d163fb0bfac7",
+      "sha256": "a964a174a30efe887fb4f749e881a7e6efbfd7c9ff042eb10cb4b236267f268f"
+    }
+  ],
+  "trackedMetadata": [
+    {
+      "file": ".datalad/.gitattributes",
+      "bytes": 132,
+      "sha256": "84890900c3a64c90b3f3db5366717517d376aa246a01d2885ca22269e4510e78"
+    },
+    {
+      "file": ".datalad/config",
+      "bytes": 63,
+      "sha256": "6afdae01520fb0c62b2a18fd1200ad134e6769d484329e8ce9ad4bf6413a86b3"
+    },
+    {
+      "file": ".gitattributes",
+      "bytes": 284,
+      "sha256": "9476689a1190b1b79c7a65a128f992a551d86f55236c939a74218973423fcdd1"
+    },
+    {
+      "file": "CHANGES",
+      "bytes": 95,
+      "sha256": "1dae7f35c4849eb11ae4d7b4f9f08aba54d96cd696431d81ecd1d73b1c030627"
+    },
+    {
+      "file": "README",
+      "bytes": 20856,
+      "sha256": "092397eaa5a9759c2aa382db51e1fa70664ccbdb3708f07659bdf0b4c50ef5fe"
+    },
+    {
+      "file": "dataset_description.json",
+      "bytes": 486,
+      "sha256": "2ba2f4d4d772663cfe50ae919c2066963e84a99778c5c64dfd3c13e8915f2a11"
+    },
+    {
+      "file": "sub-01/func/sub-01_task-freerecall_events.tsv",
+      "bytes": 21,
+      "sha256": "3a0f30a9891987b8834b9c2c2136d667670ec8a1494300cd7a6dabdb915c4cfe"
+    },
+    {
+      "file": "sub-01/func/sub-01_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-01/func/sub-01_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-02/func/sub-02_task-freerecall_events.tsv",
+      "bytes": 24,
+      "sha256": "1eb03a8a3c91546fe76760bde612cdb881716d05014f0b829561284e3a7526df"
+    },
+    {
+      "file": "sub-02/func/sub-02_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-02/func/sub-02_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-03/func/sub-03_task-freerecall_events.tsv",
+      "bytes": 24,
+      "sha256": "d35fa46d027bba2a3f3e6f931001c0b0a5c3b4ff196db7f01e040bcc7feda4ab"
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-04/func/sub-04_task-freerecall_events.tsv",
+      "bytes": 23,
+      "sha256": "daa16a79b641d8f1c6bfcd8ed54dabce1947e78b9cae91e286e753957ea4ed26"
+    },
+    {
+      "file": "sub-04/func/sub-04_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-04/func/sub-04_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-05/func/sub-05_task-freerecall_events.tsv",
+      "bytes": 22,
+      "sha256": "baa3bd254ae5e6242f3d10bccdaa76cff1f2bb11d1e27d2081d69289cfd14978"
+    },
+    {
+      "file": "sub-05/func/sub-05_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-05/func/sub-05_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-06/func/sub-06_task-freerecall_events.tsv",
+      "bytes": 24,
+      "sha256": "da0e340a7efff7e49401cfb25d605e3507d86b9887d6bccd5af2d02e5d4a789f"
+    },
+    {
+      "file": "sub-06/func/sub-06_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-07/func/sub-07_task-freerecall_events.tsv",
+      "bytes": 25,
+      "sha256": "0e348ea3251c80fa413e1c623c1b59fd887ceb19773b3aed1576276b45fdebd6"
+    },
+    {
+      "file": "sub-07/func/sub-07_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-07/func/sub-07_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-08/func/sub-08_task-freerecall_events.tsv",
+      "bytes": 25,
+      "sha256": "e4616e20718e44a6e5bbf4132868b61d84c09fcd8053c4c43adc1327d46b99bb"
+    },
+    {
+      "file": "sub-08/func/sub-08_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-08/func/sub-08_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-09/func/sub-09_task-freerecall_events.tsv",
+      "bytes": 27,
+      "sha256": "07503e745aca09c33509c6a64a25df1bcb272a992d286880d099e203512fdb86"
+    },
+    {
+      "file": "sub-09/func/sub-09_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-09/func/sub-09_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-10/func/sub-10_task-freerecall_events.tsv",
+      "bytes": 24,
+      "sha256": "6481f558548cb164ca09482d6db161fbcf2e514f2c591b1fe1d1d050def6ef96"
+    },
+    {
+      "file": "sub-10/func/sub-10_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-10/func/sub-10_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-11/func/sub-11_task-freerecall_events.tsv",
+      "bytes": 25,
+      "sha256": "adb6b15fb9f902d1adf6c7cbb46a553d4ed04c403c1e499dd91fb8b0059e4ed4"
+    },
+    {
+      "file": "sub-11/func/sub-11_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-11/func/sub-11_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-12/func/sub-12_task-freerecall_events.tsv",
+      "bytes": 26,
+      "sha256": "f1522426351e5653b3e0647bc027b6b12181a95e83b4a643990dbdd40a0c76a8"
+    },
+    {
+      "file": "sub-12/func/sub-12_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-12/func/sub-12_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-13/func/sub-13_task-freerecall_events.tsv",
+      "bytes": 25,
+      "sha256": "ed6985a6b9a1f0bcf878a9fc58afcbf31d66a2d26d9f5607cd867844374c6eeb"
+    },
+    {
+      "file": "sub-13/func/sub-13_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-13/func/sub-13_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-14/func/sub-14_task-freerecall_events.tsv",
+      "bytes": 25,
+      "sha256": "6719da19ff2e76b63f496ce61dbd97142a80b60e9bce3abfbd596337e46c03ce"
+    },
+    {
+      "file": "sub-14/func/sub-14_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-14/func/sub-14_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-15/func/sub-15_task-freerecall_events.tsv",
+      "bytes": 23,
+      "sha256": "eeaf2d9a4a27a218c10f9874e0aba98fdbafb72da539a763258e6fa96a2dd189"
+    },
+    {
+      "file": "sub-15/func/sub-15_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-15/func/sub-15_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "sub-16/func/sub-16_task-freerecall_events.tsv",
+      "bytes": 27,
+      "sha256": "429bbe54cb09bb55bc8e69a4b900b8289de5e28f72b16b684c05a87ebb5a2dd2"
+    },
+    {
+      "file": "sub-16/func/sub-16_task-sherlockPart1_events.tsv",
+      "bytes": 22,
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9"
+    },
+    {
+      "file": "sub-16/func/sub-16_task-sherlockPart2_events.tsv",
+      "bytes": 22,
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c"
+    },
+    {
+      "file": "task-freerecall_bold.json",
+      "bytes": 195,
+      "sha256": "8b96e1fe2abc0b26540bacc627fc680ecbb57ef28d0d524284c60c3846328889"
+    },
+    {
+      "file": "task-sherlockPart1_bold.json",
+      "bytes": 210,
+      "sha256": "d22304e42c6d0e165d813437017dffdc114bc7667bc3f6585bbc34786404582a"
+    },
+    {
+      "file": "task-sherlockPart2_bold.json",
+      "bytes": 210,
+      "sha256": "5f51927448ded19a11617cb47b85cbfe729973b8eacea34a2478712c3d62153a"
+    }
+  ],
+  "annexBytes": 6606773568,
+  "elapsedSeconds": 156.89038372039795,
+  "scope": "Exact retrieved bytes only. No participant alias, recording/media origin, temporal mapping, or neural-outcome analysis certified."
+}

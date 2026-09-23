@@ -37,5 +37,5 @@ This qualifies conditional per-unit region/bin queries, declared scanner clocks
 and a renderer-neutral projection. It does not establish actual OpenNeuro header/
 recording/run/media joins, recall exposure, concentration summaries, calibration,
 held-out efficacy, complete ordinary-file facade/exchange or Atlas browser acceptance.
-The M1 packet still needs media-aware admission and neutral supplied-artifact scene
-provenance before the generic projection can become a joined temporal view.
+The later [M1 merge qualification](merged-m1/README.md) includes neutral supplied-artifact
+provenance. Media-aware source admission remains necessary for a joined temporal view.
