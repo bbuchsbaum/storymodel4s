@@ -980,3 +980,11 @@ is not directly comparable to the primary mean here. This is not a held-out,
 superiority, calibration, fine-time localization, behavioral-recovery or
 OpenNeuro scanner-alignment result. Friends and Memento are not opened and
 receive no reads; no remote provider, upload or spend is used.
+
+Support registration, committed before prediction import: canonical SHA256
+`b411c972fc0cb23256468302c6fe76c7529d6760c0f60cbd0fe3dbf2a8c32557`; file SHA256
+`f65ac58eb0cf63149536d067970275abab30159caecdf0f164114fe076e331fa`. The first registered gold read
+ran at protocol commit `742308c2` and exited 0. The
+[receipt](../refactor/evidence/sherlock-development-20260923/support-registration.json)
+records the gold-file digest and exact command. New read counters for this
+reproduction: Sherlock development 1, Friends 0, Memento 0.

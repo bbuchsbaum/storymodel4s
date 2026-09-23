@@ -1,0 +1,35 @@
+{
+  "schema": "sherlock-development-support-registration/v1",
+  "protocolCommit": "742308c2",
+  "protocolSha256": "8be5037401a5148edfd461a2821c5855b2bb5ee6d260ac4d7987598b73567470",
+  "supportSha256": "b411c972fc0cb23256468302c6fe76c7529d6760c0f60cbd0fe3dbf2a8c32557",
+  "supportFileSha256": "f65ac58eb0cf63149536d067970275abab30159caecdf0f164114fe076e331fa",
+  "goldSha256": "68cc307c19cfd429a3bd0eda84ee18d0152c87444d33a79246a7cd64d3763753",
+  "partition": "development",
+  "firstGoldReadReceipt": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/tools/recall-study/gold_scene.py",
+      "freeze-support",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/unit-manifest.json",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Recall_Scene_n50_Onsets.csv",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/development-20260923/support.json",
+      "--partition",
+      "development"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable",
+    "exitCode": 0,
+    "startedUnixSeconds": 1790163095.8299809,
+    "elapsedSeconds": 0.0862421989440918,
+    "logSha256": "4008775cf10ec6284e06c91370f2b07cd28bfd580909a6dc0ee3be745cf1f148",
+    "logBytes": 168,
+    "producerCommit": "742308c21764e682bb89d77e38375623726f9f7f",
+    "protocolSha256": "8be5037401a5148edfd461a2821c5855b2bb5ee6d260ac4d7987598b73567470"
+  },
+  "newReads": {
+    "SherlockDevelopment": 1,
+    "Friends": 0,
+    "Memento": 0
+  },
+  "predictionsImported": false
+}
