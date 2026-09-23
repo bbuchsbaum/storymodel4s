@@ -750,12 +750,8 @@ trait SemanticDistance:
 
 object SemanticDistance:
   /** Jaccard distance over content lemmas: a dependency-free fallback that never abstains. */
-  val lexicalJaccard: SemanticDistance = SemanticDistance.of { (unit, node) =>
-    val a = unit.proposition.lemmas
-    val b = node.lemmas
-    if a.isEmpty && b.isEmpty then 1.0
-    else 1.0 - a.intersect(b).size.toDouble / a.union(b).size.toDouble
-  }
+  val lexicalJaccard: SemanticDistance = (unit, node) =>
+    ContentLexical.score(ContentProjection.sourceUnit(unit), ContentProjection.sourceNode(node))
 
   /** Table-driven distance with a default for unlisted pairs (simulates embedding output). */
   def fromTable(
