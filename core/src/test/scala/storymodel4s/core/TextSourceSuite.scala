@@ -38,7 +38,9 @@ class TextSourceSuite extends FunSuite:
     val x = get(TextSourcePackage.analyze(a))
     val y = get(TextSourcePackage.analyze(b))
     assertEquals(x.segments.map(_.id), y.segments.map(_.id))
-    assertNotEquals(x.segments.map(_.unit.id), y.segments.map(_.unit.id))
+    assertEquals(x.segments.map(_.unit.id), y.segments.map(_.unit.id))
+    assertEquals(x.source.id, a.id)
+    assertEquals(y.source.id, b.id)
     assert(x.segments.forall(_.id.value.stripPrefix("text-segment:").length == 64))
 
   test("supplied atlas preserves anchors and absence without claiming generated boundaries"):
@@ -81,6 +83,26 @@ class TextSourceSuite extends FunSuite:
     assertEquals(value.sourceAtlas.atlas, value.atlas)
     assertEquals(value.sourceAtlas.bundle, get(SourceBundle.writtenText(value.source)))
     assertEquals(value.sourceAtlas.units.size, value.atlas.units.size)
+
+  test("maximum-length caller ID cannot overflow generated unit IDs"):
+    val source =
+      get(StorySource.fromText("A.", explicitId = Some(StoryId.unsafe("a" * IdRules.MaxLength))))
+    val value = get(TextSourcePackage.analyze(source))
+    assertEquals(value.source.id, source.id)
+    assert(value.atlas.units.forall(_.id.value.length <= IdRules.MaxLength))
+
+  test("source metadata and supplied IDs cannot smuggle unpaired surrogates into UTF-8"):
+    val metadata = get(StorySource.fromText("A.", metadata = Map("key" -> "\uD800")))
+    assert(TextSourcePackage.analyze(metadata).isLeft)
+    val source = get(StorySource.fromText("A."))
+    val unit = SurfaceUnit(
+      SurfaceUnitId.unsafe("u\uD800"),
+      SurfaceUnitKind.Sentence,
+      TextSpan.unsafe(0, 2),
+      0,
+      None
+    )
+    assert(TextSourcePackage.fromAtlas(get(SurfaceAtlas.of(source, Vector(unit)))).isLeft)
 
   private def supplied(
       start: Int,

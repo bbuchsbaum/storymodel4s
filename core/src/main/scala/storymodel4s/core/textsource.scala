@@ -62,13 +62,16 @@ object TextSourcePackage:
     for
       _ <- checkText(source.rawText)
       _ <- checkText(source.canonicalText)
-      surface = SurfaceAnalyzer.analyze(source)
+      // Generated unit IDs use the content-derived source ID, so an admitted caller ID at
+      // IdRules.MaxLength cannot overflow when the analyzer appends its unit suffix.
+      analysisSource <- StorySource.fromText(source.rawText)
+      surface = SurfaceAnalyzer.analyze(analysisSource)
       clauses = surface.sentences
         .flatMap(sentence => clauseSpans(source.canonicalText, sentence.span).map(_ -> sentence.id))
         .zipWithIndex
         .map { case ((span, parent), ordinal) =>
           SurfaceUnit(
-            SurfaceUnitId.unsafe(s"${source.id.value}:c$ordinal"),
+            SurfaceUnitId.unsafe(s"${analysisSource.id.value}:c$ordinal"),
             SurfaceUnitKind.Clause,
             span,
             ordinal,
@@ -93,6 +96,13 @@ object TextSourcePackage:
     for
       _ <- checkText(atlas.source.rawText)
       _ <- checkText(text)
+      _ <- (
+        Vector(atlas.source.id.value, atlas.source.language.value) ++ atlas.source.title.toVector ++
+          atlas.source.metadata.toVector.flatMap((key, value) => Vector(key, value)) ++
+          atlas.units.flatMap(u => u.id.value +: u.parent.toVector.map(_.value))
+      ).foldLeft[Either[DomainError, Unit]](Right(()))((acc, value) =>
+        acc.flatMap(_ => checkUnicode(value))
+      )
       _ <- SurfaceAtlas.validated(atlas)
       _ <-
         if targets.isEmpty then invalid("no paragraph, sentence or clause targets")
@@ -125,6 +135,10 @@ object TextSourcePackage:
     )
 
   private def checkText(text: String): Either[DomainError, Unit] =
+    if text.replace("\uFEFF", "").trim.isEmpty then invalid("no text beyond whitespace or BOM")
+    else checkUnicode(text)
+
+  private def checkUnicode(text: String): Either[DomainError, Unit] =
     var i = 0
     var valid = true
     while i < text.length && valid do
@@ -136,7 +150,6 @@ object TextSourcePackage:
         valid = !Character.isLowSurrogate(c)
         i += 1
     if !valid then invalid("unpaired UTF-16 surrogate")
-    else if text.replace("\uFEFF", "").trim.isEmpty then invalid("no text beyond whitespace or BOM")
     else Right(())
 
   private def boundary(text: String, at: Int): Boolean =

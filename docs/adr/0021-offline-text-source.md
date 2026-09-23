@@ -20,6 +20,8 @@ Two profiles have different, visible authority:
   surrounding whitespace is excluded. These are surface fragments, not claims
   about grammatical clauses. A change to any segmentation rule needs a new
   profile version and regression evidence.
+  Generated surface unit IDs also use the content-derived story ID; an arbitrary
+  caller story ID remains on the source without becoming an unbounded unit prefix.
 - `supplied-atlas/v1` accepts an existing checked atlas and preserves its units,
   spans, parent links and IDs. It claims no segmentation algorithm for those
   supplied boundaries. Missing granularities remain absent; the importer does
