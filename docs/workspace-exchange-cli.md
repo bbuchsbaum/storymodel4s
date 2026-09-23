@@ -8,7 +8,7 @@ and the complete study command remain separate work.
 From a source checkout with the project's JDK and sbt requirements installed:
 
 ```sh
-sbt -batch 'pipeline/runMain storymodel4s.pipeline.mappingExchangeExport workspace.json authored-control-b analysis/mapping'
+sbt -batch 'pipeline/runMain storymodel4s.pipeline.mappingExchangeExport workspace.json authored-b analysis/mapping'
 python3 examples/mapping/read_mapping.py --directory analysis/mapping
 ```
 
@@ -21,7 +21,7 @@ prints the usage and exits successfully.
 Successful export writes one JSON receipt to process stdout and exits zero:
 
 ```json
-{"schemaVersion":"workspace-mapping-export-receipt/v0.1","status":"complete","input_sha256":"...","policy_id":"authored-control-b","mapping_digest":"...","manifest_sha256":"..."}
+{"schemaVersion":"workspace-mapping-export-receipt/v0.1","status":"complete","input_sha256":"...","policy_id":"authored-b","mapping_digest":"...","manifest_sha256":"..."}
 ```
 
 The receipt binds the exact input bytes, explicitly selected policy, checked mapping
