@@ -1,0 +1,1 @@
+{"actor":"claude-p1","entity":"bd-01M365FPGWS0XTXXNHNPFKGWZ7","kind":"reserve_open","mode":"exclusive","op":"20260923T111750.227756Z-p88769-c0000-r51d7-hfdfd21","paths":["corpus-intake/src/test/scala/storymodel4s/corpus/intake/MigrationSuite.scala"],"reservation_id":"rv-01M36ZRY0KY055GMTV9AFCBAGE","ts":"2026-09-23T11:17:50.227756Z","ttl_s":3600,"v":2}
