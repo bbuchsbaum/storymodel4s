@@ -1,0 +1,102 @@
+# Fray field notes
+
+Maintainer: `codex-temporal`. Requested by the owner on 2026-09-23.
+
+These are observations from doing the work, not a product evaluation with a
+controlled baseline. Fray carries coordination and evidence pointers; Mote owns
+tickets and work ownership, and git plus retained check results records delivery.
+Keep entries brief enough that writing them does not displace implementation.
+
+## 2026-09-23 — pairing retrospective
+
+### What worked
+
+- **A small driver/reviewer loop produced useful code.** Claude drove shared
+  local evidence; I supplied consumer tests outside `align`. Those tests exposed
+  two missing-versus-empty identity aliases and a source that changed during
+  inference while retaining the original published fingerprint. The repaired
+  six-test suite passed in my independent JVM run. Evidence:
+  `solo/local-evidence-snapshot-probe` at `3fecc774`; Fray #24, #44–46.
+- **Different roles supplied different evidence.** I implemented the checked
+  workspace export; the other Codex implemented the CLI and ran nine actual
+  Java command invocations plus two independent Python package reads. This
+  covered a consumer boundary that my producer tests alone did not establish.
+  Exchange handoff: `933d04b5`, Fray #23 and #35.
+- **Concrete handoffs were actionable.** A commit, one failing test, the exact
+  observed result, and a named fix owner worked better than broad review advice.
+  The changing-source witness showed an actual likelihood difference, which
+  made the requested snapshot repair unambiguous.
+- **One integration owner and one heavy-build slot reduced contention.** The
+  team used #16 to serialize full gates and named a final lander. Small checks
+  could proceed independently. This was a team convention, not an automatic
+  queued build scheduler supplied by Fray.
+
+### Pain points and possible improvements
+
+| Observation | Cost or risk | Improvement to try |
+| --- | --- | --- |
+| A critical review objection went unread in a busy thread; the recipient later acknowledged missing it. Direct follow-up recovered the handoff. | A known failing candidate was sent to a costly gate. | A compact incoming-decisions view showing the affected SHA, requested action, named recipient, and whether that recipient has read it. Receipt acknowledgment must remain distinct from agreement. |
+| Question/objection replies created linked cards, and important context spread across #24, #32, #35 and direct messages. | We had to reconstruct which objection applied to which candidate. | Show one conversation tree with outstanding questions and their latest answers; preserve links when resolving or superseding a candidate. |
+| I created several direct cards to recover missed handoffs. | The workaround increased the very inbox noise it was meant to overcome. | Prefer one handoff conversation per seam; add an explicit escalation or attention-request operation to the existing thread. |
+| A bounded `brief` omitted agents/context and showed old resolved work among pending receipts. | Getting back to the current assignment required extra calls. | A resume view prioritizing current assignment, active peers, unread direct actions, and build ownership; collapse historical closure receipts. |
+| Tool previews can truncate the action needed from a message. | An agent can mistake the preview for the full instruction. | Put the requested action and evidence reference in a short structured summary, with a clearly accessible full body and exact read receipt. |
+| Shared home, actor identity, branch, Mote issue and final lander were coordinated manually. | Wrong-board, wrong-identity and wrong-checkout mistakes remain possible. | A session context command that displays and validates these bindings before mutations, without becoming a second issue tracker. |
+| Passing test subtotals did not imply a passing full gate: strict compilation failed later. | A conversational “green” summary can overstate qualification. | Attach gate receipts with source SHA, command, exit status, completed tasks and log path; distinguish partial tests from a completed gate. |
+| A Fray lease or enabled registration does not prove that an interactive agent is currently executing or will be woken. | Handoffs can wait for an absent consumer. | Keep registration, recent activity, runner state and actual wake capability visibly separate. |
+
+### Working practice for the next slice
+
+Use one driver per file scope, one named reviewer, one small contract and an
+executable counterexample. Reply in the existing handoff thread. Include the
+Mote ID, exact commit, changed paths, observed checks, remaining limitation and
+next owner. Check the full message before acknowledging it. Finish the slice
+before opening another design discussion.
+
+We have evidence of defects caught and useful division of labor. We have not
+measured net time or token savings against working alone, so no speedup claim is
+justified yet. Watch for repeated handoffs, duplicate builds, missed actions and
+time spent reconstructing state as work proceeds; avoid adding a logging chore
+to every message.
+
+## 2026-09-23 — P1 restart
+
+- My availability note #47 received a bounded assignment from `codex-p1-lead`:
+  Sherlock development reproduction, Mote `bd-01M35JFJCQ2ANTVED792H705X6`.
+  The handoff named scope, input restrictions, evidence requirements and the
+  integration owner. That is enough to begin checking admission and ownership.
+- Two Claude sessions initially proposed the same strict-gate repair. The
+  collision was visible in #49; one explicitly withdrew, and the lead confirmed
+  the remaining owner. Distinct actor names helped. Fray exposed the collision;
+  Mote ownership still needs to prevent conflicting edits.
+- The coding lane and these field notes are separate responsibilities. Notes
+  should record meaningful outcomes and friction without turning into another
+  task board.
+
+## 2026-09-23 — development reproduction in progress
+
+- **The assignment was specific enough to execute.** Its Mote ID, file scope,
+  pre-gold registration requirement and permitted inputs led to a bounded
+  runner, 22 successful local mapper processes and an independent numerical
+  check. The lead could continue integration work while this lane ran in its
+  own checkout. These are concrete outputs; final review/landing are separate.
+- **Versioned commands matter in handoffs.** The issue named `score.py`, while
+  the current repaired scene scorer is `gold_scene.py`. Source and usage docs
+  resolved the mismatch before execution. This is repository documentation
+  drift, not a Fray transport defect. A handoff carrying the current executable
+  entry point and source SHA would reduce the chance of using the wrong court.
+- **Worker focus still needs refinement.** My `involved` inbox included several
+  unrelated tie-policy discussions because I subscribe to `release`. Titles
+  accumulated prefixes such as “Question on #55: Question on #50”. A worker
+  focus view could show the assigned Mote reference, direct requests and an
+  explicitly followed build-control thread while collapsing other release
+  discussion. Do not silently discard it; keep broader discovery available.
+- **Separate infrastructure latency from Fray latency.** Some message tool
+  calls took noticeably longer than the reported shell command itself, while
+  crossing the host approval boundary. We have not instrumented the split, so
+  attributing that delay to the Fray daemon would be unsupported. A client
+  receipt with queue/server/transport timing would make diagnosis less vague.
+- **A useful next measurement is handoff completion, not message count.** For a
+  future bounded slice, record assignment, accepted ownership, first executable
+  evidence and accepted review times from existing receipts. Count duplicate
+  requests and missed-action recoveries. This is a proposed measurement; no
+  throughput comparison has been made here.

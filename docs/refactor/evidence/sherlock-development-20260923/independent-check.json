@@ -1,0 +1,289 @@
+{
+  "schema": "sherlock-development-independent-check/v1",
+  "supportRowsChecked": 1744,
+  "method": "raw gold Decimal intervals; integer outcome counts; Fraction percentages; no production scorer import",
+  "percentageTolerance": 1e-10,
+  "allChecksPassed": true,
+  "integerCounts": {
+    "A": {
+      "NN03_ANT_202231_final": {
+        "units": 173,
+        "eligible": 156,
+        "correct": 92,
+        "withinOne": 126,
+        "outcomes": {
+          "label": 173
+        }
+      },
+      "NN04_ATE_163931_final": {
+        "units": 96,
+        "eligible": 86,
+        "correct": 47,
+        "withinOne": 73,
+        "outcomes": {
+          "label": 96
+        }
+      },
+      "NN05_MUN_151631_final": {
+        "units": 68,
+        "eligible": 0,
+        "correct": 0,
+        "withinOne": 0,
+        "outcomes": {
+          "label": 68
+        }
+      },
+      "NN06_SQT_213031_final": {
+        "units": 104,
+        "eligible": 100,
+        "correct": 52,
+        "withinOne": 76,
+        "outcomes": {
+          "label": 104
+        }
+      },
+      "NN07_SKS_213031_final": {
+        "units": 98,
+        "eligible": 90,
+        "correct": 39,
+        "withinOne": 47,
+        "outcomes": {
+          "label": 98
+        }
+      },
+      "NN08_OLZ_224031_final": {
+        "units": 181,
+        "eligible": 154,
+        "correct": 97,
+        "withinOne": 123,
+        "outcomes": {
+          "label": 181
+        }
+      },
+      "NN11_NMA_233131_final": {
+        "units": 148,
+        "eligible": 124,
+        "correct": 63,
+        "withinOne": 92,
+        "outcomes": {
+          "label": 148
+        }
+      },
+      "NN13_DII_241731_final": {
+        "units": 338,
+        "eligible": 303,
+        "correct": 250,
+        "withinOne": 282,
+        "outcomes": {
+          "label": 338
+        }
+      },
+      "NN15_DBF_242231_final": {
+        "units": 97,
+        "eligible": 80,
+        "correct": 59,
+        "withinOne": 69,
+        "outcomes": {
+          "label": 97
+        }
+      },
+      "NN16_DBN_242731_final": {
+        "units": 89,
+        "eligible": 79,
+        "correct": 47,
+        "withinOne": 62,
+        "outcomes": {
+          "label": 89
+        }
+      },
+      "NN17_DBE_242331_final": {
+        "units": 352,
+        "eligible": 327,
+        "correct": 232,
+        "withinOne": 289,
+        "outcomes": {
+          "label": 352
+        }
+      }
+    },
+    "AV": {
+      "NN03_ANT_202231_final": {
+        "units": 173,
+        "eligible": 156,
+        "correct": 90,
+        "withinOne": 129,
+        "outcomes": {
+          "label": 173
+        }
+      },
+      "NN04_ATE_163931_final": {
+        "units": 96,
+        "eligible": 86,
+        "correct": 45,
+        "withinOne": 73,
+        "outcomes": {
+          "label": 96
+        }
+      },
+      "NN05_MUN_151631_final": {
+        "units": 68,
+        "eligible": 0,
+        "correct": 0,
+        "withinOne": 0,
+        "outcomes": {
+          "label": 68
+        }
+      },
+      "NN06_SQT_213031_final": {
+        "units": 104,
+        "eligible": 100,
+        "correct": 52,
+        "withinOne": 77,
+        "outcomes": {
+          "label": 104
+        }
+      },
+      "NN07_SKS_213031_final": {
+        "units": 98,
+        "eligible": 90,
+        "correct": 40,
+        "withinOne": 52,
+        "outcomes": {
+          "label": 98
+        }
+      },
+      "NN08_OLZ_224031_final": {
+        "units": 181,
+        "eligible": 154,
+        "correct": 102,
+        "withinOne": 131,
+        "outcomes": {
+          "label": 181
+        }
+      },
+      "NN11_NMA_233131_final": {
+        "units": 148,
+        "eligible": 124,
+        "correct": 64,
+        "withinOne": 86,
+        "outcomes": {
+          "label": 148
+        }
+      },
+      "NN13_DII_241731_final": {
+        "units": 338,
+        "eligible": 303,
+        "correct": 253,
+        "withinOne": 282,
+        "outcomes": {
+          "label": 338
+        }
+      },
+      "NN15_DBF_242231_final": {
+        "units": 97,
+        "eligible": 80,
+        "correct": 60,
+        "withinOne": 69,
+        "outcomes": {
+          "label": 97
+        }
+      },
+      "NN16_DBN_242731_final": {
+        "units": 89,
+        "eligible": 79,
+        "correct": 51,
+        "withinOne": 65,
+        "outcomes": {
+          "label": 89
+        }
+      },
+      "NN17_DBE_242331_final": {
+        "units": 352,
+        "eligible": 327,
+        "correct": 229,
+        "withinOne": 290,
+        "outcomes": {
+          "label": 352
+        }
+      }
+    }
+  },
+  "historicalDevelopmentReportParity": [
+    {
+      "participant": "NN03_ANT_202231_final",
+      "newSha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+      "historicalSha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN04_ATE_163931_final",
+      "newSha256": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+      "historicalSha256": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN05_MUN_151631_final",
+      "newSha256": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+      "historicalSha256": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN06_SQT_213031_final",
+      "newSha256": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+      "historicalSha256": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN07_SKS_213031_final",
+      "newSha256": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+      "historicalSha256": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN08_OLZ_224031_final",
+      "newSha256": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+      "historicalSha256": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN11_NMA_233131_final",
+      "newSha256": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+      "historicalSha256": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN13_DII_241731_final",
+      "newSha256": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+      "historicalSha256": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN15_DBF_242231_final",
+      "newSha256": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+      "historicalSha256": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN16_DBN_242731_final",
+      "newSha256": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+      "historicalSha256": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+      "byteIdentical": true
+    },
+    {
+      "participant": "NN17_DBE_242331_final",
+      "newSha256": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+      "historicalSha256": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+      "byteIdentical": true
+    }
+  ],
+  "sameRegisteredAnalysisGoldReread": true,
+  "scriptSha256": "370bf637df1d3bb089721181ed06cd277236499df5aba48a73148f95bcebca54",
+  "checkedArtifacts": {
+    "support.json": "f65ac58eb0cf63149536d067970275abab30159caecdf0f164114fe076e331fa",
+    "A.json": "ea0bb68ab9d11471e289c810b05b04b5dc5b3104249d1dae30f4046953997009",
+    "AV.json": "6976a755b2096c947f3f765a96fa055bf684074e35bc60c613fb2c03ee11b6a6",
+    "A-self.json": "035d578f7d80d5f0113c458a9c3a75921371854929508957480a32708160b6dd",
+    "A-AV.json": "6f580ab508f464d237b86e5734465444c318b338e27b50a02a0413654495d5cb",
+    "summary.json": "71d71a08d00de91c875f035e94eb16b1f8f0622486ad37e7fe59ea5fa1fb8f64"
+  }
+}

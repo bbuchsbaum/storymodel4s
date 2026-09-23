@@ -1,0 +1,271 @@
+{
+  "schema": "sherlock-development-evidence/v1",
+  "productionBase": "1395ce2c86222f3155fc4fb116a836fd2c19bb60",
+  "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+  "scorerIntroductionCommit": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "protocolCommit": "742308c21764e682bb89d77e38375623726f9f7f",
+  "rawArtifactRoot": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/development-20260923",
+  "rawReportsCommitted": false,
+  "qualification": "Development scene-localization reproduction with legacy caption augmentation; no held-out, superiority, calibration, fine-time, behavioral-recovery or scanner-clock claim.",
+  "runtime": {
+    "platform": "macOS-14.3-arm64-arm-64bit-Mach-O",
+    "python": "3.14.7",
+    "javaVersionExit": 0,
+    "javaVersion": "openjdk version \"22\" 2024-03-19\nOpenJDK Runtime Environment (build 22+36-2370)\nOpenJDK 64-Bit Server VM (build 22+36-2370, mixed mode, sharing)"
+  },
+  "processes": [
+    {
+      "arm": "A",
+      "participant": "NN03_ANT_202231_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "5d40c9ecc454c89dd02b127b4e0c5f2578c73b24fd43651f68aff12af9807959",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN04_ATE_163931_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "80fe5856bd0369ba6227a0d26b2d5a225b7e44dcfa882d4d15672295e8e56574",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN05_MUN_151631_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "41e3bb4fe9b9b5953979b35e1fc1c271178c65878165c3ca9299fe22f657226c",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN06_SQT_213031_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "6433ce25cf5767d2776f6eef851813bb01ac152988f2e221c3f8629a6921e2b7",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN07_SKS_213031_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "ba83b0a699f8b317a5511ffe3bb4e724edd5019f08fb49558ffc29960f945dae",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN08_OLZ_224031_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "8e940118251f2c92be39ab512ec6e70a9a1102ea2d221dd72de76fe5deab6823",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN11_NMA_233131_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "afa783973548136d89aaff58bf76001e09615d61cf59417a692896f937f60e90",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN13_DII_241731_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "68811df90d1a26aac92555835863fdf73fb8a76d8aeee9198bb9bd503e9b220d",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN15_DBF_242231_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "eb225f3261d32d63c6e95f8c31c0399dc64dda5eaa529c9cd155d8eeb8d798b6",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN16_DBN_242731_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "6ff23af810a3e1523c541589ed99bb9bb5bd0fbcef9ee417e5b52fccaecd8c2a",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "A",
+      "participant": "NN17_DBE_242331_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "67c02498bf73ca388faa82ec8c386e3235839fb1b5ce7efb011b1254c4a1a1aa",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN03_ANT_202231_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "57b298829da60e189d0ee1e5007b1210c9918634d3f303cc486855a9dc7e1ec1",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN04_ATE_163931_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "389f93206edf2633d721218acf4f2a770dd95bb7d17375749603b772d21e9b00",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN05_MUN_151631_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "32ce646fe90257e0fb4619ee74700ff995491898cec682d97b000483d8458963",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN06_SQT_213031_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "10d1acd08a4da640dd85a23717631ce86e3f33a6334226090f3329c330196666",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN07_SKS_213031_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "1b776bdff870eec50c8ee36b073e58a4d2e7db477b62c0f5179187f94e67732d",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN08_OLZ_224031_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "ce0f094b53e5683ba94ae68fd71c4ac0d46d3a5ade6d72bd9ffc741032a91179",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN11_NMA_233131_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "2a7dac2aa6babf8c29f465a3eb8feaaf76362f33e272af022a3c07078f142953",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN13_DII_241731_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "2cff8636c36ad22a9089c2fee4b6e77f85991089a6e7691bb5485bcdf1ec2522",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN15_DBF_242231_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "91287d2324b10330d9ed98e6209d28c3a23cd49db1914bd08522183c0bd2ca26",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN16_DBN_242731_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "28b9a4919e2c5ffa55cadb7aa93830bcac10bba43248ad812ae40f34a6f5791b",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    },
+    {
+      "arm": "AV",
+      "participant": "NN17_DBE_242331_final",
+      "exitCode": 0,
+      "producerCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+      "logSha256": "8902050a9bf44e55f0543a69bb0e3b81b958a79bef007ac81896bbd885a0aa3e",
+      "localNeuralChannelObserved": true,
+      "goldNotSuppliedToMapper": true
+    }
+  ],
+  "rawArtifactHashes": {
+    "support.json": {
+      "sha256": "f65ac58eb0cf63149536d067970275abab30159caecdf0f164114fe076e331fa",
+      "bytes": 257374
+    },
+    "A.json": {
+      "sha256": "ea0bb68ab9d11471e289c810b05b04b5dc5b3104249d1dae30f4046953997009",
+      "bytes": 532641
+    },
+    "AV.json": {
+      "sha256": "6976a755b2096c947f3f765a96fa055bf684074e35bc60c613fb2c03ee11b6a6",
+      "bytes": 532621
+    },
+    "A-self.json": {
+      "sha256": "035d578f7d80d5f0113c458a9c3a75921371854929508957480a32708160b6dd",
+      "bytes": 23651
+    },
+    "A-AV.json": {
+      "sha256": "6f580ab508f464d237b86e5734465444c318b338e27b50a02a0413654495d5cb",
+      "bytes": 24460
+    },
+    "summary.json": {
+      "sha256": "71d71a08d00de91c875f035e94eb16b1f8f0622486ad37e7fe59ea5fa1fb8f64",
+      "bytes": 5064
+    },
+    "independent-check.json": {
+      "sha256": "2cd9f12353c9b7e216d7e6696fc81af10654f71abff6d668688009cb8c606fc4",
+      "bytes": 8191
+    }
+  },
+  "archive": {
+    "path": "command-receipts.tar.gz",
+    "sha256": "991981c115acea806fc2cdd632446c68b145f38bf3ad3d61986fc64e1282e21c",
+    "bytes": 17520,
+    "scope": "Exact command receipts and content-free driver logs; mapper prose/logs remain local."
+  },
+  "sourceSha256": {
+    "tools/recall-study/gold_scene.py": "a57807352d99ff9255f7cb23e0feb9833031f133bf4d137fbcbcf4daaa525fd4",
+    "tools/recall-study/scoring-config.json": "533ef8fdbbbd996b42faa12a7e0a6fa3984a00fbf704d28b81f86badb4f2ffb0",
+    "embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json": "d304975117bc0f77dbe5f76819d834e68d262dcf2ba7301c6bf2efa9f5fdf284",
+    "docs/refactor/evidence/sherlock-development-20260923/run_study.py": "2a8f7038e5318d9fd0fd6fadc63bdc840207caa8168fc475c343bb275fe747d1",
+    "docs/refactor/evidence/sherlock-development-20260923/check_readout.py": "370bf637df1d3bb089721181ed06cd277236499df5aba48a73148f95bcebca54",
+    "docs/refactor/evidence/sherlock-development-20260923/check_oracle_faults.py": "47c424db95ab5aa79cc7ac45daeddeaf172ebf8285ef13f6e336a1a1c398dfb7"
+  },
+  "artifactSha256": {
+    "A-AV.json": "6f580ab508f464d237b86e5734465444c318b338e27b50a02a0413654495d5cb",
+    "A-self.json": "035d578f7d80d5f0113c458a9c3a75921371854929508957480a32708160b6dd",
+    "independent-check.json": "2cd9f12353c9b7e216d7e6696fc81af10654f71abff6d668688009cb8c606fc4",
+    "mapper-outcomes.json": "94ba9fa775edb754e1531713c4fdd4281e72f9436b9bc04018151152ca5e3153",
+    "oracle-faults.json": "ba97889951e16a426ec3adc10a236b90fa26551f41406d19d65b25ea07f4ae69",
+    "protocol.json": "8be5037401a5148edfd461a2821c5855b2bb5ee6d260ac4d7987598b73567470",
+    "scorer-tests-receipt.json": "93ebea6f9464a283b39a74b03e259a10a475533d7a205fe487a2450c03167bb2",
+    "summary.json": "71d71a08d00de91c875f035e94eb16b1f8f0622486ad37e7fe59ea5fa1fb8f64",
+    "support-registration.json": "c506c7ae5f4f625c2ca5fdf9ae324f8faf9226db40761e8030bf2e532c453e33"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "kind": "LocallyObserved",
+  "command": [
+    "python3",
+    "tools/recall-study/tests/test_gold_scene.py",
+    "-v"
+  ],
+  "sourceCommit": "20469746baaf2dbeb14a9368db25518cec65190f",
+  "exitCode": 0,
+  "tests": 19,
+  "failures": 0,
+  "errors": 0,
+  "rawLogRetained": false,
+  "evidence": "Executed in the agent tool at this committed source; all19 named unittest cases passed. Not a full release gate.",
+  "sourceSha256": {
+    "tools/recall-study/gold_scene.py": "a57807352d99ff9255f7cb23e0feb9833031f133bf4d137fbcbcf4daaa525fd4",
+    "tools/recall-study/tests/test_gold_scene.py": "a4df1332577ecd40765bb034bddb7d0ae6dcc0660bd6eb7e6380cf110858c9ff"
+  }
+}

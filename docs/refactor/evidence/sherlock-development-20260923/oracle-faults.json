@@ -1,0 +1,52 @@
+{
+  "kind": "data corruption witnesses, not production algorithm mutations",
+  "positiveControl": "independent-check.json",
+  "faultsRejected": [
+    {
+      "fault": "pooled-as-primary",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/docs/refactor/evidence/sherlock-development-20260923/check_readout.py",
+        "--data-root",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data",
+        "--out",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/development-20260923/oracle-faults/pooled-as-primary"
+      ],
+      "exitCode": 1,
+      "expectedError": "rate mismatch",
+      "logSha256": "50197f35cbb4dc218132774da7619e1e073d8e0590a01af0972f3ac9396b9469",
+      "changedInputSha256": "fe95f86358c1a002b7b17ba0f1898805a0a2b42413a8ee1a5457d7ec8dc2d0ba"
+    },
+    {
+      "fault": "missing-gold-as-zero",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/docs/refactor/evidence/sherlock-development-20260923/check_readout.py",
+        "--data-root",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data",
+        "--out",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/development-20260923/oracle-faults/missing-gold-as-zero"
+      ],
+      "exitCode": 1,
+      "expectedError": "missing gold became a score",
+      "logSha256": "204f22e7aa5d171602cbd9c6d11fcc66d5106cccacfae6455c6c812a78b988c6",
+      "changedInputSha256": "7d3666921b31ac534e8c0ddda670283d36f15b1e87cb489d85fe06b841e5563e"
+    },
+    {
+      "fault": "omitted-participant",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/docs/refactor/evidence/sherlock-development-20260923/check_readout.py",
+        "--data-root",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data",
+        "--out",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/development-20260923/oracle-faults/omitted-participant"
+      ],
+      "exitCode": 1,
+      "expectedError": "missing reported participant",
+      "logSha256": "b6ac01b94cfd30531cef1aabbe2432b645981b108ae4c84e55143e47b3f8ed39",
+      "changedInputSha256": "388dc43998d522359a51edfd75b5be6d22fd93d5dc9d7a2939bbddb7e3442380"
+    }
+  ],
+  "scriptSha256": "47c424db95ab5aa79cc7ac45daeddeaf172ebf8285ef13f6e336a1a1c398dfb7"
+}

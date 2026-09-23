@@ -934,3 +934,79 @@ kills its named assertion while the three sibling tests pass. The same integrati
 NodeSummary equality to retain propositional scope and replaced the ledger's unsupported
 Scala.js locale formatter without changing its pinned four-decimal output. Full consolidation
 evidence is recorded in [the unification report](2026-09-05-unified-main.md).
+
+## Registered development reproduction, 2026-09-23
+
+Mote `bd-01M35JFJCQ2ANTVED792H705X6`. This entry and the
+[protocol](../refactor/evidence/sherlock-development-20260923/protocol.json) are
+committed before this run's first gold read. Protocol SHA256:
+`8be5037401a5148edfd461a2821c5855b2bb5ee6d260ac4d7987598b73567470`.
+
+The population is the frozen development partition: NN03, NN04, NN05, NN06,
+NN07, NN08, NN11, NN13, NN15, NN16 and NN17, totaling 1,744 observation units.
+Exact filenames, CSV/lineage/source/model/tokenizer hashes, scorer/configuration
+hashes and caption provenance input hashes are in the protocol. Reuse the
+previously admitted observation-only manifest, SHA256
+`7408c72545e49895a19ed16144afe09601334d258ef1621744563b3b55e38188`;
+do not reopen other participants' transcripts or predictions.
+
+Arm A uses the frozen `99344ea0` reconstruction preset on current production
+source `1395ce2c`. Arm AV differs only by the admitted historical scene-caption
+sidecar, routed to the embedded scene text. Its 50 caption texts match the
+recorded request/outcome and all 400 frame bytes match their recorded digest.
+This is provenance from before the receipt-checked timed-source loader; no VLM
+rerun or independent frame-to-video correspondence verification is implied.
+
+The repaired scene scorer is `gold_scene.py`, as documented in `SCORING.md`;
+`score.py` measures different, gold-free outcomes. Freeze gold support once and
+commit its canonical digest before importing predictions. The shared Sherlock
+gold CSV is parsed by the existing scorer, but only development observation
+units enter support and results. NN05's no-gold status and every unsuccessful or
+invalid outcome remain visible. A failed process or incomplete import blocks a
+partial aggregate; it never silently removes that participant.
+
+Primary: participant-average scene-exact accuracy for A, and participant-average
+AV minus A scene-exact difference. Secondary: within-one-scene rates, pooled
+unit-weighted rates, and outcome/eligibility accounting. Use the committed
+scoring configuration: paired participant bootstrap, 2,000 resamples, seed
+20260902. A compared with itself supplies the fixed-support absolute rates and
+a zero-difference control; it is not an additional scientific contrast. There
+is one new development contrast (AV minus A), with no parameter selection.
+
+Compare each new A TSV with the same development participant's historical
+`all17-monofill` TSV, preserving any differences. The historical approximately
+63.8% over 15 participants has a different population and pooled estimand, so it
+is not directly comparable to the primary mean here. This is not a held-out,
+superiority, calibration, fine-time localization, behavioral-recovery or
+OpenNeuro scanner-alignment result. Friends and Memento are not opened and
+receive no reads; no remote provider, upload or spend is used.
+
+Support registration, committed before prediction import: canonical SHA256
+`b411c972fc0cb23256468302c6fe76c7529d6760c0f60cbd0fe3dbf2a8c32557`; file SHA256
+`f65ac58eb0cf63149536d067970275abab30159caecdf0f164114fe076e331fa`. The first registered gold read
+ran at protocol commit `742308c2` and exited 0. The
+[receipt](../refactor/evidence/sherlock-development-20260923/support-registration.json)
+records the gold-file digest and exact command. New read counters for this
+reproduction: Sherlock development 1, Friends 0, Memento 0.
+
+Completed readout: all 22 mapper commands and the fixed-support scoring passed.
+All 11 annotations-only TSVs match the same historical development reports
+byte-for-byte. The [bound evidence](../refactor/evidence/sherlock-development-20260923/README.md)
+retains every participant and output receipt. Ten participants and 1,499 of
+1,744 units have eligible gold; the other units are 177 outside coded intervals
+and 68 from NN05, which has no gold source. No participant is silently dropped.
+
+Participant-average scene-exact accuracy is 60.9452% for A and 61.7395% for AV.
+The primary paired AV-minus-A difference is +0.7943 percentage points, 95% CI
+[-0.4296, +2.1288]. Secondary pooled accuracies are 65.2435% and 65.7772%.
+The interval spans zero; this development readout does not establish an AV gain
+or change the preset. The historical approximately 63.8% over 15 participants
+is not directly comparable because both the population and primary weighting
+differ. The matching 11 report hashes establish the narrower reproduction.
+
+The independent Decimal/whole-count checker agrees on all support rows and
+reported rates, and rejects three deliberately corrupted readouts. Its checks
+reuse this registered gold analysis; they are not additional exploratory
+contrasts. This adds one AV-versus-A development contrast to the scene ledger
+(16 to 17), with no new confirmation read. The separate within-scene and
+risk–coverage ledgers are unchanged. Friends and Memento receive zero reads.

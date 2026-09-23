@@ -1,0 +1,157 @@
+{
+  "qualification": "development-only scene localization; no held-out or calibration claim",
+  "inputParticipants": 11,
+  "eligibleParticipants": 10,
+  "arms": {
+    "A": {
+      "participantAverageSceneExactPercent": 60.945225364188055,
+      "participantAverageWithinOnePercent": 79.41183766607995,
+      "pooledSceneExactPercent": 65.24349566377585,
+      "inputUnits": 1744,
+      "goldEligibleUnits": 1499
+    },
+    "AV": {
+      "participantAverageSceneExactPercent": 61.7394895891729,
+      "participantAverageWithinOnePercent": 80.70563834088017,
+      "pooledSceneExactPercent": 65.7771847898599,
+      "inputUnits": 1744,
+      "goldEligibleUnits": 1499
+    }
+  },
+  "pairedSeries": {
+    "sceneExact": {
+      "ciStatus": "estimated",
+      "leaveOneParticipantOut": [
+        {
+          "omitted": "NN03_ANT_202231_final",
+          "primaryDifferencePoints": 1.024965947988852
+        },
+        {
+          "omitted": "NN04_ATE_163931_final",
+          "primaryDifferencePoints": 1.140913738355248
+        },
+        {
+          "omitted": "NN06_SQT_213031_final",
+          "primaryDifferencePoints": 0.88251580553871
+        },
+        {
+          "omitted": "NN07_SKS_213031_final",
+          "primaryDifferencePoints": 0.7590590154152537
+        },
+        {
+          "omitted": "NN08_OLZ_224031_final",
+          "primaryDifferencePoints": 0.5217654447883496
+        },
+        {
+          "omitted": "NN11_NMA_233131_final",
+          "primaryDifferencePoints": 0.7929100707716851
+        },
+        {
+          "omitted": "NN13_DII_241731_final",
+          "primaryDifferencePoints": 0.7725048044386003
+        },
+        {
+          "omitted": "NN15_DBF_242231_final",
+          "primaryDifferencePoints": 0.7436269166498212
+        },
+        {
+          "omitted": "NN16_DBN_242731_final",
+          "primaryDifferencePoints": 0.31992790117865394
+        },
+        {
+          "omitted": "NN17_DBE_242331_final",
+          "primaryDifferencePoints": 0.9844526047232165
+        }
+      ],
+      "perParticipantDifferences": {
+        "NN03_ANT_202231_final": -1.2820512820512775,
+        "NN04_ATE_163931_final": -2.3255813953488413,
+        "NN06_SQT_213031_final": 0.0,
+        "NN07_SKS_213031_final": 1.1111111111111072,
+        "NN08_OLZ_224031_final": 3.2467532467532436,
+        "NN11_NMA_233131_final": 0.8064516129032242,
+        "NN13_DII_241731_final": 0.9900990099009874,
+        "NN15_DBF_242231_final": 1.25,
+        "NN16_DBN_242731_final": 5.063291139240505,
+        "NN17_DBE_242331_final": -0.9174311926605583
+      },
+      "primaryCI95": [
+        -0.42958542358478624,
+        2.1288068465951087
+      ],
+      "primaryParticipantAverageDifferencePoints": 0.7942642249848391,
+      "secondaryCI95": [
+        -0.461538461538467,
+        1.7283950617283992
+      ],
+      "secondaryPooledUnitWeightedDifferencePoints": 0.5336891260840559
+    },
+    "sceneWithinOne": {
+      "ciStatus": "estimated",
+      "leaveOneParticipantOut": [
+        {
+          "omitted": "NN03_ANT_202231_final",
+          "primaryDifferencePoints": 1.2238810916583671
+        },
+        {
+          "omitted": "NN04_ATE_163931_final",
+          "primaryDifferencePoints": 1.4375563053335805
+        },
+        {
+          "omitted": "NN06_SQT_213031_final",
+          "primaryDifferencePoints": 1.3264451942224693
+        },
+        {
+          "omitted": "NN07_SKS_213031_final",
+          "primaryDifferencePoints": 0.8202723547162962
+        },
+        {
+          "omitted": "NN08_OLZ_224031_final",
+          "primaryDifferencePoints": 0.8603557281330028
+        },
+        {
+          "omitted": "NN11_NMA_233131_final",
+          "primaryDifferencePoints": 1.9751907139357299
+        },
+        {
+          "omitted": "NN13_DII_241731_final",
+          "primaryDifferencePoints": 1.4375563053335805
+        },
+        {
+          "omitted": "NN15_DBF_242231_final",
+          "primaryDifferencePoints": 1.4375563053335805
+        },
+        {
+          "omitted": "NN16_DBN_242731_final",
+          "primaryDifferencePoints": 1.0156153770635383
+        },
+        {
+          "omitted": "NN17_DBE_242331_final",
+          "primaryDifferencePoints": 1.4035773722720788
+        }
+      ],
+      "perParticipantDifferences": {
+        "NN03_ANT_202231_final": 1.9230769230769198,
+        "NN04_ATE_163931_final": 0.0,
+        "NN06_SQT_213031_final": 1.0,
+        "NN07_SKS_213031_final": 5.555555555555557,
+        "NN08_OLZ_224031_final": 5.194805194805198,
+        "NN11_NMA_233131_final": -4.838709677419345,
+        "NN13_DII_241731_final": 0.0,
+        "NN15_DBF_242231_final": 0.0,
+        "NN16_DBN_242731_final": 3.7974683544303787,
+        "NN17_DBE_242331_final": 0.3058103975535147
+      },
+      "primaryCI95": [
+        -0.6722642359228672,
+        3.0450154098859246
+      ],
+      "primaryParticipantAverageDifferencePoints": 1.2938006748002224,
+      "secondaryCI95": [
+        -0.55944055944056,
+        2.7707808564231726
+      ],
+      "secondaryPooledUnitWeightedDifferencePoints": 1.0006671114076084
+    }
+  }
+}

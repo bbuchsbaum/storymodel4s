@@ -1,0 +1,618 @@
+[
+  {
+    "arm": "A",
+    "participant": "NN03_ANT_202231_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN03_ANT_202231_final.tsv": {
+        "sha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+        "bytes": 64590
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.clock-repair.json": {
+        "sha256": "5defab89580eec291a1fc493734ae414e4dffb2d61215044d78066ed0df57766",
+        "bytes": 214510
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.posterior.json": {
+        "sha256": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee",
+        "bytes": 385362
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.stages.json": {
+        "sha256": "757fd1cb0a0eae487cf56e74b91d86df93f31381262c4dab19fe7a104195ba2f",
+        "bytes": 1437162
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.voyage.json": {
+        "sha256": "c6e1b597f8c29a94b4b2e580fdad5c8a59e5cdaa5bdd5d12c4214f3134ae0bc7",
+        "bytes": 606421
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN04_ATE_163931_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN04_ATE_163931_final.tsv": {
+        "sha256": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+        "bytes": 38856
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.clock-repair.json": {
+        "sha256": "ef069ba9233b257faa40514e3b410f188ac7716cd3a6064666237da42f4907b8",
+        "bytes": 214510
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.posterior.json": {
+        "sha256": "0dcb9b1d9e60e8981a3827db66578440babfadc6251c4c82b6380893d5594454",
+        "bytes": 213801
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.stages.json": {
+        "sha256": "5393aa835b9b741c6af8e47aad0ef55055575ada8393062c37854b910a7d406b",
+        "bytes": 797669
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.voyage.json": {
+        "sha256": "ec2f25d31caaa672795d0ebddc14df4050440c1735d03235069e25f26625734f",
+        "bytes": 416621
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN05_MUN_151631_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN05_MUN_151631_final.tsv": {
+        "sha256": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+        "bytes": 29243
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.clock-repair.json": {
+        "sha256": "9abb39efcface6f0ef21e057991af0bb661d8cc3115a3934ccbbad57818506a7",
+        "bytes": 214510
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.posterior.json": {
+        "sha256": "73a51228d81e4cac8f300d809e6dcd69213a1b57df173ae602c60ed149ed3aca",
+        "bytes": 151523
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.stages.json": {
+        "sha256": "0b41be4d345cac37785acfabf8a2e81fe3e068dff9bd705f2c4c9fda66360ee6",
+        "bytes": 564842
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.voyage.json": {
+        "sha256": "2ed6b8434f7313a4105ca33d462bdf5954d41bcb82f175fb0c812180419463aa",
+        "bytes": 347702
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN06_SQT_213031_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN06_SQT_213031_final.tsv": {
+        "sha256": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+        "bytes": 46814
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.clock-repair.json": {
+        "sha256": "8ebce5c4b0a21acc15f87154a88734257d881a09690749f434ddcc2837a98d0b",
+        "bytes": 214510
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.posterior.json": {
+        "sha256": "5d04fe142119901bafeff09927466a6c8a51982df1cff07540da153f350d043e",
+        "bytes": 231652
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.stages.json": {
+        "sha256": "e1a837453294893b73f2381858135f7dd739afcd899a42a4c8ea1664609b9d10",
+        "bytes": 864166
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.voyage.json": {
+        "sha256": "ba9ccbe37a6aedc6c32903b23b4107bcc243e0d3821a60fa24944441f804ebc2",
+        "bytes": 439694
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN07_SKS_213031_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN07_SKS_213031_final.tsv": {
+        "sha256": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+        "bytes": 40372
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.clock-repair.json": {
+        "sha256": "2e49d51bfb106e61716af6ee5aa5af8c36b9e8b99f5cbf40925968988af7e45f",
+        "bytes": 214510
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.posterior.json": {
+        "sha256": "9dc22a1254ad3ad2cad4768fbb60d2a1fac9f08388bed75cc807e7a4fb0215e8",
+        "bytes": 218324
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.stages.json": {
+        "sha256": "7b33b538afd2134ee25a3d45e8c715c3e1f3887da01c0df852f96ec6b568e624",
+        "bytes": 814593
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.voyage.json": {
+        "sha256": "1aedd4aaefdfbbf8c7dd4ae406b4dafcf0bd2299e1d1df42c489c14aaaa0b415",
+        "bytes": 422733
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN08_OLZ_224031_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN08_OLZ_224031_final.tsv": {
+        "sha256": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+        "bytes": 72514
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.clock-repair.json": {
+        "sha256": "ea61df7c7f0d9648b67e4d4693deff3c58ad5ec703f2faf135617f6bd0d7288a",
+        "bytes": 214510
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.posterior.json": {
+        "sha256": "de495276f95b93bb9d4db7d909c804a682b71d55ca3d0d2c2b44f4b9e18432c1",
+        "bytes": 403209
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.stages.json": {
+        "sha256": "bc053851457c6b15ac68df2ffc0fd0987c0342a7acf145889f725fa53191264b",
+        "bytes": 1503772
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.voyage.json": {
+        "sha256": "6186b3ba71221bc9f22e0b8fe0f7338da4e0e0ef6f9c7199c6f93a9f437c3aab",
+        "bytes": 629698
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN11_NMA_233131_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN11_NMA_233131_final.tsv": {
+        "sha256": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+        "bytes": 52457
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.clock-repair.json": {
+        "sha256": "3686524a149e058ac80b42dc863c3a982e2dd90fc8b004376e73a3ec57581ddf",
+        "bytes": 214510
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.posterior.json": {
+        "sha256": "efa1c50ab7863c28c454ff00e521038d9c5930e3c86ddaac0e6b1f2ee41e7d2b",
+        "bytes": 329680
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.stages.json": {
+        "sha256": "2f4c98ef1ad77fd279e2496a7e13b54939255477833602a0fc3c1a18a40f1da6",
+        "bytes": 1229619
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.voyage.json": {
+        "sha256": "07c3bfa558c7914d301db8a27fbc9cccfd03a8669f4599cc21727a7dc05863c3",
+        "bytes": 543468
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN13_DII_241731_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN13_DII_241731_final.tsv": {
+        "sha256": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+        "bytes": 136314
+      },
+      "recall-map-NN13_DII_241731_final.tsv.clock-repair.json": {
+        "sha256": "ed87a2052154b51355889c530a63b1885b5f6d340f5e0ff34e4d78facbb8488a",
+        "bytes": 214510
+      },
+      "recall-map-NN13_DII_241731_final.tsv.posterior.json": {
+        "sha256": "6fc9a5c1e97b029936fb0e56f5d4310ba14094173d249a8b9db1d48860176581",
+        "bytes": 752814
+      },
+      "recall-map-NN13_DII_241731_final.tsv.stages.json": {
+        "sha256": "e8e3a9169b82e57b577eb6916f2f489e483089be51f70baa612774a5070c2804",
+        "bytes": 2808397
+      },
+      "recall-map-NN13_DII_241731_final.tsv.voyage.json": {
+        "sha256": "68fa29560d605f5f3fdd42feb07dc9534f7df66b95cc789b14fd824f53a862e2",
+        "bytes": 1023290
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN15_DBF_242231_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN15_DBF_242231_final.tsv": {
+        "sha256": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+        "bytes": 40690
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.clock-repair.json": {
+        "sha256": "aa15b36cd4e82e1b44e0222855e9443f537171528df67ed888d6beef025fdc84",
+        "bytes": 214510
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.posterior.json": {
+        "sha256": "2a15575efadc853d554da0e4e194cb1132e46a38abbd4ac94bf73a2148498250",
+        "bytes": 216103
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.stages.json": {
+        "sha256": "8874e7a40630ccab281de3e07acc7f5c3392a1e7e69802a19056013974cc91cd",
+        "bytes": 806046
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.voyage.json": {
+        "sha256": "a9c24b24745cdd04cc2f5168858dfa66db1cd404049e217bfd8150d11ad6f5bc",
+        "bytes": 421050
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN16_DBN_242731_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN16_DBN_242731_final.tsv": {
+        "sha256": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+        "bytes": 40333
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.clock-repair.json": {
+        "sha256": "6c07889e014430eb1becccfc1b75b9944a0b288fdc828a14f6bca46d80d5cab5",
+        "bytes": 214510
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.posterior.json": {
+        "sha256": "0e62ef0dfa23de2bbcdafc379754a77b7491e6d153d017fddb332b77f0abd15a",
+        "bytes": 198236
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.stages.json": {
+        "sha256": "6fcc6fc2cf4121f7aaadd2365c689624fa104747a88b35ff6ad425110675e396",
+        "bytes": 739904
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.voyage.json": {
+        "sha256": "5bd9ae7c89972e628344ecd1545dcae1aa10697756934fec271e72e89071d307",
+        "bytes": 404725
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "A",
+    "participant": "NN17_DBE_242331_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN17_DBE_242331_final.tsv": {
+        "sha256": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+        "bytes": 128398
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.clock-repair.json": {
+        "sha256": "50cd2f4a6c670aa39a7027516d54b58109199034bb7e4b8130c0b68e56d52a91",
+        "bytes": 214510
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.posterior.json": {
+        "sha256": "6e4d01594dc2d3d7940bba9a4bfb8c5c54bafe5d5a70ff81ae9c8db5cbd61126",
+        "bytes": 784133
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.stages.json": {
+        "sha256": "cb6167bb51e8ca1a54136f352c86a590b9a6c029788af11c8b4922af6ecfeedc",
+        "bytes": 2924230
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.voyage.json": {
+        "sha256": "eb9fc566ded1bf7113610939cce649003b84f31110f2c6ffea2ca56789748ad5",
+        "bytes": 1051973
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN03_ANT_202231_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN03_ANT_202231_final.tsv": {
+        "sha256": "d9f277531b082a9303ca90ce8f8b2b5f2c71bb0685ee2eb01f5fc39e1e78e862",
+        "bytes": 64590
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.clock-repair.json": {
+        "sha256": "0997ec666ebe73f5031ac29d08390a3c350927377bb89fd4a9ecdfe19c0e3472",
+        "bytes": 214510
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.posterior.json": {
+        "sha256": "67437ac7b5214576d887f89cc55c1e81459ce15564b86dad22ce9b7b4bf5d25b",
+        "bytes": 385426
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.stages.json": {
+        "sha256": "415f341fbc62a5cbb09f4db352a402aa8bd653a620d6718f373ba45990d6fc7b",
+        "bytes": 1436769
+      },
+      "recall-map-NN03_ANT_202231_final.tsv.voyage.json": {
+        "sha256": "468963339d40354e4551689db183b5257df0d3ae552c3419e02654fddd44e614",
+        "bytes": 606417
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN04_ATE_163931_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN04_ATE_163931_final.tsv": {
+        "sha256": "73522ab0d2fa5c0a7e4e797fb0a6cd0da24af143e416e2f70a147ec657de72e0",
+        "bytes": 39052
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.clock-repair.json": {
+        "sha256": "f25e9cc75e9b38a880bb8a0341b7cded0e0c0a107fdcb2b7fbc732a79cb911f1",
+        "bytes": 214510
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.posterior.json": {
+        "sha256": "a608cd20e685edb44a69ff89c821f4503d84eaa557f80f83094575ebae1c0eb0",
+        "bytes": 213835
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.stages.json": {
+        "sha256": "64fd2ecb73fc48560396c4341df144d709105a43caa580bf81169d8302b49a50",
+        "bytes": 797443
+      },
+      "recall-map-NN04_ATE_163931_final.tsv.voyage.json": {
+        "sha256": "821f6603cc1a12bebc99764b4964cf005077d9e4bcff071959e976c07651117e",
+        "bytes": 416602
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN05_MUN_151631_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN05_MUN_151631_final.tsv": {
+        "sha256": "d1ebbe9d9386bf0f27de80deaefcf50fb5e175ca106dcb71587f94aa81489c4b",
+        "bytes": 28716
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.clock-repair.json": {
+        "sha256": "d2a711a38a099b399ca6aa696b745719e6c6b649eb40b9e64c720786b7f5e498",
+        "bytes": 214510
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.posterior.json": {
+        "sha256": "a9a048d46e432f363ed53a3a033d2dbfba80278826758985f723e1b5cac48d8a",
+        "bytes": 151534
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.stages.json": {
+        "sha256": "766efdaa9872502fb55f053ce97b54381007baf9154482b2595dec504e7d06ca",
+        "bytes": 564748
+      },
+      "recall-map-NN05_MUN_151631_final.tsv.voyage.json": {
+        "sha256": "308a24f9f4725ad77758da6b272e7183ecc7ba7507c77aafc44d54eee875b3ab",
+        "bytes": 347720
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN06_SQT_213031_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN06_SQT_213031_final.tsv": {
+        "sha256": "4032ff1511bf22e7d9542bab7964c8f5115dc870109052a52bcb87f1a4d684c3",
+        "bytes": 46993
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.clock-repair.json": {
+        "sha256": "5754093202a1c84d741198ae39ea928ce1b453ad5fd92c472844e06000259639",
+        "bytes": 214510
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.posterior.json": {
+        "sha256": "51423e0587befb7063e6a94bebc9ec3d2d61d1f01d53ec04736772f6f2eda39a",
+        "bytes": 231705
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.stages.json": {
+        "sha256": "133c2173444a376630520807d914fd77da972663f821bee2da9e33399b66662d",
+        "bytes": 864019
+      },
+      "recall-map-NN06_SQT_213031_final.tsv.voyage.json": {
+        "sha256": "da5f84a5dc777e0e0d327653f296fd950370310660694346878d3ef1f66af2c0",
+        "bytes": 439694
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN07_SKS_213031_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN07_SKS_213031_final.tsv": {
+        "sha256": "62fa28714d089aa7bf238fbb9cf8f8b248dfe0296342edca58e8d0bc8497bbd1",
+        "bytes": 39756
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.clock-repair.json": {
+        "sha256": "bf8305d23da9269e9c03e31e77502e03bf999ef987fa0ae6d3ee77dbfe03ee5b",
+        "bytes": 214510
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.posterior.json": {
+        "sha256": "43033a1fb90b4641ab718a01eced5475df711dbd848ab5f0f39508dc43b2f6dd",
+        "bytes": 218337
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.stages.json": {
+        "sha256": "a0828ce7a52e5bd5ba6d3e1fc19064bd826beca7250a452739e5eeca76f1ef9e",
+        "bytes": 814446
+      },
+      "recall-map-NN07_SKS_213031_final.tsv.voyage.json": {
+        "sha256": "6e3143a310c3c70fab08b1534fbf5f202389e95710ceccff6ddf1fc942f942c1",
+        "bytes": 422686
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN08_OLZ_224031_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN08_OLZ_224031_final.tsv": {
+        "sha256": "28568e41152f8287199575a9cf63a8107f8d2c491930ae076a68504211f5ed59",
+        "bytes": 71453
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.clock-repair.json": {
+        "sha256": "b9a79b570a15f4150da17419bbdfd3beb88b9279ba00c4116aa8c3efaada031b",
+        "bytes": 214510
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.posterior.json": {
+        "sha256": "70216b5bac13e899090ff6215a9c05ac2423114231b30670baf57af18bdd8e9e",
+        "bytes": 403269
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.stages.json": {
+        "sha256": "8bbc17d94feac7f3bfc88b0c66e5bca5721ceae4476495f27c793b64706cbb4c",
+        "bytes": 1503532
+      },
+      "recall-map-NN08_OLZ_224031_final.tsv.voyage.json": {
+        "sha256": "e57510fd9549fd80169f4c1415c92c73378a897f82daa00b727fc4d35968f245",
+        "bytes": 629659
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN11_NMA_233131_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN11_NMA_233131_final.tsv": {
+        "sha256": "c3a8788cc3aeb56f10a639ade8aa4b69e295b6f481a6152d790dd24e77e8802c",
+        "bytes": 53144
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.clock-repair.json": {
+        "sha256": "dffc9efa62b37378c6db4e237237a05897eb6190329ebf287f0b4475778d1d40",
+        "bytes": 214510
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.posterior.json": {
+        "sha256": "93198ab5a4ab8ca66b980c2dc092bcb0e7644f995dea99a45766177228ae5148",
+        "bytes": 329745
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.stages.json": {
+        "sha256": "d268bee2a6d6e059d3d45efdb5d2dfd6922cd99d1b739e914b7f12dcb42ce2f4",
+        "bytes": 1229437
+      },
+      "recall-map-NN11_NMA_233131_final.tsv.voyage.json": {
+        "sha256": "3501ee04e82036601f6cdc093942a56c8c7dc39aac90e8e332d614579304b0dc",
+        "bytes": 543496
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN13_DII_241731_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN13_DII_241731_final.tsv": {
+        "sha256": "99d2a6aeca2082eaff8dc264952a886a7dfae25a48c870083de00d38e5053ee1",
+        "bytes": 135676
+      },
+      "recall-map-NN13_DII_241731_final.tsv.clock-repair.json": {
+        "sha256": "d6ad1ee430f4d48243e5650668d0bf5bbf2f00afbc58d85666b467d5e35398d8",
+        "bytes": 214510
+      },
+      "recall-map-NN13_DII_241731_final.tsv.posterior.json": {
+        "sha256": "a6cd4c9373b05e9719809f0d5bbff17e2ce8f45619076ec892a93c4dec7635dc",
+        "bytes": 752944
+      },
+      "recall-map-NN13_DII_241731_final.tsv.stages.json": {
+        "sha256": "7363c092b61a9b0c0bcff5cf11c60ffc37fda706da2a733d4c1e3d3200c0c7d6",
+        "bytes": 2808149
+      },
+      "recall-map-NN13_DII_241731_final.tsv.voyage.json": {
+        "sha256": "2ec6b3ca6249a1ca02d64f49b6ab0805d359dee6484e20357c286ce5f4a77077",
+        "bytes": 1023316
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN15_DBF_242231_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN15_DBF_242231_final.tsv": {
+        "sha256": "8cfc0ce65ebe33726ff4d1755231dc1b8b1acfb35c8e481ef5706a42295c5b4c",
+        "bytes": 41280
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.clock-repair.json": {
+        "sha256": "961c8d6c907b87e2169b0296def43f94f5ae29fe753d23f6334f9394e18584ff",
+        "bytes": 214510
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.posterior.json": {
+        "sha256": "d336498e95a378a7a2798926298dce72bbc78ce179123f6410668af9f2c24e72",
+        "bytes": 216144
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.stages.json": {
+        "sha256": "46dfce36d91d96c3e9a2b58bd628265dc0c5c58165d0f8304dd6b0829ceae5d9",
+        "bytes": 805959
+      },
+      "recall-map-NN15_DBF_242231_final.tsv.voyage.json": {
+        "sha256": "ac34eee019ead99973c638ce4cb67d6dedc974f51d3890a8aff9cf708055955c",
+        "bytes": 421038
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN16_DBN_242731_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN16_DBN_242731_final.tsv": {
+        "sha256": "e5b3318fd4c38fac209c82b31dba63637cd47d988151e772ea3aa75e2b6407c5",
+        "bytes": 39887
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.clock-repair.json": {
+        "sha256": "c7c7bc76990882114c20a22d8984dab61314d6821d16580ec2bbaa865789b249",
+        "bytes": 214510
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.posterior.json": {
+        "sha256": "408cbe64ac259c5a79568ae761bfa6528ea4efb2747ecdb22beeb8bde2463385",
+        "bytes": 198292
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.stages.json": {
+        "sha256": "7394cafb06a580ad5a7ebbee9997aae18ae490d847c23286c75bd1a78f4dec15",
+        "bytes": 739647
+      },
+      "recall-map-NN16_DBN_242731_final.tsv.voyage.json": {
+        "sha256": "a6e20f83c2022759399d9155a735401cc96be1b7597194954d8da03224b0b59e",
+        "bytes": 404699
+      }
+    },
+    "status": "produced"
+  },
+  {
+    "arm": "AV",
+    "participant": "NN17_DBE_242331_final",
+    "exitCode": 0,
+    "artifacts": {
+      "recall-map-NN17_DBE_242331_final.tsv": {
+        "sha256": "5464aae8857392282584bcd5a02ea57f65388292f4ed572ae110ddb7184f1e88",
+        "bytes": 129022
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.clock-repair.json": {
+        "sha256": "bda8a293d0dc343f8adbefa9871068152199ce4e5522548997b9c5ca4b3487fa",
+        "bytes": 214510
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.posterior.json": {
+        "sha256": "6594faa2934dd0df1795c51159e78a80e4e2ae08388d3d50044d04df456356c2",
+        "bytes": 784241
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.stages.json": {
+        "sha256": "13ddd3664b7cf6b4711ca2a1438a797848871ef1a768c2ceecaf76d178d1c968",
+        "bytes": 2923519
+      },
+      "recall-map-NN17_DBE_242331_final.tsv.voyage.json": {
+        "sha256": "e472f6b968eaad3b048c0c8e96219c95f494892ad55a5f286f5ba6299d07fa97",
+        "bytes": 1051992
+      }
+    },
+    "status": "produced"
+  }
+]
