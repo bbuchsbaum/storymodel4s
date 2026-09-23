@@ -16,6 +16,9 @@ import storymodel4s.recall.RecallGraphStatus.{
   * addresses independent of iteration order; a real result round-trips through parts.
   */
 class WireSuite extends FunSuite:
+  private def coverageOf(level: Int, withEvidence: Int, members: Int): StructuralCoverage =
+    StructuralCoverage.of(level, withEvidence, members).fold(e => fail(e.message), identity)
+
   import AnnaFixture.{view, e1, e2, e5, sc1}
 
   private def checkedRecall(g: RecallGraph[RecallUnchecked]): RecallGraph[RecallChecked] =
@@ -177,11 +180,10 @@ class WireSuite extends FunSuite:
     val external = result.costs.values.flatMap(_.values).find(_.mode.isEmpty).get
     assert(malformed(rebuild(parts(external).copy(terms = Map(CostTerm.Semantic -> 0.1)))))
     // malformed coverage
+    // A count-violating coverage can no longer be built at all; the refusal moved into the type.
+    assert(StructuralCoverage.of(0, 2, 1).isLeft)
     assert(
-      malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(0, 2, 1)))))
-    )
-    assert(
-      malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(-1, 0, 1)))))
+      malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(coverageOf(-1, 0, 1)))))
     )
   }
 
@@ -221,7 +223,7 @@ class WireSuite extends FunSuite:
       StructuralReducer.Minimum,
       members,
       excluded,
-      StructuralCoverage(1, members.size + excluded.size, members.size + excluded.size),
+      coverageOf(1, members.size + excluded.size, members.size + excluded.size),
       coverage.getOrElse(Coverage.unsafe(members.size, members.count(_.estimate.isObserved)))
     )
 
@@ -261,17 +263,7 @@ class WireSuite extends FunSuite:
     assert(receipt(Vector(b), Vector(ex)).isRight)
     assert(malformed(AlignWire.memberExclusion(e1, Set.empty)))
     assert(malformed(AlignWire.memberEstimate(e1, Estimate.observed(Double.PositiveInfinity))))
-    assert(
-      malformed(
-        AlignWire.reductionReceipt(
-          StructuralReducer.Minimum,
-          Vector(a),
-          Vector.empty,
-          StructuralCoverage(1, 3, 2),
-          Coverage.unsafe(1, 1)
-        )
-      )
-    )
+    assert(StructuralCoverage.of(1, 3, 2).isLeft)
   }
 
   // ---- fingerprints ----------------------------------------------------------------------------
@@ -598,7 +590,7 @@ class WireSuite extends FunSuite:
       "receipt reduces to a value but the term is recorded missing"
     )
     // the receipt's source-chart coverage must be the breakdown's
-    val other = StructuralCoverage(cov.level, cov.membersWithEvidence, cov.members + 1)
+    val other = coverageOf(cov.level, cov.membersWithEvidence, cov.members + 1)
     val rcOther = AlignWire
       .reductionReceipt(
         StructuralReducer.Minimum,

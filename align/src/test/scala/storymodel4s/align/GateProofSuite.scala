@@ -598,3 +598,34 @@ class GateProofSuite extends FunSuite:
     assert(checksumUnchecked.nonEmpty, checksumUnchecked.toString)
     assert(signatureUnchecked.nonEmpty, signatureUnchecked.toString)
   }
+
+  test("Admissibility derives faithful and distortion from its contradictions alone") {
+    // The record used to store all three, so (no contradictions, not faithful) was representable.
+    // Expected values are written out, not recomputed with the implementation's expressions.
+    val none = Admissibility.of(Vector.empty)
+    assertEquals(none, Admissibility.faithfulOnly)
+    assert(none.faithful && none.distortion.isEmpty && none.modes == Vector(FidelityMode.Faithful))
+    val two = Admissibility.of(
+      Vector(
+        Contradiction.PolarityConflict,
+        Contradiction.RoleReversal,
+        Contradiction.PolarityConflict
+      )
+    )
+    assertEquals(
+      two.contradictions,
+      Vector(Contradiction.PolarityConflict, Contradiction.RoleReversal)
+    )
+    assert(!two.faithful && two.gated)
+    assertEquals(
+      two.distortion,
+      Some(NonEmptySet.of[Facet](Facet.RoleReversal, Facet.Polarity))
+    )
+    assertEquals(two.facets, Set[Facet](Facet.RoleReversal, Facet.Polarity))
+    assertEquals(two.modes, Vector(FidelityMode.Distorted(two.distortion.get)))
+    assertNotEquals(two, none)
+    assertEquals(
+      two,
+      Admissibility.of(Vector(Contradiction.PolarityConflict, Contradiction.RoleReversal))
+    )
+  }

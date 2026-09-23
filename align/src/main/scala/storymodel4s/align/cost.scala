@@ -1030,12 +1030,27 @@ object ContradictionDetector:
   * before any graded cost is evaluated; `faithful` is false exactly when a contradiction was
   * detected, in which case `distortion` names the contradicted facets and the distorted state is
   * the only admissible mode on that anchor.
+  *
+  * Why a non-case class holding only the contradictions: `faithful` and `distortion` are functions
+  * of them, so storing them as fields let a record contradict itself (no contradiction yet not
+  * faithful, or facets that no contradiction names), and a case class hands out `fromProduct` and
+  * `Mirror.ProductOf` to every package (design rule 8). Deriving both removes the relation instead
+  * of guarding it.
   */
-final case class Admissibility private[align] (
-    contradictions: Vector[Contradiction],
-    faithful: Boolean,
-    distortion: Option[NonEmptySet[Facet]]
-):
+final class Admissibility private (val contradictions: Vector[Contradiction]):
+  /** The faithful mode is admissible exactly when no contradiction was detected. */
+  def faithful: Boolean = contradictions.isEmpty
+
+  /** The contradicted facets, when any contradiction was detected. */
+  def distortion: Option[NonEmptySet[Facet]] =
+    NonEmptySet.fromSet(scala.collection.immutable.SortedSet.from(contradictions.map(_.facet)))
+
+  override def equals(other: Any): Boolean = other match
+    case that: Admissibility => contradictions == that.contradictions
+    case _                   => false
+  override def hashCode(): Int = contradictions.hashCode()
+  override def toString: String = s"Admissibility(${contradictions.mkString(", ")})"
+
   /** The admissible modes on this anchor, in a deterministic order. */
   def modes: Vector[FidelityMode] =
     (if faithful then Vector(FidelityMode.Faithful) else Vector.empty) ++
@@ -1051,20 +1066,10 @@ object Admissibility:
     * ablation path), never in a caller — so an admissibility map handed to [[HsmmResult.validated]]
     * cannot be fabricated, and is in any case re-derived there.
     */
-  private[align] val faithfulOnly: Admissibility =
-    Admissibility(Vector.empty, faithful = true, None)
+  private[align] val faithfulOnly: Admissibility = new Admissibility(Vector.empty)
 
   private[align] def of(contradictions: Vector[Contradiction]): Admissibility =
-    val distinct = contradictions.distinct
-    if distinct.isEmpty then faithfulOnly
-    else
-      Admissibility(
-        distinct,
-        faithful = false,
-        NonEmptySet.fromSet(
-          scala.collection.immutable.SortedSet.from(distinct.map(_.facet))
-        )
-      )
+    new Admissibility(contradictions.distinct)
 
 /** The mode gate (ADR 0001 rev 3 §D5, law L1): decides, per unit and candidate anchor, whether the
   * faithful mode is admissible and which distorted mode replaces it. It is a typed prepass owned by
