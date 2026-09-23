@@ -91,7 +91,10 @@ class MigrationSuite extends FunSuite:
         Left(IntakeRefusal.MissingArtifact(ArtifactId.unsafe("absent.xlsx")))
       )
     finally
-      Files.walk(dir).sorted(java.util.Comparator.reverseOrder()).forEach(Files.deleteIfExists(_))
+      Files
+        .walk(dir)
+        .sorted(java.util.Comparator.reverseOrder())
+        .forEach(p => { val _ = Files.deleteIfExists(p) })
   }
 
   test("a FileStore refuses a missing root and a path that escapes it, never throwing") {
@@ -104,7 +107,8 @@ class MigrationSuite extends FunSuite:
       val store = FileStore.at(dir).fold(r => fail(r.message), identity)
       val escaping = ArtifactId.unsafe("../../etc/passwd")
       assert(store.bytes(escaping).isLeft)
-    finally Files.deleteIfExists(dir)
+    finally
+      val _ = Files.deleteIfExists(dir)
   }
 
   test("the Friends storyboard profile is well formed and declares every column's encoding") {
@@ -139,7 +143,10 @@ class MigrationSuite extends FunSuite:
         .fold(r => fail(r.message), identity)
       assert(Verify.verify(bad, store).isLeft)
     finally
-      Files.walk(dir).sorted(java.util.Comparator.reverseOrder()).forEach(Files.deleteIfExists(_))
+      Files
+        .walk(dir)
+        .sorted(java.util.Comparator.reverseOrder())
+        .forEach(p => { val _ = Files.deleteIfExists(p) })
   }
 
   /** The Sherlock shape, which the Friends lift correctly refuses. */
