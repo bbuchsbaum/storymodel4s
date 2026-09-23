@@ -837,3 +837,56 @@ Scanner work still requires independently verified recording/subject/run binding
 StoryAtlas consumes the provider's checked results after its M1 handoff. This
 checkpoint does not infer exposure from onsets, project missing source coordinates,
 allocate posterior mass, establish scanner alignment or qualify fine localization.
+
+## 15. Conditional queries and declared scanner handoff — 22 September 2026
+
+Candidate `b8f22d0091f0427f779b86ac5e7e90a828da4070` on
+`solo/temporal-region-queries` integrates the landed intake/support with
+[conditional temporal queries](../temporal-queries.md),
+[declared scanner clocks](../scanner-crosswalks.md) and a generic provider-owned
+`TemporalPartitionView`. This continuation is under existing temporal ticket
+`bd-01M3549Q5W5KQFSY3ZH81FARM0` and scanner ticket
+`bd-01M354E83Z4Z7DR4KPP6Q45MAJ`; neither complete ticket is closed by this slice.
+
+The query API provides per-unit encoding-region bounds, declared uniform interval
+or point kernels and explicit mixtures, disjoint-bin accounting and top-k omitted
+weight. It preserves normalized-score versus posterior semantics, actual posterior
+states, candidate coverage, unavailable locations, external states, supplied total
+and allocation assumptions. Exact contextual `temporal-query/v0.1` reexecutes and
+compares the complete output. A support bound is conditional on the caller's
+containment assumption; it is not a confidence interval or a calibration claim.
+
+Scanner records use exact seconds and original zero-based stored-volume indices.
+Crop, pad, dropped and censored positions remain distinct. `scannerSamples` is an
+offline production command over an explicit job; its atomic JSON output leaves
+scanner binding unestablished. Declared affine bindings can map complete analysis
+bins into the actual media axis, refusing fractional ticks and out-of-domain tails.
+All these records say `declared-not-independently-verified`; no checksum licenses
+a verified image-header, recording/run or media-onset join.
+
+The view projection retains the original partition and contributions, exact
+interval gaps and atoms, ledger and omitted mass. Local navigation checks the
+mapping digest. It neither converts score alternatives into posterior cells nor
+labels supplied data as a locally executed aligner. The active M1 implementation
+at `f4af92e8` constructs a text-only source representation plus a separate declared
+display timeline. That timeline cannot become physical media support without a
+new checked source/mapping admission. Its neutral supplied-artifact provenance is
+also a dependency for a full scene. Therefore existing M1 and Atlas acceptance
+remain intact; this adapter is not browser completion.
+
+Qualification: 30 focused JVM tests pass. Ten query, ten scanner and three view
+compiled mutations fail their named assertions, and restored controls pass.
+Independent Python readers check authored Fraction landmarks, region mass, output
+missingness and canonical mixture identities. The full exact-source `checkAll` and
+formatting gate passed: 8,079 passes, five optional live skips, zero failures/errors
+across 56 test tasks and 738 fresh JUnit reports. Both independent readers accepted
+the exact candidate exports and rejected six corrupted-output controls. See the
+[bound evidence and example outputs](../refactor/evidence/temporal-scanner-20260922/README.md).
+
+Next work follows the existing dependencies: shared ordinary-file facade/exchange
+and media-aware workspace admission; recall exposure and concentration/readout
+queries; actual OpenNeuro run admission and sparse sample weights; then the Atlas
+scene/lowering/loading/interaction and exact-pair browser courts. The configured
+local Sherlock root has no BOLD files, run sidecars, events or participants table,
+so the raw/BIDS dataset location was requested. No held-out corpus, gold fitting,
+remote provider or neural outcome was used for these synthetic checks.

@@ -1,0 +1,13 @@
+{
+  "candidate": "b8f22d0091f0427f779b86ac5e7e90a828da4070",
+  "artifacts": [
+    {
+      "path": "temporal-query.json",
+      "sha256": "f0798e0a6c4e15dfe509d913712116d493690bd7fb73845d12b2632f1d86c4ae"
+    },
+    {
+      "path": "scanner-samples.json",
+      "sha256": "4a6803373f8c91cc46cc0a3221a3f4de0d6e141e329fca163955a6028792182a"
+    }
+  ]
+}

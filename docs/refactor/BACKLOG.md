@@ -44,6 +44,22 @@ mote show bd-01M2TA01EHVRF6MQ1N00XTVK1K
 
 The `workspace-m1` plus `execution` filter is the active bounded queue; the foundation filter retains its separate historical/infrastructure scope. Other lanes are visible in ticket titles and bodies, and every old issue is enumerated below. A ready research ticket is not permission to start it ahead of the delivery slice. Priorities: 0 foundation, 1 next implementation/film, 2 validation/release/maintenance, 3 deliberately later. Owner decisions apply only to their named track. Containers use nonblocking relationships; dependency edges encode technical prerequisites.
 
+## Current owner scope and temporal implementation checkpoint
+
+The live Mote reconciliation at `408178ef` supersedes the historical
+compatibility-first diagrams below: the 1.0 facade publishes reference and
+reconstruction side by side, with their declared mixing weight; film compilation
+and organization analyses are 1.1 work. Those historical rows remain traceability,
+not an instruction to make compatibility a new 1.0 prerequisite.
+
+The [22 September continuation](../plans/2026-09-22-recall-encoding-workflow.md#15-conditional-queries-and-declared-scanner-handoff--22-september-2026)
+adds conditional per-unit temporal queries, exact scanner declarations/sample CLI
+and a provider-owned view adapter. Candidate `b8f22d00` passed the full gate
+(8,079 passes, five optional skips), 23 mutation controls and exact-output independent
+readers; see [qualification](evidence/temporal-scanner-20260922/README.md). Recall exposure, concentration, facade/exchange and media-aware M1 intake
+remain open on the existing temporal ticket. Actual OpenNeuro run evidence remains
+open on the scanner ticket; declared synthetic transforms do not close it.
+
 ## Critical dependency chains
 
 ```text
