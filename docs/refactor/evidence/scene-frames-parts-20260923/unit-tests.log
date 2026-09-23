@@ -1,0 +1,30 @@
+CMD: python3 tools/recall-study/tests/test_extract_scene_frames.py -v ; SHA=f43dd6120e6e42b526b9412672566ccf10f050d1 ; python=Python 3.14.7 ; at=2026-09-23T13:07:31Z
+test_allocate_refuses_what_it_cannot_divide_exactly (__main__.SceneFramesSuite.test_allocate_refuses_what_it_cannot_divide_exactly) ... ok
+test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats (__main__.SceneFramesSuite.test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats) ... ok
+test_every_part_gets_a_frame_and_counts_sum_exactly (__main__.SceneFramesSuite.test_every_part_gets_a_frame_and_counts_sum_exactly) ... ok
+test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound (__main__.SceneFramesSuite.test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound) ... ok
+test_manifest_v2_records_per_part_extents_and_ordinals (__main__.SceneFramesSuite.test_manifest_v2_records_per_part_extents_and_ordinals) ... /private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/extract_scene_frames.py:295: ResourceWarning: unclosed file <_io.BufferedReader name='/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmp18hmzen_/scene-frames.bgr'>
+  digest = hashlib.sha256(open(raw_path, "rb").read()).hexdigest()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/extract_scene_frames.py:296: ResourceWarning: unclosed file <_io.TextIOWrapper name='/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmp18hmzen_/scene-manifest.json' mode='w' encoding='UTF-8'>
+  json.dump(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_refusal_happens_before_any_frame_is_extracted (__main__.SceneFramesSuite.test_refusal_happens_before_any_frame_is_extracted) ... ok
+test_remainder_tie_goes_to_the_earlier_part (__main__.SceneFramesSuite.test_remainder_tie_goes_to_the_earlier_part) ... ok
+test_short_extent_control_v1_sampled_outside_v2_stays_inside (__main__.SceneFramesSuite.test_short_extent_control_v1_sampled_outside_v2_stays_inside) ... ok
+test_single_part_offsets_equal_v1_from_half_a_second_up (__main__.SceneFramesSuite.test_single_part_offsets_equal_v1_from_half_a_second_up) ... ok
+test_straddling_scene_samples_every_part_inside_its_own_extent (__main__.SceneFramesSuite.test_straddling_scene_samples_every_part_inside_its_own_extent) ... ok
+test_timeline_order_is_declared_not_lexical (__main__.SceneFramesSuite.test_timeline_order_is_declared_not_lexical) ... ok
+test_unsamplable_extents_and_budgets_refuse (__main__.SceneFramesSuite.test_unsamplable_extents_and_budgets_refuse) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.006s
+
+OK
+  scene 01/2 opening                            media-part-a     0.0-   40.0s
+  scene 02/2 crossing                           media-part-a   100.0-  110.0s + media-part-b     0.0-   30.0s
+
+16 frames, 2 scenes, sha256 a1a4f5721c1c4610, straddling 1
+wrote /var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmp18hmzen_/scene-frames.bgr and scene-manifest.json
+EXIT=0

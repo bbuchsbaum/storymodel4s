@@ -1,0 +1,15 @@
+test_straddling_scene_samples_every_part_inside_its_own_extent (__main__.SceneFramesSuite.test_straddling_scene_samples_every_part_inside_its_own_extent) ... FAIL
+
+======================================================================
+FAIL: test_straddling_scene_samples_every_part_inside_its_own_extent (__main__.SceneFramesSuite.test_straddling_scene_samples_every_part_inside_its_own_extent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 49, in test_straddling_scene_samples_every_part_inside_its_own_extent
+    self.assertAlmostEqual(got, want, places=9)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 18.333333333333332 != 101.66666666666667 within 9 places (83.33333333333334 difference)
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

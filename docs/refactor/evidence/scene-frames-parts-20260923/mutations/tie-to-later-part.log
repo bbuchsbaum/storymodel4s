@@ -1,0 +1,22 @@
+test_remainder_tie_goes_to_the_earlier_part (__main__.SceneFramesSuite.test_remainder_tie_goes_to_the_earlier_part) ... FAIL
+
+======================================================================
+FAIL: test_remainder_tie_goes_to_the_earlier_part (__main__.SceneFramesSuite.test_remainder_tie_goes_to_the_earlier_part)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 62, in test_remainder_tie_goes_to_the_earlier_part
+    self.assertEqual(esf.allocate([F(5), F(5)], 3), [2, 1])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [1, 2] != [2, 1]
+
+First differing element 0:
+1
+2
+
+- [1, 2]
++ [2, 1]
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

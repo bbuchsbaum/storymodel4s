@@ -1,0 +1,22 @@
+test_every_part_gets_a_frame_and_counts_sum_exactly (__main__.SceneFramesSuite.test_every_part_gets_a_frame_and_counts_sum_exactly) ... FAIL
+
+======================================================================
+FAIL: test_every_part_gets_a_frame_and_counts_sum_exactly (__main__.SceneFramesSuite.test_every_part_gets_a_frame_and_counts_sum_exactly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 54, in test_every_part_gets_a_frame_and_counts_sum_exactly
+    self.assertEqual([p["count"] for p in esf.plan_scene(tiny, 8)], [1, 7])
+                                          ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/scene-frames-mutants-1rput5k5/no-frame-floor-per-part.py", line 132, in plan_scene
+    counts = allocate(
+        [decimal_seconds(d["end"]) - decimal_seconds(d["start"]) for _, d in chosen],
+        per,
+    )
+  File "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/scene-frames-mutants-1rput5k5/no-frame-floor-per-part.py", line 99, in allocate
+    raise AssertionError(f"allocation {alloc} does not sum to {per}")
+AssertionError: allocation [1, 9] does not sum to 8
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

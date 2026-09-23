@@ -1,0 +1,15 @@
+test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound (__main__.SceneFramesSuite.test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound) ... FAIL
+
+======================================================================
+FAIL: test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound (__main__.SceneFramesSuite.test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 146, in test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound
+    with self.assertRaises(esf.PlanRefusal):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: PlanRefusal not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

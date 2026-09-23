@@ -1,0 +1,22 @@
+test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats (__main__.SceneFramesSuite.test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats) ... FAIL
+
+======================================================================
+FAIL: test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats (__main__.SceneFramesSuite.test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 70, in test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats
+    self.assertEqual([p["count"] for p in esf.plan_scene(parts, 8)], [2, 6])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [1, 7] != [2, 6]
+
+First differing element 0:
+1
+2
+
+- [1, 7]
++ [2, 6]
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

@@ -1,0 +1,116 @@
+{
+  "sourceSha256": "0afae216b7c4c20a2ea57ce20a33b5526cdcea2b0102e57be1128af0a2ca72bf",
+  "testSha256": "f9e717a69a391a3c44966ccd0053d7e2cb8fc282fa3ba29cfb847123708a1a28",
+  "controlBefore": "pass",
+  "controlAfter": "pass",
+  "mutations": [
+    {
+      "name": "majority-part-reinstated",
+      "test": "test_straddling_scene_samples_every_part_inside_its_own_extent",
+      "compiled": true,
+      "mutantSha256": "fc5a077cfa454105b2a9776edf50a3e109840e796089230da2867969e2e8021d",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "10a412302396c78368bf76c80caa371aeb5b4debfb3b93568ce7479880f9e9f8"
+    },
+    {
+      "name": "union-span-offsets",
+      "test": "test_straddling_scene_samples_every_part_inside_its_own_extent",
+      "compiled": true,
+      "mutantSha256": "028d121d40900dd1bfe9d7322c9810c56a0cb82500fe1d66bf40fff2c5dfab6c",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "af20e0349c62e096c4cfa72d3a619b450c24b2dc9fcfcccacd62d5a2bfe94286"
+    },
+    {
+      "name": "no-frame-floor-per-part",
+      "test": "test_every_part_gets_a_frame_and_counts_sum_exactly",
+      "compiled": true,
+      "mutantSha256": "abc53f706ea7b29aa5f8fbd8e1c73fcbdb62117a33063cc67ca1b902b3bb5be5",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "31c4ab02946a57f20d2f004b2bbba49bb745d4f4af1d5869f8285eb47219e142"
+    },
+    {
+      "name": "lexical-part-order",
+      "test": "test_timeline_order_is_declared_not_lexical",
+      "compiled": true,
+      "mutantSha256": "e5bdd947f0b088e0aa92a891d67d95ff30205a27ea3de6a99e2d13850bad2c5f",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "4054c5340fd163c16b2b836fb7ba42b43e614639f60fd537792e6056760a844c"
+    },
+    {
+      "name": "tie-to-later-part",
+      "test": "test_remainder_tie_goes_to_the_earlier_part",
+      "compiled": true,
+      "mutantSha256": "177b66d82fcbdbe4d517d689091cc949fcfaa4ee1cbc490b848228f06321b562",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "920db42a9c001d8b40bee0f071bc17b2378e835058e593d0d3cb8cfe07ea5c7a"
+    },
+    {
+      "name": "skip-extent-check",
+      "test": "test_unsamplable_extents_and_budgets_refuse",
+      "compiled": true,
+      "mutantSha256": "e180af6259232bd86ddc4acbc9c34d5c83fd1e4e542682f1d84740b126a39779",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "b3c3adf5de9d4be9846e33e6e802f8eea22a995df28f27da5dc236050af6f62a"
+    },
+    {
+      "name": "legacy-half-second-span",
+      "test": "test_short_extent_control_v1_sampled_outside_v2_stays_inside",
+      "compiled": true,
+      "mutantSha256": "db56d837e5c1f4d82a6c78e3717796f11b3c8e348e060a3066df7c72438c83e5",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "0986f8b7286a63249de2f59f58e1710b2a5ec605559865f29b231c73830a46db"
+    },
+    {
+      "name": "extract-before-refusal",
+      "test": "test_refusal_happens_before_any_frame_is_extracted",
+      "compiled": true,
+      "mutantSha256": "4f6671a70f0efb9c4152473571a8339a4eec44e9692a1d4f0c4d17b8587a9ffc",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "3e4b592baedb217ccfb2c9181d44cc2ee40f7c64f4b361ea273abaebddfdf811"
+    },
+    {
+      "name": "binary-float-durations",
+      "test": "test_decimal_tie_is_decided_on_the_annotation_decimals_not_binary_floats",
+      "compiled": true,
+      "mutantSha256": "17ead4d631761416581bc6005b834f499844a69ce2297147e4e8ef51b928a1cc",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "eb8f959417c975debb55f260653159d25fba4a7757baf92e9852c14bc37a5754"
+    },
+    {
+      "name": "allocate-accepts-inexact-or-nonpositive",
+      "test": "test_allocate_refuses_what_it_cannot_divide_exactly",
+      "compiled": true,
+      "mutantSha256": "ed46c8515e39e49c41ac32378dc2a71cd6d350c61b5d1738cb3a1b504577f495",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "fcaa3ad81b8e0db331a135cfd9e6013a21ff7eb8a7cc58e7b6db1bc9315151ef"
+    },
+    {
+      "name": "undeclared-part-dropped",
+      "test": "test_timeline_order_is_declared_not_lexical",
+      "compiled": true,
+      "mutantSha256": "07e7d33215f22bb7af8ec79854b32852b5db0219b686ffc5eb7a500fc9bd665c",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "697ae697c659c5ee1d453f69f8d2e94e3454e7c5b9b6eb86b400e3ed29936e2c"
+    },
+    {
+      "name": "sample-on-extent-bound",
+      "test": "test_extent_below_float_resolution_refuses_rather_than_sampling_a_bound",
+      "compiled": true,
+      "mutantSha256": "be7ac68be49689896f0955584514e049ee4ef4a93cd16f054fc7383309b1f995",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "30fe685f781b79a416430ed9a4a0d3ee6d662269f710d69aac992730fe595514"
+    }
+  ]
+}

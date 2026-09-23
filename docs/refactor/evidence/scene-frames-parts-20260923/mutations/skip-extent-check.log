@@ -1,0 +1,15 @@
+test_unsamplable_extents_and_budgets_refuse (__main__.SceneFramesSuite.test_unsamplable_extents_and_budgets_refuse) ... FAIL
+
+======================================================================
+FAIL: test_unsamplable_extents_and_budgets_refuse (__main__.SceneFramesSuite.test_unsamplable_extents_and_budgets_refuse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 135, in test_unsamplable_extents_and_budgets_refuse
+    with self.assertRaises(esf.PlanRefusal, msg=(lo, hi)):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PlanRefusal not raised : (-1.0, 3.0)
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
