@@ -1,0 +1,17 @@
+{
+  "scope": "Independent direct-Java process probe against the peer focused11 build; full merged checkAll remains separate",
+  "source_checkout": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable",
+  "source_head": "66d0ffdcd0575ba505ed54622aceea43e29baa07",
+  "tracked_status": "",
+  "source_hashes": {
+    "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeCli.scala": "5bb79621410834c824ddda5b28f0205ce9a85d4ebbd8c681c8b2d98c3da49a33",
+    "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeBuild.scala": "05205e6f8ef04296758c45f8216b9b1c97f94afb10d99fe156f4e6100c9ffb1b",
+    "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala": "b439b76f3719394c603c5c4977421c4b45289f3ba4fb330098f75dacf7c8f618"
+  },
+  "result": {
+    "process_cases": 9,
+    "independent_export_packages": 2,
+    "status": "pass"
+  },
+  "review": "m1_plan_review and codex-temporal separately found no code blocker; docs fixture policy corrected. Process exit2 measured directly; sbt exit wrapper not assumed."
+}

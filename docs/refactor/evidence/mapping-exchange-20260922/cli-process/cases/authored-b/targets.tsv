@@ -1,0 +1,4 @@
+"mapping_digest"	"target_id"	"level"	"parent"	"axis_membership"	"support_coverage"	"propositional_scope"
+"4248da186bf9306a18f26d5ee72b6207bbe740b7cfea226dfe8cd08a7d9790d6"	"seg:bell:story"	"1"	"{""reason"":""not-supplied"",""status"":""absent""}"	"[]"	"{""status"":""complete""}"	"{""status"":""declared""}"
+"4248da186bf9306a18f26d5ee72b6207bbe740b7cfea226dfe8cd08a7d9790d6"	"sit:bell:sit:quiet"	"0"	"{""status"":""present"",""value"":""seg:bell:story""}"	"[]"	"{""status"":""complete""}"	"{""status"":""declared""}"
+"4248da186bf9306a18f26d5ee72b6207bbe740b7cfea226dfe8cd08a7d9790d6"	"sit:bell:sit:ring"	"0"	"{""status"":""present"",""value"":""seg:bell:story""}"	"[]"	"{""status"":""complete""}"	"{""status"":""declared""}"

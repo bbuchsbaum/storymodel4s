@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T02:31:02.306766+00:00",
+  "finished_utc": "2026-09-23T02:31:16.197697+00:00",
+  "duration_seconds": 13.890776,
+  "command": [
+    "python3",
+    "examples/mapping/check_cli.py",
+    "--classpath",
+    "/private/tmp/mapping-exchange-evidence/runtime-classpath.txt",
+    "--workspace",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/workspace-m1-packet-20260922/fixtures/bell.workspace.json",
+    "--evidence",
+    "/private/tmp/workspace-exchange-cli-process-20260923"
+  ],
+  "cwd": "/private/tmp/storymodel4s-public-cli-20260923",
+  "log": "/private/tmp/workspace-exchange-cli-process.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 240.0,
+  "log_bytes": 154
+}
