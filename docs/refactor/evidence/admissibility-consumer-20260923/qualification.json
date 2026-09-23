@@ -1,0 +1,129 @@
+{
+  "inputs": {
+    "atlas": {
+      "path": "/private/tmp/storyatlas-p1-seam-20260923",
+      "sha": "39b7f27844674197546610c87cae79102b4c5e73",
+      "tree": "752c5ffe77b23c2388cf65b72771f6515b310c5d",
+      "trackedClean": true,
+      "trackedCleanAfterRun": true
+    },
+    "model": {
+      "path": "/private/tmp/storymodel-p1-integration-20260923",
+      "sha": "c57d0ac726a685acd5b24bd60d55f898c562fe91",
+      "tree": "f3367f38b867f4b0f8e807289a355270cce9fc74",
+      "trackedClean": true,
+      "trackedCleanAfterRun": true
+    },
+    "grakern": {
+      "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+      "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+      "trackedClean": true,
+      "trackedCleanAfterRun": true
+    },
+    "intaglio": {
+      "path": "/private/tmp/intaglio-p1-seam-20260923",
+      "sha": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "tree": "0d87e0cac9cef841f45d51e89435fabe17ba59fe",
+      "trackedClean": true,
+      "trackedCleanAfterRun": true
+    },
+    "gale": {
+      "path": "/private/tmp/p1-closeout-sbt-staging-20260923/c6b5fe94c20cf0d05b05/gale",
+      "sha": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "tree": "4b5537accb5cf0fd2fbb3f9b0c0a54739e3ecc07",
+      "trackedCleanAfterRun": true
+    },
+    "graph4s": {
+      "path": "/private/tmp/p1-closeout-sbt-staging-20260923/8d03f2d14a9e2c9f6990/graph4s",
+      "sha": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "tree": "23759745a9ff76cd4b00b365790dedabf9c82afc",
+      "trackedCleanAfterRun": true
+    }
+  },
+  "artifacts": {
+    "shared-staging-load-failure": {
+      "rawSha256": "99a2a681e2df617c8fb2e614b6ac36182dc8571b0ff9381542fd2d1c206aad3e",
+      "gzipSha256": "35224ff8b5c95151080b51254a6b8c72735f5f0f8af59ed1758cc7835f2ba074",
+      "totals": [],
+      "exit": 1
+    },
+    "atlas-consumer": {
+      "rawSha256": "1191b211de0abbaa5c627a2ea53bc40d0f39b79a646d7214d6ce499bf1f36243",
+      "gzipSha256": "74f9830764081b05fe3f576a6ed9f0aa600420b9c1e73ad447d0daae5c3f357f",
+      "totals": [
+        {
+          "total": 22,
+          "failed": 0,
+          "errors": 0,
+          "passed": 22,
+          "skipped": 0
+        },
+        {
+          "total": 26,
+          "failed": 0,
+          "errors": 0,
+          "passed": 26,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 13,
+          "failed": 0,
+          "errors": 0,
+          "passed": 13,
+          "skipped": 0
+        },
+        {
+          "total": 13,
+          "failed": 0,
+          "errors": 0,
+          "passed": 13,
+          "skipped": 0
+        },
+        {
+          "total": 56,
+          "failed": 0,
+          "errors": 0,
+          "passed": 56,
+          "skipped": 0
+        },
+        {
+          "total": 56,
+          "failed": 0,
+          "errors": 0,
+          "passed": 56,
+          "skipped": 0
+        },
+        {
+          "total": 58,
+          "failed": 0,
+          "errors": 0,
+          "passed": 58,
+          "skipped": 0
+        },
+        {
+          "total": 4,
+          "failed": 0,
+          "errors": 0,
+          "passed": 4,
+          "skipped": 0
+        }
+      ],
+      "exit": 0
+    }
+  }
+}
