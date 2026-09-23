@@ -941,10 +941,6 @@ object ChartDistance:
   * fires only when the compared slots are both specified.
   */
 object ContradictionDetector:
-  /** Facets a chart report decides. */
-  private val ChartFacets: Set[Contradiction] =
-    Set(Contradiction.RoleReversal, Contradiction.PolarityConflict, Contradiction.ContextConflict)
-
   /** Contradictions carried by a chart report. */
   def fromReport(report: CompatibilityReport): Vector[Contradiction] =
     Vector(
@@ -957,60 +953,22 @@ object ContradictionDetector:
     * facets otherwise; modality/outcome always from the sketch.
     */
   def detect(unit: RecallUnit, node: NodeSummary): Vector[Contradiction] =
-    ChartDistance.report(unit, node) match
-      case Some(report) =>
-        val fromSketch = detect(unit.proposition, node).filterNot(ChartFacets.contains)
-        (fromReport(report) ++ fromSketch).distinct
-      case None => detect(unit.proposition, node)
+    ContentScoring
+      .contradictions(ContentProjection.sourceUnit(unit), ContentProjection.sourceNode(node))
+      .fold(r => sys.error(s"unreachable: a source-ordered comparison had readings $r"), identity)
 
   def detect(sketch: PropositionSketch, node: NodeSummary): Vector[Contradiction] =
-    val predicateMatch = sketch.predicate.exists(p => node.predicate.exists(_ == p))
-    val out = Vector.newBuilder[Contradiction]
-
-    // Role reversal: the recalled patient is the source agent (and the recalled agent is not),
-    // or the recalled agent is the source patient (and the recalled patient is not).
-    val sAgent = sketch.agent
-    val sPatient = sketch.patient
-    val nAgent = node.agent
-    val nPatient = node.patient
-    val patientIsNodeAgent = (sPatient, nAgent) match
-      case (Some(p), Some(a)) => Names.overlap(p.names, a.names)
-      case _                  => false
-    val agentIsNodeAgent = (sAgent, nAgent) match
-      case (Some(x), Some(a)) => Names.overlap(x.names, a.names)
-      case _                  => false
-    val agentIsNodePatient = (sAgent, nPatient) match
-      case (Some(x), Some(p)) => Names.overlap(x.names, p.names)
-      case _                  => false
-    val patientIsNodePatient = (sPatient, nPatient) match
-      case (Some(x), Some(p)) => Names.overlap(x.names, p.names)
-      case _                  => false
-    val reversed =
-      (patientIsNodeAgent && sAgent.nonEmpty && !agentIsNodeAgent) ||
-        (agentIsNodePatient && sPatient.nonEmpty && !patientIsNodePatient)
-    val bothInverted = patientIsNodeAgent && agentIsNodePatient
-    if bothInverted || (reversed && predicateMatch) then out += Contradiction.RoleReversal
-
-    if predicateMatch && sketch.polarity != PolarityTag.Unknown &&
-      node.polarity != PolarityTag.Unknown && sketch.polarity != node.polarity
-    then out += Contradiction.PolarityConflict
-
-    if predicateMatch && sketch.modality == ModalityTag.Asserted &&
-      node.context != ContextTag.NarratedWorld
-    then out += Contradiction.ContextConflict
-
-    val unrealized = Set(ModalityTag.Intended, ModalityTag.Desired, ModalityTag.Counterfactual)
-    val modalityConflict =
-      (sketch.modality == ModalityTag.Asserted && unrealized.contains(node.modality)) ||
-        (unrealized.contains(sketch.modality) && node.modality == ModalityTag.Asserted)
-    if predicateMatch && modalityConflict then out += Contradiction.ModalityConflict
-
-    (sketch.outcome, node.outcome) match
-      case (Some(a), Some(b)) if predicateMatch && Lexical.lower(a) != Lexical.lower(b) =>
-        out += Contradiction.OutcomeConflict
-      case _ => ()
-
-    out.result()
+    ContentScoring.sketchRules(
+      ContentScoring.RecallSlots(
+        sketch.predicate,
+        sketch.agent.map(_.names),
+        sketch.patient.map(_.names),
+        sketch.polarity,
+        sketch.modality,
+        sketch.outcome
+      ),
+      ContentScoring.slots(ContentProjection.sourceNode(node))
+    )
 
   /** Whether the sketch engages the node structurally at all (shares its predicate or contradicts
     * it); used to decide which leaves count when a segment inherits contradictions.
@@ -1022,9 +980,9 @@ object ContradictionDetector:
     * rule.
     */
   def engages(unit: RecallUnit, node: NodeSummary): Boolean =
-    ChartDistance.report(unit, node) match
-      case Some(r) => r.matchedPredicates.nonEmpty || detect(unit, node).nonEmpty
-      case None    => engages(unit.proposition, node)
+    ContentScoring
+      .engages(ContentProjection.sourceUnit(unit), ContentProjection.sourceNode(node))
+      .fold(r => sys.error(s"unreachable: a source-ordered comparison had readings $r"), identity)
 
 /** Which `(anchor, mode)` pairs a unit may occupy on a candidate node. Decided by [[ModeGate]]
   * before any graded cost is evaluated; `faithful` is false exactly when a contradiction was

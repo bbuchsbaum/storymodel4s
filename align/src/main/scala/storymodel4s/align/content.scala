@@ -175,14 +175,30 @@ object ContentProjection:
       node: NodeSummary,
       view: SourceView
   ): (UnitContent[GraphOrder.Source], TargetContent[GraphOrder.Source], ContentGrain) =
-    val src = (e: Option[storymodel4s.proposition.PropositionEvidence]) =>
-      Right(e.map(ev => SemanticProjection.sourceOrder(ev.chart)))
-    val out =
-      for
-        u <- projectUnit[GraphOrder.Source](unit, sorted = false, src)
-        t <- projectTarget[GraphOrder.Source](node, view, sorted = false, src)
-      yield (u, t, grain(view))
-    out.fold(r => throw new IllegalStateException(s"source projection cannot refuse: $r"), identity)
+    val members = new Members[GraphOrder.Source](
+      view.structuralMembers(node.ref).map(sourceNode),
+      view.leavesUnder(node.ref).flatMap(view.node).map(sourceNode)
+    )
+    (sourceUnit(unit), sourceNode(node, members), grain(view))
+
+  /** Source-ordered unit content, for the historical per-pair shims. */
+  private[align] def sourceUnit(unit: RecallUnit): UnitContent[GraphOrder.Source] =
+    unitOf(unit, sorted = false, unit.evidence.map(ev => SemanticProjection.sourceOrder(ev.chart)))
+
+  /** Source-ordered node content without members, for the per-pair shims that never read them. */
+  private[align] def sourceNode(node: NodeSummary): TargetContent[GraphOrder.Source] =
+    sourceNode(node, Members.empty.asInstanceOf[Members[GraphOrder.Source]])
+
+  private def sourceNode(
+      node: NodeSummary,
+      members: Members[GraphOrder.Source]
+  ): TargetContent[GraphOrder.Source] =
+    targetOf(
+      node,
+      sorted = false,
+      node.evidence.map(ev => SemanticProjection.sourceOrder(ev.chart)),
+      members
+    )
 
   private def grain(view: SourceView): ContentGrain = new ContentGrain(view.maxLevel)
 
@@ -195,25 +211,50 @@ object ContentProjection:
   private def order(ps: Vector[ParticipantContent], sorted: Boolean) =
     if sorted then ps.sorted else ps
 
+  private def unitOf[O <: GraphOrder](
+      unit: RecallUnit,
+      sorted: Boolean,
+      g: Option[SemanticGraph[O]]
+  ): UnitContent[O] =
+    val s = unit.proposition
+    new UnitContent[O](
+      unit.function,
+      s.predicate,
+      order(s.participants.map(p => ParticipantContent(p.role, p.specified, p.names)), sorted),
+      s.polarity,
+      s.modality,
+      s.outcome,
+      s.sensoryTerms,
+      s.lemmas,
+      g
+    )
+
+  private def targetOf[O <: GraphOrder](
+      n: NodeSummary,
+      sorted: Boolean,
+      g: Option[SemanticGraph[O]],
+      members: Members[O]
+  ): TargetContent[O] =
+    new TargetContent[O](
+      n.level,
+      n.predicate,
+      order(n.participants.map(p => ParticipantContent(p.role, specified = true, p.names)), sorted),
+      n.context,
+      n.polarity,
+      n.modality,
+      n.outcome,
+      n.lemmas,
+      n.hasEvidence,
+      g,
+      members
+    )
+
   private def projectUnit[O <: GraphOrder](
       unit: RecallUnit,
       sorted: Boolean,
       graph: Graph[O]
   ): Either[ProjectionRefusal, UnitContent[O]] =
-    val s = unit.proposition
-    graph(unit.evidence).map { g =>
-      new UnitContent[O](
-        unit.function,
-        s.predicate,
-        order(s.participants.map(p => ParticipantContent(p.role, p.specified, p.names)), sorted),
-        s.polarity,
-        s.modality,
-        s.outcome,
-        s.sensoryTerms,
-        s.lemmas,
-        g
-      )
-    }
+    graph(unit.evidence).map(unitOf(unit, sorted, _))
 
   private def projectTarget[O <: GraphOrder](
       node: NodeSummary,
@@ -221,26 +262,9 @@ object ContentProjection:
       sorted: Boolean,
       graph: Graph[O]
   ): Either[ProjectionRefusal, TargetContent[O]] =
-    def leaf(n: NodeSummary, members: Members[O]): Either[ProjectionRefusal, TargetContent[O]] =
-      graph(n.evidence).map { g =>
-        new TargetContent[O](
-          n.level,
-          n.predicate,
-          order(
-            n.participants.map(p => ParticipantContent(p.role, specified = true, p.names)),
-            sorted
-          ),
-          n.context,
-          n.polarity,
-          n.modality,
-          n.outcome,
-          n.lemmas,
-          n.hasEvidence,
-          g,
-          members
-        )
-      }
     val none = Members.empty.asInstanceOf[Members[O]]
+    def leaf(n: NodeSummary, members: Members[O]) =
+      graph(n.evidence).map(targetOf(n, sorted, _, members))
     def traverse(ns: Vector[NodeSummary]) =
       ns.foldLeft[Either[ProjectionRefusal, Vector[TargetContent[O]]]](Right(Vector.empty)) {
         (acc, n) => acc.flatMap(v => leaf(n, none).map(v :+ _))
