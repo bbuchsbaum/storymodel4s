@@ -32,8 +32,8 @@ private[pipeline] object StoryModelExportCli:
   private def failure(error: Refusal): Json =
     import StoryModelExportBuild.Error
     val (code, detail) = error match
-      case Refusal.Arguments   => ("Arguments", Vector.empty)
-      case Refusal.InvalidPath => ("InvalidPath", Vector.empty)
+      case Refusal.Arguments       => ("Arguments", Vector.empty)
+      case Refusal.InvalidPath     => ("InvalidPath", Vector.empty)
       case Refusal.Producer(value) =>
         value match
           case Error.InputRead => ("InputRead", Vector.empty)

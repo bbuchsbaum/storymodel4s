@@ -98,7 +98,10 @@ class StoryModelExportSuite extends FunSuite:
       nodes(s.id.value)("context"),
       s"""{"status":"present","value":"${s.context.value}"}"""
     )
-    assertEquals(nodes(g.entities.values.head.id.value)("context"), """{"status":"not-applicable"}""")
+    assertEquals(
+      nodes(g.entities.values.head.id.value)("context"),
+      """{"status":"not-applicable"}"""
+    )
   }
 
   test("absent differs from zero: the first situation in discourse order has position 0 present") {
@@ -137,9 +140,9 @@ class StoryModelExportSuite extends FunSuite:
       rows("relations.tsv").map(_("claim_id")) ++ rows("circumstances.tsv").map(_("claim_id")) ++
       rows("hierarchy.tsv").map(_("claim_id"))
     val metas = wog.claims.map(m => m.id.value -> m).toMap
-    val evidenceSpans = exportedClaims.map(c =>
-      metas(c).evidence.toVector.flatMap(_.spans.toVector.flatMap(_.refs.toVector)).size
-    ).sum
+    val evidenceSpans = exportedClaims
+      .map(c => metas(c).evidence.toVector.flatMap(_.spans.toVector.flatMap(_.refs.toVector)).size)
+      .sum
     val supportSpans =
       g.entities.values.toVector.map(_.support) ++ g.situations.values.toVector.map(_.support) ++
         g.contexts.values.toVector.map(_.support) ++ g.segments.values.toVector.map(_.support) ++
@@ -195,7 +198,9 @@ class StoryModelExportSuite extends FunSuite:
   lossTest("scoped-attributes", Some(g.entities.values.map(_.attributes.size).sum))
   lossTest(
     "mentions",
-    Some(g.entities.values.map(_.mentions.length).sum + g.situations.values.map(_.mentions.length).sum)
+    Some(
+      g.entities.values.map(_.mentions.length).sum + g.situations.values.map(_.mentions.length).sum
+    )
   )
   lossTest(
     "resolved-alternatives",
@@ -208,8 +213,13 @@ class StoryModelExportSuite extends FunSuite:
     "resolved-value-claims",
     Some(g.entities.size + g.segments.values.count(_.summary.stated.isDefined))
   )
-  lossTest("claim-credence-provenance", Some(rows("nodes.tsv").size + rows("relations.tsv").size +
-    rows("circumstances.tsv").size + rows("hierarchy.tsv").size))
+  lossTest(
+    "claim-credence-provenance",
+    Some(
+      rows("nodes.tsv").size + rows("relations.tsv").size +
+        rows("circumstances.tsv").size + rows("hierarchy.tsv").size
+    )
+  )
   lossTest("evidence-extractors", Some(rows("evidence.tsv").size))
   lossTest("build-receipt", None)
   lossTest("source-text", Some(1))
@@ -218,16 +228,31 @@ class StoryModelExportSuite extends FunSuite:
     assertEquals(
       losses.keySet,
       Set(
-        "trajectory-steps", "boundary-beliefs", "feature-spaces", "sidecars", "feature-refs",
-        "descriptors", "hypotheses", "sensory-profiles", "scoped-attributes", "mentions",
-        "resolved-alternatives", "resolved-value-claims", "claim-credence-provenance",
-        "evidence-extractors", "build-receipt", "source-text"
+        "trajectory-steps",
+        "boundary-beliefs",
+        "feature-spaces",
+        "sidecars",
+        "feature-refs",
+        "descriptors",
+        "hypotheses",
+        "sensory-profiles",
+        "scoped-attributes",
+        "mentions",
+        "resolved-alternatives",
+        "resolved-value-claims",
+        "claim-credence-provenance",
+        "evidence-extractors",
+        "build-receipt",
+        "source-text"
       )
     )
   }
 
   test("a supplied build receipt is counted as dropped; an absent one is not-supplied") {
-    assertEquals(losses("build-receipt").hcursor.get[String]("status").toOption, Some("not-supplied"))
+    assertEquals(
+      losses("build-receipt").hcursor.get[String]("status").toOption,
+      Some("not-supplied")
+    )
     val receipt = BuildReceipt(wog.storyId, wog.sourceChecksum, wog.schemaVersion, Vector.empty, 0L)
     val withReceipt = StoryModel
       .draftText(
@@ -322,7 +347,7 @@ class StoryModelExportSuite extends FunSuite:
       assert(
         result match
           case Left(StoryModelExportBuild.Error.NotValidated(n, laws)) => n > 0 && laws.nonEmpty
-          case _                                                    => false
+          case _                                                       => false
         ,
         result.toString
       )

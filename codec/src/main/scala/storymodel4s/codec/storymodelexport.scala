@@ -103,8 +103,9 @@ object StoryModelExport:
     case other                        => standard(other.toString)
 
   private def holder(kind: ContextKind): String = kind.heldBy match
-    case None                                 => notApplicable
-    case Some(ContextHolder.Named(entity))    => tagged("named", "entity" -> Json.fromString(entity.value))
+    case None                              => notApplicable
+    case Some(ContextHolder.Named(entity)) =>
+      tagged("named", "entity" -> Json.fromString(entity.value))
     case Some(ContextHolder.Unattributed(gap)) =>
       tagged("unattributed", "reason" -> Json.fromString(gap.render))
   private def contextKindName(kind: ContextKind): String = kind match
@@ -119,7 +120,7 @@ object StoryModelExport:
     case ContextKind.Imagination(_) => "Imagination"
 
   private def summary(s: SegmentSummary): String = s match
-    case SegmentSummary.Stated(r) => tagged("stated", "value" -> Json.fromString(r.value))
+    case SegmentSummary.Stated(r)         => tagged("stated", "value" -> Json.fromString(r.value))
     case SegmentSummary.Unsummarized(gap) =>
       tagged("unsummarized", "reason" -> Json.fromString(gap.render))
 
@@ -147,7 +148,9 @@ object StoryModelExport:
       )
 
     val nodeRows =
-      entities.map(e => Vector(e.id.value, "entity", e.meta.id.value, e.meta.status.toString, notApplicable)) ++
+      entities.map(e =>
+        Vector(e.id.value, "entity", e.meta.id.value, e.meta.status.toString, notApplicable)
+      ) ++
         situations.map(s =>
           Vector(
             s.id.value,
@@ -191,9 +194,8 @@ object StoryModelExport:
     }
     val contextRows =
       contexts.map(c => Vector(c.id.value, contextKindName(c.kind), holder(c.kind)))
-    val segmentRows = segments.map(s =>
-      Vector(s.id.value, s.kind.toString, s.level.toString, summary(s.summary))
-    )
+    val segmentRows =
+      segments.map(s => Vector(s.id.value, s.kind.toString, s.level.toString, summary(s.summary)))
 
     def relation(
         meta: ClaimMeta,
@@ -205,7 +207,14 @@ object StoryModelExport:
     ): Vector[String] = Vector(meta.id.value, layer, from, rel, to, context, meta.status.toString)
     val relationRows =
       layers.participants.map(e =>
-        relation(e.meta, "participant", e.situation.value, role(e.role), e.entity.value, notApplicable)
+        relation(
+          e.meta,
+          "participant",
+          e.situation.value,
+          role(e.role),
+          e.entity.value,
+          notApplicable
+        )
       ) ++ layers.temporal.map(e =>
         relation(
           e.meta,
@@ -225,7 +234,14 @@ object StoryModelExport:
           notApplicable
         )
       ) ++ layers.goals.map(e =>
-        relation(e.meta, "goal", e.from.value, standard(e.relation.toString), e.to.value, notApplicable)
+        relation(
+          e.meta,
+          "goal",
+          e.from.value,
+          standard(e.relation.toString),
+          e.to.value,
+          notApplicable
+        )
       ) ++ layers.stateChanges.map(e =>
         relation(
           e.meta,
@@ -236,7 +252,14 @@ object StoryModelExport:
           notApplicable
         )
       ) ++ layers.references.map(e =>
-        relation(e.meta, "reference", e.from.value, standard(e.mode.toString), e.to.value, notApplicable)
+        relation(
+          e.meta,
+          "reference",
+          e.from.value,
+          standard(e.mode.toString),
+          e.to.value,
+          notApplicable
+        )
       ) ++ layers.entityRelations.map(e =>
         relation(
           e.meta,
@@ -295,11 +318,13 @@ object StoryModelExport:
         )
       }
 
-    def evidenceTables(item: Exported): Either[Error, (Vector[Vector[String]], Vector[Vector[String]])] =
+    def evidenceTables(
+        item: Exported
+    ): Either[Error, (Vector[Vector[String]], Vector[Vector[String]])] =
       val claim = item.meta.id
       val support: Either[Error, Vector[Vector[String]]] = item.support match
-        case None                          => Right(Vector.empty)
-        case Some(TypedSupport.Text(s))    => Right(spanRows(claim, "node-support", notApplicable, s))
+        case None                       => Right(Vector.empty)
+        case Some(TypedSupport.Text(s)) => Right(spanRows(claim, "node-support", notApplicable, s))
         case Some(TypedSupport.Anchored(_)) => Left(Error.PlaybackSupport(claim.value))
       val items = item.meta.evidence.toVector.zipWithIndex
       if items.exists(_._1.anchors.isDefined) then Left(Error.PlaybackSupport(claim.value))
@@ -312,7 +337,9 @@ object StoryModelExport:
               ev.id.value,
               ev.stage.value,
               // An empty set is a measured "no upstream claims", so it is present, not absent.
-              present(Json.fromValues(ev.upstream.toVector.map(_.value).sorted.map(Json.fromString))),
+              present(
+                Json.fromValues(ev.upstream.toVector.map(_.value).sorted.map(Json.fromString))
+              ),
               ev.spans.fold(0)(_.refs.length).toString
             )
           }
@@ -324,14 +351,15 @@ object StoryModelExport:
           (evidenceRows, supportRows ++ evidenceSpans)
         }
 
-    val evidenceAll = exported.foldLeft[Either[Error, (Vector[Vector[String]], Vector[Vector[String]])]](
-      Right((Vector.empty, Vector.empty))
-    ) { (acc, item) =>
-      for
-        (ev, sp) <- acc
-        (ev2, sp2) <- evidenceTables(item)
-      yield (ev ++ ev2, sp ++ sp2)
-    }
+    val evidenceAll =
+      exported.foldLeft[Either[Error, (Vector[Vector[String]], Vector[Vector[String]])]](
+        Right((Vector.empty, Vector.empty))
+      ) { (acc, item) =>
+        for
+          (ev, sp) <- acc
+          (ev2, sp2) <- evidenceTables(item)
+        yield (ev ++ ev2, sp ++ sp2)
+      }
 
     evidenceAll.flatMap { (evidenceRows, spanRowsAll) =>
       val tables = Vector(
@@ -346,7 +374,11 @@ object StoryModelExport:
           ),
           nodeRows
         ),
-        table("entities", Vector("node_id" -> Text, "entity_type" -> Structured, "label" -> Text), entityRows),
+        table(
+          "entities",
+          Vector("node_id" -> Text, "entity_type" -> Structured, "label" -> Text),
+          entityRows
+        ),
         table(
           "situations",
           Vector(
@@ -475,7 +507,8 @@ object StoryModelExport:
                 "canonical_model" -> unavailable("not-embedded/v0.1")
               ),
               "exported_claims" -> Json.fromString(exported.size.toString),
-              "losses" -> Json.fromValues(losses(model, exported.size, evidenceRows.size).map(render)),
+              "losses" -> Json
+                .fromValues(losses(model, exported.size, evidenceRows.size).map(render)),
               "files" -> Json.fromValues(files)
             )
           )
@@ -515,7 +548,8 @@ object StoryModelExport:
     val stated = g.segments.values.toVector.flatMap(_.summary.stated)
     val attributes = entities.map(_.attributes.size).sum
     val resolvedValues = entities.size + stated.size
-    val alternatives = entities.map(_.label.alternatives.size).sum + stated.map(_.alternatives.size).sum
+    val alternatives =
+      entities.map(_.label.alternatives.size).sum + stated.map(_.alternatives.size).sum
     val steps = model.trajectory.steps.size
     Vector(
       Loss("trajectory-steps", Some(steps), steps, "flow steps and world-time transitions"),
@@ -528,7 +562,12 @@ object StoryModelExport:
       Loss("feature-spaces", Some(model.featureSpaces.size), 0, "feature space declarations"),
       Loss("sidecars", Some(model.sidecars.size), 0, "feature sidecar manifests"),
       Loss("feature-refs", Some(model.featureRefs.size), 0, "feature references"),
-      Loss("descriptors", Some(model.descriptors.size), model.descriptors.size, "segment descriptors"),
+      Loss(
+        "descriptors",
+        Some(model.descriptors.size),
+        model.descriptors.size,
+        "segment descriptors"
+      ),
       Loss("hypotheses", Some(model.hypotheses.size), model.hypotheses.size, "open hypotheses"),
       Loss(
         "sensory-profiles",
