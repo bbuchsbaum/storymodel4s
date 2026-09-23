@@ -217,8 +217,11 @@ object AlignGens:
               .sortBy(_.key)
               .headOption
               .getOrElse(AlignState.unranked)
-            val steps = r.flow.steps.updated(j, st.copy(mass = st.mass.updated((bad, other), 0.0)))
-            (anchors, r.posterior, TransitionFlow(steps), r.viterbi, r.costs)
+            val flow = FlowStep
+              .of(st.from, st.to, st.mass.updated((bad, other), 0.0))
+              .flatMap(forged => TransitionFlow.of(r.flow.steps.updated(j, forged)))
+              .fold(e => throw new IllegalStateException(e.message), identity)
+            (anchors, r.posterior, flow, r.viterbi, r.costs)
         }
         Vector(onPosterior, onPath, onCosts) ++ onFlow
       }

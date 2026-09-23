@@ -291,13 +291,25 @@ object AlignmentMatrix:
           case Some(u) => Left(AlignError.MalformedRow(u, "unit appears in more than one row"))
           case None    => Right(AlignmentMatrix(rows))
 
-/** Transition posteriors between consecutive units: `F_i(s, t)`. */
-final case class FlowStep(
-    from: RecallUnitId,
-    to: RecallUnitId,
-    mass: Map[(AlignState, AlignState), Double]
+/** Transition posteriors between consecutive units: `F_i(s, t)`.
+  *
+  * Why not a case class: a mass map admits NaN, infinite and negative values, and `from == to` is
+  * never a step between consecutive units. A case class would let any of these through `apply`,
+  * `copy`, `fromProduct` or `Mirror.ProductOf`, and only an enclosing `HsmmResult.validated` would
+  * notice. Built by the aligner inside `align`, or checked by [[FlowStep.of]].
+  */
+final class FlowStep private[align] (
+    val from: RecallUnitId,
+    val to: RecallUnitId,
+    val mass: Map[(AlignState, AlignState), Double]
 ):
   def apply(s: AlignState, t: AlignState): Double = mass.getOrElse((s, t), 0.0)
+
+  override def equals(that: Any): Boolean = that match
+    case o: FlowStep => from == o.from && to == o.to && mass == o.mass
+    case _           => false
+  override def hashCode: Int = (from, to, mass).hashCode
+  override def toString: String = s"FlowStep(${from.value}→${to.value}, ${mass.size} cells)"
 
   private def sorted: Vector[((AlignState, AlignState), Double)] =
     mass.toVector.sortBy { case ((a, b), _) => (a.key, b.key) }
@@ -318,8 +330,54 @@ final case class FlowStep(
 
   def sourceToSourceMass: Double = sourceMass((_, _) => true)
 
-final case class TransitionFlow(steps: Vector[FlowStep]):
+object FlowStep:
+  /** Unchecked construction, for the aligner and for tests that forge malformed results. */
+  private[align] def apply(
+      from: RecallUnitId,
+      to: RecallUnitId,
+      mass: Map[(AlignState, AlignState), Double]
+  ): FlowStep = new FlowStep(from, to, mass)
+
+  /** Checked construction: every mass finite and nonnegative, and two distinct units. */
+  def of(
+      from: RecallUnitId,
+      to: RecallUnitId,
+      mass: Map[(AlignState, AlignState), Double]
+  ): Either[AlignError, FlowStep] =
+    if from == to then
+      Left(
+        AlignError.InconsistentResult(s"flow step ${from.value}→${to.value} joins a unit to itself")
+      )
+    else if mass.values.exists(m => !(m >= 0.0) || m.isInfinite) then
+      Left(AlignError.InconsistentResult(s"flow step ${from.value}→${to.value} has malformed mass"))
+    else Right(new FlowStep(from, to, mass))
+
+/** The flow of a whole recall: one [[FlowStep]] per consecutive pair of units.
+  *
+  * Why not a case class: individually lawful steps need not form a chain. `step(i).to` must be
+  * `step(i + 1).from`, a relation between fields that a case class cannot hold (the rule 8
+  * Cartesian-product test). Built by the aligner inside `align`, or checked by
+  * [[TransitionFlow.of]].
+  */
+final class TransitionFlow private[align] (val steps: Vector[FlowStep]):
   def size: Int = steps.size
+
+  override def equals(that: Any): Boolean = that match
+    case o: TransitionFlow => steps == o.steps
+    case _                 => false
+  override def hashCode: Int = steps.hashCode
+  override def toString: String = s"TransitionFlow(${steps.size} steps)"
+
+object TransitionFlow:
+  /** Unchecked construction, for the aligner and for tests that forge malformed results. */
+  private[align] def apply(steps: Vector[FlowStep]): TransitionFlow = new TransitionFlow(steps)
+
+  /** Checked construction: consecutive steps share their joining unit. */
+  def of(steps: Vector[FlowStep]): Either[AlignError, TransitionFlow] =
+    steps.indices.drop(1).find(i => steps(i - 1).to != steps(i).from) match
+      case Some(i) =>
+        Left(AlignError.InconsistentResult(s"flow steps ${i - 1} and $i do not share a unit"))
+      case None => Right(new TransitionFlow(steps))
 
 /** Typed failures of the alignment API (no exceptions escape the aligners). */
 enum AlignError:

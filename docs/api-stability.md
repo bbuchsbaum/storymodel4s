@@ -66,13 +66,15 @@ freeze every feature builder or reducer. A second current dependency is
 `codec.DerivationContext.result: HsmmResult`; the structural result type is therefore
 included in the stable closure while the inference engine remains experimental.
 
-The construction audit must follow that result closure into `StructuralCoverage`
+The construction audit had to follow that result closure into `StructuralCoverage`
 (through `CostBreakdown.sourceChartCoverage`) and `TransitionFlow`/`FlowStep`
-(through `HsmmResult.flow`). Their public case-class constructors can currently
-create values that violate the coverage-count or finite/nonnegative-mass
-invariants checked by enclosing records. Alongside the existing `Admissibility`
-repair, settle these construction boundaries before freezing the result family;
-enclosing validation does not make each independently constructible value checked.
+(through `HsmmResult.flow`), because enclosing validation does not make each
+independently constructible value checked. All three boundaries are now settled,
+alongside `Admissibility` (b01c3d09). `TransitionFlow` and `FlowStep` are final
+non-case classes. They are built unchecked only inside `align`, or through
+`FlowStep.of` (finite, nonnegative mass; two distinct units) and
+`TransitionFlow.of` (consecutive steps share their joining unit). The court is
+`storymodel4s.probes.FlowUnforgeableSuite` (bd-01M37C6DJXHTATH3QV17J5QPM9).
 
 ### Approved linked decisions
 
