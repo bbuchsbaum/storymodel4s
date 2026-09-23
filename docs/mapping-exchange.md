@@ -48,6 +48,9 @@ policies refuse before creating output. The returned receipt binds the exact inp
 file bytes, policy ID, mapping digest and published manifest digest; whitespace
 changes in the input therefore change the input digest. CLI dispatch uses this
 same producer boundary.
+
+See the [workspace export CLI guide](workspace-exchange-cli.md) for the command,
+machine-readable receipt and refusal behavior.
 There is no standalone mapper command in this component; the prepare/CLI facade
 owns ordinary-file input admission and inference execution.
 
