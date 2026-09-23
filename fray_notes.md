@@ -167,3 +167,11 @@ an agent communication failure in this instance, not evidence of a lost message.
 - A handoff briefly contained an unverified placeholder commit before correction.
   Obtain the SHA from the completed commit command before composing a handoff;
   the board should make exact source binding easy, not depend on remembered IDs.
+
+- A second review round tested 20,000 seeded strings and found 363 remaining
+  Java/Python normalization disagreements. The concrete absolute-end repair
+  removed all 363. The portable Scala gate then exposed Java/Scala.js disagreement
+  in the underlying canonicalizer. This is a strong pairing result: an independent
+  oracle plus a platform court changed the implementation and identity contract
+  where hand-picked roundtrips had passed. Keep the failed gate and the first
+  insufficient repair visible; a review is not a one-pass ceremony.

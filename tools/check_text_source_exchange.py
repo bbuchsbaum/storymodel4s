@@ -61,7 +61,7 @@ def utf8_strings(value):
 def canonical_text(raw):
     lines = raw.replace("\r\n", "\n").replace("\r", "\n").split("\n")
     # Java's $ also matches before a final NEL, line separator or paragraph separator.
-    end = r"(?=$|[\u0085\u2028\u2029]$)"
+    end = r"(?=\Z|[\u0085\u2028\u2029]\Z)"
     stripped = "\n".join(re.sub(r"[ \t]+" + end, "", line) for line in lines)
     collapsed = re.sub(r"\n{3,}", "\n\n", stripped)
     return re.sub(r"\n+" + end, "", collapsed.lstrip("\n"))
@@ -158,6 +158,11 @@ def check(directory):
 def check_suite(directory):
     """Production fixtures come from pipeline/Test/runMain TextSourceExchangeWitness."""
     directory = Path(directory)
+    cases = load((directory / "canonical-cases.json").read_text(encoding="utf-8"))
+    require(isinstance(cases, list) and len(cases) == 20001, "canonicalization witnesses are missing")
+    for index, case in enumerate(cases):
+        keys(case, ("raw", "canonical"))
+        require(canonical_text(case["raw"]) == case["canonical"], f"production canonicalization mismatch at case {index}")
     reports = [check(directory / name) for name in ("bom", "unicode-lines", "supplied")]
     require(reports[0]["bom_retained"], "BOM witness is missing")
     require(reports[2]["profile"] == "supplied-atlas/v1", "supplied-atlas witness is missing")
@@ -181,7 +186,7 @@ def check_suite(directory):
                 refused.append(field)
             else:
                 raise ValueError("capability-inflation fault survived: " + field)
-    return dict(status="checked", fixtures=reports, rehashed_fields_refused=refused)
+    return dict(status="checked", fixtures=reports, canonicalization_cases=len(cases), rehashed_fields_refused=refused)
 
 
 def main():

@@ -166,3 +166,16 @@ object TextSourceExchangeWitness:
     emit("bom", "\uFEFFA\u0301😀; B.  \r\n\r\nC.\r\n")
     emit("unicode-lines", "x \u0085\ny \u2028\nz \u2029\nend\n\u2028")
     emit("supplied", "A😀; B.", supplied = true)
+
+    val random = new scala.util.Random(20260923L)
+    val alphabet = Vector(' ', '\t', '\n', '\r', '\u0085', '\u2028', '\u2029', 'a')
+    val rawCases = Vector("\t\u2029 \t\n\u2028\r\n") ++ Vector.fill(20000) {
+      Vector.fill(random.nextInt(9))(alphabet(random.nextInt(alphabet.size))).mkString
+    }
+    val cases = io.circe.Json.arr(rawCases.map { raw =>
+      io.circe.Json.obj(
+        "raw" -> io.circe.Json.fromString(raw),
+        "canonical" -> io.circe.Json.fromString(StorySource.canonicalize(raw))
+      )
+    }*)
+    val _ = Files.writeString(root.resolve("canonical-cases.json"), Canonical.print(cases))

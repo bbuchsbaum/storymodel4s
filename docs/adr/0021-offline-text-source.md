@@ -53,7 +53,11 @@ two newlines collapse, and leading/trailing blank lines are removed. Its existin
 Java regex `$` also matches before a final NEL/U+0085, LS/U+2028 or PS/U+2029.
 The space/tab step uses that anchor on each LF-separated line; the trailing-LF
 step uses it on the complete text. Those Unicode terminators are retained.
-The independent reader must mirror this established rule rather than silently
+The portable implementation now uses explicit character scans for those anchored
+trims: Scala.js and Java had disagreed about the meaning of `$`, changing source
+identity by platform. JVM results are preserved, with a frozen 20,001-case
+reference court across platforms. The independent reader must mirror this
+established rule rather than silently
 change canonical source hashes under the same tag. Unicode
 normalization is not performed; an input BOM is retained as content. Raw-file
 byte offsets, Unicode code-point offsets and canonical UTF-16 offsets are not

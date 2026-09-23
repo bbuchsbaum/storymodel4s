@@ -192,9 +192,23 @@ object StorySource:
     */
   def canonicalize(raw: String): String =
     val unixLines = raw.replace("\r\n", "\n").replace('\r', '\n')
-    val stripped = unixLines.split("\n", -1).map(_.replaceAll("[ \t ]+$", "")).mkString("\n")
+    val stripped = unixLines
+      .split("\n", -1)
+      .map(trimCanonicalEnd(_, c => c == ' ' || c == '\t'))
+      .mkString("\n")
     val collapsed = stripped.replaceAll("\n{3,}", "\n\n")
-    collapsed.replaceAll("^\n+", "").replaceAll("\n+$", "")
+    trimCanonicalEnd(collapsed.dropWhile(_ == '\n'), _ == '\n')
+
+  // Preserve the established JVM dollar-anchor behavior without depending on the platform's
+  // regex end anchor. Trim once against the original end (or before one final NEL/LS/PS),
+  // never again against an end newly exposed by the trim.
+  private def trimCanonicalEnd(text: String, removable: Char => Boolean): String =
+    val end = text.lastOption match
+      case Some('\u0085' | '\u2028' | '\u2029') => text.length - 1
+      case _                                    => text.length
+    var start = end
+    while start > 0 && removable(text.charAt(start - 1)) do start -= 1
+    text.substring(0, start) + text.substring(end)
 
   def fromText(
       rawText: String,

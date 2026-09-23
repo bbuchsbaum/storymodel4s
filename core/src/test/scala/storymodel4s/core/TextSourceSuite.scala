@@ -171,3 +171,18 @@ class TextSourceSuite extends FunSuite:
         Vector(raw)
       )
     }
+
+  test("canonicalization matches the frozen JVM reference over seeded Unicode controls"):
+    val random = new scala.util.Random(20260923L)
+    val alphabet = Vector(' ', '\t', '\n', '\r', '\u0085', '\u2028', '\u2029', 'a')
+    val raw = Vector("\t\u2029 \t\n\u2028\r\n") ++ Vector.fill(20000) {
+      Vector.fill(random.nextInt(9))(alphabet(random.nextInt(alphabet.size))).mkString
+    }
+    assertEquals(
+      Checksum.ofText(raw.mkString("\u0000")).hex,
+      "c28857953a4d2d6392e9cf39520e1bd1b0f7e0f1f8278b55d006510452fb2c10"
+    )
+    assertEquals(
+      Checksum.ofText(raw.map(StorySource.canonicalize).mkString("\u0000")).hex,
+      "4aaff31a8c317ae2f0e654c99ba97696e9642d412d6f34774eefe3918c8a6873"
+    )

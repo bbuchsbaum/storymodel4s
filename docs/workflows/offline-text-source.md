@@ -124,7 +124,8 @@ sbt 'pipeline/Test/runMain storymodel4s.pipeline.TextSourceExchangeWitness /tmp/
 python3 tools/check_text_source_exchange.py --suite /tmp/text-source-witnesses
 ```
 
-This checks generated BOM/Unicode inputs and a supplied atlas, then rehashes
+This compares Python with 20,001 cases from the production Scala canonicalizer,
+checks generated BOM/Unicode inputs and a supplied atlas, then rehashes
 undeclared capability fields to ensure rejection is semantic, not just a stale
 file hash. The witness producer invokes the production CLI in-process; process
 exit/channel behavior has a separate CLI court.
