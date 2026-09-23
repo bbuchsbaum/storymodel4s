@@ -210,3 +210,50 @@ class SampledCaptionConsumerSuite extends FunSuite:
       right(CaptionSearch.join(full, recordedRequest, outcome, envelope.worker, f0)).proposals.size,
       3
     )
+
+  test(
+    "a forged extent that is out of order, empty or repeated is refused at the join, never admitted"
+  ):
+    // CaptionExtent is a case class, so apply and copy skip CaptionExtent.of; the join re-admits.
+    // Out of order, the hull of the first and last named frames would leave out frame 11, which the
+    // model was shown (PTS 47000); empty, it would have no first frame at all.
+    val s = right(sampled())
+    val outcome = sampledOutcome("another-request", 12)
+    for bad <- Vector(Vector(0, 11, 1, 2), Vector.empty[Int], Vector(1, 1)) do
+      val forged =
+        right(issue(s)).copy(extents = CaptionExtent("shot-1", bad) +: sampledExtents.tail)
+      refusedAt(CaptionSearch.join(s, forged, outcome, envelope.worker, f0), "caption/extent-shape")
+    val twice = right(issue(s))
+      .copy(extents = sampledExtents.head +: sampledExtents.tail.map(_.copy(id = "shot-1")))
+    refusedAt(CaptionSearch.join(s, twice, outcome, envelope.worker, f0), "caption/extent-shape")
+    // The full-decode path had the same door.
+    val fullForged = recordedRequest.copy(extents =
+      CaptionExtent("shot-1", Vector(13, 0)) +: recordedRequest.extents.tail
+    )
+    refusedAt(
+      CaptionSearch.join(
+        full,
+        fullForged,
+        right(CaptionOutcome.parse(recordedOutcomeText)),
+        envelope.worker,
+        f0
+      ),
+      "caption/extent-shape"
+    )
+
+  test("the selection is bound into the frame set's identity and receipt"):
+    // Two selections of the same size over the same declared bytes digest differ only in which
+    // packets they name; their identities and receipts must differ too.
+    val a = right(sampled())
+    val b = right(sampled(shown.init :+ 43))
+    assertEquals(a.count, b.count)
+    assertEquals(a.framesSha256, b.framesSha256)
+    assertNotEquals(a.identity, b.identity)
+    assertNotEquals(a.receipt.identity, b.receipt.identity)
+
+  test("a full-decode request naming a frame beyond the decode refuses as unsampled"):
+    val outcome = right(CaptionOutcome.parse(recordedOutcomeText))
+    val beyond = recordedRequest.copy(extents =
+      recordedRequest.extents.init :+ CaptionExtent("shot-3", Vector(29, 45))
+    )
+    refusedAt(CaptionSearch.join(full, beyond, outcome, envelope.worker, f0), "caption/unsampled")

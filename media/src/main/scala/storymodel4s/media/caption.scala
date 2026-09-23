@@ -533,7 +533,7 @@ final class CaptionSearchResult private[media] (
     s"CaptionSearchResult(${frames.probe.manifest.fixtureId}, ${proposals.size} proposals, draft, ${identity.short()})"
 
 object CaptionSearch:
-  val Algorithm: String = "vlm-caption-proposals/v2"
+  val Algorithm: String = "vlm-caption-proposals/v3"
 
   def parameters(
       worker: ToolRealization,
@@ -640,6 +640,17 @@ object CaptionSearch:
         DomainError.InvariantViolation(
           "caption/request",
           s"request ${request.requestId} does not describe frame set ${frames.identity.short()}"
+        )
+      )
+    else if request.extents.exists(e => CaptionExtent.of(e.id, e.ordinals).isLeft) ||
+      request.extents.map(_.id).distinct.size != request.extents.size
+    then
+      // CaptionRequest and CaptionExtent are case classes, so apply and copy bypass
+      // CaptionExtent.of; the join re-admits every extent rather than trusting its shape.
+      Left(
+        DomainError.InvariantViolation(
+          "caption/extent-shape",
+          s"request ${request.requestId} has an extent that is empty, not strictly increasing, or not uniquely named"
         )
       )
     else
@@ -785,8 +796,8 @@ object CaptionSearch:
             )
           )
       _ <- gridsWithinLimits(request.recipe, applied, extent, result)
-      // Total over every extent: requestDescribes has already refused an unheld frame, so this
-      // refusal is a forced branch kept so the mapping never needs an unchecked lookup.
+      // requestDescribes has already refused an unheld frame and a misshapen extent, so these two
+      // refusals are forced branches; each presentation ordinal is a member of the index.
       shown <- extent.ordinals
         .foldLeft[Either[DomainError, Vector[Int]]](Right(Vector.empty)) { (acc, o) =>
           acc.flatMap(v =>
@@ -801,8 +812,13 @@ object CaptionSearch:
               .map(v :+ _)
           )
         }
-      firstEntry = frames.index.entries(shown.head)
-      lastEntry = frames.index.entries(shown.last)
+      bounds <- (shown.headOption, shown.lastOption) match
+        case (Some(f), Some(l)) => Right((frames.index.entries(f), frames.index.entries(l)))
+        case _                  =>
+          Left(
+            DomainError.InvariantViolation("caption/extent-shape", s"extent ${extent.id} is empty")
+          )
+      (firstEntry, lastEntry) = bounds
       end <- lastEntry.durationTicks
         .map(d => lastEntry.pts + d)
         .toRight(

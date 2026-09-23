@@ -1173,7 +1173,14 @@ returns to a packet. `media` therefore gains:
   **expected edition**. It refuses when the frames' edition is another (`caption/edition`), for
   full and sampled sets alike. A request ordinal that names no frame of the set refuses (`caption/unsampled`), before
   the outcome is read: a caption for a frame that was not sampled is not admitted.
-  `CaptionProposal` gains `presentationOrdinals` beside `frames`, which keeps the sample indices. An extent is closed on its **own** samples'
+  `CaptionProposal` gains `presentationOrdinals` beside `frames`, which keeps the sample indices.
+  Because `CaptionRequest` and `CaptionExtent` are case classes, the join re-admits every extent
+  (nonempty, strictly increasing, uniquely named) and refuses a forged one (`caption/extent-shape`)
+  instead of admitting a hull that omits a frame the model was shown. On the full-decode path a
+  request ordinal beyond the decode now refuses as `caption/unsampled` (previously
+  `caption/request`), and a negative one refuses where it previously threw. The algorithm tag moves
+  to `vlm-caption-proposals/v3`: the join now binds an edition and proposals carry presentation
+  ordinals, so v2 receipts do not describe v3 results. An extent is closed on its **own** samples'
   PTS: first sample to last sample plus that packet's duration. The extent says which instants the
   model was shown; it does not say the model saw everything between them. Unsampled spans are
   unavailable, not absent. Nothing here constructs a negative or semantic-absence claim (law 10).
