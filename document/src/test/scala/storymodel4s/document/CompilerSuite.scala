@@ -342,6 +342,77 @@ class CompilerSuite extends FunSuite:
     assert(!result.isPartial)
   }
 
+  test("explicit abstention remains a gap without blocking promotion; unsupported still blocks") {
+    def absentBundle[A](disposition: ProposalDisposition, salt: String): EvidenceBundle[A] =
+      val task = TaskId.unsafe(s"task:$salt")
+      val receipt = AgentCallReceipt(call("absent-agent", salt), prompt, task)
+      val proposal = disposition match
+        case ProposalDisposition.Abstained   => AgentProposal.abstained[A](task, receipt)
+        case ProposalDisposition.Unsupported =>
+          AgentProposal.unsupported[A](task, Vector.empty, receipt)
+        case other => fail(s"test requires an absent disposition, got $other")
+      EvidenceBundle(
+        Vector(proposal),
+        Vector.empty,
+        StructuralValidity.Valid,
+        SourceSupport.text(0.0, None),
+        agreementScore = 0.0,
+        Vector.empty
+      )
+
+    def withAbsentSecond(disposition: ProposalDisposition): NarrativeCompilation =
+      def missing[A](family: String): EvidenceBundle[A] =
+        absentBundle[A](disposition, s"$family:${ref1.key}")
+      compile(
+        input(
+          situationAttempts = Vector(
+            SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0")),
+            SituationAttempt(ref1, missing[SituationProposal]("situation"))
+          ),
+          contextAttempts = Some(
+            Vector(
+              contextAttempt(ref0),
+              ContextAssignmentAttempt(ref1, missing[ContextAssignmentProposal]("context"))
+            )
+          ),
+          membershipAttempts = Some(
+            Vector(
+              membershipAttempt(ref0),
+              SegmentMembershipAttempt(ref1, missing[SegmentMembershipProposal]("membership"))
+            )
+          ),
+          coverageAttempts = Some(
+            Vector(
+              coverageAttempt(ref0),
+              ParticipantCoverageAttempt(ref1, missing[ParticipantCoverage]("coverage"))
+            )
+          )
+        )
+      )
+
+    val abstained = withAbsentSecond(ProposalDisposition.Abstained)
+    val unsupported = withAbsentSecond(ProposalDisposition.Unsupported)
+    val required = Set(
+      ClaimFamily.SituationMention,
+      ClaimFamily.ContextAssignment,
+      ClaimFamily.SegmentMembership
+    )
+    assertEquals(abstained.draft.graph.situations.size, 1)
+    assertEquals(abstained.draft.hierarchy.primary.size, 1)
+    assertEquals(
+      abstained.derivation.gaps.filter(g => required(g.family)).map(_.reason).toSet,
+      Set(DerivationGapReason.Unresolved(ResolutionFailure.NoProposal))
+    )
+    assertEquals(abstained.derivation.gaps.count(g => required(g.family)), 3)
+    assert(abstained.validated.nonEmpty, abstained.validation.report.render)
+    assertEquals(abstained.validation.report.errors.size, 0)
+
+    assertEquals(unsupported.draft.graph.situations.size, 1)
+    assertEquals(unsupported.validated, None)
+    assertEquals(unsupported.validation.report.errors.size, 3)
+    assertNotEquals(abstained.derivation.candidateSet, unsupported.derivation.candidateSet)
+  }
+
   test("proposal and chart order do not change identities or the compilation fingerprint") {
     val attempts = Vector(
       SituationAttempt(

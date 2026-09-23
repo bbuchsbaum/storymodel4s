@@ -1150,3 +1150,37 @@ The three remaining violations are the one abstained sentence's situation, conte
 untitled text and a titled one now fail for the same reason, and a text with no abstention
 validates without a title. The `Summary` gap is still one of the 84.
 
+## Amendment, 2026-09-23 — §11: an explicit abstention is an absent derivation
+
+### 11. Promotion requires the structure that was derived, not a claim for every sentence
+
+When a provider explicitly abstains at a chart anchor, the compiler retains each attempted
+family as `NotEmitted(Unresolved(NoProposal))`, and the derivation artifact retains the sentence's
+`SentenceCoverage.Abstained(anchor, reason)`. These are typed absence, not a situation, context,
+or membership with an assumed status or weight. An abstained anchor contributes no situation to
+the graph and therefore no membership or discourse transition. The structural validator may
+promote the model built from the other, evidenced situations while the absence remains visible in
+the derivation record and coverage ledger. `validated` certifies the emitted model's invariants;
+the coverage ledger says how much of the source was represented.
+
+The promotion court recognizes this case only when the resolver returned
+`Unresolved(NoProposal)` **and** the corresponding nonempty proposal bundle consists entirely of
+`AgentProposal.Abstained` entries. An empty bundle, an `Unsupported` proposal, an unresolved
+candidate with a different reason, a rejected proposal, and a failed materialization keep their
+ordinary blocking behavior for required structure. The abstention exception applies to a
+candidate's own gap; it does not excuse a missing upstream claim from an accepted candidate or
+a broken discourse derivation. The gap and coverage fields retain their existing wire forms; no
+default claim is introduced.
+
+The fifty captured *War of the Ghosts* replies exercise this distinction: s43's entity focus
+abstains, and its situation, context, membership, and participant-coverage attempts have no
+accepted value. The three required-family gaps remain in the report; they do not become
+`compiler.required-derivation` errors. All other emitted situations still pass the structural
+validator. The exact Text S0 bytes and recording keys stay fixed.
+
+*Rejected: exempting every `NoProposal` gap.* That would make a provider that never ran, an
+unsupported premise, and an explicit abstention indistinguishable at promotion.
+
+*Rejected: creating a placeholder situation or weight-one membership for s43.* Neither the
+chart nor the provider licensed them, and a plausible default would erase the very absence the
+derivation record must report.
