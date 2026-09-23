@@ -171,7 +171,7 @@ object CorpusReader:
             )
 
   /** Retain only the first diagnostic cap while still counting every refusal and returning every
-    * readable row. One row's refusals are transient; they never accumulate across the sheet.
+    * readable row. Refusals are counted as emitted, without a per-row diagnostic collection.
     */
   private def openRows(
       body: Vector[Xlsx.RawRow],
@@ -181,23 +181,26 @@ object CorpusReader:
     val rows = Vector.newBuilder[OpenRow]
     val kept = Vector.newBuilder[CellRefusal]
     var seen = 0
+    def retain(refusal: CellRefusal): Unit =
+      seen += 1
+      if seen <= RefusalCap then
+        kept.addOne(refusal)
+        ()
     body.foreach { raw =>
-      val (row, refusals) = openRow(raw, binding, letters)
-      rows.addOne(row)
-      kept ++= refusals.take((RefusalCap - seen).max(0))
-      seen += refusals.size
+      rows.addOne(openRow(raw, binding, letters, retain))
+      ()
     }
     (rows.result(), kept.result(), seen)
 
-  /** Reads one row, returning it alongside any cell refusals rather than instead of it. */
+  /** Reads one row, reporting any cell refusals while preserving its readable cells. */
   private def openRow(
       row: Xlsx.RawRow,
       binding: SheetBinding,
-      letters: Map[String, String]
-  ): (OpenRow, Vector[CellRefusal]) =
+      letters: Map[String, String],
+      onRefusal: CellRefusal => Unit
+  ): OpenRow =
     val cells = Map.newBuilder[String, Raw[String]]
     val normalized = Map.newBuilder[String, String]
-    val refusals = Vector.newBuilder[CellRefusal]
     binding.columns.foreach { (name, col) =>
       letters.get(name).foreach { letter =>
         row.cells.get(letter) match
@@ -207,7 +210,7 @@ object CorpusReader:
             cells.addOne(name -> raw)
             Cell.normalize(raw.at, name, raw.value, Some(col.encoding)) match
               case Left(r) =>
-                refusals.addOne(r)
+                onRefusal(r)
                 // the cell is unreadable, so it contributes no normalized value -- and must not
                 // contribute a blank one either, or a condition would read it as present-and-empty
                 ()
@@ -215,7 +218,4 @@ object CorpusReader:
               case Right(None)       => normalized.addOne(name -> "")
       }
     }
-    (
-      new OpenRow(row.number, cells.result(), RowContext.of(normalized.result())),
-      refusals.result()
-    )
+    new OpenRow(row.number, cells.result(), RowContext.of(normalized.result()))
