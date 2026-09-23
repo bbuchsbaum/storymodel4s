@@ -100,3 +100,23 @@ to every message.
   evidence and accepted review times from existing receipts. Count duplicate
   requests and missed-action recoveries. This is a proposed measurement; no
   throughput comparison has been made here.
+
+## 2026-09-23 — waiting without a wake mechanism
+
+The owner asked how I would wake when peer review finished. Inspection showed
+`codex-temporal` enabled in Fray with `controller: null`; I had no active wait
+command. My earlier “waiting for peer review” described pending work, not a
+running mechanism that would resume this interactive session. Another user turn
+was needed for me to read the inbox. That distinction should have been explicit.
+
+`fray wait` can block for attention while an agent turn remains active.
+`fray drive` can run a configured noninteractive agent for selected attention.
+Neither had been left running for this handoff, and registration alone supplies
+no wake mechanism. A drive controller would need an intentional launch, command,
+identity, scope and runtime limits; it would not by itself reconnect this chat.
+
+Desired improvement: before an agent ends a turn with work pending on a peer,
+show the actual wake owner and mode: active wait, live controller, host delivery,
+or manual resume required. Make “review requested, manual resume required”
+distinct from “waiting with automatic delivery.” This is both a product gap and
+an agent communication failure in this instance, not evidence of a lost message.
