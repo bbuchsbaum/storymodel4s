@@ -36,7 +36,7 @@ import storymodel4s.view.ArtifactId
 
 val exported = MappingExchangeBuild.exportWorkspace(
   Path.of("workspace.json"),
-  ArtifactId.unsafe("authored-control-a"), // use an actual policy ID in the workspace
+  ArtifactId.unsafe("authored-a"), // use an actual policy ID in the workspace
   Path.of("analysis/mapping")
 )
 ```
