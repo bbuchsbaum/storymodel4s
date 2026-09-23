@@ -7,6 +7,12 @@ import storymodel4s.features.CanonicalDouble
   * `8c70dfb1`, BEFORE local evidence was extracted from `GraphHsmm.run`, so the extraction is shown
   * to be byte-identical on the gated, refined and ungated paths. The digests were captured by
   * running this probe's computation on a detached checkout of that commit.
+  *
+  * JVM-only by design. These are exact bit pins of HSMM floating-point output, reached through
+  * `math.exp`/`math.log`. Scala Native's libm differs from the JVM by one ulp here (measured on
+  * 2026-09-22: JVM and JS reproduce the pins, Native does not), which is the divergence governed by
+  * mote bd-01M1D215EY4T5BR0VRJ694AMBQ. The pins witness the refactor on one fixed platform;
+  * cross-platform agreement is that bead's question, not this one's.
   */
 class LocalEvidenceParityProbe extends FunSuite:
   import AnnaFixture.{candidates, costModel, recall, view}
