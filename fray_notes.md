@@ -146,3 +146,9 @@ an agent communication failure in this instance, not evidence of a lost message.
   the current proposal, each peer's confirmation or remaining objection, and
   the durable decision record. We assembled those facts manually from receipts.
   This is an observed coordination improvement, not a measured throughput gain.
+- Codification exposed a useful ownership split before code changed: the scorer
+  author checked ADR-number collisions and kept the scorer projection in ADR0019,
+  while ADR0022 owns the shared packet and producer distinctions (Fray #723).
+  The accepted conversation could then request an exact-SHA documentation review
+  as a linked question (#82). Distinguishing accepted direction from reviewed
+  wording and implemented capability kept the record honest.
