@@ -457,3 +457,138 @@ prints `workspace-mapping-export-receipt/v0.1` JSON binding `input_sha256`,
 `policy_id`, `mapping_digest` and `manifest_sha256`. Refusals produce content-free
 error JSON on stderr and exit 2. The command delegates to the same checked producer;
 it neither performs inference nor promises the unfinished study-preparation facade.
+
+### 2026-09-23 — engine local evidence, inference profiles and mapping runs
+
+Status: proposed for peer review on Fray (#49, #18). No code yet beyond the first item.
+
+**Engine local evidence (landed at `29e85a0c`).** `LocalEvidence.compute` gates and prices
+every nominated anchor once, before any inference, and both `GraphHsmm` and the reference path
+consume that one immutable object. `LocalEvidenceId` is derived only inside `align`. It covers:
+
+- the recall and source, including the supplements that separate absent from explicitly
+  empty proposition fields;
+- the full nominations;
+- admissibility;
+- every priced state.
+
+It does not identify the cost model, the renderer or the scoring providers. Inference binds,
+runs and validates one source snapshot. This is the engine identity, not yet the complete
+shared-evidence identity of mote `bd-01M2TACM78289S4TECE91GT5K2`: channel and provider
+receipts (AC2) still have to bind before a run may claim shared evidence.
+
+**Candidate tie policy** (agreed with the P1 lead on Fray #55, 2026-09-23). The historical
+per-level cut `sortBy((distance, ref.key)).take(perLevel)` chooses between equal scores by
+identifier. The lexical channel also ranks its hits in identifier order. A strict reference must
+not depend on identifiers (measured: `LocalEvidenceIsolationSuite` law (c)). Candidate generation
+therefore declares a `CandidateTiePolicy`, which is part of the candidate identity and of the
+Candidates stage receipt.
+
+- `TieComplete(budget)` is the policy for new strict profiles. Every candidate whose score
+  equals the k-th score at the cut is kept. Equality is exact equality of finite canonical
+  values in v1. A non-finite score is refused, never tied. Tied candidates share a dense rank,
+  and lexical hits carry no identifier-derived rank.
+- The budget is explicit profile configuration, either `Unbounded` or `AtMost(n)`. There is no
+  default: a value is chosen only after tie-size diagnostics have been measured. It applies to
+  the union of channels at a level, so lexical hits count too.
+- When a union would exceed `AtMost(n)`, the result is a typed `TieOverflow(level, size, n)`.
+  In the reference path this makes the unit's outcome an accounted reference refusal. The
+  remaining levels may be kept as diagnostics, but nothing is normalized over the silently
+  reduced target universe.
+- A successfully computed score is evidence, even when it is zero overlap or equal to every
+  other candidate. Such a level is flagged as uninformative and uncalibrated, not treated as
+  absent. Only a channel's typed no-measurement outcome may omit a score. A numeric floor or a
+  fixture default never implies absence.
+- `HistoricalKeyOrder` is kept by name so the frozen Sherlock preset reproduces byte for byte.
+  Its receipt records that it depends on identifiers, and it can never satisfy a reference
+  profile.
+- Tie-size diagnostics (level, cut rank, tie size, channel) are separate telemetry and never
+  enter historical mapper outputs.
+
+Implemented shape (branch `solo/tie-policy`, align, 2026-09-23):
+
+- `StrictCandidateConfig.of(perLevel, budget, lexicalOverlap, space)` checks that `perLevel` is
+  positive and that `AtMost(n)` satisfies `perLevel <= n`. It returns a `CandidateRefusal` rather
+  than accepting an unchecked value.
+- `StrictCandidateGenerator.generate` returns `Either[CandidateRefusal, StrictCandidates]`. A
+  non-finite score is `NonFiniteScore`, never a tie and never dropped.
+- `StrictCandidates` and `StrictCandidateSet` have no `without` or `fuse`, so the policy cannot be
+  lost by recombination. Only the generator builds `TieOverflow` and `UniformSemanticScores`,
+  because their fields stand in relations. The uniform flag counts every scored semantic
+  candidate at the level, not only the kept ones.
+- `LocalEvidence.compute(recall, source, strict, costModel)` records
+  `CandidateProvenance.Strict(policy, overflow, uniformSemantic)`. Evidence built from plain
+  `Candidates` records `Unattested`: it cannot tell generator output from hand-built sets, so it
+  claims neither the historical policy nor a strict one. The provenance is part of the evidence
+  identity, which is now `local-evidence/v3`.
+- The historical `CandidateGenerator` is unchanged, including its lexical hits, which now come
+  from a shared helper, and it reproduces the frozen digests. `HistoricalKeyOrder` exists as a
+  named, identifier-dependent policy value.
+
+Not in this slice:
+- binding the policy into a registered execution `StageReceipt`;
+- the strict reference refusal of an overflowed unit, which belongs to the reference ticket;
+- closing G1 AC2 or AC3.
+
+Rejected alternatives:
+- Dropping all candidates tied at the cut. Tie frequency correlates with how vague a recall
+  unit is, which would bias the estimand.
+- A seeded random or content-hash tie-break. Both are arbitrary: a hidden prior.
+- Treating no-overlap scores as missing. That confuses low support with no value.
+- A default budget with no measurement behind it.
+
+**Inference profiles.** An `InferenceProfile` is a versioned declaration with exactly one kind.
+
+- `LocalReference` is the strict reference operation. It declares the target universe and
+  grain, the prior, the temperature, the normalization and the external alternatives. It has
+  no transitions, refinement, monotone decode or fill. Its measure is normalized local score
+  mass.
+- `StructuredReconstruction(preset)` names a versioned preset. The preset declares
+  persistence, order, hierarchy, refinement and fill. The historical Sherlock preset stays
+  reachable by name. Its measure is a model posterior.
+- `Weighted(lambda)` sets the structural strength. `lambda` is an exact rational in the closed
+  interval [0, 1], written as a reduced pair of non-negative integers `numerator/denominator`
+  with a positive denominator. Decimal text is not used, because it represents only terminating
+  rationals. Out-of-range, unreduced and malformed values are refused. The measure kind depends
+  on the endpoint and is never implied: `Weighted(0)` dispatches to `LocalReference` and yields
+  normalized local score mass. `Weighted(1)` dispatches to the declared reconstruction preset
+  and yields that preset's model posterior. At `0 < lambda < 1` the result is a model posterior
+  of an explicitly defined structural model. That definition belongs to the lambda ticket
+  (mote `bd-01M35MHPFFKQHSJKC07VMWC7CW`), not to this ADR. It must state how zero-support
+  transitions, durations and initial or termination terms scale. This ADR asserts no continuity
+  between the interior and either endpoint. Row-normalized tempering of a sparse transition
+  matrix, for example, keeps forbidden transitions forbidden at every `lambda > 0`, so it does
+  not approach the reference as `lambda -> 0` (counterexample on Fray #52). Any continuity claim
+  needs the model that establishes it, and then a test.
+
+`InferenceProfileId` is the content digest of the whole declaration, derived only by the
+library. Any parameter that can change a result is part of it.
+
+**Mapping runs.** A `MappingRun` pairs `sharedEvidence` with `members`, a list of
+`(InferenceProfileId, MappingResult)` pairs. Its checked constructor refuses a run when:
+
+- the members have differing inventory or source digests;
+- a member's stage ledger does not bind the run's evidence identity at the Candidates,
+  Rendering and Scoring stages;
+- two members use the same profile;
+- the run is empty.
+
+In 1.0 a run offers localization, temporal and exchange projections only. It offers no
+organization or order readouts. Those arrive with compatibility in 1.1: a `lambda > 0` or
+reconstruction member is `ModelDependentOnly` for them, and `LocalReference` is the only
+member that can satisfy a strict request. Exchange serializes a run as a manifest over the
+unchanged single-record packages (`profile_id`, `kind`, `lambda`, record and bundle digests),
+with `shared_evidence_id` and `profile_id` on member rows. The exchange owns that codec. It
+consumes these types and does not define its own.
+
+**Rejected alternatives:**
+
+- A convex mixture of the reference and reconstruction outputs. It would add a normalized
+  score mass to a model posterior, which this ADR forbids, and give the result no measure
+  type.
+- Treating `priorScale = 0` as the reference. That is already rejected above.
+- A `Double` or decimal-text `lambda`. A `Double` can print alike for different values, and
+  decimal text cannot represent non-terminating rationals.
+- Letting the caller label a member's profile. That would be caller-asserted identity.
+- Applying fill or monotone decode at intermediate `lambda`. That would carry
+  reconstruction-only decisions into a weighted run.

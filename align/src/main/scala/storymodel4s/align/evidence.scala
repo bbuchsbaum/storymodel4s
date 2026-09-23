@@ -28,6 +28,7 @@ final class LocalEvidence private (
     val viewFingerprint: ViewFingerprint,
     val scopeDigest: Checksum,
     val gated: Boolean,
+    val provenance: CandidateProvenance,
     val units: Vector[RecallUnitId],
     val candidates: Vector[CandidateSet],
     val nominated: Vector[Vector[SourceNodeRef]],
@@ -67,6 +68,43 @@ object LocalEvidence:
       recall: RecallGraph[Checked],
       source: SourceView,
       candidates: Candidates,
+      costModel: LocalCostModel,
+      gate: Boolean
+  ): Either[AlignError, LocalEvidence] =
+    build(recall, source, candidates, CandidateProvenance.Unattested, costModel, gate)
+
+  /** Gated evidence over strict candidates. The tie policy, every overflow and every uniform
+    * semantic level are recorded on the evidence and in its identity, so no consumer can mistake a
+    * withheld level for a successfully nominated universe.
+    */
+  def compute(
+      recall: RecallGraph[Checked],
+      source: SourceView,
+      strict: StrictCandidates,
+      costModel: LocalCostModel
+  ): Either[AlignError, LocalEvidence] =
+    val snapshot = MappingBindingRender.snapshot(source)
+    def refuse(detail: String) = Left(AlignError.InconsistentResult(s"strict candidates $detail"))
+    val bound = StrictBinding.of(recall, snapshot)
+    val b = strict.binding
+    val check: Either[AlignError, Unit] =
+      if b.units != bound.units then refuse("cover different recall units or a different order")
+      else if b.recallChecksum != bound.recallChecksum || b.recallSupplement != bound.recallSupplement
+      then refuse("were generated for a different recall")
+      else if b.viewFingerprint != bound.viewFingerprint || b.scopeDigest != bound.scopeDigest then
+        refuse("were generated for a different source")
+      else if bound.units.exists(u => strict.get(u).isEmpty) then refuse("are missing a unit")
+      else Right(())
+    check.flatMap { _ =>
+      val provenance = CandidateProvenance.Strict.of(strict, bound.units)
+      build(recall, snapshot, strict.candidates, provenance, costModel, gate = true)
+    }
+
+  private def build(
+      recall: RecallGraph[Checked],
+      source: SourceView,
+      candidates: Candidates,
+      provenance: CandidateProvenance,
       costModel: LocalCostModel,
       gate: Boolean
   ): Either[AlignError, LocalEvidence] =
@@ -113,6 +151,7 @@ object LocalEvidence:
           ViewFingerprint.of(view),
           MappingSourceRender.scope(view.nodes),
           gate,
+          provenance,
           ids,
           ids.map(candidates.set),
           nominated,
@@ -193,13 +232,70 @@ object LocalEvidenceId:
     }
     MappingRender.digest(
       Vector(
-        "local-evidence/v2",
+        "local-evidence/v3",
         e.recallChecksum.hex,
         e.recallSupplement.hex,
         e.viewFingerprint.checksum.hex,
         e.scopeDigest.hex,
-        e.gated.toString
+        e.gated.toString,
+        CandidateProvenance.render(e.provenance)
       ) ++ perUnit
     )
 
 type LocalEvidenceId = LocalEvidenceId.LocalEvidenceId
+
+/** Where a [[LocalEvidence]]'s candidates came from.
+  *
+  * Why: evidence built from plain [[Candidates]] cannot tell generator output from hand-built sets,
+  * so it claims nothing (`Unattested`). Evidence built from [[StrictCandidates]] records the tie
+  * policy and, per unit in recall order, what that policy withheld or observed.
+  */
+sealed trait CandidateProvenance
+object CandidateProvenance:
+  case object Unattested extends CandidateProvenance
+
+  final class Strict private (
+      val policy: CandidateTiePolicy,
+      val overflow: Vector[Vector[TieOverflow]],
+      val uniformSemantic: Vector[Vector[UniformSemanticScores]]
+  ) extends CandidateProvenance:
+    /** True when some level of unit `i` exceeded its budget: a strict reference refuses it. */
+    def overflowed(i: Int): Boolean = overflow.lift(i).exists(_.nonEmpty)
+    override def equals(that: Any): Boolean = that match
+      case o: Strict =>
+        policy == o.policy && overflow == o.overflow && uniformSemantic == o.uniformSemantic
+      case _ => false
+    override def hashCode: Int = (policy, overflow, uniformSemantic).hashCode
+    override def toString: String = s"Strict($policy)"
+
+  object Strict:
+    /** Derived from strict candidates, which only checked generation can issue, for `units` in
+      * order. The caller has already checked that every unit is present.
+      */
+    private[align] def of(strict: StrictCandidates, units: Vector[RecallUnitId]): Strict =
+      val sets = units.flatMap(strict.get)
+      new Strict(strict.policy, sets.map(_.overflow), sets.map(_.uniformSemantic))
+
+  private[align] def render(p: CandidateProvenance): String =
+    import MappingRender.sequence
+    p match
+      case Unattested => sequence(Vector("unattested"))
+      case s: Strict  =>
+        sequence(
+          Vector(
+            "strict",
+            sequence(CandidateTiePolicy.render(s.policy)),
+            sequence(
+              s.overflow.map(os =>
+                sequence(
+                  os.map(o => sequence(Vector(o.level, o.unionSize, o.budget).map(_.toString)))
+                )
+              )
+            ),
+            sequence(
+              s.uniformSemantic.map(us =>
+                sequence(us.map(u => sequence(Vector(u.level, u.scoredCount).map(_.toString))))
+              )
+            )
+          )
+        )
