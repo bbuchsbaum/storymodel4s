@@ -592,3 +592,77 @@ consumes these types and does not define its own.
 - Letting the caller label a member's profile. That would be caller-asserted identity.
 - Applying fill or monotone decode at intermediate `lambda`. That would carry
   reconstruction-only decisions into a weighted run.
+
+### 2026-09-23 — content-only scoring for strict reference (S2)
+
+Status: accepted direction, with amendments from the read-only type review (Fray #68, seq
+673-682). Not yet implemented. Mote `bd-01M2TACM78289S4TECE91GT5K2`, acceptance criteria AC2 and
+AC3.
+
+**Problem.** Today's pricing reads no position, order, support or importance field; that was
+measured by `LocalEvidenceIsolationSuite`. But nothing enforces it. Every scorer receives the full
+`NodeSummary`, `RecallUnit` and `SourceView`. The data behind them also carries order at nested
+levels:
+- proposition-chart alignments with source-text spans, sentence ids and provenance;
+- expressed-uncertainty cue spans;
+- target and unit identifiers that can be scene numbers or ordinals;
+- member collections sorted by those identifiers.
+
+A strict reference must make order unreadable by construction, not by convention.
+
+**Decision.** The strict path scores only content projections. The historical signatures are
+unchanged and keep their byte-identical output.
+
+- *Payload.* A scorer receives content types:
+  - `UnitContent`: the discourse function, a projected semantic graph, the semantic kind of
+    expressed uncertainty, and the checked, bound unit text.
+  - `TargetContent`: level, leaf status, the content fields, a projected semantic graph, the
+    checked, bound target text, and its contained members.
+  - A content view: grain, meaning the maximum level.
+
+  The projected semantic graph is a distinct, recursively projected graph of concepts, roles and
+  relations. It carries no chart object, alignment span, sentence id, provenance, meta or original
+  identifier. Missing and absent charts stay distinct.
+- *Identifiers.* The payload contains no printable unit, target or binding key. Entity and
+  coreference equality survive through local semantic handles, which are opaque within one
+  projection and carry no original label or order. The map back to source references belongs to
+  the orchestration envelope and is used only to re-key outputs.
+- *Containment.* Containment and grain are admitted inputs. A scorer consumes members only
+  through library-owned reductions that do not depend on member order. Incidental ordering, such
+  as the old `structuralMembers` sort by reference, never reaches a scorer. An unordered
+  collection alone is not the guarantee; the reductions are.
+- *No way back.* Content types expose no conversion, equality or hash path to the
+  coordinate-bearing originals.
+- *Adapters.* The deterministic scorers move onto content types: lexical, fixture table,
+  contradiction, chart compatibility, structural reduction and the default cost model. Their
+  existing signatures project and delegate. S2b, required for 1.0, adds the embedding channel as
+  a controlled adapter over bound unit and target text. Production adapters do not depend on
+  `embed-bench`. Until S2b is checked, strict profiles report embedding as a typed unavailable
+  channel, never a lexical fallback.
+- *Relation to producer seams.* This projection is the scorer-seam rendering of the evidence
+  packet defined in ADR 0022 (mapping producers and evidence; Fray #75). It binds to that packet's
+  identity once the packet is defined, and this section defines no packet type of its own.
+  Complete-mapping producers, such as a direct LLM labeller or a human import, use the other seam
+  and never pass through local scoring.
+- *Scope of the claim.* This restricts the inputs supplied to a scorer. A closure can still
+  capture external state, so strict eligibility requires a registered, controlled adapter
+  (acceptance criterion AC2). It is not a claim of absolute isolation.
+
+**Falsifiers.**
+- Parity: the pinned historical `HsmmResult` digests stay byte-identical.
+- Compile court: inside a content scorer, positions, support, world order, ordinals, nested chart
+  spans, cue spans, sentence ids and binding keys fail to typecheck, and same-shape controls do
+  typecheck.
+- A widening mutant, one that adds any such accessor, fails the court.
+- Behavioural laws, with semantic content held fixed:
+  - shifting spans leaves strict evidence unchanged;
+  - renaming ids leaves strict evidence unchanged;
+  - permuting membership or storage leaves strict evidence unchanged.
+- Missing-chart and uniform-score distinctions are preserved.
+
+**Rejected alternatives.**
+- Blanking positions to constants inside the existing types. A blanked position 0 cannot be told
+  apart from a real one.
+- Passing `PropositionEvidence` or `Canonical.form`, because they retain forbidden fields.
+- Treating an unordered collection as sufficient.
+- Wrapping arbitrary existing closures as strict channels.
