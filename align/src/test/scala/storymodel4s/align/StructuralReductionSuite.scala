@@ -11,6 +11,9 @@ import storymodel4s.recall.RecallUnit
 
 /** Adversarial laws for the declared segment structural estimand and its audit receipt. */
 class StructuralReductionSuite extends ScalaCheckSuite:
+  private def coverageOf(level: Int, withEvidence: Int, members: Int): StructuralCoverage =
+    StructuralCoverage.of(level, withEvidence, members).fold(e => fail(e.message), identity)
+
   import AnnaFixture.*
 
   private def chart(agent: String, patient: String): PropositionChart[Checked] =
@@ -102,7 +105,7 @@ class StructuralReductionSuite extends ScalaCheckSuite:
     )
     val v = viewWith(Map(e4 -> straight, e5 -> compatibleOther))
     val reduction = ChartDistance.structuralReduction(provider, unit, v.node(sc2).get, v)
-    assertEquals(reduction.receipt.sourceChartCoverage, StructuralCoverage(1, 2, 3))
+    assertEquals(reduction.receipt.sourceChartCoverage, coverageOf(1, 2, 3))
     assertEquals(reduction.receipt.observedEstimateCoverage, Coverage.unsafe(2, 1))
     assertEquals(reduction.receipt.reducer, StructuralReducer.Minimum)
     assertEquals(reduction.receipt.members.map(_.member), Vector(e4, e5))
@@ -121,7 +124,7 @@ class StructuralReductionSuite extends ScalaCheckSuite:
     val chartReceipt = breakdown.reduction(CostTerm.Chart).getOrElse(fail("missing chart receipt"))
     val providerReceipt =
       breakdown.reduction(CostTerm.Structural).getOrElse(fail("missing structural receipt"))
-    assertEquals(breakdown.sourceChartCoverage, Some(StructuralCoverage(1, 2, 3)))
+    assertEquals(breakdown.sourceChartCoverage, Some(coverageOf(1, 2, 3)))
     assertEquals(chartReceipt.members.map(_.member), Vector(e4, e5))
     assertEquals(chartReceipt.observedEstimateCoverage, Coverage.unsafe(2, 2))
     assertEquals(providerReceipt.members.map(_.member), Vector(e4, e5))
@@ -163,7 +166,7 @@ class StructuralReductionSuite extends ScalaCheckSuite:
     val v = viewWith(Map(e5 -> straight))
     val reduction = ChartDistance.reduction(unit, v.node(sc2).get, v)
     assertEquals(reduction.estimate, Estimate.observed(0.0))
-    assertEquals(reduction.receipt.sourceChartCoverage, StructuralCoverage(1, 1, 3))
+    assertEquals(reduction.receipt.sourceChartCoverage, coverageOf(1, 1, 3))
     assertEquals(reduction.receipt.observedEstimateCoverage, Coverage.unsafe(1, 1))
   }
 

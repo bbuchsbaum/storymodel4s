@@ -297,7 +297,11 @@ object HsmmResultCodec:
       level <- field[Int](c, "level")
       withEvidence <- field[Int](c, "membersWithEvidence")
       members <- field[Int](c, "members")
-    yield StructuralCoverage(level, withEvidence, members)
+      coverage <- StructuralCoverage
+        .of(level, withEvidence, members)
+        .left
+        .map(e => DecodingFailure(e.message, c.history))
+    yield coverage
   }
 
   private given Encoder[StateMassWire] = Encoder.instance { entry =>

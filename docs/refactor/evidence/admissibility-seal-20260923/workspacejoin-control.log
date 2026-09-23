@@ -1,0 +1,10 @@
+== control base 577ebfdb sha=577ebfdb0f9348f235ef75706167ddbbd6684cec exit=1
+  ==> X storymodel4s.fixtures.WorkspaceJoinSuite.historical results are contextually decoded and cannot float to changed recall semantics 34.396s java.util.concurrent.TimeoutException: test timed out af
+  storymodel4s.fixtures.WorkspaceJoinSuite: finished 70.765s
+  [error] Failed: Total 20, Failed 1, Errors 0, Passed 19
+  [error] (fixturesNative / Test / testOnly) sbt.TestsFailedException: Tests unsuccessful
+== candidate 280a9931 sha=280a993143069571573a4a25bf1f9a886171f946 exit=1
+  ==> X storymodel4s.fixtures.WorkspaceJoinSuite.historical results are contextually decoded and cannot float to changed recall semantics 34.680s java.util.concurrent.TimeoutException: test timed out af
+  storymodel4s.fixtures.WorkspaceJoinSuite: finished 67.078s
+  [error] Failed: Total 20, Failed 1, Errors 0, Passed 19
+  [error] (fixturesNative / Test / testOnly) sbt.TestsFailedException: Tests unsuccessful

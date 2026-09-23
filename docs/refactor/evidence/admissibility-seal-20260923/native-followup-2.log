@@ -1,0 +1,13 @@
+== control base 577ebfdb clean Native: MappingHistoricalSuite and WorkspaceJoinSuite sha=577ebfdb0f9348f235ef75706167ddbbd6684cec exit=1 secs=212
+  ==> X storymodel4s.align.MappingHistoricalSuite.Declared and undeclared twins require their own scope and preserve missingness 30.430s java.util.concurrent.TimeoutException: test timed out after 30 seconds
+  storymodel4s.align.MappingHistoricalSuite: finished 139.366s
+  [error] Failed: Total 14, Failed 1, Errors 0, Passed 13
+== candidate remaining 6 Native tasks (after clean) sha=280a993143069571573a4a25bf1f9a886171f946 exit=0 secs=783
+  [info] Passed: Total 104, Failed 0, Errors 0, Passed 104
+  [info] Passed: Total 115, Failed 0, Errors 0, Passed 115
+  [info] Passed: Total 51, Failed 0, Errors 0, Passed 51
+  [info] Passed: Total 77, Failed 0, Errors 0, Passed 77
+  [info] Passed: Total 167, Failed 0, Errors 0, Passed 167
+  [info] Passed: Total 133, Failed 0, Errors 0, Passed 133
+DONE
+PY_EXIT=0

@@ -1,0 +1,2 @@
+M3-codec (guard removed): exit=1 totals=['Failed: Total 21, Failed 1, Errors 0, Passed 20'] failed=['storymodel4s.codec.AlignCodecSuite.a coverage whose counts break 0 <= evidenced <= members is refused at decode 0.042s munit.FailE']
+baseline restored: exit=0 totals=['Passed: Total 21, Failed 0, Errors 0, Passed 21']

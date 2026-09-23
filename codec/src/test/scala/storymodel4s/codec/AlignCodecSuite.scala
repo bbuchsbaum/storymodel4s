@@ -129,6 +129,37 @@ class AlignCodecSuite extends FunSuite:
       case other => fail(s"expected a state/cost record rejection, got $other")
   }
 
+  test("a coverage whose counts break 0 <= evidenced <= members is refused at decode") {
+    // StructuralCoverage is a checked type (bd-01M17ZNXY6AS1CMBQJRH3JMNVX): a count-violating
+    // coverage can no longer be built, so the decoder refuses it as a wire failure. The level range
+    // stays with AlignWire and still surfaces as a record rejection; both classes are pinned here.
+    def withCoverage(level: Int, evidenced: Int, members: Int): Json =
+      updateFirstSourceCost(json) { cost =>
+        cost.mapObject(
+          _.add(
+            "sourceChartCoverage",
+            Json.obj(
+              "level" -> Json.fromInt(level),
+              "membersWithEvidence" -> Json.fromInt(evidenced),
+              "members" -> Json.fromInt(members)
+            )
+          )
+        )
+      }
+    def countRefusal(r: Either[HsmmCodecError, ?]): Boolean = r match
+      case Left(HsmmCodecError.Wire(e)) => e.message.contains("StructuralCoverage")
+      case _                            => false
+    val counts = HsmmResultCodec.decodeJson(withCoverage(0, 2, 1), fixture.recall, fixture.view)
+    assert(countRefusal(counts), s"expected a StructuralCoverage decode refusal, got $counts")
+    // Control: lawful counts reach past the coverage decoder, so the refusal above is about counts.
+    val lawful = HsmmResultCodec.decodeJson(withCoverage(0, 1, 1), fixture.recall, fixture.view)
+    assert(!countRefusal(lawful), s"lawful counts were refused as counts: $lawful")
+    HsmmResultCodec.decodeJson(withCoverage(-1, 0, 1), fixture.recall, fixture.view) match
+      case Left(HsmmCodecError.Rejected(AlignError.MalformedRecord(_, detail))) =>
+        assert(detail.contains("sourceChartCoverage"), detail)
+      case other => fail(s"expected the negative level to be a record rejection, got $other")
+  }
+
   test("duplicate sparse entries are rejected before conversion to Map") {
     val changed = updateFirstObjectInArray(json, "posterior") { row =>
       row.mapObject { fields =>
