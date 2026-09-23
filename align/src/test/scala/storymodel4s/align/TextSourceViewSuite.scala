@@ -61,3 +61,14 @@ class TextSourceViewSuite extends FunSuite:
     val changed = TextSourcePackage.fromText("X😀; B.\n\nC.").toOption.get
     val other = TextSourceView.of(changed, SurfaceUnitKind.Sentence).toOption.get
     assertNotEquals(ViewFingerprint.of(sentences), ViewFingerprint.of(other))
+
+  test("nonlexical surface fragments count as selected targets and preserve succession"):
+    val fragments = TextSourcePackage.fromText("A;;\n\n\uFEFF\n\nB.").toOption.get
+    val view = TextSourceView.of(fragments, SurfaceUnitKind.Clause).toOption.get
+    assertEquals(view.nodes.size, 4)
+    assertEquals(view.nodes.map(_.discoursePosition), Vector(0, 1, 2, 3))
+    assertEquals(
+      view.weight(RelationLayer.DiscourseSuccession, view.nodes(1).ref, view.nodes(2).ref),
+      1.0
+    )
+    assert(view.nodes.forall(!_.propositional.declares))

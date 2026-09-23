@@ -34,6 +34,13 @@ The preimage is UTF-8 of NUL-joined `text-source-segment/v1`, profile tag,
 canonical checksum hex, case-sensitive `SurfaceUnitKind.toString`, start and
 end-exclusive (canonical decimal integers). IDs prefix the full digest with
 `text-segment:`. These fields cannot contain NUL.
+Generated targets retain nonlexical surface fragments (including consecutive
+semicolon fragments and BOM-only paragraphs within nonempty text). NBSP and
+zero-width-space content is also retained. Selected target counts and ordinal
+succession include these fragments; they do not estimate semantic unit counts.
+Filtering them is rejected for this profile because it would discard physical
+surface anchors and needs a separately versioned rule.
+
 Original surface unit IDs remain available separately for evidence joins. Package
 serialization binds the entire atlas, including its parent links and ordering;
 equal physical target IDs do not assert equal hierarchy or equal packages.
@@ -42,7 +49,12 @@ All spans are half-open UTF-16 code-unit offsets into `StorySource.canonicalText
 The input's raw text and checksum are retained alongside canonical text and its
 checksum. `story-source/v1` canonicalization names the existing normalization:
 CRLF/CR become LF, trailing space and tab are removed, runs of more than
-two newlines collapse, and leading/trailing blank lines are removed. Unicode
+two newlines collapse, and leading/trailing blank lines are removed. Its existing
+Java regex `$` also matches before a final NEL/U+0085, LS/U+2028 or PS/U+2029.
+The space/tab step uses that anchor on each LF-separated line; the trailing-LF
+step uses it on the complete text. Those Unicode terminators are retained.
+The independent reader must mirror this established rule rather than silently
+change canonical source hashes under the same tag. Unicode
 normalization is not performed; an input BOM is retained as content. Raw-file
 byte offsets, Unicode code-point offsets and canonical UTF-16 offsets are not
 interchangeable. This slice does not provide a raw-to-canonical offset crosswalk.
@@ -66,7 +78,7 @@ Selecting an absent granularity fails explicitly.
 
 `text-source/v1` JSON carries source, atlas, profile, derived segments and explicit
 capabilities. `segments.tsv` includes the canonical checksum, offset unit, kind,
-original surface ID, target ID, ordinal, parent surface ID and exact text. A
+original surface ID, target ID, ordinal, parent surface ID and exact text.
 Each TSV row carries its profile as well as its surface kind. Generated Clause
 rows are labeled `surface-semicolon/v1:Clause`, making the heuristic provenance
 visible even when a reader opens the table without the manifest. A

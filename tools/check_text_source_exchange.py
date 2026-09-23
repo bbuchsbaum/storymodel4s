@@ -13,6 +13,8 @@ import io
 import json
 from pathlib import Path
 import re
+import shutil
+import tempfile
 
 
 def require(condition, message):
@@ -40,29 +42,59 @@ def sha(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def keys(value, required, optional=()):
+    require(isinstance(value, dict) and set(required) <= set(value) <= set(required) | set(optional), "unknown or missing object keys")
+
+
+def utf8_strings(value):
+    if isinstance(value, str):
+        value.encode("utf-8")
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            utf8_strings(key)
+            utf8_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            utf8_strings(item)
+
+
 def canonical_text(raw):
     lines = raw.replace("\r\n", "\n").replace("\r", "\n").split("\n")
-    return re.sub(r"\n{3,}", "\n\n", "\n".join(re.sub(r"[ \t]+$", "", line) for line in lines)).strip("\n")
+    # Java's $ also matches before a final NEL, line separator or paragraph separator.
+    end = r"(?=$|[\u0085\u2028\u2029]$)"
+    stripped = "\n".join(re.sub(r"[ \t]+" + end, "", line) for line in lines)
+    collapsed = re.sub(r"\n{3,}", "\n\n", stripped)
+    return re.sub(r"\n+" + end, "", collapsed.lstrip("\n"))
 
 
 def check(directory):
     directory = Path(directory)
     require({p.name for p in directory.iterdir()} == {"source.json", "segments.tsv", "manifest.json"}, "file inventory mismatch")
     manifest = load((directory / "manifest.json").read_bytes().decode("utf-8"))
+    keys(manifest, ("schemaVersion", "wire", "files", "columns"))
     require(manifest["schemaVersion"] == "text-source-exchange/v1", "unsupported exchange schema")
     require(manifest["wire"] == "quoted-tsv/v1", "unsupported table wire")
     require([f["name"] for f in manifest["files"]] == ["source.json", "segments.tsv"], "unsafe or duplicate manifest file name")
     payloads = {}
     for record in manifest["files"]:
+        keys(record, ("name", "sha256", "bytes"))
+        require(type(record["bytes"]) is int and record["bytes"] >= 0, "invalid byte count")
         data = (directory / record["name"]).read_bytes()
         require(len(data) == record["bytes"] and hashlib.sha256(data).hexdigest() == record["sha256"], "file hash/length mismatch")
         payloads[record["name"]] = data.decode("utf-8")
     package = load(payloads["source.json"])
+    keys(package, ("schemaVersion", "profile", "canonicalization", "offset_unit", "coordinate_text", "source", "atlas", "capabilities", "segments"))
+    utf8_strings(package)
     require(package["schemaVersion"] == "text-source/v1", "unsupported source schema")
     require(package["profile"] in ("surface-semicolon/v1", "supplied-atlas/v1"), "unknown profile")
     require(package["canonicalization"] == "story-source/v1", "unknown canonicalization")
     require(package["offset_unit"] == "utf-16-code-units" and package["coordinate_text"] == "source.canonicalText", "wrong coordinate declaration")
     source = package["source"]
+    keys(source, ("id", "language", "rawText", "canonicalText", "rawChecksum", "canonicalChecksum", "metadata"), ("title",))
+    require(isinstance(source["metadata"], dict) and all(isinstance(v, str) for v in source["metadata"].values()), "invalid source metadata")
+    require("title" not in source or isinstance(source["title"], str), "invalid source title")
+    require(isinstance(source["id"], str) and source["id"], "invalid source ID")
+    require(isinstance(source["language"], str) and re.fullmatch(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*", source["language"]), "invalid language tag")
     raw, text = source["rawText"], source["canonicalText"]
     require(text == canonical_text(raw), "canonical text mismatch")
     require(source["rawChecksum"] == sha(raw) and source["canonicalChecksum"] == sha(text), "source hash mismatch")
@@ -79,12 +111,15 @@ def check(directory):
     }
     require(package["capabilities"] == expected_caps, "fabricated source capability")
     atlas = package["atlas"]
+    keys(atlas, ("schemaVersion", "storyId", "canonicalSourceChecksum", "units"))
     require(atlas["schemaVersion"] == "surface-atlas/v1" and atlas["storyId"] == source["id"] and atlas["canonicalSourceChecksum"] == sha(text), "atlas/source join mismatch")
     units = {u["id"]: u for u in atlas["units"]}
     require(len(units) == len(atlas["units"]), "duplicate atlas ID")
     coarseness = {"Paragraph": 0, "Sentence": 1, "Clause": 2, "Token": 3}
     previous = {}
     for u in atlas["units"]:
+        keys(u, ("id", "kind", "span", "ordinal"), ("parent",))
+        keys(u["span"], ("start", "end"))
         a, b, kind = u["span"]["start"], u["span"]["end"], u["kind"]
         require(type(a) is int and type(b) is int and 0 <= a < b <= len(utf16) // 2, "invalid atlas span")
         utf16[2*a:2*b].decode("utf-16-le")  # Strictly rejects a bisected surrogate pair.
@@ -120,12 +155,42 @@ def check(directory):
     return dict(status="checked", segments=len(targets), profile=package["profile"], canonical_utf16_units=len(utf16)//2, bom_retained=text.startswith("\ufeff"), segmentation_recomputed=False)
 
 
+def check_suite(directory):
+    """Production fixtures come from pipeline/Test/runMain TextSourceExchangeWitness."""
+    directory = Path(directory)
+    reports = [check(directory / name) for name in ("bom", "unicode-lines", "supplied")]
+    require(reports[0]["bom_retained"], "BOM witness is missing")
+    require(reports[2]["profile"] == "supplied-atlas/v1", "supplied-atlas witness is missing")
+    refused = []
+    for field in ("encoding_seconds_schedule", "narrative_model_claim"):
+        with tempfile.TemporaryDirectory(prefix="text-source-reader-") as temporary:
+            target = Path(temporary) / "exchange"
+            shutil.copytree(directory / "supplied", target)
+            value = load((target / "source.json").read_text(encoding="utf-8"))
+            value[field] = {"status": "available"}
+            content = canonical(value)
+            (target / "source.json").write_text(content, encoding="utf-8")
+            manifest = load((target / "manifest.json").read_text(encoding="utf-8"))
+            record = next(f for f in manifest["files"] if f["name"] == "source.json")
+            record.update(sha256=sha(content), bytes=len(content.encode("utf-8")))
+            (target / "manifest.json").write_text(canonical(manifest), encoding="utf-8")
+            try:
+                check(target)
+            except ValueError as error:
+                require(str(error) == "unknown or missing object keys", "wrong refusal court")
+                refused.append(field)
+            else:
+                raise ValueError("capability-inflation fault survived: " + field)
+    return dict(status="checked", fixtures=reports, rehashed_fields_refused=refused)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
+    parser.add_argument("--suite", action="store_true", help="check production witnesses and rehashed capability faults")
     args = parser.parse_args()
     try:
-        result = check(args.directory)
+        result = check_suite(args.directory) if args.suite else check(args.directory)
     except (ValueError, KeyError, TypeError, OSError, UnicodeError, csv.Error) as error:
         parser.exit(2, canonical({"status": "refused", "reason": str(error)}) + "\n")
     print(canonical(result))

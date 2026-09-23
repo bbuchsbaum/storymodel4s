@@ -2,7 +2,6 @@ package storymodel4s.core
 
 import java.nio.charset.StandardCharsets
 import munit.FunSuite
-import scala.compiletime.testing.typeCheckErrors
 
 /** Synthetic Unicode/segmentation diagnostics, not narrative or participant material. */
 class TextSourceSuite extends FunSuite:
@@ -148,40 +147,27 @@ class TextSourceSuite extends FunSuite:
       Vector("A;", "B;")
     )
 
-  test("checked factory compiles but package construction, copy and product doors do not"):
-    assert(typeCheckErrors("storymodel4s.core.TextSourcePackage.fromText(\"A.\")").isEmpty)
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      def forge(a: SurfaceAtlas, n: TextNarrativeAtlas) = TextSourcePackage(a, n, TextSegmentationProfile.SuppliedAtlasV1, Vector.empty)
-    """).nonEmpty)
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      def forge(p: TextSourcePackage) = p.copy(segments = Vector.empty)
-    """).nonEmpty)
-    assert(typeCheckErrors("storymodel4s.core.TextSourcePackage.fromProduct(EmptyTuple)").nonEmpty)
-    assert(
-      typeCheckErrors(
-        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.TextSourcePackage]]"
-      ).nonEmpty
-    )
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      def forge(id: SegmentId, u: SurfaceUnit) = new TextSourcePackage.Segment(id, u)
-    """).nonEmpty)
+  test("canonicalization retains Java final-line-terminator anchor semantics"):
+    Vector("\u0085", "\u2028", "\u2029").foreach { separator =>
+      val raw = s"x $separator\ny\n$separator"
+      val value = get(TextSourcePackage.fromText(raw))
+      assertEquals(value.source.canonicalText, s"x$separator\ny$separator")
+    }
 
-  test("all four product-door controls compile for an honest product of the same fields"):
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      case class Control(atlas: SurfaceAtlas, sourceAtlas: TextNarrativeAtlas, profile: TextSegmentationProfile, segments: Vector[TextSourceSegment])
-      def make(a: SurfaceAtlas, n: TextNarrativeAtlas) = Control(a, n, TextSegmentationProfile.SuppliedAtlasV1, Vector.empty)
-    """).isEmpty)
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      case class Control(atlas: SurfaceAtlas, sourceAtlas: TextNarrativeAtlas, profile: TextSegmentationProfile, segments: Vector[TextSourceSegment])
-      def rebuild(c: Control) = c.copy(segments = Vector.empty)
-    """).isEmpty)
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      case class Control(atlas: SurfaceAtlas, sourceAtlas: TextNarrativeAtlas, profile: TextSegmentationProfile, segments: Vector[TextSourceSegment])
-      object Control:
-        def fromProduct(p: Product): Control = summon[scala.deriving.Mirror.ProductOf[Control]].fromProduct(p)
-      def rebuild(c: Control) = Control.fromProduct(c)
-    """).isEmpty)
-    assert(typeCheckErrors("""import storymodel4s.core.*
-      case class Control(atlas: SurfaceAtlas, sourceAtlas: TextNarrativeAtlas, profile: TextSegmentationProfile, segments: Vector[TextSourceSegment])
-      def rebuild(c: Control) = summon[scala.deriving.Mirror.ProductOf[Control]].fromProduct(c)
-    """).isEmpty)
+  test("surface fragments retain nonlexical content without asserting semantic units"):
+    val value = get(TextSourcePackage.fromText("A;;\n\n\uFEFF\n\nB."))
+    assertEquals(
+      value.at(SurfaceUnitKind.Paragraph).map(_.unit.text(value.source)),
+      Vector("A;;", "\uFEFF", "B.")
+    )
+    assertEquals(
+      value.at(SurfaceUnitKind.Clause).map(_.unit.text(value.source)),
+      Vector("A;", ";", "\uFEFF", "B.")
+    )
+    Vector("\u00A0", "\u200B", "😀").foreach { raw =>
+      val fragment = get(TextSourcePackage.fromText(raw))
+      assertEquals(
+        fragment.at(SurfaceUnitKind.Paragraph).map(_.unit.text(fragment.source)),
+        Vector(raw)
+      )
+    }

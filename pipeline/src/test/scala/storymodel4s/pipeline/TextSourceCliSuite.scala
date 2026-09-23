@@ -124,3 +124,45 @@ class TextSourceCliSuite extends FunSuite:
       try assertEquals(entries.count(), 1L)
       finally entries.close()
     }
+
+/** Emits production CLI witnesses for an external Python court; no subprocess is spawned. */
+object TextSourceExchangeWitness:
+  def main(args: Array[String]): Unit =
+    require(args.length == 1, "expected a new witness directory")
+    val root = Files.createDirectory(Path.of(args(0)))
+    def emit(name: String, raw: String, supplied: Boolean = false): Unit =
+      val input = Files.writeString(root.resolve(s"$name.txt"), raw, StandardCharsets.UTF_8)
+      val atlasArgs =
+        if supplied then
+          val source = StorySource
+            .fromText(raw, explicitId = Some(StoryId.unsafe("supplied-story")))
+            .toOption
+            .get
+          val unit = SurfaceUnit(
+            SurfaceUnitId.unsafe("supplied-paragraph"),
+            SurfaceUnitKind.Paragraph,
+            TextSpan.unsafe(0, source.canonicalText.length),
+            7,
+            None
+          )
+          val atlas = SurfaceAtlas.of(source, Vector(unit)).toOption.get
+          val path = Files.writeString(
+            root.resolve("supplied-atlas.json"),
+            SurfaceAtlasArtifactCodec.encode(atlas)
+          )
+          List("--atlas", path.toString)
+        else Nil
+      val out = Vector.newBuilder[String]
+      val err = Vector.newBuilder[String]
+      val status = TextSourceCli.run(
+        List(input.toString, root.resolve(name).toString) ++ atlasArgs,
+        s => { val _ = out += s },
+        s => { val _ = err += s }
+      )
+      val _ =
+        Files.writeString(root.resolve(s"$name.stdout"), out.result().mkString("", "\n", "\n"))
+      val _ = Files.writeString(root.resolve(s"$name.stderr"), err.result().mkString("\n"))
+      require(status == 0, s"witness $name failed with exit $status")
+    emit("bom", "\uFEFFA\u0301😀; B.  \r\n\r\nC.\r\n")
+    emit("unicode-lines", "x \u0085\ny \u2028\nz \u2029\nend\n\u2028")
+    emit("supplied", "A😀; B.", supplied = true)

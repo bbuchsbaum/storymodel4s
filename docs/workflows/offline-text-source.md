@@ -15,7 +15,9 @@ The output directory must not exist and its parent must exist. A successful
 command returns exit 0 and a JSON receipt on stdout. Refusals return exit 2 and a
 JSON error on stderr. An existing output is never overwritten. `manifest.json`
 appears only after the payloads and completed manifest have been written; a
-directory without it is incomplete.
+directory without it is incomplete. A failed write can leave that directory behind;
+preserve it for diagnosis and retry with a new output path. Error receipts give
+the failure class and summary, not every nested domain-error detail.
 
 To preserve an existing standoff atlas:
 
@@ -42,7 +44,11 @@ sentence and clause boundaries are preserved; missing kinds remain absent.
 
 Offsets are **half-open UTF-16 code units in canonical text**. Canonicalization
 normalizes CRLF/CR to LF, removes trailing space/tab, collapses more than two
-newlines and removes leading/trailing blank lines. It does not normalize Unicode
+newlines and removes leading/trailing blank lines. The existing Java regex end
+anchor also acts immediately before a final NEL (U+0085), line separator (U+2028)
+or paragraph separator (U+2029): spaces/tabs before that character are trimmed on
+each LF-separated line, and LF before it is trimmed at the end of the text.
+Those separator characters themselves remain. It does not normalize Unicode
 or strip a BOM. Plain UTF-8 readers retain the BOM; `utf-8-sig` and `UTF-8-BOM`
 readers change the coordinate basis. Raw-file byte offsets, Python character
 indices and these UTF-16 offsets can differ. There is no raw/canonical crosswalk
@@ -77,6 +83,13 @@ explicit heuristic fragment, not a parsed grammatical clause. A sentence without
 a semicolon has one such fragment. `supplied-atlas/v1` records supplied boundaries
 without attributing them to an analyzer.
 
+The generated profile retains nonlexical surface fragments: a second consecutive
+semicolon, a BOM-only paragraph inside nonempty text, and NBSP/zero-width-space
+fragments can be targets. Supplied punctuation, emoji and combining-mark anchors
+are also valid. These targets count in the selected source-node inventory and
+ordinal succession; their count is not a count of semantic or grammatical units.
+Whole-input ASCII whitespace and BOM-only inputs are refused.
+
 The library entry points are `TextSourcePackage.fromUtf8`, `.fromText`, `.analyze`
 and `.fromAtlas`. The package exposes the existing checked `TextNarrativeAtlas`
 and its `SourceBundle`. `TextSourceView.of(package, SurfaceUnitKind.Sentence)`
@@ -91,6 +104,30 @@ Text-only intake reports narrative-model and encoding-seconds capabilities as
 unavailable. Adding a presentation schedule or choosing a model must be an explicit
 downstream operation. Ordinary-file mapping-facade and broader prepare-command
 consumption remain open; this package is their checked input seam.
+
+## Validation boundaries
+
+The checked package and segment classes do not promise structural `equals` or
+`hashCode`; compare their declared fields or canonical artifacts. Standalone JSON
+decode compares parsed values and may admit semantically equal formatting (its
+parser uses the last duplicate key). Exchange decode requires exact regenerated
+file bytes. The Python reader separately refuses duplicate and undeclared fields.
+The legacy `SourceView` requires a context value; text targets carry its
+`NarratedWorld` placeholder with `Undeclared` propositional scope, which licenses
+no narrative-context assertion.
+
+Run the production-witness and independent-reader regression court with a new
+output path (Python 3, standard library only):
+
+```sh
+sbt 'pipeline/Test/runMain storymodel4s.pipeline.TextSourceExchangeWitness /tmp/text-source-witnesses'
+python3 tools/check_text_source_exchange.py --suite /tmp/text-source-witnesses
+```
+
+This checks generated BOM/Unicode inputs and a supplied atlas, then rehashes
+undeclared capability fields to ensure rejection is semantic, not just a stale
+file hash. The witness producer invokes the production CLI in-process; process
+exit/channel behavior has a separate CLI court.
 
 The design and rejected alternatives are recorded in
 [ADR 0021](../adr/0021-offline-text-source.md).

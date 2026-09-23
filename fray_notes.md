@@ -152,3 +152,18 @@ an agent communication failure in this instance, not evidence of a lost message.
   Closed conversation status therefore did not mean every direction of the pair
   had completed. Keep the two exact review subjects visible; do not infer that a
   parent's closure satisfies an unrelated pending review.
+
+- The reciprocal reader review reproduced two mismatches that the Scala roundtrip
+  court missed: rehashed undeclared capabilities were admitted by Python, and
+  Python disagreed with Java's final-Unicode-line-terminator regex anchor. The
+  useful review artifact was a lawful or adversarial exchange, not an approval
+  adjective. Both become regression witnesses (Fray #62, seq575).
+- A real `fray wait --after 574 --timeout 50 --selection involved` returned the
+  review while this turn was active. That is a working wake mechanism for an
+  active tool wait; it does not imply an idle chat will restart automatically.
+- Resolving the exporter review raced with the peer's resolution. The expected
+  revision check refused the stale patch; rereading showed the desired resolved
+  state, so no retry was needed. This is useful conflict handling.
+- A handoff briefly contained an unverified placeholder commit before correction.
+  Obtain the SHA from the completed commit command before composing a handoff;
+  the board should make exact source binding easy, not depend on remembered IDs.
