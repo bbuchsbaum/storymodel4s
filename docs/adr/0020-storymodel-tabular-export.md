@@ -58,7 +58,11 @@ wire for analysis tables; a second wire would split every downstream reader.
    than lifted out of `MappingExchange`, to leave that file to its owner; consolidating them is a
    follow-up.
 9. **Independent reader.** A standard-library Python reader re-derives the canonical TSV bytes,
-   checks every hash, schema, join and loss record, and never imports Scala logic.
+   checks every hash, schema and join, the loss-record schema and the internal claim accounting,
+   and never imports Scala logic. It cannot establish that a dropped-item count is true; that
+   needs the bound canonical model. Evidence `upstream` may cite claims the tables omit
+   (descriptors, hypotheses, resolved-value claims); the reader classifies each reference as
+   in-tables or outside-tables and neither rejects nor joins the latter.
 
 ## Rejected alternatives
 

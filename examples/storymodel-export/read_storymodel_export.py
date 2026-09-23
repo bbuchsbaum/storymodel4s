@@ -3,7 +3,9 @@
 
 It re-derives every check from the documented wire and never imports producer logic:
 file set, SHA-256 and byte length, column schema, canonical quoted-TSV bytes, cell types,
-canonical JSON cells, joins between tables, span offsets, and the loss-record accounting.
+canonical JSON cells, joins between tables, span offsets, and the loss-record schema and internal
+accounting. It cannot establish that a dropped-item count is true: that needs the bound
+canonical model, which the bundle deliberately does not carry.
 
 Usage: read_storymodel_export.py DIRECTORY
 Prints a JSON summary on success; exits 1 with the first refusal otherwise.
@@ -302,6 +304,17 @@ def read(directory):
         key = (e["claim_id"], e["evidence_index"])
         require(key not in evidence, f"duplicate evidence {key}")
         evidence[key] = e
+    # Upstream claims may lawfully be claims these tables omit (descriptors, hypotheses,
+    # resolved-value claims). Classify each reference; never reject it and never count it joined.
+    upstream = {"in_tables": 0, "outside_tables": 0}
+    for e in evidence.values():
+        u = e["upstream"]
+        require(u["status"] == "present" and isinstance(u["value"], list), "upstream cell")
+        ids = u["value"]
+        require(all(isinstance(i, str) and i for i in ids), "upstream ids must be strings")
+        require(ids == sorted(set(ids)), "upstream ids must be sorted and unique")
+        for i in ids:
+            upstream["in_tables" if i in claims else "outside_tables"] += 1
     cited = {}
     for s in tables["spans"]:
         require(s["claim_id"] in claims, f"span for unknown claim {s['claim_id']}")
@@ -372,6 +385,7 @@ def read(directory):
         "spans": len(tables["spans"]),
         "exported_claims": exported,
         "model_claims": exported + sum(int(l["claims"]) for l in losses.values()),
+        "upstream_refs": upstream,
         "not_supplied": sorted(
             n for n, l in losses.items() if l["status"] == "not-supplied"
         ),

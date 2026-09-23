@@ -36,7 +36,22 @@ EXPECTED = {
     "exported_claims": 372,
     "model_claims": 475,
     "not_supplied": ["build-receipt"],
+    "upstream_refs": {"in_tables": 0, "outside_tables": 0},
 }
+
+
+def check_upstream_outside_tables(directory):
+    """Lawful variant: an evidence item citing one exported and one omitted claim is accepted,
+    and each reference is classified. WoG itself cites no upstream claims, so this is synthetic."""
+    with tempfile.TemporaryDirectory() as scratch:
+        copy = os.path.join(scratch, "export")
+        shutil.copytree(directory, copy)
+        cited = '"{""status"":""present"",""value"":[""wog:claim:ent:arrows"",""wog:claim:omitted-descriptor""]}"'
+        edit_table(copy, "evidence.tsv", replace_first('"{""status"":""present"",""value"":[]}"', cited))
+        rehash(copy)
+        summary, _ = reader.read(copy)
+        assert summary["upstream_refs"] == {"in_tables": 1, "outside_tables": 1}, summary
+
 
 
 def check_hand_row(tables):
@@ -155,6 +170,14 @@ CORRUPTIONS = {
         d,
         lambda m: m.__setitem__("exported_claims", str(int(m["exported_claims"]) + 1)),
     ),
+    "upstream ids unsorted": lambda d: edit_table(
+        d,
+        "evidence.tsv",
+        replace_first(
+            '"{""status"":""present"",""value"":[]}"',
+            '"{""status"":""present"",""value"":[""z"",""a""]}"',
+        ),
+    ),
     "canonical_model claimed present": lambda d: edit_manifest(
         d,
         lambda m: m["capabilities"].__setitem__(
@@ -175,6 +198,7 @@ def main(argv):
         assert summary[key] == value, (key, summary[key], value)
     check_hand_row(tables)
     check_absent_is_not_zero(tables)
+    check_upstream_outside_tables(directory)
     refused = {}
     for name, corrupt in CORRUPTIONS.items():
         with tempfile.TemporaryDirectory() as scratch:
@@ -197,7 +221,7 @@ def main(argv):
     if accepted:
         print(f"FAIL: corruptions accepted: {accepted}", file=sys.stderr)
         return 1
-    print(f"PASS: counts, hand row, absent-vs-zero, {len(refused)} corruptions refused")
+    print(f"PASS: counts, hand row, absent-vs-zero, upstream classification, {len(refused)} corruptions refused")
     return 0
 
 

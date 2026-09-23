@@ -65,7 +65,11 @@ mentions, resolved alternatives, resolved-value claims, claim credence and prove
 extractors, the build receipt, and the source text. `dropped` counts what the input carried
 (zero is a real count). An optional input the model never supplied, such as a build receipt, is
 `"status":"not-supplied"` instead. The `claims` fields satisfy
-`exported_claims + sum(claims) = |StoryModel.claims|`.
+`exported_claims + sum(claims) = |StoryModel.claims|`. The reader checks this accounting and the
+record schema; it cannot check that a `dropped` count is true without the canonical model.
+
+`evidence.tsv`'s `upstream` may cite a claim that is not in any table (a descriptor, hypothesis or
+label claim). That is lawful; the reader reports such references as `outside_tables`.
 
 ## Example and checks
 
