@@ -815,7 +815,7 @@ object StructuralDistance:
   * reported in the receipt and never imputed into the cost.
   */
 object ChartDistance:
-  private val Reducer: StructuralReducer = StructuralReducer.Minimum
+  private val Reducer: StructuralReducer = ContentScoring.Reducer
 
   /** Distance between two charts in `[0, 1]`: `1 − structuralScore`. */
   def between(a: PropositionEvidence, b: PropositionEvidence): Double =
@@ -884,36 +884,29 @@ object ChartDistance:
           sourceCoverage
         )
       case Some(unitEvidence) =>
-        val charted = view
-          .structuralMembers(node.ref)
-          .flatMap(member => member.evidence.map(evidence => member -> evidence))
-        val classified = charted.map { case (member, evidence) =>
-          val contradictions = ContradictionDetector.detect(unit, member).toSet
-          if contradictions.isEmpty then
-            Left(
-              StructuralMemberEstimate(
-                member.ref,
-                finite(estimate(unitEvidence, evidence))
-              )
-            )
-          else Right(StructuralMemberExclusion(member.ref, contradictions))
-        }
-        val members = classified.collect { case Left(member) => member }
-        val excluded = classified.collect { case Right(member) => member }
-        val observed = members.flatMap(_.estimate.toOption)
-        val aggregate =
-          if charted.isEmpty || members.isEmpty then Estimate.missing(MissingReason.Excluded)
-          else
-            Reducer
-              .reduce(observed)
-              .fold[Estimate[Double]](Estimate.missing(MissingReason.ProviderAbstained))(
-                Estimate.observed
-              )
-        result(aggregate, members, excluded, sourceCoverage)
-
-  private def finite(estimate: Estimate[Double]): Estimate[Double] = estimate match
-    case Estimate.Observed(value, credence) => Estimate.score(value, credence)
-    case missing @ Estimate.Missing(_)      => missing
+        // The one reduction, over source content; the node handle keys the receipt and feeds the
+        // provider its evidence.
+        val members =
+          view.structuralMembers(node.ref).map(m => m -> ContentProjection.sourceNode(m))
+        val reduced = ContentScoring
+          .reduceMembers(
+            ContentProjection.sourceUnit(unit),
+            members,
+            (m, _) =>
+              m.evidence.fold[Estimate[Double]](
+                Estimate.missing(MissingReason.ProviderAbstained)
+              )(estimate(unitEvidence, _))
+          )
+          .fold(
+            r => sys.error(s"unreachable: a source-ordered comparison had readings $r"),
+            identity
+          )
+        result(
+          reduced.estimate,
+          reduced.scored.map((m, e) => StructuralMemberEstimate(m.ref, e)),
+          reduced.excluded.map((m, cs) => StructuralMemberExclusion(m.ref, cs)),
+          sourceCoverage
+        )
 
   private def result(
       estimate: Estimate[Double],

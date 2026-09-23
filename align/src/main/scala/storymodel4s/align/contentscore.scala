@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.proposition.{ContentCompatibilityReport, GateReading, GraphOrder}
 import storymodel4s.proposition.SemanticCompatibility
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
@@ -103,6 +104,72 @@ object ContentScoring:
       t: TargetContent[GraphOrder.Canonical]
   ): Either[Set[GateReading], Admissibility] =
     modeGateWith(u, t, _.sortBy(_.ordinal))
+
+  /** One structural reduction before the caller names its members: the aggregate, the members that
+    * were scored, and the members excluded by a contradiction, each under the caller's handle.
+    */
+  private[align] final case class Reduced[H](
+      estimate: Estimate[Double],
+      scored: Vector[(H, Estimate[Double])],
+      excluded: Vector[(H, Set[Contradiction])]
+  )
+
+  /** Structural reduction, the one implementation. A charted member that contradicts the unit is
+    * excluded; the others are scored by `estimate` and reduced by the minimum. `H` is the caller's
+    * handle on a member: the historical path passes the node, to key its receipt and feed an
+    * injected provider; the strict path passes the content itself.
+    */
+  private[align] def reduceMembers[O <: GraphOrder, H](
+      u: UnitContent[O],
+      members: Vector[(H, TargetContent[O])],
+      estimate: (H, TargetContent[O]) => Estimate[Double]
+  ): Either[Set[GateReading], Reduced[H]] =
+    if u.graph.isEmpty then
+      Right(Reduced(Estimate.missing(MissingReason.ProviderAbstained), Vector.empty, Vector.empty))
+    else
+      val charted = members.filter(_._2.hasEvidence)
+      sequence(charted.map((h, m) => contradictions(u, m).map(cs => (h, m, cs.toSet)))).map {
+        classified =>
+          val scored = classified.collect {
+            case (h, m, cs) if cs.isEmpty => h -> finite(estimate(h, m))
+          }
+          val excluded = classified.collect { case (h, _, cs) if cs.nonEmpty => h -> cs }
+          val observed = scored.flatMap(_._2.toOption)
+          val aggregate =
+            if charted.isEmpty || scored.isEmpty then Estimate.missing(MissingReason.Excluded)
+            else
+              Reducer
+                .reduce(observed)
+                .fold[Estimate[Double]](Estimate.missing(MissingReason.ProviderAbstained))(
+                  Estimate.observed
+                )
+          Reduced(aggregate, scored, excluded)
+      }
+
+  /** The member reducer, named in every structural receipt. */
+  private[align] val Reducer: StructuralReducer = StructuralReducer.Minimum
+
+  private[align] def finite(estimate: Estimate[Double]): Estimate[Double] = estimate match
+    case Estimate.Observed(value, credence) => Estimate.score(value, credence)
+    case missing @ Estimate.Missing(_)      => missing
+
+  /** The strict `d_chart`: one minus the chart comparison's structural score, reduced over the
+    * target's members. A function of the members' multiset: the minimum does not read their order.
+    */
+  def chartReduction(
+      u: UnitContent[GraphOrder.Canonical],
+      t: TargetContent[GraphOrder.Canonical]
+  ): Either[Set[GateReading], Estimate[Double]] =
+    reduceMembers(
+      u,
+      t.members.structural.map(m => m -> m),
+      (_, m) =>
+        (for
+          a <- u.graph
+          b <- m.graph
+        yield Estimate.observed(1.0 - SemanticCompatibility.compare(a, b).structuralScore))
+          .getOrElse(Estimate.missing(MissingReason.ProviderAbstained))
+    ).map(_.estimate)
 
   /** The recall slots the sketch rules read, whatever they were projected from. */
   private[align] final case class RecallSlots(
