@@ -4,7 +4,7 @@
 # Prints the modules a gate must cover for a candidate: every module whose
 # sources reference any type DEFINED in the candidate's changed files.
 #
-# AGENTS.md rule 3 says the gate covers every module that REFERENCES the changed
+# AGENTS.md governance item 3 ("Reference scope", now under "Integration and landing") says the gate covers every module that REFERENCES the changed
 # type, and that a stacked candidate takes the UNION across its commits. That
 # rule has caught three real breaks -- laws on the population candidate,
 # embed-bench and codec on the signature stack -- and every one of them got
