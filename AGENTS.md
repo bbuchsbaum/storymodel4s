@@ -239,6 +239,39 @@ did not govern the landing — that is the honest entry, and it is the one the
 salvage used.
 
 
+## Multi-agent throughput (owner directive, 2026-09-23)
+
+Several agents now work in parallel, coordinated on the shared Fray board (its home is the
+storyatlas4s checkout; the P1 lead integrates and lands). This does not change the mode declared
+above; only the owner does that. It records what measurably slowed closure on 2026-09-22/23: 111
+commits landed and 49 more sat reviewed on an integration branch, while few beads closed. Quality
+rules elsewhere in this file are unchanged. These rules only remove waiting.
+
+- **T1. Size beads to land.** A bead is at most about a day of work with one acceptance
+  criterion. Split an epic into child beads before starting it, and close each child when its
+  exact SHA lands. A parent closes when its children do. A bead with five criteria and three
+  landed slices shows no progress and is the defect.
+- **T2. Land reviewed slices promptly.** Integrate each reviewed slice as soon as its gate is
+  green, rather than batching many slices behind one gate. A docs-only or `.mote`-only change is
+  gate-inert (see *Stale bases*): it needs a format check and review, not a full gate.
+- **T3. Tier the gate.** For a bounded slice, the `tools/reference-scope.sh` modules on every
+  platform they build, run under the Fray gate lock with bound totals, are the landing evidence.
+  The full `checkAll`, with CI's fatal warnings, runs on `main` on a schedule. Red on `main` is a
+  P0 that preempts new work. JS and Native runs always take the lock, even when scoped.
+- **T4. Price every review finding.** A finding is BLOCK (correctness, forgeability, measurement
+  validity, a failing witness) or FOLLOW-UP (hardening, advisories, extensions). Only a BLOCK holds
+  a landing. A FOLLOW-UP becomes its own bead, and the reviewed slice lands. This is L3 applied to
+  multi-agent review.
+- **T5. Waiting is the main cost; remove it.** An agent that owns a reviewable or blocking item
+  runs under `fray drive`, or checks `fray inbox --addressed-to-me --unresolved` at every
+  boundary. Objections arrive as separate linked cards, and missing one hid a real BLOCK on
+  2026-09-23. Answer a direct question within about 30 minutes or say when you will.
+- **T6. Agree the seam, then build in parallel.** For cross-owner work, post the contract and a
+  failing consumer test from outside the module first (the `fray-seam` skill), then build both
+  sides at once. Review-after-the-fact is the slow path.
+- **T7. Count what passed.** Report sbt's `Passed`, `Failed` and skipped counts separately. `Total`
+  includes skipped tests: 4569 "passed" was really 4567 plus 2 skipped, corrected in `06cf8482`.
+
 ## Layout
 
 Flat module directories, `CrossType.Pure`, cross-built JVM / Scala.js / Native.
@@ -265,6 +298,11 @@ Package namespace is flat `storymodel4s.<module>`.
 | `provider-agent` | `storymodel4s.provider.agent` | **JVM-only** remote parser adapter (ADR 0008): Anthropic Java SDK behind `ParserTransport`, content-keyed record/replay `Recordings` store, environment court for spend, `ClaudeParseDriver.parse`/`run` (text to charts with a served-from ledger and an `ExtendedBuildReceipt`), `claudeParse` main |
 | `media`     | `storymodel4s.media`      | **JVM-only** media acquisition adapter (ADR 0007 §4): exact-byte fixture manifests, ffprobe packet-index ingest yielding `Draft`-authority records; the only module allowed to spawn a process |
 | `pipeline`  | `storymodel4s.pipeline`   | **JVM-only** story-build orchestrator (ADR 0009): `storyBuild` main runs text → `provider-agent` charts → `ChartProposalProvider` → `NarrativeCompiler` → `storymodel.json`, `compilation-report.json`, `receipts.json`. Owns I/O, receipt composition, file layout, exit status; no semantics |
+| `view`      | `storymodel4s.view`       | Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas |
+| `corpus`    | `storymodel4s.corpus`     | Portable corpus-intake contract (ADR 0018): source coordinates, typed cells, segmentations, segment links, code books, profiles, capabilities, source manifest, typed refusals. Schema and laws only; no I/O, knows no corpus |
+| `corpus-intake` | `storymodel4s.corpus.intake` | **JVM-only** corpus readers (ADR 0018): xlsx/zip/tsv readers, byte verifier, receipt and descriptor emission. Owns I/O and file layout, no semantics |
+| `embed-onnx` | `storymodel4s.embed.onnx` | **JVM-only** local neural sentence-embedding channel; pinned model and tokenizer checksums define one reviewed geometry; no ONNX/DJL type crosses into portable modules |
+| `embed-bench` | `storymodel4s.bench`    | **JVM-only** evaluation harness (ADR 0001 §D7): scores alignments against adjudicated gold from checksum-verified frozen sets, or diagnostic material never labelled calibrated. No portable module depends on it |
 
 ## Build and test
 
