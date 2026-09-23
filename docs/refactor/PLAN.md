@@ -73,6 +73,17 @@ The [integration evidence](evidence/p1-integration-20260923/README.md) preserves
 failed attempts, fixes, final command receipts, exact dependency identities and
 merge equivalence. These local gates do not replace hosted CI or browser acceptance.
 
+The closeout pass also completed two older review/documentation tickets at
+`c600dd90`, with closure records at `7c9fc6dc`:
+[movie-time contract reconciliation](evidence/movie-time-contract-closeout-20260923/README.md)
+(`bd-01M199ABAG5SXR9C6Y0G4X6J2T`) and the
+[replacement intake cold review](evidence/intake-cold-review-closeout-20260923/README.md)
+(`bd-01M2WTPDBB4MQBXEJ181Q85ZG2`). The first lands the retained V12 amendment and
+accounts for all nine required courts; eight incomplete courts have explicit 1.1
+children. The second records a fresh A–C review and files its two remaining findings.
+Those implementation follow-ups remain open. Neither documentary closure certifies
+the broader film or intake workflow.
+
 The owner decisions and earlier landings close the CI-runner choice, exact-directory
 disk cleanup, stability-boundary decision, strict-warning repair and Sherlock
 re-scoring tickets. Existing GitHub-hosted runners remain the chosen route; the
@@ -402,7 +413,8 @@ Minimum deterministic witnesses:
 Every implementation ticket records baseline and result SHA, exact paths, executable commands,
 test totals/exit, artifact digests, one discriminating failure injection per new guarantee,
 compatibility impact and a separate cold review. Proposed test names are labeled proposed until
-implemented. Follow `tools/reference-scope.sh`; final landing uses `sbt checkAll` under SD2.
+implemented. Follow `tools/reference-scope.sh` and AGENTS T3 for the scoped landing gate;
+the strict full `checkAll` remains the scheduled main/release check.
 Do not call a gate green from an exit without bound test totals. Test/provider/environment skips
 remain visible. Clean archives or standalone clones avoid the linked-worktree sbt limitation.
 
