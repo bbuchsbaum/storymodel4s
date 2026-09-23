@@ -3,7 +3,7 @@ package storymodel4s.media
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import munit.FunSuite
-import storymodel4s.core.{Checksum, DomainError, ObservationAuthority}
+import storymodel4s.core.{Checksum, DomainError, EditionId, ObservationAuthority}
 
 /** The captioning court over F0 v1 (captioning admission record §5): the pinned Qwen3-VL-4B
   * revision, driven by the untrusted worker over frames the media module identified, joined into
@@ -64,6 +64,7 @@ class CaptionSearchSuite extends FunSuite:
         framesEnvelope.framesSha256
       )
     )
+  private lazy val f0: EditionId = right(EditionId.from(manifest.fixtureId))
   private lazy val envelope: CaptionEnvelope =
     right(CaptionEnvelope.parse(text("f0-v1.caption-envelope.json")))
   private lazy val request: CaptionRequest =
@@ -71,13 +72,13 @@ class CaptionSearchSuite extends FunSuite:
   private lazy val outcome: CaptionOutcome =
     right(CaptionOutcome.parse(right(envelope.verifyOutcome(resource(envelope.outcomeFile)))))
   private lazy val result: CaptionSearchResult =
-    right(CaptionSearch.join(frames, request, outcome, envelope.worker))
+    right(CaptionSearch.join(frames, request, outcome, envelope.worker, f0))
 
   private def joinWith(
       req: CaptionRequest = request,
       out: CaptionOutcome = outcome,
       worker: ToolRealization = envelope.worker
-  ): Either[DomainError, CaptionSearchResult] = CaptionSearch.join(frames, req, out, worker)
+  ): Either[DomainError, CaptionSearchResult] = CaptionSearch.join(frames, req, out, worker, f0)
 
   test(
     "the recorded outcome replays into one draft proposal per extent, each spanning its frames on the axis"
@@ -336,7 +337,7 @@ class CaptionSearchSuite extends FunSuite:
       // The worker realization is observed from the interpreter and the script, not taken from the
       // outcome; the join then compares the outcome's claim against it.
       val worker = right(WorkerRealization.observeCaption(python.get, script.get))
-      val liveResult = right(CaptionSearch.join(live, issued, liveOutcome, worker))
+      val liveResult = right(CaptionSearch.join(live, issued, liveOutcome, worker, f0))
       assertEquals(
         liveResult.proposals.map(p => (p.support.start, p.support.endExclusive)),
         result.proposals.map(p => (p.support.start, p.support.endExclusive))

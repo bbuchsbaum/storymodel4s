@@ -5,12 +5,13 @@ import munit.FunSuite
 import storymodel4s.core.{Checksum, DomainError, EditionId, ObservationAuthority}
 import storymodel4s.media.*
 
-/** AC4 slice S1 seam, written from outside `storymodel4s.media` before the implementation (AGENTS.md
-  * T6). A caption request addresses frames by *sample index* (a position in the frame bytes); time
-  * comes only from each sample's *presentation ordinal* in the probe's packet index. The two are
-  * never interchangeable. F0 v1 supplies the probe; its recorded caption request already shows 12 of
-  * 45 frames, so the sampled set here selects exactly those 12 and the recorded worker text is
-  * re-addressed to sample indices 0-11. That rewritten outcome tests the join, not the worker.
+/** AC4 slice S1 seam, written from outside `storymodel4s.media` before the implementation
+  * (AGENTS.md T6). A caption request addresses frames by *sample index* (a position in the frame
+  * bytes); time comes only from each sample's *presentation ordinal* in the probe's packet index.
+  * The two are never interchangeable. F0 v1 supplies the probe; its recorded caption request
+  * already shows 12 of 45 frames, so the sampled set here selects exactly those 12 and the recorded
+  * worker text is re-addressed to sample indices 0-11. That rewritten outcome tests the join, not
+  * the worker.
   */
 class SampledCaptionConsumerSuite extends FunSuite:
 
@@ -66,7 +67,7 @@ class SampledCaptionConsumerSuite extends FunSuite:
   private lazy val recordedRequest: CaptionRequest =
     right(CaptionRequest.parse(text(envelope.requestFile)))
   private lazy val recordedOutcomeText: String =
-    new String(right(envelope.verifyOutcome(resource(envelope.outcomeFile))), StandardCharsets.UTF_8)
+    right(envelope.verifyOutcome(resource(envelope.outcomeFile)))
   private lazy val f0: EditionId = right(EditionId.from(manifest.fixtureId))
 
   /** The presentation ordinals the recorded request showed, in order: [0,4,9,13,14,...,44]. */
@@ -99,26 +100,41 @@ class SampledCaptionConsumerSuite extends FunSuite:
 
   /** The recorded outcome with its frame echo and extent ordinals rewritten for the sampled set. */
   private def sampledOutcome(requestId: String, count: Int): CaptionOutcome =
-    val json = right(io.circe.parser.parse(recordedOutcomeText).left.map(e => DomainError.InvalidFormat("outcome", e.message, "json")))
+    val json = right(
+      io.circe.parser
+        .parse(recordedOutcomeText)
+        .left
+        .map(e => DomainError.InvalidFormat("outcome", e.message, "json"))
+    )
     val c = json.hcursor
     val extents = c.downField("extents").focus.flatMap(_.asArray).getOrElse(Vector.empty)
     val rewritten = extents.zipWithIndex.map { (e, k) =>
-      e.mapObject(_.add("ordinals", io.circe.Json.arr(Vector.tabulate(4)(i => io.circe.Json.fromInt(4 * k + i))*)))
+      e.mapObject(
+        _.add(
+          "ordinals",
+          io.circe.Json.arr(Vector.tabulate(4)(i => io.circe.Json.fromInt(4 * k + i))*)
+        )
+      )
     }
     val out = json.mapObject(
       _.add("requestId", io.circe.Json.fromString(requestId))
         .add("extents", io.circe.Json.arr(rewritten*))
         .add(
           "frames",
-          c.downField("frames").focus.get.mapObject(
-            _.add("count", io.circe.Json.fromInt(count))
-              .add("sha256", io.circe.Json.fromString(sampledSha.hex))
-          )
+          c.downField("frames")
+            .focus
+            .get
+            .mapObject(
+              _.add("count", io.circe.Json.fromInt(count))
+                .add("sha256", io.circe.Json.fromString(sampledSha.hex))
+            )
         )
     )
     right(CaptionOutcome.parse(out.spaces2))
 
-  test("a sampled set keeps presentation ordinal and sample index apart and looks time up by the former"):
+  test(
+    "a sampled set keeps presentation ordinal and sample index apart and looks time up by the former"
+  ):
     val s = right(sampled())
     assertEquals(s.count, 12)
     assertEquals(s.presentationOrdinal(0), Some(0))
@@ -148,17 +164,20 @@ class SampledCaptionConsumerSuite extends FunSuite:
       CaptionRequest.issue(s, Vector(beyond), recordedRequest.model, recordedRequest.recipe, "r"),
       "extent/ordinals"
     )
-    // A request forged against the sampled bytes but naming sample 12 is refused at the join too.
+    // A request forged against the sampled bytes but naming sample 12 is refused at the join too,
+    // before the outcome is read: the outcome here also answers another request, so a join that
+    // skipped the request check would refuse at caption/request-id instead.
     val forged = right(issue(s)).copy(extents = sampledExtents.init :+ beyond)
     refusedAt(
-      CaptionSearch.join(s, forged, sampledOutcome(forged.requestId, 12), envelope.worker, f0),
+      CaptionSearch.join(s, forged, sampledOutcome("another-request", 12), envelope.worker, f0),
       "caption/unsampled"
     )
 
   test("sampled extents close on their own samples' presented packets, at Draft"):
     val s = right(sampled())
     val req = right(issue(s))
-    val result = right(CaptionSearch.join(s, req, sampledOutcome(req.requestId, 12), envelope.worker, f0))
+    val result =
+      right(CaptionSearch.join(s, req, sampledOutcome(req.requestId, 12), envelope.worker, f0))
     assertEquals(result.authority, ObservationAuthority.Draft)
     // Independent recomputation from the full decode's index: first shown packet's PTS to the last
     // shown packet's PTS plus its duration.
@@ -169,7 +188,10 @@ class SampledCaptionConsumerSuite extends FunSuite:
     }
     assertEquals(result.proposals.map(p => (p.support.start, p.support.endExclusive)), expected)
     assertEquals(result.proposals.map(_.frames), sampledExtents.map(_.ordinals))
-    assertEquals(result.proposals.map(_.presentationOrdinals), recordedRequest.extents.map(_.ordinals))
+    assertEquals(
+      result.proposals.map(_.presentationOrdinals),
+      recordedRequest.extents.map(_.ordinals)
+    )
 
   test("the join refuses another edition, for sampled and full frame sets alike"):
     val other = right(EditionId.from("f1-v1"))
@@ -180,7 +202,10 @@ class SampledCaptionConsumerSuite extends FunSuite:
       "caption/edition"
     )
     val outcome = right(CaptionOutcome.parse(recordedOutcomeText))
-    refusedAt(CaptionSearch.join(full, recordedRequest, outcome, envelope.worker, other), "caption/edition")
+    refusedAt(
+      CaptionSearch.join(full, recordedRequest, outcome, envelope.worker, other),
+      "caption/edition"
+    )
     assertEquals(
       right(CaptionSearch.join(full, recordedRequest, outcome, envelope.worker, f0)).proposals.size,
       3

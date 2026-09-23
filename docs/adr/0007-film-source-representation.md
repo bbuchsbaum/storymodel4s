@@ -1164,10 +1164,16 @@ returns to a packet. `media` therefore gains:
   PTS is looked up in the index by presentation ordinal and is never computed from a rate or a
   seek time (§3.1). Geometry is the stream's own; S1 admits no scaling or cropping. Any later
   resampling is a recorded transformation, not a silent one. Authority is `Draft`.
-- `CaptionSearch.join` becomes polymorphic over the full decode (`FrameSet`, semantics unchanged)
-  and a `SampledFrameSet`, and takes an **expected edition**; it refuses when the frames' edition is
-  another. On a sampled set, a request or result ordinal that names no sample refuses: a caption
-  for a frame that was not sampled is not admitted. An extent is closed on its **own** samples'
+- `IdentifiedFrames`: the sealed parent of `FrameSet` and `SampledFrameSet`. It names what a caption
+  request needs: the probe, the stream, the index, the geometry, the bytes digest and identity,
+  `count`, and `presentationOrdinal(sampleIndex)`. For a full decode the two coordinates are equal.
+  `FrameSet`'s own admission, byte rule and identity are unchanged; the shared stream and geometry
+  checks moved into one helper that keeps their refusal keys.
+- `CaptionSearch.join` and `CaptionRequest.issue` take `IdentifiedFrames`, and the join takes an
+  **expected edition**. It refuses when the frames' edition is another (`caption/edition`), for
+  full and sampled sets alike. A request ordinal that names no frame of the set refuses (`caption/unsampled`), before
+  the outcome is read: a caption for a frame that was not sampled is not admitted.
+  `CaptionProposal` gains `presentationOrdinals` beside `frames`, which keeps the sample indices. An extent is closed on its **own** samples'
   PTS: first sample to last sample plus that packet's duration. The extent says which instants the
   model was shown; it does not say the model saw everything between them. Unsampled spans are
   unavailable, not absent. Nothing here constructs a negative or semantic-absence claim (law 10).
