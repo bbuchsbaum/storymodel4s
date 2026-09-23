@@ -438,6 +438,14 @@ class StoryModelExportSuite extends FunSuite:
     assertEquals(stated, g.segments.values.count(_.summary.stated.isDefined) - 1)
   }
 
+  test("an entity and a context may share an id string; both nodes are exported") {
+    // codex-temporal's production witness (Fray #61): rename an entity to a context's spelling.
+    val (model, out) = StoryModelExportSuite.sharedIdWitness
+    assertEquals(model.graph.entities.keySet.map(_.value)("wog:ctx:belief-ghosts"), true)
+    val shared = rowsOf(out, "nodes.tsv").filter(_("node_id") == "wog:ctx:belief-ghosts")
+    assertEquals(shared.map(_("node_kind")).sorted, Vector("context", "entity"))
+  }
+
   // ---- publication and command line ----------------------------------------------------------
   private def withDir[A](body: Path => A): A =
     val root = Files.createTempDirectory("storymodel-export-test-")
@@ -503,13 +511,32 @@ class StoryModelExportSuite extends FunSuite:
     }
   }
 
+object StoryModelExportSuite:
+  /** The fixture with entity `wog:ent:arrows` renamed, through the JSON, to the spelling of the
+    * existing context `wog:ctx:belief-ghosts`, then revalidated and exported.
+    */
+  lazy val sharedIdWitness: (TextModel[ModelStatus.Validated], Map[String, String]) =
+    val json = StoryModelCodec
+      .encode(WarOfTheGhostsModel.model)
+      .replace("\"wog:ent:arrows\"", "\"wog:ctx:belief-ghosts\"")
+    val draft = StoryModelCodec.decode(json).fold(e => sys.error(e.message), identity)
+    val outcome = StoryValidator.validate(draft)
+    val model = outcome.validated.getOrElse(sys.error(outcome.report.render))
+    val out = StoryModelExport.encode(model).fold(e => sys.error(e.toString), identity)
+    (model, out.files.toMap)
+
 /** Writes the War of the Ghosts export used by `examples/storymodel-export`; with `--json PATH`
-  * writes the fixture's `storymodel.json` instead, as input for the `storyModelExport` command.
+  * writes the fixture's `storymodel.json` instead, as input for the `storyModelExport` command;
+  * with `--shared-id PATH` writes the shared-id witness export.
   */
 object StoryModelExportExample:
   def main(args: Array[String]): Unit =
     if args.headOption.contains("--json") then
       Files.writeString(Path.of(args(1)), StoryModelCodec.encode(WarOfTheGhostsModel.model)): Unit
+    else if args.headOption.contains("--shared-id") then
+      StoryModelExportBuild.write(StoryModelExportSuite.sharedIdWitness._1, Path.of(args(1))) match
+        case Right(digest) => println(digest.hex)
+        case Left(error)   => sys.error(error.toString)
     else
       StoryModelExportBuild.write(WarOfTheGhostsModel.model, Path.of(args(0))) match
         case Right(digest) => println(digest.hex)
