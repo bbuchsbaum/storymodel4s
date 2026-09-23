@@ -1,0 +1,2 @@
+MUTANT delete surface-units: exit=1 compile_error=False totals=['Failed: Total 37, Failed 2, Errors 0, Passed 35'] failed=['loss record surface-units counts what the input carries 0.021s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/StoryModelExportSuite.scala:240 surface-units missing from the manifest', 'loss records are exactly the declared set; nothing is silently added or dropped 0.024s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StoryModelExportSuite.scala:303']
+RESTORED
