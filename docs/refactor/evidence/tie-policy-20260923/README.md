@@ -32,16 +32,21 @@ LocallyObserved: the author ran it. The lead's combined final gate is the landin
 
 Archive SHA-256: `47e0d8b6b5f7baa9aae30f1f2e110c33dc5573375f44a5cfd8dafa90b16a0983`.
 
-| Exact SHA | Scope | Exit | Test tasks | Passed / failed |
+| Exact SHA | Scope | Exit | Test tasks | Total / passed / failed / skipped |
 |---|---|---|---|---|
-| `44752783` | 21-module reference-scope JVM set, then `align` JS/Native/JVM with fatal warnings, then fmt | 0 | 24 | 4569 / 0 |
-| `9119e2a3` | the same | 0 | 24 | 4589 / 0 |
-| `1c7ece00` | `align` JVM/JS/Native, `codec`, `laws`, with fatal warnings, then fmt | 0 | 5 | 1949 / 0 |
+| `44752783` | 21-module reference-scope JVM set, then `align` JS/Native/JVM with fatal warnings, then fmt | 0 | 24 | 4569 / 4567 / 0 / 2 |
+| `9119e2a3` | the same | 0 | 24 | 4589 / 4587 / 0 / 2 |
+| `1c7ece00` | `align` JVM/JS/Native, `codec`, `laws`, with fatal warnings, then fmt | 0 | 5 | 1949 / 1949 / 0 / 0 |
 
 The `1c7ece00` run executed JS and Native without holding the Fray #16 gate slot. That was a
 coordination error, acknowledged on Fray #58 (seq 600). The result stands, but the procedure was
 wrong. `corpusIntake` ran without fatal warnings: its pre-existing E175 warnings belong to
-the strict-gate lane.
+the strict-gate lane (subsequently repaired in `36174e31`).
+
+The lead independently recounted the unchanged raw logs: the first two totals
+include two skipped tests each. `gates.json` now keeps total, passed, failed,
+errors and skipped separate. These author runs used a local Grakern checkout;
+the final integration gate separately qualifies the repository-pinned revision.
 
 ## Mutations ([mutations.json](mutations.json), raw logs in [mutation-logs.tar.gz](mutation-logs.tar.gz))
 

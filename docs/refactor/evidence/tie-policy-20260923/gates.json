@@ -7,9 +7,12 @@
       "command": "sbt -batch -Dstorymodel4s.grakern.build=<local grakern> clean \"<test for acquireJVM alignJVM amrInteropJVM codecJVM coreJVM corpusIntake documentJVM embedBench embedCoreJVM embedGrakern featuresJVM fixturesJVM interviewJVM lawsJVM pipeline propositionJVM providerAgent providerParser recallJVM storyJVM viewJVM>\" \"set ThisBuild / tlFatalWarnings := true\" alignJS/test alignNative/test alignJVM/test scalafmtCheckAll",
       "gateExit": 0,
       "testTaskTotals": 24,
-      "passed": 4569,
+      "passed": 4567,
       "failed": 0,
-      "note": "held #16 fence 43; tie-policy candidate"
+      "note": "held #16 fence 43; tie-policy candidate",
+      "total": 4569,
+      "errors": 0,
+      "skipped": 2
     },
     {
       "sha": "9119e2a3",
@@ -18,9 +21,12 @@
       "command": "same command as 44752783",
       "gateExit": 0,
       "testTaskTotals": 24,
-      "passed": 4589,
+      "passed": 4587,
       "failed": 0,
-      "note": "held #16 fence 45; binding repair"
+      "note": "held #16 fence 45; binding repair",
+      "total": 4589,
+      "errors": 0,
+      "skipped": 2
     },
     {
       "sha": "1c7ece00",
@@ -31,7 +37,10 @@
       "testTaskTotals": 5,
       "passed": 1949,
       "failed": 0,
-      "note": "construction fix; ran JS/Native WITHOUT #16 (coordination error, acknowledged Fray #58 seq 600)"
+      "note": "construction fix; ran JS/Native WITHOUT #16 (coordination error, acknowledged Fray #58 seq 600)",
+      "total": 1949,
+      "errors": 0,
+      "skipped": 0
     }
   ]
 }
