@@ -75,8 +75,9 @@ label claim). That is lawful; the reader reports such references as `outside_tab
 
 `examples/storymodel-export/war-of-the-ghosts/` is the export of the War of the Ghosts fixture.
 `check_export.py` runs the reader on it, checks the node, evidence and span counts, a hand-checked
-row (entity `wog:ent:egulac`, spans `[0,28)` and `[1511,1534)`), and absent-versus-zero cells, and
-confirms that ten rehashed corruptions are refused.
+row (entity `wog:ent:egulac`, spans `[0,28)` and `[1511,1534)`) and absent-versus-zero cells,
+accepts and classifies a lawful out-of-table upstream reference, and confirms that eleven rehashed
+corruptions are refused.
 
 ```sh
 cd examples/storymodel-export && python3 check_export.py war-of-the-ghosts
