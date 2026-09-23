@@ -11,6 +11,7 @@ lead on Fray #86, seq 749. Commits on `claude-p1/ac4-s1-sampled-frames`, rebased
 | `fac95927` | `d62e4e0c` | consumer test written first, from outside `storymodel4s.media` (T6) |
 | `509a7c25` | `960015a1` | implementation |
 | `91d1ba3f` | `9f10e10b` | cold-review repair (the BLOCK and three follow-ups), algorithm tag v3 |
+| `23f35516` | — | independent-review repair: the stream is bound into the sampled identity and receipt |
 
 ## What it establishes
 
@@ -34,9 +35,10 @@ correspondence witness. The caption request does not yet bind the selection: fol
 
 | artifact | command | result |
 |---|---|---|
+| `gate-23f35516.log.gz` | `git archive 23f35516` export; same commands | 63 total, 60 passed, 3 skipped, 0 failed; `TEST_EXIT=0`, `FMT_EXIT=0` |
 | `gate-91d1ba3f.log.gz` | `git archive 91d1ba3f` export (rebased; `main` moved `build.sbt` and `core`, which `media` compiles against); same commands | 62 total, 59 passed, 3 skipped, 0 failed; `TEST_EXIT=0`, `FMT_EXIT=0` |
 | `gate-9f10e10b.log.gz` | `git archive 9f10e10b` export (pre-rebase); `sbt -batch 'set ThisBuild / tlFatalWarnings := true' media/test`, then `scalafmtCheckAll scalafmtSbtCheck` separately | 62 total, 59 passed, 3 skipped (the live worker tests, which need local weights), 0 failed; `TEST_EXIT=0`, `FMT_EXIT=0` |
-| `mutations/` | `python3 docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutate_s1.py OUTDIR`, from a clone at `9f10e10b` | 9/9 named mutants compile and fail exactly their named test (`Failed: Total 1`); restored controls 10/10 before and after. `receipt.json` binds the sha256 of `frames.scala` and `caption.scala` at `9f10e10b`, which are identical at `91d1ba3f` |
+| `mutations/` | `python3 docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutate_s1.py OUTDIR`, from a clone at `9f10e10b` | 10/10 named mutants compile and fail exactly their named test (`Failed: Total 1`); restored controls 11/11 before and after. `receipt.json` binds the sha256 of `frames.scala` and `caption.scala` at `23f35516`. One earlier attempt ended in an sbt project-load failure (`NoClassDefFoundError` in the build definition, no test totals) while other agents' sbt processes were running; it measured infrastructure and was rerun, not counted |
 
 `tools/reference-scope.sh` names `media` both before and after the rebase (`43e5a613..9f10e10b`, `b737b14f..91d1ba3f`); `media` as the only module to gate. It is
 JVM-only, so the run needs no gate lock (AGENTS.md §1). `qualification.json` records totals,
@@ -57,3 +59,14 @@ binding the selection, is filed as its own bead.
 Two mutants first failed to compile under fatal warnings (unused bindings). They were rewritten
 until they compiled and were killed by their named test. A mutant that does not compile proves
 nothing.
+
+The independent reviewer (`p1_cleanup_review`, Fray #100) then blocked `4ce39ec1`. The sampled
+receipt and identity did not bind `streamIndex`, so two Decoded picture streams with the same
+geometry, selection and bytes digest got equal identities while `ptsOf` differed. `23f35516` binds
+the stream.
+
+The named test derives a two-picture-stream probe from F0 (stream 1 is stream 0 shifted by +500
+ticks). It was red on `4ce39ec1` and is green on `23f35516`, with its mutant killed.
+
+The same pre-existing gap in `FrameSet` is filed as `bd-01M37ESFCE1SZFTV7NHJEC7SNC` rather than
+changed, because this slice keeps `FrameSet` semantics intact.

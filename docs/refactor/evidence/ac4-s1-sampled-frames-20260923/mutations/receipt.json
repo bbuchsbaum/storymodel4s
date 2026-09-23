@@ -1,5 +1,5 @@
 {
-  "framesSha256": "687777ef62612454c7431ed20f824b18077098be4140a610a8acc7e67ad2fa2c",
+  "framesSha256": "e4acb686828e5dce657768f7788f126becd8982231d5aed64818ad6dc9cf064a",
   "captionSha256": "b0fa2c6ddf9723172fc82bff7b403d43f9ec31a45f7312269314754df7afad82",
   "suite": "storymodel4s.probe.SampledCaptionConsumerSuite",
   "controlBefore": "pass",
@@ -12,7 +12,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "4f6ecaec8c7ee5a914f7cffb3285cd7e20fd8e178d729f5ef46f3a638aab924d"
+      "logSha256": "871f23aa2ded4af867dd658092cf7974997736ddd7067b81e6967503626a911b"
     },
     {
       "name": "membership-unchecked",
@@ -21,7 +21,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "bda46461309d961cf0b7892b2e0d2bbb0d3d8cc255d45407c2b526579657a2aa"
+      "logSha256": "b61f207b7e91211e2d035a960308a74e3ed15e849426f8e581fcf287e7e21680"
     },
     {
       "name": "full-decode-byte-rule",
@@ -30,7 +30,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "40df1d371814e43eaed76617b4dabf2fb2f52045f62bfa0d8316f70dc0b638bf"
+      "logSha256": "dff7e4cf31e641023e9931d5748bef6437c8d534178b98f7af322ab6cd0c4d5b"
     },
     {
       "name": "selection-order-unchecked",
@@ -39,7 +39,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "84d8d668e4728a8f0825c09f824c96b54dbfc03802f7efbfd5e9571752f55901"
+      "logSha256": "c65601fe0bad3978ff92bf199c8de45b3aab224982df9e53117e94dda2c350db"
     },
     {
       "name": "edition-unchecked",
@@ -48,7 +48,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "d46187d1f05ff692e09d4f5c9188b6cde3789a4709311c9d308042e6da5b29e4"
+      "logSha256": "058a9f14145bd22a04c72477126682bbf4101930a1c8397ff591df0e00409d9b"
     },
     {
       "name": "unsampled-request-unchecked",
@@ -57,7 +57,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "38072950625e594ec7a12078b0bd6bb78d818a0356e033af0eeeafe735eb48db"
+      "logSha256": "31d9a9f73463fa0a565404c66872458b57138dbb6f6a9c66bd765a0d9de084b0"
     },
     {
       "name": "extent-shape-unchecked",
@@ -66,7 +66,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "77908c3e8ce78c2b45c2fdbc513ea2d768eee65e518c532f4b6707ed956d8071"
+      "logSha256": "a447cc3832cc1b682a46d4d0dd4f4c57f703f80f6eaf9e95e1839f9a796a3cf6"
     },
     {
       "name": "selection-not-in-identity",
@@ -75,7 +75,16 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "6518bdad914f63362dd50d489cab347642ca6c60b5a6b29d1164bc1797f58c1c"
+      "logSha256": "30bf9af05725a1ee5bf2a1fbe3d319c216217f6bceec99768a054330d1c5a5df"
+    },
+    {
+      "name": "stream-not-in-identity",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "the stream is bound into the sampled set",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "6aa79de8fb69f6135a21988059f4687e5b79649a575aedc68e23a1d4752fb5a5"
     },
     {
       "name": "sampled-ordinal-is-sample-index",
@@ -84,7 +93,7 @@
       "compiled": true,
       "exit": 1,
       "failedTotal": 1,
-      "logSha256": "e0786482deef9db4e039a0564f7beda62145e6d1a29fdbbba2b7b35a400fbe5f"
+      "logSha256": "501a0cfddd4735cc9c81a0a62502ecf88c68c9455276953656faee175a9c11fd"
     }
   ]
 }

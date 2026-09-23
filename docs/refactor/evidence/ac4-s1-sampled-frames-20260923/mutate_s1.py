@@ -99,6 +99,15 @@ CASES = [
         "the selection is bound into the frame set",
     ),
     (
+        "stream-not-in-identity",
+        FRAMES,
+        [
+            (' + s" stream $streamIndex selection ${selection.hex}"', ' + s" selection ${selection.hex}"'),
+            ("          streamIndex.toString,\n", ""),
+        ],
+        "the stream is bound into the sampled set",
+    ),
+    (
         "sampled-ordinal-is-sample-index",
         FRAMES,
         [
