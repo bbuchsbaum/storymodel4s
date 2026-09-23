@@ -23,6 +23,18 @@ class SegmentLinkSuite extends FunSuite:
 
   private def to(seg: Segmentation, ordinal: Int) = Target.To(SegmentRef(seg.id, ordinal), ev)
 
+  private def segAt(id: String, onsets: Vector[Long]) =
+    Segmentation
+      .of(
+        SegmentationId.unsafe(id),
+        work,
+        GranularityLevel.Event,
+        SegmentationAuthority.AuthorAnnotated(CoderId.unsafe("upstream")),
+        axis,
+        onsets.zipWithIndex.map((onset, i) => Segment(i + 1, onset, s"e${i + 1}"))
+      )
+      .fold(r => fail(r.message), identity)
+
   test("a segmentation refuses empty, non-dense ordinals, and non-increasing onsets") {
     val id = SegmentationId.unsafe("s")
     val auth = SegmentationAuthority.Crowd(3)
@@ -150,6 +162,33 @@ class SegmentLinkSuite extends FunSuite:
       SegmentLink.of(a, c, LinkClaim.Bijection, 1, Map(1 -> to(c, 1), 2 -> to(c, 2))).toOption.get
     assert(composed.sameMappingAs(declared))
     assertNotEquals(composed.mapping(1).evidenceOf, declared.mapping(1).evidenceOf)
+  }
+
+  test("sameMappingAs distinguishes source segmentations with the same name and ordinals") {
+    val early = segAt("a", Vector(0L, 10L, 20L))
+    val late = segAt("a", Vector(5000L, 6000L, 7000L))
+    val target = seg("b", 3)
+    val mapping = (1 to 3).map(i => i -> to(target, i)).toMap
+    val first = SegmentLink.of(early, target, LinkClaim.Bijection, 1, mapping).toOption.get
+    val second = SegmentLink.of(late, target, LinkClaim.Bijection, 1, mapping).toOption.get
+    assertEquals(first.from, second.from)
+    assertEquals(first.mapping, second.mapping)
+    assertNotEquals(first.fromIdentity, second.fromIdentity)
+    assert(!first.sameMappingAs(second))
+  }
+
+  test("sameMappingAs distinguishes target segmentations with the same name and ordinals") {
+    val source = seg("a", 3)
+    val early = segAt("b", Vector(0L, 10L, 20L))
+    val late = segAt("b", Vector(5000L, 6000L, 7000L))
+    val firstMap = (1 to 3).map(i => i -> to(early, i)).toMap
+    val secondMap = (1 to 3).map(i => i -> to(late, i)).toMap
+    val first = SegmentLink.of(source, early, LinkClaim.Bijection, 1, firstMap).toOption.get
+    val second = SegmentLink.of(source, late, LinkClaim.Bijection, 1, secondMap).toOption.get
+    assertEquals(first.to, second.to)
+    assertEquals(first.mapping, second.mapping)
+    assertNotEquals(first.toIdentity, second.toIdentity)
+    assert(!first.sameMappingAs(second))
   }
 
   test("the Friends 56 -> 52 shape: four removals and four shifts, as an Edit") {
