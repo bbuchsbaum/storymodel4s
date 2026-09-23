@@ -15,86 +15,109 @@ import storymodel4s.align.StructuralCoverage
   */
 class AdmissibilityUnforgeableSuite extends FunSuite:
 
-  test("controls: the probe mechanism can pass for a same-shape case class in align") {
-    // `typeChecks` is false for ANY error, so every refusal below needs a control that shows the
-    // same snippet shape compiles against a type that is meant to be constructible.
+  // Each door is its own test with a same-shape positive control, so a mutant that reopens one door
+  // fails that door's test by name while the others pass. `typeChecks` is false for ANY error (and
+  // needs a literal), so a refusal without a control that can pass proves nothing. The control,
+  // FunctionPrior, is a public case class in align that is meant to be constructible.
+  test(
+    "door Mirror.ProductOf: refused for Admissibility and StructuralCoverage, open for the control"
+  ) {
     assert(
       typeChecks(
         "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[FunctionPrior]]"
       ),
-      "control: a case class in align derives a Mirror from here"
+      "control does not compile"
     )
+    assert(
+      !typeChecks(
+        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[Admissibility]]"
+      ),
+      "Admissibility Mirror.ProductOf is open"
+    )
+    assert(
+      !typeChecks(
+        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StructuralCoverage]]"
+      ),
+      "StructuralCoverage Mirror.ProductOf is open"
+    )
+  }
+
+  test(
+    "door companion fromProduct: refused for Admissibility and StructuralCoverage, open for the control"
+  ) {
     assert(
       typeChecks("import storymodel4s.align.*; FunctionPrior.fromProduct(???)"),
-      "control: a case-class companion exposes fromProduct from here"
+      "control does not compile"
     )
     assert(
+      !typeChecks("import storymodel4s.align.*; Admissibility.fromProduct(???)"),
+      "Admissibility companion fromProduct is open"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; StructuralCoverage.fromProduct(???)"),
+      "StructuralCoverage companion fromProduct is open"
+    )
+  }
+
+  test("door copy: refused for Admissibility and StructuralCoverage, open for the control") {
+    assert(
       typeChecks("import storymodel4s.align.*; (??? : FunctionPrior).copy()"),
-      "control: a case class exposes copy from here"
+      "control does not compile"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; (??? : Admissibility).copy()"),
+      "Admissibility copy is open"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; (??? : StructuralCoverage).copy()"),
+      "StructuralCoverage copy is open"
+    )
+  }
+
+  test("door apply: refused for Admissibility and StructuralCoverage, open for the control") {
+    assert(
+      typeChecks("import storymodel4s.align.*; FunctionPrior(Map.empty)"),
+      "control does not compile"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; Admissibility(Vector.empty)"),
+      "Admissibility apply is open"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; StructuralCoverage(0, 2, 1)"),
+      "StructuralCoverage apply is open"
+    )
+  }
+
+  test("door new: refused for Admissibility and StructuralCoverage, open for the control") {
+    assert(
+      typeChecks("import storymodel4s.align.*; new FunctionPrior(Map.empty)"),
+      "control does not compile"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; new Admissibility(Vector.empty)"),
+      "Admissibility new is open"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; new StructuralCoverage(0, 2, 1)"),
+      "StructuralCoverage new is open"
+    )
+  }
+
+  test("only the checked StructuralCoverage factory is public; the by-construction one is not") {
+    assert(
+      typeChecks("import storymodel4s.align.*; StructuralCoverage.of(0, 1, 1)"),
+      "control: the checked factory"
     )
     assert(
       typeChecks(
         "import storymodel4s.align.*; classOf[Admissibility]; classOf[StructuralCoverage]"
       ),
-      "control: both types are visible from outside align"
-    )
-  }
-
-  test("Admissibility has no product door outside align") {
-    assert(
-      !typeChecks(
-        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[Admissibility]]"
-      ),
-      "Admissibility derives a Mirror; fromProduct would rebuild a self-contradicting record"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; Admissibility.fromProduct(???)"),
-      "the Admissibility companion exposes fromProduct"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; (??? : Admissibility).copy()"),
-      "Admissibility exposes copy"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; Admissibility(Vector.empty)"),
-      "Admissibility exposes apply"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; new Admissibility(Vector.empty)"),
-      "Admissibility exposes its constructor"
-    )
-  }
-
-  test("StructuralCoverage has no product door; construction goes through the checked factory") {
-    assert(
-      !typeChecks(
-        "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StructuralCoverage]]"
-      ),
-      "StructuralCoverage derives a Mirror; fromProduct would admit (0, 2, 1)"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; StructuralCoverage.fromProduct(???)"),
-      "the StructuralCoverage companion exposes fromProduct"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; (??? : StructuralCoverage).copy()"),
-      "StructuralCoverage exposes copy"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; StructuralCoverage(0, 2, 1)"),
-      "StructuralCoverage exposes apply"
-    )
-    assert(
-      !typeChecks("import storymodel4s.align.*; new StructuralCoverage(0, 2, 1)"),
-      "StructuralCoverage exposes its constructor"
+      "visibility"
     )
     assert(
       !typeChecks("import storymodel4s.align.*; StructuralCoverage.counted(0, Vector(true))"),
       "the by-construction builder is visible outside align"
-    )
-    assert(
-      typeChecks("import storymodel4s.align.*; StructuralCoverage.of(0, 1, 1)"),
-      "control: the checked factory is public"
     )
   }
 
