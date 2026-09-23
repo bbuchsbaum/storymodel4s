@@ -1,0 +1,263 @@
+{
+  "headSha": "1c7ece00437b7295528634f55ec5219729a169d8",
+  "mutants": [
+    {
+      "mutant": "T1-no-tie-completion",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "15d5676f14ff2d0901683f08636148539c7e5d14bf18e151b3ed0b7767e5531c",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.a union over the budget withholds the level and records the overflow",
+        "align.CandidateTiePolicySuite.tie completion keeps exactly the candidates at or below the k-th score, per level"
+      ],
+      "killed": true,
+      "logSha256": "973cd343642e7097d71639572ef1a0a11ad7567d5cc82e6e33a893e9448a01e1"
+    },
+    {
+      "mutant": "T2-rank-by-position",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "926ceed11feffa400a9ca7066c0a749b5f163aae3a31c24be7a6ba60619b281f",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.tied candidates share a dense rank; ranks carry no identifier order"
+      ],
+      "killed": true,
+      "logSha256": "7d9790899dad9562732c9f6bbf6ac35d3e09e4dd9ffd49c1dfeb985db976795c"
+    },
+    {
+      "mutant": "T3-truncate-on-overflow",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "2dc21a066a031865fa6affff683bf07b302d0751f5f606407cc14239b96d1d0f",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.a union over the budget withholds the level and records the overflow",
+        "align.CandidateTiePolicySuite.tie completion keeps exactly the candidates at or below the k-th score, per level"
+      ],
+      "killed": true,
+      "logSha256": "c0118b6420806ca5b74d175827b67b70e163b961877648d2b6128866914ee4fe"
+    },
+    {
+      "mutant": "T4-budget-semantic-only",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "0faea59a18e5c43dbb3e241f3f26316a537141cd5243521f8611bbfc3c5b20f1",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.a union over the budget withholds the level and records the overflow"
+      ],
+      "killed": true,
+      "logSha256": "cbdf06439296d2a389f6042ed8880ceeaaa9d1d7237c3f1f9dad8a7f128ddbe1"
+    },
+    {
+      "mutant": "T5-uniform-over-kept",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "0aae90f2f8b3e3b89cba5d199031746783010a29782a45d6ea38e2e1d3ba6147",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.the uniform flag describes every scored candidate, not only the kept ones"
+      ],
+      "killed": true,
+      "logSha256": "ee39b80c11f98725168da01443a5d177dc09a064de32d6efbf0e64cda7c36837"
+    },
+    {
+      "mutant": "T6-drop-nonfinite",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "a6a27852d604dd4db9f6706ecf57babe1afe43f15f9232ade25e0bbda05d195c",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.a non-finite score is refused, not tied or dropped"
+      ],
+      "killed": true,
+      "logSha256": "f0fbf368d60bc1aa8ee6481cc117ba072882d9314da7ba6a59c672add70c146a"
+    },
+    {
+      "mutant": "T7-provenance-not-identified",
+      "file": "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "sourceSha256Before": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "sourceSha256Mutated": "a4bac1a6178e12a99d2ff28ad801629b7c788843a08cfd8fc4828872026e17c6",
+      "sourceSha256Restored": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.evidence identity binds the tie policy, the budget and the overflow"
+      ],
+      "killed": true,
+      "logSha256": "b583cfa4d908f4b9c7faa258178f3f4160fc10b8e249621e7f3f577dc09733ae"
+    },
+    {
+      "mutant": "B0-remove-binding-guard",
+      "file": "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "sourceSha256Before": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "sourceSha256Mutated": "6a8abf7a8b56eb6071bb36a76ecac8825788200208f8bf8dc223ccd4cde73cca",
+      "sourceSha256Restored": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 4, Errors 0, Passed 15"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.strict candidates generated against a changed source are refused",
+        "align.CandidateTiePolicySuite.strict candidates generated for a recall differing only in absent vs empty are refused",
+        "align.CandidateTiePolicySuite.strict candidates generated for a source differing only in absent vs empty are refused",
+        "align.CandidateTiePolicySuite.strict candidates generated for a subset of the recall are refused"
+      ],
+      "killed": true,
+      "logSha256": "9981e2c1ae84aa03aac7223726cc007015a5cac229694bfb39905826e49de606"
+    },
+    {
+      "mutant": "B1-no-unit-check",
+      "file": "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "sourceSha256Before": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "sourceSha256Mutated": "3bff803f886ad09065515325ab81387b2fa3202fad5d17bd75052228dc0837b9",
+      "sourceSha256Restored": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.strict candidates generated for a subset of the recall are refused"
+      ],
+      "killed": true,
+      "logSha256": "332bc3f378cfb31868794aa5cb4d9dc9ee08327217e09abdc6748d179f1a6c06"
+    },
+    {
+      "mutant": "B2-no-recall-check",
+      "file": "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "sourceSha256Before": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "sourceSha256Mutated": "f4cfe1f9d6bd7cfa44479d43b09e66560d221e96d7dc0f30dc20da9c87deecae",
+      "sourceSha256Restored": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.strict candidates generated for a recall differing only in absent vs empty are refused"
+      ],
+      "killed": true,
+      "logSha256": "3ab7e565835c941b7e73cfd2de0b274be3a64321b56d77b5762925c2071aef32"
+    },
+    {
+      "mutant": "B3-no-source-check",
+      "file": "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "sourceSha256Before": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "sourceSha256Mutated": "2c574c5fb48f1e52b08fe345347c0e2a88e4061496171c807617844035b82348",
+      "sourceSha256Restored": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/testOnly storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "failedTests": [
+        "align.CandidateTiePolicySuite.strict candidates generated against a changed source are refused",
+        "align.CandidateTiePolicySuite.strict candidates generated for a source differing only in absent vs empty are refused"
+      ],
+      "killed": true,
+      "logSha256": "1c2e54a71490d24ac6e3a8066e87e14a2991f67d4bf18873a33cee280cd378f4"
+    },
+    {
+      "mutant": "W1-widen-StrictCandidateSet",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "629a44a218c991c1f32075d7055c3c9da3faf52fd2446e2777cd8a456663fcba",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/Test/clean alignJVM/testOnly storymodel4s.probes.StrictCandidatesUnforgeableSuite storymodel4s.align.CandidateTiePolicySuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 14, Failed 1, Errors 0, Passed 13"
+      ],
+      "failedTests": [
+        "probes.StrictCandidatesUnforgeableSuite.an align subpackage: controls compile, every strict-candidate door is closed"
+      ],
+      "killed": true,
+      "logSha256": "971c583ae28fb5b47aecbaa59ca9f7df3b7c0ad783a084e0e5ca0bded9128346"
+    },
+    {
+      "mutant": "W2-widen-StrictCandidates",
+      "file": "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "sourceSha256Before": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "sourceSha256Mutated": "fd02395f012e1ead347906a52b456919be1fd04d6fdfcd603449058f32b10809",
+      "sourceSha256Restored": "6773b353d72111aeb95833a49106c8891f1ec56eb7b6bc06c874dd58565eaca3",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/Test/clean alignJVM/testOnly storymodel4s.probes.StrictCandidatesUnforgeableSuite storymodel4s.align.CandidateTiePolicySuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 14, Failed 1, Errors 0, Passed 13"
+      ],
+      "failedTests": [
+        "probes.StrictCandidatesUnforgeableSuite.an align subpackage: controls compile, every strict-candidate door is closed"
+      ],
+      "killed": true,
+      "logSha256": "05ddb41a9f09ef5eda7643fbd3d73d35b8a13d026c372fe0d9a786c84a734c58"
+    },
+    {
+      "mutant": "W3-widen-Strict-provenance",
+      "file": "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "sourceSha256Before": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "sourceSha256Mutated": "c8084e1c2de6fb13f37e6061b377154210d45fa12704b9ec2ff28b62f897ddf5",
+      "sourceSha256Restored": "3ad66b7dc826599242b093dc3cbe2ee5cd7db129f28014b784e9deea55e7f090",
+      "restoredEqualsBefore": true,
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern alignJVM/Test/clean alignJVM/testOnly storymodel4s.probes.StrictCandidatesUnforgeableSuite storymodel4s.align.CandidateTiePolicySuite",
+      "exit": 1,
+      "totals": [
+        "Failed: Total 14, Failed 1, Errors 0, Passed 13"
+      ],
+      "failedTests": [
+        "probes.StrictCandidatesUnforgeableSuite.an align subpackage: controls compile, every strict-candidate door is closed"
+      ],
+      "killed": true,
+      "logSha256": "c6053fd9999aa44f1a1b035dabde83c701bbabe7a5cca6639389c7f1c322db7d"
+    }
+  ]
+}
