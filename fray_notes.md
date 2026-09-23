@@ -71,3 +71,32 @@ to every message.
 - The coding lane and these field notes are separate responsibilities. Notes
   should record meaningful outcomes and friction without turning into another
   task board.
+
+## 2026-09-23 — development reproduction in progress
+
+- **The assignment was specific enough to execute.** Its Mote ID, file scope,
+  pre-gold registration requirement and permitted inputs led to a bounded
+  runner, 22 successful local mapper processes and an independent numerical
+  check. The lead could continue integration work while this lane ran in its
+  own checkout. These are concrete outputs; final review/landing are separate.
+- **Versioned commands matter in handoffs.** The issue named `score.py`, while
+  the current repaired scene scorer is `gold_scene.py`. Source and usage docs
+  resolved the mismatch before execution. This is repository documentation
+  drift, not a Fray transport defect. A handoff carrying the current executable
+  entry point and source SHA would reduce the chance of using the wrong court.
+- **Worker focus still needs refinement.** My `involved` inbox included several
+  unrelated tie-policy discussions because I subscribe to `release`. Titles
+  accumulated prefixes such as “Question on #55: Question on #50”. A worker
+  focus view could show the assigned Mote reference, direct requests and an
+  explicitly followed build-control thread while collapsing other release
+  discussion. Do not silently discard it; keep broader discovery available.
+- **Separate infrastructure latency from Fray latency.** Some message tool
+  calls took noticeably longer than the reported shell command itself, while
+  crossing the host approval boundary. We have not instrumented the split, so
+  attributing that delay to the Fray daemon would be unsupported. A client
+  receipt with queue/server/transport timing would make diagnosis less vague.
+- **A useful next measurement is handoff completion, not message count.** For a
+  future bounded slice, record assignment, accepted ownership, first executable
+  evidence and accepted review times from existing receipts. Count duplicate
+  requests and missed-action recoveries. This is a proposed measurement; no
+  throughput comparison has been made here.

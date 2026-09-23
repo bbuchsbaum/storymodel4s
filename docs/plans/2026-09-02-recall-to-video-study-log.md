@@ -988,3 +988,25 @@ ran at protocol commit `742308c2` and exited 0. The
 [receipt](../refactor/evidence/sherlock-development-20260923/support-registration.json)
 records the gold-file digest and exact command. New read counters for this
 reproduction: Sherlock development 1, Friends 0, Memento 0.
+
+Completed readout: all 22 mapper commands and the fixed-support scoring passed.
+All 11 annotations-only TSVs match the same historical development reports
+byte-for-byte. The [bound evidence](../refactor/evidence/sherlock-development-20260923/README.md)
+retains every participant and output receipt. Ten participants and 1,499 of
+1,744 units have eligible gold; the other units are 177 outside coded intervals
+and 68 from NN05, which has no gold source. No participant is silently dropped.
+
+Participant-average scene-exact accuracy is 60.9452% for A and 61.7395% for AV.
+The primary paired AV-minus-A difference is +0.7943 percentage points, 95% CI
+[-0.4296, +2.1288]. Secondary pooled accuracies are 65.2435% and 65.7772%.
+The interval spans zero; this development readout does not establish an AV gain
+or change the preset. The historical approximately 63.8% over 15 participants
+is not directly comparable because both the population and primary weighting
+differ. The matching 11 report hashes establish the narrower reproduction.
+
+The independent Decimal/whole-count checker agrees on all support rows and
+reported rates, and rejects three deliberately corrupted readouts. Its checks
+reuse this registered gold analysis; they are not additional exploratory
+contrasts. This adds one AV-versus-A development contrast to the scene ledger
+(16 to 17), with no new confirmation read. The separate within-scene and
+risk–coverage ledgers are unchanged. Friends and Memento receive zero reads.
