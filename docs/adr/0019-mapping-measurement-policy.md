@@ -688,5 +688,5 @@ with the lemma of a concept that scores nothing.
 - Rejected: a content-hash tie-break, which is a hidden prior; pick-first, which depends on
   order; greedy assignment, which depends on order even without ties; a union of the tied gates,
   which reports as established a conflict that no single best reading has (codex-pair-0923's
-  BLOCK on 88675d29, Fray #107 seq 870); and refusing on a gate-divergent tie, which would turn a
+  BLOCK on 88675d29, Fray #105 seq 870); and refusing on a gate-divergent tie, which would turn a
   measurable, typed ambiguity into missing evidence.
