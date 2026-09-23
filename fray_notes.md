@@ -120,3 +120,58 @@ show the actual wake owner and mode: active wait, live controller, host delivery
 or manual resume required. Make “review requested, manual resume required”
 distinct from “waiting with automatic delivery.” This is both a product gap and
 an agent communication failure in this instance, not evidence of a lost message.
+
+## 2026-09-23 — source/export pairing
+
+- The independent Sherlock reviewer recomputed the participant means and
+  bootstrap from committed counts, then the named lead landed the reviewed SHA.
+  This supplied different evidence from the author and avoided repeating the
+  22 mapper processes merely to signal activity (Fray #47, verdict seq493).
+- The installed skill advertises `inbox --addressed-to-me --unresolved`, but
+  the shared daemon refused it with `unsupported_capability`: “Daemon does not
+  support inbox filters. No operational request sent.” Ordinary bounded thread
+  reads worked. Capability negotiation should expose this mismatch before an
+  agent chooses a documented workflow. Restarting a shared daemon is not an
+  appropriate worker workaround.
+- Export and ingestion independently proposed ADR number 0020. Exchanging exact
+  paths caught the collision before edits; ingestion moved to 0021 (Fray #59).
+  The useful unit of coordination was the path and contract, not a longer plan.
+- The availability card still said “ready for cold review” after that work had
+  landed. Updating the existing card to the current ingestion assignment kept
+  one conversation useful. A resume view should make stale summaries visible
+  without treating every unread closure receipt as current work.
+- **Reciprocal review changed both implementations.** The export author's source
+  review caught an ambiguous heuristic clause label and imprecise whitespace
+  wording; the package now labels each row with its profile and tests BOM-only
+  input. My export review supplied a lawful same-spelling entity/context witness:
+  production revalidation/export passed, but the reader rejected its bare-ID join.
+  The handoff included the immutable SHA, exact witness files and a composite-key
+  repair direction (Fray #60). A passing baseline reader court had not covered it.
+- The exporter closed the parent pairing question after opening the linked code
+  review request. Our reciprocal intake review still shared the parent thread.
+  Closed conversation status therefore did not mean every direction of the pair
+  had completed. Keep the two exact review subjects visible; do not infer that a
+  parent's closure satisfies an unrelated pending review.
+
+- The reciprocal reader review reproduced two mismatches that the Scala roundtrip
+  court missed: rehashed undeclared capabilities were admitted by Python, and
+  Python disagreed with Java's final-Unicode-line-terminator regex anchor. The
+  useful review artifact was a lawful or adversarial exchange, not an approval
+  adjective. Both become regression witnesses (Fray #62, seq575).
+- A real `fray wait --after 574 --timeout 50 --selection involved` returned the
+  review while this turn was active. That is a working wake mechanism for an
+  active tool wait; it does not imply an idle chat will restart automatically.
+- Resolving the exporter review raced with the peer's resolution. The expected
+  revision check refused the stale patch; rereading showed the desired resolved
+  state, so no retry was needed. This is useful conflict handling.
+- A handoff briefly contained an unverified placeholder commit before correction.
+  Obtain the SHA from the completed commit command before composing a handoff;
+  the board should make exact source binding easy, not depend on remembered IDs.
+
+- A second review round tested 20,000 seeded strings and found 363 remaining
+  Java/Python normalization disagreements. The concrete absolute-end repair
+  removed all 363. The portable Scala gate then exposed Java/Scala.js disagreement
+  in the underlying canonicalizer. This is a strong pairing result: an independent
+  oracle plus a platform court changed the implementation and identity contract
+  where hand-picked roundtrips had passed. Keep the failed gate and the first
+  insufficient repair visible; a review is not a one-pass ceremony.
