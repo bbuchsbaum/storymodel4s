@@ -227,6 +227,21 @@ class MappingHistoricalSuite extends FunSuite:
     )
   }
   test("adapter captures a changing view once for binding and all link assessment") {
+    // One recall unit still assesses multiple targets, without repeatedly hashing unrelated rows.
+    val singleRecall = RecallGraph
+      .validated(recall.copy(units = Vector(recall.ordered.head), relations = RecallRelations.empty))
+      .toOption
+      .get
+    val singleResult = GraphHsmm
+      .infer(singleRecall, view, AnnaFixture.candidates, AnnaFixture.costModel)
+      .toOption
+      .get
+    val expected = adapt(singleResult, singleRecall).toOption.get
+    val assessedTargets = expected.outcomes.flatMap(_.links).count { link =>
+      link.destination.isInstanceOf[Destination.Target] &&
+      link.fidelity.isInstanceOf[FidelityStatus.Assessed]
+    }
+    assert(assessedTargets > 1)
     var reads = 0
     val changing = new SourceView:
       def nodes: Vector[NodeSummary] =
@@ -237,7 +252,7 @@ class MappingHistoricalSuite extends FunSuite:
         view.adjacency(layer)
       def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
       def scoringLength: Int = view.scoringLength
-    val observed = adapt(v = changing).toOption.get
+    val observed = adapt(singleResult, singleRecall, v = changing).toOption.get
     assertEquals(reads, 1)
-    assertEquals(observed.digest, adapt().toOption.get.digest)
+    assertEquals(observed.digest, expected.digest)
   }
