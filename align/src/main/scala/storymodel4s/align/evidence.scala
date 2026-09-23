@@ -28,6 +28,7 @@ final class LocalEvidence private (
     val viewFingerprint: ViewFingerprint,
     val scopeDigest: Checksum,
     val gated: Boolean,
+    val provenance: CandidateProvenance,
     val units: Vector[RecallUnitId],
     val candidates: Vector[CandidateSet],
     val nominated: Vector[Vector[SourceNodeRef]],
@@ -67,6 +68,34 @@ object LocalEvidence:
       recall: RecallGraph[Checked],
       source: SourceView,
       candidates: Candidates,
+      costModel: LocalCostModel,
+      gate: Boolean
+  ): Either[AlignError, LocalEvidence] =
+    build(recall, source, candidates, CandidateProvenance.Unattested, costModel, gate)
+
+  /** Gated evidence over strict candidates. The tie policy, every overflow and every uniform
+    * semantic level are recorded on the evidence and in its identity, so no consumer can mistake a
+    * withheld level for a successfully nominated universe.
+    */
+  def compute(
+      recall: RecallGraph[Checked],
+      source: SourceView,
+      strict: StrictCandidates,
+      costModel: LocalCostModel
+  ): Either[AlignError, LocalEvidence] =
+    val ids = recall.ordered.map(_.id)
+    val provenance = new CandidateProvenance.Strict(
+      strict.policy,
+      ids.map(u => strict.set(u).overflow),
+      ids.map(u => strict.set(u).uniformSemantic)
+    )
+    build(recall, source, strict.candidates, provenance, costModel, gate = true)
+
+  private def build(
+      recall: RecallGraph[Checked],
+      source: SourceView,
+      candidates: Candidates,
+      provenance: CandidateProvenance,
       costModel: LocalCostModel,
       gate: Boolean
   ): Either[AlignError, LocalEvidence] =
@@ -113,6 +142,7 @@ object LocalEvidence:
           ViewFingerprint.of(view),
           MappingSourceRender.scope(view.nodes),
           gate,
+          provenance,
           ids,
           ids.map(candidates.set),
           nominated,
@@ -193,13 +223,62 @@ object LocalEvidenceId:
     }
     MappingRender.digest(
       Vector(
-        "local-evidence/v2",
+        "local-evidence/v3",
         e.recallChecksum.hex,
         e.recallSupplement.hex,
         e.viewFingerprint.checksum.hex,
         e.scopeDigest.hex,
-        e.gated.toString
+        e.gated.toString,
+        CandidateProvenance.render(e.provenance)
       ) ++ perUnit
     )
 
 type LocalEvidenceId = LocalEvidenceId.LocalEvidenceId
+
+/** Where a [[LocalEvidence]]'s candidates came from.
+  *
+  * Why: evidence built from plain [[Candidates]] cannot tell generator output from hand-built sets,
+  * so it claims nothing (`Unattested`). Evidence built from [[StrictCandidates]] records the tie
+  * policy and, per unit in recall order, what that policy withheld or observed.
+  */
+sealed trait CandidateProvenance
+object CandidateProvenance:
+  case object Unattested extends CandidateProvenance
+
+  final class Strict private[align] (
+      val policy: CandidateTiePolicy,
+      val overflow: Vector[Vector[TieOverflow]],
+      val uniformSemantic: Vector[Vector[UniformSemanticScores]]
+  ) extends CandidateProvenance:
+    /** True when some level of unit `i` exceeded its budget: a strict reference refuses it. */
+    def overflowed(i: Int): Boolean = overflow.lift(i).exists(_.nonEmpty)
+    override def equals(that: Any): Boolean = that match
+      case o: Strict =>
+        policy == o.policy && overflow == o.overflow && uniformSemantic == o.uniformSemantic
+      case _ => false
+    override def hashCode: Int = (policy, overflow, uniformSemantic).hashCode
+    override def toString: String = s"Strict($policy)"
+
+  private[align] def render(p: CandidateProvenance): String =
+    import MappingRender.sequence
+    p match
+      case Unattested => sequence(Vector("unattested"))
+      case s: Strict  =>
+        sequence(
+          Vector(
+            "strict",
+            sequence(CandidateTiePolicy.render(s.policy)),
+            sequence(
+              s.overflow.map(os =>
+                sequence(
+                  os.map(o => sequence(Vector(o.level, o.unionSize, o.budget).map(_.toString)))
+                )
+              )
+            ),
+            sequence(
+              s.uniformSemantic.map(us =>
+                sequence(us.map(u => sequence(Vector(u.level, u.scoredCount).map(_.toString))))
+              )
+            )
+          )
+        )

@@ -139,3 +139,43 @@ class LocalEvidenceIsolationSuite extends FunSuite:
     }
     assertEquals(mappedBack, content(view))
   }
+
+  test("(c) under the strict TieComplete policy, a bijective rename commutes with evidence") {
+    val refs = view.nodes.map(_.ref).sortBy(_.key)
+    val rename: Map[SourceNodeRef, SourceNodeRef] = refs.zipWithIndex.map { (r, i) =>
+      val tag = f"n${99 - i}%02d"
+      r -> (r match
+        case SourceNodeRef.Situation(_) => SourceNodeRef.Situation(SituationId.unsafe(tag))
+        case SourceNodeRef.Segment(_)   => SourceNodeRef.Segment(SegmentId.unsafe(tag)))
+    }.toMap
+    val back = rename.map(_.swap)
+    val renamedView = rebuilt(
+      view.nodes.map(n => n.copy(ref = rename(n.ref), parent = n.parent.map(rename))),
+      view.edges.map((l, es) => l -> es.map((a, b, w) => (rename(a), rename(b), w))),
+      view.worldOrder.map(_.map((r, o) => rename(r) -> o))
+    )
+    val renamedTable = table.map { case ((u, r), d) => (u, rename(r)) -> d }
+    val config = StrictCandidateConfig
+      .of(2, TieBudgetRequest.Unbounded, lexicalOverlap = true, space = None)
+      .fold(e => fail(e.message), identity)
+    def strictContent(
+        v: SourceView,
+        t: Map[(storymodel4s.recall.RecallUnitId, SourceNodeRef), Double]
+    ) =
+      val sem = SemanticDistance.fromTable(t)
+      val strict = StrictCandidateGenerator(sem, config)
+        .generate(recall.ordered, v)
+        .fold(e => fail(e.message), identity)
+      val e = LocalEvidence
+        .compute(recall, v, strict, costModel.copy(semantic = sem))
+        .fold(err => fail(err.message), identity)
+      e.nominated.map(_.toSet).zip(e.breakdowns)
+    def unrename(s: AlignState): AlignState = s match
+      case AlignState.Source(r)       => AlignState.Source(back(r))
+      case AlignState.Distorted(r, f) => AlignState.Distorted(back(r), f)
+      case other                      => other
+    val mappedBack = strictContent(renamedView, renamedTable).map { (noms, costs) =>
+      (noms.map(back), costs.map((s, c) => unrename(s) -> c))
+    }
+    assertEquals(mappedBack, strictContent(view, table))
+  }

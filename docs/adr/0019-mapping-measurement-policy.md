@@ -505,6 +505,31 @@ Candidates stage receipt.
 - Tie-size diagnostics (level, cut rank, tie size, channel) are separate telemetry and never
   enter historical mapper outputs.
 
+Implemented shape (branch `solo/tie-policy`, align, 2026-09-23):
+
+- `StrictCandidateConfig.of(perLevel, budget, lexicalOverlap, space)` checks that `perLevel` is
+  positive and that `AtMost(n)` satisfies `perLevel <= n`. It returns a `CandidateRefusal` rather
+  than accepting an unchecked value.
+- `StrictCandidateGenerator.generate` returns `Either[CandidateRefusal, StrictCandidates]`. A
+  non-finite score is `NonFiniteScore`, never a tie and never dropped.
+- `StrictCandidates` and `StrictCandidateSet` have no `without` or `fuse`, so the policy cannot be
+  lost by recombination. Only the generator builds `TieOverflow` and `UniformSemanticScores`,
+  because their fields stand in relations. The uniform flag counts every scored semantic
+  candidate at the level, not only the kept ones.
+- `LocalEvidence.compute(recall, source, strict, costModel)` records
+  `CandidateProvenance.Strict(policy, overflow, uniformSemantic)`. Evidence built from plain
+  `Candidates` records `Unattested`: it cannot tell generator output from hand-built sets, so it
+  claims neither the historical policy nor a strict one. The provenance is part of the evidence
+  identity, which is now `local-evidence/v3`.
+- The historical `CandidateGenerator` is unchanged, including its lexical hits, which now come
+  from a shared helper, and it reproduces the frozen digests. `HistoricalKeyOrder` exists as a
+  named, identifier-dependent policy value.
+
+Not in this slice:
+- binding the policy into a registered execution `StageReceipt`;
+- the strict reference refusal of an overflowed unit, which belongs to the reference ticket;
+- closing G1 AC2 or AC3.
+
 Rejected alternatives:
 - Dropping all candidates tied at the cut. Tie frequency correlates with how vague a recall
   unit is, which would bias the estimand.

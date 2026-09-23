@@ -134,17 +134,26 @@ final case class CandidateGenerator(
     val lexical =
       if !lexicalOverlap then Vector.empty
       else
-        val lemmas = unit.proposition.lemmas
-        val names = Names.tokens(unit.proposition.participants.flatMap(_.names).toSet)
-        view.nodes
-          .collect {
-            case n if lemmas.nonEmpty && lemmas.exists(n.lemmas.contains)               => n.ref
-            case n if names.nonEmpty && names.exists(Names.tokens(n.allNames).contains) => n.ref
-          }
-          .distinct
-          .sorted
+        CandidateGenerator
+          .lexicalHits(unit, view)
           .zipWithIndex
           .map { (r, i) => Nomination(r, Channels.lexical, i, None, None, None) }
     val all = dense ++ lexical
     if all.isEmpty && !anyRanked then CandidateSet.unranked
     else CandidateSet(all, abstained = false)
+
+object CandidateGenerator:
+
+  /** Source nodes sharing a lemma or a participant name token with the unit, distinct and in
+    * canonical order. Shared by the historical and strict generators so both see the same hits.
+    */
+  private[align] def lexicalHits(unit: RecallUnit, view: SourceView): Vector[SourceNodeRef] =
+    val lemmas = unit.proposition.lemmas
+    val names = Names.tokens(unit.proposition.participants.flatMap(_.names).toSet)
+    view.nodes
+      .collect {
+        case n if lemmas.nonEmpty && lemmas.exists(n.lemmas.contains)               => n.ref
+        case n if names.nonEmpty && names.exists(Names.tokens(n.allNames).contains) => n.ref
+      }
+      .distinct
+      .sorted
