@@ -28,6 +28,26 @@ val restored = MappingExchangeBuild.read(
 The parent directory must exist and the destination must be new. The writer
 publishes `manifest.json` only after every payload finishes. Interrupted output is
 incomplete and cannot be read as a valid package. Existing output is preserved.
+
+For a saved joined workspace, select the policy explicitly:
+
+```scala
+import storymodel4s.view.ArtifactId
+
+val exported = MappingExchangeBuild.exportWorkspace(
+  Path.of("workspace.json"),
+  ArtifactId.unsafe("authored-control-a"), // use an actual policy ID in the workspace
+  Path.of("analysis/mapping")
+)
+```
+
+This entry point reads strict UTF-8, checks the complete workspace join and its
+actual export permission, then copies the selected checked record without inference.
+Inspection permission alone does not permit export. Denied imports and unknown
+policies refuse before creating output. The returned receipt binds the exact input
+file bytes, policy ID, mapping digest and published manifest digest; whitespace
+changes in the input therefore change the input digest. CLI dispatch uses this
+same producer boundary.
 There is no standalone mapper command in this component; the prepare/CLI facade
 owns ordinary-file input admission and inference execution.
 

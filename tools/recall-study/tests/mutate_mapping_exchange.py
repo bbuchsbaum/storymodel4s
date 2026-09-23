@@ -18,12 +18,25 @@ def main():
     parser.add_argument('--grakern', required=True)
     parser.add_argument('--staging', required=True)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--suite', choices=['record', 'workspace'], default='record')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]
     args.out.mkdir(parents=True, exist_ok=False)
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
     mutants = [('ignore-file-content', 'codec/src/main/scala/storymodel4s/codec/mappingexchange.scala', 'supplied(name) == text', '(supplied(name) == text || supplied(name) != text)', 'codecJVM/testOnly *MappingExchangeSuite'), ('replace-invalid-utf16', 'codec/src/main/scala/storymodel4s/codec/mappingexchange.scala', '!validUtf16(text)', '(!validUtf16(text) && validUtf16(text))', 'codecJVM/testOnly *MappingExchangeSuite'), ('omit-failed-outcome', 'codec/src/main/scala/storymodel4s/codec/mappingexchange.scala', '"decisions",\n        outcomes,', '"decisions",\n        outcomes.filter(o => field(field(o, "processing_status"), "status").asString.contains("complete")),', 'codecJVM/testOnly *MappingExchangeSuite')]
     expected_failures = {'ignore-file-content': 'rehashed table corruption still refuses against the checked record', 'replace-invalid-utf16': 'direct quoted Unicode identifiers roundtrip and unmatched UTF16 refuses before byte hashing', 'omit-failed-outcome': 'all outcomes, unassigned words, exact support and original decisions roundtrip'}
+    baseline_task = 'codecJVM/testOnly *MappingExchangeSuite'
+    if args.suite == 'workspace':
+        baseline_task = 'pipeline/testOnly *WorkspaceMappingExportSuite'
+        filename = 'pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeBuild.scala'
+        mutants = [
+            ('inspection-allows-export', filename, '.permitsExport(', '.permitsInspection(', baseline_task),
+            ('implicit-first-policy', filename, '.policy(policyId)', '.policies.headOption', baseline_task),
+        ]
+        expected_failures = {
+            'inspection-allows-export': 'valid inspection-only workspace refuses before output creation',
+            'implicit-first-policy': 'unknown policy is refused without silently selecting the first record',
+        }
     originals = {name: (root / name).read_bytes() for name in sorted({m[1] for m in mutants})}
     for name, data in originals.items():
         committed = subprocess.check_output(['git', 'show', f'{head}:{name}'], cwd=root)
@@ -54,7 +67,7 @@ def main():
         print(json.dumps({'name': name, 'exit': result.returncode, 'killed': killed}), flush=True)
         return receipt, tested
 
-    baseline, tested = run('before', ['codecJVM/testOnly *MappingExchangeSuite'], {})
+    baseline, tested = run('before', [baseline_task], {})
     if baseline['exit'] != 0 or not tested:
         raise RuntimeError('baseline failed')
     for name, filename, original, replacement, task in mutants:
@@ -73,7 +86,7 @@ def main():
             path.write_bytes(before)
         if not receipt['killed']:
             raise RuntimeError(f'{name}: survived or failed without its named compiling test failure')
-    after, tested = run('after', ['codecJVM/testOnly *MappingExchangeSuite'], {})
+    after, tested = run('after', [baseline_task], {})
     assert after['exit'] == 0 and tested
     assert all((root / name).read_bytes() == data for name, data in originals.items())
 

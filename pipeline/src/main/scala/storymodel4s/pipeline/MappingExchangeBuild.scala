@@ -6,14 +6,49 @@ import java.nio.file.{FileAlreadyExistsException, Files, Path, StandardOpenOptio
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 import storymodel4s.align.MappingResult
-import storymodel4s.codec.{ExpectedMappingContext, MappingExchange}
+import storymodel4s.codec.{ExpectedMappingContext, MappingExchange, WorkspaceCodecs}
 import storymodel4s.core.Checksum
+import storymodel4s.view.{ArtifactId, WorkspaceRefusal}
 
 /** Local-file boundary for the checked single-record exchange component. */
 object MappingExchangeBuild:
   enum Error:
     case Exchange(error: MappingExchange.Error)
+    case Workspace(error: WorkspaceRefusal)
     case OutputExists, OutputWrite, InputRead
+
+  /** Digests bind the exact input bytes, explicitly selected policy and completed publication. */
+  final case class WorkspaceExportReceipt(
+      inputDigest: Checksum,
+      policyId: ArtifactId,
+      recordDigest: Checksum,
+      manifestDigest: Checksum
+  )
+
+  /** Decode the scientific join and check the actual export grant before creating any output. */
+  def exportWorkspace(
+      input: Path,
+      policyId: ArtifactId,
+      output: Path
+  ): Either[Error, WorkspaceExportReceipt] =
+    val loaded = try
+      val bytes = Files.readAllBytes(input)
+      Right((decodeUtf8(bytes), Checksum.ofBytes(bytes)))
+    catch case NonFatal(_) => Left(Error.InputRead)
+    for
+      (text, inputDigest) <- loaded
+      workspace <- WorkspaceCodecs.decode(text).left.map(Error.Workspace(_))
+      _ <- Either.cond(
+        workspace.archive.capabilities
+          .permitsExport(workspace.modelArtifact, workspace.recallArtifact),
+        (),
+        Error.Workspace(WorkspaceRefusal.PermissionDenied)
+      )
+      policy <- workspace
+        .policy(policyId)
+        .toRight(Error.Workspace(WorkspaceRefusal.IncompatiblePolicy))
+      manifestDigest <- write(policy.record, output)
+    yield WorkspaceExportReceipt(inputDigest, policy.id, policy.record.digest, manifestDigest)
 
   def write(record: MappingResult, output: Path): Either[Error, Checksum] =
     MappingExchange.encode(record).left.map(Error.Exchange(_)).flatMap(publish(_, output))
@@ -56,14 +91,16 @@ object MappingExchangeBuild:
       try
         Right(stream.iterator().asScala.toVector.map { path =>
           val bytes = Files.readAllBytes(path)
-          val text = StandardCharsets.UTF_8
-            .newDecoder()
-            .onMalformedInput(CodingErrorAction.REPORT)
-            .onUnmappableCharacter(CodingErrorAction.REPORT)
-            .decode(ByteBuffer.wrap(bytes))
-            .toString
+          val text = decodeUtf8(bytes)
           path.getFileName.toString -> text
         })
       finally stream.close()
     catch case NonFatal(_) => Left(Error.InputRead)
     files.flatMap(MappingExchange.decode(_, expected).left.map(Error.Exchange(_)))
+
+  private def decodeUtf8(bytes: Array[Byte]): String = StandardCharsets.UTF_8
+    .newDecoder()
+    .onMalformedInput(CodingErrorAction.REPORT)
+    .onUnmappableCharacter(CodingErrorAction.REPORT)
+    .decode(ByteBuffer.wrap(bytes))
+    .toString

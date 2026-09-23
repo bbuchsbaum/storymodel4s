@@ -442,3 +442,11 @@ calibration and paired-profile capabilities remain explicitly unavailable in thi
 base component. The facade owns the later reference/reconstruction/lambda envelope
 and shared evidence identity; the exchange must not invent those semantics. This
 component therefore does not close the complete paired exchange acceptance ticket.
+
+`MappingExchangeBuild.exportWorkspace` accepts an ordinary workspace file and an
+explicit `view.ArtifactId`. It performs the full scientific join and checks the
+actual model/recall-bound export grant before publishing the unchanged selected
+record. `WorkspaceExportReceipt` binds exact input bytes, policy, record and
+completed manifest. Implicit first-policy selection and inspection-as-export were
+rejected: both would hide a consequential choice at the CLI boundary. Diagnostics
+remain typed and content-free; the caller owns their presentation.
