@@ -51,11 +51,10 @@ Save the following file as `fixtures/src/main/scala/docsprobe/ModelAStory.scala`
 
 <pre><code class="language-scala">{program}</code></pre>
 
-Run it with the pinned local `grakern` source:
+Run it with the pinned `grakern` source fetched by the build:
 
 ```sh
-sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
-  "fixturesJVM/runMain docsprobe.modelAStory"
+sbt "fixturesJVM/runMain docsprobe.modelAStory"
 ```
 
 <Evidence

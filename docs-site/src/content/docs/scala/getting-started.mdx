@@ -63,8 +63,8 @@ story nodes and explicit external states.
 
 ## Run it
 
-storymodel4s currently runs from a source checkout. You need JDK 17 or 21, sbt 1.12.14, and a local
-checkout of the pinned `grakern` dependency.
+storymodel4s currently runs from a source checkout. You need JDK 17 or 21 and sbt 1.12.14.
+The build fetches its pinned `grakern` source revision; a local checkout is an optional override.
 
 ```sh
 git clone https://github.com/bbuchsbaum/storymodel4s.git
@@ -78,8 +78,7 @@ Save this exact program as `fixtures/src/main/scala/docsprobe/PublicAlignAndInte
 Run it with:
 
 ```sh
-sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
-  "fixturesJVM/runMain docsprobe.alignAndInterpret"
+sbt "fixturesJVM/runMain docsprobe.alignAndInterpret"
 ```
 
 The program uses public APIs and no test helpers.

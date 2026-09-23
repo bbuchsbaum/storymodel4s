@@ -8,8 +8,8 @@ sidebar:
 import Evidence from '../../../components/Evidence.astro';
 import { sourceLink } from '../../../lib/provenance';
 
-The current build aggregates 15 cross-platform modules and three JVM-only embedding or benchmark
-projects. Cross-platform modules target JVM, Scala.js, and Scala Native with pure source layout.
+The current build aggregates 16 cross-platform modules and eight JVM-only projects. Cross-platform
+modules target JVM, Scala.js, and Scala Native with pure source layout.
 
 <Evidence
   status="Confirmed"
@@ -39,6 +39,7 @@ projects. Cross-platform modules target JVM, Scala.js, and Scala Native with pur
 | `embed-core` | Portable embedding identity, validated vectors, receipts, privacy, cache, lexical baselines |
 | `view` | Renderer-neutral Codex and Atlas artifacts |
 | `codec` | Canonical JSON codecs |
+| `corpus` | Portable corpus coordinates, cells, segmentations, links, profiles, and refusal types |
 | `fixtures` | Researcher-reviewed acceptance fixtures and public-domain source material |
 | `laws` | Published Discipline laws and generators |
 
@@ -49,6 +50,11 @@ projects. Cross-platform modules target JVM, Scala.js, and Scala Native with pur
 | `embed-grakern` | Structural proposition-chart channel through a pinned graph-kernel source dependency |
 | `embed-onnx` | Local pinned sentence-encoder adapter with checksum and schema validation |
 | `embed-bench` | Diagnostic embedding and alignment measurements; not production defaults |
+| `provider-parser` | Parser-provider transport and admission with receipts |
+| `provider-agent` | Remote parser adapter with content-keyed record and replay |
+| `media` | Media acquisition, frame and caption workers, and process execution |
+| `pipeline` | Build orchestration, exchange export, and command exit status |
+| `corpus-intake` | Corpus readers, byte verification, and intake receipts |
 
 JVM libraries, model runtimes, HTTP clients, and provider SDKs stay outside portable modules. No
 provider-specific type crosses into `embed-core`.
