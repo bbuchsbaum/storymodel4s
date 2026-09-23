@@ -1,0 +1,19 @@
+{
+  "prepared_utc": "2026-09-23T12:22:38.123145+00:00",
+  "source_sha": "d08774acee0b770dfae7b66f8526515b6bc23820",
+  "source_tree": "02973cf2630698cd2e64b087daed8bb8440cafd3",
+  "source_clean": true,
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "grakern_cwd": "/private/tmp/storymodel-p1-grakern-0329c43c",
+  "grakern_sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "grakern_tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+  "grakern_clean": true,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+    "set ThisBuild / tlFatalWarnings := true",
+    "checkAll"
+  ],
+  "status": "prepared; awaiting shared Fray16 gate slot; not executed"
+}

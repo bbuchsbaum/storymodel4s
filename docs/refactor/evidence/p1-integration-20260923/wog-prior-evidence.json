@@ -1,0 +1,75 @@
+{
+  "schema": "p1-integration-wog-prior-evidence/v1",
+  "archived_utc": "2026-09-23T12:20:18.496591+00:00",
+  "candidate": "10290a125adf600b85cf3fad5535f59f302998ee",
+  "candidate_binding_basis": "author handoff on primary Mote bd-01M35JHB8QV2A8T2WJY4EVR0A2 and Fray49 seq501; these older raw logs do not embed command/SHA/exit receipts",
+  "independent_review": "m1-boundary-review, Fray49 seq505, exact candidate GO for cold code review; no independent execution",
+  "integrator_observation": "Raw hashes and complete printed totals independently recounted; no process exit inferred from test totals. Full exact-integration command/exit receipt will be separate.",
+  "runs": [
+    {
+      "run": "baseline",
+      "archive": "wog-baseline.log.gz",
+      "raw_sha256": "46b09ea6a46bc7dbf2325c461eece5ecac2bda394472fdd969ec52d09bce1690",
+      "archive_sha256": "3a23f6c3259d559930392da62232f13722d7dc656ce67d4d29f76bf6064e95fd",
+      "raw_bytes": 3557,
+      "parsed_totals": [
+        {
+          "result": "Failed",
+          "total": 31,
+          "failed": 1,
+          "errors": 0,
+          "passed": 30,
+          "skipped": 0
+        }
+      ],
+      "process_exit_from_raw_log": null,
+      "command_and_git_binding_embedded_in_log": false
+    },
+    {
+      "run": "focused",
+      "archive": "wog-focused.log.gz",
+      "raw_sha256": "5f817e88f3a6a4fda9ae9782c0c39f2bef680fb7b40a44efb81da9701010a1ff",
+      "archive_sha256": "b53cb029e2ffa47bc1469282be5df455a184b5d0ac48a9e4c3dd08bdb8827046",
+      "raw_bytes": 16122,
+      "parsed_totals": [
+        {
+          "result": "Passed",
+          "total": 31,
+          "failed": 0,
+          "errors": 0,
+          "passed": 31,
+          "skipped": 0
+        },
+        {
+          "result": "Passed",
+          "total": 21,
+          "failed": 0,
+          "errors": 0,
+          "passed": 21,
+          "skipped": 0
+        }
+      ],
+      "process_exit_from_raw_log": null,
+      "command_and_git_binding_embedded_in_log": false
+    },
+    {
+      "run": "mutant",
+      "archive": "wog-mutant.log.gz",
+      "raw_sha256": "f036ee448480b23246062b9cbdecf0f381ec81e3cd7df67128d81fdc1361a876",
+      "archive_sha256": "627cc5c63b19706d31cf19de62e12e9fd72bc0f3ba54f0f32536dbf7fe39b375",
+      "raw_bytes": 2699,
+      "parsed_totals": [
+        {
+          "result": "Failed",
+          "total": 31,
+          "failed": 1,
+          "errors": 0,
+          "passed": 30,
+          "skipped": 0
+        }
+      ],
+      "process_exit_from_raw_log": null,
+      "command_and_git_binding_embedded_in_log": false
+    }
+  ]
+}

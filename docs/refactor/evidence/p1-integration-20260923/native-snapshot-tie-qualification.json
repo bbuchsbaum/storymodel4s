@@ -1,0 +1,29 @@
+{
+  "source": {
+    "path": "/private/tmp/storymodel-p1-integration-20260923",
+    "sha": "e58983ad6f1cb468f0a52e60886641c1319baaba",
+    "tree": "7f073a02bfc1a02f5fd27052c98a8a0ccf1c2946",
+    "tracked_status": ""
+  },
+  "dependency": {
+    "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+    "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+    "tracked_status": ""
+  },
+  "exit_code": 0,
+  "total": 33,
+  "passed": 33,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "raw_sha256": "cc9ea6da4a94cd4e9c38721863c647bcbf91e9ecbf72358599397d5f1f10141a",
+  "suites": [
+    "MappingHistoricalSuite",
+    "CandidateTiePolicySuite",
+    "LocalEvidenceIsolationSuite"
+  ],
+  "limitation": "Requested fourth suite had incorrect package and did not execute; actual storymodel4s.probes.StrictCandidatesUnforgeableSuite remains for full checkAll.",
+  "post_tracked_trees_clean": true,
+  "recorded_utc": "2026-09-23T13:11:52.517228+00:00"
+}

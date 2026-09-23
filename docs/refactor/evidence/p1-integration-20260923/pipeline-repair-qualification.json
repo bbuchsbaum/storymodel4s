@@ -1,0 +1,14 @@
+{
+  "source_commit": "7469d3d7f49dd04df2d2bc76504fbef1202a703b",
+  "gate_binding": "Gate ran on the reviewed working diff immediately before commit; no source edit intervened between successful gate and commit. Final checkAll runs on the clean committed tree.",
+  "tests": 120,
+  "passed": 120,
+  "failed": 0,
+  "exit_code": 0,
+  "raw_sha256": "e093d62ea6b00487b8dbd37a56ff0e7caf505a7d96fff31a4aa0b53e50e58655",
+  "reviewer": "p1_cleanup_review",
+  "verdict": "GO bound to exact commit",
+  "negative_control": "Checked compiler input with s43 required bundles emptied; same model, three actual refusal errors; both views preserve law placement and crossed-receipt refusal.",
+  "historical_control": "Original S0 golden unchanged; new three-hash overlay. Current graph/candidates/derivation plus previous validation recover historical fingerprint, derivation-file hash, and view hash.",
+  "first_attempt": "Test-only missing Checksum encoder failed compilation in01; corrected to canonical hex JSON string before02."
+}

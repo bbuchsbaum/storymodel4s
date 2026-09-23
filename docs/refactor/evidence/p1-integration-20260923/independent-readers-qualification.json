@@ -1,0 +1,19 @@
+{
+  "source": {
+    "path": "/private/tmp/storymodel-p1-integration-20260923",
+    "sha": "fb22215a2216fe5a6573183e656f33d08851585a",
+    "tree": "07af5d5ed7d8ef7b6c56459591a5b76ef9cb4ce7",
+    "tracked_status": ""
+  },
+  "dependency": {
+    "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+    "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+    "tracked_status": ""
+  },
+  "recorded_utc": "2026-09-23T13:13:08.612318+00:00",
+  "exit_code": 0,
+  "raw_sha256": "8487025dab3f95c46ddacc201f8344aa1dffe6ad9b3f930c4f3a7427f7bb5d19",
+  "post_tracked_trees_clean": true,
+  "qualification": "Local execution of generated CI commands using explicit pinned Grakern checkout; not a hosted CI run."
+}

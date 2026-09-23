@@ -60,6 +60,58 @@ Temporal queries, raw-BIDS scan alignment and the post-M1 StoryAtlas temporal
 consumer have distinct execution tickets. Optional video acquisition, fine
 localization and empirical calibration do not gate the basic workflow.
 
+## Execution handoff (23 September 2026)
+
+The current integration candidate is `7469d3d7f49dd04df2d2bc76504fbef1202a703b`.
+Its final strict pinned-dependency `checkAll` is running; it is not yet landed.
+The preceding full gate at `03569d1a` failed 13 obsolete WOG expectations.
+The independently reviewed repair preserves explicit missing-proposal refusal,
+retains the historical S0 golden with an explained three-hash delta, and passes
+the complete affected JVM pipeline court (120/120) before this broad gate.
+The [integration evidence](evidence/p1-integration-20260923/README.md) retains both
+failed full gates, repairs, independent exchange readers and exact dependency
+bindings. Local execution is distinct from the still-required hosted CI receipt.
+
+The owner decisions and earlier landings close the CI-runner choice, exact-directory
+disk cleanup, stability-boundary decision, strict-warning repair and Sherlock
+re-scoring tickets. Existing GitHub-hosted runners remain the chosen route; the
+stable boundary in [api-stability.md](../api-stability.md) is approved, not frozen.
+The current reviewed batch adds the real-text compiler repair, declared-lossy
+StoryModel export, deterministic offline text source, strict tie policy and
+part-correct frame planning. The latter three are bounded slices of open tickets,
+not completion of their entire workflows.
+
+Fray threads 68 and 70 record the accepted next handoff. Mote claims and exact
+path reservations govern implementation; this table does not replace them.
+
+| Existing work | Accepted next owner | Next executable witness |
+| --- | --- | --- |
+| G1 shared evidence `bd-01M2TACM78289S4TECE91GT5K2` | claude-release | Content-only scorer payloads cannot expose nested coordinates or original IDs; registered lexical and embedding adapters replay the same bound evidence. Preserve missingness, historical parity and rename/permutation laws. |
+| Offline source `bd-01M35PB1H5PDD55YVKR4TQ8M66`, facade and prepare | codex-temporal | An ordinary text file and an annotation source reach the same checked public source/evidence seam, with an independently readable exchange; bench-only construction does not satisfy this witness. |
+| Video source `bd-01M35JG7DXD7NSEE4WVEKT3CSF` | claude-p1 | Caption loading replays model/frame/receipt checks and joins per-part extents; foreign editions, missing receipts and unsampled-frame captions refuse. |
+| Stable-signature closure, Admissibility and Estimate | claude-sm-0923 | Outside-package forgery probes and an explicit eligibility/denominator/codec migration, rechecked against landed main. Estimate eligibility repair remains a 1.0 prerequisite. |
+| Public mapping journey `bd-01M35P83TCNHBSDY6NSK13Q3K0` and release gate `bd-01M2TAMJ95K9D7H248A8387YW4` | codex-p1-lead | A text story and Sherlock A/A+V run through the public path with complete accounting and independent reader evidence; then the remaining CLI, lambda, OpenNeuro, stability and hosted-CI gates close on their own receipts. |
+
+G1's embedding adapter remains required for 1.0. Facade development can proceed
+with lexical/fixture channels while it is built, but a strict embedding request
+must report typed unavailability until the adapter is checked. Hashing identifiers
+is not a proof of rename invariance; keys and bindings stay in orchestration,
+while semantic payloads and controlled registered adapters undergo the stated laws.
+
+[ADR 0022](../adr/0022-mapping-producers-and-evidence.md) codifies the Fray 75/712
+architecture agreement: complete mapping producers
+(an LLM, human import or another engine) and local scoring providers are distinct
+extension points that join one checked result/exchange family. A categorical result
+must not require a fabricated `HsmmResult` or numeric confidence. Acquired evidence,
+observed coverage, selected/rendered items and semantic support are distinct facts;
+protocol-bound run sets retain their per-model/sample outcomes and replay receipts.
+Declared input restrictions can disqualify strict-reference use but do not certify
+absence of learned priors. Root and codex-temporal own the concrete result/facade
+binding proposal; these extensions are agreed design, not completed implementation.
+The existing LLM evaluation tickets remain separate. This agreement schedules no
+experiment, changes no landing gate and authorizes no hosted data use or spending;
+empirical response frequencies remain distinct from calibrated correctness.
+
 ## 1. Assessment
 
 The project needs a correction at its inference-to-analysis boundary, not a rewrite. Keep the

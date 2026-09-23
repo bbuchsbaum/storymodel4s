@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T13:25:05.358628+00:00",
+  "finished_utc": "2026-09-23T13:25:05.489508+00:00",
+  "duration_seconds": 0.130808,
+  "command": [
+    "python3",
+    "tools/recall-study/tests/test_extract_scene_frames.py",
+    "-v"
+  ],
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "log": "/private/tmp/p1-scene-ci-tests.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 120.0,
+  "log_bytes": 3336
+}
