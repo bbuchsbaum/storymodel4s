@@ -84,6 +84,14 @@ children. The second records a fresh A–C review and files its two remaining fi
 Those implementation follow-ups remain open. Neither documentary closure certifies
 the broader film or intake workflow.
 
+The sampled-frame S1 slice (`bd-01M37AMS9NYY9J0FWJESVPJ56E`) landed at
+`eb5463b35bb54b763cb4807975925db564533405`, including the reviewed stream-identity
+repair: **60 passed, 3 skipped, 0 failed**, with ten named mutants killed.
+Its [receipt](evidence/ac4-s1-sampled-frames-20260923/README.md) qualifies this
+bounded media slice; the parent video-ingestion workflow remains open. The optional
+[offline-source review receipts](evidence/review-receipts-20260923/README.md)
+landed separately at `c90a7e5d` and add evidence, not another workflow completion.
+
 The owner decisions and earlier landings close the CI-runner choice, exact-directory
 disk cleanup, stability-boundary decision, strict-warning repair and Sherlock
 re-scoring tickets. Existing GitHub-hosted runners remain the chosen route; the
