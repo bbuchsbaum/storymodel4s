@@ -5546,17 +5546,22 @@ runtime implementation:
 
 - packet PTS/DTS normalization and exact rescaling are separate checked operations, not one generic
   raw-value classifier with a provenance tag;
-- the C1 packet normalizer derives its field class from an explicitly synthetic, fixture-scoped
-  packet witness, and the rescaler derives its outcome from exact operands and declared arithmetic
-  policy;
+- the packet normalizer derives its field class from a checked packet/extractor witness, and the
+  rescaler derives its outcome from exact operands and declared arithmetic policy;
 - packet, extractor, and rescale-operation identities are recomputed from complete canonical
   receipt preimages at decode and join boundaries;
-- raw adapter payloads and claimed provenance remain unchecked until this join succeeds;
+- under V9's then-current rule, raw adapter payloads and claimed provenance remain unchecked until
+  the receipt join succeeds;
 - every public or package-visible construction and factory path is enumerated, and no generic or
   caller-accessible ordinary or unsafe-named `apply`, `copy`, companion `fromProduct`,
   `summon[Mirror.ProductOf[T]].fromProduct`, codec rehydration, or reflection path may mint a checked
   classification or identity from caller-supplied labels. Only the private construction door reached
   by the corresponding checked operation or verified receipt join may do so.
+
+The second and fourth bullets record V9's then-current packet-witness scope and receipt-join rule.
+Sections 124–126 supersede them by restricting C1 packet outcomes to synthetic fixtures, separating
+actually passed, receipted schema/content/identity checks from runtime-observation authority, and
+reserving promotion of the latter for the separately authorized E0 issuance join.
 
 The required C1 JVM/JS/Native courts now include provenance-flip, packet-receipt substitution,
 rescale-receipt substitution, supplied-identity mismatch, and exhaustive checked-construction-door
@@ -5589,13 +5594,13 @@ V10 makes the stage and authority boundary explicit:
   `NarrativeSourceAtlas`;
 - all records claiming decoder packet/extractor provenance remain draft in C1, even if their fields,
   checksums, fingerprints, preimages, and derived identities are internally consistent;
-- only E0's separately authorized admitted adapter-owned invocation/result join may mint
-  runtime-observed packet/extractor
-  provenance; it binds an orchestrator-issued invocation, admitted source and input checksum,
+- under V10's then-current stage assignment, only D0's admitted adapter-owned invocation/result
+  join may mint runtime-observed packet/extractor provenance; it binds an orchestrator-issued
+  invocation, admitted source and input checksum,
   adapter build/configuration fingerprint, exact result digest, terminal receipt, and append-only
   build-journal entry;
 - the issuance capability is not a serializable tag, and generic codec replay yields draft until
-  the E0 verifier rejoins it to the issued invocation and exact result.
+  the then-planned D0 verifier rejoins it to the issued invocation and exact result.
 
 The decisive court holds the entire packet content and canonical receipt preimage fixed. A
 caller-authored, self-consistent whole receipt without the adapter-owned issued invocation/result
@@ -5626,3 +5631,33 @@ the film/recall vertical.
 This correction changes stage ownership, not the V10 authority semantics: content identity,
 receipt integrity, and observation authority remain separate, and no documentation candidate opens
 package acquisition, decoder execution, media access, or runtime implementation.
+
+## 126. V12 formal review: draft authority is not unchecked content
+
+The first formal review of immutable V11 found one remaining scientific conflation. The normative
+plan called every decoder-claimed record `Unchecked` through C1, D0, and D1, while the V11 decision,
+its later plan clauses, and this design record correctly said that an internally consistent record
+remains `Draft` for observation authority. Those are not synonyms: schema/content/identity check
+state and authority to claim runtime observation are orthogonal coordinates.
+
+V12 therefore permits a decoder-claimed record to pass schema, content, and derived-identity checks
+without acquiring runtime-observation authority. It remains `Draft` on the authority axis through
+D1, and only the separately authorized E0 adapter-owned issuance join can promote that axis. A
+schema, content, or derived-identity check that actually passed with its required receipt is not
+relabelled `Unchecked` merely because observation authority remains `Draft`. Intrinsic consistency
+alone does not prove that a check ran, and neither a valid check result nor a derived identity proves
+decoder execution.
+
+Follow-up review also required the evolutionary sections to retain their actual sequence: V9 used a
+checked packet/extractor witness and receipt join; V10 restricted C1 packet outcomes to synthetic
+fixtures and placed the runtime issuance join in D0; V11 moved that join to E0; V12 separates an
+actually passed receipted check from runtime-observation authority. The current normative rule is
+the V12 rule, but it may not be projected backward into the account of an earlier version.
+
+The normative correction is limited to the check-state and observation-authority distinction. The
+associated edits to sections 123–126 repair chronology; they change no timestamp,
+construction-door, identity, receipt, fixture-scope, current stage, component-admission, or
+implementation rule. They also cannot cure the independent governance failure that put V11 on
+shared `main` before formal review and authorization. V12 must be prepared as an isolated candidate;
+the existing history is not rewritten, and chief authority determines the non-rewriting corrective
+record.

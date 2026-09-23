@@ -139,10 +139,14 @@ refusal. The packet-field normalizer may consume only an explicitly synthetic, f
 witness and selects PTS or DTS from that witness. Its checked outcomes remain fixture scoped and
 cannot become runtime-observed media evidence or enter a production `NarrativeSourceAtlas`.
 
-Any record claiming to have been emitted by a decoder remains unchecked through C1, D0, and D1,
-even when every field, checksum, fingerprint and derived identity is internally consistent. Only
-the separately authorized E0 decoder integration may mint a runtime-observed packet/extractor
-witness through an admitted adapter-owned invocation/result join.
+Any record claiming to have been emitted by a decoder may pass schema, content, and derived-identity
+checks through C1, D0, and D1, but remains `Draft` for runtime-observation authority even when every
+field, checksum, fingerprint and derived identity is internally consistent. Content check state and
+observation authority are orthogonal: withholding runtime authority may not erase a schema,
+content, or derived-identity check that actually passed with its required receipt, nor may it
+relabel that receipted check result `Unchecked`. Intrinsic consistency alone does not show that any
+check ran. Only the separately authorized E0 decoder integration may mint a runtime-observed
+packet/extractor witness through an admitted adapter-owned invocation/result join.
 That join binds an orchestrator-issued invocation, the admitted bundle, edition, stream and input
 checksum, the adapter build and configuration fingerprint, the exact raw packet result and digest,
 and the terminal execution receipt. A generic codec rehydrates such a record only as draft;
