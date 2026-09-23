@@ -521,17 +521,20 @@ Rejected alternatives:
 - `StructuredReconstruction(preset)` names a versioned preset. The preset declares
   persistence, order, hierarchy, refinement and fill. The historical Sherlock preset stays
   reachable by name. Its measure is a model posterior.
-- `Weighted(lambda)` sets the structural strength. `lambda` is an exact rational in the
-  closed interval [0, 1], carried as a decimal string, never a `Double`; out-of-range and
-  non-finite values are refused. At `0 < lambda < 1` the transition log-weights are tempered,
-  `log A_lambda(s, .) = lambda * log A(s, .) - log Z_lambda(s)`, which renormalizes every row,
-  and forward-backward runs over the same evidence. The measure is a model posterior at every
-  `lambda`. Refinement, monotone decode and fill belong to the named reconstruction presets
-  and are not applied at intermediate `lambda`.
-- The endpoints are dispatch, not limits. `Weighted(0)` runs `LocalReference` and
-  `Weighted(1)` runs the declared reconstruction preset. A law states that the tempered
-  posterior approaches the reference mass as `lambda -> 0`, within a frozen tolerance. That
-  law is a test; it is not an identity collapse.
+- `Weighted(lambda)` sets the structural strength. `lambda` is an exact rational in the closed
+  interval [0, 1], written as a reduced pair of non-negative integers `numerator/denominator`
+  with a positive denominator. Decimal text is not used, because it represents only terminating
+  rationals. Out-of-range, unreduced and malformed values are refused. The measure kind depends
+  on the endpoint and is never implied: `Weighted(0)` dispatches to `LocalReference` and yields
+  normalized local score mass. `Weighted(1)` dispatches to the declared reconstruction preset
+  and yields that preset's model posterior. At `0 < lambda < 1` the result is a model posterior
+  of an explicitly defined structural model. That definition belongs to the lambda ticket
+  (mote `bd-01M35MHPFFKQHSJKC07VMWC7CW`), not to this ADR. It must state how zero-support
+  transitions, durations and initial or termination terms scale. This ADR asserts no continuity
+  between the interior and either endpoint. Row-normalized tempering of a sparse transition
+  matrix, for example, keeps forbidden transitions forbidden at every `lambda > 0`, so it does
+  not approach the reference as `lambda -> 0` (counterexample on Fray #52). Any continuity claim
+  needs the model that establishes it, and then a test.
 
 `InferenceProfileId` is the content digest of the whole declaration, derived only by the
 library. Any parameter that can change a result is part of it.
@@ -559,8 +562,8 @@ consumes these types and does not define its own.
   score mass to a model posterior, which this ADR forbids, and give the result no measure
   type.
 - Treating `priorScale = 0` as the reference. That is already rejected above.
-- A `Double` `lambda`. Two runs whose `lambda` values print alike could carry different
-  identities.
+- A `Double` or decimal-text `lambda`. A `Double` can print alike for different values, and
+  decimal text cannot represent non-terminating rationals.
 - Letting the caller label a member's profile. That would be caller-asserted identity.
 - Applying fill or monotone decode at intermediate `lambda`. That would carry
   reconstruction-only decisions into a weighted run.
