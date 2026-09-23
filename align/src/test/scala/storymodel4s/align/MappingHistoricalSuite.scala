@@ -229,7 +229,9 @@ class MappingHistoricalSuite extends FunSuite:
   test("adapter captures a changing view once for binding and all link assessment") {
     // One recall unit still assesses multiple targets, without repeatedly hashing unrelated rows.
     val singleRecall = RecallGraph
-      .validated(recall.copy(units = Vector(recall.ordered.head), relations = RecallRelations.empty))
+      .validated(
+        recall.copy(units = Vector(recall.ordered.head), relations = RecallRelations.empty)
+      )
       .toOption
       .get
     val singleResult = GraphHsmm
