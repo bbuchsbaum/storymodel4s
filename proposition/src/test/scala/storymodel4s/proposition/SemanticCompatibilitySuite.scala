@@ -163,6 +163,97 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
       )
   }
 
+  // --- known defects owned by S2a-1b (mote bd-01M37EKWYZ1973TGK7JSTZC28C) ---------------------
+  // The canonical order is invariant under ids and storage, but CompareCore still breaks ties by
+  // view order, and canonical order is a content-hash order that also reads focus. These are
+  // named expected failures: when S2a-1b makes tie resolution order-free they pass, and munit
+  // reports them, so the `.fail` marker has to be removed then.
+
+  private def refocused(c: PropositionChart[Checked], f: Option[ConceptId]) =
+    checked(c.unchecked.copy[Unchecked](focus = f))
+
+  test("KNOWN DEFECT: canonical compare depends on focus, which the graph does not hold".fail) {
+    val b = canon(greedyB(dogFirst = false))
+    assertEquals(
+      SemanticCompatibility.compare(canon(refocused(greedyA, Some(id("p")))), b),
+      SemanticCompatibility.compare(canon(refocused(greedyA, None)), b)
+    )
+  }
+
+  test("KNOWN DEFECT: canonical compare depends on an unmatched lemma's hash".fail) {
+    // `c` scores 0.8 against x (gloss) and 0.0 against y under either lemma, so no concept score
+    // changes. Only the canonical colour order does.
+    def withLemma(l: String) =
+      val b = greedyB(dogFirst = false)
+      checked(
+        b.unchecked.copy[Unchecked](concepts =
+          b.concepts.updated(
+            id("c"),
+            Concept(Lemma.unsafe(l), Some("pet"), None, ConceptKind.Entity)
+          )
+        )
+      )
+    val a = canon(greedyA)
+    assertEquals(
+      SemanticCompatibility.compare(a, canon(withLemma("cat"))),
+      SemanticCompatibility.compare(a, canon(withLemma("feline")))
+    )
+  }
+
+  // --- the chart path's gate flags can depend on ids (corrects the S2a-0 note) ----------------
+
+  private val run1 = Some(FrameRef("propbank", "run-01", None))
+  private val run2 = Some(FrameRef("propbank", "run-02", None))
+
+  /** a: `pa` (run-02, positive, ARG0 man, ARG1 dog) and `pa2` (run-01, no arguments). */
+  private val gateA = checked(
+    PropositionChart.unchecked(
+      Some(id("pa")),
+      Map(
+        id("pa") -> Concept.predicate("run", run2),
+        id("pa2") -> Concept.predicate("run", run1),
+        id("man") -> Concept.entity("man"),
+        id("dog") -> Concept.entity("dog")
+      ),
+      Vector(
+        PropositionRelation(id("pa"), RoleAssignment.arg(0), ConceptTarget.Node(id("man"))),
+        PropositionRelation(id("pa"), RoleAssignment.arg(1), ConceptTarget.Node(id("dog")))
+      ),
+      polarity = Map(id("pa") -> Polarity.Positive)
+    )
+  )
+
+  /** b: a negated run-01 about other fillers (`neg`), and a run-01 with a's fillers reversed
+    * (`rev`). Against `pa` both score 0.6 with no argument agreement and exactly one gate each.
+    */
+  private def gateB(neg: String, rev: String) = checked(
+    PropositionChart.unchecked(
+      Some(id(neg)),
+      Map(
+        id(neg) -> Concept.predicate("run", run1),
+        id(rev) -> Concept.predicate("run", run1),
+        id("cat") -> Concept.entity("cat"),
+        id("bird") -> Concept.entity("bird"),
+        id("dog") -> Concept.entity("dog"),
+        id("man") -> Concept.entity("man")
+      ),
+      Vector(
+        PropositionRelation(id(neg), RoleAssignment.arg(0), ConceptTarget.Node(id("cat"))),
+        PropositionRelation(id(neg), RoleAssignment.arg(1), ConceptTarget.Node(id("bird"))),
+        PropositionRelation(id(rev), RoleAssignment.arg(0), ConceptTarget.Node(id("dog"))),
+        PropositionRelation(id(rev), RoleAssignment.arg(1), ConceptTarget.Node(id("man")))
+      ),
+      polarity = Map(id(neg) -> Polarity.Negative)
+    )
+  )
+
+  test("teeth: on a head tie, the chart path's ids decide which gate flag is raised") {
+    val gates = (r: CompatibilityReport) => (r.polarityConflict, r.roleReversal)
+    // The tie goes to the larger ConceptId; the reverse direction raises no gate.
+    assertEquals(gates(ChartCompatibility.compare(gateA, gateB("b1", "b2"))), (false, true))
+    assertEquals(gates(ChartCompatibility.compare(gateA, gateB("b2", "b1"))), (true, false))
+  }
+
   // --- gloss twins: the default identity cannot order them, the canonical graph must ----------
 
   /** Two same-lemma fillers told apart only by gloss, under ids chosen by the caller. */

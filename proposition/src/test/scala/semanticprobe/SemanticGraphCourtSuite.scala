@@ -47,6 +47,8 @@ class SemanticGraphCourtSuite extends FunSuite:
     refused(typeCheckErrors("g.relations"), "g.relations")
     refused(typeCheckErrors("g.relationsOf"), "g.relationsOf")
     refused(typeCheckErrors("g.polarities"), "g.polarities")
+    refused(typeCheckErrors("g.frames"), "g.frames")
+    refused(typeCheckErrors("g.embeddings"), "g.embeddings")
   }
 
   test("the source-order projection is not reachable from outside storymodel4s") {
