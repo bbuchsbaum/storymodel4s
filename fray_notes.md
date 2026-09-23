@@ -140,3 +140,15 @@ an agent communication failure in this instance, not evidence of a lost message.
   landed. Updating the existing card to the current ingestion assignment kept
   one conversation useful. A resume view should make stale summaries visible
   without treating every unread closure receipt as current work.
+- **Reciprocal review changed both implementations.** The export author's source
+  review caught an ambiguous heuristic clause label and imprecise whitespace
+  wording; the package now labels each row with its profile and tests BOM-only
+  input. My export review supplied a lawful same-spelling entity/context witness:
+  production revalidation/export passed, but the reader rejected its bare-ID join.
+  The handoff included the immutable SHA, exact witness files and a composite-key
+  repair direction (Fray #60). A passing baseline reader court had not covered it.
+- The exporter closed the parent pairing question after opening the linked code
+  review request. Our reciprocal intake review still shared the parent thread.
+  Closed conversation status therefore did not mean every direction of the pair
+  had completed. Keep the two exact review subjects visible; do not infer that a
+  parent's closure satisfies an unrelated pending review.
