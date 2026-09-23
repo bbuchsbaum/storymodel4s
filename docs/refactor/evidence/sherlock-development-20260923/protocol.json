@@ -1,0 +1,282 @@
+{
+  "schema": "sherlock-development-protocol/v1",
+  "issue": "bd-01M35JFJCQ2ANTVED792H705X6",
+  "productionBase": "1395ce2c",
+  "frozenPresetCommit": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+  "partition": "development",
+  "participants": [
+    {
+      "participant": "NN03_ANT_202231_final",
+      "sourceId": "recall-source-03",
+      "units": 173
+    },
+    {
+      "participant": "NN04_ATE_163931_final",
+      "sourceId": "recall-source-04",
+      "units": 96
+    },
+    {
+      "participant": "NN05_MUN_151631_final",
+      "sourceId": "recall-source-05",
+      "units": 68
+    },
+    {
+      "participant": "NN06_SQT_213031_final",
+      "sourceId": "recall-source-06",
+      "units": 104
+    },
+    {
+      "participant": "NN07_SKS_213031_final",
+      "sourceId": "recall-source-07",
+      "units": 98
+    },
+    {
+      "participant": "NN08_OLZ_224031_final",
+      "sourceId": "recall-source-08",
+      "units": 181
+    },
+    {
+      "participant": "NN11_NMA_233131_final",
+      "sourceId": "recall-source-11",
+      "units": 148
+    },
+    {
+      "participant": "NN13_DII_241731_final",
+      "sourceId": "recall-source-13",
+      "units": 338
+    },
+    {
+      "participant": "NN15_DBF_242231_final",
+      "sourceId": "recall-source-15",
+      "units": 97
+    },
+    {
+      "participant": "NN16_DBN_242731_final",
+      "sourceId": "recall-source-16",
+      "units": 89
+    },
+    {
+      "participant": "NN17_DBE_242331_final",
+      "sourceId": "recall-source-17",
+      "units": 352
+    }
+  ],
+  "settings": {
+    "environment": {
+      "STORYMODEL4S_BACKWARD_PENALTY": "hard",
+      "STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP": "false",
+      "STORYMODEL4S_CANDIDATES_PER_LEVEL": "8",
+      "STORYMODEL4S_CAPTION_CHANNEL": "embed",
+      "STORYMODEL4S_FORWARD_PENALTY": "0.0",
+      "STORYMODEL4S_LEXICAL_BLEND": "0.8",
+      "STORYMODEL4S_LEXICAL_FIELDS": "lemmas",
+      "STORYMODEL4S_MONOTONE_FILL": "on",
+      "STORYMODEL4S_MONOTONE_SCENE": "on",
+      "STORYMODEL4S_PRIOR_SCALE": "1.5",
+      "STORYMODEL4S_SOURCE_TEXT": "bare",
+      "STORYMODEL4S_STAGE_TRACE": "on"
+    },
+    "provider": "pinned-local-onnx",
+    "responseCache": "none; local model recomputed",
+    "unset": [
+      "STORYMODEL4S_SCENE_CODING",
+      "STORYMODEL4S_SCENE_CAPTIONS",
+      "STORYMODEL4S_SHUFFLE_RECALL",
+      "STORYMODEL4S_RUNG",
+      "STORYMODEL4S_WITHHOLD_KINDS"
+    ]
+  },
+  "arms": {
+    "A": {
+      "captions": null
+    },
+    "AV": {
+      "captions": "study/recall-to-video/scene-captions.json",
+      "channel": "embed",
+      "provenance": "historical caption request/outcome/frame-byte joins checked; predates receipt-checked timed-source loader; not re-executed VLM or verified frame-to-video correspondence"
+    }
+  },
+  "inputs": {
+    "annotation": {
+      "path": "sherlock/Sherlock_Segments_1000_NN_2017.tsv",
+      "base": "data",
+      "sha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296",
+      "bytes": 225692
+    },
+    "model": {
+      "path": "models/onnx/model.onnx",
+      "base": "data",
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+      "bytes": 90405214
+    },
+    "tokenizer": {
+      "path": "models/onnx/tokenizer.json",
+      "base": "data",
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+      "bytes": 466247
+    },
+    "partition": {
+      "path": "study/recall-to-video/partition.json",
+      "base": "data",
+      "sha256": "cc9958bf6d1cc6d07fde508ef7951dc90b3a85ca8744cedf5900ca60acea365f",
+      "bytes": 1461
+    },
+    "recallLineage": {
+      "path": "docs/data/sherlock/recall-lineage.json",
+      "base": "repo",
+      "sha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e",
+      "bytes": 13755
+    },
+    "repairRecord": {
+      "path": "docs/data/sherlock/timebase-repair.json",
+      "base": "repo",
+      "sha256": "b64d7ab2fa6457ebb39e7d43be48daf0fad910faa77c494c40979cd7f5f66146",
+      "bytes": 13943
+    },
+    "unitManifest": {
+      "path": "study/recall-to-video/scorer-20260919/unit-manifest.json",
+      "base": "data",
+      "sha256": "7408c72545e49895a19ed16144afe09601334d258ef1621744563b3b55e38188",
+      "bytes": 836472
+    },
+    "recall:NN03_ANT_202231_final": {
+      "path": "sherlock/recall/NN03_ANT_202231_final.csv",
+      "base": "data",
+      "sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+      "bytes": 91928
+    },
+    "recall:NN04_ATE_163931_final": {
+      "path": "sherlock/recall/NN04_ATE_163931_final.csv",
+      "base": "data",
+      "sha256": "0488180df8bc19f9307e2eed1ebc72d01958e35f8fb9ede81ce00cc82fc4c5db",
+      "bytes": 61977
+    },
+    "recall:NN05_MUN_151631_final": {
+      "path": "sherlock/recall/NN05_MUN_151631_final.csv",
+      "base": "data",
+      "sha256": "a20cc241597b6366496175c6b33706adc01afd25caf50373fe6cd03a510fc7ff",
+      "bytes": 52939
+    },
+    "recall:NN06_SQT_213031_final": {
+      "path": "sherlock/recall/NN06_SQT_213031_final.csv",
+      "base": "data",
+      "sha256": "0f9426b27251f7f0d66b4d6281584438330e682fe236b3730fa9fb456a9235a6",
+      "bytes": 91641
+    },
+    "recall:NN07_SKS_213031_final": {
+      "path": "sherlock/recall/NN07_SKS_213031_final.csv",
+      "base": "data",
+      "sha256": "797fc2996485e4013b2236e4cd54abcb73d47d147c0bf6d5a1809bc582faec04",
+      "bytes": 73435
+    },
+    "recall:NN08_OLZ_224031_final": {
+      "path": "sherlock/recall/NN08_OLZ_224031_final.csv",
+      "base": "data",
+      "sha256": "51420d0615480b749e2408b52b8d8aceba9284f6fd476b62541df17fad1cfe19",
+      "bytes": 132023
+    },
+    "recall:NN11_NMA_233131_final": {
+      "path": "sherlock/recall/NN11_NMA_233131_final.csv",
+      "base": "data",
+      "sha256": "2f0e1c6f7f727efb36ff090f6b740c7cab7c4a487f97ba2387079ae1a9e965bf",
+      "bytes": 77082
+    },
+    "recall:NN13_DII_241731_final": {
+      "path": "sherlock/recall/NN13_DII_241731_final.csv",
+      "base": "data",
+      "sha256": "18c51ec8a08c1c3ce7f33750f77c8ac709d396f7edbee60e56c5db5c6d9efa83",
+      "bytes": 240811
+    },
+    "recall:NN15_DBF_242231_final": {
+      "path": "sherlock/recall/NN15_DBF_242231_final.csv",
+      "base": "data",
+      "sha256": "9e805df1232634987dda35caccfc171a1da327dc458dd391dbdec0279d5d5ed8",
+      "bytes": 76364
+    },
+    "recall:NN16_DBN_242731_final": {
+      "path": "sherlock/recall/NN16_DBN_242731_final.csv",
+      "base": "data",
+      "sha256": "9b1213d49ccb6412c2ae51b7c0e8aacc037cadc3d9527c812261d082d2f997f5",
+      "bytes": 103293
+    },
+    "recall:NN17_DBE_242331_final": {
+      "path": "sherlock/recall/NN17_DBE_242331_final.csv",
+      "base": "data",
+      "sha256": "dc560db33ff99d502b9ff09daa20f790f068ddea858b20f4ae1e2df6c69d56c2",
+      "bytes": 196697
+    },
+    "tools/recall-study/gold_scene.py": {
+      "path": "tools/recall-study/gold_scene.py",
+      "base": "repo",
+      "sha256": "a57807352d99ff9255f7cb23e0feb9833031f133bf4d137fbcbcf4daaa525fd4",
+      "bytes": 25075
+    },
+    "tools/recall-study/scoring-config.json": {
+      "path": "tools/recall-study/scoring-config.json",
+      "base": "repo",
+      "sha256": "533ef8fdbbbd996b42faa12a7e0a6fa3984a00fbf704d28b81f86badb4f2ffb0",
+      "bytes": 382
+    },
+    "embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json": {
+      "path": "embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json",
+      "base": "repo",
+      "sha256": "d304975117bc0f77dbe5f76819d834e68d262dcf2ba7301c6bf2efa9f5fdf284",
+      "bytes": 1844
+    },
+    "caption:scene-caption-request.json": {
+      "path": "study/recall-to-video/scene-caption-request.json",
+      "base": "data",
+      "sha256": "4fd489d7c718c328321d6753d5a873ab982c4c405ead15c7ee8895a07c0a9b1c",
+      "bytes": 10691
+    },
+    "caption:scene-caption-outcome.json": {
+      "path": "study/recall-to-video/scene-caption-outcome.json",
+      "base": "data",
+      "sha256": "b56f31775ab2ca5c911e5cbee3ab08acd10e202d2bbc8701824effc91eed4c8b",
+      "bytes": 63509
+    },
+    "caption:scene-captions.json": {
+      "path": "study/recall-to-video/scene-captions.json",
+      "base": "data",
+      "sha256": "5f9595cdcb6f4fe0fb7d841c6f210673a020661812ec59c072cdaafcd3ee3834",
+      "bytes": 24365
+    },
+    "caption:scene-frames/scene-manifest.json": {
+      "path": "study/recall-to-video/scene-frames/scene-manifest.json",
+      "base": "data",
+      "sha256": "06a69083b2117bdea637572d1fb8f7245d8248cda7ee926cd23618da5285ab4e",
+      "bytes": 13831
+    },
+    "caption:scene-frames/scene-frames.bgr": {
+      "path": "study/recall-to-video/scene-frames/scene-frames.bgr",
+      "base": "data",
+      "sha256": "ac6d751bd1de4eda6b6c2db8b63bfaf39f0c316688608e63b0fcf3e44e3b2b44",
+      "bytes": 99532800
+    }
+  },
+  "gold": {
+    "path": "sherlock/Sherlock_Recall_Scene_n50_Onsets.csv",
+    "status": "not read; digest and support pin recorded at first registered freeze before predictions are imported"
+  },
+  "primary": "participant-average scene-exact accuracy for A; participant-average AV minus A scene-exact difference",
+  "secondary": [
+    "participant-average within-one-scene accuracy",
+    "pooled unit-weighted accuracy and paired differences",
+    "outcome and gold eligibility counts"
+  ],
+  "configuration": "tools/recall-study/scoring-config.json",
+  "retention": "Every one of the 11 participants retained, including no-gold outcomes. Any process or import failure blocks an aggregate until reconciled; no success-only mean.",
+  "comparisonPlan": "A versus itself to obtain fixed-support absolute per-participant rates and a zero-difference control; A versus AV once; no parameter selection. Absolute participant means are derived from eligible per-participant rates, with no additional interval invented.",
+  "historicalComparison": "Descriptive and not directly comparable to historical approximately63.8 percent pooled over15 participants; this uses development11 with eligibility from repaired support. Compare each new A TSV to same development participant in historical all17-monofill; never open other participant outputs.",
+  "restrictions": [
+    "No Friends or Memento inputs or gold",
+    "No untouched Sherlock transcripts or predictions",
+    "No remote upload/spend",
+    "No held-out, superiority, calibration, fine-time, behavioral-recovery or OpenNeuro scan-alignment claim"
+  ],
+  "goldReadCountersAtRegistration": {
+    "SherlockDevelopment": 0,
+    "Friends": 0,
+    "Memento": 0
+  }
+}
