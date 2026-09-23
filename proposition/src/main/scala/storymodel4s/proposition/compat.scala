@@ -51,7 +51,7 @@ object ChartCompatibility:
       a: PropositionChart[A],
       b: PropositionChart[B]
   ): CompatibilityReport =
-    val r = CompareCore.compare(ChartView(a), ChartView(b))
+    val r = CompareCore.compare(ChartView(a), ChartView(b), TiePolicy.Historical)
     CompatibilityReport(
       r.conceptMatch,
       r.argumentMatch,
@@ -99,8 +99,9 @@ private[proposition] enum CompareTarget[+N]:
   case Literal(value: LiteralValue)
   case Unknown
 
-/** What the compare core reads from one side. `N` is a concept handle and `R` a relation. The order
-  * on `N` is the only tie-break the core uses, so it decides whether the result depends on ids.
+/** What the compare core reads from one side. `N` is a concept handle and `R` a relation. Under
+  * [[TiePolicy.Historical]] the order on `N`, and the relation order, break ties, so they decide
+  * whether the result depends on ids. Under [[TiePolicy.OrderFree]] the order only sorts `matched`.
   */
 private[proposition] trait CompareView[N, R]:
   def order: Ordering[N]
@@ -115,6 +116,22 @@ private[proposition] trait CompareView[N, R]:
   def target(r: R): CompareTarget[N]
   def polarity(n: N): Polarity
   def embeddingKinds(n: N): Set[EmbeddingKind]
+
+/** How the compare core resolves choices that its scores leave tied.
+  *
+  * Why two policies: the chart path's published output breaks ties by view order, and historical
+  * parity pins it (S2a-0). The strict path must not: over a canonical graph, view order is a
+  * content-hash colouring that moves with focus and with lemmas that score nothing, a hidden prior
+  * ADR 0019 rejects.
+  */
+private[proposition] enum TiePolicy:
+  /** Greedy relation assignment and the view's order as the last tie-break (the chart path). */
+  case Historical
+
+  /** Every choice is the optimum of a fixed objective over all admissible choices, and choices that
+    * stay equally optimal are aggregated, never picked: see [[CompareCore]].
+    */
+  case OrderFree
 
 /** Directional result of the core, before a caller decides how to name matched heads. */
 private[proposition] final case class CoreReport[NA, NB](
@@ -331,13 +348,151 @@ private[proposition] object CompareCore:
       embeddingConflict
     )
 
-  /** Symmetric comparison: graded parts averaged over both directions, gates OR-ed. */
-  def compare[NA, RA, NB, RB](
+  // --- TiePolicy.OrderFree ----------------------------------------------------------------------
+  //
+  // Scores are multiples of 0.1 (conceptScore's constants, and 0/1 for literals and unknowns), so
+  // the order-free path sums them as integer tenths: a Double sum would depend on summation order
+  // in its last bit, and summation order is exactly what this path must not read.
+
+  private def tenths(x: Double): Long = math.round(x * 10)
+
+  /** One relation assignment's content: argument agreement in tenths, and filler-status mismatches.
+    */
+  private final case class Assigned(argSum10: Long, unknownMismatch: Int)
+
+  /** The best one-to-one assignment of role-equivalent relations under a fixed lexicographic
+    * objective: most argument agreement, then most roles matched (partiality counts a role present
+    * on both sides whose filler is unknown on one), then fewest such mismatches. The optimum's
+    * value is unique, and it determines both returned numbers, so neither depends on relation
+    * order. Greedy is not order-free even without ties: the relation visited first takes its best
+    * partner.
+    */
+  private def assignOrderFree[NA, RA, NB, RB](
+      va: CompareView[NA, RA],
+      ra: Vector[RA],
+      vb: CompareView[NB, RB],
+      rb: Vector[RB]
+  ): Assigned =
+    val s = math.min(ra.size, rb.size).toLong
+    if s == 0 then return Assigned(0L, 0)
+    // w = ts10 * k2 + k1 - mismatch. k1 > s bounds the mismatch total, k2 > k1 * s bounds the
+    // coverage term, so the three objectives never trade against each other. Every admissible
+    // edge weighs at least k1 - 1 >= 1, so leaving a pair unmatched is never better.
+    val k1 = s + 1
+    val k2 = k1 * (s + 1)
+    def mismatch(x: RA, y: RB): Int =
+      if isUnknownTarget(va, va.target(x)) != isUnknownTarget(vb, vb.target(y)) then 1 else 0
+    def ts10(x: RA, y: RB): Long = tenths(targetScore(va, va.target(x), vb, vb.target(y)))
+    val weight: Array[Array[Long]] = Array.tabulate(ra.size, rb.size) { (i, j) =>
+      if roleEquivalent(va, ra(i), vb, rb(j)) then
+        ts10(ra(i), rb(j)) * k2 + k1 - mismatch(ra(i), rb(j))
+      else 0L
+    }
+    val total = MaxWeightAssignment.solve(weight)
+    val ts = total / k2
+    val cover = total % k2
+    val matchedCount = (cover + k1 - 1) / k1
+    Assigned(ts, (matchedCount * k1 - cover).toInt)
+
+  private final case class PairEvalOF(
+      concept10: Long,
+      argSum10: Long,
+      argTotal: Int,
+      unknownMismatch: Int,
+      reversal: Boolean,
+      polarityConflict: Boolean,
+      embeddingConflict: Boolean
+  ):
+    def gateCount: Int = Seq(reversal, polarityConflict, embeddingConflict).count(identity)
+
+  private def evalPairOrderFree[NA, RA, NB, RB](
+      va: CompareView[NA, RA],
+      vb: CompareView[NB, RB],
+      pa: NA,
+      pb: NB
+  ): PairEvalOF =
+    val h = evalPair(va, vb, pa, pb) // gates are max/any over all relation pairs: order-free
+    val ra = va.relationsFrom(pa)
+    val a = assignOrderFree(va, ra, vb, vb.relationsFrom(pb))
+    PairEvalOF(
+      tenths(h.concept),
+      a.argSum10,
+      ra.size,
+      a.unknownMismatch,
+      h.reversal,
+      h.polarityConflict,
+      h.embeddingConflict
+    )
+
+  /** [[directional]] without the view order. Each head of `a` takes every partner that is best by
+    * (concept, argument agreement, fewest gates, fewest filler mismatches). Those partners agree on
+    * every graded quantity, since `argTotal` is fixed by the head of `a`, so the graded report is
+    * unique. They can still differ in WHICH gate they raise; the flags are then the union over
+    * them, the conservative reading: a contradiction present under some best reading is reported.
+    * `gated` is unaffected, because tied partners raise equally many gates. Every tied partner is
+    * listed in `matched`, so the matched SET does not depend on order; the view order only sorts
+    * it.
+    */
+  private def directionalOrderFree[NA, RA, NB, RB](
       va: CompareView[NA, RA],
       vb: CompareView[NB, RB]
   ): CoreReport[NA, NB] =
-    val ab = directional(va, vb)
-    val ba = directional(vb, va)
+    val ha = va.heads
+    val hb = vb.heads
+    if ha.isEmpty || hb.isEmpty then
+      return CoreReport(0.0, 0.0, 0.0, false, false, false, Vector.empty)
+
+    val chosen = ha.map { pa =>
+      val evals = hb.map(pb => pb -> evalPairOrderFree(va, vb, pa, pb))
+      def key(e: PairEvalOF) = (e.concept10, e.argSum10, -e.gateCount, -e.unknownMismatch)
+      val best = evals.map((_, e) => key(e)).max
+      val tied = evals.filter((_, e) => key(e) == best)
+      (pa, tied)
+    }
+
+    val concept10 = chosen.map(_._2.head._2.concept10).sum
+    val conceptMatch = concept10.toDouble / 10 / ha.size
+    val matched = chosen.filter(_._2.head._2.concept10 > 0)
+
+    var argTotal = 0
+    var argSum10 = 0L
+    var unknownMismatch = 0
+    var reversal = false
+    var polarityConflict = false
+    var embeddingConflict = false
+
+    matched.foreach { (_, tied) =>
+      val e = tied.head._2
+      argTotal += e.argTotal
+      argSum10 += e.argSum10
+      unknownMismatch += e.unknownMismatch
+      reversal ||= tied.exists(_._2.reversal)
+      polarityConflict ||= tied.exists(_._2.polarityConflict)
+      embeddingConflict ||= tied.exists(_._2.embeddingConflict)
+    }
+
+    val argumentMatch = if argTotal == 0 then conceptMatch else argSum10.toDouble / 10 / argTotal
+    val partiality = if argTotal == 0 then 0.0 else unknownMismatch.toDouble / argTotal
+    val pairs = for (pa, tied) <- matched; (pb, _) <- tied yield (pa, pb)
+    CoreReport(
+      conceptMatch,
+      argumentMatch,
+      partiality,
+      reversal,
+      polarityConflict,
+      embeddingConflict,
+      pairs.sorted(using Ordering.Tuple2(using va.order, vb.order))
+    )
+
+  /** Symmetric comparison: graded parts averaged over both directions, gates OR-ed. */
+  def compare[NA, RA, NB, RB](
+      va: CompareView[NA, RA],
+      vb: CompareView[NB, RB],
+      policy: TiePolicy
+  ): CoreReport[NA, NB] =
+    val (ab, ba) = policy match
+      case TiePolicy.Historical => (directional(va, vb), directional(vb, va))
+      case TiePolicy.OrderFree  => (directionalOrderFree(va, vb), directionalOrderFree(vb, va))
     CoreReport(
       (ab.conceptMatch + ba.conceptMatch) / 2,
       (ab.argumentMatch + ba.argumentMatch) / 2,
@@ -347,3 +502,56 @@ private[proposition] object CompareCore:
       ab.embeddingConflict || ba.embeddingConflict,
       ab.matched
     )
+
+/** Maximum-weight assignment (Hungarian algorithm), exact over integer weights.
+  *
+  * Why exact and not greedy: the strict compare needs the optimum's value to be a function of the
+  * weights alone, and greedy's answer depends on the order it visits rows. A zero weight means the
+  * pair is not admissible; callers keep every admissible weight positive, so a zero-weight slot and
+  * no assignment are the same thing. O(n^3) in the larger side.
+  */
+private[proposition] object MaxWeightAssignment:
+
+  /** The largest total weight of a one-to-one assignment of rows to columns. */
+  def solve(weight: Array[Array[Long]]): Long =
+    val rows = weight.length
+    val cols = if rows == 0 then 0 else weight(0).length
+    val n = math.max(rows, cols)
+    if n == 0 then return 0L
+    def w(i: Int, j: Int): Long = if i < rows && j < cols then weight(i)(j) else 0L
+    // Minimum-cost assignment on cost = -w over the padded square matrix; 1-based potentials.
+    val inf = Long.MaxValue / 4
+    val u = Array.fill(n + 1)(0L)
+    val v = Array.fill(n + 1)(0L)
+    val p = Array.fill(n + 1)(0) // p(j): the row assigned to column j
+    val way = Array.fill(n + 1)(0)
+    for i <- 1 to n do
+      p(0) = i
+      var j0 = 0
+      val minv = Array.fill(n + 1)(inf)
+      val used = Array.fill(n + 1)(false)
+      while p(j0) != 0 do
+        used(j0) = true
+        val i0 = p(j0)
+        var delta = inf
+        var j1 = 0
+        for j <- 1 to n do
+          if !used(j) then
+            val cur = -w(i0 - 1, j - 1) - u(i0) - v(j)
+            if cur < minv(j) then
+              minv(j) = cur
+              way(j) = j0
+            if minv(j) < delta then
+              delta = minv(j)
+              j1 = j
+        for j <- 0 to n do
+          if used(j) then
+            u(p(j)) += delta
+            v(j) -= delta
+          else minv(j) -= delta
+        j0 = j1
+      while j0 != 0 do
+        val j1 = way(j0)
+        p(j0) = p(j1)
+        j0 = j1
+    (1 to n).map(j => w(p(j) - 1, j - 1)).sum

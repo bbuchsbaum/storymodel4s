@@ -41,13 +41,14 @@ final class SemanticGraph[O <: GraphOrder] private (
     private[proposition] val polarities: Vector[Polarity],
     private[proposition] val embeddings: Vector[Set[EmbeddingKind]],
     private[proposition] val relationsOf: Vector[Vector[Int]],
-    private[proposition] val relations: Vector[SemanticRelation]
+    private[proposition] val relations: Vector[SemanticRelation],
+    private[proposition] val tiePolicy: TiePolicy
 ):
   /** Whether the chart had no concepts. An empty chart is a real chart, not a missing one. */
   def isEmpty: Boolean = kinds.isEmpty
 
   private def parts: Product =
-    (kinds, lemmas, glosses, frames, polarities, embeddings, relationsOf, relations)
+    (kinds, lemmas, glosses, frames, polarities, embeddings, relationsOf, relations, tiePolicy)
 
   override def equals(that: Any): Boolean = that match
     case g: SemanticGraph[?] => parts == g.parts
@@ -59,7 +60,8 @@ object SemanticGraph:
   private[proposition] def build[O <: GraphOrder, C <: CheckState](
       chart: PropositionChart[C],
       order: Vector[ConceptId],
-      relationOrder: Vector[PropositionRelation] => Vector[PropositionRelation]
+      relationOrder: Vector[PropositionRelation] => Vector[PropositionRelation],
+      tiePolicy: TiePolicy
   ): SemanticGraph[O] =
     val index = order.zipWithIndex.toMap
     val concepts = order.map(chart.concepts)
@@ -80,7 +82,8 @@ object SemanticGraph:
       order.map(chart.polarityOf),
       order.map(chart.embeddingKinds),
       perConcept.indices.map(i => (offsets(i) until offsets(i + 1)).toVector).toVector,
-      flat
+      flat,
+      tiePolicy
     )
 
 /** One relation of a [[SemanticGraph]]: roles and filler only, with no credence or id. */
@@ -108,7 +111,7 @@ object SemanticProjection:
         val label: ConceptId => String = id => f"${index(id)}%05d"
         val key: PropositionRelation => String =
           r => ChartIdentity.roleKey(r.role) + " " + ChartIdentity.targetKey(r.to, label)
-        Right(SemanticGraph.build(chart, order, _.sortBy(key)))
+        Right(SemanticGraph.build(chart, order, _.sortBy(key), TiePolicy.OrderFree))
 
   /** Storage-ordered projection for the historical scorers only: comparing two of these gives
     * exactly what [[ChartCompatibility.compare]] gives on the charts. Not for strict scoring.
@@ -118,7 +121,7 @@ object SemanticProjection:
   private[storymodel4s] def sourceOrder(
       chart: PropositionChart[Checked]
   ): SemanticGraph[GraphOrder.Source] =
-    SemanticGraph.build(chart, chart.conceptIds, identity)
+    SemanticGraph.build(chart, chart.conceptIds, identity, TiePolicy.Historical)
 
 /** Result of comparing two [[SemanticGraph]]s: the graded parts and gates of a
   * [[CompatibilityReport]], with whether any head matched instead of which heads did.
@@ -168,7 +171,9 @@ object SemanticCompatibility:
       a: SemanticGraph[O],
       b: SemanticGraph[O]
   ): ContentCompatibilityReport =
-    val r = CompareCore.compare(GraphView(a), GraphView(b))
+    // Both sides share `O`, hence a tie policy: canonical graphs resolve ties order-free, and
+    // source-ordered ones reproduce the chart path exactly.
+    val r = CompareCore.compare(GraphView(a), GraphView(b), a.tiePolicy)
     new ContentCompatibilityReport(
       r.conceptMatch,
       r.argumentMatch,

@@ -163,16 +163,15 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
       )
   }
 
-  // --- known defects owned by S2a-1b (mote bd-01M37EKWYZ1973TGK7JSTZC28C) ---------------------
-  // The canonical order is invariant under ids and storage, but CompareCore still breaks ties by
-  // view order, and canonical order is a content-hash order that also reads focus. These are
-  // named expected failures: when S2a-1b makes tie resolution order-free they pass, and munit
-  // reports them, so the `.fail` marker has to be removed then.
+  // --- order-free tie resolution (S2a-1b, mote bd-01M37EKWYZ1973TGK7JSTZC28C) -----------------
+  // Canonical order is a content-hash colouring that also reads focus and explicit-Unknown
+  // polarity. Under TiePolicy.Historical these laws failed (7d41e5d4 ran them as named expected
+  // failures); under OrderFree no tie reads the order at all.
 
   private def refocused(c: PropositionChart[Checked], f: Option[ConceptId]) =
     checked(c.unchecked.copy[Unchecked](focus = f))
 
-  test("KNOWN DEFECT: canonical compare depends on focus, which the graph does not hold".fail) {
+  test("canonical compare does not depend on focus, which the graph does not hold") {
     val b = canon(greedyB(dogFirst = false))
     assertEquals(
       SemanticCompatibility.compare(canon(refocused(greedyA, Some(id("p")))), b),
@@ -180,7 +179,7 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
     )
   }
 
-  test("KNOWN DEFECT: canonical compare depends on an unmatched lemma's hash".fail) {
+  test("canonical compare does not depend on the lemma of a concept that scores nothing") {
     // `c` scores 0.8 against x (gloss) and 0.0 against y under either lemma, so no concept score
     // changes. Only the canonical colour order does.
     def withLemma(l: String) =
@@ -198,6 +197,43 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
       SemanticCompatibility.compare(a, canon(withLemma("cat"))),
       SemanticCompatibility.compare(a, canon(withLemma("feline")))
     )
+  }
+
+  test("canonical compare does not depend on explicit-Unknown versus absent polarity") {
+    val b = canon(greedyB(dogFirst = false))
+    val unknown = checked(
+      greedyA.unchecked.copy[Unchecked](polarity = Map(id("x") -> Polarity.Unknown))
+    )
+    assertEquals(
+      SemanticCompatibility.compare(canon(unknown), b),
+      SemanticCompatibility.compare(canon(greedyA), b)
+    )
+  }
+
+  test("canonical argument agreement is the optimal assignment, in either storage order") {
+    // a->b: x-c (0.8) with y-d (1.0) is optimal; greedy can give y the 0.0 partner instead.
+    // b->a is 1.8 as well. The teeth test above shows the chart path giving 0.9 or 0.7.
+    for dogFirst <- Vector(false, true) do
+      assertEquals(
+        SemanticCompatibility.compare(canon(greedyA), canon(greedyB(dogFirst))).argumentMatch,
+        0.9
+      )
+  }
+
+  property("canonical compare ignores concept ids, relation storage and focus") {
+    forAll(chart, chart, Gen.chooseNum(1, 10000)) { (a, b, salt) =>
+      (SemanticProjection.canonical(a), SemanticProjection.canonical(b)) match
+        case (Right(ga), Right(gb)) =>
+          val moved = disguised(a, salt)
+          val refocused = checked(
+            moved.unchecked.copy[Unchecked](focus = moved.conceptIds.lift(salt % 7))
+          )
+          Prop(
+            SemanticCompatibility.compare(canon(refocused), gb) ==
+              SemanticCompatibility.compare(ga, gb)
+          )
+        case _ => Prop.undecided
+    }
   }
 
   // --- the chart path's gate flags can depend on ids (corrects the S2a-0 note) ----------------
@@ -252,6 +288,13 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
     // The tie goes to the larger ConceptId; the reverse direction raises no gate.
     assertEquals(gates(ChartCompatibility.compare(gateA, gateB("b1", "b2"))), (false, true))
     assertEquals(gates(ChartCompatibility.compare(gateA, gateB("b2", "b1"))), (true, false))
+  }
+
+  test("on the same head tie, the canonical path reports the union of the tied partners' gates") {
+    for (neg, rev) <- Vector(("b1", "b2"), ("b2", "b1")) do
+      val r = SemanticCompatibility.compare(canon(gateA), canon(gateB(neg, rev)))
+      assertEquals((r.polarityConflict, r.roleReversal), (true, true))
+      assert(r.gated)
   }
 
   // --- gloss twins: the default identity cannot order them, the canonical graph must ----------
