@@ -83,13 +83,27 @@ object LocalEvidence:
       strict: StrictCandidates,
       costModel: LocalCostModel
   ): Either[AlignError, LocalEvidence] =
-    val ids = recall.ordered.map(_.id)
-    val provenance = new CandidateProvenance.Strict(
-      strict.policy,
-      ids.map(u => strict.set(u).overflow),
-      ids.map(u => strict.set(u).uniformSemantic)
-    )
-    build(recall, source, strict.candidates, provenance, costModel, gate = true)
+    val snapshot = MappingBindingRender.snapshot(source)
+    def refuse(detail: String) = Left(AlignError.InconsistentResult(s"strict candidates $detail"))
+    val bound = StrictBinding.of(recall, snapshot)
+    val b = strict.binding
+    val check: Either[AlignError, Unit] =
+      if b.units != bound.units then refuse("cover different recall units or a different order")
+      else if b.recallChecksum != bound.recallChecksum || b.recallSupplement != bound.recallSupplement
+      then refuse("were generated for a different recall")
+      else if b.viewFingerprint != bound.viewFingerprint || b.scopeDigest != bound.scopeDigest then
+        refuse("were generated for a different source")
+      else if bound.units.exists(u => strict.get(u).isEmpty) then refuse("are missing a unit")
+      else Right(())
+    check.flatMap { _ =>
+      val sets = bound.units.map(u => strict.get(u).get)
+      val provenance = new CandidateProvenance.Strict(
+        strict.policy,
+        sets.map(_.overflow),
+        sets.map(_.uniformSemantic)
+      )
+      build(recall, snapshot, strict.candidates, provenance, costModel, gate = true)
+    }
 
   private def build(
       recall: RecallGraph[Checked],

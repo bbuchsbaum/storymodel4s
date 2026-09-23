@@ -164,7 +164,7 @@ class LocalEvidenceIsolationSuite extends FunSuite:
     ) =
       val sem = SemanticDistance.fromTable(t)
       val strict = StrictCandidateGenerator(sem, config)
-        .generate(recall.ordered, v)
+        .generate(recall, v)
         .fold(e => fail(e.message), identity)
       val e = LocalEvidence
         .compute(recall, v, strict, costModel.copy(semantic = sem))

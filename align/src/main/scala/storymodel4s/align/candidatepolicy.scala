@@ -1,6 +1,8 @@
 package storymodel4s.align
 
-import storymodel4s.recall.{RecallUnit, RecallUnitId}
+import storymodel4s.core.Checksum
+import storymodel4s.recall.{RecallGraph, RecallUnit, RecallUnitId}
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Why a strict candidate configuration or generation was refused.
   *
@@ -150,19 +152,50 @@ final class StrictCandidateSet private[align] (
     s"StrictCandidateSet(${set.size} anchors, overflow=${overflow.size}, " +
       s"uniform=${uniformSemantic.size})"
 
-/** Strict candidates for a set of units, with the policy that produced them. It deliberately has no
-  * `without` or `fuse`, so the policy cannot be lost by recombining sets. Use [[candidates]] to
-  * feed inference.
+/** What strict candidates were generated against: the recall (legacy checksum plus the supplement
+  * that separates absent from explicitly empty content), the exact unit order, and one source
+  * snapshot (fingerprint plus the presence-sensitive scope). [[LocalEvidence]] refuses strict
+  * candidates whose binding does not match the recall and source it is asked to price.
+  */
+final class StrictBinding private[align] (
+    val recallChecksum: Checksum,
+    val recallSupplement: Checksum,
+    val units: Vector[RecallUnitId],
+    val viewFingerprint: ViewFingerprint,
+    val scopeDigest: Checksum
+):
+  override def equals(that: Any): Boolean = that match
+    case o: StrictBinding =>
+      recallChecksum == o.recallChecksum && recallSupplement == o.recallSupplement &&
+      units == o.units && viewFingerprint == o.viewFingerprint && scopeDigest == o.scopeDigest
+    case _ => false
+  override def hashCode: Int =
+    (recallChecksum, recallSupplement, units, viewFingerprint, scopeDigest).hashCode
+  override def toString: String =
+    s"StrictBinding(units=${units.size}, recall=${recallChecksum.short()}, " +
+      s"view=${viewFingerprint.checksum.short()})"
+
+object StrictBinding:
+  private[align] def of(recall: RecallGraph[Checked], snapshot: SourceView): StrictBinding =
+    new StrictBinding(
+      AlignWire.recallChecksum(recall),
+      MappingBindingRender.recall(recall),
+      recall.ordered.map(_.id),
+      ViewFingerprint.of(snapshot),
+      MappingSourceRender.scope(snapshot.nodes)
+    )
+
+/** Strict candidates for one checked recall over one source snapshot, with the policy that produced
+  * them. It deliberately has no `without` or `fuse`, so the policy cannot be lost by recombining
+  * sets, and it holds exactly one entry per unit of the bound recall.
   */
 final class StrictCandidates private[align] (
     val policy: CandidateTiePolicy,
+    val binding: StrictBinding,
     val byUnit: Map[RecallUnitId, StrictCandidateSet]
 ):
-  def set(unit: RecallUnitId): StrictCandidateSet =
-    byUnit.getOrElse(
-      unit,
-      new StrictCandidateSet(CandidateSet.unranked, Vector.empty, Vector.empty)
-    )
+  /** The unit's strict candidates, or `None` for a unit outside the bound recall. */
+  def get(unit: RecallUnitId): Option[StrictCandidateSet] = byUnit.get(unit)
 
   /** The plain nominations for inference. The overflow and uniform-level records stay on this value
     * and on the [[LocalEvidence]] built from it.
@@ -179,17 +212,26 @@ final class StrictCandidateGenerator(
     val config: StrictCandidateConfig
 ):
 
+  /** Generate for every unit of `recall` over one snapshot of `source`, and bind the result to
+    * both.
+    */
   def generate(
-      units: Vector[RecallUnit],
-      view: SourceView
+      recall: RecallGraph[Checked],
+      source: SourceView
   ): Either[CandidateRefusal, StrictCandidates] =
-    units
+    val view = MappingBindingRender.snapshot(source)
+    recall.ordered
       .foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
         Right(Vector.empty)
       ) { (acc, u) => acc.flatMap(done => forUnit(u, view).map(s => done :+ (u.id -> s))) }
-      .map(pairs => new StrictCandidates(config.policy, pairs.toMap))
+      .map(pairs =>
+        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap)
+      )
 
-  def forUnit(unit: RecallUnit, view: SourceView): Either[CandidateRefusal, StrictCandidateSet] =
+  private def forUnit(
+      unit: RecallUnit,
+      view: SourceView
+  ): Either[CandidateRefusal, StrictCandidateSet] =
     val channel = Channels.semantic(config.space)
     val lexicalRefs: Set[SourceNodeRef] =
       if config.lexicalOverlap then CandidateGenerator.lexicalHits(unit, view).toSet else Set.empty
