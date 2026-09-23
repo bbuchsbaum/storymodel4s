@@ -1,0 +1,108 @@
+{
+  "schema": "worktree-cleanup-proposal/v1",
+  "status": "awaiting-exact-list-owner-approval",
+  "checked_utc": "2026-09-23T11:47:53.040985+00:00",
+  "main": "1395ce2c86222f3155fc4fb116a836fd2c19bb60",
+  "review": "Fray49 seq467, p1-cleanup-review; conditional GO after preservation, owner approval and immediate pre-delete recheck",
+  "worktrees": {
+    "own-the-metric": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/own-the-metric",
+      "head": "d7ffab482a37625a838d07ca40b3f57a83e9029a",
+      "clean_tracked_and_untracked": true,
+      "ancestor_of_main": true,
+      "disk_kib": 3194380
+    },
+    "rootseg": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/rootseg",
+      "head": "f1f411499271b4176c5f96c2fb9a520c6046ef8f",
+      "clean_tracked_and_untracked": true,
+      "ancestor_of_main": true,
+      "disk_kib": 3179420
+    }
+  },
+  "preservation": {
+    "created_utc": "2026-09-23T11:46:12.250927+00:00",
+    "scope": "Preserve old build logs/reports and worktree HEAD reflogs before owner-authorized cleanup",
+    "worktrees": {
+      "own-the-metric": {
+        "files": 4579,
+        "uncompressed_bytes": 24973213,
+        "archive": "data/maintenance/worktree-cleanup-20260923/own-the-metric-build-evidence.tar.gz",
+        "archive_bytes": 2179064,
+        "archive_sha256": "714bc5cb85babe48df1f947e15283a75b3dfb52d82fb9751ac944d2d21d6a00f",
+        "manifest_sha256": "10af6e602badbbb9dda554f3a1f8b68e51917fe5ce9e02aa9fb9775472ddde14",
+        "reflog_sha256": "fc36ceabd1070d158c67c18f5446980800e599d5ac968c54459427216bf6b7f6",
+        "archive_entry_hashes_verified": true
+      },
+      "rootseg": {
+        "files": 4753,
+        "uncompressed_bytes": 29759995,
+        "archive": "data/maintenance/worktree-cleanup-20260923/rootseg-build-evidence.tar.gz",
+        "archive_bytes": 2308582,
+        "archive_sha256": "0fbaa642f81323eeb5d9be35cabb91533342eec8f47ce109e5156638c31fce17",
+        "manifest_sha256": "310f5e69a80ca55b8fc212231275554496d0f7346507ef3bd0defc406ec52219",
+        "reflog_sha256": "651938f7b326bd4d5cb43621aa8475f97227e30b3f8cd5096165310f8a7753b8",
+        "archive_entry_hashes_verified": true
+      }
+    }
+  },
+  "archive_refs": [
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/17589e9c",
+      "commit": "17589e9c2a98ba677d5da9981db968abe4347437"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/254eacec",
+      "commit": "254eacecbed0741587e176df1e1d3d59c5ceddc3"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/28f82950",
+      "commit": "28f829500b57d0322eee8d8e8ed7cc924a88ed46"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/2a181646",
+      "commit": "2a1816467b0cfa82b6f1e578b756ea8f745911a7"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/3698b2f1",
+      "commit": "3698b2f173fa45c8e7c5608c519472ba8b3201a1"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/7c21995a",
+      "commit": "7c21995ad8fc091d24ae4f4ef2495a4a62e4282a"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/b4924952",
+      "commit": "b492495251997e481adcdbda8f40cfadd7180397"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/b7337d68",
+      "commit": "b7337d68cb98078d567b93081c0000548077ad53"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/own-the-metric/b91d8c5d",
+      "commit": "b91d8c5dcf1d3273b4ea2bb357242d80c86223d5"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/rootseg/039f8116",
+      "commit": "039f81162af4a946406ba7a3f5e01d4c9ed4a39d"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/rootseg/0f391122",
+      "commit": "0f391122976936c08671713cfd7975a2839a6490"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/rootseg/57139a08",
+      "commit": "57139a0813b6530c6ff4e4e79657c4e2726ae401"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/rootseg/5b1c196a",
+      "commit": "5b1c196a01cbbff75728aff2cdd08ab7c3256ee8"
+    },
+    {
+      "ref": "refs/archive/worktree-cleanup-20260923/rootseg/6b3edb89",
+      "commit": "6b3edb89beed44e406efa95831a3b721eaa3e99b"
+    }
+  ],
+  "excluded": "All other worktrees/clones, all source datasets, study outputs, branches and stashes. No deletion performed."
+}

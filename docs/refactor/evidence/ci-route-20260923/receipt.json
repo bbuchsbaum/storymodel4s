@@ -1,0 +1,81 @@
+{
+  "observed_on": "2026-09-23",
+  "repository": "bbuchsbaum/storymodel4s",
+  "visibility": "public",
+  "github_account": "bbuchsbaum",
+  "owner_choice": "Use existing GitHub-hosted runners (recommended)",
+  "route": "Existing GitHub-hosted Ubuntu matrix; no billing, visibility, credential or runner-registration changes",
+  "owner_issue": "bd-01M2TA2283FC7FSA2G7TJ1WSMN",
+  "qualification_issue": "bd-01M19G69RQCHMT2EMG11XFT4WX",
+  "remote_main_sha": "182d74aeed3b5a8bcd013de51e7024cc426c544b",
+  "run_id": 35667411311,
+  "run_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/35667411311",
+  "run_created_at": "2026-09-21T23:24:29Z",
+  "run_conclusion": "failure",
+  "jobs": [
+    {
+      "id": 106556135840,
+      "name": "Test (ubuntu-22.04, 3, temurin@17, rootJVM)",
+      "started_at": "2026-09-21T23:24:33Z",
+      "conclusion": "failure",
+      "test_step": "failure"
+    },
+    {
+      "id": 106556136064,
+      "name": "Test (ubuntu-22.04, 3, temurin@21, rootJVM)",
+      "started_at": "2026-09-21T23:24:34Z",
+      "conclusion": "cancelled",
+      "test_step": "cancelled"
+    },
+    {
+      "id": 106556136073,
+      "name": "Test (ubuntu-22.04, 3, temurin@17, rootJS)",
+      "started_at": "2026-09-21T23:24:34Z",
+      "conclusion": "cancelled",
+      "test_step": "cancelled"
+    },
+    {
+      "id": 106556136223,
+      "name": "Test (ubuntu-22.04, 3, temurin@17, rootNative)",
+      "started_at": "2026-09-21T23:24:34Z",
+      "conclusion": "cancelled",
+      "test_step": "skipped"
+    }
+  ],
+  "read_only_commands": [
+    [
+      "gh",
+      "api",
+      "repos/bbuchsbaum/storymodel4s",
+      "--jq",
+      "{full_name,visibility,default_branch}"
+    ],
+    [
+      "git",
+      "ls-remote",
+      "origin",
+      "refs/heads/main"
+    ],
+    [
+      "gh",
+      "api",
+      "repos/bbuchsbaum/storymodel4s/actions/runs/35667411311/jobs?per_page=100"
+    ],
+    [
+      "gh",
+      "run",
+      "view",
+      "35667411311",
+      "--repo",
+      "bbuchsbaum/storymodel4s",
+      "--job",
+      "106556135840",
+      "--log-failed"
+    ]
+  ],
+  "log_read_exit": 0,
+  "raw_log_bytes": 423135,
+  "raw_log_sha256": "8fbba971860c95f8271543e5457c6c86d2328ef84d7e79b397bf226e61b02992",
+  "archive_sha256": "481b09ad5ed3b754ee94a20fd0cd24b0371ccf0b7cd8e3355ea96490c2a30aef",
+  "qualification": "Executed historical CI failure only; no current-main green hosted run, push, deployment or release performed."
+}

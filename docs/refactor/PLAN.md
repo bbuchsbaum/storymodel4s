@@ -358,25 +358,48 @@ Reuse the mapper epic as the delivery container. Keep original rationale in Mote
 retain a complete before/after reconciliation. Close only demonstrated landed work, explicitly
 superseded duplicates, or retired fleet duties. Broad old defects with incomplete evidence remain
 open with a remaining-work statement; they are not closed merely to make the count smaller.
-Remove stale assignees and doing/review states. No claims, reservations or candidates are created
-for this single-developer planning exercise.
+Remove stale assignees and doing/review states. The 2026-09-19 reconciliation was a
+single-developer planning exercise. For the owner-directed cooperative P1 push on
+2026-09-23, Mote carries current ownership and exact path reservations; Fray thread 49
+on the existing shared board carries routing, reviews and handoffs.
 
-Use lane tags and dependency-filtered queries from BACKLOG. The active product queue is
-the M1 chain at the top of this document: finish the current G1 implementation, publish
-the checked workspace packet, then qualify StoryAtlas adoption and interaction. Completed
+Use lane tags and dependency-filtered queries from BACKLOG. M1 is complete locally; its
+[canonical charter](goals/source-recall-workspace-m1-20260922.md) retains the exact
+producer/consumer acceptance evidence. The active 1.0 queue starts with the strict build
+gate repair and the stable-type decision, then the remaining shared-evidence and
+source-ingestion/compile/export paths. The bounded Sherlock development reproduction
+can proceed independently under its preregistered admission rules. Completed
 baseline/scorer/clock/S0 work remains prerequisite evidence, not another execution queue.
 The temporal workflow extends this with bounded downstream tickets. Benchmark campaigns,
 corpus expansion, interview enhancements and fleet-tool defects remain separate. No
 benchmark win or optional hosted provider sits on the preview/film path.
 
-Remaining owner input is bounded: the CI account/runner route (deferred by the owner on
-21 September 2026: local exact-SHA gates qualify engineering meanwhile, and G5 stays open);
-per-corpus hosted transmission and spend only if those arms are pursued; human-coding resources
+The CI route is decided on 23 September 2026: use the existing GitHub-hosted Ubuntu
+runners, with no billing, visibility or credential changes. The
+[route receipt](evidence/ci-route-20260923/README.md) shows that the latest observed hosted
+run reached tests; the prior startup block is historical. The separate exact-revision
+hosted qualification and G5 release gates remain open.
+
+The owner approved the [1.0 stability boundary](../api-stability.md) on 23 September:
+stable mapping/source contracts and their required estimate/result values;
+experimental inference implementation, feature builders, organization readouts and
+narrative compiler. The final signature/construction audit and release gates remain
+required. `Estimate` eligibility must be repaired before the freeze; the deferred
+signature/licensing API work moves to P3.
+
+The owner-approved removal of two audited merged worktrees is recorded in the
+[cleanup receipt](evidence/worktree-cleanup-20260923/README.md); other directories
+remain outside that approval.
+
+Remaining owner input is bounded: per-corpus hosted transmission and spend only if
+those arms are pursued; human-coding resources
 before recruitment; missing commercial clips only for those media tracks. Film claim licensing
 was decided on 21 September 2026 (alternative A, see the
 [F0 decision record](evidence/film-f0-claim-status-20260921/README.md)). None requires guessing
 permission now. Hash policy and measurement
-architecture are decided here; P1 scope reduction is not adopted.
+architecture follow the operative decisions; the 22 September scope decisions move
+film compilation and organization analysis to 1.1 while preserving the declared 1.0
+mapping and ingestion deliverables.
 
 After each gate, demonstrate one actual user journey and name the next failing witness. Do not
 start contextual measurement or joint inference until reference recovery has identified a

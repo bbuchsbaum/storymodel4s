@@ -4,6 +4,114 @@ This records the D1A/D1B source migration for library callers. The design decisi
 are in [ADR 0007](adr/0007-film-source-representation.md). D1B qualification is
 pending; this page describes the candidate API, not a release certification.
 
+## Owner-approved 1.0 stability boundary (2026-09-23)
+
+**Owner approved on 2026-09-23; not an API freeze or a release certificate.**
+The governing decision is `bd-01M35JGSMRABV1ANW341W76JWV`; the release gate is
+`bd-01M2TAMJ95K9D7H248A8387YW4`. The classifications below describe the intended
+1.0 contract. Unimplemented entries still require their existing delivery and
+construction-audit gates. The owner confirmed stable mapping/source contracts and
+their required `Estimate`/`HsmmResult` values, experimental inference and narrative
+implementation APIs, and the linked dispositions below. The final symbol audit
+and release gates remain required; this decision does not freeze unfinished APIs.
+
+Stable means a supported public contract from 1.0.0 onward. Experimental means
+usable and tested where qualified, but its Scala API can change in 1.x with a
+migration note. Internal means implementation or test machinery, with no supported
+consumer entry point. Availability and scientific validity are separate from all
+three classifications. Experimental production paths still owe their correctness,
+missingness, permission and evidence checks.
+
+| Package or type family | Intended 1.0 status | Reason and boundary |
+| --- | --- | --- |
+| `core`: IDs, checksums, text spans, surface axes, source bundles, typed evidence/support, provenance and permission values used by the public mapping contracts | Stable | These identify observations and exact evidence; consumers must be able to join and inspect them without depending on an estimator. |
+| `proposition`: `PropositionChart`, `PropositionEvidence` and their checked value vocabulary | Stable | Canonical local semantic evidence appears in source and recall values. Parser output quality remains a separate claim. |
+| `recall`: `RecallUnit`, roles/modalities, `RecallInventory` and checked observation identity | Stable | One fixed inventory and explicit unit outcomes are the public accounting contract. |
+| `recall`: automatic segmenter heuristics and tuning configuration | Experimental | A named/versioned segmentation profile identifies output; its implementation can evolve without changing old artifact identities. |
+| `align`: `SourceView`, `NodeSummary`, source references, typed physical support, scoring positions and the value types in their public signatures | Stable | D1B's text/media distinction and exact support are part of the preserved public source commitment. |
+| `features`: `Estimate`, `ScoreEstimate`, `Coverage`, missingness/reason values and other values exposed by the stable source/mapping signatures | Stable after the missingness repair | `SourceView` already exposes these types; their constructor and pattern-match shapes must be settled before freezing it. |
+| `features`: `FeatureTrack`, planning/reducer APIs and feature derivation machinery not exposed by stable signatures | Experimental | Keep research feature construction extensible; artifact identity and declared reducer semantics remain exact. |
+| `align`: checked G1 mapping records, candidate/outcome/measure/decision vocabulary, support assessments, bindings and stage receipts | Stable | These are the inspectable, complete-accounting consumer result and preserve unknown provenance and unavailable calibration. |
+| Public mapping facade, named configuration/profile inputs and checked run envelope (implementation pending) | Stable target | Researchers need one supported invocation boundary; the existing facade/profile tickets must first implement and qualify it. No proposed spelling is frozen here. |
+| Registered shared-evidence and channel receipt values exposed by the public facade (completion pending) | Stable target | Reference and reconstruction must consume the same admitted evidence. The current engine identity alone does not establish a complete execution receipt. |
+| Declared candidate tie policy, budget and typed overflow/refusal receipt values exposed by that facade (implementation pending) | Stable target | Identifier-independent tie handling and explicit refusal belong to the public evidence contract; the final names and checked constructors still require implementation and audit. |
+| `align`: `HsmmResult` and the checked result values required by `DerivationContext`/G1 result binding | Stable structural result | The current contextual mapping decoder exposes this dependency. Checked structural consistency does not certify a custom cost invocation or calibration. |
+| `align`: `GraphHsmm`, current engine `LocalEvidence`/`LocalEvidenceId` construction, `CandidateGenerator`/`CandidateSet`, custom `LocalCostModel` and low-level inference/ablation configuration | Experimental | Research extension points remain available; promote exact public dependencies if the final stable facade exposes them. No universal invocation-authenticated or calibrated-HSMM claim follows. |
+| `align`: `RecallSignature`, `WeightedCoverage`, `MassRatio`, `StepMass` and the organization/readout helpers | Experimental | Organization measurement is 1.1 scope; residual denominator, grain and constructor work must not be implied complete by the 1.0 mapping release. |
+| `codec`: contextual mapping/workspace readers, checked exchange writer and their public error/context/result values | Stable | An independent consumer must be able to validate exact joins and refusals. Wire/schema compatibility is separately versioned below. |
+| G2 mapping exchange tables and manifests; new source/StoryModel export formats | Stable versioned format target | Retain exact accounting, declared loss and input identities. Each format still needs its own schema, independent reader and acceptance evidence before release. |
+| `story`: `StoryModel`, narrative ontology and source adapters; `document`: `NarrativeCompiler` and proposal payloads including `CausalProposal` | Experimental | The owner chose an experimental narrative compiler for 1.0 and a film compiler for 1.1. Real-text validation and honest abstention remain required. |
+| `acquire`, `amr-interop`, `embed-core`, `embed-grakern`, parser/agent-provider implementation APIs | Experimental, except signature dependencies explicitly promoted by the audit | Provider runtimes and acquisition strategies can evolve; public mapping receipts must still name exact inputs, model/configuration and outcomes. |
+| `media` and `corpus-intake` Scala adapters and worker protocols | Experimental | Their 1.0 ingestion commands owe the checked source-package contract, exact media receipts and offline missing-capability behavior; this does not freeze adapter internals. |
+| `pipeline`: documented released commands and their versioned machine-readable receipts | Stable command target | The release-infrastructure ticket still owes installation without a source checkout and tested argument/exit/receipt behavior. |
+| `pipeline`: orchestration helpers and implementation classes | Internal | Only documented public entry points carry the command contract. |
+| `fixtures`, `laws` and `MappingMiniature` | Experimental test support | Published test support carries no scientific authority and is not the production source contract. |
+| `embed-bench`, workers, test harnesses and repository tools | Internal | Reproduction tools are version-pinned evidence producers, not the researcher-facing library API. |
+| Other public symbols not covered above | Experimental pending audit | Public visibility alone is not a stability declaration; the construction audit must resolve any symbol required by a stable contract. |
+
+### Signature closure before the freeze
+
+The pre-freeze audit `bd-01M19N0W937KVZCK78F6X57X1D` must enumerate the actual stable
+symbols and their public argument, return, parent and constructor types. A type
+reachable through those signatures cannot remain experimental under a stable
+promise: promote and audit it, or revise the boundary before the owner confirms
+the final freeze. This is a release blocker, not permission to publish a mixed
+stable/experimental signature silently.
+
+A concrete current dependency is `align/source.scala`: source values expose
+`Estimate`, `Coverage`, `MissingReason` and proposition/recall values. Consequently
+marking all of `features` experimental would leave the `SourceView` promise
+incomplete. The narrower stable estimate family above is deliberate; it does not
+freeze every feature builder or reducer. A second current dependency is
+`codec.DerivationContext.result: HsmmResult`; the structural result type is therefore
+included in the stable closure while the inference engine remains experimental.
+
+The construction audit must follow that result closure into `StructuralCoverage`
+(through `CostBreakdown.sourceChartCoverage`) and `TransitionFlow`/`FlowStep`
+(through `HsmmResult.flow`). Their public case-class constructors can currently
+create values that violate the coverage-count or finite/nonnegative-mass
+invariants checked by enclosing records. Alongside the existing `Admissibility`
+repair, settle these construction boundaries before freezing the result family;
+enclosing validation does not make each independently constructible value checked.
+
+### Approved linked decisions
+
+| Issue | Approved disposition | Release consequence |
+| --- | --- | --- |
+| `bd-01M17GC475EPDVW5Z4D776AYH0` (typed narrative licensing basis) | P3; proposal payloads remain experimental. Preserve the conservative `Hypothesized` floor. | No new pre-freeze licensing API is required. This does not waive the real-text/abstention court. |
+| `bd-01M17AGFAVE90MA9QS50V0FTZD` (signature support grain) | P3 together with experimental `RecallSignature`. | Remove its direct edge to the 1.0 release gate and amend that gate's corresponding acceptance text. |
+| `bd-01M16E05TWX28QKJF2GFY67ZZV` (`RecallSignature` migration) | P3; keep the unresolved denominator/constructor work explicit. | No stable organization-readout claim in 1.0; new public mapping records must not inherit these ambiguities. |
+| `bd-01M16DBEH9PKER423BZ47ZKBMV` (`Estimate` eligibility) | Keep P2 and make the repair an explicit pre-freeze prerequisite. | Add the missing typed eligibility state and its laws before freezing the stable estimate family; do not turn ineligible into missing or zero. |
+| `bd-01M1DA6NJXYT4NEA18745FM3KY` (general HSMM invocation authentication) | Keep P2 as a separately scoped authority/claim gate. | Remove only its direct edge to the 1.0 release gate; universal authenticated/calibrated HSMM totals are not advertised. Strict reference still requires its bounded executed-producer receipts and rejects unknown provenance. |
+
+The forgeable `Admissibility` repair, platform-labelled goldens and Native numeric
+governance remain release requirements. This decision removes no demonstrated
+scientific or construction defect merely because a type becomes experimental.
+It narrows which API shapes must be frozen for the declared 1.0 product.
+
+### Compatibility and rejected alternatives
+
+The first `1.0.0` release establishes the binary baseline. The publishing ticket
+`bd-01M2TAKTB61XNXV4Y6A9J3CB0C` must enable MiMa against that baseline for later
+1.0.x/1.x releases and prove that a breaking stable-symbol change is caught.
+Experimental/internal exclusions must be explicit, scoped and reviewed; a broad
+filter cannot hide a stable API break. Before 1.0.0 there is no claimed binary
+compatibility baseline. Cross-platform and source/wire compatibility still need
+their own checks; MiMa alone establishes none of them.
+
+Existing `mapping-record/v0.1`, workspace and exchange schema tags retain their
+current meanings. A changed required field or interpretation needs a new schema
+and explicit migration/refusal behavior. A stable Scala boundary does not silently
+upgrade an old artifact, confer export permission, or turn raw/model-conditional
+values into calibrated probabilities.
+
+Rejected: freezing every public package at once (would pull deferred compiler and
+organization API work back into 1.0); marking all features experimental while
+promising stable `SourceView` (leaks unstable signature types); making every
+inference engine/custom scorer stable (confuses the public mapping contract with
+research extension points); and using stability labels to assert algorithmic
+validity, calibration or a green release gate.
+
 ## Physical support and scoring position
 
 `NodeSummary.support` and `CellCoordinates.sourceSupport` are `TypedSupport`.

@@ -1,0 +1,17 @@
+{
+  "command": [
+    "lsof",
+    "-nP",
+    "-a",
+    "-d",
+    "cwd",
+    "-F",
+    "pn"
+  ],
+  "exit": 0,
+  "checked_at_utc": "2026-09-23T11:27:13.292700+00:00",
+  "raw_sha256": "6fd42889336865c8fc7cde814061280eb12174139d9b85fc0f8dbb854a0ddb11",
+  "raw_file": "/private/tmp/storymodel-cleanup-cwd-20260923.txt",
+  "stderr": "",
+  "matches": []
+}

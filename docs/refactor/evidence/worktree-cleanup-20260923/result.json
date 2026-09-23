@@ -1,0 +1,31 @@
+{
+  "schema": "worktree-cleanup-result/v1",
+  "completed_utc": "2026-09-23T11:51:22.217790+00:00",
+  "owner_authorization": "Owner explicitly approved removal of both exact audited paths on 2026-09-23",
+  "removed": [
+    {
+      "name": "own-the-metric",
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/own-the-metric",
+      "head": "d7ffab482a37625a838d07ca40b3f57a83e9029a",
+      "git_worktree_remove_exit": 0
+    },
+    {
+      "name": "rootseg",
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/rootseg",
+      "head": "f1f411499271b4176c5f96c2fb9a520c6046ef8f",
+      "git_worktree_remove_exit": 0
+    }
+  ],
+  "final_lsof_exit": 0,
+  "final_lsof_stderr_bytes": 0,
+  "final_lsof_path_matches": 0,
+  "final_lsof_sha256": "dd3f3bfc51e240cf63daa772bcf5115373e23430c64ab2ad18cc26cc230f84f9",
+  "all_preserved_archive_and_source_entry_hashes_rechecked": true,
+  "archive_refs_verified": 14,
+  "branch_stash_and_archive_refs_unchanged": true,
+  "free_bytes_before": 26316333056,
+  "free_bytes_after": 32771567616,
+  "free_bytes_delta": 6455234560,
+  "removed_disk_kib": 6373800,
+  "other_worktrees_untouched": true
+}
