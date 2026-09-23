@@ -42,7 +42,10 @@ class MappingExchangeCliSuite extends FunSuite:
       assertEquals(stderr, Vector.empty)
       assertEquals(stdout.size, 1)
       val receipt = parse(stdout.head).toOption.get.hcursor
-      assertEquals(receipt.get[String]("schemaVersion").toOption.get, MappingExchangeCli.ReceiptSchema)
+      assertEquals(
+        receipt.get[String]("schemaVersion").toOption.get,
+        MappingExchangeCli.ReceiptSchema
+      )
       assertEquals(receipt.get[String]("status").toOption.get, "complete")
       assertEquals(receipt.get[String]("policy_id").toOption.get, selected.id.value)
       assertEquals(receipt.get[String]("input_sha256").toOption.get, Checksum.ofText(text).hex)
@@ -51,12 +54,21 @@ class MappingExchangeCliSuite extends FunSuite:
         receipt.get[String]("manifest_sha256").toOption.get,
         Checksum.ofBytes(Files.readAllBytes(output.resolve("manifest.json"))).hex
       )
-      assertEquals(Files.readString(output.resolve("mapping.json")), MappingCodecs.encode(selected.record))
+      assertEquals(
+        Files.readString(output.resolve("mapping.json")),
+        MappingCodecs.encode(selected.record)
+      )
       val (again, nextOut, nextErr) = invoke(input.toString, selected.id.value, output.toString)
       assertEquals(again, 2)
       assertEquals(nextOut, Vector.empty)
-      assertEquals(parse(nextErr.head).toOption.get.hcursor.get[String]("error").toOption.get, "OutputExists")
-      assertEquals(Files.readString(output.resolve("mapping.json")), MappingCodecs.encode(selected.record))
+      assertEquals(
+        parse(nextErr.head).toOption.get.hcursor.get[String]("error").toOption.get,
+        "OutputExists"
+      )
+      assertEquals(
+        Files.readString(output.resolve("mapping.json")),
+        MappingCodecs.encode(selected.record)
+      )
     }
   }
 
@@ -75,14 +87,20 @@ class MappingExchangeCliSuite extends FunSuite:
       assertEquals(stdout, Vector.empty)
       assertEquals(stderr.size, 1)
       assert(!stderr.head.contains("secret"))
-      assertEquals(parse(stderr.head).toOption.get.hcursor.get[String]("error").toOption.get, expected)
+      assertEquals(
+        parse(stderr.head).toOption.get.hcursor.get[String]("error").toOption.get,
+        expected
+      )
     }
   }
 
   test("unknown policy refuses without output or leaked input text") {
     temporary { root =>
       val input = root.resolve("input.json")
-      Files.writeString(input, WorkspaceArchiveCodec.encode(workspace.archive.manifest).toOption.get): Unit
+      Files.writeString(
+        input,
+        WorkspaceArchiveCodec.encode(workspace.archive.manifest).toOption.get
+      ): Unit
       val output = root.resolve("must-not-exist")
       val (status, stdout, stderr) = invoke(input.toString, "unknown-policy", output.toString)
       assertEquals(status, 2)

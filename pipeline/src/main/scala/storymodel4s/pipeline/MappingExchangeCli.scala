@@ -33,15 +33,15 @@ private[pipeline] object MappingExchangeCli:
 
   private def failure(error: Refusal): Json =
     val (code, reason) = error match
-      case Refusal.Arguments     => ("Arguments", None)
-      case Refusal.InvalidPolicy => ("InvalidPolicy", None)
-      case Refusal.InvalidPath   => ("InvalidPath", None)
+      case Refusal.Arguments       => ("Arguments", None)
+      case Refusal.InvalidPolicy   => ("InvalidPolicy", None)
+      case Refusal.InvalidPath     => ("InvalidPath", None)
       case Refusal.Producer(value) =>
         value match
           case MappingExchangeBuild.Error.Workspace(value) =>
             ("WorkspaceRefused", Some(value.toString))
-          case MappingExchangeBuild.Error.Exchange(_) => ("ExchangeRefused", None)
-          case MappingExchangeBuild.Error.InputRead   => ("InputRead", None)
+          case MappingExchangeBuild.Error.Exchange(_)  => ("ExchangeRefused", None)
+          case MappingExchangeBuild.Error.InputRead    => ("InputRead", None)
           case MappingExchangeBuild.Error.OutputExists => ("OutputExists", None)
           case MappingExchangeBuild.Error.OutputWrite  => ("OutputWrite", None)
     val fields = Vector(
