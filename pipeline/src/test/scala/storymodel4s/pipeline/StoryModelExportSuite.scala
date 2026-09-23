@@ -368,9 +368,14 @@ class StoryModelExportSuite extends FunSuite:
     }
   }
 
-/** Writes the War of the Ghosts export used by `examples/storymodel-export`. */
+/** Writes the War of the Ghosts export used by `examples/storymodel-export`; with `--json PATH`
+  * writes the fixture's `storymodel.json` instead, as input for the `storyModelExport` command.
+  */
 object StoryModelExportExample:
   def main(args: Array[String]): Unit =
-    StoryModelExportBuild.write(WarOfTheGhostsModel.model, Path.of(args(0))) match
-      case Right(digest) => println(digest.hex)
-      case Left(error)   => sys.error(error.toString)
+    if args.headOption.contains("--json") then
+      Files.writeString(Path.of(args(1)), StoryModelCodec.encode(WarOfTheGhostsModel.model)): Unit
+    else
+      StoryModelExportBuild.write(WarOfTheGhostsModel.model, Path.of(args(0))) match
+        case Right(digest) => println(digest.hex)
+        case Left(error)   => sys.error(error.toString)
