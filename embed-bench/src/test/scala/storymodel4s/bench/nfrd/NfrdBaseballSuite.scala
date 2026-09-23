@@ -1,6 +1,6 @@
 package storymodel4s.bench.nfrd
 
-import storymodel4s.corpus.{ReadOperation, RelativeArtifactPath, RootIssue}
+import storymodel4s.corpus.{RelativeArtifactPath, RootIssue}
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, LinkOption, Path}
