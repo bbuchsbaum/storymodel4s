@@ -1,6 +1,5 @@
 package storymodel4s.align
 
-import cats.syntax.all.*
 import storymodel4s.core.{Checksum, TypedSupport}
 import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
@@ -678,22 +677,34 @@ object GraphHsmm:
       costModel: LocalCostModel,
       config: HsmmConfig = HsmmConfig.default
   ): Either[AlignError, HsmmResult] =
-    val units = recall.ordered
-    if units.isEmpty then Left(AlignError.EmptyRecall)
-    else
-      run(units, recall, view, candidates, costModel, config, gate = true).flatMap {
+    LocalEvidence
+      .compute(recall, view, candidates, costModel, gate = true)
+      .flatMap(infer(recall, view, _, config))
+
+  /** Gated inference over precomputed [[LocalEvidence]]. The evidence must have been computed with
+    * the gate on, for this recall and this view; anything else is refused before inference runs.
+    */
+  def infer(
+      recall: RecallGraph[Checked],
+      source: SourceView,
+      evidence: LocalEvidence,
+      config: HsmmConfig
+  ): Either[AlignError, HsmmResult] =
+    // One snapshot is bound, inferred over and validated, so a view that answers differently on a
+    // later read cannot pass the binding check with one source and be inferred over with another.
+    val view = MappingBindingRender.snapshot(source)
+    LocalEvidence.bound(evidence, recall, view, gate = true).flatMap { _ =>
+      run(recall.ordered, recall, view, evidence, config).flatMap {
         case (post, flow, path, logZ, costs, adm, passes) =>
           // The engine proves its own output: a gate violation here would be a bug, and it surfaces
           // as a typed error rather than an unproven result (law: every infer output validates). The
           // anchors it used are handed over as the nominated set — candidates that are not nodes of
-          // the view are dropped here and from the cost keys (`run`), never nominated: the proof
+          // the view were dropped when the evidence was computed, never nominated: the proof
           // refuses absent anchors, and an unreachable candidate is a nomination error, not a state.
           HsmmResult.validated(
             recall,
             view,
-            candidates
-              .anchorsByUnit(units.map(_.id))
-              .map((u, refs) => u -> refs.filter(ref => view.node(ref).nonEmpty)),
+            evidence.units.zip(evidence.nominated).toMap,
             post,
             flow,
             path,
@@ -703,6 +714,7 @@ object GraphHsmm:
             Some(AdmissibilityEcho.of(adm))
           )
       }
+    }
 
   /** Ungated inference for ablations: every candidate is admitted in the faithful mode and no
     * distorted state exists. Returns an [[AblationResult]], never an `HsmmResult`.
@@ -714,13 +726,13 @@ object GraphHsmm:
       costModel: LocalCostModel,
       config: HsmmConfig = HsmmConfig.default
   ): Either[AlignError, AblationResult] =
-    val units = recall.ordered
-    if units.isEmpty then Left(AlignError.EmptyRecall)
-    else
-      run(units, recall, view, candidates, costModel, config, gate = false).map {
-        case (post, _, path, logZ, _, _, _) =>
-          AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ, config.layerUse)
-      }
+    val snapshot = MappingBindingRender.snapshot(view)
+    for
+      evidence <- LocalEvidence.compute(recall, snapshot, candidates, costModel, gate = false)
+      out <- run(recall.ordered, recall, snapshot, evidence, config)
+    yield
+      val (post, _, path, logZ, _, _, _) = out
+      AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ, config.layerUse)
 
   private type Costs = Map[RecallUnitId, Map[AlignState, CostBreakdown]]
   private type Adm = Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]
@@ -729,53 +741,21 @@ object GraphHsmm:
       units: Vector[RecallUnit],
       recall: RecallGraph[Checked],
       view: SourceView,
-      candidates: Candidates,
-      costModel: LocalCostModel,
-      config: HsmmConfig,
-      gate: Boolean
+      evidence: LocalEvidence,
+      config: HsmmConfig
   ): Either[
     AlignError,
     (AlignmentMatrix, TransitionFlow, Vector[AlignState], Double, Costs, Adm, Int)
   ] =
     val tau = config.temperature
 
-    // 1. The mode gate (prepass): which (anchor, mode) pairs exist for each unit. The cost model
-    //    is consulted only for those pairs.
-    val admissibility: Vector[Map[SourceNodeRef, Admissibility]] = units.map { u =>
-      candidates
-        .set(u.id)
-        .ranked
-        .flatMap { ref =>
-          view.node(ref).map { n =>
-            ref -> (if gate then ModeGate.assess(u, n, view) else Admissibility.faithfulOnly)
-          }
-        }
-        .toMap
-    }
+    // 1. The mode gate and local prices come from the evidence, computed once for every consumer
+    //    (LocalEvidence.compute). Nothing below re-prices a state.
+    val admissibility = evidence.admissibility
     val checkedBreakdowns: Either[AlignError, Vector[Map[AlignState, CostBreakdown]]] =
-      units.zip(admissibility).traverse { (u, adm) =>
-        val set = candidates.set(u.id)
-        // Candidates absent from the view are dropped (not priced, not nominated): the gated
-        // result carries only anchors the proof can re-derive on this view.
-        val sources = set.ranked.flatMap { ref =>
-          view.node(ref).toVector.flatMap { n =>
-            adm(ref).modes.map(m => AlignState.anchored(ref, m) -> costModel.cost(u, n, m, view))
-          }
-        }
-        val externals =
-          if set.abstained && set.ranked.isEmpty then Vector(AlignState.unranked)
-          else AlignState.externals
-        val ext = externals.traverse {
-          case s @ AlignState.External(x) =>
-            CostBreakdown.external(costModel.externalCost(u, x)).map(s -> _)
-          case s => Right(s -> CostBreakdown.unreachable)
-        }
-        ext.map(values => (sources ++ values).toMap)
-      }
+      Right(evidence.breakdowns)
     checkedBreakdowns.map { breakdowns =>
-      val states: Vector[Vector[AlignState]] = breakdowns.map { m =>
-        m.toVector.collect { case (s, b) if !b.excluded => s }.sortBy(_.key)
-      }
+      val states: Vector[Vector[AlignState]] = evidence.states
       val baseCost: Vector[Map[AlignState, Double]] =
         breakdowns.zip(states).map { (m, ss) => ss.map(s => s -> m(s).total).toMap }
 
