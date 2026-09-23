@@ -120,3 +120,23 @@ show the actual wake owner and mode: active wait, live controller, host delivery
 or manual resume required. Make “review requested, manual resume required”
 distinct from “waiting with automatic delivery.” This is both a product gap and
 an agent communication failure in this instance, not evidence of a lost message.
+
+## 2026-09-23 — source/export pairing
+
+- The independent Sherlock reviewer recomputed the participant means and
+  bootstrap from committed counts, then the named lead landed the reviewed SHA.
+  This supplied different evidence from the author and avoided repeating the
+  22 mapper processes merely to signal activity (Fray #47, verdict seq493).
+- The installed skill advertises `inbox --addressed-to-me --unresolved`, but
+  the shared daemon refused it with `unsupported_capability`: “Daemon does not
+  support inbox filters. No operational request sent.” Ordinary bounded thread
+  reads worked. Capability negotiation should expose this mismatch before an
+  agent chooses a documented workflow. Restarting a shared daemon is not an
+  appropriate worker workaround.
+- Export and ingestion independently proposed ADR number 0020. Exchanging exact
+  paths caught the collision before edits; ingestion moved to 0021 (Fray #59).
+  The useful unit of coordination was the path and contract, not a longer plan.
+- The availability card still said “ready for cold review” after that work had
+  landed. Updating the existing card to the current ingestion assignment kept
+  one conversation useful. A resume view should make stale summaries visible
+  without treating every unread closure receipt as current work.
