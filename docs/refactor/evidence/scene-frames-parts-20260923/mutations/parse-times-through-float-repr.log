@@ -1,0 +1,29 @@
+test_parser_decides_ties_on_source_decimal_text (__main__.SceneFramesSuite.test_parser_decides_ties_on_source_decimal_text) ... FAIL
+
+======================================================================
+FAIL: test_parser_decides_ties_on_source_decimal_text (__main__.SceneFramesSuite.test_parser_decides_ties_on_source_decimal_text)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-502/-Users-bbuchsbaum-code-scala-storymodel4s/63584fa3-48af-48a9-bee1-3634dd25a543/scratchpad/scene-parts/tools/recall-study/tests/test_extract_scene_frames.py", line 109, in test_parser_decides_ties_on_source_decimal_text
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        parsed_counts(
+        ^^^^^^^^^^^^^^
+    ...<2 lines>...
+        [1, 7],
+        ^^^^^^^
+    )
+    ^
+AssertionError: Lists differ: [2, 6] != [1, 7]
+
+First differing element 0:
+2
+1
+
+- [2, 6]
++ [1, 7]
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

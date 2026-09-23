@@ -1,0 +1,9 @@
+{
+  "frozenManifestSha256": "06a69083b2117bdea637572d1fb8f7245d8248cda7ee926cd23618da5285ab4e",
+  "frozenStraddlingScenes": [],
+  "scenes": 50,
+  "refused": 0,
+  "multiPartPlans": 0,
+  "offsetsIdenticalToV1": 50,
+  "extentsUnderHalfSecond": []
+}
