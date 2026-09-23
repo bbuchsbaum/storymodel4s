@@ -1,0 +1,50 @@
+{
+  "base": "05e0c3627f89a156784a4ee2ce2be1bbb14fe35b",
+  "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+  "old": "val checkedView = MappingBindingRender.snapshot(view)",
+  "new": "val checkedView = view",
+  "source_sha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+  "mutant_sha256": "fd25f39d2cacb9757a7cc2a333abca99874880c0cdae14477d0ccdc0bc9598f3",
+  "exit_code": 1,
+  "restored_sha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+  "logs": {
+    "p1-snapshot-jvm-control": {
+      "raw_sha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b",
+      "gz_sha256": "c9633d987d63831ae67a28e866d27d4eb52e49b815f53f32de02e981d8182e5c",
+      "exit_code": 1,
+      "reason": "exited"
+    },
+    "p1-snapshot-jvm-control-authorized": {
+      "raw_sha256": "a70bdd792be11d40f390095fa99c97f37ca75f524d68ec01c89b5512ed3b5943",
+      "gz_sha256": "28d263aa71275e87b32d8c6acdfc44be6c75d90caa8bffb768242c8533fe7fb8",
+      "exit_code": 0,
+      "reason": "exited"
+    },
+    "p1-snapshot-jvm-mutant": {
+      "raw_sha256": "fdf35f3cd1420e1c34d0aeac8a64341a72122baae2a2ca413f4e23a5637e7534",
+      "gz_sha256": "0ba654936388c3ab427423497d66c7cfda46d42a57c185cd5fd4d19ae7e9506b",
+      "exit_code": 1,
+      "reason": "exited"
+    },
+    "p1-snapshot-jvm-restored": {
+      "raw_sha256": "dd572fcfc43d284d5a46e0d5b6bcdb2699869592e478eae868c54b4941c6385f",
+      "gz_sha256": "92353efa62c6167e6cb0dfaa303c650baa9f06022a03a13b3781e9035003236b",
+      "exit_code": 1,
+      "reason": "exited"
+    },
+    "p1-snapshot-jvm-formatted": {
+      "raw_sha256": "25014225edf56672c52f53d288f293a1480ebb115eb2e7fab1bf434569931c39",
+      "gz_sha256": "58cccd36042e04de6d348187b860ad0c1facbdceccc8c646f5539cfd09acb1b5",
+      "exit_code": 0,
+      "reason": "exited"
+    }
+  },
+  "limitations": "Native and final integration remain pending. Initial control preceded05e0 with its exact test diff; formatted restored control preceded61d12cc2 with its exact whitespace-only diff. Original production source restored byte-for-byte. Later exact integration gate remains required.",
+  "formatted_commit": "61d12cc26eec53672f8bc19b7ad5abdf230fa73b",
+  "review": {
+    "commit": "05e0c3627f89a156784a4ee2ce2be1bbb14fe35b",
+    "reviewer": "p1_cleanup_review",
+    "verdict": "GO",
+    "scope": "Single-unit fixture preserves multiple assessed targets, exactly one changing-view read and full result digest equality. No gate or timeout weakened."
+  }
+}

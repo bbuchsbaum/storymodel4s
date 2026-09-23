@@ -1,0 +1,16 @@
+{
+  "code_sha": "03569d1a530e043a626ef1798d7ff65b37578ae7",
+  "review": "p1_cleanup_review independent GO on CI delta; independent15/15 tests and15/15 killed mutants at942a9f75 code69b71322",
+  "tests": {
+    "total": 15,
+    "passed": 15,
+    "exit_code": 0,
+    "raw_sha256": "403f2ade58c5071b51bb57626ae4eaddb8187d831ef1807ce8a564b1ac811cdb"
+  },
+  "workflow_generation": {
+    "exit_code": 0,
+    "raw_sha256": "dd6fd9eb9c279c505bb20e757a76cc49f645d3e5dbcdd33be0de8f8a2b5c8809",
+    "qualification": "Run before commit03569d1a with exact reviewed build/workflow changes; final formatting/full gate pending."
+  },
+  "limitation": "Synthetic frame planning and parser control only. No media seek accuracy or complete video ingestion claim."
+}

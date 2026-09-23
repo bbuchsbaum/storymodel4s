@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T12:44:25.301989+00:00",
+  "finished_utc": "2026-09-23T12:44:25.705232+00:00",
+  "duration_seconds": 0.403162,
+  "command": [
+    "env",
+    "-u",
+    "STORYMODEL4S_GRAKERN_BUILD",
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.MappingHistoricalSuite"
+  ],
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "log": "/private/tmp/p1-snapshot-jvm-control.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 1377
+}

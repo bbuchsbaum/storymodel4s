@@ -1,0 +1,16 @@
+{
+  "evidence_commit": "a90a9ee5e70db6834c9165db8a291c9af3bab225",
+  "code_sha": "b52b26a0b3e02de62cde695511de5c4ad170cc1d",
+  "archive_sha256": "e6dd3286d8b82edcacc5782c6f963f071e12157f83e3ba2827eefaa597a11b9e",
+  "payloads_verified": 141,
+  "gate11_recount": {
+    "total": 2449,
+    "failed": 0,
+    "errors": 0,
+    "passed": 2449,
+    "skipped": 0,
+    "summary_count": 8,
+    "exit_code": 0
+  },
+  "qualification": "Lead independently verified archive integrity and recounted raw totals, not a rerun. Full final merged gate is separate."
+}

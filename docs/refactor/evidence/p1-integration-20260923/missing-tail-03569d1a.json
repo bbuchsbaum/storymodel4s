@@ -1,0 +1,10 @@
+{
+  "source_sha": "03569d1a530e043a626ef1798d7ff65b37578ae7",
+  "tracked_tree_clean_after": true,
+  "log_sha256": "f6d0851936d096702d4093690101d394e912f5175c9860f9553a1cdc44edbb0f",
+  "test_totals": [
+    "[info] Passed: Total 158, Failed 0, Errors 0, Passed 158"
+  ],
+  "exit_code": 0,
+  "qualification": "Remaining corpusIntake tests and formatting pass independently; the complete checkAll gate remains failed on 13 pipeline assertions."
+}

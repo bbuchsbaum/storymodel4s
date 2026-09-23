@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "4eb625970205e1f62b300ca897e94eaa927bbd6c",
+  "reviewer": "p1_cleanup_review",
+  "verdict": "APPROVE",
+  "landed_adr_commit": "51d4134512fe4ec6c4319aa84702b6592a3224b1",
+  "exact_adr_bytes_preserved": true,
+  "relative_links_checked": [
+    "../refactor/PLAN.md",
+    "0019-mapping-measurement-policy.md",
+    "../plans/2026-09-22-recall-encoding-workflow.md",
+    "../plans/2026-09-21-g1-mapping-records-plan.md",
+    "../plans/2026-09-18-best-recall-to-video-mapper.md"
+  ],
+  "plan_pointer": "../adr/0022-mapping-producers-and-evidence.md",
+  "conflict_resolution": "Only fray_notes.md: preserved main content and appended exactly reviewed26lines from8491f681;0904e3f1 adds6lines. No source implementation cherry-picked.",
+  "qualification": "Documentation acceptance only; facade/source implementation remains open."
+}

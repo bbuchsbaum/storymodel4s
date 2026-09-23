@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T13:06:30.987935+00:00",
+  "finished_utc": "2026-09-23T13:08:56.400853+00:00",
+  "duration_seconds": 145.438212,
+  "command": [
+    "env",
+    "-u",
+    "STORYMODEL4S_GRAKERN_BUILD",
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel-p1-grakern-0329c43c",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignNative/testOnly storymodel4s.align.MappingHistoricalSuite storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite storymodel4s.align.attack.StrictCandidatesUnforgeableSuite"
+  ],
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "log": "/private/tmp/p1-native-snapshot-tie-regressions.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3818
+}

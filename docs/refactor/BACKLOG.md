@@ -1,5 +1,7 @@
 # Delivery backlog
 
+Current execution handoff: [23 September checkpoint](PLAN.md#execution-handoff-23-september-2026), with accepted owners, next witnesses and the bound integration evidence. Live Mote acceptance remains authoritative.
+
 Reconciled 19 September 2026 against `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. Governing direction: [PLAN.md](PLAN.md).
 
 **22 September 2026 re-scope.** Every open bead was reviewed against the code, and owner

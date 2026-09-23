@@ -1,0 +1,281 @@
+{
+  "status": "failed",
+  "recorded_utc": "2026-09-23T12:42:21.561295+00:00",
+  "source": {
+    "path": "/private/tmp/storymodel-p1-integration-20260923",
+    "commit": "d08774acee0b770dfae7b66f8526515b6bc23820",
+    "tree": "02973cf2630698cd2e64b087daed8bb8440cafd3",
+    "tracked_status": ""
+  },
+  "grakern": {
+    "path": "/private/tmp/storymodel-p1-grakern-0329c43c",
+    "commit": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "tree": "2de621754fbd95f5c7419d42600d8ddb05666f33",
+    "tracked_status": ""
+  },
+  "raw_sha256": "4997d6848538dfae4df12df6bb34261b2628a47301e81940c791a9629cc84a11",
+  "gzip_sha256": "99abe71d9474f3added845c67786d0cc4a7d8ca9cc85fa29f9b2ea4990ba7dd6",
+  "execution_receipt": "compiler-checkAll-failed.meta.json",
+  "test_totals": [
+    {
+      "line": 268,
+      "status": "Passed",
+      "total": 231,
+      "failed": 0,
+      "errors": 0,
+      "passed": 231,
+      "skipped": 0
+    },
+    {
+      "line": 342,
+      "status": "Passed",
+      "total": 231,
+      "failed": 0,
+      "errors": 0,
+      "passed": 231,
+      "skipped": 0
+    },
+    {
+      "line": 433,
+      "status": "Passed",
+      "total": 231,
+      "failed": 0,
+      "errors": 0,
+      "passed": 231,
+      "skipped": 0
+    },
+    {
+      "line": 461,
+      "status": "Passed",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "line": 490,
+      "status": "Passed",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "line": 531,
+      "status": "Passed",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "line": 559,
+      "status": "Passed",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "line": 588,
+      "status": "Passed",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "line": 629,
+      "status": "Passed",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "line": 648,
+      "status": "Passed",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "line": 668,
+      "status": "Passed",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "line": 700,
+      "status": "Passed",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "line": 752,
+      "status": "Passed",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "line": 805,
+      "status": "Passed",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "line": 871,
+      "status": "Passed",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "line": 923,
+      "status": "Passed",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "line": 976,
+      "status": "Passed",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "line": 1041,
+      "status": "Passed",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "line": 1088,
+      "status": "Passed",
+      "total": 189,
+      "failed": 0,
+      "errors": 0,
+      "passed": 189,
+      "skipped": 0
+    },
+    {
+      "line": 1133,
+      "status": "Passed",
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "line": 1191,
+      "status": "Passed",
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "line": 1219,
+      "status": "Passed",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "line": 1248,
+      "status": "Passed",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "line": 1289,
+      "status": "Passed",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "line": 1449,
+      "status": "Passed",
+      "total": 490,
+      "failed": 0,
+      "errors": 0,
+      "passed": 490,
+      "skipped": 0
+    },
+    {
+      "line": 1607,
+      "status": "Passed",
+      "total": 487,
+      "failed": 0,
+      "errors": 0,
+      "passed": 487,
+      "skipped": 0
+    },
+    {
+      "line": 1779,
+      "status": "Failed",
+      "total": 487,
+      "failed": 1,
+      "errors": 0,
+      "passed": 486,
+      "skipped": 0
+    }
+  ],
+  "aggregate": {
+    "total": 4497,
+    "passed": 4496,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "test_total_lines": 27,
+  "error_lines": [
+    "[error] Failed: Total 487, Failed 1, Errors 0, Passed 486",
+    "[error] Failed tests:",
+    "[error] \tstorymodel4s.align.MappingHistoricalSuite",
+    "[error] (alignNative / Test / test) sbt.TestsFailedException: Tests unsuccessful",
+    "[error] Total time: 350 s (0:05:50.0), completed Sep 23, 2026, 8:39:16 a.m."
+  ],
+  "failure": "alignNative MappingHistoricalSuite.adapter captures a changing view once for binding and all link assessment: existing 30s timeout; observed40.193s. Gate stopped, later tasks did not run. No causal attribution to resource contention is established.",
+  "next_action": "Retain failed gate. Diagnose unchanged expensive fixture, preserve falsifier, rerun affected Native court and complete exact integration gate before landing."
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T13:13:12.834602+00:00",
+  "finished_utc": "2026-09-23T13:14:05.018952+00:00",
+  "duration_seconds": 52.18414,
+  "command": [
+    "bash",
+    "/private/tmp/p1-independent-readers-command.sh"
+  ],
+  "cwd": "/private/tmp/storymodel-p1-integration-20260923",
+  "log": "/private/tmp/p1-independent-readers.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 8131
+}
