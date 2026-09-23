@@ -80,8 +80,8 @@ object CorpusReader:
       s"OpenCorpus(${verified.manifest.corpus.value}, ${sheets.size} sheets, " +
         s"profile ${profile.identity.short()})"
 
-  /** How many cell refusals one sheet retains. Bounded so that a systematically misdeclared
-    * column cannot leave 27,777 error objects in the opened sheet.
+  /** How many cell refusals one sheet retains. Bounded so that a systematically misdeclared column
+    * cannot leave 27,777 error objects in the opened sheet.
     */
   val RefusalCap: Int = 100
 
