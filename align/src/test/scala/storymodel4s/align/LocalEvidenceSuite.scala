@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import munit.FunSuite
+import storymodel4s.recall.RecallGraph
 
 /** Local evidence is computed once, identified by its content, and bound to the recall, view and
   * gate it was computed under (mote bd-01M2TACM78289S4TECE91GT5K2 AC1).
@@ -82,4 +83,27 @@ class LocalEvidenceSuite extends FunSuite:
     )
     val refused = GraphHsmm.infer(recall, other, evidence(), HsmmConfig.default)
     assert(refused.left.exists(_.message.contains("different source view")), refused)
+  }
+
+  test("evidence computed for another recall is refused") {
+    val other = RecallGraph
+      .validated(
+        recall.transcript,
+        recall.atlas,
+        recall.units.map(u => u.copy(proposition = u.proposition.copy(times = Vector("at dusk")))),
+        recall.relations
+      )
+      .fold(e => fail(s"invalid recall: $e"), identity)
+    assertEquals(
+      MappingBindingRender.recall(other),
+      MappingBindingRender.recall(recall),
+      "isolation: the supplement must not see this change, so only the legacy check can refuse it"
+    )
+    assertNotEquals(
+      AlignWire.recallChecksum(other),
+      AlignWire.recallChecksum(recall),
+      "capacity to fail: the legacy checksum must see this change"
+    )
+    val refused = GraphHsmm.infer(other, view, evidence(), HsmmConfig.default)
+    assert(refused.left.exists(_.message.contains("different recall")), refused)
   }

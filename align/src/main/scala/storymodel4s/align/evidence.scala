@@ -14,12 +14,19 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   * to re-pricing. Only [[LocalEvidence.compute]] builds one. It records the recall, the view, and
   * whether the mode gate ran, and [[GraphHsmm]] refuses evidence bound to anything else.
   *
+  * The legacy recall checksum and view fingerprint do not separate an absent predicate, outcome or
+  * cause from an explicitly empty one, so each is paired with the supplement that does
+  * (`MappingBindingRender.recall`, `MappingSourceRender.scope`), exactly as [[DerivationBinding]]
+  * binds a mapping. Equality and hashing digest the whole evidence once.
+  *
   * Candidates that are not nodes of the view are dropped here, exactly as inference always did:
   * they are neither priced nor nominated.
   */
 final class LocalEvidence private (
     val recallChecksum: Checksum,
+    val recallSupplement: Checksum,
     val viewFingerprint: ViewFingerprint,
+    val scopeDigest: Checksum,
     val gated: Boolean,
     val units: Vector[RecallUnitId],
     val candidates: Vector[CandidateSet],
@@ -46,7 +53,7 @@ final class LocalEvidence private (
 
   override def toString: String =
     s"LocalEvidence(units=${units.size}, gated=$gated, " +
-      s"view=${viewFingerprint.checksum.short()}, id=${identity.checksum.short()})"
+      s"view=${viewFingerprint.checksum.short()}, recall=${recallChecksum.short()})"
 
 object LocalEvidence:
 
@@ -58,7 +65,7 @@ object LocalEvidence:
     */
   def compute(
       recall: RecallGraph[Checked],
-      view: SourceView,
+      source: SourceView,
       candidates: Candidates,
       costModel: LocalCostModel,
       gate: Boolean
@@ -66,6 +73,8 @@ object LocalEvidence:
     val units = recall.ordered
     if units.isEmpty then Left(AlignError.EmptyRecall)
     else
+      // One snapshot prices and identifies the evidence, so a mutable view cannot change between.
+      val view = MappingBindingRender.snapshot(source)
       val admissibility: Vector[Map[SourceNodeRef, Admissibility]] = units.map { u =>
         candidates
           .set(u.id)
@@ -100,7 +109,9 @@ object LocalEvidence:
       breakdowns.map { b =>
         new LocalEvidence(
           AlignWire.recallChecksum(recall),
+          MappingBindingRender.recall(recall),
           ViewFingerprint.of(view),
+          MappingSourceRender.scope(view.nodes),
           gate,
           ids,
           ids.map(candidates.set),
@@ -121,10 +132,12 @@ object LocalEvidence:
     if evidence.gated != gate then
       refuse(s"was computed with gate=${evidence.gated}; this inference requires gate=$gate")
     else if evidence.units != recall.ordered.map(_.id) then refuse("covers different recall units")
-    else if evidence.recallChecksum != AlignWire.recallChecksum(recall) then
-      refuse("was computed for a different recall")
-    else if evidence.viewFingerprint != ViewFingerprint.of(view) then
-      refuse("was computed for a different source view")
+    else if evidence.recallChecksum != AlignWire.recallChecksum(recall) ||
+      evidence.recallSupplement != MappingBindingRender.recall(recall)
+    then refuse("was computed for a different recall")
+    else if evidence.viewFingerprint != ViewFingerprint.of(view) ||
+      evidence.scopeDigest != MappingSourceRender.scope(view.nodes)
+    then refuse("was computed for a different source view")
     else Right(())
 
 /** Content identity of a [[LocalEvidence]]. Only [[LocalEvidence]] derives one: there is no public
@@ -152,7 +165,7 @@ object LocalEvidenceId:
     def admissibility(ref: SourceNodeRef, a: Admissibility): String = sequence(
       Vector(
         ref.key,
-        sequence(a.contradictions.map(_.toString)),
+        sequence(a.contradictions.map(_.toString).sorted),
         a.faithful.toString,
         sequence(a.facets.toVector.sorted.map(_.toString))
       )
@@ -180,9 +193,11 @@ object LocalEvidenceId:
     }
     MappingRender.digest(
       Vector(
-        "local-evidence/v1",
+        "local-evidence/v2",
         e.recallChecksum.hex,
+        e.recallSupplement.hex,
         e.viewFingerprint.checksum.hex,
+        e.scopeDigest.hex,
         e.gated.toString
       ) ++ perUnit
     )
