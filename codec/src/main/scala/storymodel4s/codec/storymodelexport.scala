@@ -507,6 +507,8 @@ object StoryModelExport:
                 "canonical_model" -> unavailable("not-embedded/v0.1")
               ),
               "exported_claims" -> Json.fromString(exported.size.toString),
+              // Published so a reader can test the accounting law instead of assuming it.
+              "model_claims" -> Json.fromString(model.claims.size.toString),
               "losses" -> Json
                 .fromValues(losses(model, exported.size, evidenceRows.size).map(render)),
               "files" -> Json.fromValues(files)
@@ -557,7 +559,7 @@ object StoryModelExport:
         "boundary-beliefs",
         Some(model.hierarchy.boundaryBeliefs.size),
         0,
-        "candidate segment boundaries"
+        "hierarchy boundary beliefs; per-step copies leave with trajectory-steps"
       ),
       Loss("feature-spaces", Some(model.featureSpaces.size), 0, "feature space declarations"),
       Loss("sidecars", Some(model.sidecars.size), 0, "feature sidecar manifests"),
@@ -612,5 +614,11 @@ object StoryModelExport:
         0,
         "build receipt"
       ),
-      Loss("source-text", Some(1), 0, "the source text; bound by source_checksum")
+      Loss("source-text", Some(1), 0, "the source text; bound by source_checksum"),
+      Loss(
+        "surface-units",
+        Some(model.atlas.units.size),
+        0,
+        "surface unit extents and hierarchy; spans.surface_unit names them"
+      )
     )

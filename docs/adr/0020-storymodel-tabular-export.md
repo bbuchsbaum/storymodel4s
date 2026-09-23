@@ -15,12 +15,14 @@ wire for analysis tables; a second wire would split every downstream reader.
 
 ## Decision
 
-1. **Input is `TextModel[Validated]` only.** A draft is refused by type. The command-line entry
+1. **Input is `TextModel[Validated]` only.** A draft is refused by type; so, in v0.1, is an
+   `Adjudicated` model, and `model_status` is always `validated`. The command-line entry
    decodes `storymodel.json` (which yields a draft), revalidates with `StoryValidator`, and refuses
    when no validated model results. No field is defaulted on the way.
 2. **Film/playback is out of scope for v0.1** and says so: the manifest declares
    `playback_evidence` unavailable. Anchored support met inside a text model is refused, never cast
-   to character offsets and never mixed with text spans.
+   to character offsets and never mixed with text spans. That refusal is defensive: text-model
+   construction already rejects anchored evidence.
 3. **Wire = the mapping-exchange wire** (`quoted-tsv/v1`): every cell quoted, tab-separated, LF
    after every record, UTF-8 without BOM, typed column schema in the manifest, SHA-256 and UTF-8
    byte length per file, integers in canonical decimal, doubles as binary64 hex, structured cells
@@ -31,7 +33,8 @@ wire for analysis tables; a second wire would split every downstream reader.
    `{"status":"custom","namespace":...,"label":...}`. The in-code render `ns:label` is not used,
    because `Custom("a:b","c")` and `Custom("a","b:c")` render identically.
 5. **Tables** (schema `storymodel-export/v0.1`): `nodes` (every entity, situation, context and
-   segment with its claim id, epistemic status and context), per-kind detail tables `entities`,
+   segment with its claim id, epistemic status and context; node identity is the pair of kind
+   family and `node_id`, because the model's four id types may share a string), per-kind detail tables `entities`,
    `situations`, `contexts`, `segments`, then `relations` (the seven edge layers with a target
    node), `circumstances` (situation + literal label, kept apart so a label is never read as a node
    id), `hierarchy` (containment), `evidence` (per claim evidence item: id, stage, upstream claims)
@@ -43,11 +46,13 @@ wire for analysis tables; a second wire would split every downstream reader.
    the count is zero. v0.1 drops: trajectory steps, boundary beliefs, feature spaces, sidecars,
    feature refs, descriptors, hypotheses, sensory profiles, scoped attributes, mentions, resolved
    alternatives, resolved-value claims (entity labels, segment summaries: the value is exported,
-   its own claim is not), claim credence and provenance, evidence extractors, and the build
-   receipt. Counts come only from structures observable in the input: an optional input that was
+   its own claim is not), claim credence and provenance, evidence extractors, the build
+   receipt, the source text and the surface units (spans name units whose extents are not
+   carried). Counts come only from structures observable in the input: an optional input that was
    never supplied (a model with no build receipt) is recorded as `not-supplied`, not as zero
    dropped. Accounting law: exported claims plus claims counted in loss records equal
-   `model.claims`.
+   `model.claims`; the manifest publishes `model_claims` so a reader can test the law rather
+   than assume it.
 7. **No embedded lossless copy.** Unlike `mapping.json` in the mapping exchange, the bundle does not
    carry `storymodel.json`; it binds the model by digest. Users who need the full model keep the
    build output beside the export. The manifest declares this as the `canonical_model` capability,

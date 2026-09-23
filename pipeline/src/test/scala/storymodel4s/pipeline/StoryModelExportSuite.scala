@@ -20,7 +20,8 @@ class StoryModelExportSuite extends FunSuite:
   private lazy val manifest: Json = parse(bundle.manifest).fold(e => fail(e.message), identity)
 
   /** Quoted-TSV reader written against the documented wire, not the exporter's code. */
-  private def rows(name: String): Vector[Map[String, String]] =
+  private def rows(name: String): Vector[Map[String, String]] = rowsOf(files, name)
+  private def rowsOf(files: Map[String, String], name: String): Vector[Map[String, String]] =
     val text = files(name)
     val records = Vector.newBuilder[Vector[String]]
     var record = Vector.newBuilder[String]
@@ -162,10 +163,62 @@ class StoryModelExportSuite extends FunSuite:
     )
   }
 
+  test("span values: every row equals the model's own span, in the model's own order") {
+    val metas = wog.claims.map(m => m.id.value -> m).toMap
+    def unit(ref: SpanRef): String = ref.unit.fold(
+      """{"reason":"not-supplied","status":"absent"}"""
+    )(u => s"""{"status":"present","value":"${u.value}"}""")
+    def refs(claim: String, origin: String, index: String, spans: SpanSet) =
+      spans.refs.toVector.zipWithIndex.map((ref, i) =>
+        Vector(
+          claim,
+          origin,
+          index,
+          i.toString,
+          unit(ref),
+          ref.span.start.toString,
+          ref.span.endExclusive.toString
+        )
+      )
+    val got = rows("spans.tsv").map(r =>
+      Vector(
+        "claim_id",
+        "origin",
+        "evidence_index",
+        "ref_index",
+        "surface_unit",
+        "utf16_start",
+        "utf16_end_exclusive"
+      ).map(r)
+    )
+    val supportOwners = (g.entities.values.map(e => e.meta.id.value -> e.support) ++
+      g.situations.values.map(s => s.meta.id.value -> s.support) ++
+      g.contexts.values.map(c => c.meta.id.value -> c.support) ++
+      g.segments.values.map(s => s.meta.id.value -> s.support) ++
+      g.relations.circumstances.map(c => c.meta.id.value -> c.support)).toMap
+    val expected = got.map(_(0)).distinct.flatMap { claim =>
+      supportOwners
+        .get(claim)
+        .toVector
+        .flatMap(s =>
+          refs(claim, "node-support", """{"status":"not-applicable"}""", s.textSpans.get)
+        ) ++ metas(claim).evidence.toVector.zipWithIndex.flatMap((ev, i) =>
+        ev.spans.toVector.flatMap(
+          refs(claim, "claim-evidence", s"""{"status":"present","value":$i}""", _)
+        )
+      )
+    }
+    assertEquals(got, expected)
+  }
+
   test("claim accounting: exported claims plus claims in loss records equal model.claims") {
     val exported = manifest.hcursor.get[String]("exported_claims").toOption.get.toInt
     val lost = losses.keys.toVector.map(lostClaims).sum
     assertEquals(exported + lost, wog.claims.size)
+    assertEquals(
+      manifest.hcursor.get[String]("model_claims").toOption,
+      Some(wog.claims.size.toString)
+    )
     val tableClaims = (rows("nodes.tsv").map(_("claim_id")) ++
       rows("relations.tsv").map(_("claim_id")) ++ rows("circumstances.tsv").map(_("claim_id")) ++
       rows("hierarchy.tsv").map(_("claim_id"))).toSet
@@ -223,6 +276,7 @@ class StoryModelExportSuite extends FunSuite:
   lossTest("evidence-extractors", Some(rows("evidence.tsv").size))
   lossTest("build-receipt", None)
   lossTest("source-text", Some(1))
+  lossTest("surface-units", Some(wog.atlas.units.size))
 
   test("loss records are exactly the declared set; nothing is silently added or dropped") {
     assertEquals(
@@ -243,7 +297,8 @@ class StoryModelExportSuite extends FunSuite:
         "claim-credence-provenance",
         "evidence-extractors",
         "build-receipt",
-        "source-text"
+        "source-text",
+        "surface-units"
       )
     )
   }
@@ -301,6 +356,86 @@ class StoryModelExportSuite extends FunSuite:
   test("a draft is refused by type") {
     assert(compiletime.testing.typeChecks("StoryModelExport.encode(WarOfTheGhostsModel.model)"))
     assert(!compiletime.testing.typeChecks("StoryModelExport.encode(WarOfTheGhostsModel.draft)"))
+  }
+
+  // ---- a variant reaching cells the fixture never produces ----------------------------------
+  /** WoG has no custom terms, no unattributed holder, no unsummarized segment and no rival values.
+    * This variant edits exactly those, revalidates, and pins the exact cells.
+    */
+  private lazy val variant: (TextModel[ModelStatus.Validated], Map[String, String]) =
+    import storymodel4s.proposition.ParticipantRole
+    val base = WarOfTheGhostsModel.graph
+    val parts = base.relations.participants
+    val colonA = ParticipantRole.Custom("ns:a", "b")
+    val colonB = ParticipantRole.Custom("ns", "a:b")
+    val relabeled =
+      parts.updated(0, parts(0).copy(role = colonA)).updated(1, parts(1).copy(role = colonB))
+    val entity = base.entities.values.minBy(_.id)
+    val altEntity = entity.copy(
+      entityType = EntityType.Custom("lab", "vessel"),
+      label =
+        entity.label.copy(alternatives = Vector(("a rival label", entity.label.meta.credence)))
+    )
+    val segment = base.segments.values.filter(_.summary.stated.isDefined).minBy(_.id)
+    val bare = segment.copy(summary = SegmentSummary.Unsummarized(SummaryGap.NotAccepted))
+    val held = base.contexts.values.filter(_.kind.heldBy.isDefined).minBy(_.id)
+    val unheld = held.copy(kind = held.kind match
+      case ContextKind.Speech(_) =>
+        ContextKind.Speech(ContextHolder.Unattributed(HolderGap.SeveralCandidates))
+      case ContextKind.Belief(_) =>
+        ContextKind.Belief(ContextHolder.Unattributed(HolderGap.SeveralCandidates))
+      case other => other)
+    val graph = base.copy(
+      entities = base.entities.updated(entity.id, altEntity),
+      segments = base.segments.updated(segment.id, bare),
+      contexts = base.contexts.updated(held.id, unheld),
+      relations = base.relations.copy(participants = relabeled)
+    )
+    val draft = StoryModel
+      .draftText(
+        WarOfTheGhostsModel.atlas,
+        graph,
+        WarOfTheGhostsModel.hierarchy,
+        WarOfTheGhostsModel.trajectory,
+        descriptors = WarOfTheGhostsModel.descriptors,
+        hypotheses = WarOfTheGhostsModel.hypotheses
+      )
+      .fold(e => fail(e.message), identity)
+    val outcome = StoryValidator.validate(draft)
+    val model = outcome.validated.getOrElse(fail(outcome.report.render))
+    val ids = Map(
+      "partA" -> parts(0).meta.id.value,
+      "partB" -> parts(1).meta.id.value,
+      "entity" -> entity.id.value,
+      "segment" -> segment.id.value,
+      "context" -> held.id.value
+    )
+    (model, ids)
+
+  test("custom terms keep namespace and label apart, so ns:a/b and ns/a:b stay distinct") {
+    val (model, ids) = variant
+    val out = StoryModelExport.encode(model).fold(e => fail(e.toString), identity).files.toMap
+    val relations = rowsOf(out, "relations.tsv").map(r => r("claim_id") -> r("relation")).toMap
+    assertEquals(relations(ids("partA")), """{"label":"b","namespace":"ns:a","status":"custom"}""")
+    assertEquals(relations(ids("partB")), """{"label":"a:b","namespace":"ns","status":"custom"}""")
+    val entity = rowsOf(out, "entities.tsv").find(_("node_id") == ids("entity")).get
+    assertEquals(
+      entity("entity_type"),
+      """{"label":"vessel","namespace":"lab","status":"custom"}"""
+    )
+    val segment = rowsOf(out, "segments.tsv").find(_("node_id") == ids("segment")).get
+    assertEquals(segment("summary"), """{"reason":"not-accepted","status":"unsummarized"}""")
+    val context = rowsOf(out, "contexts.tsv").find(_("node_id") == ids("context")).get
+    assertEquals(context("holder"), """{"reason":"several-candidates","status":"unattributed"}""")
+  }
+
+  test("a rival value is counted as a resolved alternative, and a dropped summary claim leaves") {
+    val (model, _) = variant
+    val l = StoryModelExport.losses(model, 0, 0).map(x => x.structure -> x).toMap
+    assertEquals(l("resolved-alternatives").dropped, Some(1))
+    val stated = model.graph.segments.values.count(_.summary.stated.isDefined)
+    assertEquals(l("resolved-value-claims").dropped, Some(model.graph.entities.size + stated))
+    assertEquals(stated, g.segments.values.count(_.summary.stated.isDefined) - 1)
   }
 
   // ---- publication and command line ----------------------------------------------------------

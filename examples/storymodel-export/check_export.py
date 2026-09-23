@@ -11,6 +11,7 @@
 
 Usage: check_export.py DIRECTORY
 """
+import csv
 import hashlib
 import json
 import os
@@ -52,6 +53,25 @@ def check_upstream_outside_tables(directory):
         summary, _ = reader.read(copy)
         assert summary["upstream_refs"] == {"in_tables": 1, "outside_tables": 1}, summary
 
+
+
+def check_shared_id_across_families(directory):
+    """Lawful variant: a segment whose id string equals an entity's. The model's id types are
+    distinct, so this is legal; the reader must keep the two nodes apart by family."""
+    with tempfile.TemporaryDirectory() as scratch:
+        copy = os.path.join(scratch, "export")
+        shutil.copytree(directory, copy)
+        for name in ("nodes.tsv", "segments.tsv", "hierarchy.tsv"):
+            edit_table(
+                copy,
+                name,
+                lambda ls: [l.replace('"wog:seg:ep1-river"', '"wog:ent:arrows"') for l in ls],
+            )
+        rehash(copy)
+        summary, tables = reader.read(copy)
+        assert summary["nodes"] == EXPECTED["nodes"], summary
+        shared = [n["node_kind"] for n in tables["nodes"] if n["node_id"] == "wog:ent:arrows"]
+        assert sorted(shared) == ["entity", "segment"], shared
 
 
 def check_hand_row(tables):
@@ -131,6 +151,115 @@ def replace_first(old, new):
     return edit
 
 
+def cells(line):
+    return next(csv.reader([line], delimiter="\t"))
+
+
+def join(row):
+    return "\t".join('"' + c.replace('"', '""') + '"' for c in row)
+
+
+def drop_column(directory, name, column):
+    def edit(lines):
+        header = cells(lines[0])
+        k = header.index(column)
+        return [join(r[:k] + r[k + 1 :]) for r in map(cells, lines)]
+
+    edit_table(directory, name, edit)
+
+    def schema(m):
+        for f in m["files"]:
+            if f["name"] == name:
+                f["table"]["columns"] = [c for c in f["table"]["columns"] if c["name"] != column]
+
+    edit_manifest(directory, schema)
+
+
+def retype(name, column):
+    def edit(m):
+        for f in m["files"]:
+            if f["name"] == name:
+                for c in f["table"]["columns"]:
+                    if c["name"] == column:
+                        c["type"] = "utf8-string"
+
+    return edit
+
+
+def reparent(lines):
+    for i, line in enumerate(lines):
+        row = cells(line)
+        if row[2] == "context" and row[5].startswith('{"status":"present"'):
+            row[5] = '{"status":"present","value":"wog:ent:arrows"}'
+            lines[i] = join(row)
+            return lines
+    raise AssertionError("no context with a parent")
+
+
+def negate_level(line):
+    row = cells(line)
+    row[3] = "-" + row[3]
+    return join(row)
+
+
+def support_on_relation(directory, span_line):
+    with open(os.path.join(directory, "relations.tsv"), encoding="utf-8") as handle:
+        relation = cells(handle.read().split("\n")[1])[1]
+    row = cells(span_line)
+    row[1] = relation
+    return join(row)
+
+
+def reindex(line, index):
+    row = cells(line)
+    row[2] = str(index)
+    return join(row)
+
+
+def reindex_everywhere(directory, index):
+    """Move the first claim's only evidence item to `index` in both tables, so the only defect
+    left is the gap in 0..n-1."""
+    with open(os.path.join(directory, "evidence.tsv"), encoding="utf-8") as handle:
+        rows = handle.read().split("\n")
+    claim = cells(rows[1])[1]
+    assert sum(cells(r)[1] == claim for r in rows[1:] if r) == 1, "fixture claim has >1 item"
+    edit_table(directory, "evidence.tsv", lambda ls: ls[:1] + [reindex(ls[1], index)] + ls[2:])
+
+    def spans(lines):
+        old = '{"status":"present","value":0}'
+        new = '{"status":"present","value":%d}' % index
+        out = []
+        for line in lines:
+            row = cells(line)
+            if row[1] == claim and row[3] == old:
+                row[3] = new
+                line = join(row)
+            out.append(line)
+        return out
+
+    edit_table(directory, "spans.tsv", spans)
+
+
+def remove_evidence(directory):
+    with open(os.path.join(directory, "evidence.tsv"), encoding="utf-8") as handle:
+        first = cells(handle.read().split("\n")[1])[1]
+    edit_table(directory, "evidence.tsv", lambda ls: [l for l in ls if cells(l)[1] != first])
+    edit_table(
+        directory,
+        "spans.tsv",
+        lambda ls: [l for l in ls if not (cells(l)[1] == first and cells(l)[2] == "claim-evidence")],
+    )
+
+    def extractors(m):
+        with open(os.path.join(directory, "evidence.tsv"), encoding="utf-8") as handle:
+            n = handle.read().count("\n") - 1
+        for l in m["losses"]:
+            if l["structure"] == "evidence-extractors":
+                l["dropped"] = str(n)
+
+    edit_manifest(directory, extractors)
+
+
 CORRUPTIONS = {
     "situation context names no context": lambda d: edit_table(
         d,
@@ -187,6 +316,27 @@ CORRUPTIONS = {
     "foreign model digest in one row": lambda d: edit_table(
         d, "relations.tsv", lambda ls: ls[:1] + ['"' + "0" * 64 + ls[1][65:]] + ls[2:]
     ),
+    "loss claims inflated (accounting)": lambda d: edit_manifest(
+        d,
+        lambda m: [l.__setitem__("claims", "5") for l in m["losses"] if l["structure"] == "mentions"],
+    ),
+    "non-canonical integer 0552": lambda d: edit_table(
+        d, "spans.tsv", lambda ls: ls[:1] + [ls[1].replace('"552"', '"0552"', 1)] + ls[2:]
+    ),
+    "column dropped from table and schema": lambda d: drop_column(d, "entities.tsv", "label"),
+    "level retyped to text": lambda d: edit_manifest(d, retype("segments.tsv", "level")),
+    "context parent names an entity": lambda d: edit_table(d, "nodes.tsv", reparent),
+    "claim_status outside the vocabulary": lambda d: edit_table(
+        d, "nodes.tsv", replace_first('"SurfaceExplicit"', '"Banana"')
+    ),
+    "negative segment level": lambda d: edit_table(
+        d, "segments.tsv", lambda ls: ls[:1] + [negate_level(ls[1])] + ls[2:]
+    ),
+    "node support on a relation claim": lambda d: edit_table(
+        d, "spans.tsv", lambda ls: ls + [support_on_relation(d, ls[1])]
+    ),
+    "evidence index not contiguous": lambda d: reindex_everywhere(d, 7),
+    "claim with every evidence row removed": lambda d: remove_evidence(d),
     "extra file": lambda d: open(os.path.join(d, "notes.txt"), "w").close(),
 }
 
@@ -199,6 +349,7 @@ def main(argv):
     check_hand_row(tables)
     check_absent_is_not_zero(tables)
     check_upstream_outside_tables(directory)
+    check_shared_id_across_families(directory)
     refused = {}
     for name, corrupt in CORRUPTIONS.items():
         with tempfile.TemporaryDirectory() as scratch:
