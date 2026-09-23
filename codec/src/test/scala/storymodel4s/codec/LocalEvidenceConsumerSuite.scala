@@ -98,3 +98,35 @@ class LocalEvidenceConsumerSuite extends FunSuite:
     assert(refused.left.exists(_.message.contains("different source view")), refused.toString)
     assertNotEquals(saved.identity, evidence(view = empty).identity)
   }
+
+  test("consumer inference uses one source snapshot across admission and computation") {
+    val stable = fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(cause = None)))
+    val extraEdges = Map(fixture.refs.head -> Map(fixture.refs.last -> 1.0))
+    var reads = 0
+    val changing = new SourceView:
+      def nodes: Vector[NodeSummary] =
+        reads += 1
+        stable.nodes
+      def node(ref: SourceNodeRef): Option[NodeSummary] =
+        stable.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        // Both binding reads see the original graph. Only the intervening transition work
+        // sees this edge; the result's later fingerprint sees the original again.
+        if reads == 3 && layer == RelationLayer.DiscourseSuccession then extraEdges
+        else stable.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = stable.worldOrder
+      def scoringLength: Int = stable.scoringLength
+    val saved = evidence(view = stable)
+    val expected = GraphHsmm
+      .infer(fixture.recall, stable, saved, HsmmConfig.default)
+      .fold(e => fail(e.message), identity)
+    val actual = GraphHsmm
+      .infer(fixture.recall, changing, saved, HsmmConfig.default)
+      .fold(e => fail(e.message), identity)
+    assertEquals(actual.viewFingerprint, expected.viewFingerprint)
+    assertEquals(actual.logLikelihood, expected.logLikelihood)
+    assertEquals(
+      HsmmResultCodec.encode(actual).map(Checksum.ofText),
+      HsmmResultCodec.encode(expected).map(Checksum.ofText)
+    )
+  }
