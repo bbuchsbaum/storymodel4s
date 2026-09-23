@@ -207,7 +207,7 @@ object CaptionRequest:
   val Schema: String = "storymodel4s.media.caption-request"
 
   def issue(
-      frames: FrameSet,
+      frames: IdentifiedFrames,
       extents: Vector[CaptionExtent],
       model: ModelPin,
       recipe: CaptionRecipe,
@@ -493,12 +493,16 @@ object CaptionEnvelope:
   * playback interval those frames span on the picture stream's axis, and the identities that
   * produced it. It is a proposal with `Draft` authority: it says what a model wrote about these
   * frames, not what happened in the film, and it is not a `TimedSegment`. The support is the hull
-  * of the frames shown; `frames` says which they were.
+  * of the frames shown. `frames` names them by sample index in the frame bytes, and
+  * `presentationOrdinals` by presented packet; the two agree for a full decode and differ for a
+  * sampled one. The support says which instants the model was shown, not that it saw everything
+  * between them.
   */
 final class CaptionProposal private[media] (
     val extentId: String,
     val support: PlaybackInterval,
     val frames: Vector[Int],
+    val presentationOrdinals: Vector[Int],
     val text: String,
     val generatedTokens: Option[Int],
     val recipe: Checksum,
@@ -513,7 +517,7 @@ final class CaptionProposal private[media] (
   * assumption as the boundary court, and checked the same way.
   */
 final class CaptionSearchResult private[media] (
-    val frames: FrameSet,
+    val frames: IdentifiedFrames,
     val bundle: SourceBundle,
     val axis: PresentationAxis,
     val proposals: Vector[CaptionProposal],
@@ -529,7 +533,7 @@ final class CaptionSearchResult private[media] (
     s"CaptionSearchResult(${frames.probe.manifest.fixtureId}, ${proposals.size} proposals, draft, ${identity.short()})"
 
 object CaptionSearch:
-  val Algorithm: String = "vlm-caption-proposals/v2"
+  val Algorithm: String = "vlm-caption-proposals/v3"
 
   def parameters(
       worker: ToolRealization,
@@ -556,16 +560,29 @@ object CaptionSearch:
     * offline; when what the library applied does not satisfy the recipe, or a result's image grids
     * fall outside the declared pixel limits (the one piece of evidence that the limits bound); when
     * coverage is partial or a result does not answer its extent; or when an extent cannot be closed
-    * on the axis. Every interval comes from the packet index.
+    * on the axis. It also refuses frames of an edition other than `expected`, and an extent that
+    * names a frame the set does not hold (`caption/unsampled`). Every interval comes from the
+    * packet index, through each frame's presentation ordinal.
     */
   def join(
-      frames: FrameSet,
+      frames: IdentifiedFrames,
       request: CaptionRequest,
       outcome: CaptionOutcome,
-      worker: ToolRealization
+      worker: ToolRealization,
+      expected: EditionId
   ): Either[DomainError, CaptionSearchResult] =
     for
       _ <- BoundarySearch.identityEditList(frames)
+      edition <- EditionId.from(frames.probe.manifest.fixtureId)
+      _ <-
+        if edition == expected then Right(())
+        else
+          Left(
+            DomainError.InvariantViolation(
+              "caption/edition",
+              s"frames belong to edition $edition, not the expected $expected"
+            )
+          )
       _ <- requestDescribes(frames, request)
       _ <- outcomeAnswers(frames, request, outcome, worker)
       _ <- appliedMatches(request.recipe, outcome.applied)
@@ -576,7 +593,6 @@ object CaptionSearch:
           "the last frame's duration is unknown; the examined extent cannot be closed"
         )
       )
-      edition <- EditionId.from(frames.probe.manifest.fixtureId)
       bundle <- SourceBundle.filmEdition(
         edition,
         frames.probe.input,
@@ -614,24 +630,42 @@ object CaptionSearch:
     )
 
   private def requestDescribes(
-      frames: FrameSet,
+      frames: IdentifiedFrames,
       request: CaptionRequest
   ): Either[DomainError, Unit] =
-    if request.framesSha256 == frames.framesSha256 && request.count == frames.count &&
-      request.geometry == frames.geometry && request.extents.forall(
-        _.ordinals.forall(_ < frames.count)
-      )
-    then Right(())
-    else
+    if !(request.framesSha256 == frames.framesSha256 && request.count == frames.count &&
+        request.geometry == frames.geometry)
+    then
       Left(
         DomainError.InvariantViolation(
           "caption/request",
           s"request ${request.requestId} does not describe frame set ${frames.identity.short()}"
         )
       )
+    else if request.extents.exists(e => CaptionExtent.of(e.id, e.ordinals).isLeft) ||
+      request.extents.map(_.id).distinct.size != request.extents.size
+    then
+      // CaptionRequest and CaptionExtent are case classes, so apply and copy bypass
+      // CaptionExtent.of; the join re-admits every extent rather than trusting its shape.
+      Left(
+        DomainError.InvariantViolation(
+          "caption/extent-shape",
+          s"request ${request.requestId} has an extent that is empty, not strictly increasing, or not uniquely named"
+        )
+      )
+    else
+      request.extents.find(_.ordinals.exists(o => frames.presentationOrdinal(o).isEmpty)) match
+        case None    => Right(())
+        case Some(e) =>
+          Left(
+            DomainError.InvariantViolation(
+              "caption/unsampled",
+              s"extent ${e.id} names a frame the ${frames.count}-frame set does not hold"
+            )
+          )
 
   private def outcomeAnswers(
-      frames: FrameSet,
+      frames: IdentifiedFrames,
       request: CaptionRequest,
       outcome: CaptionOutcome,
       worker: ToolRealization
@@ -743,7 +777,7 @@ object CaptionSearch:
         case None => Right(())
 
   private def proposal(
-      frames: FrameSet,
+      frames: IdentifiedFrames,
       axis: PresentationAxis,
       request: CaptionRequest,
       applied: AppliedCaptionRecipe,
@@ -762,14 +796,35 @@ object CaptionSearch:
             )
           )
       _ <- gridsWithinLimits(request.recipe, applied, extent, result)
-      firstEntry = frames.index.entries(extent.ordinals.head)
-      lastEntry = frames.index.entries(extent.ordinals.last)
+      // requestDescribes has already refused an unheld frame and a misshapen extent, so these two
+      // refusals are forced branches; each presentation ordinal is a member of the index.
+      shown <- extent.ordinals
+        .foldLeft[Either[DomainError, Vector[Int]]](Right(Vector.empty)) { (acc, o) =>
+          acc.flatMap(v =>
+            frames
+              .presentationOrdinal(o)
+              .toRight(
+                DomainError.InvariantViolation(
+                  "caption/unsampled",
+                  s"extent ${extent.id} names frame $o, which the frame set does not hold"
+                )
+              )
+              .map(v :+ _)
+          )
+        }
+      bounds <- (shown.headOption, shown.lastOption) match
+        case (Some(f), Some(l)) => Right((frames.index.entries(f), frames.index.entries(l)))
+        case _                  =>
+          Left(
+            DomainError.InvariantViolation("caption/extent-shape", s"extent ${extent.id} is empty")
+          )
+      (firstEntry, lastEntry) = bounds
       end <- lastEntry.durationTicks
         .map(d => lastEntry.pts + d)
         .toRight(
           DomainError.InvariantViolation(
             "caption/extent",
-            s"frame ${extent.ordinals.last} has unknown duration; the extent cannot be closed"
+            s"presented packet ${shown.last} has unknown duration; the extent cannot be closed"
           )
         )
       support <- PlaybackInterval.on(axis, firstEntry.pts, end)
@@ -777,6 +832,7 @@ object CaptionSearch:
       extent.id,
       support,
       extent.ordinals,
+      shown,
       result.text,
       result.generatedTokens,
       request.recipe.identity,

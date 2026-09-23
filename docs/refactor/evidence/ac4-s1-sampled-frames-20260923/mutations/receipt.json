@@ -1,0 +1,99 @@
+{
+  "framesSha256": "e4acb686828e5dce657768f7788f126becd8982231d5aed64818ad6dc9cf064a",
+  "captionSha256": "b0fa2c6ddf9723172fc82bff7b403d43f9ec31a45f7312269314754df7afad82",
+  "suite": "storymodel4s.probe.SampledCaptionConsumerSuite",
+  "controlBefore": "pass",
+  "controlAfter": "pass",
+  "mutations": [
+    {
+      "name": "sample-index-as-presentation-ordinal",
+      "file": "media/src/main/scala/storymodel4s/media/caption.scala",
+      "test": "sampled extents close on their own samples",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "871f23aa2ded4af867dd658092cf7974997736ddd7067b81e6967503626a911b"
+    },
+    {
+      "name": "membership-unchecked",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "a selected ordinal outside the packet index refuses",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "b61f207b7e91211e2d035a960308a74e3ed15e849426f8e581fcf287e7e21680"
+    },
+    {
+      "name": "full-decode-byte-rule",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "bytes must be exactly one frame per selected sample",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "dff7e4cf31e641023e9931d5748bef6437c8d534178b98f7af322ab6cd0c4d5b"
+    },
+    {
+      "name": "selection-order-unchecked",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "a selection that is empty, repeated or out of order refuses",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "c65601fe0bad3978ff92bf199c8de45b3aab224982df9e53117e94dda2c350db"
+    },
+    {
+      "name": "edition-unchecked",
+      "file": "media/src/main/scala/storymodel4s/media/caption.scala",
+      "test": "the join refuses another edition",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "058a9f14145bd22a04c72477126682bbf4101930a1c8397ff591df0e00409d9b"
+    },
+    {
+      "name": "unsampled-request-unchecked",
+      "file": "media/src/main/scala/storymodel4s/media/caption.scala",
+      "test": "a caption request cannot name a frame that was not sampled",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "31d9a9f73463fa0a565404c66872458b57138dbb6f6a9c66bd765a0d9de084b0"
+    },
+    {
+      "name": "extent-shape-unchecked",
+      "file": "media/src/main/scala/storymodel4s/media/caption.scala",
+      "test": "a forged extent that is out of order, empty or repeated",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "a447cc3832cc1b682a46d4d0dd4f4c57f703f80f6eaf9e95e1839f9a796a3cf6"
+    },
+    {
+      "name": "selection-not-in-identity",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "the selection is bound into the frame set",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "30bf9af05725a1ee5bf2a1fbe3d319c216217f6bceec99768a054330d1c5a5df"
+    },
+    {
+      "name": "stream-not-in-identity",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "the stream is bound into the sampled set",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "6aa79de8fb69f6135a21988059f4687e5b79649a575aedc68e23a1d4752fb5a5"
+    },
+    {
+      "name": "sampled-ordinal-is-sample-index",
+      "file": "media/src/main/scala/storymodel4s/media/frames.scala",
+      "test": "a sampled set keeps presentation ordinal and sample index apart",
+      "compiled": true,
+      "exit": 1,
+      "failedTotal": 1,
+      "logSha256": "501a0cfddd4735cc9c81a0a62502ecf88c68c9455276953656faee175a9c11fd"
+    }
+  ]
+}

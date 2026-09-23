@@ -1,7 +1,13 @@
 package storymodel4s.media
 
 import java.nio.file.Path
-import storymodel4s.core.{Checksum, ContentAddress, DomainError, SourceDerivationReceipt}
+import storymodel4s.core.{
+  Checksum,
+  ContentAddress,
+  DomainError,
+  ObservationAuthority,
+  SourceDerivationReceipt
+}
 
 /** The one frame-extraction invocation this module admits: decode one picture stream to raw BGR24
   * frames with PTS passthrough (no frame duplication or dropping), no scaling, no cropping. The
@@ -121,9 +127,33 @@ object FramesEnvelope:
       sha
     )
 
-/** Decoded frames bound to the packet index that names each frame's PTS. Why: a detector sees frame
-  * ordinals only; the ordinal-to-PTS table here is the sole lawful route back to time, and it comes
-  * from the probe, never from a nominal rate.
+/** Frames in a raw BGR24 byte file, each bound to one presented packet of one picture stream. Why:
+  * a worker sees frames by position in the bytes only (the *sample index*); the only lawful route
+  * back to time is that frame's *presentation ordinal* in the probe's packet index, never a nominal
+  * rate or a seek time. The two coordinates coincide for a full decode and differ for a sample, so
+  * they are named apart here and never interchanged.
+  */
+sealed trait IdentifiedFrames:
+  def probe: MediaProbe
+  def streamIndex: Int
+  def index: PacketIndex
+  def geometry: PictureGeometry
+  def framesSha256: Checksum
+  def identity: Checksum
+
+  /** Frames in the byte file. */
+  def count: Int
+
+  /** The presented packet shown at `sampleIndex` in the bytes, or `None` if no such frame exists.
+    */
+  def presentationOrdinal(sampleIndex: Int): Option[Int]
+
+  /** The PTS of the frame at `sampleIndex`, looked up through its presentation ordinal. */
+  def ptsOf(sampleIndex: Int): Option[Long] =
+    presentationOrdinal(sampleIndex).flatMap(index.entries.lift).map(_.pts)
+
+/** Decoded frames bound to the packet index that names each frame's PTS: every presented packet, in
+  * order, so sample index and presentation ordinal are the same number.
   */
 final class FrameSet private (
     val probe: MediaProbe,
@@ -135,9 +165,10 @@ final class FrameSet private (
     val args: Vector[String],
     val receipt: SourceDerivationReceipt,
     val identity: Checksum
-):
+) extends IdentifiedFrames:
   def count: Int = index.entries.size
-  def ptsOf(ordinal: Int): Option[Long] = index.entries.lift(ordinal).map(_.pts)
+  def presentationOrdinal(sampleIndex: Int): Option[Int] =
+    if sampleIndex >= 0 && sampleIndex < count then Some(sampleIndex) else None
   override def toString: String =
     s"FrameSet(${probe.manifest.fixtureId}, $count frames, ${identity.short()})"
 
@@ -170,6 +201,45 @@ object FrameSet:
       framesSha256: Checksum
   ): Either[DomainError, FrameSet] =
     for
+      index <- admittedStream(probe, streamIndex, geometry)
+      expected = geometry.frameBytes * index.entries.size.toLong
+      _ <-
+        if byteLength == expected then Right(())
+        else
+          Left(
+            DomainError.InvariantViolation(
+              "frames/bytes",
+              s"$byteLength decoded bytes; ${index.entries.size} presented packets of ${geometry.frameBytes} bytes require $expected"
+            )
+          )
+      receipt <- SourceDerivationReceipt.of(
+        Algorithm,
+        parameters(tool, args, geometry),
+        Vector(probe.input, probe.identity)
+      )
+    yield new FrameSet(
+      probe,
+      streamIndex,
+      index,
+      geometry,
+      framesSha256,
+      tool,
+      args,
+      receipt,
+      ContentAddress.digest(
+        Vector("frame-set", receipt.identity.hex, framesSha256.hex, index.entries.size.toString)
+      )
+    )
+
+  /** The shared admission of a frame source: a `Decoded` picture stream of the probe whose geometry
+    * matches the manifest's declaration, and its packet index.
+    */
+  private[media] def admittedStream(
+      probe: MediaProbe,
+      streamIndex: Int,
+      geometry: PictureGeometry
+  ): Either[DomainError, PacketIndex] =
+    for
       stream <- probe
         .stream(streamIndex)
         .toRight(
@@ -200,31 +270,107 @@ object FrameSet:
             )
           )
       index <- PacketIndex.of(stream)
-      expected = geometry.frameBytes * index.entries.size.toLong
+    yield index
+
+/** Frames of one picture stream selected by presentation ordinal: a few frames per scene instead of
+  * a full decode. Why: describing a scene needs a handful of frames, and a full decode of a feature
+  * is tens of gigabytes. Sample `i` in the bytes shows presented packet `selected(i)`, and its time
+  * is that packet's PTS. The join establishes this relation on declared inputs; that a tool run
+  * actually emitted these packets is a separate, executed court. Authority is `Draft`.
+  */
+final class SampledFrameSet private (
+    val probe: MediaProbe,
+    val streamIndex: Int,
+    val index: PacketIndex,
+    val geometry: PictureGeometry,
+    val selected: Vector[Int],
+    val framesSha256: Checksum,
+    val tool: ToolRealization,
+    val args: Vector[String],
+    val receipt: SourceDerivationReceipt,
+    val identity: Checksum
+) extends IdentifiedFrames:
+  def count: Int = selected.size
+  def presentationOrdinal(sampleIndex: Int): Option[Int] = selected.lift(sampleIndex)
+  def authority: ObservationAuthority = ObservationAuthority.Draft
+  override def toString: String =
+    s"SampledFrameSet(${probe.manifest.fixtureId}, $count of ${index.entries.size} frames, ${identity.short()})"
+
+object SampledFrameSet:
+  val Algorithm: String = "ffmpeg-bgr24-sampled-frames/v1"
+
+  /** Join sampled bytes to the probe. Refuses, besides the full decode's stream and geometry
+    * checks, when the selection is empty, negative, repeated or out of order; when a selected
+    * ordinal names no presented packet; or when the byte length is not exactly one frame per
+    * selected sample.
+    */
+  def join(
+      probe: MediaProbe,
+      streamIndex: Int,
+      geometry: PictureGeometry,
+      tool: ToolRealization,
+      args: Vector[String],
+      selected: Vector[Int],
+      byteLength: Long,
+      framesSha256: Checksum
+  ): Either[DomainError, SampledFrameSet] =
+    for
+      index <- FrameSet.admittedStream(probe, streamIndex, geometry)
+      _ <-
+        if selected.nonEmpty && selected.head >= 0 &&
+          selected.iterator.sliding(2).forall(w => w.size < 2 || w(0) < w(1))
+        then Right(())
+        else
+          Left(
+            DomainError.InvariantViolation(
+              "sampled-frames/selection",
+              s"selection ${selected.take(8).mkString(",")} must be nonempty, non-negative and strictly increasing"
+            )
+          )
+      _ <- selected.find(_ >= index.entries.size) match
+        case None    => Right(())
+        case Some(o) =>
+          Left(
+            DomainError.InvariantViolation(
+              "sampled-frames/membership",
+              s"selected ordinal $o names no presented packet; stream $streamIndex presents ${index.entries.size}"
+            )
+          )
+      expected = geometry.frameBytes * selected.size.toLong
       _ <-
         if byteLength == expected then Right(())
         else
           Left(
             DomainError.InvariantViolation(
-              "frames/bytes",
-              s"$byteLength decoded bytes; ${index.entries.size} presented packets of ${geometry.frameBytes} bytes require $expected"
+              "sampled-frames/bytes",
+              s"$byteLength sampled bytes; ${selected.size} selected frames of ${geometry.frameBytes} bytes require $expected"
             )
           )
+      selection = Checksum.ofText(selected.mkString(","))
       receipt <- SourceDerivationReceipt.of(
         Algorithm,
-        parameters(tool, args, geometry),
+        FrameSet
+          .parameters(tool, args, geometry) + s" stream $streamIndex selection ${selection.hex}",
         Vector(probe.input, probe.identity)
       )
-    yield new FrameSet(
+    yield new SampledFrameSet(
       probe,
       streamIndex,
       index,
       geometry,
+      selected,
       framesSha256,
       tool,
       args,
       receipt,
       ContentAddress.digest(
-        Vector("frame-set", receipt.identity.hex, framesSha256.hex, index.entries.size.toString)
+        Vector(
+          "sampled-frame-set",
+          receipt.identity.hex,
+          streamIndex.toString,
+          framesSha256.hex,
+          selection.hex,
+          selected.size.toString
+        )
       )
     )
