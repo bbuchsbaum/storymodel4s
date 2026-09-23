@@ -450,3 +450,10 @@ record. `WorkspaceExportReceipt` binds exact input bytes, policy, record and
 completed manifest. Implicit first-policy selection and inspection-as-export were
 rejected: both would hide a consequential choice at the CLI boundary. Diagnostics
 remain typed and content-free; the caller owns their presentation.
+
+The JVM entry point `storymodel4s.pipeline.mappingExchangeExport` requires exactly
+`WORKSPACE POLICY OUTPUT`, with no implicit policy or output overwrite. Success
+prints `workspace-mapping-export-receipt/v0.1` JSON binding `input_sha256`,
+`policy_id`, `mapping_digest` and `manifest_sha256`. Refusals produce content-free
+error JSON on stderr and exit 2. The command delegates to the same checked producer;
+it neither performs inference nor promises the unfinished study-preparation facade.
