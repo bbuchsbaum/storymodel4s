@@ -257,3 +257,70 @@ class SampledCaptionConsumerSuite extends FunSuite:
       recordedRequest.extents.init :+ CaptionExtent("shot-3", Vector(29, 45))
     )
     refusedAt(CaptionSearch.join(full, beyond, outcome, envelope.worker, f0), "caption/unsampled")
+
+  /** F0 re-declared with a second Decoded picture stream: stream 1 is stream 0's packets shifted by
+    * +500 ticks, in place of the audio stream. Same geometry, same selection, same bytes digest;
+    * only the stream, and therefore every PTS, differs. Probed without the envelope's stdout
+    * digest, since the ffprobe document is rewritten here on purpose.
+    */
+  private lazy val twoPictureProbe: MediaProbe =
+    import io.circe.Json
+    def parse(t: String): Json =
+      right(
+        io.circe.parser.parse(t).left.map(e => DomainError.InvalidFormat("json", e.message, "json"))
+      )
+    val m = parse(text("f0-v1.manifest.json"))
+    val picture = m.hcursor.downField("streams").downArray.focus.get
+    val m2 = m.mapObject(
+      _.add("streams", Json.arr(picture, picture.mapObject(_.add("index", Json.fromInt(1)))))
+    )
+    val p = parse(new String(resource(probeEnvelope.stdoutFile), StandardCharsets.UTF_8))
+    val videoStream = p.hcursor.downField("streams").downArray.focus.get
+    val shifted =
+      videoStream.mapObject(_.add("index", Json.fromInt(1)).add("start_pts", Json.fromLong(500)))
+    val video = p.hcursor
+      .downField("packets")
+      .focus
+      .flatMap(_.asArray)
+      .get
+      .filter(_.hcursor.downField("stream_index").as[Int].toOption.contains(0))
+    val copies = video.map(pk =>
+      pk.mapObject(o =>
+        o.add("stream_index", Json.fromInt(1))
+          .add("pts", Json.fromLong(pk.hcursor.downField("pts").as[Long].toOption.get + 500))
+          .add("dts", Json.fromLong(pk.hcursor.downField("dts").as[Long].toOption.get + 500))
+      )
+    )
+    val p2 = p.mapObject(
+      _.add("streams", Json.arr(videoStream, shifted)).add("packets", Json.arr((video ++ copies)*))
+    )
+    val manifest2 = right(FixtureManifest.parse(m2.spaces2))
+    right(
+      MediaProbe.join(
+        manifest2,
+        right(manifest2.verify(resource("f0-v1.mov"))),
+        probeEnvelope.tool,
+        probeEnvelope.args,
+        right(FfprobeJson.parse(p2.spaces2))
+      )
+    )
+
+  test("the stream is bound into the sampled set's identity and receipt"):
+    def on(stream: Int) = right(
+      SampledFrameSet.join(
+        twoPictureProbe,
+        stream,
+        framesEnvelope.geometry,
+        framesEnvelope.tool,
+        framesEnvelope.args,
+        shown,
+        framesEnvelope.geometry.frameBytes * shown.size,
+        sampledSha
+      )
+    )
+    val (a, b) = (on(0), on(1))
+    // The precondition that makes this test able to fail: same selection and bytes, different time.
+    assertEquals((a.selected, a.framesSha256), (b.selected, b.framesSha256))
+    assertEquals(b.ptsOf(0).map(_ - 500), a.ptsOf(0))
+    assertNotEquals(a.identity, b.identity)
+    assertNotEquals(a.receipt.identity, b.receipt.identity)

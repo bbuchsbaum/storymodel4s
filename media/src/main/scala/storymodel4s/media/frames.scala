@@ -349,7 +349,8 @@ object SampledFrameSet:
       selection = Checksum.ofText(selected.mkString(","))
       receipt <- SourceDerivationReceipt.of(
         Algorithm,
-        FrameSet.parameters(tool, args, geometry) + s" selection ${selection.hex}",
+        FrameSet
+          .parameters(tool, args, geometry) + s" stream $streamIndex selection ${selection.hex}",
         Vector(probe.input, probe.identity)
       )
     yield new SampledFrameSet(
@@ -366,6 +367,7 @@ object SampledFrameSet:
         Vector(
           "sampled-frame-set",
           receipt.identity.hex,
+          streamIndex.toString,
           framesSha256.hex,
           selection.hex,
           selected.size.toString
