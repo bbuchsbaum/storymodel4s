@@ -1,0 +1,158 @@
+{
+  "command": [
+    "sbt",
+    "-J-Xmx2G",
+    "-batch",
+    "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+    "pipeline/scalafmt",
+    "pipeline/Test/scalafmt",
+    "pipeline/testOnly *MappingExchangeBuildSuite *WorkspaceMappingExportSuite"
+  ],
+  "exit": 0,
+  "seconds": 30.527740001678467,
+  "source_commit": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+  "test_totals": [
+    [
+      "7",
+      "0",
+      "0",
+      "7"
+    ]
+  ],
+  "mutations": [
+    {
+      "name": "before",
+      "head": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *WorkspaceMappingExportSuite"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 21.26935386657715,
+      "totals": [
+        [
+          "4",
+          "0",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": false,
+      "expected_failure": null,
+      "failure_lines": []
+    },
+    {
+      "name": "inspection-allows-export",
+      "head": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *WorkspaceMappingExportSuite"
+      ],
+      "exit": 1,
+      "elapsed_seconds": 29.617164134979248,
+      "totals": [
+        [
+          "4",
+          "1",
+          "0",
+          "3"
+        ]
+      ],
+      "killed": true,
+      "expected_failure": "valid inspection-only workspace refuses before output creation",
+      "failure_lines": [
+        "==> X storymodel4s.pipeline.WorkspaceMappingExportSuite.valid inspection-only workspace refuses before output creation 1.898s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/WorkspaceMappingExportSuite.scala:149"
+      ],
+      "file": "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeBuild.scala",
+      "original_sha256": "05205e6f8ef04296758c45f8216b9b1c97f94afb10d99fe156f4e6100c9ffb1b",
+      "mutant_sha256": "bf8354bbdb4e6af9c3625581b9ea4664cfd5532ff00f9cdb4a3eaea5ed65cf72"
+    },
+    {
+      "name": "implicit-first-policy",
+      "head": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *WorkspaceMappingExportSuite"
+      ],
+      "exit": 1,
+      "elapsed_seconds": 32.72322082519531,
+      "totals": [
+        [
+          "4",
+          "2",
+          "0",
+          "2"
+        ]
+      ],
+      "killed": true,
+      "expected_failure": "unknown policy is refused without silently selecting the first record",
+      "failure_lines": [
+        "==> X storymodel4s.pipeline.WorkspaceMappingExportSuite.each explicit policy exports its unchanged record and an exact input-byte receipt 5.636s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/WorkspaceMappingExportSuite.scala:100",
+        "==> X storymodel4s.pipeline.WorkspaceMappingExportSuite.unknown policy is refused without silently selecting the first record 0.778s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/WorkspaceMappingExportSuite.scala:163"
+      ],
+      "file": "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeBuild.scala",
+      "original_sha256": "05205e6f8ef04296758c45f8216b9b1c97f94afb10d99fe156f4e6100c9ffb1b",
+      "mutant_sha256": "5bb2b0d170e18c54fc4ee715d6c4b850effe3d725089ab8bec81106f18ca561d"
+    },
+    {
+      "name": "after",
+      "head": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+      "command": [
+        "sbt",
+        "-J-Xmx2G",
+        "-batch",
+        "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+        "pipeline/testOnly *WorkspaceMappingExportSuite"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 26.0885910987854,
+      "totals": [
+        [
+          "4",
+          "0",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": false,
+      "expected_failure": null,
+      "failure_lines": []
+    }
+  ],
+  "independent_reader": {
+    "status": "pass",
+    "fixtures": [
+      "workspace-policy-0",
+      "workspace-policy-1",
+      "workspace-policy-2"
+    ],
+    "digests": {
+      "workspace-policy-0": "1d0de28ead5d6da47d9641989561c0716f3edb252777b21379782d85d4c0cecf",
+      "workspace-policy-1": "fc3ebe41bf1852f9afaac7981cb88eac92cafac13d8aab515aeaaa8409baf963",
+      "workspace-policy-2": "a06193df69ff123ec8a0c44880f23754524b101451016eae890b90b11c9d7acd"
+    },
+    "qualification": "package, projection and authored policy checks; not contextual derivation admission",
+    "firstPolicySubstitutionControl": "policy substitution"
+  },
+  "source_hashes": {
+    "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeBuild.scala": "05205e6f8ef04296758c45f8216b9b1c97f94afb10d99fe156f4e6100c9ffb1b",
+    "pipeline/src/test/scala/storymodel4s/pipeline/WorkspaceMappingExportSuite.scala": "8b0952caa6baac846662a76e30de19e2b903ce4805e563017f8a4d8d72144bde",
+    "examples/mapping/check_workspace_export.py": "37f107dc537b39808d82dc07af2d88d485f4264465415e1b8c6ff0d6a1ed4b99"
+  },
+  "raw_evidence_sha256": "1bfb90d96ed5e40f52b8bad1ce9c539b2290c7b61c413a6be8df78ebd19063a3",
+  "qualification": "Focused JVM, compiling mutation and independent consumer evidence only; full checkAll pending."
+}
