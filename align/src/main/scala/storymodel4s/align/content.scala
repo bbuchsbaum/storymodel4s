@@ -175,9 +175,12 @@ object ContentProjection:
       node: NodeSummary,
       view: SourceView
   ): (UnitContent[GraphOrder.Source], TargetContent[GraphOrder.Source], ContentGrain) =
+    // Each leaf is projected once and placed in both historical orders.
+    val leaves = view.leavesUnder(node.ref).flatMap(view.node)
+    val content = leaves.map(n => n.ref -> sourceNode(n)).toMap
     val members = new Members[GraphOrder.Source](
-      view.structuralMembers(node.ref).map(sourceNode),
-      view.leavesUnder(node.ref).flatMap(view.node).map(sourceNode)
+      view.structuralMembers(node.ref).map(n => content(n.ref)),
+      leaves.map(n => content(n.ref))
     )
     (sourceUnit(unit), sourceNode(node, members), grain(view))
 

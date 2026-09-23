@@ -1036,15 +1036,10 @@ object Admissibility:
   */
 object ModeGate:
   def assess(unit: RecallUnit, node: NodeSummary, view: SourceView): Admissibility =
-    if node.isLeaf then Admissibility.of(ContradictionDetector.detect(unit, node))
-    else
-      val engaged = view
-        .leavesUnder(node.ref)
-        .flatMap(view.node)
-        .filter(ContradictionDetector.engages(unit, _))
-      val reports = engaged.map(ContradictionDetector.detect(unit, _))
-      if engaged.nonEmpty && reports.forall(_.nonEmpty) then Admissibility.of(reports.flatten)
-      else Admissibility.faithfulOnly
+    val (u, t, _) = ContentProjection.source(unit, node, view)
+    ContentScoring
+      .modeGateWith(u, t, identity)
+      .fold(r => sys.error(s"unreachable: a source-ordered comparison had readings $r"), identity)
 
 /** Prior cost added to every *source* candidate according to the unit's discourse function: an
   * association or a task comment is presumptively external, an episodic assertion is not.

@@ -67,6 +67,43 @@ object ContentScoring:
           u.predicate.exists(p => t.predicate.contains(p)) || sketchContradictions(u, t).nonEmpty
         )
 
+  private def sequence[L, R](xs: Vector[Either[L, R]]): Either[L, Vector[R]] =
+    xs.foldLeft[Either[L, Vector[R]]](Right(Vector.empty))((acc, x) =>
+      acc.flatMap(v => x.map(v :+ _))
+    )
+
+  /** Which modes a unit may occupy on a target. A leaf takes its own contradictions. A segment
+    * inherits contradictions only when every member the unit engages contradicts it; otherwise the
+    * unit may occupy it faithfully.
+    *
+    * `arrange` fixes the order of the inherited contradictions: the historical path keeps the
+    * members' storage order, and the canonical path orders them by content.
+    */
+  private[align] def modeGateWith[O <: GraphOrder](
+      u: UnitContent[O],
+      t: TargetContent[O],
+      arrange: Vector[Contradiction] => Vector[Contradiction]
+  ): Either[Set[GateReading], Admissibility] =
+    if t.isLeaf then contradictions(u, t).map(cs => Admissibility.of(arrange(cs)))
+    else
+      for
+        flags <- sequence(t.members.leaves.map(m => engages(u, m).map(m -> _)))
+        engaged = flags.collect { case (m, true) => m }
+        reports <- sequence(engaged.map(contradictions(u, _)))
+      yield
+        if engaged.nonEmpty && reports.forall(_.nonEmpty) then
+          Admissibility.of(arrange(reports.flatten))
+        else Admissibility.faithfulOnly
+
+  /** The strict mode gate. Inherited contradictions are ordered by content, never by member storage
+    * order.
+    */
+  def modeGate(
+      u: UnitContent[GraphOrder.Canonical],
+      t: TargetContent[GraphOrder.Canonical]
+  ): Either[Set[GateReading], Admissibility] =
+    modeGateWith(u, t, _.sortBy(_.ordinal))
+
   /** The recall slots the sketch rules read, whatever they were projected from. */
   private[align] final case class RecallSlots(
       predicate: Option[String],
