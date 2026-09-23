@@ -1,0 +1,37 @@
+{
+  "gates": [
+    {
+      "sha": "44752783",
+      "log": "gates/tie-gate.log",
+      "logSha256": "4aab00bdc0f57fda827e7dc77c63201e93d765cb27c387c27f3dc5a100a273b2",
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=<local grakern> clean \"<test for acquireJVM alignJVM amrInteropJVM codecJVM coreJVM corpusIntake documentJVM embedBench embedCoreJVM embedGrakern featuresJVM fixturesJVM interviewJVM lawsJVM pipeline propositionJVM providerAgent providerParser recallJVM storyJVM viewJVM>\" \"set ThisBuild / tlFatalWarnings := true\" alignJS/test alignNative/test alignJVM/test scalafmtCheckAll",
+      "gateExit": 0,
+      "testTaskTotals": 24,
+      "passed": 4569,
+      "failed": 0,
+      "note": "held #16 fence 43; tie-policy candidate"
+    },
+    {
+      "sha": "9119e2a3",
+      "log": "gates/bind-gate.log",
+      "logSha256": "f98b71a05be8657ba8890b69915c1a7b507be0893b319c2a1b8bcb0d78dad73f",
+      "command": "same command as 44752783",
+      "gateExit": 0,
+      "testTaskTotals": 24,
+      "passed": 4589,
+      "failed": 0,
+      "note": "held #16 fence 45; binding repair"
+    },
+    {
+      "sha": "1c7ece00",
+      "log": "gates/door-gate.log",
+      "logSha256": "c242600474a73ec4f08d02b2cf5dae3d129a665d4c5491d94ce31af846e27707",
+      "command": "sbt -batch -Dstorymodel4s.grakern.build=<local grakern> \"set ThisBuild / tlFatalWarnings := true\" clean alignJVM/test alignJS/test alignNative/test codecJVM/test lawsJVM/test scalafmtCheckAll",
+      "gateExit": 0,
+      "testTaskTotals": 5,
+      "passed": 1949,
+      "failed": 0,
+      "note": "construction fix; ran JS/Native WITHOUT #16 (coordination error, acknowledged Fray #58 seq 600)"
+    }
+  ]
+}
