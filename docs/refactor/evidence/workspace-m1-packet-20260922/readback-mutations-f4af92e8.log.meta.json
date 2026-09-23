@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T00:00:42.884946+00:00",
+  "finished_utc": "2026-09-23T00:00:43.024266+00:00",
+  "duration_seconds": 0.139259,
+  "command": [
+    "python3",
+    "tools/mutate-workspace-readback.py",
+    "/private/tmp/workspace-m1-evidence/packet/generated-f4af92e8",
+    "f4af92e8fccf805f34a23d48ca1e9c08d084df96"
+  ],
+  "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+  "log": "/private/tmp/workspace-m1-evidence/packet/readback-mutations-f4af92e8.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 120.0,
+  "log_bytes": 672
+}

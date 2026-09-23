@@ -1,0 +1,211 @@
+{
+  "schema": "storymodel4s.workspace-m1-producer-qualification/v1",
+  "qualifiedSource": "f4af92e8fccf805f34a23d48ca1e9c08d084df96",
+  "gatedMainBase": "f1c82af6bba061cb80e2394a79f633008d8ff7d2",
+  "postGateIntegration": "b86eae616437da8a61f64591e535ca4b0f3c8f53",
+  "postGateMain": "408178ef809442022868792380ba9b8d08fcf673",
+  "postGateQualification": "Only 302 concurrent .mote/ops notebook records were merged after the clean gate; no executable source, test, build or fixture changed.",
+  "fullGate": "checkAll.json",
+  "fullGateTasks": 56,
+  "counts": {
+    "Total": 8230,
+    "Passed": 8225,
+    "Failed": 0,
+    "Errors": 0,
+    "Skipped": 5,
+    "Ignored": 0
+  },
+  "freshJUnit": 756,
+  "fixtureIndex": "fixtures/index.json",
+  "independentReadback": {
+    "checks": 514,
+    "artifacts": 21,
+    "controls": "before and after passed",
+    "mutants": [
+      "duplicate-csv",
+      "wrong-policy",
+      "renormalize-selection",
+      "hull-evidence"
+    ],
+    "allKilled": true
+  },
+  "compiledMutationAttempts": [
+    {
+      "run": "mutations-1",
+      "name": "skip-byte-digest",
+      "head": "3af774228643350db477744200672f6440ee8609",
+      "exit": 1,
+      "totals": [
+        [
+          13,
+          1,
+          0,
+          12
+        ]
+      ]
+    },
+    {
+      "run": "mutations-1",
+      "name": "filter-failed-rows",
+      "head": "3af774228643350db477744200672f6440ee8609",
+      "exit": 1,
+      "totals": [
+        [
+          7,
+          1,
+          0,
+          6
+        ]
+      ]
+    },
+    {
+      "run": "mutations-1",
+      "name": "missing-as-zero",
+      "head": "3af774228643350db477744200672f6440ee8609",
+      "exit": 1,
+      "totals": [
+        [
+          7,
+          3,
+          0,
+          4
+        ]
+      ]
+    },
+    {
+      "run": "mutations-1",
+      "name": "source-renormalize",
+      "head": "3af774228643350db477744200672f6440ee8609",
+      "exit": 1,
+      "totals": [
+        [
+          7,
+          1,
+          0,
+          6
+        ]
+      ]
+    },
+    {
+      "run": "mutations-1",
+      "name": "hull-evidence",
+      "head": "3af774228643350db477744200672f6440ee8609",
+      "exit": 1,
+      "totals": [
+        [
+          23,
+          4,
+          0,
+          19
+        ]
+      ]
+    },
+    {
+      "run": "mutations-1",
+      "name": "ignore-export-grant",
+      "head": "3af774228643350db477744200672f6440ee8609",
+      "exit": 0,
+      "totals": [
+        [
+          23,
+          0,
+          0,
+          23
+        ]
+      ]
+    },
+    {
+      "run": "mutations-2",
+      "name": "ignore-export-grant",
+      "head": "851b97119f6cd27d959e594320bea866ef51ece5",
+      "exit": 1,
+      "totals": [
+        [
+          13,
+          1,
+          0,
+          12
+        ]
+      ]
+    },
+    {
+      "run": "mutations-2",
+      "name": "serialize-denied-packet",
+      "head": "851b97119f6cd27d959e594320bea866ef51ece5",
+      "exit": 1,
+      "totals": [
+        [
+          12,
+          1,
+          0,
+          11
+        ]
+      ]
+    },
+    {
+      "run": "mutations-2",
+      "name": "local-only-addresses",
+      "head": "851b97119f6cd27d959e594320bea866ef51ece5",
+      "exit": 1,
+      "totals": [
+        [
+          23,
+          1,
+          0,
+          22
+        ]
+      ]
+    },
+    {
+      "run": "adapter-mutations-1",
+      "name": "undeclared-recall-origin",
+      "head": "1a1a280dcf00b71a4a341ad7ab7029665206280a",
+      "exit": 1,
+      "totals": [
+        [
+          12,
+          1,
+          0,
+          11
+        ]
+      ]
+    },
+    {
+      "run": "adapter-mutations-3",
+      "name": "drop-source-mark-bridge",
+      "head": "f597344575871f6b7c85bd5c4ff654980d972f9a",
+      "exit": 1,
+      "totals": [
+        [
+          12,
+          1,
+          0,
+          11
+        ]
+      ]
+    },
+    {
+      "run": "adapter-mutations-3",
+      "name": "round-word-clock",
+      "head": "f597344575871f6b7c85bd5c4ff654980d972f9a",
+      "exit": 1,
+      "totals": [
+        [
+          12,
+          1,
+          0,
+          11
+        ]
+      ]
+    }
+  ],
+  "developmentEvidence": "development-evidence.tar.gz",
+  "review": "Separate SD6 review of manifest/export/evidence and lawful Voyage adapter; final readback review recorded in README.",
+  "limits": [
+    "Local producer qualification only; Atlas adoption and full joined browser journey remain open.",
+    "Five optional live checks skipped; Clang 15 advisory retained.",
+    "Authored control values and explicitly synthetic presentation clocks are not empirical calibration or verified recording correspondence.",
+    "WOG has no lawful supplied Voyage clocks; every unit remains in the inventory with an explicit unavailable disposition.",
+    "No hosted CI, push, publication, release, automatic chart/scene generation or reference-inference authority."
+  ]
+}

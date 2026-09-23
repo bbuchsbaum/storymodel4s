@@ -1,0 +1,30 @@
+{
+  "schemaVersion" : "workspace-fixture-voyage/v0.1",
+  "workspace_sha256" : "bfc99a70bdb0913fd194951b411b4981a1ebab2fc98a11d4d32f59fb46166088",
+  "policy" : "historical-lexical",
+  "mapping_digest" : "a06193df69ff123ec8a0c44880f23754524b101451016eae890b90b11c9d7acd",
+  "units" : [
+    {
+      "unit" : "m1:u0",
+      "ordinal" : 0,
+      "disposition" : "Unsupported(ClocksNotSupplied)"
+    },
+    {
+      "unit" : "m1:u1",
+      "ordinal" : 1,
+      "disposition" : "Unsupported(ClocksNotSupplied)"
+    },
+    {
+      "unit" : "m1:u2",
+      "ordinal" : 2,
+      "disposition" : "Unsupported(ClocksNotSupplied)"
+    },
+    {
+      "unit" : "m1:u3",
+      "ordinal" : 3,
+      "disposition" : "Unsupported(ClocksNotSupplied)"
+    }
+  ],
+  "addresses" : [
+  ]
+}

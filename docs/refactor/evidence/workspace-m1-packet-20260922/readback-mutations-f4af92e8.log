@@ -1,0 +1,6 @@
+{"before": {"status": "passed", "checks": 514, "producerRevision": "f4af92e8fccf805f34a23d48ca1e9c08d084df96", "fixtures": ["wog", "bell"], "artifacts": 21}}
+{"mutation": "duplicate-csv", "killed": true, "witness": "unique CSV measure coordinates"}
+{"mutation": "wrong-policy", "killed": true, "witness": "selected policy"}
+{"mutation": "renormalize-selection", "killed": true, "witness": "unchanged original outcome"}
+{"mutation": "hull-evidence", "killed": true, "witness": "literal discontiguous recall answer"}
+{"after": {"status": "passed", "checks": 514, "producerRevision": "f4af92e8fccf805f34a23d48ca1e9c08d084df96", "fixtures": ["wog", "bell"], "artifacts": 21}}
