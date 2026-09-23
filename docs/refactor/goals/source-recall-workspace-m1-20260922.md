@@ -14,6 +14,42 @@ and named reconstruction results, exchange and temporal/OpenNeuro export. The ow
 22 September decisions moved film compilation and organization/recovery analyses to 1.1.
 Those changes do not enlarge or weaken this M1 completion boundary.
 
+## Completion receipt
+
+M1 passed its local exact-pair acceptance on 22 September 2026 (receipts use UTC
+23 September). StoryAtlas runtime `f74573eb7606ef0243b0bb75b93b4c54b54c995a` is
+qualified against StoryModel package `7b2f076a57bde1ec540090c43debfec51c8d44d4`
+(producer executable `f4af92e8fccf805f34a23d48ca1e9c08d084df96`). The consumer and
+its evidence landed locally in StoryAtlas `b8ce8c0e3ea5e02e146af2205574b8127e06f06b`.
+
+The [consumer acceptance archive](../../../../storyatlas4s/docs/delivery/evidence/workspace-m1-20260922/README.md)
+in the sibling checkout records 376 tests, 83 joined-workspace browser checks,
+19 standalone Voyage checks, the source/static/feature preservation courts,
+five killed source mutants, ten independently refused export corruptions and a
+separate cold receipt review. Its `artifact-index.json` has SHA-256
+`f396160e5548248a17e47be3ed4563c1208d6e7204094b372a264b048d7b2336`.
+The [producer archive](../evidence/workspace-m1-packet-20260922/README.md) retains
+its exact commands, totals, independent reader and five optional live-inference
+skips. Consumer Java 25 runtime warnings remain visible in the consumer receipt.
+
+Both generated fixtures open in the same app, including draft authority, complete
+recall traversal, every supplied alternative, exact permitted evidence, independent
+clocks/horizons, policy switching, source attachment, save/reopen and export.
+Foreign joins, denied content, stale openings and changed replay identities have
+executed refusal witnesses. The foreign acceptance and container were read back
+closed before reconciling the canonical StoryModel goal. The table below preserves
+the original setup sequence; it is not a current open-work list.
+
+This completes the bounded workspace milestone. It does not establish automatic
+narrative construction, automatic recall charts, comparative inference efficacy,
+calibration, film/interview delivery, hosted CI or a 1.0 release. The next work
+continues under the existing 1.0 gate and workflow tickets: ordinary-file
+preparation/CLI, shared evidence and reference/reconstruction mapping, checked
+exchange and temporal/OpenNeuro delivery. Fray thread 11 records the agreed lanes;
+threads 18/22/23 record the next concrete pair: the CLI dispatcher consumes the
+checked workspace-export helper, with explicit policy identity and a denied-export
+counterexample. No estimator is added to StoryAtlas.
+
 ## Goal and completion boundary
 
 A researcher opens generated source, recall and mapping artifacts in the same application,
