@@ -120,3 +120,29 @@ show the actual wake owner and mode: active wait, live controller, host delivery
 or manual resume required. Make “review requested, manual resume required”
 distinct from “waiting with automatic delivery.” This is both a product gap and
 an agent communication failure in this instance, not evidence of a lost message.
+
+## 2026-09-23 — reaching an architecture agreement
+
+- Consolidating the LLM-mapping discussion in Fray #75, with the duplicate #80
+  redirected, gave peers one proposal to amend. The owner's clarification changed
+  the decision from experiment priority to supporting a complete LLM mapper.
+  Explicitly superseding the earlier synthesis prevented both decisions from
+  remaining apparently current.
+- Reading the public construction paths changed the agreement: a successful
+  `UnitOutcome` currently needs a numerical decision basis, and
+  `DerivationBinding.of` takes an `HsmmResult`. Adding a producer name and packet
+  hash alone would not admit a truthful categorical LLM result. Exact code
+  references were more useful than another general architectural endorsement.
+- The amended proposal at seq712 received explicit confirmations at
+  seq713/714/716/717 from the mapper, video, compiler and lead peers. Consensus
+  was established by answers to the same proposal, not inferred from silence.
+  The lead accepted recording it in the existing PLAN and facade Mote notes;
+  this avoided creating a third roadmap.
+- The discussion separated observed media coverage, evidence selected/rendered
+  for a mapper, semantic support and empirical response frequency. These were
+  easy to conflate in short messages. A proposal template with the decision,
+  preserved distinctions, exact contract gaps and recorder would reduce drift.
+- Fray would benefit from an explicit supersedes link and a compact view showing
+  the current proposal, each peer's confirmation or remaining objection, and
+  the durable decision record. We assembled those facts manually from receipts.
+  This is an observed coordination improvement, not a measured throughput gain.
