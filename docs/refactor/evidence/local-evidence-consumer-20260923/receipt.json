@@ -1,0 +1,51 @@
+{
+  "schema": "local-evidence-consumer-review/v1",
+  "scope": "Synthetic JVM consumer regressions outside align; independent navigator runs. Full release gate remains separate.",
+  "runs": [
+    {
+      "source_commit": "91645dc82e0d4b0f288b94e547603d16e2c0a1cc",
+      "log": "before.log",
+      "command_receipt": "before.json",
+      "total": 5,
+      "passed": 3,
+      "failed": 2,
+      "exit_code": 1,
+      "finding": "Missing versus empty recall/source fields alias under legacy identities and admit reused evidence."
+    },
+    {
+      "source_commit": "8a222c712b16c7f2f2d3f3ed31e52cc5334db580",
+      "log": "snapshot-mixed-numeric.log",
+      "command_receipt": "snapshot-mixed-numeric.log.meta.json",
+      "total": 6,
+      "passed": 5,
+      "failed": 1,
+      "exit_code": 1,
+      "finding": "Source adjacency can change during inference while published view identity remains unchanged.",
+      "expected_log_likelihood": -3.473917465573736,
+      "actual_log_likelihood": -2.6285460342350806
+    },
+    {
+      "source_commit": "5fbb983128e0e957be4f8b5546dbeac9d426d08f",
+      "production_fix": "fb76f1422d045d7ad5f7ef2795f83f2fde744556",
+      "log": "snapshot-after.log",
+      "command_receipt": "snapshot-after.log.meta.json",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "exit_code": 0
+    }
+  ],
+  "sha256": {
+    "before.log": "a1f5282c54fa2a8e50d5581d17688919ba2a0fd6acac23fd1066d6200f752684",
+    "before.json": "b23ab4fab091a181f6a02668df06b534a96a8796bb35aba24ced94d50201167a",
+    "snapshot-mixed-numeric.log": "63cd99be5cfb7a34e71642889f5445ebb634c6c45a1fa45b69024b7fd5553e65",
+    "snapshot-mixed-numeric.log.meta.json": "11c0b662282e12150d31eb36310504c8753a7142ff3cac201f368e4f3aafaace",
+    "snapshot-after.log": "f32504b395323044b228a908d0742c32353f2d4649cd4805f15a6ca9021b1c51",
+    "snapshot-after.log.meta.json": "526c9927558868e7e61005d2969df315d82f892d7443a25d6dd851e0c87508b5"
+  },
+  "source_sha256": {
+    "align/src/main/scala/storymodel4s/align/hsmm.scala": "e3541bc7c9ca2b09618a47c96ab19921017dfeda14343ea1b55a9795253f3e8f",
+    "align/src/main/scala/storymodel4s/align/evidence.scala": "abbc66f557e09181d3e0761958e16874378666d1c21050a66f85f000b4688352",
+    "codec/src/test/scala/storymodel4s/codec/LocalEvidenceConsumerSuite.scala": "749943d922ee23f8938066f425345d8c1c031cd9cfc246052fd14cfbbf0ad23b"
+  }
+}

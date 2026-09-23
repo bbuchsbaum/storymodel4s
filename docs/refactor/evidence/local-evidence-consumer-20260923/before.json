@@ -1,0 +1,13 @@
+{
+  "command": [
+    "sbt",
+    "-J-Xmx2G",
+    "-batch",
+    "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+    "codecJVM/Test/scalafmt",
+    "codecJVM/testOnly *LocalEvidenceConsumerSuite"
+  ],
+  "exit": 1,
+  "seconds": 34.84492516517639
+}
