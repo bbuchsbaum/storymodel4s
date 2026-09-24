@@ -750,12 +750,8 @@ trait SemanticDistance:
 
 object SemanticDistance:
   /** Jaccard distance over content lemmas: a dependency-free fallback that never abstains. */
-  val lexicalJaccard: SemanticDistance = SemanticDistance.of { (unit, node) =>
-    val a = unit.proposition.lemmas
-    val b = node.lemmas
-    if a.isEmpty && b.isEmpty then 1.0
-    else 1.0 - a.intersect(b).size.toDouble / a.union(b).size.toDouble
-  }
+  val lexicalJaccard: SemanticDistance = (unit, node) =>
+    ContentLexical.score(ContentProjection.sourceUnit(unit), ContentProjection.sourceNode(node))
 
   /** Table-driven distance with a default for unlisted pairs (simulates embedding output). */
   def fromTable(
@@ -815,7 +811,7 @@ object StructuralDistance:
   * reported in the receipt and never imputed into the cost.
   */
 object ChartDistance:
-  private val Reducer: StructuralReducer = StructuralReducer.Minimum
+  private val Reducer: StructuralReducer = ContentScoring.Reducer
 
   /** Distance between two charts in `[0, 1]`: `1 − structuralScore`. */
   def between(a: PropositionEvidence, b: PropositionEvidence): Double =
@@ -884,36 +880,29 @@ object ChartDistance:
           sourceCoverage
         )
       case Some(unitEvidence) =>
-        val charted = view
-          .structuralMembers(node.ref)
-          .flatMap(member => member.evidence.map(evidence => member -> evidence))
-        val classified = charted.map { case (member, evidence) =>
-          val contradictions = ContradictionDetector.detect(unit, member).toSet
-          if contradictions.isEmpty then
-            Left(
-              StructuralMemberEstimate(
-                member.ref,
-                finite(estimate(unitEvidence, evidence))
-              )
-            )
-          else Right(StructuralMemberExclusion(member.ref, contradictions))
-        }
-        val members = classified.collect { case Left(member) => member }
-        val excluded = classified.collect { case Right(member) => member }
-        val observed = members.flatMap(_.estimate.toOption)
-        val aggregate =
-          if charted.isEmpty || members.isEmpty then Estimate.missing(MissingReason.Excluded)
-          else
-            Reducer
-              .reduce(observed)
-              .fold[Estimate[Double]](Estimate.missing(MissingReason.ProviderAbstained))(
-                Estimate.observed
-              )
-        result(aggregate, members, excluded, sourceCoverage)
-
-  private def finite(estimate: Estimate[Double]): Estimate[Double] = estimate match
-    case Estimate.Observed(value, credence) => Estimate.score(value, credence)
-    case missing @ Estimate.Missing(_)      => missing
+        // The one reduction, over source content; the node handle keys the receipt and feeds the
+        // provider its evidence.
+        val members =
+          view.structuralMembers(node.ref).map(m => m -> ContentProjection.sourceNode(m))
+        val reduced = ContentScoring
+          .reduceMembers(
+            ContentProjection.sourceUnit(unit),
+            members,
+            (m, _) =>
+              m.evidence.fold[Estimate[Double]](
+                Estimate.missing(MissingReason.ProviderAbstained)
+              )(estimate(unitEvidence, _))
+          )
+          .fold(
+            r => sys.error(s"unreachable: a source-ordered comparison had readings $r"),
+            identity
+          )
+        result(
+          reduced.estimate,
+          reduced.scored.map((m, e) => StructuralMemberEstimate(m.ref, e)),
+          reduced.excluded.map((m, cs) => StructuralMemberExclusion(m.ref, cs)),
+          sourceCoverage
+        )
 
   private def result(
       estimate: Estimate[Double],
@@ -941,10 +930,6 @@ object ChartDistance:
   * fires only when the compared slots are both specified.
   */
 object ContradictionDetector:
-  /** Facets a chart report decides. */
-  private val ChartFacets: Set[Contradiction] =
-    Set(Contradiction.RoleReversal, Contradiction.PolarityConflict, Contradiction.ContextConflict)
-
   /** Contradictions carried by a chart report. */
   def fromReport(report: CompatibilityReport): Vector[Contradiction] =
     Vector(
@@ -957,60 +942,22 @@ object ContradictionDetector:
     * facets otherwise; modality/outcome always from the sketch.
     */
   def detect(unit: RecallUnit, node: NodeSummary): Vector[Contradiction] =
-    ChartDistance.report(unit, node) match
-      case Some(report) =>
-        val fromSketch = detect(unit.proposition, node).filterNot(ChartFacets.contains)
-        (fromReport(report) ++ fromSketch).distinct
-      case None => detect(unit.proposition, node)
+    ContentScoring
+      .contradictions(ContentProjection.sourceUnit(unit), ContentProjection.sourceNode(node))
+      .fold(r => sys.error(s"unreachable: a source-ordered comparison had readings $r"), identity)
 
   def detect(sketch: PropositionSketch, node: NodeSummary): Vector[Contradiction] =
-    val predicateMatch = sketch.predicate.exists(p => node.predicate.exists(_ == p))
-    val out = Vector.newBuilder[Contradiction]
-
-    // Role reversal: the recalled patient is the source agent (and the recalled agent is not),
-    // or the recalled agent is the source patient (and the recalled patient is not).
-    val sAgent = sketch.agent
-    val sPatient = sketch.patient
-    val nAgent = node.agent
-    val nPatient = node.patient
-    val patientIsNodeAgent = (sPatient, nAgent) match
-      case (Some(p), Some(a)) => Names.overlap(p.names, a.names)
-      case _                  => false
-    val agentIsNodeAgent = (sAgent, nAgent) match
-      case (Some(x), Some(a)) => Names.overlap(x.names, a.names)
-      case _                  => false
-    val agentIsNodePatient = (sAgent, nPatient) match
-      case (Some(x), Some(p)) => Names.overlap(x.names, p.names)
-      case _                  => false
-    val patientIsNodePatient = (sPatient, nPatient) match
-      case (Some(x), Some(p)) => Names.overlap(x.names, p.names)
-      case _                  => false
-    val reversed =
-      (patientIsNodeAgent && sAgent.nonEmpty && !agentIsNodeAgent) ||
-        (agentIsNodePatient && sPatient.nonEmpty && !patientIsNodePatient)
-    val bothInverted = patientIsNodeAgent && agentIsNodePatient
-    if bothInverted || (reversed && predicateMatch) then out += Contradiction.RoleReversal
-
-    if predicateMatch && sketch.polarity != PolarityTag.Unknown &&
-      node.polarity != PolarityTag.Unknown && sketch.polarity != node.polarity
-    then out += Contradiction.PolarityConflict
-
-    if predicateMatch && sketch.modality == ModalityTag.Asserted &&
-      node.context != ContextTag.NarratedWorld
-    then out += Contradiction.ContextConflict
-
-    val unrealized = Set(ModalityTag.Intended, ModalityTag.Desired, ModalityTag.Counterfactual)
-    val modalityConflict =
-      (sketch.modality == ModalityTag.Asserted && unrealized.contains(node.modality)) ||
-        (unrealized.contains(sketch.modality) && node.modality == ModalityTag.Asserted)
-    if predicateMatch && modalityConflict then out += Contradiction.ModalityConflict
-
-    (sketch.outcome, node.outcome) match
-      case (Some(a), Some(b)) if predicateMatch && Lexical.lower(a) != Lexical.lower(b) =>
-        out += Contradiction.OutcomeConflict
-      case _ => ()
-
-    out.result()
+    ContentScoring.sketchRules(
+      ContentScoring.RecallSlots(
+        sketch.predicate,
+        sketch.agent.map(_.names),
+        sketch.patient.map(_.names),
+        sketch.polarity,
+        sketch.modality,
+        sketch.outcome
+      ),
+      ContentScoring.slots(ContentProjection.sourceNode(node))
+    )
 
   /** Whether the sketch engages the node structurally at all (shares its predicate or contradicts
     * it); used to decide which leaves count when a segment inherits contradictions.
@@ -1022,9 +969,9 @@ object ContradictionDetector:
     * rule.
     */
   def engages(unit: RecallUnit, node: NodeSummary): Boolean =
-    ChartDistance.report(unit, node) match
-      case Some(r) => r.matchedPredicates.nonEmpty || detect(unit, node).nonEmpty
-      case None    => engages(unit.proposition, node)
+    ContentScoring
+      .engages(ContentProjection.sourceUnit(unit), ContentProjection.sourceNode(node))
+      .fold(r => sys.error(s"unreachable: a source-ordered comparison had readings $r"), identity)
 
 /** Which `(anchor, mode)` pairs a unit may occupy on a candidate node. Decided by [[ModeGate]]
   * before any graded cost is evaluated; `faithful` is false exactly when a contradiction was
@@ -1083,15 +1030,10 @@ object Admissibility:
   */
 object ModeGate:
   def assess(unit: RecallUnit, node: NodeSummary, view: SourceView): Admissibility =
-    if node.isLeaf then Admissibility.of(ContradictionDetector.detect(unit, node))
-    else
-      val engaged = view
-        .leavesUnder(node.ref)
-        .flatMap(view.node)
-        .filter(ContradictionDetector.engages(unit, _))
-      val reports = engaged.map(ContradictionDetector.detect(unit, _))
-      if engaged.nonEmpty && reports.forall(_.nonEmpty) then Admissibility.of(reports.flatten)
-      else Admissibility.faithfulOnly
+    val (u, t, _) = ContentProjection.source(unit, node, view)
+    ContentScoring
+      .modeGateWith(u, t, identity)
+      .fold(r => sys.error(s"unreachable: a source-ordered comparison had readings $r"), identity)
 
 /** Prior cost added to every *source* candidate according to the unit's discourse function: an
   * association or a task comment is presumptively external, an episodic assertion is not.
@@ -1242,100 +1184,29 @@ final case class DefaultLocalCostModel(
       mode: FidelityMode,
       view: SourceView
   ): CostBreakdown =
-    val sketch = unit.proposition
-    // The provider's own answer is kept, not collapsed to a Double, so that "abstained" survives to
-    // the receipt. The PRICE is unchanged - `missingSemantic` is still substituted, and the M0
-    // decision at cost.scala:705 stands - but the substitution is now recorded rather than silent.
-    val semEstimate = semantic(unit, node)
-    val dSem = clamp(semEstimate.toOption.getOrElse(missingSemantic))
-    val semImputed: Map[CostTerm, MissingReason] = semEstimate match
-      case Estimate.Missing(reason) => Map(CostTerm.Semantic -> reason)
-      case _                        => Map.empty
-    val dProp = (sketch.predicate, node.predicate) match
-      case (Some(a), Some(b)) => if a == b then 0.0 else 1.0
-      case _                  => 0.5
-    val specified = sketch.participants.filter(_.specified)
-    // Role-aware: a name found in the same role earns full credit, in another role half credit.
-    val dEnt =
-      if specified.isEmpty then 0.5
-      else
-        val credit = specified.map { p =>
-          if node.byRole(p.role).exists(n => Names.overlap(p.names, n.names)) then 1.0
-          else if Names.overlap(p.names, node.allNames) then 0.5
-          else 0.0
-        }.sum
-        1.0 - credit / specified.size.toDouble
-    val dSens =
-      if sketch.sensoryTerms.isEmpty then Estimate.missing(MissingReason.AllMissing)
-      else
-        val hits = sketch.sensoryTerms.count(t => node.lemmas.contains(Lexical.stem(t)))
-        Estimate.observed(1.0 - hits.toDouble / sketch.sensoryTerms.size.toDouble)
-    // Preferred abstraction level: summaries want a scene, thematic/evaluative remarks want the
-    // global level, predicate-bearing assertions want a leaf, predicate-less ones a scene.
-    val preferred = unit.function match
-      case DiscourseFunction.Summary                                    => 1
-      case DiscourseFunction.Association | DiscourseFunction.Evaluation => view.maxLevel
-      case _ if sketch.predicate.isEmpty && sketch.participants.isEmpty => 1
-      case _                                                            => 0
-    val dGran = math.min(1.0, 0.5 * math.abs(node.level - preferred))
-    // The distortion term: `distortionPenalty` per contradicted facet, weighted by
-    // `contradiction`. It separates a distorted anchor from a faithful one at equal content
-    // match and must stay below the external floor so a well-matched distorted anchor is
-    // preferred to intrusion (design record §9). Provisional until W4 calibration.
-    val dDist = distortionPenalty * mode.facetSet.size.toDouble
-    // Optional evidence-backed terms: present only when charts exist on both sides (and, for
-    // `d_wl`, a provider answered). Absent terms are inert and recorded, never substituted.
+    // Providers and receipt identities stay outside the content scorer. Their typed outcomes are
+    // supplied to the single deterministic price calculation after Source-order projection.
+    val semanticEstimate = semantic(unit, node)
     val chartReduction = ChartDistance.reduction(unit, node, view)
     val structuralReduction = ChartDistance.structuralReduction(structural, unit, node, view)
-    val dChart = chartReduction.estimate
-    val dWl = structuralReduction.estimate
-    val always = Vector(
-      CostTerm.Semantic -> dSem,
-      CostTerm.Propositional -> dProp,
-      CostTerm.Entity -> dEnt,
-      CostTerm.Granularity -> dGran,
-      CostTerm.Distortion -> dDist
+    val (u, t, grain) = ContentProjection.source(unit, node, view)
+    val price = ContentCostScoring.terms(
+      u,
+      t,
+      grain,
+      mode,
+      semanticEstimate,
+      chartReduction.estimate,
+      structuralReduction.estimate,
+      structural != StructuralDistance.missing,
+      missingSemantic,
+      distortionPenalty
     )
-    val optional =
-      Vector(CostTerm.Chart -> dChart, CostTerm.Structural -> dWl, CostTerm.Sensory -> dSens)
-    val present = optional.collect { case (t, Estimate.Observed(v, _)) => t -> clamp(v) }
-    val missing = optional.collect { case (t, Estimate.Missing(_)) => t }.toSet
-    val terms = (always ++ present).toMap
-    // ELIGIBILITY IS PER-CELL, not per-view. A chartless node in a mixed view could never have been
-    // chart-compared, so treating it as a missed measurement would invent a dimension that cell
-    // cannot have — the same error as scaling over all terms, which collapsed every row to External.
-    // Chart eligibility must be asked of the function that PRODUCES the term. `dChart` comes from
-    // ChartDistance.reduction, which measures over `view.structuralMembers(node.ref)` — the leaves.
-    // It does NOT come from ChartDistance.report, whose `(unit, node)` signature genuinely does
-    // need a chart on each side. Testing `node.evidence` here applied report's contract to
-    // reduction's term: identical on a leaf, wrong on a segment, because StorySourceView gives a
-    // segment no chart of its own ("segments never get a fabricated chart") while its leaves carry
-    // the charts actually compared. Chart then came out present-but-not-eligible, wPresent exceeded
-    // wEligible, and the blend multiplied the cost DOWN while the old numeric support's clamp
-    // reported the over-unity ratio as full support. `leavesUnder` returns the node itself for a leaf, so this
-    // predicate is a strict generalization and no leaf cell moves.
-    //
-    // Structural has the SAME defect mirrored, found by scout on this candidate. It is produced by
-    // ChartDistance.structuralReduction, which reads the same structuralMembers population, but its
-    // eligibility asked only whether a provider was configured and the unit had evidence — never
-    // whether the source had a chart to compare against. On a chartless cell the term is absent
-    // either way, yet CONFIGURATION ALONE moved (support, total) from (0.9552, 1.37045) to
-    // (0.8312, 1.575): a 15% cost inflation for a measurement that cell could never have had,
-    // biasing chartless cells toward External. That is exactly the error the paragraph above warns
-    // about, in the term I did not check. Both now ask the population the measurement reads.
-    val chartedMembers = view.structuralMembers(node.ref).exists(_.hasEvidence)
-    val chartEligible = unit.evidence.nonEmpty && chartedMembers
-    val structuralEligible =
-      structural != StructuralDistance.missing && unit.evidence.nonEmpty && chartedMembers
-    val eligible = always.map(_._1).toSet ++
-      Set(CostTerm.Sensory) ++
-      Option.when(chartEligible)(CostTerm.Chart) ++
-      Option.when(structuralEligible)(CostTerm.Structural)
     // SUPPORT COUNTS MEASURED WEIGHT, NOT PRICED WEIGHT. An imputed term stays in `terms` (it is
     // priced) and stays in `eligible` (the comparison was possible), so it leaves the numerator
     // only. That is exactly the gap the two-cell court measures: support must differ between a
     // measured and an imputed cell by semanticWeight / eligibleWeight, and nothing else may move.
-    // The factory derives the measured population from `terms -- semImputed` itself, so the
+    // The factory derives the measured population itself (terms minus `price.semanticImputed`), so the
     // support basis cannot disagree with the record it describes.
     //
     // ZERO ASSESSED SUPPORT IS AN EXCLUSION, NOT A PRICE (see CostBreakdown.derived). Excluding it
@@ -1344,20 +1215,22 @@ final case class DefaultLocalCostModel(
     // total is by-name and is not computed for such a cell.
     CostBreakdown
       .derived(
-        terms,
+        price.values,
         mode,
-        missing,
+        price.missing,
         Some(view.structuralCoverage(node.ref)),
         Map(
           CostTerm.Chart -> chartReduction.receipt,
           CostTerm.Structural -> structuralReduction.receipt
         ),
-        semImputed,
-        eligible,
+        price.semanticImputed,
+        price.eligible,
         weights,
-        DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function), eligible)
+        DefaultLocalCostModel.blend(
+          price.values,
+          weights,
+          functionPrior(u.function),
+          price.eligible
+        )
       )
       .fold(e => throw new IllegalStateException(e.message), identity)
-
-  private def clamp(x: Double): Double =
-    if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))

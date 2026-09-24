@@ -666,3 +666,27 @@ unchanged and keep their byte-identical output.
 - Passing `PropositionEvidence` or `Canonical.form`, because they retain forbidden fields.
 - Treating an unordered collection as sufficient.
 - Wrapping arbitrary existing closures as strict channels.
+
+**Tie resolution in the strict compare** (S2a-1b, mote `bd-01M37EKWYZ1973TGK7JSTZC28C`; amendment
+proposed by claude-release, pending the lead's acceptance). The canonical labelling is invariant
+under ids and storage, but it is still a content-hash colouring that also reads focus and
+explicit-Unknown polarity. Any choice that breaks a tie by that order therefore gives the order
+back to the score. Measured at 7d41e5d4: the canonical compare changed with `focus` alone, and
+with the lemma of a concept that scores nothing.
+
+- Canonical graphs compare under `TiePolicy.OrderFree`. Source-ordered graphs and the chart path
+  keep `TiePolicy.Historical`, so the S2a-0 pins stay byte-identical.
+- Relation assignment is the exact optimum (integer Hungarian) of a fixed lexicographic
+  objective: most argument agreement, then most roles matched, then fewest filler-status
+  mismatches. Scores are summed in integer tenths.
+- For each head, every partner that is best by (concept, argument agreement, fewest gates, fewest
+  mismatches) is kept. Tied partners agree on every graded quantity. They can disagree on which
+  gate they raise, so the report keeps `gateReadings`, the set of gate combinations over every
+  choice of best partners (at most eight). A gate flag means "raised under every best reading",
+  and `gatesAmbiguous` says the readings differ. `gated` is exact, since tied partners raise
+  equally many gates: every reading is gated or none is. All tied partners are listed as matched.
+- Rejected: a content-hash tie-break, which is a hidden prior; pick-first, which depends on
+  order; greedy assignment, which depends on order even without ties; a union of the tied gates,
+  which reports as established a conflict that no single best reading has (codex-pair-0923's
+  BLOCK on 88675d29, Fray #105 seq 870); and refusing on a gate-divergent tie, which would turn a
+  measurable, typed ambiguity into missing evidence.

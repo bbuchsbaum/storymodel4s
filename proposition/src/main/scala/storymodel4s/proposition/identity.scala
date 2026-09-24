@@ -38,6 +38,12 @@ object ChartIdentity:
     val frame = c.frame.map(f => s"${esc(f.namespace)}/${esc(f.id)}").getOrElse("-")
     s"${c.kind}|${esc(c.lemma.value)}|$frame"
 
+  /** [[conceptKey]] plus the gloss, for orderings that must separate concepts `compare` separates.
+    * `None` renders as `-`, which no escaped gloss can equal because `g:` prefixes every `Some`.
+    */
+  private[proposition] def glossedConceptKey(c: Concept): String =
+    conceptKey(c) + "|" + c.gloss.map(g => "g:" + esc(g)).getOrElse("-")
+
   def roleKey(r: RoleAssignment): String =
     val normalized = r.normalizedRole match
       case Some(ParticipantRole.Custom(ns, l)) => s"Custom/${esc(ns)}/${esc(l)}"
@@ -57,8 +63,15 @@ object ChartIdentity:
 
   /** Canonical serialization under a labeling. Lines are sorted so relation order is irrelevant. */
   def serialize[C <: CheckState](chart: PropositionChart[C], label: ConceptId => String): String =
+    serializeKeyed(chart, label, conceptKey)
+
+  private[proposition] def serializeKeyed[C <: CheckState](
+      chart: PropositionChart[C],
+      label: ConceptId => String,
+      key: Concept => String
+  ): String =
     val lab: ConceptId => String = id => esc(label(id))
-    val concepts = chart.conceptIds.map(id => s"c ${lab(id)} ${conceptKey(chart.concepts(id))}")
+    val concepts = chart.conceptIds.map(id => s"c ${lab(id)} ${key(chart.concepts(id))}")
     val relations =
       chart.relations.map(r => s"r ${lab(r.from)} ${roleKey(r.role)} ${targetKey(r.to, label)}")
     val polarity = chart.polarity.toVector.map((id, p) => s"p ${lab(id)} $p")
@@ -97,9 +110,12 @@ object Canonical:
 
   private def label(index: Int): String = f"$Prefix$index%05d"
 
-  private def initialColors[C <: CheckState](chart: PropositionChart[C]): Map[ConceptId, String] =
+  private def initialColors[C <: CheckState](
+      chart: PropositionChart[C],
+      key: Concept => String
+  ): Map[ConceptId, String] =
     chart.conceptIds.map { id =>
-      val base = ChartIdentity.conceptKey(chart.concepts(id))
+      val base = key(chart.concepts(id))
       val pol = chart.polarityOf(id).toString
       val focus = if chart.focus.contains(id) then "F" else "-"
       id -> Sha256.hexDigest(s"$base|$pol|$focus")
@@ -148,11 +164,18 @@ object Canonical:
 
   /** Colour classes after refinement, in canonical (colour) order. */
   def refine[C <: CheckState](chart: PropositionChart[C]): Vector[Vector[ConceptId]] =
-    if chart.isEmpty then Vector.empty else classesOf(refineColors(chart, initialColors(chart)))
+    if chart.isEmpty then Vector.empty
+    else classesOf(refineColors(chart, initialColors(chart, ChartIdentity.conceptKey)))
 
   /** Colour of every concept after refinement; equal colours are comparable across charts. */
   def colors[C <: CheckState](chart: PropositionChart[C]): Map[ConceptId, String] =
-    if chart.isEmpty then Map.empty else refineColors(chart, initialColors(chart))
+    colorsKeyed(chart, ChartIdentity.conceptKey)
+
+  private def colorsKeyed[C <: CheckState](
+      chart: PropositionChart[C],
+      key: Concept => String
+  ): Map[ConceptId, String] =
+    if chart.isEmpty then Map.empty else refineColors(chart, initialColors(chart, key))
 
   /** Signature of `x` with `y` abstracted as OTHER and `x` itself as SELF. */
   private def swapSignature[C <: CheckState](
@@ -179,10 +202,11 @@ object Canonical:
   private[proposition] def twins[C <: CheckState](
       chart: PropositionChart[C],
       a: ConceptId,
-      b: ConceptId
+      b: ConceptId,
+      key: Concept => String = ChartIdentity.conceptKey
   ): Boolean =
     a != b &&
-      ChartIdentity.conceptKey(chart.concepts(a)) == ChartIdentity.conceptKey(chart.concepts(b)) &&
+      key(chart.concepts(a)) == key(chart.concepts(b)) &&
       chart.polarityOf(a) == chart.polarityOf(b) &&
       chart.focus.contains(a) == chart.focus.contains(b) &&
       swapSignature(chart, a, b) == swapSignature(chart, b, a)
@@ -190,12 +214,13 @@ object Canonical:
   /** Partition one colour class into twin cells (members ordered by id; cells by first member). */
   private def twinCells[C <: CheckState](
       chart: PropositionChart[C],
-      cls: Vector[ConceptId]
+      cls: Vector[ConceptId],
+      key: Concept => String
   ): Vector[Vector[ConceptId]] =
     val cells = Vector.newBuilder[Vector[ConceptId]]
     var acc = Vector.empty[Vector[ConceptId]]
     cls.foreach { id =>
-      acc.indexWhere(cell => twins(chart, cell.head, id)) match
+      acc.indexWhere(cell => twins(chart, cell.head, id, key)) match
         case -1 => acc = acc :+ Vector(id)
         case i  => acc = acc.updated(i, acc(i) :+ id)
     }
@@ -208,10 +233,11 @@ object Canonical:
   private def search[C <: CheckState](
       chart: PropositionChart[C],
       colors: Map[ConceptId, String],
-      budget: Budget
+      budget: Budget,
+      key: Concept => String
   ): Option[(String, Vector[ConceptId])] =
     val classes = classesOf(colors)
-    val cells = classes.map(cls => twinCells(chart, cls))
+    val cells = classes.map(cls => twinCells(chart, cls, key))
     cells.indexWhere(_.size > 1) match
       case -1 =>
         budget.leaves += 1
@@ -219,14 +245,14 @@ object Canonical:
         else
           val order = cells.flatten.flatten
           val idx = order.zipWithIndex.toMap
-          Some((ChartIdentity.serialize(chart, id => label(idx(id))), order))
+          Some((ChartIdentity.serializeKeyed(chart, id => label(idx(id)), key), order))
       case k =>
         var best: Option[(String, Vector[ConceptId])] = None
         var exhausted = false
         cells(k).foreach { cell =>
           if !exhausted then
             val individualized = colors ++ cell.map(id => id -> (colors(id) + "!"))
-            search(chart, refineColors(chart, individualized), budget) match
+            search(chart, refineColors(chart, individualized), budget, key) match
               case None    => exhausted = true
               case Some(r) => if best.forall(_._1 > r._1) then best = Some(r)
         }
@@ -234,9 +260,22 @@ object Canonical:
 
   private def exact[C <: CheckState](
       chart: PropositionChart[C]
+  ): Option[(String, Vector[ConceptId])] = exactKeyed(chart, ChartIdentity.conceptKey)
+
+  private def exactKeyed[C <: CheckState](
+      chart: PropositionChart[C],
+      key: Concept => String
   ): Option[(String, Vector[ConceptId])] =
     if chart.isEmpty then Some(("", Vector.empty))
-    else search(chart, colors(chart), new Budget(0))
+    else search(chart, colorsKeyed(chart, key), new Budget(0), key)
+
+  /** Exact canonical order under the gloss-aware keying, or `None` when the leaf budget is
+    * exhausted. There is deliberately no fallback: every fallback here orders by concept id.
+    */
+  private[proposition] def glossedExactOrder[C <: CheckState](
+      chart: PropositionChart[C]
+  ): Option[Vector[ConceptId]] =
+    exactKeyed(chart, ChartIdentity.glossedConceptKey).map(_._2)
 
   /** Whether the canonical form of `chart` is unique across isomorphic inputs (budget not hit). */
   def isExact[C <: CheckState](chart: PropositionChart[C]): Boolean = exact(chart).nonEmpty
@@ -245,7 +284,7 @@ object Canonical:
     * input but not unique across isomorphic inputs.
     */
   private def fallbackOrder[C <: CheckState](chart: PropositionChart[C]): Vector[ConceptId] =
-    refine(chart).flatMap(cls => twinCells(chart, cls).flatten)
+    refine(chart).flatMap(cls => twinCells(chart, cls, ChartIdentity.conceptKey).flatten)
 
   /** The canonical ordering of concept ids for `chart`. */
   def order[C <: CheckState](chart: PropositionChart[C]): Vector[ConceptId] =
