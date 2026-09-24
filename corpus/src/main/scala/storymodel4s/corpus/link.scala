@@ -229,9 +229,10 @@ object SegmentLink:
         })
 
 extension (link: SegmentLink)
-  /** Agreement on the mapping alone, ignoring evidence. */
+  /** Agreement on endpoint content and the mapping, ignoring evidence. */
   def sameMappingAs(other: SegmentLink): Boolean =
     link.from == other.from && link.to == other.to &&
+      link.fromIdentity == other.fromIdentity && link.toIdentity == other.toIdentity &&
       link.mapping.map((k, v) => k -> v.target) == other.mapping.map((k, v) => k -> v.target)
 
 enum LinkRefusal:
