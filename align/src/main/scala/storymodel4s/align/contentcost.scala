@@ -27,7 +27,8 @@ private[align] object ContentCostScoring:
   ): Terms =
     // The provider's own answer is kept, not collapsed to a Double, so that "abstained" survives to
     // the receipt. The PRICE is unchanged - `missingSemantic` is still substituted, and the M0
-    // decision at cost.scala:705 stands - but the substitution is now recorded rather than silent.
+    // decision (see [[DefaultLocalCostModel]]) stands - but the substitution is now recorded rather
+    // than silent.
     val dSem = clamp(semantic.toOption.getOrElse(missingSemantic))
     val semImputed: Map[CostTerm, MissingReason] = semantic match
       case Estimate.Missing(reason) => Map(CostTerm.Semantic -> reason)
@@ -80,17 +81,18 @@ private[align] object ContentCostScoring:
     val missing = optional.collect { case (term, Estimate.Missing(_)) => term }.toSet
     // ELIGIBILITY IS PER-CELL, not per-view. A chartless node in a mixed view could never have been
     // chart-compared, so treating it as a missed measurement would invent a dimension that cell
-    // cannot have — the same error as scaling over all terms, which collapsed every row to External.
-    // Chart eligibility must be asked of the function that PRODUCES the term. `dChart` comes from
-    // ChartDistance.reduction, which measures over `view.structuralMembers(node.ref)` — the leaves.
-    // It does NOT come from ChartDistance.report, whose `(unit, node)` signature genuinely does
-    // need a chart on each side. Testing `node.evidence` here applied report's contract to
-    // reduction's term: identical on a leaf, wrong on a segment, because StorySourceView gives a
-    // segment no chart of its own ("segments never get a fabricated chart") while its leaves carry
-    // the charts actually compared. Chart then came out present-but-not-eligible, wPresent exceeded
-    // wEligible, and the blend multiplied the cost DOWN while the old numeric support's clamp
-    // reported the over-unity ratio as full support. `leavesUnder` returns the node itself for a leaf, so this
-    // predicate is a strict generalization and no leaf cell moves.
+    // cannot have — the same error as scaling over all terms, which collapsed every row to
+    // External. Chart eligibility must be asked of the function that PRODUCES the term. `chart`
+    // comes from ChartDistance.reduction, which measures over `view.structuralMembers(node.ref)` —
+    // the leaves. It does NOT come from ChartDistance.report, whose `(unit, node)` signature
+    // genuinely does need a chart on each side. Testing the node's own evidence here (as the code
+    // once did) applied report's contract to reduction's term: identical on a leaf, wrong on a
+    // segment, because StorySourceView gives a segment no chart of its own ("segments never get a
+    // fabricated chart") while its leaves carry the charts actually compared. Chart then came out
+    // present-but-not-eligible, wPresent exceeded wEligible, and the blend multiplied the cost DOWN
+    // while the old numeric support's clamp reported the over-unity ratio as full support.
+    // `leavesUnder` returns the node itself for a leaf, so this predicate is a strict
+    // generalization and no leaf cell moves.
     //
     // Structural has the SAME defect mirrored, found by scout on this candidate. It is produced by
     // ChartDistance.structuralReduction, which reads the same structuralMembers population, but its

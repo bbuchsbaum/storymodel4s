@@ -1201,7 +1201,7 @@ final case class DefaultLocalCostModel(
     // priced) and stays in `eligible` (the comparison was possible), so it leaves the numerator
     // only. That is exactly the gap the two-cell court measures: support must differ between a
     // measured and an imputed cell by semanticWeight / eligibleWeight, and nothing else may move.
-    // The factory derives the measured population from `terms -- semImputed` itself, so the
+    // The factory derives the measured population itself (terms minus `price.semanticImputed`), so the
     // support basis cannot disagree with the record it describes.
     //
     // ZERO ASSESSED SUPPORT IS AN EXCLUSION, NOT A PRICE (see CostBreakdown.derived). Excluding it
