@@ -650,6 +650,7 @@ object HsmmResultCodec:
         rows <- traverse(wire.posterior)(_.materialize)
         posterior <- AlignmentMatrix.of(rows)
         steps <- traverse(wire.flow)(_.materialize)
+        flow <- TransitionFlow.of(steps)
         costsByUnit <- traverse(wire.costs)(_.materialize)
         costs <- uniqueMap("HsmmResult.costs", costsByUnit)
         anchors <- uniqueMap(
@@ -661,7 +662,7 @@ object HsmmResultCodec:
           view,
           anchors,
           posterior,
-          TransitionFlow(steps),
+          flow,
           wire.viterbi,
           wire.logLikelihood,
           costs,
@@ -690,7 +691,7 @@ object HsmmResultCodec:
       uniqueMap(
         "FlowStep.mass",
         wire.mass.map(entry => (entry.fromState -> entry.toState) -> entry.mass)
-      ).map(FlowStep(wire.from, wire.to, _))
+      ).flatMap(FlowStep.of(wire.from, wire.to, _))
 
   extension (wire: UnitCostsWire)
     private def materialize: Either[AlignError, (RecallUnitId, Map[AlignState, CostBreakdown])] =

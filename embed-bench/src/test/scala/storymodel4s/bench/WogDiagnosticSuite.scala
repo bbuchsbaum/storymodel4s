@@ -78,14 +78,18 @@ class WogDiagnosticSuite extends FunSuite:
       AlignmentRow.of(unit.id, Map(state -> 1.0)).fold(e => fail(e.message), identity)
     }
     val posterior = AlignmentMatrix.of(rows).fold(e => fail(e.message), identity)
-    val flow = TransitionFlow(
-      units.indices
-        .drop(1)
-        .map { i =>
-          FlowStep(units(i - 1).id, units(i).id, Map((states(i - 1), states(i)) -> 1.0))
-        }
-        .toVector
-    )
+    val flow = TransitionFlow
+      .of(
+        units.indices
+          .drop(1)
+          .map { i =>
+            FlowStep
+              .of(units(i - 1).id, units(i).id, Map((states(i - 1), states(i)) -> 1.0))
+              .fold(e => fail(e.message), identity)
+          }
+          .toVector
+      )
+      .fold(e => fail(e.message), identity)
     val candidates = units
       .zip(inferredAnchors)
       .map { case (unit, anchor) =>

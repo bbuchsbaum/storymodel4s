@@ -365,7 +365,8 @@ class GateProofSuite extends FunSuite:
     val bad = AlignState.Distorted(ref, NonEmptySet.one(Facet.Outcome))
     val step0 = result.flow.steps.head
     val flow = TransitionFlow(
-      result.flow.steps.updated(0, step0.copy(mass = step0.mass.updated((bad, bad), 0.0)))
+      result.flow.steps
+        .updated(0, FlowStep(step0.from, step0.to, step0.mass.updated((bad, bad), 0.0)))
     )
     assert(revalidate(AnnaFixture.recall, result, flow = Some(flow)).isLeft, "zero-mass flow key")
     val costs = result.costs.updated(u0, result.costs(u0).updated(bad, CostBreakdown.unreachable))
@@ -474,7 +475,7 @@ class GateProofSuite extends FunSuite:
     val step0 = result.flow.steps.head
     val (k, m) = step0.mass.toVector.maxBy(_._2)
     val bumped = TransitionFlow(
-      result.flow.steps.updated(0, step0.copy(mass = step0.mass.updated(k, m + 1e-3)))
+      result.flow.steps.updated(0, FlowStep(step0.from, step0.to, step0.mass.updated(k, m + 1e-3)))
     )
     assert(revalidate(AnnaFixture.recall, result, flow = Some(bumped)).isLeft, "flow marginal")
   }
@@ -524,7 +525,7 @@ class GateProofSuite extends FunSuite:
         flow = Some(TransitionFlow(result.flow.steps.tail))
       ).isLeft
     )
-    val swapped = TransitionFlow(result.flow.steps.map(s => s.copy(from = s.to, to = s.from)))
+    val swapped = TransitionFlow(result.flow.steps.map(s => FlowStep(s.to, s.from, s.mass)))
     assert(revalidate(AnnaFixture.recall, result, flow = Some(swapped)).isLeft)
   }
 
