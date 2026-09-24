@@ -261,6 +261,13 @@ final class PropositionChart[C <: CheckState] private[proposition] (
 ):
   def isEmpty: Boolean = concepts.isEmpty
   def conceptIds: Vector[ConceptId] = concepts.keys.toVector.sorted
+
+  /** This chart's storage-ordered semantic graph, projected once. The historical scorers compare
+    * the same charts for every recall unit, and re-projecting them on each comparison made Scala
+    * Native miss its test deadlines. Not part of equality: it is a function of the fields.
+    */
+  private[proposition] lazy val sourceGraph: SemanticGraph[GraphOrder.Source] =
+    SemanticGraph.build(this, conceptIds, identity, TiePolicy.Historical)
   def concept(id: ConceptId): Option[Concept] = concepts.get(id)
   def polarityOf(id: ConceptId): Polarity = polarity.getOrElse(id, Polarity.Unknown)
 

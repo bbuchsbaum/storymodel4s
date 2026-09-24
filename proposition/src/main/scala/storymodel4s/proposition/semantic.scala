@@ -120,8 +120,7 @@ object SemanticProjection:
     */
   private[storymodel4s] def sourceOrder(
       chart: PropositionChart[Checked]
-  ): SemanticGraph[GraphOrder.Source] =
-    SemanticGraph.build(chart, chart.conceptIds, identity, TiePolicy.Historical)
+  ): SemanticGraph[GraphOrder.Source] = chart.sourceGraph
 
 /** Result of comparing two [[SemanticGraph]]s: the graded parts and gates of a
   * [[CompatibilityReport]], with whether any head matched instead of which heads did.
