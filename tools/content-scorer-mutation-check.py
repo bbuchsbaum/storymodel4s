@@ -130,6 +130,10 @@ def main():
             allowed = {witness}
             if name == 'M2-nested-chart':
                 allowed.add('UnitContent: public method names and overload counts are pinned')
+            if name == 'M4-grain-constructor':
+                allowed.add('ContentGrain: apply is refused beside a same-shape control')
+            if name == 'M5-participant-constructor':
+                allowed.add('ParticipantContent: apply is refused beside a same-shape control')
             if name == 'M8-member-order':
                 allowed.update({'the strict mode gate does not move with node storage order',
                                 'strict inherited contradictions are in content order'})
