@@ -60,3 +60,27 @@ The reflection pin covers names and overload counts, not every possible JVM sign
 The forbidden-type scan and compiler courts add separate checks. Members callbacks may capture
 state: absence of named iteration accessors is not proof that arbitrary callbacks cannot observe
 order. The behavioural claims here concern the library's controlled scorers.
+
+## Final locally observed qualification
+
+Reviewed source SHA: `b2b700cb9b6192cdd58fe719c0738e65b478b385`.
+`summary.json` and the bound logs record the complete commands, clean-tree checks and exits.
+
+| Platform | align passed | proposition passed | Failed | Skipped |
+| --- | ---: | ---: | ---: | ---: |
+| JVM | 619 | 80 | 0 | 0 |
+| Scala.js | 592 | 80 | 0 | 0 |
+| Native | 592 | 80 | 0 | 0 |
+
+The six-cell gate exited 0; scalafmtCheckAll and scalafmtSbtCheck passed last. A separate clean
+restoration run passed 74 focused tests, with no failures/skips, and formatting. Both clones
+remained clean after verification. Fray gate lock #16 fence83 serialized the platform gate.
+
+All twelve compiled mutants were killed with passing siblings and no unrelated failures or
+skips. The independent reviewer checked full logs and reconstructed mutation hashes. M1-M11
+retain their original ca025723 run identities; their source/test trees equal reviewed b2b700cb.
+M12 ran at b2b700cb after correcting the initial runner's stale source pattern. The initial
+runner stopped before M12; its exit 1 is retained rather than reported as a completed run.
+
+The final commit adds only evidence under this directory to the reviewed/gated source. These
+results qualify this test-only slice, not the still-open S2a-3 strict-channel implementation.

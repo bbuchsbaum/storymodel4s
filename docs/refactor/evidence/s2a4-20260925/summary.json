@@ -1,0 +1,36 @@
+{
+  "source_sha": "b2b700cb9b6192cdd58fe719c0738e65b478b385",
+  "scope": [
+    "align",
+    "proposition"
+  ],
+  "gate_exit": 0,
+  "clean_after": true,
+  "platforms": {
+    "JVM": {
+      "passed": 699,
+      "failed": 0,
+      "skipped": 0
+    },
+    "JS": {
+      "passed": 672,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Native": {
+      "passed": 672,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "mutation_kills": 12,
+  "restoration": {
+    "passed": 74,
+    "failed": 0,
+    "skipped": 0,
+    "exit": 0
+  },
+  "format": "scalafmtCheckAll and scalafmtSbtCheck passed last",
+  "qualification": "LocallyObserved; no hosted CI or strict channel qualification",
+  "remaining_issue": "bd-01M379N8HK5ZCV9W252X9MQ4VV"
+}

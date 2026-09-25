@@ -1,0 +1,8 @@
+{
+  "sha": "b2b700cb9b6192cdd58fe719c0738e65b478b385",
+  "tree": "d416157b0b5d8f0e1d8477149dccb78b02a81682",
+  "cwd": "/private/tmp/storymodel4s-s2a4-gate-0925",
+  "clean_before": true,
+  "scope": "types defined by this candidate:\n  ContentBehaviorLawsSuite\n  ContentSurfaceSuite\n  ContentUnforgeableSuite\n  OpenContentGrain\n  OpenContentReport\n  OpenMembers\n  OpenParticipantContent\n  OpenSemanticGraph\n  OpenTargetContent\n  OpenUnitContent\n  SemanticGraphCourtSuite\n\nmodules that reference them (the gate must cover all of these):\n  align\n  proposition\n\ngate command (JVM; paste it, do not retype the module names):\n  sbt -batch \"alignJVM/test; propositionJVM/test\"\n\n  Run it in a CLONE, never a linked worktree. Capture the exit status. Run\n  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --\n  a red gate with no totals measured your infrastructure, not the candidate.\n",
+  "fray_gate_fence": 83
+}
