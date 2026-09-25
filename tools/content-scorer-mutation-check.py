@@ -28,11 +28,26 @@ def analyze(output, exit_code, witness, allowed_failures):
                 compile_error=compile_error, failures=failures, unrelated_failures=unrelated)
 
 
+def allowed_for(name, witness):
+    allowed = {witness}
+    if name == 'M2-nested-chart':
+        allowed.add('UnitContent: public method names and overload counts are pinned')
+    if name == 'M4-grain-constructor':
+        allowed.add('ContentGrain: apply is refused beside a same-shape control')
+    if name == 'M5-participant-constructor':
+        allowed.add('ParticipantContent: apply is refused beside a same-shape control')
+    if name == 'M8-member-order':
+        allowed.update({'the strict mode gate does not move with node storage order',
+                        'strict inherited contradictions are in content order'})
+    return allowed
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--grakern')
     parser.add_argument('--out')
     parser.add_argument('--self-test', action='store_true')
+    parser.add_argument('--audit-existing', help='Recheck retained logs without rerunning mutants')
     parser.add_argument('--only', help='Run one named mutant after an inconclusive attempt')
     args = parser.parse_args()
     if args.self_test:
@@ -46,6 +61,26 @@ def main():
         assert not analyze(good, 0, 'expected', {'expected'})['killed']
         assert not analyze(good.replace('Failed 1', 'Failed 2'), 1, 'expected', {'expected'})['killed']
         print('mutation receipt analyzer: 5 checks passed')
+        return
+    if args.audit_existing:
+        root = Path(__file__).resolve().parents[1]
+        directory = Path(args.audit_existing)
+        receipts = json.loads((directory / 'receipts.json').read_text())
+        current = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+        for receipt in receipts:
+            source = subprocess.check_output(['git', 'show', receipt['head'] + ':' + receipt['file']], cwd=root)
+            unchanged = subprocess.run(['git', 'diff', '--quiet', receipt['head'], current,
+                                        '--', 'align', 'proposition'], cwd=root).returncode == 0
+            assessment = analyze((directory / (receipt['name'] + '.log')).read_text(),
+                                 receipt['exit'], receipt['witness'],
+                                 allowed_for(receipt['name'], receipt['witness']))
+            receipt['audit'] = dict(assessment, auditor_sha=current,
+                                    original_hash_matches=hashlib.sha256(source).hexdigest() == receipt['original_sha256'],
+                                    source_and_tests_unchanged=unchanged)
+        print(json.dumps(receipts, indent=2))
+        if not receipts or not all(r['audit']['killed'] and r['audit']['original_hash_matches'] and
+                                   r['audit']['source_and_tests_unchanged'] for r in receipts):
+            raise SystemExit(1)
         return
     if not args.grakern or not args.out:
         parser.error('--grakern and --out are required unless --self-test is used')
@@ -127,17 +162,7 @@ def main():
                                         stderr=subprocess.STDOUT, timeout=900)
                 log.write(f'\nMUTATION_EXIT={result.returncode}\n')
             output = (out / f'{name}.log').read_text()
-            allowed = {witness}
-            if name == 'M2-nested-chart':
-                allowed.add('UnitContent: public method names and overload counts are pinned')
-            if name == 'M4-grain-constructor':
-                allowed.add('ContentGrain: apply is refused beside a same-shape control')
-            if name == 'M5-participant-constructor':
-                allowed.add('ParticipantContent: apply is refused beside a same-shape control')
-            if name == 'M8-member-order':
-                allowed.update({'the strict mode gate does not move with node storage order',
-                                'strict inherited contradictions are in content order'})
-            receipt.update(analyze(output, result.returncode, witness, allowed))
+            receipt.update(analyze(output, result.returncode, witness, allowed_for(name, witness)))
             killed = receipt['killed']
         finally:
             path.write_bytes(before)
