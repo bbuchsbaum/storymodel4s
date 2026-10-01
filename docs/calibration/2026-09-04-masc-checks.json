@@ -1,0 +1,46 @@
+{
+  "claim": "Inventory and refusal checks only; no Scala gate or empirical calibration fit",
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "tools/test_audit_masc.py"
+      ],
+      "exit_code": 0,
+      "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "python3",
+        "tools/test_audit_masc.py",
+        "--mutations"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\n  \"compiling_mutants_killed\": 3,\n  \"results\": [\n    {\n      \"mutant\": \"silently_drop_malformed_tree_atoms\",\n      \"tests_run\": 5,\n      \"failed_courts\": [\n        \"__main__.AuditCourts.test_malformed_empty_subject_cannot_disappear_from_leaf_count\"\n      ],\n      \"errors\": 0\n    },\n    {\n      \"mutant\": \"ignore_merged_skeleton_column\",\n      \"tests_run\": 5,\n      \"failed_courts\": [\n        \"__main__.AuditCourts.test_merged_placeholder_column_is_retained_as_a_failure\"\n      ],\n      \"errors\": 0\n    },\n    {\n      \"mutant\": \"omit_malformed_sentence_from_verdict\",\n      \"tests_run\": 5,\n      \"failed_courts\": [\n        \"__main__.AuditCourts.test_malformed_sentence_cannot_vanish_from_join_verdict\"\n      ],\n      \"errors\": 0\n    }\n  ]\n}\n"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/audit-masc.py",
+        "/private/tmp/storymodel-masc-audit-20260904",
+        "--manifest",
+        "docs/calibration/2026-09-04-masc-inputs.json",
+        "--output",
+        "/private/tmp/storymodel-masc-audit-20260904/reproduced-inventory.json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"fiction_and_ficlets_files\": 12, \"fiction_and_ficlets_with_framenet_graf\": 0, \"fiction_and_ficlets_with_unified_propbank\": 1, \"framenet_graf_documents\": 22, \"genres\": {\"blog\": 21, \"court-transcript\": 2, \"debate-transcript\": 2, \"email\": 176, \"essays\": 8, \"face-to-face\": 7, \"ficlets\": 5, \"fiction\": 7, \"govt-docs\": 5, \"jokes\": 16, \"journal\": 9, \"letters\": 49, \"movie-script\": 6, \"newspaper\": 52, \"non-fiction\": 5, \"technical\": 8, \"telephone\": 5, \"travel-guides\": 7, \"twitter\": 2}, \"masc_documents\": 392, \"original_propbank_documents\": 100, \"unified_exact_basename_matches\": 96, \"unified_exact_match_genres\": {\"court-transcript\": 1, \"email\": 2, \"face-to-face\": 4, \"fiction\": 1, \"govt-docs\": 1, \"journal\": 7, \"letters\": 31, \"newspaper\": 40, \"non-fiction\": 1, \"technical\": 1, \"telephone\": 5, \"travel-guides\": 2}, \"unified_propbank_documents\": 97}\nAudit completed; counts do not establish semantic correctness or story independence.\n"
+    }
+  ],
+  "file_sha256": {
+    "docs/calibration/2026-09-04-masc-inputs.json": "cf106a1ddf8517d6c3fd0fe0a4282d918e24d18b996707e9e95c399bef5cd9a3",
+    "docs/calibration/2026-09-04-masc-inventory.json": "7eaa743120d6af6fbd459b146ab3294446c7420ed1ba63304251f02a7332ab59",
+    "tools/audit-masc.py": "6f7cc14e67f80caf7db1b653d04b348e58468dfdedfefbce436d90ee33311fb7",
+    "tools/test_audit_masc.py": "7d752922101209d70eb3946d3e291e20db85e28cb3c29f72ae2d971430af246d"
+  },
+  "python": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "reproduced_inventory_byte_identical": true
+}

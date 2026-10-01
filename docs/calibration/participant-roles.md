@@ -9,6 +9,10 @@ The implementation is `document.ParticipantCalibration` (ADR 0015). Its numerica
 and compiler tests use synthetic labels. No human-adjudicated role corpus or
 production fit is supplied with this implementation.
 
+The [MASC corpus audit](2026-09-04-masc-audit.md) records the first external
+corpus assessment: one role-annotated fiction chapter, coordinate refusals, and
+the next steps for an independent human annotation study.
+
 ## Prepare the evidence before fitting
 
 Freeze the extraction pipeline: parser/model revision, decoding settings, prompt
