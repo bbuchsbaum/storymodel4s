@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-23T02:47:53.193343+00:00",
+  "finished_utc": "2026-09-23T02:48:18.137605+00:00",
+  "duration_seconds": 24.943735,
+  "command": [
+    "sbt",
+    "-J-Xmx2G",
+    "-batch",
+    "-Dsbt.global.staging=/private/tmp/storymodel4s-timing-sbt-staging-20260922",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-timing-grakern-20260922",
+    "codecJVM/testOnly *LocalEvidenceConsumerSuite"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable",
+  "log": "/private/tmp/local-evidence-consumer-probe/snapshot-after.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 2146
+}

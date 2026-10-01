@@ -1,0 +1,37 @@
+[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)
+[info] loading settings for project recall-timing-portable-build from plugins.sbt...
+[info] loading project definition from /Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/project
+[info] loading settings for project root from build.sbt...
+[info] loading settings for project storymodel4s-timing-grakern-20260922-build from plugins.sbt...
+[info] loading project definition from /private/tmp/storymodel4s-timing-grakern-20260922/project
+[info] loading settings for project root from build.sbt...
+[info] loading settings for project gale-build from plugins.sbt...
+[info] loading project definition from /private/tmp/storymodel4s-timing-sbt-staging-20260922/c6b5fe94c20cf0d05b05/gale/project
+[info] loading settings for project root from build.sbt...
+[info] loading settings for project graph4s-build from plugins.sbt...
+[info] loading project definition from /private/tmp/storymodel4s-timing-sbt-staging-20260922/8d03f2d14a9e2c9f6990/graph4s/project
+[info] loading settings for project root from build.sbt...
+[info] resolving key references (114172 settings) ...
+[info] set current project to root (in build file:/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/)
+[info] compiling 1 Scala source to /Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/codec/.jvm/target/scala-3.7.4/test-classes ...
+[info] done compiling
+Test run storymodel4s.codec.LocalEvidenceConsumerSuite started
+==> X storymodel4s.codec.LocalEvidenceConsumerSuite.consumer inference uses one source snapshot across admission and computation 0.097s munit.ComparisonFailException: codec/src/test/scala/storymodel4s/codec/LocalEvidenceConsumerSuite.scala:127
+126:    assertEquals(actual.viewFingerprint, expected.viewFingerprint)
+127:    assertEquals(actual.logLikelihood, expected.logLikelihood)
+128:    assertEquals(
+values are not the same
+=> Obtained
+-2.6285460342350806
+=> Diff (- expected, + obtained)
+--3.473917465573736
++-2.6285460342350806
+    at munit.FunSuite.assertEquals(FunSuite.scala:12)
+    at storymodel4s.codec.LocalEvidenceConsumerSuite.$init$$$anonfun$7(LocalEvidenceConsumerSuite.scala:127)
+storymodel4s.codec.LocalEvidenceConsumerSuite: finished 0.462s
+Test run storymodel4s.codec.LocalEvidenceConsumerSuite finished: 1 failed, 0 ignored, 6 total 0.473s
+[error] Failed: Total 6, Failed 1, Errors 0, Passed 5
+[error] Failed tests:
+[error] 	storymodel4s.codec.LocalEvidenceConsumerSuite
+[error] (codecJVM / Test / testOnly) sbt.TestsFailedException: Tests unsuccessful
+[error] Total time: 10 s, completed Sep 22, 2026, 10:41:49 p.m.
