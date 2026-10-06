@@ -1,0 +1,35 @@
+{
+  "candidate": "dae261aa2f1d9b2b3b3e0a5e90d8da3578418992",
+  "scope": "evidence retention formatting/generated-workflow checks",
+  "commands": [
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck",
+    "githubWorkflowCheck"
+  ],
+  "exit_code": 0,
+  "raw_log_bytes": 5961,
+  "raw_log_sha256": "526531388b95580bec0b64721bf0e36125301d7e6528d2d784b315147400e83f",
+  "tool_metadata": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T22:13:24.255336+00:00",
+    "finished_utc": "2026-10-06T22:13:56.198917+00:00",
+    "duration_seconds": 31.943029,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.log.noformat=true",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck",
+      "githubWorkflowCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/atlas",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/dae-evidence-format.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 600.0,
+    "log_bytes": 5961
+  },
+  "test_claim": "none; existing code test gates retained separately"
+}

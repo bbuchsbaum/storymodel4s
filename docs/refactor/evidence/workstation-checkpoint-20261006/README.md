@@ -3,7 +3,8 @@
 The numerical implementation is qualified by the full hosted matrix at
 `433aa1056f6aa5e88b63b4b665079e9959a266ae`. The matching StoryAtlas consumer is
 `d67dccfb7eec07e184ce3ef8fe6ccc16c3745523`, whose declared source pin is that producer.
-GitHub main synchronization and final workstation acceptance are still pending.
+Source and exact-consumer workstation acceptance are complete. Final integration review and
+GitHub main synchronization remain pending.
 
 ## Qualified hosted code
 
@@ -45,21 +46,26 @@ and compressed full log preserve both names. At the subsequent resource observat
 was22.26/27.00/28.00 on10cores with other-session CPU use. Resource contention is a plausible
 cause, not a proved explanation of either timeout.
 
-A single owned tmux job, `storymodel4s-resume-20261006`, resumes only after load drops to
-at most8/10 (one/five-minute averages) for120seconds. It waits at most two hours. The
-[producer runner](workstation/host-resume-gate-04.py) preserves all44 green prefix cells
-(7,789 passed) from the unchanged433 invocation and reruns the entire fixturesNative module,
-all three laws targets, and all eight JVM-only modules. It then runs documentation, three
-Native ReleaseFast courts and formatting/workflow checks last. The two failed tests retain
-exactly their original assertions and deadlines. This is assembled coverage across two
-invocations; the failed cell's158 passes are excluded from deduplicated totals. Final counts
-are not accepted until the suffix exits0 and its artifact body is checked.
-
-Only after that does the [consumer runner](workstation/host-consumer-gate-04.py) qualify exactd67
-from default source pins, build/link, export the public WOG edition and synthetic Bell Voyage,
-rehash every receipt-bound file, parse SVGs and check JavaScript syntax. It verifies actual
-loaded dependency commits. Its outputs are not yet qualified.
-
+The unchanged433 continuation completed successfully in owned tmux job
+`storymodel4s-resume-20261006`, after the recorded load preflight. The
+[completed status](workstation/producer-04-status.json) and compressed full log bind all commands,
+exits and raw hashes. The [producer runner](workstation/host-resume-gate-04.py) retains44 green
+prefix cells (7,789 passed), then reruns the entire fixturesNative module, all three laws targets
+and eight JVM-only modules. Documentation, three Native ReleaseFast courts and final
+format/workflow checks pass. Both previously timing-out tests pass with unchanged assertions
+and deadlines. This is assembled coverage across two invocations:56 normal cells plus3
+ReleaseFast courts, **9,007 passed, 0 failed/errors, 6 skipped**. The failed cell's158 passes are
+excluded from these deduplicated totals. The six skips are four optional media checks, one
+remote-provider check and one embedding-benchmark check.
+The [consumer runner](workstation/host-consumer-gate-04.py) then completed exactd67 from its
+default public source pins:10 JVM/JS cells, **480 passed, 0 failed/errors/skipped**, with
+compilation/linking and final formatting/workflow checks. The [summary](workstation/consumer-04-summary.json)
+binds actual loaded clean source checkouts to all five declared dependency commits. Public
+WOG edition (32 files,29 receipt-bound) and synthetic Bell Voyage (4 files,3 receipt-bound)
+export successfully; every bound hash reads back, all SVGs parse and bundled JavaScript syntax
+checks. Complete status/log and both export receipt bodies are retained in the consumer's
+`docs/delivery/evidence/workstation-checkpoint-20261006/`. This establishes engineering/CLI
+qualification, without Atlas browser interaction or private-corpus inference claims.
 Owned job state and full logs live under
 `~/.local/share/storymodel4s/checkpoints/20261006/` on BUC-GW01, outside temporary directories.
 The next session reads `integrated-producer-04-status.json` and
@@ -82,8 +88,8 @@ participant rows and data-bearing logs remain on approved storage. The handoff t
 unapproved hosts and conflicting bytes. The marker binds manifest identity, destination,
 root and complete byte counts; it does not widen corpus admission.
 
-Before final landing: inspect the real suffix/consumer completions and public output hashes,
-obtain independent exact-commit review, fast-forward main without force in both repositories,
+Before final landing: independently review the completed suffix/consumer receipts and public
+output hashes at the exact evidence commits, fast-forward main without force in both repositories,
 verify live remote parity and update both workstation checkouts. Retain distinct engineering,
 private-reader, browser, scientific and release evidence boundaries. The next product work is
 the typed availability/abstention distinction and ordinary-file lexical/reference walkthrough

@@ -1,0 +1,761 @@
+{
+  "schema": 1,
+  "pid": 28775,
+  "machine": "BUC-GW01",
+  "candidate": "433aa1056f6aa5e88b63b4b665079e9959a266ae",
+  "started_utc": "2026-10-06T22:07:17.369493+00:00",
+  "stages": [
+    {
+      "name": "full",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dsbt.log.noformat=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "fixturesNative/test",
+        "lawsJVM/test",
+        "lawsJS/test",
+        "lawsNative/test",
+        "providerParser/test",
+        "providerAgent/test",
+        "embedGrakern/test",
+        "embedOnnx/test",
+        "embedBench/test",
+        "media/test",
+        "pipeline/test",
+        "corpusIntake/test",
+        "doc",
+        "project alignNative",
+        "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+        "testOnly storymodel4s.align.AlignmentMathSuite storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe storymodel4s.align.NumericalPropagationSuite",
+        "project codecNative",
+        "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+        "testOnly storymodel4s.codec.MappingCodecDigestSuite storymodel4s.codec.NumericalRecordCaptureSuite",
+        "project fixturesNative",
+        "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+        "testOnly storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+        "project /",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck",
+        "githubWorkflowCheck",
+        "alias testNative"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/integrated-producer-04-full.log",
+      "started_utc": "2026-10-06T22:22:48.731599+00:00",
+      "child_pid": 91298,
+      "exit_code": 0,
+      "bytes": 886210,
+      "sha256": "8fd0f5eafde4e5239b655ae28801b802fb1f8a16e1692b830f820a8446c66d4c",
+      "totals": [
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15,
+          "skipped": 0
+        },
+        {
+          "total": 5,
+          "failed": 0,
+          "errors": 0,
+          "passed": 5,
+          "skipped": 0
+        },
+        {
+          "total": 7,
+          "failed": 0,
+          "errors": 0,
+          "passed": 7,
+          "skipped": 0
+        }
+      ],
+      "finished_utc": "2026-10-06T22:37:28.285632+00:00"
+    }
+  ],
+  "private_data_used": false,
+  "environment_removed_names": [],
+  "coverage_mode": "unchanged-SHA passed prefix plus affected module rerun and unrun suffix",
+  "passed_prefix": {
+    "status": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/integrated-producer-03-status.json",
+    "raw_log_sha256": "1a161346dc1b595068c3468e198a5fa816fe466e6afdd021b2bf78f9738189d2",
+    "cells": [
+      {
+        "total": 250,
+        "failed": 0,
+        "errors": 0,
+        "passed": 250,
+        "skipped": 0
+      },
+      {
+        "total": 250,
+        "failed": 0,
+        "errors": 0,
+        "passed": 250,
+        "skipped": 0
+      },
+      {
+        "total": 250,
+        "failed": 0,
+        "errors": 0,
+        "passed": 250,
+        "skipped": 0
+      },
+      {
+        "total": 80,
+        "failed": 0,
+        "errors": 0,
+        "passed": 80,
+        "skipped": 0
+      },
+      {
+        "total": 80,
+        "failed": 0,
+        "errors": 0,
+        "passed": 80,
+        "skipped": 0
+      },
+      {
+        "total": 80,
+        "failed": 0,
+        "errors": 0,
+        "passed": 80,
+        "skipped": 0
+      },
+      {
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "total": 68,
+        "failed": 0,
+        "errors": 0,
+        "passed": 68,
+        "skipped": 0
+      },
+      {
+        "total": 68,
+        "failed": 0,
+        "errors": 0,
+        "passed": 68,
+        "skipped": 0
+      },
+      {
+        "total": 68,
+        "failed": 0,
+        "errors": 0,
+        "passed": 68,
+        "skipped": 0
+      },
+      {
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "total": 189,
+        "failed": 0,
+        "errors": 0,
+        "passed": 189,
+        "skipped": 0
+      },
+      {
+        "total": 186,
+        "failed": 0,
+        "errors": 0,
+        "passed": 186,
+        "skipped": 0
+      },
+      {
+        "total": 186,
+        "failed": 0,
+        "errors": 0,
+        "passed": 186,
+        "skipped": 0
+      },
+      {
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "total": 627,
+        "failed": 0,
+        "errors": 0,
+        "passed": 627,
+        "skipped": 0
+      },
+      {
+        "total": 607,
+        "failed": 0,
+        "errors": 0,
+        "passed": 607,
+        "skipped": 0
+      },
+      {
+        "total": 607,
+        "failed": 0,
+        "errors": 0,
+        "passed": 607,
+        "skipped": 0
+      },
+      {
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "total": 144,
+        "failed": 0,
+        "errors": 0,
+        "passed": 144,
+        "skipped": 0
+      },
+      {
+        "total": 144,
+        "failed": 0,
+        "errors": 0,
+        "passed": 144,
+        "skipped": 0
+      },
+      {
+        "total": 144,
+        "failed": 0,
+        "errors": 0,
+        "passed": 144,
+        "skipped": 0
+      },
+      {
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "total": 319,
+        "failed": 0,
+        "errors": 0,
+        "passed": 319,
+        "skipped": 0
+      },
+      {
+        "total": 318,
+        "failed": 0,
+        "errors": 0,
+        "passed": 318,
+        "skipped": 0
+      },
+      {
+        "total": 318,
+        "failed": 0,
+        "errors": 0,
+        "passed": 318,
+        "skipped": 0
+      },
+      {
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "total": 165,
+        "failed": 0,
+        "errors": 0,
+        "passed": 165,
+        "skipped": 0
+      },
+      {
+        "total": 160,
+        "failed": 0,
+        "errors": 0,
+        "passed": 160,
+        "skipped": 0
+      }
+    ],
+    "passed": 7789,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "state": "completed",
+  "resource_policy": {
+    "one_minute_load_at_most": 8.0,
+    "five_minute_load_at_most": 10.0,
+    "stable_seconds": 120,
+    "maximum_wait_seconds": 7200
+  },
+  "load_observations": [
+    {
+      "utc": "2026-10-06T22:07:17.374060+00:00",
+      "averages": [
+        12.98046875,
+        16.35205078125,
+        18.8564453125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:07:47.385155+00:00",
+      "averages": [
+        18.5869140625,
+        17.322265625,
+        19.1162109375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:08:17.388686+00:00",
+      "averages": [
+        18.4619140625,
+        17.56884765625,
+        19.15185546875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:08:47.399959+00:00",
+      "averages": [
+        17.3408203125,
+        17.39794921875,
+        19.03466796875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:09:17.407393+00:00",
+      "averages": [
+        16.33349609375,
+        17.11279296875,
+        18.87109375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:09:47.426109+00:00",
+      "averages": [
+        15.251953125,
+        16.7294921875,
+        18.66796875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:10:17.437067+00:00",
+      "averages": [
+        14.82958984375,
+        16.4580078125,
+        18.5
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:10:47.454240+00:00",
+      "averages": [
+        14.05224609375,
+        16.072265625,
+        18.2861328125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:11:17.468849+00:00",
+      "averages": [
+        15.9951171875,
+        16.26025390625,
+        18.271484375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:11:47.478676+00:00",
+      "averages": [
+        13.3544921875,
+        15.671875,
+        17.9931640625
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:12:17.489307+00:00",
+      "averages": [
+        10.3564453125,
+        14.7294921875,
+        17.5703125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:12:47.503365+00:00",
+      "averages": [
+        8.5390625,
+        13.87646484375,
+        17.16259765625
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:13:17.514400+00:00",
+      "averages": [
+        11.52197265625,
+        14.01708984375,
+        17.09423828125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:13:47.523400+00:00",
+      "averages": [
+        15.16015625,
+        14.6162109375,
+        17.201171875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:14:17.535274+00:00",
+      "averages": [
+        15.60400390625,
+        14.64990234375,
+        17.1162109375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:14:47.546802+00:00",
+      "averages": [
+        11.44873046875,
+        13.72705078125,
+        16.6953125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:15:17.558208+00:00",
+      "averages": [
+        9.79736328125,
+        13.13818359375,
+        16.3798828125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:15:47.564194+00:00",
+      "averages": [
+        9.640625,
+        12.77490234375,
+        16.13427734375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:16:17.574936+00:00",
+      "averages": [
+        8.0654296875,
+        12.09375,
+        15.76953125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:16:47.585594+00:00",
+      "averages": [
+        6.7353515625,
+        11.39599609375,
+        15.388671875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:17:17.597689+00:00",
+      "averages": [
+        7.0107421875,
+        11.00830078125,
+        15.1083984375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:17:47.601743+00:00",
+      "averages": [
+        6.63134765625,
+        10.52880859375,
+        14.79150390625
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:18:17.612853+00:00",
+      "averages": [
+        6.92724609375,
+        10.23583984375,
+        14.537109375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:18:47.617229+00:00",
+      "averages": [
+        10.22998046875,
+        10.74755859375,
+        14.57373046875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:19:17.630850+00:00",
+      "averages": [
+        7.68994140625,
+        10.0712890625,
+        14.19482421875
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:19:47.641658+00:00",
+      "averages": [
+        5.939453125,
+        9.41162109375,
+        13.8115234375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:20:17.648035+00:00",
+      "averages": [
+        8.015625,
+        9.5283203125,
+        13.697265625
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:20:47.650403+00:00",
+      "averages": [
+        6.3427734375,
+        8.98193359375,
+        13.35400390625
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:21:17.660377+00:00",
+      "averages": [
+        6.80126953125,
+        8.88916015625,
+        13.1708984375
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:21:47.672398+00:00",
+      "averages": [
+        5.7900390625,
+        8.4248046875,
+        12.85205078125
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:22:17.673208+00:00",
+      "averages": [
+        4.923828125,
+        7.96728515625,
+        12.5322265625
+      ]
+    },
+    {
+      "utc": "2026-10-06T22:22:47.684037+00:00",
+      "averages": [
+        6.91552734375,
+        8.12158203125,
+        12.42626953125
+      ]
+    }
+  ],
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+  "node": "v24.21.0",
+  "clang": "Apple clang version 16.0.0 (clang-1600.0.26.4)",
+  "python": "Python 3.9.6",
+  "final_head": "433aa1056f6aa5e88b63b4b665079e9959a266ae",
+  "tracked_tree_clean": true,
+  "coverage_totals": {
+    "cells": 59,
+    "passed": 9007,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 6
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-06T22:37:28.389076+00:00",
+  "completed": true
+}

@@ -40,9 +40,13 @@ The order is **recover and qualify locally -> non-force GitHub synchronization/h
 first part of this checkpoint. Independent local product work may continue while host setup is
 blocked; sustained execution on a new host waits for that host's qualification.
 
-Target observed on 6 October through Tailscale: `BUC-GW01`, online, macOS. Use its MagicDNS name
-`buc-gw01.tail5f873d.ts.net` for private connectivity. This verifies tailnet presence and the
-reported OS; SSH access, architecture, installed tools and available storage still need preflight.
+The approved workstation is `BUC-GW01`, reached through Tailscale at
+`buc-gw01.tail5f873d.ts.net`. SSH, macOS15.1.1/ARM64, toolchain/storage, separate Git/API account
+routing and private-data readback are verified. The exact433 source baseline is green on the
+workstation and in hosted CI. Exactd67 StoryAtlas/default433 pin, public WOG/Bell exports and
+independent hash readback also pass. Final integration/main parity are recorded separately.
+The [checkpoint index](evidence/workstation-checkpoint-20261006/README.md) binds revisions,
+commands, passed/failed/skipped totals, preserved failures, private handoff and the resume state.
 
 1. Prepare the audit/plan branch and first recovered slices for reviewed local integration,
    as detailed below. Review the actual accumulated main tree and preservation receipts, then
@@ -67,8 +71,8 @@ reported OS; SSH access, architecture, installed tools and available storage sti
    compiler/libraries as required by the actual platform gate. Pin the tested Mote binary/build,
    not merely its `0.1.0` version label. Preflight the selected host before fixing setup commands.
 5. Create the required `.mote/local` and `.mote/tmp` runtime directories on a fresh clone and
-   verify their ignore behavior (`local` is currently ignored; `tmp` has no matching ignore rule).
-   Keep generated runtime contents out of commits and record any necessary ignore repair. Run Mote
+   verify that both are ignored by the committed rules (the checkpoint repaired the missing
+   `tmp` rule). Keep generated runtime contents out of commits. Run Mote
    doctor with a distinct actor, and prove it sees the published ticket/operation state. Fetch
    grakern and its transitive builds from the checked-in source pins. A local working grakern
    checkout must not silently replace that proof.
@@ -126,8 +130,9 @@ introducing a fleet/message-board dependency merely to keep the host running.
 Exit: GitHub main parity is observed; required recovery tips are fetchable; hosted evidence is
 bound to that revision; the destination has passed its fresh-checkout and resume smoke; and the
 handoff can be reconstructed from committed instructions/receipts plus explicitly declared
-private assets. Destination SSH/tool/storage preflight, installation, execution and private-data
-transfer remain pending; observed tailnet presence is not destination qualification.
+private assets. Destination preflight, installation and private handoff are complete. The
+checkpoint receipts identify the strict baseline, exact consumer/export acceptance and separate
+main synchronization; tailnet presence alone never establishes those results.
 
 #### Recovery slices for the first checkpoint
 

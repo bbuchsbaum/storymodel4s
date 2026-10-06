@@ -1,6 +1,6 @@
 # ADR 0023: portable alignment arithmetic
 
-Status: owner-authorized deterministic-output direction; implementation under qualification.
+Status: accepted owner direction; implementation qualified on the recorded target/toolchain tuples.
 
 Owner direction, 2026-10-06: resolve numerical determinism before updating GitHub main.
 Tracking: `bd-01M1D215EY4T5BR0VRJ694AMBQ`.
@@ -59,3 +59,13 @@ configuration fingerprint identifies an execution.
 No current golden may be recut simply to make the test green. Independently qualify one live
 producer output on all targets first; keep all historical resources intact. Where the portable
 producer exactly preserves a historical pin, retain that equality as a measured regression fact.
+
+Qualification is bound to producer `433aa1056f6aa5e88b63b4b665079e9959a266ae` in the
+[October checkpoint](../refactor/evidence/workstation-checkpoint-20261006/README.md): full hosted
+JVM17/21, JS17 and Native17 matrix; macOS ARM64 Java21 full coverage plus Native ReleaseFast
+courts; complete common-result/readout/record captures and unchanged historical resource bytes.
+StoryAtlas exactd67 consumes the same declared source pin and passes hosted tests and workstation
+public exports/readback. Tests cover the frozen631-vector original-C oracle and917 separate
+high-precision checks, including historical witnesses and arithmetic boundary cases. Neither
+these finite cases nor engineering byte agreement establish scientific calibration or universal
+correct rounding. The compiled runtime-exp mutation remains a named discriminator.
