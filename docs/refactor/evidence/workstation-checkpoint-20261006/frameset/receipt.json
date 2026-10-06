@@ -1,0 +1,101 @@
+{
+  "candidate": "49e61bca197238d3462789ac2565faeed72cdd33",
+  "recovered_from": "69e48e9a370ee6a3c4ff42d11abca36e614e60f9",
+  "actual_sbt_java": "Homebrew 25.0.1",
+  "declared_source_pins": {
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "gale": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+    "graph4s": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf"
+  },
+  "dependency_source_trees_clean": true,
+  "local_dependency_overrides": false,
+  "receipts": [
+    {
+      "name": "frameset-scope",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T16:39:42.880894+00:00",
+        "finished_utc": "2026-10-06T16:41:23.995057+00:00",
+        "duration_seconds": 101.112924,
+        "command": [
+          "sbt",
+          "-batch",
+          "set ThisBuild / tlFatalWarnings := true",
+          "media/test; pipeline/test",
+          "scalafmtCheckAll",
+          "scalafmtSbtCheck"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/frameset-scope.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 2400.0,
+        "log_bytes": 749657
+      },
+      "log": "frameset-scope.log.gz",
+      "uncompressed_sha256": "13eeadada031757b46732e39ca7ab0d2e4d78472ce1bcad91c5d07b3e84f2944",
+      "totals": [
+        "[info] Passed: Total 64, Failed 0, Errors 0, Passed 61, Skipped 3",
+        "[info] Passed: Total 120, Failed 0, Errors 0, Passed 120"
+      ]
+    },
+    {
+      "name": "frameset-baseline-control",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T16:43:15.917152+00:00",
+        "finished_utc": "2026-10-06T16:43:41.382325+00:00",
+        "duration_seconds": 25.46486,
+        "command": [
+          "sbt",
+          "-batch",
+          "set ThisBuild / tlFatalWarnings := true",
+          "media/testOnly *SampledCaptionConsumerSuite"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/frameset-baseline-control.log",
+        "exit_code": 1,
+        "child_returncode": 1,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 3204
+      },
+      "log": "frameset-baseline-control.log.gz",
+      "uncompressed_sha256": "f2bc7dd61ea17203863e2e3c1997578f96e8f77d3d0a731ccd7a2818cb3d2a3c",
+      "totals": [
+        "[error] Failed: Total 12, Failed 1, Errors 0, Passed 11"
+      ]
+    },
+    {
+      "name": "frameset-restoration",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T16:47:42.842513+00:00",
+        "finished_utc": "2026-10-06T16:48:08.084387+00:00",
+        "duration_seconds": 25.24155,
+        "command": [
+          "sbt",
+          "-batch",
+          "set ThisBuild / tlFatalWarnings := true",
+          "media/testOnly *SampledCaptionConsumerSuite"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/frameset-restoration.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 2452
+      },
+      "log": "frameset-restoration.log.gz",
+      "uncompressed_sha256": "8239ab958be22349269505f5aeb279254a49d490238feee9b1a9010de9cbe024",
+      "totals": [
+        "Passed: Total 12, Failed 0, Errors 0, Passed 12"
+      ]
+    }
+  ]
+}
