@@ -16,6 +16,9 @@ package storymodel4s.align
   * rounding. NaN payloads and floating-point exception flags are outside the contract.
   */
 private[align] object AlignmentMath:
+  /** Numerical producer revision; configuration-knob and wire-schema identities stay separate. */
+  val Revision: String = "alignment-fdlibm/exp-log-v1"
+
   private def bits(x: Double): Long = java.lang.Double.doubleToRawLongBits(x)
   private def value(x: Long): Double = java.lang.Double.longBitsToDouble(x)
   private def high(x: Double): Int = (bits(x) >>> 32).toInt
@@ -40,6 +43,8 @@ private[align] object AlignmentMath:
   private val lg5 = value(0x3fc7466496cb03deL)
   private val lg6 = value(0x3fc39a09d078c69fL)
   private val lg7 = value(0x3fc2f112df3e5244L)
+
+  def sigmoid(x: Double): Double = 1.0 / (1.0 + exp(-x))
 
   def exp(input: Double): Double =
     val word = high(input)

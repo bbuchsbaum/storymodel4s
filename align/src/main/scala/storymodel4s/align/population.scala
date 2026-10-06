@@ -175,7 +175,7 @@ final class PopulationAggregate private (
   def visitation(v: SourceNodeRef): Map[SubjectId, Double] =
     subjectIds.map { s =>
       val m = columnMassBySubject(s).getOrElse(v, 0.0)
-      s -> (if m <= 0.0 then 0.0 else 1.0 - math.exp(-m))
+      s -> (if m <= 0.0 then 0.0 else 1.0 - AlignmentMath.exp(-m))
     }.toMap
 
   /** `Σ_s Y_sv`, bounded by the number of subjects. */
@@ -286,7 +286,7 @@ final class PopulationAggregate private (
     val colIndex = nodeRefs.zipWithIndex.toMap
     val entries = subjectIds.zipWithIndex.flatMap { case (s, i) =>
       columnMassBySubject(s).toVector.sortBy(_._1.key).flatMap { case (v, m) =>
-        colIndex.get(v).filter(_ => m > 0.0).map(j => (i, j) -> (1.0 - math.exp(-m)))
+        colIndex.get(v).filter(_ => m > 0.0).map(j => (i, j) -> (1.0 - AlignmentMath.exp(-m)))
       }
     }.toMap
     SparseMatrix(subjectIds.map(_.value), nodeRefs.map(_.key), entries)

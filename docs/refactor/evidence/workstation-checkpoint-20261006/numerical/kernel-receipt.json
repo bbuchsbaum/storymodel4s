@@ -32,7 +32,33 @@
   "frozen_reference_rows": 631,
   "frozen_reference_tsv_sha256": "d020d76b77746ab45519b3662200a3926aab4628190075a7d7cf294cd240457f",
   "linux_execution": "pending",
-  "runtime_math_mutation": "running",
+  "runtime_math_mutation": {
+    "property": "historical first divergent exp operation uses owned rounding",
+    "original_sha256": "c631d4115fb915b586409b7db7becdc0b0197dd041c17faebb61a1bed4d1b736",
+    "mutant_sha256": "29e434fd1ae695f869f40241d0294099a26f1638a477f390d8d8383ee9cb4eb8",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.log.noformat=true",
+      "set ThisBuild / tlFatalWarnings := true",
+      "project alignNative",
+      "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+      "testOnly storymodel4s.align.AlignmentMathSuite"
+    ],
+    "mutant": {
+      "exit": 1,
+      "compiled": true,
+      "failed": 2,
+      "passed": 3,
+      "errors": 0
+    },
+    "restored": {
+      "exit": 0,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0
+    }
+  },
   "logs": [
     {
       "file": "kernel-unit.log.gz",
@@ -92,6 +118,61 @@
         "timeout_seconds": 1200.0,
         "log_bytes": 3489
       }
+    },
+    {
+      "file": "kernel-runtime-mutant.log.gz",
+      "uncompressed_sha256": "05d8da16851e38daac4bf212c5a8bb3022277eb399142ec671a8584301deff4d",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T18:50:29.974974+00:00",
+        "finished_utc": "2026-10-06T18:51:45.436851+00:00",
+        "duration_seconds": 75.432507,
+        "command": [
+          "sbt",
+          "-batch",
+          "-Dsbt.log.noformat=true",
+          "set ThisBuild / tlFatalWarnings := true",
+          "project alignNative",
+          "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+          "testOnly storymodel4s.align.AlignmentMathSuite"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/kernel-runtime-mutant.log",
+        "exit_code": 1,
+        "child_returncode": 1,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 4529
+      }
+    },
+    {
+      "file": "kernel-restored.log.gz",
+      "uncompressed_sha256": "d62216211d28935695631348382bc50608e70d7b89e3d39de3a16a7de1635e95",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T18:51:45.519084+00:00",
+        "finished_utc": "2026-10-06T18:52:58.621083+00:00",
+        "duration_seconds": 73.097329,
+        "command": [
+          "sbt",
+          "-batch",
+          "-Dsbt.log.noformat=true",
+          "set ThisBuild / tlFatalWarnings := true",
+          "project alignNative",
+          "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+          "testOnly storymodel4s.align.AlignmentMathSuite"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/kernel-restored.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 3518
+      }
     }
-  ]
+  ],
+  "source_sha256": "c631d4115fb915b586409b7db7becdc0b0197dd041c17faebb61a1bed4d1b736"
 }

@@ -411,11 +411,11 @@ object RecallSignature:
   ): Either[AlignError, RecallSignature] =
     val p = result.posterior
     val f = result.flow
-    val leaves = view.leaves.map(_.ref)
+    val leaves = view.leaves.map(_.ref).sortBy(_.key)
     val visitation = leafVisitation(p, view)
     val uniform = if leaves.isEmpty then 0.0 else leaves.map(visitation).sum / leaves.size
     // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
-    val importance = view.leaves.flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
+    val importance = view.leaves.sortBy(_.ref.key).flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
     val weightedNumerator = importance.map { case (r, w) => w * visitation(r) }.sum
     val weighted = WeightedCoverage.of(weightedNumerator, importance.map(_._2), leaves.size)
 
@@ -480,7 +480,7 @@ object RecallSignature:
     // placed one - the same defect compression had nine lines earlier in this function.
     val specificityN = p.rows.map(r => r.localizability(k).fold(0.0)(_ * r.sourceMass)).sum
     val specificityA = p.rows.filter(r => r.localizability(k).isDefined).map(_.sourceMass).sum
-    val specificityT = p.rows.map(r => r.mass.values.sum).sum
+    val specificityT = p.rows.map(_.total).sum
     val specificityRatio = MassRatio.unsafe(specificityN, specificityA, specificityT)
 
     // Compression as a ratio of SUMS, per the ratified estimand: N is level mass summed over every
@@ -492,10 +492,10 @@ object RecallSignature:
       (0 to view.maxLevel).map(l => l * r.massAtLevel(view, l)).sum / maxLevel
     }.sum
     val compressionA = p.rows.map(_.sourceMass).sum
-    val compressionT = p.rows.map(r => r.mass.values.sum).sum
+    val compressionT = p.rows.map(_.total).sum
     val compression = MassRatio.unsafe(compressionN, compressionA, compressionT)
 
-    val totalStepMass = f.steps.map(_.mass.values.sum).sum
+    val totalStepMass = f.steps.map(_.total).sum
     def isBackward(pos: SourceNodeRef => Option[Double])(a: SourceNodeRef, b: SourceNodeRef) =
       a != b && !view.isAncestor(b, a) && ((pos(a), pos(b)) match
         case (Some(x), Some(y)) => y < x
@@ -606,7 +606,7 @@ object RecallSignature:
       )
     val coherenceN = f.steps.map(coherentMass).sum
     val coherenceA = f.steps.map(_.sourceToSourceMass).sum
-    val coherenceT = f.steps.map(_.mass.values.sum).sum
+    val coherenceT = f.steps.map(_.total).sum
     val semanticFlow = MassRatio.unsafe(coherenceN, coherenceA, coherenceT)
 
     val n = math.max(1, p.rows.size)
@@ -658,7 +658,7 @@ object RecallSignature:
           if ls.nonEmpty then ls.foreach(l => acc.update(l, acc(l) + m / ls.size))
       }
     }
-    view.leaves.map(n => n.ref -> (1.0 - math.exp(-acc(n.ref)))).toMap
+    view.leaves.map(n => n.ref -> (1.0 - AlignmentMath.exp(-acc(n.ref)))).toMap
 
 /** A scalar projection with the support behind it.
   *

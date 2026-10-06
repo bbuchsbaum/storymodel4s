@@ -37,10 +37,10 @@ final case class TransitionModel(theta: Map[TransitionKind, Double]):
   def apply(k: TransitionKind): Double = theta.getOrElse(k, 0.0)
 
   /** Probability of moving from a source state to an external state. */
-  def pExternalIn: Double = Logistic.sigmoid(apply(TransitionKind.ExternalIn))
+  def pExternalIn: Double = AlignmentMath.sigmoid(apply(TransitionKind.ExternalIn))
 
   /** Probability of remaining external once external. */
-  def pExternalStay: Double = Logistic.sigmoid(apply(TransitionKind.ExternalStay))
+  def pExternalStay: Double = AlignmentMath.sigmoid(apply(TransitionKind.ExternalStay))
 
 object TransitionModel:
   /** Provisional defaults: forward-in-discourse and hierarchy moves are cheap, long backward jumps
@@ -774,7 +774,7 @@ object GraphHsmm:
         val logE = costs.map(_.view.mapValues(c => -c / tau).toMap)
         val n = units.size
         val logAlpha = Array.ofDim[Map[AlignState, Double]](n)
-        val logPi = -math.log(states(0).size.toDouble)
+        val logPi = -AlignmentMath.log(states(0).size.toDouble)
         logAlpha(0) = states(0).map(s => s -> (logPi + logE(0)(s))).toMap
         for i <- 1 until n do
           logAlpha(i) = states(i).map { t =>
@@ -793,14 +793,14 @@ object GraphHsmm:
         val rows = (0 until n).toVector.map { i =>
           AlignmentRow(
             units(i).id,
-            states(i).map(s => s -> math.exp(logAlpha(i)(s) + logBeta(i)(s) - logZ)).toMap
+            states(i).map(s => s -> AlignmentMath.exp(logAlpha(i)(s) + logBeta(i)(s) - logZ)).toMap
           )
         }
         val steps = (0 until n - 1).toVector.map { i =>
           val mass = for
             s <- states(i)
             t <- states(i + 1)
-          yield (s, t) -> math.exp(
+          yield (s, t) -> AlignmentMath.exp(
             logAlpha(i)(s) + logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t) - logZ
           )
           FlowStep(units(i).id, units(i + 1).id, mass.toMap)
@@ -853,13 +853,13 @@ object GraphHsmm:
         val scores =
           sources.map(t => t -> TransitionFeatures.between(view, a, t.anchor.get).score(model))
         val z = logSumExp(scores.map(_._2))
-        val src = scores.map { case (t, sc) => t -> (math.log(1.0 - pIn) + sc - z) }
-        val ext = externals.map(t => t -> (math.log(pIn) - math.log(nExt.toDouble)))
+        val src = scores.map { case (t, sc) => t -> (AlignmentMath.log(1.0 - pIn) + sc - z) }
+        val ext = externals.map(t => t -> (AlignmentMath.log(pIn) - AlignmentMath.log(nExt.toDouble)))
         (src ++ ext).toMap
       case None =>
         val pStay = if sources.isEmpty then 1.0 else model.pExternalStay
-        val src = sources.map(t => t -> (math.log(1.0 - pStay) - math.log(sources.size.toDouble)))
-        val ext = externals.map(t => t -> (math.log(pStay) - math.log(nExt.toDouble)))
+        val src = sources.map(t => t -> (AlignmentMath.log(1.0 - pStay) - AlignmentMath.log(sources.size.toDouble)))
+        val ext = externals.map(t => t -> (AlignmentMath.log(pStay) - AlignmentMath.log(nExt.toDouble)))
         (src ++ ext).toMap
 
   private def viterbi(
@@ -871,7 +871,7 @@ object GraphHsmm:
     val n = units.size
     val delta = Array.ofDim[Map[AlignState, Double]](n)
     val back = Array.ofDim[Map[AlignState, AlignState]](n)
-    val logPi = -math.log(states(0).size.toDouble)
+    val logPi = -AlignmentMath.log(states(0).size.toDouble)
     delta(0) = states(0).map(s => s -> (logPi + logE(0)(s))).toMap
     for i <- 1 until n do
       val pairs = states(i).map { t =>
@@ -892,7 +892,7 @@ object GraphHsmm:
     if xs.isEmpty then Double.NegativeInfinity
     else
       val m = xs.max
-      if m.isNegInfinity then m else m + math.log(xs.map(x => math.exp(x - m)).sum)
+      if m.isNegInfinity then m else m + AlignmentMath.log(xs.map(x => AlignmentMath.exp(x - m)).sum)
 
 /** Relation-preservation term `D_r(B^{(r)}, P A^{(r)} P^T)` restricted to explicit recall
   * relations. Used as a diagnostic and as an optional corrective on emissions.

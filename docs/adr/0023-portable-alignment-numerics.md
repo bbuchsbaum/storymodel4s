@@ -1,6 +1,6 @@
 # ADR 0023: portable alignment arithmetic
 
-Status: implementation proposal under numerical qualification; not yet integrated.
+Status: owner-authorized deterministic-output direction; implementation under qualification.
 
 Owner direction, 2026-10-06: resolve numerical determinism before updating GitHub main.
 Tracking: `bd-01M1D215EY4T5BR0VRJ694AMBQ`.
@@ -39,3 +39,23 @@ not identify the new engine. Do not manufacture executed-stage provenance for hi
 Measure full results, Viterbi/argmax decisions and identity propagation before integration, and
 obtain independent exact-revision review. No production inference or golden changes are made by
 the first kernel slice.
+
+The wired numerical producer is `alignment-fdlibm/exp-log-v1`, bound with exact source revision in
+qualification receipts. HSMM transition sigmoids, normalization, posterior/flow exponentiation and
+likelihood use the owned kernel; entropy, visitation and signature/population readouts use it too.
+Signature totals use canonical state/pair order and leaf-importance reductions use key order.
+Unrelated calibration fitting, density, Sinkhorn, feature preprocessing and external providers are
+outside this producer contract; its input values must already be admitted and fixed.
+
+`HsmmConfigFingerprint` remains the v1 identity of configuration knobs, and is not relabelled an
+engine identity. The numerical producer revision does not make a supplied result an execution
+receipt: `HsmmResult.validated` still proves structural/admissibility laws, not execution, and
+historical mappings retain unknown provenance. `hsmm/v4` remains the wire schema because its
+fields and admission contract do not change. Historical v4 values remain contextual input values;
+decoding does not silently re-execute them under the new producer. New execution receipts must bind
+the numerical revision as well as configuration and exact source, rather than claiming an old
+configuration fingerprint identifies an execution.
+
+No current golden may be recut simply to make the test green. Independently qualify one live
+producer output on all targets first; keep all historical resources intact. Where the portable
+producer exactly preserves a historical pin, retain that equality as a measured regression fact.

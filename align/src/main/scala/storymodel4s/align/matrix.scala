@@ -152,7 +152,7 @@ final class AlignmentRow private[align] (
   def entropy: Double =
     val z = total
     if z <= 0.0 then 0.0
-    else -sortedMass.map(_._2 / z).filter(_ > 0.0).map(p => p * math.log(p)).sum
+    else -sortedMass.map(_._2 / z).filter(_ > 0.0).map(p => p * AlignmentMath.log(p)).sum
 
   /** Entropy (nats) of the anchored part of the row over *anchors* (modes summed), renormalized
     * over source mass.
@@ -164,7 +164,7 @@ final class AlignmentRow private[align] (
       -anchorMass.toVector
         .sortBy(_._1.key)
         .collect { case (_, m) if m > 0.0 => m / z }
-        .map(p => p * math.log(p))
+        .map(p => p * AlignmentMath.log(p))
         .sum
 
   /** Localizability `1 − H_source / log K` where `K` is the number of alignable source nodes of the
@@ -174,7 +174,7 @@ final class AlignmentRow private[align] (
   def localizability(sourceNodeCount: Int): Option[Double] =
     if sourceMass <= 0.0 then None
     else if sourceNodeCount <= 1 then Some(1.0)
-    else Some(math.max(0.0, 1.0 - sourceEntropy / math.log(sourceNodeCount.toDouble)))
+    else Some(math.max(0.0, 1.0 - sourceEntropy / AlignmentMath.log(sourceNodeCount.toDouble)))
 
   def topK(n: Int): Vector[(AlignState, Double)] =
     sortedMass.sortBy { case (s, m) => (-m, s.key) }.take(n)
@@ -251,20 +251,22 @@ final class AlignmentMatrix private[align] (val rows: Vector[AlignmentRow]):
     */
   def columnMass: Map[SourceNodeRef, Double] =
     rows
-      .flatMap(_.mass.toVector.flatMap { case (s, m) => s.anchor.map(_ -> m) })
+      .flatMap(_.mass.toVector.sortBy(_._1.key).flatMap { case (s, m) => s.anchor.map(_ -> m) })
       .sortBy(_._1.key)
       .groupMapReduce(_._1)(_._2)(_ + _)
 
   /** Aggregate distorted mass per anchor. */
   def distortedColumnMass: Map[SourceNodeRef, Double] =
     rows
-      .flatMap(_.mass.toVector.collect { case (AlignState.Distorted(r, _), m) => (r, m) })
+      .flatMap(_.mass.toVector.sortBy(_._1.key).collect {
+        case (AlignState.Distorted(r, _), m) => (r, m)
+      })
       .sortBy(_._1.key)
       .groupMapReduce(_._1)(_._2)(_ + _)
 
   /** Fuzzy visitation `Y_v = 1 − exp(−Σ_i P_iv)` (design record §11). */
   def visitation: Map[SourceNodeRef, Double] =
-    columnMass.view.mapValues(m => 1.0 - math.exp(-m)).toMap
+    columnMass.view.mapValues(m => 1.0 - AlignmentMath.exp(-m)).toMap
 
   def isWellFormed: Boolean = rows.forall(_.isWellFormed)
 
@@ -313,6 +315,9 @@ final class FlowStep private[align] (
 
   private def sorted: Vector[((AlignState, AlignState), Double)] =
     mass.toVector.sortBy { case ((a, b), _) => (a.key, b.key) }
+
+  /** Total mass in the same canonical key order as its marginals. */
+  private[align] def total: Double = sorted.map(_._2).sum
 
   /** Row marginal: should equal `P_i`. */
   def fromMarginal: Map[AlignState, Double] =
