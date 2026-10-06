@@ -1,0 +1,97 @@
+{
+  "source_candidate": "298b832b9f10944873e435b658d7ff614b15237f",
+  "subsequent_source_change": "scalafmt only, nested if layout; tested by release-fast run",
+  "unwired": true,
+  "mac_arm64": {
+    "java": "Homebrew25.0.1",
+    "node": "26.7.0",
+    "clang": "Apple15.0.0",
+    "scala": "3.7.4",
+    "scala_native": "0.5.12",
+    "jvm": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "js": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "native_debug": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "native_release_fast": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "frozen_reference_rows": 631,
+  "frozen_reference_tsv_sha256": "d020d76b77746ab45519b3662200a3926aab4628190075a7d7cf294cd240457f",
+  "linux_execution": "pending",
+  "runtime_math_mutation": "running",
+  "logs": [
+    {
+      "file": "kernel-unit.log.gz",
+      "uncompressed_sha256": "de2256fa4fda1fdd85772e51942d21a61ff28095d7098880684d29cc78720e0c",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T18:43:34.850839+00:00",
+        "finished_utc": "2026-10-06T18:45:19.319165+00:00",
+        "duration_seconds": 104.467936,
+        "command": [
+          "sbt",
+          "-batch",
+          "-Dsbt.log.noformat=true",
+          "set ThisBuild / tlFatalWarnings := true",
+          "alignJVM/testOnly storymodel4s.align.AlignmentMathSuite",
+          "alignJS/testOnly storymodel4s.align.AlignmentMathSuite",
+          "alignNative/testOnly storymodel4s.align.AlignmentMathSuite",
+          "scalafmtAll",
+          "scalafmtCheckAll",
+          "scalafmtSbtCheck"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/kernel-unit-02.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 7303
+      }
+    },
+    {
+      "file": "kernel-releasefast-02.log.gz",
+      "uncompressed_sha256": "b1480053b005a75789b46879217ffa8b49551979aae9e8d6a649984835520417",
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T18:48:16.904750+00:00",
+        "finished_utc": "2026-10-06T18:49:37.155306+00:00",
+        "duration_seconds": 80.250271,
+        "command": [
+          "sbt",
+          "-batch",
+          "-Dsbt.log.noformat=true",
+          "set ThisBuild / tlFatalWarnings := true",
+          "project alignNative",
+          "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+          "testOnly storymodel4s.align.AlignmentMathSuite",
+          "scalafmtCheckAll",
+          "scalafmtSbtCheck"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/kernel-releasefast-02.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 3489
+      }
+    }
+  ]
+}

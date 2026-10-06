@@ -1,0 +1,58 @@
+{
+  "candidate": "3918d69793ddafafa0f878abfcde456de420ecb3",
+  "run_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37512476848",
+  "examples_passed": 13,
+  "parser_tests_passed": 5,
+  "site_build_exit": 1,
+  "failure": "model-a-story PROGRAM_SHA retained pre-TypedSupport-migration source hash; live source changed support.units to support.textSpans.toVector.flatMap(_.units)",
+  "recorded_output_sha_unchanged": true,
+  "all_other_page_program_and_output_pins_match": true,
+  "log_sha256": "004ff807dea5d819305d782180646636d067574a8499d7da80b8b6e547019432",
+  "fix": "bind migrated source and actual replay producer3918; retain output pin and exact replay check",
+  "docs-site-build-fixed": {
+    "exit": 1,
+    "log_sha256": "58c221bd410c8413559b50840e73c8fa3380dd68b599b4502bf6c14431fac4a6",
+    "run": {
+      "schema_version": 1,
+      "started_utc": "2026-10-06T18:50:50.689293+00:00",
+      "finished_utc": "2026-10-06T18:50:56.022165+00:00",
+      "duration_seconds": 5.332744,
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer/docs-site",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/docs-site-build-fixed.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 600.0,
+      "log_bytes": 2705
+    }
+  },
+  "docs-site-build-fixed-02": {
+    "exit": 0,
+    "log_sha256": "79d52c49581ee10a4b0bb748c0997e13a1d93b53496150d6106cb439f592a37f",
+    "run": {
+      "schema_version": 1,
+      "started_utc": "2026-10-06T18:51:10.343854+00:00",
+      "finished_utc": "2026-10-06T18:51:15.460280+00:00",
+      "duration_seconds": 5.109771,
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer/docs-site",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/docs-site-build-fixed-02.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 600.0,
+      "log_bytes": 2272
+    }
+  }
+}

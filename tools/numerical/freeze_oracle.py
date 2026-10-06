@@ -15,6 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = Path(__file__).resolve().parent / 'fdlibm'
 MASK = (1 << 64) - 1
+FROZEN_TSV_SHA256 = 'd020d76b77746ab45519b3662200a3926aab4628190075a7d7cf294cd240457f'
 
 def bits(x):
     return struct.unpack('>Q', struct.pack('>d', x))[0]
@@ -58,6 +59,24 @@ def main():
     subprocess.run(command, check=True)
     roster = inputs()
     output = subprocess.check_output([str(executable)], input=''.join(f'{b:016x}\n' for b in roster).encode())
+    assert hashlib.sha256(output).hexdigest() == FROZEN_TSV_SHA256, 'reference differs from frozen bits'
+    # The legacy C shifts negative signed k. Corroborate with unsigned, defined shifts, and UBSan.
+    controlled = (args.work/'e_exp.c').read_text()
+    replacements = {
+        '__HI(y) += (k<<20);': '__HI(y) = (int)((unsigned)__HI(y) + ((unsigned)k << 20));',
+        '__HI(y) += ((k+1000)<<20);': '__HI(y) = (int)((unsigned)__HI(y) + ((unsigned)(k+1000) << 20));'
+    }
+    for old, new in replacements.items():
+        assert controlled.count(old) == 1
+        controlled = controlled.replace(old, new)
+    controlled_path = args.work/'e_exp_defined_shift.c'
+    controlled_path.write_text(controlled)
+    second_executable = args.work/'fdlibm-defined-shift-oracle'
+    second_command = command[:-2] + ['-fsanitize=undefined', '-fno-sanitize-recover=all', '-o', str(second_executable)]
+    second_command[second_command.index(str(args.work/'e_exp.c'))] = str(controlled_path)
+    subprocess.run(second_command, check=True)
+    corroboration = subprocess.check_output([str(second_executable)], input=''.join(f'{b:016x}\n' for b in roster).encode())
+    assert corroboration == output, 'defined-shift reference differs from retained legacy C'
     rows = [tuple(int(v, 16) for v in line.split()) for line in output.decode().splitlines()]
     assert [r[0] for r in rows] == roster
     context = decimal.Context(prec=100, Emax=999999999, Emin=-999999999)
@@ -90,6 +109,8 @@ def main():
     receipt = {'rows': len(rows), 'sha256': hashlib.sha256(output).hexdigest(),
                'compiler': subprocess.check_output(['clang','--version']).decode().splitlines()[0],
                'compile_command': command, 'reference_sources': json.loads((SOURCE/'sources.json').read_text()),
+               'defined_shift_corroboration': {'compile_command': second_command, 'ubsan_exit': 0,
+                                                'exact_frozen_bits_match': True},
                'accuracy': {'independent_reference': 'Python Decimal 100-digit exp/ln',
                             'checked': counts, 'max_bit_distance_from_rounded_reference': maximum},
                'scala_port_executed_by_generator': False}

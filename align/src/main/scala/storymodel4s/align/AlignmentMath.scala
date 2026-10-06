@@ -94,8 +94,7 @@ private[align] object AlignmentMath:
       val f = x - 1.0
       val dk = k.toDouble
       if (0x000fffff & (2 + hx)) < 3 then
-        if f == 0.0 then
-          if k == 0 then 0.0 else dk * ln2Hi + dk * ln2Lo
+        if f == 0.0 then if k == 0 then 0.0 else dk * ln2Hi + dk * ln2Lo
         else
           val r = f * f * (0.5 - 0.33333333333333333 * f)
           if k == 0 then f - r else dk * ln2Hi - ((r - dk * ln2Lo) - f)

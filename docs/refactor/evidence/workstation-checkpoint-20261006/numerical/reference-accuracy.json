@@ -1,0 +1,71 @@
+{
+  "rows": 631,
+  "sha256": "d020d76b77746ab45519b3662200a3926aab4628190075a7d7cf294cd240457f",
+  "compiler": "Apple clang version 15.0.0 (clang-1500.1.0.2.5)",
+  "compile_command": [
+    "clang",
+    "-std=c99",
+    "-O2",
+    "-D__LITTLE_ENDIAN",
+    "-fno-strict-aliasing",
+    "-ffp-contract=off",
+    "-fno-fast-math",
+    ".agent-work/checkpoint-20261006/oracle-03/e_exp.c",
+    ".agent-work/checkpoint-20261006/oracle-03/e_log.c",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/tools/numerical/fdlibm/oracle.c",
+    "-o",
+    ".agent-work/checkpoint-20261006/oracle-03/fdlibm-oracle"
+  ],
+  "reference_sources": [
+    {
+      "file": "e_exp.c",
+      "url": "https://www.netlib.org/fdlibm/e_exp.c",
+      "bytes": 5002,
+      "sha256": "04c96195b7ced914d659b5fd204724c182f091af8631fe42016ad6e27cb302ef"
+    },
+    {
+      "file": "e_log.c",
+      "url": "https://www.netlib.org/fdlibm/e_log.c",
+      "bytes": 4451,
+      "sha256": "a2b1bd1b367026a35f36da53425cd618386c3bf69d23ac224a40791aa9855ac9"
+    },
+    {
+      "file": "fdlibm.h",
+      "url": "https://www.netlib.org/fdlibm/fdlibm.h",
+      "bytes": 6205,
+      "sha256": "64113c472c2676499288bc35a821b0867916552930bc52c7445d2c50dddf0e71"
+    }
+  ],
+  "defined_shift_corroboration": {
+    "compile_command": [
+      "clang",
+      "-std=c99",
+      "-O2",
+      "-D__LITTLE_ENDIAN",
+      "-fno-strict-aliasing",
+      "-ffp-contract=off",
+      "-fno-fast-math",
+      ".agent-work/checkpoint-20261006/oracle-03/e_exp_defined_shift.c",
+      ".agent-work/checkpoint-20261006/oracle-03/e_log.c",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/tools/numerical/fdlibm/oracle.c",
+      "-fsanitize=undefined",
+      "-fno-sanitize-recover=all",
+      "-o",
+      ".agent-work/checkpoint-20261006/oracle-03/fdlibm-defined-shift-oracle"
+    ],
+    "ubsan_exit": 0,
+    "exact_frozen_bits_match": true
+  },
+  "accuracy": {
+    "independent_reference": "Python Decimal 100-digit exp/ln",
+    "checked": {
+      "exp": 495,
+      "log": 422
+    },
+    "max_bit_distance_from_rounded_reference": {
+      "exp": 1,
+      "log": 1
+    }
+  },
+  "scala_port_executed_by_generator": false
+}

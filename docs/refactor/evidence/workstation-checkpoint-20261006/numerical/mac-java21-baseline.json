@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "pid": 69116,
+  "machine": "BUC-GW01",
+  "candidate": "3918d69793ddafafa0f878abfcde456de420ecb3",
+  "started_utc": "2026-10-06T18:36:36.371606+00:00",
+  "stages": [
+    {
+      "name": "align-parity",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dsbt.log.noformat=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "alignJVM/testOnly storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/numerical-baseline-align-parity.log",
+      "started_utc": "2026-10-06T18:36:37.686624+00:00",
+      "child_pid": 69135,
+      "exit_code": 0,
+      "bytes": 3276,
+      "sha256": "3552c1eb243a7a59cc0e5830496b77852bbbf6e195b30fcfa15f4404af20a44e",
+      "finished_utc": "2026-10-06T18:37:51.353441+00:00"
+    },
+    {
+      "name": "codec-pins",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dsbt.log.noformat=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "codecJVM/testOnly storymodel4s.codec.MappingCodecDigestSuite"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/numerical-baseline-codec-pins.log",
+      "started_utc": "2026-10-06T18:37:51.354404+00:00",
+      "child_pid": 73007,
+      "exit_code": 0,
+      "bytes": 3139,
+      "sha256": "e4a99718858deb0b1cbf9c006d43d20cd78ef9ab4a3869fca9070ada3e1b55ba",
+      "finished_utc": "2026-10-06T18:38:38.489169+00:00"
+    },
+    {
+      "name": "wog-pins",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dsbt.log.noformat=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "fixturesJVM/testOnly storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/numerical-baseline-wog-pins.log",
+      "started_utc": "2026-10-06T18:38:38.489903+00:00",
+      "child_pid": 75494,
+      "exit_code": 0,
+      "bytes": 2499,
+      "sha256": "dc8669e5475dabafc736bd03ebea237e8c5f4bdc02b93d7a0892cfb3a491d361",
+      "finished_utc": "2026-10-06T18:39:07.699790+00:00"
+    }
+  ],
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+  "finished_utc": "2026-10-06T18:39:07.700294+00:00",
+  "completed": true
+}

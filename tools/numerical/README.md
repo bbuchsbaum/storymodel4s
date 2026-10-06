@@ -19,6 +19,9 @@ compares finite reference values with nearest binary64 values and refuses a diff
 adjacent bit pattern. That sampled accuracy check does not establish correct rounding everywhere.
 
 Reference compilation disables contraction and fast math and retains the original header's
-little-endian and aliasing conventions explicitly. Qualified Scala targets must preserve binary64
+little-endian and aliasing conventions explicitly. The legacy C shifts a negative signed exponent;
+its observed outputs are corroborated against an exported copy with two unsigned shift expressions
+and an undefined-behavior sanitizer. Both must match the frozen TSV digest exactly. This qualifies
+the observed compiler execution, not arbitrary compilation of the legacy C. Qualified Scala targets must preserve binary64
 operation order, separate multiply/add rounding and gradual underflow. No network access, input
 dataset, provider, ONNX model or experimental calibration is needed.

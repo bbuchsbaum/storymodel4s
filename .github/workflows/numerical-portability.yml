@@ -1,0 +1,59 @@
+name: Numerical portability
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/numerical-portability.yml'
+      - 'align/src/main/scala/storymodel4s/align/AlignmentMath.scala'
+      - 'align/src/test/scala/storymodel4s/align/AlignmentMath*.scala'
+      - 'tools/numerical/**'
+  pull_request:
+    paths:
+      - '.github/workflows/numerical-portability.yml'
+      - 'align/src/main/scala/storymodel4s/align/AlignmentMath.scala'
+      - 'align/src/test/scala/storymodel4s/align/AlignmentMath*.scala'
+      - 'tools/numerical/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: numerical-portability-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kernel:
+    name: Kernel (${{ matrix.project }}, Java ${{ matrix.java }})
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {project: alignJVM, java: '17', nativeMode: 'none'}
+          - {project: alignJVM, java: '21', nativeMode: 'none'}
+          - {project: alignJS, java: '17', nativeMode: 'none'}
+          - {project: alignNative, java: '17', nativeMode: 'releaseFast'}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: sbt/setup-sbt@v1
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: sbt
+      - name: Runtime and reference
+        run: |
+          java -version
+          node --version
+          clang --version
+          python3 tools/numerical/freeze_oracle.py --work .agent-work/numerical-reference
+      - name: Portable kernel
+        if: matrix.nativeMode == 'none'
+        run: sbt -batch -Dsbt.log.noformat=true 'set ThisBuild / tlFatalWarnings := true' '${{ matrix.project }}/testOnly storymodel4s.align.AlignmentMathSuite'
+      - name: Portable Native release kernel
+        if: matrix.nativeMode == 'releaseFast'
+        run: sbt -batch -Dsbt.log.noformat=true 'set ThisBuild / tlFatalWarnings := true' 'project alignNative' 'set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))' 'testOnly storymodel4s.align.AlignmentMathSuite'
