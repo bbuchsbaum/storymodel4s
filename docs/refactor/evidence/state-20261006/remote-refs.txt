@@ -1,0 +1,3 @@
+182d74aeed3b5a8bcd013de51e7024cc426c544b	HEAD
+182d74aeed3b5a8bcd013de51e7024cc426c544b	refs/heads/main
+61c1e4d770329c3e3090077c92eb50a68331f69b	refs/notes/calibration-20260904

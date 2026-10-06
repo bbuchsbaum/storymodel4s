@@ -1,0 +1,19 @@
+{
+  "roots": [
+    "/Users/bbuchsbaum/code/scala",
+    "/private/tmp",
+    "/Users/bbuchsbaum/.codex/worktrees",
+    "/Users/bbuchsbaum/.codex/tmp",
+    "/Users/bbuchsbaum/.claude/worktrees",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.claude/worktrees"
+  ],
+  "maximum_depth": 3,
+  "found": [
+    {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s",
+      "origin": "https://github.com/bbuchsbaum/storymodel4s.git",
+      "kind": "gitdir"
+    }
+  ],
+  "errors": []
+}

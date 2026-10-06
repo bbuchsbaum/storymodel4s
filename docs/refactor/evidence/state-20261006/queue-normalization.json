@@ -1,0 +1,79 @@
+[
+  {
+    "issue": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M2TACM78289S4TECE91GT5K2",
+    "old_status": "doing",
+    "old_assignee": "claude-storymodel4s-release",
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M3549Q5W5KQFSY3ZH81FARM0",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M354E83Z4Z7DR4KPP6Q45MAJ",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M35JG7DXD7NSEE4WVEKT3CSF",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M35PB1H5PDD55YVKR4TQ8M66",
+    "old_status": "doing",
+    "old_assignee": null,
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M37AN2FX81EKWVJJ85PD9520",
+    "old_status": "open",
+    "old_assignee": "claude-p1",
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M37ANBB3VPY81RGMA1Q1CHA2",
+    "old_status": "open",
+    "old_assignee": "claude-p1",
+    "new_status": "open",
+    "new_assignee": null
+  },
+  {
+    "issue": "bd-01M37D2JPGXRTVF37PN417JW1Y",
+    "old_status": "open",
+    "old_assignee": "claude-p1",
+    "new_status": "open",
+    "new_assignee": null
+  }
+]

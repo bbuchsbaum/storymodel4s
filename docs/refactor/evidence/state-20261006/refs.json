@@ -1,0 +1,4820 @@
+[
+  {
+    "name": "absorb-unabsorbed-tolerance",
+    "sha": "08c26d8e9c86659c45c0ca9029d7d803a0a7a26c",
+    "date": "2026-08-29T14:27:11-04:00",
+    "upstream": "",
+    "subject": "Absorb within-tolerance slack so admitted partitions and L2 vectors store the claim they made.",
+    "behind": 1095,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "align-dsens-absence",
+    "sha": "925766eff4b37b300bbd9bd7b4f9c61970f875f8",
+    "date": "2026-08-29T11:02:43-04:00",
+    "upstream": "",
+    "subject": "fixtures: format the hsmm/v1 checksum provenance comment",
+    "behind": 1138,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "backup/own-the-metric-workspace-20260905",
+    "sha": "13400455a789bac71b6ba409e85d59aa59878550",
+    "date": "2026-09-05T10:22:42-04:00",
+    "upstream": "",
+    "subject": "Preserve the pre-unification Own the Metric workspace",
+    "behind": 611,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 13400455a789bac71b6ba409e85d59aa59878550"
+    ],
+    "base": "cc11d14261ca03907babe3d96b05ea22d3a7a5e1",
+    "paths": [
+      "README.md",
+      "data/README.md",
+      "docs/data/filmfestival/README.md",
+      "docs/data/filmfestival/source-manifest.json",
+      "docs/data/memento/README.md",
+      "docs/data/memento/recall-population.json",
+      "docs/data/memento/source-manifest.json",
+      "docs/plans/2026-09-03-memento-integration.md",
+      "docs/plans/2026-09-03-navigation-assessment.md",
+      "docs/plans/2026-09-03-second-dataset-survey.md",
+      "docs/plans/2026-09-04-filmfestival-first-run.md",
+      "docs/plans/2026-09-04-filmfestival-handoff.md",
+      "docs/plans/2026-09-04-navigation-code-quality-assessment.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/filmfestival/FilmFestivalRecallMapping.scala",
+      "mission.md",
+      "tools/corpus/filmfest_annotation.py",
+      "tools/corpus/filmfest_gold.py",
+      "tools/corpus/filmfest_recall.py",
+      "tools/corpus/xlsx_rows.py",
+      "tools/diagnostics/navigation-audit-20260904/NavigationAuditProbeSuite.scala",
+      "tools/diagnostics/navigation-audit-20260904/README.md",
+      "tools/diagnostics/navigation-audit-20260904/baseline.log.gz",
+      "tools/diagnostics/navigation-audit-20260904/probes.log.gz",
+      "tools/diagnostics/navigation-audit-20260904/receipt.json",
+      "tools/recall-study/agreement.py",
+      "tools/recall-study/filmfest_gold_film.py",
+      "vision.md"
+    ],
+    "unmatched": [
+      "13400455a789bac71b6ba409e85d59aa59878550"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/recall-alignment-visualization-court",
+    "sha": "834f28099827a9d010bcc3ffbd7a7c19cffa506d",
+    "date": "2026-08-31T13:27:28-04:00",
+    "upstream": "",
+    "subject": "docs: freeze recall alignment visualization court",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 834f28099827a9d010bcc3ffbd7a7c19cffa506d"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/recall-alignment-visualization-court.md"
+    ],
+    "unmatched": [
+      "834f28099827a9d010bcc3ffbd7a7c19cffa506d"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/recall-alignment-visualization-court-v2",
+    "sha": "7da3b10736a5aa195430d116ca1fcd939bec8a01",
+    "date": "2026-08-31T14:17:17-04:00",
+    "upstream": "",
+    "subject": "docs: harden recall visualization court",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 7da3b10736a5aa195430d116ca1fcd939bec8a01"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/recall-alignment-visualization-court.md"
+    ],
+    "unmatched": [
+      "7da3b10736a5aa195430d116ca1fcd939bec8a01"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/recall-alignment-visualization-court-v3",
+    "sha": "05e0746d65ea27db72d659d50616f006630c9df3",
+    "date": "2026-08-31T14:20:54-04:00",
+    "upstream": "",
+    "subject": "docs: complete recall visualization flow courts",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 05e0746d65ea27db72d659d50616f006630c9df3"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/recall-alignment-visualization-court.md"
+    ],
+    "unmatched": [
+      "05e0746d65ea27db72d659d50616f006630c9df3"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/recall-alignment-visualization-court-v4",
+    "sha": "ac985d4f2d279ec3e447767e4a72c4aa552f97cc",
+    "date": "2026-08-31T15:04:49-04:00",
+    "upstream": "",
+    "subject": "docs: specify recall alignment visualization court",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ ac985d4f2d279ec3e447767e4a72c4aa552f97cc"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/recall-alignment-visualization-court.md"
+    ],
+    "unmatched": [
+      "ac985d4f2d279ec3e447767e4a72c4aa552f97cc"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/recall-alignment-visualization-court-v5",
+    "sha": "a7fa64abe85d32e0f5d4520b6c7d2724cef150e5",
+    "date": "2026-08-31T15:28:22-04:00",
+    "upstream": "",
+    "subject": "docs: correct recall alignment visualization court",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ a7fa64abe85d32e0f5d4520b6c7d2724cef150e5"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/recall-alignment-visualization-court.md"
+    ],
+    "unmatched": [
+      "a7fa64abe85d32e0f5d4520b6c7d2724cef150e5"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/recall-alignment-visualization-court-v6",
+    "sha": "0be9006bf706b4432bc15bfe542db93432b3aad4",
+    "date": "2026-09-01T02:53:48-04:00",
+    "upstream": "",
+    "subject": "docs: preserve recall construction uncertainty",
+    "behind": 895,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ a7fa64abe85d32e0f5d4520b6c7d2724cef150e5",
+      "+ 0be9006bf706b4432bc15bfe542db93432b3aad4"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/recall-alignment-visualization-court.md"
+    ],
+    "unmatched": [
+      "a7fa64abe85d32e0f5d4520b6c7d2724cef150e5",
+      "0be9006bf706b4432bc15bfe542db93432b3aad4"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "candidate/sherlock-local-pair-admission-court",
+    "sha": "60d1827f9356b8a2cf3121e214432ef597edca70",
+    "date": "2026-08-31T14:40:48-04:00",
+    "upstream": "",
+    "subject": "docs: add Sherlock local admission court",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 60d1827f9356b8a2cf3121e214432ef597edca70"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      ".gitignore",
+      "docs/design/sherlock-local-pair-admission-court.md"
+    ],
+    "unmatched": [
+      "60d1827f9356b8a2cf3121e214432ef597edca70"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "chief-import-sherlock-data",
+    "sha": "e0c884bafa1f20157dfe68a110cccaf66119ca26",
+    "date": "2026-08-31T18:56:33-04:00",
+    "upstream": "",
+    "subject": "docs: bind canonical Sherlock source set",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ e0c884bafa1f20157dfe68a110cccaf66119ca26"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/data/sherlock/README.md",
+      "docs/data/sherlock/alias-map.json",
+      "docs/data/sherlock/annotation-lineage.json",
+      "docs/data/sherlock/recall-lineage.json",
+      "docs/data/sherlock/source-manifest.json",
+      "docs/data/sherlock/timebase-repair.json"
+    ],
+    "unmatched": [
+      "e0c884bafa1f20157dfe68a110cccaf66119ca26"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "claude-p1/ac4-s1-sampled-frames",
+    "sha": "c9522693838152443a0a871c16fcc2df47e593d1",
+    "date": "2026-09-23T14:27:17-04:00",
+    "upstream": "",
+    "subject": "docs(evidence): add the stream-binding repair gate, ten-mutant receipt and review record (AC4 S1)",
+    "behind": 50,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "claude-p1/scene-frames-parts",
+    "sha": "942a9f759778d712906e318e0be7268985a1b238",
+    "date": "2026-09-23T09:19:29-04:00",
+    "upstream": "",
+    "subject": "docs(evidence): refresh the scene-frame archive for the independent-review repair",
+    "behind": 125,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "claude-p1/strict-gate",
+    "sha": "12897af9f19ba1618e2b3a7cbbe07979c0c82a46",
+    "date": "2026-09-23T07:52:14-04:00",
+    "upstream": "",
+    "subject": "docs(evidence): state that the strict full gate is not a pinned-dependency pass",
+    "behind": 138,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "claude-sm/admissibility-seal",
+    "sha": "9f72ce154a071a9bd5abd40ea9e51b57226cc860",
+    "date": "2026-09-23T12:26:05-04:00",
+    "upstream": "",
+    "subject": "evidence: Admissibility seal slice gate and pre-existing Native timeout controls",
+    "behind": 59,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "claude-sm/review-receipts-20260923",
+    "sha": "2b867975022975772cacf9643650e977fcd5c34e",
+    "date": "2026-09-23T10:28:28-04:00",
+    "upstream": "",
+    "subject": "evidence: durable copies of offline-text-source review receipts (SD3)",
+    "behind": 130,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 2b867975022975772cacf9643650e977fcd5c34e"
+    ],
+    "base": "604080fc5628499efbd9f54de375c0d626a4fa68",
+    "paths": [
+      "docs/refactor/evidence/review-receipts-20260923/README.md",
+      "docs/refactor/evidence/review-receipts-20260923/offline-text-source-b52b26a0/Diff.java",
+      "docs/refactor/evidence/review-receipts-20260923/offline-text-source-b52b26a0/RECEIPT.md",
+      "docs/refactor/evidence/review-receipts-20260923/offline-text-source-b52b26a0/coreJVM-TextSourceSuite.log",
+      "docs/refactor/evidence/review-receipts-20260923/offline-text-source-ee076a47/Canon2.java"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "claude-sm/storymodel-export",
+    "sha": "06d8ebecff94be92b2a6bdcdeb24141ef383f312",
+    "date": "2026-09-23T08:53:35-04:00",
+    "upstream": "",
+    "subject": "evidence: S5 scoped gate on 69a8e754 (GATE_EXIT=0, 3327 tests, fatal warnings)",
+    "behind": 116,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex-nfrd-receipt-v3",
+    "sha": "7c7858f3c6aac5277bb34e905b532828d22da1a2",
+    "date": "2026-08-29T22:31:14-04:00",
+    "upstream": "",
+    "subject": "Add receipt-complete NFRD Baseball intake court",
+    "behind": 1013,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 7c7858f3c6aac5277bb34e905b532828d22da1a2"
+    ],
+    "base": "1a55f194f88bfa2575a9e915f691d71b938f0e67",
+    "paths": [
+      "docs/design/nfrd-baseball-diagnostic-court.md",
+      "docs/design/nfrd-primary-source-inventory.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/files.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/intake.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/nfrd/NfrdBaseballSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/consumer/NfrdIntakePublicSuite.scala"
+    ],
+    "unmatched": [
+      "7c7858f3c6aac5277bb34e905b532828d22da1a2"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/acquire-probe-anchor-20260831",
+    "sha": "e3745e20240c23805c5151d604177201a2332225",
+    "date": "2026-08-31T09:25:59-04:00",
+    "upstream": "",
+    "subject": "test(acquire): anchor CriticFinding probe dependency",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- e3745e20240c23805c5151d604177201a2332225"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "acquire/src/test/scala/storymodel4s/acquireprobe/ConstructionBoundarySuite.scala",
+      "acquire/src/test/scala/storymodel4s/acquireprobe/ConstructionProbeSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/admissibility-final-20260923",
+    "sha": "27033f4725c99c7146219697db1ed73280af66a8",
+    "date": "2026-09-23T15:03:49-04:00",
+    "upstream": "",
+    "subject": "Bound mapping decode and cross-unit link test fixtures",
+    "behind": 40,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/amr-probe-anchor-20260830",
+    "sha": "0573692458a439e3625b119baa19d1946edeb478",
+    "date": "2026-08-30T16:16:26-04:00",
+    "upstream": "",
+    "subject": "test(amr): anchor construction probe dependency",
+    "behind": 902,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 0573692458a439e3625b119baa19d1946edeb478"
+    ],
+    "base": "b518cbfa8621dac8fa8a1b5a7ef2e360894a1db5",
+    "paths": [
+      "amr-interop/src/test/scala/storymodel4s/probes/AmrGraphUnforgeableSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/anna-lemmas-p1",
+    "sha": "eae7d568983774368423d27ac101d7cf3f2bb747",
+    "date": "2026-08-29T10:05:58-04:00",
+    "upstream": "",
+    "subject": "test(align): derive Anna fixture lemmas from the production stemmer",
+    "behind": 1156,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ eae7d568983774368423d27ac101d7cf3f2bb747"
+    ],
+    "base": "1600108284e7f3a7ca57d22a5af34dabd3c33348",
+    "paths": [
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixtureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala"
+    ],
+    "unmatched": [
+      "eae7d568983774368423d27ac101d7cf3f2bb747"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/anna-nonvacuity",
+    "sha": "abdc219737cb1f9fd19eb9b84cf8b44f39c94711",
+    "date": "2026-08-29T10:14:20-04:00",
+    "upstream": "",
+    "subject": "test(align): make Anna stemming guard non-vacuous",
+    "behind": 1145,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/codec-probe-anchor-20260831",
+    "sha": "c0525f0ffbba43a69e8d8546de4fead9bca257c8",
+    "date": "2026-08-31T09:59:02-04:00",
+    "upstream": "",
+    "subject": "test(codec): anchor sidecar construction probes",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- c0525f0ffbba43a69e8d8546de4fead9bca257c8"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "codec/src/test/scala/storymodel4s/codecprobe/ConstructionProbeSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/corpus-reader-bounded-refusals-0923",
+    "sha": "195e83f20c24c47b49f73f2062e957865623bb90",
+    "date": "2026-09-23T17:07:12-04:00",
+    "upstream": "",
+    "subject": "Format CorpusReader cap documentation",
+    "behind": 33,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/docs-site-claims-0923",
+    "sha": "8973c520311fdba2d65a513d8a711c90d9b66ec7",
+    "date": "2026-09-23T18:50:14-04:00",
+    "upstream": "",
+    "subject": "Bind model tour badge to replayed example revision",
+    "behind": 36,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 589b6d265d1dacdff2fc04f9735cfa4ee44df490",
+      "+ 8973c520311fdba2d65a513d8a711c90d9b66ec7"
+    ],
+    "base": "70358e4eea7612d8089b6173fc1e1218df06e76a",
+    "paths": [
+      "docs-site/src/content/docs/method/align-and-interpret.mdx",
+      "docs-site/src/content/docs/method/model-a-story.mdx",
+      "docs-site/src/content/docs/method/orientation.mdx",
+      "docs-site/src/content/docs/method/represent-recall.mdx",
+      "docs-site/src/content/docs/method/score-interview.mdx",
+      "docs-site/src/content/docs/method/summarize-recall.mdx",
+      "docs-site/src/content/docs/scala/getting-started.mdx",
+      "docs-site/src/content/docs/scala/inspect-source.mdx",
+      "docs-site/src/content/docs/scala/modules.mdx",
+      "docs-site/src/content/docs/scala/save-and-deliver.mdx"
+    ],
+    "unmatched": [
+      "589b6d265d1dacdff2fc04f9735cfa4ee44df490",
+      "8973c520311fdba2d65a513d8a711c90d9b66ec7"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/document-probe-anchor-20260831",
+    "sha": "f47177cbde76b45ffe3558c4be8045c8c6324b0b",
+    "date": "2026-08-31T09:44:08-04:00",
+    "upstream": "",
+    "subject": "test(document): anchor construction boundary types",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- f47177cbde76b45ffe3558c4be8045c8c6324b0b"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "document/src/test/scala/storymodel4s/documentprobe/ConstructionBoundarySuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/embed-core-probe-anchor-20260831",
+    "sha": "f352b43dd80286b5f89c143c5c59e47bb445e745",
+    "date": "2026-08-31T10:33:23-04:00",
+    "upstream": "",
+    "subject": "test(embed-core): anchor construction probes",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- f352b43dd80286b5f89c143c5c59e47bb445e745"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/embed-grakern-probe-anchor-20260831",
+    "sha": "b1a3287e0d0ef63ec47fbd90c33e9bf95722647f",
+    "date": "2026-08-31T09:35:03-04:00",
+    "upstream": "",
+    "subject": "test(embed-grakern): anchor StructuralProgram probe",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- b1a3287e0d0ef63ec47fbd90c33e9bf95722647f"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "embed-grakern/src/test/scala/storymodel4s/grakernprobe/StructuralProgramBoundarySuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/frameset-stream-identity-0923",
+    "sha": "69e48e9a370ee6a3c4ff42d11abca36e614e60f9",
+    "date": "2026-09-23T18:08:12-04:00",
+    "upstream": "",
+    "subject": "fix(media): bind decoded stream in full-frame identity",
+    "behind": 36,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 69e48e9a370ee6a3c4ff42d11abca36e614e60f9"
+    ],
+    "base": "70358e4eea7612d8089b6173fc1e1218df06e76a",
+    "paths": [
+      "media/src/main/scala/storymodel4s/media/frames.scala",
+      "media/src/test/scala/storymodel4s/probe/SampledCaptionConsumerSuite.scala"
+    ],
+    "unmatched": [
+      "69e48e9a370ee6a3c4ff42d11abca36e614e60f9"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/imputed-terms-format-v2",
+    "sha": "22a325392c23d7f4f88cc2057d347ee8341c0c77",
+    "date": "2026-08-30T08:11:28-04:00",
+    "upstream": "",
+    "subject": "align: format CostBreakdown boundary note",
+    "behind": 1010,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/m1-imputed-doc-boundary",
+    "sha": "dc5374d630534bce49e5af775f42b8e40b8c6a5d",
+    "date": "2026-08-29T23:27:27-04:00",
+    "upstream": "",
+    "subject": "align: state the CostBreakdown wire boundary",
+    "behind": 1011,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/mapping-consensus-20260923",
+    "sha": "0904e3f1750d430f428eb169d6cfa8f4c39d2689",
+    "date": "2026-09-23T09:53:43-04:00",
+    "upstream": "",
+    "subject": "docs: note Fray consensus codification handoff",
+    "behind": 123,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "- a90a9ee5e70db6834c9165db8a291c9af3bab225",
+      "- 8491f6815e52e266a521617c7a4fe50b17b0d17f",
+      "- 4eb625970205e1f62b300ca897e94eaa927bbd6c",
+      "- 0904e3f1750d430f428eb169d6cfa8f4c39d2689"
+    ],
+    "base": "b52b26a0b3e02de62cde695511de5c4ad170cc1d",
+    "paths": [
+      "docs/adr/0022-mapping-producers-and-evidence.md",
+      "docs/refactor/evidence/offline-text-source-20260923/README.md",
+      "docs/refactor/evidence/offline-text-source-20260923/receipts.tar.gz",
+      "fray_notes.md"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/narrative-compiler-adr",
+    "sha": "d587e976e4a4b31c3365d47b018701b3b2cf02f8",
+    "date": "2026-08-29T15:43:17-04:00",
+    "upstream": "",
+    "subject": "Assert option fingerprint topology precisely",
+    "behind": 1079,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/p1-integration-20260923",
+    "sha": "7469d3d7f49dd04df2d2bc76504fbef1202a703b",
+    "date": "2026-09-23T10:09:32-04:00",
+    "upstream": "",
+    "subject": "Reconcile WOG pipeline witnesses with explicit abstention promotion",
+    "behind": 79,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/p1-integration-evidence-20260923",
+    "sha": "7ca1a32b0639b81aebdb7e2ddb6c635f91aaffbf",
+    "date": "2026-09-23T09:42:50-04:00",
+    "upstream": "",
+    "subject": "WIP preserve accepted P1 handoff and evidence audits while final gate runs",
+    "behind": 130,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 56b27e3ab634c81aad8d95858cf2e7295c273351",
+      "+ 97e05d704b378c386e075fda157a6df0b3048685",
+      "+ 858ac0455e4ea039f4cce9a3fc21826050673694",
+      "+ 7ca1a32b0639b81aebdb7e2ddb6c635f91aaffbf"
+    ],
+    "base": "604080fc5628499efbd9f54de375c0d626a4fa68",
+    "paths": [
+      ".mote/ops/20260923T121620.582028Z-p15029-c0000-rf1f0-h4bc1a8.json",
+      ".mote/ops/20260923T121626.820816Z-p15029-c0001-rcedf-h934a54.json",
+      ".mote/ops/20260923T121847.854988Z-p19995-c0000-r986d-h7122a8.json",
+      ".mote/ops/20260923T121853.751200Z-p19995-c0001-rd501-h0b7ba0.json",
+      ".mote/ops/20260923T121858.451904Z-p19995-c0002-r402f-h87f3a3.json",
+      ".mote/ops/20260923T121903.045202Z-p19995-c0003-r343f-h5a1261.json",
+      ".mote/ops/20260923T122619.220092Z-p38673-c0000-race1-hded75e.json",
+      ".mote/ops/20260923T124251.624089Z-p96832-c0000-rd9dd-ha2bf4d.json",
+      ".mote/ops/20260923T124343.285092Z-p97673-c0000-r3f12-h62a099.json",
+      ".mote/ops/20260923T125301.867699Z-p17915-c0000-r6323-hab1c7e.json",
+      ".mote/ops/20260923T125307.597846Z-p17915-c0001-rc959-h57efb0.json",
+      ".mote/ops/20260923T125946.239849Z-p37818-c0000-ra879-h1c1c17.json",
+      ".mote/ops/20260923T133234.250260Z-p8629-c0000-r739e-hc4fa6b.json",
+      ".mote/ops/20260923T133728.330696Z-p18572-c0000-rfa33-hb0fc73.json",
+      ".mote/ops/20260923T134159.869049Z-p27703-c0000-r191c-h6f9529.json",
+      "docs/refactor/BACKLOG.md",
+      "docs/refactor/PLAN.md",
+      "docs/refactor/evidence/p1-integration-20260923/README.md",
+      "docs/refactor/evidence/p1-integration-20260923/compiler-checkAll-failed.json",
+      "docs/refactor/evidence/p1-integration-20260923/compiler-checkAll-failed.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/compiler-checkAll-failed.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/compiler-gate-preflight.json",
+      "docs/refactor/evidence/p1-integration-20260923/independent-readers-command.sh",
+      "docs/refactor/evidence/p1-integration-20260923/independent-readers-qualification.json",
+      "docs/refactor/evidence/p1-integration-20260923/independent-readers.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/independent-readers.log.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/native-snapshot-tie-qualification.json",
+      "docs/refactor/evidence/p1-integration-20260923/native-snapshot-tie.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/native-snapshot-tie.log.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-independent-readers-workflow-clean.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-independent-readers-workflow-clean.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-independent-readers-workflow-generate.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-independent-readers-workflow-generate.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-scene-ci-tests.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-scene-ci-tests.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-scene-ci-workflow.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-scene-ci-workflow.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-control-authorized.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-control-authorized.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-control.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-control.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-formatted.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-formatted.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-mutant.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-mutant.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-restored.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/p1-snapshot-jvm-restored.meta.json",
+      "docs/refactor/evidence/p1-integration-20260923/scene-ci-qualification.json",
+      "docs/refactor/evidence/p1-integration-20260923/snapshot-fixture-qualification.json",
+      "docs/refactor/evidence/p1-integration-20260923/source-evidence-audit.json",
+      "docs/refactor/evidence/p1-integration-20260923/wog-baseline.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/wog-focused.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/wog-mutant.log.gz",
+      "docs/refactor/evidence/p1-integration-20260923/wog-prior-evidence.json"
+    ],
+    "unmatched": [
+      "56b27e3ab634c81aad8d95858cf2e7295c273351",
+      "97e05d704b378c386e075fda157a6df0b3048685",
+      "858ac0455e4ea039f4cce9a3fc21826050673694",
+      "7ca1a32b0639b81aebdb7e2ddb6c635f91aaffbf"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/p1-integration-landing-20260923",
+    "sha": "577ebfdb0f9348f235ef75706167ddbbd6684cec",
+    "date": "2026-09-23T10:41:36-04:00",
+    "upstream": "",
+    "subject": "Integrate current operating guide and landed Python media slice",
+    "behind": 64,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/p1-plan-20260923",
+    "sha": "ba84e204c3a7d898c9bebf0e83a10d61122244e4",
+    "date": "2026-09-23T07:36:18-04:00",
+    "upstream": "",
+    "subject": "WIP: preserve CI route decision and proposed 1.0 stability boundary",
+    "behind": 141,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ ba84e204c3a7d898c9bebf0e83a10d61122244e4"
+    ],
+    "base": "1395ce2c86222f3155fc4fb116a836fd2c19bb60",
+    "paths": [
+      ".mote/ops/20260923T111828.685332Z-p97705-c0000-r72e0-hb2e25d.json",
+      ".mote/ops/20260923T111833.135566Z-p97705-c0001-r2a6a-hd5b9ab.json",
+      ".mote/ops/20260923T111837.642069Z-p97705-c0002-rc7e0-h7cfd69.json",
+      ".mote/ops/20260923T111842.196354Z-p97705-c0003-r446f-h4e0bfc.json",
+      ".mote/ops/20260923T112713.656991Z-p16302-c0000-r22df-h991053.json",
+      ".mote/ops/20260923T112718.223475Z-p16302-c0001-rcde1-h14a146.json",
+      ".mote/ops/20260923T112722.796070Z-p16302-c0002-rf2fb-hbf90ed.json",
+      ".mote/ops/20260923T112727.555774Z-p16302-c0003-raaa3-hd142d9.json",
+      ".mote/ops/20260923T113105.366760Z-p19519-c0000-r5909-h085932.json",
+      ".mote/ops/20260923T113358.086224Z-p24131-c0000-r8f01-h741380.json",
+      ".mote/ops/20260923T113415.168879Z-p24407-c0000-r833c-h9d7106.json",
+      ".mote/ops/20260923T113429.435682Z-p25318-c0000-r9250-hf4da62.json",
+      ".mote/ops/20260923T113434.624735Z-p25318-c0001-re6ee-h64f9ad.json",
+      ".mote/ops/20260923T113454.118170Z-p25318-c0003-r600f-h60d3f6.json",
+      "docs/api-stability.md",
+      "docs/refactor/PLAN.md",
+      "docs/refactor/evidence/ci-route-20260923/README.md",
+      "docs/refactor/evidence/ci-route-20260923/ci-35667411311-job-106556135840.log.gz",
+      "docs/refactor/evidence/ci-route-20260923/receipt.json"
+    ],
+    "unmatched": [
+      "ba84e204c3a7d898c9bebf0e83a10d61122244e4"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/p1-source-evidence-20260923",
+    "sha": "a90a9ee5e70db6834c9165db8a291c9af3bab225",
+    "date": "2026-09-23T09:25:51-04:00",
+    "upstream": "",
+    "subject": "docs(text-source): retain review and cross-platform evidence",
+    "behind": 123,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- a90a9ee5e70db6834c9165db8a291c9af3bab225"
+    ],
+    "base": "b52b26a0b3e02de62cde695511de5c4ad170cc1d",
+    "paths": [
+      "docs/refactor/evidence/offline-text-source-20260923/README.md",
+      "docs/refactor/evidence/offline-text-source-20260923/receipts.tar.gz",
+      "fray_notes.md"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/proposition-probe-anchor-20260831",
+    "sha": "92c8782193900a3a283d1c15a26e647705423bce",
+    "date": "2026-08-31T08:58:24-04:00",
+    "upstream": "",
+    "subject": "test(proposition): anchor construction probe dependency",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 92c8782193900a3a283d1c15a26e647705423bce"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "proposition/src/test/scala/storymodel4s/probes/PropositionChartUnforgeableSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/provenance-followup",
+    "sha": "a371e102c4abbcdf4f83f84bf6fe47c55f5a795f",
+    "date": "2026-08-29T17:19:43-04:00",
+    "upstream": "",
+    "subject": "Document provenance API compatibility break",
+    "behind": 1035,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/provider-parser-contract",
+    "sha": "99fd15eef1d9ccc7d2d83d8aaa2c0e5fe6d70aa5",
+    "date": "2026-08-29T19:29:21-04:00",
+    "upstream": "",
+    "subject": "Add fail-closed AMR parser provider contract",
+    "behind": 1023,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 99fd15eef1d9ccc7d2d83d8aaa2c0e5fe6d70aa5"
+    ],
+    "base": "1ebdad3a24bd9571259dd53a62b8bca0b6fe42e0",
+    "paths": [
+      "build.sbt",
+      "provider-parser/README.md",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/cache.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/conforming.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/contract.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/envelope.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/result.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/CacheSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ConformingSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ContractSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/DeterminismSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/EnvelopeSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/TestFixtures.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundarySuite.scala"
+    ],
+    "unmatched": [
+      "99fd15eef1d9ccc7d2d83d8aaa2c0e5fe6d70aa5"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/provider-parser-contract-v2",
+    "sha": "f573ee341c6d33655d32954c85bc8b958c66e3a1",
+    "date": "2026-08-29T20:45:11-04:00",
+    "upstream": "",
+    "subject": "Make provider receipt identities injective",
+    "behind": 1023,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ bb204e9d4af43b9d2986f58303a80cc3ca55d026",
+      "+ f573ee341c6d33655d32954c85bc8b958c66e3a1"
+    ],
+    "base": "1ebdad3a24bd9571259dd53a62b8bca0b6fe42e0",
+    "paths": [
+      "build.sbt",
+      "provider-parser/README.md",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/cache.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/conforming.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/contract.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/envelope.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/identity.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/result.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/CacheSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ConformingSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ContractSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/DeterminismSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/EnvelopeSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/TestFixtures.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundarySuite.scala"
+    ],
+    "unmatched": [
+      "bb204e9d4af43b9d2986f58303a80cc3ca55d026",
+      "f573ee341c6d33655d32954c85bc8b958c66e3a1"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/provider-parser-contract-v3",
+    "sha": "48b495e9067a9e986d7de13e344811073ed1718a",
+    "date": "2026-08-29T20:49:02-04:00",
+    "upstream": "",
+    "subject": "Add fail-closed AMR parser provider contract",
+    "behind": 1023,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 48b495e9067a9e986d7de13e344811073ed1718a"
+    ],
+    "base": "1ebdad3a24bd9571259dd53a62b8bca0b6fe42e0",
+    "paths": [
+      "build.sbt",
+      "provider-parser/README.md",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/cache.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/conforming.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/contract.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/envelope.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/identity.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/result.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/CacheSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ConformingSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ContractSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/DeterminismSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/EnvelopeSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/TestFixtures.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundarySuite.scala",
+      "tools/reference-scope.sh"
+    ],
+    "unmatched": [
+      "48b495e9067a9e986d7de13e344811073ed1718a"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/provider-parser-contract-v4",
+    "sha": "4393c3d901a57fa841b80eb6bc17931f3dac467c",
+    "date": "2026-08-29T22:43:18-04:00",
+    "upstream": "",
+    "subject": "Preserve cache context in parser fallbacks",
+    "behind": 1023,
+    "ahead": 5,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 11df577cee532f138ddee0e1c7f506e16ce9849e",
+      "+ d05421a71afe2066778b009ab1e69e4d61d569fc",
+      "+ c63ab3a91712ff272c17d864fd01594c58608136",
+      "+ c7a9ba6ee80b566b3f0f658dced5903ab78ade6c",
+      "+ 4393c3d901a57fa841b80eb6bc17931f3dac467c"
+    ],
+    "base": "1ebdad3a24bd9571259dd53a62b8bca0b6fe42e0",
+    "paths": [
+      "build.sbt",
+      "provider-parser/README.md",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/cache.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/conforming.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/contract.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/envelope.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/identity.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/result.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/CacheSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ConformingSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ContractSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/DeterminismSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/EnvelopeSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/TestFixtures.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundaryControls.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundarySuite.scala",
+      "tools/reference-scope.sh"
+    ],
+    "unmatched": [
+      "11df577cee532f138ddee0e1c7f506e16ce9849e",
+      "d05421a71afe2066778b009ab1e69e4d61d569fc",
+      "c63ab3a91712ff272c17d864fd01594c58608136",
+      "c7a9ba6ee80b566b3f0f658dced5903ab78ade6c",
+      "4393c3d901a57fa841b80eb6bc17931f3dac467c"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/provider-parser-contract-v4-draft",
+    "sha": "a4e2da75b5bb0a8c57bd3e3adeb87976140f6067",
+    "date": "2026-08-29T21:22:38-04:00",
+    "upstream": "",
+    "subject": "Separate parser boundary probe controls",
+    "behind": 1023,
+    "ahead": 3,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 48b495e9067a9e986d7de13e344811073ed1718a",
+      "+ ffb76be227c8800dbc18ffc4339f987176c5e633",
+      "+ a4e2da75b5bb0a8c57bd3e3adeb87976140f6067"
+    ],
+    "base": "1ebdad3a24bd9571259dd53a62b8bca0b6fe42e0",
+    "paths": [
+      "build.sbt",
+      "provider-parser/README.md",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/cache.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/conforming.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/contract.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/envelope.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/identity.scala",
+      "provider-parser/src/main/scala/storymodel4s/provider/parser/result.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/CacheSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ConformingSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/ContractSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/DeterminismSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/EnvelopeSuite.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parser/TestFixtures.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundaryControls.scala",
+      "provider-parser/src/test/scala/storymodel4s/provider/parserprobe/ConstructionBoundarySuite.scala",
+      "tools/reference-scope.sh"
+    ],
+    "unmatched": [
+      "48b495e9067a9e986d7de13e344811073ed1718a",
+      "ffb76be227c8800dbc18ffc4339f987176c5e633",
+      "a4e2da75b5bb0a8c57bd3e3adeb87976140f6067"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/recallgraph-checked",
+    "sha": "37edf3c9c2c15716a489cc83fa0fd05a6aebb86c",
+    "date": "2026-08-29T12:42:09-04:00",
+    "upstream": "",
+    "subject": "recall: bind the surface atlas to its transcript",
+    "behind": 1123,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/reference-scope-declaration-free-0923",
+    "sha": "ed9f478daba90d1728ce584b2a896f5a88be9b26",
+    "date": "2026-09-23T19:06:22-04:00",
+    "upstream": "",
+    "subject": "Fail closed on declaration-free module source changes",
+    "behind": 36,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ ed9f478daba90d1728ce584b2a896f5a88be9b26"
+    ],
+    "base": "70358e4eea7612d8089b6173fc1e1218df06e76a",
+    "paths": [
+      "tools/reference-scope-test.sh",
+      "tools/reference-scope.sh"
+    ],
+    "unmatched": [
+      "ed9f478daba90d1728ce584b2a896f5a88be9b26"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/s2a2-cost-0923",
+    "sha": "ca44e74dda0ffb7167fb0aede816c1695114ac71",
+    "date": "2026-09-23T18:17:31-04:00",
+    "upstream": "",
+    "subject": "feat(align): calculate default local price from content",
+    "behind": 42,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/s2a2-lexical-0923",
+    "sha": "a71a3ad9c5fb4e5176c7e526a859b8e2d5e9e965",
+    "date": "2026-09-23T17:25:05-04:00",
+    "upstream": "",
+    "subject": "feat(align): route lexical Jaccard through content projection",
+    "behind": 47,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- a71a3ad9c5fb4e5176c7e526a859b8e2d5e9e965"
+    ],
+    "base": "84c822e9a9118a7c2ce1d41499a875a8862609a4",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/lexicalscore.scala",
+      "align/src/test/scala/storymodel4s/align/ContentLexicalSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/s2a4-courts-0925",
+    "sha": "e02d80d01d2a0ebba3bea8c4716caab9662209dc",
+    "date": "2026-09-25T05:44:01-04:00",
+    "upstream": "",
+    "subject": "docs: bind S2a court qualification and remaining channel dependency",
+    "behind": 6,
+    "ahead": 5,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ ca02572383740cf199839813b4c30a6d000af5c1",
+      "+ d30ac2abe898af49336640f2cee1fd7db3b3a4f8",
+      "+ b84b0ba8d06fd4e081bde1bbf3e4105b92b12722",
+      "+ b2b700cb9b6192cdd58fe719c0738e65b478b385",
+      "+ e02d80d01d2a0ebba3bea8c4716caab9662209dc"
+    ],
+    "base": "48457bdbfd2ca012bdc9144b3395d4d8e5d4ec10",
+    "paths": [
+      "align/.jvm/src/test/scala/storymodel4s/probes/ContentSurfaceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/ContentBehaviorLawsSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/ContentUnforgeableSuite.scala",
+      "docs/refactor/evidence/s2a4-20260925/M1-unit-ordinal.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M10-source-node.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M11-graph-constructor.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M12-report-constructor.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M2-nested-chart.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M3-members-iteration.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M4-grain-constructor.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M5-participant-constructor.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M6-drop-empty-chart.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M7-participant-order.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M8-member-order.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/M9-source-unit.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/README.md",
+      "docs/refactor/evidence/s2a4-20260925/REVIEW.md",
+      "docs/refactor/evidence/s2a4-20260925/initial-mutation-run.json",
+      "docs/refactor/evidence/s2a4-20260925/mutation-receipts.json",
+      "docs/refactor/evidence/s2a4-20260925/platform-gate-binding.json",
+      "docs/refactor/evidence/s2a4-20260925/platform-gate-bound.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/restoration-binding.json",
+      "docs/refactor/evidence/s2a4-20260925/restoration-bound.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-baseline.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-baseline.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-control-diagnostic.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-control-diagnostic.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-first-clone.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-first-clone.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-platform-gate.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-platform-gate.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-restoration.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-restoration.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-second.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-second.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-third.log.gz",
+      "docs/refactor/evidence/s2a4-20260925/s2a4-third.log.meta.json",
+      "docs/refactor/evidence/s2a4-20260925/summary.json",
+      "proposition/src/test/scala/semanticprobe/SemanticGraphCourtSuite.scala",
+      "proposition/src/test/scala/storymodel4s/proposition/SemanticGraphCourtControl.scala",
+      "tools/content-scorer-mutation-check.py"
+    ],
+    "unmatched": [
+      "ca02572383740cf199839813b4c30a6d000af5c1",
+      "d30ac2abe898af49336640f2cee1fd7db3b3a4f8",
+      "b84b0ba8d06fd4e081bde1bbf3e4105b92b12722",
+      "b2b700cb9b6192cdd58fe719c0738e65b478b385",
+      "e02d80d01d2a0ebba3bea8c4716caab9662209dc"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/segmentlink-endpoint-identity-0923",
+    "sha": "00103ac350b403f166da51f578205915293d474a",
+    "date": "2026-09-23T14:49:49-04:00",
+    "upstream": "",
+    "subject": "fix(corpus): compare SegmentLink endpoint content identities",
+    "behind": 47,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 00103ac350b403f166da51f578205915293d474a"
+    ],
+    "base": "c90a7e5d269b6d1aaefce7950e59134cdca4effb",
+    "paths": [
+      "corpus/src/main/scala/storymodel4s/corpus/link.scala",
+      "corpus/src/test/scala/storymodel4s/corpus/SegmentLinkSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/segmentlink-endpoint-identity-current-0923",
+    "sha": "0e1023e05166beffb72a6d26dd4e32bc8ea9f2e2",
+    "date": "2026-09-23T16:12:59-04:00",
+    "upstream": "",
+    "subject": "fix(corpus): compare SegmentLink endpoint content identities",
+    "behind": 35,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/story-probe-anchor-20260831",
+    "sha": "69d1d20a885a3052405dc0f3c1016381dae4142e",
+    "date": "2026-08-31T09:13:24-04:00",
+    "upstream": "",
+    "subject": "test(story): anchor construction probe dependency",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 69d1d20a885a3052405dc0f3c1016381dae4142e"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "story/src/test/scala/storymodel4s/probes/StoryModelUnforgeableSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/surface-detail-d14a",
+    "sha": "967e5d751ab7216b447f8d9bb0e21ddd07d40080",
+    "date": "2026-08-29T08:58:24-04:00",
+    "upstream": "",
+    "subject": "feat(view): compile surface detail marks",
+    "behind": 1231,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/view-probe-anchor-20260831",
+    "sha": "e5283b51606c9822ce3d29d1baf6e0085f914e11",
+    "date": "2026-08-31T10:18:09-04:00",
+    "upstream": "",
+    "subject": "test(view): anchor construction probes",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- e5283b51606c9822ce3d29d1baf6e0085f914e11"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "view/src/test/scala/storymodel4s/viewprobe/ConstructionProbeSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/wog-pipeline-followup",
+    "sha": "72cea6cd5ab2da4a32993a80ccbace37d468226d",
+    "date": "2026-09-23T10:30:58-04:00",
+    "upstream": "",
+    "subject": "test(pipeline): align WOG parity with typed abstention",
+    "behind": 81,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 72cea6cd5ab2da4a32993a80ccbace37d468226d"
+    ],
+    "base": "03569d1a530e043a626ef1798d7ff65b37578ae7",
+    "paths": [
+      "docs/refactor/evidence/wog-abstention-20260923/landing-delta.md",
+      "pipeline/src/test/resources/golden/d1a-s0-text-parity-before-abstention.json",
+      "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+      "pipeline/src/test/scala/storymodel4s/pipeline/TextParitySuite.scala",
+      "pipeline/src/test/scala/storymodel4s/pipeline/WarOfTheGhostsDraftAtlasSuite.scala",
+      "pipeline/src/test/scala/storymodel4s/pipeline/WarOfTheGhostsDraftCodexSuite.scala"
+    ],
+    "unmatched": [
+      "72cea6cd5ab2da4a32993a80ccbace37d468226d"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "codex/wog-typed-absence",
+    "sha": "ac4ac32247ebf2a67c55f08ffefacf9959b11826",
+    "date": "2026-09-23T08:57:30-04:00",
+    "upstream": "",
+    "subject": "Archive author-observed WOG regression receipts",
+    "behind": 138,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "cursor-grok-c1-source",
+    "sha": "33e98782e6709ff02d5ce20c1983d7f78a7c0ec3",
+    "date": "2026-09-01T09:06:43-04:00",
+    "upstream": "",
+    "subject": "Add portable C1 film source contracts and SurfaceAtlas conformance.",
+    "behind": 858,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 33e98782e6709ff02d5ce20c1983d7f78a7c0ec3"
+    ],
+    "base": "7fe0734aa7abddb0fec3c9a2b511dcf654884d32",
+    "paths": [
+      "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "core/src/main/scala/storymodel4s/core/source.scala",
+      "core/src/test/scala/storymodel4s/core/AtlasSuite.scala",
+      "core/src/test/scala/storymodel4s/core/SourceBundleSuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/SourceConstructionBoundarySuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/SourceLaws.scala",
+      "laws/src/test/scala/storymodel4s/laws/SourceLawsSuite.scala"
+    ],
+    "unmatched": [
+      "33e98782e6709ff02d5ce20c1983d7f78a7c0ec3"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "docs/agents-throughput",
+    "sha": "32f4b6ada0c4381e130ab0b42d5cdd3919657f33",
+    "date": "2026-09-23T10:30:27-04:00",
+    "upstream": "",
+    "subject": "docs(agents): address cold-audit findings on the AGENTS.md refactor",
+    "behind": 127,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "docs/movie-component-admission-ledger",
+    "sha": "f203b783da349d705258fef8634becf3e1e5a554",
+    "date": "2026-08-30T07:51:22-04:00",
+    "upstream": "",
+    "subject": "docs: record movie component admission ledger",
+    "behind": 1004,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "docs/movie-narrative-architecture",
+    "sha": "4852c124aa6e6967322d21e069dc772473a59a12",
+    "date": "2026-08-29T22:33:19-04:00",
+    "upstream": "",
+    "subject": "docs: record movie narrative architecture",
+    "behind": 1012,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "docs/provenance-derived",
+    "sha": "1cb64bd39f097c32233a52ff6e167f9f93d9d127",
+    "date": "2026-08-30T17:52:41-04:00",
+    "upstream": "",
+    "subject": "docs-site: stop reconstructing an estimand from rounded console output",
+    "behind": 884,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "docs/recover-astro-site",
+    "sha": "bf1f1a5360595ad3ad717a086390425a16253e77",
+    "date": "2026-08-30T16:59:56-04:00",
+    "upstream": "",
+    "subject": "docs: add human-facing Astro guide",
+    "behind": 894,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "docs/v12-successor",
+    "sha": "36051f6f13c6e83d79a2eca0258ce232b35b9167",
+    "date": "2026-08-30T17:05:17-04:00",
+    "upstream": "",
+    "subject": "docs: port the reviewed V12 movie-architecture delta forward",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 36051f6f13c6e83d79a2eca0258ce232b35b9167"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "NARRATIVE_PROCESS_ALIGNMENT_NOTES.md",
+      "docs/plans/2026-08-29-movie-narrative-architecture.md"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "eval/astro-docs",
+    "sha": "1cace089c4f6f77d6a6493ebcf2a7896f7d8f99b",
+    "date": "2026-09-01T11:50:45-04:00",
+    "upstream": "",
+    "subject": "eval: Astro docs-site successor onto current main",
+    "behind": 799,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "eval/cost-overflow",
+    "sha": "c44e5384241e47b06193e8732bfa1bd1b8ae8801",
+    "date": "2026-09-01T11:21:01-04:00",
+    "upstream": "",
+    "subject": "fix: refuse aggregate cost-weight overflow",
+    "behind": 819,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "fix/frozen-scoring-20260919",
+    "sha": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+    "date": "2026-09-19T14:31:34-04:00",
+    "upstream": "",
+    "subject": "Fix scene scoring to reconcile complete arms against frozen unit support",
+    "behind": 434,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "fix/production-clock-repair-20260919",
+    "sha": "6a5a92881451fb2add3947e974a196cd85070d10",
+    "date": "2026-09-19T15:38:42-04:00",
+    "upstream": "",
+    "subject": "Bind verified clock receipt parameters to the declared record",
+    "behind": 430,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-460",
+    "sha": "460a14a1f1141fbb35b16cc38d25955ce7073e29",
+    "date": "2026-08-29T17:12:31-04:00",
+    "upstream": "",
+    "subject": "align: chart eligibility asks the function that produces the term",
+    "behind": 1037,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 460a14a1f1141fbb35b16cc38d25955ce7073e29"
+    ],
+    "base": "c6f1a8b50093d73921b0b360e340794c2c6d5b7c",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "unmatched": [
+      "460a14a1f1141fbb35b16cc38d25955ce7073e29"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-abs-cand",
+    "sha": "08c26d8e9c86659c45c0ca9029d7d803a0a7a26c",
+    "date": "2026-08-29T14:27:11-04:00",
+    "upstream": "",
+    "subject": "Absorb within-tolerance slack so admitted partitions and L2 vectors store the claim they made.",
+    "behind": 1095,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-b1-cand",
+    "sha": "41f889cf225ebc45f4ecc6b690704ae2b86cab98",
+    "date": "2026-08-29T14:18:28-04:00",
+    "upstream": "",
+    "subject": "test(bench): prove signature refusals propagate",
+    "behind": 1092,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-blend",
+    "sha": "d9d7d97e290364b3d094e551dd76db8e97955bbe",
+    "date": "2026-08-29T15:31:11-04:00",
+    "upstream": "",
+    "subject": "align: the cost blend carries the support it rests on",
+    "behind": 1084,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ d9d7d97e290364b3d094e551dd76db8e97955bbe"
+    ],
+    "base": "855b7544340011f35e7e8921b774514631e2a4a8",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/src/test/resources/golden/hsmm-v1-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala"
+    ],
+    "unmatched": [
+      "d9d7d97e290364b3d094e551dd76db8e97955bbe"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-blend2",
+    "sha": "fec38fbd2ef51d47bfb7d29f51e3125da89bf59f",
+    "date": "2026-08-29T16:28:00-04:00",
+    "upstream": "",
+    "subject": "align: the cost blend carries the support it rests on",
+    "behind": 1053,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-canon",
+    "sha": "a371e102c4abbcdf4f83f84bf6fe47c55f5a795f",
+    "date": "2026-08-29T17:19:43-04:00",
+    "upstream": "",
+    "subject": "Document provenance API compatibility break",
+    "behind": 1035,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-ch2",
+    "sha": "9952ab2c309c8d4050af3e4e5e36415d79b46758",
+    "date": "2026-08-29T17:52:04-04:00",
+    "upstream": "",
+    "subject": "align: eligibility asks the population the measurement reads",
+    "behind": 1030,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-chart",
+    "sha": "f849104d3908375fb60e6c73a4319325f0c62937",
+    "date": "2026-08-29T17:29:21-04:00",
+    "upstream": "",
+    "subject": "align: eligibility asks the population the measurement reads",
+    "behind": 1034,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ f849104d3908375fb60e6c73a4319325f0c62937"
+    ],
+    "base": "234dd09a66c63ce09b90b56a22ebbced70687b2f",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "unmatched": [
+      "f849104d3908375fb60e6c73a4319325f0c62937"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-compiler",
+    "sha": "d587e976e4a4b31c3365d47b018701b3b2cf02f8",
+    "date": "2026-08-29T15:43:17-04:00",
+    "upstream": "",
+    "subject": "Assert option fingerprint topology precisely",
+    "behind": 1079,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-d2",
+    "sha": "d4407a58e7c80b39b3197a6ff9a12bbd9628cf62",
+    "date": "2026-08-29T13:17:08-04:00",
+    "upstream": "",
+    "subject": "Merge commit '0bf780a3d1834606b9491f2e19804d55b053c29c' into gate-d2",
+    "behind": 1104,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [],
+    "base": "0bf780a3d1834606b9491f2e19804d55b053c29c",
+    "paths": [],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-doc",
+    "sha": "7ae2ec9e567a2ed8d3d8f71bdc2f229d0bc38e79",
+    "date": "2026-08-29T18:03:06-04:00",
+    "upstream": "",
+    "subject": "docs: disclose NodeSummary source compatibility break",
+    "behind": 1030,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-leaf",
+    "sha": "735162d48ff3deae5a2534ff752f430eb6a71934",
+    "date": "2026-08-29T17:10:45-04:00",
+    "upstream": "",
+    "subject": "align: validate node importance at construction",
+    "behind": 1047,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-sem",
+    "sha": "c4283967b599f473d1f688f9b38a94705304766e",
+    "date": "2026-08-29T18:48:14-04:00",
+    "upstream": "",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "behind": 1025,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ c4283967b599f473d1f688f9b38a94705304766e"
+    ],
+    "base": "e022c5f01aff45c9507656ce2735a9f6cbc5faa3",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "unmatched": [
+      "c4283967b599f473d1f688f9b38a94705304766e"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-sink",
+    "sha": "178b20c458b2dc956c34989e05e28053a916f1af",
+    "date": "2026-08-29T15:42:52-04:00",
+    "upstream": "",
+    "subject": "align: reject NaN SinkhornConfig by fail-closed polarity",
+    "behind": 1079,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-sink2",
+    "sha": "3f04cffd22729a9eddc5ee9eee2dc2215df9f803",
+    "date": "2026-08-29T16:57:01-04:00",
+    "upstream": "",
+    "subject": "align: require typed InvalidConfig in Sinkhorn aggregate laws",
+    "behind": 1041,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-slicec",
+    "sha": "7af0db40feb72a9303d64d3674f9f79ae503967d",
+    "date": "2026-08-29T15:21:41-04:00",
+    "upstream": "",
+    "subject": "Close SidecarManifest, FeatureRef, and FeatureDerivation against fromProduct.",
+    "behind": 1083,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-trio",
+    "sha": "72e6832f61ab3c935cc903b6b6c3dd88d3457a7d",
+    "date": "2026-08-29T14:42:53-04:00",
+    "upstream": "",
+    "subject": "fix(align): absorb tolerated mass overflow",
+    "behind": 1087,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-win",
+    "sha": "6532f49cf42095d988cf4d2029725bb515290d10",
+    "date": "2026-08-29T16:14:37-04:00",
+    "upstream": "",
+    "subject": "Route every derived window scalar through Estimate.score.",
+    "behind": 1061,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gate-zerofix",
+    "sha": "3f3c2df3416d91a00c9b57902055e84cd7883b48",
+    "date": "2026-08-29T16:48:45-04:00",
+    "upstream": "",
+    "subject": "align: a dropped state keeps its exclusion record",
+    "behind": 1043,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "gemini/pin-8492e43",
+    "sha": "8492e43bd0adf7515b837539493217b20391a0fc",
+    "date": "2026-08-28T16:03:54-04:00",
+    "upstream": "",
+    "subject": "view: revise ADR 0002 and add CodexCompiler, Atlas, EvidenceVisibility, and WOG laws",
+    "behind": 1868,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "interview-ambiguous-reachability",
+    "sha": "652b83988031e17c4dcf02583c0b358ec3b63631",
+    "date": "2026-08-29T10:38:26-04:00",
+    "upstream": "",
+    "subject": "interview: format AmbiguousPlacementSuite for the portable scalafmt gate",
+    "behind": 1142,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "land/rootseg",
+    "sha": "f1f411499271b4176c5f96c2fb9a520c6046ef8f",
+    "date": "2026-09-04T17:33:11-04:00",
+    "upstream": "",
+    "subject": "Handoff: the viewer reads features.json (storyatlas4s f7e825d); what the drawing half needs",
+    "behind": 593,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/attributable-exclusion",
+    "sha": "1fa3c51b2abf9bf61c785efdd05f150c2ffc300e",
+    "date": "2026-08-30T08:53:45-04:00",
+    "upstream": "",
+    "subject": "interview: an exclusion receipt renders the same however its map was built",
+    "behind": 1020,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/blend-support",
+    "sha": "fec38fbd2ef51d47bfb7d29f51e3125da89bf59f",
+    "date": "2026-08-29T16:28:00-04:00",
+    "upstream": "",
+    "subject": "align: the cost blend carries the support it rests on",
+    "behind": 1053,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/blend-zerofix",
+    "sha": "3f3c2df3416d91a00c9b57902055e84cd7883b48",
+    "date": "2026-08-29T16:48:45-04:00",
+    "upstream": "",
+    "subject": "align: a dropped state keeps its exclusion record",
+    "behind": 1043,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/cell-coordinates",
+    "sha": "72b106c6351057c46049b3cf6f380dbb8ad6033d",
+    "date": "2026-08-30T09:22:58-04:00",
+    "upstream": "",
+    "subject": "align: the cell coordinate join derives its words instead of accepting them",
+    "behind": 996,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/chart-eligibility",
+    "sha": "9952ab2c309c8d4050af3e4e5e36415d79b46758",
+    "date": "2026-08-29T17:52:04-04:00",
+    "upstream": "",
+    "subject": "align: eligibility asks the population the measurement reads",
+    "behind": 1030,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/cost-blend",
+    "sha": "60cf041a91bc558bb460967012e6648d879ff366",
+    "date": "2026-08-29T00:57:18-04:00",
+    "upstream": "",
+    "subject": "align: pin the local cost blend with literal expected values",
+    "behind": 1528,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/embed-bench",
+    "sha": "4e831cb944289c8ab7520cf691c05587d59afb2e",
+    "date": "2026-08-28T23:45:25-04:00",
+    "upstream": "",
+    "subject": "embed-bench enforces Law I5: contamination reaches the label-minting function",
+    "behind": 1670,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/external-mass",
+    "sha": "59f8fd0231d20ff07a63c59ae501a32521566339",
+    "date": "2026-08-29T01:41:23-04:00",
+    "upstream": "",
+    "subject": "align: external mass no longer absorbs our failure to rank",
+    "behind": 1498,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/gate-dc5374d",
+    "sha": "dc5374d630534bce49e5af775f42b8e40b8c6a5d",
+    "date": "2026-08-29T23:27:27-04:00",
+    "upstream": "",
+    "subject": "align: state the CostBreakdown wire boundary",
+    "behind": 1011,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/leakage",
+    "sha": "e97f93cc80fa1ee16d8ac065dc426b7fb88ccc1c",
+    "date": "2026-08-29T00:35:47-04:00",
+    "upstream": "",
+    "subject": "embed-bench: make the no-story-text canary capable of failing",
+    "behind": 1555,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/membership-routing",
+    "sha": "64b44c8f9d35b15ca65c27e84c45bfbb046b4ce4",
+    "date": "2026-08-30T10:18:30-04:00",
+    "upstream": "",
+    "subject": "mote: close hsmm/v2 rename bead; release reservation",
+    "behind": 983,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/membership-v2",
+    "sha": "e1c8c407cb19028282e2622a913874791e448683",
+    "date": "2026-08-30T17:28:56-04:00",
+    "upstream": "",
+    "subject": "interview: route unconcentrated mass to an attributed membership exclusion",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ e1c8c407cb19028282e2622a913874791e448683"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "unmatched": [
+      "e1c8c407cb19028282e2622a913874791e448683"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/membership-v3",
+    "sha": "8a4346d9ac5d69dd22ae9e49770f874c81b87d26",
+    "date": "2026-08-31T09:54:07-04:00",
+    "upstream": "",
+    "subject": "interview: court the partition, not just the presence, of membership exclusion",
+    "behind": 895,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ e1c8c407cb19028282e2622a913874791e448683",
+      "+ 8a4346d9ac5d69dd22ae9e49770f874c81b87d26"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "unmatched": [
+      "e1c8c407cb19028282e2622a913874791e448683",
+      "8a4346d9ac5d69dd22ae9e49770f874c81b87d26"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court",
+    "sha": "a51df1654272cfbe29a184b88d2231cffb586965",
+    "date": "2026-08-31T13:38:59-04:00",
+    "upstream": "origin/main",
+    "subject": "docs: freeze the candidate-nomination provenance contract before code",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ a51df1654272cfbe29a184b88d2231cffb586965"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [
+      "a51df1654272cfbe29a184b88d2231cffb586965"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court-v2",
+    "sha": "a674e1468031544868721e7459c8e11120b13659",
+    "date": "2026-08-31T15:19:35-04:00",
+    "upstream": "",
+    "subject": "docs: amend the nomination provenance court for four live bypasses",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ a674e1468031544868721e7459c8e11120b13659"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [
+      "a674e1468031544868721e7459c8e11120b13659"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court-v3",
+    "sha": "3e959e6a269f571395d79f59c6ded4565043078f",
+    "date": "2026-08-31T15:27:07-04:00",
+    "upstream": "",
+    "subject": "docs: correct the nomination court against the real Estimate constructors",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 3e959e6a269f571395d79f59c6ded4565043078f"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [
+      "3e959e6a269f571395d79f59c6ded4565043078f"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court-v4",
+    "sha": "59a557b8680a297316e888d0d1b2679955e3d512",
+    "date": "2026-08-31T15:47:27-04:00",
+    "upstream": "",
+    "subject": "docs: correct rank scope and stop generalising one NaN measurement",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 59a557b8680a297316e888d0d1b2679955e3d512"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [
+      "59a557b8680a297316e888d0d1b2679955e3d512"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court-v5",
+    "sha": "7ba9356a50f4cdc64e1562d0eab8cf2d5fc75436",
+    "date": "2026-08-31T16:50:38-04:00",
+    "upstream": "",
+    "subject": "docs: derive the bound identities, keep credence, and inventory ablation publication",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 7ba9356a50f4cdc64e1562d0eab8cf2d5fc75436"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [
+      "7ba9356a50f4cdc64e1562d0eab8cf2d5fc75436"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court-v6",
+    "sha": "b73692f6a3769ce908b3012dae435751ae61ea1a",
+    "date": "2026-08-31T17:32:59-04:00",
+    "upstream": "",
+    "subject": "docs: make ablation publication a court, and widen the source checklist",
+    "behind": 895,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- b73692f6a3769ce908b3012dae435751ae61ea1a"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/nomination-court-v7",
+    "sha": "9881e06c7211ae5ef5505ab4edc6b1a9b2b852d9",
+    "date": "2026-09-01T02:53:48-04:00",
+    "upstream": "",
+    "subject": "docs: correct nomination provenance ownership",
+    "behind": 895,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "- b73692f6a3769ce908b3012dae435751ae61ea1a",
+      "+ 9881e06c7211ae5ef5505ab4edc6b1a9b2b852d9"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "unmatched": [
+      "9881e06c7211ae5ef5505ab4edc6b1a9b2b852d9"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/parked-dent",
+    "sha": "8fdb9dacf8bb9a2ed2bf6d6ce46f86ab329adfb1",
+    "date": "2026-08-29T13:11:53-04:00",
+    "upstream": "",
+    "subject": "PARKED, DO NOT MERGE: d_ent absence recording, blocked on the blend",
+    "behind": 1106,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 8fdb9dacf8bb9a2ed2bf6d6ce46f86ab329adfb1"
+    ],
+    "base": "2d39f35e613d9fcf7b01d19cf2fcb629a6872499",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala"
+    ],
+    "unmatched": [
+      "8fdb9dacf8bb9a2ed2bf6d6ce46f86ab329adfb1"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/reanchor",
+    "sha": "c7a316ab9f043f88a8e64585c4df4f86790700d5",
+    "date": "2026-08-30T11:37:28-04:00",
+    "upstream": "",
+    "subject": "align: re-anchor a probe control off a type that is scheduled for sealing",
+    "behind": 968,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ c7a316ab9f043f88a8e64585c4df4f86790700d5"
+    ],
+    "base": "a657954575fd9251f22b484f70c3665e93b79d59",
+    "paths": [
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "unmatched": [
+      "c7a316ab9f043f88a8e64585c4df4f86790700d5"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/reanchor2",
+    "sha": "d2f600f8eb526526a62c6d622cadd62429b4812e",
+    "date": "2026-08-30T14:42:36-04:00",
+    "upstream": "",
+    "subject": "align: the companion door gets its own control, after I documented it as impossible",
+    "behind": 926,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ c031fe1e68ce2521918ae5deb9fe61bf8176e60a",
+      "+ d2f600f8eb526526a62c6d622cadd62429b4812e"
+    ],
+    "base": "133e5158b49ae8c7c3a8d721eb279ba7745f6ed3",
+    "paths": [
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/ProbeCartesianControl.scala"
+    ],
+    "unmatched": [
+      "c031fe1e68ce2521918ae5deb9fe61bf8176e60a",
+      "d2f600f8eb526526a62c6d622cadd62429b4812e"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/relpres",
+    "sha": "34262301893867f897b26b2ca0a2f82a0f4e6319",
+    "date": "2026-08-29T03:33:56-04:00",
+    "upstream": "",
+    "subject": "align: relation preservation reports its support instead of inventing a mean",
+    "behind": 1421,
+    "ahead": 3,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ ed74edbc5d9481cdd235fd18159a2ba0ef174e94",
+      "- f69f756aba3f4a167513323cc5abb2edb726d698",
+      "- 34262301893867f897b26b2ca0a2f82a0f4e6319"
+    ],
+    "base": "0924e490991493ddd899b7d07b344a691c787a24",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/report.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/LeakageSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/MetricsSuite.scala"
+    ],
+    "unmatched": [
+      "ed74edbc5d9481cdd235fd18159a2ba0ef174e94"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/remedy-check",
+    "sha": "f726accca708f5373f002d1207de794ba76cfc35",
+    "date": "2026-08-30T11:15:38-04:00",
+    "upstream": "",
+    "subject": "interview: confirm the sweep-1 remedy still defeats Mirror derivation",
+    "behind": 973,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/resolution",
+    "sha": "185380b45522917ab8f90456477fe08743ca686f",
+    "date": "2026-08-29T14:00:39-04:00",
+    "upstream": "",
+    "subject": "measured-baseline: the cost asymmetry, the data outlook, and the severed link's status",
+    "behind": 1097,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/route",
+    "sha": "638294f4de1408a207889ce6b973aa3326582c2e",
+    "date": "2026-08-29T01:24:49-04:00",
+    "upstream": "",
+    "subject": "embed-bench: false gating abstains when the gate never saw the anchor",
+    "behind": 1520,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/route-honesty",
+    "sha": "1c75de19fbf020f470e9bbd211c1ed5991e2fd7f",
+    "date": "2026-08-29T02:45:13-04:00",
+    "upstream": "",
+    "subject": "align: answer the second review — no renormalized denominator, smart-constructed projection",
+    "behind": 1481,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ d4443ff26fa30d458abb379ad9bbc6ea91b327fc",
+      "- 1c75de19fbf020f470e9bbd211c1ed5991e2fd7f"
+    ],
+    "base": "5b77122cbc3a1101ebba0b061a2518dc5cf15a29",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/report.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/LeakageSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/MetricsSuite.scala"
+    ],
+    "unmatched": [
+      "d4443ff26fa30d458abb379ad9bbc6ea91b327fc"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/seal-structural",
+    "sha": "5dc1f2b6a5e6d4a32e648dd20d40d2e137c2b833",
+    "date": "2026-08-30T11:49:06-04:00",
+    "upstream": "",
+    "subject": "align: seal the four structural types the Mirror door was open on",
+    "behind": 964,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/semantic-abstention",
+    "sha": "de44f720ead68ee21b0656aed7bc3f3993cbf982",
+    "date": "2026-08-29T18:07:03-04:00",
+    "upstream": "",
+    "subject": "Merge chart/structural eligibility (align): a configured provider is necessary, not sufficient",
+    "behind": 1029,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/semantic-imputed",
+    "sha": "0ca09c56809be5bd7109acecf35d8d4171fd9c16",
+    "date": "2026-08-29T21:43:24-04:00",
+    "upstream": "",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "behind": 1012,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/tracedoc",
+    "sha": "5e0db76d39d32e91c290ad7b5e0930f0ae0f8b54",
+    "date": "2026-08-30T12:48:35-04:00",
+    "upstream": "",
+    "subject": "AGENTS.md rule 4: never put a message body in an inline double-quoted shell argument",
+    "behind": 947,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/tracedoc2",
+    "sha": "40d2c286bc4df3c074e3fd813be59d297a66cdb2",
+    "date": "2026-08-30T12:51:06-04:00",
+    "upstream": "",
+    "subject": "AGENTS.md design contract: an impossibility claim needs MORE scrutiny, not less",
+    "behind": 946,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/tracedoc3",
+    "sha": "df717431f52acb401324ba7694b024b07c19d462",
+    "date": "2026-08-30T12:58:31-04:00",
+    "upstream": "",
+    "subject": "align: a docstring stops citing a defect that was closed twelve hours before it was written",
+    "behind": 945,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "m1/verify-a0cf33d",
+    "sha": "a0cf33d07ed89fdeea16ef916e069ce28152643e",
+    "date": "2026-08-30T10:52:48-04:00",
+    "upstream": "",
+    "subject": "align: probe the structural channel -- all four types forgeable through Mirror and fromProduct",
+    "behind": 978,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "main",
+    "sha": "0500bc1029bea9df88291a7b73860f8fecfa804d",
+    "date": "2026-09-30T21:33:08-04:00",
+    "upstream": "origin/main",
+    "subject": "Merge MASC participant-role corpus audit (documentation only)",
+    "behind": 0,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "plan/measurement-delivery-20260919",
+    "sha": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+    "date": "2026-09-19T13:43:04-04:00",
+    "upstream": "",
+    "subject": "Keep recall graph and transcript checksums distinct in baseline capture",
+    "behind": 436,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "recovery/filmfestival-20260904",
+    "sha": "739acf79e5b67f17a19793453d1aab243e80e0c8",
+    "date": "2026-09-04T21:39:36-04:00",
+    "upstream": "",
+    "subject": "WIP: preserve Film Festival adapter, corpus replays and first-run evidence",
+    "behind": 611,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 739acf79e5b67f17a19793453d1aab243e80e0c8"
+    ],
+    "base": "cc11d14261ca03907babe3d96b05ea22d3a7a5e1",
+    "paths": [
+      "data/README.md",
+      "docs/data/filmfestival/README.md",
+      "docs/data/filmfestival/source-manifest.json",
+      "docs/data/memento/README.md",
+      "docs/data/memento/recall-population.json",
+      "docs/data/memento/source-manifest.json",
+      "docs/plans/2026-09-03-memento-integration.md",
+      "docs/plans/2026-09-03-second-dataset-survey.md",
+      "docs/plans/2026-09-04-filmfestival-first-run.md",
+      "docs/plans/2026-09-04-filmfestival-handoff.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/filmfestival/FilmFestivalRecallMapping.scala",
+      "tools/corpus/filmfest_annotation.py",
+      "tools/corpus/filmfest_gold.py",
+      "tools/corpus/filmfest_recall.py",
+      "tools/corpus/xlsx_rows.py",
+      "tools/recall-study/agreement.py",
+      "tools/recall-study/filmfest_gold_film.py"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "rescue/audit-masc-role-corpus",
+    "sha": "b756b4bb1aca375a14fd26d024e2b3a578ba8688",
+    "date": "2026-09-04T21:54:42-04:00",
+    "upstream": "",
+    "subject": "Audit MASC role coverage and refuse malformed coordinate joins",
+    "behind": 578,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "rescue/nfrd-lineage-99602baa",
+    "sha": "99602baac56b1a5afad5359a5c4bd019f2281343",
+    "date": "2026-08-29T19:39:17-04:00",
+    "upstream": "",
+    "subject": "Add NFRD Baseball diagnostic intake court",
+    "behind": 1021,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 99602baac56b1a5afad5359a5c4bd019f2281343"
+    ],
+    "base": "e1422d1332d67dc7f5b8ce0a7ff93bd68295e776",
+    "paths": [
+      "docs/design/nfrd-baseball-diagnostic-court.md",
+      "docs/design/nfrd-primary-source-inventory.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/files.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/intake.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/nfrd/NfrdBaseballSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/consumer/NfrdIntakePublicSuite.scala"
+    ],
+    "unmatched": [
+      "99602baac56b1a5afad5359a5c4bd019f2281343"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "rescue/world-order-input-pre-amend",
+    "sha": "91333a462c91cf0c7c3e9d3675a3746353632941",
+    "date": "2026-09-04T08:20:18-04:00",
+    "upstream": "",
+    "subject": "WorldOrderInput: the timed-source builder takes a declared world clock (ADR 0013)",
+    "behind": 595,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 91333a462c91cf0c7c3e9d3675a3746353632941"
+    ],
+    "base": "887bd15db0496bedd2049217527770074b12a249",
+    "paths": [
+      "docs/adr/0013-world-order-input.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/sherlock/SherlockRecallMapping.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/WorldOrderInput.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/sherlock/SherlockRecallMappingSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LexicalBlendSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/MonotoneSceneSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/RecallToVideoSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderFixtures.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderInputSuite.scala"
+    ],
+    "unmatched": [
+      "91333a462c91cf0c7c3e9d3675a3746353632941"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "review/navigation-assessment-20260904",
+    "sha": "e0b26022af552100e06ff2c9989541235bc6f424",
+    "date": "2026-09-04T22:46:29-04:00",
+    "upstream": "",
+    "subject": "Assess navigation direction against landed slices and retain executable evidence",
+    "behind": 579,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ e0b26022af552100e06ff2c9989541235bc6f424"
+    ],
+    "base": "680ef6e652632fdd22f3410fb3b5e7caa7c80809",
+    "paths": [
+      "docs/plans/2026-09-04-navigation-code-quality-assessment.md",
+      "tools/diagnostics/navigation-audit-20260904/NavigationAuditProbeSuite.scala",
+      "tools/diagnostics/navigation-audit-20260904/README.md",
+      "tools/diagnostics/navigation-audit-20260904/baseline.log.gz",
+      "tools/diagnostics/navigation-audit-20260904/probes.log.gz",
+      "tools/diagnostics/navigation-audit-20260904/receipt.json"
+    ],
+    "unmatched": [
+      "e0b26022af552100e06ff2c9989541235bc6f424"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "salvage/integration-20260901",
+    "sha": "ebd750e6f55ebc55cfc4f56a4a6f10f7fcd2cef5",
+    "date": "2026-09-01T10:35:25-04:00",
+    "upstream": "",
+    "subject": "docs: record the 2026-09-01 salvage manifest",
+    "behind": 836,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "salvage/output-approved-84b6ce8d",
+    "sha": "84b6ce8d9082132d79957a3b5f2d58801aff5998",
+    "date": "2026-09-01T08:14:00-04:00",
+    "upstream": "",
+    "subject": "fix(codec): preserve contextual refusal fixed point",
+    "behind": 880,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "salvage/provider-parser-73bc9af9",
+    "sha": "73bc9af9309c237717b003faaa1a635d0e39a603",
+    "date": "2026-08-31T16:24:03-04:00",
+    "upstream": "",
+    "subject": "Add parser provider without dropping ONNX wiring",
+    "behind": 893,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "salvage/worktree-snapshot-20260901",
+    "sha": "81a181960d37548ced577e02a8741b384c6fc126",
+    "date": "2026-09-01T10:09:40-04:00",
+    "upstream": "",
+    "subject": "snapshot: uncommitted working tree as found 2026-09-01",
+    "behind": 858,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 81a181960d37548ced577e02a8741b384c6fc126"
+    ],
+    "base": "7fe0734aa7abddb0fec3c9a2b511dcf654884d32",
+    "paths": [
+      ".gitignore",
+      ".mote/ops/20260901T113438.757734Z-p5372-c0000-rd003-h092386.json",
+      ".mote/ops/20260901T113455.002825Z-p5544-c0000-r62a4-h06f7d9.json",
+      ".mote/ops/20260901T113507.475142Z-p5593-c0000-r3d3f-h9e333c.json",
+      ".mote/ops/20260901T113630.858276Z-p31528-c0000-r29b6-h600ba5.json",
+      ".mote/ops/20260901T113658.438153Z-p36051-c0000-r8342-hceebd7.json",
+      ".mote/ops/20260901T113707.596487Z-p37255-c0000-r0eb0-hf7feb6.json",
+      ".mote/ops/20260901T113723.333183Z-p40288-c0000-r5354-ha7ff78.json",
+      ".mote/ops/20260901T113724.277892Z-p92465-c001b-rc812-h66de6b.json",
+      ".mote/ops/20260901T113817.041795Z-p47351-c0000-ra95b-hadfe18.json",
+      ".mote/ops/20260901T113859.384637Z-p50541-c0000-r0302-he230e3.json",
+      ".mote/ops/20260901T113922.038529Z-p50693-c0000-r0e10-h2671c9.json",
+      ".mote/ops/20260901T113945.219604Z-p52531-c0000-r9549-h322119.json",
+      ".mote/ops/20260901T114006.786129Z-p54680-c0000-rdc2d-ha41eed.json",
+      ".mote/ops/20260901T114134.572716Z-p67845-c0000-rca5a-he840cd.json",
+      ".mote/ops/20260901T114149.278479Z-p69159-c0000-r448c-hd4e0f4.json",
+      ".mote/ops/20260901T114159.078390Z-p70066-c0000-rf6da-hd13296.json",
+      ".mote/ops/20260901T114219.089222Z-p70404-c0000-r0a4d-h542d09.json",
+      ".mote/ops/20260901T114230.555326Z-p70973-c0000-r1ac0-h1aefe5.json",
+      ".mote/ops/20260901T114243.066301Z-p71024-c0000-r409a-h709c06.json",
+      ".mote/ops/20260901T114321.056530Z-p79930-c0000-r17e0-h0be775.json",
+      ".mote/ops/20260901T114403.947348Z-p83891-c0000-rcbbb-h31dcdc.json",
+      ".mote/ops/20260901T114409.968795Z-p83893-c0000-r245e-h62d217.json",
+      ".mote/ops/20260901T114419.622935Z-p84076-c0000-r5697-hadba4e.json",
+      ".mote/ops/20260901T114434.804606Z-p84241-c0000-rc9d7-h6d5c44.json",
+      ".mote/ops/20260901T114438.757269Z-p84217-c0000-ra090-hb9a72f.json",
+      ".mote/ops/20260901T114448.533788Z-p84249-c0000-r7695-h6bc8fc.json",
+      ".mote/ops/20260901T114450.692454Z-p84272-c0000-r36e1-hb4b29e.json",
+      ".mote/ops/20260901T114509.181811Z-p84444-c0000-re791-h806818.json",
+      ".mote/ops/20260901T114523.742961Z-p84538-c0000-red4b-heaa2dd.json",
+      ".mote/ops/20260901T114523.879321Z-p84539-c0000-r2e09-hc24a91.json",
+      ".mote/ops/20260901T114559.490362Z-p84656-c0000-r634f-h2a6106.json",
+      ".mote/ops/20260901T114600.711159Z-p84661-c0000-r7df9-h6d1b1e.json",
+      ".mote/ops/20260901T114619.832798Z-p84742-c0000-r00c0-he5c8ea.json",
+      ".mote/ops/20260901T114640.475119Z-p84655-c0000-r512d-h285752.json",
+      ".mote/ops/20260901T114715.146259Z-p90989-c0000-r2553-h6613ea.json",
+      ".mote/ops/20260901T114808.673163Z-p94249-c0000-r2565-h50451d.json",
+      ".mote/ops/20260901T114812.258007Z-p94235-c0000-rf4bf-h287bc4.json",
+      ".mote/ops/20260901T114913.534952Z-p97572-c0000-rb5e5-hc9aa26.json",
+      ".mote/ops/20260901T115030.624652Z-p98358-c0000-r995f-h9799a6.json",
+      ".mote/ops/20260901T115039.217814Z-p98358-c0001-r634a-hf9f713.json",
+      ".mote/ops/20260901T115126.237235Z-p99697-c0000-rb077-h17262a.json",
+      ".mote/ops/20260901T115145.025201Z-p99778-c0000-r2790-h65dd64.json",
+      ".mote/ops/20260901T115145.049115Z-p99777-c0000-rd47e-hb93b7f.json",
+      ".mote/ops/20260901T115309.330657Z-p2340-c0000-r0991-hb5000e.json",
+      ".mote/ops/20260901T115309.769763Z-p2339-c0000-r1904-h5673f7.json",
+      ".mote/ops/20260901T115529.629392Z-p5805-c0000-rdaf1-h00c5c0.json",
+      ".mote/ops/20260901T115543.502508Z-p7865-c0000-r59b9-h83c050.json",
+      ".mote/ops/20260901T115546.098915Z-p5806-c0000-r875d-ha8f75b.json",
+      ".mote/ops/20260901T115551.249766Z-p5804-c0000-r1880-h7a8bc2.json",
+      ".mote/ops/20260901T115552.276007Z-p7865-c0001-r5a95-hfbadcc.json",
+      ".mote/ops/20260901T115558.840565Z-p7865-c0002-r5ee0-h421ade.json",
+      ".mote/ops/20260901T115639.131024Z-p11289-c0000-r647a-h143bd8.json",
+      ".mote/ops/20260901T115743.700490Z-p19107-c0000-r827c-h16eec7.json",
+      ".mote/ops/20260901T115749.585514Z-p19107-c0001-re85e-hfc3ba3.json",
+      ".mote/ops/20260901T115755.726624Z-p19107-c0002-rc04c-hee19b9.json",
+      ".mote/ops/20260901T115825.176973Z-p29864-c0000-r6956-hf2d91a.json",
+      ".mote/ops/20260901T115839.498726Z-p31801-c0000-r7a12-h55f464.json",
+      ".mote/ops/20260901T115911.014768Z-p32459-c0000-re17b-h08f518.json",
+      ".mote/ops/20260901T120005.832048Z-p33723-c0000-r17cb-h0448bb.json",
+      ".mote/ops/20260901T120017.039948Z-p33723-c0001-r6241-h366eca.json",
+      ".mote/ops/20260901T120025.063092Z-p33723-c0002-rc80a-he8d781.json",
+      ".mote/ops/20260901T120119.222160Z-p42025-c0000-r9c81-h70ba98.json",
+      ".mote/ops/20260901T120131.139444Z-p42051-c0000-re8b4-h808183.json",
+      ".mote/ops/20260901T120133.095502Z-p42060-c0000-r46e1-ha5c8d6.json",
+      ".mote/ops/20260901T120155.879286Z-p42295-c0000-rd894-hf5e7ea.json",
+      ".mote/ops/20260901T120202.621887Z-p42838-c0000-r6f15-h6bf5f5.json",
+      ".mote/ops/20260901T120301.279247Z-p46097-c0000-r43f0-hb5dfc5.json",
+      ".mote/ops/20260901T120307.927199Z-p46097-c0001-r7c5f-hc74b4f.json",
+      ".mote/ops/20260901T120313.539491Z-p46097-c0002-rb287-h8b5407.json",
+      ".mote/ops/20260901T120339.696426Z-p51728-c0000-r6f2d-h68b699.json",
+      ".mote/ops/20260901T120356.062280Z-p53821-c0000-r4b6e-h8af353.json",
+      ".mote/ops/20260901T120416.642990Z-p53928-c0000-r7f7f-h0041d1.json",
+      ".mote/ops/20260901T120420.856507Z-p53939-c0000-r64b8-h12e721.json",
+      ".mote/ops/20260901T120421.303144Z-p53938-c0000-r1f0a-h49025a.json",
+      ".mote/ops/20260901T120437.545236Z-p54011-c0000-rb5bf-h67cdf4.json",
+      ".mote/ops/20260901T120507.414110Z-p54980-c0000-rcdb0-h2a3059.json",
+      ".mote/ops/20260901T120507.448804Z-p54983-c0000-rc002-hd12f32.json",
+      ".mote/ops/20260901T120507.496139Z-p54982-c0000-rf63f-ha94125.json",
+      ".mote/ops/20260901T120507.632819Z-p54979-c0000-r267a-ha16e6b.json",
+      ".mote/ops/20260901T120529.034261Z-p56025-c0000-re73c-h5a80cc.json",
+      ".mote/ops/20260901T120537.415469Z-p57042-c0000-r1fee-he0137b.json",
+      ".mote/ops/20260901T120557.705227Z-p57161-c0000-r6f0f-h5eed7c.json",
+      ".mote/ops/20260901T120559.101288Z-p57151-c0000-rec1a-hd702dd.json",
+      ".mote/ops/20260901T120606.956920Z-p57164-c0000-rc513-h9ac938.json",
+      ".mote/ops/20260901T120615.839225Z-p57215-c0000-r4326-hed7fee.json",
+      ".mote/ops/20260901T120640.686195Z-p57410-c0000-r1b38-h7d161c.json",
+      ".mote/ops/20260901T120645.460689Z-p57415-c0000-r1e75-h0c612e.json",
+      ".mote/ops/20260901T120705.364419Z-p57537-c0000-r54de-h3b9770.json",
+      ".mote/ops/20260901T120759.730771Z-p58408-c0000-r2307-h4c60f7.json",
+      ".mote/ops/20260901T120803.132172Z-p58417-c0000-r1424-h068d3e.json",
+      ".mote/ops/20260901T120803.641273Z-p58414-c0000-r18d7-h2b29cb.json",
+      ".mote/ops/20260901T120822.062668Z-p58472-c0000-r85af-h501825.json",
+      ".mote/ops/20260901T121221.476633Z-p64291-c0000-rc8fc-hfd2677.json",
+      ".mote/ops/20260901T121228.107638Z-p68859-c0000-r70d8-h7006b5.json",
+      ".mote/ops/20260901T121246.568960Z-p76114-c0000-r1e5a-hbee849.json",
+      ".mote/ops/20260901T121348.099404Z-p85299-c0000-rde30-hf775d8.json",
+      ".mote/ops/20260901T121524.338596Z-p21762-c0000-ra85a-h67fd83.json",
+      ".mote/ops/20260901T121539.628987Z-p23889-c0000-r5134-h5168f4.json",
+      ".mote/ops/20260901T121602.197876Z-p26053-c0000-r3a87-he87155.json",
+      ".mote/ops/20260901T121610.947634Z-p26063-c0000-r21a6-he28027.json",
+      ".mote/ops/20260901T121705.469030Z-p27418-c0000-rf895-hb22fc1.json",
+      ".mote/ops/20260901T121751.455526Z-p29330-c0000-r7d2c-h9a99e0.json",
+      ".mote/ops/20260901T121818.964846Z-p42445-c0000-ra243-hbc5054.json",
+      ".mote/ops/20260901T121854.341907Z-p53640-c0000-r4347-he4870d.json",
+      ".mote/ops/20260901T121855.990773Z-p53553-c0000-rd4ed-h1c416f.json",
+      ".mote/ops/20260901T121904.376652Z-p53639-c0000-rf9f1-h6c2605.json",
+      ".mote/ops/20260901T121919.753981Z-p54017-c0000-rde1d-h0c754a.json",
+      ".mote/ops/20260901T121942.469792Z-p54829-c0000-r8c81-h904642.json",
+      ".mote/ops/20260901T122123.458988Z-p56137-c0000-rea61-h7174c8.json",
+      ".mote/ops/20260901T122136.337653Z-p56193-c0000-r72d3-h9b01cd.json",
+      ".mote/ops/20260901T122146.477751Z-p56221-c0000-r5437-hb56cc0.json",
+      ".mote/ops/20260901T122147.566879Z-p56222-c0000-rbee1-he3e189.json",
+      ".mote/ops/20260901T122155.183771Z-p56192-c0000-r4859-hb65b81.json",
+      ".mote/ops/20260901T122211.338159Z-p56383-c0000-r8cdf-h976c0a.json",
+      ".mote/ops/20260901T122218.041034Z-p56619-c0000-r5e79-h887d7f.json",
+      ".mote/ops/20260901T122238.397667Z-p56718-c0000-rb4e9-hfc78e7.json",
+      ".mote/ops/20260901T122241.451508Z-p56683-c0000-refc5-hb31d1a.json",
+      ".mote/ops/20260901T122248.025593Z-p56683-c0001-r1cbd-hbf3517.json",
+      ".mote/ops/20260901T122253.411993Z-p61702-c0000-ra715-heb960b.json",
+      ".mote/ops/20260901T122255.649402Z-p56683-c0002-r72c8-h171870.json",
+      ".mote/ops/20260901T122301.690172Z-p62445-c0000-rb021-h98918d.json",
+      ".mote/ops/20260901T122327.350036Z-p62785-c0000-r5816-h14bb7a.json",
+      ".mote/ops/20260901T122330.977888Z-p62824-c0000-r884e-h5db60f.json",
+      ".mote/ops/20260901T122342.165784Z-p62945-c0000-r29a8-h7d41f0.json",
+      ".mote/ops/20260901T122408.630098Z-p63252-c0000-rb7dc-hf033f3.json",
+      ".mote/ops/20260901T122410.722731Z-p63724-c0000-r1439-h0fa2d7.json",
+      ".mote/ops/20260901T122427.740750Z-p63792-c0000-r2560-ha17e57.json",
+      ".mote/ops/20260901T122430.500261Z-p63740-c0000-re45e-h4d7b27.json",
+      ".mote/ops/20260901T122455.420742Z-p68904-c0000-rf456-h0526b0.json",
+      ".mote/ops/20260901T122457.019775Z-p63739-c0000-r01a3-ha30638.json",
+      ".mote/ops/20260901T122515.419211Z-p69008-c0000-r8293-h0fe1ea.json",
+      ".mote/ops/20260901T122641.418468Z-p75836-c0000-r4b6b-hb46b7c.json",
+      ".mote/ops/20260901T122729.151193Z-p89188-c0000-r627e-h6902ef.json",
+      ".mote/ops/20260901T122729.160439Z-p89185-c0000-r01c9-he89a87.json",
+      ".mote/ops/20260901T122736.697839Z-p89219-c0000-r1516-heb4d7d.json",
+      ".mote/ops/20260901T122833.719501Z-p90171-c0000-rf626-hb87132.json",
+      ".mote/ops/20260901T122932.721943Z-p3604-c0000-r787f-h570660.json",
+      ".mote/ops/20260901T122944.503120Z-p5613-c0000-r636b-h4794b9.json",
+      ".mote/ops/20260901T122956.962503Z-p5651-c0000-r1d04-habd19e.json",
+      ".mote/ops/20260901T123010.439750Z-p6099-c0000-refcf-h663f06.json",
+      ".mote/ops/20260901T123036.274959Z-p6384-c0000-rb97e-h7981f5.json",
+      ".mote/ops/20260901T123054.987444Z-p6481-c0000-re6de-hbb8b9c.json",
+      ".mote/ops/20260901T123055.220085Z-p6480-c0000-r2304-h70a997.json",
+      ".mote/ops/20260901T123110.927898Z-p6602-c0000-r75e0-hbf144c.json",
+      ".mote/ops/20260901T123124.047211Z-p6688-c0000-rbd5e-h4dfcbe.json",
+      ".mote/ops/20260901T123138.091874Z-p6864-c0000-rdab7-h42ad94.json",
+      ".mote/ops/20260901T123204.070069Z-p6951-c0000-r8458-h2832ae.json",
+      ".mote/ops/20260901T123448.393449Z-p13309-c0000-r8509-h279955.json",
+      ".mote/ops/20260901T123454.330946Z-p15414-c0000-r9ff5-h273d65.json",
+      ".mote/ops/20260901T123505.345855Z-p17142-c0000-r6af7-hc46c29.json",
+      ".mote/ops/20260901T123515.956018Z-p17183-c0000-r5833-ha12601.json",
+      ".mote/ops/20260901T123620.764519Z-p17739-c0000-red6a-hfb503d.json",
+      ".mote/ops/20260901T123722.277563Z-p21422-c0000-r6eec-h8a8a24.json",
+      ".mote/ops/20260901T123732.728332Z-p21422-c0001-ra65b-hc975f5.json",
+      ".mote/ops/20260901T123815.523662Z-p21663-c0000-r9d6b-he13044.json",
+      ".mote/ops/20260901T123819.658488Z-p21666-c0000-re3a3-he25806.json",
+      ".mote/ops/20260901T123828.861806Z-p21703-c0000-rcf4c-h1e590b.json",
+      ".mote/ops/20260901T123834.638870Z-p21725-c0000-r9abd-h96acca.json",
+      ".mote/ops/20260901T123854.113263Z-p21889-c0000-r7945-h80db43.json",
+      ".mote/ops/20260901T123858.259580Z-p21875-c0000-rf041-h455f82.json",
+      ".mote/ops/20260901T123909.847803Z-p22238-c0000-r01ad-h591c82.json",
+      ".mote/ops/20260901T123918.132629Z-p22238-c0001-r93f0-h410bb5.json",
+      ".mote/ops/20260901T123926.549450Z-p22238-c0002-r37ac-h93a2b2.json",
+      ".mote/ops/20260901T123935.715191Z-p22543-c0000-r1afd-h648b9e.json",
+      ".mote/ops/20260901T123935.842968Z-p22238-c0003-rd8fa-h3f0209.json",
+      ".mote/ops/20260901T123935.857367Z-p22238-c0004-rddaf-h6177e3.json",
+      ".mote/ops/20260901T124003.664796Z-p22690-c0000-re7f2-h6a5e24.json",
+      ".mote/ops/20260901T124008.983304Z-p22711-c0000-r487c-hdf0e03.json",
+      ".mote/ops/20260901T124022.944820Z-p22773-c0000-ra033-h2cc57f.json",
+      ".mote/ops/20260901T124034.700748Z-p22846-c0000-r5a68-h8311ae.json",
+      ".mote/ops/20260901T124055.155846Z-p22887-c0000-r087c-hb22082.json",
+      ".mote/ops/20260901T124058.709572Z-p22936-c0000-r6e51-h14b7e1.json",
+      ".mote/ops/20260901T124128.556256Z-p23044-c0000-rf6b7-h1c609b.json",
+      ".mote/ops/20260901T124134.187167Z-p23046-c0000-rb87f-hd2fd85.json",
+      ".mote/ops/20260901T124157.864685Z-p23112-c0000-re708-h22183f.json",
+      ".mote/ops/20260901T124256.696705Z-p23953-c0000-r11bd-he09ac4.json",
+      ".mote/ops/20260901T124307.626673Z-p27978-c0000-r10bd-h04a360.json",
+      ".mote/ops/20260901T124335.122576Z-p29663-c0000-r615e-h7b3790.json",
+      ".mote/ops/20260901T124344.047664Z-p29672-c0000-r62b2-h026134.json",
+      ".mote/ops/20260901T124417.258294Z-p35535-c0000-r1f8c-he31fca.json",
+      ".mote/ops/20260901T124429.319306Z-p35512-c0000-r588a-h879804.json",
+      ".mote/ops/20260901T124435.956566Z-p35512-c0001-r1778-h0e697c.json",
+      ".mote/ops/20260901T124443.736472Z-p35512-c0002-ra035-hdd2f14.json",
+      ".mote/ops/20260901T124513.073696Z-p41021-c0000-r6f47-h75fe23.json",
+      ".mote/ops/20260901T124521.264661Z-p41021-c0001-r4ce9-h595ba0.json",
+      ".mote/ops/20260901T124530.553211Z-p41021-c0002-r4c81-hf3e2da.json",
+      ".mote/ops/20260901T124543.521310Z-p44158-c0000-r8472-h8776f3.json",
+      ".mote/ops/20260901T124552.262702Z-p44158-c0001-rd05b-hd30e9c.json",
+      ".mote/ops/20260901T124602.704478Z-p44158-c0002-r2943-hc11432.json",
+      ".mote/ops/20260901T124612.211286Z-p52470-c0000-rdea5-h5e106d.json",
+      ".mote/ops/20260901T124619.660557Z-p52496-c0000-rf4b6-hfa0cb1.json",
+      ".mote/ops/20260901T124647.406283Z-p53394-c0000-r7fd5-h8e64d6.json",
+      ".mote/ops/20260901T124647.581367Z-p52611-c0000-rf199-hcb574b.json",
+      ".mote/ops/20260901T124709.951960Z-p58498-c0000-r61f8-h5b6fc2.json",
+      ".mote/ops/20260901T124719.128388Z-p58883-c0000-r6e39-h022acc.json",
+      ".mote/ops/20260901T124746.357871Z-p59169-c0000-r5aa9-h07b6eb.json",
+      ".mote/ops/20260901T124800.134821Z-p59949-c0000-r4f11-hd2f3f3.json",
+      ".mote/ops/20260901T124815.102722Z-p59170-c0000-rd1ba-h709f71.json",
+      ".mote/ops/20260901T124838.731669Z-p65557-c0000-r7c71-h9b6c0f.json",
+      ".mote/ops/20260901T124852.390667Z-p65607-c0000-r87c5-h7937fb.json",
+      ".mote/ops/20260901T124900.847956Z-p65631-c0000-r4eca-hca90aa.json",
+      ".mote/ops/20260901T124903.187709Z-p65634-c0000-r4fa9-hd12b06.json",
+      ".mote/ops/20260901T124952.459105Z-p66606-c0000-rc773-h7f03e9.json",
+      ".mote/ops/20260901T124953.300736Z-p66611-c0000-re98b-h5345a7.json",
+      ".mote/ops/20260901T125018.321279Z-p67311-c0000-r3967-h7115f5.json",
+      ".mote/ops/20260901T125048.423132Z-p67536-c0000-raee7-h320f36.json",
+      ".mote/ops/20260901T125108.039452Z-p67678-c0000-r1d53-hde5191.json",
+      ".mote/ops/20260901T125159.848685Z-p67945-c0000-rd235-hb86134.json",
+      ".mote/ops/20260901T125200.157278Z-p67944-c0000-rce52-h3a5160.json",
+      ".mote/ops/20260901T125203.730139Z-p68000-c0000-r5fcd-he0b0fd.json",
+      ".mote/ops/20260901T125206.739664Z-p68149-c0000-r0c76-h5c806f.json",
+      ".mote/ops/20260901T125250.485212Z-p69169-c0000-r9234-h9d030e.json",
+      ".mote/ops/20260901T125314.341242Z-p69954-c0000-r7f52-h234a1c.json",
+      ".mote/ops/20260901T125316.703917Z-p69955-c0000-r1cde-h39ab80.json",
+      ".mote/ops/20260901T125439.165591Z-p74876-c0000-r3371-h588f68.json",
+      ".mote/ops/20260901T125439.576399Z-p74875-c0000-r9176-ha49ecd.json",
+      ".mote/ops/20260901T125531.318275Z-p75178-c0000-rb29e-hba8b56.json",
+      ".mote/ops/20260901T125539.896773Z-p75181-c0000-r15aa-h834094.json",
+      ".mote/ops/20260901T125620.341582Z-p75179-c0000-r475f-h89b681.json",
+      ".mote/ops/20260901T125626.514860Z-p79808-c0000-r41db-h57acf7.json",
+      ".mote/ops/20260901T125643.686550Z-p79981-c0000-rf46f-he136bf.json",
+      ".mote/ops/20260901T125652.376635Z-p79981-c0001-r74f8-h1d2204.json",
+      ".mote/ops/20260901T125729.892674Z-p81286-c0000-r41a7-h21981c.json",
+      ".mote/ops/20260901T125812.540471Z-p82067-c0000-r5a45-hac7267.json",
+      ".mote/ops/20260901T125912.643584Z-p82910-c0000-ra7df-hd606a0.json",
+      ".mote/ops/20260901T125929.361394Z-p83052-c0000-radf8-h0fd42b.json",
+      ".mote/ops/20260901T125958.479701Z-p83432-c0000-r702c-hd2de2f.json",
+      ".mote/ops/20260901T130008.981875Z-p83758-c0000-r4c44-h24550b.json",
+      ".mote/ops/20260901T130031.440243Z-p83845-c0000-rf08e-hb531ee.json",
+      ".mote/ops/20260901T130236.974159Z-p89439-c0000-rf9df-h30db9d.json",
+      ".mote/ops/20260901T130451.813567Z-p99502-c0000-r25ab-h307421.json",
+      ".mote/ops/20260901T130626.059532Z-p1238-c0000-rc045-h000c22.json",
+      ".mote/ops/20260901T130653.516364Z-p1505-c0000-r1450-h77b1e7.json",
+      ".mote/ops/20260901T130700.219260Z-p1504-c0000-r4553-h9a04d0.json",
+      ".mote/ops/20260901T130729.281875Z-p1934-c0000-r4c20-h3a9aac.json",
+      ".mote/ops/20260901T130759.688567Z-p2300-c0000-r93f9-hb44068.json",
+      ".mote/ops/20260901T130800.324641Z-p2280-c0000-r14a6-h68d4e8.json",
+      "0.0",
+      "acquire/src/main/scala/storymodel4s/acquire/cache.scala",
+      "acquire/src/main/scala/storymodel4s/acquire/output.scala",
+      "acquire/src/test/scala/storymodel4s/acquire/OutputSuite.scala",
+      "acquire/src/test/scala/storymodel4s/acquireprobe/OutputConstructionProbeSuite.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "build.sbt",
+      "codec/README.md",
+      "codec/src/main/scala/storymodel4s/codec/output.scala",
+      "codec/src/main/scala/storymodel4s/codec/output_acquire.scala",
+      "codec/src/test/scala/storymodel4s/codec/OutputCodecSuite.scala",
+      "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "core/src/main/scala/storymodel4s/core/source.scala",
+      "core/src/test/scala/storymodel4s/core/AtlasSuite.scala",
+      "core/src/test/scala/storymodel4s/core/SourceBundleSuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/SourceConstructionBoundarySuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "docs/adr/0007-film-source-representation.md",
+      "docs/data/sherlock/README.md",
+      "docs/data/sherlock/alias-map.json",
+      "docs/data/sherlock/annotation-lineage.json",
+      "docs/data/sherlock/recall-lineage.json",
+      "docs/data/sherlock/source-manifest.json",
+      "docs/data/sherlock/timebase-repair.json",
+      "docs/design/external-floor-calibration-court.md",
+      "docs/design/gptkz-primary-source-inventory.md",
+      "docs/design/movie-component-admission-ledger.md",
+      "docs/design/nfrd-baseball-diagnostic-court.md",
+      "docs/design/nfrd-primary-source-inventory.md",
+      "docs/design/recall-alignment-visualization-court.md",
+      "docs/design/sherlock-local-pair-admission-court.md",
+      "docs/design/sherlock-source-representation-audit.md",
+      "docs/design/story-output-bundle-spec.md",
+      "docs/plans/2026-08-29-movie-narrative-architecture.md",
+      "docs/plans/2026-09-01-sherlock-recall-product-prd.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/files.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/intake.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/nfrd/NfrdBaseballSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/consumer/NfrdIntakePublicSuite.scala",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/README.md",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/SHA256SUMS",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/SurfaceArtifactDemo.java",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/SurfaceAtlasSourceIdentityOracleSuite.scala",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/Utf8RoundTripOracle.java",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/storymodel4s-surface-identity-oracle-9d8b4a3.log",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/surface-atlas-demo-input.txt",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/surface-atlas-demo.json",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/surface-atlas-qa.html",
+      "laws/src/main/scala/storymodel4s/laws/SourceLaws.scala",
+      "laws/src/test/scala/storymodel4s/laws/SourceLawsSuite.scala",
+      "view/src/main/scala/storymodel4s/view/output.scala",
+      "view/src/test/scala/storymodel4s/view/OutputSuite.scala",
+      "view/src/test/scala/storymodel4s/viewprobe/OutputConstructionProbeSuite.scala"
+    ],
+    "unmatched": [
+      "81a181960d37548ced577e02a8741b384c6fc126"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/astro-capability-tour-v4",
+    "sha": "de9265cf584f2b27a1e45014549f279798c68792",
+    "date": "2026-09-01T01:29:47-04:00",
+    "upstream": "",
+    "subject": "docs: make the library journey executable",
+    "behind": 879,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/docs-successor-v2",
+    "sha": "9005320c21cbdb435489a030b23ca2dec84015c0",
+    "date": "2026-08-31T10:36:51-04:00",
+    "upstream": "",
+    "subject": "docs-site: show executable story and recall workflows",
+    "behind": 883,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/docs-successor-v3",
+    "sha": "8a227832212a34b71ec2bb0bad3d72cee6ced935",
+    "date": "2026-08-31T10:51:49-04:00",
+    "upstream": "",
+    "subject": "docs-site: show full library breadth up front",
+    "behind": 882,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/getting-started-v2",
+    "sha": "76c62e738a2579d6598fccf3ac19266c60480e20",
+    "date": "2026-08-31T15:24:45-04:00",
+    "upstream": "",
+    "subject": "docs-site: make getting started end to end",
+    "behind": 880,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/interview-specificity",
+    "sha": "ec0c439757f4f48b765579b2f8e6963ae242d0f3",
+    "date": "2026-08-29T05:32:56-04:00",
+    "upstream": "",
+    "subject": "fix(interview): preserve missing specificity",
+    "behind": 1326,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/phantom-sweep",
+    "sha": "9e20611f3df6ffa73d05ae1b4f403fe24c817a22",
+    "date": "2026-08-29T07:28:18-04:00",
+    "upstream": "",
+    "subject": "Make phantom validation witnesses unforgeable",
+    "behind": 1248,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/reference-scope-v1",
+    "sha": "6ad95c5c5109aba3c282d854add422e67b71b07b",
+    "date": "2026-08-31T14:40:59-04:00",
+    "upstream": "",
+    "subject": "tools: harden reference scope discovery",
+    "behind": 894,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/route-shape",
+    "sha": "d821fee23b5b81847877ba833123ed57ce52cc40",
+    "date": "2026-08-29T06:14:13-04:00",
+    "upstream": "",
+    "subject": "feat(embed-bench): measure route shape against gold",
+    "behind": 1297,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/route-support-axis",
+    "sha": "f26ce3c06b3d972b2964401c113cc21d0ce1343f",
+    "date": "2026-08-29T04:24:01-04:00",
+    "upstream": "",
+    "subject": "fix(embed-bench): use support axis for route direction",
+    "behind": 1388,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/route-support-hotfix",
+    "sha": "9598a987427fa89626020d6060eb1b2ea389fbe2",
+    "date": "2026-08-29T05:06:59-04:00",
+    "upstream": "",
+    "subject": "fix(embed-bench): preserve unranked route support",
+    "behind": 1364,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/support-assessment-v4",
+    "sha": "b33fe5b571ce9f9aea54b92436ca6c073133f969",
+    "date": "2026-09-01T00:40:34-04:00",
+    "upstream": "",
+    "subject": "align: bind support basis and omit undefined costs",
+    "behind": 895,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ cb82d5bd9eff9fa9342619c2183a6410265db851",
+      "+ 6a218927a3492e27d34915aed4bcbf269bb004e7",
+      "+ c53818f6c73e0290388132996c046988136ac489",
+      "+ b33fe5b571ce9f9aea54b92436ca6c073133f969"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/EvidenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/FeaturesIntegrationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/report.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "embed-grakern/src/test/scala/storymodel4s/embed/grakern/IntegrationSuite.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v4-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/NarrativeCompilerVerticalSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "unmatched": [
+      "cb82d5bd9eff9fa9342619c2183a6410265db851",
+      "6a218927a3492e27d34915aed4bcbf269bb004e7",
+      "c53818f6c73e0290388132996c046988136ac489",
+      "b33fe5b571ce9f9aea54b92436ca6c073133f969"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/sweep2-core",
+    "sha": "7dcbffac15d4d1ade0faaaae8c2ec136a675932f",
+    "date": "2026-08-29T10:52:15-04:00",
+    "upstream": "",
+    "subject": "refactor(core): validate atlas construction",
+    "behind": 1134,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/tolerance-absorption",
+    "sha": "72e6832f61ab3c935cc903b6b6c3dd88d3457a7d",
+    "date": "2026-08-29T14:42:53-04:00",
+    "upstream": "",
+    "subject": "fix(align): absorb tolerated mass overflow",
+    "behind": 1087,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/transition-position",
+    "sha": "7ee4872c697fd1d92ffa345f0d2b188086958a72",
+    "date": "2026-08-29T20:05:12-04:00",
+    "upstream": "",
+    "subject": "align: omit position features when position is unmeasured",
+    "behind": 1018,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scout/wog-init-order",
+    "sha": "79c54712e9f37e9abcdd9c8b3436682c7b432ff7",
+    "date": "2026-08-29T11:40:41-04:00",
+    "upstream": "",
+    "subject": "fix(fixtures): remove WOG initialization-order cycle",
+    "behind": 1117,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "scratch/checkall-demo",
+    "sha": "7eb8691df317c37efc130867cb02bf2ad9ae9576",
+    "date": "2026-09-21T08:02:02-04:00",
+    "upstream": "",
+    "subject": "SCRATCH: move the formatting nit into the failing demo test",
+    "behind": 292,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 1cdcf6cbada453136c4dc10887bfd599acd7da43",
+      "+ 7eb8691df317c37efc130867cb02bf2ad9ae9576"
+    ],
+    "base": "f557679cd6fa02bd4e26012cada4eda2a4abfeae",
+    "paths": [
+      "proposition/src/test/scala/storymodel4s/proposition/ScratchCheckAllDemoSuite.scala"
+    ],
+    "unmatched": [
+      "1cdcf6cbada453136c4dc10887bfd599acd7da43",
+      "7eb8691df317c37efc130867cb02bf2ad9ae9576"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "sinkhorn-input-boundary",
+    "sha": "28ef67e2a3881bbf8441ee1c4e7086dd86625df9",
+    "date": "2026-09-01T10:30:41-04:00",
+    "upstream": "",
+    "subject": "align: validate Sinkhorn transport inputs at the boundary",
+    "behind": 891,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "sinkhorn-nan-config",
+    "sha": "3f04cffd22729a9eddc5ee9eee2dc2215df9f803",
+    "date": "2026-08-29T16:57:01-04:00",
+    "upstream": "",
+    "subject": "align: require typed InvalidConfig in Sinkhorn aggregate laws",
+    "behind": 1041,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "slice-2-core-unforgeable",
+    "sha": "874fc61fb08b8c491f59b96c9b2f8bfa4ca877f7",
+    "date": "2026-08-29T08:30:12-04:00",
+    "upstream": "",
+    "subject": "core: close fromProduct on Credence, spans, StorySource, and ClaimMeta",
+    "behind": 1181,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "slice-a-gold-unforgeable",
+    "sha": "96a7963c474ea7f5c7fe4b6d831b50a2b996ae73",
+    "date": "2026-08-29T10:06:46-04:00",
+    "upstream": "",
+    "subject": "Close Gold construction so fromProduct cannot mint an unvalidated map.",
+    "behind": 1146,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "slice-c-unforgeable",
+    "sha": "6fde1e0aeab9772a6503a5cf15997b74edebee9f",
+    "date": "2026-08-29T11:04:07-04:00",
+    "upstream": "",
+    "subject": "ADR 0004 (draft): hierarchy level takes two coordinates, not one wrapper",
+    "behind": 1131,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "slice-c-unforgeable-grok",
+    "sha": "7af0db40feb72a9303d64d3674f9f79ae503967d",
+    "date": "2026-08-29T15:21:41-04:00",
+    "upstream": "",
+    "subject": "Close SidecarManifest, FeatureRef, and FeatureDerivation against fromProduct.",
+    "behind": 1083,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "slice-d-unforgeable",
+    "sha": "1a84dbc0db0a9cd26fab8d529a5ee3114d35491d",
+    "date": "2026-08-29T15:30:14-04:00",
+    "upstream": "",
+    "subject": "Format acquireprobe ConstructionProbeSuite (scalafmtAll).",
+    "behind": 1098,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/adr0019-profiles",
+    "sha": "f7c7020ebd3e1294cf458dac5e45e801c116a2b0",
+    "date": "2026-09-23T07:33:59-04:00",
+    "upstream": "",
+    "subject": "docs(adr): add the candidate tie policy agreed on Fray #55 (ADR 0019)",
+    "behind": 141,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "- a4e1da42d66b34d4d32fba28ad7fa10bd6dab7cc",
+      "- f7c7020ebd3e1294cf458dac5e45e801c116a2b0"
+    ],
+    "base": "1395ce2c86222f3155fc4fb116a836fd2c19bb60",
+    "paths": [
+      "docs/adr/0019-mapping-measurement-policy.md"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/checkall-format-last",
+    "sha": "f557679cd6fa02bd4e26012cada4eda2a4abfeae",
+    "date": "2026-09-21T07:33:04-04:00",
+    "upstream": "",
+    "subject": "build: run checkAll correctness before formatting (WIP, gate pending)",
+    "behind": 292,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/content-scorer",
+    "sha": "02b96bf99383b88824d3e520fa041e820501429d",
+    "date": "2026-09-23T11:44:27-04:00",
+    "upstream": "",
+    "subject": "test(proposition): measure the cold review's S2a-1 findings",
+    "behind": 64,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 738d3e188d060da2aed8e4bfba5719ccfafae94f",
+      "- 8e3b909037de433ae645e835ca52e9531a0eda0f",
+      "- d13147e3f5ff62120e78a3f75523303b607aa1ac",
+      "- 02b96bf99383b88824d3e520fa041e820501429d"
+    ],
+    "base": "577ebfdb0f9348f235ef75706167ddbbd6684cec",
+    "paths": [
+      "align/.jvm/src/test/scala/storymodel4s/align/ChartedScoringParityProbe.scala",
+      "docs/adr/0019-mapping-measurement-policy.md",
+      "proposition/src/main/scala/storymodel4s/proposition/compat.scala",
+      "proposition/src/main/scala/storymodel4s/proposition/identity.scala",
+      "proposition/src/main/scala/storymodel4s/proposition/semantic.scala",
+      "proposition/src/test/scala/semanticprobe/SemanticGraphCourtSuite.scala",
+      "proposition/src/test/scala/storymodel4s/proposition/CanonicalChecksumPinSuite.scala",
+      "proposition/src/test/scala/storymodel4s/proposition/SemanticCompatibilitySuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/directed-causal",
+    "sha": "bffbbb9d1e177a8a505839141078468b9d3d0e15",
+    "date": "2026-09-04T20:02:36-04:00",
+    "upstream": "origin/main",
+    "subject": "Directed causal transition kinds beside the symmetrized one (ADR 0014)",
+    "behind": 585,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/evidence-isolation",
+    "sha": "894908a5696c77071a623317e6365b913f07297f",
+    "date": "2026-09-23T07:27:05-04:00",
+    "upstream": "",
+    "subject": "test(align): measure local evidence isolation (AC3 S1) and record a tie defect",
+    "behind": 141,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 894908a5696c77071a623317e6365b913f07297f"
+    ],
+    "base": "1395ce2c86222f3155fc4fb116a836fd2c19bb60",
+    "paths": [
+      "align/src/test/scala/storymodel4s/align/LocalEvidenceIsolationSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/filmfestival-diagnostics-20260905",
+    "sha": "42f8a9452413693562ead9a466509e551009470d",
+    "date": "2026-09-05T09:35:42-04:00",
+    "upstream": "",
+    "subject": "Bind the final Film Festival implementation to its passing landing court",
+    "behind": 565,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/filmfestival-stabilize",
+    "sha": "257a8db7d1436466aee01b0457fe56fca550ce81",
+    "date": "2026-09-04T22:50:09-04:00",
+    "upstream": "",
+    "subject": "Carry source attribution and the agreed research-use disclaimer with the results",
+    "behind": 571,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/flow-seal",
+    "sha": "1f87d1d63ecefca5d465e9348bc038b676ec7c32",
+    "date": "2026-09-23T16:52:04-04:00",
+    "upstream": "",
+    "subject": "align: seal FlowStep and TransitionFlow construction",
+    "behind": 35,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/friends-sealed-guard-20260921",
+    "sha": "3cc39b1a0b067f148152aab6bdd6e0d08c52f738",
+    "date": "2026-09-21T08:31:15-04:00",
+    "upstream": "",
+    "subject": "fix(friends): enforce committed sealed-split reads and count attempts",
+    "behind": 281,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/intake-contract",
+    "sha": "0e36a7fae2689f4d99148480afc74618ad3e087e",
+    "date": "2026-09-17T22:08:29-04:00",
+    "upstream": "",
+    "subject": "build: publish under io.github.bbuchsbaum, and state homepage and scmInfo",
+    "behind": 455,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/ladder-run",
+    "sha": "3cc1c9491d53d708d92fd5ea67e790e653eec24a",
+    "date": "2026-09-05T10:46:10-04:00",
+    "upstream": "origin/main",
+    "subject": "Pin transition features and freeze the navigation ladder development readout",
+    "behind": 576,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/layer-ledger",
+    "sha": "1175cd43b3f8e6268722d4fbea9214ac776c484a",
+    "date": "2026-09-05T01:39:36-04:00",
+    "upstream": "origin/main",
+    "subject": "Layer-use ledger derived from theta, theta in provenance, and the ablation ladder (ADR 0016)",
+    "behind": 583,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/local-evidence-consumer-probe",
+    "sha": "91645dc82e0d4b0f288b94e547603d16e2c0a1cc",
+    "date": "2026-09-22T22:20:50-04:00",
+    "upstream": "",
+    "subject": "test(codec): expose shared-evidence context aliases from a consumer",
+    "behind": 169,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 91645dc82e0d4b0f288b94e547603d16e2c0a1cc"
+    ],
+    "base": "7da16148cb24ebb7eb7405152913e56d2b0a8259",
+    "paths": [
+      "codec/src/test/scala/storymodel4s/codec/LocalEvidenceConsumerSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/local-evidence-snapshot-probe",
+    "sha": "3fecc774dc80b81f7503bdc0063c5d5fafe3deda",
+    "date": "2026-09-22T22:49:08-04:00",
+    "upstream": "",
+    "subject": "qualify: retain independent local-evidence consumer regressions",
+    "behind": 164,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/mapping-exchange",
+    "sha": "933d04b5358019cce1c2bb0f855818b69bad7bba",
+    "date": "2026-09-22T22:35:42-04:00",
+    "upstream": "",
+    "subject": "docs: connect the exchange API and command-line guide",
+    "behind": 153,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/memento-task-and-seal-20260921",
+    "sha": "8ad7175585681eceb14a2d0f933a1f9fa9d9c395",
+    "date": "2026-09-21T17:20:35-04:00",
+    "upstream": "",
+    "subject": "data(memento): seal 63 test and 60 development participants",
+    "behind": 275,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/openneuro-recall-clock-intake",
+    "sha": "6a6f22f450d675c8e17fb3f0bf92e12d7a2404ee",
+    "date": "2026-09-22T15:09:18-04:00",
+    "upstream": "",
+    "subject": "test(tools): record recall clock intake qualification",
+    "behind": 257,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/own-the-metric",
+    "sha": "cc11d14261ca03907babe3d96b05ea22d3a7a5e1",
+    "date": "2026-09-04T08:30:33-04:00",
+    "upstream": "",
+    "subject": "docs/plans: renumber to ADR 0014, and name the TimedSourceView collision",
+    "behind": 611,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/own-the-metric-w1b",
+    "sha": "d7ffab482a37625a838d07ca40b3f57a83e9029a",
+    "date": "2026-09-04T23:22:15-04:00",
+    "upstream": "",
+    "subject": "tools: matched.py is importable too",
+    "behind": 572,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/perception-first-court",
+    "sha": "49464815eae8e33a1e423f1ab85f3ee68407bf7b",
+    "date": "2026-09-03T13:20:58-04:00",
+    "upstream": "",
+    "subject": "Handoff: storyatlas4s voyage landed at b605679; intaglio main pushed",
+    "behind": 598,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/public-cli",
+    "sha": "d0cc49cec7b819431da635104ce0a9078f5cb47b",
+    "date": "2026-09-22T22:32:57-04:00",
+    "upstream": "",
+    "subject": "qualify: archive independent workspace exchange process controls",
+    "behind": 166,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 7b56d061527a6da31705d45842ec4221d837a77c",
+      "- 39711209d3b32ab531c440298f9d23d8dc66699b",
+      "- ed6bccf758bf6b16c107b55b1fec9f7f760c63a0",
+      "- d0cc49cec7b819431da635104ce0a9078f5cb47b"
+    ],
+    "base": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+    "paths": [
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/README.md",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/artifact-index.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/arguments.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/arguments.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/alternatives.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/decisions.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/links.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/manifest.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/mapping.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/measure-metadata.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/stages.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/target-support.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/targets.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/units.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-a/words.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/alternatives.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/decisions.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/links.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/manifest.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/mapping.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/measure-metadata.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/stages.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/target-support.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/targets.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/units.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/authored-b/words.tsv",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/denied.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/denied.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/existing.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/existing.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/help.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/help.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/inspection-only.workspace.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/invalid-policy.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/invalid-policy.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/invalid-utf8.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/malformed.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/malformed.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/process-receipt.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/unknown.stderr",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/cases/unknown.stdout",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/qualification.json",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/runtime-classpath.txt",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/workspace-exchange-cli-process.log",
+      "docs/refactor/evidence/mapping-exchange-20260922/cli-process/workspace-exchange-cli-process.log.meta.json",
+      "docs/workspace-exchange-cli.md",
+      "examples/mapping/check_cli.py",
+      "pipeline/src/main/scala/storymodel4s/pipeline/MappingExchangeCli.scala",
+      "pipeline/src/test/scala/storymodel4s/pipeline/MappingExchangeCliSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/recall-intake-support",
+    "sha": "f1c82af6bba061cb80e2394a79f633008d8ff7d2",
+    "date": "2026-09-22T19:09:50-04:00",
+    "upstream": "",
+    "subject": "docs: qualify intake and supplied temporal support across platforms",
+    "behind": 208,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/recall-timing-portable",
+    "sha": "b91168c493fab8ac3efe6229996f2a421adb2307",
+    "date": "2026-09-22T17:48:33-04:00",
+    "upstream": "",
+    "subject": "docs(recall): qualify portable timing and reconcile the workflow handoff",
+    "behind": 212,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/recall-word-clock-join",
+    "sha": "7ca23a84bdca7a80f728f505eef15f02c56cf5d4",
+    "date": "2026-09-22T15:37:07-04:00",
+    "upstream": "",
+    "subject": "test(tools): bind word clock join evidence and output examples",
+    "behind": 255,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/root-segment",
+    "sha": "c3ba84bd9870b754278f55972ad6027f75f8c957",
+    "date": "2026-09-04T17:08:25-04:00",
+    "upstream": "origin/main",
+    "subject": "The root segment carries its own claim; its summary is a typed absence (ADR 0005 §10, schema 0.6.0)",
+    "behind": 595,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/s2a0-standalone",
+    "sha": "8d0ed622ac9a1bf1156a524388b04ac94f81d0fb",
+    "date": "2026-09-23T16:27:09-04:00",
+    "upstream": "",
+    "subject": "docs(align): correct the S2a-0 probe's gate-flag claim",
+    "behind": 34,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/s2a1b",
+    "sha": "16d1c97c4d3735ffb8c7a03e55e658235f532755",
+    "date": "2026-09-23T16:52:52-04:00",
+    "upstream": "",
+    "subject": "docs(adr): cite the gate-union BLOCK at Fray #105 seq 870, not #107",
+    "behind": 49,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/s2a2",
+    "sha": "e486ede39cd8c2978f46e07b87fe16f7353eca2e",
+    "date": "2026-09-24T10:20:32-04:00",
+    "upstream": "",
+    "subject": "perf(proposition): project a chart's source-order graph once",
+    "behind": 38,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/shared-evidence",
+    "sha": "7da16148cb24ebb7eb7405152913e56d2b0a8259",
+    "date": "2026-09-22T22:15:19-04:00",
+    "upstream": "",
+    "subject": "feat(align): derive an engine evidence identity and pin extraction parity",
+    "behind": 169,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/shared-evidence-fix",
+    "sha": "b850e373b1f0c6bad68fbfbe9389ab10c6c78c1e",
+    "date": "2026-09-22T22:47:53-04:00",
+    "upstream": "",
+    "subject": "test(codec): expose source changes between evidence admission and inference",
+    "behind": 164,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/sherlock-development-20260923",
+    "sha": "0c4d4eeff1c9aa7361e41f9bd0eefdbff8319f06",
+    "date": "2026-09-23T07:52:12-04:00",
+    "upstream": "",
+    "subject": "docs: record the missing wake mechanism in the Fray handoff",
+    "behind": 137,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/support-honesty",
+    "sha": "caf2d5eacb3b75e58d4a5236f203db26c868b12c",
+    "date": "2026-09-21T08:18:11-04:00",
+    "upstream": "",
+    "subject": "fix(align,codec): fold the cold review of the support-honesty diff",
+    "behind": 291,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/temporal-region-queries",
+    "sha": "8c70dfb1180b5d9c0d92403d4176d1adfd104ec1",
+    "date": "2026-09-22T20:48:27-04:00",
+    "upstream": "",
+    "subject": "qualify: temporal scanner merge and pinned external BIDS acquisition",
+    "behind": 171,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/tie-policy",
+    "sha": "cd790b4ae9029cabdeaa2a1e6e29958c9aca848f",
+    "date": "2026-09-23T08:59:59-04:00",
+    "upstream": "",
+    "subject": "docs(evidence): archive tie-policy gates and mutation receipts",
+    "behind": 133,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/unified-main-20260905",
+    "sha": "9ba3709b32557387116fa2452a913dfc42de36ad",
+    "date": "2026-09-05T11:15:13-04:00",
+    "upstream": "",
+    "subject": "Bind unified main to its passing gate and preserve the navigation handoff",
+    "behind": 540,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/workspace-m1-g1",
+    "sha": "2e98b6febfd2cf510938f95936d5a212babecb8f",
+    "date": "2026-09-22T15:53:49-04:00",
+    "upstream": "",
+    "subject": "docs: bind G1 qualification to the complete clean cross-platform gate",
+    "behind": 224,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/workspace-m1-packet",
+    "sha": "7b2f076a57bde1ec540090c43debfec51c8d44d4",
+    "date": "2026-09-22T20:02:44-04:00",
+    "upstream": "",
+    "subject": "qualify: preserve checked M1 producer packet and generated handoff",
+    "behind": 183,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/workspace-m1-support",
+    "sha": "bad36f95e76978bb48d0204f6131836775e49fd5",
+    "date": "2026-09-22T10:31:45-04:00",
+    "upstream": "",
+    "subject": "test(align): bind full support qualification and consumer evidence",
+    "behind": 261,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "solo/world-order-input",
+    "sha": "bbceb82462c8b42dc0838856a6a18a9af26ecf79",
+    "date": "2026-09-04T19:41:49-04:00",
+    "upstream": "origin/main",
+    "subject": "WorldOrderInput: the timed-source builder takes a declared world clock (ADR 0013)",
+    "behind": 594,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "test/d1a-s0-text-parity-20260919",
+    "sha": "051f88f3fc94e72ed484b672937c351cafe3618e",
+    "date": "2026-09-19T17:37:06-04:00",
+    "upstream": "",
+    "subject": "docs: state exact S0 and existing golden coverage",
+    "behind": 427,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "tolerance-docs",
+    "sha": "4e08df70ed773fb40f01ecd5c1805d1178a61ebd",
+    "date": "2026-08-31T22:01:23-04:00",
+    "upstream": "",
+    "subject": "scalafmt: take the tool's wrap of the Tolerance comments.",
+    "behind": 894,
+    "ahead": 3,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 8ee9ee59dc8c18584c4e12185c6598844bd6690f",
+      "+ 944701cad5db8fab2cf0cedb015f04b2f78d17d7",
+      "+ 4e08df70ed773fb40f01ecd5c1805d1178a61ebd"
+    ],
+    "base": "c02292050e2aa34481883f6fc115d3e7249a3bb8",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/signature.scala"
+    ],
+    "unmatched": [
+      "8ee9ee59dc8c18584c4e12185c6598844bd6690f",
+      "944701cad5db8fab2cf0cedb015f04b2f78d17d7",
+      "4e08df70ed773fb40f01ecd5c1805d1178a61ebd"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "window-reducer-gate",
+    "sha": "6532f49cf42095d988cf4d2029725bb515290d10",
+    "date": "2026-08-29T16:14:37-04:00",
+    "upstream": "",
+    "subject": "Route every derived window scalar through Estimate.score.",
+    "behind": 1061,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1a-s1-20260919",
+    "sha": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+    "date": "2026-09-19T18:35:01-04:00",
+    "upstream": "",
+    "subject": "docs: record S1 review and close the ADR slice",
+    "behind": 423,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1a-s2-20260919",
+    "sha": "21534e66b0d7f0be7d1752dc8b0e9c937a68022f",
+    "date": "2026-09-19T20:23:35-04:00",
+    "upstream": "",
+    "subject": "docs(d1a): bind independent final consumer audit",
+    "behind": 411,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1a-s3-20260919",
+    "sha": "4625dba62b85e133e206ac4e4bbe8a895c045260",
+    "date": "2026-09-19T21:25:49-04:00",
+    "upstream": "",
+    "subject": "acquire: qualify typed support with frozen text resolution parity",
+    "behind": 401,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1a-s4a-20260919",
+    "sha": "4e0d47c11151916f55604915fa9d6cd87107790c",
+    "date": "2026-09-19T22:43:22-04:00",
+    "upstream": "",
+    "subject": "feat: qualify typed text nodes and fallible model construction",
+    "behind": 388,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1a-s4b-20260919",
+    "sha": "e174fdbe68e7cd3ebcfa497338c4a5a7f2f1e000",
+    "date": "2026-09-20T00:29:20-04:00",
+    "upstream": "",
+    "subject": "docs: reconcile S4b acceptance for local landing",
+    "behind": 367,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1a-s4c-20260920",
+    "sha": "146df6520d140eb466872480d39c2c0a4bbfc80e",
+    "date": "2026-09-20T01:27:39-04:00",
+    "upstream": "",
+    "subject": "docs: complete S4c acceptance and consumer evidence",
+    "behind": 351,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/d1b-typed-signatures-20260920",
+    "sha": "00b1d9e6a36b13f2cccab1714c5573e7e5a6100b",
+    "date": "2026-09-20T04:12:19-04:00",
+    "upstream": "",
+    "subject": "docs(d1b): record local delivery and remaining tracker boundary",
+    "behind": 306,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "work/film-hsmm-baseline-20260919",
+    "sha": "5a0ab94a1c737288c1a3af5b04a458f4e748e8a3",
+    "date": "2026-09-19T19:21:45-04:00",
+    "upstream": "",
+    "subject": "docs: record completed WOG baseline evidence review",
+    "behind": 423,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ f3c6edb41621c43de599ef76f66790ae52b5af1e",
+      "- b1b91560a9fe31ae429e25603cbc6cacfe70f132",
+      "- 7aff0cba5c8d52e8c1edc4aba2430d402be87f4c",
+      "- 5a0ab94a1c737288c1a3af5b04a458f4e748e8a3"
+    ],
+    "base": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+    "paths": [
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/README.md",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/WogHsmmBaselineCaptureSuite.scala",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/backend-differences.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/js.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/jvm.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/manifest.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/native.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/recapture-recipe-check.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/recapture.md",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/review.json",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/run.py",
+      "docs/refactor/evidence/wog-hsmm-baseline-20260919/runtime.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WogHsmmBaselineCaptureSuite.scala"
+    ],
+    "unmatched": [
+      "f3c6edb41621c43de599ef76f66790ae52b5af1e"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a018d04b78da3c760",
+    "sha": "d54cc0e3606c909fb62bea0f4b22fe2260b632e2",
+    "date": "2026-08-28T14:40:37-04:00",
+    "upstream": "",
+    "subject": "codec: canonical JSON, StoryModel content checksum, codecs for core/proposition/story/features/recall, JSONL ledgers, migration skeleton",
+    "behind": 1889,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a0984bd4771374b47",
+    "sha": "3c555b2be32281e44094d96459bb609370178aa2",
+    "date": "2026-08-28T15:41:27-04:00",
+    "upstream": "",
+    "subject": "embed-grakern: JVM-only structural channel over grakern (chart reification, WL subtree+OA, d_wl with receipts)",
+    "behind": 1875,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a1c551ba488100735",
+    "sha": "4f63b47712c55e7844c9e4cae80196c5b6072b87",
+    "date": "2026-08-28T08:06:25-04:00",
+    "upstream": "",
+    "subject": "Implement acquire module: autonomous acquisition protocol",
+    "behind": 1956,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a21d6fa563f368ea2",
+    "sha": "aec8d53800bc86aed83641533af98d1d2c320369",
+    "date": "2026-08-28T09:43:02-04:00",
+    "upstream": "",
+    "subject": "amr-interop: fix review findings #10-#13, #39, #32; canonical form by individualization-refinement",
+    "behind": 1935,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a24aa1614e4fa25e2",
+    "sha": "4a2d0185914e5a1c7e94687b04a25a9ae4a59a47",
+    "date": "2026-08-28T08:04:04-04:00",
+    "upstream": "",
+    "subject": "Implement proposition module: canonical local semantic contract",
+    "behind": 1956,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a2b0793021e47e564",
+    "sha": "ca78f1cdaa98c03ca71d889637c660bc7bc85058",
+    "date": "2026-08-28T08:36:17-04:00",
+    "upstream": "",
+    "subject": "Implement interview module and birthday interview fixture",
+    "behind": 1939,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a2bfff0a761f2d2fa",
+    "sha": "0ce047d2d251b446316424b56a6c24e96f78029e",
+    "date": "2026-08-28T17:33:12-04:00",
+    "upstream": "",
+    "subject": "embed-grakern: use the pinned WLCompiledKernel.cross query overlay, not the uncommitted query method",
+    "behind": 1865,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a2cd1cd6317ca88dc",
+    "sha": "04fda18d123e597218afa0908d8a68e84225f00d",
+    "date": "2026-08-28T08:18:18-04:00",
+    "upstream": "",
+    "subject": "Implement story module and War of the Ghosts narrative acceptance fixture",
+    "behind": 1956,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a2ed8a5b9eefaba6c",
+    "sha": "c0ee3265432d63738bf185c48c34dd831901875a",
+    "date": "2026-08-28T07:58:47-04:00",
+    "upstream": "",
+    "subject": "Implement amr module: PENMAN syntax, checked charts, canonical form, Smatch, schema, alignment sidecar",
+    "behind": 1959,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a30a6cb391a048b26",
+    "sha": "96dd620e6a473470758a825d7333c934543f3b0f",
+    "date": "2026-08-28T13:13:57-04:00",
+    "upstream": "",
+    "subject": "recall W5: nominal mentions with identity keys, minimal recall coreference; close TODO(M3)",
+    "behind": 1903,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a32866200333a2f5c",
+    "sha": "03c9564021fb73da25fe33752fc6a8b8010493e4",
+    "date": "2026-08-29T00:49:08-04:00",
+    "upstream": "",
+    "subject": "align: a silent participant is counted in the population receipt, not hidden",
+    "behind": 1534,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a4270bb77f937dc3a",
+    "sha": "239f2efc414a8372e83206df71118c2c866dc837",
+    "date": "2026-08-28T13:01:39-04:00",
+    "upstream": "",
+    "subject": "align: multi-subject PopulationAggregate (visitation, column mass, population flow, hubs, surviving relations, sparse subject×node matrix)",
+    "behind": 1903,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a43f4b54d22cb8487",
+    "sha": "f9cb6fd8d29aa9932dd99859e25d2c8efcb563b4",
+    "date": "2026-08-28T10:07:23-04:00",
+    "upstream": "",
+    "subject": "align/recall: gating as exclusion, Unranked state, Hasse world time, story-agnostic lexical normalizer, typed configs",
+    "behind": 1929,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a57896431c7191c3d",
+    "sha": "d8b727b7492b1140fe609a1083055d39fa087fdb",
+    "date": "2026-08-28T15:25:18-04:00",
+    "upstream": "",
+    "subject": "embed-core: portable embedding contract (ADR 0001 rev 3)",
+    "behind": 1880,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a6369b729623ed00f",
+    "sha": "0c7c541c5922607d2f6e34c023ac27977d0e38d4",
+    "date": "2026-08-28T08:14:57-04:00",
+    "upstream": "",
+    "subject": "Add amr-interop <-> proposition bridge: ToChart, FromChart, AmrCandidates",
+    "behind": 1950,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a695f94d7ddbb91e9",
+    "sha": "19664dcda192edd63e4a72b95e36644671c6ee78",
+    "date": "2026-08-28T18:45:35-04:00",
+    "upstream": "",
+    "subject": "Merge branch 'main' into worktree-agent-a695f94d7ddbb91e9",
+    "behind": 1832,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a7a9f4f110905d2c3",
+    "sha": "0631805225e274fbac3a5665a9a2386f779b197e",
+    "date": "2026-08-28T09:29:43-04:00",
+    "upstream": "",
+    "subject": "features: platform-stable derivation ids, complete recipes, kernel support, typed missingness, ledger-only boundary scores",
+    "behind": 1935,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a9825a1f101c644fd",
+    "sha": "fc3b9e94cc24997b1e472dd2a176a7ec6f20209c",
+    "date": "2026-08-28T09:31:49-04:00",
+    "upstream": "",
+    "subject": "core: lawful ClaimMeta, surrogate-safe tokenizer, splitter fixes, contiguous spans, centered windows",
+    "behind": 1936,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-a9c0502548c683bfb",
+    "sha": "a52c847eca0cd22ea3098b53c4e93d765002cce4",
+    "date": "2026-08-28T08:07:06-04:00",
+    "upstream": "",
+    "subject": "Implement recall and align modules: recall graph, segmenter, costs, graph-HSMM, transport baseline, signature",
+    "behind": 1959,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-aa6479e3946882072",
+    "sha": "9bea1ceec4641b67b23254bddf80488c893bd929",
+    "date": "2026-08-28T09:33:50-04:00",
+    "upstream": "",
+    "subject": "proposition: fix review findings #8 #9 #30 #31 #32",
+    "behind": 1936,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-aa6c170ebe6e9d99d",
+    "sha": "c9a2b7f4606c9a179a26892a51d3254f54f26520",
+    "date": "2026-08-28T19:41:57-04:00",
+    "upstream": "",
+    "subject": "embed-core: P0-2 accept-with-nits fixes — key once before delegate, plain receipts refuse non-public evidence",
+    "behind": 1809,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-aa6e4bd3e601330e3",
+    "sha": "9c2947db45c53c1869c78665201ecddd60bc77fb",
+    "date": "2026-08-28T18:29:21-04:00",
+    "upstream": "",
+    "subject": "align: HsmmResult rows must be the recall's units in recall order; state the provenance residual",
+    "behind": 1852,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-aaf814aa9703a2d5e",
+    "sha": "aa2dd58c8c170d4c37c3344cc3aebd3bb7831ad6",
+    "date": "2026-08-28T09:36:50-04:00",
+    "upstream": "",
+    "subject": "interview: fix review findings #1-3, #18-24 and P2 items",
+    "behind": 1935,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ac2a36fe54bbc6812",
+    "sha": "6f82563863a0706ff603a800fb9305932f7d3b3b",
+    "date": "2026-08-28T13:32:24-04:00",
+    "upstream": "",
+    "subject": "align W1: anchor/fidelity modes and non-bypassable mode gate (ADR 0001 rev 3 D5)",
+    "behind": 1890,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ac41d43ec8293ca09",
+    "sha": "5e9b67e54bc7da2d39357f03ac8c51a6b9010049",
+    "date": "2026-08-28T15:08:36-04:00",
+    "upstream": "",
+    "subject": "M1 W2: PropositionEvidence channel; d_chart/d_wl as separate inert-when-absent terms; chart gates over sketch heuristics; segment structural coverage",
+    "behind": 1883,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-acaf0a4e2d9cd7dc7",
+    "sha": "df88e9f0af0af1ef91bcaa522de32d103646cdab",
+    "date": "2026-08-28T08:14:30-04:00",
+    "upstream": "",
+    "subject": "Implement features module and core surface/transcript primitives",
+    "behind": 1952,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ad1327ab9ed089c8d",
+    "sha": "0a2b216a5709ec8d5233eb3209dceb155024913c",
+    "date": "2026-08-28T09:56:12-04:00",
+    "upstream": "",
+    "subject": "story/fixtures: context-scoped world time, interval consistency, atlas agreement, entity relations, hypotheses, consistency rules; WOG expectations mechanized with mutants",
+    "behind": 1929,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ad52be69fa4b63718",
+    "sha": "8773ac11e73f581f91600e895853d4f6231d1e2c",
+    "date": "2026-08-28T09:54:43-04:00",
+    "upstream": "",
+    "subject": "document/laws: typed content-addressed coref quotient, kind-checked mentions and projections; rich story generators with per-law mutants",
+    "behind": 1927,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ae272c0d34db6fcb2",
+    "sha": "e9aa6d25ca1fe6d0aceff0bb0073b0f9c459e113",
+    "date": "2026-08-28T09:32:02-04:00",
+    "upstream": "",
+    "subject": "acquire: resolver agreement by provider, per-candidate calibration, span-gated acceptance, typed patch/prompt vocabularies",
+    "behind": 1935,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ae43ffc33ecb684fa",
+    "sha": "30561db4f746f6fc87fe1ff44fff2e5255e24529",
+    "date": "2026-08-28T09:17:50-04:00",
+    "upstream": "",
+    "subject": "Integration: features types in story/align, story→align bridge, WOG alignment suite, document composition, laws module",
+    "behind": 1939,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-agent-ae83a0485926edd8a",
+    "sha": "13265661f22ae471e8708a7e33c0ef3795d82113",
+    "date": "2026-08-28T12:59:47-04:00",
+    "upstream": "",
+    "subject": "document: MentionForm (Name/Nominal/Pronominal/Other), form inference, and reader-time resolvableAt",
+    "behind": 1903,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-atlas-feature",
+    "sha": "46314d4d2ef4daef4890e84ca17d39829ec31a16",
+    "date": "2026-08-28T21:26:26-04:00",
+    "upstream": "",
+    "subject": "feat(view): unify atlas and codex planning",
+    "behind": 1708,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 46314d4d2ef4daef4890e84ca17d39829ec31a16"
+    ],
+    "base": "e7960b9c1b78b796335cab81fd28fd5abf64ee29",
+    "paths": [
+      "docs/adr/0002-visualization-contract.md",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala",
+      "view/src/main/scala/storymodel4s/view/codex.scala",
+      "view/src/main/scala/storymodel4s/view/compiler.scala",
+      "view/src/test/scala/storymodel4s/view/AtlasSuite.scala",
+      "view/src/test/scala/storymodel4s/view/CodexCompilerSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-atlas-hardening",
+    "sha": "4aa6cd93ce573fa41d3a6606cc98a03284210081",
+    "date": "2026-08-28T20:55:32-04:00",
+    "upstream": "",
+    "subject": "view: harden Atlas construction",
+    "behind": 1721,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-embed-sweep",
+    "sha": "0a65e79b6fc2ef32f9292fbe0ddfcbcd28fd3e4c",
+    "date": "2026-08-29T07:08:03-04:00",
+    "upstream": "",
+    "subject": "embed: close validating value reconstruction bypasses",
+    "behind": 1350,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-geometry",
+    "sha": "5ba0656947e182874d6cc7a3acbe7238c088639a",
+    "date": "2026-08-28T19:15:28-04:00",
+    "upstream": "",
+    "subject": "embed: validate complete geometry compatibility",
+    "behind": 1819,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-p0-receipts",
+    "sha": "f1b75ae45ae48274b17ce7b5f73df3469b35f574",
+    "date": "2026-08-28T20:18:05-04:00",
+    "upstream": "",
+    "subject": "embed: make attempt receipts provenance-complete",
+    "behind": 1808,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-p1-3-candidate",
+    "sha": "bdb782ef2e72970088c47aaa74502d3054af1222",
+    "date": "2026-08-28T19:02:25-04:00",
+    "upstream": "",
+    "subject": "align: separate structural match from coverage",
+    "behind": 1836,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ bdb782ef2e72970088c47aaa74502d3054af1222"
+    ],
+    "base": "85b8a06dde991e1a877f487c75fa33f6a25d6622",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/source.scala",
+      "align/src/test/scala/storymodel4s/align/EvidenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md"
+    ],
+    "unmatched": [
+      "bdb782ef2e72970088c47aaa74502d3054af1222"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-p1-3-final",
+    "sha": "bd22d290181aba31b8fddfc82f3b55fc3c218f93",
+    "date": "2026-08-28T18:38:29-04:00",
+    "upstream": "",
+    "subject": "align: separate structural match from coverage",
+    "behind": 1839,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ bd22d290181aba31b8fddfc82f3b55fc3c218f93"
+    ],
+    "base": "0d315b585877b1cb9b83a13a8043f33328189ee7",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/density.scala",
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/matrix.scala",
+      "align/src/main/scala/storymodel4s/align/source.scala",
+      "align/src/test/scala/storymodel4s/align/EvidenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala",
+      "laws/src/test/scala/storymodel4s/laws/LawsSuite.scala"
+    ],
+    "unmatched": [
+      "bd22d290181aba31b8fddfc82f3b55fc3c218f93"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-p1-3-final2",
+    "sha": "6c3be23a6492d7fcb5eb153dd0e63e609b025f38",
+    "date": "2026-08-28T19:17:40-04:00",
+    "upstream": "",
+    "subject": "align: separate structural match from coverage",
+    "behind": 1827,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-p1-3-snapshot",
+    "sha": "67f81f99638b92ea1221b6ef76395f324d1c0dfc",
+    "date": "2026-08-28T18:34:08-04:00",
+    "upstream": "",
+    "subject": "align: separate structural match from coverage",
+    "behind": 1845,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 67f81f99638b92ea1221b6ef76395f324d1c0dfc"
+    ],
+    "base": "8ec8a311eee143ecec6e5edc0cc3fa4468f129b6",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/source.scala",
+      "align/src/test/scala/storymodel4s/align/EvidenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md"
+    ],
+    "unmatched": [
+      "67f81f99638b92ea1221b6ef76395f324d1c0dfc"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-codex-scale-selector",
+    "sha": "617ea01f07bcaa93d5aeb858dfe7b7709525c73b",
+    "date": "2026-08-28T20:25:44-04:00",
+    "upstream": "",
+    "subject": "view: compile Codex feature scales",
+    "behind": 1738,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-cursor-grok-coverage",
+    "sha": "2c3dd344e6c90d926cc82e79fa5f105c104ffaed",
+    "date": "2026-08-29T07:55:49-04:00",
+    "upstream": "",
+    "subject": "Seal Coverage and the remaining align/grakern validating types against fromProduct.",
+    "behind": 1215,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-cursor-grok-help-core",
+    "sha": "acae44786b2465c74e0b050335af9fe8bfeb977f",
+    "date": "2026-08-29T07:30:20-04:00",
+    "upstream": "",
+    "subject": "mote: ack both L1(b) corrections; the subset law would have forced a leak",
+    "behind": 1233,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-cursor-grok-help-induce",
+    "sha": "c8c08ee4329e060d20bb46507db5cd0af0d2c121",
+    "date": "2026-08-28T23:15:12-04:00",
+    "upstream": "",
+    "subject": "interview: honest Unattached birthday placement and materialized addrOf",
+    "behind": 1622,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-cursor-grok-phenomenology",
+    "sha": "d2e7538e9851b5069bbd89211c9f313466027bd5",
+    "date": "2026-08-28T19:55:08-04:00",
+    "upstream": "",
+    "subject": "interview: phenomenology coverage uses eligible participant units",
+    "behind": 1802,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-cursor-grok-strands",
+    "sha": "06cf36a21a70b57f7b56d50771f7a6847b034b0c",
+    "date": "2026-08-28T22:52:49-04:00",
+    "upstream": "",
+    "subject": "interview: attach Coverage to every profile rate",
+    "behind": 1656,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-p0-pseudonymized-1552",
+    "sha": "46096626c1fcce138bdd1fe444c850fcef6fcc62",
+    "date": "2026-08-28T18:22:15-04:00",
+    "upstream": "",
+    "subject": "embed: seal pseudonymized remote payloads",
+    "behind": 1848,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 46096626c1fcce138bdd1fe444c850fcef6fcc62"
+    ],
+    "base": "e67f2595559117d6b608f63129933b1d7f967b83",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala"
+    ],
+    "unmatched": [
+      "46096626c1fcce138bdd1fe444c850fcef6fcc62"
+    ],
+    "classification": "review-required",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "worktree-w3-privacy-2235",
+    "sha": "a15396e6acc01fb535420754bef322b334e5f8b1",
+    "date": "2026-08-28T22:18:19-04:00",
+    "upstream": "",
+    "subject": "privacy: bind replacements to detector configuration",
+    "behind": 1712,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "local_branch"
+  },
+  {
+    "name": "astro-fix/scout/astro-00135e87-successor",
+    "sha": "00135e87f323155e398d31c0be807ac68663615e",
+    "date": "2026-09-01T03:19:48-04:00",
+    "upstream": "",
+    "subject": "docs: repair mobile layout and source claims",
+    "behind": 878,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "astro-fix/scout/astro-bac401d9-successor",
+    "sha": "bac401d90280ffaedafd8029969c15dab6a8c49c",
+    "date": "2026-09-01T03:41:09-04:00",
+    "upstream": "",
+    "subject": "test: pin docs layout court",
+    "behind": 877,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "basis-verify/candidate",
+    "sha": "91d48d18d845e88f7eb235bbf2b9cf7879761db2",
+    "date": "2026-08-29T02:35:14-04:00",
+    "upstream": "",
+    "subject": "test: pin BasisId output-space goldens",
+    "behind": 1455,
+    "ahead": 3,
+    "cherry_exit": 0,
+    "cherry": [
+      "- ac831a722669ae5c85e791185817a664622c5f71",
+      "- dca82c235cdda99e73e5c3cd2568814b7656b533",
+      "- 91d48d18d845e88f7eb235bbf2b9cf7879761db2"
+    ],
+    "base": "a97616a5a7c83ade80c28255f5f7c92110b15bc3",
+    "paths": [
+      "codec/src/main/scala/storymodel4s/codec/features.scala",
+      "codec/src/test/scala/storymodel4s/codec/FeaturesCodecSuite.scala",
+      "features/src/main/scala/storymodel4s/features/derivation.scala",
+      "features/src/main/scala/storymodel4s/features/track.scala",
+      "features/src/main/scala/storymodel4s/features/window.scala",
+      "features/src/test/scala/storymodel4s/features/StructureSuite.scala",
+      "features/src/test/scala/storymodel4s/features/WindowSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "chief/nomination-court-becaa",
+    "sha": "e719e5d6cdc60e60f857bddadb37f1744f9bc53b",
+    "date": "2026-09-01T08:42:50-04:00",
+    "upstream": "",
+    "subject": "docs: make ablation publication a court, and widen the source checklist",
+    "behind": 859,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "chief/premerge-c830",
+    "sha": "9cb7e2de7af75061166407798b55852839534dba",
+    "date": "2026-09-01T07:24:35-04:00",
+    "upstream": "",
+    "subject": "tools: harden premerge gate against rewritten views",
+    "behind": 868,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "chief/refscope-10b",
+    "sha": "b67e3b8933166854f80fdf43afb2845050118449",
+    "date": "2026-09-01T08:01:48-04:00",
+    "upstream": "",
+    "subject": "tools: harden reference scope discovery",
+    "behind": 861,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "codex-storymodel4s-scout/cost-overflow-bd-01M1DB1ZNFMNRJ7J40F4HXMZF9",
+    "sha": "bd50c89faaa43276c35d2b7fcb572b39c14c98ad",
+    "date": "2026-09-01T06:32:10-04:00",
+    "upstream": "",
+    "subject": "fix: refuse aggregate cost-weight overflow",
+    "behind": 872,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- bd50c89faaa43276c35d2b7fcb572b39c14c98ad"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "origin/main",
+    "sha": "182d74aeed3b5a8bcd013de51e7024cc426c544b",
+    "date": "2026-09-21T17:36:24-04:00",
+    "upstream": "",
+    "subject": "Merge Memento task admission and 63/60 sealed split",
+    "behind": 274,
+    "ahead": 0,
+    "classification": "ancestor",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-final/chief/premerge-authorizer-recut-20260901",
+    "sha": "abc08b576a72947cdb9b25aa56c35b269e8787b9",
+    "date": "2026-09-01T05:45:33-04:00",
+    "upstream": "",
+    "subject": "tools: refuse legacy Git graft history",
+    "behind": 872,
+    "ahead": 3,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ a92217c01f9ca41115e03b81aa960bc0eec1d172",
+      "+ 0d56733e2361041a954e3d50ab62371769951e88",
+      "+ abc08b576a72947cdb9b25aa56c35b269e8787b9"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [
+      "a92217c01f9ca41115e03b81aa960bc0eec1d172",
+      "0d56733e2361041a954e3d50ab62371769951e88",
+      "abc08b576a72947cdb9b25aa56c35b269e8787b9"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-final/chief/premerge-direct-final-20260901",
+    "sha": "e63a1cc9670b1e66d96d6ac3bb5c7905a76aa747",
+    "date": "2026-09-01T05:48:40-04:00",
+    "upstream": "",
+    "subject": "tools: make premerge gate fail closed",
+    "behind": 872,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ e63a1cc9670b1e66d96d6ac3bb5c7905a76aa747"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [
+      "e63a1cc9670b1e66d96d6ac3bb5c7905a76aa747"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-final/chief/premerge-direct-final-v2-20260901",
+    "sha": "9a0c174d818f4caf168adccdbeed94a4d11ee3a1",
+    "date": "2026-09-01T05:57:54-04:00",
+    "upstream": "",
+    "subject": "tools: make premerge gate fail closed",
+    "behind": 872,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 9a0c174d818f4caf168adccdbeed94a4d11ee3a1"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-final/chief/premerge-direct-final-v3-20260901",
+    "sha": "79c0913d5df0353c8cb0224e38d7d76bea028a9d",
+    "date": "2026-09-01T06:10:48-04:00",
+    "upstream": "",
+    "subject": "tools: harden premerge gate against rewritten views",
+    "behind": 872,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 79c0913d5df0353c8cb0224e38d7d76bea028a9d"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [],
+    "classification": "patch-equivalent",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-final/chief/premerge-final-20260901",
+    "sha": "663a0c6195c6820c80719ad9029418f2c37f3e40",
+    "date": "2026-09-01T04:54:03-04:00",
+    "upstream": "",
+    "subject": "tools: make premerge gate fail closed",
+    "behind": 872,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 663a0c6195c6820c80719ad9029418f2c37f3e40"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [
+      "663a0c6195c6820c80719ad9029418f2c37f3e40"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-fix/chief/premerge-reconciliation-gate",
+    "sha": "1e5df7aeaf6b6624764c6ca5de48119d72f91ff5",
+    "date": "2026-08-31T23:50:33-04:00",
+    "upstream": "",
+    "subject": "tools: reject partial candidate snapshots",
+    "behind": 891,
+    "ahead": 3,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 2f033f11a2efa718e2cd05de98c0ef3154ea024d",
+      "+ 120e5202148e7a8703625f00474cc310f2d7ac40",
+      "+ 1e5df7aeaf6b6624764c6ca5de48119d72f91ff5"
+    ],
+    "base": "adf58cad3dc419d6a383355cf0479e846b5175dd",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [
+      "2f033f11a2efa718e2cd05de98c0ef3154ea024d",
+      "120e5202148e7a8703625f00474cc310f2d7ac40",
+      "1e5df7aeaf6b6624764c6ca5de48119d72f91ff5"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "premerge-fix/chief/premerge-unread-fail-closed-v2",
+    "sha": "3e1db8dc00042a6379a8aa2367a1cef3d75838fe",
+    "date": "2026-09-01T02:29:32-04:00",
+    "upstream": "",
+    "subject": "tools: fail closed when board reread fails",
+    "behind": 891,
+    "ahead": 4,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 2f033f11a2efa718e2cd05de98c0ef3154ea024d",
+      "+ 120e5202148e7a8703625f00474cc310f2d7ac40",
+      "+ 1e5df7aeaf6b6624764c6ca5de48119d72f91ff5",
+      "+ 3e1db8dc00042a6379a8aa2367a1cef3d75838fe"
+    ],
+    "base": "adf58cad3dc419d6a383355cf0479e846b5175dd",
+    "paths": [
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [
+      "2f033f11a2efa718e2cd05de98c0ef3154ea024d",
+      "120e5202148e7a8703625f00474cc310f2d7ac40",
+      "1e5df7aeaf6b6624764c6ca5de48119d72f91ff5",
+      "3e1db8dc00042a6379a8aa2367a1cef3d75838fe"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "sherlock-fix/scout/sherlock-b0r-owner-post-successor",
+    "sha": "c71df91000ea2bda9e6c0c79f19c791c376dfcce",
+    "date": "2026-09-01T02:49:46-04:00",
+    "upstream": "",
+    "subject": "docs: correct Sherlock owner decision reference",
+    "behind": 895,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ e0c884bafa1f20157dfe68a110cccaf66119ca26",
+      "- c71df91000ea2bda9e6c0c79f19c791c376dfcce"
+    ],
+    "base": "e584ad6d8a1b6bc5cb28ac1c406a239114f1f48a",
+    "paths": [
+      "docs/data/sherlock/README.md",
+      "docs/data/sherlock/alias-map.json",
+      "docs/data/sherlock/annotation-lineage.json",
+      "docs/data/sherlock/recall-lineage.json",
+      "docs/data/sherlock/source-manifest.json",
+      "docs/data/sherlock/timebase-repair.json"
+    ],
+    "unmatched": [
+      "e0c884bafa1f20157dfe68a110cccaf66119ca26"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "sherlock-recut/chief/sherlock-postchecker-9410",
+    "sha": "9410eb1b842bd058761f72b8c1635cbc6aa96a41",
+    "date": "2026-09-01T06:22:21-04:00",
+    "upstream": "",
+    "subject": "docs(sherlock): recut exact pair after premerge hardening",
+    "behind": 872,
+    "ahead": 2,
+    "cherry_exit": 0,
+    "cherry": [
+      "- 79c0913d5df0353c8cb0224e38d7d76bea028a9d",
+      "+ 9410eb1b842bd058761f72b8c1635cbc6aa96a41"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "docs/data/sherlock/README.md",
+      "docs/data/sherlock/alias-map.json",
+      "docs/data/sherlock/annotation-lineage.json",
+      "docs/data/sherlock/recall-lineage.json",
+      "docs/data/sherlock/source-manifest.json",
+      "docs/data/sherlock/timebase-repair.json",
+      "tools/premerge-check-test.sh",
+      "tools/premerge-check.sh"
+    ],
+    "unmatched": [
+      "9410eb1b842bd058761f72b8c1635cbc6aa96a41"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  },
+  {
+    "name": "sherlock-recut/scout/sherlock-six-path-current-main",
+    "sha": "87c18006bd58ee9a23b9fe0a1e3b994e7d62aba9",
+    "date": "2026-09-01T05:21:02-04:00",
+    "upstream": "",
+    "subject": "docs(sherlock): recut exact pair on current main",
+    "behind": 872,
+    "ahead": 1,
+    "cherry_exit": 0,
+    "cherry": [
+      "+ 87c18006bd58ee9a23b9fe0a1e3b994e7d62aba9"
+    ],
+    "base": "d147b596017df5735ca3d5d3c184af6a8691dab8",
+    "paths": [
+      "docs/data/sherlock/README.md",
+      "docs/data/sherlock/alias-map.json",
+      "docs/data/sherlock/annotation-lineage.json",
+      "docs/data/sherlock/recall-lineage.json",
+      "docs/data/sherlock/source-manifest.json",
+      "docs/data/sherlock/timebase-repair.json"
+    ],
+    "unmatched": [
+      "87c18006bd58ee9a23b9fe0a1e3b994e7d62aba9"
+    ],
+    "classification": "review-required",
+    "ref_kind": "remote_tracking_ref"
+  }
+]

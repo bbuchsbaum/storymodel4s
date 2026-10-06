@@ -1,0 +1,1388 @@
+[
+  {
+    "candidate_id": "cand-04F7JTZE3Q902JABARFX9JZRBW",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "659840bc41a7f9155b1ff33133cbb7f5a266f374",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-04M3HM9T6EJPYM93Y26CHSEPPM",
+    "issue": "bd-01M1C0DA89WDXC9H3VTKJ46R9A",
+    "phase": "pending",
+    "sha": "b1a3287e0d0ef63ec47fbd90c33e9bf95722647f",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0668MBNBWH5GPHHTH1ZC3PE2W5",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "pending",
+    "sha": "9cb7e2de7af75061166407798b55852839534dba",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "9cb7e2de7af75061166407798b55852839534dba",
+      "locator": "refs/remotes/chief/premerge-c830",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-08QSQGY8XMA3FMETGHVR6ZKN1K",
+    "issue": "bd-01M1998654XQRSNA6R16S2ABDQ",
+    "phase": "pending",
+    "sha": "9d8b4a34283e7efb07d097fee120926b51e78080",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "9d8b4a34283e7efb07d097fee120926b51e78080",
+      "locator": "/tmp/storymodel4s-surface-atlas-v1-20260831",
+      "repository_id": "repo-e06b52031c0789a06745d9b22d728aa8621ec872be647e50eaeac10a51419499"
+    }
+  },
+  {
+    "candidate_id": "cand-0AQDH7CKVDRBJ7XTP4D0S8Y308",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "superseded",
+    "sha": "59a557b8680a297316e888d0d1b2679955e3d512",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0BZ23034MFEENEZ7RQYCRB8NJK",
+    "issue": "bd-01M19947QTCAYJJYTC003HVDB5",
+    "phase": "superseded",
+    "sha": "459640df44869536d46b8c4faa141096c8302428",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0HW65W7N023AFXN01YZC1MDMCB",
+    "issue": "bd-01M1CH1SW9K3ZW8D0HBTH9JVRP",
+    "phase": "abandoned",
+    "sha": "30f06fc3a46914c939a4ba703341311ebf464eda",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0J2GM6VA924RTNSB7EBD0HSXYX",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "1e5df7aeaf6b6624764c6ca5de48119d72f91ff5",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "1e5df7aeaf6b6624764c6ca5de48119d72f91ff5",
+      "locator": "refs/remotes/premerge-fix/chief/premerge-reconciliation-gate",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-0JAC5GG7FXPVDD42V92A1V3VCD",
+    "issue": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX",
+    "phase": "superseded",
+    "sha": "c7a316ab9f043f88a8e64585c4df4f86790700d5",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0MZMTB9PHND2DE7X110N8EZRVH",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "120e5202148e7a8703625f00474cc310f2d7ac40",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "120e5202148e7a8703625f00474cc310f2d7ac40",
+      "locator": "refs/remotes/premerge-fix/chief/premerge-reconciliation-gate",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-0NM8VRWP6D52NNS9S2AJGC1KQ7",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "c7a9ba6ee80b566b3f0f658dced5903ab78ade6c",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0P564F15Z84PPTGX1XANS3A9VY",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "abandoned",
+    "sha": "6ad95c5c5109aba3c282d854add422e67b71b07b",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "6ad95c5c5109aba3c282d854add422e67b71b07b",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-0PA9VD7NN10GMNJDHRBDWM6RAZ",
+    "issue": "bd-01M1C1S0BRF8H7EX74CGQZVV1M",
+    "phase": "pending",
+    "sha": "c0525f0ffbba43a69e8d8546de4fead9bca257c8",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0PDQ1NYDQ6S0YHGKM72ANR5EGD",
+    "issue": "bd-01M17Y03XGDD0XR26PN41TJVRJ",
+    "phase": "superseded",
+    "sha": "7ee4872c697fd1d92ffa345f0d2b188086958a72",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0PQXDW41WY6Q9Z1QE97W4J7ZTS",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "pending",
+    "sha": "6ad95c5c5109aba3c282d854add422e67b71b07b",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0RZF7C581MEEC8XNVZT04D83Q3",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "pending",
+    "sha": "7da3b10736a5aa195430d116ca1fcd939bec8a01",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-0VTTREJ92VS9D10KM7S5EP30JX",
+    "issue": "bd-01M1CQ5YS5M25F7HD9NN5YVAYP",
+    "phase": "pending",
+    "sha": "9410eb1b842bd058761f72b8c1635cbc6aa96a41",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "9410eb1b842bd058761f72b8c1635cbc6aa96a41",
+      "locator": "refs/remotes/sherlock-recut/chief/sherlock-postchecker-9410",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-0Y47V3V9B235XPPCG5TPQ5DWPF",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "48b495e9067a9e986d7de13e344811073ed1718a",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-10DAMGPHRDSZXBMNGCSXMB6WTE",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "superseded",
+    "sha": "f60b86c0f8727ea6403b37399be3e2a2ad887bce",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-10G4Y7Z3EJ71V3KF6DT5Y48K03",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "9a0c174d818f4caf168adccdbeed94a4d11ee3a1",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "9a0c174d818f4caf168adccdbeed94a4d11ee3a1",
+      "locator": "refs/remotes/premerge-final/chief/premerge-direct-final-v2-20260901",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-11AWXBY0VVB4Z5XZRPX7KRSEQ1",
+    "issue": "bd-01M16M5ETH0QHFZ62KXZJ54PN9",
+    "phase": "superseded",
+    "sha": "0ca09c56809be5bd7109acecf35d8d4171fd9c16",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-13J7K02VCBNBYWQG8354Y9MGZY",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "landed_out_of_band",
+    "sha": "73bc9af9309c237717b003faaa1a635d0e39a603",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-13MABH3J3CKW7M5CV3QZQ7PREZ",
+    "issue": "bd-01M1CH1SW9K3ZW8D0HBTH9JVRP",
+    "phase": "abandoned",
+    "sha": "ceb50dc7645cb4b8b49b350a4f8c60055387775b",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-14TZGVEXRG35CGK5BN94PYY1J0",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "c63ab3a91712ff272c17d864fd01594c58608136",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-15QXTWG1YVDF8ZYAJC8A1PADJV",
+    "issue": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+    "phase": "superseded",
+    "sha": "fb31002a27e088ffdd448c505c5bed15de5ff544",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-15R9779TEV88WR3VHD3Z7GS2D7",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "superseded",
+    "sha": "067e35b523355886b5d38f5b205311f70227885f",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-163TSH4SNEXBP7599EBQ63CN1P",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "pending",
+    "sha": "39c745d0d43a690d86c4437ac42b5b07c1526197",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-16DG6PX86NPVWRCZJG1XZ9G2Z3",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "superseded",
+    "sha": "3e959e6a269f571395d79f59c6ded4565043078f",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-16PK9PF5X501M4G0FN8SFWZD6Q",
+    "issue": "bd-01M1C3GHNJJ2XX4SQ4BV8042ZB",
+    "phase": "pending",
+    "sha": "f352b43dd80286b5f89c143c5c59e47bb445e745",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-16SR5W9N73PPBH06Q2A487YEB1",
+    "issue": "bd-01M1C6XV4F99RVRWCTF3YX16G7",
+    "phase": "pending",
+    "sha": "4c09362c185d7eb0e7fa0e3d39e13d895039c112",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-18FV6QE7JYJK4KCMKVXB6QHKDZ",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "pending",
+    "sha": "ac985d4f2d279ec3e447767e4a72c4aa552f97cc",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1EE04BNN2PY3AKNAFP32YK42YD",
+    "issue": "bd-01M199ABAG5SXR9C6Y0G4X6J2T",
+    "phase": "landed_out_of_band",
+    "sha": "77e62ef0d95b7050a5fd1e685de6ec47ad9dad75",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1EFRM8SF43RHZ35B8NZYXCEWV7",
+    "issue": "bd-01M199ABAG5SXR9C6Y0G4X6J2T",
+    "phase": "superseded",
+    "sha": "c9414dbc8837a195dd2c4d5f295098ea112e4eff",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1HMKJ93CD0FQR4T4Z3KVG6KFZH",
+    "issue": "bd-01M199ABAG5SXR9C6Y0G4X6J2T",
+    "phase": "pending",
+    "sha": "36051f6f13c6e83d79a2eca0258ce232b35b9167",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1K02123DKE9A2Z1QV3G6QBQ1Q9",
+    "issue": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX",
+    "phase": "superseded",
+    "sha": "a00fc307a06591f711dd6e17f91156eb638028a5",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1NNS16B69AP479FQ615GBE6HZN",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "superseded",
+    "sha": "92e6847aa8bead36309bc1acd9d877df4b1f2a7e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1NRX8QECWEA4R5JJJ3MN20DCC2",
+    "issue": "bd-01M1BY93E78KHABT8CMEASZA4G",
+    "phase": "pending",
+    "sha": "92c8782193900a3a283d1c15a26e647705423bce",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1XRDRNRTJB2P874SFSFMTY93GG",
+    "issue": "bd-01M19C0M9TWKK4AJ9NASXABSZH",
+    "phase": "landed_out_of_band",
+    "sha": "6a899a2665378f221832778e3a8562c847aa83d3",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1XX6WJFCSBBPMMCE9HMT4PSPSJ",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "c7a9ba6ee80b566b3f0f658dced5903ab78ade6c",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-1ZPRYW072ZAC7G653YMZXWDVTB",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "pending",
+    "sha": "05e0746d65ea27db72d659d50616f006630c9df3",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-221FNFKP681Y7NGPS3BGRKB7VH",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "pending",
+    "sha": "9881e06c7211ae5ef5505ab4edc6b1a9b2b852d9",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "9881e06c7211ae5ef5505ab4edc6b1a9b2b852d9",
+      "locator": "refs/heads/m1/nomination-court-v7",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-24WH145C4KVENCFVQC3XZAWT94",
+    "issue": "bd-01M16M5ETH0QHFZ62KXZJ54PN9",
+    "phase": "superseded",
+    "sha": "0ca09c56809be5bd7109acecf35d8d4171fd9c16",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2779QGGTABH1511Q04AMZCVEF0",
+    "issue": "bd-01M1BZQCM0P8566KACRE28RVAR",
+    "phase": "pending",
+    "sha": "e3745e20240c23805c5151d604177201a2332225",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2A9ZTSWMSJEPN68DATQBWNS86V",
+    "issue": "bd-01M1CHWCRKMPNK6RARGT7JXVXX",
+    "phase": "superseded",
+    "sha": "8a110880ff6dcc53affdb3fff2dd2e730f7ce906",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2BR1J4MN3V2T7D581ZF4KHV3GG",
+    "issue": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+    "phase": "abandoned",
+    "sha": "fb31002a27e088ffdd448c505c5bed15de5ff544",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2CFMAH74FFZWVAJH5DD4YQNPJQ",
+    "issue": "bd-01M17Q9RNW696PGP3X51BJ025M",
+    "phase": "abandoned",
+    "sha": "6adbb69403e6b7a009c0f65321d9faed28e3351d",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2D4J67Z7NMZN0WXYQ2APGV0KW2",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "superseded",
+    "sha": "3c3b617ab0b218749de69a695d0d45f13ec4431e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2DJ7F4A6Z893YZA7NF8FZPNY8G",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "8a227832212a34b71ec2bb0bad3d72cee6ced935",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2FPE0SQMVXXQ3HAAWSH5RXW0HV",
+    "issue": "bd-01M17J1GXY5GG4XZXMBREKY1S8",
+    "phase": "abandoned",
+    "sha": "a371e102c4abbcdf4f83f84bf6fe47c55f5a795f",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2G3GBE7ZDZN0JP5YKD9869YDA0",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "pending",
+    "sha": "79c0913d5df0353c8cb0224e38d7d76bea028a9d",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "79c0913d5df0353c8cb0224e38d7d76bea028a9d",
+      "locator": "refs/remotes/premerge-final/chief/premerge-direct-final-v3-20260901",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-2G6VTM7X1G7YCHFEPARWCR1NSM",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "663a0c6195c6820c80719ad9029418f2c37f3e40",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "refs/remotes/premerge-final/chief/premerge-final-20260901",
+      "locator": "refs/remotes/premerge-final/chief/premerge-final-20260901",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-2J8257JACMEGGE9H4HRK2TN2SV",
+    "issue": "bd-01M1DB1ZNFMNRJ7J40F4HXMZF9",
+    "phase": "pending",
+    "sha": "bd50c89faaa43276c35d2b7fcb572b39c14c98ad",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "bd50c89faaa43276c35d2b7fcb572b39c14c98ad",
+      "locator": "refs/remotes/codex-storymodel4s-scout/cost-overflow-bd-01M1DB1ZNFMNRJ7J40F4HXMZF9",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-2KZH2JA107QCVY6KMP7ZM3G4R4",
+    "issue": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+    "phase": "pending",
+    "sha": "7c7858f3c6aac5277bb34e905b532828d22da1a2",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2PR0D25C514364KEKA0MYM6ZXQ",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "9005320c21cbdb435489a030b23ca2dec84015c0",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2QZH1WYS3T7890NR75NFEB3KF1",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "superseded",
+    "sha": "8a4346d9ac5d69dd22ae9e49770f874c81b87d26",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2RD3H2FWMGHQM8XNX3VDCAK8H7",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "pending",
+    "sha": "834f28099827a9d010bcc3ffbd7a7c19cffa506d",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-2RJZN7R75WNJS4CMHKJ5X3FRTE",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "pending",
+    "sha": "e719e5d6cdc60e60f857bddadb37f1744f9bc53b",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "e719e5d6cdc60e60f857bddadb37f1744f9bc53b",
+      "locator": "refs/remotes/chief/nomination-court-becaa",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-308FZFPCDHHYWQJN61ZYZYG0N1",
+    "issue": "bd-01M1C0XXGBNZ91S4N313JF0HE4",
+    "phase": "pending",
+    "sha": "f47177cbde76b45ffe3558c4be8045c8c6324b0b",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-3193B07D4SGF26M52FQNSBZ3VG",
+    "issue": "bd-01M1A49W8H5MNJNKFXR84ZQFJP",
+    "phase": "pending",
+    "sha": "0573692458a439e3625b119baa19d1946edeb478",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-32WTJ0D3N5P75J34R61YEGHJN2",
+    "issue": "bd-01M166XWESBS1JZ5B38H0ZZ2DK",
+    "phase": "landed",
+    "sha": "72b106c6351057c46049b3cf6f380dbb8ad6033d",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-357FBK0VHJR3PNZ7D8W2WNW8EE",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "superseded",
+    "sha": "fa1c4e121320742ebc09c2493615ad75015c587d",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-35ME35QH9SYAWQ56GNHZKYXJR2",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "3e1db8dc00042a6379a8aa2367a1cef3d75838fe",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "3e1db8dc00042a6379a8aa2367a1cef3d75838fe",
+      "locator": "refs/remotes/premerge-fix/chief/premerge-unread-fail-closed-v2",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-38WBVZ221RZFMWTEA6GA9EPF3G",
+    "issue": "bd-01M199ABAG5SXR9C6Y0G4X6J2T",
+    "phase": "superseded",
+    "sha": "f6d57a175ff9b8f8a6d114354418e8dd6f563b50",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-3B6Y9A0XKDK0NK7PMCMVZNH5SZ",
+    "issue": "bd-01M1CQ5YS5M25F7HD9NN5YVAYP",
+    "phase": "superseded",
+    "sha": "c71df91000ea2bda9e6c0c79f19c791c376dfcce",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "c71df91000ea2bda9e6c0c79f19c791c376dfcce",
+      "locator": "refs/remotes/sherlock-fix/scout/sherlock-b0r-owner-post-successor",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-3N47S9ZY2QPVY2N7FXZZCHTWFT",
+    "issue": "bd-01M17Y03XGDD0XR26PN41TJVRJ",
+    "phase": "abandoned",
+    "sha": "e1e5ab4f5b3826593dd2087e37d84e4f8c04b842",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-3QP7G91T0SCHQVTSGJSZ36A21Y",
+    "issue": "bd-01M19956MFSG7076QE4J66T7E9",
+    "phase": "superseded",
+    "sha": "6a218927a3492e27d34915aed4bcbf269bb004e7",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-3TB4WV06BBW15W6QKP9KAC4JDM",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "pending",
+    "sha": "0be9006bf706b4432bc15bfe542db93432b3aad4",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "0be9006bf706b4432bc15bfe542db93432b3aad4",
+      "locator": "refs/heads/candidate/recall-alignment-visualization-court-v6",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-3TEQQ27MP3NNE7YYZ3PBPFQT76",
+    "issue": "bd-01M1C2K4PW5F9YS43NZNJ8ZRXV",
+    "phase": "pending",
+    "sha": "e5283b51606c9822ce3d29d1baf6e0085f914e11",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-3TGJX24DY5WG59H1E630VWQY92",
+    "issue": "bd-01M19947QTCAYJJYTC003HVDB5",
+    "phase": "superseded",
+    "sha": "ebc7a5198fb90f92cc7c1ea5e0d196c692f8e952",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-40W7YAE5N2EPS8M542GKEEZMS4",
+    "issue": "bd-01M18844CA1BFTNXR0HS8WBWB6",
+    "phase": "landed",
+    "sha": "4852c124aa6e6967322d21e069dc772473a59a12",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-47QWK6Q6Y19F40KZ4719BHHV51",
+    "issue": "bd-01M19947QTCAYJJYTC003HVDB5",
+    "phase": "pending",
+    "sha": "42df7f5f02d095d753ccbdfbf63a51579bccbcf2",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-485A9B9P1K5V50FX8J5XM97FYS",
+    "issue": "bd-01M199ABAG5SXR9C6Y0G4X6J2T",
+    "phase": "abandoned",
+    "sha": "b3c7e1d04a281cf711c0acda390292b7d8040eac",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4CSV7DTJY759BKMBYCFSGA7G0J",
+    "issue": "bd-01M166XWESBS1JZ5B38H0ZZ2DK",
+    "phase": "superseded",
+    "sha": "d9172180d112d28b67b3f3bcf0fac7e7f67ac8e3",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4DW0GRW5CA8GVMFMWEHN9HRYHK",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "pending",
+    "sha": "c6587336e131a88a9b21d703532fdc6c037a2bd4",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4E9DR9YPQ95YJFM7KV6BCKPTPX",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "a92217c01f9ca41115e03b81aa960bc0eec1d172",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "a92217c01f9ca41115e03b81aa960bc0eec1d172",
+      "locator": "refs/remotes/premerge-final/chief/premerge-authorizer-recut-20260901",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-4J5FG17T1BSBNSBGA0HFBRJC8F",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "landed",
+    "sha": "1fa3c51b2abf9bf61c785efdd05f150c2ffc300e",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4NMMYJ1JQGR57TWMQPM43A0D2R",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "bb204e9d4af43b9d2986f58303a80cc3ca55d026",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4PR9V3975VHJS2NGYJPKPCVX9R",
+    "issue": "bd-01M1CHWCRKMPNK6RARGT7JXVXX",
+    "phase": "superseded",
+    "sha": "cb63bf08ab8b48a03f9853af21ef5d33c314e3c6",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4QSQ7EQM5EY26CSJ28KXCC19AF",
+    "issue": "bd-01M16M5ETH0QHFZ62KXZJ54PN9",
+    "phase": "superseded",
+    "sha": "dc5374d630534bce49e5af775f42b8e40b8c6a5d",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4SEC14PYRWZQAYRP9X587Q8ZCG",
+    "issue": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+    "phase": "pending",
+    "sha": "16c85d4b390c07f9af0f2b08abd091d9af00335b",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4TB2H58FZP5EYF8W8TTCMJ4EAJ",
+    "issue": "bd-01M17WN3R44WSNNDN679CN04TZ",
+    "phase": "landed_out_of_band",
+    "sha": "220cbdcc23274ffd42206e53b56fcd042925ee17",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4VPHY752ZPYM29MC5GKBW7A4AD",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "superseded",
+    "sha": "1363fd4684c51dba71089c97eda6bdd34e1420d8",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4X710ZCHRH5DRM163V9Y8HMK10",
+    "issue": "bd-01M17Q9RNW696PGP3X51BJ025M",
+    "phase": "landed_out_of_band",
+    "sha": "7ae2ec9e567a2ed8d3d8f71bdc2f229d0bc38e79",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4XJ36RFAA71YCG7FKTETTBDZKY",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "superseded",
+    "sha": "a674e1468031544868721e7459c8e11120b13659",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-4ZAS3FYWX5WFKRXP2ADASYKRJN",
+    "issue": "bd-01M17Q9RNW696PGP3X51BJ025M",
+    "phase": "abandoned",
+    "sha": "6adbb69403e6b7a009c0f65321d9faed28e3351d",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-508B15Z2MEJZ82K8B0RTJXEX3G",
+    "issue": "bd-01M166XWESBS1JZ5B38H0ZZ2DK",
+    "phase": "superseded",
+    "sha": "47c061bd13736614b889fb84a0cdbddf2d1132fb",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-53BEV0JAKWF3SAV4M2Q365CBD0",
+    "issue": "bd-01M1C4Q11FWAY7MZFNNMXTTJEJ",
+    "phase": "pending",
+    "sha": "658e3044b29e6436fd0d9737729a237486cb7810",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-558Y9VJ64JKY2FY0S8YYXK388J",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "2f033f11a2efa718e2cd05de98c0ef3154ea024d",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "2f033f11a2efa718e2cd05de98c0ef3154ea024d",
+      "locator": "refs/remotes/premerge-fix/chief/premerge-reconciliation-gate",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-561AXY624D5F5188JH8J568SAP",
+    "issue": "bd-01M1CQ5YS5M25F7HD9NN5YVAYP",
+    "phase": "superseded",
+    "sha": "87c18006bd58ee9a23b9fe0a1e3b994e7d62aba9",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "87c18006bd58ee9a23b9fe0a1e3b994e7d62aba9",
+      "locator": "refs/remotes/sherlock-recut/scout/sherlock-six-path-current-main",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-56GP49PRGBS40G7V2X4QV58WT0",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "abandoned",
+    "sha": "6ad95c5c5109aba3c282d854add422e67b71b07b",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "6ad95c5c5109aba3c282d854add422e67b71b07b",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-57QNM77A1BJ92Z2F8ENFXNV8CC",
+    "issue": "bd-01M19JBF0X827AS3J863TX1J8E",
+    "phase": "landed",
+    "sha": "5dc1f2b6a5e6d4a32e648dd20d40d2e137c2b833",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-58QJW5DQC5EM87Q9EHEQ6ESYN2",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "00135e87f323155e398d31c0be807ac68663615e",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "00135e87f323155e398d31c0be807ac68663615e",
+      "locator": "refs/remotes/astro-fix/scout/astro-00135e87-successor",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-59A0QZZS7NZQ366MM1XGFYDYQ3",
+    "issue": "bd-01M1C5Y9ESYXAFNT91BVBTKZB9",
+    "phase": "pending",
+    "sha": "50eea3a7f1bcc39eb664da669fe78ed61db95aca",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-59EE93DZZMC7WWHND5KXTC9QJD",
+    "issue": "bd-01M1CH1SW9K3ZW8D0HBTH9JVRP",
+    "phase": "superseded",
+    "sha": "60d1827f9356b8a2cf3121e214432ef597edca70",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5BN2PKTQS8CJTSA2H28J1RQZY9",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "abandoned",
+    "sha": "e1c8c407cb19028282e2622a913874791e448683",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5C91Z38ATBV4CWS7DYRHPCE0ZC",
+    "issue": "bd-01M166XWESBS1JZ5B38H0ZZ2DK",
+    "phase": "landed",
+    "sha": "df717431f52acb401324ba7694b024b07c19d462",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5CRWVVR9ZSRC3M7FF8BMWT4BV1",
+    "issue": "bd-01M1EAE4X7GPERQHJZYQJQXH11",
+    "phase": "superseded",
+    "sha": "6ff6c5d4d72220e6b9f932a8f67cea4615170526",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "6ff6c5d4d72220e6b9f932a8f67cea4615170526",
+      "locator": "/private/tmp/storymodel-prd-candidate.MjBpkR/repo",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-5NFBWN0XQS7AB2CBRJTYDWA8E4",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "bf1f1a5360595ad3ad717a086390425a16253e77",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5RMB53ETNBGS50WFM5Y7068B9A",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "abandoned",
+    "sha": "bb204e9d4af43b9d2986f58303a80cc3ca55d026",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5RWGDJ9C9VZ0NJMTJVC1MDW97C",
+    "issue": "bd-01M1DDY44PMSEB6FN227S56G45",
+    "phase": "superseded",
+    "sha": "e63a1cc9670b1e66d96d6ac3bb5c7905a76aa747",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "e63a1cc9670b1e66d96d6ac3bb5c7905a76aa747",
+      "locator": "refs/remotes/premerge-final/chief/premerge-direct-final-20260901",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-5T2Q65J8XRARDYYYPKP5FPB2AZ",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "pending",
+    "sha": "b73692f6a3769ce908b3012dae435751ae61ea1a",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5WEZMFBGMXR0DYC2S1HTXCQX77",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "superseded",
+    "sha": "609e35f3c861423379351f892b44f448e0a73be3",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5YD4782PSMZVHMT458HCJ4QTAF",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "abandoned",
+    "sha": "c7a9ba6ee80b566b3f0f658dced5903ab78ade6c",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-5ZDFAN9DKVWTA9F0ANCQKKCN32",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "pending",
+    "sha": "8a4346d9ac5d69dd22ae9e49770f874c81b87d26",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-60RVY8K7QT75EENY6E5QP0HYE7",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "superseded",
+    "sha": "7ba9356a50f4cdc64e1562d0eab8cf2d5fc75436",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-62FAKD3SZBK3EVPFR6KCQ3SHH0",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "superseded",
+    "sha": "a51df1654272cfbe29a184b88d2231cffb586965",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-66YCE7XWGG0Q90GNPWR6XM191H",
+    "issue": "bd-01M17S2SGW2Z7NSR478SHSZRNW",
+    "phase": "landed_out_of_band",
+    "sha": "e022c5f01aff45c9507656ce2735a9f6cbc5faa3",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-66Z8650PW020BNTQV9DBRKQH0D",
+    "issue": "bd-01M19947QTCAYJJYTC003HVDB5",
+    "phase": "superseded",
+    "sha": "42df7f5f02d095d753ccbdfbf63a51579bccbcf2",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-67RYQZ5MJJT5BV8NY7G150S1P0",
+    "issue": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+    "phase": "pending",
+    "sha": "99602baac56b1a5afad5359a5c4bd019f2281343",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6A969TE4QEC0FWHX8R0EYX04NJ",
+    "issue": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+    "phase": "superseded",
+    "sha": "3fff6e9ff9288123dc935903b44a4fcfb470626e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6AAPYS0RBRFQNFWSXVC66J14SQ",
+    "issue": "bd-01M19956MFSG7076QE4J66T7E9",
+    "phase": "pending",
+    "sha": "b33fe5b571ce9f9aea54b92436ca6c073133f969",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "b33fe5b571ce9f9aea54b92436ca6c073133f969",
+      "locator": "refs/heads/scout/support-assessment-v4",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-6CK6QNPEVSPH1DAJEP33EKH0C7",
+    "issue": "bd-01M1CH1SW9K3ZW8D0HBTH9JVRP",
+    "phase": "pending",
+    "sha": "7d5e9dd69389b8c637ca0d008929d6d6aedcef47",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6CW0BXWTDXFF4VKHXKAS49M3AP",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "superseded",
+    "sha": "a7fa64abe85d32e0f5d4520b6c7d2724cef150e5",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6D9Z91FK56DE5Q88QGH3XGKXF5",
+    "issue": "bd-01M1CHWCRKMPNK6RARGT7JXVXX",
+    "phase": "pending",
+    "sha": "84b6ce8d9082132d79957a3b5f2d58801aff5998",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "84b6ce8d9082132d79957a3b5f2d58801aff5998",
+      "locator": "/private/tmp/storymodel4s-output-e0-remedy.jUdD14/repo",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-6ETEZ2X4434TZPKAV1RFT8GFHY",
+    "issue": "bd-01M19C0M9TWKK4AJ9NASXABSZH",
+    "phase": "superseded",
+    "sha": "12f846898e92ef68028ae64d747b5e6e1a9a093d",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6JEY4PK3EE8EQASXQXF3V4K7JH",
+    "issue": "bd-01M166XWESBS1JZ5B38H0ZZ2DK",
+    "phase": "superseded",
+    "sha": "86dda636b69a9aaefc597943fa2e4bacee713e4e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6KERSBR1FVED53QV98TPKHA0G4",
+    "issue": "bd-01M1EAE4X7GPERQHJZYQJQXH11",
+    "phase": "pending",
+    "sha": "6d225f16d8ea972a80d07e32a9c5d67b0255682d",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "6d225f16d8ea972a80d07e32a9c5d67b0255682d",
+      "locator": "/private/tmp/storymodel-prd-successor.YWO1FV/repo",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-6KQEXB07V3TRD83H5BA086Y140",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "pending",
+    "sha": "bac401d90280ffaedafd8029969c15dab6a8c49c",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "bac401d90280ffaedafd8029969c15dab6a8c49c",
+      "locator": "refs/remotes/astro-fix/scout/astro-bac401d9-successor",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-6P2D7ZBV13BRD1XQ791PB3GCC5",
+    "issue": "bd-01M1CH1SW9K3ZW8D0HBTH9JVRP",
+    "phase": "superseded",
+    "sha": "63deb2a9fcf52ae2e981c22d97f581e7c760257c",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6PWGT8E20WC66VGFSH31J1F18R",
+    "issue": "bd-01M19JBF0X827AS3J863TX1J8E",
+    "phase": "landed",
+    "sha": "f726accca708f5373f002d1207de794ba76cfc35",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6RCPY4CBQ98WQN9N8M6WX4E3KS",
+    "issue": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+    "phase": "pending",
+    "sha": "834f28099827a9d010bcc3ffbd7a7c19cffa506d",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6SKQE8NN8CSMDAPMHZK8KJ5WCS",
+    "issue": "bd-01M19956MFSG7076QE4J66T7E9",
+    "phase": "superseded",
+    "sha": "c53818f6c73e0290388132996c046988136ac489",
+    "available": true,
+    "main_reachable": false,
+    "object_source": {
+      "commit_ref": "c53818f6c73e0290388132996c046988136ac489",
+      "locator": "/private/tmp/storymodel4s-support-honesty",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-6VN2GFNJZSDW5Y1PDRAB6X61PY",
+    "issue": "bd-01M1606BEK9P4437GKVHFV1KPY",
+    "phase": "superseded",
+    "sha": "067e35b523355886b5d38f5b205311f70227885f",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6XWW93XPEQEP8WQP6HXRF9B2E6",
+    "issue": "bd-01M1CQ5YS5M25F7HD9NN5YVAYP",
+    "phase": "superseded",
+    "sha": "e0c884bafa1f20157dfe68a110cccaf66119ca26",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-6ZY18KA89G3R7QDW8PK7N8R621",
+    "issue": "bd-01M1CQ5YS5M25F7HD9NN5YVAYP",
+    "phase": "abandoned",
+    "sha": "2c179b998d40dcbf0c381a7222fea7e760ff46f8",
+    "available": false,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-70GXTV91YM9PSNGGC9300A6TJC",
+    "issue": "bd-01M1998654XQRSNA6R16S2ABDQ",
+    "phase": "superseded",
+    "sha": "1111c48387e45fbbed9e1866918e3998711804ab",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "1111c48387e45fbbed9e1866918e3998711804ab",
+      "repository_id": "repo-e06b52031c0789a06745d9b22d728aa8621ec872be647e50eaeac10a51419499"
+    }
+  },
+  {
+    "candidate_id": "cand-70K5PT8QSX3JPC8X0X7ZHEAWX1",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "pending",
+    "sha": "4393c3d901a57fa841b80eb6bc17931f3dac467c",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-71JAQ9YZ7YVZ7GWAWTPG4R57SX",
+    "issue": "bd-01M166XWESBS1JZ5B38H0ZZ2DK",
+    "phase": "superseded",
+    "sha": "d9172180d112d28b67b3f3bcf0fac7e7f67ac8e3",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-74ZS7CM9KXX54YAKRSYHJZNVG1",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "pending",
+    "sha": "b67e3b8933166854f80fdf43afb2845050118449",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "b67e3b8933166854f80fdf43afb2845050118449",
+      "locator": "refs/remotes/chief/refscope-10b",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-7693N2JQAHERYGYGZEBTQE3WJZ",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "76c62e738a2579d6598fccf3ac19266c60480e20",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7BD7026FKTFKW4Z8T4CDFHD7YB",
+    "issue": "bd-01M17Y03XGDD0XR26PN41TJVRJ",
+    "phase": "landed",
+    "sha": "7ee4872c697fd1d92ffa345f0d2b188086958a72",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7EHQ3HND7ZVZ99K66J983K7Q5M",
+    "issue": "bd-01M1C5KCPBXA2NNC2KV89FW76F",
+    "phase": "superseded",
+    "sha": "26df8dc2965e28f1da45d8a8b10cec9f1041b9b0",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7H69MS5Y1CNRF80116P1T9A1GJ",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "11df577cee532f138ddee0e1c7f506e16ce9849e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7JCB81PD47BGRFXY4VP3NS9VTW",
+    "issue": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "phase": "superseded",
+    "sha": "de9265cf584f2b27a1e45014549f279798c68792",
+    "available": true,
+    "main_reachable": true,
+    "object_source": {
+      "commit_ref": "de9265cf584f2b27a1e45014549f279798c68792",
+      "locator": "refs/heads/scout/astro-capability-tour-v4",
+      "repository_id": "repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e"
+    }
+  },
+  {
+    "candidate_id": "cand-7KHF208ZYCJRX4D06R2BS4HWAQ",
+    "issue": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX",
+    "phase": "pending",
+    "sha": "d2f600f8eb526526a62c6d622cadd62429b4812e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7MEX4N9K5PVNQS7C32XCWVNX3H",
+    "issue": "bd-01M188P265MZVEKBD5BBN34E6T",
+    "phase": "landed",
+    "sha": "f203b783da349d705258fef8634becf3e1e5a554",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7Q86DJEKAZQPYM6R7N40FCTW6Y",
+    "issue": "bd-01M17MET0E4TWW304YKXPHBSBG",
+    "phase": "superseded",
+    "sha": "99fd15eef1d9ccc7d2d83d8aaa2c0e5fe6d70aa5",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7SRWSVF7SYAZFCXSBBNYA0BT0R",
+    "issue": "bd-01M16M5ETH0QHFZ62KXZJ54PN9",
+    "phase": "landed",
+    "sha": "22a325392c23d7f4f88cc2057d347ee8341c0c77",
+    "available": true,
+    "main_reachable": true,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7VDP0203NRJD37V44X0KNYPWZ1",
+    "issue": "bd-01M1BZ5PR6T5G598S9QZWJBEWJ",
+    "phase": "pending",
+    "sha": "69d1d20a885a3052405dc0f3c1016381dae4142e",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7Z135ADMWYNVRV6680FXRFY3ZT",
+    "issue": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+    "phase": "superseded",
+    "sha": "337600b60d11fdce8d7ef3f400de0aa65e6c5239",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  },
+  {
+    "candidate_id": "cand-7ZV13JZTMY4300GQBA32SX549E",
+    "issue": "bd-01M1CH1SW9K3ZW8D0HBTH9JVRP",
+    "phase": "abandoned",
+    "sha": "63deb2a9fcf52ae2e981c22d97f581e7c760257c",
+    "available": true,
+    "main_reachable": false,
+    "object_source": null
+  }
+]

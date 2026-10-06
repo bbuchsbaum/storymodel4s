@@ -20,40 +20,41 @@ so they don't collide with those ids.
 | [docs/design/unforgeable-types.md](docs/design/unforgeable-types.md) | the working pattern for rule 8 |
 | [docs/governance/fleet-mode.md](docs/governance/fleet-mode.md) | fleet protocol, liveness history, single-developer mode (archived) |
 
-## How work runs (operating mode, owner decision 2026-09-23)
+## How work runs (operating mode, owner decision 2026-10-06)
 
-Several agents work in parallel. The owner sets the mode and the lead; nobody else does.
+Use one primary agent, with at most one helper or independent reviewer at a time. The primary
+agent coordinates the work and prepares integration within the owner's authorized scope.
+The [October stocktake](docs/refactor/STATE-20261006.md) records the recovered work and restart queue.
 
-- **Coordination is on Fray**, whose shared board lives in the sibling storyatlas4s checkout:
-  `fray --home ~/code/scala/storyatlas4s/.git/fray --as <your-name> ...`. Do not start a second
-  board. Use a distinct identity per session. Fray carries questions, answers, reviews and
-  pointers. It does not own work.
-- **Mote is authoritative for tickets and ownership.** Claim a bead (`status=doing`, `assignee`)
-  in the primary store before you edit, and reserve narrow paths when others work nearby.
-  Respect existing claims. Set your actor per call (`--actor`) or with `MOTE_ACTOR`. Never run
-  `mote actor set` in a shared checkout: it relabels other actors' posts.
-- **The lead integrates and lands.** The lead is currently `codex-p1-lead`, and the owner
-  reassigns it. An author proposes an exact SHA with gate evidence. A reviewer who did not write
-  the code checks that exact SHA. The lead integrates reviewed slices and lands them. Any named
-  role has a substitute ladder when its holder goes idle (L10).
-- **Heavy gates are serialized** through the Fray gate-lock card (#16): claim it, gate, release
-  it. JS and Native runs always need the lock. Scoped JVM-only test runs in your own clone do
-  not, unless the disk has less than 10 GiB free.
-- **Announce edits to shared governing files** (`AGENTS.md`, `build.sbt`, `README.md`,
-  `docs/refactor/PLAN.md`) on Fray before making them. ADRs may be edited paragraph-disjoint
-  (governance item 5 in [fleet-mode.md](docs/governance/fleet-mode.md)).
-- **Do not close a bead that holds another actor's live reservations** (governance item 1). Ask the
-  holder to finish it (`mote done`) instead.
-- **Working together** (governance item 6). Keep work committed and clean. Don't step on other
-  agents' toes. Discuss design choices on the board before they harden, and disagree with
-  evidence.
-- **The audit trail is git.** A commit message carries what changed, the evidence, and what the
-  evidence does not establish.
+- **Mote is authoritative for tickets and ownership.** Use an existing bead, set your actor per
+  call (`--actor`) or with `MOTE_ACTOR`, and run `mote begin` before editing. Reserve narrow paths,
+  respect live claims, and release unfinished work with a useful handoff. Never run `mote actor
+  set` in a shared checkout: it relabels other actors' posts.
+- **One writer per scope.** Use the second agent for a separable task or an independent review.
+  Keep decisions and evidence on the relevant Mote bead; communicate with the owner in chat.
+  Announce governing-file edits in chat before making them.
+- **Review exact commits.** A reviewer who did not author the change checks the exact SHA.
+  Preserve the scoped gate, test totals, mutation evidence where required, and cold review
+  protections below. Documentation-only changes need review and a format check (T2).
+- **Run one heavy gate at a time** in a standalone clone or verified export. Check for another
+  active build before starting. No Fray daemon, gate-lock card, historical lead, staffing role
+  or message-board acknowledgment is required in this mode. Existing Fray records are historical
+  evidence; use Fray again only when the owner requests it.
+- **Preserve other work.** Do not close a bead holding another actor's live reservations. Keep
+  commits narrow and record the exact landing and remote state separately. Cleanup, publication
+  and release follow the owner's authorization.
+- **The audit trail is git and Mote.** Record what changed, commands and results, remaining
+  acceptance, and the next action. A saved receipt or closed child is not proof of its parent.
 
-## Liveness and throughput
+This mode supersedes fleet staffing, timers, escalation ladders, board announcements and board
+lock requirements in older documents and tickets. Design rules 1-14, evidence discipline,
+cross-repository consumer checks and exact-revision review remain in force. Historical operating
+instructions are available with `git show 0500bc10:AGENTS.md`.
 
-Every other rule in this file catches bad work landing. None of them fires when nothing lands.
-The rules in this section do, and they outrank the others.
+## Historical fleet liveness and current delivery rules
+
+L1-L5 and L9-L10 are retained for stable historical citations; their fleet timers and staffing
+requirements are inactive in the October mode. L6-L8 and the technical delivery rules remain useful.
 
 - **L1. Zero-ship is a P0.** If no non-`.mote` commit lands on `main` in 24 hours, diagnosing the
   merge path comes before any review.
@@ -81,18 +82,16 @@ The rules in this section do, and they outrank the others.
   touch only docs or `.mote` are gate-inert: they need review and a format check, not a full
   gate.
 - **T3. Tier the gate.** A bounded slice lands on the `tools/reference-scope.sh` modules, run on
-  every platform they build, under the lock, with bound totals. The full `checkAll` with CI's
+  every platform they build, serially, with bound totals. The full `checkAll` with CI's
   fatal warnings runs on `main` on a schedule. Red on `main` is a P0 that preempts new work.
 - **T4. Price every review finding** as BLOCK or FOLLOW-UP.
   - BLOCK means correctness, forgeability, measurement validity, or a failing witness.
   - Only a BLOCK holds a landing.
   - A FOLLOW-UP becomes its own bead, and the reviewed slice lands.
-- **T5. Waiting is the main cost.** An agent who owns a reviewable or blocking item runs
-  `fray drive`, or checks `fray inbox --addressed-to-me --unresolved` at every boundary.
-  Objections arrive as separate linked cards. Answer a direct question within about 30 minutes,
-  or say when you will.
-- **T6. Agree the seam, then build in parallel.** For cross-owner work, post the contract and a failing consumer test,
-  written from outside the module, first (see the `fray-seam` skill).
+- **T5. Waiting is the main cost.** Record a blocker and its next action on the bead, and raise
+  decisions requiring the owner in chat. Keep review findings attached to the exact candidate.
+- **T6. Agree the seam before splitting work.** For cross-owner work, record the contract and a
+  failing consumer test, written from outside the module, first. Use at most two agents.
 - **T7. Count what passed.** Report sbt's `Passed`, `Failed` and skipped counts. `Total`
   includes skipped tests.
 
@@ -109,7 +108,8 @@ commits landed and 49 more waited reviewed on an integration branch, while few b
   - bound test totals and command receipts, plus an independent reviewer's verdict on the exact
     SHA.
 
-  The lead lands. The gate log must contain totals: a run with no totals did not run.
+  The primary agent integrates within the owner's authorized scope. The gate log must contain
+  totals: a run with no totals did not run.
 - **SD3. Uncommitted is lost, and unreferenced is invisible.**
   - Commit to a branch as soon as the code compiles.
   - Never let a scratch clone or `/tmp` be the only copy of anything, including drafts.
@@ -173,8 +173,10 @@ row says JVM-only. The namespace is flat: `storymodel4s.<module>`.
 - **Scripts. Run these instead of re-deriving the rules by eye:**
   - `tools/reference-scope.sh`: the modules and exact command a gate must cover. It exits 3
     rather than emit an empty command.
-  - `tools/premerge-check.sh`: merge-result tree and gate-log totals checks. Checks 4 (live
-    reservations) and 6 (board re-read) apply again while reservations and the board are in use.
+  - `tools/premerge-check.sh`: retained guard for the historical Mote candidate protocol. It
+    requires candidate authorization, ledger reconciliation and a discussion-board read; use it
+    when that protocol is explicitly selected. In the October mode, verify the exact merge tree,
+    gate receipts/totals, live reservations and independent review required by SD2 directly.
   - `tools/nan-polarity.sh`: a survey of fail-open and fail-closed numeric guards (rule 7).
   - `tools/who-is-live.sh`: who actually acted recently. Run it before assigning work or waiting
     on someone.
@@ -313,8 +315,8 @@ Rule 4 has 35 sub-rules, all in [docs/EVIDENCE.md](docs/EVIDENCE.md). Its core:
 
 ## Integration and landing
 
-The lead holds these rules when integrating, and authors hold them when preparing a slice. The
-full text is governance item 3 in `fleet-mode.md`.
+The primary agent holds these rules when integrating, and authors hold them when preparing a slice.
+The full text is governance item 3 in `fleet-mode.md`.
 
 - **Verify the branch before merging.** Afterwards, print the SHA that should have moved. Never
   `reset --hard` shared branches.
@@ -334,9 +336,9 @@ full text is governance item 3 in `fleet-mode.md`.
 - **Sibling seam.** `storyatlas4s` builds this repository from source. For a change to anything
   it consumes, compiling and running its tests is part of the gate: it runs before landing, not
   as a follow-up. Landing first and checking after is how `04fdf6b` broke the sibling app.
-- **Re-read the board immediately before the merge commit.** A hold or a correction can arrive
-  inside the gate window. Check both whether you may still merge and whether the commit message
-  is still true.
+- **Refresh state immediately before integration.** Check Git status, Mote claims/reservations
+  and current owner instructions. A correction can arrive inside the gate window; verify that
+  integration remains authorized and that the commit message is still true.
 - **Commit narrowly.** Use `git commit --only <paths>` in shared trees, and check the whole
   `git status --short` first. Record a landing where it is tracked before announcing it.
 

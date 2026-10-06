@@ -1,0 +1,12 @@
+{
+  "json_files_validated": 13,
+  "local_links_validated": 5,
+  "missing_links": [],
+  "inventory_ref_count": 276,
+  "inventory_ticket_count": 119,
+  "queue_change_count": 11,
+  "recovery_refs_read_back": 205,
+  "main_unchanged": true,
+  "untracked_test_hash_unchanged": true,
+  "git_diff_check_exit": 0
+}

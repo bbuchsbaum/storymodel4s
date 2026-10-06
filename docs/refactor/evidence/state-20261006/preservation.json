@@ -1,0 +1,1038 @@
+{
+  "objects": [
+    {
+      "kind": "commit",
+      "sha": "1100ea61b710e347022b1a9441088b0565203dda",
+      "ref": "refs/recovery/stocktake-20261006/commit/1100ea61b710e347022b1a9441088b0565203dda"
+    },
+    {
+      "kind": "commit",
+      "sha": "3200509e16f991bb5a2be9e352ce20164233d6af",
+      "ref": "refs/recovery/stocktake-20261006/commit/3200509e16f991bb5a2be9e352ce20164233d6af"
+    },
+    {
+      "kind": "commit",
+      "sha": "f301a256f45fe13acb33b6602a7927bca351408b",
+      "ref": "refs/recovery/stocktake-20261006/commit/f301a256f45fe13acb33b6602a7927bca351408b"
+    },
+    {
+      "kind": "commit",
+      "sha": "9104ccedc435e0cfadce6a899c96bf6cb3e5c0f2",
+      "ref": "refs/recovery/stocktake-20261006/commit/9104ccedc435e0cfadce6a899c96bf6cb3e5c0f2"
+    },
+    {
+      "kind": "commit",
+      "sha": "9e04fcb70a020358e3c6df9dc0f672e365210118",
+      "ref": "refs/recovery/stocktake-20261006/commit/9e04fcb70a020358e3c6df9dc0f672e365210118"
+    },
+    {
+      "kind": "commit",
+      "sha": "e804144c209c438e4d0b4cb7762eba5052bf117a",
+      "ref": "refs/recovery/stocktake-20261006/commit/e804144c209c438e4d0b4cb7762eba5052bf117a"
+    },
+    {
+      "kind": "commit",
+      "sha": "f60b86c0f8727ea6403b37399be3e2a2ad887bce",
+      "ref": "refs/recovery/stocktake-20261006/commit/f60b86c0f8727ea6403b37399be3e2a2ad887bce"
+    },
+    {
+      "kind": "commit",
+      "sha": "2f10a044a6dc66119962e20716f354735890d578",
+      "ref": "refs/recovery/stocktake-20261006/commit/2f10a044a6dc66119962e20716f354735890d578"
+    },
+    {
+      "kind": "commit",
+      "sha": "6411342d6984e11cd1ef613f29ae752478390850",
+      "ref": "refs/recovery/stocktake-20261006/commit/6411342d6984e11cd1ef613f29ae752478390850"
+    },
+    {
+      "kind": "blob",
+      "sha": "371cd6115d76ae35f2b9ef146ef6597f74d286bb",
+      "ref": "refs/recovery/stocktake-20261006/blob/371cd6115d76ae35f2b9ef146ef6597f74d286bb"
+    },
+    {
+      "kind": "commit",
+      "sha": "fa1c4e121320742ebc09c2493615ad75015c587d",
+      "ref": "refs/recovery/stocktake-20261006/commit/fa1c4e121320742ebc09c2493615ad75015c587d"
+    },
+    {
+      "kind": "commit",
+      "sha": "b71e1499131cc97b7d09547a1294b19389c8b1a6",
+      "ref": "refs/recovery/stocktake-20261006/commit/b71e1499131cc97b7d09547a1294b19389c8b1a6"
+    },
+    {
+      "kind": "commit",
+      "sha": "c11e7637e234746e27c2fb6bba642548ca0c870d",
+      "ref": "refs/recovery/stocktake-20261006/commit/c11e7637e234746e27c2fb6bba642548ca0c870d"
+    },
+    {
+      "kind": "commit",
+      "sha": "911f12e3604483c378f3cb831817827cb6692edc",
+      "ref": "refs/recovery/stocktake-20261006/commit/911f12e3604483c378f3cb831817827cb6692edc"
+    },
+    {
+      "kind": "commit",
+      "sha": "022030f50ed3053d4565d61aff3b9c38bfe54fc9",
+      "ref": "refs/recovery/stocktake-20261006/commit/022030f50ed3053d4565d61aff3b9c38bfe54fc9"
+    },
+    {
+      "kind": "commit",
+      "sha": "1b2046706c893bb3a81074f6e277f93e7559b81b",
+      "ref": "refs/recovery/stocktake-20261006/commit/1b2046706c893bb3a81074f6e277f93e7559b81b"
+    },
+    {
+      "kind": "commit",
+      "sha": "c02292bb8add76515dc7732c4fa7f27dc1495139",
+      "ref": "refs/recovery/stocktake-20261006/commit/c02292bb8add76515dc7732c4fa7f27dc1495139"
+    },
+    {
+      "kind": "blob",
+      "sha": "bc276e71e6c446f67f14f7aba765c5d3bea55af0",
+      "ref": "refs/recovery/stocktake-20261006/blob/bc276e71e6c446f67f14f7aba765c5d3bea55af0"
+    },
+    {
+      "kind": "commit",
+      "sha": "b428f01beb06d49cd14566ca44be230d99342284",
+      "ref": "refs/recovery/stocktake-20261006/commit/b428f01beb06d49cd14566ca44be230d99342284"
+    },
+    {
+      "kind": "commit",
+      "sha": "9f2a7230aea9defe185e65d50c2344177406c09b",
+      "ref": "refs/recovery/stocktake-20261006/commit/9f2a7230aea9defe185e65d50c2344177406c09b"
+    },
+    {
+      "kind": "commit",
+      "sha": "282c5460222bb00e636d4f47832da48efa9f2d0e",
+      "ref": "refs/recovery/stocktake-20261006/commit/282c5460222bb00e636d4f47832da48efa9f2d0e"
+    },
+    {
+      "kind": "commit",
+      "sha": "1a2f425ada95c67a510143b5851c381f6b86dd71",
+      "ref": "refs/recovery/stocktake-20261006/commit/1a2f425ada95c67a510143b5851c381f6b86dd71"
+    },
+    {
+      "kind": "blob",
+      "sha": "d0321203f1027c38cc39b08c6a6aeafaf275483b",
+      "ref": "refs/recovery/stocktake-20261006/blob/d0321203f1027c38cc39b08c6a6aeafaf275483b"
+    },
+    {
+      "kind": "commit",
+      "sha": "8533c4ffdf7aedd4d12e2fb5b6088354b003b5dc",
+      "ref": "refs/recovery/stocktake-20261006/commit/8533c4ffdf7aedd4d12e2fb5b6088354b003b5dc"
+    },
+    {
+      "kind": "commit",
+      "sha": "2834da1b43bab50bf4a8c56ac0bd55955a800c27",
+      "ref": "refs/recovery/stocktake-20261006/commit/2834da1b43bab50bf4a8c56ac0bd55955a800c27"
+    },
+    {
+      "kind": "commit",
+      "sha": "d736dc565d97f617726bad0a9d1ba2fdeae58dd2",
+      "ref": "refs/recovery/stocktake-20261006/commit/d736dc565d97f617726bad0a9d1ba2fdeae58dd2"
+    },
+    {
+      "kind": "commit",
+      "sha": "3b3702efcf4b1a62a47f047ba02d465fee4d8fdb",
+      "ref": "refs/recovery/stocktake-20261006/commit/3b3702efcf4b1a62a47f047ba02d465fee4d8fdb"
+    },
+    {
+      "kind": "commit",
+      "sha": "bf386ae4ac45fda955c5db6bb8c83442f7a1817c",
+      "ref": "refs/recovery/stocktake-20261006/commit/bf386ae4ac45fda955c5db6bb8c83442f7a1817c"
+    },
+    {
+      "kind": "commit",
+      "sha": "f13a883ea5105e28248673c2553ed3896072f64c",
+      "ref": "refs/recovery/stocktake-20261006/commit/f13a883ea5105e28248673c2553ed3896072f64c"
+    },
+    {
+      "kind": "commit",
+      "sha": "e9407c9b59ea6df2183b89bf61acb94988df5366",
+      "ref": "refs/recovery/stocktake-20261006/commit/e9407c9b59ea6df2183b89bf61acb94988df5366"
+    },
+    {
+      "kind": "commit",
+      "sha": "4f41c832e381dd7b1226466abf7c4dd37dbf6f11",
+      "ref": "refs/recovery/stocktake-20261006/commit/4f41c832e381dd7b1226466abf7c4dd37dbf6f11"
+    },
+    {
+      "kind": "commit",
+      "sha": "414344a015319eb4c3685da5fa88af3224a650d1",
+      "ref": "refs/recovery/stocktake-20261006/commit/414344a015319eb4c3685da5fa88af3224a650d1"
+    },
+    {
+      "kind": "blob",
+      "sha": "8544e6bbfa8ee1f826789c7f77b50b4f8805411b",
+      "ref": "refs/recovery/stocktake-20261006/blob/8544e6bbfa8ee1f826789c7f77b50b4f8805411b"
+    },
+    {
+      "kind": "commit",
+      "sha": "bc4cce6dc30d99df4cc277299953537db48dd0bf",
+      "ref": "refs/recovery/stocktake-20261006/commit/bc4cce6dc30d99df4cc277299953537db48dd0bf"
+    },
+    {
+      "kind": "commit",
+      "sha": "ec4d16967fd1449252b93b2264f570eecdf70855",
+      "ref": "refs/recovery/stocktake-20261006/commit/ec4d16967fd1449252b93b2264f570eecdf70855"
+    },
+    {
+      "kind": "commit",
+      "sha": "9250f8b66a19600fe6cabf2c9534d0801d04dcb8",
+      "ref": "refs/recovery/stocktake-20261006/commit/9250f8b66a19600fe6cabf2c9534d0801d04dcb8"
+    },
+    {
+      "kind": "commit",
+      "sha": "19510e9b605e42b40866aa4d2431c9033ebd78d7",
+      "ref": "refs/recovery/stocktake-20261006/commit/19510e9b605e42b40866aa4d2431c9033ebd78d7"
+    },
+    {
+      "kind": "commit",
+      "sha": "6e51ae0e063c7d562390bf38cf6453dc2c09f0c1",
+      "ref": "refs/recovery/stocktake-20261006/commit/6e51ae0e063c7d562390bf38cf6453dc2c09f0c1"
+    },
+    {
+      "kind": "blob",
+      "sha": "d55210ce85323402833d5afdf6c4808cd686b990",
+      "ref": "refs/recovery/stocktake-20261006/blob/d55210ce85323402833d5afdf6c4808cd686b990"
+    },
+    {
+      "kind": "commit",
+      "sha": "e05300b553e626daf8d5402005c8ceb4a516d28a",
+      "ref": "refs/recovery/stocktake-20261006/commit/e05300b553e626daf8d5402005c8ceb4a516d28a"
+    },
+    {
+      "kind": "blob",
+      "sha": "3b5588203da378e218b4d6d3ad80c8878a8349b9",
+      "ref": "refs/recovery/stocktake-20261006/blob/3b5588203da378e218b4d6d3ad80c8878a8349b9"
+    },
+    {
+      "kind": "commit",
+      "sha": "42571201addafd12a2259cd54cfa0ef1620764a6",
+      "ref": "refs/recovery/stocktake-20261006/commit/42571201addafd12a2259cd54cfa0ef1620764a6"
+    },
+    {
+      "kind": "commit",
+      "sha": "6e571684c3778a944595de324f18416483a4d841",
+      "ref": "refs/recovery/stocktake-20261006/commit/6e571684c3778a944595de324f18416483a4d841"
+    },
+    {
+      "kind": "blob",
+      "sha": "1e62b0347938a3c315eea036602cfee0bb5130ec",
+      "ref": "refs/recovery/stocktake-20261006/blob/1e62b0347938a3c315eea036602cfee0bb5130ec"
+    },
+    {
+      "kind": "commit",
+      "sha": "22689e00a3898b35f90206c75878267f3c80bae2",
+      "ref": "refs/recovery/stocktake-20261006/commit/22689e00a3898b35f90206c75878267f3c80bae2"
+    },
+    {
+      "kind": "tree",
+      "sha": "9b6c049f0d40782c9c85a2fa9ca2e7fde391bd56",
+      "ref": "refs/recovery/stocktake-20261006/tree/9b6c049f0d40782c9c85a2fa9ca2e7fde391bd56"
+    },
+    {
+      "kind": "commit",
+      "sha": "466d2c10dc39e9aad056906135646cbfc1d7cc45",
+      "ref": "refs/recovery/stocktake-20261006/commit/466d2c10dc39e9aad056906135646cbfc1d7cc45"
+    },
+    {
+      "kind": "commit",
+      "sha": "4a6d0ad42d9d5451209a14b08072ab0978d04861",
+      "ref": "refs/recovery/stocktake-20261006/commit/4a6d0ad42d9d5451209a14b08072ab0978d04861"
+    },
+    {
+      "kind": "commit",
+      "sha": "4f6e7c07fcc28ce23d4805578f5182e1e82925d9",
+      "ref": "refs/recovery/stocktake-20261006/commit/4f6e7c07fcc28ce23d4805578f5182e1e82925d9"
+    },
+    {
+      "kind": "commit",
+      "sha": "686e227053a677735b85462b0dab9197dfb3df38",
+      "ref": "refs/recovery/stocktake-20261006/commit/686e227053a677735b85462b0dab9197dfb3df38"
+    },
+    {
+      "kind": "blob",
+      "sha": "a870b449308eda47349b01548c9cdc0ecf9988c7",
+      "ref": "refs/recovery/stocktake-20261006/blob/a870b449308eda47349b01548c9cdc0ecf9988c7"
+    },
+    {
+      "kind": "commit",
+      "sha": "2173062fa45fc2e8cf7e8e0fb82b9d11bc453c7b",
+      "ref": "refs/recovery/stocktake-20261006/commit/2173062fa45fc2e8cf7e8e0fb82b9d11bc453c7b"
+    },
+    {
+      "kind": "commit",
+      "sha": "0174f2cae32ad0bee7146404b0b991a36088dbe7",
+      "ref": "refs/recovery/stocktake-20261006/commit/0174f2cae32ad0bee7146404b0b991a36088dbe7"
+    },
+    {
+      "kind": "commit",
+      "sha": "65788e2f105ec5a98aa659c00ba0175594e17a2a",
+      "ref": "refs/recovery/stocktake-20261006/commit/65788e2f105ec5a98aa659c00ba0175594e17a2a"
+    },
+    {
+      "kind": "tree",
+      "sha": "947c46506ed9e890cb41dcd375ba75a0da71c8e8",
+      "ref": "refs/recovery/stocktake-20261006/tree/947c46506ed9e890cb41dcd375ba75a0da71c8e8"
+    },
+    {
+      "kind": "commit",
+      "sha": "e37c047d36fe9de33dcc070aaafa32f8ed802fc0",
+      "ref": "refs/recovery/stocktake-20261006/commit/e37c047d36fe9de33dcc070aaafa32f8ed802fc0"
+    },
+    {
+      "kind": "commit",
+      "sha": "a07d10ec52b34a33920ffd656541580f86652e6a",
+      "ref": "refs/recovery/stocktake-20261006/commit/a07d10ec52b34a33920ffd656541580f86652e6a"
+    },
+    {
+      "kind": "commit",
+      "sha": "6285f68df6b28fc4369ad5e2be6e9ff7fe31cbcb",
+      "ref": "refs/recovery/stocktake-20261006/commit/6285f68df6b28fc4369ad5e2be6e9ff7fe31cbcb"
+    },
+    {
+      "kind": "commit",
+      "sha": "a1894c7aa9362ad3df8ef6ead6347500e5c49f3f",
+      "ref": "refs/recovery/stocktake-20261006/commit/a1894c7aa9362ad3df8ef6ead6347500e5c49f3f"
+    },
+    {
+      "kind": "commit",
+      "sha": "3e8e5e3a1424c2274791a92cc70fbd0ee373dce5",
+      "ref": "refs/recovery/stocktake-20261006/commit/3e8e5e3a1424c2274791a92cc70fbd0ee373dce5"
+    },
+    {
+      "kind": "commit",
+      "sha": "a78f2465bbc8a2b9cd3bece674c099de8247aeb4",
+      "ref": "refs/recovery/stocktake-20261006/commit/a78f2465bbc8a2b9cd3bece674c099de8247aeb4"
+    },
+    {
+      "kind": "commit",
+      "sha": "0a9076c4280e916701c615db76b1dc52c7644aa3",
+      "ref": "refs/recovery/stocktake-20261006/commit/0a9076c4280e916701c615db76b1dc52c7644aa3"
+    },
+    {
+      "kind": "commit",
+      "sha": "bb90763d6c3c9a0ec69a6dce18d1f3c4e06fbfe4",
+      "ref": "refs/recovery/stocktake-20261006/commit/bb90763d6c3c9a0ec69a6dce18d1f3c4e06fbfe4"
+    },
+    {
+      "kind": "commit",
+      "sha": "f39070072831408e94464261bd3743b13ee5c933",
+      "ref": "refs/recovery/stocktake-20261006/commit/f39070072831408e94464261bd3743b13ee5c933"
+    },
+    {
+      "kind": "commit",
+      "sha": "299360f2bf67f2feef0519e9c0c0d723a36a3fbe",
+      "ref": "refs/recovery/stocktake-20261006/commit/299360f2bf67f2feef0519e9c0c0d723a36a3fbe"
+    },
+    {
+      "kind": "commit",
+      "sha": "cc94ee8f194a1bde43dedb2ba20045f93f09d7a4",
+      "ref": "refs/recovery/stocktake-20261006/commit/cc94ee8f194a1bde43dedb2ba20045f93f09d7a4"
+    },
+    {
+      "kind": "blob",
+      "sha": "7b97d44adaea4869596d2e30d3158587a87c2772",
+      "ref": "refs/recovery/stocktake-20261006/blob/7b97d44adaea4869596d2e30d3158587a87c2772"
+    },
+    {
+      "kind": "commit",
+      "sha": "9698baa5a29e08fbfe598e1149d6395f374bf741",
+      "ref": "refs/recovery/stocktake-20261006/commit/9698baa5a29e08fbfe598e1149d6395f374bf741"
+    },
+    {
+      "kind": "commit",
+      "sha": "f99a8e5487e5a660f3411d5f9615912fbc7f87bc",
+      "ref": "refs/recovery/stocktake-20261006/commit/f99a8e5487e5a660f3411d5f9615912fbc7f87bc"
+    },
+    {
+      "kind": "blob",
+      "sha": "539ce0ef87290dbfa5d0f364a66075125c230c34",
+      "ref": "refs/recovery/stocktake-20261006/blob/539ce0ef87290dbfa5d0f364a66075125c230c34"
+    },
+    {
+      "kind": "commit",
+      "sha": "689f6079db79bde177eb6664321da75e9a6774ab",
+      "ref": "refs/recovery/stocktake-20261006/commit/689f6079db79bde177eb6664321da75e9a6774ab"
+    },
+    {
+      "kind": "commit",
+      "sha": "3aa29e0ad33f7c188e52953724b2e962eaa2f0f1",
+      "ref": "refs/recovery/stocktake-20261006/commit/3aa29e0ad33f7c188e52953724b2e962eaa2f0f1"
+    },
+    {
+      "kind": "commit",
+      "sha": "f4a2ac678b68f5a2b835322c6030ffa4dc1cc6ef",
+      "ref": "refs/recovery/stocktake-20261006/commit/f4a2ac678b68f5a2b835322c6030ffa4dc1cc6ef"
+    },
+    {
+      "kind": "commit",
+      "sha": "88a34cc12d284cade95c3a72e57491a0de96f5e2",
+      "ref": "refs/recovery/stocktake-20261006/commit/88a34cc12d284cade95c3a72e57491a0de96f5e2"
+    },
+    {
+      "kind": "commit",
+      "sha": "dca6dea887e9297e4224c169bc4efc252ecdb627",
+      "ref": "refs/recovery/stocktake-20261006/commit/dca6dea887e9297e4224c169bc4efc252ecdb627"
+    },
+    {
+      "kind": "commit",
+      "sha": "feacf048e877d283c5a921385f4b7c179b563c58",
+      "ref": "refs/recovery/stocktake-20261006/commit/feacf048e877d283c5a921385f4b7c179b563c58"
+    },
+    {
+      "kind": "commit",
+      "sha": "1eb0fa96db0ae624ed46aaa68cb82ed3e5d8478f",
+      "ref": "refs/recovery/stocktake-20261006/commit/1eb0fa96db0ae624ed46aaa68cb82ed3e5d8478f"
+    },
+    {
+      "kind": "commit",
+      "sha": "72b19e308d214c29ccbe9e74fdcb6e1f158acee8",
+      "ref": "refs/recovery/stocktake-20261006/commit/72b19e308d214c29ccbe9e74fdcb6e1f158acee8"
+    },
+    {
+      "kind": "commit",
+      "sha": "fbb214c244b9584a88b87f5198316d6a72dd380c",
+      "ref": "refs/recovery/stocktake-20261006/commit/fbb214c244b9584a88b87f5198316d6a72dd380c"
+    },
+    {
+      "kind": "commit",
+      "sha": "afb64a7e048c092358c40a066ee37f954eb10e14",
+      "ref": "refs/recovery/stocktake-20261006/commit/afb64a7e048c092358c40a066ee37f954eb10e14"
+    },
+    {
+      "kind": "blob",
+      "sha": "29b924f4e261cb343cba6b955d3f124cd4427636",
+      "ref": "refs/recovery/stocktake-20261006/blob/29b924f4e261cb343cba6b955d3f124cd4427636"
+    },
+    {
+      "kind": "commit",
+      "sha": "91be7876ceed348901ac53e0f1f92b8a7a2b969d",
+      "ref": "refs/recovery/stocktake-20261006/commit/91be7876ceed348901ac53e0f1f92b8a7a2b969d"
+    },
+    {
+      "kind": "commit",
+      "sha": "c1bfba48c09e21ce149daa6fa2d59e2f6c5ceb89",
+      "ref": "refs/recovery/stocktake-20261006/commit/c1bfba48c09e21ce149daa6fa2d59e2f6c5ceb89"
+    },
+    {
+      "kind": "commit",
+      "sha": "94c0daabeacdffefae3a0efe726349a15c91f04f",
+      "ref": "refs/recovery/stocktake-20261006/commit/94c0daabeacdffefae3a0efe726349a15c91f04f"
+    },
+    {
+      "kind": "commit",
+      "sha": "4ac248fdae0ba4f48fc733de9ee6464d044d4662",
+      "ref": "refs/recovery/stocktake-20261006/commit/4ac248fdae0ba4f48fc733de9ee6464d044d4662"
+    },
+    {
+      "kind": "commit",
+      "sha": "90c7ec0a9824efc99c99bc6a546042b25610b290",
+      "ref": "refs/recovery/stocktake-20261006/commit/90c7ec0a9824efc99c99bc6a546042b25610b290"
+    },
+    {
+      "kind": "commit",
+      "sha": "c3c8f8c250d96e141839de2b83dedfcf32fac842",
+      "ref": "refs/recovery/stocktake-20261006/commit/c3c8f8c250d96e141839de2b83dedfcf32fac842"
+    },
+    {
+      "kind": "commit",
+      "sha": "fbc82ea13a8b204279e6971baa67245216bd255b",
+      "ref": "refs/recovery/stocktake-20261006/commit/fbc82ea13a8b204279e6971baa67245216bd255b"
+    },
+    {
+      "kind": "commit",
+      "sha": "c8ca66ac93741c46490b6a2a0ed0c24d54f90e7f",
+      "ref": "refs/recovery/stocktake-20261006/commit/c8ca66ac93741c46490b6a2a0ed0c24d54f90e7f"
+    },
+    {
+      "kind": "commit",
+      "sha": "d5cb1c0ce1dd0deeae23c106e93bc3a31a3e3031",
+      "ref": "refs/recovery/stocktake-20261006/commit/d5cb1c0ce1dd0deeae23c106e93bc3a31a3e3031"
+    },
+    {
+      "kind": "commit",
+      "sha": "cbcdea254c349419863292925de43d9647bed80d",
+      "ref": "refs/recovery/stocktake-20261006/commit/cbcdea254c349419863292925de43d9647bed80d"
+    },
+    {
+      "kind": "commit",
+      "sha": "83d3649ca847bf2bc19881d5ee6698028036a923",
+      "ref": "refs/recovery/stocktake-20261006/commit/83d3649ca847bf2bc19881d5ee6698028036a923"
+    },
+    {
+      "kind": "commit",
+      "sha": "15d4b4a5e0b7ff86aafeab9484f35bbad449cc92",
+      "ref": "refs/recovery/stocktake-20261006/commit/15d4b4a5e0b7ff86aafeab9484f35bbad449cc92"
+    },
+    {
+      "kind": "commit",
+      "sha": "95d5e0024a7eb3378e56b4e1df1722de96acd59a",
+      "ref": "refs/recovery/stocktake-20261006/commit/95d5e0024a7eb3378e56b4e1df1722de96acd59a"
+    },
+    {
+      "kind": "commit",
+      "sha": "91d6e896f0c10f6f09d5c389c919ebf708763941",
+      "ref": "refs/recovery/stocktake-20261006/commit/91d6e896f0c10f6f09d5c389c919ebf708763941"
+    },
+    {
+      "kind": "commit",
+      "sha": "46e0c28c4787ef7f09d65fbbb0290a7e3550b17b",
+      "ref": "refs/recovery/stocktake-20261006/commit/46e0c28c4787ef7f09d65fbbb0290a7e3550b17b"
+    },
+    {
+      "kind": "commit",
+      "sha": "67e1e83764c0d40873f8f5da310e038ada1f03ea",
+      "ref": "refs/recovery/stocktake-20261006/commit/67e1e83764c0d40873f8f5da310e038ada1f03ea"
+    },
+    {
+      "kind": "commit",
+      "sha": "cde21652d26e88cd9fb629d942bb436da095bbee",
+      "ref": "refs/recovery/stocktake-20261006/commit/cde21652d26e88cd9fb629d942bb436da095bbee"
+    },
+    {
+      "kind": "blob",
+      "sha": "7fe388da487ceec72313e78086db405dd06b72da",
+      "ref": "refs/recovery/stocktake-20261006/blob/7fe388da487ceec72313e78086db405dd06b72da"
+    },
+    {
+      "kind": "commit",
+      "sha": "25e480d10f4714b62af5e5b1a241db81a8016c2f",
+      "ref": "refs/recovery/stocktake-20261006/commit/25e480d10f4714b62af5e5b1a241db81a8016c2f"
+    },
+    {
+      "kind": "commit",
+      "sha": "23e5362caef895b90127de0aa554e019fe8c7002",
+      "ref": "refs/recovery/stocktake-20261006/commit/23e5362caef895b90127de0aa554e019fe8c7002"
+    },
+    {
+      "kind": "tree",
+      "sha": "12e794e76e5f13e2fa5e278c83fe9b143240dfe7",
+      "ref": "refs/recovery/stocktake-20261006/tree/12e794e76e5f13e2fa5e278c83fe9b143240dfe7"
+    },
+    {
+      "kind": "commit",
+      "sha": "b9f4d0304fa72a6cd7d46e950d46749e60988962",
+      "ref": "refs/recovery/stocktake-20261006/commit/b9f4d0304fa72a6cd7d46e950d46749e60988962"
+    },
+    {
+      "kind": "commit",
+      "sha": "56f594faddd49b2fab504cc09404ed4955e3a98a",
+      "ref": "refs/recovery/stocktake-20261006/commit/56f594faddd49b2fab504cc09404ed4955e3a98a"
+    },
+    {
+      "kind": "commit",
+      "sha": "d0f618a18630b406d584818ca195bd1eb6afa842",
+      "ref": "refs/recovery/stocktake-20261006/commit/d0f618a18630b406d584818ca195bd1eb6afa842"
+    },
+    {
+      "kind": "commit",
+      "sha": "edfd7479029c8a431cf2ebc03f53ec2228dd2c81",
+      "ref": "refs/recovery/stocktake-20261006/commit/edfd7479029c8a431cf2ebc03f53ec2228dd2c81"
+    },
+    {
+      "kind": "commit",
+      "sha": "30fed2fc57206c94b2308a2f494c13fa81a9fddb",
+      "ref": "refs/recovery/stocktake-20261006/commit/30fed2fc57206c94b2308a2f494c13fa81a9fddb"
+    },
+    {
+      "kind": "commit",
+      "sha": "e2fe94a2e5d9c2a198bf113ac6f4af8668168f7e",
+      "ref": "refs/recovery/stocktake-20261006/commit/e2fe94a2e5d9c2a198bf113ac6f4af8668168f7e"
+    },
+    {
+      "kind": "commit",
+      "sha": "3fff6e9ff9288123dc935903b44a4fcfb470626e",
+      "ref": "refs/recovery/stocktake-20261006/commit/3fff6e9ff9288123dc935903b44a4fcfb470626e"
+    },
+    {
+      "kind": "commit",
+      "sha": "18094791a37b7547718bf21e19fa36b046fd6d2a",
+      "ref": "refs/recovery/stocktake-20261006/commit/18094791a37b7547718bf21e19fa36b046fd6d2a"
+    },
+    {
+      "kind": "commit",
+      "sha": "be0905d5298a7dd95b6d33d3ed1ddba6bb65175a",
+      "ref": "refs/recovery/stocktake-20261006/commit/be0905d5298a7dd95b6d33d3ed1ddba6bb65175a"
+    },
+    {
+      "kind": "commit",
+      "sha": "390c415fca25ffb08a4241b1ad55d36d74735d95",
+      "ref": "refs/recovery/stocktake-20261006/commit/390c415fca25ffb08a4241b1ad55d36d74735d95"
+    },
+    {
+      "kind": "commit",
+      "sha": "ee1197fac8de0998fdb84428fdb6fd8c52c1d1fc",
+      "ref": "refs/recovery/stocktake-20261006/commit/ee1197fac8de0998fdb84428fdb6fd8c52c1d1fc"
+    },
+    {
+      "kind": "commit",
+      "sha": "8d1237b9d979a48591b3794f19ea1ed544fbe3aa",
+      "ref": "refs/recovery/stocktake-20261006/commit/8d1237b9d979a48591b3794f19ea1ed544fbe3aa"
+    },
+    {
+      "kind": "commit",
+      "sha": "2913397af74d55d978f6cb8fd8f51c541013d964",
+      "ref": "refs/recovery/stocktake-20261006/commit/2913397af74d55d978f6cb8fd8f51c541013d964"
+    },
+    {
+      "kind": "commit",
+      "sha": "ca13cb06b14620d895199a0de39ed76fc91736d4",
+      "ref": "refs/recovery/stocktake-20261006/commit/ca13cb06b14620d895199a0de39ed76fc91736d4"
+    },
+    {
+      "kind": "commit",
+      "sha": "d9172180d112d28b67b3f3bcf0fac7e7f67ac8e3",
+      "ref": "refs/recovery/stocktake-20261006/commit/d9172180d112d28b67b3f3bcf0fac7e7f67ac8e3"
+    },
+    {
+      "kind": "commit",
+      "sha": "101bb5f37f2fc894e064f7afd933f550a9c658e6",
+      "ref": "refs/recovery/stocktake-20261006/commit/101bb5f37f2fc894e064f7afd933f550a9c658e6"
+    },
+    {
+      "kind": "commit",
+      "sha": "291c4557fa9f7ac18eed81ffebc62c3f4d7a4568",
+      "ref": "refs/recovery/stocktake-20261006/commit/291c4557fa9f7ac18eed81ffebc62c3f4d7a4568"
+    },
+    {
+      "kind": "commit",
+      "sha": "871c898b99f4aaeada0f9c2121b3e02f92dc92d9",
+      "ref": "refs/recovery/stocktake-20261006/commit/871c898b99f4aaeada0f9c2121b3e02f92dc92d9"
+    },
+    {
+      "kind": "commit",
+      "sha": "b51f83daff258db3c37864740724ef9aed58db18",
+      "ref": "refs/recovery/stocktake-20261006/commit/b51f83daff258db3c37864740724ef9aed58db18"
+    },
+    {
+      "kind": "commit",
+      "sha": "eb1f9786e17d4a4135a9e0c86fb13d16f6df1460",
+      "ref": "refs/recovery/stocktake-20261006/commit/eb1f9786e17d4a4135a9e0c86fb13d16f6df1460"
+    },
+    {
+      "kind": "commit",
+      "sha": "362535d85fde591dce257f93a65a16dde46a3d00",
+      "ref": "refs/recovery/stocktake-20261006/commit/362535d85fde591dce257f93a65a16dde46a3d00"
+    },
+    {
+      "kind": "commit",
+      "sha": "17264d6bcafaaa17bedb79e5c50fcd5c2752671d",
+      "ref": "refs/recovery/stocktake-20261006/commit/17264d6bcafaaa17bedb79e5c50fcd5c2752671d"
+    },
+    {
+      "kind": "blob",
+      "sha": "76262f8eda2b485bd0e4557b6d3442ccffd52ffe",
+      "ref": "refs/recovery/stocktake-20261006/blob/76262f8eda2b485bd0e4557b6d3442ccffd52ffe"
+    },
+    {
+      "kind": "commit",
+      "sha": "9729971b2baf413b632d8a35a0b28dda6f36174b",
+      "ref": "refs/recovery/stocktake-20261006/commit/9729971b2baf413b632d8a35a0b28dda6f36174b"
+    },
+    {
+      "kind": "commit",
+      "sha": "342a099fe28b7b1aae26800b6f034536e608e2ec",
+      "ref": "refs/recovery/stocktake-20261006/commit/342a099fe28b7b1aae26800b6f034536e608e2ec"
+    },
+    {
+      "kind": "commit",
+      "sha": "662a6f9c43640475d92358a41c200e2ab6e6e56b",
+      "ref": "refs/recovery/stocktake-20261006/commit/662a6f9c43640475d92358a41c200e2ab6e6e56b"
+    },
+    {
+      "kind": "commit",
+      "sha": "cd2ad18824c1e1f3e2f6a26c304c9bc15b86c22f",
+      "ref": "refs/recovery/stocktake-20261006/commit/cd2ad18824c1e1f3e2f6a26c304c9bc15b86c22f"
+    },
+    {
+      "kind": "blob",
+      "sha": "bd311ba11d1f53b425de45319ef7f1cf9c351231",
+      "ref": "refs/recovery/stocktake-20261006/blob/bd311ba11d1f53b425de45319ef7f1cf9c351231"
+    },
+    {
+      "kind": "commit",
+      "sha": "af339f26866ee8807642a3f93c742d7e83ec1cfa",
+      "ref": "refs/recovery/stocktake-20261006/commit/af339f26866ee8807642a3f93c742d7e83ec1cfa"
+    },
+    {
+      "kind": "commit",
+      "sha": "8f3669ed8bb007998fb15f018c1c84ed36ec4c8c",
+      "ref": "refs/recovery/stocktake-20261006/commit/8f3669ed8bb007998fb15f018c1c84ed36ec4c8c"
+    },
+    {
+      "kind": "commit",
+      "sha": "ea37d759daea42c2c990d66dff94e6edbfcae18d",
+      "ref": "refs/recovery/stocktake-20261006/commit/ea37d759daea42c2c990d66dff94e6edbfcae18d"
+    },
+    {
+      "kind": "commit",
+      "sha": "2d384d8dc96a19c99a091ebcd2e0a0beb6553602",
+      "ref": "refs/recovery/stocktake-20261006/commit/2d384d8dc96a19c99a091ebcd2e0a0beb6553602"
+    },
+    {
+      "kind": "blob",
+      "sha": "063a03bbbd446d6cb48b3507c86e7a25cb7e7475",
+      "ref": "refs/recovery/stocktake-20261006/blob/063a03bbbd446d6cb48b3507c86e7a25cb7e7475"
+    },
+    {
+      "kind": "commit",
+      "sha": "3c3b617ab0b218749de69a695d0d45f13ec4431e",
+      "ref": "refs/recovery/stocktake-20261006/commit/3c3b617ab0b218749de69a695d0d45f13ec4431e"
+    },
+    {
+      "kind": "commit",
+      "sha": "c141970024b6f95fa1472a6bd403fe3110046fff",
+      "ref": "refs/recovery/stocktake-20261006/commit/c141970024b6f95fa1472a6bd403fe3110046fff"
+    },
+    {
+      "kind": "commit",
+      "sha": "c7434d8c5549a088f5302e29e2e516e58ddc0842",
+      "ref": "refs/recovery/stocktake-20261006/commit/c7434d8c5549a088f5302e29e2e516e58ddc0842"
+    },
+    {
+      "kind": "commit",
+      "sha": "01440d3d8bcc66d569b28753420febe93b76fc55",
+      "ref": "refs/recovery/stocktake-20261006/commit/01440d3d8bcc66d569b28753420febe93b76fc55"
+    },
+    {
+      "kind": "commit",
+      "sha": "a246017909ee0d935fac16815432ff92ad4bf496",
+      "ref": "refs/recovery/stocktake-20261006/commit/a246017909ee0d935fac16815432ff92ad4bf496"
+    },
+    {
+      "kind": "commit",
+      "sha": "ac469551d0d7766363ed45e206497f4745444800",
+      "ref": "refs/recovery/stocktake-20261006/commit/ac469551d0d7766363ed45e206497f4745444800"
+    },
+    {
+      "kind": "commit",
+      "sha": "704c0749eff46a27a3a9ea10525d46115440d374",
+      "ref": "refs/recovery/stocktake-20261006/commit/704c0749eff46a27a3a9ea10525d46115440d374"
+    },
+    {
+      "kind": "commit",
+      "sha": "7f57c30ede296629db0a797e5183e27062c24fcd",
+      "ref": "refs/recovery/stocktake-20261006/commit/7f57c30ede296629db0a797e5183e27062c24fcd"
+    },
+    {
+      "kind": "commit",
+      "sha": "a15909d3529178239c0df86e79bce845192bf2d7",
+      "ref": "refs/recovery/stocktake-20261006/commit/a15909d3529178239c0df86e79bce845192bf2d7"
+    },
+    {
+      "kind": "commit",
+      "sha": "715bdde2120658e66f14c016fcb2cdafb90bf73b",
+      "ref": "refs/recovery/stocktake-20261006/commit/715bdde2120658e66f14c016fcb2cdafb90bf73b"
+    },
+    {
+      "kind": "commit",
+      "sha": "115cc32554da6495634f40119af4839255e63bf6",
+      "ref": "refs/recovery/stocktake-20261006/commit/115cc32554da6495634f40119af4839255e63bf6"
+    },
+    {
+      "kind": "tree",
+      "sha": "60607ba8c4768c2aeb2dc37c7ac375c5e7a827e1",
+      "ref": "refs/recovery/stocktake-20261006/tree/60607ba8c4768c2aeb2dc37c7ac375c5e7a827e1"
+    },
+    {
+      "kind": "blob",
+      "sha": "b661a57ced0c644486cd6a3b4e3c6deedd2130c7",
+      "ref": "refs/recovery/stocktake-20261006/blob/b661a57ced0c644486cd6a3b4e3c6deedd2130c7"
+    },
+    {
+      "kind": "commit",
+      "sha": "2a648b8545793589661ee8fd10a2cc7cff36e1db",
+      "ref": "refs/recovery/stocktake-20261006/commit/2a648b8545793589661ee8fd10a2cc7cff36e1db"
+    },
+    {
+      "kind": "commit",
+      "sha": "b56e891dfa2a129f184a0641969f80d7133f2330",
+      "ref": "refs/recovery/stocktake-20261006/commit/b56e891dfa2a129f184a0641969f80d7133f2330"
+    },
+    {
+      "kind": "commit",
+      "sha": "a76f413bb764e9594f7c803a59aeeee65b53878c",
+      "ref": "refs/recovery/stocktake-20261006/commit/a76f413bb764e9594f7c803a59aeeee65b53878c"
+    },
+    {
+      "kind": "commit",
+      "sha": "ac716747f3297314ca517d00903fc6cb0ff837ee",
+      "ref": "refs/recovery/stocktake-20261006/commit/ac716747f3297314ca517d00903fc6cb0ff837ee"
+    },
+    {
+      "kind": "commit",
+      "sha": "3678b1a1d23ac9a3d8fafb0dd6efca229d742519",
+      "ref": "refs/recovery/stocktake-20261006/commit/3678b1a1d23ac9a3d8fafb0dd6efca229d742519"
+    },
+    {
+      "kind": "commit",
+      "sha": "017a4bfbc30cd2ccb19e9fe8a85b6238122bbefa",
+      "ref": "refs/recovery/stocktake-20261006/commit/017a4bfbc30cd2ccb19e9fe8a85b6238122bbefa"
+    },
+    {
+      "kind": "commit",
+      "sha": "717a85af19f83f203cea97fdef8f58141507e7da",
+      "ref": "refs/recovery/stocktake-20261006/commit/717a85af19f83f203cea97fdef8f58141507e7da"
+    },
+    {
+      "kind": "commit",
+      "sha": "8c7deff8e75c8b508d1754f4b0aa38003c6c9caf",
+      "ref": "refs/recovery/stocktake-20261006/commit/8c7deff8e75c8b508d1754f4b0aa38003c6c9caf"
+    },
+    {
+      "kind": "commit",
+      "sha": "b87ddfdd7b33ee7f99af999bf06ed69ab88beaaf",
+      "ref": "refs/recovery/stocktake-20261006/commit/b87ddfdd7b33ee7f99af999bf06ed69ab88beaaf"
+    },
+    {
+      "kind": "commit",
+      "sha": "067e35b523355886b5d38f5b205311f70227885f",
+      "ref": "refs/recovery/stocktake-20261006/commit/067e35b523355886b5d38f5b205311f70227885f"
+    },
+    {
+      "kind": "commit",
+      "sha": "287ff5f0eb9bfd21589a5ca3387d6a6c182f581e",
+      "ref": "refs/recovery/stocktake-20261006/commit/287ff5f0eb9bfd21589a5ca3387d6a6c182f581e"
+    },
+    {
+      "kind": "commit",
+      "sha": "5f84b50c9993f0aeb6157a74d86cf45c1f6bcb63",
+      "ref": "refs/recovery/stocktake-20261006/commit/5f84b50c9993f0aeb6157a74d86cf45c1f6bcb63"
+    },
+    {
+      "kind": "commit",
+      "sha": "6b84813f79137688c6e40e5e9b7a29f326d4ad0c",
+      "ref": "refs/recovery/stocktake-20261006/commit/6b84813f79137688c6e40e5e9b7a29f326d4ad0c"
+    },
+    {
+      "kind": "commit",
+      "sha": "84848991cc77b0c16e1a3f6191edd4fd7166be28",
+      "ref": "refs/recovery/stocktake-20261006/commit/84848991cc77b0c16e1a3f6191edd4fd7166be28"
+    },
+    {
+      "kind": "commit",
+      "sha": "02879b4b49853fc656787fc06894e07a130d5407",
+      "ref": "refs/recovery/stocktake-20261006/commit/02879b4b49853fc656787fc06894e07a130d5407"
+    },
+    {
+      "kind": "commit",
+      "sha": "79876360bdc9067d624b5dd9f8461745e6e20cea",
+      "ref": "refs/recovery/stocktake-20261006/commit/79876360bdc9067d624b5dd9f8461745e6e20cea"
+    },
+    {
+      "kind": "commit",
+      "sha": "668a8dec62049823203cbb3f704004c8333107c1",
+      "ref": "refs/recovery/stocktake-20261006/commit/668a8dec62049823203cbb3f704004c8333107c1"
+    },
+    {
+      "kind": "commit",
+      "sha": "ee935518d31f855a9a22e196b0f5581cfdc8f397",
+      "ref": "refs/recovery/stocktake-20261006/commit/ee935518d31f855a9a22e196b0f5581cfdc8f397"
+    },
+    {
+      "kind": "commit",
+      "sha": "699903a38d121f5bf3161461cf1ca90ae0e41a3a",
+      "ref": "refs/recovery/stocktake-20261006/commit/699903a38d121f5bf3161461cf1ca90ae0e41a3a"
+    },
+    {
+      "kind": "commit",
+      "sha": "6e9a611ecd0d4db68913cfd0d9624c4d3fbe1d55",
+      "ref": "refs/recovery/stocktake-20261006/commit/6e9a611ecd0d4db68913cfd0d9624c4d3fbe1d55"
+    },
+    {
+      "kind": "commit",
+      "sha": "9c9ce13d83998343a9feff7ec173a6b38e1b429e",
+      "ref": "refs/recovery/stocktake-20261006/commit/9c9ce13d83998343a9feff7ec173a6b38e1b429e"
+    },
+    {
+      "kind": "commit",
+      "sha": "859def45f22dee259e4d1422d0868f6dfe267603",
+      "ref": "refs/recovery/stocktake-20261006/commit/859def45f22dee259e4d1422d0868f6dfe267603"
+    },
+    {
+      "kind": "commit",
+      "sha": "e6a1cb77c5ce0bd4d87987526187e903da9339c8",
+      "ref": "refs/recovery/stocktake-20261006/commit/e6a1cb77c5ce0bd4d87987526187e903da9339c8"
+    },
+    {
+      "kind": "commit",
+      "sha": "37a25113110eea3c160c803d4dcc8c8c972a0a45",
+      "ref": "refs/recovery/stocktake-20261006/commit/37a25113110eea3c160c803d4dcc8c8c972a0a45"
+    },
+    {
+      "kind": "commit",
+      "sha": "45a255f077a8811931a801fc91e2985fb6bfe4b2",
+      "ref": "refs/recovery/stocktake-20261006/commit/45a255f077a8811931a801fc91e2985fb6bfe4b2"
+    },
+    {
+      "kind": "commit",
+      "sha": "2ea4614121d8a8f34b05fa25039ebf76f9e47352",
+      "ref": "refs/recovery/stocktake-20261006/commit/2ea4614121d8a8f34b05fa25039ebf76f9e47352"
+    },
+    {
+      "kind": "blob",
+      "sha": "67a7fff3c58043e64ebbc04940b42e5fd3da9f1d",
+      "ref": "refs/recovery/stocktake-20261006/blob/67a7fff3c58043e64ebbc04940b42e5fd3da9f1d"
+    },
+    {
+      "kind": "commit",
+      "sha": "a5a8ab770f6d87c9203990d363b26740ce665676",
+      "ref": "refs/recovery/stocktake-20261006/commit/a5a8ab770f6d87c9203990d363b26740ce665676"
+    },
+    {
+      "kind": "commit",
+      "sha": "80a9ad01cf237169a01626050a46a3b8eb28a5f6",
+      "ref": "refs/recovery/stocktake-20261006/commit/80a9ad01cf237169a01626050a46a3b8eb28a5f6"
+    },
+    {
+      "kind": "commit",
+      "sha": "57af23b02084048f8cf88ad451cac3681601bef6",
+      "ref": "refs/recovery/stocktake-20261006/commit/57af23b02084048f8cf88ad451cac3681601bef6"
+    },
+    {
+      "kind": "commit",
+      "sha": "80af2559e3f60fba56b4607be6e6cad9268efb38",
+      "ref": "refs/recovery/stocktake-20261006/commit/80af2559e3f60fba56b4607be6e6cad9268efb38"
+    },
+    {
+      "kind": "commit",
+      "sha": "d1b113d7b39f3fd18d99f13a49a19b7fae59fac0",
+      "ref": "refs/recovery/stocktake-20261006/commit/d1b113d7b39f3fd18d99f13a49a19b7fae59fac0"
+    },
+    {
+      "kind": "commit",
+      "sha": "dfb3074430fc9b7eb18f366fd1fc651ed6a0a848",
+      "ref": "refs/recovery/stocktake-20261006/commit/dfb3074430fc9b7eb18f366fd1fc651ed6a0a848"
+    },
+    {
+      "kind": "commit",
+      "sha": "09b535c3676031532309cb2be38ffd88087d8359",
+      "ref": "refs/recovery/stocktake-20261006/commit/09b535c3676031532309cb2be38ffd88087d8359"
+    },
+    {
+      "kind": "commit",
+      "sha": "ddb6e9c499e149a9d1dd57b2768c7401f6aa86b2",
+      "ref": "refs/recovery/stocktake-20261006/commit/ddb6e9c499e149a9d1dd57b2768c7401f6aa86b2"
+    },
+    {
+      "kind": "commit",
+      "sha": "41bdc5872e9dabceff363b21d99749a329b8ce98",
+      "ref": "refs/recovery/stocktake-20261006/commit/41bdc5872e9dabceff363b21d99749a329b8ce98"
+    },
+    {
+      "kind": "commit",
+      "sha": "47c061bd13736614b889fb84a0cdbddf2d1132fb",
+      "ref": "refs/recovery/stocktake-20261006/commit/47c061bd13736614b889fb84a0cdbddf2d1132fb"
+    },
+    {
+      "kind": "commit",
+      "sha": "e5c0979c570b29cc64571ae89d7b0fcf02177495",
+      "ref": "refs/recovery/stocktake-20261006/commit/e5c0979c570b29cc64571ae89d7b0fcf02177495"
+    },
+    {
+      "kind": "commit",
+      "sha": "f8c07b203e7158032a9d2490cb1c313a3b30ebfa",
+      "ref": "refs/recovery/stocktake-20261006/commit/f8c07b203e7158032a9d2490cb1c313a3b30ebfa"
+    },
+    {
+      "kind": "commit",
+      "sha": "52c179f2e6953797178158db50e97fd3f59e1e52",
+      "ref": "refs/recovery/stocktake-20261006/commit/52c179f2e6953797178158db50e97fd3f59e1e52"
+    },
+    {
+      "kind": "commit",
+      "sha": "bdc72313a0ec5617b6b94133c4b4f202f86c9a10",
+      "ref": "refs/recovery/stocktake-20261006/commit/bdc72313a0ec5617b6b94133c4b4f202f86c9a10"
+    },
+    {
+      "kind": "commit",
+      "sha": "4ecdc3344c9d322c57975b682fd7d61522a51c25",
+      "ref": "refs/recovery/stocktake-20261006/commit/4ecdc3344c9d322c57975b682fd7d61522a51c25"
+    },
+    {
+      "kind": "commit",
+      "sha": "7adce149715077e6044ae271423e874c3842f4c7",
+      "ref": "refs/recovery/stocktake-20261006/commit/7adce149715077e6044ae271423e874c3842f4c7"
+    },
+    {
+      "kind": "commit",
+      "sha": "96dd5345b236bacc8bd1ea76098715f4a6e6bc34",
+      "ref": "refs/recovery/stocktake-20261006/commit/96dd5345b236bacc8bd1ea76098715f4a6e6bc34"
+    },
+    {
+      "kind": "commit",
+      "sha": "2adfff2939ef6d0c452bcbb6f18221933c9ab1f8",
+      "ref": "refs/recovery/stocktake-20261006/commit/2adfff2939ef6d0c452bcbb6f18221933c9ab1f8"
+    },
+    {
+      "kind": "commit",
+      "sha": "1ce37ff75212ca0cd325aca2f9feb81d39bd87f8",
+      "ref": "refs/recovery/stocktake-20261006/commit/1ce37ff75212ca0cd325aca2f9feb81d39bd87f8"
+    },
+    {
+      "kind": "commit",
+      "sha": "d7e4c557076e50a4cde37aafb8ed9b99fffc2315",
+      "ref": "refs/recovery/stocktake-20261006/commit/d7e4c557076e50a4cde37aafb8ed9b99fffc2315"
+    },
+    {
+      "kind": "commit",
+      "sha": "e1e5ab4f5b3826593dd2087e37d84e4f8c04b842",
+      "ref": "refs/recovery/stocktake-20261006/commit/e1e5ab4f5b3826593dd2087e37d84e4f8c04b842"
+    },
+    {
+      "kind": "commit",
+      "sha": "e4ec0fc0684c6ade78a7f0f375d37c738d0eb3ba",
+      "ref": "refs/recovery/stocktake-20261006/commit/e4ec0fc0684c6ade78a7f0f375d37c738d0eb3ba"
+    },
+    {
+      "kind": "commit",
+      "sha": "e9ec4196db77c91d6ec0a96259274ec00530d057",
+      "ref": "refs/recovery/stocktake-20261006/commit/e9ec4196db77c91d6ec0a96259274ec00530d057"
+    },
+    {
+      "kind": "commit",
+      "sha": "11f3994acab9b984855a35ec07839355a22ccf80",
+      "ref": "refs/recovery/stocktake-20261006/commit/11f3994acab9b984855a35ec07839355a22ccf80"
+    },
+    {
+      "kind": "commit",
+      "sha": "23f355169380a5fec8081178a267e0e13abfb4ff",
+      "ref": "refs/recovery/stocktake-20261006/commit/23f355169380a5fec8081178a267e0e13abfb4ff"
+    },
+    {
+      "kind": "commit",
+      "sha": "b3f3c35b0120e3e70648d6925d3d9e8d0efc9057",
+      "ref": "refs/recovery/stocktake-20261006/commit/b3f3c35b0120e3e70648d6925d3d9e8d0efc9057"
+    },
+    {
+      "kind": "commit",
+      "sha": "52f963166ad6b65f6e85db6089a4b16740fd280c",
+      "ref": "refs/recovery/stocktake-20261006/commit/52f963166ad6b65f6e85db6089a4b16740fd280c"
+    },
+    {
+      "kind": "commit",
+      "sha": "0efd012b23570ba6a45d99b181401c630637fe40",
+      "ref": "refs/recovery/stocktake-20261006/commit/0efd012b23570ba6a45d99b181401c630637fe40"
+    },
+    {
+      "kind": "commit",
+      "sha": "e2fd895c2329bb13b0d5430af9997fde4340e3a7",
+      "ref": "refs/recovery/stocktake-20261006/commit/e2fd895c2329bb13b0d5430af9997fde4340e3a7"
+    },
+    {
+      "kind": "tree",
+      "sha": "ebfd6fc6f1f31536d04051628cedb244181d57ee",
+      "ref": "refs/recovery/stocktake-20261006/tree/ebfd6fc6f1f31536d04051628cedb244181d57ee"
+    }
+  ],
+  "ref_count": 205,
+  "bundle": "/Users/bbuchsbaum/code/scala/storymodel4s/.git/recovery/stocktake-20261006.bundle",
+  "bundle_bytes": 139641725,
+  "bundle_sha256": "c9264abc76d285b33e6274bdb669eb82d91ea71dbefd0146370233b40b1f2898",
+  "create_exit": 0,
+  "verify_exit": 0,
+  "mirror_clone_exit": 0,
+  "mirror_fsck_exit": 0,
+  "mirror_ref_count": 1657
+}

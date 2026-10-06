@@ -1,0 +1,38 @@
+{
+  "repository_fsck": {
+    "command": "git fsck --full --no-reflogs",
+    "exit": 0,
+    "errors": 0,
+    "dangling": {
+      "commit": 183,
+      "blob": 17,
+      "tree": 5
+    }
+  },
+  "mote_fsck_at_start": {
+    "ops_checked": 15354,
+    "bad_filename": 0,
+    "bad_hash": 0,
+    "bad_json": 0,
+    "bad_op_shape": 0
+  },
+  "reference_scope_candidate": {
+    "sha": "ed9f478daba90d1728ce584b2a896f5a88be9b26",
+    "method": "git archive exact two tool files into a fresh temporary directory; run bash tools/reference-scope-test.sh",
+    "exit": 0,
+    "assertions_passed": 98
+  },
+  "bundle": {
+    "verify_exit": 0,
+    "fresh_mirror_clone_exit": 0,
+    "fresh_mirror_fsck_exit": 0,
+    "fresh_mirror_fsck_stdout_bytes": 0
+  },
+  "not_executed": [
+    "sbt runtime gates",
+    "Native/JS reruns",
+    "browser acceptance",
+    "hosted CI",
+    "real-corpus inference or reconstruction"
+  ]
+}

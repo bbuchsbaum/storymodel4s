@@ -1,0 +1,156 @@
+[
+  {
+    "ref": "stash@{0}",
+    "sha": "f53403b348cdc6645241d3a2fa08578aae215083",
+    "date": "2026-09-01 07:45:52 -0400",
+    "subject": "On main: chief-preserve-premerge-overlap-20260901T1145Z",
+    "paths": [
+      "tools/premerge-check.sh"
+    ],
+    "parents": [
+      "a7aa7e1da1a35da15efba09e226df7268935abb5",
+      "ddb45bc47a4ccaa10788f03fadd1d62fbed202ad",
+      "5437002fbd9945b03e707a1e759cc131b44f83b5"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "tools/premerge-check-test.sh"
+    ]
+  },
+  {
+    "ref": "stash@{1}",
+    "sha": "022030f50ed3053d4565d61aff3b9c38bfe54fc9",
+    "date": "2026-08-30 12:30:40 -0400",
+    "subject": "WIP on m1/reanchor2: f0e9415 tmp",
+    "paths": [],
+    "parents": [
+      "f0e94153548bc4fee10bb9395973342171ed47d1",
+      "78d5c22ed43903ec06aec3f821ffff5d128861c4",
+      "87b05a8d0feb2e4d5602d577fcabe6b95373b169"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "align/src/test/scala/storymodel4s/probes/ZZDbg.scala",
+      "features/src/test/scala/storymodel4s/features/ZZCov.scala"
+    ]
+  },
+  {
+    "ref": "stash@{2}",
+    "sha": "5f84b50c9993f0aeb6157a74d86cf45c1f6bcb63",
+    "date": "2026-08-30 11:35:45 -0400",
+    "subject": "WIP on m1/reanchor: b3ed579 tmp",
+    "paths": [],
+    "parents": [
+      "b3ed579a91d753ece9a4339554fb307e1e2873a6",
+      "2d4e6fe7a47ceefe764cbdf0a98b0e745e6b84c3",
+      "64f5ae84d39fdcf097b623ced55e287d869b9ee8"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "interview/src/test/scala/storymodel4s/probes/ZZEnumCase.scala"
+    ]
+  },
+  {
+    "ref": "stash@{3}",
+    "sha": "cde21652d26e88cd9fb629d942bb436da095bbee",
+    "date": "2026-08-30 11:01:38 -0400",
+    "subject": "WIP on m1/membership-routing: 64b44c8 mote: close hsmm/v2 rename bead; release reservation",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala"
+    ],
+    "parents": [
+      "64b44c8f9d35b15ca65c27e84c45bfbb046b4ce4",
+      "7762782d81cd7cc22668e1cb6b346d2d422db601",
+      "142c66101ddc0d8216c7a142cb4dbfa7f292af8f"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/ZZMember.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/ZZMembership.scala"
+    ]
+  },
+  {
+    "ref": "stash@{4}",
+    "sha": "3200509e16f991bb5a2be9e352ce20164233d6af",
+    "date": "2026-08-30 08:48:06 -0400",
+    "subject": "WIP on m1/cell-coordinates: 86dda63 align: the cell coordinate join derives its words instead of accepting them",
+    "paths": [],
+    "parents": [
+      "86dda636b69a9aaefc597943fa2e4bacee713e4e",
+      "41d1f09ed7d472300032b8bb01e5a613aae89300",
+      "d21e6dbc0da856ea5d74e6351d14df02c98dc990"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/ZZO3.scala"
+    ]
+  },
+  {
+    "ref": "stash@{5}",
+    "sha": "f4a2ac678b68f5a2b835322c6030ffa4dc1cc6ef",
+    "date": "2026-08-29 21:41:51 -0400",
+    "subject": "WIP on m1/semantic-imputed: e6d0cc5 align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [],
+    "parents": [
+      "e6d0cc5c31aa7b3f386ff0c56d8c1382c6b15810",
+      "72ae49686434ce78b34fb09633c246a17c6efb40",
+      "6321eeff2d377de4fc7168f333c31709d5192c79"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/ZZEndToEnd.scala"
+    ]
+  },
+  {
+    "ref": "stash@{6}",
+    "sha": "8c7deff8e75c8b508d1754f4b0aa38003c6c9caf",
+    "date": "2026-08-29 20:13:53 -0400",
+    "subject": "WIP on m1/semantic-imputed: e6d0cc5 align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [],
+    "parents": [
+      "e6d0cc5c31aa7b3f386ff0c56d8c1382c6b15810",
+      "1179b9947ad122091ee449de113da66913ec01a6",
+      "c74b38a33fe68dfb1b0d8a39d6157816aa212879"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "codec/src/test/scala/storymodel4s/codec/ZZForgeProbe.scala"
+    ]
+  },
+  {
+    "ref": "stash@{7}",
+    "sha": "a76f413bb764e9594f7c803a59aeeee65b53878c",
+    "date": "2026-08-29 19:27:44 -0400",
+    "subject": "WIP on m1/attributable-exclusion: b65c5c6 wip attributable exclusion",
+    "paths": [],
+    "parents": [
+      "b65c5c6b467ba1a1f298dc8303b1ee1e9e976453",
+      "69a66259bbf4ffc53c014b679f2b9965f6eefa02",
+      "94158b0c858e0e52e718c13e7327296f5ceff699"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "align/src/test/scala/storymodel4s/align/ZZPropEntProbe.scala"
+    ]
+  },
+  {
+    "ref": "stash@{8}",
+    "sha": "871c898b99f4aaeada0f9c2121b3e02f92dc92d9",
+    "date": "2026-08-29 19:02:16 -0400",
+    "subject": "WIP on m1/semantic-imputed: 1beda30 align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [],
+    "parents": [
+      "1beda300bd247997f4d572db0f446401bc4454bd",
+      "6c60d4017845eb5ce86261a8c90533d82af0e8f5",
+      "6b4dd88871c6b9c5bbab4d1b432213d4110a23c1"
+    ],
+    "index_paths": [],
+    "untracked_paths": [
+      "align/src/test/scala/storymodel4s/align/ZZChartEligibilityProbe.scala",
+      "align/src/test/scala/storymodel4s/align/ZZSemProbe.scala",
+      "align/src/test/scala/storymodel4s/align/ZZSinkhornProbe.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/ZZRecut.scala"
+    ]
+  }
+]

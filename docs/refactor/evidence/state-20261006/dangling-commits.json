@@ -1,0 +1,3276 @@
+[
+  {
+    "sha": "1100ea61b710e347022b1a9441088b0565203dda",
+    "date": "2026-08-29T15:43:10-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/src/test/resources/golden/hsmm-v1-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e02a7c5670078acbc0ac934aa84cbeceb409c719a71211e4184f23544834eab5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3200509e16f991bb5a2be9e352ce20164233d6af",
+    "date": "2026-08-30T08:48:06-04:00",
+    "subject": "WIP on m1/cell-coordinates: 86dda63 align: the cell coordinate join derives its words instead of accepting them",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f301a256f45fe13acb33b6602a7927bca351408b",
+    "date": "2026-08-29T19:36:44-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9104ccedc435e0cfadce6a899c96bf6cb3e5c0f2",
+    "date": "2026-08-30T09:21:48-04:00",
+    "subject": "align: the cell coordinate join derives its words instead of accepting them",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9e04fcb70a020358e3c6df9dc0f672e365210118",
+    "date": "2026-08-29T18:45:38-04:00",
+    "subject": "wip semantic imputed",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e804144c209c438e4d0b4cb7762eba5052bf117a",
+    "date": "2026-08-29T11:25:32-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "interview/src/test/scala/storymodel4s/interview/AmbiguousPlacementSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 32,
+    "changed_paths_sha256": "a35ce9125872cef3763bfa523be91d3d23d18a7e6375e1cc7fa286b518abdf92",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f60b86c0f8727ea6403b37399be3e2a2ad887bce",
+    "date": "2026-08-31T13:14:31-04:00",
+    "subject": "tools: harden reference scope discovery",
+    "paths": [
+      "tools/reference-scope-test.sh",
+      "tools/reference-scope.sh"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "724b948a23b10c3aaadd556e4a9dbb66d5c09133fdf060a4b2fa75c790c8d350",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2f10a044a6dc66119962e20716f354735890d578",
+    "date": "2026-09-23T07:54:54-04:00",
+    "subject": "WIP on main: 36174e31 test(corpus-intake): discard deleteIfExists results explicitly for fatal warnings",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "6411342d6984e11cd1ef613f29ae752478390850",
+    "date": "2026-09-04T08:17:14-04:00",
+    "subject": "WorldOrderInput: the timed-source builder takes a declared world clock (ADR 0013)",
+    "paths": [
+      "embed-bench/src/main/scala/storymodel4s/bench/sherlock/SherlockRecallMapping.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/WorldOrderInput.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/sherlock/SherlockRecallMappingSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LexicalBlendSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/MonotoneSceneSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/RecallToVideoSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderFixtures.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderInputSuite.scala"
+    ],
+    "changed_path_count": 9,
+    "changed_paths_sha256": "e38ccc5b4bb39b49120eca3cbe34c429df292fe58bb52fe3ff9a977f0ef69dd2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "fa1c4e121320742ebc09c2493615ad75015c587d",
+    "date": "2026-08-30T08:21:06-04:00",
+    "subject": "interview: a membership threshold is a threshold, and gets a threshold's guard",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "cbc554121bea4a75b724587f5b8e9bd8eb83aae9f82f8f4c513090b49a65999c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b71e1499131cc97b7d09547a1294b19389c8b1a6",
+    "date": "2026-09-23T11:13:50-04:00",
+    "subject": "docs(evidence): archive the AC4 S1 gate, mutation receipt and review record",
+    "paths": [
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/README.md",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/gate-9f10e10b.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutate_s1.py",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-after.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-before.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/edition-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/extent-shape-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/full-decode-byte-rule.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/membership-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/receipt.json",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sample-index-as-presentation-ordinal.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sampled-ordinal-is-sample-index.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-not-in-identity.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-order-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/unsampled-request-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/qualification.json"
+    ],
+    "changed_path_count": 16,
+    "changed_paths_sha256": "a90dfb7d3821c9bdf203dca8e20087963e5c0cd95bda5f9f3da70ca6327f44df",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c11e7637e234746e27c2fb6bba642548ca0c870d",
+    "date": "2026-09-23T07:56:46-04:00",
+    "subject": "WIP on main: e9ed9994 Merge reviewed Sherlock development reproduction",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "911f12e3604483c378f3cb831817827cb6692edc",
+    "date": "2026-08-28T22:41:33-04:00",
+    "subject": "embed-bench: W4(10) evaluation harness \u2014 frozen-vs-diagnostic origins, spike metrics, label discipline",
+    "paths": [
+      "build.sbt",
+      "embed-bench/README.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/channels.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/gold.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/origin.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/report.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/LabelSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/MetricsSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/ProtocolSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala"
+    ],
+    "changed_path_count": 13,
+    "changed_paths_sha256": "94f54f78648fc38c102eebcd3d5743d1d5759d6dd936772c135b893d7f6a8117",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "022030f50ed3053d4565d61aff3b9c38bfe54fc9",
+    "date": "2026-08-30T12:30:40-04:00",
+    "subject": "WIP on m1/reanchor2: f0e9415 tmp",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "1b2046706c893bb3a81074f6e277f93e7559b81b",
+    "date": "2026-08-30T11:46:55-04:00",
+    "subject": "tmp",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/probes/StructuralChannelUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "804f0aab238ad0e54ab889509620c142f6c1673677eb406df2878a56a5be08d0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c02292bb8add76515dc7732c4fa7f27dc1495139",
+    "date": "2026-09-02T22:49:23-04:00",
+    "subject": "study: two nulls, and the content-free floor that makes the result credible",
+    "paths": [
+      "docs/plans/2026-09-02-recall-to-video-study-log.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/MonotoneScene.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "182cff71b61965e7f7099dd5e83d23368b3db750cf6755e391cf96f0fff1314d",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b428f01beb06d49cd14566ca44be230d99342284",
+    "date": "2026-08-28T20:00:19-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9f2a7230aea9defe185e65d50c2344177406c09b",
+    "date": "2026-09-21T08:03:39-04:00",
+    "subject": "WIP on main: 3193d365 data(friends): seal the participant-level test split (10 test / 13 dev)",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "282c5460222bb00e636d4f47832da48efa9f2d0e",
+    "date": "2026-08-28T18:37:05-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "1a2f425ada95c67a510143b5851c381f6b86dd71",
+    "date": "2026-09-03T08:27:21-04:00",
+    "subject": "view: a coding may run past the last word",
+    "paths": [
+      "view/src/main/scala/storymodel4s/view/voyage.scala",
+      "view/src/test/scala/storymodel4s/view/VoyageSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "b3f39472611a02ebe85188d30c14b5c5839f54526b77e4fa4d7daf064e651885",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "8533c4ffdf7aedd4d12e2fb5b6088354b003b5dc",
+    "date": "2026-08-28T23:02:02-04:00",
+    "subject": "test: run WOG leak canaries portably",
+    "paths": [
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "48d3fe293257f0fe34d97a9592421ba866b8e4da37cda2cc208a504d445bbd3b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2834da1b43bab50bf4a8c56ac0bd55955a800c27",
+    "date": "2026-08-29T11:00:25-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 28,
+    "changed_paths_sha256": "c1ba92a36ba830b6181debdee5415222e5b7cad90103b7448ef4b27faef8d60a",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "d736dc565d97f617726bad0a9d1ba2fdeae58dd2",
+    "date": "2026-08-29T08:01:01-04:00",
+    "subject": "mote: record E7 candidate coordination",
+    "paths": [],
+    "changed_path_count": 122,
+    "changed_paths_sha256": "5254a83a2ce51ddd65766c7400e830ddad4c4fbae3cd5540eab748aa54fc7dea",
+    "mote_op_path_count": 122,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3b3702efcf4b1a62a47f047ba02d465fee4d8fdb",
+    "date": "2026-08-29T10:16:00-04:00",
+    "subject": "refactor(core): validate atlas construction",
+    "paths": [
+      "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "core/src/main/scala/storymodel4s/core/transcript.scala",
+      "core/src/test/scala/storymodel4s/core/AtlasSuite.scala",
+      "core/src/test/scala/storymodel4s/core/TranscriptSuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/AtlasConstructionBoundarySuite.scala",
+      "fixtures/src/main/scala/storymodel4s/fixtures/interview/BirthdayInterview.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 12,
+    "changed_paths_sha256": "7c5bbded9065960b4c4e0672741eb6dd9cdc3f9680299c9bc4a07b14e5824e25",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "bf386ae4ac45fda955c5db6bb8c83442f7a1817c",
+    "date": "2026-09-23T11:17:51-04:00",
+    "subject": "docs(evidence): archive the AC4 S1 gate, mutation receipt and review record",
+    "paths": [
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/README.md",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/gate-91d1ba3f.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/gate-9f10e10b.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutate_s1.py",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-after.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-before.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/edition-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/extent-shape-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/full-decode-byte-rule.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/membership-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/receipt.json",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sample-index-as-presentation-ordinal.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sampled-ordinal-is-sample-index.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-not-in-identity.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-order-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/unsampled-request-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/qualification.json"
+    ],
+    "changed_path_count": 17,
+    "changed_paths_sha256": "e0639fbdc1259839f9fa51ffd01e65b0aaf3c4013f23c376a43796eab0c51734",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f13a883ea5105e28248673c2553ed3896072f64c",
+    "date": "2026-08-28T18:09:39-04:00",
+    "subject": "align: drop unused import in PopulationSuite",
+    "paths": [
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "46db7c8c884e3ef3c2c01d6bb22d6ef55f6bd23b65ed3637377f980540aed12b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e9407c9b59ea6df2183b89bf61acb94988df5366",
+    "date": "2026-08-29T19:26:18-04:00",
+    "subject": "wip attributable exclusion",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "ff86074197f82a70ab03dc132b9f2f500ec911cf31dd955cee4c5cead4f8bc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "4f41c832e381dd7b1226466abf7c4dd37dbf6f11",
+    "date": "2026-08-29T15:11:38-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "ee473f3eaf8b246cb6566fc30f361e7039492af6d439659c111c7b8478a3085a",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "414344a015319eb4c3685da5fa88af3224a650d1",
+    "date": "2026-08-30T16:45:26-04:00",
+    "subject": "MUTATION: remove the window.scala finiteness guard",
+    "paths": [
+      "features/src/main/scala/storymodel4s/features/window.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "82e002c8eb0f3c45410b21e4ab899a9841d069ad8e98e94e2da28afb1ed3ca5d",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "bc4cce6dc30d99df4cc277299953537db48dd0bf",
+    "date": "2026-08-29T07:42:22-04:00",
+    "subject": "feat(view): compile surface detail marks",
+    "paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "64e264e87c3dd07bc35bd05820a1f735006db08a7cd5497058bf4cf359253edb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ec4d16967fd1449252b93b2264f570eecdf70855",
+    "date": "2026-08-29T11:00:12-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 28,
+    "changed_paths_sha256": "c1ba92a36ba830b6181debdee5415222e5b7cad90103b7448ef4b27faef8d60a",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9250f8b66a19600fe6cabf2c9534d0801d04dcb8",
+    "date": "2026-08-29T18:38:33-04:00",
+    "subject": "wip semantic imputed",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 9,
+    "changed_paths_sha256": "c4e00fac6029fd96dd224c67fb11a93e21a50c07c5fd0f1af9ec448272d250d4",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "19510e9b605e42b40866aa4d2431c9033ebd78d7",
+    "date": "2026-08-29T15:32:14-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/src/test/resources/golden/hsmm-v1-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala"
+    ],
+    "changed_path_count": 9,
+    "changed_paths_sha256": "3f4fae48b0a79bc5bdc1d03e8bf58c7fdd69bf6d67fbbaef9992b050975472a7",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "6e51ae0e063c7d562390bf38cf6453dc2c09f0c1",
+    "date": "2026-09-23T11:44:36-04:00",
+    "subject": "Notes added by 'git notes add'",
+    "paths": [
+      "d13147e3f5ff62120e78a3f75523303b607aa1ac"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "6cb0c091d001bf9c8cb18efd4b0a0d83517a542a5bdb54bcc2281d3233cb713c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e05300b553e626daf8d5402005c8ceb4a516d28a",
+    "date": "2026-08-29T08:05:24-04:00",
+    "subject": "feat(view): compile surface detail marks",
+    "paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "64e264e87c3dd07bc35bd05820a1f735006db08a7cd5497058bf4cf359253edb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "42571201addafd12a2259cd54cfa0ef1620764a6",
+    "date": "2026-08-29T15:51:47-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/src/test/resources/golden/hsmm-v1-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e02a7c5670078acbc0ac934aa84cbeceb409c719a71211e4184f23544834eab5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "6e571684c3778a944595de324f18416483a4d841",
+    "date": "2026-08-29T17:44:35-04:00",
+    "subject": "align: eligibility asks the population the measurement reads",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "199718652a27ea7532a09f08a02d196c89cf5d68b81520f08d6fcd18ecceb1f0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "22689e00a3898b35f90206c75878267f3c80bae2",
+    "date": "2026-08-29T03:31:35-04:00",
+    "subject": "align: relation preservation reports its support instead of inventing a mean",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "d33bd6eb84986ff18daad3aa95804b68147836894a47bc511b832b42a25b486b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "466d2c10dc39e9aad056906135646cbfc1d7cc45",
+    "date": "2026-08-30T08:03:34-04:00",
+    "subject": "interview: excluded placement mass must say which rule removed it",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "cbc554121bea4a75b724587f5b8e9bd8eb83aae9f82f8f4c513090b49a65999c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "4a6d0ad42d9d5451209a14b08072ab0978d04861",
+    "date": "2026-08-29T11:35:35-04:00",
+    "subject": "fix(fixtures): remove WOG initialization-order cycle",
+    "paths": [
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsInitializationSuite.scala",
+      "fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsModel.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "e23471bf11da729c7755aed1afbb58f374cdd72556bc382c116e30f1704d6f02",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "4f6e7c07fcc28ce23d4805578f5182e1e82925d9",
+    "date": "2026-08-29T21:52:00-04:00",
+    "subject": "align: the cell coordinate join, behind a construction boundary that proves its relation",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "686e227053a677735b85462b0dab9197dfb3df38",
+    "date": "2026-08-30T14:04:35-04:00",
+    "subject": "align: the companion door gets its own control, after I documented it as impossible",
+    "paths": [
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/ProbeCartesianControl.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "620fef347a8b9179ebfafa4961b8a2e74ec1f2457aeb41b37b9f9ec51120c0ba",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2173062fa45fc2e8cf7e8e0fb82b9d11bc453c7b",
+    "date": "2026-08-28T22:14:45-04:00",
+    "subject": "mote: P0-2 follow-up landed",
+    "paths": [],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "db0e7d93dbec6fab17bb2acbfcce973f45859bf8ab5f48ff7219e6a39821a957",
+    "mote_op_path_count": 4,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "0174f2cae32ad0bee7146404b0b991a36088dbe7",
+    "date": "2026-08-29T11:04:01-04:00",
+    "subject": "Replace LatePoolingRecipe.copy with replace that re-validates.",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "0e0f8d96998938b3fb9222de9f44df7f0e70aeefd1ee17205813c340214d6b35",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "65788e2f105ec5a98aa659c00ba0175594e17a2a",
+    "date": "2026-08-28T20:04:16-04:00",
+    "subject": "view: compile Codex feature scales",
+    "paths": [
+      "docs/adr/0002-visualization-contract.md",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "view/src/main/scala/storymodel4s/view/codex.scala",
+      "view/src/main/scala/storymodel4s/view/compiler.scala",
+      "view/src/main/scala/storymodel4s/view/visibility.scala",
+      "view/src/test/scala/storymodel4s/view/CodexCompilerSuite.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "82870533c5964f4f69db7c817247085ce8ab05805e0c928754846ac8ec7908bc",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e37c047d36fe9de33dcc070aaafa32f8ed802fc0",
+    "date": "2026-08-28T18:40:04-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a07d10ec52b34a33920ffd656541580f86652e6a",
+    "date": "2026-08-29T17:07:01-04:00",
+    "subject": "wip",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "199718652a27ea7532a09f08a02d196c89cf5d68b81520f08d6fcd18ecceb1f0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "6285f68df6b28fc4369ad5e2be6e9ff7fe31cbcb",
+    "date": "2026-08-28T20:00:58-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a1894c7aa9362ad3df8ef6ead6347500e5c49f3f",
+    "date": "2026-09-17T08:20:53-04:00",
+    "subject": "On main: friends intake: staged before the 2026-09-17 1.0 session (restore with git stash pop)",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3e8e5e3a1424c2274791a92cc70fbd0ee373dce5",
+    "date": "2026-08-28T18:52:50-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "5a7f6b8488d626e80a3f0b5198793bb8307341f2d06405184658685846cc8a40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a78f2465bbc8a2b9cd3bece674c099de8247aeb4",
+    "date": "2026-08-28T19:24:25-04:00",
+    "subject": "codec: add typed numeric sidecars",
+    "paths": [
+      "codec/README.md",
+      "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "codec/src/main/scala/storymodel4s/codec/sidecar.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/SidecarSuite.scala",
+      "docs/adr/0002-visualization-contract.md"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "6b4bc623fa9f2e812da4057ff4883ef92654722095df633dcfc0649f9b4399f6",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "0a9076c4280e916701c615db76b1dc52c7644aa3",
+    "date": "2026-09-23T11:44:14-04:00",
+    "subject": "docs(evidence): add the stream-binding repair gate, ten-mutant receipt and review record (AC4 S1)",
+    "paths": [
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/README.md",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/gate-23f35516.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutate_s1.py",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-after.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-before.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/edition-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/extent-shape-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/full-decode-byte-rule.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/membership-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/receipt.json",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sample-index-as-presentation-ordinal.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sampled-ordinal-is-sample-index.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-not-in-identity.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-order-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/stream-not-in-identity.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/unsampled-request-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/qualification.json"
+    ],
+    "changed_path_count": 17,
+    "changed_paths_sha256": "a0b8ccb2d3cd99eb559de95c0af87debb83989e6ab60ea258b6528c35ceccb89",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "bb90763d6c3c9a0ec69a6dce18d1f3c4e06fbfe4",
+    "date": "2026-09-03T06:54:34-04:00",
+    "subject": "Within-scene: review findings applied; stratum weights as pre-registered; machine lane provenance",
+    "paths": [
+      "docs/data/sherlock/within-scene/README.md",
+      "docs/plans/2026-09-02-recall-to-video-study-log.md",
+      "docs/plans/2026-09-03-within-scene-precision-preregistration.md",
+      "tools/recall-study/within_scene.py"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "ae0fb60d47f276677a179c81c35e79b4f5b94931bd434fd1f269ae347e909592",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f39070072831408e94464261bd3743b13ee5c933",
+    "date": "2026-08-29T07:53:27-04:00",
+    "subject": "feat(view): compile surface detail marks",
+    "paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "64e264e87c3dd07bc35bd05820a1f735006db08a7cd5497058bf4cf359253edb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "299360f2bf67f2feef0519e9c0c0d723a36a3fbe",
+    "date": "2026-08-30T11:13:48-04:00",
+    "subject": "tmp",
+    "paths": [
+      "interview/src/test/scala/storymodel4s/probes/PlacementResolutionRemedySuite.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "3c5d86023cb9e32442e38c97b72362db49339f817f7d2544050a1418358ec735",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "cc94ee8f194a1bde43dedb2ba20045f93f09d7a4",
+    "date": "2026-08-30T08:20:05-04:00",
+    "subject": "interview: excluded placement mass says which rule and which threshold removed it",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "cbc554121bea4a75b724587f5b8e9bd8eb83aae9f82f8f4c513090b49a65999c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9698baa5a29e08fbfe598e1149d6395f374bf741",
+    "date": "2026-08-29T17:43:15-04:00",
+    "subject": "align: eligibility asks the population the measurement reads",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "199718652a27ea7532a09f08a02d196c89cf5d68b81520f08d6fcd18ecceb1f0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f99a8e5487e5a660f3411d5f9615912fbc7f87bc",
+    "date": "2026-08-29T21:09:33-04:00",
+    "subject": "align: the cell coordinate join, behind a construction boundary that proves its relation",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "689f6079db79bde177eb6664321da75e9a6774ab",
+    "date": "2026-08-28T20:04:25-04:00",
+    "subject": "view: compile Codex feature scales",
+    "paths": [
+      "docs/adr/0002-visualization-contract.md",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "view/src/main/scala/storymodel4s/view/codex.scala",
+      "view/src/main/scala/storymodel4s/view/compiler.scala",
+      "view/src/main/scala/storymodel4s/view/visibility.scala",
+      "view/src/test/scala/storymodel4s/view/CodexCompilerSuite.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "82870533c5964f4f69db7c817247085ce8ab05805e0c928754846ac8ec7908bc",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3aa29e0ad33f7c188e52953724b2e962eaa2f0f1",
+    "date": "2026-08-29T03:19:28-04:00",
+    "subject": "align: relation preservation reports its support instead of inventing a mean",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "d33bd6eb84986ff18daad3aa95804b68147836894a47bc511b832b42a25b486b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f4a2ac678b68f5a2b835322c6030ffa4dc1cc6ef",
+    "date": "2026-08-29T21:41:51-04:00",
+    "subject": "WIP on m1/semantic-imputed: e6d0cc5 align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "88a34cc12d284cade95c3a72e57491a0de96f5e2",
+    "date": "2026-08-28T20:53:08-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/contract.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 14,
+    "changed_paths_sha256": "64ff546d0db6b704131badca202b660d5fe8c96d5c55c39e0e927afedc736549",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "dca6dea887e9297e4224c169bc4efc252ecdb627",
+    "date": "2026-08-29T17:11:01-04:00",
+    "subject": "align: chart eligibility asks the function that produces the term",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "199718652a27ea7532a09f08a02d196c89cf5d68b81520f08d6fcd18ecceb1f0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "feacf048e877d283c5a921385f4b7c179b563c58",
+    "date": "2026-08-28T23:51:50-04:00",
+    "subject": "align: population aggregates are bound to one view and to each subject's recall",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala",
+      "laws/src/test/scala/storymodel4s/laws/LawsSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "c32e7842e1cd5e06021be6344ae317047784bcf71cf5b058739824276e82bebb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "1eb0fa96db0ae624ed46aaa68cb82ed3e5d8478f",
+    "date": "2026-08-28T22:44:08-04:00",
+    "subject": "align: population aggregates are bound to one view and to each subject's recall",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala",
+      "laws/src/test/scala/storymodel4s/laws/LawsSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "c32e7842e1cd5e06021be6344ae317047784bcf71cf5b058739824276e82bebb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "72b19e308d214c29ccbe9e74fdcb6e1f158acee8",
+    "date": "2026-08-28T20:23:26-04:00",
+    "subject": "view: compile Codex feature scales",
+    "paths": [
+      "docs/adr/0002-visualization-contract.md",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "view/src/main/scala/storymodel4s/view/codex.scala",
+      "view/src/main/scala/storymodel4s/view/compiler.scala",
+      "view/src/main/scala/storymodel4s/view/visibility.scala",
+      "view/src/test/scala/storymodel4s/view/CodexCompilerSuite.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "82870533c5964f4f69db7c817247085ce8ab05805e0c928754846ac8ec7908bc",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "fbb214c244b9584a88b87f5198316d6a72dd380c",
+    "date": "2026-08-29T05:30:33-04:00",
+    "subject": "fix(interview): preserve missing specificity",
+    "paths": [
+      "codec/src/main/scala/storymodel4s/codec/features.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "codec/src/test/scala/storymodel4s/codec/FeaturesCodecSuite.scala",
+      "features/src/main/scala/storymodel4s/features/estimate.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "7b235d8ce090af9b1f6b4a123283717cd8f475bd5515fbd25c4b24ce4f6e771d",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "afb64a7e048c092358c40a066ee37f954eb10e14",
+    "date": "2026-09-23T07:53:23-04:00",
+    "subject": "WIP on main: 36174e31 test(corpus-intake): discard deleteIfExists results explicitly for fatal warnings",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "91be7876ceed348901ac53e0f1f92b8a7a2b969d",
+    "date": "2026-08-29T14:31:42-04:00",
+    "subject": "WIP blend: scale to eligible support, record supportWeight (pre-rebase snapshot)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "8131be8aabc018fba0c918f46a02579e999024e91a96a0fef23ca3ab20e751cd",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c1bfba48c09e21ce149daa6fa2d59e2f6c5ceb89",
+    "date": "2026-08-28T20:27:40-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "94c0daabeacdffefae3a0efe726349a15c91f04f",
+    "date": "2026-08-28T22:52:43-04:00",
+    "subject": "interview: attach Coverage to every profile rate",
+    "paths": [
+      "interview/README.md",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewProfileSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "a24b89084ea84e62b0e065b492831f72c4b4f87ed975bae27631bb00c7bc8765",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "4ac248fdae0ba4f48fc733de9ee6464d044d4662",
+    "date": "2026-08-28T20:42:49-04:00",
+    "subject": "embed: reject invalid cache and key results",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/baselines.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/cache.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/BaselineSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "8956786b7f1e8ab83704bf387d843101cab2b29e1a5f12bb82806c00b321c066",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "90c7ec0a9824efc99c99bc6a546042b25610b290",
+    "date": "2026-08-29T14:34:14-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "ee473f3eaf8b246cb6566fc30f361e7039492af6d439659c111c7b8478a3085a",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c3c8f8c250d96e141839de2b83dedfcf32fac842",
+    "date": "2026-08-28T19:05:36-04:00",
+    "subject": "align: separate structural match from coverage",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/source.scala",
+      "align/src/test/scala/storymodel4s/align/EvidenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "c83536a7175bf47bebb764914314848a094ee8decddbc091820a2531caa8b9d4",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "fbc82ea13a8b204279e6971baa67245216bd255b",
+    "date": "2026-08-29T17:26:56-04:00",
+    "subject": "align: chart eligibility asks the function that produces the term",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "199718652a27ea7532a09f08a02d196c89cf5d68b81520f08d6fcd18ecceb1f0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c8ca66ac93741c46490b6a2a0ed0c24d54f90e7f",
+    "date": "2026-08-28T22:44:32-04:00",
+    "subject": "embed: discard untrusted receipt provenance",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/cache.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/contract.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/BaselineSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "24e23efbc37ac276f7747c098ee69c0da062058cb993480fdc9f899bb94bc9fb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "d5cb1c0ce1dd0deeae23c106e93bc3a31a3e3031",
+    "date": "2026-08-29T11:03:21-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "interview/src/test/scala/storymodel4s/interview/AmbiguousPlacementSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 29,
+    "changed_paths_sha256": "4d580aceb971a206aeee149e9eb35023c24f7a8c7949a5c0d060815e51abdc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "cbcdea254c349419863292925de43d9647bed80d",
+    "date": "2026-08-29T14:31:42-04:00",
+    "subject": "WIP blend: scale to eligible support, record supportWeight (pre-rebase snapshot)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "8131be8aabc018fba0c918f46a02579e999024e91a96a0fef23ca3ab20e751cd",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "83d3649ca847bf2bc19881d5ee6698028036a923",
+    "date": "2026-08-28T19:27:29-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "5a7f6b8488d626e80a3f0b5198793bb8307341f2d06405184658685846cc8a40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "15d4b4a5e0b7ff86aafeab9484f35bbad449cc92",
+    "date": "2026-08-29T19:41:35-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "95d5e0024a7eb3378e56b4e1df1722de96acd59a",
+    "date": "2026-08-29T05:29:06-04:00",
+    "subject": "fix(interview): preserve missing specificity",
+    "paths": [
+      "codec/src/main/scala/storymodel4s/codec/features.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "codec/src/test/scala/storymodel4s/codec/FeaturesCodecSuite.scala",
+      "features/src/main/scala/storymodel4s/features/estimate.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "7b235d8ce090af9b1f6b4a123283717cd8f475bd5515fbd25c4b24ce4f6e771d",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "91d6e896f0c10f6f09d5c389c919ebf708763941",
+    "date": "2026-09-05T01:36:49-04:00",
+    "subject": "Layer-use ledger derived from theta, theta in provenance, and the ablation ladder (ADR 0016)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/LayerUseSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "docs/adr/0013-world-order-input.md",
+      "docs/adr/0014-directed-causal-transition-kinds.md",
+      "docs/adr/0016-layer-use-ledger-and-theta-provenance.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallOrderControl.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LadderSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderInputSuite.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "0e41efb84f61ad684d3ac77820f9f024a6ec02ac52de73cbcd9b84b7dd54afda",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "46e0c28c4787ef7f09d65fbbb0290a7e3550b17b",
+    "date": "2026-08-29T19:44:48-04:00",
+    "subject": "interview: excluded placement mass must say which rule removed it",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "ff86074197f82a70ab03dc132b9f2f500ec911cf31dd955cee4c5cead4f8bc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "67e1e83764c0d40873f8f5da310e038ada1f03ea",
+    "date": "2026-09-23T16:47:19-04:00",
+    "subject": "wip(align): seal FlowStep and TransitionFlow (mutants pending)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/matrix.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/FlowUnforgeableSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "cfbedff971d7d231ee43e2333d224d0fef52d60c6bb98dac607887d780b1d130",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "cde21652d26e88cd9fb629d942bb436da095bbee",
+    "date": "2026-08-30T11:01:38-04:00",
+    "subject": "WIP on m1/membership-routing: 64b44c8 mote: close hsmm/v2 rename bead; release reservation",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "25e480d10f4714b62af5e5b1a241db81a8016c2f",
+    "date": "2026-08-28T18:45:08-04:00",
+    "subject": "align: separate structural match from coverage",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/source.scala",
+      "align/src/test/scala/storymodel4s/align/EvidenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "c83536a7175bf47bebb764914314848a094ee8decddbc091820a2531caa8b9d4",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "23e5362caef895b90127de0aa554e019fe8c7002",
+    "date": "2026-08-29T17:10:41-04:00",
+    "subject": "align: chart eligibility asks the function that produces the term",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "199718652a27ea7532a09f08a02d196c89cf5d68b81520f08d6fcd18ecceb1f0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b9f4d0304fa72a6cd7d46e950d46749e60988962",
+    "date": "2026-09-01T10:09:09-04:00",
+    "subject": "snapshot: uncommitted working tree as found 2026-09-01",
+    "paths": [
+      ".gitignore",
+      "0.0",
+      "acquire/src/main/scala/storymodel4s/acquire/cache.scala",
+      "acquire/src/main/scala/storymodel4s/acquire/output.scala",
+      "acquire/src/test/scala/storymodel4s/acquire/OutputSuite.scala",
+      "acquire/src/test/scala/storymodel4s/acquireprobe/OutputConstructionProbeSuite.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "build.sbt",
+      "codec/README.md",
+      "codec/src/main/scala/storymodel4s/codec/output.scala",
+      "codec/src/main/scala/storymodel4s/codec/output_acquire.scala",
+      "codec/src/test/scala/storymodel4s/codec/OutputCodecSuite.scala",
+      "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "core/src/main/scala/storymodel4s/core/source.scala",
+      "core/src/test/scala/storymodel4s/core/AtlasSuite.scala",
+      "core/src/test/scala/storymodel4s/core/SourceBundleSuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/SourceConstructionBoundarySuite.scala",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "docs/adr/0007-film-source-representation.md",
+      "docs/data/sherlock/README.md",
+      "docs/data/sherlock/alias-map.json",
+      "docs/data/sherlock/annotation-lineage.json",
+      "docs/data/sherlock/recall-lineage.json",
+      "docs/data/sherlock/source-manifest.json",
+      "docs/data/sherlock/timebase-repair.json",
+      "docs/design/external-floor-calibration-court.md",
+      "docs/design/gptkz-primary-source-inventory.md",
+      "docs/design/movie-component-admission-ledger.md",
+      "docs/design/nfrd-baseball-diagnostic-court.md",
+      "docs/design/nfrd-primary-source-inventory.md",
+      "docs/design/recall-alignment-visualization-court.md",
+      "docs/design/sherlock-local-pair-admission-court.md",
+      "docs/design/sherlock-source-representation-audit.md",
+      "docs/design/story-output-bundle-spec.md",
+      "docs/plans/2026-08-29-movie-narrative-architecture.md",
+      "docs/plans/2026-09-01-sherlock-recall-product-prd.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/files.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/nfrd/intake.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/nfrd/NfrdBaseballSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/consumer/NfrdIntakePublicSuite.scala",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/README.md",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/SHA256SUMS",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/SurfaceArtifactDemo.java",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/SurfaceAtlasSourceIdentityOracleSuite.scala",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/Utf8RoundTripOracle.java",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/storymodel4s-surface-identity-oracle-9d8b4a3.log",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/surface-atlas-demo-input.txt",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/surface-atlas-demo.json",
+      "handoffs/codex-cli-vertical-slice-2026-08-31/surface-atlas-qa.html",
+      "laws/src/main/scala/storymodel4s/laws/SourceLaws.scala",
+      "laws/src/test/scala/storymodel4s/laws/SourceLawsSuite.scala",
+      "view/src/main/scala/storymodel4s/view/output.scala",
+      "view/src/test/scala/storymodel4s/view/OutputSuite.scala",
+      "view/src/test/scala/storymodel4s/viewprobe/OutputConstructionProbeSuite.scala"
+    ],
+    "changed_path_count": 15843,
+    "changed_paths_sha256": "26936f4168096a84117e69347c33693914fd466ec4b242b2f4832a34f880a322",
+    "mote_op_path_count": 237,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 15552
+  },
+  {
+    "sha": "56f594faddd49b2fab504cc09404ed4955e3a98a",
+    "date": "2026-09-02T17:20:17-04:00",
+    "subject": "study: unseal the untouched six and state what may not be claimed",
+    "paths": [
+      "docs/plans/2026-09-02-recall-to-video-study-log.md"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "7193d0e5e74cec03ec397c3342a7be5947152a8ee3fc04da825a15172dade368",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "d0f618a18630b406d584818ca195bd1eb6afa842",
+    "date": "2026-09-02T16:22:41-04:00",
+    "subject": "study: courts for the blend invariants, and the encoder headroom measured",
+    "paths": [
+      "docs/plans/2026-09-02-recall-to-video-study-log.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/sherlock/SherlockRecallMapping.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LexicalBlendSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "58cc89b43f6696996d8b791ccd7cd79cd0784a55a97752fe2c8b88b2cb793a64",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "edfd7479029c8a431cf2ebc03f53ec2228dd2c81",
+    "date": "2026-08-29T11:12:00-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "interview/src/test/scala/storymodel4s/interview/AmbiguousPlacementSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 29,
+    "changed_paths_sha256": "4d580aceb971a206aeee149e9eb35023c24f7a8c7949a5c0d060815e51abdc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "30fed2fc57206c94b2308a2f494c13fa81a9fddb",
+    "date": "2026-08-29T19:28:44-04:00",
+    "subject": "interview: excluded placement mass must say which rule removed it",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "ff86074197f82a70ab03dc132b9f2f500ec911cf31dd955cee4c5cead4f8bc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e2fe94a2e5d9c2a198bf113ac6f4af8668168f7e",
+    "date": "2026-08-29T10:08:55-04:00",
+    "subject": "Merge: an interview fixture that reaches PlacementBasis.Ambiguous",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3fff6e9ff9288123dc935903b44a4fcfb470626e",
+    "date": "2026-08-31T13:32:46-04:00",
+    "subject": "docs: freeze the candidate-nomination provenance contract before code",
+    "paths": [
+      "docs/design/candidate-nomination-provenance-court.md"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "470e1c35f567ef66214d9c6b6612e2d28cdc7bbad60f8aa962fadabafff1d4f7",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "18094791a37b7547718bf21e19fa36b046fd6d2a",
+    "date": "2026-09-23T17:01:37-04:00",
+    "subject": "wip(align): S2a-2 content types and projection (seam draft, untested)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/content.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "921e90b91e238810ad8eb1b893a899a5c4028a012712418824014a33aaace176",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "be0905d5298a7dd95b6d33d3ed1ddba6bb65175a",
+    "date": "2026-08-29T07:44:46-04:00",
+    "subject": "feat(view): compile surface detail marks",
+    "paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "64e264e87c3dd07bc35bd05820a1f735006db08a7cd5497058bf4cf359253edb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "390c415fca25ffb08a4241b1ad55d36d74735d95",
+    "date": "2026-09-23T11:13:29-04:00",
+    "subject": "docs(evidence): archive the AC4 S1 gate, mutation receipt and review record",
+    "paths": [
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/README.md",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/gate-9f10e10b.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutate_s1.py",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-after.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/control-before.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/edition-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/extent-shape-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/full-decode-byte-rule.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/membership-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/receipt.json",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sample-index-as-presentation-ordinal.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/sampled-ordinal-is-sample-index.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-not-in-identity.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/selection-order-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/mutations/unsampled-request-unchecked.log.gz",
+      "docs/refactor/evidence/ac4-s1-sampled-frames-20260923/qualification.json"
+    ],
+    "changed_path_count": 16,
+    "changed_paths_sha256": "a90dfb7d3821c9bdf203dca8e20087963e5c0cd95bda5f9f3da70ca6327f44df",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ee1197fac8de0998fdb84428fdb6fd8c52c1d1fc",
+    "date": "2026-08-28T18:49:34-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "8d1237b9d979a48591b3794f19ea1ed544fbe3aa",
+    "date": "2026-08-29T08:46:08-04:00",
+    "subject": "feat(view): compile surface detail marks",
+    "paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala",
+      "view/src/test/scala/storymodel4s/viewprobe/ConstructionProbeSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "5e47b015084d56806e9b307383569bb70f636243a6e880d963e3eb1c6c7f24f2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2913397af74d55d978f6cb8fd8f51c541013d964",
+    "date": "2026-08-29T03:47:13-04:00",
+    "subject": "interview: a typed vehicle for fractional placement resolution",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "ff86074197f82a70ab03dc132b9f2f500ec911cf31dd955cee4c5cead4f8bc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ca13cb06b14620d895199a0de39ed76fc91736d4",
+    "date": "2026-09-04T19:52:25-04:00",
+    "subject": "Directed causal transition kinds beside the symmetrized one (ADR 0014)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/DirectedCausalSuite.scala",
+      "docs/adr/0014-directed-causal-transition-kinds.md"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4b57a3b5d0b0a4a14481c971849a430ce29a3275a0896ccae876c92bf93a9f44",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "d9172180d112d28b67b3f3bcf0fac7e7f67ac8e3",
+    "date": "2026-08-29T21:52:50-04:00",
+    "subject": "align: the cell coordinate join, behind a construction boundary that proves its relation",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "101bb5f37f2fc894e064f7afd933f550a9c658e6",
+    "date": "2026-08-29T11:35:59-04:00",
+    "subject": "fix(fixtures): remove WOG initialization-order cycle",
+    "paths": [
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsInitializationSuite.scala",
+      "fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsModel.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "e23471bf11da729c7755aed1afbb58f374cdd72556bc382c116e30f1704d6f02",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "291c4557fa9f7ac18eed81ffebc62c3f4d7a4568",
+    "date": "2026-08-29T19:34:07-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "871c898b99f4aaeada0f9c2121b3e02f92dc92d9",
+    "date": "2026-08-29T19:02:16-04:00",
+    "subject": "WIP on m1/semantic-imputed: 1beda30 align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b51f83daff258db3c37864740724ef9aed58db18",
+    "date": "2026-08-28T19:24:16-04:00",
+    "subject": "codec: add typed numeric sidecars",
+    "paths": [
+      "codec/README.md",
+      "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "codec/src/main/scala/storymodel4s/codec/sidecar.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/SidecarSuite.scala",
+      "docs/adr/0002-visualization-contract.md"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "6b4bc623fa9f2e812da4057ff4883ef92654722095df633dcfc0649f9b4399f6",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "eb1f9786e17d4a4135a9e0c86fb13d16f6df1460",
+    "date": "2026-08-28T19:09:10-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "5a7f6b8488d626e80a3f0b5198793bb8307341f2d06405184658685846cc8a40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "362535d85fde591dce257f93a65a16dde46a3d00",
+    "date": "2026-08-28T17:58:38-04:00",
+    "subject": "embed: seal pseudonymized remote payloads",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "bed1df10b81502b0a137e5e26d44896af6842775ac6e616861e05d24cf3ff4c7",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "17264d6bcafaaa17bedb79e5c50fcd5c2752671d",
+    "date": "2026-09-05T01:23:56-04:00",
+    "subject": "Layer-use ledger derived from theta, theta in provenance, and the ablation ladder (ADR 0016)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/LayerUseSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "docs/adr/0013-world-order-input.md",
+      "docs/adr/0014-directed-causal-transition-kinds.md",
+      "docs/adr/0016-layer-use-ledger-and-theta-provenance.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallOrderControl.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LadderSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderInputSuite.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "0e41efb84f61ad684d3ac77820f9f024a6ec02ac52de73cbcd9b84b7dd54afda",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9729971b2baf413b632d8a35a0b28dda6f36174b",
+    "date": "2026-08-28T18:46:12-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "981f2f30a804146935c9741f0f04a5ee21429a718a936e5de1822206334e31e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "342a099fe28b7b1aae26800b6f034536e608e2ec",
+    "date": "2026-08-29T21:08:43-04:00",
+    "subject": "align: the coordinate join for a cell, without the statuses the record cannot support",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "662a6f9c43640475d92358a41c200e2ab6e6e56b",
+    "date": "2026-08-28T19:45:38-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "cd2ad18824c1e1f3e2f6a26c304c9bc15b86c22f",
+    "date": "2026-09-01T10:16:44-04:00",
+    "subject": "Salvage SurfaceAtlas source-identity oracle suite",
+    "paths": [
+      "codec/src/test/scala/storymodel4s/codec/SurfaceAtlasSourceIdentityOracleSuite.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "188c2836fd476822bf9c50a8b62fe93c34153c84a2c701f63e58011ca356b456",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "af339f26866ee8807642a3f93c742d7e83ec1cfa",
+    "date": "2026-08-29T19:31:43-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "8f3669ed8bb007998fb15f018c1c84ed36ec4c8c",
+    "date": "2026-08-28T20:13:12-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ea37d759daea42c2c990d66dff94e6edbfcae18d",
+    "date": "2026-08-28T21:27:36-04:00",
+    "subject": "embed: enforce batch-scoped receipt authority",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/baselines.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/cache.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/contract.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/error.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/BaselineSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala"
+    ],
+    "changed_path_count": 8,
+    "changed_paths_sha256": "de9ebc23577714a87c9e39bf8101acdc57d753db107153044ed07deda5218639",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2d384d8dc96a19c99a091ebcd2e0a0beb6553602",
+    "date": "2026-08-28T18:54:18-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3c3b617ab0b218749de69a695d0d45f13ec4431e",
+    "date": "2026-08-30T08:06:20-04:00",
+    "subject": "interview: excluded placement mass says which rule and which threshold removed it",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "cbc554121bea4a75b724587f5b8e9bd8eb83aae9f82f8f4c513090b49a65999c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c141970024b6f95fa1472a6bd403fe3110046fff",
+    "date": "2026-08-29T07:55:48-04:00",
+    "subject": "Seal Coverage and the remaining align/grakern validating types against fromProduct.",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/matrix.scala",
+      "align/src/test/scala/storymodel4s/consumer/AlignBoundarySuite.scala",
+      "embed-grakern/src/main/scala/storymodel4s/embed/grakern/distance.scala",
+      "embed-grakern/src/test/scala/storymodel4s/grakernprobe/StructuralProgramBoundarySuite.scala",
+      "features/src/main/scala/storymodel4s/features/estimate.scala",
+      "features/src/test/scala/storymodel4s/featuresprobe/CoverageBoundarySuite.scala"
+    ],
+    "changed_path_count": 8,
+    "changed_paths_sha256": "b4ba3d12b3d4d05a3700900436649562fd484983e48013eb3ebfcc4db8a8b9e1",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "c7434d8c5549a088f5302e29e2e516e58ddc0842",
+    "date": "2026-08-28T19:11:58-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "5a7f6b8488d626e80a3f0b5198793bb8307341f2d06405184658685846cc8a40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "01440d3d8bcc66d569b28753420febe93b76fc55",
+    "date": "2026-09-23T09:59:22-04:00",
+    "subject": "docs(adr): record the approved S2 content-only scoring boundary (ADR 0019)",
+    "paths": [
+      "docs/adr/0019-mapping-measurement-policy.md"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "6055160d4d66cb30d544fdf14ff1166314a075b5a8659f1516e3d85f851ba55d",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a246017909ee0d935fac16815432ff92ad4bf496",
+    "date": "2026-08-28T18:48:58-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "981f2f30a804146935c9741f0f04a5ee21429a718a936e5de1822206334e31e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ac469551d0d7766363ed45e206497f4745444800",
+    "date": "2026-08-28T20:23:14-04:00",
+    "subject": "view: compile Codex feature scales",
+    "paths": [
+      "docs/adr/0002-visualization-contract.md",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "view/src/main/scala/storymodel4s/view/codex.scala",
+      "view/src/main/scala/storymodel4s/view/compiler.scala",
+      "view/src/main/scala/storymodel4s/view/visibility.scala",
+      "view/src/test/scala/storymodel4s/view/CodexCompilerSuite.scala"
+    ],
+    "changed_path_count": 6,
+    "changed_paths_sha256": "82870533c5964f4f69db7c817247085ce8ab05805e0c928754846ac8ec7908bc",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "704c0749eff46a27a3a9ea10525d46115440d374",
+    "date": "2026-08-28T20:25:23-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "7f57c30ede296629db0a797e5183e27062c24fcd",
+    "date": "2026-09-17T09:30:22-04:00",
+    "subject": "On main: session-2 provenance court: friends README edit, restore immediately",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a15909d3529178239c0df86e79bce845192bf2d7",
+    "date": "2026-08-29T11:06:00-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "interview/src/test/scala/storymodel4s/interview/AmbiguousPlacementSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 29,
+    "changed_paths_sha256": "4d580aceb971a206aeee149e9eb35023c24f7a8c7949a5c0d060815e51abdc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "715bdde2120658e66f14c016fcb2cdafb90bf73b",
+    "date": "2026-08-29T18:43:27-04:00",
+    "subject": "wip semantic imputed",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "115cc32554da6495634f40119af4839255e63bf6",
+    "date": "2026-08-29T03:55:03-04:00",
+    "subject": "interview: a typed vehicle for fractional placement resolution",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "ff86074197f82a70ab03dc132b9f2f500ec911cf31dd955cee4c5cead4f8bc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2a648b8545793589661ee8fd10a2cc7cff36e1db",
+    "date": "2026-08-28T18:44:48-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b56e891dfa2a129f184a0641969f80d7133f2330",
+    "date": "2026-08-29T12:42:02-04:00",
+    "subject": "fixup! recall: bind graph validation in the type",
+    "paths": [
+      "embed-grakern/src/test/scala/storymodel4s/embed/grakern/IntegrationSuite.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "23c7ec54b42aca3bb025b0982519a72e09e00c93f10d8e1cc5c07e7f56218ede",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a76f413bb764e9594f7c803a59aeeee65b53878c",
+    "date": "2026-08-29T19:27:44-04:00",
+    "subject": "WIP on m1/attributable-exclusion: b65c5c6 wip attributable exclusion",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ac716747f3297314ca517d00903fc6cb0ff837ee",
+    "date": "2026-08-29T09:06:49-04:00",
+    "subject": "interview: a fixture that reaches Ambiguous, and what it shows",
+    "paths": [
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewProfileSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "70af2a605c7d9de49843bd94e61bfe2c5d26eeda86e72aae8afb1e9a0366f54b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "3678b1a1d23ac9a3d8fafb0dd6efca229d742519",
+    "date": "2026-08-30T08:51:26-04:00",
+    "subject": "interview: a membership threshold is a threshold, and gets a threshold's guard",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/scoring/PlacementProducerSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "cbc554121bea4a75b724587f5b8e9bd8eb83aae9f82f8f4c513090b49a65999c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "017a4bfbc30cd2ccb19e9fe8a85b6238122bbefa",
+    "date": "2026-08-28T20:15:33-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "717a85af19f83f203cea97fdef8f58141507e7da",
+    "date": "2026-08-29T15:54:36-04:00",
+    "subject": "align: reject the whole SinkhornConfig domain, not only NaN epsilon",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/SinkhornSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "760fe0c86211cb95a71df73115ca048ff6611e2fc526efbeb7bfbe9943c9dfed",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "8c7deff8e75c8b508d1754f4b0aa38003c6c9caf",
+    "date": "2026-08-29T20:13:53-04:00",
+    "subject": "WIP on m1/semantic-imputed: e6d0cc5 align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b87ddfdd7b33ee7f99af999bf06ed69ab88beaaf",
+    "date": "2026-08-29T19:36:58-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "067e35b523355886b5d38f5b205311f70227885f",
+    "date": "2026-08-29T19:47:54-04:00",
+    "subject": "interview: excluded placement mass must say which rule removed it",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "ff86074197f82a70ab03dc132b9f2f500ec911cf31dd955cee4c5cead4f8bc90",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "287ff5f0eb9bfd21589a5ca3387d6a6c182f581e",
+    "date": "2026-08-28T20:53:00-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/contract.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 14,
+    "changed_paths_sha256": "64ff546d0db6b704131badca202b660d5fe8c96d5c55c39e0e927afedc736549",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "5f84b50c9993f0aeb6157a74d86cf45c1f6bcb63",
+    "date": "2026-08-30T11:35:45-04:00",
+    "subject": "WIP on m1/reanchor: b3ed579 tmp",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "6b84813f79137688c6e40e5e9b7a29f326d4ad0c",
+    "date": "2026-08-29T11:23:09-04:00",
+    "subject": "WIP recall: make validation status binding",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/population.scala",
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/AnnaFixture.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PopulationSuite.scala",
+      "align/src/test/scala/storymodel4s/align/PropertySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "codec/src/main/scala/storymodel4s/codec/recall.scala",
+      "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/case.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/wog.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAlignmentSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atoms.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/main/scala/storymodel4s/interview/model.scala",
+      "interview/src/main/scala/storymodel4s/interview/segment.scala",
+      "interview/src/test/scala/storymodel4s/interview/AmbiguousPlacementSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/AlignGens.scala",
+      "recall/src/main/scala/storymodel4s/recall/graph.scala",
+      "recall/src/main/scala/storymodel4s/recall/segmenter.scala",
+      "recall/src/test/scala/storymodel4s/probes/RecallGraphUnforgeableSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/GraphSuite.scala",
+      "recall/src/test/scala/storymodel4s/recall/SegmenterSuite.scala"
+    ],
+    "changed_path_count": 32,
+    "changed_paths_sha256": "a35ce9125872cef3763bfa523be91d3d23d18a7e6375e1cc7fa286b518abdf92",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "84848991cc77b0c16e1a3f6191edd4fd7166be28",
+    "date": "2026-08-29T04:52:17-04:00",
+    "subject": "fix(embed-bench): preserve unranked route support",
+    "paths": [
+      "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/MetricsSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "b721c118526cf34907ccd17c46fe6cb3c30cd63f74df601c824bb7086782bece",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "02879b4b49853fc656787fc06894e07a130d5407",
+    "date": "2026-08-28T19:56:03-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "79876360bdc9067d624b5dd9f8461745e6e20cea",
+    "date": "2026-08-30T15:16:29-04:00",
+    "subject": "PART B SCOPED PROPERLY, AND MY HANDOFF OVERSTATED HOW FREE IT IS. Measured at 19:50, no build required.",
+    "paths": [],
+    "changed_path_count": 7,
+    "changed_paths_sha256": "3f82dc3c33ff6e269d53216b706c81896bea56d8707a3bc712a7a987807bdff7",
+    "mote_op_path_count": 7,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "668a8dec62049823203cbb3f704004c8333107c1",
+    "date": "2026-08-29T04:24:30-04:00",
+    "subject": "align, interview: close the Mirror forge on my two smart-constructed types",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/signature.scala",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Resolution.scala",
+      "interview/src/test/scala/storymodel4s/interview/ResolutionSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "539e1d450ae40966ac2a7295c54f7171d91499ab81d3e2545482b45bc77b3b07",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ee935518d31f855a9a22e196b0f5581cfdc8f397",
+    "date": "2026-08-28T22:45:26-04:00",
+    "subject": "interview: honest Unattached birthday placement and materialized addrOf",
+    "paths": [
+      "fixtures/src/main/scala/storymodel4s/fixtures/interview/BirthdayInterview.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/BirthdayInterviewSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "e788f870c36e46c2b9a9b8eea3c927e992fba41868115a641a8badec50d57f40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "699903a38d121f5bf3161461cf1ca90ae0e41a3a",
+    "date": "2026-08-28T18:22:08-04:00",
+    "subject": "embed: seal pseudonymized remote payloads",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ContractSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "bed1df10b81502b0a137e5e26d44896af6842775ac6e616861e05d24cf3ff4c7",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "6e9a611ecd0d4db68913cfd0d9624c4d3fbe1d55",
+    "date": "2026-08-28T18:54:53-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "5a7f6b8488d626e80a3f0b5198793bb8307341f2d06405184658685846cc8a40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "9c9ce13d83998343a9feff7ec173a6b38e1b429e",
+    "date": "2026-08-28T19:15:19-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/BaselineSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "a79a818dbee9c40bf6f321e996023f3d223ebc6594fac9baadcccdb933749c9f",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "859def45f22dee259e4d1422d0868f6dfe267603",
+    "date": "2026-08-29T10:15:24-04:00",
+    "subject": "refactor(core): validate atlas construction",
+    "paths": [
+      "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "core/src/main/scala/storymodel4s/core/transcript.scala",
+      "core/src/test/scala/storymodel4s/core/AtlasSuite.scala",
+      "core/src/test/scala/storymodel4s/core/TranscriptSuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/AtlasConstructionBoundarySuite.scala",
+      "fixtures/src/main/scala/storymodel4s/fixtures/interview/BirthdayInterview.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 12,
+    "changed_paths_sha256": "7c5bbded9065960b4c4e0672741eb6dd9cdc3f9680299c9bc4a07b14e5824e25",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e6a1cb77c5ce0bd4d87987526187e903da9339c8",
+    "date": "2026-08-29T14:32:46-04:00",
+    "subject": "feat(document): compile proposal evidence into narratives",
+    "paths": [
+      "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "document/src/test/scala/storymodel4s/document/CompilerSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/NarrativeCompilerVerticalSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "4f3b08486e1acae76162b4c5b2092e6d725801e06c4b8cf6a31df1eecf9e3ac9",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "37a25113110eea3c160c803d4dcc8c8c972a0a45",
+    "date": "2026-08-29T19:02:16-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "45a255f077a8811931a801fc91e2985fb6bfe4b2",
+    "date": "2026-08-28T18:49:47-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2ea4614121d8a8f34b05fa25039ebf76f9e47352",
+    "date": "2026-08-29T21:41:51-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "a5a8ab770f6d87c9203990d363b26740ce665676",
+    "date": "2026-08-30T08:14:40-04:00",
+    "subject": "align: the cell coordinate join, behind a construction boundary that proves its relation",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "80a9ad01cf237169a01626050a46a3b8eb28a5f6",
+    "date": "2026-08-29T15:55:29-04:00",
+    "subject": "align: reject the whole SinkhornConfig domain, not only NaN epsilon",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/sinkhorn.scala",
+      "align/src/test/scala/storymodel4s/align/SinkhornSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "760fe0c86211cb95a71df73115ca048ff6611e2fc526efbeb7bfbe9943c9dfed",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "57af23b02084048f8cf88ad451cac3681601bef6",
+    "date": "2026-08-29T20:46:29-04:00",
+    "subject": "align: the coordinate join for a cell, without the statuses the record cannot support",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "bfb6a630fca69cfae0f865c05a686d98cfeae04e3f960ff4b5e55990c2f5d8de",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "80af2559e3f60fba56b4607be6e6cad9268efb38",
+    "date": "2026-08-28T20:41:39-04:00",
+    "subject": "interview: profile strands count units and situations, not atoms",
+    "paths": [
+      "interview/README.md",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewPhenomenologySuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewProfileSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "a98bcce865efe1fa86672aec23b4a98d1927d345d7fab37ab9dd4ea2d49fd15c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "d1b113d7b39f3fd18d99f13a49a19b7fae59fac0",
+    "date": "2026-08-28T19:06:14-04:00",
+    "subject": "interview: split pseudonymization key from remote payload",
+    "paths": [
+      "build.sbt",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 5,
+    "changed_paths_sha256": "5a7f6b8488d626e80a3f0b5198793bb8307341f2d06405184658685846cc8a40",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "dfb3074430fc9b7eb18f366fd1fc651ed6a0a848",
+    "date": "2026-08-29T15:43:10-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/src/test/resources/golden/hsmm-v1-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e02a7c5670078acbc0ac934aa84cbeceb409c719a71211e4184f23544834eab5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "09b535c3676031532309cb2be38ffd88087d8359",
+    "date": "2026-09-05T01:21:54-04:00",
+    "subject": "Layer-use ledger derived from theta, theta in provenance, and the ablation ladder (ADR 0015)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/LayerUseSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "docs/adr/0015-layer-use-ledger-and-theta-provenance.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallOrderControl.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LadderSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderInputSuite.scala"
+    ],
+    "changed_path_count": 8,
+    "changed_paths_sha256": "e367720bcdfa74a4955f3a43ba4347d2d2cdb5c5e9706468fb5390c5d83cd0a7",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "ddb6e9c499e149a9d1dd57b2768c7401f6aa86b2",
+    "date": "2026-09-23T07:57:12-04:00",
+    "subject": "WIP on main: 9d0d0fca Merge qualified strict-build evidence and dependency disclosure",
+    "paths": [],
+    "changed_path_count": 0,
+    "changed_paths_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "41bdc5872e9dabceff363b21d99749a329b8ce98",
+    "date": "2026-08-29T20:45:39-04:00",
+    "subject": "wip trace",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "bfb6a630fca69cfae0f865c05a686d98cfeae04e3f960ff4b5e55990c2f5d8de",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "47c061bd13736614b889fb84a0cdbddf2d1132fb",
+    "date": "2026-08-30T08:15:45-04:00",
+    "subject": "align: the cell coordinate join derives its words instead of accepting them",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/trace.scala",
+      "align/src/test/scala/storymodel4s/align/TraceSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "2017546436eaa8b68babeb2ad43f886026fa0bb74ab1893d4a301fc989b270c0",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e5c0979c570b29cc64571ae89d7b0fcf02177495",
+    "date": "2026-08-29T16:21:30-04:00",
+    "subject": "align: the cost blend carries the support it rests on",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SensoryAbsenceSuite.scala",
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/src/test/resources/golden/hsmm-v1-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e02a7c5670078acbc0ac934aa84cbeceb409c719a71211e4184f23544834eab5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "f8c07b203e7158032a9d2490cb1c313a3b30ebfa",
+    "date": "2026-09-23T09:19:14-04:00",
+    "subject": "docs(evidence): refresh the scene-frame archive for the independent-review repair",
+    "paths": [
+      "docs/refactor/evidence/scene-frames-parts-20260923/README.md",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/accept-any-fraction-token.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/admit-reversed-row.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/after.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/allocate-accepts-inexact-or-nonpositive.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/before.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/binary-float-durations.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/extract-before-refusal.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/legacy-half-second-span.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/lexical-part-order.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/majority-part-reinstated.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/no-frame-floor-per-part.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/parse-times-through-float-repr.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/parse-times-through-float.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/receipt.json",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/sample-on-extent-bound.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/skip-extent-check.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/tie-to-later-part.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/undeclared-part-dropped.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/mutations/union-span-offsets.log",
+      "docs/refactor/evidence/scene-frames-parts-20260923/unit-tests.log"
+    ],
+    "changed_path_count": 21,
+    "changed_paths_sha256": "6021a943cd93f1eb022a3fd4410de7eae8bcdfd7b4bf8149401c16011faa219b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "52c179f2e6953797178158db50e97fd3f59e1e52",
+    "date": "2026-09-17T22:08:22-04:00",
+    "subject": "build: publish under io.github.bbuchsbaum, and state homepage and scmInfo",
+    "paths": [
+      "build.sbt"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "a1a88486a04a22eee5e2f2d65444aa412f0155018cf219ace47bbce6d33d318b",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "bdc72313a0ec5617b6b94133c4b4f202f86c9a10",
+    "date": "2026-08-29T10:36:07-04:00",
+    "subject": "refactor(core): validate atlas construction",
+    "paths": [
+      "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "codec/src/test/scala/storymodel4s/codec/CodecGens.scala",
+      "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "core/src/main/scala/storymodel4s/core/transcript.scala",
+      "core/src/test/scala/storymodel4s/core/AtlasSuite.scala",
+      "core/src/test/scala/storymodel4s/core/TranscriptSuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/AtlasConstructionBoundarySuite.scala",
+      "fixtures/src/main/scala/storymodel4s/fixtures/interview/BirthdayInterview.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodexCompilerSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 12,
+    "changed_paths_sha256": "7c5bbded9065960b4c4e0672741eb6dd9cdc3f9680299c9bc4a07b14e5824e25",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "4ecdc3344c9d322c57975b682fd7d61522a51c25",
+    "date": "2026-08-28T20:02:07-04:00",
+    "subject": "privacy: bind pseudonymization to detector evidence",
+    "paths": [
+      "build.sbt",
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/privacy.scala",
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/DigestPrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/PrivacySuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "fixtures/src/test/scala/storymodel4s/fixtures/interview/PrivacyFixtureSuite.scala",
+      "interview/src/main/scala/storymodel4s/interview/atlas.scala",
+      "interview/src/main/scala/storymodel4s/interview/privacy.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewSuite.scala"
+    ],
+    "changed_path_count": 11,
+    "changed_paths_sha256": "d0876b0d43a5960aa3c5dcca3c23359676fbf9252bd78b22f85328c1e6e3b2e2",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "7adce149715077e6044ae271423e874c3842f4c7",
+    "date": "2026-08-29T19:44:39-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "96dd5345b236bacc8bd1ea76098715f4a6e6bc34",
+    "date": "2026-09-23T10:27:02-04:00",
+    "subject": "docs(adr): ADR 0007 amendment for sampled frame sets (AC4 S1, draft)",
+    "paths": [
+      "docs/adr/0007-film-source-representation.md"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "4b03f4b7bec8447f18c23a1f9bd2aed1e5000479984f10032b146ca9431cf27c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "2adfff2939ef6d0c452bcbb6f18221933c9ab1f8",
+    "date": "2026-08-29T06:49:35-04:00",
+    "subject": "align: forge tripwires for the two remaining smart-constructed carriers",
+    "paths": [
+      "align/src/test/scala/storymodel4s/align/SignatureSuite.scala"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "87d7893f964f662ad68e34db033faed411fc14aafd08779f7718a42d6c44870d",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "1ce37ff75212ca0cd325aca2f9feb81d39bd87f8",
+    "date": "2026-09-21T08:30:37-04:00",
+    "subject": "fix(friends): enforce committed sealed-split reads and count attempts",
+    "paths": [
+      ".github/workflows/baseline-integrity.yml",
+      "docs/adr/0019-mapping-measurement-policy.md",
+      "docs/data/friends/README.md",
+      "docs/data/friends/test-split-reads.json",
+      "tools/recall-study/friends_guard.py",
+      "tools/recall-study/friends_split.py",
+      "tools/recall-study/sealed_split.py",
+      "tools/recall-study/tests/mutate_friends_guard.py",
+      "tools/recall-study/tests/test_friends_guard.py",
+      "tools/recall-study/tests/test_sealed_split.py"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "c72c43b65633f0a1c064fb190eae1e417e1bb7cf7d239684f3dc9aa9b3a160fa",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "d7e4c557076e50a4cde37aafb8ed9b99fffc2315",
+    "date": "2026-08-29T21:43:16-04:00",
+    "subject": "align/codec: an imputed term is priced like a measured one and accounted differently",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/cost.scala",
+      "align/src/main/scala/storymodel4s/align/wire.scala",
+      "align/src/test/scala/storymodel4s/align/CostSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WireSuite.scala",
+      "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+      "fixtures/src/test/resources/golden/hsmm-v2-wog.json",
+      "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ],
+    "changed_path_count": 10,
+    "changed_paths_sha256": "e6c4298257679362d670dfbf6cacb27f878dbbaa087b0304ab4183eceb36fbe5",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e1e5ab4f5b3826593dd2087e37d84e4f8c04b842",
+    "date": "2026-08-29T19:53:49-04:00",
+    "subject": "align: omit position features when position is unmeasured",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/TransitionFeaturesSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "22b6f178f01bb8c746690495f8c98b987fff4e6b19726933ec4e6cfcb5f76859",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e4ec0fc0684c6ade78a7f0f375d37c738d0eb3ba",
+    "date": "2026-09-03T06:09:15-04:00",
+    "subject": "docs/plans: handoff brief for the recall-to-video work",
+    "paths": [
+      "docs/plans/2026-09-03-recall-to-video-handoff.md"
+    ],
+    "changed_path_count": 1,
+    "changed_paths_sha256": "c20a7e0c453c5e5ee224b02bacbbd036c759fdce09a40357dd5e23c4a4ac6442",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e9ec4196db77c91d6ec0a96259274ec00530d057",
+    "date": "2026-09-03T07:54:21-04:00",
+    "subject": "docs: the voyage companions in the handoff, and what the posterior sidecar showed",
+    "paths": [
+      "docs/plans/2026-09-02-recall-to-video-study-log.md",
+      "docs/plans/2026-09-03-recall-to-video-handoff.md"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "2f1b0030e05c1278948f6ab0344ced2b103aa6f52ec797ecbb91d64f9f5a1002",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "11f3994acab9b984855a35ec07839355a22ccf80",
+    "date": "2026-08-28T22:45:02-04:00",
+    "subject": "interview: profile strands count units and situations, not atoms",
+    "paths": [
+      "interview/README.md",
+      "interview/src/main/scala/storymodel4s/interview/scoring/Scoring.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewPhenomenologySuite.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewProfileSuite.scala"
+    ],
+    "changed_path_count": 4,
+    "changed_paths_sha256": "a98bcce865efe1fa86672aec23b4a98d1927d345d7fab37ab9dd4ea2d49fd15c",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "23f355169380a5fec8081178a267e0e13abfb4ff",
+    "date": "2026-09-23T11:40:51-04:00",
+    "subject": "fix(media): bind the stream into the sampled set identity and receipt (AC4 S1 review)",
+    "paths": [
+      "media/src/main/scala/storymodel4s/media/frames.scala",
+      "media/src/test/scala/storymodel4s/probe/SampledCaptionConsumerSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "94fb3c5221f26b2ac9e1dd2f6731e3ce37a8255b2020b5f2e2c37c64cf965feb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "b3f3c35b0120e3e70648d6925d3d9e8d0efc9057",
+    "date": "2026-08-29T08:17:12-04:00",
+    "subject": "feat(view): compile surface detail marks",
+    "paths": [
+      "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala",
+      "view/src/main/scala/storymodel4s/view/atlas.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "64e264e87c3dd07bc35bd05820a1f735006db08a7cd5497058bf4cf359253edb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "52f963166ad6b65f6e85db6089a4b16740fd280c",
+    "date": "2026-09-05T01:19:56-04:00",
+    "subject": "WIP: layer-use ledger, theta provenance, ablation ladder (ADR 0015)",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/test/scala/storymodel4s/align/LayerUseSuite.scala",
+      "align/src/test/scala/storymodel4s/align/WorkedExampleSuite.scala",
+      "docs/adr/0015-layer-use-ledger-and-theta-provenance.md",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallOrderControl.scala",
+      "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/LadderSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/WorldOrderInputSuite.scala"
+    ],
+    "changed_path_count": 8,
+    "changed_paths_sha256": "e367720bcdfa74a4955f3a43ba4347d2d2cdb5c5e9706468fb5390c5d83cd0a7",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "0efd012b23570ba6a45d99b181401c630637fe40",
+    "date": "2026-08-28T19:49:32-04:00",
+    "subject": "interview: keep episodic address when mixed cues appear; return only on explicit cue or lost continuity",
+    "paths": [
+      "interview/src/main/scala/storymodel4s/interview/induce.scala",
+      "interview/src/test/scala/storymodel4s/interview/InterviewInductionSuite.scala"
+    ],
+    "changed_path_count": 2,
+    "changed_paths_sha256": "3086944f3d524f10b0203f4535a8d03149447f1e2e3e5bdaf325b19f50c46dfb",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  },
+  {
+    "sha": "e2fd895c2329bb13b0d5430af9997fde4340e3a7",
+    "date": "2026-08-28T18:41:28-04:00",
+    "subject": "embed: validate complete geometry compatibility",
+    "paths": [
+      "docs/adr/0001-embedding-contract-and-hard-gate.md",
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/IdentitySuite.scala"
+    ],
+    "changed_path_count": 3,
+    "changed_paths_sha256": "4981c1c676783cbb2334279f21332fc23019744020b4eff7b6195f64c9c9b398",
+    "mote_op_path_count": 0,
+    "nested_mote_op_path_count": 0,
+    "generated_or_dependency_path_count": 0
+  }
+]

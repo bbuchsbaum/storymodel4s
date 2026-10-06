@@ -1,0 +1,277 @@
+name,sha,ref_kind,date,behind,ahead,classification,unmatched_count,subject
+absorb-unabsorbed-tolerance,08c26d8e9c86659c45c0ca9029d7d803a0a7a26c,local_branch,2026-08-29T14:27:11-04:00,1095,0,ancestor,0,Absorb within-tolerance slack so admitted partitions and L2 vectors store the claim they made.
+align-dsens-absence,925766eff4b37b300bbd9bd7b4f9c61970f875f8,local_branch,2026-08-29T11:02:43-04:00,1138,0,ancestor,0,fixtures: format the hsmm/v1 checksum provenance comment
+backup/own-the-metric-workspace-20260905,13400455a789bac71b6ba409e85d59aa59878550,local_branch,2026-09-05T10:22:42-04:00,611,1,review-required,1,Preserve the pre-unification Own the Metric workspace
+candidate/recall-alignment-visualization-court,834f28099827a9d010bcc3ffbd7a7c19cffa506d,local_branch,2026-08-31T13:27:28-04:00,895,1,review-required,1,docs: freeze recall alignment visualization court
+candidate/recall-alignment-visualization-court-v2,7da3b10736a5aa195430d116ca1fcd939bec8a01,local_branch,2026-08-31T14:17:17-04:00,895,1,review-required,1,docs: harden recall visualization court
+candidate/recall-alignment-visualization-court-v3,05e0746d65ea27db72d659d50616f006630c9df3,local_branch,2026-08-31T14:20:54-04:00,895,1,review-required,1,docs: complete recall visualization flow courts
+candidate/recall-alignment-visualization-court-v4,ac985d4f2d279ec3e447767e4a72c4aa552f97cc,local_branch,2026-08-31T15:04:49-04:00,895,1,review-required,1,docs: specify recall alignment visualization court
+candidate/recall-alignment-visualization-court-v5,a7fa64abe85d32e0f5d4520b6c7d2724cef150e5,local_branch,2026-08-31T15:28:22-04:00,895,1,review-required,1,docs: correct recall alignment visualization court
+candidate/recall-alignment-visualization-court-v6,0be9006bf706b4432bc15bfe542db93432b3aad4,local_branch,2026-09-01T02:53:48-04:00,895,2,review-required,2,docs: preserve recall construction uncertainty
+candidate/sherlock-local-pair-admission-court,60d1827f9356b8a2cf3121e214432ef597edca70,local_branch,2026-08-31T14:40:48-04:00,895,1,review-required,1,docs: add Sherlock local admission court
+chief-import-sherlock-data,e0c884bafa1f20157dfe68a110cccaf66119ca26,local_branch,2026-08-31T18:56:33-04:00,895,1,review-required,1,docs: bind canonical Sherlock source set
+claude-p1/ac4-s1-sampled-frames,c9522693838152443a0a871c16fcc2df47e593d1,local_branch,2026-09-23T14:27:17-04:00,50,0,ancestor,0,"docs(evidence): add the stream-binding repair gate, ten-mutant receipt and review record (AC4 S1)"
+claude-p1/scene-frames-parts,942a9f759778d712906e318e0be7268985a1b238,local_branch,2026-09-23T09:19:29-04:00,125,0,ancestor,0,docs(evidence): refresh the scene-frame archive for the independent-review repair
+claude-p1/strict-gate,12897af9f19ba1618e2b3a7cbbe07979c0c82a46,local_branch,2026-09-23T07:52:14-04:00,138,0,ancestor,0,docs(evidence): state that the strict full gate is not a pinned-dependency pass
+claude-sm/admissibility-seal,9f72ce154a071a9bd5abd40ea9e51b57226cc860,local_branch,2026-09-23T12:26:05-04:00,59,0,ancestor,0,evidence: Admissibility seal slice gate and pre-existing Native timeout controls
+claude-sm/review-receipts-20260923,2b867975022975772cacf9643650e977fcd5c34e,local_branch,2026-09-23T10:28:28-04:00,130,1,patch-equivalent,0,evidence: durable copies of offline-text-source review receipts (SD3)
+claude-sm/storymodel-export,06d8ebecff94be92b2a6bdcdeb24141ef383f312,local_branch,2026-09-23T08:53:35-04:00,116,0,ancestor,0,"evidence: S5 scoped gate on 69a8e754 (GATE_EXIT=0, 3327 tests, fatal warnings)"
+codex-nfrd-receipt-v3,7c7858f3c6aac5277bb34e905b532828d22da1a2,local_branch,2026-08-29T22:31:14-04:00,1013,1,review-required,1,Add receipt-complete NFRD Baseball intake court
+codex/acquire-probe-anchor-20260831,e3745e20240c23805c5151d604177201a2332225,local_branch,2026-08-31T09:25:59-04:00,895,1,patch-equivalent,0,test(acquire): anchor CriticFinding probe dependency
+codex/admissibility-final-20260923,27033f4725c99c7146219697db1ed73280af66a8,local_branch,2026-09-23T15:03:49-04:00,40,0,ancestor,0,Bound mapping decode and cross-unit link test fixtures
+codex/amr-probe-anchor-20260830,0573692458a439e3625b119baa19d1946edeb478,local_branch,2026-08-30T16:16:26-04:00,902,1,patch-equivalent,0,test(amr): anchor construction probe dependency
+codex/anna-lemmas-p1,eae7d568983774368423d27ac101d7cf3f2bb747,local_branch,2026-08-29T10:05:58-04:00,1156,1,review-required,1,test(align): derive Anna fixture lemmas from the production stemmer
+codex/anna-nonvacuity,abdc219737cb1f9fd19eb9b84cf8b44f39c94711,local_branch,2026-08-29T10:14:20-04:00,1145,0,ancestor,0,test(align): make Anna stemming guard non-vacuous
+codex/codec-probe-anchor-20260831,c0525f0ffbba43a69e8d8546de4fead9bca257c8,local_branch,2026-08-31T09:59:02-04:00,895,1,patch-equivalent,0,test(codec): anchor sidecar construction probes
+codex/corpus-reader-bounded-refusals-0923,195e83f20c24c47b49f73f2062e957865623bb90,local_branch,2026-09-23T17:07:12-04:00,33,0,ancestor,0,Format CorpusReader cap documentation
+codex/docs-site-claims-0923,8973c520311fdba2d65a513d8a711c90d9b66ec7,local_branch,2026-09-23T18:50:14-04:00,36,2,review-required,2,Bind model tour badge to replayed example revision
+codex/document-probe-anchor-20260831,f47177cbde76b45ffe3558c4be8045c8c6324b0b,local_branch,2026-08-31T09:44:08-04:00,895,1,patch-equivalent,0,test(document): anchor construction boundary types
+codex/embed-core-probe-anchor-20260831,f352b43dd80286b5f89c143c5c59e47bb445e745,local_branch,2026-08-31T10:33:23-04:00,895,1,patch-equivalent,0,test(embed-core): anchor construction probes
+codex/embed-grakern-probe-anchor-20260831,b1a3287e0d0ef63ec47fbd90c33e9bf95722647f,local_branch,2026-08-31T09:35:03-04:00,895,1,patch-equivalent,0,test(embed-grakern): anchor StructuralProgram probe
+codex/frameset-stream-identity-0923,69e48e9a370ee6a3c4ff42d11abca36e614e60f9,local_branch,2026-09-23T18:08:12-04:00,36,1,review-required,1,fix(media): bind decoded stream in full-frame identity
+codex/imputed-terms-format-v2,22a325392c23d7f4f88cc2057d347ee8341c0c77,local_branch,2026-08-30T08:11:28-04:00,1010,0,ancestor,0,align: format CostBreakdown boundary note
+codex/m1-imputed-doc-boundary,dc5374d630534bce49e5af775f42b8e40b8c6a5d,local_branch,2026-08-29T23:27:27-04:00,1011,0,ancestor,0,align: state the CostBreakdown wire boundary
+codex/mapping-consensus-20260923,0904e3f1750d430f428eb169d6cfa8f4c39d2689,local_branch,2026-09-23T09:53:43-04:00,123,4,patch-equivalent,0,docs: note Fray consensus codification handoff
+codex/narrative-compiler-adr,d587e976e4a4b31c3365d47b018701b3b2cf02f8,local_branch,2026-08-29T15:43:17-04:00,1079,0,ancestor,0,Assert option fingerprint topology precisely
+codex/p1-integration-20260923,7469d3d7f49dd04df2d2bc76504fbef1202a703b,local_branch,2026-09-23T10:09:32-04:00,79,0,ancestor,0,Reconcile WOG pipeline witnesses with explicit abstention promotion
+codex/p1-integration-evidence-20260923,7ca1a32b0639b81aebdb7e2ddb6c635f91aaffbf,local_branch,2026-09-23T09:42:50-04:00,130,4,review-required,4,WIP preserve accepted P1 handoff and evidence audits while final gate runs
+codex/p1-integration-landing-20260923,577ebfdb0f9348f235ef75706167ddbbd6684cec,local_branch,2026-09-23T10:41:36-04:00,64,0,ancestor,0,Integrate current operating guide and landed Python media slice
+codex/p1-plan-20260923,ba84e204c3a7d898c9bebf0e83a10d61122244e4,local_branch,2026-09-23T07:36:18-04:00,141,1,review-required,1,WIP: preserve CI route decision and proposed 1.0 stability boundary
+codex/p1-source-evidence-20260923,a90a9ee5e70db6834c9165db8a291c9af3bab225,local_branch,2026-09-23T09:25:51-04:00,123,1,patch-equivalent,0,docs(text-source): retain review and cross-platform evidence
+codex/proposition-probe-anchor-20260831,92c8782193900a3a283d1c15a26e647705423bce,local_branch,2026-08-31T08:58:24-04:00,895,1,patch-equivalent,0,test(proposition): anchor construction probe dependency
+codex/provenance-followup,a371e102c4abbcdf4f83f84bf6fe47c55f5a795f,local_branch,2026-08-29T17:19:43-04:00,1035,0,ancestor,0,Document provenance API compatibility break
+codex/provider-parser-contract,99fd15eef1d9ccc7d2d83d8aaa2c0e5fe6d70aa5,local_branch,2026-08-29T19:29:21-04:00,1023,1,review-required,1,Add fail-closed AMR parser provider contract
+codex/provider-parser-contract-v2,f573ee341c6d33655d32954c85bc8b958c66e3a1,local_branch,2026-08-29T20:45:11-04:00,1023,2,review-required,2,Make provider receipt identities injective
+codex/provider-parser-contract-v3,48b495e9067a9e986d7de13e344811073ed1718a,local_branch,2026-08-29T20:49:02-04:00,1023,1,review-required,1,Add fail-closed AMR parser provider contract
+codex/provider-parser-contract-v4,4393c3d901a57fa841b80eb6bc17931f3dac467c,local_branch,2026-08-29T22:43:18-04:00,1023,5,review-required,5,Preserve cache context in parser fallbacks
+codex/provider-parser-contract-v4-draft,a4e2da75b5bb0a8c57bd3e3adeb87976140f6067,local_branch,2026-08-29T21:22:38-04:00,1023,3,review-required,3,Separate parser boundary probe controls
+codex/recallgraph-checked,37edf3c9c2c15716a489cc83fa0fd05a6aebb86c,local_branch,2026-08-29T12:42:09-04:00,1123,0,ancestor,0,recall: bind the surface atlas to its transcript
+codex/reference-scope-declaration-free-0923,ed9f478daba90d1728ce584b2a896f5a88be9b26,local_branch,2026-09-23T19:06:22-04:00,36,1,review-required,1,Fail closed on declaration-free module source changes
+codex/s2a2-cost-0923,ca44e74dda0ffb7167fb0aede816c1695114ac71,local_branch,2026-09-23T18:17:31-04:00,42,0,ancestor,0,feat(align): calculate default local price from content
+codex/s2a2-lexical-0923,a71a3ad9c5fb4e5176c7e526a859b8e2d5e9e965,local_branch,2026-09-23T17:25:05-04:00,47,1,patch-equivalent,0,feat(align): route lexical Jaccard through content projection
+codex/s2a4-courts-0925,e02d80d01d2a0ebba3bea8c4716caab9662209dc,local_branch,2026-09-25T05:44:01-04:00,6,5,review-required,5,docs: bind S2a court qualification and remaining channel dependency
+codex/segmentlink-endpoint-identity-0923,00103ac350b403f166da51f578205915293d474a,local_branch,2026-09-23T14:49:49-04:00,47,1,patch-equivalent,0,fix(corpus): compare SegmentLink endpoint content identities
+codex/segmentlink-endpoint-identity-current-0923,0e1023e05166beffb72a6d26dd4e32bc8ea9f2e2,local_branch,2026-09-23T16:12:59-04:00,35,0,ancestor,0,fix(corpus): compare SegmentLink endpoint content identities
+codex/story-probe-anchor-20260831,69d1d20a885a3052405dc0f3c1016381dae4142e,local_branch,2026-08-31T09:13:24-04:00,895,1,patch-equivalent,0,test(story): anchor construction probe dependency
+codex/surface-detail-d14a,967e5d751ab7216b447f8d9bb0e21ddd07d40080,local_branch,2026-08-29T08:58:24-04:00,1231,0,ancestor,0,feat(view): compile surface detail marks
+codex/view-probe-anchor-20260831,e5283b51606c9822ce3d29d1baf6e0085f914e11,local_branch,2026-08-31T10:18:09-04:00,895,1,patch-equivalent,0,test(view): anchor construction probes
+codex/wog-pipeline-followup,72cea6cd5ab2da4a32993a80ccbace37d468226d,local_branch,2026-09-23T10:30:58-04:00,81,1,review-required,1,test(pipeline): align WOG parity with typed abstention
+codex/wog-typed-absence,ac4ac32247ebf2a67c55f08ffefacf9959b11826,local_branch,2026-09-23T08:57:30-04:00,138,0,ancestor,0,Archive author-observed WOG regression receipts
+cursor-grok-c1-source,33e98782e6709ff02d5ce20c1983d7f78a7c0ec3,local_branch,2026-09-01T09:06:43-04:00,858,1,review-required,1,Add portable C1 film source contracts and SurfaceAtlas conformance.
+docs/agents-throughput,32f4b6ada0c4381e130ab0b42d5cdd3919657f33,local_branch,2026-09-23T10:30:27-04:00,127,0,ancestor,0,docs(agents): address cold-audit findings on the AGENTS.md refactor
+docs/movie-component-admission-ledger,f203b783da349d705258fef8634becf3e1e5a554,local_branch,2026-08-30T07:51:22-04:00,1004,0,ancestor,0,docs: record movie component admission ledger
+docs/movie-narrative-architecture,4852c124aa6e6967322d21e069dc772473a59a12,local_branch,2026-08-29T22:33:19-04:00,1012,0,ancestor,0,docs: record movie narrative architecture
+docs/provenance-derived,1cb64bd39f097c32233a52ff6e167f9f93d9d127,local_branch,2026-08-30T17:52:41-04:00,884,0,ancestor,0,docs-site: stop reconstructing an estimand from rounded console output
+docs/recover-astro-site,bf1f1a5360595ad3ad717a086390425a16253e77,local_branch,2026-08-30T16:59:56-04:00,894,0,ancestor,0,docs: add human-facing Astro guide
+docs/v12-successor,36051f6f13c6e83d79a2eca0258ce232b35b9167,local_branch,2026-08-30T17:05:17-04:00,895,1,patch-equivalent,0,docs: port the reviewed V12 movie-architecture delta forward
+eval/astro-docs,1cace089c4f6f77d6a6493ebcf2a7896f7d8f99b,local_branch,2026-09-01T11:50:45-04:00,799,0,ancestor,0,eval: Astro docs-site successor onto current main
+eval/cost-overflow,c44e5384241e47b06193e8732bfa1bd1b8ae8801,local_branch,2026-09-01T11:21:01-04:00,819,0,ancestor,0,fix: refuse aggregate cost-weight overflow
+fix/frozen-scoring-20260919,dd6050e0ea2ac85e7c3de2e045882d5c64118e2b,local_branch,2026-09-19T14:31:34-04:00,434,0,ancestor,0,Fix scene scoring to reconcile complete arms against frozen unit support
+fix/production-clock-repair-20260919,6a5a92881451fb2add3947e974a196cd85070d10,local_branch,2026-09-19T15:38:42-04:00,430,0,ancestor,0,Bind verified clock receipt parameters to the declared record
+gate-460,460a14a1f1141fbb35b16cc38d25955ce7073e29,local_branch,2026-08-29T17:12:31-04:00,1037,1,review-required,1,align: chart eligibility asks the function that produces the term
+gate-abs-cand,08c26d8e9c86659c45c0ca9029d7d803a0a7a26c,local_branch,2026-08-29T14:27:11-04:00,1095,0,ancestor,0,Absorb within-tolerance slack so admitted partitions and L2 vectors store the claim they made.
+gate-b1-cand,41f889cf225ebc45f4ecc6b690704ae2b86cab98,local_branch,2026-08-29T14:18:28-04:00,1092,0,ancestor,0,test(bench): prove signature refusals propagate
+gate-blend,d9d7d97e290364b3d094e551dd76db8e97955bbe,local_branch,2026-08-29T15:31:11-04:00,1084,1,review-required,1,align: the cost blend carries the support it rests on
+gate-blend2,fec38fbd2ef51d47bfb7d29f51e3125da89bf59f,local_branch,2026-08-29T16:28:00-04:00,1053,0,ancestor,0,align: the cost blend carries the support it rests on
+gate-canon,a371e102c4abbcdf4f83f84bf6fe47c55f5a795f,local_branch,2026-08-29T17:19:43-04:00,1035,0,ancestor,0,Document provenance API compatibility break
+gate-ch2,9952ab2c309c8d4050af3e4e5e36415d79b46758,local_branch,2026-08-29T17:52:04-04:00,1030,0,ancestor,0,align: eligibility asks the population the measurement reads
+gate-chart,f849104d3908375fb60e6c73a4319325f0c62937,local_branch,2026-08-29T17:29:21-04:00,1034,1,review-required,1,align: eligibility asks the population the measurement reads
+gate-compiler,d587e976e4a4b31c3365d47b018701b3b2cf02f8,local_branch,2026-08-29T15:43:17-04:00,1079,0,ancestor,0,Assert option fingerprint topology precisely
+gate-d2,d4407a58e7c80b39b3197a6ff9a12bbd9628cf62,local_branch,2026-08-29T13:17:08-04:00,1104,1,patch-equivalent,0,Merge commit '0bf780a3d1834606b9491f2e19804d55b053c29c' into gate-d2
+gate-doc,7ae2ec9e567a2ed8d3d8f71bdc2f229d0bc38e79,local_branch,2026-08-29T18:03:06-04:00,1030,0,ancestor,0,docs: disclose NodeSummary source compatibility break
+gate-leaf,735162d48ff3deae5a2534ff752f430eb6a71934,local_branch,2026-08-29T17:10:45-04:00,1047,0,ancestor,0,align: validate node importance at construction
+gate-sem,c4283967b599f473d1f688f9b38a94705304766e,local_branch,2026-08-29T18:48:14-04:00,1025,1,review-required,1,align/codec: an imputed term is priced like a measured one and accounted differently
+gate-sink,178b20c458b2dc956c34989e05e28053a916f1af,local_branch,2026-08-29T15:42:52-04:00,1079,0,ancestor,0,align: reject NaN SinkhornConfig by fail-closed polarity
+gate-sink2,3f04cffd22729a9eddc5ee9eee2dc2215df9f803,local_branch,2026-08-29T16:57:01-04:00,1041,0,ancestor,0,align: require typed InvalidConfig in Sinkhorn aggregate laws
+gate-slicec,7af0db40feb72a9303d64d3674f9f79ae503967d,local_branch,2026-08-29T15:21:41-04:00,1083,0,ancestor,0,"Close SidecarManifest, FeatureRef, and FeatureDerivation against fromProduct."
+gate-trio,72e6832f61ab3c935cc903b6b6c3dd88d3457a7d,local_branch,2026-08-29T14:42:53-04:00,1087,0,ancestor,0,fix(align): absorb tolerated mass overflow
+gate-win,6532f49cf42095d988cf4d2029725bb515290d10,local_branch,2026-08-29T16:14:37-04:00,1061,0,ancestor,0,Route every derived window scalar through Estimate.score.
+gate-zerofix,3f3c2df3416d91a00c9b57902055e84cd7883b48,local_branch,2026-08-29T16:48:45-04:00,1043,0,ancestor,0,align: a dropped state keeps its exclusion record
+gemini/pin-8492e43,8492e43bd0adf7515b837539493217b20391a0fc,local_branch,2026-08-28T16:03:54-04:00,1868,0,ancestor,0,"view: revise ADR 0002 and add CodexCompiler, Atlas, EvidenceVisibility, and WOG laws"
+interview-ambiguous-reachability,652b83988031e17c4dcf02583c0b358ec3b63631,local_branch,2026-08-29T10:38:26-04:00,1142,0,ancestor,0,interview: format AmbiguousPlacementSuite for the portable scalafmt gate
+land/rootseg,f1f411499271b4176c5f96c2fb9a520c6046ef8f,local_branch,2026-09-04T17:33:11-04:00,593,0,ancestor,0,Handoff: the viewer reads features.json (storyatlas4s f7e825d); what the drawing half needs
+m1/attributable-exclusion,1fa3c51b2abf9bf61c785efdd05f150c2ffc300e,local_branch,2026-08-30T08:53:45-04:00,1020,0,ancestor,0,interview: an exclusion receipt renders the same however its map was built
+m1/blend-support,fec38fbd2ef51d47bfb7d29f51e3125da89bf59f,local_branch,2026-08-29T16:28:00-04:00,1053,0,ancestor,0,align: the cost blend carries the support it rests on
+m1/blend-zerofix,3f3c2df3416d91a00c9b57902055e84cd7883b48,local_branch,2026-08-29T16:48:45-04:00,1043,0,ancestor,0,align: a dropped state keeps its exclusion record
+m1/cell-coordinates,72b106c6351057c46049b3cf6f380dbb8ad6033d,local_branch,2026-08-30T09:22:58-04:00,996,0,ancestor,0,align: the cell coordinate join derives its words instead of accepting them
+m1/chart-eligibility,9952ab2c309c8d4050af3e4e5e36415d79b46758,local_branch,2026-08-29T17:52:04-04:00,1030,0,ancestor,0,align: eligibility asks the population the measurement reads
+m1/cost-blend,60cf041a91bc558bb460967012e6648d879ff366,local_branch,2026-08-29T00:57:18-04:00,1528,0,ancestor,0,align: pin the local cost blend with literal expected values
+m1/embed-bench,4e831cb944289c8ab7520cf691c05587d59afb2e,local_branch,2026-08-28T23:45:25-04:00,1670,0,ancestor,0,embed-bench enforces Law I5: contamination reaches the label-minting function
+m1/external-mass,59f8fd0231d20ff07a63c59ae501a32521566339,local_branch,2026-08-29T01:41:23-04:00,1498,0,ancestor,0,align: external mass no longer absorbs our failure to rank
+m1/gate-dc5374d,dc5374d630534bce49e5af775f42b8e40b8c6a5d,local_branch,2026-08-29T23:27:27-04:00,1011,0,ancestor,0,align: state the CostBreakdown wire boundary
+m1/leakage,e97f93cc80fa1ee16d8ac065dc426b7fb88ccc1c,local_branch,2026-08-29T00:35:47-04:00,1555,0,ancestor,0,embed-bench: make the no-story-text canary capable of failing
+m1/membership-routing,64b44c8f9d35b15ca65c27e84c45bfbb046b4ce4,local_branch,2026-08-30T10:18:30-04:00,983,0,ancestor,0,mote: close hsmm/v2 rename bead; release reservation
+m1/membership-v2,e1c8c407cb19028282e2622a913874791e448683,local_branch,2026-08-30T17:28:56-04:00,895,1,review-required,1,interview: route unconcentrated mass to an attributed membership exclusion
+m1/membership-v3,8a4346d9ac5d69dd22ae9e49770f874c81b87d26,local_branch,2026-08-31T09:54:07-04:00,895,2,review-required,2,"interview: court the partition, not just the presence, of membership exclusion"
+m1/nomination-court,a51df1654272cfbe29a184b88d2231cffb586965,local_branch,2026-08-31T13:38:59-04:00,895,1,review-required,1,docs: freeze the candidate-nomination provenance contract before code
+m1/nomination-court-v2,a674e1468031544868721e7459c8e11120b13659,local_branch,2026-08-31T15:19:35-04:00,895,1,review-required,1,docs: amend the nomination provenance court for four live bypasses
+m1/nomination-court-v3,3e959e6a269f571395d79f59c6ded4565043078f,local_branch,2026-08-31T15:27:07-04:00,895,1,review-required,1,docs: correct the nomination court against the real Estimate constructors
+m1/nomination-court-v4,59a557b8680a297316e888d0d1b2679955e3d512,local_branch,2026-08-31T15:47:27-04:00,895,1,review-required,1,docs: correct rank scope and stop generalising one NaN measurement
+m1/nomination-court-v5,7ba9356a50f4cdc64e1562d0eab8cf2d5fc75436,local_branch,2026-08-31T16:50:38-04:00,895,1,review-required,1,"docs: derive the bound identities, keep credence, and inventory ablation publication"
+m1/nomination-court-v6,b73692f6a3769ce908b3012dae435751ae61ea1a,local_branch,2026-08-31T17:32:59-04:00,895,1,patch-equivalent,0,"docs: make ablation publication a court, and widen the source checklist"
+m1/nomination-court-v7,9881e06c7211ae5ef5505ab4edc6b1a9b2b852d9,local_branch,2026-09-01T02:53:48-04:00,895,2,review-required,1,docs: correct nomination provenance ownership
+m1/parked-dent,8fdb9dacf8bb9a2ed2bf6d6ce46f86ab329adfb1,local_branch,2026-08-29T13:11:53-04:00,1106,1,review-required,1,"PARKED, DO NOT MERGE: d_ent absence recording, blocked on the blend"
+m1/reanchor,c7a316ab9f043f88a8e64585c4df4f86790700d5,local_branch,2026-08-30T11:37:28-04:00,968,1,review-required,1,align: re-anchor a probe control off a type that is scheduled for sealing
+m1/reanchor2,d2f600f8eb526526a62c6d622cadd62429b4812e,local_branch,2026-08-30T14:42:36-04:00,926,2,review-required,2,"align: the companion door gets its own control, after I documented it as impossible"
+m1/relpres,34262301893867f897b26b2ca0a2f82a0f4e6319,local_branch,2026-08-29T03:33:56-04:00,1421,3,review-required,1,align: relation preservation reports its support instead of inventing a mean
+m1/remedy-check,f726accca708f5373f002d1207de794ba76cfc35,local_branch,2026-08-30T11:15:38-04:00,973,0,ancestor,0,interview: confirm the sweep-1 remedy still defeats Mirror derivation
+m1/resolution,185380b45522917ab8f90456477fe08743ca686f,local_branch,2026-08-29T14:00:39-04:00,1097,0,ancestor,0,"measured-baseline: the cost asymmetry, the data outlook, and the severed link's status"
+m1/route,638294f4de1408a207889ce6b973aa3326582c2e,local_branch,2026-08-29T01:24:49-04:00,1520,0,ancestor,0,embed-bench: false gating abstains when the gate never saw the anchor
+m1/route-honesty,1c75de19fbf020f470e9bbd211c1ed5991e2fd7f,local_branch,2026-08-29T02:45:13-04:00,1481,2,review-required,1,"align: answer the second review — no renormalized denominator, smart-constructed projection"
+m1/seal-structural,5dc1f2b6a5e6d4a32e648dd20d40d2e137c2b833,local_branch,2026-08-30T11:49:06-04:00,964,0,ancestor,0,align: seal the four structural types the Mirror door was open on
+m1/semantic-abstention,de44f720ead68ee21b0656aed7bc3f3993cbf982,local_branch,2026-08-29T18:07:03-04:00,1029,0,ancestor,0,"Merge chart/structural eligibility (align): a configured provider is necessary, not sufficient"
+m1/semantic-imputed,0ca09c56809be5bd7109acecf35d8d4171fd9c16,local_branch,2026-08-29T21:43:24-04:00,1012,0,ancestor,0,align/codec: an imputed term is priced like a measured one and accounted differently
+m1/tracedoc,5e0db76d39d32e91c290ad7b5e0930f0ae0f8b54,local_branch,2026-08-30T12:48:35-04:00,947,0,ancestor,0,AGENTS.md rule 4: never put a message body in an inline double-quoted shell argument
+m1/tracedoc2,40d2c286bc4df3c074e3fd813be59d297a66cdb2,local_branch,2026-08-30T12:51:06-04:00,946,0,ancestor,0,"AGENTS.md design contract: an impossibility claim needs MORE scrutiny, not less"
+m1/tracedoc3,df717431f52acb401324ba7694b024b07c19d462,local_branch,2026-08-30T12:58:31-04:00,945,0,ancestor,0,align: a docstring stops citing a defect that was closed twelve hours before it was written
+m1/verify-a0cf33d,a0cf33d07ed89fdeea16ef916e069ce28152643e,local_branch,2026-08-30T10:52:48-04:00,978,0,ancestor,0,align: probe the structural channel -- all four types forgeable through Mirror and fromProduct
+main,0500bc1029bea9df88291a7b73860f8fecfa804d,local_branch,2026-09-30T21:33:08-04:00,0,0,ancestor,0,Merge MASC participant-role corpus audit (documentation only)
+plan/measurement-delivery-20260919,99344ea01ffd82613b85337d6dd23a49b809f0c7,local_branch,2026-09-19T13:43:04-04:00,436,0,ancestor,0,Keep recall graph and transcript checksums distinct in baseline capture
+recovery/filmfestival-20260904,739acf79e5b67f17a19793453d1aab243e80e0c8,local_branch,2026-09-04T21:39:36-04:00,611,1,patch-equivalent,0,"WIP: preserve Film Festival adapter, corpus replays and first-run evidence"
+rescue/audit-masc-role-corpus,b756b4bb1aca375a14fd26d024e2b3a578ba8688,local_branch,2026-09-04T21:54:42-04:00,578,0,ancestor,0,Audit MASC role coverage and refuse malformed coordinate joins
+rescue/nfrd-lineage-99602baa,99602baac56b1a5afad5359a5c4bd019f2281343,local_branch,2026-08-29T19:39:17-04:00,1021,1,review-required,1,Add NFRD Baseball diagnostic intake court
+rescue/world-order-input-pre-amend,91333a462c91cf0c7c3e9d3675a3746353632941,local_branch,2026-09-04T08:20:18-04:00,595,1,review-required,1,WorldOrderInput: the timed-source builder takes a declared world clock (ADR 0013)
+review/navigation-assessment-20260904,e0b26022af552100e06ff2c9989541235bc6f424,local_branch,2026-09-04T22:46:29-04:00,579,1,review-required,1,Assess navigation direction against landed slices and retain executable evidence
+salvage/integration-20260901,ebd750e6f55ebc55cfc4f56a4a6f10f7fcd2cef5,local_branch,2026-09-01T10:35:25-04:00,836,0,ancestor,0,docs: record the 2026-09-01 salvage manifest
+salvage/output-approved-84b6ce8d,84b6ce8d9082132d79957a3b5f2d58801aff5998,local_branch,2026-09-01T08:14:00-04:00,880,0,ancestor,0,fix(codec): preserve contextual refusal fixed point
+salvage/provider-parser-73bc9af9,73bc9af9309c237717b003faaa1a635d0e39a603,local_branch,2026-08-31T16:24:03-04:00,893,0,ancestor,0,Add parser provider without dropping ONNX wiring
+salvage/worktree-snapshot-20260901,81a181960d37548ced577e02a8741b384c6fc126,local_branch,2026-09-01T10:09:40-04:00,858,1,review-required,1,snapshot: uncommitted working tree as found 2026-09-01
+scout/astro-capability-tour-v4,de9265cf584f2b27a1e45014549f279798c68792,local_branch,2026-09-01T01:29:47-04:00,879,0,ancestor,0,docs: make the library journey executable
+scout/docs-successor-v2,9005320c21cbdb435489a030b23ca2dec84015c0,local_branch,2026-08-31T10:36:51-04:00,883,0,ancestor,0,docs-site: show executable story and recall workflows
+scout/docs-successor-v3,8a227832212a34b71ec2bb0bad3d72cee6ced935,local_branch,2026-08-31T10:51:49-04:00,882,0,ancestor,0,docs-site: show full library breadth up front
+scout/getting-started-v2,76c62e738a2579d6598fccf3ac19266c60480e20,local_branch,2026-08-31T15:24:45-04:00,880,0,ancestor,0,docs-site: make getting started end to end
+scout/interview-specificity,ec0c439757f4f48b765579b2f8e6963ae242d0f3,local_branch,2026-08-29T05:32:56-04:00,1326,0,ancestor,0,fix(interview): preserve missing specificity
+scout/phantom-sweep,9e20611f3df6ffa73d05ae1b4f403fe24c817a22,local_branch,2026-08-29T07:28:18-04:00,1248,0,ancestor,0,Make phantom validation witnesses unforgeable
+scout/reference-scope-v1,6ad95c5c5109aba3c282d854add422e67b71b07b,local_branch,2026-08-31T14:40:59-04:00,894,0,ancestor,0,tools: harden reference scope discovery
+scout/route-shape,d821fee23b5b81847877ba833123ed57ce52cc40,local_branch,2026-08-29T06:14:13-04:00,1297,0,ancestor,0,feat(embed-bench): measure route shape against gold
+scout/route-support-axis,f26ce3c06b3d972b2964401c113cc21d0ce1343f,local_branch,2026-08-29T04:24:01-04:00,1388,0,ancestor,0,fix(embed-bench): use support axis for route direction
+scout/route-support-hotfix,9598a987427fa89626020d6060eb1b2ea389fbe2,local_branch,2026-08-29T05:06:59-04:00,1364,0,ancestor,0,fix(embed-bench): preserve unranked route support
+scout/support-assessment-v4,b33fe5b571ce9f9aea54b92436ca6c073133f969,local_branch,2026-09-01T00:40:34-04:00,895,4,review-required,4,align: bind support basis and omit undefined costs
+scout/sweep2-core,7dcbffac15d4d1ade0faaaae8c2ec136a675932f,local_branch,2026-08-29T10:52:15-04:00,1134,0,ancestor,0,refactor(core): validate atlas construction
+scout/tolerance-absorption,72e6832f61ab3c935cc903b6b6c3dd88d3457a7d,local_branch,2026-08-29T14:42:53-04:00,1087,0,ancestor,0,fix(align): absorb tolerated mass overflow
+scout/transition-position,7ee4872c697fd1d92ffa345f0d2b188086958a72,local_branch,2026-08-29T20:05:12-04:00,1018,0,ancestor,0,align: omit position features when position is unmeasured
+scout/wog-init-order,79c54712e9f37e9abcdd9c8b3436682c7b432ff7,local_branch,2026-08-29T11:40:41-04:00,1117,0,ancestor,0,fix(fixtures): remove WOG initialization-order cycle
+scratch/checkall-demo,7eb8691df317c37efc130867cb02bf2ad9ae9576,local_branch,2026-09-21T08:02:02-04:00,292,2,review-required,2,SCRATCH: move the formatting nit into the failing demo test
+sinkhorn-input-boundary,28ef67e2a3881bbf8441ee1c4e7086dd86625df9,local_branch,2026-09-01T10:30:41-04:00,891,0,ancestor,0,align: validate Sinkhorn transport inputs at the boundary
+sinkhorn-nan-config,3f04cffd22729a9eddc5ee9eee2dc2215df9f803,local_branch,2026-08-29T16:57:01-04:00,1041,0,ancestor,0,align: require typed InvalidConfig in Sinkhorn aggregate laws
+slice-2-core-unforgeable,874fc61fb08b8c491f59b96c9b2f8bfa4ca877f7,local_branch,2026-08-29T08:30:12-04:00,1181,0,ancestor,0,"core: close fromProduct on Credence, spans, StorySource, and ClaimMeta"
+slice-a-gold-unforgeable,96a7963c474ea7f5c7fe4b6d831b50a2b996ae73,local_branch,2026-08-29T10:06:46-04:00,1146,0,ancestor,0,Close Gold construction so fromProduct cannot mint an unvalidated map.
+slice-c-unforgeable,6fde1e0aeab9772a6503a5cf15997b74edebee9f,local_branch,2026-08-29T11:04:07-04:00,1131,0,ancestor,0,"ADR 0004 (draft): hierarchy level takes two coordinates, not one wrapper"
+slice-c-unforgeable-grok,7af0db40feb72a9303d64d3674f9f79ae503967d,local_branch,2026-08-29T15:21:41-04:00,1083,0,ancestor,0,"Close SidecarManifest, FeatureRef, and FeatureDerivation against fromProduct."
+slice-d-unforgeable,1a84dbc0db0a9cd26fab8d529a5ee3114d35491d,local_branch,2026-08-29T15:30:14-04:00,1098,0,ancestor,0,Format acquireprobe ConstructionProbeSuite (scalafmtAll).
+solo/adr0019-profiles,f7c7020ebd3e1294cf458dac5e45e801c116a2b0,local_branch,2026-09-23T07:33:59-04:00,141,2,patch-equivalent,0,docs(adr): add the candidate tie policy agreed on Fray #55 (ADR 0019)
+solo/checkall-format-last,f557679cd6fa02bd4e26012cada4eda2a4abfeae,local_branch,2026-09-21T07:33:04-04:00,292,0,ancestor,0,"build: run checkAll correctness before formatting (WIP, gate pending)"
+solo/content-scorer,02b96bf99383b88824d3e520fa041e820501429d,local_branch,2026-09-23T11:44:27-04:00,64,4,patch-equivalent,0,test(proposition): measure the cold review's S2a-1 findings
+solo/directed-causal,bffbbb9d1e177a8a505839141078468b9d3d0e15,local_branch,2026-09-04T20:02:36-04:00,585,0,ancestor,0,Directed causal transition kinds beside the symmetrized one (ADR 0014)
+solo/evidence-isolation,894908a5696c77071a623317e6365b913f07297f,local_branch,2026-09-23T07:27:05-04:00,141,1,patch-equivalent,0,test(align): measure local evidence isolation (AC3 S1) and record a tie defect
+solo/filmfestival-diagnostics-20260905,42f8a9452413693562ead9a466509e551009470d,local_branch,2026-09-05T09:35:42-04:00,565,0,ancestor,0,Bind the final Film Festival implementation to its passing landing court
+solo/filmfestival-stabilize,257a8db7d1436466aee01b0457fe56fca550ce81,local_branch,2026-09-04T22:50:09-04:00,571,0,ancestor,0,Carry source attribution and the agreed research-use disclaimer with the results
+solo/flow-seal,1f87d1d63ecefca5d465e9348bc038b676ec7c32,local_branch,2026-09-23T16:52:04-04:00,35,0,ancestor,0,align: seal FlowStep and TransitionFlow construction
+solo/friends-sealed-guard-20260921,3cc39b1a0b067f148152aab6bdd6e0d08c52f738,local_branch,2026-09-21T08:31:15-04:00,281,0,ancestor,0,fix(friends): enforce committed sealed-split reads and count attempts
+solo/intake-contract,0e36a7fae2689f4d99148480afc74618ad3e087e,local_branch,2026-09-17T22:08:29-04:00,455,0,ancestor,0,"build: publish under io.github.bbuchsbaum, and state homepage and scmInfo"
+solo/ladder-run,3cc1c9491d53d708d92fd5ea67e790e653eec24a,local_branch,2026-09-05T10:46:10-04:00,576,0,ancestor,0,Pin transition features and freeze the navigation ladder development readout
+solo/layer-ledger,1175cd43b3f8e6268722d4fbea9214ac776c484a,local_branch,2026-09-05T01:39:36-04:00,583,0,ancestor,0,"Layer-use ledger derived from theta, theta in provenance, and the ablation ladder (ADR 0016)"
+solo/local-evidence-consumer-probe,91645dc82e0d4b0f288b94e547603d16e2c0a1cc,local_branch,2026-09-22T22:20:50-04:00,169,1,patch-equivalent,0,test(codec): expose shared-evidence context aliases from a consumer
+solo/local-evidence-snapshot-probe,3fecc774dc80b81f7503bdc0063c5d5fafe3deda,local_branch,2026-09-22T22:49:08-04:00,164,0,ancestor,0,qualify: retain independent local-evidence consumer regressions
+solo/mapping-exchange,933d04b5358019cce1c2bb0f855818b69bad7bba,local_branch,2026-09-22T22:35:42-04:00,153,0,ancestor,0,docs: connect the exchange API and command-line guide
+solo/memento-task-and-seal-20260921,8ad7175585681eceb14a2d0f933a1f9fa9d9c395,local_branch,2026-09-21T17:20:35-04:00,275,0,ancestor,0,data(memento): seal 63 test and 60 development participants
+solo/openneuro-recall-clock-intake,6a6f22f450d675c8e17fb3f0bf92e12d7a2404ee,local_branch,2026-09-22T15:09:18-04:00,257,0,ancestor,0,test(tools): record recall clock intake qualification
+solo/own-the-metric,cc11d14261ca03907babe3d96b05ea22d3a7a5e1,local_branch,2026-09-04T08:30:33-04:00,611,0,ancestor,0,"docs/plans: renumber to ADR 0014, and name the TimedSourceView collision"
+solo/own-the-metric-w1b,d7ffab482a37625a838d07ca40b3f57a83e9029a,local_branch,2026-09-04T23:22:15-04:00,572,0,ancestor,0,tools: matched.py is importable too
+solo/perception-first-court,49464815eae8e33a1e423f1ab85f3ee68407bf7b,local_branch,2026-09-03T13:20:58-04:00,598,0,ancestor,0,Handoff: storyatlas4s voyage landed at b605679; intaglio main pushed
+solo/public-cli,d0cc49cec7b819431da635104ce0a9078f5cb47b,local_branch,2026-09-22T22:32:57-04:00,166,4,patch-equivalent,0,qualify: archive independent workspace exchange process controls
+solo/recall-intake-support,f1c82af6bba061cb80e2394a79f633008d8ff7d2,local_branch,2026-09-22T19:09:50-04:00,208,0,ancestor,0,docs: qualify intake and supplied temporal support across platforms
+solo/recall-timing-portable,b91168c493fab8ac3efe6229996f2a421adb2307,local_branch,2026-09-22T17:48:33-04:00,212,0,ancestor,0,docs(recall): qualify portable timing and reconcile the workflow handoff
+solo/recall-word-clock-join,7ca23a84bdca7a80f728f505eef15f02c56cf5d4,local_branch,2026-09-22T15:37:07-04:00,255,0,ancestor,0,test(tools): bind word clock join evidence and output examples
+solo/root-segment,c3ba84bd9870b754278f55972ad6027f75f8c957,local_branch,2026-09-04T17:08:25-04:00,595,0,ancestor,0,"The root segment carries its own claim; its summary is a typed absence (ADR 0005 §10, schema 0.6.0)"
+solo/s2a0-standalone,8d0ed622ac9a1bf1156a524388b04ac94f81d0fb,local_branch,2026-09-23T16:27:09-04:00,34,0,ancestor,0,docs(align): correct the S2a-0 probe's gate-flag claim
+solo/s2a1b,16d1c97c4d3735ffb8c7a03e55e658235f532755,local_branch,2026-09-23T16:52:52-04:00,49,0,ancestor,0,"docs(adr): cite the gate-union BLOCK at Fray #105 seq 870, not #107"
+solo/s2a2,e486ede39cd8c2978f46e07b87fe16f7353eca2e,local_branch,2026-09-24T10:20:32-04:00,38,0,ancestor,0,perf(proposition): project a chart's source-order graph once
+solo/shared-evidence,7da16148cb24ebb7eb7405152913e56d2b0a8259,local_branch,2026-09-22T22:15:19-04:00,169,0,ancestor,0,feat(align): derive an engine evidence identity and pin extraction parity
+solo/shared-evidence-fix,b850e373b1f0c6bad68fbfbe9389ab10c6c78c1e,local_branch,2026-09-22T22:47:53-04:00,164,0,ancestor,0,test(codec): expose source changes between evidence admission and inference
+solo/sherlock-development-20260923,0c4d4eeff1c9aa7361e41f9bd0eefdbff8319f06,local_branch,2026-09-23T07:52:12-04:00,137,0,ancestor,0,docs: record the missing wake mechanism in the Fray handoff
+solo/support-honesty,caf2d5eacb3b75e58d4a5236f203db26c868b12c,local_branch,2026-09-21T08:18:11-04:00,291,0,ancestor,0,"fix(align,codec): fold the cold review of the support-honesty diff"
+solo/temporal-region-queries,8c70dfb1180b5d9c0d92403d4176d1adfd104ec1,local_branch,2026-09-22T20:48:27-04:00,171,0,ancestor,0,qualify: temporal scanner merge and pinned external BIDS acquisition
+solo/tie-policy,cd790b4ae9029cabdeaa2a1e6e29958c9aca848f,local_branch,2026-09-23T08:59:59-04:00,133,0,ancestor,0,docs(evidence): archive tie-policy gates and mutation receipts
+solo/unified-main-20260905,9ba3709b32557387116fa2452a913dfc42de36ad,local_branch,2026-09-05T11:15:13-04:00,540,0,ancestor,0,Bind unified main to its passing gate and preserve the navigation handoff
+solo/workspace-m1-g1,2e98b6febfd2cf510938f95936d5a212babecb8f,local_branch,2026-09-22T15:53:49-04:00,224,0,ancestor,0,docs: bind G1 qualification to the complete clean cross-platform gate
+solo/workspace-m1-packet,7b2f076a57bde1ec540090c43debfec51c8d44d4,local_branch,2026-09-22T20:02:44-04:00,183,0,ancestor,0,qualify: preserve checked M1 producer packet and generated handoff
+solo/workspace-m1-support,bad36f95e76978bb48d0204f6131836775e49fd5,local_branch,2026-09-22T10:31:45-04:00,261,0,ancestor,0,test(align): bind full support qualification and consumer evidence
+solo/world-order-input,bbceb82462c8b42dc0838856a6a18a9af26ecf79,local_branch,2026-09-04T19:41:49-04:00,594,0,ancestor,0,WorldOrderInput: the timed-source builder takes a declared world clock (ADR 0013)
+test/d1a-s0-text-parity-20260919,051f88f3fc94e72ed484b672937c351cafe3618e,local_branch,2026-09-19T17:37:06-04:00,427,0,ancestor,0,docs: state exact S0 and existing golden coverage
+tolerance-docs,4e08df70ed773fb40f01ecd5c1805d1178a61ebd,local_branch,2026-08-31T22:01:23-04:00,894,3,review-required,3,scalafmt: take the tool's wrap of the Tolerance comments.
+window-reducer-gate,6532f49cf42095d988cf4d2029725bb515290d10,local_branch,2026-08-29T16:14:37-04:00,1061,0,ancestor,0,Route every derived window scalar through Estimate.score.
+work/d1a-s1-20260919,75c8df52adb2ffc54a5cd3586528deddabf4a531,local_branch,2026-09-19T18:35:01-04:00,423,0,ancestor,0,docs: record S1 review and close the ADR slice
+work/d1a-s2-20260919,21534e66b0d7f0be7d1752dc8b0e9c937a68022f,local_branch,2026-09-19T20:23:35-04:00,411,0,ancestor,0,docs(d1a): bind independent final consumer audit
+work/d1a-s3-20260919,4625dba62b85e133e206ac4e4bbe8a895c045260,local_branch,2026-09-19T21:25:49-04:00,401,0,ancestor,0,acquire: qualify typed support with frozen text resolution parity
+work/d1a-s4a-20260919,4e0d47c11151916f55604915fa9d6cd87107790c,local_branch,2026-09-19T22:43:22-04:00,388,0,ancestor,0,feat: qualify typed text nodes and fallible model construction
+work/d1a-s4b-20260919,e174fdbe68e7cd3ebcfa497338c4a5a7f2f1e000,local_branch,2026-09-20T00:29:20-04:00,367,0,ancestor,0,docs: reconcile S4b acceptance for local landing
+work/d1a-s4c-20260920,146df6520d140eb466872480d39c2c0a4bbfc80e,local_branch,2026-09-20T01:27:39-04:00,351,0,ancestor,0,docs: complete S4c acceptance and consumer evidence
+work/d1b-typed-signatures-20260920,00b1d9e6a36b13f2cccab1714c5573e7e5a6100b,local_branch,2026-09-20T04:12:19-04:00,306,0,ancestor,0,docs(d1b): record local delivery and remaining tracker boundary
+work/film-hsmm-baseline-20260919,5a0ab94a1c737288c1a3af5b04a458f4e748e8a3,local_branch,2026-09-19T19:21:45-04:00,423,4,review-required,1,docs: record completed WOG baseline evidence review
+worktree-agent-a018d04b78da3c760,d54cc0e3606c909fb62bea0f4b22fe2260b632e2,local_branch,2026-08-28T14:40:37-04:00,1889,0,ancestor,0,"codec: canonical JSON, StoryModel content checksum, codecs for core/proposition/story/features/recall, JSONL ledgers, migration skeleton"
+worktree-agent-a0984bd4771374b47,3c555b2be32281e44094d96459bb609370178aa2,local_branch,2026-08-28T15:41:27-04:00,1875,0,ancestor,0,"embed-grakern: JVM-only structural channel over grakern (chart reification, WL subtree+OA, d_wl with receipts)"
+worktree-agent-a1c551ba488100735,4f63b47712c55e7844c9e4cae80196c5b6072b87,local_branch,2026-08-28T08:06:25-04:00,1956,0,ancestor,0,Implement acquire module: autonomous acquisition protocol
+worktree-agent-a21d6fa563f368ea2,aec8d53800bc86aed83641533af98d1d2c320369,local_branch,2026-08-28T09:43:02-04:00,1935,0,ancestor,0,"amr-interop: fix review findings #10-#13, #39, #32; canonical form by individualization-refinement"
+worktree-agent-a24aa1614e4fa25e2,4a2d0185914e5a1c7e94687b04a25a9ae4a59a47,local_branch,2026-08-28T08:04:04-04:00,1956,0,ancestor,0,Implement proposition module: canonical local semantic contract
+worktree-agent-a2b0793021e47e564,ca78f1cdaa98c03ca71d889637c660bc7bc85058,local_branch,2026-08-28T08:36:17-04:00,1939,0,ancestor,0,Implement interview module and birthday interview fixture
+worktree-agent-a2bfff0a761f2d2fa,0ce047d2d251b446316424b56a6c24e96f78029e,local_branch,2026-08-28T17:33:12-04:00,1865,0,ancestor,0,"embed-grakern: use the pinned WLCompiledKernel.cross query overlay, not the uncommitted query method"
+worktree-agent-a2cd1cd6317ca88dc,04fda18d123e597218afa0908d8a68e84225f00d,local_branch,2026-08-28T08:18:18-04:00,1956,0,ancestor,0,Implement story module and War of the Ghosts narrative acceptance fixture
+worktree-agent-a2ed8a5b9eefaba6c,c0ee3265432d63738bf185c48c34dd831901875a,local_branch,2026-08-28T07:58:47-04:00,1959,0,ancestor,0,"Implement amr module: PENMAN syntax, checked charts, canonical form, Smatch, schema, alignment sidecar"
+worktree-agent-a30a6cb391a048b26,96dd620e6a473470758a825d7333c934543f3b0f,local_branch,2026-08-28T13:13:57-04:00,1903,0,ancestor,0,"recall W5: nominal mentions with identity keys, minimal recall coreference; close TODO(M3)"
+worktree-agent-a32866200333a2f5c,03c9564021fb73da25fe33752fc6a8b8010493e4,local_branch,2026-08-29T00:49:08-04:00,1534,0,ancestor,0,"align: a silent participant is counted in the population receipt, not hidden"
+worktree-agent-a4270bb77f937dc3a,239f2efc414a8372e83206df71118c2c866dc837,local_branch,2026-08-28T13:01:39-04:00,1903,0,ancestor,0,"align: multi-subject PopulationAggregate (visitation, column mass, population flow, hubs, surviving relations, sparse subject×node matrix)"
+worktree-agent-a43f4b54d22cb8487,f9cb6fd8d29aa9932dd99859e25d2c8efcb563b4,local_branch,2026-08-28T10:07:23-04:00,1929,0,ancestor,0,"align/recall: gating as exclusion, Unranked state, Hasse world time, story-agnostic lexical normalizer, typed configs"
+worktree-agent-a57896431c7191c3d,d8b727b7492b1140fe609a1083055d39fa087fdb,local_branch,2026-08-28T15:25:18-04:00,1880,0,ancestor,0,embed-core: portable embedding contract (ADR 0001 rev 3)
+worktree-agent-a6369b729623ed00f,0c7c541c5922607d2f6e34c023ac27977d0e38d4,local_branch,2026-08-28T08:14:57-04:00,1950,0,ancestor,0,"Add amr-interop <-> proposition bridge: ToChart, FromChart, AmrCandidates"
+worktree-agent-a695f94d7ddbb91e9,19664dcda192edd63e4a72b95e36644671c6ee78,local_branch,2026-08-28T18:45:35-04:00,1832,0,ancestor,0,Merge branch 'main' into worktree-agent-a695f94d7ddbb91e9
+worktree-agent-a7a9f4f110905d2c3,0631805225e274fbac3a5665a9a2386f779b197e,local_branch,2026-08-28T09:29:43-04:00,1935,0,ancestor,0,"features: platform-stable derivation ids, complete recipes, kernel support, typed missingness, ledger-only boundary scores"
+worktree-agent-a9825a1f101c644fd,fc3b9e94cc24997b1e472dd2a176a7ec6f20209c,local_branch,2026-08-28T09:31:49-04:00,1936,0,ancestor,0,"core: lawful ClaimMeta, surrogate-safe tokenizer, splitter fixes, contiguous spans, centered windows"
+worktree-agent-a9c0502548c683bfb,a52c847eca0cd22ea3098b53c4e93d765002cce4,local_branch,2026-08-28T08:07:06-04:00,1959,0,ancestor,0,"Implement recall and align modules: recall graph, segmenter, costs, graph-HSMM, transport baseline, signature"
+worktree-agent-aa6479e3946882072,9bea1ceec4641b67b23254bddf80488c893bd929,local_branch,2026-08-28T09:33:50-04:00,1936,0,ancestor,0,proposition: fix review findings #8 #9 #30 #31 #32
+worktree-agent-aa6c170ebe6e9d99d,c9a2b7f4606c9a179a26892a51d3254f54f26520,local_branch,2026-08-28T19:41:57-04:00,1809,0,ancestor,0,"embed-core: P0-2 accept-with-nits fixes — key once before delegate, plain receipts refuse non-public evidence"
+worktree-agent-aa6e4bd3e601330e3,9c2947db45c53c1869c78665201ecddd60bc77fb,local_branch,2026-08-28T18:29:21-04:00,1852,0,ancestor,0,align: HsmmResult rows must be the recall's units in recall order; state the provenance residual
+worktree-agent-aaf814aa9703a2d5e,aa2dd58c8c170d4c37c3344cc3aebd3bb7831ad6,local_branch,2026-08-28T09:36:50-04:00,1935,0,ancestor,0,"interview: fix review findings #1-3, #18-24 and P2 items"
+worktree-agent-ac2a36fe54bbc6812,6f82563863a0706ff603a800fb9305932f7d3b3b,local_branch,2026-08-28T13:32:24-04:00,1890,0,ancestor,0,align W1: anchor/fidelity modes and non-bypassable mode gate (ADR 0001 rev 3 D5)
+worktree-agent-ac41d43ec8293ca09,5e9b67e54bc7da2d39357f03ac8c51a6b9010049,local_branch,2026-08-28T15:08:36-04:00,1883,0,ancestor,0,M1 W2: PropositionEvidence channel; d_chart/d_wl as separate inert-when-absent terms; chart gates over sketch heuristics; segment structural coverage
+worktree-agent-acaf0a4e2d9cd7dc7,df88e9f0af0af1ef91bcaa522de32d103646cdab,local_branch,2026-08-28T08:14:30-04:00,1952,0,ancestor,0,Implement features module and core surface/transcript primitives
+worktree-agent-ad1327ab9ed089c8d,0a2b216a5709ec8d5233eb3209dceb155024913c,local_branch,2026-08-28T09:56:12-04:00,1929,0,ancestor,0,"story/fixtures: context-scoped world time, interval consistency, atlas agreement, entity relations, hypotheses, consistency rules; WOG expectations mechanized with mutants"
+worktree-agent-ad52be69fa4b63718,8773ac11e73f581f91600e895853d4f6231d1e2c,local_branch,2026-08-28T09:54:43-04:00,1927,0,ancestor,0,"document/laws: typed content-addressed coref quotient, kind-checked mentions and projections; rich story generators with per-law mutants"
+worktree-agent-ae272c0d34db6fcb2,e9aa6d25ca1fe6d0aceff0bb0073b0f9c459e113,local_branch,2026-08-28T09:32:02-04:00,1935,0,ancestor,0,"acquire: resolver agreement by provider, per-candidate calibration, span-gated acceptance, typed patch/prompt vocabularies"
+worktree-agent-ae43ffc33ecb684fa,30561db4f746f6fc87fe1ff44fff2e5255e24529,local_branch,2026-08-28T09:17:50-04:00,1939,0,ancestor,0,"Integration: features types in story/align, story→align bridge, WOG alignment suite, document composition, laws module"
+worktree-agent-ae83a0485926edd8a,13265661f22ae471e8708a7e33c0ef3795d82113,local_branch,2026-08-28T12:59:47-04:00,1903,0,ancestor,0,"document: MentionForm (Name/Nominal/Pronominal/Other), form inference, and reader-time resolvableAt"
+worktree-codex-atlas-feature,46314d4d2ef4daef4890e84ca17d39829ec31a16,local_branch,2026-08-28T21:26:26-04:00,1708,1,patch-equivalent,0,feat(view): unify atlas and codex planning
+worktree-codex-atlas-hardening,4aa6cd93ce573fa41d3a6606cc98a03284210081,local_branch,2026-08-28T20:55:32-04:00,1721,0,ancestor,0,view: harden Atlas construction
+worktree-codex-embed-sweep,0a65e79b6fc2ef32f9292fbe0ddfcbcd28fd3e4c,local_branch,2026-08-29T07:08:03-04:00,1350,0,ancestor,0,embed: close validating value reconstruction bypasses
+worktree-codex-geometry,5ba0656947e182874d6cc7a3acbe7238c088639a,local_branch,2026-08-28T19:15:28-04:00,1819,0,ancestor,0,embed: validate complete geometry compatibility
+worktree-codex-p0-receipts,f1b75ae45ae48274b17ce7b5f73df3469b35f574,local_branch,2026-08-28T20:18:05-04:00,1808,0,ancestor,0,embed: make attempt receipts provenance-complete
+worktree-codex-p1-3-candidate,bdb782ef2e72970088c47aaa74502d3054af1222,local_branch,2026-08-28T19:02:25-04:00,1836,1,review-required,1,align: separate structural match from coverage
+worktree-codex-p1-3-final,bd22d290181aba31b8fddfc82f3b55fc3c218f93,local_branch,2026-08-28T18:38:29-04:00,1839,2,review-required,1,align: separate structural match from coverage
+worktree-codex-p1-3-final2,6c3be23a6492d7fcb5eb153dd0e63e609b025f38,local_branch,2026-08-28T19:17:40-04:00,1827,0,ancestor,0,align: separate structural match from coverage
+worktree-codex-p1-3-snapshot,67f81f99638b92ea1221b6ef76395f324d1c0dfc,local_branch,2026-08-28T18:34:08-04:00,1845,1,review-required,1,align: separate structural match from coverage
+worktree-codex-scale-selector,617ea01f07bcaa93d5aeb858dfe7b7709525c73b,local_branch,2026-08-28T20:25:44-04:00,1738,0,ancestor,0,view: compile Codex feature scales
+worktree-cursor-grok-coverage,2c3dd344e6c90d926cc82e79fa5f105c104ffaed,local_branch,2026-08-29T07:55:49-04:00,1215,0,ancestor,0,Seal Coverage and the remaining align/grakern validating types against fromProduct.
+worktree-cursor-grok-help-core,acae44786b2465c74e0b050335af9fe8bfeb977f,local_branch,2026-08-29T07:30:20-04:00,1233,0,ancestor,0,mote: ack both L1(b) corrections; the subset law would have forced a leak
+worktree-cursor-grok-help-induce,c8c08ee4329e060d20bb46507db5cd0af0d2c121,local_branch,2026-08-28T23:15:12-04:00,1622,0,ancestor,0,interview: honest Unattached birthday placement and materialized addrOf
+worktree-cursor-grok-phenomenology,d2e7538e9851b5069bbd89211c9f313466027bd5,local_branch,2026-08-28T19:55:08-04:00,1802,0,ancestor,0,interview: phenomenology coverage uses eligible participant units
+worktree-cursor-grok-strands,06cf36a21a70b57f7b56d50771f7a6847b034b0c,local_branch,2026-08-28T22:52:49-04:00,1656,0,ancestor,0,interview: attach Coverage to every profile rate
+worktree-p0-pseudonymized-1552,46096626c1fcce138bdd1fe444c850fcef6fcc62,local_branch,2026-08-28T18:22:15-04:00,1848,1,review-required,1,embed: seal pseudonymized remote payloads
+worktree-w3-privacy-2235,a15396e6acc01fb535420754bef322b334e5f8b1,local_branch,2026-08-28T22:18:19-04:00,1712,0,ancestor,0,privacy: bind replacements to detector configuration
+astro-fix/scout/astro-00135e87-successor,00135e87f323155e398d31c0be807ac68663615e,remote_tracking_ref,2026-09-01T03:19:48-04:00,878,0,ancestor,0,docs: repair mobile layout and source claims
+astro-fix/scout/astro-bac401d9-successor,bac401d90280ffaedafd8029969c15dab6a8c49c,remote_tracking_ref,2026-09-01T03:41:09-04:00,877,0,ancestor,0,test: pin docs layout court
+basis-verify/candidate,91d48d18d845e88f7eb235bbf2b9cf7879761db2,remote_tracking_ref,2026-08-29T02:35:14-04:00,1455,3,patch-equivalent,0,test: pin BasisId output-space goldens
+chief/nomination-court-becaa,e719e5d6cdc60e60f857bddadb37f1744f9bc53b,remote_tracking_ref,2026-09-01T08:42:50-04:00,859,0,ancestor,0,"docs: make ablation publication a court, and widen the source checklist"
+chief/premerge-c830,9cb7e2de7af75061166407798b55852839534dba,remote_tracking_ref,2026-09-01T07:24:35-04:00,868,0,ancestor,0,tools: harden premerge gate against rewritten views
+chief/refscope-10b,b67e3b8933166854f80fdf43afb2845050118449,remote_tracking_ref,2026-09-01T08:01:48-04:00,861,0,ancestor,0,tools: harden reference scope discovery
+codex-storymodel4s-scout/cost-overflow-bd-01M1DB1ZNFMNRJ7J40F4HXMZF9,bd50c89faaa43276c35d2b7fcb572b39c14c98ad,remote_tracking_ref,2026-09-01T06:32:10-04:00,872,1,patch-equivalent,0,fix: refuse aggregate cost-weight overflow
+origin/main,182d74aeed3b5a8bcd013de51e7024cc426c544b,remote_tracking_ref,2026-09-21T17:36:24-04:00,274,0,ancestor,0,Merge Memento task admission and 63/60 sealed split
+premerge-final/chief/premerge-authorizer-recut-20260901,abc08b576a72947cdb9b25aa56c35b269e8787b9,remote_tracking_ref,2026-09-01T05:45:33-04:00,872,3,review-required,3,tools: refuse legacy Git graft history
+premerge-final/chief/premerge-direct-final-20260901,e63a1cc9670b1e66d96d6ac3bb5c7905a76aa747,remote_tracking_ref,2026-09-01T05:48:40-04:00,872,1,review-required,1,tools: make premerge gate fail closed
+premerge-final/chief/premerge-direct-final-v2-20260901,9a0c174d818f4caf168adccdbeed94a4d11ee3a1,remote_tracking_ref,2026-09-01T05:57:54-04:00,872,1,patch-equivalent,0,tools: make premerge gate fail closed
+premerge-final/chief/premerge-direct-final-v3-20260901,79c0913d5df0353c8cb0224e38d7d76bea028a9d,remote_tracking_ref,2026-09-01T06:10:48-04:00,872,1,patch-equivalent,0,tools: harden premerge gate against rewritten views
+premerge-final/chief/premerge-final-20260901,663a0c6195c6820c80719ad9029418f2c37f3e40,remote_tracking_ref,2026-09-01T04:54:03-04:00,872,1,review-required,1,tools: make premerge gate fail closed
+premerge-fix/chief/premerge-reconciliation-gate,1e5df7aeaf6b6624764c6ca5de48119d72f91ff5,remote_tracking_ref,2026-08-31T23:50:33-04:00,891,3,review-required,3,tools: reject partial candidate snapshots
+premerge-fix/chief/premerge-unread-fail-closed-v2,3e1db8dc00042a6379a8aa2367a1cef3d75838fe,remote_tracking_ref,2026-09-01T02:29:32-04:00,891,4,review-required,4,tools: fail closed when board reread fails
+sherlock-fix/scout/sherlock-b0r-owner-post-successor,c71df91000ea2bda9e6c0c79f19c791c376dfcce,remote_tracking_ref,2026-09-01T02:49:46-04:00,895,2,review-required,1,docs: correct Sherlock owner decision reference
+sherlock-recut/chief/sherlock-postchecker-9410,9410eb1b842bd058761f72b8c1635cbc6aa96a41,remote_tracking_ref,2026-09-01T06:22:21-04:00,872,2,review-required,1,docs(sherlock): recut exact pair after premerge hardening
+sherlock-recut/scout/sherlock-six-path-current-main,87c18006bd58ee9a23b9fe0a1e3b994e7d62aba9,remote_tracking_ref,2026-09-01T05:21:02-04:00,872,1,review-required,1,docs(sherlock): recut exact pair on current main

@@ -1,5 +1,10 @@
 # Delivery and measurement plan
 
+**6 October 2026 restart:** the owner has moved to one primary agent and at most one helper.
+The [current stocktake and salvage queue](STATE-20261006.md) supersedes historical staffing,
+Fray-lock and next-owner handoffs below. Mote remains authoritative; the 1.0/1.1 scope and
+scientific acceptance boundaries remain as recorded here.
+
 Accepted direction, 19 September 2026, under the owner's request to assess the external review
 and reorganize delivery. Implementation is pending unless evidence below says otherwise.
 Baseline: `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. This is the active delivery index.

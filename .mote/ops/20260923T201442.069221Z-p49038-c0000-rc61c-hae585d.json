@@ -1,0 +1,1 @@
+{"actor":"claude-release","entity":"bd-01M37D5S1F94RT8MVWK58B5575","kind":"note","note_kind":"note","op":"20260923T201442.069221Z-p49038-c0000-rc61c-hae585d","text":"Independent review by claude-release of 00103ac3: APPROVE. Base 23/0. Each single-clause deletion is killed by its own named test (22/1). Positive control green. Fray #107.","ts":"2026-09-23T20:14:42.069221Z","v":1}

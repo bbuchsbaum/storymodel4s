@@ -1,0 +1,55 @@
+{
+  "observed_at": "2026-10-06T13:36:05.083732+00:00",
+  "main": "0500bc1029bea9df88291a7b73860f8fecfa804d",
+  "tracking_main": "182d74aeed3b5a8bcd013de51e7024cc426c544b",
+  "live_main": "182d74aeed3b5a8bcd013de51e7024cc426c544b",
+  "main_ahead": 274,
+  "main_behind": 0,
+  "ref_counts_at_start": {
+    "local_branches": 258,
+    "remote_tracking_refs": 18
+  },
+  "ref_classification": {
+    "ancestor": 187,
+    "review-required": 61,
+    "patch-equivalent": 28
+  },
+  "registered_worktrees_at_start": 1,
+  "initial_status": {
+    "untracked_mote_ops": 292,
+    "untracked_other": [
+      "align/ContentBehaviorLawsSuite.scala"
+    ],
+    "tracked_changes": 0
+  },
+  "untracked_test": {
+    "matches_candidate": "e02d80d01d2a0ebba3bea8c4716caab9662209dc",
+    "candidate_path": "align/src/test/scala/storymodel4s/align/ContentBehaviorLawsSuite.scala",
+    "sha256": "26cd9a10d72115a1b126709c42f4b5ea93edf39efe88b3b5a06c3f2fd5e888d5",
+    "same_bytes": true,
+    "active_test_source": false
+  },
+  "tickets_at_start": {
+    "closed": 297,
+    "open": 108,
+    "doing": 8,
+    "review": 3,
+    "unfinished": 119,
+    "ready": 58,
+    "priority_counts": {
+      "1": 21,
+      "2": 33,
+      "3": 65
+    }
+  },
+  "active_claims_at_start": 0,
+  "active_reservations_at_start": 0,
+  "mote_ops_verified_at_start": 15354,
+  "release_open_dependency_closure_count": 23,
+  "release_closure_scope": "Git-independent Mote blocks-edge closure; explicit acceptance children not necessarily represented by these edges",
+  "storyatlas_source_pin": "48457bdbfd2ca012bdc9144b3395d4d8e5d4ec10",
+  "storyatlas_pin_on_advertised_remote_main": false,
+  "fresh_runtime_gate": false,
+  "fresh_scientific_qualification": false,
+  "restricted_story_or_participant_data_read": false
+}

@@ -1,0 +1,305 @@
+{
+  "as_of_ts": "2026-10-06T13:24:08.755375Z",
+  "summary": {
+    "error": 0,
+    "warning": 200,
+    "info": 54,
+    "skipped": 4
+  },
+  "finding_counts": {
+    "aged_open_request": 173,
+    "candidate_ancestry_operator_override_recorded": 1,
+    "candidate_landing_repository_mismatch": 4,
+    "candidate_out_of_band_landing_recorded": 6,
+    "candidate_reachable_unrecorded": 7,
+    "candidate_reconciliation_operator_override_recorded": 6,
+    "candidate_reconciliation_repository_bridge_recorded": 2,
+    "git_store_uncommitted_ops": 1,
+    "candidate_blockers": 41,
+    "candidate_containment_recovery_recorded": 1,
+    "doing_without_live_claim": 8,
+    "parent_all_children_closed": 4
+  },
+  "recovery_findings": [
+    {
+      "code": "candidate_ancestry_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-70GXTV91YM9PSNGGC9300A6TJC",
+      "message": "operator codex-storymodel4s-chief refreshed immutable-producer Git ancestry under an explicit recovery basis"
+    },
+    {
+      "code": "candidate_landing_repository_mismatch",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-163TSH4SNEXBP7599EBQ63CN1P",
+      "message": "audit repository does not match the candidate's bound landing repository"
+    },
+    {
+      "code": "candidate_landing_repository_mismatch",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-4DW0GRW5CA8GVMFMWEHN9HRYHK",
+      "message": "audit repository does not match the candidate's bound landing repository"
+    },
+    {
+      "code": "candidate_landing_repository_mismatch",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-67RYQZ5MJJT5BV8NY7G150S1P0",
+      "message": "audit repository does not match the candidate's bound landing repository"
+    },
+    {
+      "code": "candidate_landing_repository_mismatch",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-70K5PT8QSX3JPC8X0X7ZHEAWX1",
+      "message": "audit repository does not match the candidate's bound landing repository"
+    },
+    {
+      "code": "candidate_out_of_band_landing_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-13J7K02VCBNBYWQG8354Y9MGZY",
+      "message": "candidate was observed reachable from main and recorded as landed outside the formal candidate transition"
+    },
+    {
+      "code": "candidate_out_of_band_landing_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-1EE04BNN2PY3AKNAFP32YK42YD",
+      "message": "candidate was observed reachable from main and recorded as landed outside the formal candidate transition"
+    },
+    {
+      "code": "candidate_out_of_band_landing_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-1XRDRNRTJB2P874SFSFMTY93GG",
+      "message": "candidate was observed reachable from main and recorded as landed outside the formal candidate transition"
+    },
+    {
+      "code": "candidate_out_of_band_landing_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-4TB2H58FZP5EYF8W8TTCMJ4EAJ",
+      "message": "candidate was observed reachable from main and recorded as landed outside the formal candidate transition"
+    },
+    {
+      "code": "candidate_out_of_band_landing_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-4X710ZCHRH5DRM163V9Y8HMK10",
+      "message": "candidate was observed reachable from main and recorded as landed outside the formal candidate transition"
+    },
+    {
+      "code": "candidate_out_of_band_landing_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-66YCE7XWGG0Q90GNPWR6XM191H",
+      "message": "candidate was observed reachable from main and recorded as landed outside the formal candidate transition"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-0668MBNBWH5GPHHTH1ZC3PE2W5",
+      "message": "pending candidate commit 9cb7e2de7af75061166407798b55852839534dba is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-08QSQGY8XMA3FMETGHVR6ZKN1K",
+      "message": "pending candidate commit 9d8b4a34283e7efb07d097fee120926b51e78080 is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-0PQXDW41WY6Q9Z1QE97W4J7ZTS",
+      "message": "pending candidate commit 6ad95c5c5109aba3c282d854add422e67b71b07b is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-2RJZN7R75WNJS4CMHKJ5X3FRTE",
+      "message": "pending candidate commit e719e5d6cdc60e60f857bddadb37f1744f9bc53b is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-6D9Z91FK56DE5Q88QGH3XGKXF5",
+      "message": "pending candidate commit 84b6ce8d9082132d79957a3b5f2d58801aff5998 is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-6KQEXB07V3TRD83H5BA086Y140",
+      "message": "pending candidate commit bac401d90280ffaedafd8029969c15dab6a8c49c is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reachable_unrecorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-74ZS7CM9KXX54YAKRSYHJZNVG1",
+      "message": "pending candidate commit b67e3b8933166854f80fdf43afb2845050118449 is reachable from observed target main at 0500bc1029bea9df88291a7b73860f8fecfa804d"
+    },
+    {
+      "code": "candidate_reconciliation_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-13J7K02VCBNBYWQG8354Y9MGZY",
+      "message": "operator bbuchsbaum-owner reconciled the candidate by explicit override while preserving original proposal authorizer codex-storymodel4s-chief"
+    },
+    {
+      "code": "candidate_reconciliation_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-1EE04BNN2PY3AKNAFP32YK42YD",
+      "message": "operator codex-storymodel4s-chief reconciled the candidate by explicit override while preserving original proposal authorizer claude-storymodel4s"
+    },
+    {
+      "code": "candidate_reconciliation_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-1XRDRNRTJB2P874SFSFMTY93GG",
+      "message": "operator codex-storymodel4s-chief reconciled the candidate by explicit override while preserving original proposal authorizer claude-storymodel4s"
+    },
+    {
+      "code": "candidate_reconciliation_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-4TB2H58FZP5EYF8W8TTCMJ4EAJ",
+      "message": "operator codex-storymodel4s-chief reconciled the candidate by explicit override while preserving original proposal authorizer claude-storymodel4s"
+    },
+    {
+      "code": "candidate_reconciliation_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-4X710ZCHRH5DRM163V9Y8HMK10",
+      "message": "operator codex-storymodel4s-chief reconciled the candidate by explicit override while preserving original proposal authorizer claude-storymodel4s"
+    },
+    {
+      "code": "candidate_reconciliation_operator_override_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-66YCE7XWGG0Q90GNPWR6XM191H",
+      "message": "operator codex-storymodel4s-chief reconciled the candidate by explicit override while preserving original proposal authorizer claude-storymodel4s"
+    },
+    {
+      "code": "candidate_reconciliation_repository_bridge_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-1XRDRNRTJB2P874SFSFMTY93GG",
+      "message": "candidate was reconciled in repository repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e while preserving landing repository repo-7a744f01a2b13e42e96968d4eda44d7a3b9dd15dd54808b860a9295407cacd35"
+    },
+    {
+      "code": "candidate_reconciliation_repository_bridge_recorded",
+      "severity": "warning",
+      "scope": "candidate",
+      "subject": "cand-4X710ZCHRH5DRM163V9Y8HMK10",
+      "message": "candidate was reconciled in repository repo-13c45bc9a6082196cc715efb4feb8aceb0f7517b3784a801a92dec48dece009e while preserving landing repository repo-d6430c2d898733bfeb570f9a4ef456b70035b2dde873b207dd575db73c76ae75"
+    },
+    {
+      "code": "git_store_uncommitted_ops",
+      "severity": "warning",
+      "scope": "store",
+      "subject": "st-01M14B2C58PJ9415QYYMFGPD0N",
+      "message": "git-backed op store has 292 uncommitted operation(s); oldest is 15d01h17m; clones populated from Git cannot observe them; synchronize the op files before asking those producers to refresh"
+    },
+    {
+      "code": "candidate_containment_recovery_recorded",
+      "severity": "info",
+      "scope": "candidate",
+      "subject": "cand-6XWW93XPEQEP8WQP6HXRF9B2E6",
+      "message": "successor authorizer codex-storymodel4s-chief retired the pending predecessor using 1 exact containment evidence operation(s)"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M2TACM78289S4TECE91GT5K2",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M3549Q5W5KQFSY3ZH81FARM0",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M354E83Z4Z7DR4KPP6Q45MAJ",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M35JG7DXD7NSEE4WVEKT3CSF",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "doing_without_live_claim",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M35PB1H5PDD55YVKR4TQ8M66",
+      "message": "recorded status is doing but no claim lease is active"
+    },
+    {
+      "code": "parent_all_children_closed",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M16E05TWX28QKJF2GFY67ZZV",
+      "message": "recorded parent remains open while all 1 live relation children are closed"
+    },
+    {
+      "code": "parent_all_children_closed",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M1836WDBB72KXXPKG23PSSWT",
+      "message": "recorded parent remains open while all 12 live relation children are closed"
+    },
+    {
+      "code": "parent_all_children_closed",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M2TAK2EFCDWR2A01Q3XSNS79",
+      "message": "recorded parent remains open while all 1 live relation children are closed"
+    },
+    {
+      "code": "parent_all_children_closed",
+      "severity": "info",
+      "scope": "issue",
+      "subject": "bd-01M2TAM66RTEMY3VVHA3N2MYXK",
+      "message": "recorded parent remains open while all 1 live relation children are closed"
+    }
+  ]
+}
