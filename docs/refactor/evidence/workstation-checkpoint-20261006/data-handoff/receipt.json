@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "implementation": "3bfe9925d049bf0bac9cfcd5cd599a8072db290b",
+  "source_machine": "BUC-GW02",
+  "destination_machine": "BUC-GW01",
+  "placement_basis": "owner-approved checkpoint",
+  "selection": {
+    "development_sources": 11,
+    "heldout_assets": 0,
+    "video_assets": 0,
+    "assets": 18,
+    "recovery_archives": 3,
+    "originals_preserved": true,
+    "frozen_protocol_hashes_verified": true,
+    "private_manifests_and_paths_published": false
+  },
+  "interruption": {
+    "schema": 1,
+    "manifest_sha256": "1a66314bfe235165a8b2c54cf8f7ab6bc13df10cd925251c9865add6d2142c35",
+    "partial_bytes": 65536,
+    "unadmitted_after_interrupt": true,
+    "source_preserved": true,
+    "actual_machine_verified": true
+  },
+  "resume_run": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T17:46:07.703109+00:00",
+    "finished_utc": "2026-10-06T17:46:48.964757+00:00",
+    "duration_seconds": 41.261564,
+    "command": [
+      "python3",
+      "tools/data_handoff.py",
+      "transfer",
+      "--manifest",
+      "1a66314bfe235165a8b2c54cf8f7ab6bc13df10cd925251c9865add6d2142c35",
+      "--execute"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/private-copy-resume.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 600.0,
+    "log_bytes": 236
+  },
+  "destination_readback": {
+    "data_ready": {
+      "assets": 18,
+      "bytes": 276496625,
+      "machine": "BUC-GW01",
+      "manifest_sha256": "1a66314bfe235165a8b2c54cf8f7ab6bc13df10cd925251c9865add6d2142c35",
+      "root": "/Users/bbuchsbaum/.local/share/storymodel4s/data",
+      "schema": 1,
+      "verified": true
+    },
+    "machine": "BUC-GW01",
+    "permitted_reader": {
+      "alignment_scanner_and_canonical_word_join": "not qualified",
+      "clock": "openneuro",
+      "development_sources": 11,
+      "lineage_and_output_readback_verified": true,
+      "reader": "existing recall_clock.py",
+      "records": 30798
+    },
+    "preserved_bundles": [
+      {
+        "bytes": 139641725,
+        "sha256": "c9264abc76d285b33e6274bdb669eb82d91ea71dbefd0146370233b40b1f2898",
+        "verify_exit": 0
+      },
+      {
+        "bytes": 33007376,
+        "sha256": "a6488a0d266f8713dda57dfdb3bc16b7c9564ef7f97303f41cbb18f4bf52d749",
+        "verify_exit": 0
+      }
+    ],
+    "repos": {
+      "storyatlas4s": {
+        "account": "canardlapin",
+        "authenticated_push_dry_run_exit": 0,
+        "clean": true,
+        "head": "798bb7937150bdeb91356e4713b536d81740d805",
+        "mote_doctor_exit": 0
+      },
+      "storymodel4s": {
+        "account": "bbuchsbaum",
+        "authenticated_push_dry_run_exit": 0,
+        "clean": true,
+        "head": "5d32836e161a984d97552504db622afb33015a28",
+        "mote_doctor_exit": 0
+      }
+    },
+    "schema": 1,
+    "synthetic_handoff_tests": {
+      "failed": 0,
+      "passed": 20
+    },
+    "tools": {
+      "clang": "Apple clang version 16.0.0 (clang-1600.0.26.4)",
+      "git": "git version 2.39.5 (Apple Git-154)",
+      "mote": "mote 0.1.0",
+      "node": "v24.21.0",
+      "pkg_config": "3.0.7",
+      "python": "Python 3.9.6",
+      "tmux": "tmux 3.7c"
+    }
+  },
+  "admission_scope": "byte placement and existing permitted development reader only; no new corpus use, scientific mapping, scanner alignment or canonical word join"
+}

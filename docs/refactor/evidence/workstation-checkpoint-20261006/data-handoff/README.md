@@ -1,0 +1,7 @@
+# Approved private handoff exercised
+
+Reviewed tool3bfe9925 copies an explicit digest-bound development selection through existing authenticated SSH keys to the actual approved BUC-GW01. The source keeps all originals. No held-out recall or video asset is selected. Eighteen assets (276,496,625 bytes) include eleven development recall exports, their annotation/partition, pinned model/tokenizer and three private recovery archives. Filenames, manifest bodies, archive inventories and row-level reader outputs remain in approved private storage.
+
+An actual truncated SSH stream leaves a matching65,536-byte staged prefix and refuses readiness. The normal CLI resumes and verifies every byte before the atomic ready marker. A separate verify and fresh-checkout local reader guard rehash the copy. Existing recall_clock.py reads all11 permitted sources against declared lineage;30,798 records and its private outputs read back. Both Git bundles verify; the source and unrelated destination files are preserved.
+
+Twenty synthetic tests pass on source Python3.14 and destination Python3.9.6. Removing destination approval kills the two named approval witnesses while eighteen siblings pass. The receipt distinguishes fresh checkout/transport/Mote preflight from full workstation Scala qualification, which is recorded separately. This does not qualify new scientific inference, scanner alignment, canonical word joins or ONNX execution.

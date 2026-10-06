@@ -1,0 +1,76 @@
+{
+  "source_inputs": "999d17ddeb4391ed9323b507e8107a1d40ed7a5d",
+  "subsequent_changes": "generatedCI/mote/evidence only",
+  "examples_verified": 13,
+  "parser_tests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "parser_mutant": {
+    "named_failure": "colored hosted logger markers preserve exact plain example bytes",
+    "passed": 4,
+    "failed": 1,
+    "compiled": true
+  },
+  "source_compiler_selector": "explicit3.7.4; noforce; no reproduction claim for producer ambiguity",
+  "raw_example_output_preserved": true,
+  "logs": [
+    {
+      "name": "producer-ci-selector",
+      "sha256": "1f0c4885eb7373e3f3ae0c5b3729593c2a86de5b05a82cbc95949ebd2646b6ae",
+      "bytes": 1451,
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T18:14:04.932358+00:00",
+        "finished_utc": "2026-10-06T18:14:18.822307+00:00",
+        "duration_seconds": 13.889773,
+        "command": [
+          "sbt",
+          "-batch",
+          "githubWorkflowGenerate",
+          "scalafmtSbtCheck",
+          "githubWorkflowCheck"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/producer-ci-selector.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 600.0,
+        "log_bytes": 1451
+      }
+    },
+    {
+      "name": "docs-example-replay",
+      "sha256": "0dd6d717af26353741ecbb21f8997e5d4326fcdc2645a7429ca983503533707f",
+      "bytes": 1224,
+      "run": {
+        "schema_version": 1,
+        "started_utc": "2026-10-06T18:16:26.116586+00:00",
+        "finished_utc": "2026-10-06T18:19:12.438609+00:00",
+        "duration_seconds": 166.321075,
+        "command": [
+          "npm",
+          "run",
+          "verify:examples"
+        ],
+        "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer/docs-site",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/docs-example-replay.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 1200.0,
+        "log_bytes": 1224
+      }
+    },
+    {
+      "name": "docs-marker-mutant",
+      "sha256": "33a43be3e4d3d24313237ae42cead85898fd90590b67e7203070c808e6f02fd5",
+      "bytes": 1268
+    }
+  ],
+  "full_workstation_gate": "pending",
+  "hosted_engine_numerical_qualification": "open in bd-01M1D215EY4T5BR0VRJ694AMBQ; productionmath/goldensunchanged"
+}

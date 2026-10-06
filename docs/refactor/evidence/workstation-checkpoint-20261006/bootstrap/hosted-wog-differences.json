@@ -1,0 +1,35 @@
+{
+  "source": "hosted Temurin21 Linux x86_64 vs committed JVM golden",
+  "differences": [
+    {
+      "path": "/posterior/1/mass/7/mass",
+      "expected": "0x3f655be4582d2fe4",
+      "obtained": "0x3f655be4582d2fe5",
+      "bit_distance": 1
+    },
+    {
+      "path": "/flow/0/mass/8/mass",
+      "expected": "0x3f1b6b38f0f1bc60",
+      "obtained": "0x3f1b6b38f0f1bc5f",
+      "bit_distance": 1
+    },
+    {
+      "path": "/flow/0/mass/17/mass",
+      "expected": "0x3f1b6b38f0f1bc60",
+      "obtained": "0x3f1b6b38f0f1bc5f",
+      "bit_distance": 1
+    },
+    {
+      "path": "/flow/0/mass/35/mass",
+      "expected": "0x3f1b6b38f0f1bc60",
+      "obtained": "0x3f1b6b38f0f1bc5f",
+      "bit_distance": 1
+    },
+    {
+      "path": "/flow/0/mass/44/mass",
+      "expected": "0x3f1b6b38f0f1bc60",
+      "obtained": "0x3f1b6b38f0f1bc5f",
+      "bit_distance": 1
+    }
+  ]
+}
