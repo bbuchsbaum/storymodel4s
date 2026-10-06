@@ -1,0 +1,20 @@
+[
+  {
+    "file": "e_exp.c",
+    "url": "https://www.netlib.org/fdlibm/e_exp.c",
+    "bytes": 5002,
+    "sha256": "04c96195b7ced914d659b5fd204724c182f091af8631fe42016ad6e27cb302ef"
+  },
+  {
+    "file": "e_log.c",
+    "url": "https://www.netlib.org/fdlibm/e_log.c",
+    "bytes": 4451,
+    "sha256": "a2b1bd1b367026a35f36da53425cd618386c3bf69d23ac224a40791aa9855ac9"
+  },
+  {
+    "file": "fdlibm.h",
+    "url": "https://www.netlib.org/fdlibm/fdlibm.h",
+    "bytes": 6205,
+    "sha256": "64113c472c2676499288bc35a821b0867916552930bc52c7445d2c50dddf0e71"
+  }
+]
