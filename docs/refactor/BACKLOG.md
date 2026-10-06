@@ -4,6 +4,16 @@
 Eight stale `doing` tickets were requeued and four historical assignments cleared with Mote
 decision notes. The earlier named-owner and M1-next handoffs below are historical. The owner
 has selected one primary agent and at most one helper; acceptance and dependency records remain.
+The executable [October delivery sequence](PLAN.md#october-delivery-sequence) is the current
+plan: recover/qualify -> ordinary-file text investigation -> annotation-only Sherlock ->
+weighted/timed/video/imaging journey -> release.
+The first checkpoint also requires reviewed GitHub main parity and a tested fresh-checkout/
+resume handoff on `buc-gw01` (Tailscale-reported macOS); architecture/tools/storage still need
+preflight. Other machines support public/synthetic development. Private data and derived
+artifacts require owner-approved machines and the verified transfer contract in PLAN/data README.
+The new bounded handoff ticket is `bd-01M48TNS4G0442F7SJW57671B6`: approved-host dry-run,
+resumable encrypted copy, checksum/readback verification and synthetic failure witnesses.
+Private-data journeys wait for this acceptance; public/synthetic work can continue.
 
 Historical execution handoff: [23 September checkpoint](PLAN.md#execution-handoff-23-september-2026), with the then-accepted owners, next witnesses and bound integration evidence. Live Mote acceptance remains authoritative.
 
@@ -23,10 +33,26 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-The active next product milestone is [M1: one reproducible source-plus-recall investigation](goals/source-recall-workspace-m1-20260922.md),
-Mote `bd-01M34J9FS10B14WQA309K0P6V8`. G1 revision 4 is locally qualified; next is the checked
-provider packet and StoryAtlas's local adoption/loading/interaction/replay chain. Use the `workspace-m1`
-and `execution` tags for the bounded queue. One implementation slice and one heavy gate at a time.
+Prepare the reviewed audit/plan branch for authorized integration, then work this small queue:
+
+| Order | Existing Mote | Acceptance to resume |
+| --- | --- | --- |
+| 1 | `bd-01M1CGP2K4H93WM8CW5EFEPTJK` | Recover `ed9f478d` reference-scope guard; 98 integrated tool assertions. |
+| 2 | `bd-01M37ESFCE1SZFTV7NHJEC7SNC` | Recover `69e48e9a` FrameSet stream identity; scoped media gate and explicit skips. |
+| 3 | `bd-01M379NZZ67GZJMWVBT5XNA0ZD` | Recover `e02d80d` tests/tools/evidence; retain the unmet S2a-3 channel witness. |
+| 4 | `bd-01M16DBEH9PKER423BZ47ZKBMV` | Coherent eligibility/missingness/denominator/codec migration before lasting public API shapes. |
+| 5 | `bd-01M379N8HK5ZCV9W252X9MQ4VV` | Strict content-only lexical wiring; unavailable differs from provider abstention; historical parity retained. |
+
+The first visible milestone after this queue is one ordinary text source plus two untimed
+recalls through prepare, reference/reconstruction, facade, independent exchange reader and
+actual Atlas opening. The registered embedding adapter remains a G1/1.0 prerequisite; it does
+not block lexical development when verified executable prerequisites are recorded. The full
+workspace/prepare/channel tickets stay open wherever their broader acceptance remains unmet.
+
+The earlier [M1 fixture investigation](goals/source-recall-workspace-m1-20260922.md) is complete
+locally and supplies reusable serializers and exact-pair evidence. Its `workspace-m1` queue
+is historical. Use the current PLAN and explicit Mote IDs above; one implementation slice
+and one heavy gate at a time. Review the docs-site claims candidate during recovery/walkthrough.
 
 The [film foundation goal](goals/film-foundation-20260919.md) remains the historical delivery
 record. Its types/signature work and the baseline/scorer/clock courts have landed; D1B's live
@@ -46,7 +72,7 @@ measurement, research comparisons and stable release retain their existing ticke
 - Completed; live tracker closed `bd-01M2TAGDJ5F0FEPC3XPWVDSWDH` — [S4c sealed alignment capabilities](evidence/d1a-s4c-alignment-source-20260920/README.md)
 - Completed; live tracker closed `bd-01M2TAC80YRK5JFNKTT7B7CAQN` — [D1B typed recall signatures](evidence/d1b-typed-signatures-20260920/README.md)
 - Completed; live tracker closed `bd-01M2TAGST4EBFR1HM9Q3EWSYAH` — [cold-reviewed film phase plan](../plans/2026-09-20-film-compiler-phase-plan.md); subsequent film implementation remains on its own lane
-- `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — [foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo
+- Completed `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — MASC audit rescued by main `0500bc10`; see the October stocktake
 - `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
 
 Useful Mote commands after reconciliation:
@@ -57,7 +83,12 @@ mote ls --tag delivery-20260919
 mote show bd-01M2TA01EHVRF6MQ1N00XTVK1K
 ```
 
-The `workspace-m1` plus `execution` filter is the active bounded queue; the foundation filter retains its separate historical/infrastructure scope. Other lanes are visible in ticket titles and bodies, and every old issue is enumerated below. A ready research ticket is not permission to start it ahead of the delivery slice. Priorities: 0 foundation, 1 next implementation/film, 2 validation/release/maintenance, 3 deliberately later. Owner decisions apply only to their named track. Containers use nonblocking relationships; dependency edges encode technical prerequisites.
+The current bounded queue is the explicit list above; the foundation and `workspace-m1` filters
+retain historical/infrastructure context. Other lanes remain in ticket titles/tags and the
+inventory below. A ready research ticket does not move ahead of the delivery slice. Priorities
+and 1.0/1.1 scope follow live Mote. Containers use nonblocking relationships; executable
+dependency edges must follow verified prerequisites, including justified refinements of coarse
+container edges before consumer work. Preserve full parent/release acceptance during any split.
 
 ## Current owner scope and temporal implementation checkpoint
 

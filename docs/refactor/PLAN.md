@@ -1,9 +1,15 @@
 # Delivery and measurement plan
 
 **6 October 2026 restart:** the owner has moved to one primary agent and at most one helper.
-The [current stocktake and salvage queue](STATE-20261006.md) supersedes historical staffing,
-Fray-lock and next-owner handoffs below. Mote remains authoritative; the 1.0/1.1 scope and
-scientific acceptance boundaries remain as recorded here.
+The [stocktake](STATE-20261006.md) establishes the recovery baseline. The October delivery
+sequence below is the current execution plan and supersedes historical staffing, next-owner
+handoffs and M1-next prose. Mote remains authoritative; the accepted 1.0/1.1 scope and scientific
+acceptance boundaries remain in force. This plan schedules work; it does not certify execution.
+The owner's subsequent workstation requirement makes GitHub parity and an exercised remote
+checkout handoff part of the first checkpoint. The sustained-development target is `buc-gw01`;
+other machines must be able to clone, build and continue public/synthetic work through the same
+portable contract. Private data and data-derived artifacts are used only on owner-approved
+machines, including `buc-gw01`; joining the tailnet does not grant that approval.
 
 Accepted direction, 19 September 2026, under the owner's request to assess the external review
 and reorganize delivery. Implementation is pending unless evidence below says otherwise.
@@ -11,15 +17,287 @@ Baseline: `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. This is the active deliver
 The [backlog](BACKLOG.md) gives live Mote IDs, ticket acceptance criteria and scheduling lanes;
 the [reconciliation](RECONCILIATION.json) accounts for every previously unfinished ticket.
 
-## Active product milestone: M1 (22 September 2026)
+## October delivery sequence
 
-The owner has activated [one reproducible source-plus-recall investigation](goals/source-recall-workspace-m1-20260922.md),
+**Outcome:** a researcher can start with ordinary source and recall files, obtain checked local
+reference and structured reconstruction mappings, inspect them in StoryAtlas, and export the
+same results for analysis. Deliver that path in progressively broader, independently checked
+examples. Measure progress by demonstrated journeys and reviewed commits.
+
+**Starting point:** audit `e4933fcb2e58a845a703590d39b01e0bd213c0ca`, local main
+`0500bc1029bea9df88291a7b73860f8fecfa804d`. The stocktake found 119 unfinished tickets, but
+only a small working queue is selected. This is an execution order within the existing delivery
+epic `bd-01M2TA01EHVRF6MQ1N00XTVK1K`, not another backlog or a change to release scope.
+
+### 1. Recover, synchronize GitHub and qualify development hosts
+
+Success means the reviewed main history, current instructions, delivery plan, Mote operations
+and selected resumable work are available beyond this Mac. A fresh checkout on the always-on
+workstation must demonstrate that it can continue development.
+
+The order is **recover and qualify locally -> non-force GitHub synchronization/hosted evidence
+-> fresh destination checkout and resume qualification**. The recovery slices below are the
+first part of this checkpoint. Independent local product work may continue while host setup is
+blocked; sustained execution on a new host waits for that host's qualification.
+
+Target observed on 6 October through Tailscale: `BUC-GW01`, online, macOS. Use its MagicDNS name
+`buc-gw01.tail5f873d.ts.net` for private connectivity. This verifies tailnet presence and the
+reported OS; SSH access, architecture, installed tools and available storage still need preflight.
+
+1. Prepare the audit/plan branch and first recovered slices for reviewed local integration,
+   as detailed below. Review the actual accumulated main tree and preservation receipts, then
+   qualify the exact result and sibling source pin. Fix any reproducibility regression exposed
+   by an environment without local dependency overrides. Do not replace observed evidence with
+   the assumption that 274 earlier local commits are remotely qualified.
+2. Synchronize GitHub through a non-force push of the reviewed main result. Record local main,
+   tracking main and live remote SHA equality. Retain a small explicit list of recovery branch
+   refs still needed for resumption and publish their exact tips after reviewing identity and
+   publication contents. Label each unfinished, review-ready or qualified; remote preservation
+   does not require implementation completion. Do not push all refs or snapshots wholesale.
+   Bind hosted CI by run URL, matrix cell and SHA. Git transport and
+   GitHub API authentication are checked separately; preserve repo-local account routing.
+3. Copy the recovery bundle and its hash manifest to approved private workstation/backup
+   storage and verify them there. An ordinary GitHub clone does not carry `.git/recovery`, local
+   stashes or the full protected object archive. Keep the original copy until readback succeeds.
+4. Bootstrap a standalone checkout from GitHub, using the repository URL and account routing
+   configured on that host rather than assuming this Mac's `github-bbuchsbaum` SSH alias exists.
+   Record the OS/architecture, tested tool/build identities, checkout path, dependency pins and
+   host-local artifact/data locations. The checked-in build selects Scala 3.7.4, sbt 1.12.14 and
+   sbt-typelevel 0.8.7; current CI uses Temurin 17/21. Supply Node, Python and the tested Native
+   compiler/libraries as required by the actual platform gate. Pin the tested Mote binary/build,
+   not merely its `0.1.0` version label. Preflight the selected host before fixing setup commands.
+5. Create the required `.mote/local` and `.mote/tmp` runtime directories on a fresh clone and
+   verify their ignore behavior (`local` is currently ignored; `tmp` has no matching ignore rule).
+   Keep generated runtime contents out of commits and record any necessary ignore repair. Run Mote
+   doctor with a distinct actor, and prove it sees the published ticket/operation state. Fetch
+   grakern and its transitive builds from the checked-in source pins. A local working grakern
+   checkout must not silently replace that proof.
+6. Record the exact StoryAtlas consumer SHA and StoryModel source pin and verify that both are
+   fetchable on the destination. An unavailable consumer revision remains an explicit handoff
+   dependency. Run the strict baseline and exact-provider consumer from the workstation checkout;
+   replay a small public/synthetic CLI export and independent reader. Bind SHA, commands, exits,
+   passed/failed/skipped counts and output hashes in a portable handoff receipt. Missing optional
+   model/media/data assets produce explicit unavailable capabilities rather than guessed output.
+
+Each development machine uses an independent GitHub clone and host/session-specific Mote actor.
+Keep one active implementation writer across all machines. Before a writer handoff, commit/push
+the code, tracker operations and resumable evidence, release ownership, then have the next host
+pull the published state and acquire its own claim. Local Mote leases are not a distributed
+mutex across unsynchronized clones. Other machines can build/review public code and synthetic
+fixtures concurrently within the one-helper and heavy-gate resource limits. Private-data work
+requires explicit machine approval and the relevant corpus admission. Configure credentials on
+each host normally rather than copying credential stores as project state.
+
+Use `STORYMODEL4S_DATA` and `tools/data-root.sh --check` for approved host-local data/model
+locations, as documented in `data/README.md`. The directory check establishes presence, not byte
+identity. Map dataset/model manifests to those locations with byte verification; do not assume
+`/Volumes/...`, old temporary logs or the Mac's caches will exist on a new host. Initial bootstrap
+uses public/synthetic inputs. Private corpus use, held-out access and hosted-use permissions keep
+their existing corpus-specific controls, even on an approved machine.
+
+Provide one documented, tool-assisted private-data handoff under
+`bd-01M48TNS4G0442F7SJW57671B6`, a bounded child of the existing delivery epic:
+
+- Record owner approval for the destination and permitted corpus/use before any private transfer.
+  `buc-gw01` is approved for development; additional machines require their own recorded approval.
+  Bind the destination's authenticated host identity, explicit storage root and sufficient space.
+- Preview the minimum source/model/study assets for the next milestone. Keep a private manifest
+  of relative asset identities, byte sizes/counts, SHA-256, admission and partition restrictions.
+  No participant text, identifying filenames or credentials enter the committed receipt.
+- Copy over authenticated encrypted transport on the tailnet, with resumable staging. Preserve
+  source originals and unrelated destination files; refuse conflicting assets rather than
+  silently overwriting them. Require complete checksum verification before promotion/admission.
+- Run destination byte validation and a small permitted reader smoke; record verified readback.
+  Check interruption/resume, corrupt/truncated data, conflicting files and an unapproved host
+  using synthetic fixtures. Missing assets remain explicit unavailable capabilities.
+- Keep private data, derived study rows and data-bearing logs on approved machines/storage.
+  Keep held-out partitions sealed. Code, recovery and data have separate manifests/receipts;
+  GitHub, hosted CI and public artifacts carry only reviewed content-free receipts and synthetic
+  fixtures. Machine transfer never widens corpus admission or authorizes redistribution.
+
+Before the first sustained run, retain logs outside temporary directories, bound the process
+and resource limits, and exercise interruption/restart once: a replacement session reads the
+same Mote bead, branch/SHA, artifact paths, completed checks and next action and resumes without
+repeating accepted work. The workstation has one writer and one heavy gate at a time; the helper
+is bounded review/lookup. Continuous operation does not widen merge, release or data authority.
+Use an established local runner/controller if unattended execution is requested, rather than
+introducing a fleet/message-board dependency merely to keep the host running.
+
+Exit: GitHub main parity is observed; required recovery tips are fetchable; hosted evidence is
+bound to that revision; the destination has passed its fresh-checkout and resume smoke; and the
+handoff can be reconstructed from committed instructions/receipts plus explicitly declared
+private assets. Destination SSH/tool/storage preflight, installation, execution and private-data
+transfer remain pending; observed tailnet presence is not destination qualification.
+
+#### Recovery slices for the first checkpoint
+
+Prepare the reviewed audit/plan branch for integration so the current operating instructions
+and recovered tracker history are available on main. Recover the following bounded slices in
+separate commits, using their existing tickets and retaining evidence:
+
+| Order | Existing ticket / candidate | Required result |
+| --- | --- | --- |
+| 1 | Reference-scope guard `bd-01M1CGP2K4H93WM8CW5EFEPTJK`, `ed9f478d` | Declaration-free recognized Scala source changes refuse; all 98 tool assertions pass on the integrated tool files. |
+| 2 | FrameSet identity `bd-01M37ESFCE1SZFTV7NHJEC7SNC`, `69e48e9a` | Stream changes alter the receipt/identity; version change and scoped media results are retained, with live-media skips explicit. |
+| 3 | Content scorer court `bd-01M379NZZ67GZJMWVBT5XNA0ZD`, `e02d80d` | Recover the tests/tools/evidence slice and recheck its affected platforms. Keep the full ticket open for the S2a-3 channel distinction. |
+| Supporting docs | Docs-site claims `bd-01M31TQTBMBGEAS9A666B5MPA6`, `8973c520` | Review and replay the bounded documentation corrections during recovery or the first user walkthrough. |
+
+Use the exact merge result for scoped gates and independent review. After the recovered slices,
+run one strict full baseline gate in a clean standalone clone, then the StoryAtlas consumer at
+the exact producer revision. Carry forward already qualified compiler, source and export work.
+Resolve new regressions before adding features; distinguish infrastructure failures and old skips.
+
+Exit: useful recovered slices are reachable from main, tracker records match Git, the baseline
+and consumer receipts identify exact revisions, and one next failing product witness is named.
+Complete the GitHub/workstation handoff above on this qualified baseline. The owner
+has requested remote synchronization; package releases and unrelated public/data publication
+remain separate actions.
+
+Branch disposition is bounded maintenance: compare a branch when it overlaps the active work,
+record salvage/supersession/retention against its ticket, and continue delivery. Keep the verified
+recovery bundle. A sweep of all 61 unresolved refs is not a prerequisite for the first journey;
+deletion requires a separate approved cleanup list.
+
+### 2. Make the mapping contract usable through ordinary text files
+
+This is the first visible product milestone: one ordinary UTF-8 source and two untimed recall
+files produce both mappings, independently readable exchange and a package that StoryAtlas
+actually opens. Inputs use synthetic or admitted text under rule 14.
+
+Build the smallest complete path in this order:
+
+1. Settle typed eligibility before lasting public result/denominator/codec shapes:
+   `bd-01M16DBEH9PKER423BZ47ZKBMV`. Ineligible, missing and observed zero must differ across
+   construction, reduction, wire formats and consumers. Complete the coherent migration;
+   half-migrated meanings do not satisfy design rule 7. Apply the stable-signature/construction
+   review `bd-01M19N0W937KVZCK78F6X57X1D` to each new public seam, with final closure before freeze.
+2. Complete strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV`, then the remaining S2a-4
+   unavailable-versus-abstention witness. Preserve canonical rename/permutation laws and the
+   separately frozen historical path. Establish the controlled lexical/shared-evidence slice
+   under G1 `bd-01M2TACM78289S4TECE91GT5K2`.
+3. Extract the public reference `bd-01M2WVF86T8QEEA1TK8Z0ASJHW` and reconstruction
+   `bd-01M2TAD04SR823TQVG9VPNH6R3` operations. Reference executes before HSMM; both use the same
+   checked evidence digest. Reconstruction retains its named policies and historical parity.
+4. Finish the necessary stable words/unit membership/support integration
+   `bd-01M2WVH1DC8ZPDC992G4MX3TXG`. Wire offline source `bd-01M35PB1H5PDD55YVKR4TQ8M66`
+   and prepare `bd-01M35B05TC6GBED9Z3HZMX618E` into facade `bd-01M2TADC4VKSDZ2S9SXETH2MYM`,
+   exchange `bd-01M2WVHF4B5DAXJYY4W91VK4WV` and workspace CLI `bd-01M35B103S2KHRSF853GD2FYHW`.
+   Reuse TextSourceCli, MappingExchangeCli and canonical M1 serializers; choose and test the
+   public command spelling during implementation rather than promising a nonexistent command.
+
+The registered embedding adapter remains G1/1.0 work. It may follow the lexical development
+milestone; a strict embedding request remains typed unavailable until its receipt/replay court
+passes. Keep G1 open. A coarse dependency on the full G1 container must not be bypassed silently:
+when scheduling consumer work, identify the independently verified executable prerequisite,
+split oversized existing work under T1 if necessary, and record the justified edge refinement.
+Retain the embedding requirement and full parent acceptance at the release gate.
+
+Exit witnesses for the text milestone:
+
+- The user supplies files and ordinary configuration, without bench imports or handwritten
+  checksum/join manifests. The source is prepared once for both participants.
+- Every input participant/unit has a success, external alternative, abstention or typed failure;
+  one failed participant preserves the other's results. Missing timing stays missing.
+- An independent Python/R reader verifies joins, hashes, values, exact support and known answers.
+- Interrupted publication and foreign/corrupt resume refuse, while a lawful resumed run preserves
+  identity and completed participants. The untouched output opens in the exact-pair Atlas court.
+- A walkthrough documents actual commands, emitted capabilities and limitations. Record the
+  consumer receipt in the existing Atlas ticket/store; producer decode alone is not browser proof.
+
+This is a milestone within the existing tickets. Their broader annotation-assisted, channel and
+cohort acceptance remains open where unmet. Imaging, temporal grids and organization analyses
+are not prerequisites for untimed text inspection. The final API freeze remains a release step.
+
+### 3. Reproduce annotation-only Sherlock through the same public path
+
+First complete the required registered pinned-ONNX/replay slice under G1
+`bd-01M2TACM78289S4TECE91GT5K2`. The retained Sherlock development protocol names
+`pinned-local-onnx`; a lexical provider substitution is not reproduction of that preset.
+This adapter follows the lexical text milestone but precedes the historical Sherlock run.
+
+Reuse the freshly scored development reproduction `bd-01M35JFJCQ2ANTVED792H705X6` and its
+retained artifacts. Admit the annotation/recall file adapters through the existing prepare
+ticket, preserving observation identities, fixed source cut, units, support and denominators.
+Run the same public command/facade/exchange path used for text; keep corpus parsing outside the
+solver and viewer. Use only permitted development participants under existing admission rules.
+
+Exit: the structured A arm uses the retained provider/configuration and matches the historical
+preset, with any implementation-caused difference independently measured and explained;
+changing providers is not an accepted parity repair. The reference has its own declared policy;
+independent readers and Atlas inspect the emitted package. This demonstrates the annotation-only
+arm of `bd-01M35P83TCNHBSDY6NSK13Q3K0`, not the complete A+V/imaging journey.
+
+### 4. Extend that journey to weights, time, video and imaging
+
+| Order | Existing work | Executable completion witness |
+| --- | --- | --- |
+| A | Lambda `bd-01M35MHPFFKQHSJKC07VMWC7CW` | After the two endpoint paths work, test lambda 0, 0.5 and 1; preserve endpoint bytes, define the intermediate policy, refuse non-finite/out-of-range values, and bind policy/cache/export identity. |
+| B | Complete remaining registered-channel acceptance under G1 | Carry forward the pinned ONNX/replay slice required by stage 3; finish remaining receipt/channel courts and close G1 only after its full acceptance passes. |
+| C | Paired exchange and temporal integration `bd-01M2WVHF4B5DAXJYY4W91VK4WV`, `bd-01M3549Q5W5KQFSY3ZH81FARM0` | Query/readback preserves allocation/support distinctions, recall exposure, concentration, unprojectable mass and exact axes through the same facade/artifacts. |
+| D | Video intake `bd-01M35JG7DXD7NSEE4WVEKT3CSF` and its caption/extraction children | Raw video produces a checked timed source; executed ordinal/media correspondence and replayed caption/model/frame/edition receipts refuse foreign or incomplete inputs. |
+| E | Sherlock A+V under `bd-01M35P83TCNHBSDY6NSK13Q3K0` | Run A and A+V through the public path with the same unit inventory/cut/denominators and independently readable outputs. Preserve both results; an AV accuracy gain is not required. |
+| F | OpenNeuro `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | Establish actual run/alias/full-media-origin/array-history joins and export one admitted development participant. Independent timing landmarks, volume indices and lost-mass accounting pass before cohort expansion. |
+
+Extend the earlier walkthrough rather than creating a second command family or result schema.
+These stages complete the declared 1.0 mapping journey. Synthetic clock declarations, a dataset
+download, frame planning, provider availability or a benchmark result cannot replace its witnesses.
+
+### 5. Qualify the demonstrated surface and release
+
+Close the remaining stable-signature/eligibility checks, Native numerical-governance ticket
+`bd-01M1D215EY4T5BR0VRJ694AMBQ`, platform-labelled goldens, actionable errors
+`bd-01M2TAM66RTEMY3VVHA3N2MYXK`, reader docs `bd-01M19FPY1EC5QNTW6SBG3QYT3R`, and installation/
+publishing/MiMa work `bd-01M2TAKTB61XNXV4Y6A9J3CB0C`. Cite exact-revision hosted CI under
+`bd-01M19G69RQCHMT2EMG11XFT4WX`, using the already chosen GitHub-hosted runner route.
+
+Exit: a fresh checkout/installation executes the documented text and Sherlock journeys; the
+exact release tree has strict platform and sibling-consumer receipts; exported examples have
+independent readback; the stability table matches actual signatures; the release gate
+`bd-01M2TAMJ95K9D7H248A8387YW4` is satisfied. Publish after owner authorization. Calibration,
+superiority and organization-recovery claims require their separately named scientific evidence.
+
+### Working cadence and escalation
+
+- One implementation ticket is active at a time. The primary agent writes/integrates; the second
+  agent reviews the exact candidate or performs a separable bounded lookup. One heavy gate runs
+  at a time. Mote owns claims, reservations, remaining acceptance and handoff; chat carries owner
+  decisions. Existing governing documents remain the source of design rules.
+- Size each implementation slice to one acceptance criterion under T1. Define its failing witness
+  before editing. Complete the smallest meaningful checks, required mutation/control evidence,
+  scoped platform gate and independent review; integrate promptly within authorized scope.
+- At each completed slice, show the current user artifact and record one next failing witness,
+  exact commit, command exits/totals and remaining acceptance. Keep tracker operations committed.
+  Review findings are BLOCK or FOLLOW-UP (T4); a follow-up becomes bounded work, not a holding queue.
+- Use `bash tools/reference-scope.sh BASE_SHA CANDIDATE_SHA` for each actual code diff. Run the
+  emitted commands in a clean standalone clone. The shared baseline/release check is
+  `sbt -batch 'set ThisBuild / tlFatalWarnings := true' checkAll`; formatting runs last. Docs-only
+  slices use a complete candidate `git diff --check`, link checks and separate text review (T2).
+- When a code BLOCK stalls the current slice, retain its runnable reproducer and revised next
+  action. If it needs an owner decision or external resource, expose that exact need and continue
+  a ready, bounded task that does not depend on it. Do not fall back to a general backlog sweep.
+
+Scope remains fixed: reuse the existing modules/contracts and completed qualification. Film
+compilation and organization analyses stay in 1.1; benchmark/LLM campaigns, corpus expansion and
+empirical calibration remain on their existing research lanes. No calendar release promise is
+made before the fresh baseline and first public journey expose the remaining integration cost.
+
+**Immediate action:** prepare the audited instructions/tracker/plan branch for reviewed
+integration, recover the reference-scope guard on its existing ticket, then FrameSet and the
+bounded S2a-4 slice. Qualify and synchronize that baseline to GitHub and exercise the workstation
+handoff before sustained development moves there. Begin eligibility and strict lexical wiring
+next. The remaining stages follow executable prerequisites, not the size of the ready queue.
+
+## Completed fixture milestone: M1 (22 September 2026)
+
+The owner activated [one reproducible source-plus-recall investigation](goals/source-recall-workspace-m1-20260922.md),
 Mote `bd-01M34J9FS10B14WQA309K0P6V8`. Its execution sequence is support honesty -> G1 records -> checked
 producer packet -> StoryAtlas adoption/loading -> shared selection/matrix/evidence -> saved-state
 replay/export and exact-pair acceptance. This bounded integration of the existing viewer supersedes
 the earlier deferral of viewer work for this milestone only. The reference-measurement, film and
 release commitments below remain in force on their own lanes and do not all gate M1.
 Live Mote and the goal's explicit dependency/receipt handoffs supersede older next-task prose.
+Its local exact-pair acceptance is complete; the charter retains the receipts. Ordinary-file
+production delivery now follows the October sequence above.
 
 ## Operative 1.0 scope (owner decisions, 22 September 2026)
 
@@ -44,9 +322,9 @@ closure; the tracker reconciliation landed at `408178ef`.
     offers no organization readouts.
 - **Post-1.0 research (P3):** the benchmark, LLM-arm and human-ceiling work from the mapper
   roadmap.
-- **Division of labor** is agreed on the shared Fray board (storyatlas4s home, thread #11). Mote
-  claims remain authoritative. There is one writer per bead and module, and heavy sbt gates are
-  serialized through the Fray "sbt-gate lock" card.
+- **Current division of labor:** one primary agent and at most one helper, as recorded in
+  AGENTS.md on 6 October. Mote claims remain authoritative; one writer per scope and one heavy
+  gate at a time. The September Fray assignments are historical coordination evidence.
 
 The [recall-to-encoding workflow plan](../plans/2026-09-22-recall-encoding-workflow.md)
 extends this delivery toward reusable temporal queries, uncertainty maps, structured

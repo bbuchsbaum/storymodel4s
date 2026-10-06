@@ -50,8 +50,36 @@ redistribution of participant recall prose.
 ## Rules
 
 - Sources are read-only. A new source is admitted through `docs/data/` first.
+- Private data, derived participant/study artifacts and data-bearing logs stay on owner-approved
+  development machines and approved private storage. The owner approved `buc-gw01` for
+  development on 6 October 2026. Other machines can develop public code and synthetic fixtures; tailnet
+  membership alone does not authorize private data access. Corpus admission and sealed-partition
+  restrictions still apply on approved machines.
 - The study record is written only by the study tools. Deleting an arm directory deletes evidence
   a landed document cites; the documents quote the numbers, but the row-level record is here.
-- Video bytes are never copied elsewhere and never referenced by path in a committed file.
+- Video/source bytes may move to another approved development machine through the verified
+  handoff below; they are never published or referenced by local path in a committed file.
 - Recall prose lives only here and in the study record derived from it. A file admitted to Git from
   this tree must be content-free: identities, counts, digests, unit indices, segment numbers.
+
+## Approved-machine handoff
+
+The current [delivery plan](../docs/refactor/PLAN.md#1-recover-synchronize-github-and-qualify-development-hosts)
+defines the handoff acceptance. Implementation and the first transfer remain pending.
+Mote `bd-01M48TNS4G0442F7SJW57671B6` owns the bounded transfer implementation and its witnesses.
+
+Record owner approval for each destination and corpus/use, authenticate its host identity, and
+select an explicit `STORYMODEL4S_DATA` root. Preview the minimum assets required; use a private
+manifest containing relative asset identities, byte sizes/counts, SHA-256 and admission/partition
+restrictions. Transfer through authenticated encrypted transport on the tailnet into resumable
+staging. Preserve the source and unrelated destination files; conflicting destination assets
+require resolution before replacement. Verify every byte against the manifest before admitting
+the copy, then run a permitted reader smoke and record readback. A directory-presence check is
+not checksum verification.
+
+Test refusal of an unapproved destination, interruption/resume, corrupt/truncated bytes and
+destination conflicts with synthetic assets before exercising the private transfer. Keep private
+manifests, identifying filenames and data-bearing logs in approved private storage. Committed
+receipts contain only reviewed content-free identities and verification status. GitHub and
+hosted CI are not storage or execution destinations for these private assets. Copying leaves
+corpus admission and held-out restrictions unchanged.
