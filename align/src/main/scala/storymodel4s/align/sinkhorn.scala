@@ -38,6 +38,13 @@ final case class SinkhornResult(
   * same all-zero plan as "nothing to send" or "nothing found".
   */
 object UnbalancedSinkhorn:
+  /** Retains this baseline's runtime arithmetic when the HSMM's owned arithmetic is revised. */
+  private def logSumExp(xs: Vector[Double]): Double =
+    if xs.isEmpty then Double.NegativeInfinity
+    else
+      val m = xs.max
+      if m.isNegInfinity then m else m + math.log(xs.map(x => math.exp(x - m)).sum)
+
   def solve(
       cost: Vector[Vector[Double]],
       a: Vector[Double],
@@ -77,7 +84,7 @@ object UnbalancedSinkhorn:
                   if fa == 0.0 then 0.0
                   else if logA(i).isNegInfinity then Double.NegativeInfinity
                   else
-                    val s = GraphHsmm.logSumExp((0 until n).toVector.map(j => logK(i)(j) + logV(j)))
+                    val s = logSumExp((0 until n).toVector.map(j => logK(i)(j) + logV(j)))
                     fa * (logA(i) - s)
                 }
                 val newV = (0 until n).toVector.map { j =>
@@ -85,7 +92,7 @@ object UnbalancedSinkhorn:
                   else if logB(j).isNegInfinity then Double.NegativeInfinity
                   else
                     val s =
-                      GraphHsmm.logSumExp((0 until m).toVector.map(i => logK(i)(j) + newU(i)))
+                      logSumExp((0 until m).toVector.map(i => logK(i)(j) + newU(i)))
                     fb * (logB(j) - s)
                 }
                 val delta = (newU.zip(logU) ++ newV.zip(logV))

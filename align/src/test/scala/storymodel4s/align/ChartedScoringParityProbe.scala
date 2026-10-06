@@ -19,7 +19,7 @@ import storymodel4s.proposition.CheckState.Checked
   * reverse direction raises none, the ids choose the flag (`SemanticCompatibilitySuite`, "teeth: on
   * a head tie"). `twin` witnesses the gate-count key in `matchedPredicates`.
   */
-class ChartedScoringParityProbe extends FunSuite:
+private[align] object ChartedScoringParityFixture extends munit.Assertions:
   import AnnaFixture.*
 
   private def checked(u: PropositionChart[CheckState.Unchecked]): PropositionChart[Checked] =
@@ -28,7 +28,7 @@ class ChartedScoringParityProbe extends FunSuite:
   private def rel(from: ConceptId, arg: Int, to: ConceptId) =
     PropositionRelation(from, RoleAssignment.arg(arg), ConceptTarget.Node(to))
 
-  private val p = ConceptId.unsafe("p")
+  val p = ConceptId.unsafe("p")
   private val a = ConceptId.unsafe("a")
   private val b = ConceptId.unsafe("b")
 
@@ -47,7 +47,7 @@ class ChartedScoringParityProbe extends FunSuite:
     )
 
   /** Two same-lemma predicates: x is negated, y is embedded under speech. */
-  private def tie(xName: String, yName: String) =
+  def tie(xName: String, yName: String) =
     val x = ConceptId.unsafe(xName)
     val y = ConceptId.unsafe(yName)
     val s = ConceptId.unsafe("s")
@@ -71,7 +71,7 @@ class ChartedScoringParityProbe extends FunSuite:
     * argument ratio, so only `compare`'s gate-count key decides the head: it witnesses head
     * selection.
     */
-  private def twin(xName: String, yName: String) =
+  def twin(xName: String, yName: String) =
     val x = ConceptId.unsafe(xName)
     val y = ConceptId.unsafe(yName)
     checked(
@@ -88,13 +88,13 @@ class ChartedScoringParityProbe extends FunSuite:
       )
     )
 
-  private val straight = find("anna", "brother")
+  val straight = find("anna", "brother")
   private val reversed = find("brother", "anna")
   private val negated = find("anna", "brother", Polarity.Negative)
 
   private def num(d: Double) = CanonicalDouble.render(d)
 
-  private def report(r: CompatibilityReport): String =
+  def report(r: CompatibilityReport): String =
     Vector(
       num(r.structuralScore),
       r.toString.replaceAll("\\d+\\.\\d+(E-?\\d+)?", "#")
@@ -141,7 +141,7 @@ class ChartedScoringParityProbe extends FunSuite:
       )
       .fold(e => fail(s"invalid recall: $e"), identity)
 
-  private def pins: (String, String, String) =
+  def pins: (String, String, String) =
     val v = charted
     val r = chartedRecall
     val ev = LocalEvidence
@@ -150,9 +150,8 @@ class ChartedScoringParityProbe extends FunSuite:
     val res = GraphHsmm.infer(r, v, candidates, costModel).fold(e => fail(e.message), identity)
     (reportDigest(chartPairs), ev.identity.checksum.hex, MappingBindingRender.result(res).hex)
 
-  test("chart compatibility over the pinned pair corpus is byte-identical to the pre-port base") {
-    assertEquals(pins._1, "a6ca0861c4e3a5a7c9d2008ba8357e67477dc40f7f38a3fa0e2c36ac4e04a3ee")
-  }
+class ChartedScoringParityProbe extends FunSuite:
+  import ChartedScoringParityFixture.*
 
   test("charted local evidence identity is byte-identical to the pre-port base") {
     assertEquals(pins._2, "b31d1255af80f12100c1a65564ad853975799bfc316301383a8b8198180e2a99")

@@ -72,7 +72,9 @@ class NumericalPropagationSuite extends FunSuite:
   /** Exhaustive for this fixture's published fields; an unfamiliar carrier fails the capture. */
   private def exact(value: Any): String = value match
     case d: Double => CanonicalDouble.render(d)
-    case i: Int => s"int:$i"
+    // Scala.js cannot distinguish boxed integer-valued Double from Int at this Any boundary.
+    // Every Int is exactly representable in binary64; carrier/field position retains its meaning.
+    case i: Int => CanonicalDouble.render(i.toDouble)
     case l: Long => s"long:$l"
     case b: Boolean => s"bool:$b"
     case s: String => MappingRender.sequence(Vector("string", s))
