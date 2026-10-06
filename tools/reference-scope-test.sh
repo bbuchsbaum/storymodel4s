@@ -115,15 +115,19 @@ assert_contains "  core" "mixed module and documentation change"
 assert_contains 'sbt -batch "coreJVM/test"' "mixed module and documentation change"
 assert_not_contains "docsSite" "mixed module and documentation change"
 
-new_repo no-declaration
-base="$(git -C "$repo" rev-parse HEAD)"
+new_repo changed-top-level-def
 mkdir -p "$repo/core/src/main/scala"
 printf '%s\n' 'def lowerCaseDefinition: Int = 1' > "$repo/core/src/main/scala/lower.scala"
-commit_all "$repo" no-declaration
+commit_all "$repo" add-top-level-def
+base="$(git -C "$repo" rev-parse HEAD)"
+printf '%s\n' 'def lowerCaseDefinition: Int = 2' > "$repo/core/src/main/scala/lower.scala"
+commit_all "$repo" change-top-level-def
 head="$(git -C "$repo" rev-parse HEAD)"
 run_scope "$repo" "$base" "$head"
-assert_status 0 "module source without uppercase declaration"
-assert_contains "no types defined in changed files" "module source without uppercase declaration"
+assert_status 5 "changed top-level def"
+assert_contains "DECLARATION-FREE MODULE SOURCE" "changed top-level def"
+assert_contains "core: core/src/main/scala/lower.scala" "changed top-level def"
+assert_not_contains 'sbt -batch' "changed top-level def"
 
 new_repo deleted-declaration-free-source
 mkdir -p "$repo/core/src/main/scala"
@@ -134,8 +138,55 @@ rm "$repo/core/src/main/scala/removed.scala"
 commit_all "$repo" delete-source
 head="$(git -C "$repo" rev-parse HEAD)"
 run_scope "$repo" "$base" "$head"
-assert_status 0 "deleted declaration-free module source"
-assert_contains "no types defined in changed files" "deleted declaration-free module source"
+assert_status 5 "deleted top-level def"
+assert_contains "core: core/src/main/scala/removed.scala" "deleted top-level def"
+assert_not_contains 'sbt -batch' "deleted top-level def"
+
+for declaration in val given; do
+  new_repo "changed-top-level-$declaration"
+  mkdir -p "$repo/core/src/main/scala"
+  case "$declaration" in
+    val) printf '%s\n' 'val exportedConstant: Int = 1' > "$repo/core/src/main/scala/value.scala" ;;
+    given) printf '%s\n' 'given exportedOrdering: Ordering[Int] = Ordering.Int' > "$repo/core/src/main/scala/value.scala" ;;
+  esac
+  commit_all "$repo" "add-top-level-$declaration"
+  base="$(git -C "$repo" rev-parse HEAD)"
+  case "$declaration" in
+    val) printf '%s\n' 'val exportedConstant: Int = 2' > "$repo/core/src/main/scala/value.scala" ;;
+    given) printf '%s\n' 'given exportedOrdering: Ordering[Int] = Ordering.Int.reverse' > "$repo/core/src/main/scala/value.scala" ;;
+  esac
+  commit_all "$repo" "change-top-level-$declaration"
+  head="$(git -C "$repo" rev-parse HEAD)"
+  run_scope "$repo" "$base" "$head"
+  assert_status 5 "changed top-level $declaration"
+  assert_contains "core: core/src/main/scala/value.scala" "changed top-level $declaration"
+  assert_not_contains 'sbt -batch' "changed top-level $declaration"
+done
+
+new_repo changed-jvm-top-level-def
+mkdir -p "$repo/core/.jvm/src/main/scala"
+printf '%s\n' 'def jvmHelper: Int = 1' > "$repo/core/.jvm/src/main/scala/helper.scala"
+commit_all "$repo" add-jvm-top-level-def
+base="$(git -C "$repo" rev-parse HEAD)"
+printf '%s\n' 'def jvmHelper: Int = 2' > "$repo/core/.jvm/src/main/scala/helper.scala"
+commit_all "$repo" change-jvm-top-level-def
+head="$(git -C "$repo" rev-parse HEAD)"
+run_scope "$repo" "$base" "$head"
+assert_status 5 "changed JVM-only top-level def"
+assert_contains "core: core/.jvm/src/main/scala/helper.scala" "changed JVM-only top-level def"
+assert_not_contains 'sbt -batch' "changed JVM-only top-level def"
+
+new_repo mixed-typed-and-declaration-free
+base="$(git -C "$repo" rev-parse HEAD)"
+mkdir -p "$repo/core/src/main/scala" "$repo/features/src/main/scala"
+printf '%s\n' 'object TypedApi' > "$repo/core/src/main/scala/TypedApi.scala"
+printf '%s\n' 'def untrackedApi: Int = 1' > "$repo/features/src/main/scala/untracked.scala"
+commit_all "$repo" mixed-source-kinds
+head="$(git -C "$repo" rev-parse HEAD)"
+run_scope "$repo" "$base" "$head"
+assert_status 5 "typed and declaration-free sources in one diff"
+assert_contains "features: features/src/main/scala/untracked.scala" "typed and declaration-free sources in one diff"
+assert_not_contains 'sbt -batch' "typed and declaration-free sources in one diff"
 
 new_repo deleted-declaration
 mkdir -p "$repo/core/src/main/scala"

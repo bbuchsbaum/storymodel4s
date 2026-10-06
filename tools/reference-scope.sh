@@ -188,6 +188,46 @@ changed_types() {
       done
 }
 
+# A top-level def, val or given can be a public API without defining a type.
+# Check each changed module source independently: a declaration in a different
+# changed file cannot justify silently omitting this one's consumers. The
+# type-name search below has no safe lowercase-name heuristic to use instead.
+declaration_free_path_at() {
+  local path="$1"
+  shift
+  is_module_source "$path" || return 0
+  local declarations
+  declarations="$(
+    for revision in "$@"; do declared_types_at "$revision" "$path"; done | sort -u
+  )"
+  if [ -z "$declarations" ]; then printf '%s\n' "$path"; fi
+}
+
+changed_declaration_free_paths() {
+  git diff --name-status --find-renames "$BASE..$HEAD_REF" -- '*.scala' \
+    | while IFS=$'\t' read -r status path_before path_after; do
+        case "$status" in
+          A*) declaration_free_path_at "$path_before" "$HEAD_REF" ;;
+          D*) declaration_free_path_at "$path_before" "$BASE" ;;
+          R*|C*)
+            declaration_free_path_at "$path_before" "$BASE"
+            declaration_free_path_at "$path_after" "$HEAD_REF"
+            ;;
+          *) declaration_free_path_at "$path_before" "$BASE" "$HEAD_REF" ;;
+        esac
+      done
+}
+
+declaration_free_paths="$(changed_declaration_free_paths | sort -u)"
+if [ -n "$declaration_free_paths" ]; then
+  echo "DECLARATION-FREE MODULE SOURCE -- REFUSING TO EMIT A GATE COMMAND." >&2
+  while IFS= read -r path; do
+    printf '  %s: %s\n' "${path%%/*}" "$path" >&2
+  done <<< "$declaration_free_paths"
+  echo "Type-name extraction cannot prove the reference scope of these changed Scala sources." >&2
+  exit 5
+fi
+
 types="$(changed_types | sort -u)"
 
 if [ -z "$types" ]; then
