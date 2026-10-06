@@ -8,9 +8,9 @@ import storymodel4s.features.CanonicalDouble
   * to be byte-identical on the gated, refined and ungated paths. The digests were captured by
   * running this probe's computation on a detached checkout of that commit.
   *
-  * These unchanged pins were captured on the historical Mac JVM. The owned numerical producer
-  * now requires every qualified target to reproduce them exactly. The legacy runtime-math
-  * differences remain retained evidence under bd-01M1D215EY4T5BR0VRJ694AMBQ, not alternate current
+  * These unchanged pins were captured on the historical Mac JVM. The owned numerical producer now
+  * requires every qualified target to reproduce them exactly. The legacy runtime-math differences
+  * remain retained evidence under bd-01M1D215EY4T5BR0VRJ694AMBQ, not alternate current
   * expectations. No tolerance or platform selection is applied.
   */
 class LocalEvidenceParityProbe extends FunSuite:

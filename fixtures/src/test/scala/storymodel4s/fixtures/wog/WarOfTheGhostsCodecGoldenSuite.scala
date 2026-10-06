@@ -11,7 +11,7 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Locks `hsmm/v4` to a real inferred War of the Ghosts result without serializing story text.
   *
-  * Portable: every backend checks its OWN live bytes against its platform-labelled pin
+  * Portable: every backend checks its live bytes against the ONE owned-producer pin
   * ([[WogGoldenBackend]]), and checks that nothing but support moved relative to its own `hsmm/v3`
   * baseline. The committed resource files are read on the JVM only
   * (`WarOfTheGhostsCodecGoldenResourceSuite`), which also proves each pin is the checksum of its
@@ -40,7 +40,7 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     assertEquals(decoded.flatMap(HsmmResultCodec.encode), Right(encoded))
   }
 
-  test("the live WOG artifact is this platform's committed hsmm/v4 golden") {
+  test("the live WOG artifact is the portable producer's committed hsmm/v4 golden") {
     val backend = WogGoldenPlatform.current
     assertEquals(
       Checksum.ofText(encoded).hex,
@@ -49,7 +49,7 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     )
   }
 
-  test("hsmm/v4 moved no number: everything but support is this platform's hsmm/v3 baseline") {
+  test("portable hsmm/v4 retains the historical Mac JVM numbers outside support") {
     // Posterior, flow, Viterbi path, log-likelihood, every total and term, receipts, anchors and
     // fingerprints: the artifact with schemaVersion and each cost's support removed is exactly the
     // v3 artifact with schemaVersion and each supportWeight removed, on this backend.
@@ -82,13 +82,12 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     )
   }
 
-/** The backends whose `hsmm/v4` WOG bytes are pinned, each with its own committed golden.
+/** Retained historical runtime pins and the one current portable producer pin.
   *
-  * JVM and Scala.js produce identical bytes. Native differs from them in five posterior/flow leaves
-  * by one adjacent IEEE-754 bit pattern each — the same five leaves, with the same values, as the
-  * pre-migration `hsmm/v3` baseline (docs/refactor/evidence/wog-hsmm-baseline-20260919; the Native
-  * numerical policy is bd-01M1D215EY4T5BR0VRJ694AMBQ). No tolerance is applied anywhere: each
-  * backend is compared with its own bytes.
+  * Historical runtime math produced identical Mac JVM/JS bytes and five adjacent-bit Native
+  * differences. Those original resources and their pins remain intact. The owned producer is
+  * qualified to reproduce the historical Mac JVM bytes on every target; current expectations
+  * select Portable unconditionally, never by platform or observed output.
   *
   * `encodedV4` is the SHA-256 of the canonical encoding; `goldenFile` of the committed resource,
   * which is that encoding plus one terminal newline; `withoutSupport` of the artifact with
@@ -129,6 +128,16 @@ private[wog] enum WogGoldenBackend(
         "/golden/hsmm-v3-wog.native.json",
         "ccb0b98f21c7c2e1c9d5d81bad3f0858ed4c2f5d4f4c3ac671a6f45b152af012",
         "7505f523b5ccd440b7e742cb563b3f8f943bb322ba09ec8af189d6d5b5fa6b7e"
+      )
+
+  case Portable
+      extends WogGoldenBackend(
+        "/golden/hsmm-v4-wog.json",
+        "6388aaaf70e9cb6782c3342ca0108d5e085bb892a114d6b10af470bf6826fa2a",
+        "6ee06ebbb90709ebe323e7bd98e99f9c839809489a780e113d4c2441b7abf1e6",
+        "/golden/hsmm-v3-wog.json",
+        "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+        "70af0bf6bab5bfe30202e1b4d72f7ddbcc2d41bc4dff8017f0f9dc0cb1ee0e81"
       )
 
 private[wog] object WarOfTheGhostsCodecGolden:

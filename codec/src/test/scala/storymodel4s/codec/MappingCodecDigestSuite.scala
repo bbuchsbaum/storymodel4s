@@ -32,22 +32,18 @@ class MappingCodecDigestSuite extends FunSuite:
     )
     assertEquals(encoded.length, 50731)
   }
-  // The live Native HSMM has one posterior leaf one ULP below JVM/JS. Each backend pins its
-  // own exact bytes and result identity; no numeric tolerance or codec rounding is introduced.
+  // The owned producer has one exact current pin on every target. Historical runtime Native
+  // bytes19cd12e4.../recorda171dc25... remain retained in git and numerical-policy evidence.
   test("historical canonical bytes and record identity are pinned") {
     val record = MappingCodecFixture.record()
     val encoded = MappingCodecs.encode(record)
     assertEquals(
       Checksum.ofText(encoded).hex,
-      if System.getProperty("java.vm.name") == "Scala Native" then
-        "19cd12e4c86567679432f03a62527a6ed3bd21dbc4def135c6b819cc49190b16"
-      else "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7"
+      "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7"
     )
     assertEquals(
       record.digest.hex,
-      if System.getProperty("java.vm.name") == "Scala Native" then
-        "a171dc2555bc3ebf2664983c7814f1c7467607d7066564b25d07886090711c79"
-      else "50089af8b939848e8c0d44180095eddd7ffae2f3c010c5a89f8a29deb91c9790"
+      "50089af8b939848e8c0d44180095eddd7ffae2f3c010c5a89f8a29deb91c9790"
     )
     assertEquals(encoded.length, 32202)
   }

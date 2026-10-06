@@ -8,6 +8,11 @@ class NumericalRecordCaptureSuite extends FunSuite:
   test("capture the historical adapter's live canonical record identity") {
     val record = MappingCodecFixture.record()
     val encoded = MappingCodecs.encode(record)
-    println(s"NUMERICAL_RECORD=${Checksum.ofText(encoded).hex}:${record.digest.hex}:${encoded.length}")
-    assertEquals(MappingCodecs.decode(encoded, MappingCodecFixture.context()).map(MappingCodecs.encode), Right(encoded))
+    println(
+      s"NUMERICAL_RECORD=${Checksum.ofText(encoded).hex}:${record.digest.hex}:${encoded.length}"
+    )
+    assertEquals(
+      MappingCodecs.decode(encoded, MappingCodecFixture.context()).map(MappingCodecs.encode),
+      Right(encoded)
+    )
   }

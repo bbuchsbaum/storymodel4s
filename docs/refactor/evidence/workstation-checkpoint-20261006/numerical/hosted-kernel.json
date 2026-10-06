@@ -1,0 +1,35 @@
+{
+  "candidate": "61a353d831100baaac8dedd95a0b7b298511a777",
+  "run_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37514800313",
+  "conclusion": "success",
+  "cells": [
+    {
+      "name": "Kernel (alignJVM, Java 17)",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "name": "Kernel (alignJVM, Java 21)",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "name": "Kernel (alignJS, Java 17)",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "name": "Kernel (alignNative, Java 17)",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "original_and_defined_shift_c_references_exact_frozen_sha256": "d020d76b77746ab45519b3662200a3926aab4628190075a7d7cf294cd240457f",
+  "native_mode": "release-fast",
+  "log_sha256": "c3de18d74c138c1294c64e9ca1bbb32f6304641e2a7dd66597c52d712bad3934",
+  "production_inference_qualification": false
+}

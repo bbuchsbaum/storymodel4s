@@ -54,19 +54,37 @@ class NumericalPropagationSuite extends FunSuite:
   test("capture complete synthetic signature and population readout bits") {
     val result = GraphHsmm.infer(recall, view, candidates, costModel).toOption.get
     val signature = RecallSignature.compute(result, recall, view).toOption.get
-    val population = PopulationAggregate.of(
-      view,
-      Vector(SubjectAlignment(SubjectId.unsafe("synthetic-numerical"), recall, result, None))
-    ).toOption.get
-    val perNode = view.nodes.sortBy(_.ref.key).map(n =>
-      (n.ref.key, population.columnMass(n.ref), population.visitation(n.ref),
-        population.expectedVisits(n.ref), population.visitationRate(n.ref))
+    val population = PopulationAggregate
+      .of(
+        view,
+        Vector(SubjectAlignment(SubjectId.unsafe("synthetic-numerical"), recall, result, None))
+      )
+      .toOption
+      .get
+    val perNode = view.nodes
+      .sortBy(_.ref.key)
+      .map(n =>
+        (
+          n.ref.key,
+          population.columnMass(n.ref),
+          population.visitation(n.ref),
+          population.expectedVisits(n.ref),
+          population.visitationRate(n.ref)
+        )
+      )
+    val payload = exact(
+      (
+        signature,
+        perNode,
+        population.populationFlow,
+        population.totalFlow,
+        population.visitationMatrix
+      )
     )
-    val payload = exact((signature, perNode, population.populationFlow, population.totalFlow,
-      population.visitationMatrix))
     println("NUMERICAL_READOUT=" + MappingRender.digest(Vector(payload)).hex)
     println("NUMERICAL_READOUT_FIELDS=" + payload)
-    assert(payload.contains(CanonicalDouble.render(signature.uniformCoverage)))
+    assertEquals(MappingRender.digest(Vector(payload)).hex,
+      "612a1d03d494dc39a07fa3e7d75b13bf7ec6b801a02cb87e5779bded16cb948d")
   }
 
   /** Exhaustive for this fixture's published fields; an unfamiliar carrier fails the capture. */
@@ -74,19 +92,24 @@ class NumericalPropagationSuite extends FunSuite:
     case d: Double => CanonicalDouble.render(d)
     // Scala.js cannot distinguish boxed integer-valued Double from Int at this Any boundary.
     // Every Int is exactly representable in binary64; carrier/field position retains its meaning.
-    case i: Int => CanonicalDouble.render(i.toDouble)
-    case l: Long => s"long:$l"
-    case b: Boolean => s"bool:$b"
-    case s: String => MappingRender.sequence(Vector("string", s))
-    case r: MassRatio => exact((r.value, r.conditioningMass, r.totalMass))
-    case w: WeightedCoverage => exact((w.estimate, w.conditioningWeight,
-      w.coverage.eligible, w.coverage.observed))
-    case s: StepMass => exact((s.perStep, s.comparableSteps, s.totalSteps))
-    case m: FidelityMode => MappingRender.sequence(Vector("mode", m.render))
+    case i: Int              => CanonicalDouble.render(i.toDouble)
+    case l: Long             => s"long:$l"
+    case b: Boolean          => s"bool:$b"
+    case s: String           => MappingRender.sequence(Vector("string", s))
+    case r: MassRatio        => exact((r.value, r.conditioningMass, r.totalMass))
+    case w: WeightedCoverage =>
+      exact((w.estimate, w.conditioningWeight, w.coverage.eligible, w.coverage.observed))
+    case s: StepMass                       => exact((s.perStep, s.comparableSteps, s.totalSteps))
+    case m: FidelityMode                   => MappingRender.sequence(Vector("mode", m.render))
     case c: storymodel4s.features.Coverage => exact((c.eligible, c.observed))
-    case m: scala.collection.Map[?, ?] =>
-      MappingRender.sequence(Vector("map") ++ m.toVector.map((k,v) => exact(k) -> exact(v))
-        .sortBy(_._1).map((k,v) => MappingRender.sequence(Vector(k,v))))
+    case m: scala.collection.Map[?, ?]     =>
+      MappingRender.sequence(
+        Vector("map") ++ m.toVector
+          .map((k, v) => exact(k) -> exact(v))
+          .sortBy(_._1)
+          .map((k, v) => MappingRender.sequence(Vector(k, v)))
+      )
     case xs: Iterable[?] => MappingRender.sequence(Vector("seq") ++ xs.iterator.map(exact))
-    case p: Product => MappingRender.sequence(Vector("product", p.productPrefix) ++ p.productIterator.map(exact))
+    case p: Product      =>
+      MappingRender.sequence(Vector("product", p.productPrefix) ++ p.productIterator.map(exact))
     case other => fail(s"unrepresented readout carrier: ${other.getClass.getName}")

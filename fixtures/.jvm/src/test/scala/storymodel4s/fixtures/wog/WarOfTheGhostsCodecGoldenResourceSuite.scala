@@ -26,8 +26,8 @@ class WarOfTheGhostsCodecGoldenResourceSuite extends FunSuite:
   private def text(path: String): String = new String(resource(path), StandardCharsets.UTF_8)
 
   test("the committed hsmm/v4 resource is the inferred artifact, with its terminal newline") {
-    val backend = WogGoldenBackend.JVM
-    assertEquals(WogGoldenPlatform.current, backend, "the JVM read another backend's label")
+    val backend = WogGoldenBackend.Portable
+    assertEquals(WogGoldenPlatform.current, backend, "current numerical producer is not the qualified portable producer")
     val committed = resource(backend.goldenResource)
     assertEquals(new String(committed, StandardCharsets.UTF_8), encoded + "\n")
     assertEquals(Checksum.ofBytes(committed).hex, backend.goldenFile)

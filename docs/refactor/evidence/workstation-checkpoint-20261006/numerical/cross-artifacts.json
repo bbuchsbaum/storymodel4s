@@ -1,0 +1,112 @@
+{
+  "candidate": "0dec1835ff044e4d28d8efa2dbbc1254b3ef9078",
+  "numerical_revision": "alignment-fdlibm/exp-log-v1",
+  "platforms": [
+    "JVM",
+    "JS",
+    "Native(debug)"
+  ],
+  "run": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T19:13:47.557122+00:00",
+    "finished_utc": "2026-10-06T19:16:33.298423+00:00",
+    "duration_seconds": 165.739344,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.log.noformat=true",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.AlignmentMathSuite storymodel4s.align.NumericalPropagationSuite storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe storymodel4s.align.ChartedScoringDisplayParityProbe",
+      "alignJS/testOnly storymodel4s.align.AlignmentMathSuite storymodel4s.align.NumericalPropagationSuite storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe",
+      "alignNative/testOnly storymodel4s.align.AlignmentMathSuite storymodel4s.align.NumericalPropagationSuite storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe",
+      "codecJVM/testOnly storymodel4s.codec.NumericalRecordCaptureSuite",
+      "codecJS/testOnly storymodel4s.codec.NumericalRecordCaptureSuite",
+      "codecNative/testOnly storymodel4s.codec.NumericalRecordCaptureSuite",
+      "fixturesJVM/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+      "fixturesJS/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+      "fixturesNative/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+      "scalafmtAll",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/numerical-cross-artifacts-02.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 1800.0,
+    "log_bytes": 155921
+  },
+  "passed": 52,
+  "failed": 0,
+  "skipped": 0,
+  "cells": [
+    [
+      16,
+      0,
+      0,
+      16
+    ],
+    [
+      15,
+      0,
+      0,
+      15
+    ],
+    [
+      15,
+      0,
+      0,
+      15
+    ],
+    [
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      1
+    ]
+  ],
+  "wog_full_bytes_equal": true,
+  "wog_exact_historical_mac_jvm_resource_equal": true,
+  "wog_encoded_sha256": "6388aaaf70e9cb6782c3342ca0108d5e085bb892a114d6b10af470bf6826fa2a",
+  "wog_encoded_bytes": 30682,
+  "readout_full_fields_equal": true,
+  "readout_fields_sha256": "60c28809adbf7f6c826a9b393157890b63ef27c1169e76c0829a3aba1728188c",
+  "readout_digest": "612a1d03d494dc39a07fa3e7d75b13bf7ec6b801a02cb87e5779bded16cb948d",
+  "historical_mapping_record": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7:50089af8b939848e8c0d44180095eddd7ffae2f3c010c5a89f8a29deb91c9790:32202",
+  "viterbi_argmax": "WOG fullposterior/viterbi bytesandAnna/charted full-result binding pins areunchanged fromhistoricalMacJVM; no generalnear-tie invarianceclaim",
+  "historical_native_wog": "five one-bit P/F differences comparedwith unchangedhistorical resource; no oldresourceupdated",
+  "log_sha256": "4b935824a23bc9833f4e2f517cf962168cd2cd616c75eddb1260c55be522ebdc",
+  "capture_format": "support integercoordinates encodedexactly asbinary64 toavoidJS Anyboxedtypeerasure; allfieldpositions/carriers retained"
+}
