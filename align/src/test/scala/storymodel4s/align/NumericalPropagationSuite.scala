@@ -83,8 +83,10 @@ class NumericalPropagationSuite extends FunSuite:
     )
     println("NUMERICAL_READOUT=" + MappingRender.digest(Vector(payload)).hex)
     println("NUMERICAL_READOUT_FIELDS=" + payload)
-    assertEquals(MappingRender.digest(Vector(payload)).hex,
-      "612a1d03d494dc39a07fa3e7d75b13bf7ec6b801a02cb87e5779bded16cb948d")
+    assertEquals(
+      MappingRender.digest(Vector(payload)).hex,
+      "612a1d03d494dc39a07fa3e7d75b13bf7ec6b801a02cb87e5779bded16cb948d"
+    )
   }
 
   /** Exhaustive for this fixture's published fields; an unfamiliar carrier fails the capture. */

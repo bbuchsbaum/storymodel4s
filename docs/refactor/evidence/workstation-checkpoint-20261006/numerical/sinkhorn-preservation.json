@@ -1,0 +1,53 @@
+{
+  "oracle_source_candidate": "61a353d831100baaac8dedd95a0b7b298511a777",
+  "historical_sinkhorn_source_sha256": "e486f47a59ead10dbb07cd16b0a0625558ae12f078d39ca3eb3261cf79a9e931",
+  "historical_hsmm_source_sha256": "e3541bc7c9ca2b09618a47c96ab19921017dfeda14343ea1b55a9795253f3e8f",
+  "construction": "old source extracted verbatim with object namespace changed and its original runtime helper inlined; public input/result types preserved",
+  "cases": 284,
+  "oracle_scala_sha256": "e66cffc6de85ee409fb072322d212cc7ce94b3457ece56433fd45d591e3c9381",
+  "candidate": "5b341adb7ad2d7eb8c0a5beaab9751ef7b69b1b9",
+  "run": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T19:24:42.564690+00:00",
+    "finished_utc": "2026-10-06T19:26:08.798166+00:00",
+    "duration_seconds": 86.232649,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.log.noformat=true",
+      "set ThisBuild / tlFatalWarnings := true",
+      "project alignJVM",
+      "set Test / unmanagedSources ++= Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-parity/LegacyRuntimeSinkhorn.scala\"), file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-parity/SinkhornRuntimeParitySuite.scala\"))",
+      "testOnly storymodel4s.align.SinkhornRuntimeParitySuite",
+      "project alignJS",
+      "set Test / unmanagedSources ++= Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-parity/LegacyRuntimeSinkhorn.scala\"), file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-parity/SinkhornRuntimeParitySuite.scala\"))",
+      "testOnly storymodel4s.align.SinkhornRuntimeParitySuite",
+      "project alignNative",
+      "set Test / unmanagedSources ++= Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-parity/LegacyRuntimeSinkhorn.scala\"), file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-parity/SinkhornRuntimeParitySuite.scala\"))",
+      "testOnly storymodel4s.align.SinkhornRuntimeParitySuite",
+      "scalafmtAll",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/sinkhorn-preservation.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 1200.0,
+    "log_bytes": 7271
+  },
+  "passed": 3,
+  "failed": 0,
+  "comparisons_per_target": 284,
+  "targets": [
+    "JVM",
+    "JS",
+    "Native(debug)"
+  ],
+  "formatting": "sources were formatted after all tests; source artifact below retains the post-format text and is marked accordingly",
+  "log_sha256": "b901491cf7a65d987afffbfca851eb24dddb44162c7b9253b8794f9c58b1a6c2",
+  "LegacyRuntimeSinkhorn.scala_post_format_sha256": "0289d1ff9a62af3c6951a9500bc199b9eb3e9a5a579fb1fa40f3d5952f3d764e",
+  "SinkhornRuntimeParitySuite.scala_post_format_sha256": "d82a9772036027bc96c12062371025b1a19ff781975aace9b3852be4d9079130"
+}
