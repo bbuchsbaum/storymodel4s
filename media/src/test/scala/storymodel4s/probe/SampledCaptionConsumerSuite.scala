@@ -324,3 +324,28 @@ class SampledCaptionConsumerSuite extends FunSuite:
     assertEquals(b.ptsOf(0).map(_ - 500), a.ptsOf(0))
     assertNotEquals(a.identity, b.identity)
     assertNotEquals(a.receipt.identity, b.receipt.identity)
+
+  test("the full frame set binds the decoded picture stream even when caller args are equal"):
+    def on(stream: Int) = right(
+      FrameSet.join(
+        twoPictureProbe,
+        stream,
+        framesEnvelope.geometry,
+        framesEnvelope.tool,
+        framesEnvelope.args,
+        framesEnvelope.byteLength,
+        framesEnvelope.framesSha256
+      )
+    )
+    val (a, b) = (on(0), on(1))
+    // Both joins are admitted with identical caller-declared extraction data, but address different
+    // packet timelines. The stream must be independently bound in the receipt and identity.
+    assertEquals(
+      (a.count, a.geometry, a.framesSha256, a.args),
+      (b.count, b.geometry, b.framesSha256, b.args)
+    )
+    assertEquals(b.ptsOf(0).map(_ - 500), a.ptsOf(0))
+    assert(a.receipt.parameters.endsWith(" stream 0"))
+    assert(b.receipt.parameters.endsWith(" stream 1"))
+    assertNotEquals(a.receipt.identity, b.receipt.identity)
+    assertNotEquals(a.identity, b.identity)

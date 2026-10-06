@@ -173,8 +173,9 @@ final class FrameSet private (
     s"FrameSet(${probe.manifest.fixtureId}, $count frames, ${identity.short()})"
 
 object FrameSet:
-  val Algorithm: String = "ffmpeg-bgr24-frames/v2"
+  val Algorithm: String = "ffmpeg-bgr24-frames/v3"
 
+  /** Common extraction parameters; a joined set adds its admitted picture stream. */
   def parameters(tool: ToolRealization, args: Vector[String], geometry: PictureGeometry): String =
     (Vector(
       "tool",
@@ -214,7 +215,7 @@ object FrameSet:
           )
       receipt <- SourceDerivationReceipt.of(
         Algorithm,
-        parameters(tool, args, geometry),
+        parameters(tool, args, geometry) + s" stream $streamIndex",
         Vector(probe.input, probe.identity)
       )
     yield new FrameSet(
