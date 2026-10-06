@@ -1,0 +1,597 @@
+[
+  {
+    "name": "M1-unit-ordinal",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentSurfaceSuite"
+    ],
+    "witness": "UnitContent: public method names and overload counts are pinned",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "283f3ff7a8a1eee2af6317fe1f48ec7a37c8af9caa2684af6f373d6f480d274a",
+    "exit": 1,
+    "totals": [
+      [
+        "17",
+        "1",
+        "0",
+        "16"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "17",
+          "1",
+          "0",
+          "16"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "UnitContent: public method names and overload counts are pinned"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M2-nested-chart",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentSurfaceSuite"
+    ],
+    "witness": "UnitContent: no forbidden type in JVM signatures",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "a93b29fbac2e2430d187292b675e718201297d209a98144d77c3ed3aa546acbc",
+    "exit": 1,
+    "totals": [
+      [
+        "17",
+        "2",
+        "0",
+        "15"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "17",
+          "2",
+          "0",
+          "15"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "UnitContent: public method names and overload counts are pinned",
+        "UnitContent: no forbidden type in JVM signatures"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M3-members-iteration",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentSurfaceSuite"
+    ],
+    "witness": "Members: public method names and overload counts are pinned",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "cd1589afd25cd4678302f6203545a58a19627d89fd382244e6a2cc4353e3d731",
+    "exit": 1,
+    "totals": [
+      [
+        "17",
+        "1",
+        "0",
+        "16"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "17",
+          "1",
+          "0",
+          "16"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "Members: public method names and overload counts are pinned"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M4-grain-constructor",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentUnforgeableSuite"
+    ],
+    "witness": "ContentGrain: new is refused beside a same-shape control",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "ffe57d201873509b2c1f6debe6c18db83469f8fd8f22978996b9e80beef56809",
+    "exit": 1,
+    "totals": [
+      [
+        "33",
+        "2",
+        "0",
+        "31"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "33",
+          "2",
+          "0",
+          "31"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "ContentGrain: new is refused beside a same-shape control",
+        "ContentGrain: apply is refused beside a same-shape control"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M5-participant-constructor",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentUnforgeableSuite"
+    ],
+    "witness": "ParticipantContent: new is refused beside a same-shape control",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "1038a78ccd95e40ca8edb0f940814014ead0ef0ba3e2c97eed561fb24b719aeb",
+    "exit": 1,
+    "totals": [
+      [
+        "33",
+        "2",
+        "0",
+        "31"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "33",
+          "2",
+          "0",
+          "31"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "ParticipantContent: new is refused beside a same-shape control",
+        "ParticipantContent: apply is refused beside a same-shape control"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M6-drop-empty-chart",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentBehaviorLawsSuite"
+    ],
+    "witness": "a missing chart remains distinct from an observed empty chart",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "8e494bc261dd724adfd0d01d714e11f7fa1087da586e95a825acaf66cec98f10",
+    "exit": 1,
+    "totals": [
+      [
+        "6",
+        "1",
+        "0",
+        "5"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "6",
+          "1",
+          "0",
+          "5"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "a missing chart remains distinct from an observed empty chart"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M7-participant-order",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentProjectionSuite"
+    ],
+    "witness": "canonical content does not move with recall participant order",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "0cdba2473e326d89f01b5be42d1ed4ee933626a8018837a24f3624df5a1828fa",
+    "exit": 1,
+    "totals": [
+      [
+        "8",
+        "1",
+        "0",
+        "7"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "8",
+          "1",
+          "0",
+          "7"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "canonical content does not move with recall participant order"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M8-member-order",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/contentscore.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentScoringSuite"
+    ],
+    "witness": "the strict gate orders the same contradictions by content, whatever the storage order",
+    "original_sha256": "3e6f221fb0e2543baa4e8db757ed784a1e88c9f9cc2a3bd03457ef9580d3a203",
+    "mutant_sha256": "ab4a3758704c48f46b3dc8c7e1da87de09286e99abe42fb109eeba32a1cbaaa0",
+    "exit": 1,
+    "totals": [
+      [
+        "5",
+        "1",
+        "0",
+        "4"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "5",
+          "1",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "the strict gate orders the same contradictions by content, whatever the storage order"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M9-source-unit",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentUnforgeableSuite"
+    ],
+    "witness": "the sourceUnit historical shortcut is not public",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "b4874f0fdebaf7f63d4abcb0694f2f6b5804b6ef9633ffaed4a0ff2a3f4ca446",
+    "exit": 1,
+    "totals": [
+      [
+        "33",
+        "1",
+        "0",
+        "32"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "33",
+          "1",
+          "0",
+          "32"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "the sourceUnit historical shortcut is not public"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M10-source-node",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *ContentUnforgeableSuite"
+    ],
+    "witness": "the sourceNode historical shortcut is not public",
+    "original_sha256": "4195728ced77d39715bcbb06efc39ae95a7f915db882ae815752129f2cc3b76c",
+    "mutant_sha256": "50c39f1c789fdbb5f953afd08318138af1ca4b4f7749da740a82d9d4e365d755",
+    "exit": 1,
+    "totals": [
+      [
+        "33",
+        "1",
+        "0",
+        "32"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "33",
+          "1",
+          "0",
+          "32"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "the sourceNode historical shortcut is not public"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M11-graph-constructor",
+    "head": "ca02572383740cf199839813b4c30a6d000af5c1",
+    "file": "proposition/src/main/scala/storymodel4s/proposition/semantic.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "propositionJVM/Test/clean",
+      "propositionJVM/testOnly *SemanticGraphCourtSuite"
+    ],
+    "witness": "construction doors are closed on SemanticGraph and ContentCompatibilityReport",
+    "original_sha256": "9e2c7049ee0e8dde1ad491c96d3905a4615dbb6f8931e56772a5bd8bc946e100",
+    "mutant_sha256": "866b8a044c5aaa8d81e89b63c62677b78934641034a362f833e52c3b5a83989d",
+    "exit": 1,
+    "totals": [
+      [
+        "5",
+        "1",
+        "0",
+        "4"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "5",
+          "1",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "construction doors are closed on SemanticGraph and ContentCompatibilityReport"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  },
+  {
+    "name": "M12-report-constructor",
+    "head": "b2b700cb9b6192cdd58fe719c0738e65b478b385",
+    "file": "proposition/src/main/scala/storymodel4s/proposition/semantic.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "propositionJVM/Test/clean",
+      "propositionJVM/testOnly *SemanticGraphCourtSuite"
+    ],
+    "witness": "construction doors are closed on SemanticGraph and ContentCompatibilityReport",
+    "original_sha256": "9e2c7049ee0e8dde1ad491c96d3905a4615dbb6f8931e56772a5bd8bc946e100",
+    "mutant_sha256": "15353ae362f8015c9164549a8518439f695d5f4356d397f25ef528052b32d6b3",
+    "exit": 1,
+    "totals": [
+      [
+        "5",
+        "1",
+        "0",
+        "4"
+      ]
+    ],
+    "killed": true,
+    "named_failure": true,
+    "compile_error": false,
+    "failures": [
+      "construction doors are closed on SemanticGraph and ContentCompatibilityReport"
+    ],
+    "unrelated_failures": [],
+    "audit": {
+      "exit": 1,
+      "totals": [
+        [
+          "5",
+          "1",
+          "0",
+          "4"
+        ]
+      ],
+      "killed": true,
+      "named_failure": true,
+      "compile_error": false,
+      "failures": [
+        "construction doors are closed on SemanticGraph and ContentCompatibilityReport"
+      ],
+      "unrelated_failures": [],
+      "auditor_sha": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+      "original_hash_matches": true,
+      "source_and_tests_unchanged": true
+    }
+  }
+]

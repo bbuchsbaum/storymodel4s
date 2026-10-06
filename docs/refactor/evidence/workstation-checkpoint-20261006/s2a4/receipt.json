@@ -1,0 +1,493 @@
+{
+  "candidate": "0bd050dd2d94f62524ab390e445c61a37adfaf07",
+  "recovered_from": "e02d80d01d2a0ebba3bea8c4716caab9662209dc",
+  "scope": "test courts and historical mutation evidence only; S2a-4 remains unfinished pending S2a-3",
+  "run": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T17:03:43.152175+00:00",
+    "finished_utc": "2026-10-06T17:29:07.401440+00:00",
+    "duration_seconds": 1524.251592,
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean;alignJS/Test/clean;alignNative/Test/clean;propositionJVM/Test/clean;propositionJS/Test/clean;propositionNative/Test/clean",
+      "checkAll",
+      "githubWorkflowCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/producer-strict-baseline.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 5400.0,
+    "log_bytes": 1049682
+  },
+  "actual_java": "Homebrew 25.0.1",
+  "dependency_overrides": false,
+  "declared_source_pins": {
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "gale": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+    "graph4s": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf"
+  },
+  "log_uncompressed_sha256": "0c9f72590841fb98c18614ea69f9baf176d614ae9b1544ff20748dfa0337873d",
+  "cells": [
+    {
+      "module": "coreJVM",
+      "total": 250,
+      "failed": 0,
+      "errors": 0,
+      "passed": 250,
+      "skipped": 0
+    },
+    {
+      "module": "coreJS",
+      "total": 250,
+      "failed": 0,
+      "errors": 0,
+      "passed": 250,
+      "skipped": 0
+    },
+    {
+      "module": "coreNative",
+      "total": 250,
+      "failed": 0,
+      "errors": 0,
+      "passed": 250,
+      "skipped": 0
+    },
+    {
+      "module": "propositionJVM",
+      "total": 80,
+      "failed": 0,
+      "errors": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    {
+      "module": "propositionJS",
+      "total": 80,
+      "failed": 0,
+      "errors": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    {
+      "module": "propositionNative",
+      "total": 80,
+      "failed": 0,
+      "errors": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    {
+      "module": "amrInteropJVM",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "module": "amrInteropJS",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "module": "amrInteropNative",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "module": "featuresJVM",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "module": "featuresJS",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "module": "featuresNative",
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "module": "acquireJVM",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "module": "acquireJS",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "module": "acquireNative",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "module": "storyJVM",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "module": "storyJS",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "module": "storyNative",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "module": "documentJVM",
+      "total": 189,
+      "failed": 0,
+      "errors": 0,
+      "passed": 189,
+      "skipped": 0
+    },
+    {
+      "module": "documentJS",
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "module": "documentNative",
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "module": "recallJVM",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "module": "recallJS",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "module": "recallNative",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "module": "alignJVM",
+      "total": 619,
+      "failed": 0,
+      "errors": 0,
+      "passed": 619,
+      "skipped": 0
+    },
+    {
+      "module": "alignJS",
+      "total": 592,
+      "failed": 0,
+      "errors": 0,
+      "passed": 592,
+      "skipped": 0
+    },
+    {
+      "module": "alignNative",
+      "total": 592,
+      "failed": 0,
+      "errors": 0,
+      "passed": 592,
+      "skipped": 0
+    },
+    {
+      "module": "interviewJVM",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "module": "interviewJS",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "module": "interviewNative",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "module": "embedCoreJVM",
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "module": "embedCoreJS",
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "module": "embedCoreNative",
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "module": "viewJVM",
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "module": "viewJS",
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "module": "viewNative",
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "module": "codecJVM",
+      "total": 318,
+      "failed": 0,
+      "errors": 0,
+      "passed": 318,
+      "skipped": 0
+    },
+    {
+      "module": "codecJS",
+      "total": 317,
+      "failed": 0,
+      "errors": 0,
+      "passed": 317,
+      "skipped": 0
+    },
+    {
+      "module": "codecNative",
+      "total": 317,
+      "failed": 0,
+      "errors": 0,
+      "passed": 317,
+      "skipped": 0
+    },
+    {
+      "module": "corpusJVM",
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "module": "corpusJS",
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "module": "corpusNative",
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "module": "fixturesJVM",
+      "total": 165,
+      "failed": 0,
+      "errors": 0,
+      "passed": 165,
+      "skipped": 0
+    },
+    {
+      "module": "fixturesJS",
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    {
+      "module": "fixturesNative",
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    {
+      "module": "lawsJVM",
+      "total": 115,
+      "failed": 0,
+      "errors": 0,
+      "passed": 115,
+      "skipped": 0
+    },
+    {
+      "module": "lawsJS",
+      "total": 115,
+      "failed": 0,
+      "errors": 0,
+      "passed": 115,
+      "skipped": 0
+    },
+    {
+      "module": "lawsNative",
+      "total": 115,
+      "failed": 0,
+      "errors": 0,
+      "passed": 115,
+      "skipped": 0
+    },
+    {
+      "module": "providerParser",
+      "total": 98,
+      "failed": 0,
+      "errors": 0,
+      "passed": 98,
+      "skipped": 0
+    },
+    {
+      "module": "providerAgent",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 76,
+      "skipped": 1
+    },
+    {
+      "module": "embedGrakern",
+      "total": 28,
+      "failed": 0,
+      "errors": 0,
+      "passed": 28,
+      "skipped": 0
+    },
+    {
+      "module": "embedOnnx",
+      "total": 6,
+      "failed": 0,
+      "errors": 0,
+      "passed": 6,
+      "skipped": 0
+    },
+    {
+      "module": "embedBench",
+      "total": 140,
+      "failed": 0,
+      "errors": 0,
+      "passed": 139,
+      "skipped": 1
+    },
+    {
+      "module": "media",
+      "total": 64,
+      "failed": 0,
+      "errors": 0,
+      "passed": 61,
+      "skipped": 3
+    },
+    {
+      "module": "pipeline",
+      "total": 120,
+      "failed": 0,
+      "errors": 0,
+      "passed": 120,
+      "skipped": 0
+    },
+    {
+      "module": "corpusIntake",
+      "total": 159,
+      "failed": 0,
+      "errors": 0,
+      "passed": 159,
+      "skipped": 0
+    }
+  ],
+  "sum": {
+    "passed": 8940,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5,
+    "total": 8945
+  },
+  "mutation_audit": "retrospective; retained original dates/SHAs; no rerun claim"
+}
