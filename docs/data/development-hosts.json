@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "source_machines": ["BUC-GW02", "BUC-GW01"],
+  "source_basis": "BUC-GW02 is the existing data source for the owner-requested checkpoint; BUC-GW01 is the approved destination.",
+  "destinations": {
+    "buc-gw01": {
+      "approved": true,
+      "approval_basis": "Owner instruction, 6 October 2026: approved private development machine.",
+      "ssh_target": "buc-gw01.tail5f873d.ts.net",
+      "host_key_alias": "buc-gw01",
+      "machine": "BUC-GW01",
+      "root": "/Users/bbuchsbaum/.local/share/storymodel4s/data"
+    }
+  }
+}

@@ -64,9 +64,11 @@ redistribution of participant recall prose.
 
 ## Approved-machine handoff
 
-The current [delivery plan](../docs/refactor/PLAN.md#1-recover-synchronize-github-and-qualify-development-hosts)
-defines the handoff acceptance. Implementation and the first transfer remain pending.
-Mote `bd-01M48TNS4G0442F7SJW57671B6` owns the bounded transfer implementation and its witnesses.
+The [development guide](../docs/development.md#private-data-on-approved-machines) documents
+`tools/data_handoff.py`: committed host approval, explicit private selections, resumable SSH
+streams, conflict refusal, full byte verification and a final readiness marker. Every new
+destination reader must first pass `check-local`; directory presence does not admit a dataset.
+Mote `bd-01M48TNS4G0442F7SJW57671B6` owns the first exercised handoff and its evidence.
 
 Record owner approval for each destination and corpus/use, authenticate its host identity, and
 select an explicit `STORYMODEL4S_DATA` root. Preview the minimum assets required; use a private

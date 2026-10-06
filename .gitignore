@@ -5,6 +5,8 @@
 .scala-build/
 .vscode/
 .mote/local/
+.mote/tmp/
+.agent-work/
 target/
 **/target/
 .DS_Store
