@@ -115,7 +115,7 @@ commits landed and 49 more waited reviewed on an integration branch, while few b
   - Never let a scratch clone or `/tmp` be the only copy of anything, including drafts.
   - Before you conclude that work is gone, sweep `git fsck --dangling`.
 - **SD5. ADRs gate vocabulary.** No new module, dependency or public vocabulary without an ADR
-  line that records the rejected alternative. The owner decides ADRs. The lead may accept
+  line that records the rejected alternative. The owner decides ADRs. The primary agent may accept
   amendments within scope the owner has approved, as it did for the S2 section on 2026-09-23.
 - **SD6. Read your work cold, in a separate pass,** with a fresh-context agent or reviewer. Never
   approve in the same breath as authoring. Rereading catches prose. Only measurement catches a
@@ -332,7 +332,7 @@ The full text is governance item 3 in `fleet-mode.md`.
   never invalidates a gate. A delta that touches a gated input does; gated inputs are a `.scala`
   file in a gated module, `build.sbt` and `project/`.
   - If the delta touches the same file as the candidate, the author rebases and re-gates.
-  - If it touches different modules, the lead gates the merged tree.
+  - If it touches different modules, the primary agent gates the merged tree.
 - **Sibling seam.** `storyatlas4s` builds this repository from source. For a change to anything
   it consumes, compiling and running its tests is part of the gate: it runs before landing, not
   as a follow-up. Landing first and checking after is how `04fdf6b` broke the sibling app.

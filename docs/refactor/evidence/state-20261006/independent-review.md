@@ -33,3 +33,19 @@ precede that implementation; closing the complete S2a-4 ticket cannot.
 
 The candidate is candid about controlled scorer behavior, reflection limits and stateful
 callbacks. It does not qualify arbitrary user callbacks or the strict end-to-end pipeline.
+
+## Stocktake commit review
+
+The same independent reviewer checked `ed1b9d3fa5f2362987afcc1aab50a730507bbbee` against main
+`0500bc1029bea9df88291a7b73860f8fecfa804d`. Substantive inventory, branch classifications,
+ticket counts, all 205 recovery refs, bundle size/hash and preserved branch/stash tips matched.
+The 1,658 bundle heads include pseudo-ref HEAD, agreeing with 1,657 named refs in the mirror.
+All 345 changed paths were documentation or additive tracker operations: 292 historical and
+30 audit operations, eight requeues and four assignment clears across eleven tickets, with no
+product closures or acceptance/dependency edits.
+
+Verdict on that commit: BLOCK. Exact `git diff --check 0500bc1 ed1b9d3` returned 2 because all
+277 CSV lines used CRLF. The initial tracked-only working diff check omitted this new file.
+The successor normalizes CSV line endings and records a full staged diff check against main.
+Three wording FOLLOW-UPs remove residual active lead references and label the September handoff
+historical. Technical/design, exact-SHA review and sibling-consumer gates remain required.

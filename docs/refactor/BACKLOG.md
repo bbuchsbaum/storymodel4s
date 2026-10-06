@@ -5,7 +5,7 @@ Eight stale `doing` tickets were requeued and four historical assignments cleare
 decision notes. The earlier named-owner and M1-next handoffs below are historical. The owner
 has selected one primary agent and at most one helper; acceptance and dependency records remain.
 
-Current execution handoff: [23 September checkpoint](PLAN.md#execution-handoff-23-september-2026), with accepted owners, next witnesses and the bound integration evidence. Live Mote acceptance remains authoritative.
+Historical execution handoff: [23 September checkpoint](PLAN.md#execution-handoff-23-september-2026), with the then-accepted owners, next witnesses and bound integration evidence. Live Mote acceptance remains authoritative.
 
 Reconciled 19 September 2026 against `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. Governing direction: [PLAN.md](PLAN.md).
 

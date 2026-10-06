@@ -8,5 +8,20 @@
   "recovery_refs_read_back": 205,
   "main_unchanged": true,
   "untracked_test_hash_unchanged": true,
-  "git_diff_check_exit": 0
+  "git_diff_check_exit": 0,
+  "initial_working_tree_check_scope": "Tracked working files only; independent exact-commit review found omitted untracked CSV CRLF",
+  "correction": "CSV line endings normalized to LF; complete staged diff against original main required before final commit",
+  "csv_crlf_count": 0,
+  "initial_review_failure": {
+    "candidate": "ed1b9d3fa5f2362987afcc1aab50a730507bbbee",
+    "command": "git diff --check 0500bc1 ed1b9d3",
+    "exit": 2,
+    "reason": "277 CRLF CSV lines omitted by the tracked-only working-tree check"
+  },
+  "complete_candidate_format_check": {
+    "base": "0500bc1029bea9df88291a7b73860f8fecfa804d",
+    "command": "git diff --cached --check 0500bc1029bea9df88291a7b73860f8fecfa804d",
+    "exit": 0,
+    "changed_path_count": 345
+  }
 }
