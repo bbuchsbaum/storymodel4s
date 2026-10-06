@@ -1,0 +1,972 @@
+{
+  "candidate": "433aa1056f6aa5e88b63b4b665079e9959a266ae",
+  "repo": "bbuchsbaum/storymodel4s",
+  "run": 37526554024,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526554024",
+  "conclusion": "success",
+  "retrieval": "fresh raw per-step GitHub API archive, not the CLI stitched view",
+  "jobs": [
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526554024/job/112484909960",
+      "conclusion": "success",
+      "test_log_entry": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)/12_Test.txt",
+      "test_log_bytes": 917381,
+      "test_log_sha256": "7b2ff9f6c3c0934436b4614f1bc83e29f7324bc2c197c546692e071a7bcedf05",
+      "test_cells": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        }
+      ],
+      "sum": {
+        "passed": 3470,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 6
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Setup Java (temurin@21)",
+          "conclusion": "success"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check that workflows are up to date",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check formatting",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "scalaJSLink",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "nativeLink",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test Native serially",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check binary compatibility",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Generate API documentation",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check source exports and scene frame planning",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Setup Java (temurin@21)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526554024/job/112484910004",
+      "conclusion": "success",
+      "test_log_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)/12_Test.txt",
+      "test_log_bytes": 917358,
+      "test_log_sha256": "c108394eefe343b7efbce7b0432818efcf0e63418eb2ee1fd9b119fb5344f428",
+      "test_cells": [
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        }
+      ],
+      "sum": {
+        "passed": 3470,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 6
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@21)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check that workflows are up to date",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check formatting",
+          "conclusion": "success"
+        },
+        {
+          "name": "scalaJSLink",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "nativeLink",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test Native serially",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check binary compatibility",
+          "conclusion": "success"
+        },
+        {
+          "name": "Generate API documentation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check source exports and scene frame planning",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526554024/job/112484910022",
+      "conclusion": "success",
+      "test_log_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)/13_Test Native serially.txt",
+      "test_log_bytes": 157625,
+      "test_log_sha256": "b34586997487abac46cbfd6106b18e946c554d0319ab3b8d4b73707cd7a9d3e1",
+      "test_cells": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 607,
+          "failed": 0,
+          "errors": 0,
+          "passed": 607,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 318,
+          "failed": 0,
+          "errors": 0,
+          "passed": 318,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        }
+      ],
+      "sum": {
+        "passed": 2755,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@21)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check that workflows are up to date",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check formatting",
+          "conclusion": "success"
+        },
+        {
+          "name": "scalaJSLink",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "nativeLink",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Test Native serially",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check binary compatibility",
+          "conclusion": "success"
+        },
+        {
+          "name": "Generate API documentation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check source exports and scene frame planning",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526554024/job/112484912184",
+      "conclusion": "success",
+      "test_log_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)/12_Test.txt",
+      "test_log_bytes": 148221,
+      "test_log_sha256": "69d0bbf35bec425cbecf489f07497f74b24e09a52af99b8bcd87d5c71c3f13ae",
+      "test_cells": [
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 607,
+          "failed": 0,
+          "errors": 0,
+          "passed": 607,
+          "skipped": 0
+        },
+        {
+          "total": 318,
+          "failed": 0,
+          "errors": 0,
+          "passed": 318,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        }
+      ],
+      "sum": {
+        "passed": 2755,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@21)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "sbt update",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check that workflows are up to date",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check formatting",
+          "conclusion": "success"
+        },
+        {
+          "name": "scalaJSLink",
+          "conclusion": "success"
+        },
+        {
+          "name": "nativeLink",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test Native serially",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check binary compatibility",
+          "conclusion": "success"
+        },
+        {
+          "name": "Generate API documentation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check source exports and scene frame planning",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "sum": {
+    "passed": 12450,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "archive": "hosted-37526554024.zip",
+  "archive_bytes": 532317,
+  "archive_sha256": "feec7dd18378cd41a2380c88bbc34156bef2a090ff0eb291db71e67a583bd8ef",
+  "scope": "declared public source dependency pins; no private data or dependency override in committed CI"
+}

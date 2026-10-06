@@ -57,5 +57,638 @@
   "documentation": "https://www.scala-sbt.org/1.x/docs/Parallel-Execution.html",
   "raw_log_bytes": 1432130,
   "raw_log_sha256": "c31764f8f9f5d14ed2fc362b6d85c0f0d78c0b7b6e04e24eefd4758c54022a17",
-  "totals_boundary": "Concurrent terminal output may interleave totals; these are the complete parsed totals only, not an invented complete module count. Six named failed Native tests are independently retained below."
+  "totals_boundary": "Concurrent terminal output may interleave totals; these are the complete parsed totals only, not an invented complete module count. Six named failed Native tests are independently retained below.",
+  "complete_archive_retrieval": {
+    "command": [
+      "gh",
+      "api",
+      "repos/bbuchsbaum/storymodel4s/actions/runs/37522460856/logs"
+    ],
+    "zip_bytes": 508895,
+    "zip_sha256": "3b0a8e8ac35ffed80ac24bf787f430cdc455655206c8586580eca39e0b0ba2ee",
+    "records": [
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)/12_Test.txt",
+        "retained": "ec37-jvm21-test.log.gz",
+        "bytes": 917356,
+        "sha256": "3d7602fe803093bb4bb9109ca1a830249629d3aaef4cb64e8e98f8c878934fe2",
+        "cells": [
+          {
+            "total": 116,
+            "failed": 0,
+            "errors": 0,
+            "passed": 116,
+            "skipped": 0
+          },
+          {
+            "total": 250,
+            "failed": 0,
+            "errors": 0,
+            "passed": 250,
+            "skipped": 0
+          },
+          {
+            "total": 68,
+            "failed": 0,
+            "errors": 0,
+            "passed": 68,
+            "skipped": 0
+          },
+          {
+            "total": 92,
+            "failed": 0,
+            "errors": 0,
+            "passed": 92,
+            "skipped": 0
+          },
+          {
+            "total": 64,
+            "failed": 0,
+            "errors": 0,
+            "passed": 60,
+            "skipped": 4
+          },
+          {
+            "total": 138,
+            "failed": 0,
+            "errors": 0,
+            "passed": 138,
+            "skipped": 0
+          },
+          {
+            "total": 167,
+            "failed": 0,
+            "errors": 0,
+            "passed": 167,
+            "skipped": 0
+          },
+          {
+            "total": 80,
+            "failed": 0,
+            "errors": 0,
+            "passed": 80,
+            "skipped": 0
+          },
+          {
+            "total": 6,
+            "failed": 0,
+            "errors": 0,
+            "passed": 6,
+            "skipped": 0
+          },
+          {
+            "total": 144,
+            "failed": 0,
+            "errors": 0,
+            "passed": 144,
+            "skipped": 0
+          },
+          {
+            "total": 98,
+            "failed": 0,
+            "errors": 0,
+            "passed": 98,
+            "skipped": 0
+          },
+          {
+            "total": 77,
+            "failed": 0,
+            "errors": 0,
+            "passed": 77,
+            "skipped": 0
+          },
+          {
+            "total": 77,
+            "failed": 0,
+            "errors": 0,
+            "passed": 76,
+            "skipped": 1
+          },
+          {
+            "total": 159,
+            "failed": 0,
+            "errors": 0,
+            "passed": 159,
+            "skipped": 0
+          },
+          {
+            "total": 189,
+            "failed": 0,
+            "errors": 0,
+            "passed": 189,
+            "skipped": 0
+          },
+          {
+            "total": 133,
+            "failed": 0,
+            "errors": 0,
+            "passed": 133,
+            "skipped": 0
+          },
+          {
+            "total": 104,
+            "failed": 0,
+            "errors": 0,
+            "passed": 104,
+            "skipped": 0
+          },
+          {
+            "total": 28,
+            "failed": 0,
+            "errors": 0,
+            "passed": 28,
+            "skipped": 0
+          },
+          {
+            "total": 319,
+            "failed": 0,
+            "errors": 0,
+            "passed": 319,
+            "skipped": 0
+          },
+          {
+            "total": 627,
+            "failed": 0,
+            "errors": 0,
+            "passed": 627,
+            "skipped": 0
+          },
+          {
+            "total": 115,
+            "failed": 0,
+            "errors": 0,
+            "passed": 115,
+            "skipped": 0
+          },
+          {
+            "total": 140,
+            "failed": 0,
+            "errors": 0,
+            "passed": 139,
+            "skipped": 1
+          },
+          {
+            "total": 120,
+            "failed": 0,
+            "errors": 0,
+            "passed": 120,
+            "skipped": 0
+          },
+          {
+            "total": 165,
+            "failed": 0,
+            "errors": 0,
+            "passed": 165,
+            "skipped": 0
+          }
+        ],
+        "sum": {
+          "passed": 3470,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 6
+        }
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)/12_Test.txt",
+        "retained": "ec37-js17-test.log.gz",
+        "bytes": 148223,
+        "sha256": "32419f87a8f90ebcd5189d41de3362e7c13b9ae01f629617c4b39bcd58d42b11",
+        "cells": [
+          {
+            "total": 116,
+            "failed": 0,
+            "errors": 0,
+            "passed": 116,
+            "skipped": 0
+          },
+          {
+            "total": 68,
+            "failed": 0,
+            "errors": 0,
+            "passed": 68,
+            "skipped": 0
+          },
+          {
+            "total": 250,
+            "failed": 0,
+            "errors": 0,
+            "passed": 250,
+            "skipped": 0
+          },
+          {
+            "total": 138,
+            "failed": 0,
+            "errors": 0,
+            "passed": 138,
+            "skipped": 0
+          },
+          {
+            "total": 167,
+            "failed": 0,
+            "errors": 0,
+            "passed": 167,
+            "skipped": 0
+          },
+          {
+            "total": 144,
+            "failed": 0,
+            "errors": 0,
+            "passed": 144,
+            "skipped": 0
+          },
+          {
+            "total": 77,
+            "failed": 0,
+            "errors": 0,
+            "passed": 77,
+            "skipped": 0
+          },
+          {
+            "total": 186,
+            "failed": 0,
+            "errors": 0,
+            "passed": 186,
+            "skipped": 0
+          },
+          {
+            "total": 92,
+            "failed": 0,
+            "errors": 0,
+            "passed": 92,
+            "skipped": 0
+          },
+          {
+            "total": 133,
+            "failed": 0,
+            "errors": 0,
+            "passed": 133,
+            "skipped": 0
+          },
+          {
+            "total": 104,
+            "failed": 0,
+            "errors": 0,
+            "passed": 104,
+            "skipped": 0
+          },
+          {
+            "total": 80,
+            "failed": 0,
+            "errors": 0,
+            "passed": 80,
+            "skipped": 0
+          },
+          {
+            "total": 607,
+            "failed": 0,
+            "errors": 0,
+            "passed": 607,
+            "skipped": 0
+          },
+          {
+            "total": 318,
+            "failed": 0,
+            "errors": 0,
+            "passed": 318,
+            "skipped": 0
+          },
+          {
+            "total": 160,
+            "failed": 0,
+            "errors": 0,
+            "passed": 160,
+            "skipped": 0
+          },
+          {
+            "total": 115,
+            "failed": 0,
+            "errors": 0,
+            "passed": 115,
+            "skipped": 0
+          }
+        ],
+        "sum": {
+          "passed": 2755,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)/12_Test.txt",
+        "retained": "ec37-native17-test.log.gz",
+        "bytes": 161820,
+        "sha256": "ab044f7d7bd5969e405a1495fd73cb2309a5dc43f230ab6be7a1e31500692517",
+        "cells": [
+          {
+            "total": 68,
+            "failed": 0,
+            "errors": 0,
+            "passed": 68,
+            "skipped": 0
+          },
+          {
+            "total": 116,
+            "failed": 0,
+            "errors": 0,
+            "passed": 116,
+            "skipped": 0
+          },
+          {
+            "total": 138,
+            "failed": 0,
+            "errors": 0,
+            "passed": 138,
+            "skipped": 0
+          },
+          {
+            "total": 250,
+            "failed": 0,
+            "errors": 0,
+            "passed": 250,
+            "skipped": 0
+          },
+          {
+            "total": 144,
+            "failed": 0,
+            "errors": 0,
+            "passed": 144,
+            "skipped": 0
+          },
+          {
+            "total": 167,
+            "failed": 0,
+            "errors": 0,
+            "passed": 167,
+            "skipped": 0
+          },
+          {
+            "total": 77,
+            "failed": 0,
+            "errors": 0,
+            "passed": 77,
+            "skipped": 0
+          },
+          {
+            "total": 186,
+            "failed": 0,
+            "errors": 0,
+            "passed": 186,
+            "skipped": 0
+          },
+          {
+            "total": 104,
+            "failed": 0,
+            "errors": 0,
+            "passed": 104,
+            "skipped": 0
+          },
+          {
+            "total": 133,
+            "failed": 0,
+            "errors": 0,
+            "passed": 133,
+            "skipped": 0
+          },
+          {
+            "total": 92,
+            "failed": 0,
+            "errors": 0,
+            "passed": 92,
+            "skipped": 0
+          },
+          {
+            "total": 80,
+            "failed": 1,
+            "errors": 0,
+            "passed": 79,
+            "skipped": 0
+          },
+          {
+            "total": 318,
+            "failed": 0,
+            "errors": 0,
+            "passed": 318,
+            "skipped": 0
+          },
+          {
+            "total": 115,
+            "failed": 0,
+            "errors": 0,
+            "passed": 115,
+            "skipped": 0
+          },
+          {
+            "total": 607,
+            "failed": 5,
+            "errors": 0,
+            "passed": 602,
+            "skipped": 0
+          },
+          {
+            "total": 160,
+            "failed": 0,
+            "errors": 0,
+            "passed": 160,
+            "skipped": 0
+          }
+        ],
+        "sum": {
+          "passed": 2749,
+          "failed": 6,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)/12_Test.txt",
+        "retained": "ec37-jvm17-test.log.gz",
+        "bytes": 917358,
+        "sha256": "224c3a516dd3e9fd78d8ed8f4f8b445d95019983927854a271d251c1bdd4f319",
+        "cells": [
+          {
+            "total": 116,
+            "failed": 0,
+            "errors": 0,
+            "passed": 116,
+            "skipped": 0
+          },
+          {
+            "total": 68,
+            "failed": 0,
+            "errors": 0,
+            "passed": 68,
+            "skipped": 0
+          },
+          {
+            "total": 250,
+            "failed": 0,
+            "errors": 0,
+            "passed": 250,
+            "skipped": 0
+          },
+          {
+            "total": 64,
+            "failed": 0,
+            "errors": 0,
+            "passed": 60,
+            "skipped": 4
+          },
+          {
+            "total": 167,
+            "failed": 0,
+            "errors": 0,
+            "passed": 167,
+            "skipped": 0
+          },
+          {
+            "total": 138,
+            "failed": 0,
+            "errors": 0,
+            "passed": 138,
+            "skipped": 0
+          },
+          {
+            "total": 77,
+            "failed": 0,
+            "errors": 0,
+            "passed": 77,
+            "skipped": 0
+          },
+          {
+            "total": 92,
+            "failed": 0,
+            "errors": 0,
+            "passed": 92,
+            "skipped": 0
+          },
+          {
+            "total": 144,
+            "failed": 0,
+            "errors": 0,
+            "passed": 144,
+            "skipped": 0
+          },
+          {
+            "total": 98,
+            "failed": 0,
+            "errors": 0,
+            "passed": 98,
+            "skipped": 0
+          },
+          {
+            "total": 80,
+            "failed": 0,
+            "errors": 0,
+            "passed": 80,
+            "skipped": 0
+          },
+          {
+            "total": 189,
+            "failed": 0,
+            "errors": 0,
+            "passed": 189,
+            "skipped": 0
+          },
+          {
+            "total": 159,
+            "failed": 0,
+            "errors": 0,
+            "passed": 159,
+            "skipped": 0
+          },
+          {
+            "total": 6,
+            "failed": 0,
+            "errors": 0,
+            "passed": 6,
+            "skipped": 0
+          },
+          {
+            "total": 77,
+            "failed": 0,
+            "errors": 0,
+            "passed": 76,
+            "skipped": 1
+          },
+          {
+            "total": 104,
+            "failed": 0,
+            "errors": 0,
+            "passed": 104,
+            "skipped": 0
+          },
+          {
+            "total": 133,
+            "failed": 0,
+            "errors": 0,
+            "passed": 133,
+            "skipped": 0
+          },
+          {
+            "total": 28,
+            "failed": 0,
+            "errors": 0,
+            "passed": 28,
+            "skipped": 0
+          },
+          {
+            "total": 319,
+            "failed": 0,
+            "errors": 0,
+            "passed": 319,
+            "skipped": 0
+          },
+          {
+            "total": 165,
+            "failed": 0,
+            "errors": 0,
+            "passed": 165,
+            "skipped": 0
+          },
+          {
+            "total": 627,
+            "failed": 0,
+            "errors": 0,
+            "passed": 627,
+            "skipped": 0
+          },
+          {
+            "total": 115,
+            "failed": 0,
+            "errors": 0,
+            "passed": 115,
+            "skipped": 0
+          },
+          {
+            "total": 120,
+            "failed": 0,
+            "errors": 0,
+            "passed": 120,
+            "skipped": 0
+          },
+          {
+            "total": 140,
+            "failed": 0,
+            "errors": 0,
+            "passed": 139,
+            "skipped": 1
+          }
+        ],
+        "sum": {
+          "passed": 3470,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 6
+        }
+      }
+    ],
+    "supersedes_partial_counts": true,
+    "finding": "Fresh raw per-step archive contains complete24-cell JVM tails and final success. Prior gh run view stitched capture omitted tails; upstream capture/retrieval cause is not assumed."
+  }
 }

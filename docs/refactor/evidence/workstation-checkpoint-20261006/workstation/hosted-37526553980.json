@@ -1,0 +1,76 @@
+{
+  "candidate": "433aa1056f6aa5e88b63b4b665079e9959a266ae",
+  "run": 37526553980,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526553980",
+  "conclusion": "success",
+  "parser_tests": 5,
+  "exact_example_replays": 13,
+  "verified_pages": 20,
+  "browser_and_provenance_verifiers": "completed under the full committed npm verify command",
+  "jobs": [
+    {
+      "name": "Verify docs site",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37526553980/job/112484909100",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install site dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install the pinned Playwright browser",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "archive": "hosted-37526553980.zip",
+  "archive_bytes": 38424,
+  "archive_sha256": "a793a3479e5be86c86edb2b42360e474ef1b12722c6001f71df8b41e9a609454",
+  "verify_entry": "Verify docs site/8_Verify.txt",
+  "verify_bytes": 16402,
+  "verify_sha256": "d09dea1387b78770ccd20ae6b2e0cc7dc84e59cc88dfa115d555447083b01485"
+}

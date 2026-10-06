@@ -1,0 +1,500 @@
+{
+  "schema": 1,
+  "pid": 11583,
+  "machine": "BUC-GW01",
+  "candidate": "a6c27212d9da06c242d9b8c5ad66b8a675eee9a3",
+  "started_utc": "2026-10-06T19:46:55.127394+00:00",
+  "stages": [
+    {
+      "name": "fetch",
+      "command": [
+        "git",
+        "fetch",
+        "origin",
+        "codex/workstation-final-20261006"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/integrated-producer-fetch.log",
+      "started_utc": "2026-10-06T19:46:55.261744+00:00",
+      "child_pid": 11592,
+      "exit_code": 0,
+      "bytes": 216,
+      "sha256": "5b488ec75406ca54261100804f6803179b9c8a7afdbb2867e0be8b5f2f546db2",
+      "totals": [],
+      "finished_utc": "2026-10-06T19:46:56.041890+00:00"
+    },
+    {
+      "name": "fast-forward",
+      "command": [
+        "git",
+        "merge",
+        "--ff-only",
+        "a6c27212d9da06c242d9b8c5ad66b8a675eee9a3"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/integrated-producer-fast-forward.log",
+      "started_utc": "2026-10-06T19:46:56.060036+00:00",
+      "child_pid": 11598,
+      "exit_code": 0,
+      "bytes": 8916,
+      "sha256": "6db00c287072dc960dbb101c357030cdea1783c8ecdb699a931e2f795efcac13",
+      "totals": [],
+      "finished_utc": "2026-10-06T19:46:56.143399+00:00"
+    },
+    {
+      "name": "full",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dsbt.log.noformat=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "compileAll",
+        "testAll",
+        "doc",
+        "project alignNative",
+        "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+        "testOnly storymodel4s.align.AlignmentMathSuite storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe storymodel4s.align.NumericalPropagationSuite",
+        "project codecNative",
+        "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+        "testOnly storymodel4s.codec.MappingCodecDigestSuite storymodel4s.codec.NumericalRecordCaptureSuite",
+        "project fixturesNative",
+        "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+        "testOnly storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+        "project /",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck",
+        "githubWorkflowCheck"
+      ],
+      "log": "/Users/bbuchsbaum/.local/share/storymodel4s/checkpoints/20261006/integrated-producer-full.log",
+      "started_utc": "2026-10-06T19:46:56.629559+00:00",
+      "child_pid": 11613,
+      "exit_code": 1,
+      "bytes": 1225077,
+      "sha256": "b9ee3b9c888c3509e11e2f3d83ac20fbe931fa7f0f311d17cb42140e7235eb4b",
+      "totals": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 607,
+          "failed": 0,
+          "errors": 0,
+          "passed": 607,
+          "skipped": 0
+        },
+        {
+          "total": 607,
+          "failed": 0,
+          "errors": 0,
+          "passed": 607,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 318,
+          "failed": 0,
+          "errors": 0,
+          "passed": 318,
+          "skipped": 0
+        },
+        {
+          "total": 318,
+          "failed": 0,
+          "errors": 0,
+          "passed": 318,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15,
+          "skipped": 0
+        },
+        {
+          "total": 5,
+          "failed": 0,
+          "errors": 0,
+          "passed": 5,
+          "skipped": 0
+        },
+        {
+          "total": 7,
+          "failed": 0,
+          "errors": 0,
+          "passed": 7,
+          "skipped": 0
+        }
+      ],
+      "finished_utc": "2026-10-06T20:27:16.952833+00:00"
+    }
+  ],
+  "private_data_used": false,
+  "environment_removed_names": [],
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+  "node": "v24.21.0",
+  "clang": "Apple clang version 16.0.0 (clang-1600.0.26.4)",
+  "python": "Python 3.9.6",
+  "exit_code": 1,
+  "failure": "stage failed: full",
+  "finished_utc": "2026-10-06T20:27:16.956832+00:00",
+  "completed": true
+}

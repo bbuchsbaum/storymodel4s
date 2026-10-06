@@ -1,0 +1,388 @@
+{
+  "schema": 1,
+  "candidate": "433aa1056f6aa5e88b63b4b665079e9959a266ae",
+  "machine": "BUC-GW01",
+  "state": "failed",
+  "exit_code": 1,
+  "commands": [
+    "sbt",
+    "-batch",
+    "-Dsbt.log.noformat=true",
+    "set ThisBuild / tlFatalWarnings := true",
+    "compileAll",
+    "testAll",
+    "doc",
+    "project alignNative",
+    "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+    "testOnly storymodel4s.align.AlignmentMathSuite storymodel4s.align.LocalEvidenceParityProbe storymodel4s.align.ChartedScoringParityProbe storymodel4s.align.NumericalPropagationSuite",
+    "project codecNative",
+    "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+    "testOnly storymodel4s.codec.MappingCodecDigestSuite storymodel4s.codec.NumericalRecordCaptureSuite",
+    "project fixturesNative",
+    "set nativeConfig ~= (_.withMode(scala.scalanative.build.Mode.releaseFast))",
+    "testOnly storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+    "project /",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck",
+    "githubWorkflowCheck",
+    "alias testNative"
+  ],
+  "started_utc": "2026-10-06T20:29:04.291735+00:00",
+  "finished_utc": "2026-10-06T21:04:58.820927+00:00",
+  "raw_log_bytes": 345747,
+  "raw_log_sha256": "1a161346dc1b595068c3468e198a5fa816fe466e6afdd021b2bf78f9738189d2",
+  "cells": [
+    {
+      "total": 250,
+      "failed": 0,
+      "errors": 0,
+      "passed": 250,
+      "skipped": 0
+    },
+    {
+      "total": 250,
+      "failed": 0,
+      "errors": 0,
+      "passed": 250,
+      "skipped": 0
+    },
+    {
+      "total": 250,
+      "failed": 0,
+      "errors": 0,
+      "passed": 250,
+      "skipped": 0
+    },
+    {
+      "total": 80,
+      "failed": 0,
+      "errors": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    {
+      "total": 80,
+      "failed": 0,
+      "errors": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    {
+      "total": 80,
+      "failed": 0,
+      "errors": 0,
+      "passed": 80,
+      "skipped": 0
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "total": 68,
+      "failed": 0,
+      "errors": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    {
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "total": 189,
+      "failed": 0,
+      "errors": 0,
+      "passed": 189,
+      "skipped": 0
+    },
+    {
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "total": 627,
+      "failed": 0,
+      "errors": 0,
+      "passed": 627,
+      "skipped": 0
+    },
+    {
+      "total": 607,
+      "failed": 0,
+      "errors": 0,
+      "passed": 607,
+      "skipped": 0
+    },
+    {
+      "total": 607,
+      "failed": 0,
+      "errors": 0,
+      "passed": 607,
+      "skipped": 0
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "total": 319,
+      "failed": 0,
+      "errors": 0,
+      "passed": 319,
+      "skipped": 0
+    },
+    {
+      "total": 318,
+      "failed": 0,
+      "errors": 0,
+      "passed": 318,
+      "skipped": 0
+    },
+    {
+      "total": 318,
+      "failed": 0,
+      "errors": 0,
+      "passed": 318,
+      "skipped": 0
+    },
+    {
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "total": 165,
+      "failed": 0,
+      "errors": 0,
+      "passed": 165,
+      "skipped": 0
+    },
+    {
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    {
+      "total": 160,
+      "failed": 2,
+      "errors": 0,
+      "passed": 158,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "passed": 7947,
+    "failed": 2,
+    "errors": 0,
+    "skipped": 0
+  },
+  "passed_prefix_cells": 44,
+  "passed_prefix_tests": 7789,
+  "failed_module": "fixturesNative",
+  "failures": [
+    {
+      "suite": "WorkspaceVoyageSuite",
+      "test": "external global winner with residual source mass does not become a source anchor",
+      "seconds": 70.097,
+      "kind": "30-second timeout"
+    },
+    {
+      "suite": "WorkspaceJoinSuite",
+      "test": "historical results are contextually decoded and cannot float to changed recall semantics",
+      "seconds": 44.72,
+      "kind": "30-second timeout"
+    }
+  ],
+  "load_observation": {
+    "cpu_cores": 10,
+    "utc": "2026-10-06T21:09:00Z",
+    "load_averages": [
+      22.26,
+      27.0,
+      28.0
+    ],
+    "free_memory_percent": 71,
+    "other_sessions_cpu_busy": true,
+    "other_sessions_modified": false
+  },
+  "interpretation": "Two timeout failures under measured resource contention. No numerical assertion failure observed; this command did not qualify the workstation. Unrun modules and checks remain required.",
+  "private_data_used": false
+}
