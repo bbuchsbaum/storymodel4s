@@ -33,6 +33,8 @@ ThisBuild / scmInfo := Some(
 
 ThisBuild / scalaVersion := Scala3
 ThisBuild / crossScalaVersions := Seq(Scala3)
+// A binary selector (3) is ambiguous across independently pinned external source builds.
+ThisBuild / githubWorkflowScalaVersions := Seq(Scala3)
 ThisBuild / tlJdkRelease := Some(11)
 ThisBuild / githubWorkflowJavaVersions := Seq(
   JavaSpec.temurin("17"),

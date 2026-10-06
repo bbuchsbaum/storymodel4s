@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { extractExampleOutput } from './sbt-output.mjs';
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repositoryRoot = resolve(siteRoot, '..');
@@ -54,10 +55,6 @@ function quoteForSbt(path) {
   return path.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
 }
 
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 const byProject = Map.groupBy(manifest.examples, (entry) => entry.project);
 for (const [project, entries] of byProject) {
   const sources = entries
@@ -66,6 +63,7 @@ for (const [project, entries] of byProject) {
   const args = [
     ...grakernOverride,
     '-Dsbt.supershell=false',
+    '-Dsbt.log.noformat=true',
     `project ${project}`,
     `set Compile / unmanagedSources ++= Seq(${sources})`,
     ...entries.map((entry) => `runMain ${entry.main}`),
@@ -82,13 +80,7 @@ for (const [project, entries] of byProject) {
   }
 
   for (const entry of entries) {
-    const marker = new RegExp(`^\\[info\\] running ${escapeRegex(entry.main)}(?: .*)?$`, 'm');
-    const match = marker.exec(transcript);
-    if (!match) throw new Error(`could not find sbt run marker for ${entry.main}`);
-    const start = transcript.indexOf('\n', match.index) + 1;
-    const end = transcript.indexOf('[success]', start);
-    if (end < 0) throw new Error(`could not find sbt success marker after ${entry.main}`);
-    const actual = transcript.slice(start, end);
+    const actual = extractExampleOutput(transcript, entry.main);
     const expected = readFileSync(resolve(siteRoot, entry.output), 'utf8');
     if (actual !== expected) {
       let firstDifference = 0;
