@@ -86,8 +86,8 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
   *
   * Historical runtime math produced identical Mac JVM/JS bytes and five adjacent-bit Native
   * differences. Those original resources and their pins remain intact. The owned producer is
-  * qualified to reproduce the historical Mac JVM bytes on every target; current expectations
-  * select Portable unconditionally, never by platform or observed output.
+  * qualified to reproduce the historical Mac JVM bytes on every target; current expectations select
+  * Portable unconditionally, never by platform or observed output.
   *
   * `encodedV4` is the SHA-256 of the canonical encoding; `goldenFile` of the committed resource,
   * which is that encoding plus one terminal newline; `withoutSupport` of the artifact with

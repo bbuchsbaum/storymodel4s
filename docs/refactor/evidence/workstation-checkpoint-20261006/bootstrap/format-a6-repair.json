@@ -1,0 +1,42 @@
+{
+  "candidate": "a6c27212d9da06c242d9b8c5ad66b8a675eee9a3",
+  "hosted_run": 37521362845,
+  "hosted_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37521362845",
+  "failure": "scalafmtCheckAll: two fixtures test files were not formatted; numerical acceptance did not run to completion",
+  "changed_files": [
+    "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala",
+    "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala"
+  ],
+  "golden_resources_changed": false,
+  "format_run": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T19:52:35.071797+00:00",
+    "finished_utc": "2026-10-06T19:52:47.807606+00:00",
+    "duration_seconds": 12.73573,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.log.noformat=true",
+      "scalafmtAll",
+      "scalafmtSbt",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/whole-tree-format-a6.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 600.0,
+    "log_bytes": 3032
+  },
+  "hosted-format-a6-red.log.gz": {
+    "sha256_uncompressed": "64f54b122f23262fa32645d53a08a28b9983580f1be2b4b403926bfe7befdb9e",
+    "bytes_uncompressed": 432465
+  },
+  "whole-tree-format-a6.log.gz": {
+    "sha256_uncompressed": "6564573aad88d5125ce3790a12868effcb2173650dfb844e82613f214e87b99a",
+    "bytes_uncompressed": 3032
+  }
+}
