@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Copy an explicit private asset selection to an owner-approved development host.
 
-Python 3.9+, POSIX, SSH. Metadata and errors are private; stdout contains counts/digests only.
+Python 3.9+, POSIX, SSH. Stdout contains counts/digests and committed placement fields only.
 The ready marker admits bytes at this machine/root, never a new corpus use or study partition.
 """
 import argparse
@@ -26,6 +26,11 @@ READ = os.O_RDONLY | os.O_NOFOLLOW
 
 class Refusal(Exception):
     pass
+
+
+class PrivateArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise Refusal()
 
 
 def require(condition):
@@ -395,7 +400,7 @@ def client(args):
 
 def main():
     os.umask(0o077)
-    p = argparse.ArgumentParser(description=__doc__)
+    p = PrivateArgumentParser(description=__doc__)
     p.add_argument("action", nargs="?", choices=["plan", "transfer", "verify", "check-local"])
     p.add_argument("--destination", default="buc-gw01")
     p.add_argument("--root")
@@ -405,8 +410,8 @@ def main():
     p.add_argument("--execute", action="store_true")
     p.add_argument("--receive", choices=["identity", "status", "put", "finalize", "verify"], help=argparse.SUPPRESS)
     p.add_argument("--machine", help=argparse.SUPPRESS)
-    args = p.parse_args()
     try:
+        args = p.parse_args()
         if args.receive:
             require(machine() == args.machine)
             if args.receive == "identity":

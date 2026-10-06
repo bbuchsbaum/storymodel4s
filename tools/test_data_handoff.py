@@ -233,6 +233,13 @@ class HandoffTests(unittest.TestCase):
         self.assertNotIn("identifying", err.getvalue())
         self.assertNotIn("secret", err.getvalue())
 
+    def test_argument_error_contains_no_private_filename(self):
+        out, err = io.StringIO(), io.StringIO()
+        with patch.object(h.sys, "argv", ["data_handoff.py", "transfer", "--unexpected", "SYNTHETIC_IDENTIFYING_FILENAME"]), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            self.assertEqual(h.main(), 2)
+        self.assertEqual(out.getvalue(), "")
+        self.assertNotIn("SYNTHETIC_IDENTIFYING_FILENAME", err.getvalue())
+
     def test_client_execute_streams_selected_bytes_and_verify(self):
         policy, args, tool = self.client_fixture()
         def committed(repo, path):
