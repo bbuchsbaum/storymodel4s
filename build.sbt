@@ -48,6 +48,7 @@ ThisBuild / githubWorkflowJavaVersions := Seq(
 ThisBuild / tlCiReleaseBranches := Seq()
 ThisBuild / tlCiReleaseTags := false
 ThisBuild / githubWorkflowArtifactUpload := false
+ThisBuild / githubWorkflowIncludeClean := false
 ThisBuild / tlCiHeaderCheck := false
 ThisBuild / tlCiDependencyGraphJob := false
 
