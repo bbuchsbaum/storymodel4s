@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-25T09:16:21.851024+00:00",
+  "finished_utc": "2026-09-25T09:17:45.713459+00:00",
+  "duration_seconds": 83.861456,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "propositionJVM/testOnly *SemanticGraphCourtSuite",
+    "alignJVM/testOnly *ContentUnforgeableSuite *ContentSurfaceSuite *ContentBehaviorLawsSuite *ContentScoringSuite *ContentProjectionSuite",
+    "propositionJVM/Test/scalafmt",
+    "alignJVM/Test/scalafmt"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2a4-0925",
+  "log": "/private/tmp/s2a4-baseline.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 4431
+}

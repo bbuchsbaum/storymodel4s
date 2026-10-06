@@ -71,7 +71,19 @@ class SemanticGraphCourtSuite extends FunSuite:
   }
 
   test("construction doors are closed on SemanticGraph and ContentCompatibilityReport") {
-    // Same-shape controls: a public report class with the same fields exposes all four doors.
+    compiles(
+      typeCheckErrors(
+        "new OpenSemanticGraph[GraphOrder.Canonical](???, ???, ???, ???, ???, ???, ???, ???, ???)"
+      ),
+      "same-field graph constructor"
+    )
+    compiles(
+      typeCheckErrors(
+        "new OpenContentReport(0.0, 0.0, 0.0, Set(GateReading(false, false, false)), true)"
+      ),
+      "same-field content report constructor"
+    )
+    // The historical report supplies precompiled case-class construction controls.
     compiles(
       typeCheckErrors("new CompatibilityReport(0.0, 0.0, 0.0, false, false, false, Vector.empty)"),
       "new CompatibilityReport"
@@ -86,7 +98,9 @@ class SemanticGraphCourtSuite extends FunSuite:
       "Mirror.ProductOf[CompatibilityReport]"
     )
     refused(
-      typeCheckErrors("new ContentCompatibilityReport(0.0, 0.0, 0.0, false, false, false, true)"),
+      typeCheckErrors(
+        "new ContentCompatibilityReport(0.0, 0.0, 0.0, Set(GateReading(false, false, false)), true)"
+      ),
       "new ContentCompatibilityReport"
     )
     refused(typeCheckErrors("report.copy()"), "ContentCompatibilityReport.copy")
@@ -102,7 +116,7 @@ class SemanticGraphCourtSuite extends FunSuite:
     )
     refused(
       typeCheckErrors(
-        "new SemanticGraph[GraphOrder.Canonical](Vector(), Vector(), Vector(), Vector(), Vector(), Vector(), Vector(), Vector())"
+        "new SemanticGraph[GraphOrder.Canonical](???, ???, ???, ???, ???, ???, ???, ???, ???)"
       ),
       "new SemanticGraph"
     )
