@@ -220,7 +220,7 @@ final class PopulationAggregate private (
     subjectIds
       .flatMap { s =>
         bySubject(s).result.flow.steps.flatMap { step =>
-          step.mass.toVector.flatMap { case ((x, y), m) =>
+          step.mass.toVector.sortBy { case ((x, y), _) => (x.key, y.key) }.flatMap { case ((x, y), m) =>
             x.anchor.zip(y.anchor).filter(_ => m > 0.0).map(ab => (ab, m))
           }
         }

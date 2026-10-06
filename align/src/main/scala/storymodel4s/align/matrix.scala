@@ -258,8 +258,8 @@ final class AlignmentMatrix private[align] (val rows: Vector[AlignmentRow]):
   /** Aggregate distorted mass per anchor. */
   def distortedColumnMass: Map[SourceNodeRef, Double] =
     rows
-      .flatMap(_.mass.toVector.sortBy(_._1.key).collect {
-        case (AlignState.Distorted(r, _), m) => (r, m)
+      .flatMap(_.mass.toVector.sortBy(_._1.key).collect { case (AlignState.Distorted(r, _), m) =>
+        (r, m)
       })
       .sortBy(_._1.key)
       .groupMapReduce(_._1)(_._2)(_ + _)

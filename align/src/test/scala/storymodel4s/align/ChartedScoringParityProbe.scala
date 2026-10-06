@@ -8,7 +8,7 @@ import storymodel4s.proposition.CheckState.Checked
 /** Regression guard, not a positive control: pins today's CHARTED scoring path before the S2a port
   * (mote bd-01M379K5TYZVCC5YMWX2F242CA). The existing parity pins use a chart-free fixture, so
   * chart compatibility, chart-derived contradictions and structural reductions had no byte witness.
-  * JVM-only, like `LocalEvidenceParityProbe`: these are exact bit pins.
+  * These unchanged historical Mac JVM pins now qualify the owned producer on every target.
   *
   * The fixture includes a member chart with two same-lemma predicates (one negated, one embedded
   * under speech), and a segment whose leaves both carry charts.

@@ -415,7 +415,8 @@ object RecallSignature:
     val visitation = leafVisitation(p, view)
     val uniform = if leaves.isEmpty then 0.0 else leaves.map(visitation).sum / leaves.size
     // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
-    val importance = view.leaves.sortBy(_.ref.key).flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
+    val importance =
+      view.leaves.sortBy(_.ref.key).flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
     val weightedNumerator = importance.map { case (r, w) => w * visitation(r) }.sum
     val weighted = WeightedCoverage.of(weightedNumerator, importance.map(_._2), leaves.size)
 

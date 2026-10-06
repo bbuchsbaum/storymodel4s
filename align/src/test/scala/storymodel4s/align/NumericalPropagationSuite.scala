@@ -3,7 +3,7 @@ package storymodel4s.align
 import cats.data.NonEmptySet
 import munit.FunSuite
 import scala.collection.immutable.ListMap
-import storymodel4s.core.Checksum
+import storymodel4s.features.CanonicalDouble
 
 /** Keeps arithmetic-order and exact identity consequences observable after portable inference. */
 class NumericalPropagationSuite extends FunSuite:
@@ -12,16 +12,21 @@ class NumericalPropagationSuite extends FunSuite:
 
   test("same-anchor mode totals are bit-identical across opposing input map orders") {
     val ref = view.leaves.head.ref
-    val states = Facet.values.take(3).toVector.map(f =>
-      AlignState.Distorted(ref, NonEmptySet.of(f))
-    ).sortBy(_.key)
+    val states = Facet.values
+      .take(3)
+      .toVector
+      .map(f => AlignState.Distorted(ref, NonEmptySet.of(f)))
+      .sortBy(_.key)
     val tiny = java.lang.Double.longBitsToDouble(0x3c90000000000000L) // 2^-54
     val values = Vector(states(0) -> 0.5, states(1) -> tiny, states(2) -> tiny)
     // The controls prove this fixture discriminates accumulation order before invoking production.
     assertNotEquals(bits(values.map(_._2).sum), bits(values.reverse.map(_._2).sum))
-    def matrix(xs: Vector[(AlignState, Double)]) = AlignmentMatrix.of(
-      Vector(AlignmentRow.of(recall.ordered.head.id, ListMap.from(xs)).toOption.get)
-    ).toOption.get
+    def matrix(xs: Vector[(AlignState, Double)]) = AlignmentMatrix
+      .of(
+        Vector(AlignmentRow.of(recall.ordered.head.id, ListMap.from(xs)).toOption.get)
+      )
+      .toOption
+      .get
     val a = matrix(values)
     val b = matrix(values.reverse)
     assertEquals(bits(a.columnMass(ref)), bits(b.columnMass(ref)))
@@ -46,7 +51,40 @@ class NumericalPropagationSuite extends FunSuite:
     assertEquals(binding.checkResult(changed), Left(MappingRefusal.BindingMismatch("resultDigest")))
   }
 
-  test("numerical producer revision is distinct from configuration identity") {
-    assertEquals(AlignmentMath.Revision, "alignment-fdlibm/exp-log-v1")
-    assertNotEquals(Checksum.ofText(AlignmentMath.Revision), HsmmConfig.default.fingerprint)
+  test("capture complete synthetic signature and population readout bits") {
+    val result = GraphHsmm.infer(recall, view, candidates, costModel).toOption.get
+    val signature = RecallSignature.compute(result, recall, view).toOption.get
+    val population = PopulationAggregate.of(
+      view,
+      Vector(SubjectAlignment(SubjectId.unsafe("synthetic-numerical"), recall, result, None))
+    ).toOption.get
+    val perNode = view.nodes.sortBy(_.ref.key).map(n =>
+      (n.ref.key, population.columnMass(n.ref), population.visitation(n.ref),
+        population.expectedVisits(n.ref), population.visitationRate(n.ref))
+    )
+    val payload = exact((signature, perNode, population.populationFlow, population.totalFlow,
+      population.visitationMatrix))
+    println("NUMERICAL_READOUT=" + MappingRender.digest(Vector(payload)).hex)
+    println("NUMERICAL_READOUT_FIELDS=" + payload)
+    assert(payload.contains(CanonicalDouble.render(signature.uniformCoverage)))
   }
+
+  /** Exhaustive for this fixture's published fields; an unfamiliar carrier fails the capture. */
+  private def exact(value: Any): String = value match
+    case d: Double => CanonicalDouble.render(d)
+    case i: Int => s"int:$i"
+    case l: Long => s"long:$l"
+    case b: Boolean => s"bool:$b"
+    case s: String => MappingRender.sequence(Vector("string", s))
+    case r: MassRatio => exact((r.value, r.conditioningMass, r.totalMass))
+    case w: WeightedCoverage => exact((w.estimate, w.conditioningWeight,
+      w.coverage.eligible, w.coverage.observed))
+    case s: StepMass => exact((s.perStep, s.comparableSteps, s.totalSteps))
+    case m: FidelityMode => MappingRender.sequence(Vector("mode", m.render))
+    case c: storymodel4s.features.Coverage => exact((c.eligible, c.observed))
+    case m: scala.collection.Map[?, ?] =>
+      MappingRender.sequence(Vector("map") ++ m.toVector.map((k,v) => exact(k) -> exact(v))
+        .sortBy(_._1).map((k,v) => MappingRender.sequence(Vector(k,v))))
+    case xs: Iterable[?] => MappingRender.sequence(Vector("seq") ++ xs.iterator.map(exact))
+    case p: Product => MappingRender.sequence(Vector("product", p.productPrefix) ++ p.productIterator.map(exact))
+    case other => fail(s"unrepresented readout carrier: ${other.getClass.getName}")

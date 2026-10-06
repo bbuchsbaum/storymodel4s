@@ -854,12 +854,16 @@ object GraphHsmm:
           sources.map(t => t -> TransitionFeatures.between(view, a, t.anchor.get).score(model))
         val z = logSumExp(scores.map(_._2))
         val src = scores.map { case (t, sc) => t -> (AlignmentMath.log(1.0 - pIn) + sc - z) }
-        val ext = externals.map(t => t -> (AlignmentMath.log(pIn) - AlignmentMath.log(nExt.toDouble)))
+        val ext =
+          externals.map(t => t -> (AlignmentMath.log(pIn) - AlignmentMath.log(nExt.toDouble)))
         (src ++ ext).toMap
       case None =>
         val pStay = if sources.isEmpty then 1.0 else model.pExternalStay
-        val src = sources.map(t => t -> (AlignmentMath.log(1.0 - pStay) - AlignmentMath.log(sources.size.toDouble)))
-        val ext = externals.map(t => t -> (AlignmentMath.log(pStay) - AlignmentMath.log(nExt.toDouble)))
+        val src = sources.map(t =>
+          t -> (AlignmentMath.log(1.0 - pStay) - AlignmentMath.log(sources.size.toDouble))
+        )
+        val ext =
+          externals.map(t => t -> (AlignmentMath.log(pStay) - AlignmentMath.log(nExt.toDouble)))
         (src ++ ext).toMap
 
   private def viterbi(
@@ -892,7 +896,8 @@ object GraphHsmm:
     if xs.isEmpty then Double.NegativeInfinity
     else
       val m = xs.max
-      if m.isNegInfinity then m else m + AlignmentMath.log(xs.map(x => AlignmentMath.exp(x - m)).sum)
+      if m.isNegInfinity then m
+      else m + AlignmentMath.log(xs.map(x => AlignmentMath.exp(x - m)).sum)
 
 /** Relation-preservation term `D_r(B^{(r)}, P A^{(r)} P^T)` restricted to explicit recall
   * relations. Used as a diagnostic and as an optional corrective on emissions.
