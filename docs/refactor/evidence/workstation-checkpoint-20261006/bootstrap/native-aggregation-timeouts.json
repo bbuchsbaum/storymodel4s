@@ -1,0 +1,61 @@
+{
+  "candidate": "ec37ad4cc9ac1cae9db2d68c0e9249ca3f82b7b0",
+  "run": 37522460856,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37522460856",
+  "cells": [
+    {
+      "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "test_cells_with_complete_totals": 16,
+      "counts_from_complete_totals": {
+        "passed": 2755,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "test_cells_with_complete_totals": 21,
+      "counts_from_complete_totals": {
+        "passed": 3096,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 5
+      }
+    },
+    {
+      "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "test_cells_with_complete_totals": 16,
+      "counts_from_complete_totals": {
+        "passed": 2749,
+        "failed": 6,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "test_cells_with_complete_totals": 18,
+      "counts_from_complete_totals": {
+        "passed": 1985,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 5
+      }
+    }
+  ],
+  "native_failures": [
+    "2026-10-06T20:09:03.0432889Z ==> X storymodel4s.align.MappingResultSuite.Assessed on a non-Declared target refuses 31.274s java.util.concurrent.TimeoutException: test timed out after 30 seconds",
+    "2026-10-06T20:09:22.5391037Z ==> X storymodel4s.proposition.SemanticCompatibilitySuite.an exhausted canonical budget is refused, never ordered by id 56.418s java.util.concurrent.TimeoutException: test timed out after 30 seconds",
+    "2026-10-06T20:10:01.7052697Z ==> X storymodel4s.align.MappingMeasuresSuite.fidelity on the link's own unit 32.844s java.util.concurrent.TimeoutException: test timed out after 30 seconds",
+    "2026-10-06T20:12:46.5101686Z ==> X storymodel4s.align.MappingHistoricalSuite.historical posterior is bit-equal to the supplied result 30.904s java.util.concurrent.TimeoutException: test timed out after 30 seconds",
+    "2026-10-06T20:13:33.2489538Z ==> X storymodel4s.align.MappingHistoricalSuite.external links remain NotApplicable 30.814s java.util.concurrent.TimeoutException: test timed out after 30 seconds",
+    "2026-10-06T20:14:05.8689973Z ==> X storymodel4s.align.MappingHistoricalSuite.missing breakdown refuses 32.619s java.util.concurrent.TimeoutException: test timed out after 30 seconds"
+  ],
+  "diagnosis": "Per-project parallelExecution=false leaves different aggregate project test tasks concurrent. Raw log shows proposition/align/laws Native binaries overlap; six named30s timeouts, no numerical comparison failure. Serialization is to be qualified without changing the timeout/assertions.",
+  "remedy": "Explicit testNative serial alias for the generated Native Test step, preserving all sixteen modules and all other CI steps.",
+  "documentation": "https://www.scala-sbt.org/1.x/docs/Parallel-Execution.html",
+  "raw_log_bytes": 1432130,
+  "raw_log_sha256": "c31764f8f9f5d14ed2fc362b6d85c0f0d78c0b7b6e04e24eefd4758c54022a17",
+  "totals_boundary": "Concurrent terminal output may interleave totals; these are the complete parsed totals only, not an invented complete module count. Six named failed Native tests are independently retained below."
+}

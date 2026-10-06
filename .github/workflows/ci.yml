@@ -89,7 +89,12 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/nativeLink
 
       - name: Test
+        if: matrix.project != 'rootNative'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
+
+      - name: Test Native serially
+        if: matrix.project == 'rootNative'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' testNative
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'

@@ -1,0 +1,59 @@
+{
+  "source_parent": "515b1609ede38ad68f104630e43a47cf448c890c",
+  "native_alias_commands": [
+    "coreNative/test",
+    "propositionNative/test",
+    "amrInteropNative/test",
+    "featuresNative/test",
+    "acquireNative/test",
+    "storyNative/test",
+    "documentNative/test",
+    "recallNative/test",
+    "alignNative/test",
+    "interviewNative/test",
+    "embedCoreNative/test",
+    "viewNative/test",
+    "codecNative/test",
+    "corpusNative/test",
+    "fixturesNative/test",
+    "lawsNative/test"
+  ],
+  "covers_all_portable_modules_exactly_once": true,
+  "test_timeout_unchanged": true,
+  "assertions_unchanged": true,
+  "native_link_unchanged": true,
+  "jvm_js_test_command_unchanged": true,
+  "conditions": [
+    "matrix.project != 'rootNative'",
+    "matrix.project == 'rootNative'"
+  ],
+  "plugin": "sbt-typelevel0.8.7 supported WorkflowStep.Sbt.withCommands/withCond",
+  "mechanism": "alias executes each explicit module command sequentially; no reliance on cross-project test-task tags",
+  "run": {
+    "schema_version": 1,
+    "started_utc": "2026-10-06T20:24:10.103003+00:00",
+    "finished_utc": "2026-10-06T20:24:22.681379+00:00",
+    "duration_seconds": 12.578099,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dsbt.log.noformat=true",
+      "githubWorkflowGenerate",
+      "alias testNative",
+      "scalafmtSbt",
+      "scalafmtSbtCheck",
+      "githubWorkflowCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/checkpoint-20261006/native-ci-generate.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 600.0,
+    "log_bytes": 1934
+  },
+  "raw_log_sha256": "d039f30b90a2c39b88b8059a21f58736f147ecb549c636663b73c78c7268a50a",
+  "raw_log_bytes": 1934,
+  "runtime_acceptance": "pending the new exact-SHA hosted16-cell Native run and full workstation gate"
+}

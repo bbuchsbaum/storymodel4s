@@ -54,6 +54,27 @@ ThisBuild / githubWorkflowIncludeClean := false
 ThisBuild / tlCiHeaderCheck := false
 ThisBuild / tlCiDependencyGraphJob := false
 
+// Per-project parallelExecution does not serialize aggregate Native test binaries on CI.
+// Keep every court and its timeout; run the existing portable modules one at a time instead.
+ThisBuild / githubWorkflowBuild ~= { steps =>
+  def isTest(step: WorkflowStep): Boolean = step match {
+    case s: WorkflowStep.Sbt => s.name.contains("Test") && s.commands == List("test")
+    case _                   => false
+  }
+  require(steps.count(isTest) == 1, "Expected exactly one generated Test step")
+  steps.flatMap {
+    case s: WorkflowStep.Sbt if isTest(s) =>
+      require(s.cond.isEmpty, "Generated Test condition changed")
+      List(
+        s.withCond(Some("matrix.project != 'rootNative'")),
+        s.withCommands(List("testNative"))
+          .withName(Some("Test Native serially"))
+          .withCond(Some("matrix.project == 'rootNative'"))
+      )
+    case other => List(other)
+  }
+}
+
 // Run the independent exchange readers and synthetic media planner courts in generated CI.
 ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
   List(
@@ -552,5 +573,9 @@ addCommandAlias(
   "testJVM",
   (allModules.map(m => s"${m}JVM/test") ++ jvmOnlyModules.map(m => s"$m/test"))
     .mkString(";", ";", "")
+)
+addCommandAlias(
+  "testNative",
+  allModules.map(m => s"${m}Native/test").mkString(";", ";", "")
 )
 addCommandAlias("checkAll", ";compileAll;testAll;scalafmtCheckAll;scalafmtSbtCheck")
