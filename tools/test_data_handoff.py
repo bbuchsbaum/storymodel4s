@@ -46,9 +46,11 @@ class HandoffTests(unittest.TestCase):
         self.assertEqual(self.receiver.verify(), r)
 
     def test_unapproved_destination_refused_before_transport(self):
+        destination = {"approved": False, "approval_basis": "synthetic", "ssh_target": "synthetic.invalid",
+                       "host_key_alias": "synthetic", "machine": "DESTINATION", "root": self.root}
         with patch.object(h, "ssh_call") as ssh:
             with self.assertRaises(h.Refusal):
-                h.policy_destination({"schema": 1, "destinations": {"x": {"approved": False}}}, "x")
+                h.policy_destination({"schema": 1, "destinations": {"x": destination}}, "x")
             ssh.assert_not_called()
 
     def test_wrong_actual_machine_refused_before_root_creation(self):
