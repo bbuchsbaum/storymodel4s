@@ -1,0 +1,17 @@
+{
+  "gh_path": "/Users/bbuchsbaum/.local/bin/gh",
+  "gh_dispatcher": "/Users/bbuchsbaum/.codex/skills/github-account-switch/scripts/gh-dispatch",
+  "gh_api": {
+    "storymodel4s": {
+      "auth_status_exit": 0,
+      "user_exit": 0,
+      "expected_login_matches": true
+    },
+    "storyatlas4s": {
+      "auth_status_exit": 0,
+      "user_exit": 0,
+      "expected_login_matches": true
+    }
+  },
+  "power_settings": "AC Power:\n Sleep On Power Button 1\n lowpowermode         0\n standby              0\n ttyskeepawake        1\n powernap             1\n displaysleep         0\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n autorestart          0\n disksleep            10"
+}

@@ -1,0 +1,61 @@
+{
+  "run": 37521362926,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37521362926",
+  "candidate": "a6c27212d9da06c242d9b8c5ad66b8a675eee9a3",
+  "scope": "five independent-reference kernel tests per cell; production HSMM acceptance is in the separate full integrated matrix",
+  "cells": [
+    {
+      "name": "Kernel (alignJVM, Java 21)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37521362926/job/112467300811",
+      "counts": {
+        "total": 5,
+        "failed": 0,
+        "errors": 0,
+        "passed": 5,
+        "skipped": 0
+      },
+      "conclusion": "success"
+    },
+    {
+      "name": "Kernel (alignJVM, Java 17)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37521362926/job/112467301210",
+      "counts": {
+        "total": 5,
+        "failed": 0,
+        "errors": 0,
+        "passed": 5,
+        "skipped": 0
+      },
+      "conclusion": "success"
+    },
+    {
+      "name": "Kernel (alignNative, Java 17)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37521362926/job/112467301215",
+      "counts": {
+        "total": 5,
+        "failed": 0,
+        "errors": 0,
+        "passed": 5,
+        "skipped": 0
+      },
+      "conclusion": "success"
+    },
+    {
+      "name": "Kernel (alignJS, Java 17)",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37521362926/job/112467301238",
+      "counts": {
+        "total": 5,
+        "failed": 0,
+        "errors": 0,
+        "passed": 5,
+        "skipped": 0
+      },
+      "conclusion": "success"
+    }
+  ],
+  "passed": 20,
+  "failed": 0,
+  "skipped": 0,
+  "raw_log_bytes": 267209,
+  "raw_log_sha256": "c70a6d65a861d77feba695e4114b8c1493cf396f505b0d8021a58a702070d925"
+}

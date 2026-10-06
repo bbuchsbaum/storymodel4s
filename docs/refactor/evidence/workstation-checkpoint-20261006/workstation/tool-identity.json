@@ -1,0 +1,9 @@
+{
+  "machine": "BUC-GW01",
+  "os": "macOS-15.1.1-arm64-arm-64bit",
+  "architecture": "arm64",
+  "mote_binary": "/Users/bbuchsbaum/.cargo/bin/mote",
+  "mote_sha256": "7c391698851d3edf6ea4a7195e4f15f5573657b19e8534eba4522ee08e63b5c0",
+  "mote_version": "mote 0.1.0",
+  "mote_bytes": 6508432
+}

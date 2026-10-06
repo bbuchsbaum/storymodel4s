@@ -1,0 +1,69 @@
+{
+  "candidate": "ec37ad4cc9ac1cae9db2d68c0e9249ca3f82b7b0",
+  "run": 37522460937,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37522460937",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "Verify docs site",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37522460937/job/112471179100",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install site dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install the pinned Playwright browser",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup Java (temurin@17)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Setup sbt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "raw_log_bytes": 107079,
+  "raw_log_sha256": "926c6861cc59bf0d5babcc284ee814d3e7d3832fd3639593b93f2dce210f1450",
+  "scope": "complete committed documentation verify command, including exact example replay, parser tests, diagrams/build, and hosted browser verification"
+}
