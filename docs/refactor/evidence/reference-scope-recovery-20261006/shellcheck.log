@@ -1,0 +1,3 @@
+COMMAND=shellcheck tools/reference-scope.sh tools/reference-scope-test.sh
+
+GATE_EXIT=0

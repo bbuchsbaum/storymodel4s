@@ -1,0 +1,4 @@
+COMMAND=bash tools/reference-scope-test.sh
+PASS: reference-scope regression court (98 assertions)
+
+GATE_EXIT=0

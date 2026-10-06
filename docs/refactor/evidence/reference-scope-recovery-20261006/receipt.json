@@ -1,0 +1,65 @@
+{
+  "observed_utc": "2026-10-06T16:10:08.057220+00:00",
+  "candidate": "c3f33c14744ea09c5d4a8bf6df0ca46e9748ec97",
+  "base": "1f3254b599db1027cf9e78176613756eb6396c85",
+  "recovered_from": "ed9f478daba90d1728ce584b2a896f5a88be9b26",
+  "environment": "standalone shared clone at exact candidate; only synthetic repositories",
+  "assertions": {
+    "passed": 98,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline_control": "expected exit 1 at named changed-top-level-def assertion; baseline returned 0 instead of 5",
+  "commands": [
+    {
+      "name": "syntax",
+      "command": [
+        "bash",
+        "-n",
+        "tools/reference-scope.sh",
+        "tools/reference-scope-test.sh"
+      ],
+      "exit": 0,
+      "log": "syntax.log",
+      "sha256": "4bd6366aacd886a5856efcb5497d3a7a1ad2ff325b6e1d18d47f7a8a4c898c1a"
+    },
+    {
+      "name": "shellcheck",
+      "command": [
+        "shellcheck",
+        "tools/reference-scope.sh",
+        "tools/reference-scope-test.sh"
+      ],
+      "exit": 0,
+      "log": "shellcheck.log",
+      "sha256": "e6dfbcc42038215ef05dd8095279e5d024919d0ee23a314d8cce2d147394983e"
+    },
+    {
+      "name": "regression",
+      "command": [
+        "bash",
+        "tools/reference-scope-test.sh"
+      ],
+      "exit": 0,
+      "log": "regression.log",
+      "sha256": "2978e99dc1d39da3a293530153f40d6a47803dbe375408e5ea5c1bbc09b74aaa"
+    },
+    {
+      "name": "baseline-control",
+      "command": [
+        "bash",
+        "tools/reference-scope-test.sh"
+      ],
+      "exit": 1,
+      "log": "baseline-control.log",
+      "sha256": "e738093b259efa8c1616d0dac2d07cca9260af64e1b0f2632f269fcab81f68a2",
+      "environment_override": {
+        "REFERENCE_SCOPE_SCRIPT": "/private/tmp/storymodel4s-scope-recovery-ifj6ztk_/baseline-reference-scope.sh"
+      }
+    }
+  ],
+  "source_files": {
+    "tools/reference-scope.sh": "1958d7ce4c582b9b283114bccf94df171c7a26e7",
+    "tools/reference-scope-test.sh": "93efb5f49cd8945fe482deba6fd7301372cc00a7"
+  }
+}

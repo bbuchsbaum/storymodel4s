@@ -1,0 +1,5 @@
+COMMAND=bash tools/reference-scope-test.sh
+FAIL: changed top-level def: expected exit 5, got 0
+no types defined in changed files
+
+GATE_EXIT=1
