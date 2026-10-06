@@ -44,7 +44,9 @@ The approved workstation is `BUC-GW01`, reached through Tailscale at
 `buc-gw01.tail5f873d.ts.net`. SSH, macOS15.1.1/ARM64, toolchain/storage, separate Git/API account
 routing and private-data readback are verified. The exact433 source baseline is green on the
 workstation and in hosted CI. Exactd67 StoryAtlas/default433 pin, public WOG/Bell exports and
-independent hash readback also pass. Final integration/main parity are recorded separately.
+independent hash readback also pass. Reviewed checkpoint23d0c73c/22bf1f50 was published
+without force, with local/tracking/live parity and clean approved-host main readback recorded
+in the checkpoint; numerical, CI-execution and consumer-pin tickets are closed after landing.
 The [checkpoint index](evidence/workstation-checkpoint-20261006/README.md) binds revisions,
 commands, passed/failed/skipped totals, preserved failures, private handoff and the resume state.
 

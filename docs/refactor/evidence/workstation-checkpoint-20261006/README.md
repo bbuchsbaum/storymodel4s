@@ -3,8 +3,11 @@
 The numerical implementation is qualified by the full hosted matrix at
 `433aa1056f6aa5e88b63b4b665079e9959a266ae`. The matching StoryAtlas consumer is
 `d67dccfb7eec07e184ce3ef8fe6ccc16c3745523`, whose declared source pin is that producer.
-Source and exact-consumer workstation acceptance are complete. Final integration review and
-GitHub main synchronization remain pending.
+Source and exact-consumer qualification, independent review and non-force publication are
+complete. The reviewed checkpoint was published as source23d0c73c and consumer22bf1f50;
+subsequent tracker/receipt commits are gate-inert descendants of the same qualified code.
+[Remote parity](workstation/remote-parity.json) and [workstation main readback](workstation/main-readback.json)
+record the observed local/tracking/live equality and clean approved-host checkouts.
 
 ## Qualified hosted code
 
@@ -27,7 +30,7 @@ propagation/record captures are described in [ADR0023](../../../adr/0023-portabl
 and the numerical receipts. This establishes fixed-input engineering determinism on qualified
 targets. It does not establish corpus-level scientific validity.
 
-## Workstation acceptance still in progress
+## Qualified workstation
 
 `buc-gw01.tail5f873d.ts.net` authenticates as `BUC-GW01`: macOS15.1.1/ARM64, 10 CPU cores,
 32GiB RAM, Temurin21.0.12.1+1, Node24.21.0, Apple Clang16 and Python3.9.6. Repo-local Git identity,
@@ -68,9 +71,10 @@ checks. Complete status/log and both export receipt bodies are retained in the c
 qualification, without Atlas browser interaction or private-corpus inference claims.
 Owned job state and full logs live under
 `~/.local/share/storymodel4s/checkpoints/20261006/` on BUC-GW01, outside temporary directories.
-The next session reads `integrated-producer-04-status.json` and
-`integrated-consumer-04-status.json` before starting anything. A failed or incomplete status
-is not permission to duplicate the gate. Other sessions' processes are left untouched.
+Both `integrated-producer-04-status.json` and `integrated-consumer-04-status.json` completed0;
+the owned gate/watcher jobs have finished. Read saved completions before repeating a gate.
+Other sessions' processes were left untouched. Both repositories now develop from independent
+clean `main` checkouts under `~/code/scala/`, with Mote doctor0 and ignored runtime directories.
 
 ## Recovery and private data
 
@@ -88,9 +92,22 @@ participant rows and data-bearing logs remain on approved storage. The handoff t
 unapproved hosts and conflicting bytes. The marker binds manifest identity, destination,
 root and complete byte counts; it does not widen corpus admission.
 
-Before final landing: independently review the completed suffix/consumer receipts and public
-output hashes at the exact evidence commits, fast-forward main without force in both repositories,
-verify live remote parity and update both workstation checkouts. Retain distinct engineering,
-private-reader, browser, scientific and release evidence boundaries. The next product work is
-the typed availability/abstention distinction and ordinary-file lexical/reference walkthrough
-from the existing queue, followed by pinned ONNX qualification.
+Independent reviewer `salvage_review` approved exact source23d0c73c/consumer22bf1f50 and
+independently rehashed all36 live public output files,32 bound entries, both receipt bodies,
+12 SVGs and five loaded source checkouts. Both histories fast-forwarded onto local main and
+were published without force; both workstation checkouts then read back clean on main.
+The approved private marker and all18 asset hashes were verified again after that handoff.
+The numerical, CI-execution and exact-consumer checkpoint tickets are closed after landing;
+the full S2a4, product/scientific and release tickets remain open.
+
+Continue with one primary writer and at most one helper. Use a host/session-specific Mote actor,
+`mote ready` and an existing bead; acquire ownership before editing. Public/synthetic development
+can use other machines. Private readers first run `tools/data_handoff.py check-local` against
+the approved root/manifest; new private-data machines need recorded owner approval and the same
+preview, resumable transfer and byte-verification path. No private manifest or credential store
+is copied through GitHub. Cross-machine writer handoff commits/pushes code and tracker state,
+releases ownership, and reacquires it from the destination checkout.
+
+The next product work is the typed availability/abstention distinction and ordinary-file
+lexical/reference walkthrough from the existing queue, followed by pinned ONNX qualification.
+Retain distinct engineering, private-reader, browser, scientific and release evidence boundaries.

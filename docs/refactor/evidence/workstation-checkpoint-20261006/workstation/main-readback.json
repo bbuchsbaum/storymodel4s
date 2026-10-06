@@ -1,0 +1,32 @@
+{
+  "utc": "2026-10-06T22:54:49.462114+00:00",
+  "machine": "BUC-GW01",
+  "repos": [
+    {
+      "repo": "storymodel4s",
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s",
+      "head": "23d0c73c5593865f0f9e5a2de249a502bef71b5e",
+      "branch": "main",
+      "clean": true,
+      "mote_doctor_exit": 0,
+      "runtime_paths_ignored": true
+    },
+    {
+      "repo": "storyatlas4s",
+      "path": "/Users/bbuchsbaum/code/scala/storyatlas4s",
+      "head": "22bf1f50f51d6187208e3e3be45df85da262f6e2",
+      "branch": "main",
+      "clean": true,
+      "mote_doctor_exit": 0,
+      "runtime_paths_ignored": true
+    }
+  ],
+  "private_readiness": {
+    "manifest_sha256": "1a66314bfe235165a8b2c54cf8f7ab6bc13df10cd925251c9865add6d2142c35",
+    "assets": 18,
+    "bytes": 276496625,
+    "verified": true
+  },
+  "private_rows_or_names_emitted": false,
+  "source_controller_completed": true
+}
