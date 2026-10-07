@@ -30,6 +30,47 @@ class AlignCodecSuite extends FunSuite:
     assert(!encoded.contains("supportWeight"), "the v3 numeric support leaked into v4")
   }
 
+  test("a ranked provider-ineligible structural receipt survives contextual wire roundtrip") {
+    import storymodel4s.features.{Coverage, Estimate}
+    import storymodel4s.proposition.*
+    val id = ConceptId.unsafe("event")
+    val chart = ChartValidator
+      .check(
+        PropositionChart.unchecked(Some(id), Map(id -> Concept.predicate("arrive")), Vector.empty)
+      )
+      .toOption
+      .get
+    val evidence = PropositionEvidence.hand(chart)
+    val view = fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(evidence = Some(evidence))))
+    val recall = RecallGraph
+      .validated(
+        fixture.recall.transcript,
+        fixture.recall.atlas,
+        fixture.recall.units.map(_.copy(evidence = Some(evidence))),
+        fixture.recall.relations
+      )
+      .toOption
+      .get
+    val model = DefaultLocalCostModel(
+      semantic = SemanticDistance.of((_, _) => 0.2),
+      structural = StructuralDistance((_, _) => Estimate.Ineligible)
+    )
+    val result = GraphHsmm.infer(recall, view, fixture.candidates, model).toOption.get
+    val cells = result.costs.values.toVector.flatMap(_.toVector.filter(!_._1.isExternal).map(_._2))
+    assert(cells.nonEmpty)
+    assert(cells.forall(!_.excluded))
+    assert(cells.forall(!_.missingTerms.contains(CostTerm.Structural)))
+    assert(
+      cells.forall(_.reductions(CostTerm.Structural).observedEstimateCoverage == Coverage.empty)
+    )
+    val document = HsmmResultCodec.encode(result).toOption.get
+    assert(
+      document.contains("\"ineligible\":true"),
+      "the provider outcome disappeared from the wire"
+    )
+    assertEquals(HsmmResultCodec.decode(document, recall, view), Right(result))
+  }
+
   test("a view-only change is rejected by the mandatory fingerprint match") {
     val changed = fixture.view.copy(scoringLength = fixture.view.scoringLength + 1)
     HsmmResultCodec.decode(encoded, fixture.recall, changed) match

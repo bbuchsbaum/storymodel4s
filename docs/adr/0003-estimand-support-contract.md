@@ -329,6 +329,13 @@ ineligibility. Coverage excludes ineligible outcomes while eligible missing outc
 denominator and missing-value policy. Nonempty, entirely ineligible support reduces to
 `Ineligible`; actually empty support retains `Missing(AllMissing)`. Validate policies and weights
 before either outcome, and preserve original sample positions and narrative distances.
+Lexical builders retain all tokens in the declared support, representing known nonlexical tokens
+as ineligible samples. This preserves kernel centres and lets punctuation-only nonempty support
+remain distinguishable from support containing no tokens. `AllTokens` preserves the underlying
+measure's eligibility rather than restoring ineligible values. An ineligible embedding endpoint
+makes its pairwise distance ineligible, including when its counterpart is eligible but missing.
+Source-leaf importance has a fixed eligible population; its checked constructor refuses
+`Ineligible` rather than silently changing the signature's denominator.
 
 The dedicated JSON tag is `{"ineligible":true}`. It consumes no sidecar row. Reject mixed
 estimate branches; preserve valid historical observed/missing encodings and do not reinterpret

@@ -242,15 +242,14 @@ object Windowed:
     )
     val red = WindowReducer.scalar(reducer)
     val outs = sequence.windows(plan).toVector.traverse { w =>
-      val eligible = w.tokenRange.indices.toVector.filter { i =>
-        eligibility match
-          case Eligibility.LexicalTokens => sequence.tokens(i).isLexical
-          case Eligibility.AllTokens     => true
-      }
-      val samples = eligible.map { i =>
-        val est = track
-          .get(FeatureTarget.Token(TokenIndex.unsafe(i)))
-          .getOrElse(Estimate.Missing(MissingReason.Unknown))
+      val samples = w.tokenRange.indices.toVector.map { i =>
+        val est =
+          if eligibility == Eligibility.LexicalTokens && !sequence.tokens(i).isLexical then
+            Estimate.Ineligible
+          else
+            track
+              .get(FeatureTarget.Token(TokenIndex.unsafe(i)))
+              .getOrElse(Estimate.Missing(MissingReason.Unknown))
         Sample(i, est, 1.0)
       }
       Reduction.reduce(samples, red, missing).map { (est, cov) =>
@@ -321,21 +320,20 @@ object Windowed:
       val covered: Vector[(TokenIndex, Int)] =
         members.flatMap((d, sup) => sequence.coveringIndices(sup).map(i => (i, d)))
       val distanceOf: Map[Int, Int] = covered.groupMapReduce(_._1.value)(_._2)(math.min)
-      val eligible = covered.map(_._1).distinct.sorted.filter { i =>
-        eligibility match
-          case Eligibility.LexicalTokens => sequence.tokens(i.value).isLexical
-          case Eligibility.AllTokens     => true
-      }
-      val samples = eligible.map { i =>
-        val est = track
-          .get(FeatureTarget.Token(i))
-          .getOrElse(Estimate.Missing(MissingReason.Unknown))
+      val samples = covered.map(_._1).distinct.sorted.map { i =>
+        val est =
+          if eligibility == Eligibility.LexicalTokens && !sequence.tokens(i.value).isLexical then
+            Estimate.Ineligible
+          else
+            track
+              .get(FeatureTarget.Token(i))
+              .getOrElse(Estimate.Missing(MissingReason.Unknown))
         Sample(i.value, est, 1.0)
       }
       val red = reducer match
         case ScalarReducer.Kernel(shape) =>
-          // every sample position is a key of `distanceOf`: samples come from `eligible`, which is
-          // drawn from `covered`, the very pairs `distanceOf` was folded from — the default is
+          // every sample position is a key of `distanceOf`: samples come from `covered`, the very
+          // pairs `distanceOf` was folded from — the default is
           // unreachable and only keeps the lookup total
           WindowReducer.kernelAt(shape, s => distanceOf.getOrElse(s.position, 0).toDouble)
         case other => WindowReducer.scalar(other)
@@ -544,12 +542,12 @@ object Aggregate:
     val red = WindowReducer.scalar(reducer)
     targets
       .traverse { (t, support) =>
-        val idx = sequence
-          .coveringIndices(support)
-          .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
+        val idx = sequence.coveringIndices(support)
         val samples = idx.map { i =>
           val est =
-            track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
+            if lexicalOnly && !sequence.tokens(i.value).isLexical then Estimate.Ineligible
+            else
+              track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
           Sample(i.value, est, 1.0)
         }
         Reduction

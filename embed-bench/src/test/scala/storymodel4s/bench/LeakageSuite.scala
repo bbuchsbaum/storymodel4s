@@ -87,6 +87,24 @@ class LeakageSuite extends FunSuite:
       )
     )
 
+  test("an entirely ineligible risk arm remains distinct from eligible abstention") {
+    val report = channelReportOutcomes(
+      "eligibility",
+      ChannelExposure.Memorizing,
+      Map(
+        "famous-1" -> MetricObservation.Ineligible,
+        "obscure-1" -> MetricObservation.Missing(MissingReason.ProviderAbstained)
+      )
+    )
+    val findings = LeakageControl.assess(Vector(report), riskOf, metric).findings
+    assertEquals(findings.size, 1)
+    assertEquals(findings.head.highMean, Estimate.Ineligible)
+    assertEquals(findings.head.lowMean, Estimate.missing(MissingReason.ProviderAbstained))
+    assertEquals(findings.head.gain, None)
+    assertEquals(findings.head.highStories, 0)
+    assertEquals(findings.head.lowStories, 0)
+  }
+
   test("a uniform fame advantage is not leakage: it cancels against the baselines") {
     val reports = Vector(
       flat("tfidf", ChannelExposure.NonMemorizing, 0.40),

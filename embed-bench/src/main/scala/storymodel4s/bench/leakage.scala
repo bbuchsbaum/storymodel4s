@@ -1,7 +1,7 @@
 package storymodel4s.bench
 
 import storymodel4s.core.{Checksum, ContentAddress}
-import storymodel4s.features.{Coverage, Estimate, MissingReason}
+import storymodel4s.features.{Coverage, Estimate}
 
 /** Whether a channel could have memorized a story before it ever saw a recall.
   *
@@ -131,7 +131,7 @@ object LeakageControl:
           else f
         }
         val receipt = ContentAddress.digest(
-          Vector("leakage/v1", metric, threshold.toString) ++
+          Vector("leakage/v2", metric, threshold.toString) ++
             withExcess.flatMap(f =>
               Vector(
                 f.channel,
@@ -158,22 +158,9 @@ object LeakageControl:
     val byRisk = report.runs.groupBy(r => riskOf(r.caseId))
     def arm(risk: ContaminationRisk): (Estimate[Double], Int) =
       val runs = byRisk.getOrElse(Some(risk), Vector.empty)
-      val outcomes = runs.map { r =>
-        val obs = r.observations.byMetric.getOrElse(metric, Vector.empty)
-        val missing = obs.collect { case UnitObservation(_, MetricObservation.Missing(reason)) =>
-          reason
-        }
-        val observed = obs.collect { case UnitObservation(_, MetricObservation.Observed(value)) =>
-          value
-        }
-        if missing.nonEmpty then Left(missing.sortBy(_.toString).head)
-        else Right(if observed.isEmpty then None else Some(observed.sum / observed.size))
-      }
-      val missing = outcomes.collect { case Left(reason) => reason }.sortBy(_.toString)
-      val means = outcomes.collect { case Right(Some(mean)) => mean }
-      if missing.nonEmpty then (Estimate.missing(missing.head), 0)
-      else if means.isEmpty then (Estimate.missing(MissingReason.AllMissing), 0)
-      else (Estimate.observed(means.sum / means.size), means.size)
+      val aggregate =
+        Metrics.aggregate(metric, runs.map(_.observations), Vector.empty, seed = 0L, resamples = 1)
+      (aggregate.value, aggregate.stories)
 
     val (high, highN) = arm(ContaminationRisk.High)
     val (low, lowN) = arm(ContaminationRisk.Low)

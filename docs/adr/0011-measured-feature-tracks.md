@@ -124,6 +124,7 @@ table identity still means table content and measure identity also records its e
 contract. Raw provenance becomes `features-measure/v2`; window, narrative-window and aggregate
 recipes advance to `windowed-3`, `narrative-windowed-2` and `aggregate-3`. Benchmark aggregation
 receipts advance to `metric/v3`. Historical records remain readable with their original identities.
+The leakage diagnostic uses the same story-macro carrier and advances its receipt to `leakage/v2`.
 Rejected alternative: retain the old producer identities, which would make changed coverage and
 absence semantics appear to be the same scientific output.
 

@@ -160,3 +160,137 @@ class EligibilitySuite extends FunSuite:
       Estimate.missing(MissingReason.Undefined(UndefinedReason.NotFinite))
     )
   }
+
+  private val sequence = Fixtures.sequence
+  private val punctuation = sequence.tokens.indexWhere(!_.isLexical)
+  private def support(i: Int): SpanSet = SpanSet.one(sequence.tokens(i).span)
+  private def trackAt(values: Map[Int, Estimate[Double]]) =
+    Fixtures
+      .imageabilityTrack()
+      .copy(observations =
+        Fixtures
+          .imageabilityTrack()
+          .observations
+          .map(o => o.copy(estimate = values.getOrElse(o.target.index.value, o.estimate)))
+      )
+
+  test("lexical window and aggregate builders retain an ineligible endpoint in kernel geometry") {
+    assert(
+      punctuation >= 0 && sequence.tokens(punctuation + 1).isLexical && sequence
+        .tokens(punctuation + 2)
+        .isLexical
+    )
+    val raw = trackAt(
+      Map(punctuation + 1 -> Estimate.observed(0.0), punctuation + 2 -> Estimate.observed(10.0))
+    )
+    val reducer = ScalarReducer.Kernel(KernelShape.Rectangular(0.5))
+    val windows =
+      Windowed(raw, sequence, WindowPlan.tokens(3, 1), reducer, MissingValuePolicy.IgnoreMissing)
+        .fold(e => fail(e.message), identity)
+    val window = windows.observations
+      .find(_.target.range == TokenRange.unsafe(punctuation, punctuation + 3))
+      .get
+    assertEquals(window.estimate, Estimate.observed(0.0))
+    assertEquals(window.coverage, Some(Coverage.unsafe(2, 2)))
+    val spans = SpanSet.one(
+      TextSpan.unsafe(
+        sequence.tokens(punctuation).span.start,
+        sequence.tokens(punctuation + 2).span.endExclusive
+      )
+    )
+    assertEquals(window.support, Some(spans))
+    val aggregate = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        Vector(FeatureTarget.Situation(SituationId.unsafe("geometry-court")) -> spans),
+        reducer,
+        MissingValuePolicy.Fail
+      )
+      .toOption
+      .get
+      .observations
+      .head
+    assertEquals(aggregate.estimate, Estimate.observed(0.0))
+    assertEquals(aggregate.coverage, Some(Coverage.unsafe(2, 2)))
+    assertEquals(aggregate.support, Some(spans))
+  }
+
+  test("nonempty punctuation-only supports stay ineligible at every declared reduction grain") {
+    val raw = Fixtures.imageabilityTrack()
+    val span = support(punctuation)
+    val windows = Windowed(
+      raw,
+      sequence,
+      WindowPlan.tokens(1, 1),
+      ScalarReducer.Mean,
+      MissingValuePolicy.RequireMinCoverage(1.0)
+    ).toOption.get
+    val window = windows.observations
+      .find(_.target.range == TokenRange.unsafe(punctuation, punctuation + 1))
+      .get
+    assertEquals(window.estimate, Estimate.Ineligible)
+    assertEquals(window.coverage, Some(Coverage.empty))
+    val id = SituationId.unsafe("punctuation-court")
+    val aggregate = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        Vector(FeatureTarget.Situation(id) -> span),
+        ScalarReducer.Mean,
+        MissingValuePolicy.Fail
+      )
+      .toOption
+      .get
+      .observations
+      .head
+    assertEquals(aggregate.estimate, Estimate.Ineligible)
+    assertEquals(aggregate.support, Some(span))
+    val resolver = SupportResolver(sequence, situation = i => Option.when(i == id)(span))
+    val basis = NarrativeBasis.situations(Vector(id), resolver).toOption.get
+    val narrative = Windowed
+      .overBasis(
+        raw,
+        sequence,
+        basis,
+        NarrativeWindowPlan.of(0).toOption.get,
+        ScalarReducer.Mean,
+        MissingValuePolicy.Fail
+      )
+      .toOption
+      .get
+      .observations
+      .head
+    assertEquals(narrative.estimate, Estimate.Ineligible)
+    assertEquals(narrative.coverage, Some(Coverage.empty))
+  }
+
+  test("an ineligible narrative centre preserves unit distances and point-mass fallback") {
+    assert(sequence.tokens(punctuation - 1).isLexical && sequence.tokens(punctuation + 1).isLexical)
+    val raw = trackAt(
+      Map(punctuation - 1 -> Estimate.observed(0.0), punctuation + 1 -> Estimate.observed(10.0))
+    )
+    val ids = Vector.tabulate(3)(i => SituationId.unsafe(s"unit-court-$i"))
+    val supports = ids.zip(Vector(punctuation - 1, punctuation, punctuation + 1).map(support)).toMap
+    val resolver = SupportResolver(sequence, situation = supports.get)
+    val basis = NarrativeBasis.situations(ids, resolver).toOption.get
+    def centre(bandwidth: Double) = Windowed
+      .overBasis(
+        raw,
+        sequence,
+        basis,
+        NarrativeWindowPlan.of(1).toOption.get,
+        ScalarReducer.Kernel(KernelShape.Rectangular(bandwidth)),
+        MissingValuePolicy.Fail
+      )
+      .toOption
+      .get
+      .observations(1)
+    assertEquals(
+      centre(0.5).estimate,
+      Estimate.missing(MissingReason.Undefined(UndefinedReason.OutsideKernelSupport))
+    )
+    assertEquals(centre(0.5).coverage, Some(Coverage.unsafe(2, 2)))
+    assertEquals(centre(0.0).estimate, Estimate.observed(5.0))
+    assertEquals(centre(1.0).estimate, Estimate.observed(5.0))
+  }
