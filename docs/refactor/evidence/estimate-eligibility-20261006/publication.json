@@ -1,0 +1,43 @@
+{
+  "observed_source_main": "3dc4bdfc07fd6bc6a2311cc14480eddc1cd00353",
+  "consumer_main": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+  "github": [
+    {
+      "repo": "storymodel4s",
+      "local_main": "3dc4bdfc07fd6bc6a2311cc14480eddc1cd00353",
+      "tracking_main": "3dc4bdfc07fd6bc6a2311cc14480eddc1cd00353",
+      "live_main": "3dc4bdfc07fd6bc6a2311cc14480eddc1cd00353",
+      "all_equal": true,
+      "push": "non-force"
+    },
+    {
+      "repo": "storyatlas4s",
+      "local_main": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+      "tracking_main": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+      "live_main": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+      "all_equal": true,
+      "push": "non-force"
+    }
+  ],
+  "workstation": {
+    "machine": "BUC-GW01",
+    "repos": [
+      {
+        "repo": "storymodel4s",
+        "main": "3dc4bdfc07fd6bc6a2311cc14480eddc1cd00353",
+        "origin_main": "3dc4bdfc07fd6bc6a2311cc14480eddc1cd00353",
+        "clean": true,
+        "mote_doctor_exit": 0
+      },
+      {
+        "repo": "storyatlas4s",
+        "main": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+        "origin_main": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+        "clean": true,
+        "mote_doctor_exit": 0
+      }
+    ],
+    "private_data_accessed": false
+  },
+  "basis": "Observed after reviewed source closure; this receipt and the handoff note add only documentation/Mote metadata. Final descendant main parity is checked separately."
+}

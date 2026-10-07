@@ -294,7 +294,9 @@ handoff and JVM gate serialization are complete on `cb310958`. The coherent elig
 [the full receipt](evidence/estimate-eligibility-20261006/README.md) binds the 80-cell source matrix,
 15-cell default-pinned consumer matrix, compiled mutation controls and documentation successor.
 The independently reviewed pair landed locally on source `68989cbc` and consumer `2175735`;
-eligibility is closed. Publish and synchronize `buc-gw01`. Next is strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV`: controlled
+eligibility is closed. GitHub and approved `buc-gw01` are synchronized; both workstation
+checkouts are clean and Mote health checks pass. The final handoff metadata preserves the
+qualified inputs. Next is strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV`: controlled
 Lexical / ContentTable / Unavailable channels through generation, canonical evidence and HSMM
 rederivation together, retaining historical pins and distinct unavailable/abstaining outcomes.
 The first proposed witness is canonical contradiction order through the production strict

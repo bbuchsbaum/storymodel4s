@@ -1,5 +1,5 @@
 {
-  "README.md": "513ad43c45e3d92ebf097d452903476019c3f6e647894da4c0c9c577d21075b1",
+  "README.md": "83fc57a44119c14fa39ab7c330acdb1d11c6eb83548168ad126106018bd40f16",
   "consumer-full-gate.log.gz": "35e7e22991379f30c289e9aa9ac5ffb1e3e90835c367cd9575dec4a4436b0f4a",
   "consumer-full-gate.log.meta.json": "a5c9e1d830fd523a8777f6e11dfffe64ce270c7229a24a620b3d030bd42418d8",
   "consumer-gate-inputs.json": "2ed1872e9ecbb0975d99fd8a2f9aa32c46f36830228455e5400201396912e71d",
@@ -60,6 +60,7 @@
   "mutations/wire-classification.log.gz": "e11d54d6f87cb26b1654857110310e559238e02bca7c98b53bb75b817beb3dd0",
   "mutations/wire-classification.log.meta.json": "6303bcbaea87b1131ca165859af916b68f62ca7696cfd6ca3fe980baf21c53c4",
   "mutations/wire-classification.patch": "18fbde663418adc35f7bea06f938e9454b00064cd168c3bb53e4a1730213e353",
+  "publication.json": "b99db2b83964e1552be5938bfb55944cd0d9fb6f314df85faa86108e0ee8ba8b",
   "qualification.json": "e5ec10c4cb4601771836db42c2a9f014c65ebe98c87ebd495e0b149140e8d2ce",
   "reference-scope-d5a7.log": "187d879b851db10071d4c42fc6d3b0566bf82b1d64636d5c09bbe8668a7945af",
   "reference-scope-d5a7.log.meta.json": "1753e88c873a02cc93d69f89f9bc21d6ab662985dfc53cc5765b538732522cb6",

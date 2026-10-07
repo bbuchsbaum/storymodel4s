@@ -92,3 +92,8 @@ consumer, documentation and local-evidence GO verdicts are in `reviews.md`.
 
 This acceptance is the coherent eligibility migration. Strict channel wiring, G1, the broader
 construction audit, and release qualification retain their separate open acceptance.
+
+The reviewed pair was published without force and synchronized to approved BUC-GW01; both
+workstation checkouts are clean and explicit-actor Mote health checks passed. `publication.json`
+records the observed3dc4/217 pair before this final gate-inert handoff metadata. The completed
+Mote and current delivery index identify strict content wiring as the next open slice.
