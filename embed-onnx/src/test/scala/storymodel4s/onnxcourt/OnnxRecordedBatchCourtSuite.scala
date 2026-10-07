@@ -11,10 +11,10 @@ class OnnxRecordedBatchCourtSuite extends FunSuite:
       import storymodel4s.embed.*
       import storymodel4s.embed.onnx.*
       def lawful(e: OnnxSentenceEmbedder, b: EmbedBatch) = e.record(b)
-      final class Open(r: Vector[EmbedRequest], m: OnnxSentenceModel, p: ProviderFingerprint,
+      final class RecordedBatchConstructorControl(r: Vector[EmbedRequest], m: OnnxSentenceModel, p: ProviderFingerprint,
         rt: String, s: Vector[EmbeddingSpace], v: BatchResult)
       def control(e: OnnxSentenceEmbedder, b: EmbedBatch) =
-        new Open(b.requests, e.model, e.info.provider, e.runtimeIdentity, e.spaces, e.embed(b))
+        new RecordedBatchConstructorControl(b.requests, e.model, e.info.provider, e.runtimeIdentity, e.spaces, e.embed(b))
     """))
     assert(!typeChecks("""
       import storymodel4s.embed.*
@@ -28,10 +28,10 @@ class OnnxRecordedBatchCourtSuite extends FunSuite:
     assert(typeChecks("""
       import storymodel4s.embed.*
       import storymodel4s.embed.onnx.*
-      final case class Open(r: Vector[EmbedRequest], m: OnnxSentenceModel, p: ProviderFingerprint,
+      final case class RecordedBatchApplyControl(r: Vector[EmbedRequest], m: OnnxSentenceModel, p: ProviderFingerprint,
         rt: String, s: Vector[EmbeddingSpace], v: BatchResult)
       def control(e: OnnxSentenceEmbedder, b: EmbedBatch) =
-        Open(b.requests, e.model, e.info.provider, e.runtimeIdentity, e.spaces, e.embed(b))
+        RecordedBatchApplyControl(b.requests, e.model, e.info.provider, e.runtimeIdentity, e.spaces, e.embed(b))
     """))
     assert(!typeChecks("""
       import storymodel4s.embed.*
@@ -44,8 +44,8 @@ class OnnxRecordedBatchCourtSuite extends FunSuite:
   test("record copy is closed with a same-shape positive control"):
     assert(typeChecks("""
       import storymodel4s.embed.BatchResult
-      final case class Open(result: BatchResult)
-      def control(record: Open, replacement: BatchResult) = record.copy(result = replacement)
+      final case class RecordedBatchCopyControl(result: BatchResult)
+      def control(record: RecordedBatchCopyControl, replacement: BatchResult) = record.copy(result = replacement)
     """))
     assert(!typeChecks("""
       import storymodel4s.embed.BatchResult
@@ -55,8 +55,8 @@ class OnnxRecordedBatchCourtSuite extends FunSuite:
 
   test("record fromProduct is closed with a same-shape positive control"):
     assert(typeChecks("""
-      final case class Open(result: Int)
-      def control = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(Tuple1(1))
+      final case class RecordedBatchProductControl(result: Int)
+      def control = summon[scala.deriving.Mirror.ProductOf[RecordedBatchProductControl]].fromProduct(Tuple1(1))
     """))
     assert(!typeChecks("""
       import storymodel4s.embed.onnx.OnnxSentenceEmbedder.RecordedBatch
@@ -65,8 +65,8 @@ class OnnxRecordedBatchCourtSuite extends FunSuite:
 
   test("record product mirror is closed with a same-shape positive control"):
     assert(typeChecks("""
-      final case class Open(result: Int)
-      val control = summon[scala.deriving.Mirror.ProductOf[Open]]
+      final case class RecordedBatchMirrorControl(result: Int)
+      val control = summon[scala.deriving.Mirror.ProductOf[RecordedBatchMirrorControl]]
     """))
     assert(!typeChecks("""
       import storymodel4s.embed.onnx.OnnxSentenceEmbedder.RecordedBatch
@@ -76,8 +76,8 @@ class OnnxRecordedBatchCourtSuite extends FunSuite:
   test("captured payloads cannot be read with a same-shape positive control"):
     assert(typeChecks("""
       import storymodel4s.embed.EmbedRequest
-      final class Open(val requests: Vector[EmbedRequest])
-      def control(record: Open) = record.requests
+      final class RecordedBatchPayloadControl(val requests: Vector[EmbedRequest])
+      def control(record: RecordedBatchPayloadControl) = record.requests
     """))
     assert(!typeChecks("""
       import storymodel4s.embed.onnx.OnnxSentenceEmbedder.RecordedBatch

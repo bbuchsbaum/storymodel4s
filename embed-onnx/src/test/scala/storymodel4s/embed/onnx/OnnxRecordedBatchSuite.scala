@@ -166,6 +166,7 @@ class OnnxRecordedBatchSuite extends FunSuite:
         "control needs equal denied receipts"
       )
       assertNotEquals(record, other, "receipt equality lost the exact denied payload binding")
+      assertEquals(record.hashCode, other.hashCode, "denied text entered a public hash")
       assert(!record.toString.contains("private original"))
       assert(!record.toString.contains(query.id.value))
     }
