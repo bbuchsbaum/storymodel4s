@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuite hostname="BUC-GW02.local" name="storymodel4s.align.StructuralReductionSuite" tests="14" errors="0" failures="1" skipped="0" time="0.232" timestamp="2026-10-06T22:28:20">
+          <properties>
+      <property name="java.specification.version" value="25"/><property name="sun.jnu.encoding" value="UTF-8"/><property name="java.class.path" value="/opt/homebrew/Cellar/sbt/1.11.7/libexec/bin/sbt-launch.jar"/><property name="java.vm.vendor" value="Homebrew"/><property name="sun.arch.data.model" value="64"/><property name="jline.shutdownhook" value="false"/><property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues"/><property name="user.timezone" value="America/Toronto"/><property name="java.vm.specification.version" value="25"/><property name="os.name" value="Mac OS X"/><property name="sun.java.launcher" value="SUN_STANDARD"/><property name="user.country" value="CA"/><property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/25.0.1/libexec/openjdk.jdk/Contents/Home/lib"/><property name="sun.java.command" value="/opt/homebrew/Cellar/sbt/1.11.7/libexec/bin/sbt-launch.jar set ThisBuild / tlFatalWarnings := true alignJVM/testOnly storymodel4s.align.StructuralReductionSuite"/><property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/><property name="jdk.debug" value="release"/><property name="sun.cpu.endian" value="little"/><property name="user.home" value="/Users/bbuchsbaum"/><property name="user.language" value="en"/><property name="sbt.script" value="/opt/homebrew/Cellar/sbt/1.11.7/libexec/bin/sbt"/><property name="java.specification.vendor" value="Oracle Corporation"/><property name="sbt.ipcsocket.tmpdir" value="/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/.sbt1b8b7ae4/ipcsocket"/><property name="swoval.tmpdir" value="/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/.sbt1b8b7ae4/swoval"/><property name="java.version.date" value="2025-10-21"/><property name="java.home" value="/opt/homebrew/Cellar/openjdk/25.0.1/libexec/openjdk.jdk/Contents/Home"/><property name="file.separator" value="/"/><property name="java.vm.compressedOopsMode" value="Zero based"/><property name="line.separator" value="
+"/><property name="java.vm.specification.vendor" value="Oracle Corporation"/><property name="java.specification.name" value="Java Platform API Specification"/><property name="apple.awt.application.name" value="Boot"/><property name="jline.esc.timeout" value="0"/><property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/><property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/><property name="java.runtime.version" value="25.0.1"/><property name="user.name" value="bbuchsbaum"/><property name="stdout.encoding" value="US-ASCII"/><property name="path.separator" value=":"/><property name="os.version" value="14.3"/><property name="jna.nosys" value="true"/><property name="java.runtime.name" value="OpenJDK Runtime Environment"/><property name="log4j.ignoreTCL" value="true"/><property name="file.encoding" value="UTF-8"/><property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/><property name="java.vendor.version" value="Homebrew"/><property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/><property name="java.io.tmpdir" value="/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/"/><property name="java.version" value="25.0.1"/><property name="user.dir" value="/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer"/><property name="os.arch" value="aarch64"/><property name="sun.misc.unsafe.memory.access" value="allow"/><property name="java.vm.specification.name" value="Java Virtual Machine Specification"/><property name="native.encoding" value="US-ASCII"/><property name="java.library.path" value="/Users/bbuchsbaum/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/><property name="java.vm.info" value="mixed mode, sharing"/><property name="stderr.encoding" value="US-ASCII"/><property name="java.vendor" value="Homebrew"/><property name="java.vm.version" value="25.0.1"/><property name="stdin.encoding" value="US-ASCII"/><property name="scala.ext.dirs" value="/Users/bbuchsbaum/.sbt/1.0/java9-rt-ext-homebrew_25_0_1"/><property name="sun.io.unicode.encoding" value="UnicodeBig"/><property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/><property name="java.class.version" value="69.0"/>
+    </properties>
+          <testcase classname="storymodel4s.align.StructuralReductionSuite" name="an incompatible chart with a flattering estimate cannot lower segment cost" time="0.129">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="an incompatible input remains visible as an exclusion but never becomes a member" time="0.008">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="provider abstention cannot lower the minimum over observed compatible members" time="0.03">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="source-chart coverage and provider-observed coverage are separate receipt fields" time="0.001">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="local costs retain both typed per-term reduction receipts" time="0.017">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="permuting source storage cannot change the structural estimand" time="0.019">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="a one-member leaf reduction equals its direct pair estimate" time="0.007">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="uncovered leaves never contribute a neutral constant to chart distance" time="0.0">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="all-provider abstention is Missing rather than an imputed neutral score" time="0.001">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="provider ineligibility retains members and differs from contradiction exclusion" time="0.001">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="ineligible structural receipts remain valid on ranked cells with other measured evidence" time="0.001">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="an ineligible receipt refuses forged missing and eligible cost classifications" time="0.015">
+                      <failure message="align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala:255 assertion failed
+254:    assert(checked(cell.missingTerms, cell.support).isRight)
+255:    assert(checked(cell.missingTerms + CostTerm.Structural, cell.support).isLeft)
+256:    val basis = cell.support.asInstanceOf[SupportAssessment.Assessed].basis" type="munit.FailException">munit.FailException: align/src/test/scala/storymodel4s/align/StructuralReductionSuite.scala:255 assertion failed
+254:    assert(checked(cell.missingTerms, cell.support).isRight)
+255:    assert(checked(cell.missingTerms + CostTerm.Structural, cell.support).isLeft)
+256:    val basis = cell.support.asInstanceOf[SupportAssessment.Assessed].basis
+	at munit.FunSuite.assert(FunSuite.scala:12)
+	at storymodel4s.align.StructuralReductionSuite.$init$$$anonfun$12(StructuralReductionSuite.scala:255)
+</failure>
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="only an actually invoked ineligible structural provider removes the last positive weight" time="0.002">
+                      
+                    </testcase><testcase classname="storymodel4s.align.StructuralReductionSuite" name="mixed provider outcomes count only eligible members and preserve missing versus minimum" time="0.001">
+                      
+                    </testcase>
+          <system-out><![CDATA[]]></system-out>
+          <system-err><![CDATA[]]></system-err>
+        </testsuite>

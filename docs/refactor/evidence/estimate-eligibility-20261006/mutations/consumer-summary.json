@@ -1,0 +1,53 @@
+{
+  "group": "consumer",
+  "base_sha": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+  "source_sha": "d5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19",
+  "mutants": [
+    {
+      "label": "html-classification",
+      "path": "cli/src/main/scala/storyatlas4s/cli/FeatureEdition.scala",
+      "exit": 1,
+      "compiled": true,
+      "original_sha256": "42878f10ba7a12f8add6f69bff0c222e249128c7eb2327e7856d5ae364a6b70f",
+      "mutant_sha256": "3fab9ad22cb62c758dd9e756e44018ac49610ecc169f403327aeb7214bd32c86",
+      "patch_sha256": "45e417447a6453f5c3df006fc3a63c0ba659c4634d7c4ddf12791d2a23ca25a5",
+      "reports": [
+        {
+          "suite": "storyatlas4s.cli.ModelInputSuite",
+          "tests": 23,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [
+            "Ineligible survives the sidecar, reading class, SVG metadata and textual twin"
+          ],
+          "report_sha256": "db4adc4b5e2499171b5a383d7ad27fb8c5f25f5f972e96fea9a02af2d692e0e5"
+        }
+      ]
+    },
+    {
+      "label": "monochrome-glyph",
+      "path": "intaglio/src/main/scala/storyatlas4s/intaglio/AtlasLowering.scala",
+      "exit": 1,
+      "compiled": true,
+      "original_sha256": "339e03eacd55160c098d98a2385c9fe995868ba20d70a0e2f60cdb33ecd9b471",
+      "mutant_sha256": "d38ae399240d616009059e4318ddc973484980d417b6c5080a1506a6a53fe19d",
+      "patch_sha256": "2686763a82172fa8562f77c00bb0fc64bff1b0b110eccc739e89f4c5ea4e7ee9",
+      "reports": [
+        {
+          "suite": "storyatlas4s.intaglio.FeatureEligibilitySuite",
+          "tests": 2,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [
+            "Ineligible has a hollow dashed box distinct from observed, crossed missing and dotted excluded"
+          ],
+          "report_sha256": "c7f933d886521cd95787732add0266edbb60b6bdfcf6172839421228450e3345"
+        }
+      ]
+    }
+  ],
+  "restored_exit": 0,
+  "restored_clean": true
+}

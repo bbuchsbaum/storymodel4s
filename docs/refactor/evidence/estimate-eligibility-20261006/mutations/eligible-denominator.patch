@@ -1,0 +1,11 @@
+--- a/features/src/main/scala/storymodel4s/features/window.scala
++++ b/features/src/main/scala/storymodel4s/features/window.scala
+@@ -383,7 +383,7 @@
+       missing: MissingValuePolicy
+   ): Either[DomainError, (Estimate[O], Coverage)] =
+     val cov = Coverage.unsafe(
+-      samples.count(_.estimate.isEligible),
++      samples.size,
+       samples.count(_.estimate.isObserved)
+     )
+     val badFloor = missing match

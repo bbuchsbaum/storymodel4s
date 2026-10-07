@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:23:24.794526+00:00",
+  "finished_utc": "2026-10-07T02:24:28.500457+00:00",
+  "duration_seconds": 63.705961,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/testOnly storymodel4s.pipeline.StoryBuildSuite",
+    "set featuresJVM / Compile / unmanagedSources += file(\"/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer/docs-site/examples/WindowFeatures.scala\")",
+    "featuresJVM/runMain docsprobe.windowFeatures",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/stale-expectation-courts.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3930
+}

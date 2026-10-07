@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:34:54.586452+00:00",
+  "finished_utc": "2026-10-07T02:35:28.042582+00:00",
+  "duration_seconds": 33.455967,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "set ThisBuild / tlFatalWarnings := true",
+    "cli/testOnly storyatlas4s.cli.ModelInputSuite",
+    "intaglioJVM/testOnly storyatlas4s.intaglio.FeatureEligibilitySuite",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/atlas",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/consumer-restored.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5842
+}

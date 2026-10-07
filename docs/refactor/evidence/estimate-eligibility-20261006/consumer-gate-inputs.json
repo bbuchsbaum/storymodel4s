@@ -1,0 +1,78 @@
+{
+  "observed_head": "3ff98c925ede528b1e3af32ac0bbba2fc399ca15",
+  "source_override": "d5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19",
+  "changed_inputs": {
+    "build.sbt": "33407bbdafc9b888311a09e6af523e8936bad067c0cbb2e19cd54858d5eb2768",
+    "cli/src/main/scala/storyatlas4s/cli/FeatureEdition.scala": "42878f10ba7a12f8add6f69bff0c222e249128c7eb2327e7856d5ae364a6b70f",
+    "intaglio/src/main/scala/storyatlas4s/intaglio/AtlasLowering.scala": "339e03eacd55160c098d98a2385c9fe995868ba20d70a0e2f60cdb33ecd9b471"
+  },
+  "totals": [
+    [
+      22,
+      0,
+      0,
+      22
+    ],
+    [
+      26,
+      0,
+      0,
+      26
+    ],
+    [
+      100,
+      0,
+      0,
+      100
+    ],
+    [
+      100,
+      0,
+      0,
+      100
+    ],
+    [
+      13,
+      0,
+      0,
+      13
+    ],
+    [
+      13,
+      0,
+      0,
+      13
+    ],
+    [
+      74,
+      0,
+      0,
+      74
+    ],
+    [
+      74,
+      0,
+      0,
+      74
+    ],
+    [
+      59,
+      0,
+      0,
+      59
+    ],
+    [
+      4,
+      0,
+      0,
+      4
+    ]
+  ],
+  "passed": 485,
+  "local_gate_exit": 0,
+  "fastLinkJS": true,
+  "workflowGeneration": true,
+  "formatChecksLast": true,
+  "qualified_consumer_code": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+  "committed_blob_binding_verified": true
+}

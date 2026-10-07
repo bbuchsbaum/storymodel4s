@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:28:22.104598+00:00",
+  "finished_utc": "2026-10-07T02:28:42.531312+00:00",
+  "duration_seconds": 20.426665,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.EstimateEligibilitySuite storymodel4s.align.SupportAssessmentSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/last-positive-weight.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 4258
+}

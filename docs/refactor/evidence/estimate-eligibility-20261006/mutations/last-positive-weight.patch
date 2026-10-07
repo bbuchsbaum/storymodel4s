@@ -1,0 +1,11 @@
+--- a/align/src/main/scala/storymodel4s/align/cost.scala
++++ b/align/src/main/scala/storymodel4s/align/cost.scala
+@@ -713,7 +713,7 @@
+       CellSupportBasis.fromWeights(terms.keySet -- imputedTerms.keySet, eligible, weights)
+     val support = SupportAssessment.derive(basis)
+     val lostPositiveWeight = providerOutcomes.exists { (term, outcome) =>
+-      !outcome.isEligible && weights(term) > 0.0
++      !outcome.isEligible && weights(term) < 0.0
+     }
+     val unassessable = support match
+       case assessed: SupportAssessment.Assessed     => assessed.share <= 0.0

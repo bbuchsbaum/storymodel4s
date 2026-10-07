@@ -1,0 +1,11 @@
+--- a/intaglio/src/main/scala/storyatlas4s/intaglio/AtlasLowering.scala
++++ b/intaglio/src/main/scala/storyatlas4s/intaglio/AtlasLowering.scala
+@@ -1245,7 +1245,7 @@
+         val intensity = fraction.fold(245)(f => (235.0 - 150.0 * f).round.toInt)
+         val (missing, ineligible) = v.estimate match
+           case storymodel4s.features.Estimate.Missing(r)     => (Some(r), false)
+-          case storymodel4s.features.Estimate.Ineligible     => (None, true)
++          case storymodel4s.features.Estimate.Ineligible     => (None, false)
+           case storymodel4s.features.Estimate.Observed(_, _) => (None, false)
+         for
+           colour <- ig.Rgba(intensity, intensity, intensity)

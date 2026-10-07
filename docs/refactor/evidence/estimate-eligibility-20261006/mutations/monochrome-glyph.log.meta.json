@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:34:27.852545+00:00",
+  "finished_utc": "2026-10-07T02:34:54.452774+00:00",
+  "duration_seconds": 26.600102,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "set ThisBuild / tlFatalWarnings := true",
+    "intaglioJVM/testOnly storyatlas4s.intaglio.FeatureEligibilitySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/atlas",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/monochrome-glyph.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5682
+}

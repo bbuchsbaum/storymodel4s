@@ -1,0 +1,11 @@
+--- a/features/src/main/scala/storymodel4s/features/window.scala
++++ b/features/src/main/scala/storymodel4s/features/window.scala
+@@ -163,7 +163,7 @@
+             case ScalarReducer.WeightedMean =>
+               finiteWeightedMean(vs, obs.map(_.weight))
+             case ScalarReducer.Kernel(shape) =>
+-              val positions = samples.toVector.map(_.position)
++              val positions = obs.map(_.position)
+               val centre = (positions.min + positions.max) / 2.0
+               val weighted = obs.map(s => (s, shape.weight(s.position - centre)))
+               val tw = weighted.map(_._2).sum

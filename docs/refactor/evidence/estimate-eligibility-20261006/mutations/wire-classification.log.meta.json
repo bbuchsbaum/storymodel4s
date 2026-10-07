@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:27:55.321608+00:00",
+  "finished_utc": "2026-10-07T02:28:21.505988+00:00",
+  "duration_seconds": 26.184385,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.StructuralReductionSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/wire-classification.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3543
+}

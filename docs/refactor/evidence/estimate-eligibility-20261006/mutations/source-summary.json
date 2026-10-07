@@ -1,0 +1,114 @@
+{
+  "group": "source",
+  "base_sha": "d5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19",
+  "source_sha": "d5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19",
+  "mutants": [
+    {
+      "label": "wire-classification",
+      "path": "align/src/main/scala/storymodel4s/align/wire.scala",
+      "exit": 1,
+      "compiled": true,
+      "original_sha256": "1d38a5c97092d88fb0417f8ecf269dffd5a8f0b736dc27c02ce294804e1c33c6",
+      "mutant_sha256": "65e41eb3084489750d2a498198a14f74d08c03869ee886ad7683269b4ae88397",
+      "patch_sha256": "18fbde663418adc35f7bea06f938e9454b00064cd168c3bb53e4a1730213e353",
+      "reports": [
+        {
+          "suite": "storymodel4s.align.StructuralReductionSuite",
+          "tests": 14,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [
+            "an ineligible receipt refuses forged missing and eligible cost classifications"
+          ],
+          "report_sha256": "c7fea237c8a585d4de1990ba7f67b72349146ba5a8c8f6da6b7c82b06a35bd17"
+        }
+      ]
+    },
+    {
+      "label": "last-positive-weight",
+      "path": "align/src/main/scala/storymodel4s/align/cost.scala",
+      "exit": 1,
+      "compiled": true,
+      "original_sha256": "e503267a954e14f043bfe4461c2e05d7164e3bb3efaf06495c7a135fc3fcc1bf",
+      "mutant_sha256": "12fbf0858866a787725bd0b8339f7b69e0d53ee6754539b982b4d1816369ce3f",
+      "patch_sha256": "620883a1f3b51132a5293ecabc666065a79802f53e5fd5622534baccb902a74e",
+      "reports": [
+        {
+          "suite": "storymodel4s.align.EstimateEligibilitySuite",
+          "tests": 7,
+          "failures": 3,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [
+            "an ineligible semantic provider contributes no price, imputation, missing term or support",
+            "the ineligible last-positive-weight guard never evaluates the by-name total",
+            "HSMM cannot rank anchors whose only configured channel is explicitly ineligible"
+          ],
+          "report_sha256": "33b4cdd63f8468353dba8194531358b691f04eaa9427813a8eed0a5c3189aaa8"
+        },
+        {
+          "suite": "storymodel4s.align.SupportAssessmentSuite",
+          "tests": 18,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [],
+          "report_sha256": "d58d6e2d27de93227d946c78feb8191207677401127443fca66c5d26365a1a79"
+        }
+      ]
+    },
+    {
+      "label": "kernel-geometry",
+      "path": "features/src/main/scala/storymodel4s/features/window.scala",
+      "exit": 1,
+      "compiled": true,
+      "original_sha256": "4d49db1fac5f38ce12aef024ad519f9584ed22c33ee9754449e4056ae398be41",
+      "mutant_sha256": "9892d349068d5529dd7bfd5befc4e93bf98ab2ef8a55d5bffc7264c49e4a4c1f",
+      "patch_sha256": "47c9bfd29a46dda10506df8afaa793571d9ba302cae6fcd5ae0e53f398bff05d",
+      "reports": [
+        {
+          "suite": "storymodel4s.features.EligibilitySuite",
+          "tests": 9,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [
+            "ineligible samples retain the original kernel centre and slope positions",
+            "lexical window and aggregate builders retain an ineligible endpoint in kernel geometry"
+          ],
+          "report_sha256": "1c82561ea5bf028749e8a0fcb116cbd6dad5b058c007505f2c4db41c9a808687"
+        }
+      ]
+    },
+    {
+      "label": "eligible-denominator",
+      "path": "features/src/main/scala/storymodel4s/features/window.scala",
+      "exit": 1,
+      "compiled": true,
+      "original_sha256": "4d49db1fac5f38ce12aef024ad519f9584ed22c33ee9754449e4056ae398be41",
+      "mutant_sha256": "d42bc9bc58ba891de7d70369993ef144c32559fa858668e7c8541f1fd8e151b4",
+      "patch_sha256": "48a66cb3c272e4d0e00e3035ec0eb68456efede132dc72e83d91ef8450fd84dc",
+      "reports": [
+        {
+          "suite": "storymodel4s.features.EligibilitySuite",
+          "tests": 9,
+          "failures": 6,
+          "errors": 0,
+          "skipped": 0,
+          "failed_names": [
+            "coverage and missing policies exclude only ineligible targets",
+            "nonempty all-ineligible support differs from actually empty and all-missing support",
+            "ineligible samples retain the original kernel centre and slope positions",
+            "lexical window and aggregate builders retain an ineligible endpoint in kernel geometry",
+            "nonempty punctuation-only supports stay ineligible at every declared reduction grain",
+            "an ineligible narrative centre preserves unit distances and point-mass fallback"
+          ],
+          "report_sha256": "6c140620a128e9c8f05e81e48257cc1095d913522f3bd87222b382a0dcd80522"
+        }
+      ]
+    }
+  ],
+  "restored_exit": 0,
+  "restored_clean": true
+}

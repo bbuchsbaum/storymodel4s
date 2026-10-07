@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:29:05.125355+00:00",
+  "finished_utc": "2026-10-07T02:29:25.336639+00:00",
+  "duration_seconds": 20.211252,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "featuresJVM/testOnly storymodel4s.features.EligibilitySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/eligible-denominator.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 6464
+}

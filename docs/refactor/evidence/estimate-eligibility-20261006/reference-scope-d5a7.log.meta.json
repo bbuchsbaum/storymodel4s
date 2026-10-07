@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:30:43.445845+00:00",
+  "finished_utc": "2026-10-07T02:31:25.642823+00:00",
+  "duration_seconds": 42.182792,
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "cb3109585b127cc9254fd9d72482030fd82ef172",
+    "d5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/reference-scope-d5a7.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 300.0,
+  "log_bytes": 4470
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:09:22.597803+00:00",
+  "finished_utc": "2026-10-07T02:09:59.962543+00:00",
+  "duration_seconds": 37.364724,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "set ThisBuild / tlFatalWarnings := true",
+    "cli/testOnly storyatlas4s.cli.ModelInputSuite",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/atlas",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/consumer-negative-cli.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 6059
+}

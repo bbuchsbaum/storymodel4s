@@ -1,0 +1,11 @@
+--- a/cli/src/main/scala/storyatlas4s/cli/FeatureEdition.scala
++++ b/cli/src/main/scala/storyatlas4s/cli/FeatureEdition.scala
+@@ -204,7 +204,7 @@
+       val cls = v.estimate match
+         case Estimate.Missing(MissingReason.Excluded) => "excluded"
+         case Estimate.Missing(_)                      => "missing"
+-        case Estimate.Ineligible                      => "ineligible"
++        case Estimate.Ineligible                      => "observed"
+         case Estimate.Observed(_, _)                  => "observed"
+       s"class=\"$cls\" style=\"background-color:rgb($shade,$shade,$shade)\""
+     def piece(f: VisualPrimitive.Feature, span: TextSpan): String =

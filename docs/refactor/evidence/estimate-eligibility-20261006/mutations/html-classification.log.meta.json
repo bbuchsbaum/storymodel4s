@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:33:58.408118+00:00",
+  "finished_utc": "2026-10-07T02:34:27.721709+00:00",
+  "duration_seconds": 29.313482,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "set ThisBuild / tlFatalWarnings := true",
+    "cli/testOnly storyatlas4s.cli.ModelInputSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/atlas",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/html-classification.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5755
+}

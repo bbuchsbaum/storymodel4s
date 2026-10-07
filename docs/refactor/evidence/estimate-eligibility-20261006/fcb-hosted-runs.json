@@ -1,0 +1,23 @@
+[
+  {
+    "conclusion": "",
+    "databaseId": 37563021452,
+    "event": "push",
+    "headBranch": "codex/estimate-eligibility-docs-20261006",
+    "headSha": "fcb232f593fdfc80ed71a5707fb4fabb745004fb",
+    "name": "Continuous Integration",
+    "status": "in_progress",
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37563021452",
+    "cancellation_basis": "Own documentation-only descendant: all scientific/build inputs identical to d5a7; that complete matrix continues on the immutable code ref (T2 stale-base rule). Canceled redundant run is not qualification."
+  },
+  {
+    "conclusion": "",
+    "databaseId": 37563021552,
+    "event": "push",
+    "headBranch": "codex/estimate-eligibility-docs-20261006",
+    "headSha": "fcb232f593fdfc80ed71a5707fb4fabb745004fb",
+    "name": "Documentation",
+    "status": "in_progress",
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37563021552"
+  }
+]

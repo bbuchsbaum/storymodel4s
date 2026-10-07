@@ -1,0 +1,38 @@
+{
+  "ticket": "bd-01M16DBEH9PKER423BZ47ZKBMV",
+  "source_base": "cb3109585b127cc9254fd9d72482030fd82ef172",
+  "source_code": "d5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19",
+  "docs_successor": "fcb232f593fdfc80ed71a5707fb4fabb745004fb",
+  "docs_delta_gate_inert": true,
+  "consumer_base": "cc69a9aea23df080b386977e5acc61fc474f90ed",
+  "consumer_code": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+  "consumer_pin_verified": true,
+  "source_hosted": {
+    "cells": 80,
+    "passed": 12570,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "consumer_hosted": {
+    "cells": 15,
+    "passed": 753,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "local_consumer": {
+    "cells": 10,
+    "passed": 485,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "appFastLinkJS": true
+  },
+  "compiled_mutants": 6,
+  "restored_source_passed": 48,
+  "restored_consumer_passed": 25,
+  "private_inputs": false,
+  "release_qualified": false,
+  "next_mote": "bd-01M379N8HK5ZCV9W252X9MQ4VV"
+}

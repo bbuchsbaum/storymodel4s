@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T02:28:43.609213+00:00",
+  "finished_utc": "2026-10-07T02:29:04.558134+00:00",
+  "duration_seconds": 20.948877,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "featuresJVM/testOnly storymodel4s.features.EligibilitySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/eligibility-20261006/mutations/kernel-geometry.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3559
+}

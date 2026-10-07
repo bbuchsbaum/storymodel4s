@@ -288,11 +288,19 @@ compilation and organization analyses stay in 1.1; benchmark/LLM campaigns, corp
 empirical calibration remain on their existing research lanes. No calendar release promise is
 made before the fresh baseline and first public journey expose the remaining integration cost.
 
-**Immediate action:** prepare the audited instructions/tracker/plan branch for reviewed
-integration, recover the reference-scope guard on its existing ticket, then FrameSet and the
-bounded S2a-4 slice. Qualify and synchronize that baseline to GitHub and exercise the workstation
-handoff before sustained development moves there. Begin eligibility and strict lexical wiring
-next. The remaining stages follow executable prerequisites, not the size of the ready queue.
+**Current action:** recovery, numerical determinism, baseline qualification, GitHub/workstation
+handoff and JVM gate serialization are complete on `cb310958`. The coherent eligibility migration
+`bd-01M16DBEH9PKER423BZ47ZKBMV` is qualified at source `d5a7aefd` and consumer `2175735`;
+[the full receipt](evidence/estimate-eligibility-20261006/README.md) binds the 80-cell source matrix,
+15-cell default-pinned consumer matrix, compiled mutation controls and documentation successor.
+Integrate the independently reviewed exact pair, close eligibility on landing, and synchronize
+`buc-gw01`. Next is strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV`: controlled
+Lexical / ContentTable / Unavailable channels through generation, canonical evidence and HSMM
+rederivation together, retaining historical pins and distinct unavailable/abstaining outcomes.
+The first proposed witness is canonical contradiction order through the production strict
+evidence route and its successful HSMM validation. It has not yet been executed. G1, the broader
+construction audit and release acceptance remain open; the remaining stages follow executable
+prerequisites, not the size of the ready queue.
 
 ## Completed fixture milestone: M1 (22 September 2026)
 

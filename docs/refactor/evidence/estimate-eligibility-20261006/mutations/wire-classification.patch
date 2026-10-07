@@ -1,0 +1,50 @@
+--- a/align/src/main/scala/storymodel4s/align/wire.scala
++++ b/align/src/main/scala/storymodel4s/align/wire.scala
+@@ -424,34 +424,22 @@
+           val ineligible = reductions
+             .get(t)
+             .exists(rc => rc.members.nonEmpty && rc.members.forall(!_.estimate.isEligible))
+-          val eligible = support match
+-            case s: SupportAssessment.Assessed      => s.basis.eligibleTerms.contains(t)
+-            case s: SupportAssessment.Unestablished => s.basis.eligibleTerms.contains(t)
+-            case _: SupportAssessment.NotApplicable => false
+           val reduced = reductions
+             .get(t)
+             .flatMap(rc => rc.reducer.reduce(rc.members.flatMap(_.estimate.toOption)))
+-          if ineligible && (missingTerms.contains(t) || imputedTerms.contains(t) || eligible) then
+-            Some(
+-              bad(
+-                r,
+-                s"term $t has entirely ineligible members but is classified as eligible or missing"
+-              )
+-            )
+-          else
+-            (terms.get(t), reduced) match
+-              case (Some(_), _) if !reductions.contains(t) =>
+-                Some(bad(r, s"term $t is present without its reduction receipt"))
+-              case (Some(v), Some(x)) if clamp(x) != v =>
+-                Some(bad(r, s"term $t is $v but its receipt reduces to ${clamp(x)}"))
+-              case (Some(v), None) =>
+-                Some(bad(r, s"term $t is $v but its receipt reduces to nothing"))
+-              case (None, Some(x)) =>
+-                Some(bad(r, s"term $t is missing but its receipt reduces to $x"))
+-              case (None, None)
+-                  if reductions.contains(t) && !ineligible && !missingTerms.contains(t) =>
+-                Some(bad(r, s"term $t reduces to nothing but is not recorded as missing"))
+-              case _ => None
++          (terms.get(t), reduced) match
++            case (Some(_), _) if !reductions.contains(t) =>
++              Some(bad(r, s"term $t is present without its reduction receipt"))
++            case (Some(v), Some(x)) if clamp(x) != v =>
++              Some(bad(r, s"term $t is $v but its receipt reduces to ${clamp(x)}"))
++            case (Some(v), None) =>
++              Some(bad(r, s"term $t is $v but its receipt reduces to nothing"))
++            case (None, Some(x)) =>
++              Some(bad(r, s"term $t is missing but its receipt reduces to $x"))
++            case (None, None)
++                if reductions.contains(t) && !ineligible && !missingTerms.contains(t) =>
++              Some(bad(r, s"term $t reduces to nothing but is not recorded as missing"))
++            case _ => None
+         }
+         .headOption,
+       reductions.toVector.sortBy(_._1.ordinal).collectFirst {
