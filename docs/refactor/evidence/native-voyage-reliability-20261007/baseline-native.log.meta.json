@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T16:10:54.952365+00:00",
+  "finished_utc": "2026-10-07T16:14:11.506938+00:00",
+  "duration_seconds": 196.553627,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "fixturesNative/testOnly storymodel4s.fixtures.WorkspaceVoyageSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/native-reliability-20261007/baseline-native.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": null,
+  "log_bytes": 7174
+}

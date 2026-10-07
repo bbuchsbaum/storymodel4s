@@ -1,0 +1,14 @@
+Independent landing GO
+Reviewer: salvage_review
+Exact source: 09f08b43e8be88c0efdf12a6efbfab13d1801b18
+
+Verified exact checkout SHAs and raw hosted logs matching ZIP bodies:
+- CI: 80 cells, 12,722 Passed, 0 Failed, 0 Errors, 12 existing skips.
+- Native: 2,822 Passed, including all nine Voyage courts, zero ignored.
+- Docs: 13 executable examples; site and provenance checks pass.
+- Local: 485 Passed; compiled mutant has one named failure and eight passing controls.
+
+Evidence verifier and compressed raw patch identities pass. No remaining BLOCK.
+Docs/Mote-only successors preserve runtime qualification when gated inputs remain
+unchanged and receive separate exact-SHA review and format checks. No consumer
+repin/retest is required. Publication and BUC synchronization are separate observations.

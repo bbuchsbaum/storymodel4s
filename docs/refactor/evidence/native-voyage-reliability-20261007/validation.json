@@ -1,0 +1,19 @@
+{
+  "code_sha": "09f08b43e8be88c0efdf12a6efbfab13d1801b18",
+  "local_passed": 485,
+  "local_failed": 0,
+  "local_errors": 0,
+  "local_skipped": 0,
+  "compiled_mutant_failed": 1,
+  "mutant_siblings_passed": 8,
+  "hosted": {
+    "cells": 80,
+    "passed": 12722,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "native_passed": 2822,
+  "docs_examples": 13,
+  "verified_artifacts": 37
+}

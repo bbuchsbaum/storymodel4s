@@ -1,0 +1,27 @@
+{
+  "base_sha": "975f06761695fd23b10442d9cb27b12eee81eb34",
+  "diagnostic_patch": "baseline-profile.patch",
+  "platform": "macOS arm64 / Native debug / Java25 / Scala3.7.4",
+  "exit": 0,
+  "passed": 9,
+  "failed": 0,
+  "ignored": 0,
+  "suite_seconds": 108.477,
+  "shared_setup_ms": 41470,
+  "wog_source_bytes": 477497,
+  "bell_source_bytes": 9024,
+  "wog_checked_archive_ms": 20393,
+  "wog_source_view_ms": 244,
+  "wog_hsmm_decode_ms": 40,
+  "wog_adapter_ms": 227,
+  "bell_checked_archive_ms": [
+    6496,
+    6453,
+    6485,
+    6480,
+    6728,
+    6454,
+    3793
+  ],
+  "runner_boundary": "Local baseline passed; retained hosted timeout proves runner-dependent deadline crossing. No claim of deterministic local failure."
+}

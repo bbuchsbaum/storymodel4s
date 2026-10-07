@@ -1,0 +1,24 @@
+{
+  "run": 37650914132,
+  "source_sha": "09f08b43e8be88c0efdf12a6efbfab13d1801b18",
+  "job_id": 112893696980,
+  "job_name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+  "native_totals": {
+    "cells": 16,
+    "passed": 2822,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "setup_ms": {
+    "producer fixture": 55652,
+    "external-winner checked fixture": 26844
+  },
+  "voyage_lines": [
+    "2026-10-07T16:43:09.5143840Z Test run storymodel4s.fixtures.WorkspaceVoyageSuite started",
+    "2026-10-07T16:44:05.1678858Z WorkspaceVoyage producer fixture setup: 55652 ms",
+    "2026-10-07T16:44:32.0125404Z WorkspaceVoyage external-winner checked fixture setup: 26844 ms",
+    "2026-10-07T16:45:35.9917188Z storymodel4s.fixtures.WorkspaceVoyageSuite: finished 146.476s",
+    "2026-10-07T16:45:35.9918440Z Test run storymodel4s.fixtures.WorkspaceVoyageSuite finished: 0 failed, 0 ignored, 9 total 146.476s"
+  ]
+}

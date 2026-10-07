@@ -1,0 +1,7 @@
+{
+  "base_sha": "975f06761695fd23b10442d9cb27b12eee81eb34",
+  "original_file_sha256": "f05447f4dbead5428e638c2176e04c70f83673e2754a2dd0467c97aa01212248",
+  "instrumented_file_sha256": "54e6d049934b2eaf236cb23a6d2773065bd4cad7dac696387b670d8df58c79d8",
+  "patch_sha256": "72ca01f8dd07a7e2fb8337c1c1e04bbb30accb39c3c8497295198e7ee1f7277d",
+  "scope": "timing-only diagnostic; all original tests/assertions/timeouts retained"
+}

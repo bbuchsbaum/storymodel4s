@@ -1,0 +1,27 @@
+{
+  "original_compound_exit": 0,
+  "boundary": "Original completion continued during the server restart and completed both reservation closes and release; canonical handoff confirms its exit0. Initial recovery read observed an intermediate state.",
+  "redundant_recovery_attempts": [
+    {
+      "command": "mote unreserve rv-01M4BK395WNWQP4D54AMYMBFPM",
+      "exit": 0,
+      "op": "20261007T171016.467719Z-p7857-c0000-rc4f9-ha6e19a",
+      "effect": "already closed reservation remains closed"
+    },
+    {
+      "command": "mote release bd-01M4B896MCEE43Q9QMR4HT60R0",
+      "exit": 2,
+      "stderr": "rejected: no active claim to release",
+      "op": "20261007T171031.838417Z-p8351-c0000-r22a9-hbce63d",
+      "effect": "no active claim; no state change"
+    }
+  ],
+  "canonical_ownership": {
+    "actor": "codex-native-reliability-20261007",
+    "active_claims": 0,
+    "active_reservations": 0,
+    "orphaned_claims": 0,
+    "orphaned_reservations": 0
+  },
+  "issue_status": "closed"
+}

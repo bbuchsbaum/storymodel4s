@@ -1,0 +1,47 @@
+{
+  "source_sha": "09f08b43e8be88c0efdf12a6efbfab13d1801b18",
+  "base_sha": "975f06761695fd23b10442d9cb27b12eee81eb34",
+  "platforms": [
+    "JVM",
+    "Scala.js",
+    "Native"
+  ],
+  "totals": [
+    {
+      "total": 165,
+      "failed": 0,
+      "errors": 0,
+      "passed": 165,
+      "skipped": 0
+    },
+    {
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    {
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    }
+  ],
+  "sum": {
+    "passed": 485,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "fatal_warnings": true,
+  "formatting_last": true,
+  "clean_exact_clone_after_restoration": true,
+  "raw_log_sha256": "160f03b895d20a9ac246fe1b7851d68d9e57848efdcc3c49cff57e1531945b04",
+  "native_setup_ms": {
+    "producer fixture": 41561,
+    "external-winner checked fixture": 19869
+  },
+  "consumer_impact": "Test-only fixture class; no consumer-facing inputs changed; no sibling repin/retest required."
+}

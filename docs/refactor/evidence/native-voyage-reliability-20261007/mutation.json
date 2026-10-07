@@ -1,0 +1,24 @@
+{
+  "candidate_sha": "09f08b43e8be88c0efdf12a6efbfab13d1801b18",
+  "mutation": "Invent a residual source anchor for an external global decision",
+  "original_sha256": "aaf779b7eae527a63720c1ea3f39e3f26d0fe20156840829d1a454b99130fdea",
+  "mutant_sha256": "3b7c528530aa0d0e258c3865a4e78bea3c91e740dc913ef812587b0fc0a3eef5",
+  "patch_sha256": "27f788ac07ef3ba4409623d1f0dd45d5e1958b59ed336ac3d45733f71841494b",
+  "log_sha256": "1de05ce904a2b567412e388a9cda915d769ba55e22ec863f81268df64bc08a4b",
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "fixturesJVM/testOnly storymodel4s.fixtures.WorkspaceVoyageSuite"
+  ],
+  "exit": 1,
+  "total": 9,
+  "failed": 1,
+  "errors": 0,
+  "passed": 8,
+  "ignored": 0,
+  "compiled": true,
+  "named_failure": "external global winner with residual source mass does not become a source anchor",
+  "failure_kind": "munit.ComparisonFailException; None-versus-Some document assertion",
+  "accepting_control_and_siblings_passed": true
+}

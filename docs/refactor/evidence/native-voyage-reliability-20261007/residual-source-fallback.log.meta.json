@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T16:18:43.030987+00:00",
+  "finished_utc": "2026-10-07T16:19:17.350928+00:00",
+  "duration_seconds": 34.319675,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "fixturesJVM/testOnly storymodel4s.fixtures.WorkspaceVoyageSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/native-reliability-20261007/residual-source-fallback.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": null,
+  "log_bytes": 3768
+}

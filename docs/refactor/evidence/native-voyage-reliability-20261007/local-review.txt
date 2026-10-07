@@ -1,0 +1,16 @@
+Independent read-only local-evidence GO
+Reviewer: salvage_review
+Exact source: 09f08b43e8be88c0efdf12a6efbfab13d1801b18
+
+Raw gate hash and counts checked: 165 JVM + 160 JS + 160 Native = 485 Passed,
+0 Failed, 0 Errors, 0 skipped; formatting last. All nine Voyage courts execute
+on each platform, zero ignored; the accepting Bell court remains.
+
+The mutant compiles, with exactly one named ComparisonFail at the document
+None-versus-Some assertion on line 295. Eight siblings pass. Original, mutant,
+patch and raw-log hashes match. The restored gate recompiles production; the
+owned clone is independently observed clean at the exact SHA, with production
+and fixture bytes matching the commit. The baseline timing-only profile correctly
+distinguishes its local pass from the retained hosted timeout.
+
+No local BLOCK. This verdict does not assert hosted qualification or metadata landing.

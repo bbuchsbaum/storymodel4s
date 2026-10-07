@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T16:15:41.644628+00:00",
+  "finished_utc": "2026-10-07T16:16:22.094948+00:00",
+  "duration_seconds": 40.450077,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "fixturesJVM/Test/scalafmt",
+    "fixturesJVM/testOnly storymodel4s.fixtures.WorkspaceVoyageSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/native-reliability-20261007/repair-jvm-smoke.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": null,
+  "log_bytes": 2265
+}
