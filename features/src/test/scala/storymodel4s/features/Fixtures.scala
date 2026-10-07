@@ -93,6 +93,7 @@ object Fixtures:
         MissingReason.NotInLexicon,
         MissingReason.OutOfVocabulary,
         MissingReason.ProviderAbstained,
+        MissingReason.ChannelUnavailable,
         MissingReason.Excluded,
         MissingReason.AllMissing,
         MissingReason.Undefined(UndefinedReason.NotFinite),

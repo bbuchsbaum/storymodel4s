@@ -229,7 +229,10 @@ class AlignCodecSuite extends FunSuite:
         HsmmResultCodec.decodeJson(document, fixture.recall, fixture.view),
         Left(
           HsmmCodecError.Wire(
-            CodecError.UnsupportedSchema(version, Vector(HsmmResultCodec.SchemaVersion))
+            CodecError.UnsupportedSchema(
+              version,
+              Vector(HsmmResultCodec.SchemaVersion, HsmmResultCodec.CanonicalSchemaVersion)
+            )
           )
         )
       )
@@ -237,7 +240,10 @@ class AlignCodecSuite extends FunSuite:
         HsmmResultCodec.decode(Canonical.print(document), fixture.recall, fixture.view),
         Left(
           HsmmCodecError.Wire(
-            CodecError.UnsupportedSchema(version, Vector(HsmmResultCodec.SchemaVersion))
+            CodecError.UnsupportedSchema(
+              version,
+              Vector(HsmmResultCodec.SchemaVersion, HsmmResultCodec.CanonicalSchemaVersion)
+            )
           )
         )
       )
@@ -245,7 +251,9 @@ class AlignCodecSuite extends FunSuite:
     val v0 = json.mapObject(_.add("schemaVersion", Json.fromString("hsmm/v0")))
     assertEquals(
       HsmmResultCodec.decodeJson(v0, fixture.recall, fixture.view),
-      Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v0", Vector("hsmm/v4"))))
+      Left(
+        HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v0", Vector("hsmm/v4", "hsmm/v5")))
+      )
     )
     // An untagged artifact is a wire error, not a guess at the current version.
     HsmmResultCodec.decodeJson(

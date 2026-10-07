@@ -24,13 +24,13 @@ package storymodel4s.align.attack {
     )
 
     val setConstructor = typeCheckErrors(
-      "import storymodel4s.align.*; new StrictCandidateSet(???, Vector.empty, Vector.empty)"
+      "import storymodel4s.align.*; new StrictCandidateSet(???, Vector.empty, Vector.empty, Vector.empty)"
     )
     val candidatesConstructor = typeCheckErrors(
-      "import storymodel4s.align.*; new StrictCandidates(???, ???, ???)"
+      "import storymodel4s.align.*; new StrictCandidates(???, ???, ???, None)"
     )
     val strictProvenanceConstructor = typeCheckErrors(
-      "import storymodel4s.align.*; new CandidateProvenance.Strict(???, Vector.empty, Vector.empty)"
+      "import storymodel4s.align.*; new CandidateProvenance.Strict(???, Vector.empty, Vector.empty, None, Vector.empty)"
     )
     val setMirror = typeCheckErrors(
       "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StrictCandidateSet]]"

@@ -704,6 +704,13 @@ enter `StrictCostModel`. Compact per-level counts retain unavailable, abstained,
 observed populations even when all nominations are unranked. Explicit lexical nominations remain
 a separately named configuration choice, never an unavailable-channel fallback.
 
+**Persistence boundary.** The public `LocalEvidence` value preserves measured generation outcomes
+and binds them into its identity. An exported HSMM result cannot explain why semantic generation
+was entirely unranked or independently establish strict-reference eligibility; those claims need
+the originating evidence. `GateSemantics.CanonicalContent` certifies a gate proof only. Reject
+adding caller-supplied counts to a result as proof of adapter execution. Durable originating
+evidence/result bundles and downstream reference integration remain separate G1 work.
+
 The comparison's gate alternatives remain measured evidence. The current single-facet HSMM cannot
 represent several equally supported readings: it returns a typed downstream-model refusal carrying
 the exact `GateReading` set. This clarifies the preceding rejection: never discard alternatives,

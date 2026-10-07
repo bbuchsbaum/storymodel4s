@@ -387,8 +387,19 @@ object HsmmResult:
       refinementPasses: Int,
       admissibilityEcho: Option[AdmissibilityEcho] = None
   ): Either[AlignError, HsmmResult] =
-    validatedWith(recall, view, candidateAnchors, posterior, flow, viterbi, logLikelihood,
-      costs, refinementPasses, admissibilityEcho, GateSemantics.Historical)
+    validatedWith(
+      recall,
+      view,
+      candidateAnchors,
+      posterior,
+      flow,
+      viterbi,
+      logLikelihood,
+      costs,
+      refinementPasses,
+      admissibilityEcho,
+      GateSemantics.Historical
+    )
 
   /** Re-derive canonical content gates before accepting result parts. This proves gate semantics,
     * not candidate-generation or scoring provenance supplied by a caller.
@@ -405,8 +416,19 @@ object HsmmResult:
       refinementPasses: Int,
       admissibilityEcho: Option[AdmissibilityEcho] = None
   ): Either[AlignError, HsmmResult] =
-    validatedWith(recall, view, candidateAnchors, posterior, flow, viterbi, logLikelihood,
-      costs, refinementPasses, admissibilityEcho, GateSemantics.CanonicalContent)
+    validatedWith(
+      recall,
+      view,
+      candidateAnchors,
+      posterior,
+      flow,
+      viterbi,
+      logLikelihood,
+      costs,
+      refinementPasses,
+      admissibilityEcho,
+      GateSemantics.CanonicalContent
+    )
 
   private def validatedWith(
       recall: RecallGraph[Checked],
@@ -547,11 +569,16 @@ object HsmmResult:
       // The nomination pass has already refused absent anchors; derivation still goes through
       // `view.node` totally (an anchor without a node simply has no record, and would then fail
       // the gate below rather than throw).
-      recall.ordered.traverse { unit =>
-        candidateAnchors(unit.id).flatMap(ref => view.node(ref).map(ref -> _)).traverse { (ref, node) =>
-          GateSemantics.assess(gateSemantics, unit, node, view).map(ref -> _)
-        }.map(entries => unit.id -> entries.toMap)
-      }.map(_.toMap)
+      recall.ordered
+        .traverse { unit =>
+          candidateAnchors(unit.id)
+            .flatMap(ref => view.node(ref).map(ref -> _))
+            .traverse { (ref, node) =>
+              GateSemantics.assess(gateSemantics, unit, node, view).map(ref -> _)
+            }
+            .map(entries => unit.id -> entries.toMap)
+        }
+        .map(_.toMap)
     def drift(derived: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]) =
       admissibilityEcho match
         case Some(echo) =>
@@ -740,7 +767,7 @@ object GraphHsmm:
           // the view were dropped when the evidence was computed, never nominated: the proof
           // refuses absent anchors, and an unreachable candidate is a nomination error, not a state.
           val validate = evidence.gateSemantics match
-            case GateSemantics.Historical => HsmmResult.validated
+            case GateSemantics.Historical       => HsmmResult.validated
             case GateSemantics.CanonicalContent => HsmmResult.validatedCanonical
           validate(
             recall,

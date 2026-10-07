@@ -162,12 +162,19 @@ class LocalEvidenceIsolationSuite extends FunSuite:
         v: SourceView,
         t: Map[(storymodel4s.recall.RecallUnitId, SourceNodeRef), Double]
     ) =
-      val sem = SemanticDistance.fromTable(t)
-      val strict = StrictCandidateGenerator(sem, config)
-        .generate(recall, v)
+      val sem = StrictSemanticChannel.ContentTable
+        .projected(
+          recall,
+          v,
+          t.toVector.map((key, value) => key -> storymodel4s.features.Estimate.observed(value)),
+          storymodel4s.features.Estimate.observed(0.9)
+        )
+        .fold(e => fail(e.message), identity)
+      val strict = StrictCandidateGenerator
+        .canonical(sem, config, recall, v)
         .fold(e => fail(e.message), identity)
       val e = LocalEvidence
-        .compute(recall, v, strict, costModel.copy(semantic = sem))
+        .compute(recall, v, strict, StrictCostModel.of(sem).fold(e => fail(e.message), identity))
         .fold(err => fail(err.message), identity)
       e.nominated.map(_.toSet).zip(e.breakdowns)
     def unrename(s: AlignState): AlignState = s match

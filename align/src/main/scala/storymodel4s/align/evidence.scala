@@ -21,6 +21,11 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   *
   * Candidates that are not nodes of the view are dropped here, exactly as inference always did:
   * they are neither priced nor nominated.
+  *
+  * Canonical controlled generation retains its adapter and measured outcome populations in
+  * [[CandidateProvenance.Strict]], even when every unit is unranked. Retain this originating
+  * evidence to explain that distinction: an exported [[HsmmResult]] proves gates and result parts,
+  * and cannot restore generation outcomes or establish strict-reference eligibility by itself.
   */
 final class LocalEvidence private (
     val recallChecksum: Checksum,
@@ -72,7 +77,14 @@ object LocalEvidence:
       costModel: LocalCostModel,
       gate: Boolean
   ): Either[AlignError, LocalEvidence] =
-    build(recall, source, candidates, CandidateProvenance.Unattested, Pricing.Historical(costModel), gate)
+    build(
+      recall,
+      source,
+      candidates,
+      CandidateProvenance.Unattested,
+      Pricing.Historical(costModel),
+      gate
+    )
 
   /** Gated evidence over strict candidates. The tie policy, every overflow and every uniform
     * semantic level are recorded on the evidence and in its identity, so no consumer can mistake a
@@ -96,7 +108,11 @@ object LocalEvidence:
       costModel: StrictCostModel
   ): Either[AlignError, LocalEvidence] =
     if !strict.semanticChannel.contains(costModel.semantic) then
-      Left(AlignError.InconsistentResult("strict candidates were generated with a different or historical semantic channel"))
+      Left(
+        AlignError.InconsistentResult(
+          "strict candidates were generated with a different or historical semantic channel"
+        )
+      )
     else computeStrict(recall, source, strict, Pricing.Canonical(costModel))
 
   private enum Pricing:
@@ -105,15 +121,20 @@ object LocalEvidence:
 
     def semantics: GateSemantics = this match
       case Historical(_) => GateSemantics.Historical
-      case Canonical(_) => GateSemantics.CanonicalContent
+      case Canonical(_)  => GateSemantics.CanonicalContent
 
-    def cost(unit: RecallUnit, node: NodeSummary, mode: FidelityMode, view: SourceView): Either[AlignError, CostBreakdown] = this match
+    def cost(
+        unit: RecallUnit,
+        node: NodeSummary,
+        mode: FidelityMode,
+        view: SourceView
+    ): Either[AlignError, CostBreakdown] = this match
       case Historical(model) => Right(model.cost(unit, node, mode, view))
-      case Canonical(model) => model.cost(unit, node, mode, view)
+      case Canonical(model)  => model.cost(unit, node, mode, view)
 
     def external(unit: RecallUnit, state: ExternalState): Double = this match
       case Historical(model) => model.externalCost(unit, state)
-      case Canonical(model) => model.externalCost(unit, state)
+      case Canonical(model)  => model.externalCost(unit, state)
 
   private def computeStrict(
       recall: RecallGraph[Checked],
@@ -151,58 +172,62 @@ object LocalEvidence:
     else
       // One snapshot prices and identifies the evidence, so a mutable view cannot change between.
       val view = MappingBindingRender.snapshot(source)
-      val admissibility: Either[AlignError, Vector[Map[SourceNodeRef, Admissibility]]] = units.traverse { u =>
-        candidates
-          .set(u.id)
-          .ranked
-          .flatMap(ref => view.node(ref).map(ref -> _))
-          .traverse { (ref, n) =>
-            (if gate then GateSemantics.assess(pricing.semantics, u, n, view)
-             else Right(Admissibility.faithfulOnly)).map(ref -> _)
-          }
-          .map(_.toMap)
-      }
+      val admissibility: Either[AlignError, Vector[Map[SourceNodeRef, Admissibility]]] =
+        units.traverse { u =>
+          candidates
+            .set(u.id)
+            .ranked
+            .flatMap(ref => view.node(ref).map(ref -> _))
+            .traverse { (ref, n) =>
+              (if gate then GateSemantics.assess(pricing.semantics, u, n, view)
+               else Right(Admissibility.faithfulOnly)).map(ref -> _)
+            }
+            .map(_.toMap)
+        }
       val breakdowns: Either[AlignError, Vector[Map[AlignState, CostBreakdown]]] =
-        admissibility.flatMap { admitted => units.zip(admitted).traverse { (u, adm) =>
-          val set = candidates.set(u.id)
-          val sources = set.ranked.flatMap(ref => view.node(ref).toVector.flatMap(n =>
-            adm(ref).modes.map(m => (ref, n, m))
-          )).traverse { (ref, n, m) =>
-            pricing.cost(u, n, m, view).map(AlignState.anchored(ref, m) -> _)
+        admissibility.flatMap { admitted =>
+          units.zip(admitted).traverse { (u, adm) =>
+            val set = candidates.set(u.id)
+            val sources = set.ranked
+              .flatMap(ref =>
+                view.node(ref).toVector.flatMap(n => adm(ref).modes.map(m => (ref, n, m)))
+              )
+              .traverse { (ref, n, m) =>
+                pricing.cost(u, n, m, view).map(AlignState.anchored(ref, m) -> _)
+              }
+            val externals =
+              if set.abstained && set.ranked.isEmpty then Vector(AlignState.unranked)
+              else AlignState.externals
+            val ext = externals.traverse {
+              case s @ AlignState.External(x) =>
+                CostBreakdown.external(pricing.external(u, x)).map(s -> _)
+              case s => Right(s -> CostBreakdown.unreachable)
+            }
+            for
+              values <- sources
+              outside <- ext
+            yield (values ++ outside).toMap
           }
-          val externals =
-            if set.abstained && set.ranked.isEmpty then Vector(AlignState.unranked)
-            else AlignState.externals
-          val ext = externals.traverse {
-            case s @ AlignState.External(x) =>
-              CostBreakdown.external(pricing.external(u, x)).map(s -> _)
-            case s => Right(s -> CostBreakdown.unreachable)
-          }
-          for
-            values <- sources
-            outside <- ext
-          yield (values ++ outside).toMap
-        }}
+        }
       val ids = units.map(_.id)
       val nominated = ids.map(id => candidates.anchorsOf(id).filter(ref => view.node(ref).nonEmpty))
       for
         a <- admissibility
         b <- breakdowns
-      yield
-        new LocalEvidence(
-          AlignWire.recallChecksum(recall),
-          MappingBindingRender.recall(recall),
-          ViewFingerprint.of(view),
-          MappingSourceRender.scope(view.nodes),
-          gate,
-          provenance,
-          ids,
-          ids.map(candidates.set),
-          nominated,
-          a,
-          b,
-          pricing.semantics
-        )
+      yield new LocalEvidence(
+        AlignWire.recallChecksum(recall),
+        MappingBindingRender.recall(recall),
+        ViewFingerprint.of(view),
+        MappingSourceRender.scope(view.nodes),
+        gate,
+        provenance,
+        ids,
+        ids.map(candidates.set),
+        nominated,
+        a,
+        b,
+        pricing.semantics
+      )
 
   /** Refuse evidence computed for another recall, another view, or under the other gate setting. */
   private[align] def bound(
@@ -276,7 +301,8 @@ object LocalEvidenceId:
     }
     MappingRender.digest(
       Vector(
-        if e.gateSemantics == GateSemantics.Historical then "local-evidence/v3" else "local-evidence/strict-content/v1",
+        if e.gateSemantics == GateSemantics.Historical then "local-evidence/v3"
+        else "local-evidence/strict-content/v1",
         e.recallChecksum.hex,
         e.recallSupplement.hex,
         e.viewFingerprint.checksum.hex,
@@ -310,9 +336,10 @@ object CandidateProvenance:
     override def equals(that: Any): Boolean = that match
       case o: Strict =>
         policy == o.policy && overflow == o.overflow && uniformSemantic == o.uniformSemantic &&
-          semanticChannel == o.semanticChannel && semanticOutcomes == o.semanticOutcomes
+        semanticChannel == o.semanticChannel && semanticOutcomes == o.semanticOutcomes
       case _ => false
-    override def hashCode: Int = (policy, overflow, uniformSemantic, semanticChannel, semanticOutcomes).hashCode
+    override def hashCode: Int =
+      (policy, overflow, uniformSemantic, semanticChannel, semanticOutcomes).hashCode
     override def toString: String = s"Strict($policy)"
 
   object Strict:
@@ -321,7 +348,13 @@ object CandidateProvenance:
       */
     private[align] def of(strict: StrictCandidates, units: Vector[RecallUnitId]): Strict =
       val sets = units.flatMap(strict.get)
-      new Strict(strict.policy, sets.map(_.overflow), sets.map(_.uniformSemantic), strict.semanticChannel, sets.map(_.semanticOutcomes))
+      new Strict(
+        strict.policy,
+        sets.map(_.overflow),
+        sets.map(_.uniformSemantic),
+        strict.semanticChannel,
+        sets.map(_.semanticOutcomes)
+      )
 
   private[align] def render(p: CandidateProvenance): String =
     import MappingRender.sequence
@@ -347,12 +380,29 @@ object CandidateProvenance:
           )
         )
         s.semanticChannel match
-          case None => historical
-          case Some(channel) => sequence(Vector(
-            historical,
-            channel.kind,
-            sequence(s.semanticOutcomes.map(levels => sequence(levels.map { o => sequence(Vector(
-              o.level.toString, o.observed.toString, o.ineligible.toString,
-              sequence(o.missing.toVector.sortBy(_._1.toString).map((r, n) => sequence(Vector(r.toString, n.toString))))
-            )) })))
-          ))
+          case None          => historical
+          case Some(channel) =>
+            sequence(
+              Vector(
+                historical,
+                channel.kind,
+                sequence(
+                  s.semanticOutcomes.map(levels =>
+                    sequence(levels.map { o =>
+                      sequence(
+                        Vector(
+                          o.level.toString,
+                          o.observed.toString,
+                          o.ineligible.toString,
+                          sequence(
+                            o.missing.toVector
+                              .sortBy(_._1.toString)
+                              .map((r, n) => sequence(Vector(r.toString, n.toString)))
+                          )
+                        )
+                      )
+                    })
+                  )
+                )
+              )
+            )

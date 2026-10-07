@@ -18,10 +18,10 @@ enum CandidateRefusal:
   case StrictScoring(unit: RecallUnitId, ref: SourceNodeRef, refusal: StrictScoringRefusal)
 
   def message: String = this match
-    case NonPositivePerLevel(k)    => s"perLevel must be positive, got $k"
-    case NonPositiveBudget(n)      => s"tie budget must be positive, got $n"
-    case BudgetBelowPerLevel(n, k) => s"tie budget $n is below perLevel $k"
-    case NonFiniteScore(unit, ref) => s"non-finite semantic score for ${unit.value} at ${ref.key}"
+    case NonPositivePerLevel(k)      => s"perLevel must be positive, got $k"
+    case NonPositiveBudget(n)        => s"tie budget must be positive, got $n"
+    case BudgetBelowPerLevel(n, k)   => s"tie budget $n is below perLevel $k"
+    case NonFiniteScore(unit, ref)   => s"non-finite semantic score for ${unit.value} at ${ref.key}"
     case StrictScoring(unit, ref, r) => s"unit ${unit.value} at ${ref.key}: ${r.message}"
 
 /** The budget a caller asks for. It is an unchecked request; [[StrictCandidateConfig.of]] checks it
@@ -150,7 +150,7 @@ final class StrictCandidateSet private (
   override def equals(that: Any): Boolean = that match
     case o: StrictCandidateSet =>
       set == o.set && overflow == o.overflow && uniformSemantic == o.uniformSemantic &&
-        semanticOutcomes == o.semanticOutcomes
+      semanticOutcomes == o.semanticOutcomes
     case _ => false
   override def hashCode: Int = (set, overflow, uniformSemantic, semanticOutcomes).hashCode
   override def toString: String =
@@ -231,18 +231,19 @@ object StrictCandidateSet:
             case None           => Right(done :+ (level -> scored))
         }
       }
-    scoredByLevel.map(byLevel => complete(config, unit, view, byLevel, Vector.empty))
+    val lexicalRefs =
+      if config.lexicalOverlap then CandidateGenerator.lexicalHits(unit, view).toSet
+      else Set.empty[SourceNodeRef]
+    scoredByLevel.map(byLevel => complete(config, view, byLevel, Vector.empty, lexicalRefs))
 
   private def complete(
       config: StrictCandidateConfig,
-      unit: RecallUnit,
       view: SourceView,
       byLevel: Vector[(Int, Vector[(SourceNodeRef, Double)])],
-      outcomes: Vector[SemanticOutcomeSummary]
+      outcomes: Vector[SemanticOutcomeSummary],
+      lexicalRefs: Set[SourceNodeRef]
   ): StrictCandidateSet =
     val channel = Channels.semantic(config.space)
-    val lexicalRefs: Set[SourceNodeRef] =
-      if config.lexicalOverlap then CandidateGenerator.lexicalHits(unit, view).toSet else Set.empty
     val anyRanked = byLevel.exists(_._2.nonEmpty)
     val perLevel = byLevel.map { (level, scored) =>
       val sorted = scored.sortBy(_._2)
@@ -284,23 +285,53 @@ object StrictCandidateSet:
       view: SourceView
   ): Either[CandidateRefusal, StrictCandidateSet] =
     val levels = view.byLevel.toVector.sortBy(_._1)
-    levels.foldLeft[Either[CandidateRefusal, Vector[(Int, Vector[(SourceNodeRef, Double)], SemanticOutcomeSummary)]]](
-      Right(Vector.empty)
-    ) { case (pending, (level, nodes)) =>
-      pending.flatMap { previous =>
-        nodes.foldLeft[Either[CandidateRefusal, Vector[(SourceNodeRef, Estimate[Double])]]](Right(Vector.empty)) { (values, node) =>
-          values.flatMap { vs =>
-            ContentProjection.canonical(unit, node, view)
-              .left.map(r => CandidateRefusal.StrictScoring(unit.id, node.ref, StrictScoringRefusal.Projection(r)))
-              .map((u, t, _) => vs :+ (node.ref -> semantic.score(u, t)))
-          }
-        }.map { values =>
-          previous :+ (level, values.flatMap((r, e) => e.toOption.map(r -> _)),
-            SemanticOutcomeSummary.counted(level, values.map(_._2)))
+    levels
+      .foldLeft[Either[CandidateRefusal, Vector[
+        (Int, Vector[(SourceNodeRef, Double)], SemanticOutcomeSummary, Set[SourceNodeRef])
+      ]]](
+        Right(Vector.empty)
+      ) { case (pending, (level, nodes)) =>
+        pending.flatMap { previous =>
+          nodes
+            .foldLeft[Either[CandidateRefusal, Vector[(SourceNodeRef, Estimate[Double], Boolean)]]](
+              Right(Vector.empty)
+            ) { (values, node) =>
+              values.flatMap { vs =>
+                ContentProjection
+                  .canonical(unit, node, view)
+                  .left
+                  .map(r =>
+                    CandidateRefusal
+                      .StrictScoring(unit.id, node.ref, StrictScoringRefusal.Projection(r))
+                  )
+                  .map((u, t, _) =>
+                    vs :+ (
+                      node.ref,
+                      semantic.score(u, t),
+                      config.lexicalOverlap && ContentLexical.overlaps(u, t)
+                    )
+                  )
+              }
+            }
+            .map { values =>
+              previous :+ (
+                level,
+                values.flatMap((r, e, _) => e.toOption.map(r -> _)),
+                SemanticOutcomeSummary.counted(level, values.map(_._2)),
+                values.collect { case (r, _, true) => r }.toSet
+              )
+            }
         }
       }
-    }.map(scored => complete(config, unit, view,
-      scored.map((level, distances, _) => level -> distances), scored.map(_._3)))
+      .map(scored =>
+        complete(
+          config,
+          view,
+          scored.map((level, distances, _, _) => level -> distances),
+          scored.map(_._3),
+          scored.flatMap(_._4).toSet
+        )
+      )
 
 object StrictCandidates:
 
@@ -334,12 +365,24 @@ object StrictCandidates:
       source: SourceView
   ): Either[CandidateRefusal, StrictCandidates] =
     val view = MappingBindingRender.snapshot(source)
-    recall.ordered.foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
-      Right(Vector.empty)
-    ) { (acc, unit) =>
-      acc.flatMap(done => StrictCandidateSet.canonicalGenerated(semantic, config, unit, view)
-        .map(set => done :+ (unit.id -> set)))
-    }.map(pairs => new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap, Some(semantic)))
+    recall.ordered
+      .foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
+        Right(Vector.empty)
+      ) { (acc, unit) =>
+        acc.flatMap(done =>
+          StrictCandidateSet
+            .canonicalGenerated(semantic, config, unit, view)
+            .map(set => done :+ (unit.id -> set))
+        )
+      }
+      .map(pairs =>
+        new StrictCandidates(
+          config.policy,
+          StrictBinding.of(recall, view),
+          pairs.toMap,
+          Some(semantic)
+        )
+      )
 
 /** Strict candidate generation: semantic candidates per hierarchy level, cut tie-complete with
   * dense ranks, unioned with lexical hits and bounded by the union-wide budget.

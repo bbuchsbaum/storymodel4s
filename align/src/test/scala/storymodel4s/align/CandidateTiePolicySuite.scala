@@ -14,14 +14,30 @@ class CandidateTiePolicySuite extends FunSuite:
   import AnnaFixture.{costModel, recall, table, view}
 
   private val default = 0.9 // SemanticDistance.fromTable's value for unlisted pairs
-  private val semantic = SemanticDistance.fromTable(table, default)
+  private def channel(
+      values: Map[(RecallUnitId, SourceNodeRef), Double],
+      fallback: Double = default
+  ) =
+    StrictSemanticChannel.ContentTable
+      .projected(
+        recall,
+        view,
+        values.toVector.map((key, value) => key -> Estimate.observed(value)),
+        Estimate.observed(fallback)
+      )
+      .fold(e => fail(e.message), identity)
+  private val semantic = channel(table)
+  private val strictModel = StrictCostModel.of(semantic).fold(e => fail(e.message), identity)
 
   private def config(perLevel: Int, budget: TieBudgetRequest, lexical: Boolean = false) =
     StrictCandidateConfig.of(perLevel, budget, lexical, None).fold(e => fail(e.message), identity)
 
-  private def strict(c: StrictCandidateConfig, s: SemanticDistance = semantic): StrictCandidates =
-    StrictCandidateGenerator(s, c)
-      .generate(recall, view)
+  private def strict(
+      c: StrictCandidateConfig,
+      s: StrictSemanticChannel = semantic
+  ): StrictCandidates =
+    StrictCandidateGenerator
+      .canonical(s, c, recall, view)
       .fold(e => fail(e.message), identity)
 
   private def distance(u: RecallUnitId, r: SourceNodeRef): Double = table.getOrElse((u, r), default)
@@ -92,7 +108,7 @@ class CandidateTiePolicySuite extends FunSuite:
   }
 
   test("a uniform semantic level is recorded with its scored population") {
-    val flat = SemanticDistance.fromTable(Map.empty, default)
+    val flat = channel(Map.empty, default)
     val out = strict(config(2, TieBudgetRequest.Unbounded), flat)
     val u = recall.ordered.head.id
     val expected = view.byLevel.collect {
@@ -111,7 +127,7 @@ class CandidateTiePolicySuite extends FunSuite:
     val (level, nodes) = view.byLevel.find(_._2.size >= 3).getOrElse(fail("need a level of 3+"))
     val u = recall.ordered.head.id
     val split = nodes.zipWithIndex.map((n, i) => (u, n.ref) -> (if i < 2 then 0.1 else 0.5)).toMap
-    val out = strict(config(2, TieBudgetRequest.Unbounded), SemanticDistance.fromTable(split))
+    val out = strict(config(2, TieBudgetRequest.Unbounded), channel(split))
     val kept = out.get(u).get.set.nominations.filter(_.receipt.contains(s"level:$level"))
     assertEquals(
       kept.flatMap(_.rawScore).distinct,
@@ -121,11 +137,12 @@ class CandidateTiePolicySuite extends FunSuite:
     assert(!out.get(u).get.uniformSemantic.exists(_.level == level), out.get(u).get.uniformSemantic)
   }
 
-  test("a non-finite score is refused, not tied or dropped") {
+  test("the historical callback path refuses a non-finite score, not tied or dropped") {
     val poison = view.nodes.head.ref
     val nan = new SemanticDistance:
       def apply(unit: RecallUnit, node: NodeSummary): Estimate[Double] =
-        if node.ref == poison then Estimate.observed(Double.NaN) else semantic(unit, node)
+        if node.ref == poison then Estimate.observed(Double.NaN)
+        else AnnaFixture.semantic(unit, node)
     val refused = StrictCandidateGenerator(nan, config(2, TieBudgetRequest.Unbounded))
       .generate(recall, view)
     assert(refused.left.exists(_.isInstanceOf[CandidateRefusal.NonFiniteScore]), refused)
@@ -136,7 +153,7 @@ class CandidateTiePolicySuite extends FunSuite:
     val generous = strict(config(2, TieBudgetRequest.AtMost(1000)))
     assertEquals(unbounded.candidates, generous.candidates, "same nominations, different budget")
     def ev(s: StrictCandidates) =
-      LocalEvidence.compute(recall, view, s, costModel).fold(e => fail(e.message), identity)
+      LocalEvidence.compute(recall, view, s, strictModel).fold(e => fail(e.message), identity)
     val plain = LocalEvidence
       .compute(recall, view, unbounded.candidates, costModel, gate = true)
       .fold(e => fail(e.message), identity)
@@ -156,8 +173,8 @@ class CandidateTiePolicySuite extends FunSuite:
       r: storymodel4s.recall.RecallGraph[storymodel4s.recall.RecallGraphStatus.Checked],
       v: SourceView
   ) =
-    StrictCandidateGenerator(semantic, config(2, TieBudgetRequest.Unbounded))
-      .generate(r, v)
+    StrictCandidateGenerator
+      .canonical(semantic, config(2, TieBudgetRequest.Unbounded), r, v)
       .fold(e => fail(e.message), identity)
 
   private def recallWith(units: Vector[RecallUnit]) = storymodel4s.recall.RecallGraph
@@ -165,7 +182,7 @@ class CandidateTiePolicySuite extends FunSuite:
     .fold(e => fail(s"invalid recall: $e"), identity)
 
   test("positive control: strict candidates are accepted for the recall and source they bind") {
-    assert(LocalEvidence.compute(recall, view, generated(recall, view), costModel).isRight)
+    assert(LocalEvidence.compute(recall, view, generated(recall, view), strictModel).isRight)
   }
 
   test("strict candidates generated for a subset of the recall are refused") {
@@ -177,7 +194,7 @@ class CandidateTiePolicySuite extends FunSuite:
         storymodel4s.recall.RecallRelations.empty
       )
       .fold(e => fail(s"invalid subset recall: $e"), identity)
-    val refused = LocalEvidence.compute(recall, view, generated(subset, view), costModel)
+    val refused = LocalEvidence.compute(recall, view, generated(subset, view), strictModel)
     assert(refused.left.exists(_.message.contains("different recall units")), refused)
   }
 
@@ -187,7 +204,7 @@ class CandidateTiePolicySuite extends FunSuite:
     val empty =
       recallWith(recall.units.map(u => u.copy(proposition = u.proposition.copy(cause = Some("")))))
     assertEquals(AlignWire.recallChecksum(absent), AlignWire.recallChecksum(empty), "legacy alias")
-    val refused = LocalEvidence.compute(empty, view, generated(absent, view), costModel)
+    val refused = LocalEvidence.compute(empty, view, generated(absent, view), strictModel)
     assert(refused.left.exists(_.message.contains("different recall")), refused)
   }
 
@@ -195,7 +212,7 @@ class CandidateTiePolicySuite extends FunSuite:
     val absent = view.copy(nodes = view.nodes.map(_.copy(cause = None)))
     val empty = view.copy(nodes = view.nodes.map(_.copy(cause = Some(""))))
     assertEquals(ViewFingerprint.of(absent), ViewFingerprint.of(empty), "legacy alias")
-    val refused = LocalEvidence.compute(recall, empty, generated(recall, absent), costModel)
+    val refused = LocalEvidence.compute(recall, empty, generated(recall, absent), strictModel)
     assert(refused.left.exists(_.message.contains("different source")), refused)
   }
 
@@ -205,6 +222,6 @@ class CandidateTiePolicySuite extends FunSuite:
         if n.ref == view.nodes.head.ref then n.copy(context = ContextTag.Speech) else n
       )
     )
-    val refused = LocalEvidence.compute(recall, changed, generated(recall, view), costModel)
+    val refused = LocalEvidence.compute(recall, changed, generated(recall, view), strictModel)
     assert(refused.left.exists(_.message.contains("different source")), refused)
   }

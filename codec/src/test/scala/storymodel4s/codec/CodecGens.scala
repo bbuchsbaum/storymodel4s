@@ -119,6 +119,7 @@ object CodecGens:
     Gen.const(MissingReason.NotInLexicon),
     Gen.const(MissingReason.OutOfVocabulary),
     Gen.const(MissingReason.ProviderAbstained),
+    Gen.const(MissingReason.ChannelUnavailable),
     Gen.const(MissingReason.Excluded),
     Gen.const(MissingReason.AllMissing),
     Gen.const(MissingReason.InputUnresolved),
