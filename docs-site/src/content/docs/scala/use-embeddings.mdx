@@ -13,9 +13,9 @@ import { resolve } from 'node:path';
 
 export const programPath = 'docs-site/examples/UseEmbeddings.scala';
 export const outputPath = 'docs-site/examples/use-embeddings.output.txt';
-export const PROGRAM_SHA = 'e0c3d9c182ea99eb4d7d6fcd2bbd5d86bf81849b7e0e6a84cc5c70d7bfe196be';
+export const PROGRAM_SHA = '5d12ad8ddfc42d6beb107bf91f6ace19a59677c1ecc89ba75d9aa134014df515';
 export const OUTPUT_SHA = 'a0609f215741b12fe739a27d25e4b1049ed964caf464abf90bc1726fd61d647c';
-export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+export const PRODUCER_REVISION = 'd5a7aefd20e695d2c1dfe3b55d20ca1c4be8fc19';
 export const program = readFileSync(resolve(process.cwd(), 'examples/UseEmbeddings.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/use-embeddings.output.txt'), 'utf8');
 export const programSha = createHash('sha256').update(program).digest('hex');
