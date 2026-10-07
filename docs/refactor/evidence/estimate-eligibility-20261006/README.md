@@ -54,7 +54,7 @@ One heavy local build ran at a time in standalone clones. No private data was us
 The denominator result contains five assertion failures and one dependent None.get; it is not
 six independent guard kills. The wire mutant stops at its forged-missing assertion; it is not
 a separately executed kill for each forged classification. Full patches, raw compressed logs,
-actual command exits and fresh JUnit reports are retained under `mutations/`. Apply each patch
+actual command exits and fresh compressed JUnit reports are retained under `mutations/`. Apply each patch
 only to its declared clean candidate, run the command in its metadata, restore the original
 source and recompile the named courts. Mutation evidence is JVM evidence; normal portable
 qualification is supplied by the full hosted matrix.
