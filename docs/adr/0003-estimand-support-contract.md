@@ -320,3 +320,31 @@ in `post-01M162GWXD475BKJV0M5JGFW50`. This ADR is the chief-assigned work item
   public vocabulary for one field, and a Scala 3 enum case cannot hide its
   constructor either way, so the point-of-use re-check is required regardless.
 
+### Amendment 2026-10-06: portable estimate eligibility
+
+Owner-approved Mote `bd-01M16DBEH9PKER423BZ47ZKBMV` adds bare `Estimate.Ineligible`:
+the declared measure does not apply. `Observed` and `Missing` remain eligible; only
+`Observed` contributes a value. A total fold preserves observed credence, missing reason and
+ineligibility. Coverage excludes ineligible outcomes while eligible missing outcomes retain their
+denominator and missing-value policy. Nonempty, entirely ineligible support reduces to
+`Ineligible`; actually empty support retains `Missing(AllMissing)`. Validate policies and weights
+before either outcome, and preserve original sample positions and narrative distances.
+
+The dedicated JSON tag is `{"ineligible":true}`. It consumes no sidecar row. Reject mixed
+estimate branches; preserve valid historical observed/missing encodings and do not reinterpret
+historical `Missing(Excluded)` records. The benchmark's finite checked observation constructor
+remains a separate boundary with a lossless portable conversion.
+
+Alignment provider ineligibility removes its term from priced, missing, imputed and eligible
+weighted support. If it removes the last positive configured eligible weight, the producer emits
+an unassessable cell with its actual unestablished support basis and never evaluates its price.
+This does not reprice historical all-configured-zero records: their function prior remains valid.
+Structural receipts count eligible provider outcomes, and distinguish all-provider-ineligible
+support from contradiction exclusion and eligible provider abstention. Views and consumer reports
+expose the state in text and structure.
+
+Rejected alternatives: a missing reason convention would hide eligibility in consumer-specific
+denominator rules; a reason-bearing `Ineligible` would introduce another reason taxonomy without
+a requirement (the recorded feature policy explains eligibility); aliasing the benchmark carrier
+would weaken its checked finite-value boundary; filtering samples would change support geometry;
+universally rejecting zero-weight historical records would alter an unrelated pricing contract.

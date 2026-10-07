@@ -121,6 +121,16 @@ class VectorSuite extends ScalaCheckSuite:
     assert(Distances.cosineEstimate(Estimate.observed(a), Estimate.observed(a)).isObserved)
   }
 
+  test("an ineligible endpoint makes the comparison ineligible even when the other is missing") {
+    val a = ValidatedVector.l2(d4, Vector(1.0, 0.0, 0.0, 0.0)).toOption.get
+    val ineligible: Estimate[ValidatedVector] = Estimate.Ineligible
+    val missing: Estimate[ValidatedVector] = Estimate.missing(MissingReason.ProviderAbstained)
+    Vector(Estimate.observed(a), missing, ineligible).foreach { other =>
+      assertEquals(Distances.cosineEstimate(ineligible, other), Estimate.Ineligible)
+      assertEquals(Distances.cosineEstimate(other, ineligible), Estimate.Ineligible)
+    }
+  }
+
   test("truncation re-normalizes and rejects non-shrinking targets") {
     val v = ValidatedVector.l2(d4, Vector(3.0, 4.0, 0.0, 0.0)).toOption.get
     val t = v.truncated(Dimension.unsafe(2)).toOption.get

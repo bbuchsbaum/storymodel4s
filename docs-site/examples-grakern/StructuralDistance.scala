@@ -58,6 +58,7 @@ import storymodel4s.proposition.*
     distance(PropositionEvidence.hand(query), PropositionEvidence.hand(source)) match
       case Estimate.Observed(value, _) => f"Observed($value%.6f)"
       case Estimate.Missing(reason)    => s"Missing($reason)"
+      case Estimate.Ineligible         => "Ineligible"
 
   println(s"prepared source charts: ${distance.prepared.size}")
   println(s"identical structure: ${render(find, find)}")

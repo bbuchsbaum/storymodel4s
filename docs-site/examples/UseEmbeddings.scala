@@ -40,6 +40,8 @@ import storymodel4s.features.Estimate
         )
       case Right(Estimate.Missing(reason)) =>
         println(s"${outcome.id.value}: missing reason=$reason")
+      case Right(Estimate.Ineligible) =>
+        println(s"${outcome.id.value}: ineligible")
       case Left(failure) =>
         println(s"${outcome.id.value}: failed ${failure.render}")
   }

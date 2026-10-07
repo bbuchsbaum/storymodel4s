@@ -789,6 +789,7 @@ object SidecarCodec:
           row += 1
           Estimate.Observed(ref, credence)
         case Estimate.Missing(reason) => Estimate.Missing(reason)
+        case Estimate.Ineligible      => Estimate.Ineligible
       FeatureObservation(observation.target, estimate, observation.support, observation.coverage)
     }
 
@@ -804,6 +805,7 @@ object SidecarCodec:
         built <- acc
         estimate <- observation.estimate match
           case Estimate.Missing(reason)         => Right(Estimate.Missing(reason))
+          case Estimate.Ineligible              => Right(Estimate.Ineligible)
           case Estimate.Observed(ref, credence) =>
             for
               row <- rows

@@ -130,7 +130,8 @@ object CodecGens:
 
   def estimate[V](v: Gen[V]): Gen[Estimate[V]] = Gen.oneOf(
     Gen.zip(v, Gen.option(credence)).map(Estimate.Observed.apply),
-    missingReason.map(Estimate.Missing.apply)
+    missingReason.map(Estimate.Missing.apply),
+    Gen.const(Estimate.Ineligible)
   )
 
   val scoreEstimate: Gen[Estimate[Double]] = estimate(finiteDouble)

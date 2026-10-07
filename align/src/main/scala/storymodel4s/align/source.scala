@@ -177,6 +177,13 @@ object ImportanceWeight:
   /** Validate an existing estimate without changing its credence or missing reason. */
   def from(estimate: ScoreEstimate): Either[AlignError, ImportanceWeight] =
     estimate match
+      case Estimate.Ineligible =>
+        Left(
+          AlignError.MalformedRecord(
+            "importanceWeight",
+            "source leaf importance belongs to a fixed eligible population"
+          )
+        )
       case Estimate.Observed(value, _) if value.isNaN || value.isInfinite =>
         Left(AlignError.MalformedRecord("importanceWeight", "observed value is not finite"))
       case Estimate.Observed(value, _) if value < 0.0 =>

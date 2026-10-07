@@ -49,7 +49,7 @@ class FeatureMaterializerSuite extends FunSuite:
     // A missing observation consumes no row and keeps its reason.
     val missing = raw.observations.filter(!_.estimate.isObserved)
     assertEquals(missing.size, sequence.size - sequence.lexicalSize)
-    assert(missing.forall(_.estimate == Estimate.Missing(MissingReason.Excluded)))
+    assert(missing.forall(_.estimate == Estimate.Ineligible))
     // The model's own feature laws hold on the augmented draft.
     val violations =
       StoryValidator.validate(model).report.violations.filter(_.law.startsWith("feature."))
@@ -165,7 +165,9 @@ class FeatureMaterializerSuite extends FunSuite:
     }
   }
 
-  test("observed zero and missing or excluded words survive as different visible outcomes") {
+  test(
+    "observed zero, eligible missing and ineligible words survive as different visible outcomes"
+  ) {
     val word = sequence.lexicalTokens.flatMap(_.normalized).head
     val table = LexiconTable
       .of("partial-zero", "test values, not norms", Some("test-units"), Vector(word -> 0.0))
@@ -181,8 +183,8 @@ class FeatureMaterializerSuite extends FunSuite:
       "missing lexical values disappeared"
     )
     assert(
-      values.exists(_.estimate == Estimate.Missing(MissingReason.Excluded)),
-      "excluded punctuation disappeared"
+      values.exists(_.estimate == Estimate.Ineligible),
+      "ineligible punctuation disappeared"
     )
     // JVM and JS differ on the decimal spelling of integer-valued doubles (0.0 vs 0).
     assert(
@@ -191,7 +193,7 @@ class FeatureMaterializerSuite extends FunSuite:
         .exists(_.group(1).toDoubleOption.contains(0.0))
     )
     assert(scene.textualTwin.contains("missing=NotInLexicon"))
-    assert(scene.textualTwin.contains("missing=Excluded"))
+    assert(scene.textualTwin.contains("ineligible"))
   }
 
   test("whole-story measurements refuse a reader horizon instead of leaking future evidence") {

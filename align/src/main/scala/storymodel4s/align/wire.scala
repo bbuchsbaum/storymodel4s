@@ -62,6 +62,7 @@ private[align] object Render:
       }
       composite(Vector("observed", CanonicalDouble.render(v)) ++ c)
     case Estimate.Missing(reason) => composite(Vector("missing", reason.toString))
+    case Estimate.Ineligible      => composite(Vector("ineligible"))
 
 /** Content address of a [[SourceView]] as the aligner reads it (`view-fingerprint/v1`, ADR 0001
   * §D5; bead `HsmmResult wire`). A gated result carries the fingerprint of the view it was proved
@@ -420,21 +421,37 @@ object AlignWire:
       HasReductionReceipt.toVector
         .sortBy(_.ordinal)
         .flatMap { t =>
+          val ineligible = reductions
+            .get(t)
+            .exists(rc => rc.members.nonEmpty && rc.members.forall(!_.estimate.isEligible))
+          val eligible = support match
+            case s: SupportAssessment.Assessed      => s.basis.eligibleTerms.contains(t)
+            case s: SupportAssessment.Unestablished => s.basis.eligibleTerms.contains(t)
+            case _: SupportAssessment.NotApplicable => false
           val reduced = reductions
             .get(t)
             .flatMap(rc => rc.reducer.reduce(rc.members.flatMap(_.estimate.toOption)))
-          (terms.get(t), reduced) match
-            case (Some(_), _) if !reductions.contains(t) =>
-              Some(bad(r, s"term $t is present without its reduction receipt"))
-            case (Some(v), Some(x)) if clamp(x) != v =>
-              Some(bad(r, s"term $t is $v but its receipt reduces to ${clamp(x)}"))
-            case (Some(v), None) =>
-              Some(bad(r, s"term $t is $v but its receipt reduces to nothing"))
-            case (None, Some(x)) =>
-              Some(bad(r, s"term $t is missing but its receipt reduces to $x"))
-            case (None, None) if reductions.contains(t) && !missingTerms.contains(t) =>
-              Some(bad(r, s"term $t reduces to nothing but is not recorded as missing"))
-            case _ => None
+          if ineligible && (missingTerms.contains(t) || imputedTerms.contains(t) || eligible) then
+            Some(
+              bad(
+                r,
+                s"term $t has entirely ineligible members but is classified as eligible or missing"
+              )
+            )
+          else
+            (terms.get(t), reduced) match
+              case (Some(_), _) if !reductions.contains(t) =>
+                Some(bad(r, s"term $t is present without its reduction receipt"))
+              case (Some(v), Some(x)) if clamp(x) != v =>
+                Some(bad(r, s"term $t is $v but its receipt reduces to ${clamp(x)}"))
+              case (Some(v), None) =>
+                Some(bad(r, s"term $t is $v but its receipt reduces to nothing"))
+              case (None, Some(x)) =>
+                Some(bad(r, s"term $t is missing but its receipt reduces to $x"))
+              case (None, None)
+                  if reductions.contains(t) && !ineligible && !missingTerms.contains(t) =>
+                Some(bad(r, s"term $t reduces to nothing but is not recorded as missing"))
+              case _ => None
         }
         .headOption,
       reductions.toVector.sortBy(_._1.ordinal).collectFirst {
@@ -552,7 +569,10 @@ object AlignWire:
       observedEstimateCoverage: Coverage
   ): Either[AlignError, StructuralReductionReceipt] =
     val r = "StructuralReductionReceipt"
-    val expected = Coverage.unsafe(members.size, members.count(_.estimate.isObserved))
+    val expected = Coverage.unsafe(
+      members.count(_.estimate.isEligible),
+      members.count(_.estimate.isObserved)
+    )
     val checks: Vector[Option[AlignError]] = Vector(
       Option.when(!canonical(members.map(_.member)))(
         bad(r, "members must be sorted by reference and unique")
@@ -594,6 +614,7 @@ object AlignWire:
   ): Either[AlignError, StructuralReduction] =
     val r = "StructuralReduction"
     val observed = receipt.members.flatMap(_.estimate.toOption)
+    val allIneligible = receipt.members.nonEmpty && receipt.members.forall(!_.estimate.isEligible)
     estimate match
       case Estimate.Observed(v, _) if !finite(v) => Left(bad(r, "estimate is not finite"))
       case Estimate.Observed(v, _)               =>
@@ -602,6 +623,11 @@ object AlignWire:
           case Some(expected)                  =>
             Left(bad(r, s"estimate $v is not the ${receipt.reducer} of the members ($expected)"))
           case None => Left(bad(r, "an observed estimate needs an observed member"))
+      case Estimate.Ineligible =>
+        if allIneligible then Right(StructuralReduction(estimate, receipt))
+        else Left(bad(r, "ineligible estimate needs nonempty entirely ineligible members"))
+      case Estimate.Missing(_) if allIneligible =>
+        Left(bad(r, "entirely ineligible members must yield an ineligible estimate"))
       case Estimate.Missing(_) =>
         receipt.reducer.reduce(observed) match
           case Some(x) => Left(bad(r, s"estimate is missing but the members reduce to $x"))

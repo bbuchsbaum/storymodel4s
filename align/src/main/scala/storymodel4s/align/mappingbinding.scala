@@ -208,6 +208,7 @@ private[align] object MappingBindingRender:
       sequence(Vector("observed", number(v), optional(c.map(credence))))
     case Estimate.Missing(reason) =>
       sequence(Vector("missing", MappingSourceRender.missing(reason)))
+    case Estimate.Ineligible => sequence(Vector("ineligible"))
   private def reduction(value: StructuralReductionReceipt): String = sequence(
     Vector(
       value.reducer.toString,

@@ -90,6 +90,7 @@ object WindowReducer:
     val obs = samples.toVector.flatMap(s => Estimate.finite(s.estimate).map(v => (s, v)))
     if obs.nonEmpty then Right(obs)
     else if samples.exists(_.estimate.isObserved) then Left(undefined(UndefinedReason.NotFinite))
+    else if !samples.exists(_.estimate.isEligible) then Left(Estimate.Ineligible)
     else Left(Estimate.Missing(MissingReason.AllMissing))
 
   private def values(obs: Vector[Sample[Double]]): Vector[Double] =
@@ -148,6 +149,7 @@ object WindowReducer:
         if obs.isEmpty then
           val anyNonFinite = samples.exists(s => s.estimate.isObserved)
           if anyNonFinite then undefined(UndefinedReason.NotFinite)
+          else if !samples.exists(_.estimate.isEligible) then Estimate.Ineligible
           else Estimate.Missing(MissingReason.AllMissing)
         else
           val vs = values(obs)
@@ -217,7 +219,7 @@ object WindowReducer:
   * `Eligibility.AllTokens`.
   */
 object Windowed:
-  val implementationVersion = "windowed-2"
+  val implementationVersion = "windowed-3"
 
   def apply(
       track: FeatureTrack[FeatureTarget.Token, Double],
@@ -276,7 +278,7 @@ object Windowed:
   /** Implementation version recorded in narrative-window recipes; bump whenever
     * [[Windowed.overBasis]] changes any output value, so old derivation ids never alias new ones.
     */
-  val narrativeImplementationVersion = "narrative-windowed-1"
+  val narrativeImplementationVersion = "narrative-windowed-2"
 
   /** Centred windows of `±plan.halfWidth` units over a [[NarrativeBasis]]: one observation per unit
     * (an event or a scene), whose support is the union of the member units' supports and whose
@@ -382,7 +384,10 @@ object Reduction:
       reducer: WindowReducer[V, O],
       missing: MissingValuePolicy
   ): Either[DomainError, (Estimate[O], Coverage)] =
-    val cov = Coverage.unsafe(samples.size, samples.count(_.estimate.isObserved))
+    val cov = Coverage.unsafe(
+      samples.count(_.estimate.isEligible),
+      samples.count(_.estimate.isObserved)
+    )
     val badFloor = missing match
       case MissingValuePolicy.RequireMinCoverage(f) => !MissingValuePolicy.isCoverageFraction(f)
       case _                                        => false
@@ -399,8 +404,9 @@ object Reduction:
       )
     else
       NonEmptyVector.fromVector(samples) match
-        case None      => Right((Estimate.Missing(MissingReason.AllMissing), cov))
-        case Some(nev) =>
+        case None                   => Right((Estimate.Missing(MissingReason.AllMissing), cov))
+        case Some(_) if cov.isEmpty => Right((Estimate.Ineligible, cov))
+        case Some(nev)              =>
           missing match
             case MissingValuePolicy.Fail if cov.missing > 0 =>
               Left(
@@ -414,7 +420,7 @@ object Reduction:
   * situation's or scene's `SpanSet`.
   */
 object Aggregate:
-  val implementationVersion = "aggregate-2"
+  val implementationVersion = "aggregate-3"
 
   def overTargets[T <: FeatureTarget](
       track: FeatureTrack[FeatureTarget.Token, Double],

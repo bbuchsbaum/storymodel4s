@@ -140,6 +140,8 @@ object FeatureMaterializer:
               row += 1
         case Estimate.Missing(reason) =>
           out += FeatureObservation(o.target, Estimate.Missing(reason), o.support, o.coverage)
+        case Estimate.Ineligible =>
+          out += FeatureObservation(o.target, Estimate.Ineligible, o.support, o.coverage)
     }
     failure.toLeft(out.result()).flatMap { obs =>
       if row != manifest.rowCount then

@@ -137,6 +137,7 @@ object ContentScoring:
           val observed = scored.flatMap(_._2.toOption)
           val aggregate =
             if charted.isEmpty || scored.isEmpty then Estimate.missing(MissingReason.Excluded)
+            else if scored.forall(!_._2.isEligible) then Estimate.Ineligible
             else
               Reducer
                 .reduce(observed)
@@ -152,6 +153,7 @@ object ContentScoring:
   private[align] def finite(estimate: Estimate[Double]): Estimate[Double] = estimate match
     case Estimate.Observed(value, credence) => Estimate.score(value, credence)
     case missing @ Estimate.Missing(_)      => missing
+    case Estimate.Ineligible                => Estimate.Ineligible
 
   /** The strict `d_chart`: one minus the chart comparison's structural score, reduced over the
     * target's members. A function of the members' multiset: the minimum does not read their order.

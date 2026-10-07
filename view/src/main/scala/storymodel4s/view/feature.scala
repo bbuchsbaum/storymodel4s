@@ -68,6 +68,7 @@ final class FeatureValue private[view] (
     val outcome = estimate match
       case Estimate.Observed(v, c) => s"value=$v credence=${c.fold("not supplied")(_.toString)}"
       case Estimate.Missing(r)     => s"missing=$r"
+      case Estimate.Ineligible     => "ineligible"
     val covered = coverage.fold("not recorded")(c => s"${c.observed}/${c.eligible}")
     val spans = support.spans.toVector.map(s => s"[${s.start},${s.endExclusive})").mkString(",")
     val recipe = derivation.fold("raw")(_.canonicalString)

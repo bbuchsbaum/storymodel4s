@@ -393,10 +393,9 @@ enum Exclusion:
   /** The candidate reference is not a node of the view. */
   case Unreachable
 
-  /** Nothing weighted was measured for this cell: its support is assessed at exactly `0`, so the
-    * cost rests on no evidence at all. (A cell whose ELIGIBLE weight is zero has no share at all —
-    * [[SupportAssessment.Unestablished]] — and is still priced as before `hsmm/v4`; that pricing is
-    * a separate estimand question, not a support claim.)
+  /** No weighted evidence remains: support is assessed at exactly `0`, or an actually invoked
+    * provider has made the last positive configured dimension ineligible. Historical
+    * all-configured-zero cells retain their function prior and unestablished support.
     *
     * DISTINCT FROM Unreachable, and the distinction is the point: Unreachable is a claim about the
     * REFERENCE - that node is not in the view. This is a claim about the EVIDENCE - the node is
@@ -693,8 +692,10 @@ object CostBreakdown:
     * contributes nothing and the cost falls to the function prior, which is below the external
     * floor — so a cell that measured nothing would win. Such a cell is [[Exclusion.Unassessable]]:
     * it keeps its basis and its zero share as the audit trail, carries no terms, and `total` is
-    * never evaluated for it. Unestablished support is NOT excluded here, deliberately: the cost it
-    * is priced at is today's price, and `hsmm/v4` changes only how support is published.
+    * never evaluated for it. An actually invoked provider that removes the last positive eligible
+    * weight also makes the cell unassessable. The production caller supplies its actual typed
+    * outcomes; this private factory does not authenticate arbitrary provider invocation maps.
+    * Historical all-configured-zero support remains priced at its existing function prior.
     */
   private[align] def derived(
       terms: Map[CostTerm, Double],
@@ -705,35 +706,43 @@ object CostBreakdown:
       imputedTerms: Map[CostTerm, MissingReason],
       eligible: Set[CostTerm],
       weights: CostWeights,
-      total: => Double
+      total: => Double,
+      providerOutcomes: Map[CostTerm, Estimate[Double]] = Map.empty
   ): Either[AlignError, CostBreakdown] =
     val basis =
       CellSupportBasis.fromWeights(terms.keySet -- imputedTerms.keySet, eligible, weights)
-    SupportAssessment.derive(basis) match
-      case assessed: SupportAssessment.Assessed if assessed.share <= 0.0 =>
-        checked(
-          Map.empty,
-          None,
-          Some(Exclusion.Unassessable),
-          OutOfReach,
-          Set.empty,
-          None,
-          Map.empty,
-          assessed,
-          Map.empty
-        )
-      case support =>
-        checked(
-          terms,
-          Some(mode),
-          None,
-          total,
-          missingTerms,
-          sourceChartCoverage,
-          reductions,
-          support,
-          imputedTerms
-        )
+    val support = SupportAssessment.derive(basis)
+    val lostPositiveWeight = providerOutcomes.exists { (term, outcome) =>
+      !outcome.isEligible && weights(term) > 0.0
+    }
+    val unassessable = support match
+      case assessed: SupportAssessment.Assessed     => assessed.share <= 0.0
+      case missing: SupportAssessment.Unestablished =>
+        lostPositiveWeight && missing.reason == SupportUnestablishedReason.ZeroEligibleWeight
+    if unassessable then
+      checked(
+        Map.empty,
+        None,
+        Some(Exclusion.Unassessable),
+        OutOfReach,
+        Set.empty,
+        None,
+        Map.empty,
+        support,
+        Map.empty
+      )
+    else
+      checked(
+        terms,
+        Some(mode),
+        None,
+        total,
+        missingTerms,
+        sourceChartCoverage,
+        reductions,
+        support,
+        imputedTerms
+      )
 
 /** Graded semantic distance in `[0, 1]` between a recall unit and a source node, or `Missing` when
   * the provider abstains (no embedding for the unit, out-of-domain text, budget exceeded). This is
@@ -911,7 +920,10 @@ object ChartDistance:
       sourceCoverage: StructuralCoverage
   ): StructuralReduction =
     val observedEstimateCoverage =
-      Coverage.unsafe(members.size, members.count(_.estimate.isObserved))
+      Coverage.unsafe(
+        members.count(_.estimate.isEligible),
+        members.count(_.estimate.isObserved)
+      )
     StructuralReduction(
       estimate,
       StructuralReductionReceipt(
@@ -1231,6 +1243,11 @@ final case class DefaultLocalCostModel(
           weights,
           functionPrior(u.function),
           price.eligible
+        ),
+        Map(
+          CostTerm.Semantic -> semanticEstimate,
+          CostTerm.Chart -> chartReduction.estimate,
+          CostTerm.Structural -> structuralReduction.estimate
         )
       )
       .fold(e => throw new IllegalStateException(e.message), identity)

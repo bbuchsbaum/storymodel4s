@@ -256,9 +256,18 @@ object FeatureCodecs:
   given [V](using e: Encoder[V]): Encoder[Estimate[V]] = Encoder.instance {
     case Estimate.Observed(v, cr) => obj("observed" -> e(v), "credence" -> opt(cr))
     case Estimate.Missing(r)      => Json.obj("missing" -> r.asJson)
+    case Estimate.Ineligible      => Json.obj("ineligible" -> true.asJson)
   }
   given [V](using d: Decoder[V]): Decoder[Estimate[V]] = Decoder.instance { c =>
-    if c.downField("missing").succeeded then
+    val branches = Vector("observed", "missing", "ineligible").filter(c.downField(_).succeeded)
+    if branches.size != 1 then
+      Left(DecodingFailure("estimate must contain exactly one outcome branch", c.history))
+    else if branches.head == "ineligible" then
+      field[Boolean](c, "ineligible").flatMap { flag =>
+        if flag then Right(Estimate.Ineligible)
+        else Left(DecodingFailure("ineligible must be true", c.history))
+      }
+    else if branches.head == "missing" then
       field[MissingReason](c, "missing").map(Estimate.Missing.apply)
     else
       for

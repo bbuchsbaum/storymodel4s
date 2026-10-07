@@ -64,20 +64,36 @@ enum MissingReason:
 
   case Unknown
 
-/** An observed value with optional uncertainty, or a typed absence. */
+/** A measurement outcome that preserves whether the declared measure applies to its target. */
 enum Estimate[+V]:
   case Observed(value: V, credence: Option[Credence])
   case Missing(reason: MissingReason)
+  case Ineligible
 
   def toOption: Option[V] = this match
     case Observed(v, _) => Some(v)
     case Missing(_)     => None
+    case Ineligible     => None
 
   def isObserved: Boolean = toOption.isDefined
+
+  /** Missing evidence remains in the denominator; an inapplicable target does not. */
+  def isEligible: Boolean = this != Ineligible
+
+  /** Inspect every outcome without losing observed uncertainty or absence semantics. */
+  def fold[A](
+      onIneligible: => A,
+      onObserved: (V, Option[Credence]) => A,
+      onMissing: MissingReason => A
+  ): A = this match
+    case Ineligible     => onIneligible
+    case Observed(v, c) => onObserved(v, c)
+    case Missing(r)     => onMissing(r)
 
   def map[W](f: V => W): Estimate[W] = this match
     case Observed(v, c) => Observed(f(v), c)
     case Missing(r)     => Missing(r)
+    case Ineligible     => Ineligible
 
 object Estimate:
   def observed[V](v: V): Estimate[V] = Observed(v, None)

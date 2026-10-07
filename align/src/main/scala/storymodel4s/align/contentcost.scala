@@ -67,12 +67,11 @@ private[align] object ContentCostScoring:
     // preferred to intrusion (design record §9). Provisional until W4 calibration.
     val dDist = distortionPenalty * mode.facetSet.size.toDouble
     val always = Vector(
-      CostTerm.Semantic -> dSem,
       CostTerm.Propositional -> dProp,
       CostTerm.Entity -> dEnt,
       CostTerm.Granularity -> dGran,
       CostTerm.Distortion -> dDist
-    )
+    ) ++ Option.when(semantic.isEligible)(CostTerm.Semantic -> dSem)
     // Optional evidence-backed terms: present only when charts exist on both sides (and, for
     // `d_wl`, a provider answered). Absent terms are inert and recorded, never substituted.
     val optional =
@@ -105,8 +104,9 @@ private[align] object ContentCostScoring:
     // (Since S2a-2 that population is read here as `t.members`, which the Source projection fills
     // from `view.structuralMembers(node.ref)`.)
     val chartedMembers = t.members.exists(_.hasEvidence)
-    val chartEligible = u.graph.nonEmpty && chartedMembers
-    val structuralEligible = structuralConfigured && chartEligible
+    val chartEligible = u.graph.nonEmpty && chartedMembers && chart.isEligible
+    val structuralEligible =
+      structuralConfigured && u.graph.nonEmpty && chartedMembers && structural.isEligible
     val eligible = always.map(_._1).toSet ++
       Set(CostTerm.Sensory) ++
       Option.when(chartEligible)(CostTerm.Chart) ++

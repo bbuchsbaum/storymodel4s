@@ -26,6 +26,7 @@ class MeasureSuite extends FunSuite:
       o.estimate match
         case Estimate.Observed(v, _)  => word -> Right(v)
         case Estimate.Missing(reason) => word -> Left(reason.toString)
+        case Estimate.Ineligible      => word -> Left("Ineligible")
     }
 
   private def obs(word: String, value: Double): (String, Either[String, Double]) =
@@ -73,15 +74,15 @@ class MeasureSuite extends FunSuite:
         obs("boats", 6.7),
         miss("crossed", "NotInLexicon"),
         miss("quietly", "NotInLexicon"),
-        miss(".", "Excluded"),
+        miss(".", "Ineligible"),
         obs("Red", 5.5)
       )
     )
     assertEquals(track.coverage.observed, 4)
-    assertEquals(track.coverage.eligible, sequence.size)
-    assertEquals(track.space.id.value, s"lexicon:demo:${m.table.identity.short(12)}")
+    assertEquals(track.coverage.eligible, sequence.lexicalSize)
+    assertEquals(track.space.id.value, s"lexicon:demo:${m.identity.short(12)}")
     assertEquals(track.provenance.storyChecksum, Some(source.canonicalChecksum))
-    assertEquals(track.provenance.provenance.configHash, m.table.identity)
+    assertEquals(track.provenance.provenance.configHash, m.identity)
     assert(track.isRaw)
   }
 
@@ -94,7 +95,7 @@ class MeasureSuite extends FunSuite:
         obs("boats", 5.0),
         obs("crossed", 7.0),
         obs("quietly", 7.0),
-        miss(".", "Excluded")
+        miss(".", "Ineligible")
       )
     )
     assertEquals(track.coverage.observed, sequence.lexicalSize)
@@ -108,7 +109,7 @@ class MeasureSuite extends FunSuite:
     assert(byWord.contains(obs("boats", 2.0)), byWord.toString)
     assert(byWord.contains(obs("crossed", 1.0)), byWord.toString)
     assert(byWord.contains(obs("3", 1.0)), byWord.toString)
-    assert(byWord.contains(miss(",", "Excluded")), byWord.toString)
+    assert(byWord.contains(miss(",", "Ineligible")), byWord.toString)
   }
 
   test("the sentence reduction carries each sentence's support and lexical coverage") {

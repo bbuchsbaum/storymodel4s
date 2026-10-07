@@ -1291,8 +1291,8 @@ class StoryBuildSuite extends FunSuite:
         .map(_.track)
         .filter(_.derivation.exists(_.inputs.toVector.contains(raw.space.id)))
       (raw +: reductions).map(_.manifest.rowCount)
-    assertEquals(family("measure:token-length/v1").sorted, Vector(50, 65, 425))
-    assertEquals(family("measure:type-frequency/v1").sorted, Vector(50, 65, 425))
+    assertEquals(family("measure:token-length/v2").sorted, Vector(50, 65, 425))
+    assertEquals(family("measure:type-frequency/v2").sorted, Vector(50, 65, 425))
     val lexiconId =
       record.tracks.map(_.track.space.id.value).find(_.startsWith("lexicon:synthetic-demo:")).get
     val lexiconFamily = family(lexiconId)
@@ -1310,11 +1310,11 @@ class StoryBuildSuite extends FunSuite:
     // 3. Each grain, measured: the raw token tracks cover exactly the lexical tokens and exclude
     // the rest; the sentence and situation reductions are one observation per unit.
     val byId = record.tracks.map(e => e.track.space.id.value -> e.track).toMap
-    val length = byId("measure:token-length/v1")
+    val length = byId("measure:token-length/v2")
     assertEquals(length.observations.size, 517)
     assertEquals(length.manifest.rowCount, 425)
     assertEquals(
-      length.observations.count(_.estimate == Estimate.Missing(MissingReason.Excluded)),
+      length.observations.count(_.estimate == Estimate.Ineligible),
       92
     )
     assert(length.derivation.isEmpty)

@@ -182,3 +182,86 @@ class StructuralReductionSuite extends ScalaCheckSuite:
     assertEquals(reduction.estimate, Estimate.missing(MissingReason.ProviderAbstained))
     assertEquals(reduction.receipt.observedEstimateCoverage, Coverage.unsafe(2, 0))
   }
+
+  test("provider ineligibility retains members and differs from contradiction exclusion") {
+    val v = viewWith(Map(e4 -> straight, e5 -> compatibleOther))
+    val provider = StructuralDistance((_, _) => Estimate.Ineligible)
+    val reduction = ChartDistance.structuralReduction(provider, unit, v.node(sc2).get, v)
+    assertEquals(reduction.estimate, Estimate.Ineligible)
+    assertEquals(reduction.receipt.members.map(_.member), Vector(e4, e5))
+    assertEquals(reduction.receipt.observedEstimateCoverage, Coverage.empty)
+    assertEquals(reduction.receipt.sourceChartCoverage, coverageOf(1, 2, 3))
+    val rejected = viewWith(Map(e4 -> reversed))
+    val excluded =
+      ChartDistance.structuralReduction(provider, unit, rejected.node(sc2).get, rejected)
+    assertEquals(excluded.estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(excluded.receipt.members, Vector.empty)
+    assertEquals(excluded.receipt.excludedMembers.map(_.member), Vector(e4))
+  }
+
+  test("ineligible structural receipts remain valid on ranked cells with other measured evidence") {
+    val v = viewWith(Map(e4 -> straight, e5 -> compatibleOther))
+    val provider = StructuralDistance((_, _) => Estimate.Ineligible)
+    val model = costModel.copy(semantic = SemanticDistance.of((_, _) => 0.2), structural = provider)
+    val cell = model.cost(unit, v.node(sc2).get, FidelityMode.Faithful, v)
+    assertEquals(cell.exclusion, None)
+    assert(!cell.terms.contains(CostTerm.Structural))
+    assert(!cell.missingTerms.contains(CostTerm.Structural))
+    assert(
+      !cell.support
+        .asInstanceOf[SupportAssessment.Assessed]
+        .basis
+        .eligibleTerms
+        .contains(CostTerm.Structural)
+    )
+    assertEquals(cell.reductions(CostTerm.Structural).observedEstimateCoverage, Coverage.empty)
+    assert(
+      AlignWire
+        .costBreakdown(
+          cell.terms,
+          cell.mode,
+          cell.exclusion,
+          cell.total,
+          cell.missingTerms,
+          cell.sourceChartCoverage,
+          cell.reductions,
+          cell.support,
+          cell.imputedTerms
+        )
+        .isRight
+    )
+  }
+
+  test("only an actually invoked ineligible structural provider removes the last positive weight") {
+    var calls = 0
+    val provider = StructuralDistance((_, _) => { calls += 1; Estimate.Ineligible })
+    val structuralOnly = CostWeights.unsafe(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+    val model = costModel.copy(weights = structuralOnly, structural = provider)
+    val charted = viewWith(Map(e4 -> straight))
+    val cell = model.cost(unit, charted.node(e4).get, FidelityMode.Faithful, charted)
+    assertEquals(calls, 1)
+    assertEquals(cell.exclusion, Some(Exclusion.Unassessable))
+    calls = 0
+    val chartless = viewWith(Map.empty)
+    val unavailable = model.cost(unit, chartless.node(e4).get, FidelityMode.Faithful, chartless)
+    assertEquals(calls, 0)
+    assertEquals(unavailable.exclusion, None)
+    assertEquals(unavailable.total, FunctionPrior.default(unit.function))
+  }
+
+  test("mixed provider outcomes count only eligible members and preserve missing versus minimum") {
+    val v = viewWith(Map(e4 -> straight, e5 -> compatibleOther))
+    val missing = StructuralDistance((_, member) =>
+      if member == straight then Estimate.Ineligible
+      else Estimate.missing(MissingReason.ProviderAbstained)
+    )
+    val absent = ChartDistance.structuralReduction(missing, unit, v.node(sc2).get, v)
+    assertEquals(absent.estimate, Estimate.missing(MissingReason.ProviderAbstained))
+    assertEquals(absent.receipt.observedEstimateCoverage, Coverage.unsafe(1, 0))
+    val observed = StructuralDistance((_, member) =>
+      if member == straight then Estimate.Ineligible else Estimate.observed(0.4)
+    )
+    val present = ChartDistance.structuralReduction(observed, unit, v.node(sc2).get, v)
+    assertEquals(present.estimate, Estimate.observed(0.4))
+    assertEquals(present.receipt.observedEstimateCoverage, Coverage.unsafe(1, 1))
+  }

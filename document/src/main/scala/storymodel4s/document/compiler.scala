@@ -3034,6 +3034,7 @@ object NarrativeCompiler:
           step.entityTurnover match
             case Estimate.Observed(v, _)  => s"observed:${CanonicalDouble.render(v)}"
             case Estimate.Missing(reason) => s"missing:$reason"
+            case Estimate.Ineligible      => "ineligible"
           ,
           step.contextChange.toString,
           step.worldTime.value.toString,

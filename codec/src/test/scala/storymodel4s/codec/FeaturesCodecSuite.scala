@@ -7,12 +7,33 @@ import org.scalacheck.Prop.forAll
 import storymodel4s.core.*
 import storymodel4s.features.*
 import FeatureCodecs.given
+import CanonicalPrimitives.given
 
 /** Wire form of `features` targets and recipes: every `FeatureTarget` case (including the
   * surface-unit case of ADR 0002 §9 checkpoint 2) and the optional narrative-window slot of a
   * derivation round-trip, and a recipe keeps its `derivationId` across the round trip.
   */
 class FeaturesCodecSuite extends ScalaCheckSuite:
+
+  test(
+    "Estimate has a distinct ineligible tag and preserves historical observed and missing bytes"
+  ) {
+    val observed: Estimate[Double] = Estimate.observed(0.0)
+    val missing: Estimate[Double] = Estimate.missing(MissingReason.Excluded)
+    val absent: Estimate[Double] = Estimate.Ineligible
+    assertEquals(Canonical.encode(observed), """{"observed":"0x0000000000000000"}""")
+    assertEquals(Canonical.encode(missing), """{"missing":"Excluded"}""")
+    assertEquals(Canonical.encode(absent), """{"ineligible":true}""")
+    Vector(observed, missing, absent).foreach(e =>
+      assertEquals(Canonical.decode[Estimate[Double]](Canonical.encode(e)), Right(e))
+    )
+    Vector(
+      """{"ineligible":false}""",
+      """{"ineligible":true,"observed":0}""",
+      """{"ineligible":true,"missing":"Excluded"}""",
+      """{"observed":0,"missing":"Excluded"}"""
+    ).foreach(text => assert(Canonical.decode[Estimate[Double]](text).isLeft, text))
+  }
 
   private val validId: Gen[String] =
     Gen.nonEmptyListOf(Gen.oneOf(Gen.alphaNumChar, Gen.oneOf(':', '-', '_'))).map(_.mkString)

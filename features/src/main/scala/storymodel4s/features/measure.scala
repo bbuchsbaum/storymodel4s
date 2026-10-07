@@ -38,7 +38,7 @@ trait LexicalMeasure:
   def over(sequence: SurfaceSequence): TokenIndex => Estimate[Double]
 
 object LexicalMeasure:
-  val Version: String = "features-measure/v1"
+  val Version: String = "features-measure/v2"
 
   private[features] def provider(name: String): Fingerprint =
     Fingerprint.unsafe(s"storymodel4s:features:measure:$name")
@@ -121,14 +121,14 @@ object LexiconTable:
 
 /** A measure that reads a [[LexiconTable]]: the word's value, or `NotInLexicon`. */
 final class LexiconMeasure(val table: LexiconTable) extends LexicalMeasure:
-  val identity: Checksum = table.identity
+  val identity: Checksum = Checksum.ofText(s"lexicon-measure/v2\n${table.identity.hex}")
 
   val space: FeatureSpace[Double] = FeatureSpace(
-    FeatureSpaceId.unsafe(s"lexicon:${table.name}:${table.identity.short(12)}"),
+    FeatureSpaceId.unsafe(s"lexicon:${table.name}:${identity.short(12)}"),
     table.description,
     FeatureValueSchema.Scalar(table.units),
     table.units,
-    Fingerprint.unsafe(s"storymodel4s:features:lexicon:${table.identity.hex}"),
+    Fingerprint.unsafe(s"storymodel4s:features:lexicon:${identity.hex}"),
     normalized = false
   )
 
@@ -140,7 +140,7 @@ final class LexiconMeasure(val table: LexiconTable) extends LexicalMeasure:
 
 /** The length of a lexical token in Unicode code points. Needs nothing outside the text. */
 object TokenLength extends LexicalMeasure:
-  val Name: String = "token-length/v1"
+  val Name: String = "token-length/v2"
   val identity: Checksum = Checksum.ofText(s"measure:$Name")
   val space: FeatureSpace[Double] = FeatureSpace(
     FeatureSpaceId.unsafe(s"measure:$Name"),
@@ -165,7 +165,7 @@ object TokenLength extends LexicalMeasure:
   * the text.
   */
 object TypeFrequency extends LexicalMeasure:
-  val Name: String = "type-frequency/v1"
+  val Name: String = "type-frequency/v2"
   val identity: Checksum = Checksum.ofText(s"measure:$Name")
   val space: FeatureSpace[Double] = FeatureSpace(
     FeatureSpaceId.unsafe(s"measure:$Name"),
@@ -197,7 +197,7 @@ object TokenTracks:
     val observations = sequence.tokens.zipWithIndex.map { (token, i) =>
       val index = TokenIndex.unsafe(i)
       val estimate: Estimate[Double] =
-        if !token.isLexical then Estimate.Missing(MissingReason.Excluded) else valued(index)
+        if !token.isLexical then Estimate.Ineligible else valued(index)
       FeatureObservation[FeatureTarget.Token, Double](
         FeatureTarget.Token(index),
         estimate,

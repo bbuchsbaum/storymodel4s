@@ -36,7 +36,7 @@ import storymodel4s.features.*
     space,
     sequence.tokens.zipWithIndex.map { (token, index) =>
       val estimate: Estimate[Double] =
-        if !token.isLexical then Estimate.Missing(MissingReason.Excluded)
+        if !token.isLexical then Estimate.Ineligible
         else
           token.normalized.flatMap(lexicon.get) match
             case Some(value) => Estimate.observed(value)
@@ -70,6 +70,7 @@ import storymodel4s.features.*
   def render(estimate: Estimate[Double]): String = estimate match
     case Estimate.Observed(value, _) => f"Observed($value%.2f)"
     case Estimate.Missing(reason)    => s"Missing($reason)"
+    case Estimate.Ineligible         => "Ineligible"
 
   println(s"surface tokens: ${sequence.size}; lexical tokens: ${sequence.lexicalSize}")
   println(s"raw track coverage: ${raw.coverage.observed}/${raw.coverage.eligible}")

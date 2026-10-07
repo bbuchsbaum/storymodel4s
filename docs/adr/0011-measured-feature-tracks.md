@@ -114,6 +114,19 @@ shape any real norms table will have.
 
 ## Rejected alternatives
 
+### Amendment 2026-10-06: explicit lexical eligibility
+
+Under the owner-approved portable eligibility migration (ADR 0003), `TokenTracks.measure`
+emits `Ineligible` for known nonlexical tokens, while uncovered lexical tokens stay eligible
+`Missing(NotInLexicon)`. Token-length and type-frequency procedures become `v2`; lexicon
+measure identity is derived from `lexicon-measure/v2` and the unchanged table checksum, so
+table identity still means table content and measure identity also records its eligibility
+contract. Raw provenance becomes `features-measure/v2`; window, narrative-window and aggregate
+recipes advance to `windowed-3`, `narrative-windowed-2` and `aggregate-3`. Benchmark aggregation
+receipts advance to `metric/v3`. Historical records remain readable with their original identities.
+Rejected alternative: retain the old producer identities, which would make changed coverage and
+absence semantics appear to be the same scientific output.
+
 - **An imageability lexicon in the repository.** No public-domain table is available, and a slice
   that works only with one table is the thing the vision warns against.
 - **A boolean "novelty" feature.** A 1/0 measurement is a categorical dressed as a scalar; type

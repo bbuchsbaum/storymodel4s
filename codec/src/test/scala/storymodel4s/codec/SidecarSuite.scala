@@ -69,6 +69,23 @@ class SidecarSuite extends ScalaCheckSuite:
     provenance
   )
 
+  test("sidecars retain ineligible and missing outcomes without consuming observed rows") {
+    val track = scalarTrack.copy(observations =
+      scalarTrack.observations :+
+        FeatureObservation(target(3), Estimate.Ineligible, None, Some(Coverage.empty))
+    )
+    val (proxy, bytes) = SidecarCodec.encodeScalarTrack(track, Dtype.Float64).toOption.get
+    assertEquals(proxy.manifest.rowCount, 2)
+    assertEquals(proxy.observations(3).estimate, Estimate.Ineligible)
+    assertEquals(proxy.observations(1).estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(proxy.observations.flatMap(_.estimate.toOption).map(_.row), Vector(0, 1))
+    assertEquals(SidecarCodec.materializeScalarTrack(proxy, bytes), Right(track))
+    val decoded =
+      Canonical.decode[SidecarTrack[FeatureTarget, Double]](Canonical.encode(proxy)).toOption.get
+    assertEquals(SidecarCodec.materializeScalarTrack(decoded, bytes), Right(track))
+    assertEquals(track.coverage, Coverage.unsafe(3, 2))
+  }
+
   test("SM4SFT01 Float32 bytes have the exact versioned little-endian layout") {
     val (manifest, bytes) = SidecarCodec
       .encodeRows(vectorSpace.id, 2, Dtype.Float32, Vector(Vector(1.0, -2.5)))

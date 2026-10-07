@@ -726,6 +726,15 @@ object EstimateLaws extends Laws:
     new DefaultRuleSet(
       "features.estimate",
       None,
+      "Functor identity preserves every eligibility state" -> forAll(
+        Gen.oneOf(missing.map(_.estimate), observed.map(_.estimate), Gen.const(Estimate.Ineligible))
+      ) { e => cats.Functor[Estimate].map(e)(identity) == e },
+      "Functor composition preserves every eligibility state" -> forAll(
+        Gen.oneOf(missing.map(_.estimate), observed.map(_.estimate), Gen.const(Estimate.Ineligible))
+      ) { e =>
+        cats.Functor[Estimate].map(cats.Functor[Estimate].map(e)(_ + 1.0))(_ * 2.0) ==
+          cats.Functor[Estimate].map(e)(v => (v + 1.0) * 2.0)
+      },
       "reducers over all-missing samples yield Missing(AllMissing), never zero" -> forAll(
         reducers,
         Gen.nonEmptyListOf(missing)

@@ -24,6 +24,7 @@ final case class MetricValue(
     val v = value match
       case Estimate.Observed(x, _) => f"$x%.4f"
       case Estimate.Missing(r)     => s"missing(${r.toString})"
+      case Estimate.Ineligible     => "ineligible"
     val ci =
       interval.map(i => f" [${i.lower}%.4f, ${i.upper}%.4f] (B=${i.resamples})").getOrElse("")
     s"$name = $v cov=${coverage.observed}/${coverage.eligible} stories=$stories$ci receipt=${receipt.short()}"
@@ -54,6 +55,12 @@ enum MetricObservation:
     case Observed(value) => onObserved(value)
     case Missing(reason) => onMissing(reason)
 
+  /** Preserve eligibility in portable reports while retaining this carrier's finite boundary. */
+  def toEstimate: Estimate[Double] =
+    fold(Estimate.Ineligible, Estimate.observed(_), Estimate.missing(_))
+
+  def isEligible: Boolean = toEstimate.isEligible
+
 object MetricObservation:
   /** A finite observation, or a typed absence when arithmetic produced no real score. */
   def observed(value: Double): MetricObservation =
@@ -64,6 +71,10 @@ object MetricObservation:
   /** Lift the ordinary optional scoring path: absence means the metric does not apply. */
   def fromOption(value: Option[Double]): MetricObservation =
     value.fold(Ineligible)(observed)
+
+  /** Validate portable observed values instead of exposing an unchecked observed constructor. */
+  def fromEstimate(value: Estimate[Double]): MetricObservation =
+    value.fold(Ineligible, (v, _) => observed(v), Missing.apply)
 
 /** A per-unit metric outcome with eligibility and missingness kept distinct. */
 final case class UnitObservation(unit: RecallUnitId, observation: MetricObservation)
@@ -488,7 +499,7 @@ object Metrics:
   ): MetricValue =
     val perCase: Vector[(Coverage, Option[Double], Vector[MissingReason])] = cases.map { c =>
       val obs = c.byMetric.getOrElse(name, Vector.empty)
-      val eligible = obs.filter(_.observation != MetricObservation.Ineligible)
+      val eligible = obs.filter(_.observation.isEligible)
       val observed = eligible.collect {
         case UnitObservation(_, MetricObservation.Observed(value)) => value
       }
@@ -504,12 +515,16 @@ object Metrics:
     val means = perCase.flatMap(_._2)
     val missing = perCase.flatMap(_._3).sortBy(_.toString)
     val receipt = ContentAddress.digest(
-      Vector("metric/v2", name, seed.toString, resamples.toString) ++ inputs.map(_.hex)
+      Vector("metric/v3", name, seed.toString, resamples.toString) ++ inputs.map(_.hex)
     )
     if missing.nonEmpty then
       MetricValue(name, Estimate.missing(missing.head), coverage, 0, None, receipt)
     else if means.isEmpty then
-      MetricValue(name, Estimate.missing(MissingReason.AllMissing), coverage, 0, None, receipt)
+      val declared = cases.flatMap(_.byMetric.getOrElse(name, Vector.empty))
+      val value =
+        if declared.nonEmpty && declared.forall(!_.observation.isEligible) then Estimate.Ineligible
+        else Estimate.missing(MissingReason.AllMissing)
+      MetricValue(name, value, coverage, 0, None, receipt)
     else
       val mean = means.sum / means.size
       val interval =

@@ -45,9 +45,12 @@ final case class FeatureTrack[T <: FeatureTarget, V](
   def observed: Vector[(T, V)] =
     observations.flatMap(o => o.estimate.toOption.map(v => o.target -> v))
 
-  /** Eligible = all observations; observed = those with a value. */
+  /** Missing observations remain eligible; inapplicable observations do not. */
   def coverage: Coverage =
-    Coverage.unsafe(observations.size, observations.count(_.estimate.isObserved))
+    Coverage.unsafe(
+      observations.count(_.estimate.isEligible),
+      observations.count(_.estimate.isObserved)
+    )
 
   /** Pair with another track on the same target set (targets present in both). */
   def zip[W](other: FeatureTrack[T, W]): Vector[(T, Estimate[V], Estimate[W])] =

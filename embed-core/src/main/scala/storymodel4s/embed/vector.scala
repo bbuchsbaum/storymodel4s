@@ -154,7 +154,8 @@ object Distances:
       b: Estimate[ValidatedVector]
   ): Estimate[ValidatedDistance] =
     (a, b) match
-      case (Estimate.Observed(x, _), Estimate.Observed(y, _)) =>
+      case (Estimate.Ineligible, _) | (_, Estimate.Ineligible) => Estimate.Ineligible
+      case (Estimate.Observed(x, _), Estimate.Observed(y, _))  =>
         cosine(x, y).fold(
           _ =>
             Estimate.Missing(

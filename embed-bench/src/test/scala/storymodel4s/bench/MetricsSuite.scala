@@ -49,7 +49,9 @@ class MetricsSuite extends FunSuite:
     assertEquals(m.coverage.eligible, 10)
   }
 
-  test("ineligible units are outside coverage; no eligible unit yields Missing") {
+  test(
+    "ineligible units are outside coverage; entirely ineligible declared units yield Ineligible"
+  ) {
     val c = obs("s", "x", Vector(None, Some(0.5), None))
     val m = Metrics.aggregate("x", Vector(c), inputs, seed = 1L)
     assertEquals(m.value, Estimate.observed(0.5))
@@ -57,6 +59,7 @@ class MetricsSuite extends FunSuite:
     assertEquals(m.coverage.observed, 1)
     val none = Metrics.aggregate("x", Vector(obs("s", "x", Vector(None, None))), inputs, 1L)
     assert(!none.value.isObserved, none.render)
+    assertEquals(none.value, Estimate.Ineligible)
     assertEquals(none.coverage.eligible, 0)
     assertEquals(none.stories, 0)
     assertEquals(none.interval, None)
@@ -107,6 +110,33 @@ class MetricsSuite extends FunSuite:
     )
   }
 
+  test("portable metric conversion retains eligibility and checks observed finiteness") {
+    val missing = MissingReason.ProviderAbstained
+    Vector(
+      MetricObservation.Ineligible,
+      MetricObservation.observed(0.0),
+      MetricObservation.Missing(missing)
+    ).foreach { value =>
+      assertEquals(MetricObservation.fromEstimate(value.toEstimate), value)
+    }
+    assertEquals(
+      MetricObservation.fromEstimate(Estimate.Observed(Double.NaN, None)),
+      MetricObservation.Missing(MissingReason.Undefined(UndefinedReason.NotFinite))
+    )
+    assertEquals(
+      Metrics.aggregate("x", Vector.empty, inputs, 1L).value,
+      Estimate.missing(MissingReason.AllMissing)
+    )
+    assertEquals(
+      Metrics.aggregate("x", Vector(CaseObservations("absent", Map.empty)), inputs, 1L).value,
+      Estimate.missing(MissingReason.AllMissing)
+    )
+    assertEquals(
+      Metrics.aggregate("x", Vector(obs("empty", "x", Vector.empty)), inputs, 1L).value,
+      Estimate.missing(MissingReason.AllMissing)
+    )
+  }
+
   test("bootstrap is deterministic under a seed and changes with it") {
     val cases = Vector(
       obs("a", "x", Vector(Some(0.2))),
@@ -132,7 +162,7 @@ class MetricsSuite extends FunSuite:
     assertEquals(a.value, b.value)
     assertEquals(
       a.receipt,
-      ContentAddress.digest(Vector("metric/v2", "x", "1", "200", Checksum.ofText("one").hex))
+      ContentAddress.digest(Vector("metric/v3", "x", "1", "200", Checksum.ofText("one").hex))
     )
   }
 
