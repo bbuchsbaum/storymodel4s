@@ -1,0 +1,1238 @@
+{
+  "conclusion": "failure",
+  "headSha": "d1ec73ef0f2791b11f21a2e4b98c40d6d62c8d25",
+  "jobs": [
+    {
+      "completedAt": "2026-10-07T00:32:05Z",
+      "conclusion": "success",
+      "databaseId": 112569033140,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "startedAt": "2026-10-07T00:25:29Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-07T00:25:33Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-07T00:25:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:36Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-07T00:25:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:40Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-07T00:25:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:40Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-07T00:25:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:40Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-07T00:25:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:40Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-07T00:25:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:26:40Z",
+          "conclusion": "success",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-07T00:25:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:26:52Z",
+          "conclusion": "success",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-07T00:26:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:26:52Z",
+          "conclusion": "skipped",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-07T00:26:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:26:52Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-07T00:26:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:26:52Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-07T00:26:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:26:52Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-07T00:26:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:31:55Z",
+          "conclusion": "success",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-07T00:26:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:31:55Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-07T00:31:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:31:55Z",
+          "conclusion": "skipped",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-07T00:31:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:31:55Z",
+          "conclusion": "skipped",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-07T00:31:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:31:55Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-07T00:31:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:31:59Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@21)",
+          "number": 32,
+          "startedAt": "2026-10-07T00:31:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:32:00Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-07T00:31:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:32:00Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-07T00:32:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:32:00Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-07T00:32:00Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37551878591/job/112569033140",
+      "entry": "3_Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM).txt",
+      "raw_log_sha256": "a60f3edd72a8b0ab94f34eafad4655bae3c7a1c1f3c5fcb251db6c49d8f482e2",
+      "cells": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        }
+      ],
+      "totals": {
+        "total": 3476,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3470,
+        "skipped": 6
+      },
+      "failures": []
+    },
+    {
+      "completedAt": "2026-10-07T00:40:05Z",
+      "conclusion": "success",
+      "databaseId": 112569033367,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "startedAt": "2026-10-07T00:25:29Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-07T00:25:32Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-07T00:25:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:37Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-07T00:25:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:40Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-07T00:25:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:41Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-07T00:25:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:13Z",
+          "conclusion": "success",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-07T00:25:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:13Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-07T00:27:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:13Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-07T00:27:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:35Z",
+          "conclusion": "success",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-07T00:27:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:32Z",
+          "conclusion": "success",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-07T00:27:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:32:33Z",
+          "conclusion": "success",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-07T00:28:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:32:33Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-07T00:32:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:38:14Z",
+          "conclusion": "success",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-07T00:32:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:38:14Z",
+          "conclusion": "skipped",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-07T00:38:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:38:14Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-07T00:38:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:38:50Z",
+          "conclusion": "success",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-07T00:38:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:58Z",
+          "conclusion": "success",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-07T00:38:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:58Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-07T00:39:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:40:00Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 32,
+          "startedAt": "2026-10-07T00:39:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:40:04Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-07T00:40:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:40:04Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-07T00:40:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:40:04Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-07T00:40:04Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37551878591/job/112569033367",
+      "entry": "2_Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS).txt",
+      "raw_log_sha256": "431b12b2bd06b2078cc27694fba38fa90c42c2bff235e393343283064d489358",
+      "cells": [
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 607,
+          "failed": 0,
+          "errors": 0,
+          "passed": 607,
+          "skipped": 0
+        },
+        {
+          "total": 318,
+          "failed": 0,
+          "errors": 0,
+          "passed": 318,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        }
+      ],
+      "totals": {
+        "total": 2755,
+        "failed": 0,
+        "errors": 0,
+        "passed": 2755,
+        "skipped": 0
+      },
+      "failures": []
+    },
+    {
+      "completedAt": "2026-10-07T00:39:36Z",
+      "conclusion": "success",
+      "databaseId": 112569033438,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "startedAt": "2026-10-07T00:25:28Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-07T00:25:33Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-07T00:25:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:36Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-07T00:25:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:41Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-07T00:25:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:42Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-07T00:25:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:15Z",
+          "conclusion": "success",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-07T00:25:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:15Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-07T00:27:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:15Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-07T00:27:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:35Z",
+          "conclusion": "success",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-07T00:27:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:31Z",
+          "conclusion": "success",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-07T00:27:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:31Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-07T00:28:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:31Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-07T00:28:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:31Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-07T00:28:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:37:09Z",
+          "conclusion": "success",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-07T00:28:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:37:09Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-07T00:37:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:37:44Z",
+          "conclusion": "success",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-07T00:37:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:00Z",
+          "conclusion": "success",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-07T00:37:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:30Z",
+          "conclusion": "success",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-07T00:39:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:32Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 32,
+          "startedAt": "2026-10-07T00:39:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:35Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-07T00:39:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:35Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-07T00:39:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:39:35Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-07T00:39:35Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37551878591/job/112569033438",
+      "entry": "0_Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM).txt",
+      "raw_log_sha256": "d21b8b42d08f0e12608e6b72bdbf8f0a8ee76b0f672747fbab1ed9f5d77d1449",
+      "cells": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        }
+      ],
+      "totals": {
+        "total": 3476,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3470,
+        "skipped": 6
+      },
+      "failures": []
+    },
+    {
+      "completedAt": "2026-10-07T00:42:06Z",
+      "conclusion": "failure",
+      "databaseId": 112569033478,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "startedAt": "2026-10-07T00:25:30Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-07T00:25:35Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-07T00:25:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:40Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-07T00:25:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:45Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-07T00:25:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:25:47Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-07T00:25:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:18Z",
+          "conclusion": "success",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-07T00:25:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:18Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-07T00:27:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:18Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-07T00:27:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:27:38Z",
+          "conclusion": "success",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-07T00:27:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:33Z",
+          "conclusion": "success",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-07T00:27:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:28:33Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-07T00:28:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:37:58Z",
+          "conclusion": "success",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-07T00:28:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:37:58Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-07T00:37:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:37:58Z",
+          "conclusion": "skipped",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-07T00:37:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:01Z",
+          "conclusion": "failure",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-07T00:37:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:01Z",
+          "conclusion": "skipped",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-07T00:42:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:01Z",
+          "conclusion": "skipped",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-07T00:42:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:01Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-07T00:42:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:02Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 32,
+          "startedAt": "2026-10-07T00:42:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:02Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-07T00:42:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:02Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-07T00:42:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-07T00:42:02Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-07T00:42:02Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37551878591/job/112569033478",
+      "entry": "1_Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative).txt",
+      "raw_log_sha256": "8ed8d0e1e7ee15715af0a09163db0f8c288711ff6a36fb7c701cc1865c137f28",
+      "cells": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 1,
+          "errors": 0,
+          "passed": 79,
+          "skipped": 0
+        }
+      ],
+      "totals": {
+        "total": 330,
+        "failed": 1,
+        "errors": 0,
+        "passed": 329,
+        "skipped": 0
+      },
+      "failures": [
+        "2026-10-07T00:40:10.7977477Z ==> X storymodel4s.proposition.SemanticCompatibilitySuite.an exhausted canonical budget is refused, never ordered by id 38.144s java.util.concurrent.TimeoutException: test timed out after 30 seconds"
+      ]
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37551878591",
+  "archive_sha256": "79675039159d7448ffb46c747679d9567f286c9d02f57827dd1bc622640d8eeb",
+  "archive_bytes": 485421
+}

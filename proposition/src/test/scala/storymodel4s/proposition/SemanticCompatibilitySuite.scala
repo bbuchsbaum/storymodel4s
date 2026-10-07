@@ -419,9 +419,13 @@ class SemanticCompatibilitySuite extends ScalaCheckSuite:
       )
     )
 
+  // Each API exhausts the full leaf budget independently; keep one search per timed test.
+  test("identity exactness flags an exhausted canonical budget") {
+    assert(!Canonical.isExact(triangles(5)), "this chart must exhaust the leaf budget")
+  }
+
   test("an exhausted canonical budget is refused, never ordered by id") {
     val c = triangles(5)
-    assert(!Canonical.isExact(c), "precondition: this chart must exhaust the leaf budget")
     assertEquals(
       SemanticProjection.canonical(c),
       Left(ProjectionRefusal.CanonicalBudgetExhausted(Canonical.MaxLeaves))
