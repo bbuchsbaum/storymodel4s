@@ -751,3 +751,41 @@ receipts and StageTrace adoption remain open. Current content keys omit submitte
 distance spans `[0,2]`, whereas the strict fixture table accepts `[0,1]`. Neither difference can be
 silently erased to register an embedding adapter. Wire replay admission remains separate work;
 this slice provides no decoder that can promote caller-supplied artifacts to executed authority.
+
+### 2026-10-07 — checked surface rendering and explicit cosine units (S2b-2)
+
+Within the accepted S2 direction, `SurfaceRendering.pair` joins a checked recall unit and frozen
+source target to actual canonical surface text. The source representation must match the frozen
+view fingerprint and semantic scope, declare one text checksum matching the supplied atlas's
+source, and locate the target with exactly the node's support. Span bounds, optional surface-unit
+anchors and UTF-16 boundaries are checked before rendering. A sparse non-recursive check refuses
+parent cycles throughout the captured inventory before recursive content projection. This validates consistency with the
+source declaration, not acquisition authority or annotation truth. Anchored media support is
+refused until an admitted stream/render binding exists.
+
+`RenderedContentPair` carries canonical content, grain, exact submitted strings and a versioned
+rendering policy, with no coordinates, original identifiers, source objects, binding receipts or
+callback. Equality includes the rendered strings; its public hash does not derive from those
+strings. This additive interpretation of S2's bound-text payload preserves the existing
+`UnitContent`/`TargetContent` equivalence used by lexical, fixture and historical scorers. Reject
+adding optional raw text to those keys, caller-supplied string/content pairs, and a hash of private
+text as a substitute for checked binding.
+
+Recall rendering preserves the checked graph's hull substring. Source rendering merges overlapping
+and touching declared spans and joins separated runs with one newline, without introducing a new
+hull. Empty spans render the empty string, which is content, not a distance or successful inference;
+future registered adapters must declare their empty-input outcome. Earlier support producers may
+already have introduced a hull; this renderer cannot prove otherwise. Historical video `embedText`
+and group-label rendering are different policies and retain their own parity acceptance.
+
+`EmbeddingMetric.fromCosine` explicitly accepts raw finite cosine distance in `[0,2]`, returning an
+unforgeable value with its declared scale: `CosineDistance` preserves `d`, while
+`HalfCosineDistance` returns `d / 2` in `[0,1]`. Missing and ineligible estimates remain distinct,
+and observation credence is preserved. The conversion refuses invalid input instead of clamping.
+Reject feeding raw cosine into strict pricing's existing `[0,1]` clamp, silently changing units,
+or claiming that half-cosine preserves weighted historical costs merely because ranking agrees.
+The existing vector cosine routine's numerical clamp is unchanged.
+
+These boundaries are prerequisites, not registered strict embedding execution. Model/render/
+candidate receipts, batch execution/replay joins, immutable nomination/pricing, frozen-preset
+parity, and originating-evidence StageTrace adoption remain on G1. No new module or dependency.
