@@ -1,0 +1,61 @@
+{
+  "candidate": "e065177d5a7478da35f9c905a9398e73c5a156cb",
+  "actual_clone_head_during_gate": "d1ec73ef0f2791b11f21a2e4b98c40d6d62c8d25",
+  "test_source_imported_from_primary_then_committed_as_e065": true,
+  "tested_gated_blob_hashes": {
+    "build.sbt": "aa368e0d7d85386eeff150596182ce1ad018d069655d1621d0cdfb60c7244504",
+    ".github/workflows/ci.yml": "4a64296401e071ed5c30be659563532052959398b312ecec8016c4ee34e1b34c",
+    "proposition/src/main/scala/storymodel4s/proposition/semantic.scala": "9e2c7049ee0e8dde1ad491c96d3905a4615dbb6f8931e56772a5bd8bc946e100",
+    "proposition/src/test/scala/storymodel4s/proposition/SemanticCompatibilitySuite.scala": "54a4a0405dba7a39b9cae1e9e06b6ef0bdf0b97f1c5aecfd8bf9ceb05c42d998"
+  },
+  "local": {
+    "schema_version": 1,
+    "started_utc": "2026-10-07T00:50:58.530540+00:00",
+    "finished_utc": "2026-10-07T00:55:20.699437+00:00",
+    "duration_seconds": 262.167541,
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "propositionJVM/test",
+      "propositionJS/test",
+      "propositionNative/test",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck",
+      "githubWorkflowCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-slice-20261006/native-budget-split-local.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": null,
+    "log_bytes": 12318
+  },
+  "raw_log_sha256": "270175edc6b16b9036bce5dd50e378432de993f75457e0f9e669b09c323c8058",
+  "cells": [
+    {
+      "module": "propositionJVM",
+      "passed": 81,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "module": "propositionJS",
+      "passed": 81,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "module": "propositionNative",
+      "passed": 81,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "passed": 243,
+  "failed": 0,
+  "skipped": 0,
+  "qualification": "LocallyObserved source-identical inputs; exact-e065 hosted gate pending"
+}

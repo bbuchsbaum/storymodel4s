@@ -1,0 +1,19 @@
+--- a/proposition/src/main/scala/storymodel4s/proposition/semantic.scala
++++ b/proposition/src/main/scala/storymodel4s/proposition/semantic.scala
+@@ -105,7 +105,15 @@
+       chart: PropositionChart[Checked]
+   ): Either[ProjectionRefusal, SemanticGraph[GraphOrder.Canonical]] =
+     Canonical.glossedExactOrder(chart) match
+-      case None        => Left(ProjectionRefusal.CanonicalBudgetExhausted(Canonical.MaxLeaves))
++      case None =>
++        Right(
++          SemanticGraph.build[GraphOrder.Canonical, Checked](
++            chart,
++            chart.conceptIds.sortBy(_.value),
++            identity,
++            TiePolicy.OrderFree
++          )
++        )
+       case Some(order) =>
+         val index = order.zipWithIndex.toMap
+         val label: ConceptId => String = id => f"${index(id)}%05d"
