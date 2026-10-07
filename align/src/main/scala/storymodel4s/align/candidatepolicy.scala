@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import storymodel4s.core.Checksum
+import storymodel4s.features.Estimate
 import storymodel4s.recall.{RecallGraph, RecallUnit, RecallUnitId}
 import storymodel4s.recall.RecallGraphStatus.Checked
 
@@ -14,12 +15,14 @@ enum CandidateRefusal:
   case NonPositiveBudget(budget: Int)
   case BudgetBelowPerLevel(budget: Int, perLevel: Int)
   case NonFiniteScore(unit: RecallUnitId, ref: SourceNodeRef)
+  case StrictScoring(unit: RecallUnitId, ref: SourceNodeRef, refusal: StrictScoringRefusal)
 
   def message: String = this match
     case NonPositivePerLevel(k)    => s"perLevel must be positive, got $k"
     case NonPositiveBudget(n)      => s"tie budget must be positive, got $n"
     case BudgetBelowPerLevel(n, k) => s"tie budget $n is below perLevel $k"
     case NonFiniteScore(unit, ref) => s"non-finite semantic score for ${unit.value} at ${ref.key}"
+    case StrictScoring(unit, ref, r) => s"unit ${unit.value} at ${ref.key}: ${r.message}"
 
 /** The budget a caller asks for. It is an unchecked request; [[StrictCandidateConfig.of]] checks it
   * against `perLevel` and there is no default, so every strict profile states its choice.
@@ -141,13 +144,15 @@ object StrictCandidateConfig:
 final class StrictCandidateSet private (
     val set: CandidateSet,
     val overflow: Vector[TieOverflow],
-    val uniformSemantic: Vector[UniformSemanticScores]
+    val uniformSemantic: Vector[UniformSemanticScores],
+    val semanticOutcomes: Vector[SemanticOutcomeSummary]
 ):
   override def equals(that: Any): Boolean = that match
     case o: StrictCandidateSet =>
-      set == o.set && overflow == o.overflow && uniformSemantic == o.uniformSemantic
+      set == o.set && overflow == o.overflow && uniformSemantic == o.uniformSemantic &&
+        semanticOutcomes == o.semanticOutcomes
     case _ => false
-  override def hashCode: Int = (set, overflow, uniformSemantic).hashCode
+  override def hashCode: Int = (set, overflow, uniformSemantic, semanticOutcomes).hashCode
   override def toString: String =
     s"StrictCandidateSet(${set.size} anchors, overflow=${overflow.size}, " +
       s"uniform=${uniformSemantic.size})"
@@ -192,7 +197,8 @@ object StrictBinding:
 final class StrictCandidates private (
     val policy: CandidateTiePolicy,
     val binding: StrictBinding,
-    val byUnit: Map[RecallUnitId, StrictCandidateSet]
+    val byUnit: Map[RecallUnitId, StrictCandidateSet],
+    val semanticChannel: Option[StrictSemanticChannel]
 ):
   /** The unit's strict candidates, or `None` for a unit outside the bound recall. */
   def get(unit: RecallUnitId): Option[StrictCandidateSet] = byUnit.get(unit)
@@ -213,9 +219,6 @@ object StrictCandidateSet:
       unit: RecallUnit,
       view: SourceView
   ): Either[CandidateRefusal, StrictCandidateSet] =
-    val channel = Channels.semantic(config.space)
-    val lexicalRefs: Set[SourceNodeRef] =
-      if config.lexicalOverlap then CandidateGenerator.lexicalHits(unit, view).toSet else Set.empty
     val levels = view.byLevel.toVector.sortBy(_._1)
     val scoredByLevel: Either[CandidateRefusal, Vector[(Int, Vector[(SourceNodeRef, Double)])]] =
       levels.foldLeft[Either[CandidateRefusal, Vector[(Int, Vector[(SourceNodeRef, Double)])]]](
@@ -228,41 +231,76 @@ object StrictCandidateSet:
             case None           => Right(done :+ (level -> scored))
         }
       }
-    scoredByLevel.map { byLevel =>
-      val anyRanked = byLevel.exists(_._2.nonEmpty)
-      val perLevel = byLevel.map { (level, scored) =>
-        val sorted = scored.sortBy(_._2)
-        val kept =
-          if sorted.size <= config.perLevel then sorted
-          else
-            val cutoff = sorted(config.perLevel - 1)._2
-            sorted.filter((_, d) => d <= cutoff)
-        val distinct = kept.map(_._2).distinct.sorted
-        val semanticNoms = kept.map { (r, d) =>
-          Nomination(r, channel, distinct.indexOf(d), Some(d), config.space, Some(s"level:$level"))
-        }
-        val levelNodes = view.byLevel.getOrElse(level, Vector.empty).map(_.ref).toSet
-        val lexicalNoms = lexicalRefs
-          .intersect(levelNodes)
-          .toVector
-          .sorted
-          .map(r => Nomination(r, Channels.lexical, 0, None, None, None))
-        val union = (semanticNoms.map(_.ref) ++ lexicalNoms.map(_.ref)).distinct.size
-        val overflow = config.policy.budget match
-          case a: TieBudget.AtMost if union > a.n => Some(new TieOverflow(level, union, a.n))
-          case _                                  => None
-        val uniform =
-          if scored.size >= 2 && scored.forall(_._2 == scored.head._2) then
-            Some(new UniformSemanticScores(level, scored.size))
-          else None
-        (if overflow.isEmpty then semanticNoms ++ lexicalNoms else Vector.empty, overflow, uniform)
+    scoredByLevel.map(byLevel => complete(config, unit, view, byLevel, Vector.empty))
+
+  private def complete(
+      config: StrictCandidateConfig,
+      unit: RecallUnit,
+      view: SourceView,
+      byLevel: Vector[(Int, Vector[(SourceNodeRef, Double)])],
+      outcomes: Vector[SemanticOutcomeSummary]
+  ): StrictCandidateSet =
+    val channel = Channels.semantic(config.space)
+    val lexicalRefs: Set[SourceNodeRef] =
+      if config.lexicalOverlap then CandidateGenerator.lexicalHits(unit, view).toSet else Set.empty
+    val anyRanked = byLevel.exists(_._2.nonEmpty)
+    val perLevel = byLevel.map { (level, scored) =>
+      val sorted = scored.sortBy(_._2)
+      val kept =
+        if sorted.size <= config.perLevel then sorted
+        else
+          val cutoff = sorted(config.perLevel - 1)._2
+          sorted.filter((_, d) => d <= cutoff)
+      val distinct = kept.map(_._2).distinct.sorted
+      val semanticNoms = kept.map { (r, d) =>
+        Nomination(r, channel, distinct.indexOf(d), Some(d), config.space, Some(s"level:$level"))
       }
-      val nominations = perLevel.flatMap(_._1)
-      val set =
-        if nominations.isEmpty && !anyRanked && lexicalRefs.isEmpty then CandidateSet.unranked
-        else CandidateSet(nominations, abstained = false)
-      new StrictCandidateSet(set, perLevel.flatMap(_._2), perLevel.flatMap(_._3))
+      val levelNodes = view.byLevel.getOrElse(level, Vector.empty).map(_.ref).toSet
+      val lexicalNoms = lexicalRefs
+        .intersect(levelNodes)
+        .toVector
+        .sorted
+        .map(r => Nomination(r, Channels.lexical, 0, None, None, None))
+      val union = (semanticNoms.map(_.ref) ++ lexicalNoms.map(_.ref)).distinct.size
+      val overflow = config.policy.budget match
+        case a: TieBudget.AtMost if union > a.n => Some(new TieOverflow(level, union, a.n))
+        case _                                  => None
+      val uniform =
+        if scored.size >= 2 && scored.forall(_._2 == scored.head._2) then
+          Some(new UniformSemanticScores(level, scored.size))
+        else None
+      (if overflow.isEmpty then semanticNoms ++ lexicalNoms else Vector.empty, overflow, uniform)
     }
+    val nominations = perLevel.flatMap(_._1)
+    val set =
+      if nominations.isEmpty && !anyRanked && lexicalRefs.isEmpty then CandidateSet.unranked
+      else CandidateSet(nominations, abstained = false)
+    new StrictCandidateSet(set, perLevel.flatMap(_._2), perLevel.flatMap(_._3), outcomes)
+
+  private[align] def canonicalGenerated(
+      semantic: StrictSemanticChannel,
+      config: StrictCandidateConfig,
+      unit: RecallUnit,
+      view: SourceView
+  ): Either[CandidateRefusal, StrictCandidateSet] =
+    val levels = view.byLevel.toVector.sortBy(_._1)
+    levels.foldLeft[Either[CandidateRefusal, Vector[(Int, Vector[(SourceNodeRef, Double)], SemanticOutcomeSummary)]]](
+      Right(Vector.empty)
+    ) { case (pending, (level, nodes)) =>
+      pending.flatMap { previous =>
+        nodes.foldLeft[Either[CandidateRefusal, Vector[(SourceNodeRef, Estimate[Double])]]](Right(Vector.empty)) { (values, node) =>
+          values.flatMap { vs =>
+            ContentProjection.canonical(unit, node, view)
+              .left.map(r => CandidateRefusal.StrictScoring(unit.id, node.ref, StrictScoringRefusal.Projection(r)))
+              .map((u, t, _) => vs :+ (node.ref -> semantic.score(u, t)))
+          }
+        }.map { values =>
+          previous :+ (level, values.flatMap((r, e) => e.toOption.map(r -> _)),
+            SemanticOutcomeSummary.counted(level, values.map(_._2)))
+        }
+      }
+    }.map(scored => complete(config, unit, view,
+      scored.map((level, distances, _) => level -> distances), scored.map(_._3)))
 
 object StrictCandidates:
 
@@ -285,8 +323,23 @@ object StrictCandidates:
         )
       }
       .map(pairs =>
-        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap)
+        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap, None)
       )
+
+  /** Controlled canonical generation; historical callback generation has no channel binding. */
+  private[align] def canonical(
+      semantic: StrictSemanticChannel,
+      config: StrictCandidateConfig,
+      recall: RecallGraph[Checked],
+      source: SourceView
+  ): Either[CandidateRefusal, StrictCandidates] =
+    val view = MappingBindingRender.snapshot(source)
+    recall.ordered.foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
+      Right(Vector.empty)
+    ) { (acc, unit) =>
+      acc.flatMap(done => StrictCandidateSet.canonicalGenerated(semantic, config, unit, view)
+        .map(set => done :+ (unit.id -> set)))
+    }.map(pairs => new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap, Some(semantic)))
 
 /** Strict candidate generation: semantic candidates per hierarchy level, cut tie-complete with
   * dense ranks, unioned with lexical hits and bounded by the union-wide budget.
@@ -304,3 +357,13 @@ final class StrictCandidateGenerator(
       source: SourceView
   ): Either[CandidateRefusal, StrictCandidates] =
     StrictCandidates.generated(semantic, config, recall, source)
+
+object StrictCandidateGenerator:
+  /** Strict content generation accepts only controlled adapters, never arbitrary closures. */
+  def canonical(
+      semantic: StrictSemanticChannel,
+      config: StrictCandidateConfig,
+      recall: RecallGraph[Checked],
+      source: SourceView
+  ): Either[CandidateRefusal, StrictCandidates] =
+    StrictCandidates.canonical(semantic, config, recall, source)

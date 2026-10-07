@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import cats.syntax.all.*
 import storymodel4s.core.{Checksum, TypedSupport}
 import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
@@ -301,7 +302,8 @@ final class HsmmResult private (
     val recallChecksum: Checksum,
     val refinementPasses: Int,
     val sourceSupport: Map[SourceNodeRef, TypedSupport],
-    val textWireCompatible: Boolean
+    val textWireCompatible: Boolean,
+    val gateSemantics: GateSemantics
 ):
   /** Digest of the derived admissibility, for the wire's drift check. */
   def admissibilityEcho: AdmissibilityEcho = AdmissibilityEcho.of(admissibility)
@@ -319,7 +321,8 @@ final class HsmmResult private (
       recallChecksum,
       refinementPasses,
       sourceSupport,
-      textWireCompatible
+      textWireCompatible,
+      gateSemantics
     )
 
   override def equals(o: Any): Boolean = o match
@@ -383,6 +386,40 @@ object HsmmResult:
       costs: Map[RecallUnitId, Map[AlignState, CostBreakdown]],
       refinementPasses: Int,
       admissibilityEcho: Option[AdmissibilityEcho] = None
+  ): Either[AlignError, HsmmResult] =
+    validatedWith(recall, view, candidateAnchors, posterior, flow, viterbi, logLikelihood,
+      costs, refinementPasses, admissibilityEcho, GateSemantics.Historical)
+
+  /** Re-derive canonical content gates before accepting result parts. This proves gate semantics,
+    * not candidate-generation or scoring provenance supplied by a caller.
+    */
+  def validatedCanonical(
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      candidateAnchors: Map[RecallUnitId, Vector[SourceNodeRef]],
+      posterior: AlignmentMatrix,
+      flow: TransitionFlow,
+      viterbi: Vector[AlignState],
+      logLikelihood: Double,
+      costs: Map[RecallUnitId, Map[AlignState, CostBreakdown]],
+      refinementPasses: Int,
+      admissibilityEcho: Option[AdmissibilityEcho] = None
+  ): Either[AlignError, HsmmResult] =
+    validatedWith(recall, view, candidateAnchors, posterior, flow, viterbi, logLikelihood,
+      costs, refinementPasses, admissibilityEcho, GateSemantics.CanonicalContent)
+
+  private def validatedWith(
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      candidateAnchors: Map[RecallUnitId, Vector[SourceNodeRef]],
+      posterior: AlignmentMatrix,
+      flow: TransitionFlow,
+      viterbi: Vector[AlignState],
+      logLikelihood: Double,
+      costs: Map[RecallUnitId, Map[AlignState, CostBreakdown]],
+      refinementPasses: Int,
+      admissibilityEcho: Option[AdmissibilityEcho],
+      gateSemantics: GateSemantics
   ): Either[AlignError, HsmmResult] =
     val sourceNodes = view.nodes
     val sourceIndex = sourceNodes.map(n => n.ref -> n).toMap
@@ -506,15 +543,15 @@ object HsmmResult:
           .getOrElse(Right(()))
     // Derivation: the gate over exactly the nominated anchors — never all view nodes, never the
     // anchors that happen to appear in the parts.
-    def derive: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]] =
+    def derive: Either[AlignError, Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]] =
       // The nomination pass has already refused absent anchors; derivation still goes through
       // `view.node` totally (an anchor without a node simply has no record, and would then fail
       // the gate below rather than throw).
-      recall.ordered.iterator.map { unit =>
-        unit.id -> candidateAnchors(unit.id).iterator.flatMap { ref =>
-          view.node(ref).map(node => ref -> ModeGate.assess(unit, node, view))
-        }.toMap
-      }.toMap
+      recall.ordered.traverse { unit =>
+        candidateAnchors(unit.id).flatMap(ref => view.node(ref).map(ref -> _)).traverse { (ref, node) =>
+          GateSemantics.assess(gateSemantics, unit, node, view).map(ref -> _)
+        }.map(entries => unit.id -> entries.toMap)
+      }.map(_.toMap)
     def drift(derived: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]) =
       admissibilityEcho match
         case Some(echo) =>
@@ -612,7 +649,7 @@ object HsmmResult:
       _ <- inventory
       _ <- structural
       _ <- nomination
-      admissibility = derive
+      admissibility <- derive
       _ <- drift(admissibility)
       _ <- gate(admissibility)
     yield new HsmmResult(
@@ -627,7 +664,8 @@ object HsmmResult:
       AlignWire.recallChecksum(recall),
       refinementPasses,
       sourceIndex.view.mapValues(_.support).toMap,
-      view.textWireCompatible
+      view.textWireCompatible,
+      gateSemantics
     )
 
   /** Row-marginal consistency of a flow step with its adjacent rows (deterministic key order). */
@@ -701,7 +739,10 @@ object GraphHsmm:
           // anchors it used are handed over as the nominated set — candidates that are not nodes of
           // the view were dropped when the evidence was computed, never nominated: the proof
           // refuses absent anchors, and an unreachable candidate is a nomination error, not a state.
-          HsmmResult.validated(
+          val validate = evidence.gateSemantics match
+            case GateSemantics.Historical => HsmmResult.validated
+            case GateSemantics.CanonicalContent => HsmmResult.validatedCanonical
+          validate(
             recall,
             view,
             evidence.units.zip(evidence.nominated).toMap,

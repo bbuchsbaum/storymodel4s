@@ -255,7 +255,8 @@ private[align] object MappingBindingRender:
   )
   def result(value: HsmmResult): Checksum = MappingRender.digest(
     Vector(
-      "mapping-hsmm-result/v1",
+      if value.gateSemantics == GateSemantics.Historical then "mapping-hsmm-result/v1"
+      else "mapping-hsmm-result/canonical-content/v1",
       value.recallChecksum.hex,
       value.viewFingerprint.checksum.hex,
       sequence(

@@ -233,6 +233,7 @@ object FeatureCodecs:
           MissingReason.NotInLexicon,
           MissingReason.OutOfVocabulary,
           MissingReason.ProviderAbstained,
+          MissingReason.ChannelUnavailable,
           MissingReason.Excluded,
           MissingReason.AllMissing,
           MissingReason.InputUnresolved,

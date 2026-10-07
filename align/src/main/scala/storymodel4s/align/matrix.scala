@@ -388,6 +388,8 @@ object TransitionFlow:
 enum AlignError:
   case EmptyRecall
   case InvalidConfig(field: String, detail: String)
+  /** Retains the canonical comparison that the current strict model cannot consume. */
+  case StrictScoring(unit: RecallUnitId, ref: SourceNodeRef, refusal: StrictScoringRefusal)
   case MalformedRow(unit: RecallUnitId, detail: String)
   case SizeMismatch(detail: String)
 
@@ -437,6 +439,7 @@ enum AlignError:
   def message: String = this match
     case EmptyRecall            => "recall has no units"
     case InvalidConfig(f, m)    => s"$f: $m"
+    case StrictScoring(u, r, reason) => s"unit ${u.value} at ${r.key}: ${reason.message}"
     case MalformedRow(u, m)     => s"row ${u.value}: $m"
     case SizeMismatch(m)        => m
     case EmptyPopulation        => "population has no subjects"

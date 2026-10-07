@@ -690,3 +690,32 @@ with the lemma of a concept that scores nothing.
   which reports as established a conflict that no single best reading has (codex-pair-0923's
   BLOCK on 88675d29, Fray #105 seq 870); and refusing on a gate-divergent tie, which would turn a
   measurable, typed ambiguity into missing evidence.
+
+### 2026-10-07 — controlled strict wiring and downstream ambiguity (S2a-3)
+
+Within the accepted S2 direction, strict generation and pricing share a sealed
+`StrictSemanticChannel`: `Lexical`, checked `ContentTable`, or `Unavailable`. A table holds
+canonical content pairs and immutable declared fixture outcomes; it refuses conflicting outcomes
+for equal content, non-finite or out-of-range distances, and fabricated channel-unavailable
+outcomes. Coordinate-bearing fixture inputs are projected once and discarded. Reject wrapping an
+arbitrary historical callback as a controlled adapter. Generation binds its actual immutable
+channel to evidence construction; mismatched or historical callback-generated candidates cannot
+enter `StrictCostModel`. Compact per-level counts retain unavailable, abstained, ineligible and
+observed populations even when all nominations are unranked. Explicit lexical nominations remain
+a separately named configuration choice, never an unavailable-channel fallback.
+
+The comparison's gate alternatives remain measured evidence. The current single-facet HSMM cannot
+represent several equally supported readings: it returns a typed downstream-model refusal carrying
+the exact `GateReading` set. This clarifies the preceding rejection: never discard alternatives,
+choose one, union them, or relabel the comparison as missing/provider abstention. A downstream
+model may decline to consume an ambiguity it cannot represent. Reject inventing probabilities or
+alternative state weights in this wiring slice; alternative-aware inference requires its own
+estimand decision.
+
+Canonical content gates are re-derived during inference and contextual wire decoding. `hsmm/v5`
+requires explicit canonical gate semantics; historical `hsmm/v4` bytes and historical scoring
+entrypoints remain unchanged. Gate semantics certify the contextual gate proof, not execution of
+a provider or the provenance of caller-supplied result parts. Canonical evidence/result identities
+use separate version tags. Source, recall and member coordinates remain in orchestration bindings
+and receipts, where canonical reduction outcomes are re-keyed after scoring. Complete record
+identities may therefore change with coordinates even when their re-keyed content results agree.

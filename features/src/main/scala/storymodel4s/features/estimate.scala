@@ -40,6 +40,9 @@ enum MissingReason:
   /** The provider declined to answer. */
   case ProviderAbstained
 
+  /** No approved adapter is configured for this channel; no provider was invoked. */
+  case ChannelUnavailable
+
   /** An eligible value was withheld by policy (e.g. low coverage); also retains historical
     * policy-exclusion records. Known targets outside the measure now use `Ineligible`.
     */

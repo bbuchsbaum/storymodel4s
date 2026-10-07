@@ -70,6 +70,8 @@ object HsmmResultCodec:
     * [[AlignWire.costBreakdown]] is the only door a decoded record can come through.
     */
   val SchemaVersion: String = "hsmm/v4"
+  /** Canonical gate proof is explicit; historical v4 artifacts retain their original bytes. */
+  val CanonicalSchemaVersion: String = "hsmm/v5"
 
   private final case class StateMassWire(state: AlignState, mass: Double)
   private final case class RowWire(unit: RecallUnitId, mass: Vector[StateMassWire])
@@ -134,7 +136,8 @@ object HsmmResultCodec:
       admissibilityEcho: Checksum,
       viewFingerprint: Checksum,
       recallChecksum: Checksum,
-      refinementPasses: Int
+      refinementPasses: Int,
+      gateSemantics: GateSemantics
   )
 
   /** Encode a proved result as canonical JSON text. */
@@ -179,8 +182,8 @@ object HsmmResultCodec:
       view: SourceView
   ): Either[HsmmCodecError, HsmmResult] =
     json.hcursor.get[String]("schemaVersion") match
-      case Right(version) if version != SchemaVersion =>
-        Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema(version, Vector(SchemaVersion))))
+      case Right(version) if version != SchemaVersion && version != CanonicalSchemaVersion =>
+        Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema(version, Vector(SchemaVersion, CanonicalSchemaVersion))))
       case _ =>
         Canonical
           .decodeJson[Wire](json)
@@ -530,7 +533,7 @@ object HsmmResultCodec:
 
   private given Encoder[Wire] = Encoder.instance { wire =>
     Json.obj(
-      "schemaVersion" -> SchemaVersion.asJson,
+      "schemaVersion" -> (if wire.gateSemantics == GateSemantics.Historical then SchemaVersion else CanonicalSchemaVersion).asJson,
       "posterior" -> wire.posterior.asJson,
       "flow" -> wire.flow.asJson,
       "viterbi" -> wire.viterbi.asJson,
@@ -541,14 +544,23 @@ object HsmmResultCodec:
       "viewFingerprint" -> wire.viewFingerprint.asJson,
       "recallChecksum" -> wire.recallChecksum.asJson,
       "refinementPasses" -> wire.refinementPasses.asJson
+    ).mapObject(obj =>
+      if wire.gateSemantics == GateSemantics.Historical then obj
+      else obj.add("gateSemantics", "CanonicalContent".asJson)
     )
   }
   private given Decoder[Wire] = Decoder.instance { c =>
     for
       // The value is judged before the body is decoded (see `decodeSupported`); the field is
       // still required here, so an artifact without a schema tag is a wire error.
-      _ <- field[String](c, "schemaVersion")
-      _ <- onlyFields(c, "HSMM artifact", ArtifactFields)
+      version <- field[String](c, "schemaVersion")
+      _ <- onlyFields(c, "HSMM artifact", if version == CanonicalSchemaVersion then ArtifactFields + "gateSemantics" else ArtifactFields)
+      semantics <- if version == CanonicalSchemaVersion then
+        field[String](c, "gateSemantics").flatMap { value =>
+          if value == "CanonicalContent" then Right(GateSemantics.CanonicalContent)
+          else Left(DecodingFailure(s"hsmm/v5 requires CanonicalContent gate semantics, got $value", c.history))
+        }
+        else Right(GateSemantics.Historical)
       posterior <- field[Vector[RowWire]](c, "posterior")
       flow <- field[Vector[FlowStepWire]](c, "flow")
       viterbi <- field[Vector[AlignState]](c, "viterbi")
@@ -569,7 +581,8 @@ object HsmmResultCodec:
       echo,
       viewFingerprint,
       recallChecksum,
-      passes
+      passes,
+      semantics
     )
   }
 
@@ -607,7 +620,8 @@ object HsmmResultCodec:
         result.admissibilityEcho.checksum,
         result.viewFingerprint.checksum,
         result.recallChecksum,
-        result.refinementPasses
+        result.refinementPasses,
+        result.gateSemantics
       )
 
   private object CostBreakdownWire:
@@ -657,7 +671,10 @@ object HsmmResultCodec:
           "HsmmResult.candidateAnchors",
           wire.candidateAnchors.map(entry => entry.unit -> entry.anchors)
         )
-        result <- HsmmResult.validated(
+        validate = wire.gateSemantics match
+          case GateSemantics.Historical => HsmmResult.validated
+          case GateSemantics.CanonicalContent => HsmmResult.validatedCanonical
+        result <- validate(
           recall,
           view,
           anchors,
