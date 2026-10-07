@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T21:33:17.283457+00:00",
+  "finished_utc": "2026-10-07T21:34:03.157169+00:00",
+  "duration_seconds": 45.873172,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly surfaceprobe.SurfaceRenderingBoundarySuite -- \"--tests=^(cosine value Mirror is closed|rendered pair .*|direct .*text reads compile)$\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b2-build",
+  "log": "/private/tmp/storymodel4s-s2b2-logs/product-mirror.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 3034
+}

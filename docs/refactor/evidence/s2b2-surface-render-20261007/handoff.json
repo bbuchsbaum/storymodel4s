@@ -1,0 +1,17 @@
+{
+  "code_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+  "local_main": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+  "child": "bd-01M4C13FZZQ1T0Z64WES25MMXB",
+  "child_status": "closed",
+  "parent": "bd-01M2TACM78289S4TECE91GT5K2",
+  "parent_status": "open",
+  "unfinished": 112,
+  "release_counts": {
+    "release-1.0": 26,
+    "release-1.1": 24,
+    "release-later": 62
+  },
+  "code_published": false,
+  "hosted_refreshed": false,
+  "next_action": "Register actual ONNX record/replay over checked rendered payloads and explicit scale; bind model/config/render/candidate receipts and one immutable nomination/pricing channel, then originating StageTrace evidence and named historical parity."
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T21:45:08.345770+00:00",
+  "finished_utc": "2026-10-07T21:48:21.699821+00:00",
+  "duration_seconds": 193.352281,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-s2b2-build",
+    "set ThisBuild / tlFatalWarnings := true",
+    "compileAll",
+    "testAll",
+    "app/fastLinkJS",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b2-atlas",
+  "log": "/private/tmp/storymodel4s-s2b2-logs/consumer-gate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 27360
+}

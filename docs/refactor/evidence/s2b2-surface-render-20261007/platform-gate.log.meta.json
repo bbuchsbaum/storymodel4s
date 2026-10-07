@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T21:36:01.750870+00:00",
+  "finished_utc": "2026-10-07T21:44:29.954636+00:00",
+  "duration_seconds": 508.199702,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/clean",
+    "alignJS/clean",
+    "alignNative/clean",
+    "alignJVM/test;featuresJVM/test;alignJS/test;featuresJS/test;alignNative/test;featuresNative/test",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b2-build",
+  "log": "/private/tmp/storymodel4s-s2b2-logs/platform-gate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 2400.0,
+  "log_bytes": 105654
+}

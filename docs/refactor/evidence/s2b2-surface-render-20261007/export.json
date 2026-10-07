@@ -1,0 +1,23 @@
+{
+  "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+  "base_sha": "328e426acc46b110fe0bd9c688d996453b2be6c6",
+  "clean_before_gate": true,
+  "files_sha256": {
+    ".mote/ops/20261007T203258.879764Z-p29103-c0000-rf469-hee6f9e.json": "e9ef82df78b388512ebe3e1a642aa8a4b2dd89b593b2f862d96dbd3318c12f1c",
+    ".mote/ops/20261007T203258.893363Z-p29103-c0001-r5557-he822fd.json": "b95aadc83873820a62c30253b4b84eb58b7837b0af67d765dc2dbdce06bbd25c",
+    ".mote/ops/20261007T203258.902281Z-p29103-c0002-r801c-h098e1b.json": "3e2ac0938870fd5678a4f5cc7370866941830f66a6d849c056c2cfbdd16c9da9",
+    ".mote/ops/20261007T203258.911406Z-p29103-c0003-r35de-hed9a47.json": "49f785108b5ce6d3c343ed645274780f8e718d01f1407781ad75749c452eee57",
+    ".mote/ops/20261007T203258.920358Z-p29103-c0004-r3d32-he25ca6.json": "aa2f6031bed234bfaa85f6d72e7abd3168476adbac07de173e7abd5bf1117001",
+    ".mote/ops/20261007T203336.707444Z-p30873-c0000-r12c1-hda5117.json": "b5549fdb9d90432a47336921d2ca3dd981cc6a568f34930be0f2a15a862a4094",
+    ".mote/ops/20261007T203347.267246Z-p30846-c0000-rd9ae-h3feb4f.json": "8822846bc40c72f3a6e8798e222ee9155ba8dc6a692b50921fd5fb21325d6d43",
+    ".mote/ops/20261007T203352.664622Z-p30846-c0001-r2641-h4107f3.json": "43012f157a907b1fa2ecd0140f7adc194aa05f94eacf5db77dbefabbdc50e6e5",
+    ".mote/ops/20261007T203358.202898Z-p30846-c0002-r10e9-h1a5820.json": "e5addbee0811ea83360c6977395f12581a7512c7d1a38a9e2f01a948a561c6ef",
+    ".mote/ops/20261007T203404.230859Z-p30846-c0003-rddf2-h0f69b0.json": "f22a0a4b3f92e7e7532447a00be9cf4d9f4d881dedcb914a473a47b2dde6d34c",
+    ".mote/ops/20261007T203835.255056Z-p48654-c0000-rb877-h5f9764.json": "5ae8c19dc421c0d6f9a51c0c8b6eb2cf744508a4bfd2660f27d3ba2f0f779464",
+    "align/src/main/scala/storymodel4s/align/embeddingmetric.scala": "3820cb93acdb4f7b5a3b6216aa878f45f1c9b49c66ba04cfc073b5bf7d31bcfd",
+    "align/src/main/scala/storymodel4s/align/surfacerender.scala": "0ffb9ea2222799b3990dd5e08160fe85efe4c9eb20902cb65ddb5788c52dd61b",
+    "align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala": "5786690f7694bee1ef1d7ffc5e2d002797f5cdadc1940c0b080df7a7e7058c40",
+    "align/src/test/scala/storymodel4s/probes/SurfaceRenderingBoundarySuite.scala": "744b7f9292f3011b516d17cfdb6a285214528ebbdb4dbb31c1c550d53de2bff5",
+    "docs/adr/0019-mapping-measurement-policy.md": "62383cad18008bc5b002fa2dbea1198bdd7c95f953a005cf0ed8b543d44aa871"
+  }
+}

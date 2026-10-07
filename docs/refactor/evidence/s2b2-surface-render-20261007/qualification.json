@@ -1,0 +1,126 @@
+{
+  "code_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+  "source": {
+    "totals": [
+      [
+        715,
+        0,
+        0,
+        715
+      ],
+      [
+        77,
+        0,
+        0,
+        77
+      ],
+      [
+        695,
+        0,
+        0,
+        695
+      ],
+      [
+        77,
+        0,
+        0,
+        77
+      ],
+      [
+        695,
+        0,
+        0,
+        695
+      ],
+      [
+        77,
+        0,
+        0,
+        77
+      ]
+    ],
+    "sum": {
+      "passed": 2336,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log_sha256": "a4ce3c0778bff667070ef809e3ed7a10283b815f5ac45c97a1fe3ad6cf958981"
+  },
+  "source_restored_clean": true,
+  "hosted_refreshed": false,
+  "parent_complete": false,
+  "consumer": {
+    "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+    "totals": [
+      [
+        22,
+        0,
+        0,
+        22
+      ],
+      [
+        26,
+        0,
+        0,
+        26
+      ],
+      [
+        100,
+        0,
+        0,
+        100
+      ],
+      [
+        100,
+        0,
+        0,
+        100
+      ],
+      [
+        13,
+        0,
+        0,
+        13
+      ],
+      [
+        13,
+        0,
+        0,
+        13
+      ],
+      [
+        74,
+        0,
+        0,
+        74
+      ],
+      [
+        74,
+        0,
+        0,
+        74
+      ],
+      [
+        59,
+        0,
+        0,
+        59
+      ],
+      [
+        4,
+        0,
+        0,
+        4
+      ]
+    ],
+    "sum": {
+      "passed": 485,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log_sha256": "9c8604eba3ef813c0cf47a276eb0d485aebc18e58b29a4160ea31fd7cba39a12"
+  },
+  "consumer_primary_preserved": true
+}

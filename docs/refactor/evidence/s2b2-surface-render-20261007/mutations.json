@@ -1,0 +1,394 @@
+[
+  {
+    "mutation": "source-identity",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "source declaration refuses different bytes even at identical text length",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.source declaration refuses different bytes even at identical text length 0.019s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:234"
+    ],
+    "source_sha256": "3c79db84c61b326f8bd3f0ef9919a6ade73bac2594d05db4934cfb45ec689a72",
+    "patch_sha256": "0b259ddac08100ca357581c24d6ae56dc704f366024d48dc331b3a25e51c82d8",
+    "log_sha256": "479950c9d2cf7d8f83ad9ca4e2dc7f6a6d6cac2f3a110ad0117b497390dea2bf",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "physical-support",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "representation physical support must equal node support",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.representation physical support must equal node support 0.019s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:250"
+    ],
+    "source_sha256": "d5c4e237e2ad427df0f1c2ff9f4547b3820810ee5ec5e6c9db0480575d09fbfd",
+    "patch_sha256": "fb8d22a907a0797017d592499d0cae5bc83188d4b77ea860b5ba9175b2fb69ef",
+    "log_sha256": "7f7641d9cfbe7b0e8bc003542ebf329513ddc3976aeb4c24c0d5fdd57d4e9c90",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "view-binding",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "source representation must bind the frozen view",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.source representation must bind the frozen view 0.023s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:289"
+    ],
+    "source_sha256": "a0653884a3640f549d741886ad27a4846321c1605eaf572152aee4fa2ac13336",
+    "patch_sha256": "a48599ba9e323e172ad238ade70a49ae1c26310a72b726d35dca7307e4871bea",
+    "log_sha256": "b3a598769652822cac63edcfb74ba27b23d2f19ae915437cdefae3de9b652ce7",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "target-alias",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "same semantic target with reordered surface strings has distinct rendered identity",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.same semantic target with reordered surface strings has distinct rendered identity 0.022s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:213 values are the same, expected 2 different values: RenderedContentPair(unitChars=12, targetChars=8) is equal to RenderedContentPair(unitChars=12, targetChars=8)"
+    ],
+    "source_sha256": "7e6d034dec9044f0af63da7c2bcc6492c3ceca4a046f547900f1317a45f80d9a",
+    "patch_sha256": "13fb2a0ddcb4c9ba8a3428f1d2b6a1bffc50010a6789a7ca77bb933718e0d05f",
+    "log_sha256": "6a3963531cb85828e22caa9b96c7f3e0a0885ce530e47b3e8445a4625b62242b",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "unicode",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "unpaired source Unicode is refused before rendering",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.unpaired source Unicode is refused before rendering 0.026s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:347"
+    ],
+    "source_sha256": "326303b2a14a2150f85dc19d5eec7466a174e9ee05253293cfc782131dd44a53",
+    "patch_sha256": "62e39e76ec26642d0395efc15900217f504cf4ccdcf19946496740e80a378abf",
+    "log_sha256": "fd53c14ab4303d5a1f09bdeffff5e1f389a8362fca6aefd9f38931bec2dc050d",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "anchors",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=^(?!known anchors|unit anchor).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        22,
+        1,
+        0,
+        21
+      ]
+    ],
+    "named_failure": "foreign source anchors are refused before merging spans",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.foreign source anchors are refused before merging spans 0.026s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:294"
+    ],
+    "source_sha256": "176583b92f91d57e0c4b0d166190c60a4f1bdea1c58fdcbc5444fbd4355c09bd",
+    "patch_sha256": "eeb535aa8860e99fa12c3fca9a506754f1be8f8eadaf4d7fbe67535fd7c822c1",
+    "log_sha256": "ee367870990fb0c7eae0be954991da1be601a47c059124a5da293e54ae8efadc",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "cycle",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "self-cycle and disconnected two-node cycle return typed hierarchy refusal",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.self-cycle and disconnected two-node cycle return typed hierarchy refusal 0.053s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:158"
+    ],
+    "source_sha256": "5f0e148b3400c308dadf502bd1a09193118c6c235a9e181aae6f37a66224baf7",
+    "patch_sha256": "6c0c727553637bc8da6ec20eaedeb4dd3786d95d1d4bbcfe150f583f18a6d443",
+    "log_sha256": "ad67e45ec7139a334008b79401a5d88642eb825795e5b31270702b049db026c3",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "half-scale",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/embeddingmetric.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=^(?!cosine conversion preserves).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        23,
+        1,
+        0,
+        22
+      ]
+    ],
+    "named_failure": "raw and half cosine retain exact declared units",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.raw and half cosine retain exact declared units 0.022s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:385"
+    ],
+    "source_sha256": "0f12b2424f84e548fda6ab04944e4edcdb84e89d77415242bc176653b0165ca8",
+    "patch_sha256": "9111548cf6eaaeb42142eee94d7606f1de0d7d7b7a909031a3c719c5ec665f61",
+    "log_sha256": "05a7d8fb4592dde162c904886c01f943a605438ef2027d6a55dc9fdb36724b24",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "constructor",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly surfaceprobe.SurfaceRenderingBoundarySuite -- \"--tests=^(?!rendered pair apply).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        17,
+        1,
+        0,
+        16
+      ]
+    ],
+    "named_failure": "rendered pair constructor is closed",
+    "failures": [
+      "==> X surfaceprobe.SurfaceRenderingBoundarySuite.rendered pair constructor is closed 0.016s munit.FailException: align/src/test/scala/storymodel4s/probes/SurfaceRenderingBoundarySuite.scala:41 constructor opened"
+    ],
+    "source_sha256": "66e31237a07846ae22d11ebcd537f9ebeb7b739d9080d44f04bcb176c82b53c9",
+    "patch_sha256": "0530e5c279bf4bfa91672370dffd223aeb2a11d3cf77754fe9070f0713f52637",
+    "log_sha256": "cbb1d3ad3a2b84f92b3fc3a2aec415eacce402c5f4b5a9d9578fcc9db4597105",
+    "clean_test_recompile": true
+  },
+  {
+    "mutation": "product-mirror",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/embeddingmetric.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly surfaceprobe.SurfaceRenderingBoundarySuite -- \"--tests=^(cosine value Mirror is closed|rendered pair .*|direct .*text reads compile)$\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        14,
+        1,
+        0,
+        13
+      ]
+    ],
+    "named_failure": "cosine value Mirror is closed",
+    "failures": [
+      "==> X surfaceprobe.SurfaceRenderingBoundarySuite.cosine value Mirror is closed 0.013s munit.FailException: align/src/test/scala/storymodel4s/probes/SurfaceRenderingBoundarySuite.scala:174 Mirror opened"
+    ],
+    "source_sha256": "7e3b366adfa8524babc75d7d873ab5e50c740505ae356c0856bfcf96917d635b",
+    "patch_sha256": "fedd210330f8f30ef2e13c445380a42b2dba7343a5f8f1b93f6ca167cb4876f7",
+    "log_sha256": "88dd198fa1ed9646c0c0dddab18486b0e76fff759671eefc64026587cdffc636",
+    "clean_test_recompile": true
+  },
+  {
+    "mutation": "metric-finiteness",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/embeddingmetric.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "cosine conversion refuses nonfinite and out of range rather than clamping",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.cosine conversion refuses nonfinite and out of range rather than clamping 0.029s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:396"
+    ],
+    "source_sha256": "111e2133a709705d18cc2912b247725f76cf08fd96739aeda5361da940065560",
+    "patch_sha256": "9247a2a08c75c7c9af29905076fa269aadbe1130c06a5be68613417c77b34108",
+    "log_sha256": "b9d369eda82b37d8b4ef7de3f729b8f442ff6ae14b44d88c0e65af9c1a85c95e",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "metric-range",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/embeddingmetric.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "cosine conversion refuses nonfinite and out of range rather than clamping",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.cosine conversion refuses nonfinite and out of range rather than clamping 0.028s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:398"
+    ],
+    "source_sha256": "c9fe84a770569129efdbcc6f0bde7be85578cc9fd2d83cc896f092a403bb1bf7",
+    "patch_sha256": "099e578395c87f910952246ab6eac3aeadb2cd542339c6ce767983651f0efa59",
+    "log_sha256": "4f9e919b6f4a99d7e64e17764ffe24ec453cfaf9986a00b162df1b4a6944888b",
+    "clean_test_recompile": false
+  },
+  {
+    "mutation": "unit-alias",
+    "candidate_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "argv": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceRenderingSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        24,
+        1,
+        0,
+        23
+      ]
+    ],
+    "named_failure": "same semantic recall with reordered surface strings has distinct rendered identity",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceRenderingSuite.same semantic recall with reordered surface strings has distinct rendered identity 0.011s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceRenderingSuite.scala:222 values are the same, expected 2 different values: RenderedContentPair(unitChars=8, targetChars=8) is equal to RenderedContentPair(unitChars=8, targetChars=8)"
+    ],
+    "source_sha256": "fc20fc7a52b8b1ae69a213867eb01b7a3ea3d6b4dd979205f6cba6ec5d64c55e",
+    "patch_sha256": "d945232e4af2ffddac20e0900663f4c16aed31fb8c7e0b50a263e39da35a1e64",
+    "log_sha256": "c74d0dcc82aa714eda4f1b0a6e9a3cebab2871459a9ea6119e83ed04b938e8e9",
+    "clean_test_recompile": false
+  }
+]

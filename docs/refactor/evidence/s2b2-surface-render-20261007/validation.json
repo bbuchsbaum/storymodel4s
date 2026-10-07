@@ -1,0 +1,19 @@
+{
+  "code_sha": "b06b72a1b8744bfd3ee07b827a85f8219fd91b0a",
+  "compiled_named_mutation_kills": 13,
+  "source": {
+    "passed": 2336,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "consumer": {
+    "passed": 485,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "verified_artifacts": 61,
+  "parent_complete": false,
+  "hosted_refreshed": false
+}
