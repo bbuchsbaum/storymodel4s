@@ -58,8 +58,8 @@ class EstimateEligibilitySuite extends FunSuite:
       )
       .toOption
       .get
-    assertEquals(cell.exclusion, Some(Exclusion.Unassessable))
     assertEquals(evaluated, false)
+    assertEquals(cell.exclusion, Some(Exclusion.Unassessable))
   }
 
   test("eligible Missing and Observed retain their existing distinct support and price") {

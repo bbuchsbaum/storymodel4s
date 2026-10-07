@@ -15,7 +15,7 @@ import storymodel4s.codec.{
   SidecarCodec,
   StoryModelCodec
 }
-import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.features.{Estimate, LexiconMeasure, MissingReason}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
@@ -1339,7 +1339,10 @@ class StoryBuildSuite extends FunSuite:
     )
     assertEquals(lexiconTrack.manifest.rowCount + notIn + 92, 517)
     val table = LexiconFile.load(lexicon, "synthetic-demo").fold(e => fail(e.message), identity)
-    assertEquals(lexiconTrack.provenance.provenance.configHash, table.identity)
+    val measureIdentity = LexiconMeasure(table).identity
+    assertEquals(measureIdentity, Checksum.ofText("lexicon-measure/v2\n" + table.identity.hex))
+    assertNotEquals(measureIdentity, table.identity)
+    assertEquals(lexiconTrack.provenance.provenance.configHash, measureIdentity)
     assertEquals(lexiconTrack.provenance.storyChecksum, Some(model.source.canonicalChecksum))
 
     // 5. The sidecar bytes verify against their manifests and decode to the rows.

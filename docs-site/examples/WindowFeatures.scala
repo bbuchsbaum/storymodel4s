@@ -88,5 +88,7 @@ import storymodel4s.features.*
         s"ignore=${render(loose.estimate)}; require75=${render(gated.estimate)}"
     )
   }
-  println(s"different policies, different derived spaces: ${permissive.space.id != strict.space.id}")
+  println(
+    s"different policies, different derived spaces: ${permissive.space.id != strict.space.id}"
+  )
   println(s"derived recipe recorded: ${permissive.derivation.exists(_.window.contains(plan))}")
