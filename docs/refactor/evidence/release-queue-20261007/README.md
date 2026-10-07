@@ -47,6 +47,7 @@ The snapshots/counts concern this reconciliation baseline; use `mote ls` for sub
 | `prewrite-review.txt`, `s2a4-closure.md` | Independent classification/acceptance reviews. Exact committed metadata review is recorded separately on the audit Mote. |
 | `docs-archive.json`, `docs-archive-handoff.json` | Reviewed and remotely verified preservation branch; original docs ancestry retained, legacy workflows removed, canonical docs-ticket handoff note observed. |
 | `preservation.json` | Unrelated source draft and all 1,177 pre-existing consumer paths remain byte-identical. No participant content is included. |
+| `handoff.json` | Exact metadata review, GitHub/approved-host parity, fresh-clone reconstruction and canonical audit closure; final 308 closed / 113 open. |
 | `verify.py`, `verify-controls.py`, `verification-controls.json` | Reproducible receipt checks and four rehashed corruptions that must fail their named boundary, with passing controls. |
 | `SHA256SUMS` | Exact static artifact byte identities; the manifest itself and generated `validation.json` checker output are excluded to avoid self-reference. |
 
@@ -89,7 +90,12 @@ smallest current acceptance. Reuse landed timing/source/exchange/temporal compon
 against exact landed evidence, including negative/not-applicable study dispositions where
 the original protocol allows them; never close an epic merely because children are closed.
 
-GitHub parity and approved `buc-gw01` synchronization are recorded after metadata review.
+Reconciliation metadata `4e47a3fa773e05df041c3e7572ab6fc79c11c9ca` received an independent
+T2 landing GO, reached GitHub main and the clean approved `buc-gw01` checkout, and reconstructed
+all tickets in a standalone clone. Following PLAN's `mkdir -p .mote/local .mote/tmp` bootstrap
+gives clean `mote doctor`/`fsck` without initializing another store or copying local identity.
+`handoff.json` binds those observations and the audit's closure. The completion receipt's own
+metadata successor does not extend runtime qualification.
 StoryAtlas code/pin is unchanged by this slice. Private data, credentials, live actor/session
 state and local runtime caches are not moved. Other machines may work on synthetic/public
 fixtures; private data needs the existing approved-host transfer and corpus-use boundaries.
