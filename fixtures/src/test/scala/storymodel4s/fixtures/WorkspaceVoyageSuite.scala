@@ -13,13 +13,18 @@ class WorkspaceVoyageSuite extends FunSuite:
   import WorkspaceVoyage.{Disposition, Unavailable}
   private val revision = "0" * 40
   private lazy val fixtures = WorkspaceFixtures.all(revision).toMap
-  // Producer construction (including both HSMM executions) is shared fixture setup, not work
+  // Producer construction and the large checked WOG repack are fixture setup, not work
   // performed by the adapter. Keep the default per-test timeout and every behavioral assertion.
   override def beforeAll(): Unit =
     val started = System.nanoTime()
     val _ = fixtures
     println(
       s"WorkspaceVoyage producer fixture setup: ${(System.nanoTime() - started) / 1000000L} ms"
+    )
+    val repackStarted = System.nanoTime()
+    val _ = externalWinnerWorkspace
+    println(
+      s"WorkspaceVoyage external-winner checked fixture setup: ${(System.nanoTime() - repackStarted) / 1000000L} ms"
     )
 
   private lazy val bell = fixtures("bell")
@@ -84,6 +89,35 @@ class WorkspaceVoyageSuite extends FunSuite:
       WorkspaceContentGrant.Granted,
       clocks
     )
+  // Checked archive production is fixture setup; the named test still exercises the adapter.
+  private lazy val externalWinnerWorkspace: SourceRecallWorkspace =
+    val wog = fixtures("wog")
+    val original = input(bell)
+    val words = RecallTiming
+      .checked(
+        wog.inventory,
+        original.words.clock,
+        wog.inventory.words.map(w =>
+          RecallTiming.Entry(
+            w.id,
+            original.words.clock,
+            RecallTiming.Observation.Missing(RecallTiming.MissingReason.NotProvided)
+          )
+        ),
+        original.words.provenance
+      )
+      .toOption
+      .get
+    val timeline = SourceTimeline
+      .of(
+        wog.source.targets.map(t =>
+          SourceTimelineNode(t.ref, t.level, None, ClockSpan.of(0, 30).toOption.get, t.ref.key)
+        ),
+        Vector.empty
+      )
+      .toOption
+      .get
+    repack(wog, Some(original.copy(words = words, sourceTimeline = timeline))).toOption.get
   private def wordsChanged(f: RecallTiming.Entry => RecallTiming.Observation): WorkspaceClockInput =
     val original = input(bell)
     val timing = original.words
@@ -245,34 +279,7 @@ class WorkspaceVoyageSuite extends FunSuite:
   }
 
   test("external global winner with residual source mass does not become a source anchor") {
-    val wog = fixtures("wog")
-    val original = input(bell)
-    val words = RecallTiming
-      .checked(
-        wog.inventory,
-        original.words.clock,
-        wog.inventory.words.map(w =>
-          RecallTiming.Entry(
-            w.id,
-            original.words.clock,
-            RecallTiming.Observation.Missing(RecallTiming.MissingReason.NotProvided)
-          )
-        ),
-        original.words.provenance
-      )
-      .toOption
-      .get
-    val timeline = SourceTimeline
-      .of(
-        wog.source.targets.map(t =>
-          SourceTimelineNode(t.ref, t.level, None, ClockSpan.of(0, 30).toOption.get, t.ref.key)
-        ),
-        Vector.empty
-      )
-      .toOption
-      .get
-    val workspace =
-      repack(wog, Some(original.copy(words = words, sourceTimeline = timeline))).toOption.get
+    val workspace = externalWinnerWorkspace
     val record = workspace.policy(historical).get.record
     assert(
       record.outcomes.forall(o =>
