@@ -6,6 +6,34 @@ import org.scalacheck.Prop.*
 
 class SinkhornSuite extends ScalaCheckSuite:
 
+  test("the baseline forbids ineligible comparisons while keeping eligible missing substitution") {
+    import AnnaFixture.{recall, view, e4, e5}
+    import storymodel4s.features.{Estimate, MissingReason}
+    val units = recall.ordered
+    assert(units.size >= 2)
+    val candidates = Candidates.of(units.map(_.id -> Vector(e4, e5)).toMap)
+    val provider = SemanticDistance((u, n) =>
+      if (u.id == units.head.id) == (n.ref == e4) then Estimate.Ineligible
+      else Estimate.missing(MissingReason.ProviderAbstained)
+    )
+    val plan = BaselineAligner.align(recall, view, candidates, provider).toOption.get
+    assertEquals(plan.rows.head.faithfulMassOn(e4), 0.0)
+    assertEquals(plan.rows(1).faithfulMassOn(e5), 0.0)
+    assert(plan.rows.head.faithfulMassOn(e5) > 0.0)
+    assert(plan.rows(1).faithfulMassOn(e4) > 0.0)
+    val missing = BaselineAligner.align(recall, view, candidates, SemanticDistance.abstaining)
+    assert(missing.exists(_.rows.forall(_.mass.values.forall(_ > 0.0))))
+    BaselineAligner.align(
+      recall,
+      view,
+      candidates,
+      SemanticDistance((_, _) => Estimate.Ineligible)
+    ) match
+      case Left(AlignError.InvalidConfig("cost", reason)) =>
+        assert(reason.contains("no admissible partner"))
+      case other => fail(s"ineligible comparisons were imputed: $other")
+  }
+
   private val genCost: Gen[Vector[Vector[Double]]] =
     for
       m <- Gen.choose(2, 4)

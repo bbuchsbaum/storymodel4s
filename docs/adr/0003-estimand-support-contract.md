@@ -349,6 +349,9 @@ This does not reprice historical all-configured-zero records: their function pri
 Structural receipts count eligible provider outcomes, and distinguish all-provider-ineligible
 support from contradiction exclusion and eligible provider abstention. Views and consumer reports
 expose the state in text and structure.
+The transport baseline maps an ineligible comparison to its existing `+Inf` forbidden-edge
+encoding, yielding no transport on that edge and refusing a positive-mass row or column with no
+eligible partner. Eligible missing comparisons retain their declared neutral substitution.
 
 Rejected alternatives: a missing reason convention would hide eligibility in consumer-specific
 denominator rules; a reason-bearing `Ineligible` would introduce another reason taxonomy without

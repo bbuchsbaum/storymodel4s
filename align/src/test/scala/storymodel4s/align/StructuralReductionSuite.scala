@@ -232,6 +232,39 @@ class StructuralReductionSuite extends ScalaCheckSuite:
     )
   }
 
+  test("an ineligible receipt refuses forged missing and eligible cost classifications") {
+    val v = viewWith(Map(e4 -> straight, e5 -> compatibleOther))
+    val model = costModel.copy(
+      semantic = SemanticDistance.of((_, _) => 0.2),
+      structural = StructuralDistance((_, _) => Estimate.Ineligible)
+    )
+    val cell = model.cost(unit, v.node(sc2).get, FidelityMode.Faithful, v)
+    def checked(missing: Set[CostTerm], support: SupportAssessment) =
+      AlignWire.costBreakdown(
+        cell.terms,
+        cell.mode,
+        cell.exclusion,
+        cell.total,
+        missing,
+        cell.sourceChartCoverage,
+        cell.reductions,
+        support,
+        cell.imputedTerms
+      )
+    assert(checked(cell.missingTerms, cell.support).isRight)
+    assert(checked(cell.missingTerms + CostTerm.Structural, cell.support).isLeft)
+    val basis = cell.support.asInstanceOf[SupportAssessment.Assessed].basis
+    val widened = SupportAssessment
+      .fromEvidence(
+        basis.measuredTerms,
+        basis.eligibleTerms + CostTerm.Structural,
+        basis.eligibleWeights.toMap + (CostTerm.Structural -> CostWeights.default.structural)
+      )
+      .toOption
+      .get
+    assert(checked(cell.missingTerms, widened).isLeft)
+  }
+
   test("only an actually invoked ineligible structural provider removes the last positive weight") {
     var calls = 0
     val provider = StructuralDistance((_, _) => { calls += 1; Estimate.Ineligible })

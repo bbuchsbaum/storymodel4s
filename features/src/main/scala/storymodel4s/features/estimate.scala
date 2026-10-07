@@ -40,7 +40,9 @@ enum MissingReason:
   /** The provider declined to answer. */
   case ProviderAbstained
 
-  /** The target was excluded by policy (punctuation, low coverage, leakage rule). */
+  /** An eligible value was withheld by policy (e.g. low coverage); also retains historical
+    * policy-exclusion records. Known targets outside the measure now use `Ineligible`.
+    */
   case Excluded
 
   /** A safely associated provider value was rejected because it violated its result contract. */

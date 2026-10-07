@@ -11,8 +11,9 @@ import storymodel4s.core.*
   * measured, in what units, under what identity, and which tokens it could not measure. Two
   * families ship: a table of published norms ([[LexiconMeasure]], any word→value table with a
   * content identity) and quantities computed from the text alone with no external data
-  * ([[TokenLength]], [[TypeFrequency]]). Every token a measure cannot value is a typed `Missing`,
-  * never a number (ADR 0003: no eligible unit is scored by a default).
+  * ([[TokenLength]], [[TypeFrequency]]). Eligible tokens a measure cannot value are typed
+  * `Missing`; known nonlexical targets are `Ineligible`, never a number or missing lexical
+  * evidence.
   *
   * A measure is prepared once per sequence ([[over]]) so a text-level quantity such as a type's
   * frequency is counted once, not once per token. Non-lexical tokens are excluded by the track
@@ -186,8 +187,9 @@ object TypeFrequency extends LexicalMeasure:
 
 /** Builds raw token tracks from a measure, and the declared reductions of one. */
 object TokenTracks:
-  /** One observation per surface token: excluded when the token is not lexical, else the measure's
-    * estimate, with the token's span as support. Refuses a measure that emits a non-finite value.
+  /** One observation per surface token: ineligible when the token is not lexical, else the
+    * measure's estimate, with the token's span as support. Refuses a measure that emits a
+    * non-finite value.
     */
   def measure(
       sequence: SurfaceSequence,

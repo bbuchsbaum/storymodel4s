@@ -70,8 +70,8 @@ enum ScalarReducer:
     case WeightedMean => WeightingPolicy.Provided("sample weights")
     case _            => WeightingPolicy.Uniform
 
-/** Reduces a nonempty set of samples to one estimate. Implementations must return `Missing` (never
-  * zero) when no sample is observed, and must say why.
+/** Reduces nonempty support without inventing a value: all-ineligible samples stay `Ineligible`,
+  * while eligible support without observations yields typed `Missing`.
   */
 trait WindowReducer[V, O]:
   def reduce(samples: NonEmptyVector[Sample[V]]): Estimate[O]
@@ -215,8 +215,8 @@ object WindowReducer:
   *
   * Every output retains the window's exact support and its coverage (eligible basis tokens vs.
   * observed values). Missing values are never coerced to zero. Eligibility is lexical by default
-  * regardless of the window basis: punctuation never deflates coverage unless the caller declares
-  * `Eligibility.AllTokens`.
+  * regardless of the window basis. `AllTokens` retains historical eligible punctuation outcomes but
+  * cannot override the underlying measure's explicit ineligibility.
   */
 object Windowed:
   val implementationVersion = "windowed-3"

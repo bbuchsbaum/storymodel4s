@@ -146,8 +146,9 @@ object Distances:
         i += 1
       ValidatedDistance.of(math.sqrt(acc))
 
-  /** Lift a distance over estimates: either side Missing ⇒ Missing (its reason); an invalid pair
-    * (dimension mismatch) is `Missing(Undefined)` rather than an exception.
+  /** Lift a distance over estimates: either side Ineligible ⇒ Ineligible, else Missing ⇒ Missing
+    * (its reason); an invalid pair (dimension mismatch) is `Missing(Undefined)` rather than an
+    * exception.
     */
   def cosineEstimate(
       a: Estimate[ValidatedVector],

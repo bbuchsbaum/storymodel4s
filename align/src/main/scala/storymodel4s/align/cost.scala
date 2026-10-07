@@ -753,7 +753,9 @@ object CostBreakdown:
 trait SemanticDistance:
   def apply(unit: RecallUnit, node: NodeSummary): Estimate[Double]
 
-  /** The distance, or `default` when the provider abstained. */
+  /** Lossy value-or-default convenience: both Missing and Ineligible use `default`.
+    * Eligibility-sensitive scoring must inspect [[apply]] instead.
+    */
   def orElse(unit: RecallUnit, node: NodeSummary, default: Double): Double =
     apply(unit, node).toOption.getOrElse(default)
 

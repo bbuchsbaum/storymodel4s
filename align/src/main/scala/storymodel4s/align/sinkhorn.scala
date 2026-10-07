@@ -2,6 +2,7 @@ package storymodel4s.align
 
 import storymodel4s.recall.RecallGraph
 import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.features.Estimate
 
 final case class SinkhornConfig(
     epsilon: Double = 0.1,
@@ -196,7 +197,8 @@ object UnbalancedSinkhorn:
   * Default configuration mirrors the failure mode it is meant to exhibit: every recall unit must be
   * placed (strong row penalty) while source nodes need not all be recalled (weak column penalty).
   * An abstaining semantic provider is substituted by the same neutral `missingDistance` the HSMM
-  * uses, so the ablation compares engines under one missingness policy (review #29).
+  * uses, so the ablation compares engines under one missingness policy (review #29). Explicitly
+  * ineligible comparisons are forbidden edges, and never receive that substitution.
   */
 object BaselineAligner:
   val defaultConfig: SinkhornConfig =
@@ -218,7 +220,15 @@ object BaselineAligner:
     else
       val cost = units.map { u =>
         columns.map(c =>
-          view.node(c).map(n => semantic.orElse(u, n, missingDistance)).getOrElse(1.0)
+          view
+            .node(c)
+            .map { n =>
+              semantic(u, n) match
+                case Estimate.Ineligible     => Double.PositiveInfinity
+                case Estimate.Observed(v, _) => v
+                case Estimate.Missing(_)     => missingDistance
+            }
+            .getOrElse(1.0)
         )
       }
       val a = Vector.fill(units.size)(1.0)
