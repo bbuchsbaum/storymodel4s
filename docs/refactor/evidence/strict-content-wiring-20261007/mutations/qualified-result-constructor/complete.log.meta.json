@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T11:22:40.906820+00:00",
+  "finished_utc": "2026-10-07T11:23:16.851965+00:00",
+  "duration_seconds": 35.944925,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.probes.StrictContentBoundarySuite storymodel4s.align.probes.D1bResultBoundarySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/s2a3-20261007/mutations/qualified-result-constructor/complete.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3240
+}

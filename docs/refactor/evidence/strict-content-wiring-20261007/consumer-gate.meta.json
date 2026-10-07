@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T11:24:18.608430+00:00",
+  "finished_utc": "2026-10-07T11:26:47.171700+00:00",
+  "duration_seconds": 148.562628,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "compileAll",
+    "testAll",
+    "app/fastLinkJS",
+    "githubWorkflowGenerate",
+    "scalafmtAll",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/atlas",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/s2a3-20261007/consumer-gate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 26742
+}

@@ -1,0 +1,154 @@
+{
+  "kind": "consumer",
+  "sha": "0cd43ffdb37e6a2c71577284368cec4cd823c921",
+  "run": 37614267670,
+  "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/37614267670",
+  "conclusion": "success",
+  "collected_utc": "2026-10-07T11:40:36.808729+00:00",
+  "archive_sha256": "9680a1a8f2bc7e9736285ea673cacccc7a47bfa4ffbb9fb3b76ff5332d7c903f",
+  "archive_bytes": 139116,
+  "jobs": [
+    {
+      "job_id": 112768710905,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/37614267670/job/112768710905",
+      "conclusion": "success",
+      "log_bytes": 92726,
+      "log_sha256": "88a1c8f80487201bebf0fe786876ce69b21e26b99db8a44c1a07da8704fca646",
+      "sbt_totals": [
+        [
+          22,
+          0,
+          0,
+          22
+        ],
+        [
+          100,
+          0,
+          0,
+          100
+        ],
+        [
+          13,
+          0,
+          0,
+          13
+        ],
+        [
+          59,
+          0,
+          0,
+          59
+        ],
+        [
+          74,
+          0,
+          0,
+          74
+        ]
+      ],
+      "cells": 5,
+      "passed": 268,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "job_id": 112768711145,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/37614267670/job/112768711145",
+      "conclusion": "success",
+      "log_bytes": 170244,
+      "log_sha256": "a72d36294da8668679e14a36db0ecd06c403881d57c3aed2fd362b723922cf00",
+      "sbt_totals": [
+        [
+          26,
+          0,
+          0,
+          26
+        ],
+        [
+          4,
+          0,
+          0,
+          4
+        ],
+        [
+          100,
+          0,
+          0,
+          100
+        ],
+        [
+          13,
+          0,
+          0,
+          13
+        ],
+        [
+          74,
+          0,
+          0,
+          74
+        ]
+      ],
+      "cells": 5,
+      "passed": 217,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "job_id": 112768711258,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/37614267670/job/112768711258",
+      "conclusion": "success",
+      "log_bytes": 150751,
+      "log_sha256": "7f3854ee4bef5de4b41034265a8f0857bd4dca67d6ee6675746c289d44e99183",
+      "sbt_totals": [
+        [
+          22,
+          0,
+          0,
+          22
+        ],
+        [
+          100,
+          0,
+          0,
+          100
+        ],
+        [
+          13,
+          0,
+          0,
+          13
+        ],
+        [
+          59,
+          0,
+          0,
+          59
+        ],
+        [
+          74,
+          0,
+          0,
+          74
+        ]
+      ],
+      "cells": 5,
+      "passed": 268,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "cells": 15,
+    "passed": 753,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

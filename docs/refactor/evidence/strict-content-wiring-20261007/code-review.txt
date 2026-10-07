@@ -1,0 +1,8 @@
+Independent code review by salvage_review, read-only, no authoring or builds.
+
+GO a2d795b26e64ca9cf304c861216c7622bb807190.
+Earlier GO ac13ed280d3b48d0b8d4aba0918fd399c4967953 covered the closed controlled channels, actual adapter identity, compact outcomes, canonical member re-keying, canonical contextual gate and historical v4 / canonical v5 wire boundary. Fresh construction probes and local input hashes were verified.
+
+The final a2d795b2 delta changes only two explicit supported-schema assertions to Vector(hsmm/v4, hsmm/v5), plus author-owned Mote operations. No runtime or golden bytes changed. Both committed-file hashes match the fixture gate receipt; parent and diff check pass. Retained focused fixture gate:10 Passed,0 Failed,0 Errors,0 Skipped, exit0, final formatting checks green.
+
+This code verdict does not claim hosted, mutation or consumer qualification. Final qualification review is recorded separately.

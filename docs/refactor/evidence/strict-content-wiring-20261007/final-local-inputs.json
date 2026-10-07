@@ -1,0 +1,51 @@
+{
+  "base": "50903b18fa4d2b004de55134426f5bbaa6b2c783",
+  "files": {
+    "align/src/main/scala/storymodel4s/align/candidatepolicy.scala": "67bed6918b9f6ddd20ed6a6c44ce259583e00c516a31fd8633d5b829760bf92a",
+    "align/src/main/scala/storymodel4s/align/evidence.scala": "af8a372bb4acf067f9ed439ce82108f1ad5bdb558bd28faa4e5c40728797ee8e",
+    "align/src/main/scala/storymodel4s/align/hsmm.scala": "54d25bfa3125eddebf744bc8b9e866cfe87cc34576e73a1642727ec0a5cc2687",
+    "align/src/main/scala/storymodel4s/align/mappingbinding.scala": "322ba7db868dd08669afe3ca854f1bf046c8ae6d9d7327b8ce2f0f434f2ffcf0",
+    "align/src/main/scala/storymodel4s/align/matrix.scala": "80d6ae7e930786dcd605900d418e0a916b2d0a814b8a63285d32728c3570d15b",
+    "align/src/test/scala/storymodel4s/align/CandidateTiePolicySuite.scala": "e2f067b14f35695b355c88717d330e654f5808a2a79c1ea0c6da80120b3ea52d",
+    "align/src/test/scala/storymodel4s/align/LocalEvidenceIsolationSuite.scala": "032148554864c8763f8439ba64d6899bbe2fd0b4f18cd06ea186e762a4084dfb",
+    "align/src/test/scala/storymodel4s/probes/StrictCandidatesUnforgeableSuite.scala": "fff7a1c3a9c13bfcf008b7badc19b6b9c3f8829db8b897e24332fe9890d7a4d3",
+    "codec/src/main/scala/storymodel4s/codec/align.scala": "f8823031c3564f7d64df5769ed1c18e7b7632bb40a31bb36b10d3ae64dfc7d65",
+    "codec/src/main/scala/storymodel4s/codec/features.scala": "69b4885ff8ccacee469fb10bd99f7ce6cf54d9b3431dc82907786e03e7fb887d",
+    "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala": "4c242d297b0132d55290f1d9e0e7216791bd152319614bff46988b250f449233",
+    "codec/src/test/scala/storymodel4s/codec/CodecGens.scala": "40b22c58a538fb5252fe14410556acfaafe9ffcd8151140c9717d984fb957942",
+    "docs/adr/0019-mapping-measurement-policy.md": "82eaf6ff92376b314bf316d0db89eaafe18a7e0fc3037634177585ed9130e6ad",
+    "features/src/main/scala/storymodel4s/features/estimate.scala": "d606a1089ab8846033604630cf5eea61520c02c8bbbf0aadbd31363dd78f3b64",
+    "features/src/test/scala/storymodel4s/features/Fixtures.scala": "ce6bf7d0079795fd4bf8ba9c7971c8c76973c4d7e2318f97e7f71ea56c00a650",
+    "align/src/main/scala/storymodel4s/align/strictcost.scala": "87f70a7d18304514a69938370e3e9dfeef5136b517ea046de970562c4839dfe4",
+    "align/src/test/scala/storymodel4s/align/StrictContentWiringSuite.scala": "3c666589621d239fbd4f8533ade8c92d82d30e3b84ed0e85a2d81d5380fd853e",
+    "codec/src/test/scala/storymodel4s/codec/StrictContentCodecSuite.scala": "23c1034cc9e7285fd328516d6c1d147f11685f4040cc67bbb8b3294687dbb86a",
+    "align/src/test/scala/storymodel4s/probes/StrictContentBoundarySuite.scala": "bd190f783bdf235890d145713ef1798daf01634e3e0257ef3acf0e542f3e3344",
+    "align/src/main/scala/storymodel4s/align/lexicalscore.scala": "75b3a4fca875fa851ee39426745161b0890cdc0eb3883b8258d49a037528c6fa",
+    "align/src/test/scala/storymodel4s/align/probes/D1bResultBoundarySuite.scala": "03717f57d6dd7ba8216133e7e78f79f54162628a8cd19d7b9ba2b0d8c6102610",
+    "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala": "ac7332c95f8070bc3fc9f152c9f89118f26448887f5ace53454f0545bfca1be0",
+    "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala": "586ffa45fb875ef24767ac0f283e6c7545127f180109dd66721cfd1844e8ea75"
+  },
+  "totals": [
+    [
+      67,
+      0,
+      0,
+      67
+    ],
+    [
+      27,
+      0,
+      0,
+      27
+    ]
+  ],
+  "format_checks": true,
+  "candidate": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "supporting_gate_sha": "ac13ed280d3b48d0b8d4aba0918fd399c4967953",
+  "fixture_gate_totals": [
+    10,
+    0,
+    0,
+    10
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "member-rekey",
+  "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "exit": 1,
+  "totals": [
+    11,
+    1,
+    0,
+    10
+  ],
+  "named_failures": [
+    "canonical production reduction re-keys exact, partial and contradicted chart members"
+  ],
+  "fresh_reports": 1,
+  "compiled": true,
+  "clean_test_compile": false,
+  "patch_sha256": "5a3b6b63f08aa01a0a49bc7b9c6984741f890b1db56a9e916bf9aecba12e2d03"
+}

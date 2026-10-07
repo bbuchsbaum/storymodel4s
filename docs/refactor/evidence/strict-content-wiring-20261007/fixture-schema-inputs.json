@@ -1,0 +1,13 @@
+{
+  "parent": "ac13ed280d3b48d0b8d4aba0918fd399c4967953",
+  "files": {
+    "fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala": "ac7332c95f8070bc3fc9f152c9f89118f26448887f5ace53454f0545bfca1be0",
+    "fixtures/.jvm/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenResourceSuite.scala": "586ffa45fb875ef24767ac0f283e6c7545127f180109dd66721cfd1844e8ea75"
+  },
+  "totals": [
+    10,
+    0,
+    0,
+    10
+  ]
+}

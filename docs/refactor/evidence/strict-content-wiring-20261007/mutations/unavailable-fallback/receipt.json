@@ -1,0 +1,19 @@
+{
+  "name": "unavailable-fallback",
+  "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "exit": 1,
+  "totals": [
+    11,
+    2,
+    0,
+    9
+  ],
+  "named_failures": [
+    "unavailable never supplies lexical semantic scores; explicit lexical nominations stay named",
+    "unavailable, table abstention, ineligible and observed zero retain distinct generation outcomes"
+  ],
+  "fresh_reports": 1,
+  "compiled": true,
+  "clean_test_compile": false,
+  "patch_sha256": "2d51fd4e1350ba750a3955e68602371eee2d3ced672527da3f378db889a96b5d"
+}

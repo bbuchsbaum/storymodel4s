@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T11:21:57.140884+00:00",
+  "finished_utc": "2026-10-07T11:22:16.801273+00:00",
+  "duration_seconds": 19.660192,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.StrictContentWiringSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/s2a3-20261007/mutations/table-conflict/complete.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 2898
+}

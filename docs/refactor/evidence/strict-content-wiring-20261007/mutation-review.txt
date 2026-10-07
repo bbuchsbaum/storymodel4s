@@ -1,0 +1,14 @@
+Independent mutation-evidence review by salvage_review, read-only, no builds or authoring.
+
+GO source a2d795b26e64ca9cf304c861216c7622bb807190.
+
+All six decompressed patch hashes match. Each patch original and reconstructed mutant blobs match its Git indices. Raw log sizes, exit statuses and totals agree with the receipts. Fresh JUnit timestamps fall within each run. Every mutant compiled without compilation failure, and exact named failure sets were verified:
+
+channel-equality:1 Failed /10 Passed; different immutable tables accepted.
+member-rekey:1 Failed /10 Passed; wrong member references.
+unavailable-fallback:2 Failed /9 Passed; unavailable outcome lost and semantic nominations fabricated.
+table-conflict:1 Failed /10 Passed; conflicting equal-content entries accepted.
+decoder-historical:1 Failed /26 Passed; anchored canonical round-trip reports GateDrift.
+qualified-result-constructor:1 Failed /24 Passed; constructor opens within align while outside-package controls remain closed.
+
+The qualified constructor mutant and restoration both clean-recompiled all77 alignment test sources. Restoration passed94 tests with0 failures/errors/skips; final formatting checks green. The owned clone was clean at exact source a2d795b2. Hosted qualification is separate.

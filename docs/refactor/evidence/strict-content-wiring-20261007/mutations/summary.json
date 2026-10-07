@@ -1,0 +1,131 @@
+{
+  "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "mutations": [
+    {
+      "name": "channel-equality",
+      "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+      "exit": 1,
+      "totals": [
+        11,
+        1,
+        0,
+        10
+      ],
+      "named_failures": [
+        "strict evidence refuses historical callbacks and mismatched controlled channels"
+      ],
+      "fresh_reports": 1,
+      "compiled": true,
+      "clean_test_compile": false,
+      "patch_sha256": "9ac334055308dcea34cc9f0199715d2329032c16b1d7f9c054b8a6fe99e2aa8f"
+    },
+    {
+      "name": "member-rekey",
+      "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+      "exit": 1,
+      "totals": [
+        11,
+        1,
+        0,
+        10
+      ],
+      "named_failures": [
+        "canonical production reduction re-keys exact, partial and contradicted chart members"
+      ],
+      "fresh_reports": 1,
+      "compiled": true,
+      "clean_test_compile": false,
+      "patch_sha256": "5a3b6b63f08aa01a0a49bc7b9c6984741f890b1db56a9e916bf9aecba12e2d03"
+    },
+    {
+      "name": "unavailable-fallback",
+      "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+      "exit": 1,
+      "totals": [
+        11,
+        2,
+        0,
+        9
+      ],
+      "named_failures": [
+        "unavailable never supplies lexical semantic scores; explicit lexical nominations stay named",
+        "unavailable, table abstention, ineligible and observed zero retain distinct generation outcomes"
+      ],
+      "fresh_reports": 1,
+      "compiled": true,
+      "clean_test_compile": false,
+      "patch_sha256": "2d51fd4e1350ba750a3955e68602371eee2d3ced672527da3f378db889a96b5d"
+    },
+    {
+      "name": "table-conflict",
+      "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+      "exit": 1,
+      "totals": [
+        11,
+        1,
+        0,
+        10
+      ],
+      "named_failures": [
+        "checked table refuses nonfinite distances, fabricated unavailable and equal-content conflicts"
+      ],
+      "fresh_reports": 1,
+      "compiled": true,
+      "clean_test_compile": false,
+      "patch_sha256": "75d0edc886b635a32a25b0ffcdb2707f08ebc8ec1b1e39cca1721dab9f0381e3"
+    },
+    {
+      "name": "decoder-historical",
+      "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+      "exit": 1,
+      "totals": [
+        27,
+        1,
+        0,
+        26
+      ],
+      "named_failures": [
+        "canonical inferred result roundtrips through v5 and the canonical contextual gate"
+      ],
+      "fresh_reports": 2,
+      "compiled": true,
+      "clean_test_compile": false,
+      "patch_sha256": "c6376db2a3f98630b822bc57db72516512376ec07bc8229747ea2f0ec08f6de7"
+    },
+    {
+      "name": "qualified-result-constructor",
+      "base_sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+      "exit": 1,
+      "totals": [
+        25,
+        1,
+        0,
+        24
+      ],
+      "named_failures": [
+        "result constructor is inaccessible even inside align"
+      ],
+      "fresh_reports": 2,
+      "compiled": true,
+      "clean_test_compile": true,
+      "patch_sha256": "45d9ec70ef3a6966eb1492e813d019e6cf17ef0b664efc778507fa8de263599f"
+    }
+  ],
+  "restored_totals": [
+    [
+      67,
+      0,
+      0,
+      67
+    ],
+    [
+      27,
+      0,
+      0,
+      27
+    ]
+  ],
+  "restored_passed": 94,
+  "restored_exit": 0,
+  "clean_exact_clone": true
+}

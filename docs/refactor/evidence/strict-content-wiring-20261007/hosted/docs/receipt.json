@@ -1,0 +1,56 @@
+{
+  "kind": "docs",
+  "sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "run": 37613462315,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37613462315",
+  "conclusion": "success",
+  "collected_utc": "2026-10-07T11:31:23.905146+00:00",
+  "archive_sha256": "03188b6c9a7cb80f6036303cc2e61233f0559b9798dc28e4a00c01459258c289",
+  "archive_bytes": 38665,
+  "jobs": [
+    {
+      "job_id": 112766069616,
+      "name": "Verify docs site",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37613462315/job/112766069616",
+      "conclusion": "success",
+      "log_bytes": 74619,
+      "log_sha256": "8618cbdb30518d69ed49305080dcb3ff451e3a7c38308204bff7b0844dbbc1b4",
+      "sbt_totals": [],
+      "cells": 0,
+      "passed": 0,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "examples": 13,
+      "verification_lines": [
+        "2026-10-07T11:23:01.4084192Z verified inspect-source: 381 output bytes",
+        "2026-10-07T11:25:04.4758206Z verified model-a-story: 729 output bytes",
+        "2026-10-07T11:25:04.4759618Z verified represent-recall: 598 output bytes",
+        "2026-10-07T11:25:04.4761806Z verified align-and-interpret: 551 output bytes",
+        "2026-10-07T11:25:04.4763915Z verified summarize-recall: 756 output bytes",
+        "2026-10-07T11:25:04.4766096Z verified score-interview: 1074 output bytes",
+        "2026-10-07T11:25:04.4768355Z verified save-model: 330 output bytes",
+        "2026-10-07T11:25:43.9336828Z verified penman-to-chart: 840 output bytes",
+        "2026-10-07T11:26:21.9293262Z verified resolve-acquisition: 318 output bytes",
+        "2026-10-07T11:27:01.7061929Z verified compose-document: 340 output bytes",
+        "2026-10-07T11:27:39.4024799Z verified window-features: 634 output bytes",
+        "2026-10-07T11:28:17.6310998Z verified use-embeddings: 436 output bytes",
+        "2026-10-07T11:29:37.1983421Z verified structural-distance: 402 output bytes",
+        "2026-10-07T11:29:37.1984223Z verified 13 executable documentation examples",
+        "2026-10-07T11:29:44.6243356Z - 0 errors",
+        "2026-10-07T11:29:44.6243648Z - 0 warnings",
+        "2026-10-07T11:29:48.6167675Z 11:29:48 [build] 21 page(s) built in 2.30s",
+        "2026-10-07T11:29:54.3171602Z verified 20 built pages",
+        "2026-10-07T11:29:54.3173479Z verified 19 unique sidebar entries",
+        "2026-10-07T11:29:54.3174048Z verified 15 internal links"
+      ]
+    }
+  ],
+  "totals": {
+    "cells": 0,
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

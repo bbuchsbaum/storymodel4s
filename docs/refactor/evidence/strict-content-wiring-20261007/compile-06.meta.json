@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T11:08:09.831071+00:00",
+  "finished_utc": "2026-10-07T11:08:54.430860+00:00",
+  "duration_seconds": 44.599644,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.probes.StrictContentBoundarySuite storymodel4s.align.probes.D1bResultBoundarySuite storymodel4s.align.StrictContentWiringSuite storymodel4s.align.CandidateTiePolicySuite storymodel4s.align.LocalEvidenceIsolationSuite storymodel4s.align.LocalEvidenceSuite storymodel4s.align.ContentCostSuite storymodel4s.probes.StrictCandidatesUnforgeableSuite",
+    "codecJVM/testOnly storymodel4s.codec.StrictContentCodecSuite storymodel4s.codec.AlignCodecSuite",
+    "scalafmtAll",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/s2a3-20261007/compile-06.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 6946
+}

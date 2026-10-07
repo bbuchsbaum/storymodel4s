@@ -1,0 +1,42 @@
+{
+  "source_base": "50903b18fa4d2b004de55134426f5bbaa6b2c783",
+  "source_code": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "consumer_base": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+  "consumer_code": "0cd43ffdb37e6a2c71577284368cec4cd823c921",
+  "source_hosted": {
+    "run": 37613462330,
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37613462330",
+    "cells": 80,
+    "passed": 12722,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "consumer_hosted": {
+    "run": 37614267670,
+    "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/37614267670",
+    "cells": 15,
+    "passed": 753,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "docs_hosted": {
+    "run": 37613462315,
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37613462315",
+    "examples": 13
+  },
+  "source_local_passed": 94,
+  "additional_fixture_passed": 10,
+  "consumer_local_passed": 485,
+  "compiled_mutations": 6,
+  "restored_passed": 94,
+  "source_code_review": "GO exacta2d795b2",
+  "consumer_code_review": "GO exact0cd43ff",
+  "mutation_review": "GO exacta2d795b2",
+  "private_inputs_used": false,
+  "unrelated_source_files_preserved": 1,
+  "unrelated_consumer_files_preserved": 1177,
+  "remaining_acceptance": "S2a-4 wider content court and behavioural laws (8 specified mutants); remaining G1 reference/bundle integration and scientific calibration.",
+  "landing_and_publication": "Recorded separately in Mote after exact metadata review."
+}

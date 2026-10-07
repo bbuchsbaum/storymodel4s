@@ -1,0 +1,86 @@
+{
+  "base": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+  "source_pin": "a2d795b26e64ca9cf304c861216c7622bb807190",
+  "files": {
+    "build.sbt": "691182951bc3d85252ed277a05671c842114f1288a92c5bd47a0648670636b9e",
+    "cli/src/test/scala/storyatlas4s/cli/ModelInputSuite.scala": "db2539059e99e1d5f16c02e5928796827e833e6d807933ade84d9c5f78207577"
+  },
+  "actor_ops": [
+    ".mote/ops/20261007T105527.796764Z-p9342-c0000-r90f4-h03bbb7.json",
+    ".mote/ops/20261007T105527.808300Z-p9342-c0001-ra704-hf66d92.json",
+    ".mote/ops/20261007T105845.230446Z-p17265-c0000-rfe50-hf6c4ca.json",
+    ".mote/ops/20261007T105845.268246Z-p17265-c0001-re3f4-h202ddd.json",
+    ".mote/ops/20261007T105845.307805Z-p17265-c0002-rda88-hce8cf0.json",
+    ".mote/ops/20261007T105845.344017Z-p17265-c0003-r11b9-hfe7df8.json",
+    ".mote/ops/20261007T112729.099852Z-p8559-c0000-ra2ba-h426efb.json"
+  ],
+  "patch_sha256": "d8e43663c705cebf21d5c9d34ab422f8415151a2acc75bb2d3306c54dce71971",
+  "totals": [
+    [
+      22,
+      0,
+      0,
+      22
+    ],
+    [
+      26,
+      0,
+      0,
+      26
+    ],
+    [
+      100,
+      0,
+      0,
+      100
+    ],
+    [
+      100,
+      0,
+      0,
+      100
+    ],
+    [
+      13,
+      0,
+      0,
+      13
+    ],
+    [
+      13,
+      0,
+      0,
+      13
+    ],
+    [
+      74,
+      0,
+      0,
+      74
+    ],
+    [
+      74,
+      0,
+      0,
+      74
+    ],
+    [
+      59,
+      0,
+      0,
+      59
+    ],
+    [
+      4,
+      0,
+      0,
+      4
+    ]
+  ],
+  "passed": 485,
+  "exit": 0,
+  "default_published_pins": true,
+  "app_fastLinkJS": true,
+  "final_format_checks": true,
+  "candidate": "0cd43ffdb37e6a2c71577284368cec4cd823c921"
+}

@@ -1,0 +1,7 @@
+Independent consumer code review by salvage_review, read-only, no authoring or builds.
+
+GO 0cd43ffdb37e6a2c71577284368cec4cd823c921 over 217573567bfe5609aa7d562dd70ce4a6513458c9.
+
+Both code blobs match the retained receipt. The source pin is exact a2d795b26e64ca9cf304c861216c7622bb807190. The expanded fixture preserves five outcomes, coverage4/1, one numeric sidecar row and distinct unavailable/abstained reasons in HTML, SVG and the textual twin. No renderer or shell changes. Ancestry and diff check pass; all seven Mote operations belong to the author.
+
+Full default-pin local log:10 cells,485 Passed,0 Failed,0 Errors,0 Skipped, app linking, workflow generation and final formatting, exit0. Hosted consumer qualification remains pending.
