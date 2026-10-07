@@ -1,0 +1,21 @@
+{
+  "sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "jvm_cells": 11,
+  "js_cells": 6,
+  "native_cells": 6,
+  "argv": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedOnnx/clean",
+    "acquireJVM/test; alignJVM/test; codecJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedOnnx/test; pipeline/test; providerAgent/test; viewJVM/test",
+    "acquireJS/test; alignJS/test; codecJS/test; corpusJS/test; documentJS/test; viewJS/test",
+    "acquireNative/test; alignNative/test; codecNative/test; corpusNative/test; documentNative/test; viewNative/test",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "formatting_last": true,
+  "clean_clone_before_run": true,
+  "onnx_clean_before_gate": true,
+  "prior_failed_run": "incremental-probe-recovery.json"
+}

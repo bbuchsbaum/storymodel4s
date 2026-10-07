@@ -1,0 +1,48 @@
+{
+  "actor": "codex-g1-20261007",
+  "actor_ok": true,
+  "actor_source": "flag",
+  "format": {
+    "error": null,
+    "ok": true,
+    "schema_version": 1
+  },
+  "fsck": {
+    "bad_filename": [],
+    "bad_hash": [],
+    "bad_json": [],
+    "bad_op_shape": [],
+    "ops_checked": 15961,
+    "tmp_cleaned": 0,
+    "tmp_total": 0
+  },
+  "fsck_clean": true,
+  "fsck_error": null,
+  "git_backing": {
+    "as_of_ts": "2026-10-07T19:05:09.369589Z",
+    "deleted_op_count": 0,
+    "head": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "mode": "git_backed",
+    "modified_op_count": 0,
+    "oldest_uncommitted_age_s": 4389,
+    "oldest_uncommitted_op_ts": "2026-10-07T17:52:00.167210Z",
+    "repository_root": "/Users/bbuchsbaum/code/scala/storymodel4s",
+    "staged_op_count": 0,
+    "tracked_op_count": 15938,
+    "uncommitted_op_count": 23,
+    "unparseable_uncommitted_count": 0,
+    "untracked_op_count": 23,
+    "working_op_count": 15961
+  },
+  "layout": {
+    "local": true,
+    "ops": true,
+    "root": true,
+    "tmp": true
+  },
+  "ok": true,
+  "store_root": "/Users/bbuchsbaum/code/scala/storymodel4s/.mote",
+  "warnings": [
+    "git-backed op store has 23 uncommitted operation(s); oldest is 1h13m09s; clones populated from Git cannot observe them; synchronize the op files before asking those producers to refresh"
+  ]
+}

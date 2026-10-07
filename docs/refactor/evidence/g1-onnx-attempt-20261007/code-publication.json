@@ -1,0 +1,31 @@
+{
+  "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "previous_main_sha": "acc5cca1f0d62418c79baa96c09612b21153e758",
+  "git_refs": {
+    "local": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "tracking": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "remote": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f"
+  },
+  "github_push_exit": 0,
+  "buc": {
+    "host": "buc-gw01",
+    "source_refs": {
+      "local": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+      "tracking": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+      "remote": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f"
+    },
+    "source_clean": true,
+    "mote_doctor_exit": 0,
+    "mote_fsck_exit": 0,
+    "queue_counts": {
+      "release-1.0": 26,
+      "release-later": 62,
+      "release-1.1": 24
+    },
+    "slice_ticket_status": null,
+    "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+    "consumer_clean": true,
+    "data_or_credentials_moved": false
+  },
+  "local_unrelated_draft_preserved": true
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T17:57:07.975219+00:00",
+  "finished_utc": "2026-10-07T17:57:36.343597+00:00",
+  "duration_seconds": 28.368354,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedOnnx/testOnly *OnnxRecordedBatch*",
+    "embedOnnx/scalafmt",
+    "embedOnnx/Test/scalafmt"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/g1-onnx-attempt-20261007/smoke.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 3917
+}

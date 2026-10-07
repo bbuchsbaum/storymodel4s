@@ -1,0 +1,21 @@
+{
+  "code_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "local": {
+    "passed": 5198,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "compiled_named_mutant_kills": 9,
+  "hosted": {
+    "cells": 80,
+    "passed": 12754,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "docs_examples": 13,
+  "child_closed": true,
+  "parent_complete": false,
+  "verified_artifacts": 67
+}

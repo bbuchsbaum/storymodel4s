@@ -1,0 +1,11 @@
+{
+  "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "exit": 1,
+  "raw_log_sha256": "3f579f673b1d5916238a1ce69ae3ab1fa49265ec18868a0c270149fec09e92c3",
+  "failure": "record fromProduct/productMirror negative courts retained expansion against case-class mutant after incremental restore",
+  "source_restored_clean": true,
+  "named_failed": 2,
+  "onnx_passed": 20,
+  "onnx_errors": 0,
+  "next": "clean embedOnnx Compile/Test outputs; repeat complete23cell restoredtree gate; retain original failedrun"
+}

@@ -1,0 +1,9 @@
+Independent reviewer: /root/g1_boundary_review
+Final verdict: GO
+Exact candidate: d7c0d97a37a6a1ae375f7f12f250e8f7317f591f
+Exact base: acc5cca1f0d62418c79baa96c09612b21153e758
+No BLOCK or new FOLLOW-UP findings.
+Verified raw artifacts: clean exact standalone clone; cold restored23cells5198Passed0Failed0Errors2Skipped; ONNXCompile1source/Test3sources freshly compiled, new16courts0ignored, formattinglast.9mutation rawlog/patch/source hashes match independently reviewed named kills/controls. Retained incremental stale-probe failure correctly superseded by clean compilation.
+HostedCI37664410336 exactSHA/all4successfuljobs80cells12754Passed0Failed0Errors12Skipped; HostedDocs37664410358 exactSHA13examples. Job logs and ZIP hashes match.
+Scope: concrete adapter attempts and exact in-memory replay only. No strict registration, production-model efficacy, durable replay admission or G1 completion. Publication/childclosure and exactT2metadatareview remain primary actions.
+No builds/private data reads/writes by reviewer.

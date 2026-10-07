@@ -1,0 +1,38 @@
+types defined by this candidate:
+  Admitted
+  OnnxArtifactKind
+  OnnxEmbedderError
+  OnnxLoadStage
+  OnnxRecordedBatchCourtSuite
+  OnnxRecordedBatchSuite
+  OnnxReplayRefusal
+  OnnxSentenceArtifacts
+  OnnxSentenceEmbedder
+  OnnxSentenceModel
+  RecordedBatch
+  RecordedBatchApplyControl
+  RecordedBatchConstructorControl
+  RecordedBatchCopyControl
+  RecordedBatchMirrorControl
+  RecordedBatchPayloadControl
+  RecordedBatchProductControl
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  codec
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  embed-onnx
+  pipeline
+  provider-agent
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; codecJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedOnnx/test; pipeline/test; providerAgent/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

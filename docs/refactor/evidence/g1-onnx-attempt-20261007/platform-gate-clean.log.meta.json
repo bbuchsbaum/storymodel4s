@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T18:25:19.888129+00:00",
+  "finished_utc": "2026-10-07T18:35:31.954744+00:00",
+  "duration_seconds": 612.089194,
+  "command": [
+    "env",
+    "-u",
+    "STORYMODEL4S_ONNX_MODEL",
+    "-u",
+    "STORYMODEL4S_ONNX_TOKENIZER",
+    "-u",
+    "STORYMODEL4S_DATA_ROOT",
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedOnnx/clean",
+    "acquireJVM/test; alignJVM/test; codecJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedOnnx/test; pipeline/test; providerAgent/test; viewJVM/test",
+    "acquireJS/test; alignJS/test; codecJS/test; corpusJS/test; documentJS/test; viewJS/test",
+    "acquireNative/test; alignNative/test; codecNative/test; corpusNative/test; documentNative/test; viewNative/test",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/g1-onnx-attempt-20261007/platform-gate-clean.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 905515
+}

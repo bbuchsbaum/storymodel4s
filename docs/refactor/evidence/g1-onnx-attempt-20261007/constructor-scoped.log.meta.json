@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T18:10:49.619148+00:00",
+  "finished_utc": "2026-10-07T18:11:09.622166+00:00",
+  "duration_seconds": 20.002743,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedOnnx/Test/clean",
+    "embedOnnx/testOnly storymodel4s.onnxcourt.OnnxRecordedBatchCourtSuite -- \"--tests=^(?!record apply).*\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/g1-onnx-attempt-20261007/constructor-scoped.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 3355
+}

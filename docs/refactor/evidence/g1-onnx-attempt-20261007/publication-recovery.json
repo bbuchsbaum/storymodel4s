@@ -1,0 +1,13 @@
+{
+  "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "first_code_publish": "GitHub/local/tracking main verified; stopped before BUC sync because adapted helper retained old evidence-directory allowlist prefix",
+  "verified_refs": {
+    "local": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "tracking": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "remote": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f"
+  },
+  "git_push_already_succeeded": true,
+  "buc_sync_not_started": true,
+  "code_changed": false,
+  "next": "correct owned evidence prefix; resume idempotent exactSHA sync"
+}

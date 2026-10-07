@@ -1,0 +1,68 @@
+{
+  "code_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "ticket": "bd-01M4BQWQN7DDCZT095ND23772A",
+  "parent": "bd-01M2TACM78289S4TECE91GT5K2",
+  "source_review": "g1_boundary_review final landing GO; source-review.txt",
+  "publication": {
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "previous_main_sha": "acc5cca1f0d62418c79baa96c09612b21153e758",
+    "git_refs": {
+      "local": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+      "tracking": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+      "remote": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f"
+    },
+    "github_push_exit": 0,
+    "buc": {
+      "host": "buc-gw01",
+      "source_refs": {
+        "local": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+        "tracking": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+        "remote": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f"
+      },
+      "source_clean": true,
+      "mote_doctor_exit": 0,
+      "mote_fsck_exit": 0,
+      "queue_counts": {
+        "release-1.0": 26,
+        "release-later": 62,
+        "release-1.1": 24
+      },
+      "slice_ticket_status": null,
+      "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+      "consumer_clean": true,
+      "data_or_credentials_moved": false
+    },
+    "local_unrelated_draft_preserved": true
+  },
+  "closure": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "note": "S2b-1 completion at d7c0d97a37a6a1ae375f7f12f250e8f7317f591f. Concrete checked OnnxSentenceEmbedder.record alone mints RecordedBatch after its actual adapter attempt. Exact replay checks full model/provider, ordered IDs/count, geometry and exact payload/sensitivity; it returns original outcomes/receipt after close without calling the provider. Empty/denied/all-TooLong remain typed outcomes. Six outside-package construction/read courts and ten runtime courts pass; nine compiled named mutations are killed. Cold restored reference-scope gate: 23 cells, 5198 Passed / 0 Failed / 0 Errors / 2 existing skips, fatal warnings and formatting last. Exact hosted CI 37664410336: 80 cells, 12754 Passed / 0 Failed / 0 Errors / 12 existing skips; docs 37664410358: 13 examples. Independent g1_boundary_review final GO on exact SHA. Local/tracking/GitHub main and clean approved buc-gw01 source are identical; consumer stays 90f682d1acddd759867098e90f6e3ef163244b0e. Evidence: docs/refactor/evidence/g1-onnx-attempt-20261007. Remaining / next action: Native reliability and S2a-4 are complete. S2b-1 child bd-01M4BQWQN7DDCZT095ND23772A lands concrete ONNX attempt records and exact in-memory replay at d7c0d97a37a6a1ae375f7f12f250e8f7317f591f; receipts: docs/refactor/evidence/g1-onnx-attempt-20261007. It does not register a strict channel. Next bounded slice: checked library-owned surface-text rendering plus a declared metric scale/registration contract. Current UnitContent/TargetContent omit submitted text and can alias differently ordered strings; raw cosine distance [0,2] must not be silently forced into the strict ContentTable [0,1] contract. Then bind actual model/config/render/candidate receipts and identical immutable nomination/pricing, qualify frozen-preset embedding parity, and adopt that originating evidence in StageTrace. Reference and reconstruction must consume identical candidates, scores and evidence digest. No lexical substitution or coarse dependency bypass. No private data/credentials were used or moved. Earlier literal dash decision/progress posts contain no decision; this note and the amended current body provide the operative context. The bounded child acceptance is complete; the parent G1 and all remaining strict-channel/scientific acceptance stay open. Queue after child closure: 112 open tickets, 26 release-1.0 / 24 release-1.1 / 62 later.",
+    "readback_status": "closed",
+    "canonical_note": {
+      "actor": "codex-g1-20261007",
+      "kind": "note",
+      "op_id": "20261007T190426.195427Z-p50633-c0000-r20a3-h8e417e",
+      "text": "S2b-1 completion at d7c0d97a37a6a1ae375f7f12f250e8f7317f591f. Concrete checked OnnxSentenceEmbedder.record alone mints RecordedBatch after its actual adapter attempt. Exact replay checks full model/provider, ordered IDs/count, geometry and exact payload/sensitivity; it returns original outcomes/receipt after close without calling the provider. Empty/denied/all-TooLong remain typed outcomes. Six outside-package construction/read courts and ten runtime courts pass; nine compiled named mutations are killed. Cold restored reference-scope gate: 23 cells, 5198 Passed / 0 Failed / 0 Errors / 2 existing skips, fatal warnings and formatting last. Exact hosted CI 37664410336: 80 cells, 12754 Passed / 0 Failed / 0 Errors / 12 existing skips; docs 37664410358: 13 examples. Independent g1_boundary_review final GO on exact SHA. Local/tracking/GitHub main and clean approved buc-gw01 source are identical; consumer stays 90f682d1acddd759867098e90f6e3ef163244b0e. Evidence: docs/refactor/evidence/g1-onnx-attempt-20261007. Remaining / next action: Native reliability and S2a-4 are complete. S2b-1 child bd-01M4BQWQN7DDCZT095ND23772A lands concrete ONNX attempt records and exact in-memory replay at d7c0d97a37a6a1ae375f7f12f250e8f7317f591f; receipts: docs/refactor/evidence/g1-onnx-attempt-20261007. It does not register a strict channel. Next bounded slice: checked library-owned surface-text rendering plus a declared metric scale/registration contract. Current UnitContent/TargetContent omit submitted text and can alias differently ordered strings; raw cosine distance [0,2] must not be silently forced into the strict ContentTable [0,1] contract. Then bind actual model/config/render/candidate receipts and identical immutable nomination/pricing, qualify frozen-preset embedding parity, and adopt that originating evidence in StageTrace. Reference and reconstruction must consume identical candidates, scores and evidence digest. No lexical substitution or coarse dependency bypass. No private data/credentials were used or moved. Earlier literal dash decision/progress posts contain no decision; this note and the amended current body provide the operative context. The bounded child acceptance is complete; the parent G1 and all remaining strict-channel/scientific acceptance stay open. Queue after child closure: 112 open tickets, 26 release-1.0 / 24 release-1.1 / 62 later.",
+      "ts": "2026-10-07T19:04:26.195427Z"
+    }
+  },
+  "final_states": {
+    "closed": 310,
+    "open": 112
+  },
+  "final_release_counts": {
+    "release-1.0": 26,
+    "release-later": 62,
+    "release-1.1": 24
+  },
+  "remaining_parent_acceptance": "Remaining / next action: Native reliability and S2a-4 are complete. S2b-1 child bd-01M4BQWQN7DDCZT095ND23772A lands concrete ONNX attempt records and exact in-memory replay at d7c0d97a37a6a1ae375f7f12f250e8f7317f591f; receipts: docs/refactor/evidence/g1-onnx-attempt-20261007. It does not register a strict channel. Next bounded slice: checked library-owned surface-text rendering plus a declared metric scale/registration contract. Current UnitContent/TargetContent omit submitted text and can alias differently ordered strings; raw cosine distance [0,2] must not be silently forced into the strict ContentTable [0,1] contract. Then bind actual model/config/render/candidate receipts and identical immutable nomination/pricing, qualify frozen-preset embedding parity, and adopt that originating evidence in StageTrace. Reference and reconstruction must consume identical candidates, scores and evidence digest. No lexical substitution or coarse dependency bypass.",
+  "metadata_publication": "separate reviewed documentation/tracker successor; final SHA cannot be embedded in its own tree",
+  "postclosure_ownership": {
+    "claims": 0,
+    "reservations": 0,
+    "orphaned_claims": 0,
+    "orphaned_reservations": 0
+  }
+}

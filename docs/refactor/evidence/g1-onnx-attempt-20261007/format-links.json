@@ -1,0 +1,58 @@
+{
+  "diff_check_exit": 0,
+  "structured_files_parse": true,
+  "trailing_whitespace": 0,
+  "missing_local_links": 0,
+  "links": [
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "PLAN.md#operative-10-scope-owner-decisions-22-september-2026",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/release-queue-20261007/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/native-voyage-reliability-20261007/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/g1-onnx-attempt-20261007/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/workstation-checkpoint-20261006/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/strict-content-wiring-20261007/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/release-queue-20261007/s2a4-closure.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/g1-onnx-attempt-20261007/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "evidence/native-voyage-reliability-20261007/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/refactor/RELEASE-QUEUE.md",
+      "target": "../../data/README.md",
+      "exists": true
+    }
+  ]
+}

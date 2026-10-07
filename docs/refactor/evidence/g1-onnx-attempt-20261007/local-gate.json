@@ -1,0 +1,195 @@
+{
+  "source_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+  "base_sha": "acc5cca1f0d62418c79baa96c09612b21153e758",
+  "exit": 0,
+  "cells": 23,
+  "sbt_totals": [
+    [
+      138,
+      0,
+      0,
+      138
+    ],
+    [
+      673,
+      0,
+      0,
+      673
+    ],
+    [
+      327,
+      0,
+      0,
+      327
+    ],
+    [
+      116,
+      0,
+      0,
+      116
+    ],
+    [
+      159,
+      0,
+      0,
+      159
+    ],
+    [
+      189,
+      0,
+      0,
+      189
+    ],
+    [
+      142,
+      0,
+      0,
+      141
+    ],
+    [
+      22,
+      0,
+      0,
+      22
+    ],
+    [
+      120,
+      0,
+      0,
+      120
+    ],
+    [
+      77,
+      0,
+      0,
+      76
+    ],
+    [
+      133,
+      0,
+      0,
+      133
+    ],
+    [
+      138,
+      0,
+      0,
+      138
+    ],
+    [
+      653,
+      0,
+      0,
+      653
+    ],
+    [
+      326,
+      0,
+      0,
+      326
+    ],
+    [
+      116,
+      0,
+      0,
+      116
+    ],
+    [
+      186,
+      0,
+      0,
+      186
+    ],
+    [
+      133,
+      0,
+      0,
+      133
+    ],
+    [
+      138,
+      0,
+      0,
+      138
+    ],
+    [
+      653,
+      0,
+      0,
+      653
+    ],
+    [
+      326,
+      0,
+      0,
+      326
+    ],
+    [
+      116,
+      0,
+      0,
+      116
+    ],
+    [
+      186,
+      0,
+      0,
+      186
+    ],
+    [
+      133,
+      0,
+      0,
+      133
+    ]
+  ],
+  "sum": {
+    "passed": 5198,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "platforms": {
+    "jvm": {
+      "cells": 11,
+      "passed": 2094,
+      "skipped": 2
+    },
+    "js": {
+      "cells": 6,
+      "passed": 1552,
+      "skipped": 0
+    },
+    "native": {
+      "cells": 6,
+      "passed": 1552,
+      "skipped": 0
+    }
+  },
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedOnnx/clean",
+    "acquireJVM/test; alignJVM/test; codecJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedOnnx/test; pipeline/test; providerAgent/test; viewJVM/test",
+    "acquireJS/test; alignJS/test; codecJS/test; corpusJS/test; documentJS/test; viewJS/test",
+    "acquireNative/test; alignNative/test; codecNative/test; corpusNative/test; documentNative/test; viewNative/test",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "fatal_warnings": true,
+  "formatting_last": true,
+  "clean_exact_clone_after_restoration": true,
+  "cold_onnx_compile_and_test": true,
+  "new_courts": {
+    "passed": 16,
+    "failed": 0,
+    "errors": 0,
+    "ignored": 0
+  },
+  "raw_log_sha256": "ffcf541f64169f639e1b47b95f7f12d3a5e057040fbff52abb024118fb840c95",
+  "raw_log": "platform-gate-clean.log.gz",
+  "duration_seconds": 612.089194,
+  "prior_failed_gate_retained": "incremental-probe-recovery.json",
+  "scientific_efficacy_claim": false
+}

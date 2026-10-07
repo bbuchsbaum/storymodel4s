@@ -1,0 +1,333 @@
+[
+  {
+    "mutation": "model",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "expected": [
+      9,
+      1,
+      0,
+      8
+    ],
+    "compiled": true,
+    "named_failure": "replay refuses changed model configuration even with the same provider fingerprint",
+    "source_sha256": "28fef5b8dc6143f231c98db4380bfc6ba3759f69ab6aae846a2f35142cf54b40",
+    "log_sha256": "fb6f20c2839ef8dde5baa248335ff2b150a8568705b373a36fc9e5ba2500455b",
+    "patch_sha256": "bbde851c62256c46cfbf8aa922db05b1508c4b2226c8e8e533998d2540edad0e",
+    "clean_test_recompile": false,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly storymodel4s.embed.onnx.OnnxRecordedBatchSuite -- \"--tests=^(?!denied).*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 9, Failed 1, Errors 0, Passed 8, Ignored 1"
+    ],
+    "filter_ignored": 1,
+    "killed": true
+  },
+  {
+    "mutation": "provider",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "expected": [
+      9,
+      1,
+      0,
+      8
+    ],
+    "compiled": true,
+    "named_failure": "replay refuses a foreign provider",
+    "source_sha256": "b59b131383cd4653f7b6b297498caf07134ac4b8593b677500dda493e6163236",
+    "log_sha256": "a780af68f4c325ea932a197d2f6216a866965a647d3c685a34a0cb6670c65819",
+    "patch_sha256": "11cdcdb7bf39739636ec3cda652c26c3c75a46636e9f0c3c4d77cd5b210ee045",
+    "clean_test_recompile": false,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly storymodel4s.embed.onnx.OnnxRecordedBatchSuite -- \"--tests=^(?!denied).*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 9, Failed 1, Errors 0, Passed 8, Ignored 1"
+    ],
+    "filter_ignored": 1,
+    "killed": true
+  },
+  {
+    "mutation": "ids",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "expected": [
+      9,
+      1,
+      0,
+      8
+    ],
+    "compiled": true,
+    "named_failure": "replay refuses changed request IDs and order",
+    "source_sha256": "a2f07cdada440f17870248e58ceb454ade5680e8d2080cedacaf93453cd0cfd6",
+    "log_sha256": "1217330e930048f31c06eabc3ef4e240a1ddd2f9eb06d1dad55993bdc0e8f468",
+    "patch_sha256": "815f84016da6e96ff27cd8d4b01be3a979940ca3591f90a2242faf98d6b05851",
+    "clean_test_recompile": false,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly storymodel4s.embed.onnx.OnnxRecordedBatchSuite -- \"--tests=^(?!denied).*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 9, Failed 1, Errors 0, Passed 8, Ignored 1"
+    ],
+    "filter_ignored": 1,
+    "killed": true
+  },
+  {
+    "mutation": "geometry",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "expected": [
+      9,
+      1,
+      0,
+      8
+    ],
+    "compiled": true,
+    "named_failure": "replay refuses changed role geometry",
+    "source_sha256": "1f51053c9c11f1d4480a89c67767f4beefb546528bb9277ff23605470c414b3a",
+    "log_sha256": "2aedefe476182aadbf46eda819ce1d5f25cab94058fd74bc191bbe042cffba88",
+    "patch_sha256": "6f885b6bfd75cdb3490441a3d704a357189695cc259b9d977bb9cb1805f6ee4c",
+    "clean_test_recompile": false,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly storymodel4s.embed.onnx.OnnxRecordedBatchSuite -- \"--tests=^(?!denied).*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 9, Failed 1, Errors 0, Passed 8, Ignored 1"
+    ],
+    "filter_ignored": 1,
+    "killed": true
+  },
+  {
+    "mutation": "payload",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "expected": [
+      9,
+      1,
+      0,
+      8
+    ],
+    "compiled": true,
+    "named_failure": "replay refuses changed exact payload and sensitivity",
+    "source_sha256": "db5841de13a6fa899ff959199d4253b049c2ddce49ca45e9f020f771132d93b6",
+    "log_sha256": "bc07a6189ebed8a8e68154ce1a4e64be1610689946428c24c0e4f5d3b05551f7",
+    "patch_sha256": "810000554082e51a1f83c710010696d773e83e27022a298487bccd3422dd1690",
+    "clean_test_recompile": false,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly storymodel4s.embed.onnx.OnnxRecordedBatchSuite -- \"--tests=^(?!denied).*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 9, Failed 1, Errors 0, Passed 8, Ignored 1"
+    ],
+    "filter_ignored": 1,
+    "killed": true
+  },
+  {
+    "mutation": "constructor-scoped",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4
+      ]
+    ],
+    "expected": [
+      5,
+      1,
+      0,
+      4
+    ],
+    "compiled": true,
+    "named_failure": "record constructor is closed with a same-shape positive control",
+    "source_sha256": "2fe6aa9ad66a64fc9a703bf07a8d3129a4bb14386f854a4ab6e681bec9662531",
+    "log_sha256": "c280a5703e37201599889f4d72fbc5b242381996ce3a0f1a0c1f091c4643935b",
+    "patch_sha256": "2c68ab33978c063a17abbc8528549492f48755deef274583d00edb8c871c5f55",
+    "clean_test_recompile": true,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly storymodel4s.onnxcourt.OnnxRecordedBatchCourtSuite -- \"--tests=^(?!record apply).*\""
+    ],
+    "compiled_in_current_log": false,
+    "compilation_receipt": "constructor-discovery.json",
+    "test_recompiled": true,
+    "compilation_note": "Exact same compiled public-constructor mutant was reused; clean test recompile observed. Source hash matches the preceding compiled discovery.",
+    "sbt_summary": [
+      "Failed: Total 5, Failed 1, Errors 0, Passed 4, Ignored 1"
+    ],
+    "filter_ignored": 1,
+    "killed": true
+  },
+  {
+    "mutation": "payload-read",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        6,
+        1,
+        0,
+        5
+      ]
+    ],
+    "expected": [
+      6,
+      1,
+      0,
+      5
+    ],
+    "compiled": true,
+    "named_failure": "captured payloads cannot be read with a same-shape positive control",
+    "source_sha256": "bb8ca426e11c0d374204f6b8a7f57b85ce6211a9bd8a8c5cabeb19bfa488cc16",
+    "log_sha256": "d38576071f01f137bceca68ab3022a698e570e4dc3fe248e46d5875503a65757",
+    "patch_sha256": "3d9c04358460432271b0b01142b17565397667f8e8926a9406b1f28ddcc3b921",
+    "clean_test_recompile": true,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly storymodel4s.onnxcourt.OnnxRecordedBatchCourtSuite -- \"--tests=.*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 6, Failed 1, Errors 0, Passed 5"
+    ],
+    "filter_ignored": 0,
+    "killed": true
+  },
+  {
+    "mutation": "product-mirror",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1
+      ]
+    ],
+    "expected": [
+      2,
+      1,
+      0,
+      1
+    ],
+    "compiled": true,
+    "named_failure": "record product mirror is closed with a same-shape positive control",
+    "source_sha256": "bdb542686f7f0bb756c8ee9dd1f999a07da6fd4117726d85da53c98cbeee899b",
+    "log_sha256": "083e6ef3b274bdb282782195e132c59d11e03470093cc2347d88c1546bdec744",
+    "patch_sha256": "cddd4034a08661529d983ec4ffc75c9b9e781e17884cb027ac0571aeb6fa5d33",
+    "clean_test_recompile": true,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly storymodel4s.onnxcourt.OnnxRecordedBatchCourtSuite -- \"--tests=^(record product mirror|captured payloads).*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 2, Failed 1, Errors 0, Passed 1, Ignored 4"
+    ],
+    "filter_ignored": 4,
+    "killed": true
+  },
+  {
+    "mutation": "payload-hash",
+    "candidate_sha": "d7c0d97a37a6a1ae375f7f12f250e8f7317f591f",
+    "exit": 1,
+    "totals": [
+      [
+        10,
+        1,
+        0,
+        9
+      ]
+    ],
+    "expected": [
+      10,
+      1,
+      0,
+      9
+    ],
+    "compiled": true,
+    "named_failure": "denied payloads remain exactly bound without publishing a new input digest",
+    "source_sha256": "46558ff94f43d4463f96f9f58dc29c7df4e9cf3a96fe621c605047c29d7363bb",
+    "log_sha256": "c49c2fb5778dcc9620223aee223a49d8276527c782618a91dfad2ce2fff743cb",
+    "patch_sha256": "95f527d6fff4a21074f63016301ec9ebc84f43c52a6a75acfcfdd5f6f3235b7b",
+    "clean_test_recompile": false,
+    "argv": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly storymodel4s.embed.onnx.OnnxRecordedBatchSuite -- \"--tests=.*\""
+    ],
+    "sbt_summary": [
+      "Failed: Total 10, Failed 1, Errors 0, Passed 9"
+    ],
+    "filter_ignored": 0,
+    "killed": true
+  }
+]
