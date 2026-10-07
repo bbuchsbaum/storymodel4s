@@ -23,7 +23,7 @@ class D1bResultBoundarySuite extends FunSuite:
       def forged(r: HsmmResult): HsmmResult =
         new HsmmResult(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs,
           r.candidateAnchors, r.admissibility, r.viewFingerprint, r.recallChecksum,
-          r.refinementPasses, r.sourceSupport, true)
+          r.refinementPasses, r.sourceSupport, true, r.gateSemantics)
     """).nonEmpty)
 
   test("result has no Product or Mirror construction door"):

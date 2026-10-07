@@ -269,13 +269,14 @@ object HsmmConfig:
   * states); `admissibility` records, per candidate anchor, which modes the gate allowed and which
   * contradictions it found — including anchors whose only admissible mode is distorted.
   *
-  * The constructor is `private[align]` and the class has no `copy`: the only ways to obtain a value
-  * are [[GraphHsmm.infer]] (which itself goes through [[HsmmResult.validated]]) and
-  * [[HsmmResult.validated]], which takes the recall and the source view and proves that every
-  * anchored state appearing in the posterior, the flow, the costs, or the Viterbi path is admitted
-  * in exactly that mode by an admissibility record that the [[ModeGate]] itself reproduces on that
-  * unit and node. A forged row on an inadmissible `(anchor, mode)` — or a forged admissibility
-  * record — therefore cannot inhabit this type, and every consumer that requires it
+  * The constructor is bare `private` and the class has no `copy`. [[GraphHsmm.infer]] goes through
+  * [[HsmmResult.validated]] or [[HsmmResult.validatedCanonical]], according to the originating
+  * evidence's gate semantics. Both checked factories take the recall and source view and prove
+  * every anchored state appearing in the posterior, the flow, the costs, or the Viterbi path is
+  * admitted in exactly that mode by the selected gate: historical [[ModeGate]], or canonical
+  * content scoring. [[gateSemantics]] names the algorithm actually re-derived, not scoring or
+  * provider provenance. A forged row on an inadmissible `(anchor, mode)` — or a forged
+  * admissibility record — therefore cannot inhabit this type, and every consumer that requires it
   * ([[RecallSignature]], [[PopulationAggregate]], [[SupportDensity]]) is guaranteed a gated result.
   * [[AblationResult]] is a separate type with no path here.
   *
@@ -283,9 +284,9 @@ object HsmmConfig:
   * vectors, construction input) is the exact set over which `admissibility` is derived, and no
   * anchored key may fall outside it — so faithful mass on a never-nominated, uncontradicted node is
   * refused as "not nominated", not admitted by silence. `admissibility`, `viewFingerprint`, and
-  * `recallChecksum` are derived inside [[HsmmResult.validated]], never supplied; a wire record
-  * carries them as mandatory match fields (see [[AlignWire.matched]]) and an [[AdmissibilityEcho]]
-  * for drift detection only.
+  * `recallChecksum` are derived inside the checked factory, never supplied; a wire record carries
+  * them as mandatory match fields (see [[AlignWire.matched]]) and an [[AdmissibilityEcho]] for
+  * drift detection only.
   *
   * Residual (stated, not hidden): nomination *provenance* (which channel nominated an anchor) is
   * not proven; the candidate-anchor set is construction data like the posterior itself.

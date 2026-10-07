@@ -23,10 +23,35 @@ class StrictContentBoundarySuite extends FunSuite:
     summon[scala.deriving.Mirror.ProductOf[ModelControl]].fromProduct((StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3))
     summon[scala.deriving.Mirror.ProductOf[ModelControl]]
   """)
+  private val summaryControl = typeCheckErrors("""
+    import storymodel4s.features.MissingReason
+    case class SummaryControl(level: Int, observed: Int, ineligible: Int, missing: Map[MissingReason, Int])
+    val value = SummaryControl(0, 1, 0, Map.empty)
+    value.copy(observed = 0)
+    summon[scala.deriving.Mirror.ProductOf[SummaryControl]].fromProduct((0, 1, 0, Map.empty))
+    summon[scala.deriving.Mirror.ProductOf[SummaryControl]]
+  """)
+  private val resultControl = typeCheckErrors("""
+    import storymodel4s.align.*
+    import storymodel4s.core.*
+    import storymodel4s.recall.RecallUnitId
+    case class ResultControl(posterior: AlignmentMatrix, flow: TransitionFlow, viterbi: Vector[AlignState], logLikelihood: Double, costs: Map[RecallUnitId, Map[AlignState, CostBreakdown]], candidateAnchors: Map[RecallUnitId, Vector[SourceNodeRef]], admissibility: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]], viewFingerprint: ViewFingerprint, recallChecksum: Checksum, refinementPasses: Int, sourceSupport: Map[SourceNodeRef, TypedSupport], textWireCompatible: Boolean, gateSemantics: GateSemantics)
+    def lift(r: HsmmResult) = new ResultControl(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs,
+      r.candidateAnchors, r.admissibility, r.viewFingerprint, r.recallChecksum,
+      r.refinementPasses, r.sourceSupport, r.textWireCompatible, r.gateSemantics)
+    def apply(r: HsmmResult) = ResultControl(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs,
+      r.candidateAnchors, r.admissibility, r.viewFingerprint, r.recallChecksum,
+      r.refinementPasses, r.sourceSupport, r.textWireCompatible, r.gateSemantics)
+    (??? : ResultControl).copy(gateSemantics = GateSemantics.CanonicalContent)
+    summon[scala.deriving.Mirror.ProductOf[ResultControl]].fromProduct(???)
+    summon[scala.deriving.Mirror.ProductOf[ResultControl]]
+  """)
 
   test("checked issuance and same-shape controls compile") {
     assertEquals(tableControl, Nil)
     assertEquals(modelControl, Nil)
+    assertEquals(summaryControl, Nil)
+    assertEquals(resultControl, Nil)
     // Direct companions acquire this compiler-synthesized method only after their defining run.
     assertEquals(typeCheckErrors("storymodel4s.align.FunctionPrior.fromProduct(???)"), Nil)
     assertEquals(
@@ -103,6 +128,70 @@ class StrictContentBoundarySuite extends FunSuite:
     assert(
       typeCheckErrors(
         "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.StrictCostModel]]"
+      ).nonEmpty
+    )
+  }
+  test("outcome summary constructor is closed outside align") {
+    assert(
+      typeCheckErrors("new storymodel4s.align.SemanticOutcomeSummary(0, 1, 0, Map.empty)").nonEmpty
+    )
+  }
+  test("outcome summary apply is closed") {
+    assert(
+      typeCheckErrors("storymodel4s.align.SemanticOutcomeSummary(0, 1, 0, Map.empty)").nonEmpty
+    )
+  }
+  test("outcome summary copy is closed") {
+    assert(
+      typeCheckErrors(
+        "(??? : storymodel4s.align.SemanticOutcomeSummary).copy(observed = 0)"
+      ).nonEmpty
+    )
+  }
+  test("outcome summary fromProduct is closed") {
+    assert(
+      typeCheckErrors(
+        "storymodel4s.align.SemanticOutcomeSummary.fromProduct((0, 1, 0, Map.empty))"
+      ).nonEmpty
+    )
+  }
+  test("outcome summary Mirror is closed") {
+    assert(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.SemanticOutcomeSummary]]"
+      ).nonEmpty
+    )
+  }
+  test("HSMM result constructor is closed outside align with the complete field shape") {
+    assert(typeCheckErrors("""
+      import storymodel4s.align.*
+      def forged(r: HsmmResult) = new HsmmResult(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs,
+        r.candidateAnchors, r.admissibility, r.viewFingerprint, r.recallChecksum,
+        r.refinementPasses, r.sourceSupport, r.textWireCompatible, r.gateSemantics)
+    """).nonEmpty)
+  }
+  test("HSMM result apply is closed") {
+    assert(typeCheckErrors("""
+      import storymodel4s.align.*
+      def forged(r: HsmmResult) = HsmmResult(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs,
+        r.candidateAnchors, r.admissibility, r.viewFingerprint, r.recallChecksum,
+        r.refinementPasses, r.sourceSupport, r.textWireCompatible, r.gateSemantics)
+    """).nonEmpty)
+  }
+  test("HSMM result copy is closed") {
+    assert(
+      typeCheckErrors(
+        "(??? : storymodel4s.align.HsmmResult).copy(gateSemantics = storymodel4s.align.GateSemantics.CanonicalContent)"
+      ).nonEmpty
+    )
+  }
+  test("HSMM result fromProduct is closed") {
+    assert(typeCheckErrors("storymodel4s.align.HsmmResult.fromProduct(???)").nonEmpty)
+  }
+  test("HSMM result Mirror is closed") {
+    assert(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.HsmmResult]]"
       ).nonEmpty
     )
   }
