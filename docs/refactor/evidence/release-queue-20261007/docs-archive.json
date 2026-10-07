@@ -1,0 +1,35 @@
+{
+  "original_tip": "8973c520311fdba2d65a513d8a711c90d9b66ec7",
+  "prose_commit": "589b6d265d1dacdff2fc04f9735cfa4ee44df490",
+  "archive_tip": "5a4c82197fbe4082628769e63396d59bd2554afe",
+  "archive_ref": "recovery/docs-site-claims-20261007",
+  "removed_workflows": [
+    ".github/workflows/baseline-integrity.yml",
+    ".github/workflows/ci.yml",
+    ".github/workflows/clean.yml",
+    ".github/workflows/docs.yml"
+  ],
+  "delta": [
+    "D\t.github/workflows/baseline-integrity.yml",
+    "D\t.github/workflows/ci.yml",
+    "D\t.github/workflows/clean.yml",
+    "D\t.github/workflows/docs.yml",
+    "A\tRECOVERY.md"
+  ],
+  "purpose": "preservation-only; not merge qualification",
+  "review": {
+    "verdict": "Publication GO",
+    "reviewer": "salvage_review",
+    "sha": "5a4c82197fbe4082628769e63396d59bd2554afe",
+    "scope": "Archival publication only; not integration or runtime qualification",
+    "evidence": "Exact original parent; only four workflow deletions plus RECOVERY.md; no workflows remain; documentation blobs unchanged; whitespace check passed; no new private or credential payload."
+  },
+  "remote_verified": {
+    "remote": "origin",
+    "ref": "refs/heads/recovery/docs-site-claims-20261007",
+    "sha": "5a4c82197fbe4082628769e63396d59bd2554afe",
+    "push_exit": 0,
+    "ls_remote_exit": 0
+  },
+  "original_tip_publication_block": "Inherited clean.yml runs on push and deletes Actions artifacts; do not publish original tip as a branch."
+}

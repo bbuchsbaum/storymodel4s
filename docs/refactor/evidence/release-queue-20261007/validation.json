@@ -1,0 +1,20 @@
+{
+  "original_issues": 113,
+  "reconciled_issues": 114,
+  "unfinished": 113,
+  "release_counts": {
+    "release-later": 62,
+    "release-1.0": 27,
+    "release-1.1": 24
+  },
+  "status_changes": [
+    "bd-01M31TQTBMBGEAS9A666B5MPA6",
+    "bd-01M379NZZ67GZJMWVBT5XNA0ZD"
+  ],
+  "new_edges": 10,
+  "acyclic": true,
+  "original_acceptance_preserved": true,
+  "stable_1_1_assignments": 24,
+  "accepted_batch_operations": 223,
+  "verified_artifacts": 27
+}

@@ -1,0 +1,24 @@
+Independent review by salvage_review, 7 October 2026: pre-write GO.
+
+113 unique original unfinished issues: 27 release-1.0, unchanged24 release-1.1,
+62 release-later. Every successor body preserves its original body verbatim;
+body hashes match. The full September22 membership and privacy notes are restored,
+including derived disclosure authority and the three explicit privacy witnesses.
+
+G1 embedding/shared-evidence acceptance is retained; later experimental signatures,
+research and view work are not made new1.0 prerequisites. Proposed graph additions
+are acyclic and do not create a1.0 blocker on1.1/later work. Stale-docs review->open
+is supported by named current prose/provenance findings.
+
+Separate acceptance reviews: keep RecallSignature, construction-probe audit and
+G5 hardening open; closed children do not establish their acceptance. H5 compiler
+AC1-2 are landed while its development pilot AC3-7 remains. Filename/proof wording
+follow-ups remain unimplemented.
+
+CI P0 distinguishes failed/incomplete Native coverage from prior qualification
+and a retry, and requires diagnosis/repair/exact-source evidence. A retry pass alone
+does not close reliability. Metadata reconciliation may continue; next runtime
+work is CI before G1.
+
+Subsequent independent S2a-4 acceptance audit: GO-for-close at8d4881a. See
+s2a4-closure.md for the complete original requirement/witness crosswalk.

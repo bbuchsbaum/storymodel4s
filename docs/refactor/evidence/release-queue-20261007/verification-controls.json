@@ -1,0 +1,30 @@
+{
+  "accepting_control_exit": 0,
+  "restored_control_exit": 0,
+  "refused_rehashed_controls": [
+    {
+      "mutation": "wrong-edge",
+      "exit": 1,
+      "named_refusal": "dependency changes do not match reviewed requests",
+      "hashes_recomputed": true
+    },
+    {
+      "mutation": "missing-note-text",
+      "exit": 1,
+      "named_refusal": "missing restored acceptance",
+      "hashes_recomputed": true
+    },
+    {
+      "mutation": "truncated-batch",
+      "exit": 1,
+      "named_refusal": "batch operation coverage",
+      "hashes_recomputed": true
+    },
+    {
+      "mutation": "omitted-manifest-entry",
+      "exit": 1,
+      "named_refusal": "artifact coverage",
+      "hashes_recomputed": true
+    }
+  ]
+}

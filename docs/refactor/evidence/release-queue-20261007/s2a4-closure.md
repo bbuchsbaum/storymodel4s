@@ -1,0 +1,49 @@
+# S2a-4 closure crosswalk
+
+Mote `bd-01M379NZZ67GZJMWVBT5XNA0ZD`; source baseline
+`8d4881a931fb809b27ac7ad14478fe60cde1e6e3`. Independent read-only acceptance review by
+`salvage_review`, 7 October 2026: **GO for closure**. This reconciles landed evidence; no tests
+or mutations were rerun during the queue audit.
+
+| Original acceptance | Landed witness |
+| --- | --- |
+| Outside-align construction/accessor court, same-shape controls | `align/src/test/scala/storymodel4s/probes/ContentUnforgeableSuite.scala`, package `contentprobe`: constructor/apply/copy/fromProduct/Mirror refusals for five types, forbidden reads, controls and historical-shortcut refusals. |
+| JVM widening net | `align/.jvm/src/test/scala/storymodel4s/probes/ContentSurfaceSuite.scala`: public method/overload and constructor counts, forbidden signature types. |
+| Eight named compiled mutations | [S2a-4 receipt set](../s2a4-20260925/mutation-receipts.json), M1-M8 raw logs. Four additional boundary mutations M9-M12 are also qualified. |
+| Span-shift, ID-rename, permutation laws and historical-moves control | `ContentBehaviorLawsSuite`, `ContentProjectionSuite` and `ContentScoringSuite`. |
+| None versus Some(empty) | Exact `ProviderAbstained` versus observed `0.85` assertions; M6 kills their collapse. |
+| Unavailable versus provider abstention | `StrictContentWiringSuite.scala` test starting at line100 distinguishes reasons, generation summaries and LocalEvidence identities, with separate ineligible and observed-zero controls. The new unavailable-fallback mutant kills the named distinctions. |
+
+The reviewer inspected all twelve historical raw mutation logs and reconstructed each original
+and mutant SHA-256. Each mutation compiled, failed its named assertion, retained passing
+siblings and had no unrelated compilation error. Original production `content.scala` and
+`semantic.scala`, and all original courts, remain byte-identical from preserved
+`e02d80d01d2a0ebba3bea8c4716caab9662209dc` to the baseline. `contentscore.scala` differs only in
+two eligibility branches outside M8's unchanged ordering guard. Recovery landed at
+`9339172694484aad98e2a75f961728dbdb0012b5`; retained qualification is in the
+[workstation checkpoint](../workstation-checkpoint-20261006/README.md).
+
+The final distinction was qualified at source
+`a2d795b26e64ca9cf304c861216c7622bb807190`. Its
+[unavailable-fallback receipt](../strict-content-wiring-20261007/mutations/unavailable-fallback/receipt.json)
+records exactly two named failures and nine passes:
+
+- `unavailable never supplies lexical semantic scores; explicit lexical nominations stay named`
+- `unavailable, table abstention, ineligible and observed zero retain distinct generation outcomes`
+
+Mutation patch SHA-256:
+`2d51fd4e1350ba750a3955e68602371eee2d3ced672527da3f378db889a96b5d`.
+Raw-log SHA-256:
+`4f6067bffa10313e07d421b790273b5b53351a0597f56a7bed6f64f6d55a351c`.
+
+The reviewer hash-checked the retained hosted logs for
+[run37613462330](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37613462330), which
+execute the portable construction/behavior/strict-wiring courts on JVM/JS/Native and the
+reflection court on both JVM versions. There are no align/proposition changes between that
+qualified source and the baseline. The current-main Native fixture timeout is a separate
+P0, `bd-01M4B896MCEE43Q9QMR4HT60R0`; it does not change these court bodies or invalidate their
+recorded results.
+
+Closure establishes the specified controlled-content courts. Registered embedding execution,
+the complete shared-evidence G1 contract, general arbitrary-callback confinement and scientific
+efficacy remain outside this closure. G1 `bd-01M2TACM78289S4TECE91GT5K2` stays open.

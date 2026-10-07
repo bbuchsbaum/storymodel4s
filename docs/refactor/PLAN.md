@@ -1,5 +1,15 @@
 # Delivery and measurement plan
 
+**7 October 2026 queue reconciliation:** start with [RELEASE-QUEUE.md](RELEASE-QUEUE.md)
+and the live Mote body, rather than the dated recovery list. Every previously unfinished
+ticket now has a release group and current remaining-work context. Recovery, workstation/data
+handoff, eligibility and S2a-3 are complete; the acceptance audit also supports S2a-4 closure.
+The next runtime work is current-main Native fixture reliability
+`bd-01M4B896MCEE43Q9QMR4HT60R0`, then G1 registered embedding/shared evidence and the public
+mapping path below. The latest baseline-main CI failure is a fixture timeout; earlier qualified
+exact-code receipts remain separate evidence. The [queue receipt](evidence/release-queue-20261007/README.md)
+records classifications, closure, restored acceptance, graph changes and verification.
+
 **6 October 2026 restart:** the owner has moved to one primary agent and at most one helper.
 The [stocktake](STATE-20261006.md) establishes the recovery baseline. The October delivery
 sequence below is the current execution plan and supersedes historical staffing, next-owner
@@ -136,23 +146,23 @@ private assets. Destination preflight, installation and private handoff are comp
 checkpoint receipts identify the strict baseline, exact consumer/export acceptance and separate
 main synchronization; tailnet presence alone never establishes those results.
 
-#### Recovery slices for the first checkpoint
+#### Completed recovery slices for the first checkpoint
 
-Prepare the reviewed audit/plan branch for integration so the current operating instructions
-and recovered tracker history are available on main. Recover the following bounded slices in
-separate commits, using their existing tickets and retaining evidence:
+The following table retains the first checkpoint's recovery targets. The three source slices
+are landed and qualified; S2a-4's former S2a-3 dependency is now satisfied and its complete
+courts are reconciled for closure. The docs repair remains open with current salvage instructions.
 
 | Order | Existing ticket / candidate | Required result |
 | --- | --- | --- |
 | 1 | Reference-scope guard `bd-01M1CGP2K4H93WM8CW5EFEPTJK`, `ed9f478d` | Declaration-free recognized Scala source changes refuse; all 98 tool assertions pass on the integrated tool files. |
 | 2 | FrameSet identity `bd-01M37ESFCE1SZFTV7NHJEC7SNC`, `69e48e9a` | Stream changes alter the receipt/identity; version change and scoped media results are retained, with live-media skips explicit. |
-| 3 | Content scorer court `bd-01M379NZZ67GZJMWVBT5XNA0ZD`, `e02d80d` | Recover the tests/tools/evidence slice and recheck its affected platforms. Keep the full ticket open for the S2a-3 channel distinction. |
-| Supporting docs | Docs-site claims `bd-01M31TQTBMBGEAS9A666B5MPA6`, `8973c520` | Review and replay the bounded documentation corrections during recovery or the first user walkthrough. |
+| 3 | Content scorer court `bd-01M379NZZ67GZJMWVBT5XNA0ZD`, `e02d80d` | Courts recovered and qualified; the now-landed S2a-3 distinction completes the acceptance crosswalk. See the release-queue closure receipt. |
+| Supporting docs | Docs-site claims `bd-01M31TQTBMBGEAS9A666B5MPA6`, `589b6d26` | Salvage prose, preserve the newer ModelAStory badge and repair current SaveModel provenance; requalify before declaring review readiness. |
 
-Use the exact merge result for scoped gates and independent review. After the recovered slices,
-run one strict full baseline gate in a clean standalone clone, then the StoryAtlas consumer at
-the exact producer revision. Carry forward already qualified compiler, source and export work.
-Resolve new regressions before adding features; distinguish infrastructure failures and old skips.
+The strict full baseline and exact-pair StoryAtlas gates are retained in the checkpoint receipts.
+Carry forward already qualified compiler, source and export work. Resolve the new Native fixture
+reliability P0 before adding runtime features; distinguish that failure from completed numerical
+determinism and existing skips.
 
 Exit: useful recovered slices are reachable from main, tracker records match Git, the baseline
 and consumer receipts identify exact revisions, and one next failing product witness is named.
@@ -171,17 +181,16 @@ This is the first visible product milestone: one ordinary UTF-8 source and two u
 files produce both mappings, independently readable exchange and a package that StoryAtlas
 actually opens. Inputs use synthetic or admitted text under rule 14.
 
-Build the smallest complete path in this order:
+Continue the smallest complete path in this order, after the current CI P0:
 
-1. Settle typed eligibility before lasting public result/denominator/codec shapes:
-   `bd-01M16DBEH9PKER423BZ47ZKBMV`. Ineligible, missing and observed zero must differ across
-   construction, reduction, wire formats and consumers. Complete the coherent migration;
-   half-migrated meanings do not satisfy design rule 7. Apply the stable-signature/construction
+1. Preserve the completed eligibility migration `bd-01M16DBEH9PKER423BZ47ZKBMV`:
+   ineligible, missing and observed zero differ through construction, reduction, codecs and
+   the qualified consumer. Apply the stable-signature/construction
    review `bd-01M19N0W937KVZCK78F6X57X1D` to each new public seam, with final closure before freeze.
-2. Complete strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV`, then the remaining S2a-4
-   unavailable-versus-abstention witness. Preserve canonical rename/permutation laws and the
-   separately frozen historical path. Establish the controlled lexical/shared-evidence slice
-   under G1 `bd-01M2TACM78289S4TECE91GT5K2`.
+2. Reuse completed strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV` and the reconciled
+   S2a-4 courts. Preserve canonical rename/permutation laws and the separately frozen historical
+   path. Finish registered controlled embedding/replay and the shared immutable local-evidence
+   seam under G1 `bd-01M2TACM78289S4TECE91GT5K2`; G1 remains open.
 3. Extract the public reference `bd-01M2WVF86T8QEEA1TK8Z0ASJHW` and reconstruction
    `bd-01M2TAD04SR823TQVG9VPNH6R3` operations. Reference executes before HSMM; both use the same
    checked evidence digest. Reconstruction retains its named policies and historical parity.
@@ -189,12 +198,16 @@ Build the smallest complete path in this order:
    `bd-01M2WVH1DC8ZPDC992G4MX3TXG`. Wire offline source `bd-01M35PB1H5PDD55YVKR4TQ8M66`
    and prepare `bd-01M35B05TC6GBED9Z3HZMX618E` into facade `bd-01M2TADC4VKSDZ2S9SXETH2MYM`,
    exchange `bd-01M2WVHF4B5DAXJYY4W91VK4WV` and workspace CLI `bd-01M35B103S2KHRSF853GD2FYHW`.
-   Reuse TextSourceCli, MappingExchangeCli and canonical M1 serializers; choose and test the
+   Preserve a typed recall-text disclosure basis for non-public inputs
+   `bd-01M168TZ3VRQYSE7TNT5JKJTSJ`, and separate admitted source headers
+   `bd-01M17010MM68DG7B49DMEKA2AA`. Reuse TextSourceCli, MappingExchangeCli and canonical M1
+   serializers; choose and test the
    public command spelling during implementation rather than promising a nonexistent command.
 
-The registered embedding adapter remains G1/1.0 work. It may follow the lexical development
-milestone; a strict embedding request remains typed unavailable until its receipt/replay court
-passes. Keep G1 open. A coarse dependency on the full G1 container must not be bypassed silently:
+The registered embedding adapter remains G1/1.0 work and is the default next implementation
+after CI recovery. An earlier lexical development milestone is possible only through the explicit
+recorded dependency refinement below; a strict embedding request remains typed unavailable until
+its receipt/replay court passes. Keep G1 open. A coarse dependency on the full G1 container must not be bypassed silently:
 when scheduling consumer work, identify the independently verified executable prerequisite,
 split oversized existing work under T1 if necessary, and record the justified edge refinement.
 Retain the embedding requirement and full parent acceptance at the release gate.
@@ -220,7 +233,8 @@ are not prerequisites for untimed text inspection. The final API freeze remains 
 First complete the required registered pinned-ONNX/replay slice under G1
 `bd-01M2TACM78289S4TECE91GT5K2`. The retained Sherlock development protocol names
 `pinned-local-onnx`; a lexical provider substitution is not reproduction of that preset.
-This adapter follows the lexical text milestone but precedes the historical Sherlock run.
+The default queue completes this adapter under G1 before the public mapping path. If a recorded,
+verified lexical-only dependency refinement is chosen, it still precedes the historical Sherlock run.
 
 Reuse the freshly scored development reproduction `bd-01M35JFJCQ2ANTVED792H705X6` and its
 retained artifacts. Admit the annotation/recall file adapters through the existing prepare
@@ -251,11 +265,13 @@ download, frame planning, provider availability or a benchmark result cannot rep
 
 ### 5. Qualify the demonstrated surface and release
 
-Close the remaining stable-signature/eligibility checks, Native numerical-governance ticket
-`bd-01M1D215EY4T5BR0VRJ694AMBQ`, platform-labelled goldens, actionable errors
+Preserve the completed eligibility, portable numerical-governance
+`bd-01M1D215EY4T5BR0VRJ694AMBQ` and baseline CI `bd-01M19G69RQCHMT2EMG11XFT4WX` receipts.
+Resolve the new Native fixture P0 and qualify current release-head CI. Complete the stable-signature/
+construction judgment, actionable errors
 `bd-01M2TAM66RTEMY3VVHA3N2MYXK`, reader docs `bd-01M19FPY1EC5QNTW6SBG3QYT3R`, and installation/
-publishing/MiMa work `bd-01M2TAKTB61XNXV4Y6A9J3CB0C`. Cite exact-revision hosted CI under
-`bd-01M19G69RQCHMT2EMG11XFT4WX`, using the already chosen GitHub-hosted runner route.
+publishing/MiMa work `bd-01M2TAKTB61XNXV4Y6A9J3CB0C`. Cite fresh exact-revision hosted CI on the
+release gate, using the already chosen GitHub-hosted runner route.
 
 Exit: a fresh checkout/installation executes the documented text and Sherlock journeys; the
 exact release tree has strict platform and sibling-consumer receipts; exported examples have
@@ -288,21 +304,18 @@ compilation and organization analyses stay in 1.1; benchmark/LLM campaigns, corp
 empirical calibration remain on their existing research lanes. No calendar release promise is
 made before the fresh baseline and first public journey expose the remaining integration cost.
 
-**Current action:** recovery, numerical determinism, baseline qualification, GitHub/workstation
-handoff and JVM gate serialization are complete on `cb310958`. The coherent eligibility migration
-`bd-01M16DBEH9PKER423BZ47ZKBMV` is qualified at source `d5a7aefd` and consumer `2175735`;
-[the full receipt](evidence/estimate-eligibility-20261006/README.md) binds the 80-cell source matrix,
-15-cell default-pinned consumer matrix, compiled mutation controls and documentation successor.
-The independently reviewed pair landed locally on source `68989cbc` and consumer `2175735`;
-eligibility is closed. GitHub and approved `buc-gw01` are synchronized; both workstation
-checkouts are clean and Mote health checks pass. The final handoff metadata preserves the
-qualified inputs. Next is strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV`: controlled
-Lexical / ContentTable / Unavailable channels through generation, canonical evidence and HSMM
-rederivation together, retaining historical pins and distinct unavailable/abstaining outcomes.
-The first proposed witness is canonical contradiction order through the production strict
-evidence route and its successful HSMM validation. It has not yet been executed. G1, the broader
-construction audit and release acceptance remain open; the remaining stages follow executable
-prerequisites, not the size of the ready queue.
+**Current action, 7 October:** recovery, approved-host/data handoff, numerical determinism and
+the [eligibility migration](evidence/estimate-eligibility-20261006/README.md) are complete.
+[S2a-3](evidence/strict-content-wiring-20261007/README.md) is qualified at source `a2d795b` and
+consumer `0cd43ffd`; the strict route, canonical contradiction order, unavailable/abstaining
+outcomes and historical pins have executed with hosted and consumer receipts. The independent
+[S2a-4 closure crosswalk](evidence/release-queue-20261007/s2a4-closure.md) reconciles the remaining
+court acceptance. Baseline GitHub/workstation heads are source `8d4881a` and consumer `90f682d`.
+Their metadata successors do not extend the code claim. Current-main Native has a fixture timeout
+recorded in `bd-01M4B896MCEE43Q9QMR4HT60R0`; resolve it before G1 registered embedding/shared
+evidence, then public reference/reconstruction and ordinary-file facade. G1, stable construction,
+broader integration and release acceptance stay open. Use RELEASE-QUEUE and live Mote, rather
+than dated next-task prose.
 
 ## Completed fixture milestone: M1 (22 September 2026)
 

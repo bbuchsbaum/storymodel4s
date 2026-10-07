@@ -1,0 +1,22 @@
+[
+  {
+    "sha": "6a310fe38e6db8c44aada401e5262d8c56d43b00",
+    "ancestor_of_baseline": true
+  },
+  {
+    "sha": "b8f22d0091f0427f779b86ac5e7e90a828da4070",
+    "ancestor_of_baseline": true
+  },
+  {
+    "sha": "9339172694484aad98e2a75f961728dbdb0012b5",
+    "ancestor_of_baseline": true
+  },
+  {
+    "sha": "a2d795b26e64ca9cf304c861216c7622bb807190",
+    "ancestor_of_baseline": true
+  },
+  {
+    "sha": "589b6d265d1dacdff2fc04f9735cfa4ee44df490",
+    "ancestor_of_baseline": false
+  }
+]

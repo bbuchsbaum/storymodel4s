@@ -1,5 +1,11 @@
 # Delivery backlog
 
+**7 October 2026 current queue:** use [RELEASE-QUEUE.md](RELEASE-QUEUE.md) and live Mote.
+The complete before/after [ticket reconciliation](evidence/release-queue-20261007/README.md)
+supersedes this document's dated status tables and named-owner handoffs. All unfinished tickets
+have one of `release-1.0`, `release-1.1` or `release-later`, plus a milestone and next action.
+The owner-approved 1.0/1.1 boundary is unchanged; later is scheduling without a version promise.
+
 **6 October 2026 restart:** use the [stocktake and ordered restart queue](STATE-20261006.md).
 Eight stale `doing` tickets were requeued and four historical assignments cleared with Mote
 decision notes. The earlier named-owner and M1-next handoffs below are historical. The owner
@@ -7,13 +13,12 @@ has selected one primary agent and at most one helper; acceptance and dependency
 The executable [October delivery sequence](PLAN.md#october-delivery-sequence) is the current
 plan: recover/qualify -> ordinary-file text investigation -> annotation-only Sherlock ->
 weighted/timed/video/imaging journey -> release.
-The first checkpoint also requires reviewed GitHub main parity and a tested fresh-checkout/
-resume handoff on `buc-gw01` (Tailscale-reported macOS); architecture/tools/storage still need
-preflight. Other machines support public/synthetic development. Private data and derived
-artifacts require owner-approved machines and the verified transfer contract in PLAN/data README.
-The new bounded handoff ticket is `bd-01M48TNS4G0442F7SJW57671B6`: approved-host dry-run,
-resumable encrypted copy, checksum/readback verification and synthetic failure witnesses.
-Private-data journeys wait for this acceptance; public/synthetic work can continue.
+The first checkpoint's GitHub parity, fresh approved `buc-gw01` checkout and private-data handoff
+are complete, with [retained receipts](evidence/workstation-checkpoint-20261006/README.md).
+`bd-01M48TNS4G0442F7SJW57671B6` is closed. Other machines support public/synthetic development;
+private data and derived artifacts still require owner-approved machines and the verified
+transfer/readback contract in PLAN/data README. This host qualification does not authorize
+hosted content disclosure, participant-text redistribution or sealed-test reads.
 
 Historical execution handoff: [23 September checkpoint](PLAN.md#execution-handoff-23-september-2026), with the then-accepted owners, next witnesses and bound integration evidence. Live Mote acceptance remains authoritative.
 
@@ -33,15 +38,17 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-Prepare the reviewed audit/plan branch for authorized integration, then work this small queue:
+The current [release queue](RELEASE-QUEUE.md) selects this small working order:
 
 | Order | Existing Mote | Acceptance to resume |
 | --- | --- | --- |
-| 1 | `bd-01M1CGP2K4H93WM8CW5EFEPTJK` | Recover `ed9f478d` reference-scope guard; 98 integrated tool assertions. |
-| 2 | `bd-01M37ESFCE1SZFTV7NHJEC7SNC` | Recover `69e48e9a` FrameSet stream identity; scoped media gate and explicit skips. |
-| 3 | `bd-01M379NZZ67GZJMWVBT5XNA0ZD` | Recover `e02d80d` tests/tools/evidence; retain the unmet S2a-3 channel witness. |
-| 4 | `bd-01M16DBEH9PKER423BZ47ZKBMV` | Coherent eligibility/missingness/denominator/codec migration before lasting public API shapes. |
-| 5 | `bd-01M379N8HK5ZCV9W252X9MQ4VV` | Strict content-only lexical wiring; unavailable differs from provider abstention; historical parity retained. |
+| 1 | `bd-01M4B896MCEE43Q9QMR4HT60R0` | Diagnose/repair the hosted Native fixture timeout without weakening the external-winner/residual-mass court. |
+| 2 | `bd-01M2TACM78289S4TECE91GT5K2` | Finish registered embedding/replay and shared immutable evidence/StageTrace. |
+| 3 | `bd-01M2WVF86T8QEEA1TK8Z0ASJHW`, `bd-01M2TAD04SR823TQVG9VPNH6R3` | Public strict reference and named reconstruction on identical evidence. |
+| 4 | `bd-01M2WVH1DC8ZPDC992G4MX3TXG`, `bd-01M2TADC4VKSDZ2S9SXETH2MYM` | Support adoption, ordinary-file facade and complete outcomes/safe publication. |
+
+Reference-scope recovery, FrameSet repair, eligibility, S2a-3 and S2a-4 courts are now complete.
+S2a-4 closure reconciles existing qualified evidence; its old remaining-S2a-3 handoff is historical.
 
 The first visible milestone after this queue is one ordinary text source plus two untimed
 recalls through prepare, reference/reconstruction, facade, independent exchange reader and
@@ -73,7 +80,7 @@ measurement, research comparisons and stable release retain their existing ticke
 - Completed; live tracker closed `bd-01M2TAC80YRK5JFNKTT7B7CAQN` — [D1B typed recall signatures](evidence/d1b-typed-signatures-20260920/README.md)
 - Completed; live tracker closed `bd-01M2TAGST4EBFR1HM9Q3EWSYAH` — [cold-reviewed film phase plan](../plans/2026-09-20-film-compiler-phase-plan.md); subsequent film implementation remains on its own lane
 - Completed `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — MASC audit rescued by main `0500bc10`; see the October stocktake
-- `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
+- Completed `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0 baseline build/CI receipts; current-head Native reliability has its separate P0
 
 Useful Mote commands after reconciliation:
 
@@ -112,13 +119,15 @@ open on the scanner ticket; declared synthetic transforms do not close it.
 G1 records -> M1 packet -> Atlas adoption -> loading -> selection -> save/export -> M1 acceptance
        |
        +-> timing -> base exchange -> temporal queries -> OpenNeuro scan crosswalk
-       +-> shared evidence -> reference -> compatibility -> organization -> recovery -> full G2 preview
+       +-> shared evidence -> reference -> 1.1 compatibility -> organization -> recovery -> organization preview
                           -> reconstruction
-compatibility + reconstruction + timing -> facade -> full G2 preview
+reference + reconstruction + timing -> facade -> 1.0 mapping journey
+1.1 compatibility + organization + recovery -> 1.1 organization preview
 M1 packet + base exchange + facade -> temporal queries
 temporal queries + exact provider handoff + Atlas M1 acceptance -> Atlas temporal consumer
 
-film substrate -> film compiler -> film proofs -> stable-release gate
+1.0 film-capable types + raw-video timed-source package -> 1.0 mapping journey -> stable-release gate
+1.1 film compiler -> film proofs + V1/E0
 ```
 
 The diagrams summarize, rather than replace, live dependencies. Temporal queries also
