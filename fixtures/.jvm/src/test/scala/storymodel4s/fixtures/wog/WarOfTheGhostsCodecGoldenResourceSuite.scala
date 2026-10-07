@@ -87,7 +87,9 @@ class WarOfTheGhostsCodecGoldenResourceSuite extends FunSuite:
       assertEquals(Checksum.ofText(v3).hex, backend.v3File)
       assertEquals(
         HsmmResultCodec.decode(v3, context.recall, context.view),
-        Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v3", Vector("hsmm/v4"))))
+        Left(
+          HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v3", Vector("hsmm/v4", "hsmm/v5")))
+        )
       )
     }
   }

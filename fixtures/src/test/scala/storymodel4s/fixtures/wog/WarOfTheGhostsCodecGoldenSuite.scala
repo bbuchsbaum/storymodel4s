@@ -78,7 +78,9 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     val v3 = json.mapObject(_.add("schemaVersion", Json.fromString("hsmm/v3")))
     assertEquals(
       HsmmResultCodec.decodeJson(v3, context.recall, context.view),
-      Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v3", Vector("hsmm/v4"))))
+      Left(
+        HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v3", Vector("hsmm/v4", "hsmm/v5")))
+      )
     )
   }
 
