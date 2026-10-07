@@ -4,7 +4,7 @@ Main `885cba1ee14a7520ae4725f4d93af3492b107469` failed [hosted run 37544052239](
 
 Per-project `parallelExecution := false` does not serialize aggregate project tests. Interleaved module output shows concurrent aggregate execution. Contention is a plausible cause, not a proven exclusive cause of the timeout. Generated JVM CI now uses the existing sequential `testJVM` alias covering exactly the root's 24 JVM modules. Native retains `testNative`; JS retains `test`. Compiler/project preambles, deadlines, assertions and matrix cells are unchanged.
 
-The clean-clone named-suite check passes four tests in 12.074 seconds under fatal warnings, followed by `scalafmtSbtCheck` and `githubWorkflowCheck`; raw output, exit status, alias membership and generated workflow digest are retained. This is local evidence on Java 25, not hosted JVM17/21 qualification. Hosted candidate qualification and exact-SHA independent review remain pending.
+The clean-clone named-suite check passes four tests in 12.074 seconds under fatal warnings, followed by `scalafmtSbtCheck` and `githubWorkflowCheck`; raw output, exit status, alias membership and generated workflow digest are retained. This local evidence used Java 25. The completed hosted JVM17/21, JS, Native and documentation qualification is recorded below; an independent reviewer approved the code and retained evidence for landing.
 
 This CI-only transformation changes no consumed module settings, dependencies, public/runtime source or exports. StoryAtlas retains its independently qualified producer pin `433aa1056f6aa5e88b63b4b665079e9959a266ae`; a repin would not change its compiled inputs.
 
