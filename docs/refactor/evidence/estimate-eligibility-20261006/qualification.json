@@ -34,5 +34,14 @@
   "restored_consumer_passed": 25,
   "private_inputs": false,
   "release_qualified": false,
-  "next_mote": "bd-01M379N8HK5ZCV9W252X9MQ4VV"
+  "next_mote": "bd-01M379N8HK5ZCV9W252X9MQ4VV",
+  "local_landing": {
+    "source": "68989cbc01d40d2b54a20af22778ebea933ec05a",
+    "consumer": "217573567bfe5609aa7d562dd70ce4a6513458c9",
+    "review": "independent exact-pair GO",
+    "mote": "completion recorded after local main ancestry proof",
+    "foreign_reservation_conflicts": 0,
+    "source_unrelated_files_unchanged": 1,
+    "consumer_unrelated_files_unchanged": 1177
+  }
 }

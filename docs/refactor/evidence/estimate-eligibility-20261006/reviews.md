@@ -9,6 +9,19 @@ Reviewer: read-only `salvage_review` agent, independent of the author.
 
 The denominator mutant has five assertion failures and one dependent `None.get`; these are not six independent guard kills. The wire mutant stops at the forged-missing assertion; it proves one guard kill, not separately executed kills for both forged classifications.
 
-Hosted qualification and final landing review remain pending. No builds were rerun by the reviewer.
+Those initial code verdicts preceded hosted qualification and landing review. No builds were rerun by the reviewer.
 
 **Hosted consumer and Docs receipts GO:** archive/gzip hashes, byte-identical whole-job bodies, exact checkout SHAs and all totals verified independently. Consumer: JVM17 268, JVM21 268, JS217; 753 passed, no failures/errors/skips. Docs:5parser tests,13exact replays,21pages and allsitecourts. Source80-cell and finalmetadata review follows.
+
+**Final integration GO:** source `68989cbc01d40d2b54a20af22778ebea933ec05a` and consumer
+`217573567bfe5609aa7d562dd70ce4a6513458c9`. Source raw ZIP/gzip hashes, checkout SHAs and
+80 cells (12570 passed,0failed/errors,12skipped) independently verified. All73manifest entries
+match committed bytes; seven compressed XML reports preserve their originals exactly.
+Source descendants preserve qualifiedd5a7 inputs; consumer pins d5a7. Ancestry, whitespace
+and tracked-path checks passed. Final live bases remained cb310958/cc69a9a; all9live
+reservations belong to the author and there are0foreign overlaps. Preflight's exit2 reports
+only duplicate attempts to reserve existing self-owned paths, which are reused.
+
+The exact reviewed pair then fast-forwarded local main. The source alignment draft and all1177
+unrelated consumer files remain byte-identical. Eligibility completion is recorded in Mote.
+GitHub publication and workstation parity follow this local landing.
