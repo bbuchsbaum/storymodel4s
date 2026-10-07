@@ -726,3 +726,28 @@ a provider or the provenance of caller-supplied result parts. Canonical evidence
 use separate version tags. Source, recall and member coordinates remain in orchestration bindings
 and receipts, where canonical reduction outcomes are re-keyed after scoring. Complete record
 identities may therefore change with coordinates even when their re-keyed content results agree.
+
+
+### 2026-10-07 — concrete ONNX attempts and exact replay (S2b-1)
+
+Within the accepted S2 embedding direction, `OnnxSentenceEmbedder.record` mints an immutable
+`RecordedBatch` only after the concrete, artifact-checked adapter attempts the captured requests.
+It retains actual model/artifact/configuration, provider/runtime and geometry identities and the
+original typed outcomes/attempt receipt. An adapter attempt does not establish successful native
+inference: entirely too-long, denied or empty batches may never reach the runtime.
+
+Exact in-memory replay checks model configuration, provider identity and the complete ordered
+request sequence, including IDs, payload/sensitivity and geometry. Denied payloads need not have
+item digests, so matching receipts alone cannot bind them. Replay returns the original result;
+it neither invokes the provider nor renews policy approval. Requests remain private; refusals and
+diagnostics expose no text, and the capability adds no plain hash of non-public inputs or vectors.
+It owns no native resource and remains usable after the embedder is closed.
+
+Reject minting execution authority from public `BatchResult` or caller-written embedding receipts,
+wrapping arbitrary `Embedder` callbacks, and treating a replay as a fresh call. No new module or
+dependency is needed. This child is a prerequisite, not strict channel registration or G1 closure:
+checked surface-text binding, an explicit score scale, registered channel/candidate/configuration
+receipts and StageTrace adoption remain open. Current content keys omit submitted text; raw cosine
+distance spans `[0,2]`, whereas the strict fixture table accepts `[0,1]`. Neither difference can be
+silently erased to register an embedding adapter. Wire replay admission remains separate work;
+this slice provides no decoder that can promote caller-supplied artifacts to executed authority.

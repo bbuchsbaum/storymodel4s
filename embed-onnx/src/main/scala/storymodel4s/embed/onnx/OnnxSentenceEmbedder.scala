@@ -110,6 +110,10 @@ enum OnnxLoadStage:
     case Runtime   => "ONNX runtime"
     case Session   => "ONNX session"
 
+/** Replay refusals identify the changed contract without disclosing submitted text. */
+enum OnnxReplayRefusal:
+  case Model, Provider, RequestIds, Geometry, Payload
+
 /** JVM-local sentence encoder behind the portable [[Embedder]] contract.
   *
   * Why it owns native resources: callers get one checked model/tokenizer pair, one fingerprint, and
@@ -133,6 +137,14 @@ final class OnnxSentenceEmbedder private (
       item: ItemDigest,
       encoding: Either[ExecutionFailure, Encoding]
   )
+
+  /** Record this concrete adapter's attempt, including failures and policy denials.
+    *
+    * A record is not proof that native inference ran: an empty, denied or entirely too-long batch
+    * may never reach the runtime. No caller-supplied result or receipt can mint this capability.
+    */
+  def record(batch: EmbedBatch): RecordedBatch =
+    new RecordedBatch(batch.requests, model, info.provider, runtimeIdentity, spaces, embed(batch))
 
   def embed(batch: EmbedBatch): BatchResult = this.synchronized {
     val nonPublic = batch.itemSensitivity.exists { case (_, sensitivity) =>
@@ -416,6 +428,61 @@ final class OnnxSentenceEmbedder private (
     finally tokenizer.close()
 
 object OnnxSentenceEmbedder:
+  /** An immutable attempt retained for exact, in-memory replay after native resources are closed.
+    *
+    * Captured requests remain private, including denied payloads that have no item digest. Replay
+    * returns the original result and receipt; it makes no new call and renews no policy approval.
+    * This is not a wire format or a registered strict scoring channel.
+    */
+  final class RecordedBatch private[OnnxSentenceEmbedder] (
+      private val requests: Vector[EmbedRequest],
+      val model: OnnxSentenceModel,
+      val provider: ProviderFingerprint,
+      val runtimeIdentity: String,
+      val spaces: Vector[EmbeddingSpace],
+      val result: BatchResult
+  ):
+    /** Check the whole submitted sequence, not just the receipt's admitted-item digests. */
+    def replay(
+        batch: EmbedBatch,
+        expectedModel: OnnxSentenceModel,
+        expectedProvider: ProviderFingerprint
+    ): Either[OnnxReplayRefusal, BatchResult] =
+      if modelSignature(expectedModel) != modelSignature(model) then Left(OnnxReplayRefusal.Model)
+      else if expectedProvider != provider then Left(OnnxReplayRefusal.Provider)
+      else if batch.ids != requests.map(_.id) then Left(OnnxReplayRefusal.RequestIds)
+      else if batch.requests.map(_.space) != requests.map(_.space) then
+        Left(OnnxReplayRefusal.Geometry)
+      else if batch.requests.map(_.payload) != requests.map(_.payload) then
+        Left(OnnxReplayRefusal.Payload)
+      else Right(result)
+
+    override def equals(other: Any): Boolean = other match
+      case b: RecordedBatch =>
+        requests == b.requests && modelSignature(model) == modelSignature(b.model) &&
+        provider == b.provider && runtimeIdentity == b.runtimeIdentity && spaces == b.spaces &&
+        result == b.result
+      case _ => false
+
+    // Do not introduce a plain hash of captured non-public requests or their output vectors.
+    // Denied payloads may collide here while remaining distinct under exact equality.
+    override def hashCode: Int =
+      (modelSignature(model), provider, runtimeIdentity, spaces, result.receipt.digest).hashCode
+
+    override def toString: String =
+      s"RecordedBatch(items=${requests.size}, provider=${provider.render})"
+
+  private def modelSignature(model: OnnxSentenceModel) =
+    (
+      model.modelId,
+      model.revision,
+      model.modelChecksum,
+      model.tokenizerChecksum,
+      model.dimension,
+      model.maxTokens,
+      model.license
+    )
+
   private val ImplementationVersion = "storymodel4s-embed-onnx/v1"
   private val InputIds = "input_ids"
   private val AttentionMask = "attention_mask"
