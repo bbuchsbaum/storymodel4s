@@ -1,0 +1,522 @@
+{
+  "candidate": "885cba1ee14a7520ae4725f4d93af3492b107469",
+  "run": 37544052239,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37544052239",
+  "conclusion": "failure",
+  "archive_sha256": "dd2e9a39939a4dbe4ac6531a155068028ec572dc3a54e4d9347e934e28512c8c",
+  "archive_bytes": 205388,
+  "jobs": [
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "conclusion": "failure",
+      "entry": "3_Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM).txt",
+      "raw_log_sha256": "0170e6aa3d5f702fef778c70f57fc15e4e43f9cbca6e1881e3156cfd38e3409f",
+      "cells": [
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 120,
+          "failed": 1,
+          "errors": 0,
+          "passed": 119,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        }
+      ],
+      "sum": {
+        "passed": 3469,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 6
+      },
+      "named_failures": [
+        "2026-10-06T23:07:57.0801515Z ==> X storymodel4s.pipeline.WorkspaceMappingExportSuite.each explicit policy exports its unchanged record and an exact input-byte receipt 36.072s java.util.concurrent.TimeoutException: test timed out after 30 seconds",
+        "2026-10-06T23:08:52.4301325Z [error] Failed: Total 120, Failed 1, Errors 0, Passed 119",
+        "2026-10-06T23:08:52.4339598Z [error] \tstorymodel4s.pipeline.WorkspaceMappingExportSuite",
+        "2026-10-06T23:09:00.2483633Z [error] Total time: 360 s (0:06:00.0), completed Oct 6, 2026, 11:09:00 PM"
+      ]
+    },
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "conclusion": "success",
+      "entry": "1_Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM).txt",
+      "raw_log_sha256": "185fbe7040b2c618916416309de25fd72af487f03d4cc24924cbfb005a9d2812",
+      "cells": [
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 64,
+          "failed": 0,
+          "errors": 0,
+          "passed": 60,
+          "skipped": 4
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        },
+        {
+          "total": 627,
+          "failed": 0,
+          "errors": 0,
+          "passed": 627,
+          "skipped": 0
+        },
+        {
+          "total": 319,
+          "failed": 0,
+          "errors": 0,
+          "passed": 319,
+          "skipped": 0
+        },
+        {
+          "total": 120,
+          "failed": 0,
+          "errors": 0,
+          "passed": 120,
+          "skipped": 0
+        },
+        {
+          "total": 140,
+          "failed": 0,
+          "errors": 0,
+          "passed": 139,
+          "skipped": 1
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        }
+      ],
+      "sum": {
+        "passed": 3470,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 6
+      },
+      "named_failures": []
+    },
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "conclusion": "cancelled",
+      "entry": "2_Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative).txt",
+      "raw_log_sha256": "8f8db5cb5809156c8d2f9905e68018f42ab8702ad8fd759e08d51edfe316b9a1",
+      "cells": [],
+      "sum": {
+        "passed": 0,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "named_failures": []
+    },
+    {
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "conclusion": "cancelled",
+      "entry": "0_Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS).txt",
+      "raw_log_sha256": "175e11535d533d873fa2a35c32f9abe0606ec5527d4a7794ede420e630bf07c7",
+      "cells": [
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 68,
+          "failed": 0,
+          "errors": 0,
+          "passed": 68,
+          "skipped": 0
+        },
+        {
+          "total": 250,
+          "failed": 0,
+          "errors": 0,
+          "passed": 250,
+          "skipped": 0
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 144,
+          "failed": 0,
+          "errors": 0,
+          "passed": 144,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 80,
+          "failed": 0,
+          "errors": 0,
+          "passed": 80,
+          "skipped": 0
+        },
+        {
+          "total": 607,
+          "failed": 0,
+          "errors": 0,
+          "passed": 607,
+          "skipped": 0
+        },
+        {
+          "total": 318,
+          "failed": 0,
+          "errors": 0,
+          "passed": 318,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 115,
+          "failed": 0,
+          "errors": 0,
+          "passed": 115,
+          "skipped": 0
+        }
+      ],
+      "sum": {
+        "passed": 2755,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "named_failures": []
+    }
+  ]
+}

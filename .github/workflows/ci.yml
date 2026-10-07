@@ -89,8 +89,12 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/nativeLink
 
       - name: Test
-        if: matrix.project != 'rootNative'
+        if: matrix.project != 'rootNative' && matrix.project != 'rootJVM'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
+
+      - name: Test JVM serially
+        if: matrix.project == 'rootJVM'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' testJVM
 
       - name: Test Native serially
         if: matrix.project == 'rootNative'

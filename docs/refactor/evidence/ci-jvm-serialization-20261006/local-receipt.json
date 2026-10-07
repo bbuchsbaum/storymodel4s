@@ -1,0 +1,68 @@
+{
+  "base": "885cba1ee14a7520ae4725f4d93af3492b107469",
+  "build_sbt_blob": "228bac518ccb48e6d4fb59f6d53a29b4d9a5cc17",
+  "raw_log_sha256": "672e29c26af2b672a65c1c64d1f9bb7ae7d63337cc863706b51e010ae6cc2665",
+  "local": {
+    "schema_version": 1,
+    "started_utc": "2026-10-07T00:24:00.788080+00:00",
+    "finished_utc": "2026-10-07T00:24:50.436124+00:00",
+    "duration_seconds": 49.647625,
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "githubWorkflowGenerate",
+      "pipeline/testOnly storymodel4s.pipeline.WorkspaceMappingExportSuite",
+      "scalafmtSbtCheck",
+      "githubWorkflowCheck"
+    ],
+    "cwd": "/private/tmp/storymodel4s-checkpoint-a2pjdpy9/producer",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-slice-20261006/jvm-route-local.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": null,
+    "log_bytes": 728504
+  },
+  "test_totals": {
+    "passed": 4,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "named_suite": "storymodel4s.pipeline.WorkspaceMappingExportSuite",
+  "suite_seconds": 12.074,
+  "portable_jvm_modules": [
+    "core",
+    "proposition",
+    "amrInterop",
+    "features",
+    "acquire",
+    "story",
+    "document",
+    "recall",
+    "align",
+    "interview",
+    "embedCore",
+    "view",
+    "codec",
+    "corpus",
+    "fixtures",
+    "laws"
+  ],
+  "jvm_only_modules": [
+    "providerParser",
+    "providerAgent",
+    "embedGrakern",
+    "embedOnnx",
+    "embedBench",
+    "media",
+    "pipeline",
+    "corpusIntake"
+  ],
+  "aggregate_equals_alias": true,
+  "generated_workflow_sha256": "4a64296401e071ed5c30be659563532052959398b312ecec8016c4ee34e1b34c",
+  "hosted": "pending",
+  "private_inputs": false
+}
