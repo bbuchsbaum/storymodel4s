@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-08T20:27:22.296881+00:00",
+  "finished_utc": "2026-10-08T20:28:38.100450+00:00",
+  "duration_seconds": 75.803693,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedBench/Test/clean",
+    "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(accepted unused|one-unit identical).*\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-s2b5-final-mutations/nonfinite-config-refusal.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 4885
+}

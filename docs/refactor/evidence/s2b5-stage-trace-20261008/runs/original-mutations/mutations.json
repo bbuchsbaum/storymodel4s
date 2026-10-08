@@ -1,0 +1,266 @@
+[
+  {
+    "name": "config-substitution",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(actual inference uses|one-unit identical).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        10
+      ]
+    ],
+    "named_failure": "actual inference uses the requested competing-state configuration",
+    "failures": [
+      "==> X storymodel4s.bench.video.StageTraceOriginSuite.actual inference uses the requested competing-state configuration 0.058s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala:116"
+    ],
+    "test_selection": "^(actual inference uses|one-unit identical).*",
+    "source_sha256": "5a38cda0cc596c38a5c4b1d971fdd38ca5bc51ef54a1dc52f4464d30ed038929",
+    "patch_sha256": "6ab2be658654eab91f41dfefe910135510549efd40eee79ba37d0722ba9f3427",
+    "log_sha256": "7266f56fa167e00e9df929c02e407af711b4c0feb648f93781d9dc268da693c2"
+  },
+  {
+    "name": "double-pricing",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(historical pricing|one-unit identical).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        10
+      ]
+    ],
+    "named_failure": "historical pricing occurs once and repeated rendering adds no calls",
+    "failures": [
+      "==> X storymodel4s.bench.video.StageTraceOriginSuite.historical pricing occurs once and repeated rendering adds no calls 0.523s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala:61"
+    ],
+    "test_selection": "^(historical pricing|one-unit identical).*",
+    "source_sha256": "6ed847c4affe4590659452c8185dc2183853d987668ecafaf2e952e3d1df23f2",
+    "patch_sha256": "bc11502a7efefb7d0c440cd6acd132186f0f3d909772c61612ebb9fc713f694d",
+    "log_sha256": "67fd4a8f3cc7db66c7c7aa74f90b83b454779bf27eda021ca5a1d5dffb7f87f6"
+  },
+  {
+    "name": "unranked-mass",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(execution-failed unranked|tie overflow).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        10
+      ]
+    ],
+    "named_failure": "execution-failed unranked units retain attempts and no invented local mass",
+    "failures": [
+      "==> X storymodel4s.bench.video.StageTraceOriginSuite.execution-failed unranked units retain attempts and no invented local mass 5.458s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala:310"
+    ],
+    "test_selection": "^(execution-failed unranked|tie overflow).*",
+    "source_sha256": "c5f688f615b7617b6b09c8f78c9be27c69ec1d391fb576a3c1c82442b9791016",
+    "patch_sha256": "eee19e98c4f6de78efe4d0f8bbdf62b6ea7c06dbe1354090668b8abb401b6f95",
+    "log_sha256": "8c0a942d1d383207d314550c9673c515000e9165a0eb8f22b16077c0769e11cf"
+  },
+  {
+    "name": "base-record-erasure",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(complete base cost|one-unit identical).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        10
+      ]
+    ],
+    "named_failure": "complete base cost records retain support imputation reduction and exclusion fields",
+    "failures": [
+      "==> X storymodel4s.bench.video.StageTraceOriginSuite.complete base cost records retain support imputation reduction and exclusion fields 0.05s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala:149"
+    ],
+    "test_selection": "^(complete base cost|one-unit identical).*",
+    "source_sha256": "e4893fe0e9697a0d239d0142fd109d17c309c885f8ddcc7c1f5312d8afae1a92",
+    "patch_sha256": "741c9171038c786fe849b5745c7271b50f7ca27a714b14a503bd6b923c4853af",
+    "log_sha256": "949157833f6041804b23e1ab1b83757b572614446dac4b07f347b6e5027f9c43"
+  },
+  {
+    "name": "nomination-receipt-erasure",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(equal results retain|one-unit identical).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        10
+      ]
+    ],
+    "named_failure": "equal results retain different originating nomination receipts",
+    "failures": [
+      "==> X storymodel4s.bench.video.StageTraceOriginSuite.equal results retain different originating nomination receipts 0.043s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala:140"
+    ],
+    "test_selection": "^(equal results retain|one-unit identical).*",
+    "source_sha256": "f58863cface74d0f14c03b8b5f0759fac20189faacec87b010264282835baa34",
+    "patch_sha256": "a2b97d9571161e92ca4d0cd91c5549360477336df741bbd843dccc4d86e76d78",
+    "log_sha256": "9d0686eef9040ab10a4dc79d32fa15899792dffba215e0ccb33072c98b7a8490"
+  },
+  {
+    "name": "fake-registered-origin",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.video.StageTraceOriginSuite -- \"--tests=^(generic strict evidence|registered and replayed).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        10
+      ]
+    ],
+    "named_failure": "generic strict evidence cannot acquire registered execution authority",
+    "failures": [
+      "==> X storymodel4s.bench.video.StageTraceOriginSuite.generic strict evidence cannot acquire registered execution authority 0.044s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala:291"
+    ],
+    "test_selection": "^(generic strict evidence|registered and replayed).*",
+    "source_sha256": "4378b1e7a07aa67348716c5d7795b336d04b30582e3ff86f4c7d7e3504694740",
+    "patch_sha256": "0d85e37a0b7f5c823ddc99b42473c5be94e6ed56a06749a95b3a7a8a064fb69a",
+    "log_sha256": "6f5c79edc7d4f1666e3d747e500a205d697628d0e8c6f2df0805d82bd1773156"
+  },
+  {
+    "name": "constructor-visibility",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.consumer.StageTraceBoundarySuite -- \"--tests=^(executed run constructor|executed run has no product Mirror).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        3
+      ]
+    ],
+    "named_failure": "executed run constructor refuses an independently supplied evidence config result tuple",
+    "failures": [
+      "==> X storymodel4s.bench.consumer.StageTraceBoundarySuite.executed run constructor refuses an independently supplied evidence config result tuple 0.019s munit.FailException: embed-bench/src/test/scala/storymodel4s/bench/consumer/StageTraceBoundarySuite.scala:34 assertion failed"
+    ],
+    "test_selection": "^(executed run constructor|executed run has no product Mirror).*",
+    "source_sha256": "d015d19bdfe7d09d43c715c6b74c9810b990eb0d4806a026ca83d13884ec1070",
+    "patch_sha256": "3aaeb8f820839613b71454a62b4b533581c106389bfc2be5b844946366e6daba",
+    "log_sha256": "7f7d84ea6cc0b260435d821ce148d999084cb2c3ec13f5387d2f7aca853c5f5a"
+  },
+  {
+    "name": "registration-read-door",
+    "candidate_sha": "e04d8b62687c4c8430385136d2292c60ead973be",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/Test/clean",
+      "embedBench/testOnly storymodel4s.bench.consumer.StageTraceBoundarySuite -- \"--tests=^(captured recall|executed run has no product Mirror).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        3
+      ]
+    ],
+    "named_failure": "captured recall video levels and registration have no external read doors",
+    "failures": [
+      "==> X storymodel4s.bench.consumer.StageTraceBoundarySuite.captured recall video levels and registration have no external read doors 0.021s munit.FailException: embed-bench/src/test/scala/storymodel4s/bench/consumer/StageTraceBoundarySuite.scala:92 assertion failed"
+    ],
+    "test_selection": "^(captured recall|executed run has no product Mirror).*",
+    "source_sha256": "a2d1dd25943861346987bba38d974b38e34269a5ab4dd591cc6bcea032241b18",
+    "patch_sha256": "cfa8f12d273f37cd569beba6ceb4c44de291bb8f4ed3bf57ee3cca14d6da1575",
+    "log_sha256": "42feaf5c1a021fd34580fb6d6677ba05972a9a8aaf146a19f2abc7685679a082"
+  }
+]

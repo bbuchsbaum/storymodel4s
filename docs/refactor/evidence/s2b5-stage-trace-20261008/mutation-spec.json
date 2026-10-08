@@ -1,0 +1,74 @@
+[
+  {
+    "name": "config-substitution",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "GraphHsmm.infer(recall, source, evidence, config)",
+    "new": "GraphHsmm.infer(recall, source, evidence, HsmmConfig.default)",
+    "expected": "actual inference uses the requested competing-state configuration",
+    "suite": "storymodel4s.bench.video.StageTraceOriginSuite",
+    "selection": "^(actual inference uses|one-unit identical).*"
+  },
+  {
+    "name": "double-pricing",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": ".flatMap(infer(recall, built, _, config))",
+    "new": ".flatMap(_ => LocalEvidence.compute(recall, built.view, candidates, pricing, gate = true).flatMap(infer(recall, built, _, config)))",
+    "expected": "historical pricing occurs once and repeated rendering adds no calls",
+    "suite": "storymodel4s.bench.video.StageTraceOriginSuite",
+    "selection": "^(historical pricing|one-unit identical).*"
+  },
+  {
+    "name": "unranked-mass",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "val unranked = costs.map(_._1) == Vector(AlignState.unranked)",
+    "new": "val unranked = false",
+    "expected": "execution-failed unranked units retain attempts and no invented local mass",
+    "suite": "storymodel4s.bench.video.StageTraceOriginSuite",
+    "selection": "^(execution-failed unranked|tie overflow).*"
+  },
+  {
+    "name": "base-record-erasure",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "\"baseCosts\" -> wire.hcursor.downField(\"costs\").focus.get",
+    "new": "\"baseCosts\" -> { val _ = wire; Json.Null }",
+    "expected": "complete base cost records retain support imputation reduction and exclusion fields",
+    "suite": "storymodel4s.bench.video.StageTraceOriginSuite",
+    "selection": "^(complete base cost|one-unit identical).*"
+  },
+  {
+    "name": "nomination-receipt-erasure",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "\"receipt\" -> n.receipt.fold(Json.Null)(Json.fromString)",
+    "new": "\"receipt\" -> Json.Null",
+    "expected": "equal results retain different originating nomination receipts",
+    "suite": "storymodel4s.bench.video.StageTraceOriginSuite",
+    "selection": "^(equal results retain|one-unit identical).*"
+  },
+  {
+    "name": "fake-registered-origin",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "run.registration.fold(Json.Null)(registeredOrigin)",
+    "new": "run.registration.fold(Json.obj(\"basis\" -> Json.fromString(\"Recorded\")))(registeredOrigin)",
+    "expected": "generic strict evidence cannot acquire registered execution authority",
+    "suite": "storymodel4s.bench.video.StageTraceOriginSuite",
+    "selection": "^(generic strict evidence|registered and replayed).*"
+  },
+  {
+    "name": "constructor-visibility",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "final class Run private[StageTrace] (",
+    "new": "final class Run (",
+    "expected": "executed run constructor refuses an independently supplied evidence config result tuple",
+    "suite": "storymodel4s.bench.consumer.StageTraceBoundarySuite",
+    "selection": "^(executed run constructor|executed run has no product Mirror).*"
+  },
+  {
+    "name": "registration-read-door",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala",
+    "old": "private[StageTrace] val registration: Option[OnnxMappingRegistration.Registered]",
+    "new": "val registration: Option[OnnxMappingRegistration.Registered]",
+    "expected": "captured recall video levels and registration have no external read doors",
+    "suite": "storymodel4s.bench.consumer.StageTraceBoundarySuite",
+    "selection": "^(captured recall|executed run has no product Mirror).*"
+  }
+]

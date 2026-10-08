@@ -1,0 +1,50 @@
+types defined by this candidate:
+  AnchorConfidence
+  Built
+  Group
+  HistoricalEmbeddingParityCapture
+  MediaLocus
+  Naming
+  Preset
+  RecallTiming
+  RecallToVideo
+  RecallWord
+  RecallWordsCsv
+  Row
+  Run
+  StageTrace
+  StageTraceBoundarySuite
+  StageTraceOriginSuite
+  StageTraceSuite
+  TimedSegment
+  TimedSourceView
+  TraceRunControl
+  UnitTiming
+  WorldClock
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  amr-interop
+  codec
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  features
+  fixtures
+  laws
+  media
+  pipeline
+  proposition
+  provider-agent
+  recall
+  story
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; featuresJVM/test; fixturesJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; recallJVM/test; storyJVM/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

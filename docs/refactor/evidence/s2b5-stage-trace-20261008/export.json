@@ -1,0 +1,18 @@
+{
+  "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
+  "base_sha": "4384fea201115a896eacb0d975c7fe88c807cfad",
+  "clean": true,
+  "changed_files_sha256": {
+    "docs/adr/0019-mapping-measurement-policy.md": "574fe59a349d4107dd46432c468eeea9a4c9960568542467e22caf53cd820db9",
+    "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala": "cf5da52413c5d34458fce0b22fcb32cf6ee63879fe17a6840305a64c8aa4735f",
+    "embed-bench/src/main/scala/storymodel4s/bench/video/StageTrace.scala": "10cf782aa7eb71805fa4c1296ccf49366414d287a32545b93bfb422ebe33e5df",
+    "embed-bench/src/test/scala/storymodel4s/bench/consumer/StageTraceBoundarySuite.scala": "08ce93fdf11939c63b880f23c4f512f714f1ba0595ba1395c479fe09a71e60be",
+    "embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParityCapture.scala": "4b40d263984f69bf4c00a682046ace7e8421e03525658a752e437684082488dd",
+    "embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala": "415ea720e7cd141cfd2c801d1b5690ffa2db23069ae55890f6d1b55e0cdc827f",
+    "embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceSuite.scala": "4a876028e58c32d1922184c5574643e8b8585d9b00f89756d3d933d840a3b85e",
+    "tools/recall-study/filmfest_diagnostics.py": "2bae23962d588bcecb0c187e67be15615637ff470489f6459d67d7d0ff8adf03",
+    "tools/recall-study/freeze_baseline.py": "617ea0ccafeeb42b14778aa2b1f8854e014cd77a2167d6fd68496da7d573c0c6",
+    "tools/recall-study/test_freeze_baseline.py": "9b4b06edf5a3acc1ad82d2e7e151b0c7d34f5ea3617df8db5d357766a53160a2",
+    "tools/recall-study/tests/test_filmfest_diagnostics.py": "fc4df5c65897a3ea43ae8d6ce71816d9112682d6883db276877fe8db2cddd8be"
+  }
+}

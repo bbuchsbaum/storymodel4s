@@ -1,0 +1,520 @@
+[
+  {
+    "path": "runs/storymodel4s-s2b5-smoke-01.log.gz",
+    "gzip": true,
+    "raw_bytes": 1377,
+    "raw_sha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-smoke-01.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 750,
+    "raw_sha256": "2e6291c3f34fdb3b1bab29290d3ddc0c15775fc23438ab51d98c339c067a8a03"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-smoke-02.log.gz",
+    "gzip": true,
+    "raw_bytes": 3829,
+    "raw_sha256": "1ac40704dbb741a8854cadb8494f74203b87d434905db2fc55080659d3bfddcc"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-smoke-02.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 751,
+    "raw_sha256": "8904cbffb4b3b53194fc54471892e2d3ec6ee3d8c8783e891ee8a29843e0635e"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-01.log.gz",
+    "gzip": true,
+    "raw_bytes": 4235,
+    "raw_sha256": "a52ff7c233e1973f4e47ec5f7c21936ce2c94652d6ac2012f8c62d24acc96138"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-01.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 760,
+    "raw_sha256": "7e8f95eb1d756cb637582e6081fcc9a13c99fd9286e11b6fea762bada547421f"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-02.log.gz",
+    "gzip": true,
+    "raw_bytes": 2227,
+    "raw_sha256": "7b17e4b4952c496f5305fbf597eb28ba69956149d784207dbbc9c251a02a9956"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-02.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 760,
+    "raw_sha256": "2b09c9f9ba3220f061e74acc1b599af091cba60c1caac551d039d8be1dd22729"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-03.log.gz",
+    "gzip": true,
+    "raw_bytes": 9608,
+    "raw_sha256": "6e9a55592ad264722e97877ae4e3788bdc8112a6f78a843c994b881e6e6b05e0"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-03.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 760,
+    "raw_sha256": "88ef84cc982f92d3f68fdacb05622ecfc9fc01e33c89c7181d50c7816c2e4e20"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-04.log.gz",
+    "gzip": true,
+    "raw_bytes": 4252,
+    "raw_sha256": "3ea8fee5bac46cd8eed27cd0d05bc9e111487a45575d1679dd25c2d186a6b66c"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-04.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 760,
+    "raw_sha256": "dbdb7f834f49d92edd32c7793c30f6ba88c3f23ccc355c98fa928e815624140e"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-05.log.gz",
+    "gzip": true,
+    "raw_bytes": 4299,
+    "raw_sha256": "7e0715fbd7761ca22272438396c73b0aa4dc7633516c0081e5d2f87b2aee7c98"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-origin-smoke-05.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 856,
+    "raw_sha256": "050bf0f74a36602e9138410e51aadea646adc108c35199bcec8d828fa3af4e95"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-review-weight-before.log.gz",
+    "gzip": true,
+    "raw_bytes": 4912,
+    "raw_sha256": "a9e5a067c2c259f2768f4b3087cf4339062efbe1b1eb1209c231f72ccc23122c"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-review-weight-before.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 709,
+    "raw_sha256": "96d24c77a0a7311d4a173780e74fd57cf3928098064a39dd03db2a8e9e76bac8"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-review-fixes-smoke.log.gz",
+    "gzip": true,
+    "raw_bytes": 4634,
+    "raw_sha256": "d99851dcbf606010d6520d95b0f84c6f80b197eada85576d52fa0831a8009cc3"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-review-fixes-smoke.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 860,
+    "raw_sha256": "b2846549f5da267ec7178239b4e27a72322677f70039502348de107efd05d7cf"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-review-fixes-clean-smoke.log.gz",
+    "gzip": true,
+    "raw_bytes": 4181,
+    "raw_sha256": "4882d402ca9bae99ff086b8431d6d6906831565600f2450764dcb8e9c1c42e87"
+  },
+  {
+    "path": "runs/storymodel4s-s2b5-review-fixes-clean-smoke.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 895,
+    "raw_sha256": "65539c3c76f9d752b7f9c3657d80dea4a4cf7c26de6ab5f0edbcb16f0a618aa3"
+  },
+  {
+    "path": "runs/consumer-before-0.log.gz",
+    "gzip": true,
+    "raw_bytes": 1288,
+    "raw_sha256": "86d22818986cbdcf1c4d0337be82c61e1e2a7bdc4c3a718f5d8c6e160ce82a75"
+  },
+  {
+    "path": "runs/consumer-before-1.log.gz",
+    "gzip": true,
+    "raw_bytes": 1917,
+    "raw_sha256": "d9aed7e17680ddd945cd8bdd6edd7d8ae865645b5c31755fc20d741fe02e7409"
+  },
+  {
+    "path": "runs/review-consumer-before.log.gz",
+    "gzip": true,
+    "raw_bytes": 1553,
+    "raw_sha256": "40f086c9a5d92360d5a31efc4ebcb54bda6f270be33e97af7b2a10e0136c81bb"
+  },
+  {
+    "path": "runs/consumer-reviewed-0.log.gz",
+    "gzip": true,
+    "raw_bytes": 127,
+    "raw_sha256": "7f9eaebd3bed5aa1139820a68e75a84d72e7b29ff70516cc1112bb7e5d5d1a6b"
+  },
+  {
+    "path": "runs/consumer-reviewed-1.log.gz",
+    "gzip": true,
+    "raw_bytes": 130,
+    "raw_sha256": "5dc13afeb9bb9311c5d1ba1b7d793d6d63a5d7097242d2630ee344383b1b0098"
+  },
+  {
+    "path": "runs/consumer-reviewed-2.log.gz",
+    "gzip": true,
+    "raw_bytes": 118,
+    "raw_sha256": "d24e6972d0e3854e90ad3a382a443087325d95e61c3b971a8aaa574a94f874fd"
+  },
+  {
+    "path": "runs/original-mutations/constructor-visibility.log.gz",
+    "gzip": true,
+    "raw_bytes": 3641,
+    "raw_sha256": "7f7d84ea6cc0b260435d821ce148d999084cb2c3ec13f5387d2f7aca853c5f5a"
+  },
+  {
+    "path": "runs/original-mutations/double-pricing.log.gz",
+    "gzip": true,
+    "raw_bytes": 4722,
+    "raw_sha256": "67fd4a8f3cc7db66c7c7aa74f90b83b454779bf27eda021ca5a1d5dffb7f87f6"
+  },
+  {
+    "path": "runs/original-mutations/base-record-erasure.patch.gz",
+    "gzip": true,
+    "raw_bytes": 757,
+    "raw_sha256": "741c9171038c786fe849b5745c7271b50f7ca27a714b14a503bd6b923c4853af"
+  },
+  {
+    "path": "runs/original-mutations/registration-read-door.patch.gz",
+    "gzip": true,
+    "raw_bytes": 617,
+    "raw_sha256": "cfa8f12d273f37cd569beba6ceb4c44de291bb8f4ed3bf57ee3cca14d6da1575"
+  },
+  {
+    "path": "runs/original-mutations/fake-registered-origin.log.gz",
+    "gzip": true,
+    "raw_bytes": 5660,
+    "raw_sha256": "6f5c79edc7d4f1666e3d747e500a205d697628d0e8c6f2df0805d82bd1773156"
+  },
+  {
+    "path": "runs/original-mutations/base-record-erasure.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 750,
+    "raw_sha256": "fbff03e87e1e5a9571446e9cc8bdb1c55fcc07a226e888b7528409638c7b7567"
+  },
+  {
+    "path": "runs/original-mutations/fake-registered-origin.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 763,
+    "raw_sha256": "178ee577c126591071b869a7256e66c468633e51947f0031a16e084f3e8b676e"
+  },
+  {
+    "path": "runs/original-mutations/constructor-visibility.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 780,
+    "raw_sha256": "3a949119a8044874bd3c913f7dce93ff672232b643bab03ae195b6657806f9d0"
+  },
+  {
+    "path": "runs/original-mutations/nomination-receipt-erasure.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 759,
+    "raw_sha256": "ce1e6ad4b48d62df3daa46c571432a08d4caacdfd92c8855c3d7b551cae75ad4"
+  },
+  {
+    "path": "runs/original-mutations/unranked-mass.log.gz",
+    "gzip": true,
+    "raw_bytes": 5492,
+    "raw_sha256": "8c0a942d1d383207d314550c9673c515000e9165a0eb8f22b16077c0769e11cf"
+  },
+  {
+    "path": "runs/original-mutations/nomination-receipt-erasure.log.gz",
+    "gzip": true,
+    "raw_bytes": 4943,
+    "raw_sha256": "9d0686eef9040ab10a4dc79d32fa15899792dffba215e0ccb33072c98b7a8490"
+  },
+  {
+    "path": "runs/original-mutations/fake-registered-origin.patch.gz",
+    "gzip": true,
+    "raw_bytes": 856,
+    "raw_sha256": "0d85e37a0b7f5c823ddc99b42473c5be94e6ed56a06749a95b3a7a8a064fb69a"
+  },
+  {
+    "path": "runs/original-mutations/registration-read-door.log.gz",
+    "gzip": true,
+    "raw_bytes": 3891,
+    "raw_sha256": "42feaf5c1a021fd34580fb6d6677ba05972a9a8aaf146a19f2abc7685679a082"
+  },
+  {
+    "path": "runs/original-mutations/config-substitution.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 753,
+    "raw_sha256": "6a0f8db8d01ddf96f9bf4327461fa9393a5c6152e139eab85db2e0dff62466e7"
+  },
+  {
+    "path": "runs/original-mutations/mutations.json",
+    "gzip": false,
+    "raw_bytes": 11324,
+    "raw_sha256": "d773b09db77c3459fcff7e089a6ab8dc57302b548aa31bcd746e0d52d3a42957"
+  },
+  {
+    "path": "runs/original-mutations/config-substitution.log.gz",
+    "gzip": true,
+    "raw_bytes": 5083,
+    "raw_sha256": "7266f56fa167e00e9df929c02e407af711b4c0feb648f93781d9dc268da693c2"
+  },
+  {
+    "path": "runs/original-mutations/config-substitution.patch.gz",
+    "gzip": true,
+    "raw_bytes": 552,
+    "raw_sha256": "6ab2be658654eab91f41dfefe910135510549efd40eee79ba37d0722ba9f3427"
+  },
+  {
+    "path": "runs/original-mutations/constructor-visibility.patch.gz",
+    "gzip": true,
+    "raw_bytes": 558,
+    "raw_sha256": "3aaeb8f820839613b71454a62b4b533581c106389bfc2be5b844946366e6daba"
+  },
+  {
+    "path": "runs/original-mutations/double-pricing.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 745,
+    "raw_sha256": "48a819385fc5a77cfd63d49a134e973e4f784cef22e0b66ac7b2f51f18fba175"
+  },
+  {
+    "path": "runs/original-mutations/base-record-erasure.log.gz",
+    "gzip": true,
+    "raw_bytes": 13344,
+    "raw_sha256": "949157833f6041804b23e1ab1b83757b572614446dac4b07f347b6e5027f9c43"
+  },
+  {
+    "path": "runs/original-mutations/unranked-mass.patch.gz",
+    "gzip": true,
+    "raw_bytes": 694,
+    "raw_sha256": "eee19e98c4f6de78efe4d0f8bbdf62b6ea7c06dbe1354090668b8abb401b6f95"
+  },
+  {
+    "path": "runs/original-mutations/nomination-receipt-erasure.patch.gz",
+    "gzip": true,
+    "raw_bytes": 641,
+    "raw_sha256": "a2b97d9571161e92ca4d0cd91c5549360477336df741bbd843dccc4d86e76d78"
+  },
+  {
+    "path": "runs/original-mutations/double-pricing.patch.gz",
+    "gzip": true,
+    "raw_bytes": 598,
+    "raw_sha256": "bc11502a7efefb7d0c440cd6acd132186f0f3d909772c61612ebb9fc713f694d"
+  },
+  {
+    "path": "runs/original-mutations/unranked-mass.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 745,
+    "raw_sha256": "c00d8c082f029178924c5533225a38d05d62bb2176b744ebccb961ac5aef38b1"
+  },
+  {
+    "path": "runs/original-mutations/registration-read-door.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 771,
+    "raw_sha256": "1f98e866521ed8cbb47de0652b87c9175e73ef13f78bdfbaceab730124834abf"
+  },
+  {
+    "path": "runs/mutations/constructor-visibility.log.gz",
+    "gzip": true,
+    "raw_bytes": 3640,
+    "raw_sha256": "ec0180c214dbdb8250159f654e6fc8b7b4024ef2578e9ce432bb366d1deddbcf"
+  },
+  {
+    "path": "runs/mutations/double-pricing.log.gz",
+    "gzip": true,
+    "raw_bytes": 4876,
+    "raw_sha256": "be533095fcf52aec953fa2ae62f89812868701f1e4191faad80f76daa1c983bb"
+  },
+  {
+    "path": "runs/mutations/nonfinite-config-refusal.patch.gz",
+    "gzip": true,
+    "raw_bytes": 649,
+    "raw_sha256": "ae381497bf8d99b102eba963840bd4ba4359f973501a1750e1da4b660be068a4"
+  },
+  {
+    "path": "runs/mutations/base-record-erasure.patch.gz",
+    "gzip": true,
+    "raw_bytes": 757,
+    "raw_sha256": "481ff7c61bd5cbbcfa461c9557b732cf77cd367955e0126c81ea3abb951c78c1"
+  },
+  {
+    "path": "runs/mutations/registration-read-door.patch.gz",
+    "gzip": true,
+    "raw_bytes": 617,
+    "raw_sha256": "cfa8f12d273f37cd569beba6ceb4c44de291bb8f4ed3bf57ee3cca14d6da1575"
+  },
+  {
+    "path": "runs/mutations/fake-registered-origin.log.gz",
+    "gzip": true,
+    "raw_bytes": 5829,
+    "raw_sha256": "ba228a5deb0be4f4ef8b248faeb00a285a1811e1248119dd3b23c2fc9dc81de2"
+  },
+  {
+    "path": "runs/mutations/base-record-erasure.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 757,
+    "raw_sha256": "7fd81c4af38bea698b6a5e393de3277eb09cffd741d07af66452c75819f5d325"
+  },
+  {
+    "path": "runs/mutations/fake-registered-origin.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 770,
+    "raw_sha256": "c04f6515f95a30a77c53e076d3afddddf22db93736200f227f2a4ab96569d321"
+  },
+  {
+    "path": "runs/mutations/constructor-visibility.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 786,
+    "raw_sha256": "7261c7cea64b8f029f6bbadaaab0b3718ea2979490f61e6c2ac9f2a7092bfe70"
+  },
+  {
+    "path": "runs/mutations/nonfinite-config-refusal.log.gz",
+    "gzip": true,
+    "raw_bytes": 4885,
+    "raw_sha256": "cb5e253a2dfc9c61e6064ad93df618566bbf3f2a53c690d0d8c5d95675b7f290"
+  },
+  {
+    "path": "runs/mutations/nomination-receipt-erasure.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 766,
+    "raw_sha256": "2bbfedb40b1a053ec9487b377004ae248b540f08ac317fde4f4d82a9c4b00578"
+  },
+  {
+    "path": "runs/mutations/unranked-mass.log.gz",
+    "gzip": true,
+    "raw_bytes": 5646,
+    "raw_sha256": "a5e4351ad65303650febdef3698e11183dce3f43cddaa736163627433b5f792b"
+  },
+  {
+    "path": "runs/mutations/nomination-receipt-erasure.log.gz",
+    "gzip": true,
+    "raw_bytes": 5099,
+    "raw_sha256": "9eb936cc290732d384acb621e694f5bd09df0e9576afbd10f354fcaaada7da8a"
+  },
+  {
+    "path": "runs/mutations/fake-registered-origin.patch.gz",
+    "gzip": true,
+    "raw_bytes": 856,
+    "raw_sha256": "0269d1cd899065a1aa22c8d3e92658506fca882b49525e57a73aabc51ff5d3dd"
+  },
+  {
+    "path": "runs/mutations/registration-read-door.log.gz",
+    "gzip": true,
+    "raw_bytes": 3891,
+    "raw_sha256": "99eecc9e73d2332483939a91647c68ccf260b75cf18a5190e2bcf077985197fe"
+  },
+  {
+    "path": "runs/mutations/config-substitution.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 759,
+    "raw_sha256": "11a05664093a049c51a8ea23f35cbbc11c6fbf76ede2aff59885cfab532bf2e6"
+  },
+  {
+    "path": "runs/mutations/mutations.json",
+    "gzip": false,
+    "raw_bytes": 12794,
+    "raw_sha256": "0778e9f657c9035399de0475b1ad2a86a494bece5f297e06d71711b0c42dfc34"
+  },
+  {
+    "path": "runs/mutations/config-substitution.log.gz",
+    "gzip": true,
+    "raw_bytes": 5237,
+    "raw_sha256": "eeeca728bdd96244f7ce29d5a2b8a149fd48f76a07096bf0f11642a88e00474f"
+  },
+  {
+    "path": "runs/mutations/config-substitution.patch.gz",
+    "gzip": true,
+    "raw_bytes": 552,
+    "raw_sha256": "6ab2be658654eab91f41dfefe910135510549efd40eee79ba37d0722ba9f3427"
+  },
+  {
+    "path": "runs/mutations/constructor-visibility.patch.gz",
+    "gzip": true,
+    "raw_bytes": 558,
+    "raw_sha256": "3aaeb8f820839613b71454a62b4b533581c106389bfc2be5b844946366e6daba"
+  },
+  {
+    "path": "runs/mutations/double-pricing.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 751,
+    "raw_sha256": "ce4d806e56c1f8b6184ee9028962e0a43df8bc81fa39a3ef493ca5871891d9b8"
+  },
+  {
+    "path": "runs/mutations/base-record-erasure.log.gz",
+    "gzip": true,
+    "raw_bytes": 13499,
+    "raw_sha256": "4e9af5f95d7a6b8ab0da852fcebd3fc83d83b9123f8b6f4abdd8cc81524e069c"
+  },
+  {
+    "path": "runs/mutations/unranked-mass.patch.gz",
+    "gzip": true,
+    "raw_bytes": 694,
+    "raw_sha256": "91024441c810aed81ab2a00b2720808fdb46d16990964ce0c52a3dc5428f58ba"
+  },
+  {
+    "path": "runs/mutations/nomination-receipt-erasure.patch.gz",
+    "gzip": true,
+    "raw_bytes": 641,
+    "raw_sha256": "9a50a9336433e88203a157f5bfdc585d2ca353111c58dca95ef7a15f37ee822d"
+  },
+  {
+    "path": "runs/mutations/double-pricing.patch.gz",
+    "gzip": true,
+    "raw_bytes": 598,
+    "raw_sha256": "bc11502a7efefb7d0c440cd6acd132186f0f3d909772c61612ebb9fc713f694d"
+  },
+  {
+    "path": "runs/mutations/unranked-mass.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 751,
+    "raw_sha256": "3f7129d64a0168813480b7225c9ff7cef494d801334e6db2863b07b8009910cb"
+  },
+  {
+    "path": "runs/mutations/registration-read-door.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 777,
+    "raw_sha256": "ae8198283fdce2e5df9704c74c35aa2c823f04943077586a4fb5e7ae62aebd36"
+  },
+  {
+    "path": "runs/mutations/nonfinite-config-refusal.log.meta.json",
+    "gzip": false,
+    "raw_bytes": 758,
+    "raw_sha256": "e4ac322d18829010e06786e16b7099c6ce912fa861861406b6c6b85f42dc57bc"
+  },
+  {
+    "path": "runs/python-mutations/availability-erasure.log.gz",
+    "gzip": true,
+    "raw_bytes": 817,
+    "raw_sha256": "b21f524e8ba7ba15e48261dd611a99c43de2d149ba6bf3a828053f2660f6ccf1"
+  },
+  {
+    "path": "runs/python-mutations/availability-erasure.patch.gz",
+    "gzip": true,
+    "raw_bytes": 802,
+    "raw_sha256": "470bcc542e2ee28aa7489ce338c1ac7b8f4a24c59767e621151244c61de64fed"
+  },
+  {
+    "path": "runs/python-mutations/paired-denominator.log.gz",
+    "gzip": true,
+    "raw_bytes": 821,
+    "raw_sha256": "a95956325ee34d9f94ce4df68f3b2b52ae3e68830f4657c7c7307533ee5ac75c"
+  },
+  {
+    "path": "runs/python-mutations/paired-denominator.patch.gz",
+    "gzip": true,
+    "raw_bytes": 652,
+    "raw_sha256": "02956513b89096eae67024310f0811b22472a85c48dba99ff8b6777765c8ee8d"
+  },
+  {
+    "path": "runs/source-gate-failed.log.gz",
+    "raw_bytes": 984031,
+    "raw_sha256": "e6e4b15724fd442fc2fbe1a677f21d37fdfc37af93ed87c0081cb32b263ca5aa"
+  },
+  {
+    "path": "runs/source-gate-failed.log.meta.json",
+    "raw_bytes": 1574,
+    "raw_sha256": "8df75594f9bfbaf4255e714221d1660fe86636e299e78ca908385eae1c34af57"
+  },
+  {
+    "path": "reference-scope.txt",
+    "raw_bytes": 1231,
+    "raw_sha256": "7ce99b5f8bfe159589913c25a237439356c3e6ca73ea2936b6d8b2c0c87fe9c7"
+  },
+  {
+    "path": "reference-scope.json",
+    "raw_bytes": 2602,
+    "raw_sha256": "618a9f4a5152820daaaabe2bbbb8ed4c110efa8992ef8a821ad9cc683a25f3ad"
+  }
+]

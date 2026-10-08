@@ -1,0 +1,50 @@
+[
+  {
+    "name": "availability-erasure",
+    "candidate_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
+    "path": "tools/recall-study/filmfest_diagnostics.py",
+    "command": [
+      "python3",
+      "tools/recall-study/tests/test_filmfest_diagnostics.py",
+      "DiagnosticsTests.test_v2_unranked_trace_keeps_the_unit_without_inventing_local_mass",
+      "DiagnosticsTests.test_valid_trace_joins_and_forged_binding_or_mass_is_refused"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "passed": 1,
+    "failed": 1,
+    "errors": 0,
+    "qualified": true,
+    "named_failure": "test_v2_unranked_trace_keeps_the_unit_without_inventing_local_mass",
+    "log": "/private/tmp/storymodel4s-s2b5-python-availability-erasure.log",
+    "patch": "/private/tmp/storymodel4s-s2b5-python-availability-erasure.patch",
+    "log_sha256": "b21f524e8ba7ba15e48261dd611a99c43de2d149ba6bf3a828053f2660f6ccf1",
+    "patch_sha256": "470bcc542e2ee28aa7489ce338c1ac7b8f4a24c59767e621151244c61de64fed",
+    "log_archive": "runs/python-mutations/availability-erasure.log.gz",
+    "patch_archive": "runs/python-mutations/availability-erasure.patch.gz"
+  },
+  {
+    "name": "paired-denominator",
+    "candidate_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
+    "path": "tools/recall-study/filmfest_diagnostics.py",
+    "command": [
+      "python3",
+      "tools/recall-study/tests/test_filmfest_diagnostics.py",
+      "DiagnosticsTests.test_summary_keeps_unavailable_local_comparisons_out_of_measured_denominators",
+      "DiagnosticsTests.test_valid_trace_joins_and_forged_binding_or_mass_is_refused"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "passed": 1,
+    "failed": 1,
+    "errors": 0,
+    "qualified": true,
+    "named_failure": "test_summary_keeps_unavailable_local_comparisons_out_of_measured_denominators",
+    "log": "/private/tmp/storymodel4s-s2b5-python-paired-denominator.log",
+    "patch": "/private/tmp/storymodel4s-s2b5-python-paired-denominator.patch",
+    "log_sha256": "a95956325ee34d9f94ce4df68f3b2b52ae3e68830f4657c7c7307533ee5ac75c",
+    "patch_sha256": "02956513b89096eae67024310f0811b22472a85c48dba99ff8b6777765c8ee8d",
+    "log_archive": "runs/python-mutations/paired-denominator.log.gz",
+    "patch_archive": "runs/python-mutations/paired-denominator.patch.gz"
+  }
+]
