@@ -806,8 +806,9 @@ proof. Build workflow generation accompanies these existing-module dependency ch
 
 The portable factorized channel is declared data. It checks the complete ordered endpoint
 association, Query/Document geometry, vector dimension/normalization, and conflicting equal keys.
-Vector storage is `O((U+N)d)`; complete nomination still evaluates `O(UNd)` work, with per-unit
-working storage and additional hierarchy/candidate costs. No dense pair table or hidden pair cache.
+Vector storage is `O((U+N)d)`; complete nomination performs `O(UNd)` distance arithmetic.
+Endpoint lookup, hierarchy projection and retained-candidate costs are separate; public privacy-safe
+endpoint hashes can collide for equal semantic content. No dense pair table or hidden pair cache.
 A single library-owned dispatcher supplies the same full payload to nomination and pricing;
 context-free entrypoints refuse this channel. Nomination/pricing bind the same entire context,
 including the source declaration/text join and rendering policy, beyond historical `StrictBinding`.
@@ -815,7 +816,8 @@ including the source declaration/text join and rendering policy, beyond historic
 A JVM-only, final non-case registration envelope is derived from actual concrete ONNX recorded
 attempts. It builds requests itself, verifies outcome association and derives the declared
 channel, candidates and local evidence. Exact capability replay verifies rebuilt requests,
-model/provider/configuration and sensitivity before derivation; it reuses the original attempts,
+model/provider/configuration and sensitivity before derivation; public replay starts from the
+original bound registration, while raw-record replay is private. It reuses the original attempts,
 never a fresh approval or call. Reject caller-written results, tables or generic engine evidence
 as execution proof, including attaching unrelated honest receipts. Execution identity remains
 separate from the numerical `LocalEvidence` identity; equal numerical prices need not imply equal
@@ -828,7 +830,11 @@ not claim the provider attempted skipped requests. An empty actual batch may sti
 empty adapter-attempt record. Empty logical recall/source populations are refused before execution.
 Reject using special-token vectors as an unlicensed similarity for absent surface content.
 
-Both typed endpoint outcomes survive on `SurfaceScore` and the original records. Ineligibility
+For successful registrations, both typed endpoint outcomes survive on `SurfaceScore` and the
+original records. Equal rendered endpoints with different per-request outcomes refuse registration
+as `ConflictingEndpoint`; for example, keyless sensitive denials retain their distinct request IDs.
+A refused registration returns its typed refusal, not a registered envelope carrying every attempt.
+Do not erase per-request denial identity to force outcomes equal. Ineligibility
 wins aggregate applicability; otherwise an execution failure produces the fixed domain reason
 `Custom("embedding", "endpoint-execution-failed")`, rather than provider abstention. Original missing
 reasons remain on both endpoints; the scalar uses query-side precedence only when both are eligible

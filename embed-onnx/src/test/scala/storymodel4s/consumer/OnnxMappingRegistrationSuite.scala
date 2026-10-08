@@ -382,3 +382,14 @@ class OnnxMappingRegistrationSuite extends FunSuite:
       score
     )
   }
+
+  test("duplicate denied payloads refuse conflicting per-request outcomes") {
+    withEncoder { e =>
+      val ctx = OnnxMappingFixture.context(ranges = Vector(0 -> 5, 0 -> 5))
+      val c = sensitive(Sensitivity.Public, Sensitivity.Sensitive)
+      assertEquals(
+        OnnxMappingRegistration.record(e, ctx, c),
+        Left(OnnxMappingRefusal.Surface(SurfaceEmbeddingRefusal.ConflictingEndpoint))
+      )
+    }
+  }
