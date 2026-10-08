@@ -624,3 +624,34 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
     assert(typeChecks("(??? : surfaceembeddingconsumer.OpenRead).binding"))
     assert(!typeChecks("(??? : storymodel4s.align.RenderedTargetInput).binding"))
   }
+
+  test("canonical unit projection helper is package private") {
+    assert(
+      typeChecks("import surfaceembeddingconsumer.*; OpenProjection.canonicalUnit(???)"),
+      "same-shape control"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; ContentProjection.canonicalUnit(???)"),
+      "unit helper opened"
+    )
+  }
+
+  test("canonical target projection helper is package private") {
+    assert(
+      typeChecks("import surfaceembeddingconsumer.*; OpenProjection.canonicalTarget(???, ???)"),
+      "same-shape control"
+    )
+    assert(
+      !typeChecks("import storymodel4s.align.*; ContentProjection.canonicalTarget(???, ???)"),
+      "target helper opened"
+    )
+  }
+
+object OpenProjection:
+  def canonicalUnit(
+      unit: RecallUnit
+  ): Either[storymodel4s.proposition.ProjectionRefusal, UnitContent[GraphOrder.Canonical]] = ???
+  def canonicalTarget(
+      node: NodeSummary,
+      source: SourceView
+  ): Either[storymodel4s.proposition.ProjectionRefusal, TargetContent[GraphOrder.Canonical]] = ???

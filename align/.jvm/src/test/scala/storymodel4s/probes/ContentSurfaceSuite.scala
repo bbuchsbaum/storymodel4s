@@ -11,7 +11,14 @@ import storymodel4s.proposition.{GraphOrder, SemanticGraph, SemanticProjection}
   */
 class ContentSurfaceSuite extends FunSuite:
   private val surfaces = Vector(
-    ContentProjection.getClass -> Set("canonical", "source", "sourceUnit", "sourceNode"),
+    ContentProjection.getClass -> Set(
+      "canonical",
+      "canonicalUnit",
+      "canonicalTarget",
+      "source",
+      "sourceUnit",
+      "sourceNode"
+    ),
     SemanticProjection.getClass -> Set("canonical", "sourceOrder"),
     SemanticGraph.getClass -> Set("build"),
     Members.getClass -> Set("empty"),
