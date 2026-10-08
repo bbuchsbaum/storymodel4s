@@ -96,7 +96,8 @@ def load_arm(directory, annotation, gold_rows, ranges):
         traces = None
         if spath.exists():
             trace = json.loads(spath.read_text())
-            if trace['schema'] != 'storymodel4s.bench.stage-trace/v1' or trace['refinementPasses'] != 0:
+            if trace['schema'] not in ('storymodel4s.bench.stage-trace/v1',
+                                       'storymodel4s.bench.stage-trace/v2') or trace['refinementPasses'] != 0:
                 raise ValueError('unsupported stage trace or refined costs')
             if trace.get('reportSha256') != gold.digest(report) or trace.get('sourceInputSha256') != gold.digest(annotation):
                 raise ValueError('trace report or source checksum differs')
@@ -179,7 +180,17 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 local, traced_post, traced_external = collections.Counter(), collections.Counter(), collections.Counter()
                 unique(t['states'], 'state')
                 costs = [gold.finite(s['cost']) for s in t['states']]
-                if not costs: raise ValueError('empty trace state set')
+                if not costs:
+                    if (trace['schema'] != 'storymodel4s.bench.stage-trace/v2'
+                            or t.get('localComparison') != {'status':'NotComputed','reason':'NoAdmittedStates'}
+                            or nominated or masses or set(external) != {'Unranked'}
+                            or not math.isclose(external['Unranked'], 1., abs_tol=1e-12)
+                            or t['noFillAnchor'] is not None):
+                        raise ValueError('empty trace state set without unranked evidence')
+                    row.update(noFillFilm=None, nominationIdentity=[], nominationEvidence=[],
+                               localCostIdentity=[])
+                    output.append(row)
+                    continue
                 weights = [math.exp(-(c-min(costs))/temperature) for c in costs]
                 norm = sum(weights)
                 for state, weight in zip(t['states'],weights):

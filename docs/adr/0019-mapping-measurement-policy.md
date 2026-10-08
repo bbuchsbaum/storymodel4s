@@ -874,3 +874,30 @@ failure detail, its channel checksum does not bind rendered inputs/preset, and i
 retains a pair table. Historical evidence remains Unattested. Keep these existing limits explicit;
 a provenance/sparsity repair would be a separate contract. Originating shared-evidence StageTrace
 adoption remains the next G1 slice; result costs cannot restore originating provenance.
+
+
+### 2026-10-08 — originating evidence in private executed traces (S2b-5)
+
+A bench-private final non-case run is minted only around the actual `GraphHsmm.infer` evidence
+call. It retains that exact evidence, configuration and result. The historical producer computes
+one evidence object; the registered producer derives its recall, source and evidence exclusively
+from the original ONNX registration and retains its recorded/replayed basis. Reject a
+`fromParts(evidence, result, config)` admission: a consistent result does not identify its
+configuration, and one-unit results can be identical under different transition configurations.
+
+Trace v2 reads originating nominations, admissibility and base prices. It retains the engine
+evidence identity, full configuration, strict tie/uniform/outcome accounting, privacy-safe existing
+attempt receipts and all published cost/support/reduction/imputation/exclusion fields. Registered
+origin is separate from generic strict numerical provenance. No submitted text, vectors or new
+plain hash of private requests is emitted. The existing HSMM codec supplies the complete checked
+base-record echo; an unsupported support wire remains a typed trace refusal. Refined traces
+still refuse even when a zero refinement weight leaves numerical prices unchanged.
+
+Historical reports and frozen numerical bodies stay unchanged. The opt-in v2 diagnostic retains
+legacy consumed row fields; existing Python numerical/byte readers admit both v1 and v2 without
+minting library execution authority from JSON. Empty admitted populations remain explicitly
+NotComputed and preserve their unranked units. Downstream scene choices are reported diagnostics,
+validated for population/reference consistency, and are not inference-origin proof. Reject
+re-pricing in rendering, result-only provenance recovery and an invented local mass for no states.
+No module, dependency or public Scala API is added. Public reference/reconstruction admission,
+full media interchange, durable replay and learned/corpus efficacy remain separate acceptance.

@@ -112,11 +112,10 @@ object HistoricalEmbeddingParityCapture:
       val candidates = CandidateGenerator(blended, preset.perLevel, preset.lexicalOverlap)
         .generate(recall.ordered, built.view)
       val costModel = DefaultLocalCostModel(semantic = blended)
-      val evidence = checked(
-        LocalEvidence.compute(recall, built.view, candidates, costModel, gate = true)
-      )
       val config = RecallOrderControl.scaledConfig(preset.orderingScale)
-      val result = checked(GraphHsmm.infer(recall, built.view, evidence, config))
+      val run = checked(StageTrace.historical(recall, built, candidates, costModel, config))
+      val evidence = run.evidence
+      val result = run.result
       val historical = checked(GraphHsmm.infer(recall, built.view, candidates, costModel, config))
       require(result == historical, "precomputed and historical inference differ")
       val resultJson = checked(parse(checked(HsmmResultCodec.encode(result))))

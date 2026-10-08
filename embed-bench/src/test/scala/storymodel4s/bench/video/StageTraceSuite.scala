@@ -55,21 +55,23 @@ class StageTraceSuite extends FunSuite:
       assertEqualsDouble(mass, result.posterior.rows.head(state), 1e-12)
     }
     assert(costs.exists(_._1.isExternal), "external alternatives were removed")
-    val rendered = StageTrace.render(
-      built,
-      r.ordered,
-      c,
-      result,
-      HsmmConfig.default,
-      Vector.empty,
-      result.posterior.rows.map(_.mapSource),
-      Checksum.ofBytes(Array.emptyByteArray),
-      None
-    )
+    val run = StageTrace
+      .historical(r, built, c, DefaultLocalCostModel(), HsmmConfig.default)
+      .fold(e => fail(e.message), identity)
+    assertEquals(run.result, result)
+    val rendered = StageTrace
+      .render(
+        run,
+        Vector.empty,
+        result.posterior.rows.map(_.mapSource),
+        Checksum.ofBytes(Array.emptyByteArray),
+        None
+      )
+      .fold(e => fail(e.message), identity)
     val json = parse(rendered).fold(e => fail(e.message), identity)
     assertEquals(
       json.hcursor.get[String]("schema").toOption,
-      Some("storymodel4s.bench.stage-trace/v1")
+      Some("storymodel4s.bench.stage-trace/v2")
     )
     assert(!rendered.contains("Alpha opens"), "trace leaked prose")
 

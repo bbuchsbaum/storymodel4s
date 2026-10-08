@@ -578,9 +578,10 @@ object RecallToVideo:
       .flatMap(ladder => RecallOrderControl.LadderRun.of(ladder, scale))
       .fold(e => throw new IllegalArgumentException(e), identity)
     val hsmmConfig = ladderRun.config
-    val result = GraphHsmm
-      .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic), hsmmConfig)
+    val stageRun = StageTrace
+      .historical(recall, built, candidates, DefaultLocalCostModel(semantic = semantic), hsmmConfig)
       .fold(e => throw new IllegalStateException(e.message), identity)
+    val result = stageRun.result
     embedderToClose.foreach(_.close())
     val signature = RecallSignature
       .compute(result, recall, built.view)
@@ -704,17 +705,15 @@ object RecallToVideo:
       if monotoneAnchors.isEmpty then row.mapSource else monotoneAnchors(i)
     }
     if sys.env.get("STORYMODEL4S_STAGE_TRACE").contains("on") then
-      val trace = StageTrace.render(
-        built,
-        recall.ordered,
-        candidates,
-        result,
-        hsmmConfig,
-        decisions,
-        chosenAnchors,
-        Checksum.ofBytes(Files.readAllBytes(outPath)),
-        traceSourceChecksum
-      )
+      val trace = StageTrace
+        .render(
+          stageRun,
+          decisions,
+          chosenAnchors,
+          Checksum.ofBytes(Files.readAllBytes(outPath)),
+          traceSourceChecksum
+        )
+        .fold(e => throw new IllegalStateException(e.message), identity)
       val _ = Files.write(
         Paths.get(outPath.toString + ".stages.json"),
         trace.getBytes(StandardCharsets.UTF_8)

@@ -167,7 +167,8 @@ def inspect_run(paths, expected_inventory=None):
     posterior, stages = load(paths["posterior"]), load(paths["stages"])
     require(posterior["schema"] == "storymodel4s.bench.recall-to-video.posterior" and
             posterior["schemaVersion"] == 1 and
-            stages["schema"] == "storymodel4s.bench.stage-trace/v1", "unknown sidecar schema")
+            stages["schema"] in ("storymodel4s.bench.stage-trace/v1",
+                                 "storymodel4s.bench.stage-trace/v2"), "unknown sidecar schema")
     require([u["unit"] for u in posterior["units"]] == ordinals, "posterior unit accounting mismatch")
     require([u["unit"] for u in stages["units"]] == ordinals, "stage unit accounting mismatch")
     require([u["unitId"] for u in stages["units"]] == unit_ids, "stage unit identity mismatch")

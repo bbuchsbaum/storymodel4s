@@ -107,6 +107,46 @@ class DiagnosticsTests(unittest.TestCase):
                 t = copy.deepcopy(valid); mutate(t); path.write_text(json.dumps(t))
                 with self.assertRaisesRegex(ValueError,error): self.load()
 
+    def test_v2_trace_preserves_the_existing_numerical_and_identity_join(self):
+        # This unchecked miniature exercises consumed fields, not Scala execution admission.
+        trace = self.trace()
+        trace['schema'] = 'storymodel4s.bench.stage-trace/v2'
+        Path(str(self.report)+'.stages.json').write_text(json.dumps(trace))
+        row = self.load()[0]
+        self.assertEqual(row['localFilm'], 1)
+        self.assertEqual(row['noFillFilm'], 1)
+        self.assertTrue(row['goldInCandidates'])
+        trace['reportSha256'] = 'foreign'
+        Path(str(self.report)+'.stages.json').write_text(json.dumps(trace))
+        with self.assertRaisesRegex(ValueError, 'checksum'):
+            self.load()
+
+    def test_v2_unranked_trace_keeps_the_unit_without_inventing_local_mass(self):
+        bits = lambda x: '0x'+struct.pack('>d', x).hex()
+        self.report.write_text('unit\trecallText\trecallOnsetSeconds\trecallLastWordOnsetSeconds\tstartSeconds\tmediaPart\n'
+                               '0\tSynthetic recall\t0\t1\t\t\n')
+        self.voyage['rows'][0]['mass'] = [
+            {'state':{'type':'External','state':'Unranked'},'mass':bits(1.)}]
+        self.voyage['decisions'][0]['anchor'] = None
+        self.save()
+        trace = self.trace()
+        trace['schema'] = 'storymodel4s.bench.stage-trace/v2'
+        unit = trace['units'][0]
+        unit.update(finalAnchor=None, posteriorAnchor=None, noFillAnchor=None,
+                    nominations=[], states=[],
+                    localComparison={'status':'NotComputed','reason':'NoAdmittedStates'})
+        path = Path(str(self.report)+'.stages.json')
+        path.write_text(json.dumps(trace))
+        rows = self.load()
+        self.assertEqual(len(rows), 1)
+        self.assertIsNone(rows[0]['localFilm'])
+        self.assertFalse(rows[0]['goldInCandidates'])
+        self.assertEqual(rows[0]['externalStates'], {'Unranked': 1.})
+        unit['localComparison']['status'] = 'Computed'
+        path.write_text(json.dumps(trace))
+        with self.assertRaisesRegex(ValueError, 'without unranked evidence'):
+            self.load()
+
     def test_equal_film_totals_do_not_hide_anchor_mass_divergence(self):
         a = self.load()
         b = copy.deepcopy(a)

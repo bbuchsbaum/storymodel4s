@@ -146,6 +146,20 @@ class BaselineSuite(unittest.TestCase):
         post = baseline.load(self.paths[0]["posterior"])["units"][2]
         self.assertNotEqual(post["argmax"]["ref"], post["decoded"]["ref"])
 
+    def test_v2_stage_trace_preserves_frozen_identity_and_outcome_accounting(self):
+        # Wire identity inspection grants no execution authority to either schema.
+        for run in range(2):
+            stage = baseline.load(self.paths[run]["stages"])
+            stage["schema"] = "storymodel4s.bench.stage-trace/v2"
+            self.change_artifact("stages", stage, run)
+        summary = self.verify()
+        self.assertEqual(summary["units"], 8)
+        self.assertEqual(summary["outcomes"], self.manifest["summary"]["outcomes"])
+        stage["recallChecksum"] = "foreign"
+        self.change_artifact("stages", stage, 1)
+        with self.assertRaisesRegex(ValueError, "foreign recall receipt"):
+            self.verify()
+
     def test_independent_fixture_has_reversal_revisit_and_partial_support(self):
         f = self.fixture
         ranks = {e["id"]: e["order"] for e in f["textSource"]["events"]}
