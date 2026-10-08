@@ -180,20 +180,28 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 local, traced_post, traced_external = collections.Counter(), collections.Counter(), collections.Counter()
                 unique(t['states'], 'state')
                 costs = [gold.finite(s['cost']) for s in t['states']]
-                if not costs:
-                    if (trace['schema'] != 'storymodel4s.bench.stage-trace/v2'
-                            or t.get('localComparison') != {'status':'NotComputed','reason':'NoAdmittedStates'}
-                            or nominated or masses or set(external) != {'Unranked'}
+                comparison = t.get('localComparison', {})
+                if trace['schema'] == 'storymodel4s.bench.stage-trace/v2' and comparison.get('status') == 'NotComputed':
+                    empty = (comparison == {'status':'NotComputed','reason':'NoAdmittedStates'} and not costs)
+                    unranked = (comparison == {'status':'NotComputed','reason':'UnrankedOutcome'}
+                                and len(t['states']) == 1
+                                and t['states'][0]['state'] == 'ext:Unranked'
+                                and t['states'][0]['anchor'] is None
+                                and t['states'][0]['localMass'] is None
+                                and math.isclose(gold.finite(t['states'][0]['posteriorMass']), 1., abs_tol=1e-12))
+                    if (not (empty or unranked) or nominated or masses or set(external) != {'Unranked'}
                             or not math.isclose(external['Unranked'], 1., abs_tol=1e-12)
                             or t['noFillAnchor'] is not None):
-                        raise ValueError('empty trace state set without unranked evidence')
+                        raise ValueError('not-computed comparison without unranked evidence')
                     row.update(noFillFilm=None, nominationIdentity=[], nominationEvidence=[],
-                               localCostIdentity=[])
+                               localCostIdentity=[(s['state'], s['cost']) for s in t['states']])
                     output.append(row)
                     continue
+                if not costs: raise ValueError('empty trace state set without unranked evidence')
                 weights = [math.exp(-(c-min(costs))/temperature) for c in costs]
                 norm = sum(weights)
                 for state, weight in zip(t['states'],weights):
+                    if state['localMass'] is None: raise ValueError('invalid local mass')
                     m = gold.finite(state['localMass'])
                     if not 0 <= m <= 1: raise ValueError('invalid local mass')
                     if not math.isclose(m,weight/norm,rel_tol=1e-10,abs_tol=1e-12):

@@ -195,11 +195,18 @@ private[bench] object StageTrace:
             case ExecutionFailure.Transport(_)                                   => "Transport"
             case ExecutionFailure.Invalid(_)                                     => "Invalid"
           Json.obj("status" -> Json.fromString("ExecutionFailed"), "kind" -> Json.fromString(kind))
-      Json.obj("request" -> Json.fromString(o.id.value), "outcome" -> outcome)
+      Json.obj(
+        "request" -> Json.fromString(o.id.value),
+        "space" -> Json.fromString(o.space.value),
+        "outcome" -> outcome
+      )
     }
     Json.obj(
       "provider" -> Json.fromString(record.provider.render),
       "runtime" -> Json.fromString(record.runtimeIdentity),
+      "model" -> Json.fromString(record.model.coordinate),
+      "dimension" -> Json.fromInt(record.model.dimension.value),
+      "maxTokens" -> Json.fromInt(record.model.maxTokens),
       "modelSha256" -> Json.fromString(record.model.modelChecksum.hex),
       "tokenizerSha256" -> Json.fromString(record.model.tokenizerChecksum.hex),
       "receipt" -> Json.fromString(record.result.receipt.digest.render),
@@ -207,9 +214,15 @@ private[bench] object StageTrace:
       "outcomes" -> Json.fromValues(outcomes)
     )
 
+  private def candidateConfiguration(c: StrictCandidateConfig): Json = Json.obj(
+    "perLevel" -> Json.fromInt(c.perLevel),
+    "tiePolicy" -> policy(c.policy),
+    "lexicalOverlap" -> Json.fromBoolean(c.lexicalOverlap),
+    "space" -> c.space.fold(Json.Null)(Json.fromString)
+  )
+
   private def registeredOrigin(r: OnnxMappingRegistration.Registered): Json =
     val p = r.pricing
-    val c = r.effectiveCandidates
     Json.obj(
       "basis" -> Json.fromString(r.basis.toString),
       "surfacePolicy" -> Json.fromString(r.context.policy),
@@ -217,12 +230,8 @@ private[bench] object StageTrace:
       "emptyPolicy" -> Json.fromString(r.config.emptyPolicy.toString),
       "querySensitivity" -> Json.fromString(r.config.querySensitivity.toString),
       "documentSensitivity" -> Json.fromString(r.config.documentSensitivity.toString),
-      "candidates" -> Json.obj(
-        "perLevel" -> Json.fromInt(c.perLevel),
-        "tiePolicy" -> policy(c.policy),
-        "lexicalOverlap" -> Json.fromBoolean(c.lexicalOverlap),
-        "space" -> c.space.fold(Json.Null)(Json.fromString)
-      ),
+      "requestedCandidates" -> candidateConfiguration(r.config.candidates),
+      "candidates" -> candidateConfiguration(r.effectiveCandidates),
       "pricing" -> Json.obj(
         "weights" -> Json.obj(
           CostTerm.values.toVector.map(t => t.toString -> number(p.weights(t)))*
@@ -301,9 +310,10 @@ private[bench] object StageTrace:
               val row = result.posterior.rows(i)
               val set = evidence.candidates(i)
               val costs = evidence.breakdowns(i).toVector.filterNot(_._2.excluded).sortBy(_._1.key)
-              val masses =
-                if costs.isEmpty then Vector.empty
-                else localMass(costs.map(_._2.total), config.temperature)
+              val unranked = costs.map(_._1) == Vector(AlignState.unranked)
+              val masses: Vector[Option[Double]] =
+                if costs.isEmpty || unranked then costs.map(_ => None)
+                else localMass(costs.map(_._2.total), config.temperature).map(Some(_))
               Json.obj(
                 "unit" -> Json.fromInt(u.ordinal),
                 "unitId" -> Json.fromString(u.id.toString),
@@ -311,10 +321,13 @@ private[bench] object StageTrace:
                 "candidateAccounting" -> accounting(evidence.provenance, i),
                 "admittedAnchors" -> Json
                   .fromValues(evidence.nominated(i).map(r => Json.fromString(r.key))),
-                "localComparison" -> (if costs.isEmpty then
+                "localComparison" -> (if costs.isEmpty || unranked then
                                         Json.obj(
                                           "status" -> Json.fromString("NotComputed"),
-                                          "reason" -> Json.fromString("NoAdmittedStates")
+                                          "reason" -> Json.fromString(
+                                            if unranked then "UnrankedOutcome"
+                                            else "NoAdmittedStates"
+                                          )
                                         )
                                       else Json.obj("status" -> Json.fromString("Computed"))),
                 "nominations" -> Json.fromValues(set.nominations.map { n =>
@@ -333,7 +346,7 @@ private[bench] object StageTrace:
                     "state" -> Json.fromString(state.key),
                     "anchor" -> anchor(state.anchor),
                     "cost" -> number(cost.total),
-                    "localMass" -> number(mass),
+                    "localMass" -> mass.fold(Json.Null)(number),
                     "posteriorMass" -> number(row(state)),
                     "terms" -> Json.obj(
                       cost.terms.toVector

@@ -133,8 +133,9 @@ class DiagnosticsTests(unittest.TestCase):
         trace['schema'] = 'storymodel4s.bench.stage-trace/v2'
         unit = trace['units'][0]
         unit.update(finalAnchor=None, posteriorAnchor=None, noFillAnchor=None,
-                    nominations=[], states=[],
-                    localComparison={'status':'NotComputed','reason':'NoAdmittedStates'})
+                    nominations=[], states=[{'state':'ext:Unranked','anchor':None,
+                        'cost':1.,'localMass':None,'posteriorMass':1.}],
+                    localComparison={'status':'NotComputed','reason':'UnrankedOutcome'})
         path = Path(str(self.report)+'.stages.json')
         path.write_text(json.dumps(trace))
         rows = self.load()
@@ -144,7 +145,7 @@ class DiagnosticsTests(unittest.TestCase):
         self.assertEqual(rows[0]['externalStates'], {'Unranked': 1.})
         unit['localComparison']['status'] = 'Computed'
         path.write_text(json.dumps(trace))
-        with self.assertRaisesRegex(ValueError, 'without unranked evidence'):
+        with self.assertRaisesRegex(ValueError, 'invalid.*mass|without unranked evidence'):
             self.load()
 
     def test_equal_film_totals_do_not_hide_anchor_mass_divergence(self):

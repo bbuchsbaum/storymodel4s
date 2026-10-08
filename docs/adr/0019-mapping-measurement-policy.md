@@ -895,8 +895,9 @@ still refuse even when a zero refinement weight leaves numerical prices unchange
 
 Historical reports and frozen numerical bodies stay unchanged. The opt-in v2 diagnostic retains
 legacy consumed row fields; existing Python numerical/byte readers admit both v1 and v2 without
-minting library execution authority from JSON. Empty admitted populations remain explicitly
-NotComputed and preserve their unranked units. Downstream scene choices are reported diagnostics,
+minting library execution authority from JSON. A typed Unranked singleton retains its actual state, cost/support and posterior, but its local
+comparison is NotComputed with null local mass. Ordinary external alternatives remain computed.
+Empty admitted populations are separately NotComputed and never lose units. Downstream scene choices are reported diagnostics,
 validated for population/reference consistency, and are not inference-origin proof. Reject
 re-pricing in rendering, result-only provenance recovery and an invented local mass for no states.
 No module, dependency or public Scala API is added. Public reference/reconstruction admission,
