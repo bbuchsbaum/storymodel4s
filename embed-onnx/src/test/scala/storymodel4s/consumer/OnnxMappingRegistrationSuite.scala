@@ -79,15 +79,8 @@ class OnnxMappingRegistrationSuite extends FunSuite:
     )
     val different = OnnxMappingFixture.context(query = "ghost")
     assertEquals(
-      OnnxMappingRegistration.replay(
-        different,
-        config,
-        OnnxMappingFixture.model(),
-        original.queryRecord.provider,
-        original.queryRecord,
-        original.documentRecord
-      ),
-      Left(OnnxMappingRefusal.Replay(OnnxReplayRefusal.Payload))
+      original.replay(different, config, OnnxMappingFixture.model(), original.queryRecord.provider),
+      Left(OnnxMappingRefusal.Context)
     )
   }
 
@@ -140,7 +133,7 @@ class OnnxMappingRegistrationSuite extends FunSuite:
     )
   }
 
-  test("query document role substitution cannot become registered execution") {
+  test("query document role substitution is refused by the original capability") {
     withEncoder { e =>
       val ctx = OnnxMappingFixture.context(ranges = Vector(0 -> 5))
       val original = value(OnnxMappingRegistration.record(e, ctx, config))
@@ -158,10 +151,26 @@ class OnnxMappingRegistrationSuite extends FunSuite:
         )
       )
       val wrong = e.record(batch)
+      val query = e.spaces.find(_.role == Role.Query).get
+      val expected = value(
+        EmbedBatch.validated(
+          Vector(
+            EmbedRequest(
+              RequestId.unsafe("surface-query-0"),
+              EmbedPayload.Raw("hello", Sensitivity.Public),
+              query.id
+            )
+          ),
+          e.spaceIds
+        )
+      )
       assertEquals(
-        OnnxMappingRegistration
-          .replay(ctx, config, e.model, e.info.provider, wrong, original.documentRecord),
-        Left(OnnxMappingRefusal.Replay(OnnxReplayRefusal.Geometry))
+        wrong.replay(expected, e.model, e.info.provider),
+        Left(OnnxReplayRefusal.Geometry)
+      )
+      assertEquals(
+        original.queryRecord.replay(expected, e.model, e.info.provider),
+        Right(original.queryRecord.result)
       )
     }
   }

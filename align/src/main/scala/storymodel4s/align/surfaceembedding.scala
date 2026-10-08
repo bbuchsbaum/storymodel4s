@@ -21,8 +21,9 @@ type SurfaceScore = SurfaceEmbedding.Score
 type SurfaceScoringSession = SurfaceEmbedding.Session
 
 /** Factorized declared data store O((U+N)d) vectors and calculate pair distances on demand.
-  * Complete nomination remains O(UNd); hierarchy projections and retained candidates have their own
-  * costs. No callback, source coordinate or all-pairs cache belongs to the evaluator.
+  * Complete nomination performs O(UNd) distance arithmetic; endpoint lookups, hierarchy projections
+  * and retained candidates have their own costs. No callback, source coordinate or all-pairs cache
+  * belongs to the evaluator.
   */
 object SurfaceEmbedding:
   type Outcome = Either[ExecutionFailure, Estimate[ValidatedVector]]

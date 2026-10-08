@@ -27,6 +27,16 @@ final case class OpenRegistered(
     basis: OnnxMappingBasis
 )
 
+object OpenReplay:
+  def replay(
+      context: SurfaceScoringContext,
+      config: OnnxMappingRegistration.Config,
+      model: OnnxSentenceModel,
+      provider: ProviderFingerprint,
+      query: OnnxSentenceEmbedder.RecordedBatch,
+      document: OnnxSentenceEmbedder.RecordedBatch
+  ): Either[OnnxMappingRefusal, OnnxMappingRegistration.Registered] = ???
+
 /** Declared vectors and unrelated receipts cannot manufacture concrete execution authority. */
 class OnnxMappingBoundarySuite extends FunSuite:
 
@@ -177,5 +187,20 @@ class OnnxMappingBoundarySuite extends FunSuite:
         "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; summon[scala.deriving.Mirror.ProductOf[OnnxMappingRegistration.Registered]]"
       ),
       "Mirror opened"
+    )
+  }
+
+  test("raw recording replay cannot bypass bound registration context and configuration") {
+    assert(
+      typeChecks(
+        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; OpenReplay.replay(???, ???, ???, ???, ???, ???)"
+      ),
+      "same-shape control"
+    )
+    assert(
+      !typeChecks(
+        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; OnnxMappingRegistration.replay(???, ???, ???, ???, ???, ???)"
+      ),
+      "raw replay bypass opened"
     )
   }

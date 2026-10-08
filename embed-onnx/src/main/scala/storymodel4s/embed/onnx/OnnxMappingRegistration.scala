@@ -177,7 +177,7 @@ object OnnxMappingRegistration:
   /** Genuine unrelated capabilities cannot be attached to an arbitrary declared table/evidence.
     * Expected requests are rebuilt here, including exact text, sensitivity, IDs and geometry.
     */
-  def replay(
+  private def replay(
       context: SurfaceScoringContext,
       config: Config,
       expectedModel: OnnxSentenceModel,
