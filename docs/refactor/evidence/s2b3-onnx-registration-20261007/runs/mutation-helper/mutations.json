@@ -1,0 +1,68 @@
+[
+  {
+    "mutation": "unit-helper-door",
+    "candidate_sha": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+    "path": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly surfaceembeddingconsumer.SurfaceEmbeddingBoundarySuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        47,
+        1,
+        0,
+        46
+      ]
+    ],
+    "named_failure": "canonical unit projection helper is package private",
+    "failures": [
+      "==> X surfaceembeddingconsumer.SurfaceEmbeddingBoundarySuite.canonical unit projection helper is package private 0.018s munit.FailException: align/src/test/scala/storymodel4s/probes/SurfaceEmbeddingBoundarySuite.scala:636 unit helper opened"
+    ],
+    "clean_test_recompile": true,
+    "test_selection": null,
+    "source_sha256": "df0909469408d18e5defef6b208323d86d3fbf50467e914c90c1aa0a0414866f",
+    "patch_sha256": "43c3947520f8b9c0bdd234b7fdf603d776caeef45d170af4dddb731e6a347e4e",
+    "log_sha256": "ef93412f3fd0b2a19b498c0eb34230cf6db41c08343d0719dc5149745caf871a"
+  },
+  {
+    "mutation": "target-helper-door",
+    "candidate_sha": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+    "path": "align/src/main/scala/storymodel4s/align/content.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly surfaceembeddingconsumer.SurfaceEmbeddingBoundarySuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        47,
+        1,
+        0,
+        46
+      ]
+    ],
+    "named_failure": "canonical target projection helper is package private",
+    "failures": [
+      "==> X surfaceembeddingconsumer.SurfaceEmbeddingBoundarySuite.canonical target projection helper is package private 0.015s munit.FailException: align/src/test/scala/storymodel4s/probes/SurfaceEmbeddingBoundarySuite.scala:647 target helper opened"
+    ],
+    "clean_test_recompile": true,
+    "test_selection": null,
+    "source_sha256": "034102669f57b05b97b61e5db00c69eee7c53c38a7f9a3a42f39c3157a6be509",
+    "patch_sha256": "d2b50bac9bbcae0e5f01773fc02511682d73a2576c38098bee01b140c157fd9c",
+    "log_sha256": "0236fe185b63e681ea18b549b41c63aa773e7c94d938deaee5b6e3eb373520c6"
+  }
+]

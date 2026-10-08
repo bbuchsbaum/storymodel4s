@@ -1,0 +1,9 @@
+{
+  "local_override": "/Users/bbuchsbaum/code/scala/grakern",
+  "head": "8efc5efade4e56c6e0b29745bd1b108d4c9a9d57",
+  "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_entries": 0,
+  "declared_pin": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "scope": "LocallyObserved using the clean local override; default pinned-dependency and hosted qualification are not established.",
+  "unchanged_after_gates": true
+}

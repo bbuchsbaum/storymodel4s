@@ -1,0 +1,541 @@
+{
+  "status": "qualified",
+  "source_candidate": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+  "mutation_session": null,
+  "mutation_output": "/private/tmp/storymodel4s-s2b3-logs",
+  "next_action": "Child landed locally and closed; G1 historical weighted-cost parity and originating StageTrace adoption remain open. Publication and default-pinned/hosted qualification remain separate.",
+  "hosted_refreshed": false,
+  "published": false,
+  "parent_complete": false,
+  "source_session": null,
+  "source_log": "/private/tmp/storymodel4s-s2b3-logs/source-gate-final.log",
+  "source_clone": "/private/tmp/storymodel4s-s2b3-build",
+  "source_timeout_seconds": 7200,
+  "mutation_witnesses": 12,
+  "helper_mutation_session": null,
+  "mutation_input_compatibility": {
+    "mutation_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "unchanged_paths": [
+      "align/src/main/scala/storymodel4s/align/content.scala",
+      "align/src/main/scala/storymodel4s/align/surfaceembedding.scala",
+      "align/src/main/scala/storymodel4s/align/evidence.scala",
+      "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+      "embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala",
+      "align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala"
+    ],
+    "extended_test_paths": [
+      "align/src/test/scala/storymodel4s/probes/SurfaceEmbeddingBoundarySuite.scala",
+      "embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala"
+    ]
+  },
+  "source_observer_session": 24914,
+  "mutation_passing_siblings": 194,
+  "code_sha": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+  "base": "426754cb0996ffa67aba54c0536a1f2ea2748d7c",
+  "source": {
+    "exit": 0,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJS/Test/clean",
+      "alignNative/Test/clean",
+      "embedOnnx/Test/clean",
+      "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedCoreJVM/test; embedOnnx/test; featuresJVM/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test",
+      "acquireJS/test",
+      "alignJS/test",
+      "amrInteropJS/test",
+      "codecJS/test",
+      "coreJS/test",
+      "documentJS/test",
+      "embedCoreJS/test",
+      "featuresJS/test",
+      "fixturesJS/test",
+      "interviewJS/test",
+      "lawsJS/test",
+      "recallJS/test",
+      "storyJS/test",
+      "viewJS/test",
+      "acquireNative/test",
+      "alignNative/test",
+      "amrInteropNative/test",
+      "codecNative/test",
+      "coreNative/test",
+      "documentNative/test",
+      "embedCoreNative/test",
+      "featuresNative/test",
+      "fixturesNative/test",
+      "interviewNative/test",
+      "lawsNative/test",
+      "recallNative/test",
+      "storyNative/test",
+      "viewNative/test",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "totals": [
+      [
+        138,
+        0,
+        0,
+        138,
+        0
+      ],
+      [
+        775,
+        0,
+        0,
+        775,
+        0
+      ],
+      [
+        92,
+        0,
+        0,
+        92,
+        0
+      ],
+      [
+        327,
+        0,
+        0,
+        327,
+        0
+      ],
+      [
+        250,
+        0,
+        0,
+        250,
+        0
+      ],
+      [
+        159,
+        0,
+        0,
+        159,
+        0
+      ],
+      [
+        189,
+        0,
+        0,
+        189,
+        0
+      ],
+      [
+        142,
+        0,
+        0,
+        141,
+        1
+      ],
+      [
+        145,
+        0,
+        0,
+        145,
+        0
+      ],
+      [
+        48,
+        0,
+        0,
+        48,
+        0
+      ],
+      [
+        77,
+        0,
+        0,
+        77,
+        0
+      ],
+      [
+        165,
+        0,
+        0,
+        165,
+        0
+      ],
+      [
+        104,
+        0,
+        0,
+        104,
+        0
+      ],
+      [
+        117,
+        0,
+        0,
+        117,
+        0
+      ],
+      [
+        64,
+        0,
+        0,
+        61,
+        3
+      ],
+      [
+        120,
+        0,
+        0,
+        120,
+        0
+      ],
+      [
+        98,
+        0,
+        0,
+        98,
+        0
+      ],
+      [
+        77,
+        0,
+        0,
+        77,
+        0
+      ],
+      [
+        167,
+        0,
+        0,
+        167,
+        0
+      ],
+      [
+        133,
+        0,
+        0,
+        133,
+        0
+      ],
+      [
+        138,
+        0,
+        0,
+        138,
+        0
+      ],
+      [
+        755,
+        0,
+        0,
+        755,
+        0
+      ],
+      [
+        92,
+        0,
+        0,
+        92,
+        0
+      ],
+      [
+        326,
+        0,
+        0,
+        326,
+        0
+      ],
+      [
+        250,
+        0,
+        0,
+        250,
+        0
+      ],
+      [
+        186,
+        0,
+        0,
+        186,
+        0
+      ],
+      [
+        145,
+        0,
+        0,
+        145,
+        0
+      ],
+      [
+        77,
+        0,
+        0,
+        77,
+        0
+      ],
+      [
+        160,
+        0,
+        0,
+        160,
+        0
+      ],
+      [
+        104,
+        0,
+        0,
+        104,
+        0
+      ],
+      [
+        117,
+        0,
+        0,
+        117,
+        0
+      ],
+      [
+        77,
+        0,
+        0,
+        77,
+        0
+      ],
+      [
+        167,
+        0,
+        0,
+        167,
+        0
+      ],
+      [
+        133,
+        0,
+        0,
+        133,
+        0
+      ],
+      [
+        138,
+        0,
+        0,
+        138,
+        0
+      ],
+      [
+        755,
+        0,
+        0,
+        755,
+        0
+      ],
+      [
+        92,
+        0,
+        0,
+        92,
+        0
+      ],
+      [
+        326,
+        0,
+        0,
+        326,
+        0
+      ],
+      [
+        250,
+        0,
+        0,
+        250,
+        0
+      ],
+      [
+        186,
+        0,
+        0,
+        186,
+        0
+      ],
+      [
+        145,
+        0,
+        0,
+        145,
+        0
+      ],
+      [
+        77,
+        0,
+        0,
+        77,
+        0
+      ],
+      [
+        160,
+        0,
+        0,
+        160,
+        0
+      ],
+      [
+        104,
+        0,
+        0,
+        104,
+        0
+      ],
+      [
+        117,
+        0,
+        0,
+        117,
+        0
+      ],
+      [
+        77,
+        0,
+        0,
+        77,
+        0
+      ],
+      [
+        167,
+        0,
+        0,
+        167,
+        0
+      ],
+      [
+        133,
+        0,
+        0,
+        133,
+        0
+      ]
+    ],
+    "sum": {
+      "passed": 8837,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 4
+    },
+    "log_archive": "runs/source-gate-final.log.gz",
+    "metadata_archive": "runs/source-gate-final.log.meta.json",
+    "log_sha256": "eaf122e94108651814f50ba3e2293edb0c75d5232cbce2334f6bbf83ada60dc7",
+    "skipped_tests": [
+      "==> s storymodel4s.bench.sherlock.SherlockRecallMappingSuite.the neural channel puts the red-door unit nearer its row than an unrelated row skipped 0.004s",
+      "==> s storymodel4s.media.BoundarySearchSuite.live ffmpeg and worker, when this machine has both, reproduce the recorded proposals skipped 0.007s",
+      "==> s storymodel4s.media.CaptionSearchSuite.live worker and weights, when this machine has them, reproduce the recorded proposals skipped 0.002s",
+      "==> s storymodel4s.media.F1ExcerptSuite.live tools, when this machine has them and the excerpt, reproduce the recorded packet table and proposals skipped 0.001s"
+    ]
+  },
+  "source_restored_clean": true,
+  "consumer_session": null,
+  "consumer_log": "/private/tmp/storymodel4s-s2b3-logs/consumer-gate.log",
+  "consumer": {
+    "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+    "producer_sha": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+    "exit": 0,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-s2b3-build",
+      "set ThisBuild / tlFatalWarnings := true",
+      "compileAll",
+      "testAll",
+      "app/fastLinkJS",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "totals": [
+      [
+        22,
+        0,
+        0,
+        22,
+        0
+      ],
+      [
+        26,
+        0,
+        0,
+        26,
+        0
+      ],
+      [
+        100,
+        0,
+        0,
+        100,
+        0
+      ],
+      [
+        100,
+        0,
+        0,
+        100,
+        0
+      ],
+      [
+        13,
+        0,
+        0,
+        13,
+        0
+      ],
+      [
+        13,
+        0,
+        0,
+        13,
+        0
+      ],
+      [
+        74,
+        0,
+        0,
+        74,
+        0
+      ],
+      [
+        74,
+        0,
+        0,
+        74,
+        0
+      ],
+      [
+        59,
+        0,
+        0,
+        59,
+        0
+      ],
+      [
+        4,
+        0,
+        0,
+        4,
+        0
+      ]
+    ],
+    "sum": {
+      "passed": 485,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "log_archive": "runs/consumer-gate.log.gz",
+    "metadata_archive": "runs/consumer-gate.log.meta.json",
+    "log_sha256": "a2577d65b577f6524058208a030c8ec759c4d702c86934e88a789ef28ea426b9"
+  },
+  "consumer_primary_preserved": true,
+  "independent_review": {
+    "sha": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+    "verdict": "PASS",
+    "reviewer": "/root/s2b3_review",
+    "unresolved_blocks": 0,
+    "record": "REVIEW.md"
+  }
+}

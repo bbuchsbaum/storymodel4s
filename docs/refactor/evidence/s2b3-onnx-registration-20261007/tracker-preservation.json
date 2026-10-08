@@ -1,0 +1,31 @@
+{
+  "resumed_actor": "codex-s2b3-20261007",
+  "resumed_op_paths": [
+    ".mote/ops/20261007T222037.244478Z-p74082-c0000-r6f75-hf69ae1.json",
+    ".mote/ops/20261007T222037.255106Z-p74082-c0001-rdc64-h7daf72.json",
+    ".mote/ops/20261007T222037.265034Z-p74082-c0002-rec72-hd4f572.json",
+    ".mote/ops/20261007T222037.275163Z-p74082-c0003-r216f-h465194.json",
+    ".mote/ops/20261007T222037.285162Z-p74082-c0004-r7154-h315eca.json",
+    ".mote/ops/20261007T222707.697189Z-p83684-c0000-re594-h5fffed.json",
+    ".mote/ops/20261007T222719.981141Z-p83683-c0000-rf1ee-h5c8764.json",
+    ".mote/ops/20261007T222726.197818Z-p83683-c0001-r3608-hd60830.json",
+    ".mote/ops/20261007T222732.254919Z-p83683-c0002-r9d74-h269a8c.json",
+    ".mote/ops/20261007T222738.330249Z-p83683-c0003-rfe00-h63a639.json",
+    ".mote/ops/20261007T223422.432570Z-p92906-c0000-re2af-hce2133.json",
+    ".mote/ops/20261008T011018.867437Z-p75279-c0000-rcf40-haceb01.json",
+    ".mote/ops/20261008T011111.063068Z-p77040-c0000-rf1ea-ha88bbb.json",
+    ".mote/ops/20261008T011209.699312Z-p78708-c0000-r0473-he7b91a.json",
+    ".mote/ops/20261008T011748.323858Z-p94949-c0000-r8610-h82fdae.json",
+    ".mote/ops/20261008T012120.274667Z-p2826-c0000-r8190-h79bd9f.json",
+    ".mote/ops/20261008T013333.137025Z-p51279-c0000-r04de-hef51a0.json",
+    ".mote/ops/20261008T013340.067171Z-p51279-c0001-r3af7-h2ebad4.json",
+    ".mote/ops/20261008T013347.397142Z-p51279-c0002-r42df-h278c2b.json",
+    ".mote/ops/20261008T013954.325132Z-p10230-c0000-r3d1e-h1d52b8.json",
+    ".mote/ops/20261008T015649.667096Z-p66076-c0000-r5e52-he226d1.json",
+    ".mote/ops/20261008T023626.639992Z-p48307-c0000-rd849-h8c39f9.json",
+    ".mote/ops/20261008T023634.690900Z-p48307-c0001-rb464-hb50ab4.json",
+    ".mote/ops/20261008T023634.909744Z-p49241-c0000-r4252-h7637cd.json",
+    ".mote/ops/20261008T023653.659983Z-p48307-c0002-r2914-h3dc151.json"
+  ],
+  "unrelated_actor_ops_included": false
+}

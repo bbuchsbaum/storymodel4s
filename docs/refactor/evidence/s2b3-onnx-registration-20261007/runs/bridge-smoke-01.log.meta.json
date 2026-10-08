@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T22:52:53.639839+00:00",
+  "finished_utc": "2026-10-07T22:53:37.359099+00:00",
+  "duration_seconds": 43.718882,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite surfaceembeddingconsumer.SurfaceEmbeddingBoundarySuite storymodel4s.align.SurfaceRenderingSuite storymodel4s.probes.StrictContentBoundarySuite",
+    "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingRegistrationSuite",
+    "alignJVM/scalafmt",
+    "alignJVM/Test/scalafmt",
+    "embedOnnx/scalafmt",
+    "embedOnnx/Test/scalafmt"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-s2b3-logs/bridge-smoke-01.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3220
+}

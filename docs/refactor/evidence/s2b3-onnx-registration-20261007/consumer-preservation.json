@@ -1,0 +1,14 @@
+{
+  "head": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "status_sha256": "3dbe7fa5c835397fcdc108968b9732ffed396e44a0f6d1cd2a3f512976758da1",
+  "dirty_entries": 1166,
+  "untouched": true,
+  "status_command": [
+    "git",
+    "status",
+    "--porcelain=v1",
+    "-z"
+  ],
+  "status_serialization": "raw bytes including NUL separators; no stripping or decoding",
+  "content_claim": "No writes to sibling primary; HEAD and raw dirty-status digest match before/after."
+}

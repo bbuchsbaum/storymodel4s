@@ -1,0 +1,253 @@
+[
+  {
+    "mutation": "endpoint-association",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "align/src/main/scala/storymodel4s/align/surfaceembedding.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        13,
+        1,
+        0,
+        12
+      ]
+    ],
+    "named_failure": "complete ordered endpoint association refuses missing extra and reordered keys",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceEmbeddingSuite.complete ordered endpoint association refuses missing extra and reordered keys 0.026s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala:135"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "66c8c42c7adc66d1baf2f56ef77544c2afe518329ac0f4fc14cfe1ad25e72459",
+    "patch_sha256": "c596fd950da525df8df0284ba766c7f6c8a9da220e8e169488780e71a811b9d4",
+    "log_sha256": "77a9df5d853145aae0d855ddda190708b72020fd38c2eef794b7e3e121b65078"
+  },
+  {
+    "mutation": "vector-geometry",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "align/src/main/scala/storymodel4s/align/surfaceembedding.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        13,
+        1,
+        0,
+        12
+      ]
+    ],
+    "named_failure": "endpoint vectors must match their checked role geometry",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceEmbeddingSuite.endpoint vectors must match their checked role geometry 0.023s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala:187"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "97d6766ae58507cc8810cf93059762d5d31d586b44d55f7b2a05bbdd40bf6c1a",
+    "patch_sha256": "cebc5fb804cf5bfa9e6391380b52013a0832afa1d4591dcce78ed51e4d30c2bf",
+    "log_sha256": "fff584a5627f0ef338414e1ab923913d5a68f48de61609f934a78159950cb9e5"
+  },
+  {
+    "mutation": "empty-input-policy",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "align/src/main/scala/storymodel4s/align/surfaceembedding.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        13,
+        1,
+        0,
+        12
+      ]
+    ],
+    "named_failure": "literal empty text must be ineligible and cannot acquire a vector",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceEmbeddingSuite.literal empty text must be ineligible and cannot acquire a vector 0.023s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala:265"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "317dfc161cf458e4501fa0eecc950c60ce0fef2eb573ed3f0dbbdead5697113b",
+    "patch_sha256": "cfa324145f506b09df3f961c1d57162da02df04191beed6e8bd126f26d54a2d9",
+    "log_sha256": "36e446361bb006971004cb8a5feb07538168a0f9a11b1b4a8afcbae4d3ff2fd7"
+  },
+  {
+    "mutation": "conflicting-endpoints",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "align/src/main/scala/storymodel4s/align/surfaceembedding.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        13,
+        1,
+        0,
+        12
+      ]
+    ],
+    "named_failure": "identical rendered keys refuse conflicting outcomes rather than insertion order",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceEmbeddingSuite.identical rendered keys refuse conflicting outcomes rather than insertion order 0.025s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala:147"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "6dabd0221f0442bd4c9405ba7fcc41574d1c204890a246765e0b7148231af388",
+    "patch_sha256": "ed3ff3046c8866132cb941f0241ec718924c67702950be6be62818cfd83aa320",
+    "log_sha256": "463b83ae27c1de131c2ce81661195f66567cfbe0880afd640296ee6ed8671a6b"
+  },
+  {
+    "mutation": "shared-surface-context",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "align/src/main/scala/storymodel4s/align/evidence.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        13,
+        1,
+        0,
+        12
+      ]
+    ],
+    "named_failure": "matching numerical tables cannot substitute a different source text context",
+    "failures": [
+      "==> X storymodel4s.align.SurfaceEmbeddingSuite.matching numerical tables cannot substitute a different source text context 0.021s munit.FailException: align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala:311 assertion failed"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "0dad6bdb252c3b634f988ddf23f5cb574186a8823e8c99933cdd7cecaefb07ad",
+    "patch_sha256": "c481b2891b46145c6cde98a875a72cee2c4ea3c32c18e00d479f99924bff00c1",
+    "log_sha256": "8489e37e6919ff0ce80b925b01b2ed7a6a6f29f3a5c5300806934d21e20b4f72"
+  },
+  {
+    "mutation": "registration-context",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingRegistrationSuite -- \"--tests=^(exact registration replay binds source bytes|registration replay refuses changed configuration).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1
+      ]
+    ],
+    "named_failure": "exact registration replay binds source bytes beyond equal view fields and payloads",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingRegistrationSuite.exact registration replay binds source bytes beyond equal view fields and payloads 5.775s munit.ComparisonFailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala:96"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": "^(exact registration replay binds source bytes|registration replay refuses changed configuration).*",
+    "source_sha256": "becb984184931f2ae2f7ce8a7eec9a89b109922da482c0d7eaf8b4bacdef7752",
+    "patch_sha256": "6e341872b7a1600b47cd3a918536c3f90a40afcf8c7b3db1c18710b598b016d0",
+    "log_sha256": "a1ce5315db775802f05314aab7da0afa84d260195220af494244d5d472ea11e3"
+  },
+  {
+    "mutation": "raw-replay-door",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingBoundarySuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "totals": [
+      [
+        11,
+        1,
+        0,
+        10
+      ]
+    ],
+    "named_failure": "raw recording replay cannot bypass bound registration context and configuration",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingBoundarySuite.raw recording replay cannot bypass bound registration context and configuration 0.014s munit.FailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala:205 raw replay bypass opened"
+    ],
+    "clean_test_recompile": true,
+    "test_selection": null,
+    "source_sha256": "a3dbbded2d771764073ebdcc903b0056c915fff400854acf5ae1d22ecd0cacf5",
+    "patch_sha256": "683ac74678c73503777943d0c91e578c2e5f4d3f9b15502a09c1b5f96c665afa",
+    "log_sha256": "42f51327318a8b2eb3edaf5a8ead55dad2f2a253835d43d4e88865533e5058ae"
+  },
+  {
+    "mutation": "executed-constructor-door",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingBoundarySuite"
+    ],
+    "exit": 1,
+    "compiled": false,
+    "totals": [
+      [
+        11,
+        2,
+        0,
+        9
+      ]
+    ],
+    "named_failure": "registered constructor is closed outside the defining package",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingBoundarySuite.registered constructor is closed outside the defining package 0.015s munit.FailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala:130 constructor opened",
+      "==> X onnxmappingconsumer.OnnxMappingBoundarySuite.registered apply is closed outside the defining package 0.002s munit.FailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala:145 apply opened"
+    ],
+    "clean_test_recompile": true,
+    "test_selection": null,
+    "source_sha256": "5f84930ed7ac30f4981841cc77821c0cb6591b2df994e3ad9eab1759cbbb78ef",
+    "patch_sha256": "4b001cc813718f01015578dcfe71ed9af62478864d231109b90da55e6f19b588",
+    "log_sha256": "5e5cb51998e99ab47cb898c761f881dd34b2f30a24a1ee59c52e65bfd5a5c481"
+  }
+]

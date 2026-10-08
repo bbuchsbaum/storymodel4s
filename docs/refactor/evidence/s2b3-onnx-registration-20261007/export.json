@@ -1,0 +1,24 @@
+{
+  "candidate_sha": "658fec8bce07ecaf8e541d7dce71700f7992335d",
+  "base": "426754cb0996ffa67aba54c0536a1f2ea2748d7c",
+  "clean": true,
+  "changed_files_sha256": {
+    "align/src/main/scala/storymodel4s/align/candidatepolicy.scala": "b2e44a9f58fe4554a031ed68fe8021210b654a387f5f73efdbfbf8e9fbe6a316",
+    "align/src/main/scala/storymodel4s/align/content.scala": "795f5246cab49a1e0e5ca2bf2105f6c4bbe6a3297c2f6f063f8044a17a9d6cb0",
+    "align/src/main/scala/storymodel4s/align/evidence.scala": "461594045b63434e40ea594e3a044b184e36562df16303623db0e1857e310ef4",
+    "align/src/main/scala/storymodel4s/align/strictcost.scala": "89726c3c312a759ef677bea01e7d2a52d709a2d9da16810273181a6ab88a31a5",
+    "align/src/main/scala/storymodel4s/align/surfacerender.scala": "67224f3e805db8ed68fa88275c744f14fd9234ddf1fd5328251dd6c3792d9c41",
+    "align/src/test/scala/storymodel4s/probes/StrictCandidatesUnforgeableSuite.scala": "796d7a397e37bcce3ae6a6c162ecd95bec75896d199958336ab1708972a51b3b",
+    "align/src/test/scala/storymodel4s/probes/StrictContentBoundarySuite.scala": "e86f4e8a10fd5f696c4c31e6d361bdef05107b405e0bc8ee5fe77432aa7c8ec5",
+    "build.sbt": "e05c34585e331636bcda6e8f6b9ce73d80c0a2c65b8254de8bc34cb8a366dfc4",
+    "docs/adr/0019-mapping-measurement-policy.md": "c25d618b9636bff2547585e955c7873d65e39aefcb73688ccf9410b1a873b7fd",
+    "align/src/main/scala/storymodel4s/align/surfaceembedding.scala": "108ef4ca73b5f7da3dbe4353a21e399ef47fd17003486d98930a704d3f1d934b",
+    "align/src/test/scala/storymodel4s/align/SurfaceEmbeddingSuite.scala": "6c38a73aa0e846e2781e05175b1bccf2e1d0450d0026916576f382f24eac4395",
+    "align/src/test/scala/storymodel4s/probes/SurfaceEmbeddingBoundarySuite.scala": "5c75efdc6cbd6bc69cba55c3cf5dc76c5061541ea3c5d82402d031a767f273be",
+    "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala": "26b3e5c899c156dd863b8fd98b5a73b957951fdf8ad14aa2a822e8c11d711a57",
+    "embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala": "f6f0f19da9fc2494ae34557e8b9feff7864e608ea3076ffe6eba3cc71104cc9a",
+    "embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala": "09dee870d825e6e6072f17e318470e2cfea08df99d063f736cadaaf00ac300dd",
+    "embed-onnx/src/test/scala/storymodel4s/embed/onnx/OnnxMappingFixture.scala": "8493e142450e29f4922cbcc6c2ce1f30c8369ab0488877af8f790fd7992f36c5",
+    "align/.jvm/src/test/scala/storymodel4s/probes/ContentSurfaceSuite.scala": "9944f489113f449a0f083868dd532182265258e0a78beef71d09629000800bf0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-07T22:48:25.312187+00:00",
+  "finished_utc": "2026-10-07T22:48:52.297507+00:00",
+  "duration_seconds": 26.984991,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedOnnx/Test/compile"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-s2b3-logs/consumer-before-bridge.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 2776
+}

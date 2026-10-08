@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-08T01:21:09.971512+00:00",
+  "finished_utc": "2026-10-08T01:21:35.632534+00:00",
+  "duration_seconds": 25.660971,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.SurfaceEmbeddingSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-s2b3-logs/mutations/endpoint-association.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3106
+}

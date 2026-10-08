@@ -1,0 +1,68 @@
+[
+  {
+    "mutation": "executed-constructor-door",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingBoundarySuite -- \"--tests=^(?!registered apply).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        10,
+        1,
+        0,
+        9
+      ]
+    ],
+    "named_failure": "registered constructor is closed outside the defining package",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingBoundarySuite.registered constructor is closed outside the defining package 0.015s munit.FailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala:130 constructor opened"
+    ],
+    "clean_test_recompile": true,
+    "test_selection": "^(?!registered apply).*",
+    "source_sha256": "5f84930ed7ac30f4981841cc77821c0cb6591b2df994e3ad9eab1759cbbb78ef",
+    "patch_sha256": "4b001cc813718f01015578dcfe71ed9af62478864d231109b90da55e6f19b588",
+    "log_sha256": "0549156341ed9d1157f50ec2079149c280a5c8007f0340962023c0c604badfb8"
+  },
+  {
+    "mutation": "executed-apply-door",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/Test/clean",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingBoundarySuite -- \"--tests=^(?!registered constructor).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        10,
+        1,
+        0,
+        9
+      ]
+    ],
+    "named_failure": "registered apply is closed outside the defining package",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingBoundarySuite.registered apply is closed outside the defining package 0.014s munit.FailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingBoundarySuite.scala:145 apply opened"
+    ],
+    "clean_test_recompile": true,
+    "test_selection": "^(?!registered constructor).*",
+    "source_sha256": "5f84930ed7ac30f4981841cc77821c0cb6591b2df994e3ad9eab1759cbbb78ef",
+    "patch_sha256": "4b001cc813718f01015578dcfe71ed9af62478864d231109b90da55e6f19b588",
+    "log_sha256": "2c6312eb44d9fa105e2672c1bf4c58d2af48328f7a3c63b7e0b05910b15b9415"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "mutation": "registration-configuration",
+    "candidate_sha": "073bca27bc7fe37ab108b02f5eca60e23758009b",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingRegistrationSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        14,
+        1,
+        0,
+        13
+      ]
+    ],
+    "named_failure": "registration replay refuses changed configuration model and provider",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingRegistrationSuite.registration replay refuses changed configuration model and provider 0.035s munit.ComparisonFailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala:115"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "cac6dd712bb213913166f39616285260f6b040ab4fe23f3e12961e57cbb954b8",
+    "patch_sha256": "28b541f7f18e58fd4137745ad7cc4ff3f4809122625adb37dc70e5f22380b72f",
+    "log_sha256": "299a004b8c5ea57a1d2471c30fbc93387cf00dcacb600cc6180b7cb04c7429b8"
+  }
+]
