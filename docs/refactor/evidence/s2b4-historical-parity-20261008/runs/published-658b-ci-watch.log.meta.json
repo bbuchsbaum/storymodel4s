@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-08T13:09:02.852501+00:00",
+  "finished_utc": "2026-10-08T13:48:19.913248+00:00",
+  "duration_seconds": 2357.035853,
+  "command": [
+    "/Users/bbuchsbaum/.local/bin/gh-bbuchsbaum",
+    "run",
+    "watch",
+    "37782012657",
+    "--repo",
+    "bbuchsbaum/storymodel4s",
+    "--exit-status",
+    "--interval",
+    "30"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/private/tmp/storymodel4s-s2b4-hosted-ci-watch.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 196136
+}

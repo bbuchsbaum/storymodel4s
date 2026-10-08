@@ -351,8 +351,8 @@
     "metadata_archive": "runs/source-gate.log.meta.json"
   },
   "mutation_witnesses": 6,
-  "qualification_scope": "LocallyObserved with unchanged clean grakern 8efc5ef override; prior exact head c4010ed8 hosted default-pin qualification recorded separately",
-  "status": "locally_qualified_independent_review_pass",
+  "qualification_scope": "Local exact-source gate and six mutations use the recorded grakern override; hosted exact published 658b source/docs qualify declared default pins. Historical engineering compatibility only.",
+  "status": "hosted_source_qualified_on_658b",
   "stage_trace_adopted": false,
   "independent_review": {
     "reviewer": "/root/s2b3_review",
@@ -360,5 +360,6 @@
     "source_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
     "remaining_blocks": 0,
     "mutation_verifier_followup": "closed after actual-log/metadata reconciliation and reviewer rerun"
-  }
+  },
+  "hosted_publication_receipt": "publication-658b.json"
 }

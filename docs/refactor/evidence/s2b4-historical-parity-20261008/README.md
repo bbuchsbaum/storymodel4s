@@ -29,8 +29,21 @@ actual exits, complete logs and patches are retained. The local profile uses the
 grakern 8efc override, so it does not establish this candidate's default-pinned/hosted qualification.
 
 The previously published c4010ed8 is separately qualified on hosted source run 37768447564 (all four
-matrix cells; 12,656 passed/12 skipped over 76 totals) and documentation run 37768447399 (13 executable
+matrix cells; 13,214 passed/12 skipped over 80 raw-job totals) and documentation run 37768447399 (13 executable
 examples) using declared pins. Those runs qualify that exact previous head, not this candidate.
+
+Published `658b1d9433db155542ccba33a115704ad1e058ab` is now qualified by
+[source run 37782012657](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37782012657)
+and [docs run 37782012767](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37782012767),
+using declared pins: all four matrix cells succeeded, with 13,232 passed, zero failed/errors and
+12 existing optional skips over 80 totals. Both JVM 17 and 21 raw logs record the complete nine-case
+parity suite with zero failed or ignored tests. Documentation replayed 13 examples and verified
+20 built pages, navigation and provenance. [Hosted receipts](publication-658b.json) bind the exact
+head, original raw job logs, metadata and actual watcher exits. The source code is unchanged from
+reviewed `71a79818`; the intervening commit contains documentation and tracker records.
+
+[Receipt correction](CORRECTION.md) explains the earlier incomplete rendered-log count. Complete
+raw job logs supply the corrected c401 count above; its original rendered receipt is preserved.
 
 Historical evidence remains Unattested. Its channel identity does not authenticate text/preset or
 execution, endpoint failures still project to ProviderAbstained, and the legacy blend retains a pair

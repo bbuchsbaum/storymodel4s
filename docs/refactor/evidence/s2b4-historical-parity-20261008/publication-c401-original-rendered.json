@@ -6,9 +6,6 @@
     "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37768447564",
     "matrix_cells": 4,
     "conclusion": "success",
-    "metadata_archive": "runs/published-c401-ci.json",
-    "log_archive": "runs/published-c401-ci.log.gz",
-    "full_log_sha256": "e60873b86186dc51138f499ecef71a80bc515ce536d07eb1420dad9315088c61",
     "totals": [
       {
         "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
@@ -391,26 +388,6 @@
         ]
       },
       {
-        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
-        "counts": [
-          120,
-          0,
-          0,
-          120,
-          0
-        ]
-      },
-      {
-        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
-        "counts": [
-          159,
-          0,
-          0,
-          159,
-          0
-        ]
-      },
-      {
         "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
         "counts": [
           250,
@@ -631,26 +608,6 @@
         ]
       },
       {
-        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
-        "counts": [
-          120,
-          0,
-          0,
-          120,
-          0
-        ]
-      },
-      {
-        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
-        "counts": [
-          159,
-          0,
-          0,
-          159,
-          0
-        ]
-      },
-      {
         "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
         "counts": [
           250,
@@ -811,56 +768,16 @@
         ]
       }
     ],
-    "job_logs": [
-      {
-        "job_id": 113281750262,
-        "job_name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
-        "log_archive": "runs/published-c401-job-113281750262.log.gz",
-        "full_log_sha256": "a76ed1f8f0236b83a5171e404be090aa8021917dd54726662cc966a7d77b89bc"
-      },
-      {
-        "job_id": 113281750588,
-        "job_name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
-        "log_archive": "runs/published-c401-job-113281750588.log.gz",
-        "full_log_sha256": "c967461d45029bc28aee6ca6d9e5db78525cf962a3196ddbca6d371d18a18431"
-      },
-      {
-        "job_id": 113281750594,
-        "job_name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
-        "log_archive": "runs/published-c401-job-113281750594.log.gz",
-        "full_log_sha256": "cb7831603e6f6a3bda8d639da05fdf40c4c5e7df081e71baac0e65c88a1d41cf"
-      },
-      {
-        "job_id": 113281750714,
-        "job_name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
-        "log_archive": "runs/published-c401-job-113281750714.log.gz",
-        "full_log_sha256": "fa38e41ed3d368369f958c0d146e21a7bea93dbad3d7325dfdd79035a74bb075"
-      }
-    ],
-    "count_method": "complete raw job logs, ANSI normalized only for parsing",
-    "passed": 13214,
+    "passed": 12656,
     "skipped": 12,
-    "failed": 0,
-    "errors": 0,
-    "total_rows": 80
+    "full_log_sha256": "e60873b86186dc51138f499ecef71a80bc515ce536d07eb1420dad9315088c61"
   },
   "docs": {
     "run": 37768447399,
     "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37768447399",
     "conclusion": "success",
     "executable_examples": 13,
-    "metadata_archive": "runs/published-c401-docs.json",
-    "log_archive": "runs/published-c401-docs.log.gz",
     "full_log_sha256": "5a11d3d6cceec894c796e178e46f269ad86435b8f6dda044d1ace3fbb449f501"
   },
-  "dependency_profile": "default declared pins; no local grakern override",
-  "observed_at_utc": "2026-10-08T13:58:38.962412+00:00",
-  "correction": {
-    "original_receipt": "publication-c401-original-rendered.json",
-    "original_rendered_totals": 76,
-    "original_rendered_passed": 12656,
-    "missing_final_totals_per_jvm_job": 2,
-    "corrected_raw_totals": 80,
-    "corrected_raw_passed": 13214
-  }
+  "dependency_profile": "default declared pins; no local grakern override"
 }

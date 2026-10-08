@@ -1,8 +1,8 @@
 {
   "source_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
   "local_main": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
-  "remote_main_as_observed": "c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650",
-  "publication_pending": true,
+  "remote_main_as_observed": "658b1d9433db155542ccba33a115704ad1e058ab",
+  "publication_pending": false,
   "child": "bd-01M4DM1KG9NZKZBQCA3ZGQP2FE",
   "parent": "bd-01M2TACM78289S4TECE91GT5K2",
   "parent_status": "open",
@@ -16,5 +16,12 @@
   "review": "PASS /root/s2b3_review exact source",
   "local_passed": 7794,
   "local_skipped": 4,
-  "mutation_witnesses": 6
+  "mutation_witnesses": 6,
+  "hosted_qualification_pending": false,
+  "artifact_review": "PASS /root/s2b3_review exact 658b1d9433db155542ccba33a115704ad1e058ab",
+  "hosted_qualified_head": "658b1d9433db155542ccba33a115704ad1e058ab",
+  "hosted_passed": 13232,
+  "hosted_skipped": 12,
+  "hosted_receipt": "publication-658b.json",
+  "final_receipt_state": "Prepared for exact-SHA review/publication; use live Git for publication state."
 }

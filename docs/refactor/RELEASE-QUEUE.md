@@ -34,7 +34,10 @@ and publication are separate. The unfinished queue at that checkpoint remained *
 S2b-4 historical video rendering and frozen-preset compatibility is locally landed at `71a79818`:
 [parity receipts and handoff](evidence/s2b4-historical-parity-20261008/README.md) bind the unchanged
 production baseline, exact harness, six compiled mutations, independent review and 7,794 passed
-tests with four optional skips. Publication and current-head hosted qualification are separate.
+tests with four optional skips. It is published through `658b1d94` and hosted-qualified there against declared pins:
+13,232 passed, zero failed/errors, 12 optional skips over 80 raw-job totals; documentation replayed
+13 examples. [Hosted receipt](evidence/s2b4-historical-parity-20261008/publication-658b.json) and
+[count correction](evidence/s2b4-historical-parity-20261008/CORRECTION.md) preserve exact revisions.
 Both bounded children are closed; G1 stays open for originating-evidence StageTrace adoption and
 the remaining parent acceptance. The historical witness makes no learned/corpus efficacy claim.
 
@@ -85,7 +88,7 @@ The reconciliation baseline is source `8d4881a931fb809b27ac7ad14478fe60cde1e6e3`
 | S2b-1 concrete ONNX attempt/replay | `bd-01M4BQWQN7DDCZT095ND23772A` is closed at source `d7c0d97`. [Receipts](evidence/g1-onnx-attempt-20261007/README.md): 16 new courts, nine compiled named mutation kills, 5,198 local passes and 12,754 hosted passes (2/12 existing skips). Records establish actual adapter attempts and exact in-memory replay; strict registration/rendering, production-model efficacy and durable replay admission remain outside this child. |
 | S2b-2 checked rendering/metric prerequisite | `bd-01M4C13FZZQ1T0Z64WES25MMXB` is closed at locally landed source `b06b72a1`. [Local receipts](evidence/s2b2-surface-render-20261007/README.md) bind 42 new courts, 13 compiled mutation kills, 2,336 source passes and 485 consumer passes. The rendered key includes exact checked text; raw/half cosine units stay explicit. Actual strict registration, historical video-rendering/preset parity and shared-evidence adoption remain open. |
 | S2b-3 strict concrete ONNX registration | `bd-01M4C78JZW5YKSADFV5X290CCD` is closed; source `658fec8b` is published through `c4010ed8`. The checked surface, explicit half-cosine units, factorized vectors, shared nomination/pricing evaluator and context-bound replay have [local registration receipts](evidence/s2b3-onnx-registration-20261007/README.md) and [exact c401 hosted receipts](evidence/s2b4-historical-parity-20261008/publication-c401.json). |
-| S2b-4 historical rendering/preset compatibility | `bd-01M4DM1KG9NZKZBQCA3ZGQP2FE` is closed at local source `71a79818`. [Receipts](evidence/s2b4-historical-parity-20261008/README.md) bind exact baseline reproduction, nine courts, six compiled mutations and 7,794 local passes / four optional skips. Historical provenance remains Unattested; StageTrace adoption and learned/corpus reproduction remain open. |
+| S2b-4 historical rendering/preset compatibility | `bd-01M4DM1KG9NZKZBQCA3ZGQP2FE` is closed at source `71a79818`, published and hosted-qualified through `658b1d94`. [Receipts](evidence/s2b4-historical-parity-20261008/README.md) bind exact baseline reproduction, nine courts, six compiled mutations and 7,794 local passes / four optional skips. Historical provenance remains Unattested; StageTrace adoption and learned/corpus reproduction remain open. |
 | Timing/support, offline source, single-record exchange and synthetic temporal/scanner contracts | Existing `TextSourceCli`, `RecallTimingBuild`, `MappingExchangeBuild/CLI` and temporal queries are reusable. Their parent tickets retain adoption, paired-result and real scanner acceptance. |
 | Film-capable substrate/signatures, storyBuild and tabular StoryModel export | Landed components remain available. They do not establish the compiled-film route, organization preview, a full mapping facade or scientific efficacy. |
 

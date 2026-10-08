@@ -5,6 +5,8 @@ E=Path(__file__).resolve().parent
 R=E.parents[3]
 def sha(b):return hashlib.sha256(b).hexdigest()
 def obj(commit,path):return subprocess.check_output(['git','show',commit+':'+path],cwd=R)
+def log_text(raw):
+ return re.sub(r'(?:\x1b|\^\[)\[[0-?]*[ -/]*[@-~]','',raw.decode())
 def totals(log):
  return [[int(v or 0) for v in row] for row in re.findall(
   r'(?:Passed|Failed): Total (\d+), Failed (\d+), Errors (\d+), Passed (\d+)(?:, (?:Skipped|Ignored) (\d+))?',log)]
@@ -55,4 +57,42 @@ assert rows==s['totals'] and len(rows)==43
 assert sum(r[3] for r in rows)==s['passed']==7794
 assert sum(r[1] for r in rows)==s['failed']==0 and sum(r[2] for r in rows)==s['errors']==0
 assert sum(r[4] for r in rows)==s['skipped']==4
-print('Verified exact candidate, committed baseline harness/body, six compiled kills and 43-task actual gate receipts.')
+for label,expected_sha in (
+ ('c401','c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650'),
+ ('658b','658b1d9433db155542ccba33a115704ad1e058ab')):
+ published=E/('publication-'+label+'.json')
+ if not published.exists():continue
+ p=json.loads(published.read_text())
+ assert p['published_sha']==expected_sha
+ if label=='658b':
+  assert p['source_code_sha']==q['source_sha']
+  delta=subprocess.check_output(['git','diff','--name-only',q['source_sha'],p['published_sha']],cwd=R,text=True).splitlines()
+  assert all(path.startswith(('docs/','.mote/')) for path in delta)
+ for kind in ('source','docs'):
+  run=p[kind]
+  data=json.loads((E/run['metadata_archive']).read_text())
+  assert data['headSha']==p['published_sha'] and data['databaseId']==run['run']
+  assert data['status']=='completed' and data['conclusion']==run['conclusion']=='success'
+  assert all(job['conclusion']=='success' for job in data['jobs'])
+  raw=gzip.decompress((E/run['log_archive']).read_bytes())
+  assert sha(raw)==run['full_log_sha256']
+  if kind=='source':
+   actual=[]
+   assert len(run['job_logs'])==len(data['jobs'])==4
+   for receipt,job in zip(run['job_logs'],data['jobs']):
+    assert receipt['job_id']==job['databaseId'] and receipt['job_name']==job['name']
+    job_raw=gzip.decompress((E/receipt['log_archive']).read_bytes())
+    assert sha(job_raw)==receipt['full_log_sha256']
+    text=log_text(job_raw)
+    for counts in totals(text):actual.append({'job':job['name'],'counts':counts})
+    if label=='658b' and 'rootJVM' in job['name']:
+     assert 'HistoricalEmbeddingParitySuite finished: 0 failed, 0 ignored, 9 total' in text
+   assert actual==run['totals'] and len(actual)==80
+   assert sum(row['counts'][3] for row in actual)==run['passed']
+   assert sum(row['counts'][4] for row in actual)==run['skipped']
+   assert sum(row['counts'][1]+row['counts'][2] for row in actual)==0
+  else:
+   examples=re.findall(r'verified (\d+) executable documentation examples',raw.decode())
+   assert examples==[str(run['executable_examples'])] and run['executable_examples']==13
+   assert b'provenance court: all checks passed' in raw
+print('Verified exact source, baseline, six compiled kills, local gate and raw hosted source/docs receipts.')
