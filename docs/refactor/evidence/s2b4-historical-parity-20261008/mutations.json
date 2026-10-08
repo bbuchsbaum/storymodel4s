@@ -1,0 +1,194 @@
+[
+  {
+    "name": "raw-to-half",
+    "candidate_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/channels.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/testOnly storymodel4s.bench.video.HistoricalEmbeddingParitySuite -- \"--tests=^(concrete raw cosine|historical overrides).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "concrete raw cosine and weighted prices match independent scalar oracles",
+    "failures": [
+      "==> X storymodel4s.bench.video.HistoricalEmbeddingParitySuite.concrete raw cosine and weighted prices match independent scalar oracles 1.949s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala:98 values are not the same expected: 0.3333333333333333 but was: 0.16666666666666669"
+    ],
+    "test_selection": "^(concrete raw cosine|historical overrides).*",
+    "source_sha256": "5b39361a0d89e7c6967e77f9f6e30847971d17bd4f50d76c9a08e9e81773f837",
+    "patch_sha256": "63922aaf1296863f233462a7457c1aae288cee7355d7555a61cecd76095c4451",
+    "log_sha256": "61a82793b79413847fef3530580a339ef102d67a25ad8f9b4be56a8d41a35a66"
+  },
+  {
+    "name": "leaf-render-override",
+    "candidate_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/testOnly storymodel4s.bench.video.HistoricalEmbeddingParitySuite -- \"--tests=^(historical overrides|default values).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "historical overrides empty overrides group labels and lexical-only extras are exact",
+    "failures": [
+      "==> X storymodel4s.bench.video.HistoricalEmbeddingParitySuite.historical overrides empty overrides group labels and lexical-only extras are exact 0.138s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala:76"
+    ],
+    "test_selection": "^(historical overrides|default values).*",
+    "source_sha256": "9f20ddebc5891ec2cf1209b411c38cf8d17063f33db23840a89d92501b3bd1a4",
+    "patch_sha256": "9b2e356069cf31d0f70314548fa87152af895854ab9bc5b3609d40a4a578837c",
+    "log_sha256": "b3f8ce4bb9ad1d462c64dd2a20ec251cc65875610020b7af4b9a7bf97210bfb7"
+  },
+  {
+    "name": "group-render-override",
+    "candidate_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/testOnly storymodel4s.bench.video.HistoricalEmbeddingParitySuite -- \"--tests=^(historical overrides|default values).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "historical overrides empty overrides group labels and lexical-only extras are exact",
+    "failures": [
+      "==> X storymodel4s.bench.video.HistoricalEmbeddingParitySuite.historical overrides empty overrides group labels and lexical-only extras are exact 0.138s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala:82"
+    ],
+    "test_selection": "^(historical overrides|default values).*",
+    "source_sha256": "0270373d6d73f3fd53b799cf2b05510d2ac1b3bfae09d03cccfe42af934ee9c3",
+    "patch_sha256": "f7322624fc490754cc066738dc1a59a5816ab1159a1c08fa75dd0e79652e32b8",
+    "log_sha256": "61519c64389356e20a165badad9c9f5310bfcc7378bf08946ff86d96a1020619"
+  },
+  {
+    "name": "blend-default",
+    "candidate_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/HistoricalVideoDefaults.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/testOnly storymodel4s.bench.video.HistoricalEmbeddingParitySuite -- \"--tests=^(default values|historical over-one).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "default values and full ladder are the frozen recipe rather than a copied alternate",
+    "failures": [
+      "==> X storymodel4s.bench.video.HistoricalEmbeddingParitySuite.default values and full ladder are the frozen recipe rather than a copied alternate 0.029s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala:61"
+    ],
+    "test_selection": "^(default values|historical over-one).*",
+    "source_sha256": "3c15fb89731e6f35bbf3c0735aa66aa32ac3337c07d8529eb284e824f21e3e1d",
+    "patch_sha256": "7db68cd84b77f638cb4c1ddd6c277b147914b7880428cc18b7589411b0c82a37",
+    "log_sha256": "06c5f7805675e39babfa2067da048f5207e3981fe6eee14cddefeac3a3ad6860"
+  },
+  {
+    "name": "candidate-default",
+    "candidate_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+    "path": "embed-bench/src/main/scala/storymodel4s/bench/video/HistoricalVideoDefaults.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/testOnly storymodel4s.bench.video.HistoricalEmbeddingParitySuite -- \"--tests=^(default values|historical over-one).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "default values and full ladder are the frozen recipe rather than a copied alternate",
+    "failures": [
+      "==> X storymodel4s.bench.video.HistoricalEmbeddingParitySuite.default values and full ladder are the frozen recipe rather than a copied alternate 0.032s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala:61"
+    ],
+    "test_selection": "^(default values|historical over-one).*",
+    "source_sha256": "189af0e2cd3d22d72a4b556e76e3d2346f6ca0529f19494ad802dee1e6b8cc4e",
+    "patch_sha256": "0b2488df9e512aeae747ef12e1d4e4667e9925f7f61ff2941afb1cd3a76c1b28",
+    "log_sha256": "24302c30e62f04a333da58106c90ecb4f5fcd7bc257b470356716cb3be148570"
+  },
+  {
+    "name": "eligible-weight-scale",
+    "candidate_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+    "path": "align/src/main/scala/storymodel4s/align/cost.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedBench/testOnly storymodel4s.bench.video.HistoricalEmbeddingParitySuite -- \"--tests=^(concrete raw cosine|historical overrides).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "concrete raw cosine and weighted prices match independent scalar oracles",
+    "failures": [
+      "==> X storymodel4s.bench.video.HistoricalEmbeddingParitySuite.concrete raw cosine and weighted prices match independent scalar oracles 5.037s munit.ComparisonFailException: embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala:107 values are not the same expected: 0.9770833333333333 but was: 0.9333333333333335"
+    ],
+    "test_selection": "^(concrete raw cosine|historical overrides).*",
+    "source_sha256": "860919c79b52472ec2449f3fd8165412bcba8d653c8609b72106b3c43afb6be0",
+    "patch_sha256": "7c5786919f5240fff5686a173ee4d65204c269916ed7555243d3fcc5089948c8",
+    "log_sha256": "692ceec1b36e6693f31481120061c3d5a2b5a024f733457f8ee493950f92e143"
+  }
+]

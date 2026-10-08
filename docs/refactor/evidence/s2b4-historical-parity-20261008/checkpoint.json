@@ -1,0 +1,22 @@
+{
+  "source_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+  "base_sha": "c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650",
+  "issue": "bd-01M4DM1KG9NZKZBQCA3ZGQP2FE",
+  "actor": "codex-g1-parity-20261008",
+  "dashboard_session": "codex-d921e4bd",
+  "mutation_session": null,
+  "mutation_output": "/private/tmp/storymodel4s-s2b4-logs/mutations",
+  "clone": "/private/tmp/storymodel4s-s2b3-build",
+  "state": "Source locally landed after exact-SHA independent PASS; evidence commit/publication and current-head hosted qualification pending.",
+  "next_action": "Commit and review evidence, publish exact main, then inspect current-head CI/docs against declared pins. G1 StageTrace adoption remains the next implementation slice.",
+  "published_previous_head": "c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650",
+  "previous_hosted_source_run": 37768447564,
+  "previous_hosted_docs_run": 37768447399,
+  "mutation_witnesses": 6,
+  "source_session": null,
+  "source_observer_session": null,
+  "source_log": "/private/tmp/storymodel4s-s2b4-logs/source-gate.log",
+  "source_timeout_seconds": 7200,
+  "local_main": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+  "source_review": "PASS"
+}

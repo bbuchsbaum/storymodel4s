@@ -1,0 +1,14 @@
+{
+  "source_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+  "clean": true,
+  "changed_files_sha256": {
+    "docs/adr/0019-mapping-measurement-policy.md": "7b91ebf9cddf574b9d8f0580d5fe150538dbaae53e9135c66529ecb26a71a505",
+    "embed-bench/src/main/scala/storymodel4s/bench/video/LexicalBlend.scala": "8a60fe087ab57fac13bd914c5560acc39fb57c66506a4d59e2d0fcb4f113541b",
+    "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala": "2ddb8487f1130caa6e1ab953d872ca29707f827732067f30b8d4d8f95fcd94c4",
+    "embed-bench/src/main/scala/storymodel4s/bench/video/HistoricalVideoDefaults.scala": "35dc863cb183823607f1816a931a621fc7a8926901a3974a799bb101ef0b9600",
+    "embed-bench/src/test/resources/storymodel4s/bench/video/historical-embedding-parity-v1.json": "2ed46ce420a187eac6e292cd4932d86889e8e53577fa4cbc65387ec1f63ccc75",
+    "embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParityCapture.scala": "c4b80aef19aa898819196532a671023260ad264f9277903509f5550876831937",
+    "embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParitySuite.scala": "b11d03d174122592d5210fb70ad3c729ff8c5f77c4d5076b442ecb9426552d65",
+    "embed-bench/src/test/scala/storymodel4s/embed/onnx/HistoricalParityFixture.scala": "a1514e5da873a615ee1b81f6fbcec674a7efa2f23eb85c23d5a8a7683ee63927"
+  }
+}

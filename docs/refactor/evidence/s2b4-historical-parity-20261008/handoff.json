@@ -1,0 +1,20 @@
+{
+  "source_sha": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+  "local_main": "71a79818b225f33dfb6af46273d1e2293f55cbf9",
+  "remote_main_as_observed": "c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650",
+  "publication_pending": true,
+  "child": "bd-01M4DM1KG9NZKZBQCA3ZGQP2FE",
+  "parent": "bd-01M2TACM78289S4TECE91GT5K2",
+  "parent_status": "open",
+  "next_slice": "Originating-evidence StageTrace adoption; preserve historical compatibility, strict registration and complete failure/receipt distinctions.",
+  "limits": [
+    "historical evidence remains Unattested",
+    "historical endpoint failures flatten to ProviderAbstained",
+    "historical blend retains a dense pair table",
+    "no learned/corpus efficacy or reproduction claim"
+  ],
+  "review": "PASS /root/s2b3_review exact source",
+  "local_passed": 7794,
+  "local_skipped": 4,
+  "mutation_witnesses": 6
+}

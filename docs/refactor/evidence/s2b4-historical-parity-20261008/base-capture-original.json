@@ -1,0 +1,16 @@
+{
+  "base_sha": "c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650",
+  "body_sha256": "2ed46ce420a187eac6e292cd4932d86889e8e53577fa4cbc65387ec1f63ccc75",
+  "body_bytes": 29427,
+  "production_unchanged_before_capture": true,
+  "test_only_overlay": {
+    "untouched_production_sha": "c4010ed8f89d1e4e0ad94c58115fc4e8ebfa2650",
+    "test_only_overlay_sha256": {
+      "embed-bench/src/test/scala/storymodel4s/embed/onnx/HistoricalParityFixture.scala": "226fc7ef26cc4594067627f63c73003844841ef581f25627747456ffe6288869",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/HistoricalEmbeddingParityCapture.scala": "bb17a81a068a9a256175dace73501b44e22407a383625718cbde2e35d2404e03"
+    }
+  },
+  "model_sha256": "3e21121e42719ab61e888e8dbb9559591278701bec9193729bd2d1de38daca02",
+  "tokenizer_sha256": "0237b6bbc55d00142f9fa04557641e8ce5ea3abaf89e957aac5bca7dbd3bbf9a",
+  "scope": "synthetic fixed-lookup ONNX engineering compatibility; no learned/corpus efficacy"
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-08T11:56:01.833025+00:00",
+  "finished_utc": "2026-10-08T11:56:33.687821+00:00",
+  "duration_seconds": 31.854409,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedBench/Test/runMain storymodel4s.bench.video.HistoricalEmbeddingParityCapture /private/tmp/storymodel4s-s2b3-build /private/tmp/storymodel4s-s2b4-base-exact.json"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-s2b4-logs/base-capture-exact.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3020
+}
