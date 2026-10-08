@@ -107,7 +107,7 @@ object LexicalBlend:
       */
     def parse(raw: Option[String]): LexicalFields = raw.map(_.trim.toLowerCase) match
       case Some("text") | Some("text-only") => TextOnly
-      case _                                => WithLemmas
+      case _                                => HistoricalVideoDefaults.lexicalFields
 
   /** The blended channel. `alpha` is the weight on the semantic side, in `(0, 1]`. */
   def blended(

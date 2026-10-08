@@ -516,7 +516,7 @@ object RecallToVideo:
       .match
         case Some("off") | Some("none") => None
         case Some(raw)                  => raw.toDoubleOption.filter(a => a > 0.0 && a <= 1.0)
-        case None                       => Some(0.8)
+        case None                       => Some(HistoricalVideoDefaults.blendAlpha)
     val lexicalFields = LexicalBlend.LexicalFields.parse(sys.env.get("STORYMODEL4S_LEXICAL_FIELDS"))
 
     val (semantic, channelLabel) = blendAlpha match
@@ -543,11 +543,11 @@ object RecallToVideo:
     // different candidate policy is a different derivation, not a tuning of the same one.
     val perLevel = sys.env.get("STORYMODEL4S_CANDIDATES_PER_LEVEL").flatMap(_.toIntOption) match
       case Some(n) if n > 0 => n
-      case _                => 8
+      case _                => HistoricalVideoDefaults.candidatesPerLevel
     val lexicalOverlap = sys.env.get("STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP").map(_.trim) match
       case Some("true")  => true
       case Some("false") => false
-      case _             => false
+      case _             => HistoricalVideoDefaults.lexicalOverlap
     val candidates =
       CandidateGenerator(semantic, perLevel = perLevel, lexicalOverlap = lexicalOverlap)
         .generate(recall.ordered, built.view)
@@ -570,7 +570,7 @@ object RecallToVideo:
     // is suggestive rather than significant (116 pairs closer, 95 farther).
     val priorScale =
       sys.env.get("STORYMODEL4S_PRIOR_SCALE").flatMap(_.trim.toDoubleOption).filter(_ >= 0.0)
-    val scale = priorScale.getOrElse(1.5)
+    val scale = priorScale.getOrElse(HistoricalVideoDefaults.orderingScale)
     // Which rung of the ablation ladder this run is (ADR 0016): a declaration, refused rather
     // than defaulted when a name is unknown, rendered into provenance beside the model's own
     // fingerprint and ledger.

@@ -847,3 +847,30 @@ route; no raw value is silently sent through the strict `[0,1]` clamp. Existing 
 this new surface/half-cosine policy. Their compatibility and weighted-cost parity need a named
 comparison; they cannot be inferred from ranking parity. Originating-evidence StageTrace adoption,
 upstream admission truth and scientific efficacy remain outside this bounded registration proof.
+
+
+### 2026-10-08 — historical video compatibility witness (S2b-4)
+
+Retain the historical video path as a named engineering compatibility policy: query unit text;
+leaf `embedText` or physical text; group `embedText` or group label, including literal empty
+overrides. Lexical-only augmentation remains separate. Its raw cosine values nominate anchors;
+historical pricing clamps the semantic term while preserving eligible-weight accounting. The
+new strict surface/half-cosine policy remains separate; equal ranks cannot establish equal prices.
+
+Extract only the existing environment-independent runner defaults into a bench-private seam so
+its actual blend 0.8, WithLemmas fields, top-eight historical cutoff, disabled lexical-overlap and
+ordering scale 1.5 are exercised by the witness. Preserve environment override behavior. Reject a
+copied test preset that would remain green when the runner defaults changed.
+
+Capture the unchanged production base using the existing fixed four-dimensional ONNX graph and
+synthetic inputs, then compare the complete candidate output and numerical evidence digest under
+the same local runtime. Independent scalar oracles distinguish raw/half values, priced clamping,
+missing-but-eligible support scaling and a real reassignment by the blend. The prior scale binds
+its transition/configuration identity separately from local costs. This witness is engineering
+compatibility, not a learned-model/corpus reproduction or an efficacy result.
+
+Reject promoting this legacy composition into registered execution authority: it drops endpoint
+failure detail, its channel checksum does not bind rendered inputs/preset, and its lexical blend
+retains a pair table. Historical evidence remains Unattested. Keep these existing limits explicit;
+a provenance/sparsity repair would be a separate contract. Originating shared-evidence StageTrace
+adoption remains the next G1 slice; result costs cannot restore originating provenance.
