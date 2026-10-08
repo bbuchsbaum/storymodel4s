@@ -265,6 +265,8 @@ private[bench] object StageTrace:
     val units = run.recall.ordered
     if result.refinementPasses != 0 then
       Left(refused("cannot publish base emissions as refined emissions"))
+    else if !config.refinementWeight.isFinite then
+      Left(refused("cannot publish nonfinite inference configuration"))
     else if units.size != chosen.size || (decisions.nonEmpty && decisions.size != units.size) then
       Left(refused("downstream choices cover a different unit population"))
     else if decisions.nonEmpty && run.video.isEmpty then

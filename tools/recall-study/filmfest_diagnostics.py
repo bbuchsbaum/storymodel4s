@@ -161,7 +161,9 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 'nominationAvailable': traces is not None,
                 'goldNominationRanks': None,
                 'goldInCandidates': None, 'goldLocalRank': None, 'localFilm': None,
-                'localStateFilm': None, 'noFillFilm': None}
+                'localStateFilm': None, 'noFillFilm': None,
+                'localComparisonAvailable': False, 'localComparisonStatus': 'NotComputed',
+                'localComparisonReason': 'TraceUnavailable'}
             if traces is not None:
                 t = traces[ordinal]
                 if t['unitId'] != vu['id'] or t['finalAnchor'] != chosen or t['posteriorAnchor'] != argmax:
@@ -180,7 +182,13 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 local, traced_post, traced_external = collections.Counter(), collections.Counter(), collections.Counter()
                 unique(t['states'], 'state')
                 costs = [gold.finite(s['cost']) for s in t['states']]
-                comparison = t.get('localComparison', {})
+                comparison = ({'status':'Computed'} if trace['schema'].endswith('/v1')
+                              else t.get('localComparison', {}))
+                if comparison.get('status') not in ('Computed', 'NotComputed'):
+                    raise ValueError('unknown local comparison status')
+                row.update(localComparisonStatus=comparison['status'],
+                           localComparisonAvailable=comparison['status'] == 'Computed',
+                           localComparisonReason=comparison.get('reason'))
                 if trace['schema'] == 'storymodel4s.bench.stage-trace/v2' and comparison.get('status') == 'NotComputed':
                     empty = (comparison == {'status':'NotComputed','reason':'NoAdmittedStates'} and not costs)
                     unranked = (comparison == {'status':'NotComputed','reason':'UnrankedOutcome'}
@@ -247,8 +255,18 @@ def summarize(rows):
             selected = [r for r in rs if r['origin']==origin]
             result.setdefault('byOrigin', {})[origin] = {'units': len(selected),
                 'correct': sum(r['finalFilm']==r['goldFilm'] for r in selected)}
+        computed = [r for r in rs if r['localComparisonAvailable']]
+        unavailable = [r for r in rs if not r['localComparisonAvailable']]
+        correct = sum(r['localFilm']==r['goldFilm'] for r in computed)
+        result['localComparison'] = {
+            'computed': len(computed), 'notComputed': len(unavailable),
+            'notComputedReasons': dict(collections.Counter(r['localComparisonReason'] for r in unavailable)),
+            'correct': correct, 'accuracyPercentage': gold.percent(correct, len(computed)),
+            'stateCorrect': sum(r['localStateFilm']==r['goldFilm'] for r in computed),
+            'denominatorBasis': 'computed-local-comparisons'}
         if all(r['nominationAvailable'] for r in rs):
-            result.update(candidateGold=sum(r['goldInCandidates'] for r in rs),
+            result.update(localAllRowBasis='not-computed-is-incorrect', localAllRowDenominator=n,
+                candidateGold=sum(r['goldInCandidates'] for r in rs),
                 localCorrect=sum(r['localFilm']==r['goldFilm'] for r in rs),
                 localStateCorrect=sum(r['localStateFilm']==r['goldFilm'] for r in rs),
                 localStateAnchored=sum(r['localStateFilm'] is not None for r in rs),
@@ -258,19 +276,31 @@ def summarize(rows):
     if all(r['nominationAvailable'] for r in rows):
         pairs += [('localFilm','posteriorArgmaxFilm'),('posteriorArgmaxFilm','noFillFilm'),
                   ('noFillFilm','finalFilm'),('localStateFilm','localFilm')]
-    stage_changes = {}
-    for before,after in pairs:
+    def change(rs, before, after, basis):
         participants = []
-        for sub in sorted({r['participant'] for r in rows}):
-            rs = [r for r in rows if r['participant']==sub]
-            participants.append({'eligible':len(rs),
-                'delta':sum(int(r[after]==r['goldFilm'])-int(r[before]==r['goldFilm']) for r in rs)})
-        stage_changes[f'{before}__{after}'] = {
-            'deltaPercentagePoints':gold.percent(sum(p['delta'] for p in participants),len(rows)),
-            'participantBootstrap95':gold.cluster_ci(participants,'delta','eligible'),
-            'corrections':sum(r[before]!=r['goldFilm'] and r[after]==r['goldFilm'] for r in rows),
-            'regressions':sum(r[before]==r['goldFilm'] and r[after]!=r['goldFilm'] for r in rows)}
+        for sub in sorted({r['participant'] for r in rs}):
+            selected = [r for r in rs if r['participant']==sub]
+            participants.append({'eligible':len(selected),
+                'delta':sum(int(r[after]==r['goldFilm'])-int(r[before]==r['goldFilm']) for r in selected)})
+        return {
+            'denominator':len(rs), 'populationBasis':basis,
+            'deltaPercentagePoints':gold.percent(sum(p['delta'] for p in participants),len(rs)),
+            'participantBootstrap95':gold.cluster_ci(participants,'delta','eligible') if participants else None,
+            'corrections':sum(r[before]!=r['goldFilm'] and r[after]==r['goldFilm'] for r in rs),
+            'regressions':sum(r[before]==r['goldFilm'] and r[after]!=r['goldFilm'] for r in rs)}
+    stage_changes, computed_changes = {}, {}
+    local_fields = {'localFilm','localStateFilm'}
+    for before,after in pairs:
+        involves_local = before in local_fields or after in local_fields
+        basis = 'all-eligible; not-computed-local-is-incorrect' if involves_local else 'all-eligible'
+        stage_changes[f'{before}__{after}'] = change(rows, before, after, basis)
+        if involves_local:
+            computed = [r for r in rows if r['localComparisonAvailable']]
+            result = change(computed,before,after,'computed-local-comparisons')
+            result['notComputedExcluded'] = len(rows)-len(computed)
+            computed_changes[f'{before}__{after}'] = result
     return {'overall': group(rows), 'pairedStageChanges':stage_changes,
+            'computedLocalStageChanges':computed_changes,
             'participants': {s: group([r for r in rows if r['participant']==s])
             for s in sorted({r['participant'] for r in rows})},
             'films': {str(f): group([r for r in rows if r['goldFilm']==f]) for f in sorted({r['goldFilm'] for r in rows})}}
@@ -289,7 +319,8 @@ def compare(a, b, sample_size=12):
         xc, yc = x['finalFilm']==x['goldFilm'], y['finalFilm']==y['goldFilm']
         if xc == yc: continue
         if x['nominationAvailable'] and y['nominationAvailable']:
-            if x['nominationIdentity'] != y['nominationIdentity']: first = 'candidate_membership'
+            if (x['localComparisonStatus'],x['localComparisonReason']) != (y['localComparisonStatus'],y['localComparisonReason']): first = 'local_comparison_availability'
+            elif x['nominationIdentity'] != y['nominationIdentity']: first = 'candidate_membership'
             elif x['nominationEvidence'] != y['nominationEvidence']: first = 'nomination_rank_or_score'
             elif x['localCostIdentity'] != y['localCostIdentity']: first = 'local_cost'
             elif x['posteriorIdentity'] != y['posteriorIdentity']: first = 'posterior'

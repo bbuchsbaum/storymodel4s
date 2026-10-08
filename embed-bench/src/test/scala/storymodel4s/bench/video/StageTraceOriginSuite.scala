@@ -191,6 +191,23 @@ class StageTraceOriginSuite extends FunSuite:
     )
   }
 
+  test("accepted unused nonfinite refinement weight yields typed trace refusal without throwing") {
+    val cfg = value(HsmmConfig.of(refinementPasses = 0, refinementWeight = Double.PositiveInfinity))
+    val run = history(recall("hello"), built, cfg)
+    assertEquals(run.result.refinementPasses, 0)
+    val rendered = scala.util.Try(
+      StageTrace.render(
+        run,
+        Vector.empty,
+        run.result.posterior.rows.map(_.mapSource),
+        Checksum.ofBytes(Array.emptyByteArray),
+        None
+      )
+    )
+    assert(rendered.isSuccess, "trace must return its typed refusal rather than throw")
+    assert(rendered.get.isLeft)
+  }
+
   test("foreign recall source gate and downstream choices refuse instead of relabelling") {
     val r = recall("hello"); val b = built; val run = history(r, b)
     assert(StageTrace.infer(recall("world"), b, run.evidence, HsmmConfig.default).isLeft)

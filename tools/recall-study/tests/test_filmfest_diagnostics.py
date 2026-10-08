@@ -81,6 +81,7 @@ class DiagnosticsTests(unittest.TestCase):
             'reportSha256':gold.digest(self.report),'sourceInputSha256':gold.digest(self.annotation),
             'units':[{'unit':0,'unitId':'u0','finalAnchor':'sit:filmfest:seg:0002',
                 'posteriorAnchor':'sit:filmfest:seg:0001','noFillAnchor':'sit:filmfest:seg:0001',
+                'localComparison':{'status':'Computed'},
                 'nominations':[{'ref':'sit:filmfest:seg:0001','level':0,'channel':'semantic','rankWithinLevel':0,'rawScore':.1}],
                 'states':[{'state':'sit:filmfest:seg:0001','anchor':'sit:filmfest:seg:0001',
                            'cost':-math.log(.8),'localMass':.8,'posteriorMass':.8},
@@ -143,10 +144,34 @@ class DiagnosticsTests(unittest.TestCase):
         self.assertIsNone(rows[0]['localFilm'])
         self.assertFalse(rows[0]['goldInCandidates'])
         self.assertEqual(rows[0]['externalStates'], {'Unranked': 1.})
+        self.assertFalse(rows[0]['localComparisonAvailable'])
+        self.assertEqual(rows[0]['localComparisonReason'], 'UnrankedOutcome')
         unit['localComparison']['status'] = 'Computed'
         path.write_text(json.dumps(trace))
         with self.assertRaisesRegex(ValueError, 'invalid.*mass|without unranked evidence'):
             self.load()
+
+    def test_summary_keeps_unavailable_local_comparisons_out_of_measured_denominators(self):
+        path = Path(str(self.report)+'.stages.json')
+        path.write_text(json.dumps(self.trace()))
+        computed = self.load()[0]
+        unavailable = copy.deepcopy(computed)
+        unavailable.update(unit=1, localFilm=None, localStateFilm=None,
+                           posteriorArgmaxFilm=None, finalFilm=None, noFillFilm=None,
+                           localComparisonAvailable=False, localComparisonStatus='NotComputed',
+                           localComparisonReason='UnrankedOutcome')
+        before = diag.summarize([computed])
+        after = diag.summarize([computed, unavailable])
+        actual = after['overall']['localComparison']
+        self.assertEqual(actual['computed'], 1)
+        self.assertEqual(actual['notComputed'], 1)
+        self.assertEqual(actual['accuracyPercentage'], 100.)
+        self.assertEqual(actual['notComputedReasons'], {'UnrankedOutcome': 1})
+        measured = after['computedLocalStageChanges']['localFilm__posteriorArgmaxFilm']
+        self.assertEqual(measured['denominator'], 1)
+        self.assertEqual(measured['deltaPercentagePoints'],
+                         before['computedLocalStageChanges']['localFilm__posteriorArgmaxFilm']['deltaPercentagePoints'])
+        self.assertEqual(after['overall']['eligible'], 2)
 
     def test_equal_film_totals_do_not_hide_anchor_mass_divergence(self):
         a = self.load()
