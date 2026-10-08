@@ -17,10 +17,10 @@ class StrictContentBoundarySuite extends FunSuite:
   """)
   private val modelControl = typeCheckErrors("""
     import storymodel4s.align.*
-    case class ModelControl(semantic: StrictSemanticChannel, weights: CostWeights, functionPrior: FunctionPrior, externalFloor: Double, externalMismatch: Double, missingSemantic: Double, distortionPenalty: Double)
-    val value = ModelControl(StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3)
+    case class ModelControl(semantic: StrictSemanticChannel, weights: CostWeights, functionPrior: FunctionPrior, externalFloor: Double, externalMismatch: Double, missingSemantic: Double, distortionPenalty: Double, surfaceSession: Option[SurfaceScoringSession])
+    val value = ModelControl(StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3, None)
     value.copy(missingSemantic = 0.0)
-    summon[scala.deriving.Mirror.ProductOf[ModelControl]].fromProduct((StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3))
+    summon[scala.deriving.Mirror.ProductOf[ModelControl]].fromProduct((StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3, None))
     summon[scala.deriving.Mirror.ProductOf[ModelControl]]
   """)
   private val summaryControl = typeCheckErrors("""
@@ -103,13 +103,13 @@ class StrictContentBoundarySuite extends FunSuite:
   test("strict cost constructor is closed outside align") {
     assert(typeCheckErrors("""
       import storymodel4s.align.*
-      new StrictCostModel(StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3)
+      new StrictCostModel(StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3, None)
     """).nonEmpty)
   }
   test("strict cost apply is closed") {
     assert(typeCheckErrors("""
       import storymodel4s.align.*
-      StrictCostModel(StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3)
+      StrictCostModel(StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3, None)
     """).nonEmpty)
   }
   test("strict cost copy is closed") {
@@ -121,7 +121,7 @@ class StrictContentBoundarySuite extends FunSuite:
   test("strict cost fromProduct is closed") {
     assert(typeCheckErrors("""
       import storymodel4s.align.*
-      StrictCostModel.fromProduct((StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3))
+      StrictCostModel.fromProduct((StrictSemanticChannel.Lexical, CostWeights.default, FunctionPrior.default, 1.0, 0.5, 0.5, 0.3, None))
     """).nonEmpty)
   }
   test("strict cost Mirror is closed") {

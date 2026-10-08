@@ -789,3 +789,55 @@ The existing vector cosine routine's numerical clamp is unchanged.
 These boundaries are prerequisites, not registered strict embedding execution. Model/render/
 candidate receipts, batch execution/replay joins, immutable nomination/pricing, frozen-preset
 parity, and originating-evidence StageTrace adoption remain on G1. No new module or dependency.
+
+### 2026-10-07 — factorized registered ONNX mapping execution (S2b-3)
+
+Within the accepted S2 direction, the library prepares the complete declared checked recall/source
+node inventory, validates its source-text/view/representation join, and projects each endpoint
+once. Coordinates remain in `SurfaceScoringContext`; query/document payloads contain only canonical
+content, exact text and the rendering policy. Reject obtaining endpoints through dummy pairs,
+arbitrary coordinate-selected retrieval, and down-projecting rendered keys to semantic content.
+
+`align -> embedCore` reuses the portable checked geometry/vector/failure algebra, and
+`embedOnnx -> align.jvm` owns the concrete registration bridge. The graph is acyclic and follows
+the existing structural adapter direction. Reject a reverse portable dependency on ONNX, a new
+module, duplicated vector/geometry implementations and public portable minting of execution
+proof. Build workflow generation accompanies these existing-module dependency changes.
+
+The portable factorized channel is declared data. It checks the complete ordered endpoint
+association, Query/Document geometry, vector dimension/normalization, and conflicting equal keys.
+Vector storage is `O((U+N)d)`; complete nomination still evaluates `O(UNd)` work, with per-unit
+working storage and additional hierarchy/candidate costs. No dense pair table or hidden pair cache.
+A single library-owned dispatcher supplies the same full payload to nomination and pricing;
+context-free entrypoints refuse this channel. Nomination/pricing bind the same entire context,
+including the source declaration/text join and rendering policy, beyond historical `StrictBinding`.
+
+A JVM-only, final non-case registration envelope is derived from actual concrete ONNX recorded
+attempts. It builds requests itself, verifies outcome association and derives the declared
+channel, candidates and local evidence. Exact capability replay verifies rebuilt requests,
+model/provider/configuration and sensitivity before derivation; it reuses the original attempts,
+never a fresh approval or call. Reject caller-written results, tables or generic engine evidence
+as execution proof, including attaching unrelated honest receipts. Execution identity remains
+separate from the numerical `LocalEvidence` identity; equal numerical prices need not imply equal
+model/runtime/render/configuration or private requests.
+
+Sensitivity is explicit for each side and follows existing keyed/withheld receipt policy. No new
+plain public digest of non-public text or vectors is introduced. The declared empty-text policy
+`EmptyIsIneligible` omits literal empty requests and retains those endpoints as ineligible; it does
+not claim the provider attempted skipped requests. An empty actual batch may still have an actual
+empty adapter-attempt record. Empty logical recall/source populations are refused before execution.
+Reject using special-token vectors as an unlicensed similarity for absent surface content.
+
+Both typed endpoint outcomes survive on `SurfaceScore` and the original records. Ineligibility
+wins aggregate applicability; otherwise an execution failure produces the fixed domain reason
+`Custom("embedding", "endpoint-execution-failed")`, rather than provider abstention. Original missing
+reasons remain on both endpoints; the scalar uses query-side precedence only when both are eligible
+and missing. Calculation errors remain separate from endpoint execution failures. Reject duplicating
+embedding-specific failure taxonomies in generic `features` or parsing display strings for authority.
+
+Current strict pricing admits explicit half-cosine only. Raw cosine retains its existing historical
+route; no raw value is silently sent through the strict `[0,1]` clamp. Existing historical video
+`embedText`/group-label rendering and frozen presets remain unchanged, and are not relabeled as
+this new surface/half-cosine policy. Their compatibility and weighted-cost parity need a named
+comparison; they cannot be inferred from ranking parity. Originating-evidence StageTrace adoption,
+upstream admission truth and scientific efficacy remain outside this bounded registration proof.

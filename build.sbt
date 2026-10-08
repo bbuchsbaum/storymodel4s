@@ -224,7 +224,7 @@ lazy val align = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("align"))
   .settings(moduleSettings("align"))
-  .dependsOn(core, proposition, features, story, recall)
+  .dependsOn(core, proposition, features, story, recall, embedCore)
 
 /** Autobiographical Interview: transcript atlas, detail atoms, memory addresses, derived scores. */
 lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -351,7 +351,7 @@ lazy val embedOnnx = project
     Test / fork := true,
     Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
   )
-  .dependsOn(embedCore.jvm)
+  .dependsOn(embedCore.jvm, align.jvm)
 
 /** JVM-only evaluation harness (M1 W4(10), ADR 0001 §D7): scores gated alignments against
   * adjudicated gold from frozen sets verified by manifest checksum, or against diagnostic material

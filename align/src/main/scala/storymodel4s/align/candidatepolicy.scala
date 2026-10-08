@@ -16,8 +16,11 @@ enum CandidateRefusal:
   case BudgetBelowPerLevel(budget: Int, perLevel: Int)
   case NonFiniteScore(unit: RecallUnitId, ref: SourceNodeRef)
   case StrictScoring(unit: RecallUnitId, ref: SourceNodeRef, refusal: StrictScoringRefusal)
+  case SurfaceContextRequired
 
   def message: String = this match
+    case SurfaceContextRequired =>
+      "factorized surface candidates require a matching checked context"
     case NonPositivePerLevel(k)      => s"perLevel must be positive, got $k"
     case NonPositiveBudget(n)        => s"tie budget must be positive, got $n"
     case BudgetBelowPerLevel(n, k)   => s"tie budget $n is below perLevel $k"
@@ -198,7 +201,8 @@ final class StrictCandidates private (
     val policy: CandidateTiePolicy,
     val binding: StrictBinding,
     val byUnit: Map[RecallUnitId, StrictCandidateSet],
-    val semanticChannel: Option[StrictSemanticChannel]
+    val semanticChannel: Option[StrictSemanticChannel],
+    val surfaceContext: Option[SurfaceScoringContext]
 ):
   /** The unit's strict candidates, or `None` for a unit outside the bound recall. */
   def get(unit: RecallUnitId): Option[StrictCandidateSet] = byUnit.get(unit)
@@ -282,7 +286,8 @@ object StrictCandidateSet:
       semantic: StrictSemanticChannel,
       config: StrictCandidateConfig,
       unit: RecallUnit,
-      view: SourceView
+      view: SourceView,
+      session: Option[SurfaceScoringSession]
   ): Either[CandidateRefusal, StrictCandidateSet] =
     val levels = view.byLevel.toVector.sortBy(_._1)
     levels
@@ -297,17 +302,14 @@ object StrictCandidateSet:
               Right(Vector.empty)
             ) { (values, node) =>
               values.flatMap { vs =>
-                ContentProjection
-                  .canonical(unit, node, view)
+                StrictScoring
+                  .evaluate(semantic, unit, node, view, session)
                   .left
-                  .map(r =>
-                    CandidateRefusal
-                      .StrictScoring(unit.id, node.ref, StrictScoringRefusal.Projection(r))
-                  )
-                  .map((u, t, _) =>
+                  .map(r => CandidateRefusal.StrictScoring(unit.id, node.ref, r))
+                  .map((u, t, _, estimate) =>
                     vs :+ (
                       node.ref,
-                      semantic.score(u, t),
+                      estimate,
                       config.lexicalOverlap && ContentLexical.overlaps(u, t)
                     )
                   )
@@ -354,7 +356,7 @@ object StrictCandidates:
         )
       }
       .map(pairs =>
-        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap, None)
+        new StrictCandidates(config.policy, StrictBinding.of(recall, view), pairs.toMap, None, None)
       )
 
   /** Controlled canonical generation; historical callback generation has no channel binding. */
@@ -362,27 +364,36 @@ object StrictCandidates:
       semantic: StrictSemanticChannel,
       config: StrictCandidateConfig,
       recall: RecallGraph[Checked],
-      source: SourceView
+      source: SourceView,
+      session: Option[SurfaceScoringSession] = None
   ): Either[CandidateRefusal, StrictCandidates] =
     val view = MappingBindingRender.snapshot(source)
-    recall.ordered
-      .foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
-        Right(Vector.empty)
-      ) { (acc, unit) =>
-        acc.flatMap(done =>
-          StrictCandidateSet
-            .canonicalGenerated(semantic, config, unit, view)
-            .map(set => done :+ (unit.id -> set))
+    val contextCheck: Either[CandidateRefusal, Unit] =
+      if semantic.isInstanceOf[StrictSemanticChannel.FactorizedSurface] &&
+        !session.exists(s => s.channel == semantic && s.context.binds(recall, view))
+      then Left(CandidateRefusal.SurfaceContextRequired)
+      else Right(())
+    contextCheck.flatMap(_ =>
+      recall.ordered
+        .foldLeft[Either[CandidateRefusal, Vector[(RecallUnitId, StrictCandidateSet)]]](
+          Right(Vector.empty)
+        ) { (acc, unit) =>
+          acc.flatMap(done =>
+            StrictCandidateSet
+              .canonicalGenerated(semantic, config, unit, view, session)
+              .map(set => done :+ (unit.id -> set))
+          )
+        }
+        .map(pairs =>
+          new StrictCandidates(
+            config.policy,
+            StrictBinding.of(recall, view),
+            pairs.toMap,
+            Some(semantic),
+            session.map(_.context)
+          )
         )
-      }
-      .map(pairs =>
-        new StrictCandidates(
-          config.policy,
-          StrictBinding.of(recall, view),
-          pairs.toMap,
-          Some(semantic)
-        )
-      )
+    )
 
 /** Strict candidate generation: semantic candidates per hierarchy level, cut tie-complete with
   * dense ranks, unioned with lexical hits and bounded by the union-wide budget.
@@ -410,3 +421,18 @@ object StrictCandidateGenerator:
       source: SourceView
   ): Either[CandidateRefusal, StrictCandidates] =
     StrictCandidates.canonical(semantic, config, recall, source)
+
+/** A checked declared surface session shares its exact channel/context across generation/pricing.
+  */
+object SurfaceCandidateGenerator:
+  def generate(
+      session: SurfaceScoringSession,
+      config: StrictCandidateConfig
+  ): Either[CandidateRefusal, StrictCandidates] =
+    StrictCandidates.canonical(
+      session.channel,
+      config,
+      session.context.recall,
+      session.context.source,
+      Some(session)
+    )

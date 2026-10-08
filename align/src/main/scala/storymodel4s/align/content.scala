@@ -189,14 +189,27 @@ object ContentProjection:
     ProjectionRefusal,
     (UnitContent[GraphOrder.Canonical], TargetContent[GraphOrder.Canonical], ContentGrain)
   ] =
-    val canon = (e: Option[storymodel4s.proposition.PropositionEvidence]) =>
-      e match
-        case None     => Right(None)
-        case Some(ev) => SemanticProjection.canonical(ev.chart).map(Some(_))
     for
-      u <- projectUnit(unit, sorted = true, canon)
-      t <- projectTarget(node, view, sorted = true, canon)
+      u <- canonicalUnit(unit)
+      t <- canonicalTarget(node, view)
     yield (u, t, grain(view))
+
+  private def canonicalGraph(
+      evidence: Option[storymodel4s.proposition.PropositionEvidence]
+  ): Either[ProjectionRefusal, Option[SemanticGraph[GraphOrder.Canonical]]] = evidence match
+    case None     => Right(None)
+    case Some(ev) => SemanticProjection.canonical(ev.chart).map(Some(_))
+
+  private[align] def canonicalUnit(
+      unit: RecallUnit
+  ): Either[ProjectionRefusal, UnitContent[GraphOrder.Canonical]] =
+    projectUnit(unit, sorted = true, canonicalGraph)
+
+  private[align] def canonicalTarget(
+      node: NodeSummary,
+      view: SourceView
+  ): Either[ProjectionRefusal, TargetContent[GraphOrder.Canonical]] =
+    projectTarget(node, view, sorted = true, canonicalGraph)
 
   private[align] def source(
       unit: RecallUnit,

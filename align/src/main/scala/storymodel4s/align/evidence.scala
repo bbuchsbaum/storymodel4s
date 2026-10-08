@@ -113,6 +113,9 @@ object LocalEvidence:
           "strict candidates were generated with a different or historical semantic channel"
         )
       )
+    else if strict.surfaceContext != costModel.surfaceSession.map(_.context) ||
+      costModel.surfaceSession.exists(s => !s.context.binds(recall, source))
+    then Left(AlignError.InconsistentResult("strict surface nomination/pricing contexts differ"))
     else computeStrict(recall, source, strict, Pricing.Canonical(costModel))
 
   private enum Pricing:

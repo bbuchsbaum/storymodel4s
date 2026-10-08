@@ -10,12 +10,16 @@ enum StrictScoringRefusal:
   case Projection(reason: ProjectionRefusal)
   case AmbiguousGates(readings: Set[GateReading])
   case InvalidTable(detail: String)
+  case SurfaceContextRequired
+  case Surface(reason: SurfaceEmbeddingRefusal)
 
   def message: String = this match
     case Projection(r)      => s"canonical content projection refused: $r"
     case AmbiguousGates(rs) =>
       s"single-facet model cannot consume ${rs.size} distinct measured gate readings"
-    case InvalidTable(d) => s"content table: $d"
+    case InvalidTable(d)        => s"content table: $d"
+    case SurfaceContextRequired => "factorized surface scoring requires its checked context"
+    case Surface(r)             => s"surface scoring refused: $r"
 
 /** Closed content adapters prevent a strict scorer from reading coordinate-bearing originals. */
 sealed trait StrictSemanticChannel:
@@ -43,6 +47,24 @@ object StrictSemanticChannel:
         u: UnitContent[GraphOrder.Canonical],
         t: TargetContent[GraphOrder.Canonical]
     ): Estimate[Double] = Estimate.missing(MissingReason.ChannelUnavailable)
+
+  /** Factorized declared vectors grant no ONNX execution or strict-reference authority. */
+  final class FactorizedSurface private (val data: SurfaceEmbedding.Data)
+      extends StrictSemanticChannel:
+    val kind: String = "factorized-surface-data/v1"
+    // A content-only projection lacks the required rendered text; public entrypoints refuse it.
+    private[align] def score(
+        u: UnitContent[GraphOrder.Canonical],
+        t: TargetContent[GraphOrder.Canonical]
+    ): Estimate[Double] = Estimate.missing(MissingReason.InputUnresolved)
+    override def equals(other: Any): Boolean = other match
+      case s: FactorizedSurface => data == s.data
+      case _                    => false
+    override def hashCode: Int = data.hashCode
+    override def toString: String = s"FactorizedSurface($data)"
+
+  object FactorizedSurface:
+    def declared(data: SurfaceEmbedding.Data): FactorizedSurface = new FactorizedSurface(data)
 
   /** A frozen fixture adapter keyed only by canonical content, never by original identifiers.
     * Declared outcomes are fixture measurements, not evidence of provider execution.
@@ -175,7 +197,8 @@ final class StrictCostModel private (
     val externalFloor: Double,
     val externalMismatch: Double,
     val missingSemantic: Double,
-    val distortionPenalty: Double
+    val distortionPenalty: Double,
+    val surfaceSession: Option[SurfaceScoringSession]
 ):
   private[align] def externalCost(unit: RecallUnit, state: ExternalState): Double =
     if state == ExternalState.Unranked || ExternalStates.natural(unit.function) == state then
@@ -188,38 +211,41 @@ final class StrictCostModel private (
       mode: FidelityMode,
       view: SourceView
   ): Either[AlignError, CostBreakdown] =
-    StrictScoring.project(unit, node, view).flatMap { (u, t, grain) =>
-      val semanticEstimate = semantic.score(u, t)
-      for
-        chart <- StrictScoring.reduction(unit, node, view, u, t, chart = true)
-        structural <- StrictScoring.reduction(unit, node, view, u, t, chart = false)
-        price = ContentCostScoring.terms(
-          u,
-          t,
-          grain,
-          mode,
-          semanticEstimate,
-          chart.estimate,
-          structural.estimate,
-          structuralConfigured = false,
-          missingSemantic,
-          distortionPenalty
-        )
-        result <- CostBreakdown.derived(
-          price.values,
-          mode,
-          price.missing,
-          Some(view.structuralCoverage(node.ref)),
-          Map(CostTerm.Chart -> chart.receipt, CostTerm.Structural -> structural.receipt),
-          price.semanticImputed,
-          price.eligible,
-          weights,
-          DefaultLocalCostModel
-            .blend(price.values, weights, functionPrior(u.function), price.eligible),
-          Map(CostTerm.Semantic -> semanticEstimate, CostTerm.Chart -> chart.estimate)
-        )
-      yield result
-    }
+    StrictScoring
+      .evaluate(semantic, unit, node, view, surfaceSession)
+      .left
+      .map(r => AlignError.StrictScoring(unit.id, node.ref, r))
+      .flatMap { (u, t, grain, semanticEstimate) =>
+        for
+          chart <- StrictScoring.reduction(unit, node, view, u, t, chart = true)
+          structural <- StrictScoring.reduction(unit, node, view, u, t, chart = false)
+          price = ContentCostScoring.terms(
+            u,
+            t,
+            grain,
+            mode,
+            semanticEstimate,
+            chart.estimate,
+            structural.estimate,
+            structuralConfigured = false,
+            missingSemantic,
+            distortionPenalty
+          )
+          result <- CostBreakdown.derived(
+            price.values,
+            mode,
+            price.missing,
+            Some(view.structuralCoverage(node.ref)),
+            Map(CostTerm.Chart -> chart.receipt, CostTerm.Structural -> structural.receipt),
+            price.semanticImputed,
+            price.eligible,
+            weights,
+            DefaultLocalCostModel
+              .blend(price.values, weights, functionPrior(u.function), price.eligible),
+            Map(CostTerm.Semantic -> semanticEstimate, CostTerm.Chart -> chart.estimate)
+          )
+        yield result
+      }
 
   override def toString: String = s"StrictCostModel(${semantic.kind}, $weights)"
 
@@ -231,11 +257,26 @@ object StrictCostModel:
       externalFloor: Double = 1.0,
       externalMismatch: Double = 0.5,
       missingSemantic: Double = 0.5,
-      distortionPenalty: Double = 0.3
+      distortionPenalty: Double = 0.3,
+      surfaceSession: Option[SurfaceScoringSession] = None
   ): Either[AlignError, StrictCostModel] =
     val finiteNonnegative =
       Vector(externalFloor, externalMismatch, distortionPenalty) ++ functionPrior.costs.values
-    if finiteNonnegative.exists(d =>
+    if semantic.isInstanceOf[StrictSemanticChannel.FactorizedSurface] &&
+      !surfaceSession.exists(_.channel == semantic)
+    then
+      Left(
+        AlignError
+          .InvalidConfig("strict cost", "factorized surface channel requires its matching session")
+      )
+    else if !semantic
+        .isInstanceOf[StrictSemanticChannel.FactorizedSurface] && surfaceSession.nonEmpty
+    then
+      Left(
+        AlignError
+          .InvalidConfig("strict cost", "surface session supplied for a content-only channel")
+      )
+    else if finiteNonnegative.exists(d =>
         !d.isFinite || d < 0.0
       ) || !(externalFloor + externalMismatch).isFinite
     then Left(AlignError.InvalidConfig("strict cost", "costs must be finite and nonnegative"))
@@ -252,7 +293,8 @@ object StrictCostModel:
           externalFloor,
           externalMismatch,
           missingSemantic,
-          distortionPenalty
+          distortionPenalty,
+          surfaceSession
         )
       )
 
@@ -263,6 +305,41 @@ private[align] object StrictScoring:
       .canonical(unit, node, view)
       .left
       .map(r => AlignError.StrictScoring(unit.id, node.ref, StrictScoringRefusal.Projection(r)))
+
+  def evaluate(
+      semantic: StrictSemanticChannel,
+      unit: RecallUnit,
+      node: NodeSummary,
+      view: SourceView,
+      session: Option[SurfaceScoringSession]
+  ): Either[
+    StrictScoringRefusal,
+    (
+        UnitContent[GraphOrder.Canonical],
+        TargetContent[GraphOrder.Canonical],
+        ContentGrain,
+        Estimate[Double]
+    )
+  ] = semantic match
+    case _: StrictSemanticChannel.FactorizedSurface =>
+      session.toRight(StrictScoringRefusal.SurfaceContextRequired).flatMap { s =>
+        if s.channel != semantic then
+          Left(StrictScoringRefusal.Surface(SurfaceEmbeddingRefusal.ContextMismatch))
+        else
+          for
+            scored <- s.evaluate(unit, node).left.map(StrictScoringRefusal.Surface.apply)
+            pair <- s.context
+              .pair(unit.id, node.ref)
+              .left
+              .map(_ => StrictScoringRefusal.Surface(SurfaceEmbeddingRefusal.ContextMismatch))
+          yield (pair.unit, pair.target, pair.grain, scored.estimate)
+      }
+    case _ =>
+      ContentProjection
+        .canonical(unit, node, view)
+        .left
+        .map(StrictScoringRefusal.Projection.apply)
+        .map((u, t, grain) => (u, t, grain, semantic.score(u, t)))
 
   def gate(
       unit: RecallUnit,
