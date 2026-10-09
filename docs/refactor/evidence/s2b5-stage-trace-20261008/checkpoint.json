@@ -21,11 +21,11 @@
   "dashboard_session": "codex-9bea8e84",
   "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Child locally landed at reviewed9b8d6cb; source95ba and local qualification complete. Landing-receipt review and hosted publication pending.",
+  "state": "Reviewed655c0b39 published and exact remote SHA verified; source95ba remains unchanged. Hosted source/docs qualification running.",
   "mutation_session": null,
   "mutation_output": "/private/tmp/storymodel4s-s2b5-final-mutations",
   "mutation_timeout_seconds": 1200,
-  "next_action": "Review and publish the gate-inert landing receipt, then inspect exact-head hosted source/docs raw job logs against declared pins. G1 remains open.",
+  "next_action": "Wait on hosted controller53858; inspect completed exact655 run/job metadata and complete raw job logs, bind totals and docs artifacts, review/publish gate-inert hosted receipt.",
   "mutation_state": "Nine final95ba0e4d source mutations qualified, each namedassertion failure plusone passing sibling and explicitignored cases; twoPython guards qualified.",
   "receipt_coverage_followup": "bd-01M4EA3TVCGSVSA114DQX9588N",
   "source_review": "PASS /root/s2b3_review; two BLOCKs closed",
@@ -34,5 +34,26 @@
   "source_timeout_seconds": 2400,
   "source_scope": "18 modules/44 JVM-JS-Native tasks; fatal warnings, clean compile-time probes, format last",
   "reservation": "rv-01M4EY9BA8P1HN499DHAG8NVTD",
-  "local_landing_sha": "9b8d6cb25a0b1ffbb4f5e78730f86d468a4d2df5"
+  "local_landing_sha": "9b8d6cb25a0b1ffbb4f5e78730f86d468a4d2df5",
+  "published_sha": "655c0b3921539ad0c2cdf46181f0711480379f12",
+  "remote_verified": true,
+  "hosted_session": 53858,
+  "hosted_output": "/private/tmp/storymodel4s-s2b5-hosted",
+  "hosted_timeout_seconds": 7200,
+  "hosted_runs": {
+    "source": {
+      "id": 37863839427,
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427",
+      "status": "in_progress",
+      "conclusion": null,
+      "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
+    },
+    "docs": {
+      "id": 37863839384,
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839384",
+      "status": "in_progress",
+      "conclusion": null,
+      "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
+    }
+  }
 }

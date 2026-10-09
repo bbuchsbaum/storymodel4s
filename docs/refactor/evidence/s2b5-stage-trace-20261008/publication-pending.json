@@ -1,0 +1,25 @@
+{
+  "published_sha": "655c0b3921539ad0c2cdf46181f0711480379f12",
+  "remote_verified": true,
+  "publication_review": {
+    "reviewer": "/root/s2b5_qualification_review",
+    "verdict": "PASS",
+    "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
+  },
+  "hosted_runs": {
+    "source": {
+      "id": 37863839427,
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427",
+      "status": "in_progress",
+      "conclusion": null,
+      "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
+    },
+    "docs": {
+      "id": 37863839384,
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839384",
+      "status": "in_progress",
+      "conclusion": null,
+      "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
+    }
+  }
+}
