@@ -93,3 +93,57 @@ if qp.exists():
             assert meta['cwd'] == c['clone']
             assert '-Dstoryatlas4s.storymodel4s.build=' + export['clone'] in meta['command']
     print('Verified complete restored scoped source and exact sibling consumer gate exits/totals.')
+
+publication_path = E / 'publication.json'
+if publication_path.exists():
+    publication = json.loads(publication_path.read_text())
+    published_sha = publication['published_sha']
+    assert published_sha == '38cf9c7f0f879c883a307cbeb54d51c67f6c1476'
+    assert publication['source_sha'] == SHA and publication['remote_verified']
+    assert not subprocess.check_output(['git', 'diff', '--name-only', SHA, published_sha,
+        '--', '*.scala', 'build.sbt', 'project', '.github/workflows', 'tools/recall-study'], cwd=R)
+    ansi = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
+    hosted_rows = []
+    for slug in ['source', 'docs']:
+        receipt = publication[slug]
+        run = json.loads(raw(receipt['metadata_archive']))
+        jobs = json.loads(raw(receipt['jobs_metadata_archive']))['jobs']
+        assert run['head_sha'] == published_sha and run['id'] == receipt['run']
+        assert run['status'] == 'completed' and run['conclusion'] == 'success'
+        assert {j['id'] for j in jobs} == {j['id'] for j in receipt['jobs']}
+        assert len(jobs) == (4 if slug == 'source' else 1)
+        if slug == 'source':
+            expected = {f'Test (ubuntu-22.04, 3.7.4, temurin@{java}, {project})'
+                        for java, project in [(17, 'rootJVM'), (21, 'rootJVM'),
+                                              (17, 'rootJS'), (17, 'rootNative')]}
+            assert {j['name'] for j in jobs} == expected
+        for recorded in receipt['jobs']:
+            job = next(j for j in jobs if j['id'] == recorded['id'])
+            assert job['name'] == recorded['name'] and job['conclusion'] == 'success'
+            assert job['status'] == 'completed'
+            log = raw(recorded['log_archive'])
+            assert len(log) == recorded['log_bytes'] and digest(log) == recorded['log_sha256']
+            text = ansi.sub('', log.decode())
+            rows = totals(text)
+            assert rows == recorded['totals']
+            if slug == 'docs':
+                for field, suffix in [('executable_examples', 'executable documentation examples'),
+                    ('built_pages', 'built pages'), ('sidebar_entries', 'unique sidebar entries'),
+                    ('internal_links', 'internal links')]:
+                    assert f"verified {receipt[field]} {suffix}" in text
+                assert 'provenance court: all checks passed' in text
+            if slug == 'source':
+                assert len(rows) == (24 if 'rootJVM' in job['name'] else 16)
+                assert all(r[1] == r[2] == 0 and r[0] == r[3] + r[4] for r in rows)
+                hosted_rows.extend(rows)
+                for suite in ['ReferenceMeasurementSuite', 'ReferenceIsolationSuite',
+                    'LocalReferenceBoundarySuite']:
+                    assert suite in text
+                if 'rootJVM' in job['name']:
+                    assert 'LocalReferenceConsumerSuite' in text
+    source = publication['source']
+    assert len(hosted_rows) == source['task_totals'] == 80
+    assert sum(r[3] for r in hosted_rows) == source['passed']
+    assert sum(r[4] for r in hosted_rows) == source['skipped']
+    assert source['failed'] == source['errors'] == 0
+    print('Verified exact published-head four-job matrix, complete raw job logs and hosted totals.')

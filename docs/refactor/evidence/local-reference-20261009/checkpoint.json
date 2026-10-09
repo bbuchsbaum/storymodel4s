@@ -6,8 +6,8 @@
   "reservation": null,
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Independent bounded local qualification PASS; exact a046a5fa25ccad155fba669b7807b318a5cdb508 landed on main. Reference bead closed; hosted/default-pin qualification pending.",
-  "next_action": "Publish reviewed receipt, verify remote SHA, collect complete hosted source/docs job logs and exact-head qualification. G1 and named reconstruction remain open.",
+  "state": "Reference independently reviewed, landed and closed. Published38cf9c7f remotely verified; hosted exact-head workflow controller active.",
+  "next_action": "Wait for exact published-head CI/docs completion; archive complete raw job logs and verify matrix totals/docs courts. Independent T2 review before final receipt push; G1/reconstruction stay open.",
   "source_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
   "focused_session": null,
   "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log",
@@ -26,5 +26,13 @@
   "source_progress": "44/44 complete",
   "source_state": "Complete actualexit0;44 totals8077Passed/0Failed/0Errors/5Skipped; formatlast.",
   "reviewed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508",
-  "landed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508"
+  "landed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508",
+  "published_sha": "38cf9c7f0f879c883a307cbeb54d51c67f6c1476",
+  "hosted_session": 55408,
+  "hosted_output": "/private/tmp/storymodel4s-reference-hosted",
+  "hosted_runs": {
+    "source": 37979712366,
+    "docs": 37979712407
+  },
+  "hosted_docs_state": "Documentation37979712407 completed success on published38cf9c7f; complete raw job113986813502 log cached for final archive."
 }
