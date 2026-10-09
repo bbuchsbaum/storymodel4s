@@ -1,0 +1,137 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 113986813502,
+      "run_id": 37979712407,
+      "workflow_name": "Documentation",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/bbuchsbaum/storymodel4s/actions/runs/37979712407",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUHEUp88AAAAaiiS-Pg",
+      "head_sha": "38cf9c7f0f879c883a307cbeb54d51c67f6c1476",
+      "url": "https://api.github.com/repos/bbuchsbaum/storymodel4s/actions/jobs/113986813502",
+      "html_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712407/job/113986813502",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-09T19:21:50Z",
+      "started_at": "2026-10-09T19:21:53Z",
+      "completed_at": "2026-10-09T19:29:19Z",
+      "name": "Verify docs site",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-09T19:21:54Z",
+          "completed_at": "2026-10-09T19:21:58Z"
+        },
+        {
+          "name": "Checkout current branch (full)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-09T19:21:58Z",
+          "completed_at": "2026-10-09T19:22:03Z"
+        },
+        {
+          "name": "Setup sbt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-09T19:22:03Z",
+          "completed_at": "2026-10-09T19:22:07Z"
+        },
+        {
+          "name": "Setup Java (temurin@17)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-09T19:22:07Z",
+          "completed_at": "2026-10-09T19:22:13Z"
+        },
+        {
+          "name": "Setup Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-09T19:22:13Z",
+          "completed_at": "2026-10-09T19:22:18Z"
+        },
+        {
+          "name": "Install site dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-09T19:22:18Z",
+          "completed_at": "2026-10-09T19:22:24Z"
+        },
+        {
+          "name": "Install the pinned Playwright browser",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-09T19:22:24Z",
+          "completed_at": "2026-10-09T19:22:52Z"
+        },
+        {
+          "name": "Verify",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-09T19:22:52Z",
+          "completed_at": "2026-10-09T19:29:14Z"
+        },
+        {
+          "name": "Post Setup Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-09T19:29:14Z",
+          "completed_at": "2026-10-09T19:29:15Z"
+        },
+        {
+          "name": "Post Setup Java (temurin@17)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-09T19:29:15Z",
+          "completed_at": "2026-10-09T19:29:15Z"
+        },
+        {
+          "name": "Post Setup sbt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-09T19:29:15Z",
+          "completed_at": "2026-10-09T19:29:17Z"
+        },
+        {
+          "name": "Post Checkout current branch (full)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-09T19:29:17Z",
+          "completed_at": "2026-10-09T19:29:17Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-09T19:29:17Z",
+          "completed_at": "2026-10-09T19:29:17Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/bbuchsbaum/storymodel4s/check-runs/113986813502",
+      "labels": [
+        "ubuntu-22.04"
+      ],
+      "runner_id": 1000057875,
+      "runner_name": "GitHub Actions 1000057875",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

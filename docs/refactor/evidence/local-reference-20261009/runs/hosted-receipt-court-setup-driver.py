@@ -43,19 +43,14 @@ def change_log(body, case):
                 n += 1
         assert n == 1
         s = ''.join(lines)
-    if case in ["wrong-suite-count", "missing-suite-completion"]:
-        lines, n = s.splitlines(keepends=True), 0
-        for i, line in enumerate(lines):
-            normalized = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', line)
-            if 'Test run ' + SUITE + ' finished:' in normalized:
-                if case == "wrong-suite-count":
-                    assert line.count('14 total') == 1
-                    lines[i] = line.replace('14 total', '13 total', 1)
-                else:
-                    lines[i] = line.replace('finished:', 'incomplete:', 1)
-                n += 1
+    if case == "wrong-suite-count":
+        s, n = re.subn(r'(Test run ' + re.escape(SUITE) +
+                       r' finished: 0 failed, 0 ignored, )14 total', r'\g<1>13 total', s)
         assert n == 1
-        s = ''.join(lines)
+    if case == "missing-suite-completion":
+        s, n = re.subn(r'Test run ' + re.escape(SUITE) + r' finished:',
+                       "Test run " + SUITE + " incomplete:", s)
+        assert n == 1
     return s.encode()
 
 def invoke(tool, version, case=None):

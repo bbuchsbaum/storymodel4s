@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python3",
+    "docs/refactor/evidence/local-reference-20261009/hosted-receipt-court.py",
+    "/private/tmp/storymodel4s-reference-hosted"
+  ],
+  "exit_code": 1,
+  "log_bytes": 758,
+  "log_sha256": "4bfc38846269e48b38849acf69996998c0bc2fa9a3786b69fae9e0beb698baa4",
+  "duration_seconds": 1.4744064999977127
+}

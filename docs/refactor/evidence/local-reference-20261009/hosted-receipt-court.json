@@ -1,0 +1,95 @@
+{
+  "published_sha": "38cf9c7f0f879c883a307cbeb54d51c67f6c1476",
+  "old_tooling_sha": "eb240ffa7a11576525938b96491a2c94027aeba0",
+  "script_sha256": {
+    "hosted-receipt-court.py": "d5064c995e301f0020ab56988dd9064915cf17e45745455c83d352705cc55853",
+    "collect-hosted.py": "8eb4deaf6c911baf04a12f37e319ddf345efcd2b66228cc29a71470a95bb89ad",
+    "verify.py": "69c3d890dc9b0abfd8510f79c00ddb07e3ef83d9002b696acc496432749af930"
+  },
+  "cases": [
+    {
+      "tool": "collect-hosted.py",
+      "case": "wrong-run",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "hosted job run"
+    },
+    {
+      "tool": "collect-hosted.py",
+      "case": "wrong-head",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "hosted job head"
+    },
+    {
+      "tool": "collect-hosted.py",
+      "case": "wrong-attempt",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "hosted job attempt"
+    },
+    {
+      "tool": "collect-hosted.py",
+      "case": "wrong-checkout",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "checkout SHA"
+    },
+    {
+      "tool": "collect-hosted.py",
+      "case": "wrong-suite-count",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "suite completion storymodel4s.align.ReferenceMeasurementSuite"
+    },
+    {
+      "tool": "collect-hosted.py",
+      "case": "missing-suite-completion",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "suite completion storymodel4s.align.ReferenceMeasurementSuite"
+    },
+    {
+      "tool": "verify.py",
+      "case": "wrong-run",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "hosted job run"
+    },
+    {
+      "tool": "verify.py",
+      "case": "wrong-head",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "hosted job head"
+    },
+    {
+      "tool": "verify.py",
+      "case": "wrong-attempt",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "hosted job attempt"
+    },
+    {
+      "tool": "verify.py",
+      "case": "wrong-checkout",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "checkout SHA"
+    },
+    {
+      "tool": "verify.py",
+      "case": "wrong-suite-count",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "suite completion storymodel4s.align.ReferenceMeasurementSuite"
+    },
+    {
+      "tool": "verify.py",
+      "case": "missing-suite-completion",
+      "old_exit": 0,
+      "current_exit": 1,
+      "named_assertion": "suite completion storymodel4s.align.ReferenceMeasurementSuite"
+    }
+  ]
+}

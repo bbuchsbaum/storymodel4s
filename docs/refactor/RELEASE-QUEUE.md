@@ -57,8 +57,10 @@ single-level, mode-preserving `LocalReference` candidate at source `cd740302`.
 [Receipts](evidence/local-reference-20261009/README.md) bind 8,077 local passes / five existing
 skips over 44 scoped tasks, 485 pinned StoryAtlas consumer passes, 16 compiled assertion guard
 kills and a positive-controlled HSMM independence trap. Independent exact-SHA review passed;
-the slice is landed on main at `a046a5fa` and the reference bead is closed. Publication and
-hosted declared-pin qualification remain pending. The reference/reconstruction -> G1 cycle was
+the slice is landed on main at `a046a5fa` and the reference bead is closed. Published `38cf9c7f`
+is hosted-qualified: 13,442 passes / 12 existing skips over 80 complete raw-job totals, plus
+13 executable documentation examples and 20 pages. Final proof receipt review/publication is
+pending. The reference/reconstruction -> G1 cycle was
 refined onto completed S2a-4/S2b-3/4/5 prerequisites; G1 now waits for those existing consumers
 and retains its remaining acceptance. Named reconstruction is the next bounded implementation.
 

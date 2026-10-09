@@ -1,0 +1,727 @@
+{
+  "published_sha": "38cf9c7f0f879c883a307cbeb54d51c67f6c1476",
+  "source_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+  "remote_verified": true,
+  "status": "hosted_declared_pins_qualified",
+  "logs_basis": "Complete original job logs; ANSI normalized only while parsing.",
+  "source": {
+    "run": 37979712366,
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712366",
+    "conclusion": "success",
+    "metadata_archive": "runs/hosted-source-run.json",
+    "jobs_metadata_archive": "runs/hosted-source-jobs.json",
+    "jobs": [
+      {
+        "id": 113986813858,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712366/job/113986813858",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113986813858.log.gz",
+        "log_bytes": 962435,
+        "log_sha256": "00131f0d01b44c5678f9e7f702d7fe02d2a86b7d3d924a1412a143233c1469dd",
+        "totals": [
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            189,
+            0,
+            0,
+            189,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            817,
+            0,
+            0,
+            817,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            327,
+            0,
+            0,
+            327,
+            0
+          ],
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            165,
+            0,
+            0,
+            165,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ],
+          [
+            98,
+            0,
+            0,
+            98,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            76,
+            1
+          ],
+          [
+            28,
+            0,
+            0,
+            28,
+            0
+          ],
+          [
+            48,
+            0,
+            0,
+            48,
+            0
+          ],
+          [
+            172,
+            0,
+            0,
+            171,
+            1
+          ],
+          [
+            64,
+            0,
+            0,
+            60,
+            4
+          ],
+          [
+            120,
+            0,
+            0,
+            120,
+            0
+          ],
+          [
+            159,
+            0,
+            0,
+            159,
+            0
+          ]
+        ],
+        "reference_suites": {
+          "storymodel4s.align.ReferenceMeasurementSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 14
+          },
+          "storymodel4s.align.ReferenceIsolationSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 7
+          },
+          "storymodel4s.probes.LocalReferenceBoundarySuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 21
+          },
+          "storymodel4s.bench.video.LocalReferenceConsumerSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 3
+          }
+        }
+      },
+      {
+        "id": 113986814154,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712366/job/113986814154",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113986814154.log.gz",
+        "log_bytes": 275965,
+        "log_sha256": "e2804fcdfb7287f19a59b1a8f8d8a78715dfac91cc410b816bc589780aeb9f98",
+        "totals": [
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            186,
+            0,
+            0,
+            186,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            797,
+            0,
+            0,
+            797,
+            0
+          ],
+          [
+            326,
+            0,
+            0,
+            326,
+            0
+          ],
+          [
+            160,
+            0,
+            0,
+            160,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ]
+        ],
+        "reference_suites": {
+          "storymodel4s.align.ReferenceMeasurementSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 14
+          },
+          "storymodel4s.align.ReferenceIsolationSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 7
+          },
+          "storymodel4s.probes.LocalReferenceBoundarySuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 21
+          }
+        }
+      },
+      {
+        "id": 113986814232,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712366/job/113986814232",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113986814232.log.gz",
+        "log_bytes": 299728,
+        "log_sha256": "0a791816bc1edc8286be82bd306f8ec5bd5e40ca491f485c181884d7ab491160",
+        "totals": [
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            186,
+            0,
+            0,
+            186,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            797,
+            0,
+            0,
+            797,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            326,
+            0,
+            0,
+            326,
+            0
+          ],
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            160,
+            0,
+            0,
+            160,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ]
+        ],
+        "reference_suites": {
+          "storymodel4s.align.ReferenceMeasurementSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 14
+          },
+          "storymodel4s.align.ReferenceIsolationSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 7
+          },
+          "storymodel4s.probes.LocalReferenceBoundarySuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 21
+          }
+        }
+      },
+      {
+        "id": 113986814305,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712366/job/113986814305",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113986814305.log.gz",
+        "log_bytes": 1046939,
+        "log_sha256": "51381de53e39ec9689c36ebee1fbb8b135f43df750950cbf24b2b7abedab1ff6",
+        "totals": [
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            189,
+            0,
+            0,
+            189,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            817,
+            0,
+            0,
+            817,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            327,
+            0,
+            0,
+            327,
+            0
+          ],
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            165,
+            0,
+            0,
+            165,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ],
+          [
+            98,
+            0,
+            0,
+            98,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            76,
+            1
+          ],
+          [
+            28,
+            0,
+            0,
+            28,
+            0
+          ],
+          [
+            48,
+            0,
+            0,
+            48,
+            0
+          ],
+          [
+            172,
+            0,
+            0,
+            171,
+            1
+          ],
+          [
+            64,
+            0,
+            0,
+            60,
+            4
+          ],
+          [
+            120,
+            0,
+            0,
+            120,
+            0
+          ],
+          [
+            159,
+            0,
+            0,
+            159,
+            0
+          ]
+        ],
+        "reference_suites": {
+          "storymodel4s.align.ReferenceMeasurementSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 14
+          },
+          "storymodel4s.align.ReferenceIsolationSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 7
+          },
+          "storymodel4s.probes.LocalReferenceBoundarySuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 21
+          },
+          "storymodel4s.bench.video.LocalReferenceConsumerSuite": {
+            "failed": 0,
+            "ignored": 0,
+            "passed": 3
+          }
+        }
+      }
+    ],
+    "task_totals": 80,
+    "passed": 13442,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "docs": {
+    "run": 37979712407,
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712407",
+    "conclusion": "success",
+    "metadata_archive": "runs/hosted-docs-run.json",
+    "jobs_metadata_archive": "runs/hosted-docs-jobs.json",
+    "jobs": [
+      {
+        "id": 113986813502,
+        "name": "Verify docs site",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712407/job/113986813502",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-docs-job-113986813502.log.gz",
+        "log_bytes": 75473,
+        "log_sha256": "dd00c1d4ae3c0bdf23bfa5e4e957857829b7989e154b45aa8064bb27ea907176",
+        "totals": []
+      }
+    ],
+    "executable_examples": 13,
+    "built_pages": 20,
+    "sidebar_entries": 19,
+    "internal_links": 15,
+    "provenance_court": "all checks passed"
+  }
+}

@@ -452,5 +452,5 @@
   "focused_courts": 45,
   "mass_tolerance": 1e-12,
   "status": "locally_qualified_review_pending",
-  "qualification_scope": "Local source override uses clean grakern8efc; pinned StoryAtlas90f uses exact sourcecd740 and defaultIntaglio2fa5. No hosted default-grakern qualification yet. Engine-evidence/reference scope only; concrete-provider origin remains on its envelope; G1/reconstruction open."
+  "qualification_scope": "Initial local source override uses clean grakern8efc; pinned StoryAtlas90f uses exact sourcecd740 and defaultIntaglio2fa5. Subsequent hosted declared-pin qualification on published38cf is bound in publication.json. Engine-evidence/reference scope only; concrete-provider origin remains on its envelope; G1/reconstruction open."
 }

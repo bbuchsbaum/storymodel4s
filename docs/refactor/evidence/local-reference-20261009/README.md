@@ -16,7 +16,22 @@ Local qualification: **8,077 passed, zero failed/errors, five existing skips ove
 (20 JVM modules plus 12 each JS/Native), fatal warnings, clean probes and formatting last.
 Pinned clean StoryAtlas `90f682d1acddd759867098e90f6e3ef163244b0e` compiled and passed **485 tests
 across 10 totals**, zero failures/errors/skips, against the same source; its formatting passed last.
-These runs use the recorded clean grakern 8efc override; hosted/default-pin qualification is pending.
+These local runs use the recorded clean grakern 8efc override.
+
+Published `38cf9c7f0f879c883a307cbeb54d51c67f6c1476` is hosted-qualified on the declared
+grakern pin: [CI 37979712366](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712366)
+passed **13,442 tests, zero failed/errors, 12 existing skips over 80 task totals** across
+Java 17/21, Scala.js and Native. Each job is bound to the exact run, SHA and attempt, with raw
+checkout output and completed 14/7/21 reference suites; each JVM job also completed three
+registered-channel consumer tests. [Documentation 37979712407](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37979712407)
+verified 13 executable examples, 20 pages, 19 sidebar entries, 15 links and the provenance court.
+Original job logs and API metadata are retained; `publication.json` binds the complete totals.
+
+The hosted receipt court rejects twelve altered receipts across the collector and verifier;
+old tooling accepts all twelve, and two unchanged current controls pass. The run/head/attempt,
+checkout, suite-count and missing-completion challenges reach their named assertions after
+artifact hashes are repaired. Setup failures are excluded and preserved in
+[the court correction](HOSTED-COURT-CORRECTION.md).
 
 The 45 focused courts include 14 analytical/refusal, 7 isolation, 21 independent external construction
 probes and 3 actual ONNX registration/replay consumers. Frozen mass tolerance is 1e-12; opaque-ID
@@ -33,7 +48,9 @@ UnmeasuredTargetCost fallback is source-excluded under today's producer, not bra
 [Verifier](verify.py) reconciles exact source hashes, complete raw archives, reconstructible mutation
 patches, actual exits, named assertions, selected counts and complete source/consumer totals.
 Independent review passed on `a046a5fa25ccad155fba669b7807b318a5cdb508`, which is now landed
-on main; the existing reference bead is closed. Publication and hosted qualification remain pending.
+on main; the existing reference bead is closed. Publication was separately reviewed on `38cf9c7f`;
+the receipt-binding correction passed source review on `191b3292`.
+Final complete-receipt review and publication remain pending.
 This is engineering qualification;
 no corpus/private data, calibration, learned-model efficacy or aggregate release qualification is
 claimed. G1 stays open for named reconstruction and remaining complete shared-provider/run acceptance.

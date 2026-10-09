@@ -35,5 +35,13 @@ All 44 source task totals (8,077 passed, five skips) and ten pinned consumer tot
 zero skips) have actual exit zero, zero failures/errors, fatal warnings and formatting last.
 Producer source is unchanged from reviewed e256; gated inputs are unchanged since cd740.
 The source, consumer and grakern clones were independently clean at their recorded revisions.
-No BLOCK remains for this bounded slice. Hosted/default-pin qualification remains pending;
-G1 and named reconstruction retain their acceptance.
+No BLOCK remains for this bounded slice. G1 and named reconstruction retain their acceptance.
+
+The reviewer BLOCKed hosted receipt tooling `eb240ffa`: jobs were not bound to their run, head
+and attempt, and suite names alone did not prove successful completion. Both scripts were
+corrected; source T2 PASS on exact `191b3292105ecebc87d81ff9dd0068e4a0eedb25` confirmed the
+run/head/attempt checks, raw checkout SHA and exact successful 14/7/21/3 suite counts.
+The complete hosted runs subsequently passed on published `38cf9c7f`; the executed court
+records twelve named refusals, twelve old-tooling acceptance controls and two unchanged current
+controls. The two fixture setup failures contribute no acceptance count. Final exact-receipt
+review remains pending.

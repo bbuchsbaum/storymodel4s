@@ -6,8 +6,8 @@
   "reservation": null,
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Reference independently reviewed, landed and closed. Published38cf9c7f remotely verified; hosted exact-head workflow controller active.",
-  "next_action": "Wait for exact published-head CI/docs completion; archive complete raw job logs and verify matrix totals/docs courts. Independent T2 review before final receipt push; G1/reconstruction stay open.",
+  "state": "Reference reviewed, landed and closed; published38cf9c7f qualified on hosted four-cell matrix13442 Passed/0Failed/Errors/12existingSkips and docs13examples/20pages. Receipt-binding correction passed12 named refusals with old-tooling controls; final complete-receipt review/push pending.",
+  "next_action": "Independent exact-SHA completed-receipt review, narrow receipt publication and exact remote verification. Named reconstruction bd-01M2TAD04SR823TQVG9VPNH6R3 is ready; G1 remains open.",
   "source_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
   "focused_session": null,
   "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log",
@@ -28,11 +28,12 @@
   "reviewed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508",
   "landed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508",
   "published_sha": "38cf9c7f0f879c883a307cbeb54d51c67f6c1476",
-  "hosted_session": 55408,
+  "hosted_session": null,
   "hosted_output": "/private/tmp/storymodel4s-reference-hosted",
   "hosted_runs": {
     "source": 37979712366,
     "docs": 37979712407
   },
-  "hosted_docs_state": "Documentation37979712407 completed success on published38cf9c7f; complete raw job113986813502 log cached for final archive."
+  "hosted_docs_state": "Complete original job log archived and checked:13executable examples,20pages,19sidebar entries,15links,provenance court passed.",
+  "hosted_state": "Controller55408 exited0; source37979712366 and docs37979712407 completed success. Complete raw logs/metadata archived."
 }
