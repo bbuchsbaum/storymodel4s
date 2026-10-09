@@ -6,8 +6,8 @@
   "reservation": null,
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Reference reviewed, landed and closed; published38cf9c7f qualified on hosted four-cell matrix13442 Passed/0Failed/Errors/12existingSkips and docs13examples/20pages. Receipt-binding correction passed12 named refusals with old-tooling controls; final complete-receipt review/push pending.",
-  "next_action": "Independent exact-SHA completed-receipt review, narrow receipt publication and exact remote verification. Named reconstruction bd-01M2TAD04SR823TQVG9VPNH6R3 is ready; G1 remains open.",
+  "state": "Bounded public reference complete: independent review and source landinga046; sourcepublication38cf remotely verified and hosted-qualified; complete receipt independently PASSed and locallylanded ata771. G1/reconstruction remain open.",
+  "next_action": "Existing ready named reconstruction bd-01M2TAD04SR823TQVG9VPNH6R3: extract versioned structured policy, preserve historical anchors and separate raw argmax/selected target/selected mass/fill origin; default no fill for new profiles.",
   "source_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
   "focused_session": null,
   "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log",
@@ -35,5 +35,7 @@
     "docs": 37979712407
   },
   "hosted_docs_state": "Complete original job log archived and checked:13executable examples,20pages,19sidebar entries,15links,provenance court passed.",
-  "hosted_state": "Controller55408 exited0; source37979712366 and docs37979712407 completed success. Complete raw logs/metadata archived."
+  "hosted_state": "Controller55408 exited0; source37979712366 and docs37979712407 completed success. Complete raw logs/metadata archived.",
+  "receipt_reviewed_sha": "a771712c71bdabc467a74c11ec0e89e6ec667ac8",
+  "receipt_landed_sha": "a771712c71bdabc467a74c11ec0e89e6ec667ac8"
 }

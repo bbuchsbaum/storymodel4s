@@ -723,5 +723,11 @@
     "sidebar_entries": 19,
     "internal_links": 15,
     "provenance_court": "all checks passed"
+  },
+  "publication_review": {
+    "reviewer": "/root/s2b5_qualification_review",
+    "verdict": "PASS",
+    "sha": "a771712c71bdabc467a74c11ec0e89e6ec667ac8",
+    "scope": "Complete local and hosted receipt; all139 archive entries, exact job bindings, suite completions and receipt refusal observations."
   }
 }

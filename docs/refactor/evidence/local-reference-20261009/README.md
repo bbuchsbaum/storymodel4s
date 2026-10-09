@@ -50,7 +50,8 @@ patches, actual exits, named assertions, selected counts and complete source/con
 Independent review passed on `a046a5fa25ccad155fba669b7807b318a5cdb508`, which is now landed
 on main; the existing reference bead is closed. Publication was separately reviewed on `38cf9c7f`;
 the receipt-binding correction passed source review on `191b3292`.
-Final complete-receipt review and publication remain pending.
+Complete-receipt review passed on `a771712c71bdabc467a74c11ec0e89e6ec667ac8`, now landed on
+main. These receipts bind the tested publication `38cf9c7f` separately from subsequent receipt commits.
 This is engineering qualification;
 no corpus/private data, calibration, learned-model efficacy or aggregate release qualification is
 claimed. G1 stays open for named reconstruction and remaining complete shared-provider/run acceptance.

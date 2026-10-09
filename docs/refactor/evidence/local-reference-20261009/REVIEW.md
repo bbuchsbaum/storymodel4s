@@ -43,5 +43,13 @@ corrected; source T2 PASS on exact `191b3292105ecebc87d81ff9dd0068e4a0eedb25` co
 run/head/attempt checks, raw checkout SHA and exact successful 14/7/21/3 suite counts.
 The complete hosted runs subsequently passed on published `38cf9c7f`; the executed court
 records twelve named refusals, twelve old-tooling acceptance controls and two unchanged current
-controls. The two fixture setup failures contribute no acceptance count. Final exact-receipt
-review remains pending.
+controls. The two fixture setup failures contribute no acceptance count.
+
+Final exact-receipt PASS on `a771712c71bdabc467a74c11ec0e89e6ec667ac8`: the independent
+reviewer reconciled all 139 archive entries; published `38cf9c7f` attempt one, all four jobs and
+80 totals (13,442 passed, zero failed/errors, 12 skips); exact run/head/attempt and raw checkout
+bindings; successful 14/7/21 reference suites and three consumers in each JVM job; all five
+documentation markers; and the court's actual exit zero and 26 observations. The corrected
+mutations reach their named assertions, with both setup failures excluded. Gated inputs remain
+unchanged since cd740 and the tested publication. Verifier and diff check exit zero; no BLOCK
+remains for the bounded reference slice. G1 and reconstruction remain open.
