@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-09T18:15:45.695991+00:00",
+  "finished_utc": "2026-10-09T18:16:43.234540+00:00",
+  "duration_seconds": 57.537914,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.align.ReferenceIsolationSuite -- \"--tests=shifted normalization survives a tiny temperature with strictly positive minimum cost|source storage permutations preserve each state's local mass\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-reference-mutations/shifted-normalization.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3646
+}

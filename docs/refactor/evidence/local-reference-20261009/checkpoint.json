@@ -6,12 +6,17 @@
   "reservation": "rv-01M4GTK0Y9ZWHS39Z7FXDC4W4T",
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Exact e0d6 source/courts independently PASS; direct-product BLOCK closed.17 compiled guard/trap witnesses running serially.45 focused courts observed passing. Restored scoped/consumer gates remain required.",
-  "next_action": "Inspect guard/trap campaign actual exits/named assertions/passing siblings; restore exact clean source, run20-module44-task platform gate and StoryAtlas source consumer serially, then exact-SHA evidence review and narrow publication.",
-  "source_sha": "e0d6ac9e9b46a8ad586b84875020462a24a735da",
+  "state": "Mutation/trap qualification complete; queued94970 restored20-module44-task source gate is starting/running. StoryAtlas consumer gate not yet run.",
+  "next_action": "Require all17 stricter witnesses: compiled named assertion failure plus one passing sibling, including HSMM trap/reference independence. Then restored44-task20-module source gate and exactStoryAtlas consumer gate, formatting last, independent evidence review and narrow publication.",
+  "source_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
   "focused_session": null,
   "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log",
-  "mutation_session": 47971,
-  "mutation_output": "/private/tmp/storymodel4s-reference-mutations",
-  "mutation_timeout_seconds": 1200
+  "mutation_session": null,
+  "mutation_output": "/private/tmp/storymodel4s-reference-final-mutations",
+  "mutation_timeout_seconds": 1200,
+  "mutation_state": "Sixteen compiled guard kills plusone HSMM trap independently qualify: exactcd740, each namedassertion failure/onepassing sibling; clean source restored. Initial e0d6 batch retained without qualification count.",
+  "source_session": 94970,
+  "source_log": "/private/tmp/storymodel4s-reference-source-gate.log",
+  "source_timeout_seconds": 7200,
+  "source_scope": "20 modules;44 JVM/JS/Native module tasks, clean compile probes, fatal warnings, formatlast"
 }

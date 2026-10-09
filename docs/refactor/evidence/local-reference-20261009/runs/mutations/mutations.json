@@ -1,0 +1,580 @@
+[
+  {
+    "name": "finite-profile",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "profile checks finite positive temperature nonempty universe and single level",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.profile checks finite positive temperature nonempty universe and single level 0.317s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:193 assertion failed"
+    ],
+    "test_selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "source_sha256": "abdadb23f165c4d8d07ee81911fe9748393c8dfd0d0584df9373fd79d70e0c97",
+    "patch_sha256": "3afda2f9996f5a873c74c5f5e09bd71340eb71f9b227ea87490d3655075368b1",
+    "log_sha256": "f43dd5c31102c5aae74084fadb44bf9bc9dc3c0207c486d0dcb10e31c34cee9a"
+  },
+  {
+    "name": "nonempty-profile",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "profile checks finite positive temperature nonempty universe and single level",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.profile checks finite positive temperature nonempty universe and single level 0.383s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:199 assertion failed"
+    ],
+    "test_selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "source_sha256": "8ac300be1f0935a6c86d2f3337b9729f8c71bbd4185d0ee03fa9ce6d8ced6918",
+    "patch_sha256": "e089098a9099526981cd6d77f8929fb44668e2d009ee31a8a5f643b7e70079e8",
+    "log_sha256": "2fb26fc70a18fbe3cd69754db5c47df4a680a69cb6d09b3c8a015c3532002c28"
+  },
+  {
+    "name": "single-level-profile",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "profile checks finite positive temperature nonempty universe and single level",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.profile checks finite positive temperature nonempty universe and single level 0.433s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:207 assertion failed"
+    ],
+    "test_selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "source_sha256": "7f2e255727cd131a59f7f94465f6336a1a50ac62fb240042701b78cb56edc15d",
+    "patch_sha256": "182e7ad4f8482b2ca80edb3a1c55b2e006fd8ec6d5354d4fa84b2652cec8cf37",
+    "log_sha256": "1f2c1309a8c6799301b10eb157e26b6bea38c9b79c5eca43e44f8356e268b625"
+  },
+  {
+    "name": "temperature-identity",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "profile checks finite positive temperature nonempty universe and single level",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.profile checks finite positive temperature nonempty universe and single level 0.363s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:209 values are the same, expected 2 different values: 80896a3f4889a7f5960769df179df998c3772451fe93f06548b2e1e25d7e6c37 is equal to 80896a3f4889a7f5960769df179df998c3772451fe93f06548b2e1e25d7e6c37"
+    ],
+    "test_selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "source_sha256": "5b5af614e3c042cbbf2604c5dcaca8eb0ca42fa3bbb13fcd7f7177322004e689",
+    "patch_sha256": "9f0c92eaad5ab257da05d6ae96ba14223d029f00e6f7eb3071f0d2d418c04175",
+    "log_sha256": "085623a5fdde7cebfdcfdea0c5355a8ad180e5876d3460014e26887be3cf4992"
+  },
+  {
+    "name": "context-binding",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=foreign recall source and ungated evidence refuse before deriving rows|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "foreign recall source and ungated evidence refuse before deriving rows",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.foreign recall source and ungated evidence refuse before deriving rows 0.394s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:292 assertion failed"
+    ],
+    "test_selection": "foreign recall source and ungated evidence refuse before deriving rows|reference produces mass before any sequence result is requested",
+    "source_sha256": "4268a3ecaf5fa5077fc39cea35dafeeed185cc7fc552b0d783e1bb662bca022b",
+    "patch_sha256": "54a3ac38b208e0553e20b176c5c9c711f7a3ff7acf9678478fa7ae4331b7b684",
+    "log_sha256": "7f73529635ab5185ba1418d31f37f20c2b9e6032a3f7f807ef8cc6d989b51f98"
+  },
+  {
+    "name": "controlled-provenance",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=unattested and callback-generated evidence cannot become strict reference|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "unattested and callback-generated evidence cannot become strict reference",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.unattested and callback-generated evidence cannot become strict reference 0.422s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:284 assertion failed"
+    ],
+    "test_selection": "unattested and callback-generated evidence cannot become strict reference|reference produces mass before any sequence result is requested",
+    "source_sha256": "0f7e3ece9340f2262b596c4bf7084e9505bdb613f9ca23a15485654224004a6e",
+    "patch_sha256": "646f288a7b0faf25f24446df712fef08128c23e471a6f3c40b672d931f6b7675",
+    "log_sha256": "cd9de57c06be80d09d488771799a3097b9ffa2ea535242e3e6f04a389529aec3"
+  },
+  {
+    "name": "complete-universe",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=a foreign or incomplete universe cannot silently condition the local denominator|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "a foreign or incomplete universe cannot silently condition the local denominator",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.a foreign or incomplete universe cannot silently condition the local denominator 0.463s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:236 assertion failed"
+    ],
+    "test_selection": "a foreign or incomplete universe cannot silently condition the local denominator|reference produces mass before any sequence result is requested",
+    "source_sha256": "400dd2e4c6730d680d4d502bef750453a44d963017ebdb1223569461b4cce487",
+    "patch_sha256": "7196aa7c988a65585e85498381f673be267e5c987613d67501e33c50a6a39537",
+    "log_sha256": "2fd05a49c9b36e43ee2b3aefbf7fcecaa227938a83805a8c9b28ac33359c8c26"
+  },
+  {
+    "name": "no-posthoc-cut",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=mixed-grain nominations refuse instead of filtering already-priced states|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "mixed-grain nominations refuse instead of filtering already-priced states",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.mixed-grain nominations refuse instead of filtering already-priced states 0.336s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:264 assertion failed"
+    ],
+    "test_selection": "mixed-grain nominations refuse instead of filtering already-priced states|reference produces mass before any sequence result is requested",
+    "source_sha256": "2d23b70747c23afe070e69cebe80661ba442bae738aab0cb1d03768360b4a4c3",
+    "patch_sha256": "90807fd1c68308c28c0efcf7183449e5c9dd94a52b8a3d679a391c36319dc20f",
+    "log_sha256": "067c0c38d5ce59b3cfb87a2781d7d39e6f030230936f061bbc3f82454f3d9f7b"
+  },
+  {
+    "name": "overflow-population",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=overflow refuses an otherwise measurable retained target population|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "overflow refuses an otherwise measurable retained target population",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.overflow refuses an otherwise measurable retained target population 0.252s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:251 assertion failed"
+    ],
+    "test_selection": "overflow refuses an otherwise measurable retained target population|reference produces mass before any sequence result is requested",
+    "source_sha256": "ed4175f24e6c48cecabbcf4d85a023527b971677c0837128ce7d92ef92b64e28",
+    "patch_sha256": "ec6c4f36dcd8b0e8880c6565b0b9ad914a54e46a46710d4bfa2f13fbd8c1ca58",
+    "log_sha256": "e4e3c75077fbe97f2c85e6ff6c14696c13958d71f2bf4eade1865989f8960533"
+  },
+  {
+    "name": "prior-only-classification",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=prior-only prices are not promoted to observed uniform mass|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "prior-only prices are not promoted to observed uniform mass",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.prior-only prices are not promoted to observed uniform mass 0.36s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:164"
+    ],
+    "test_selection": "prior-only prices are not promoted to observed uniform mass|reference produces mass before any sequence result is requested",
+    "source_sha256": "4bbe65a9ae3ea104e9a643d3825e7c3ffe68815cbe76e18e4a890a98a8ea325d",
+    "patch_sha256": "fc1875bc4ea7fe076d7a5f8bd9c46970671163896de93a8915900b9e642c0920",
+    "log_sha256": "34023bedbba473beb30a11a9090150dbeddf0f4ab811a0581afcb48c1df1b395"
+  },
+  {
+    "name": "admitted-target-population",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=unassessable targets retain exclusions rather than normalizing external-only prices|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "unassessable targets retain exclusions rather than normalizing external-only prices",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.unassessable targets retain exclusions rather than normalizing external-only prices 0.235s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:175 assertion failed"
+    ],
+    "test_selection": "unassessable targets retain exclusions rather than normalizing external-only prices|reference produces mass before any sequence result is requested",
+    "source_sha256": "1d6a017715f102070d22848aedc387e75be349d4268b2ed48bf09f87ac81ff6d",
+    "patch_sha256": "29926bd6260022afa480561cf355c2cc7c7157bf4530bac1c328a9b775a32659",
+    "log_sha256": "a6f3101532d36cd49b294e63d4f595eb261e226106bdf76bc006d6dd1b1d4b7e"
+  },
+  {
+    "name": "mode-preservation",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=analytical odds preserve faithful distorted and all five external states|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "analytical odds preserve faithful distorted and all five external states",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.analytical odds preserve faithful distorted and all five external states 0.283s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:113"
+    ],
+    "test_selection": "analytical odds preserve faithful distorted and all five external states|reference produces mass before any sequence result is requested",
+    "source_sha256": "d0c75ae4cda2a20b3bf1deb9112da0d320ad0cce01ddcb9066e0dc7e2348fb1e",
+    "patch_sha256": "a3ebb049ca5837b50b422bdde32a4eb62d0e18c980c542cd8e3ed52f2a200e09",
+    "log_sha256": "89a659cbac466c299c2b46bca72422d03f70ae2d2c1eb1ae601a4ef331418652"
+  },
+  {
+    "name": "shifted-normalization",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceIsolationSuite -- \"--tests=shifted normalization survives a tiny temperature with strictly positive minimum cost|source storage permutations preserve each state's local mass\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        5
+      ]
+    ],
+    "named_failure": "shifted normalization survives a tiny temperature with strictly positive minimum cost",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceIsolationSuite.shifted normalization survives a tiny temperature with strictly positive minimum cost 0.022s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/ReferenceIsolationSuite.scala:121"
+    ],
+    "test_selection": "shifted normalization survives a tiny temperature with strictly positive minimum cost|source storage permutations preserve each state's local mass",
+    "source_sha256": "c4df20d24f7039d8b3fc2185ce07fb15907253060638165ded6e65e28fd7eb79",
+    "patch_sha256": "833b2c2d1d522daa2cc5a1c16eba653af871b2456d2e336a1d9d38acbda7a739",
+    "log_sha256": "ecd1f9c088414986bdc193ee310a3a7187514264ec101dd48eef6ff188475094"
+  },
+  {
+    "name": "rename-independent-denominator",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceIsolationSuite -- \"--tests=opaque target rename preserves bits with an identifier-independent denominator|source storage permutations preserve each state's local mass\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        5
+      ]
+    ],
+    "named_failure": "opaque target rename preserves bits with an identifier-independent denominator",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceIsolationSuite.opaque target rename preserves bits with an identifier-independent denominator 0.027s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/ReferenceIsolationSuite.scala:83"
+    ],
+    "test_selection": "opaque target rename preserves bits with an identifier-independent denominator|source storage permutations preserve each state's local mass",
+    "source_sha256": "29642193dc85b669c512b6f52da522b5443a1f8709c8a72b5271e1c6d5d295a0",
+    "patch_sha256": "2fe99208b6923f31b8d843623227b00603e45335cfefca9624da1228dca867e0",
+    "log_sha256": "9d5ce1e37ac196ed04c3819ca0d231e1082c8410ee10f4eb84a3f5460e55d86e"
+  },
+  {
+    "name": "result-constructor",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.probes.LocalReferenceBoundarySuite -- \"--tests=Result has no unchecked constructor or apply door|checked public factories and inspectable computed fields remain available\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        19
+      ]
+    ],
+    "named_failure": "Result has no unchecked constructor or apply door",
+    "failures": [
+      "==> X storymodel4s.probes.LocalReferenceBoundarySuite.Result has no unchecked constructor or apply door 0.012s munit.FailException: align/src/test/scala/storymodel4s/probes/LocalReferenceBoundarySuite.scala:140 assertion failed"
+    ],
+    "test_selection": "Result has no unchecked constructor or apply door|checked public factories and inspectable computed fields remain available",
+    "source_sha256": "0472dbdcdb5f809e095e2976e49e1266806411c4f7f1060b962b6facf381f860",
+    "patch_sha256": "cadb20cd5c04366207fefa5662dc7bb060157016291381a9ea34481e19ff40d9",
+    "log_sha256": "7bbe4b563b05c5e6722a2abb3207ddd1a006223c076a1a0ae49508d1c1f53153"
+  },
+  {
+    "name": "direct-product-factory",
+    "kind": "guard",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.probes.LocalReferenceBoundarySuite -- \"--tests=Profile has no direct companion fromProduct door|Profile has no product Mirror door\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        19
+      ]
+    ],
+    "named_failure": "Profile has no direct companion fromProduct door",
+    "failures": [
+      "==> X storymodel4s.probes.LocalReferenceBoundarySuite.Profile has no direct companion fromProduct door 0.008s munit.FailException: align/src/test/scala/storymodel4s/probes/LocalReferenceBoundarySuite.scala:315 assertion failed"
+    ],
+    "test_selection": "Profile has no direct companion fromProduct door|Profile has no product Mirror door",
+    "source_sha256": "fb7919e3ddabd2cfbe5b4cec28832a0e35714624ea26916dbb7057e1a2cbccae",
+    "patch_sha256": "e854246a7d4fbac048bdc3d717e8c68f66d6a3d40d6470294f5d579f48d5c4ee",
+    "log_sha256": "c0472c58ecc8f1bce7585cb2ec8aa12b1b52170e7e2d973c2162305725c9f797"
+  },
+  {
+    "name": "hsmm-trap-control",
+    "kind": "independence-trap",
+    "candidate_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
+    "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=the exact originating evidence subsequently feeds HSMM without repricing or mode loss|reference produces mass before any sequence result is requested\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        12
+      ]
+    ],
+    "named_failure": "the exact originating evidence subsequently feeds HSMM without repricing or mode loss",
+    "failures": [
+      "==> X storymodel4s.align.ReferenceMeasurementSuite.the exact originating evidence subsequently feeds HSMM without repricing or mode loss 0.268s munit.FailException: align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala:331 actual HSMM invocation is the trap's positive control"
+    ],
+    "test_selection": "the exact originating evidence subsequently feeds HSMM without repricing or mode loss|reference produces mass before any sequence result is requested",
+    "source_sha256": "46d7dc2ba7c19458a11566031ec5e02319a60777a9dc0756ab2bb4c004c17631",
+    "patch_sha256": "a3dd976980a4a004ab38a718995644ccdd0ca7f848c8225de447b1c16ee9ccb4",
+    "log_sha256": "9969993998903db6b911d66a95bbe9e2024922522e7412b2691bda6eb02592f0"
+  }
+]

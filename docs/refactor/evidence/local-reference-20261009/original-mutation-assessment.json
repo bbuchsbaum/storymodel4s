@@ -1,0 +1,7 @@
+{
+  "candidate_sha": "e0d6ac9e9b46a8ad586b84875020462a24a735da",
+  "reported_witnesses": 17,
+  "qualification_claim": "No acceptance count from this superseded batch; all rerun on updated source.",
+  "unqualified_case": "admitted-target-population failed viaClassCastException rather than named assertion.",
+  "original_report": "runs/original-mutations/mutations.json"
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-09T18:33:19.295673+00:00",
+  "finished_utc": "2026-10-09T18:34:01.427555+00:00",
+  "duration_seconds": 42.131447,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.align.ReferenceIsolationSuite -- \"--tests=opaque target rename preserves bits with an identifier-independent denominator|source storage permutations preserve each state's local mass\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-reference-final-mutations/rename-independent-denominator.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3716
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-09T18:28:14.599071+00:00",
+  "finished_utc": "2026-10-09T18:29:10.023697+00:00",
+  "duration_seconds": 55.424106,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=a foreign or incomplete universe cannot silently condition the local denominator|reference produces mass before any sequence result is requested\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-reference-final-mutations/complete-universe.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 4485
+}

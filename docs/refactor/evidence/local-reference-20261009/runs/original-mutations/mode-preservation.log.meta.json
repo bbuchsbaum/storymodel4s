@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-09T18:14:47.482540+00:00",
+  "finished_utc": "2026-10-09T18:15:45.590990+00:00",
+  "duration_seconds": 58.107884,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite -- \"--tests=analytical odds preserve faithful distorted and all five external states|reference produces mass before any sequence result is requested\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-reference-mutations/mode-preservation.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 5081
+}
