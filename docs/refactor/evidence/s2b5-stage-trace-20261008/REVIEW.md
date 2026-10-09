@@ -36,3 +36,9 @@ Hosted qualification completed on the separately reviewed published `655c0b39`: 
 `37863839427` and documentation `37863839384` succeeded. Complete original raw jobs bind
 13,268 source passes / 12 optional skips over 80 totals, plus 13 executable documentation
 examples and 20 pages. The final hosted receipt receives its own T2 review before publication.
+
+Final hosted-receipt T2 verdict: `/root/s2b5_qualification_review` independently returned PASS
+on exact `0eabf2554e08c3e3b32642eb3c9d51667ebf34a3`, with no BLOCK. It verified all 123
+evidence files, 101 archives, unchanged source, both successful attempt-1 workflows and complete
+raw-job totals, all four trace/parity suites on both JVMs, and the documentation markers. The
+controller API failure is correctly distinguished from workflow success.

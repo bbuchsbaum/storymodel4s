@@ -21,11 +21,11 @@
   "dashboard_session": "codex-9bea8e84",
   "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Reviewed655c published and exact remote SHA verified; hosted source/docs success on that exacthead. 80 raw-job totals13268Passed/0Failed/0Errors/12 optional skips;13 executable docs examples/20 pages. Local7888/5 plus31Python and9+2mutations; final hosted receipt review/publication pending.",
+  "state": "S2b-5 source and hosted qualification complete; final hosted receipt independently PASS at0eabf255. Recorded qualification jobs completed; no active local gate or task reservations. Final publication records the remote Git head; G1 stays open.",
   "mutation_session": null,
   "mutation_output": "/private/tmp/storymodel4s-s2b5-final-mutations",
   "mutation_timeout_seconds": 1200,
-  "next_action": "Review and publish the final gate-inert hosted receipt, verify exact remoteSHA, finish dashboard. Next implementation is paired strict reference/reconstruction from identical checked evidence; G1 remains open.",
+  "next_action": "Implement paired public strict LocalReference before HSMM and named StructuredReconstruction using identical checked LocalEvidence; prove candidate/score/digest equality and order/opaque-ID/tie isolation. Optional populated-cost-field oracle remains separate.",
   "mutation_state": "Nine final95ba0e4d source mutations qualified, each namedassertion failure plusone passing sibling and explicitignored cases; twoPython guards qualified.",
   "receipt_coverage_followup": "bd-01M4EA3TVCGSVSA114DQX9588N",
   "source_review": "PASS /root/s2b3_review; two BLOCKs closed",
@@ -55,5 +55,11 @@
       "conclusion": "success",
       "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
     }
+  },
+  "hosted_receipt_review": {
+    "reviewer": "/root/s2b5_qualification_review",
+    "verdict": "PASS",
+    "sha": "0eabf2554e08c3e3b32642eb3c9d51667ebf34a3",
+    "remaining_blocks": 0
   }
 }

@@ -906,5 +906,11 @@
   },
   "local_landing_sha": "9b8d6cb25a0b1ffbb4f5e78730f86d468a4d2df5",
   "published_sha": "655c0b3921539ad0c2cdf46181f0711480379f12",
-  "hosted_publication_receipt": "publication-655c.json"
+  "hosted_publication_receipt": "publication-655c.json",
+  "independent_hosted_receipt_review": {
+    "reviewer": "/root/s2b5_qualification_review",
+    "verdict": "PASS",
+    "sha": "0eabf2554e08c3e3b32642eb3c9d51667ebf34a3",
+    "remaining_blocks": 0
+  }
 }
