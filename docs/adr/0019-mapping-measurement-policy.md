@@ -902,3 +902,43 @@ validated for population/reference consistency, and are not inference-origin pro
 re-pricing in rendering, result-only provenance recovery and an invented local mass for no states.
 No module, dependency or public Scala API is added. Public reference/reconstruction admission,
 full media interchange, durable replay and learned/corpus efficacy remain separate acceptance.
+
+### 2026-10-09 — public strict local reference, first admission
+
+`LocalReference.compute` consumes the actual immutable `LocalEvidence` before any HSMM call.
+Its owner-minted final non-case result retains the exact evidence, its existing engine identity,
+checked profile and one accounted outcome per unit. It does not accept replacement prices/mass,
+a cost model after the fact, or a caller-supplied identity. Reject reusing supplied
+`NormalizedScoreMass` as execution proof or collapsing fidelity modes through `Destination.of`.
+The authoritative mass remains keyed by `AlignState`; a later projection must explicitly sum
+already-normalized state masses.
+
+The v1 profile declares one nonempty `SingleLevel` universe equal to the bound source's complete
+cut, a finite positive temperature, uniform prior over admitted states, the five existing
+non-Unranked external alternatives and shifted exponential-cost normalization. This normalization
+prior is distinct from the function prior already used to price source states. Reject filtering
+mixed-grain nominations after evidence was built: consumers would share an identity while using
+different state populations. A hierarchy cut must be produced and retained before both consumers.
+Canonical gated, controlled, tie-complete provenance is required; historical arbitrary scoring
+callbacks are not sufficient. A tie-complete shortlist does not assert full target coverage.
+
+Every overflow refuses the entire unit's reference comparison, including retained ordinary
+external alternatives. Unranked, no admitted target prices, and prior-only/unmeasured admitted
+target prices remain accounted NotComputed; no uniform substitute is minted. Computed rows retain
+all original cost/support/imputation/reduction/exclusion records and generation accounting.
+Equal actual costs are classified separately from uniform semantic scores, which need not imply
+uniform combined costs. The denominator sums weights in numerical order so opaque-ID or storage
+permutations do not change its accumulation order. The frozen mass-comparison tolerance is 1e-12.
+Normalized score mass is neither a model posterior nor calibrated probability.
+
+This exposes the reference operation already named in the inference-profile contract. No new
+module/dependency, MappingResult/codec migration, profile dispatcher, facade, hierarchical cut,
+calibration or concrete-provider authority is introduced. The engine identity does not bind full
+model/render/provider execution; actual ONNX authority remains on the original registration.
+Named reconstruction and the complete paired-run envelope remain the next existing acceptance.
+
+The live reference/reconstruction -> G1 edges formed a cycle with G1's AC1/AC4 consumption proof.
+Under the owner's October continuation, those two coarse edges are replaced with the completed
+S2a-4 and S2b-3/4/5 producer prerequisites, and G1 waits for the existing consumers. Reject a
+replacement bypass ticket or premature G1 closure. Its acceptance, other dependencies and optional
+populated-cost court remain explicit in Mote.

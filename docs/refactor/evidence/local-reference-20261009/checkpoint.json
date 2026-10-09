@@ -1,0 +1,11 @@
+{
+  "actor": "codex-reference-20261009",
+  "issue": "bd-01M2WVF86T8QEEA1TK8Z0ASJHW",
+  "base": "cb6e35227939bf0a0757f0caf077d9dc1450a7e6",
+  "branch": "codex/strict-local-reference-20261009",
+  "reservation": "rv-01M4GTK0Y9ZWHS39Z7FXDC4W4T",
+  "dashboard_session": "codex-18f98e66",
+  "clone": "/private/tmp/storymodel4s-s2b3-build",
+  "state": "Decided narrow single-level reference contract; implementation and tests in progress. No source gate or runtime qualification yet.",
+  "next_action": "Finish synthetic analytical/binding/outcome/isolation and external compile courts, compile/commit narrow source, then run mutations and exact restored scoped/consumer gates. G1 remains open; named reconstruction next."
+}

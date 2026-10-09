@@ -1,0 +1,12 @@
+[
+  {
+    "path": "runs/smoke-01.log.gz",
+    "raw_bytes": 2438,
+    "raw_sha256": "b9291055ca30f4b3661ddf8e3df2ddc5aef5a74a7ed1edfb0bee07fd45f410f5"
+  },
+  {
+    "path": "runs/smoke-01.log.meta.json",
+    "raw_bytes": 697,
+    "raw_sha256": "4a16ed099c985f0f6a2d561e1338af940153d06322cb1baf5403a0d47021d9c5"
+  }
+]

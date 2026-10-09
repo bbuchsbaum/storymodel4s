@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-09T17:23:59.511949+00:00",
+  "finished_utc": "2026-10-09T17:24:33.993147+00:00",
+  "duration_seconds": 34.480519,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.ReferenceMeasurementSuite",
+    "alignJVM/scalafmt",
+    "alignJVM/Test/scalafmt"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-reference-smoke-01.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 2438
+}
