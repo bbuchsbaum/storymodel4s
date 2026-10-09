@@ -22,7 +22,7 @@ failed task executions are excluded from the qualified totals. Timeout causation
 The 32 focused Scala controls and 31 synthetic Python controls passed; nine compiled Scala and two
 Python named mutation witnesses are qualified. The exact source has independent PASS after two
 review corrections. Local checks use the recorded clean grakern 8efc override; hosted declared-pin
-qualification remains pending. This is engineering evidence; no corpus, private or
+qualification is complete on published `655c0b39`. This is engineering evidence; no corpus, private or
 sealed data access, learned-model efficacy, public reference/reconstruction completion or release
 qualification is claimed. Read checkpoint.json for real active jobs/output paths and next action.
 
@@ -30,3 +30,13 @@ Local summaries retain availability/reason and explicitly separate all-row abste
 counts from computed-only quantities with declared denominators and exclusions. The optional
 populated-receipt coverage court is tracked separately as `bd-01M4EA3TVCGSVSA114DQX9588N`; current
 cost-field coverage proves checked-codec delegation, not an independent optional-field oracle.
+
+Hosted source [run 37863839427](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427)
+and [documentation run 37863839384](https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839384)
+succeeded on exact `655c0b3921539ad0c2cdf46181f0711480379f12`. Complete original job logs bind
+80 totals: 13,268 passed, zero failures/errors and 12 existing optional skips across JVM 17/21,
+JavaScript and Native. Both JVM logs contain the origin, boundary, trace and historical-parity courts.
+Documentation verified 13 executable examples, 20 built pages, navigation and provenance.
+[Hosted receipt](publication-655c.json) records exact jobs, log bytes/digests and counts. The controller
+encountered a transient API connection reset; live refresh confirmed success without resubmitting
+any build. These receipts qualify the bounded source seam against declared pins; G1 remains open.

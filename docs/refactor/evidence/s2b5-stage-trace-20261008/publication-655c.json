@@ -1,0 +1,654 @@
+{
+  "published_sha": "655c0b3921539ad0c2cdf46181f0711480379f12",
+  "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
+  "remote_verified": true,
+  "status": "hosted_declared_pins_qualified",
+  "logs_basis": "Complete original job logs; ANSI normalized only while parsing.",
+  "source": {
+    "run": 37863839427,
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427",
+    "conclusion": "success",
+    "metadata_archive": "runs/hosted-source-run.json",
+    "jobs_metadata_archive": "runs/hosted-source-jobs.json",
+    "jobs": [
+      {
+        "id": 113605722521,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427/job/113605722521",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113605722521.log.gz",
+        "log_bytes": 275272,
+        "log_sha256": "7ff29cd336be9f6b2b75c482251c3294fa7e884d33d37fef4eadc47ce62f48c5",
+        "totals": [
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            186,
+            0,
+            0,
+            186,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            326,
+            0,
+            0,
+            326,
+            0
+          ],
+          [
+            755,
+            0,
+            0,
+            755,
+            0
+          ],
+          [
+            160,
+            0,
+            0,
+            160,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 113605722522,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427/job/113605722522",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113605722522.log.gz",
+        "log_bytes": 960454,
+        "log_sha256": "6597cf89379080fccdcbbdbf6644b59f3cb54364b5370b3c29a97ddd3ddeb780",
+        "totals": [
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            189,
+            0,
+            0,
+            189,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            775,
+            0,
+            0,
+            775,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            327,
+            0,
+            0,
+            327,
+            0
+          ],
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            165,
+            0,
+            0,
+            165,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ],
+          [
+            98,
+            0,
+            0,
+            98,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            76,
+            1
+          ],
+          [
+            28,
+            0,
+            0,
+            28,
+            0
+          ],
+          [
+            48,
+            0,
+            0,
+            48,
+            0
+          ],
+          [
+            169,
+            0,
+            0,
+            168,
+            1
+          ],
+          [
+            64,
+            0,
+            0,
+            60,
+            4
+          ],
+          [
+            120,
+            0,
+            0,
+            120,
+            0
+          ],
+          [
+            159,
+            0,
+            0,
+            159,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 113605722567,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427/job/113605722567",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113605722567.log.gz",
+        "log_bytes": 1044386,
+        "log_sha256": "ab29b37186cdbf739c94e6b9769d618c60197677ecec2b1f7eef26a4f10037e4",
+        "totals": [
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            189,
+            0,
+            0,
+            189,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            775,
+            0,
+            0,
+            775,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            327,
+            0,
+            0,
+            327,
+            0
+          ],
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            165,
+            0,
+            0,
+            165,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ],
+          [
+            98,
+            0,
+            0,
+            98,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            76,
+            1
+          ],
+          [
+            28,
+            0,
+            0,
+            28,
+            0
+          ],
+          [
+            48,
+            0,
+            0,
+            48,
+            0
+          ],
+          [
+            169,
+            0,
+            0,
+            168,
+            1
+          ],
+          [
+            64,
+            0,
+            0,
+            60,
+            4
+          ],
+          [
+            120,
+            0,
+            0,
+            120,
+            0
+          ],
+          [
+            159,
+            0,
+            0,
+            159,
+            0
+          ]
+        ]
+      },
+      {
+        "id": 113605722647,
+        "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839427/job/113605722647",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-source-job-113605722647.log.gz",
+        "log_bytes": 300472,
+        "log_sha256": "eaf015ede5e855bd759e9cb5066eca6f36b346ec47a244f169cee8cd373c35cf",
+        "totals": [
+          [
+            250,
+            0,
+            0,
+            250,
+            0
+          ],
+          [
+            81,
+            0,
+            0,
+            81,
+            0
+          ],
+          [
+            92,
+            0,
+            0,
+            92,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            138,
+            0,
+            0,
+            138,
+            0
+          ],
+          [
+            167,
+            0,
+            0,
+            167,
+            0
+          ],
+          [
+            186,
+            0,
+            0,
+            186,
+            0
+          ],
+          [
+            77,
+            0,
+            0,
+            77,
+            0
+          ],
+          [
+            755,
+            0,
+            0,
+            755,
+            0
+          ],
+          [
+            104,
+            0,
+            0,
+            104,
+            0
+          ],
+          [
+            145,
+            0,
+            0,
+            145,
+            0
+          ],
+          [
+            133,
+            0,
+            0,
+            133,
+            0
+          ],
+          [
+            326,
+            0,
+            0,
+            326,
+            0
+          ],
+          [
+            116,
+            0,
+            0,
+            116,
+            0
+          ],
+          [
+            160,
+            0,
+            0,
+            160,
+            0
+          ],
+          [
+            117,
+            0,
+            0,
+            117,
+            0
+          ]
+        ]
+      }
+    ],
+    "task_totals": 80,
+    "passed": 13268,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 12
+  },
+  "docs": {
+    "run": 37863839384,
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839384",
+    "conclusion": "success",
+    "metadata_archive": "runs/hosted-docs-run.json",
+    "jobs_metadata_archive": "runs/hosted-docs-jobs.json",
+    "jobs": [
+      {
+        "id": 113605721967,
+        "name": "Verify docs site",
+        "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/37863839384/job/113605721967",
+        "conclusion": "success",
+        "log_archive": "runs/hosted-docs-job-113605721967.log.gz",
+        "log_bytes": 75039,
+        "log_sha256": "dc3a8700d1c3a049180dcf78c60141e908f941686467adbfe572cf15430e95d8",
+        "totals": []
+      }
+    ],
+    "executable_examples": 13,
+    "built_pages": 20,
+    "sidebar_entries": 19,
+    "internal_links": 15,
+    "provenance_court": "all checks passed"
+  },
+  "publication_review": {
+    "reviewer": "/root/s2b5_qualification_review",
+    "verdict": "PASS",
+    "sha": "655c0b3921539ad0c2cdf46181f0711480379f12"
+  }
+}

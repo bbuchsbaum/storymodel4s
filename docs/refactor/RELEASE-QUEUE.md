@@ -46,8 +46,9 @@ S2b-5 originating-evidence StageTrace is locally qualified at source `95ba0e4d`:
 7,888 passed / five optional skips, 31 Python controls and nine Scala plus two Python mutation
 witnesses. Both earlier unchanged Native timeout attempts remain separately recorded; the final
 Native tail and formatting exited zero. Exact-source independent review passed. The reviewed slice is locally landed at `9b8d6cb2`; its bounded child
-`bd-01M4E4XRA1P9F48QDKRT87ZPH4` is closed. Publication and hosted declared-pin
-qualification are the next steps. G1 remains open for paired public reference /
+`bd-01M4E4XRA1P9F48QDKRT87ZPH4` is closed. The slice is published through `655c0b39` and hosted-qualified there:
+13,268 passed / 12 existing optional skips over 80 complete raw-job totals; documentation
+verified 13 examples and 20 pages. G1 remains open for paired public reference /
 reconstruction evidence equality and its remaining acceptance; the optional populated-cost-field
 oracle is tracked as `bd-01M4EA3TVCGSVSA114DQX9588N`.
 
@@ -73,7 +74,7 @@ The immediate order is:
 
 | Order | Mote | Next acceptance |
 | --- | --- | --- |
-| 1 | `bd-01M2TACM78289S4TECE91GT5K2` | Finish S2b-5 landing/hosted qualification, then prove paired reference/reconstruction consume identical checked evidence and reconcile remaining G1 acceptance. |
+| 1 | `bd-01M2TACM78289S4TECE91GT5K2` | Prove paired reference/reconstruction consume identical checked evidence and reconcile remaining G1 acceptance; S2b-5 origin adoption is published and hosted-qualified. |
 | 2 | `bd-01M2WVF86T8QEEA1TK8Z0ASJHW`, `bd-01M2TAD04SR823TQVG9VPNH6R3` | Extract public reference before HSMM and named reconstruction from identical checked evidence. |
 | 3 | `bd-01M2WVH1DC8ZPDC992G4MX3TXG`, `bd-01M2TADC4VKSDZ2S9SXETH2MYM` | Complete support adoption and the ordinary-file public facade, with explicit profiles, complete outcomes and safe publication. |
 

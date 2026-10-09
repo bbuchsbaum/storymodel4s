@@ -31,3 +31,8 @@ against the commit, all 91 complete archives, the clean build clone at source `9
 Both failed attempts retain their four timeout failures outside qualified totals. Two wording
 clarifications were corrected in this landing receipt. Hosted declared-pin qualification remains
 a separate step.
+
+Hosted qualification completed on the separately reviewed published `655c0b39`: source CI
+`37863839427` and documentation `37863839384` succeeded. Complete original raw jobs bind
+13,268 source passes / 12 optional skips over 80 totals, plus 13 executable documentation
+examples and 20 pages. The final hosted receipt receives its own T2 review before publication.

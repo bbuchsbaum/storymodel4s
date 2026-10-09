@@ -150,3 +150,51 @@ if qpath.exists():
     print('Verified exact source, archives, nine compiled Scala kills, two Python kills and 44 unique scoped tasks; both timeout attempts retained, final Native tail green.')
 else:
     print('Verified exact source, archives, nine compiled Scala kills and two Python kills; gate receipt pending.')
+
+publication_path = E / 'publication-655c.json'
+if publication_path.exists():
+    publication = json.loads(publication_path.read_text())
+    published_sha = publication['published_sha']
+    assert published_sha == '655c0b3921539ad0c2cdf46181f0711480379f12'
+    assert publication['source_sha'] == SHA and publication['remote_verified']
+    assert not subprocess.check_output(['git', 'diff', '--name-only', SHA, published_sha,
+        '--', '*.scala', 'build.sbt', 'project', '.github/workflows', 'tools/recall-study'], cwd=R)
+    ansi = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
+    hosted_rows = []
+    for slug in ['source', 'docs']:
+        receipt = publication[slug]
+        run = json.loads(raw(receipt['metadata_archive']))
+        jobs = json.loads(raw(receipt['jobs_metadata_archive']))['jobs']
+        assert run['head_sha'] == published_sha and run['id'] == receipt['run']
+        assert run['status'] == 'completed' and run['conclusion'] == 'success'
+        assert {j['id'] for j in jobs} == {j['id'] for j in receipt['jobs']}
+        assert len(jobs) == (4 if slug == 'source' else 1)
+        for recorded in receipt['jobs']:
+            job = next(j for j in jobs if j['id'] == recorded['id'])
+            assert job['name'] == recorded['name'] and job['conclusion'] == 'success'
+            assert job['status'] == 'completed'
+            log = raw(recorded['log_archive'])
+            assert len(log) == recorded['log_bytes'] and digest(log) == recorded['log_sha256']
+            text = ansi.sub('', log.decode())
+            rows = totals(text)
+            assert rows == recorded['totals']
+            if slug == 'docs':
+                for field, suffix in [('executable_examples', 'executable documentation examples'),
+                    ('built_pages', 'built pages'), ('sidebar_entries', 'unique sidebar entries'),
+                    ('internal_links', 'internal links')]:
+                    assert f"verified {receipt[field]} {suffix}" in text
+                assert 'provenance court: all checks passed' in text
+            if slug == 'source':
+                assert len(rows) == (24 if 'rootJVM' in job['name'] else 16)
+                assert all(r[1] == r[2] == 0 and r[0] == r[3] + r[4] for r in rows)
+                hosted_rows.extend(rows)
+                if 'rootJVM' in job['name']:
+                    for suite in ['StageTraceOriginSuite', 'StageTraceBoundarySuite',
+                        'StageTraceSuite', 'HistoricalEmbeddingParitySuite']:
+                        assert suite in text
+    source = publication['source']
+    assert len(hosted_rows) == source['task_totals'] == 80
+    assert sum(r[3] for r in hosted_rows) == source['passed']
+    assert sum(r[4] for r in hosted_rows) == source['skipped']
+    assert source['failed'] == source['errors'] == 0
+    print('Verified exact published-head four-job matrix, complete raw job logs and hosted totals.')

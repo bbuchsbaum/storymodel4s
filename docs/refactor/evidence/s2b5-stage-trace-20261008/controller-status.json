@@ -1,0 +1,7 @@
+{
+  "controller_session": 53858,
+  "controller_exit_code": 1,
+  "failure": "GitHub API read: connection reset by peer",
+  "workflow_failure": false,
+  "recovery": "Refreshed exact existing run/job IDs through isolated GitHub API; both workflows and all five jobs completed successfully. No rerun or new build submitted. Complete original job logs archived by collect-hosted.py."
+}
