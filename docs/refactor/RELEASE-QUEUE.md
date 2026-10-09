@@ -52,6 +52,15 @@ verified 13 examples and 20 pages. G1 remains open for paired public reference /
 reconstruction evidence equality and its remaining acceptance; the optional populated-cost-field
 oracle is tracked as `bd-01M4EA3TVCGSVSA114DQX9588N`.
 
+9 October reference checkpoint: existing `bd-01M2WVF86T8QEEA1TK8Z0ASJHW` has a public
+single-level, mode-preserving `LocalReference` candidate at source `cd740302`.
+[Receipts](evidence/local-reference-20261009/README.md) bind 8,077 local passes / five existing
+skips over 44 scoped tasks, 485 pinned StoryAtlas consumer passes, 16 compiled assertion guard
+kills and a positive-controlled HSMM independence trap. Final exact-SHA review, landing and
+hosted declared-pin qualification remain pending. The reference/reconstruction -> G1 cycle was
+refined onto completed S2a-4/S2b-3/4/5 prerequisites; G1 now waits for those existing consumers
+and retains its remaining acceptance. Named reconstruction is the next bounded implementation.
+
 ## Start here
 
 Use one primary agent and at most one helper. Select one bounded acceptance criterion, inspect

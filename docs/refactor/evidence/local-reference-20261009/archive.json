@@ -588,5 +588,25 @@
     "path": "runs/mutations/temperature-identity.patch.gz",
     "raw_bytes": 451,
     "raw_sha256": "9f0c92eaad5ab257da05d6ae96ba14223d029f00e6f7eb3071f0d2d418c04175"
+  },
+  {
+    "path": "runs/source-gate.log.gz",
+    "raw_bytes": 1054040,
+    "raw_sha256": "298cdd6f8f5a37cd0f2e7af2036b01701ab60423f9c4253d2d366fe466d9440a"
+  },
+  {
+    "path": "runs/source-gate.log.meta.json",
+    "raw_bytes": 1618,
+    "raw_sha256": "1c5d5d75a46fdd0dd761150db81ed089483db4fdaa220efe4d3de8007a8e0357"
+  },
+  {
+    "path": "runs/consumer-gate.log.gz",
+    "raw_bytes": 27585,
+    "raw_sha256": "bbe9aedc9428e8de5bc1b8bd1d370691329119227ab68a549b712b926b3097c6"
+  },
+  {
+    "path": "runs/consumer-gate.log.meta.json",
+    "raw_bytes": 749,
+    "raw_sha256": "a2c86f6dffb1ad02c198cd9eaf15a7057af0a85ddad96f12aa9c08a3c34e36ab"
   }
 ]
