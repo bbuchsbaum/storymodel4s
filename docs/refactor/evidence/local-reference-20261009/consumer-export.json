@@ -4,5 +4,5 @@
   "clone": "/private/tmp/storyatlas4s-reference-consumer",
   "clean": true,
   "source_override": "/private/tmp/storymodel4s-s2b3-build",
-  "status": "required gate not yet run"
+  "status": "initial clean export; subsequent gate completed with exit zero (qualification.json)"
 }

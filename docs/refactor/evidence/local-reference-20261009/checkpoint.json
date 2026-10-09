@@ -3,11 +3,11 @@
   "issue": "bd-01M2WVF86T8QEEA1TK8Z0ASJHW",
   "base": "cb6e35227939bf0a0757f0caf077d9dc1450a7e6",
   "branch": "codex/strict-local-reference-20261009",
-  "reservation": "rv-01M4GTK0Y9ZWHS39Z7FXDC4W4T",
+  "reservation": null,
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Sourcecd740 local qualification complete:8077/5 over44tasks; pinnedStoryAtlas consumer complete;16 assertion guard kills+HSMM independence trap qualified. Exact evidence review/publication pending.",
-  "next_action": "Commit complete source/consumer proof receipt and queue handoff; independent exact-SHA final review, refreshclaims/main, land and close onlyreference, publish and inspect hosted complete raw job logs. G1/reconstruction remain open.",
+  "state": "Independent bounded local qualification PASS; exact a046a5fa25ccad155fba669b7807b318a5cdb508 landed on main. Reference bead closed; hosted/default-pin qualification pending.",
+  "next_action": "Publish reviewed receipt, verify remote SHA, collect complete hosted source/docs job logs and exact-head qualification. G1 and named reconstruction remain open.",
   "source_sha": "cd740302cc681b62ac5287e2e829b9a3eb320d63",
   "focused_session": null,
   "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log",
@@ -24,5 +24,7 @@
   "consumer_timeout_seconds": 3600,
   "consumer_state": "Complete actualexit0; pinned90f consumer compile/tests/format passed, counts inqualification.json.",
   "source_progress": "44/44 complete",
-  "source_state": "Complete actualexit0;44 totals8077Passed/0Failed/0Errors/5Skipped; formatlast."
+  "source_state": "Complete actualexit0;44 totals8077Passed/0Failed/0Errors/5Skipped; formatlast.",
+  "reviewed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508",
+  "landed_sha": "a046a5fa25ccad155fba669b7807b318a5cdb508"
 }

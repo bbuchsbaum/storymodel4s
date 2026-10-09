@@ -26,3 +26,14 @@ population from `ContentCostScoring.terms` is nonempty; assessed zero support is
 retained zero-eligible-weight cells take PriorOnlyTargetCost first. This is not a universal
 impossibility claim. The failed, archived experiment07 did not produce retained empty-eligibility
 targets and is not counted as an acceptance witness.
+
+Final bounded local qualification PASS on exact
+`a046a5fa25ccad155fba669b7807b318a5cdb508`, independently returned by
+`/root/s2b5_qualification_review`: all 122 raw artifacts were accounted for and hash-verified;
+16 compiled guard kills and the HSMM trap each have a named assertion failure and a passing sibling.
+All 44 source task totals (8,077 passed, five skips) and ten pinned consumer totals (485 passed,
+zero skips) have actual exit zero, zero failures/errors, fatal warnings and formatting last.
+Producer source is unchanged from reviewed e256; gated inputs are unchanged since cd740.
+The source, consumer and grakern clones were independently clean at their recorded revisions.
+No BLOCK remains for this bounded slice. Hosted/default-pin qualification remains pending;
+G1 and named reconstruction retain their acceptance.

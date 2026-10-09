@@ -32,7 +32,9 @@ UnmeasuredTargetCost fallback is source-excluded under today's producer, not bra
 
 [Verifier](verify.py) reconciles exact source hashes, complete raw archives, reconstructible mutation
 patches, actual exits, named assertions, selected counts and complete source/consumer totals.
-Final independent evidence review and publication remain pending. This is engineering qualification;
+Independent review passed on `a046a5fa25ccad155fba669b7807b318a5cdb508`, which is now landed
+on main; the existing reference bead is closed. Publication and hosted qualification remain pending.
+This is engineering qualification;
 no corpus/private data, calibration, learned-model efficacy or aggregate release qualification is
 claimed. G1 stays open for named reconstruction and remaining complete shared-provider/run acceptance.
 The cycle was explicitly refined onto qualified producer prerequisites; no replacement ticket or
