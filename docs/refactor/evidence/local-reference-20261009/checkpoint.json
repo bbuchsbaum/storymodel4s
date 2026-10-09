@@ -6,6 +6,9 @@
   "reservation": "rv-01M4GTK0Y9ZWHS39Z7FXDC4W4T",
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "Decided narrow single-level reference contract; implementation and tests in progress. No source gate or runtime qualification yet.",
-  "next_action": "Finish synthetic analytical/binding/outcome/isolation and external compile courts, compile/commit narrow source, then run mutations and exact restored scoped/consumer gates. G1 remains open; named reconstruction next."
+  "state": "41 portable runtime/isolation/external construction courts and3 registered/replay bench consumers pass (0Failed/Errors/Skipped); source e256 independently PASS. Direct product-factory proof gap corrected; final exact candidate review/mutations/gates pending.",
+  "next_action": "Commit complete courts; reviewer checks exact candidate and independent direct fromProduct probes. Run compiled guard mutations and inference trap, then restored scoped platform and StoryAtlas consumer gates.",
+  "source_sha": "e25650ce33f5f9a11047ce05ce4d755745643d2b",
+  "focused_session": null,
+  "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log"
 }

@@ -8,5 +8,45 @@
     "path": "runs/smoke-01.log.meta.json",
     "raw_bytes": 697,
     "raw_sha256": "4a16ed099c985f0f6a2d561e1338af940153d06322cb1baf5403a0d47021d9c5"
+  },
+  {
+    "path": "runs/smoke-02.log.gz",
+    "raw_bytes": 7930,
+    "raw_sha256": "7b1ba6b5bef0a8701f1ec6f298be46e9c4d1844465ff30de9eb4f2f01a33159b"
+  },
+  {
+    "path": "runs/smoke-02.log.meta.json",
+    "raw_bytes": 815,
+    "raw_sha256": "4a0df9311e76a7a157acf0ad42d8afb036a371c7b68bacb16576ad79ce2f34d1"
+  },
+  {
+    "path": "runs/smoke-03.log.gz",
+    "raw_bytes": 3543,
+    "raw_sha256": "f91e14937e1cc6f98421ae93b048f3141ee05c18bd16d4afbe70f0c923318bc6"
+  },
+  {
+    "path": "runs/smoke-03.log.meta.json",
+    "raw_bytes": 927,
+    "raw_sha256": "ca5d307dd77de73d95eb521d2d34e5501acffdf617cab2d10be74d0151ec03c0"
+  },
+  {
+    "path": "runs/consumer-smoke-04.log.gz",
+    "raw_bytes": 3526,
+    "raw_sha256": "46484014903e812b9ebeb8dc2f9546643b835a66b86d5629ed1460b54a48edcd"
+  },
+  {
+    "path": "runs/consumer-smoke-04.log.meta.json",
+    "raw_bytes": 748,
+    "raw_sha256": "0ae0d79b8fefce6339055d9be65383c244e0513281937ce965868788f1e406e4"
+  },
+  {
+    "path": "runs/smoke-05.log.gz",
+    "raw_bytes": 4527,
+    "raw_sha256": "0bdfe21c36d896ee10ef871ae5ee6ea0d5f77b3c178900f7e57743e9d6214040"
+  },
+  {
+    "path": "runs/smoke-05.log.meta.json",
+    "raw_bytes": 928,
+    "raw_sha256": "dcf1e17811132704acb53efb1ba195f3b1af77482fcd3cc9625dd49a18083f20"
   }
 ]

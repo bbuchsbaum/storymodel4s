@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-09T17:36:46.832807+00:00",
+  "finished_utc": "2026-10-09T17:37:22.408413+00:00",
+  "duration_seconds": 35.575202,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedBench/testOnly storymodel4s.bench.video.LocalReferenceConsumerSuite",
+    "alignJVM/scalafmt",
+    "alignJVM/Test/scalafmt",
+    "embedBench/Test/scalafmt"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/private/tmp/storymodel4s-reference-consumer-smoke-04.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 3526
+}

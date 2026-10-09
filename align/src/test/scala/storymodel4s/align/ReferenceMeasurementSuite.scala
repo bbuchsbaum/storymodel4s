@@ -70,7 +70,8 @@ private[align] object ReferenceFixture:
       v: SourceView = view,
       cfg: StrictCandidateConfig = config(),
       weights: CostWeights = CostWeights.semanticOnly,
-      external: Double = 1.0
+      external: Double = 1.0,
+      distortion: Double = 0.0
   ): LocalEvidence =
     val generated = right(StrictCandidateGenerator.canonical(channel, cfg, r, v))
     val model = right(
@@ -80,7 +81,7 @@ private[align] object ReferenceFixture:
         functionPrior = FunctionPrior.none,
         externalFloor = external,
         externalMismatch = 0.0,
-        distortionPenalty = 0.0
+        distortionPenalty = distortion
       )
     )
     right(LocalEvidence.compute(r, v, generated, model))
@@ -287,7 +288,7 @@ class ReferenceMeasurementSuite extends FunSuite:
   test("the exact originating evidence subsequently feeds HSMM without repricing or mode loss") {
     val e = evidence(table())
     val local = run(e)
-    val hsmm = right(
+    val attempted = scala.util.Try(
       GraphHsmm.infer(
         recall,
         view,
@@ -295,6 +296,11 @@ class ReferenceMeasurementSuite extends FunSuite:
         right(HsmmConfig.of(temperature = local.profile.temperature))
       )
     )
+    assert(
+      attempted.toOption.exists(_.isRight),
+      "actual HSMM invocation is the trap's positive control"
+    )
+    val hsmm = right(attempted.get)
     assertEquals(hsmm.costs(unit.id), computed(local).costs)
     assertEquals(hsmm.posterior.row(unit.id).get.mass.keySet, computed(local).mass.keySet)
     assertEquals(hsmm.candidateAnchors(unit.id).toSet, e.nominated.head.toSet)
