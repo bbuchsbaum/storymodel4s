@@ -1,6 +1,7 @@
 # G1 / S2b-5: originating evidence in executed StageTrace
 
-Candidate `95ba0e4d5c05742cea5983f0bfddbe65acfc66cc` over published `4384fea2`;
+Source `95ba0e4d5c05742cea5983f0bfddbe65acfc66cc` over published `4384fea2`,
+locally landed with reviewed evidence at `9b8d6cb25a0b1ffbb4f5e78730f86d468a4d2df5`;
 child `bd-01M4E4XRA1P9F48QDKRT87ZPH4`, actor `codex-g1-stage-trace-20261008`.
 
 The private run is minted around actual inference and retains its originating evidence/config.
@@ -15,7 +16,7 @@ and five existing optional skips. This is a composite receipt: the initial attem
 after three unchanged alignment Native timeouts; its continuation passed alignment and five more
 modules, then exited one after an unchanged fixture timeout. The final six-task Native tail exited
 zero with formatting last. Both failed attempts and all four timeout failures remain archived;
-failed attempts are excluded from the qualified totals. Timeout causation remains unestablished.
+failed task executions are excluded from the qualified totals. Timeout causation remains unestablished.
 [The verifier](verify.py) binds each required task exactly once to the unchanged source/configuration.
 
 The 32 focused Scala controls and 31 synthetic Python controls passed; nine compiled Scala and two

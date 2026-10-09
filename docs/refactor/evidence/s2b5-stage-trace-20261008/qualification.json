@@ -897,5 +897,12 @@
     "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
     "remaining_blocks": 0
   },
-  "optional_receipt_court_followup": "bd-01M4EA3TVCGSVSA114DQX9588N"
+  "optional_receipt_court_followup": "bd-01M4EA3TVCGSVSA114DQX9588N",
+  "independent_qualification_review": {
+    "reviewer": "/root/s2b5_qualification_review",
+    "verdict": "PASS",
+    "evidence_sha": "9b8d6cb25a0b1ffbb4f5e78730f86d468a4d2df5",
+    "remaining_blocks": 0
+  },
+  "local_landing_sha": "9b8d6cb25a0b1ffbb4f5e78730f86d468a4d2df5"
 }

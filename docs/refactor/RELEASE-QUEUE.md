@@ -45,8 +45,9 @@ S2b-5 originating-evidence StageTrace is locally qualified at source `95ba0e4d`:
 [origin receipts](evidence/s2b5-stage-trace-20261008/README.md) bind 44 unique scoped checks,
 7,888 passed / five optional skips, 31 Python controls and nine Scala plus two Python mutation
 witnesses. Both earlier unchanged Native timeout attempts remain separately recorded; the final
-Native tail and formatting exited zero. Exact-source independent review passed. Landing and hosted
-declared-pin qualification are separate next steps. G1 remains open for paired public reference /
+Native tail and formatting exited zero. Exact-source independent review passed. The reviewed slice is locally landed at `9b8d6cb2`; its bounded child
+`bd-01M4E4XRA1P9F48QDKRT87ZPH4` is closed. Publication and hosted declared-pin
+qualification are the next steps. G1 remains open for paired public reference /
 reconstruction evidence equality and its remaining acceptance; the optional populated-cost-field
 oracle is tracked as `bd-01M4EA3TVCGSVSA114DQX9588N`.
 
