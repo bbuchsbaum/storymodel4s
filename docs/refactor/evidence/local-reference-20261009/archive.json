@@ -48,5 +48,15 @@
     "path": "runs/smoke-05.log.meta.json",
     "raw_bytes": 928,
     "raw_sha256": "dcf1e17811132704acb53efb1ba195f3b1af77482fcd3cc9625dd49a18083f20"
+  },
+  {
+    "path": "runs/measurement-smoke-06.log.gz",
+    "raw_bytes": 2098,
+    "raw_sha256": "759cc56d8c7769fa3081aad527f42c1b78f9dbf9ec076ffb6db2399700ed21a6"
+  },
+  {
+    "path": "runs/measurement-smoke-06.log.meta.json",
+    "raw_bytes": 684,
+    "raw_sha256": "d01d1d74a5e4d9b61459c4cf8261676ddad12bcf64a80c58901a9985f7895d03"
   }
 ]

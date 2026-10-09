@@ -221,8 +221,35 @@ class ReferenceMeasurementSuite extends FunSuite:
       LocalReference.Profile
         .of(right(DeclaredUniverse.of(Vector(a), TargetGrain.SingleLevel(0))), 1.0)
     )
+    val superset = right(
+      LocalReference.Profile.of(
+        right(
+          DeclaredUniverse.of(Vector(a, b, AnnaFixture.sit("foreign")), TargetGrain.SingleLevel(0))
+        ),
+        1.0
+      )
+    )
     assert(LocalReference.compute(recall, view, e, foreign).isLeft)
     assert(LocalReference.compute(recall, view, e, subset).isLeft)
+    assert(LocalReference.compute(recall, view, e, superset).isLeft)
+  }
+
+  test("overflow refuses an otherwise measurable retained target population") {
+    val high = Vector(
+      view.nodes.head
+        .copy(ref = AnnaFixture.seg("high-alpha"), level = 1, lemmas = Set("high-alpha")),
+      view.nodes.head.copy(ref = AnnaFixture.seg("high-beta"), level = 1, lemmas = Set("high-beta"))
+    )
+    val mixed = view.copy(nodes = view.nodes ++ high)
+    val channel = table(v = mixed, distance = (_, ref) => if ref == b then 1.0 else 0.0)
+    val e = evidence(channel, v = mixed, cfg = config(1, TieBudgetRequest.AtMost(1)))
+    assertEquals(e.nominated.head, Vector(a))
+    assert(e.states.head.exists(_.isSource), "the retained level must really be measurable")
+    val result = run(e, profile(), v = mixed)
+    assert(result.outcomes.head.isInstanceOf[LocalReference.NotComputed])
+    val row = unavailable(result)
+    assertEquals(row.reason, LocalReference.NotComputedReason.TieOverflow)
+    assertEquals(row.overflow.map(_.level), Vector(1))
   }
 
   test("mixed-grain nominations refuse instead of filtering already-priced states") {
