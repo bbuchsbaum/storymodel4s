@@ -1,0 +1,172 @@
+[
+  {
+    "name": "finite-profile",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "if !temperature.isFinite || !(temperature > 0.0) then",
+    "new": "if false then",
+    "expected": "profile checks finite positive temperature nonempty universe and single level",
+    "selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "nonempty-profile",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "else if universe.targets.isEmpty then",
+    "new": "else if false then",
+    "expected": "profile checks finite positive temperature nonempty universe and single level",
+    "selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "single-level-profile",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "case _                              => Left(refused(\"v1 requires a single target level\"))",
+    "new": "case _                              => Right(new Profile(universe, temperature, 0))",
+    "expected": "profile checks finite positive temperature nonempty universe and single level",
+    "selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "temperature-identity",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "CanonicalDouble.render(temperature),",
+    "new": "CanonicalDouble.render(1.0),",
+    "expected": "profile checks finite positive temperature nonempty universe and single level",
+    "selection": "profile checks finite positive temperature nonempty universe and single level|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "context-binding",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "LocalEvidence.bound(evidence, recall, view, gate = true)",
+    "new": "LocalEvidence.bound(evidence, recall, view, gate = true).orElse(Right(()))",
+    "expected": "foreign recall source and ungated evidence refuse before deriving rows",
+    "selection": "foreign recall source and ungated evidence refuse before deriving rows|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "controlled-provenance",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "if evidence.gateSemantics == GateSemantics.CanonicalContent &&\n              p.semanticChannel.nonEmpty && p.policy.isInstanceOf[CandidateTiePolicy.TieComplete] =>",
+    "new": "if p.policy.isInstanceOf[CandidateTiePolicy.TieComplete] =>",
+    "expected": "unattested and callback-generated evidence cannot become strict reference",
+    "selection": "unattested and callback-generated evidence cannot become strict reference|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "complete-universe",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "actualUniverse == profile.universe.targets,",
+    "new": "actualUniverse.nonEmpty,",
+    "expected": "a foreign or incomplete universe cannot silently condition the local denominator",
+    "selection": "a foreign or incomplete universe cannot silently condition the local denominator|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "no-posthoc-cut",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "evidence.nominated.flatten.forall(profile.universe.targets.toSet),",
+    "new": "profile.universe.targets.nonEmpty,",
+    "expected": "mixed-grain nominations refuse instead of filtering already-priced states",
+    "selection": "mixed-grain nominations refuse instead of filtering already-priced states|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "overflow-population",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "if overflow.nonEmpty then unavailable(NotComputedReason.TieOverflow)",
+    "new": "if false then unavailable(NotComputedReason.TieOverflow)",
+    "expected": "overflow refuses an otherwise measurable retained target population",
+    "selection": "overflow refuses an otherwise measurable retained target population|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "prior-only-classification",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "p.reason == SupportUnestablishedReason.ZeroEligibleWeight",
+    "new": "p.reason == SupportUnestablishedReason.EmptyEligibility",
+    "expected": "prior-only prices are not promoted to observed uniform mass",
+    "selection": "prior-only prices are not promoted to observed uniform mass|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "admitted-target-population",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "else if targets.isEmpty then unavailable(NotComputedReason.NoAdmittedTargets)",
+    "new": "else if false then unavailable(NotComputedReason.NoAdmittedTargets)",
+    "expected": "unassessable targets retain exclusions rather than normalizing external-only prices",
+    "selection": "unassessable targets retain exclusions rather than normalizing external-only prices|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "mode-preservation",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "val mass = admitted.map(_._1).zip(weights.map(_ / denominator)).toMap",
+    "new": "val mass = admitted.map((s, _) => s.anchor.fold(s)(AlignState.Source.apply)).zip(weights.map(_ / denominator)).toMap",
+    "expected": "analytical odds preserve faithful distorted and all five external states",
+    "selection": "analytical odds preserve faithful distorted and all five external states|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "shifted-normalization",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "math.exp(-((cost - least) / profile.temperature))",
+    "new": "math.exp(-(cost / profile.temperature))",
+    "expected": "shifted normalization survives a tiny temperature with strictly positive minimum cost",
+    "selection": "shifted normalization survives a tiny temperature with strictly positive minimum cost|source storage permutations preserve each state's local mass",
+    "suite": "storymodel4s.align.ReferenceIsolationSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "rename-independent-denominator",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "val denominator = weights.sorted.sum",
+    "new": "val denominator = weights.sum",
+    "expected": "opaque target rename preserves bits with an identifier-independent denominator",
+    "selection": "opaque target rename preserves bits with an identifier-independent denominator|source storage permutations preserve each state's local mass",
+    "suite": "storymodel4s.align.ReferenceIsolationSuite",
+    "kind": "guard"
+  },
+  {
+    "name": "result-constructor",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "final class Result private[LocalReference] (",
+    "new": "final class Result (",
+    "expected": "Result has no unchecked constructor or apply door",
+    "selection": "Result has no unchecked constructor or apply door|checked public factories and inspectable computed fields remain available",
+    "suite": "storymodel4s.probes.LocalReferenceBoundarySuite",
+    "kind": "guard"
+  },
+  {
+    "name": "direct-product-factory",
+    "path": "align/src/main/scala/storymodel4s/align/localreference.scala",
+    "old": "  object Profile:\n",
+    "new": "  object Profile:\n    def fromProduct(p: Product): Profile = new Profile(p.productElement(0).asInstanceOf[DeclaredUniverse], p.productElement(1).asInstanceOf[Double], p.productElement(2).asInstanceOf[Int])\n",
+    "expected": "Profile has no direct companion fromProduct door",
+    "selection": "Profile has no direct companion fromProduct door|Profile has no product Mirror door",
+    "suite": "storymodel4s.probes.LocalReferenceBoundarySuite",
+    "kind": "guard"
+  },
+  {
+    "name": "hsmm-trap-control",
+    "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+    "old": "    LocalEvidence.bound(evidence, recall, view, gate = true).flatMap { _ =>",
+    "new": "    LocalEvidence.bound(evidence, recall, view, gate = true).flatMap { _ =>\n      throw new IllegalStateException(\"reference inference trap\")",
+    "expected": "the exact originating evidence subsequently feeds HSMM without repricing or mode loss",
+    "selection": "the exact originating evidence subsequently feeds HSMM without repricing or mode loss|reference produces mass before any sequence result is requested",
+    "suite": "storymodel4s.align.ReferenceMeasurementSuite",
+    "kind": "independence-trap"
+  }
+]

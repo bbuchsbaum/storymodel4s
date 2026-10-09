@@ -1,0 +1,8 @@
+{
+  "repo": "storyatlas4s",
+  "sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "clone": "/private/tmp/storyatlas4s-reference-consumer",
+  "clean": true,
+  "source_override": "/private/tmp/storymodel4s-s2b3-build",
+  "status": "required gate not yet run"
+}

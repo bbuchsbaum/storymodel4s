@@ -1,12 +1,12 @@
 {
-  "source_sha": "c2383e7f78f6eb2ccef983a7d86f6240c4149358",
+  "source_sha": "e0d6ac9e9b46a8ad586b84875020462a24a735da",
   "base_sha": "cb6e35227939bf0a0757f0caf077d9dc1450a7e6",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
   "clean": true,
   "changed_files_sha256": {
     "align/src/main/scala/storymodel4s/align/localreference.scala": "021e42b75d6af66d5742a06d06f1493ed8064eb7413bfeddb3dcd97e1374f77f",
     "align/src/test/scala/storymodel4s/align/ReferenceIsolationSuite.scala": "f82ad0ff15b73dd19d3bbeec454e8090409230362d76a2b19f1ac04818d5c648",
-    "align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala": "862142a33255f78f86e2e5a6a22b4744df333d0189926033be5db6f6138ead36",
+    "align/src/test/scala/storymodel4s/align/ReferenceMeasurementSuite.scala": "aea1989540492b63d7ac08ec9105e68b8f86474d897d0a666508a241ec2435cd",
     "align/src/test/scala/storymodel4s/probes/LocalReferenceBoundarySuite.scala": "78dcb587017bfdac9c819e66ee6f8d6d5a370220813749cb4e5eedaeba4b71f4",
     "docs/adr/0019-mapping-measurement-policy.md": "fd409c8193037dda4416fffa1e1d13a4c899bf28d122562b17ec059ae2710236",
     "embed-bench/src/test/scala/storymodel4s/bench/video/LocalReferenceConsumerSuite.scala": "74be5e3e86a23f66f1c48e77e442234465a209a629dc7f607e82f6df92182c4d"

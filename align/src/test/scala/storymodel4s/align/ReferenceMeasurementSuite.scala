@@ -171,7 +171,9 @@ class ReferenceMeasurementSuite extends FunSuite:
     val excluded = e.breakdowns.head.filter(_._1.isSource)
     assertEquals(excluded.size, 2)
     assert(excluded.values.forall(_.exclusion.contains(Exclusion.Unassessable)))
-    val row = unavailable(run(e))
+    val result = run(e)
+    assert(result.outcomes.head.isInstanceOf[LocalReference.NotComputed])
+    val row = unavailable(result)
     assertEquals(row.reason, LocalReference.NotComputedReason.NoAdmittedTargets)
     assertEquals(row.costs, e.breakdowns.head)
   }

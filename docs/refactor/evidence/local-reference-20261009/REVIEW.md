@@ -14,3 +14,15 @@ the same temperature and frozen1e-12 tolerance; origin/cost/state equality is se
 An inference trap is still required to turn caller ordering/source inspection into an executed
 pre-HSMM independence witness. Compiled mutations, full scoped/consumer gates and final review
 remain pending. No scientific accuracy or full provider execution authority is claimed.
+
+Independent exact-candidate PASS: `/root/s2b5_qualification_review` returned PASS on
+`e0d6ac9e9b46a8ad586b84875020462a24a735da`, closing the direct-product court BLOCK.
+It reconciled the 12 committed archive entries and14+7+21+3 passing focused courts. Final
+compiled mutations, inference trap and scoped/consumer qualification remain pending.
+
+`UnmeasuredTargetCost` is defensive and source-excluded under the present canonical producer,
+not experimentally branch-tested: canonical prices use `CostBreakdown.derived`; the eligible
+population from `ContentCostScoring.terms` is nonempty; assessed zero support is excluded and
+retained zero-eligible-weight cells take PriorOnlyTargetCost first. This is not a universal
+impossibility claim. The failed, archived experiment07 did not produce retained empty-eligibility
+targets and is not counted as an acceptance witness.

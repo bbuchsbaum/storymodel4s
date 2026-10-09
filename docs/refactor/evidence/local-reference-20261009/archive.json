@@ -58,5 +58,15 @@
     "path": "runs/measurement-smoke-06.log.meta.json",
     "raw_bytes": 684,
     "raw_sha256": "d01d1d74a5e4d9b61459c4cf8261676ddad12bcf64a80c58901a9985f7895d03"
+  },
+  {
+    "path": "runs/empty-eligibility-experiment-07.log.gz",
+    "raw_bytes": 2826,
+    "raw_sha256": "dd29fa6b100085789d3e9e0cb6cf73ba191ffb27653795360904cf26119fe04b"
+  },
+  {
+    "path": "runs/empty-eligibility-experiment-07.log.meta.json",
+    "raw_bytes": 684,
+    "raw_sha256": "6c2f7042cc97a5fce9e1fb9bc87e1a5efeeee674732ff4222891975200fd4043"
   }
 ]

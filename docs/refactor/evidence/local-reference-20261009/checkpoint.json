@@ -6,9 +6,12 @@
   "reservation": "rv-01M4GTK0Y9ZWHS39Z7FXDC4W4T",
   "dashboard_session": "codex-18f98e66",
   "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "state": "45 focused courts observed passing across unchanged/current receipts:14 measurement,7 isolation,21 external boundaries,3 actual registered/replay consumers. Source e256 independently PASS; final direct product probes corrected. Full exact-source gate/mutations pending.",
-  "next_action": "Commit strengthened universe/retained-target overflow falsifiers, refresh exact clean export, run compiled named guard mutations and positive-control HSMM trap, then restored44-task20-module source gate and StoryAtlas consumer.",
-  "source_sha": "e25650ce33f5f9a11047ce05ce4d755745643d2b",
+  "state": "Exact e0d6 source/courts independently PASS; direct-product BLOCK closed.17 compiled guard/trap witnesses running serially.45 focused courts observed passing. Restored scoped/consumer gates remain required.",
+  "next_action": "Inspect guard/trap campaign actual exits/named assertions/passing siblings; restore exact clean source, run20-module44-task platform gate and StoryAtlas source consumer serially, then exact-SHA evidence review and narrow publication.",
+  "source_sha": "e0d6ac9e9b46a8ad586b84875020462a24a735da",
   "focused_session": null,
-  "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log"
+  "focused_log": "/private/tmp/storymodel4s-reference-smoke-03.log",
+  "mutation_session": 47971,
+  "mutation_output": "/private/tmp/storymodel4s-reference-mutations",
+  "mutation_timeout_seconds": 1200
 }
