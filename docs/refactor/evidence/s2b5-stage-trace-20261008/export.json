@@ -14,5 +14,6 @@
     "tools/recall-study/freeze_baseline.py": "617ea0ccafeeb42b14778aa2b1f8854e014cd77a2167d6fd68496da7d573c0c6",
     "tools/recall-study/test_freeze_baseline.py": "9b4b06edf5a3acc1ad82d2e7e151b0c7d34f5ea3617df8db5d357766a53160a2",
     "tools/recall-study/tests/test_filmfest_diagnostics.py": "fc4df5c65897a3ea43ae8d6ce71816d9112682d6883db276877fe8db2cddd8be"
-  }
+  },
+  "clone": "/private/tmp/storymodel4s-s2b3-build"
 }

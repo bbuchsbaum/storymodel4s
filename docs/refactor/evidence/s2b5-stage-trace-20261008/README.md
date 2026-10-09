@@ -10,10 +10,18 @@ unchanged. Trace v2 preserves original nomination/outcome accounting and full ba
 A typed Unranked singleton retains state/cost/posterior but has NotComputed local comparison and
 null local mass; ordinary external alternatives retain computed emissions.
 
-Current checkpoint: 32 focused Scala tests and 31 synthetic Python consumer tests passed. Nine compiled Scala
-mutation witnesses and two Python mutation witnesses are qualified; restored scoped-gate
-qualification remains pending. The exact source has independent PASS after two review corrections. Local checks
-use the recorded clean grakern 8efc override. This is engineering evidence; no corpus, private or
+Local qualification: 44 unique module/platform checks passed 7,888 tests with zero failures/errors
+and five existing optional skips. This is a composite receipt: the initial attempt exited one
+after three unchanged alignment Native timeouts; its continuation passed alignment and five more
+modules, then exited one after an unchanged fixture timeout. The final six-task Native tail exited
+zero with formatting last. Both failed attempts and all four timeout failures remain archived;
+failed attempts are excluded from the qualified totals. Timeout causation remains unestablished.
+[The verifier](verify.py) binds each required task exactly once to the unchanged source/configuration.
+
+The 32 focused Scala controls and 31 synthetic Python controls passed; nine compiled Scala and two
+Python named mutation witnesses are qualified. The exact source has independent PASS after two
+review corrections. Local checks use the recorded clean grakern 8efc override; hosted declared-pin
+qualification remains pending. This is engineering evidence; no corpus, private or
 sealed data access, learned-model efficacy, public reference/reconstruction completion or release
 qualification is claimed. Read checkpoint.json for real active jobs/output paths and next action.
 

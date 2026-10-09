@@ -41,6 +41,15 @@ tests with four optional skips. It is published through `658b1d94` and hosted-qu
 Both bounded children are closed; G1 stays open for originating-evidence StageTrace adoption and
 the remaining parent acceptance. The historical witness makes no learned/corpus efficacy claim.
 
+S2b-5 originating-evidence StageTrace is locally qualified at source `95ba0e4d`:
+[origin receipts](evidence/s2b5-stage-trace-20261008/README.md) bind 44 unique scoped checks,
+7,888 passed / five optional skips, 31 Python controls and nine Scala plus two Python mutation
+witnesses. Both earlier unchanged Native timeout attempts remain separately recorded; the final
+Native tail and formatting exited zero. Exact-source independent review passed. Landing and hosted
+declared-pin qualification are separate next steps. G1 remains open for paired public reference /
+reconstruction evidence equality and its remaining acceptance; the optional populated-cost-field
+oracle is tracked as `bd-01M4EA3TVCGSVSA114DQX9588N`.
+
 ## Start here
 
 Use one primary agent and at most one helper. Select one bounded acceptance criterion, inspect
@@ -63,7 +72,7 @@ The immediate order is:
 
 | Order | Mote | Next acceptance |
 | --- | --- | --- |
-| 1 | `bd-01M2TACM78289S4TECE91GT5K2` | Adopt originating-evidence StageTrace over the checked ONNX registration and immutable nomination/pricing seam, preserving the qualified historical compatibility witness. |
+| 1 | `bd-01M2TACM78289S4TECE91GT5K2` | Finish S2b-5 landing/hosted qualification, then prove paired reference/reconstruction consume identical checked evidence and reconcile remaining G1 acceptance. |
 | 2 | `bd-01M2WVF86T8QEEA1TK8Z0ASJHW`, `bd-01M2TAD04SR823TQVG9VPNH6R3` | Extract public reference before HSMM and named reconstruction from identical checked evidence. |
 | 3 | `bd-01M2WVH1DC8ZPDC992G4MX3TXG`, `bd-01M2TADC4VKSDZ2S9SXETH2MYM` | Complete support adoption and the ordinary-file public facade, with explicit profiles, complete outcomes and safe publication. |
 

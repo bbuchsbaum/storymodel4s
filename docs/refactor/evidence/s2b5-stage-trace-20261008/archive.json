@@ -516,5 +516,25 @@
     "path": "reference-scope.json",
     "raw_bytes": 2602,
     "raw_sha256": "618a9f4a5152820daaaabe2bbbb8ed4c110efa8992ef8a821ad9cc683a25f3ad"
+  },
+  {
+    "path": "runs/native-continuation-failed.log.gz",
+    "raw_bytes": 86547,
+    "raw_sha256": "283c29e3528caa443ee619bc49c0167e408b3a0ace1760a2431ba7d6d7f74739"
+  },
+  {
+    "path": "runs/native-continuation-failed.log.meta.json",
+    "raw_bytes": 937,
+    "raw_sha256": "bfa1fe1737e07e07b34e95f23121e4e33a62e3cc67d9e7d3ae9dbfeec596434a"
+  },
+  {
+    "path": "runs/native-tail.log.gz",
+    "raw_bytes": 50402,
+    "raw_sha256": "548ecab503f0b2c13e3968a8efb8604e05cd65cc9a27e1f9a67dabc372ef5fc7"
+  },
+  {
+    "path": "runs/native-tail.log.meta.json",
+    "raw_bytes": 773,
+    "raw_sha256": "a1eaa57e633fafd58a2433026aac5ad35cd341da60fbb95289af374e521ad97b"
   }
 ]

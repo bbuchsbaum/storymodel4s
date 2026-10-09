@@ -1,0 +1,17 @@
+{
+  "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
+  "clone_clean_before_retry": true,
+  "cpu_count": 14,
+  "load_before_retry": [
+    15.05126953125,
+    21.8984375,
+    22.6748046875
+  ],
+  "observed_prior_load": [
+    31.08056640625,
+    25.51025390625,
+    23.6259765625
+  ],
+  "observed_prior_memory_free_percent": 48,
+  "basis": "Resource check during second timeout; cause remains unestablished. Same fixture/inputs unchanged versus4384 main; deadlines unchanged. Retry only failed module and unrun tail."
+}

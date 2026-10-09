@@ -1,0 +1,47 @@
+{
+  "source_sha": "95ba0e4d5c05742cea5983f0bfddbe65acfc66cc",
+  "runs": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/recall-study/tests",
+        "-p",
+        "test_filmfest_diagnostics.py"
+      ],
+      "exit": 0,
+      "log": "/private/tmp/storymodel4s-s2b5-consumer-reviewed-0.log",
+      "log_archive": "runs/consumer-reviewed-0.log.gz",
+      "passed": 12
+    },
+    {
+      "command": [
+        "python3",
+        "tools/recall-study/test_freeze_baseline.py"
+      ],
+      "exit": 0,
+      "log": "/private/tmp/storymodel4s-s2b5-consumer-reviewed-1.log",
+      "log_archive": "runs/consumer-reviewed-1.log.gz",
+      "passed": 15
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/recall-study/tests",
+        "-p",
+        "test_filmfest_replay.py"
+      ],
+      "exit": 0,
+      "log": "/private/tmp/storymodel4s-s2b5-consumer-reviewed-2.log",
+      "log_archive": "runs/consumer-reviewed-2.log.gz",
+      "passed": 4
+    }
+  ]
+}
