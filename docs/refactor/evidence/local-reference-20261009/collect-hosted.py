@@ -36,6 +36,9 @@ for slug in ['source', 'docs']:
         assert {j['name'] for j in jobs['jobs']} == expected
     records = []
     for job in jobs['jobs']:
+        assert job['run_id'] == run['id'], 'hosted job run'
+        assert job['head_sha'] == SHA, 'hosted job head'
+        assert job['run_attempt'] == run['run_attempt'], 'hosted job attempt'
         assert job['status'] == 'completed' and job['conclusion'] == 'success'
         path = f'runs/hosted-{slug}-job-{job["id"]}.log.gz'
         cache = O / f'job-{job["id"]}.log'
@@ -46,15 +49,24 @@ for slug in ['source', 'docs']:
         body = cache.read_bytes()
         save(path, body)
         text = ansi.sub('', body.decode())
+        assert re.search(r'\[command\]/usr/bin/git log -1 --format=%H\r?\n\S+Z ' + re.escape(SHA) + r'(?:\r?\n|$)', text), 'checkout SHA'
         rows = [[int(v or 0) for v in row] for row in re.findall(r'(?:Passed|Failed): Total (\d+), Failed (\d+), Errors (\d+), Passed (\d+)(?:, (?:Skipped|Ignored) (\d+))?', text)]
         record = {'id': job['id'], 'name': job['name'], 'url': job['html_url'], 'conclusion': job['conclusion'], 'log_archive': path, 'log_bytes': len(body), 'log_sha256': hashlib.sha256(body).hexdigest(), 'totals': rows}
         if slug == 'source':
             assert len(rows) == (24 if 'rootJVM' in job['name'] else 16)
             assert all(row[1] == row[2] == 0 and row[0] == row[3] + row[4] for row in rows)
-            for suite in ['ReferenceMeasurementSuite', 'ReferenceIsolationSuite', 'LocalReferenceBoundarySuite']:
-                assert suite in text, suite
+            suites = {'storymodel4s.align.ReferenceMeasurementSuite': 14,
+                      'storymodel4s.align.ReferenceIsolationSuite': 7,
+                      'storymodel4s.probes.LocalReferenceBoundarySuite': 21}
             if 'rootJVM' in job['name']:
-                assert 'LocalReferenceConsumerSuite' in text
+                suites['storymodel4s.bench.video.LocalReferenceConsumerSuite'] = 3
+            record['reference_suites'] = {}
+            for suite, expected in suites.items():
+                found = [[int(v) for v in row] for row in re.findall(
+                    r'Test run ' + re.escape(suite) +
+                    r' finished: (\d+) failed, (\d+) ignored, (\d+) total', text)]
+                assert found == [[0, 0, expected]], 'suite completion ' + suite + ': ' + str(found)
+                record['reference_suites'][suite] = {'failed': 0, 'ignored': 0, 'passed': expected}
         if slug == 'docs':
             for field, suffix in [('executable_examples', 'executable documentation examples'),
                 ('built_pages', 'built pages'), ('sidebar_entries', 'unique sidebar entries'),

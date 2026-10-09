@@ -119,11 +119,15 @@ if publication_path.exists():
             assert {j['name'] for j in jobs} == expected
         for recorded in receipt['jobs']:
             job = next(j for j in jobs if j['id'] == recorded['id'])
+            assert job['run_id'] == run['id'], 'hosted job run'
+            assert job['head_sha'] == published_sha, 'hosted job head'
+            assert job['run_attempt'] == run['run_attempt'], 'hosted job attempt'
             assert job['name'] == recorded['name'] and job['conclusion'] == 'success'
             assert job['status'] == 'completed'
             log = raw(recorded['log_archive'])
             assert len(log) == recorded['log_bytes'] and digest(log) == recorded['log_sha256']
             text = ansi.sub('', log.decode())
+            assert re.search(r'\[command\]/usr/bin/git log -1 --format=%H\r?\n\S+Z ' + re.escape(published_sha) + r'(?:\r?\n|$)', text), 'checkout SHA'
             rows = totals(text)
             assert rows == recorded['totals']
             if slug == 'docs':
@@ -136,14 +140,50 @@ if publication_path.exists():
                 assert len(rows) == (24 if 'rootJVM' in job['name'] else 16)
                 assert all(r[1] == r[2] == 0 and r[0] == r[3] + r[4] for r in rows)
                 hosted_rows.extend(rows)
-                for suite in ['ReferenceMeasurementSuite', 'ReferenceIsolationSuite',
-                    'LocalReferenceBoundarySuite']:
-                    assert suite in text
+                suites = {'storymodel4s.align.ReferenceMeasurementSuite': 14,
+                          'storymodel4s.align.ReferenceIsolationSuite': 7,
+                          'storymodel4s.probes.LocalReferenceBoundarySuite': 21}
                 if 'rootJVM' in job['name']:
-                    assert 'LocalReferenceConsumerSuite' in text
+                    suites['storymodel4s.bench.video.LocalReferenceConsumerSuite'] = 3
+                assert set(recorded['reference_suites']) == set(suites)
+                for suite, expected in suites.items():
+                    found = [[int(v) for v in row] for row in re.findall(
+                        r'Test run ' + re.escape(suite) +
+                        r' finished: (\d+) failed, (\d+) ignored, (\d+) total', text)]
+                    assert found == [[0, 0, expected]], 'suite completion ' + suite + ': ' + str(found)
+                    assert recorded['reference_suites'][suite] == {'failed': 0, 'ignored': 0, 'passed': expected}
     source = publication['source']
     assert len(hosted_rows) == source['task_totals'] == 80
     assert sum(r[3] for r in hosted_rows) == source['passed']
     assert sum(r[4] for r in hosted_rows) == source['skipped']
     assert source['failed'] == source['errors'] == 0
     print('Verified exact published-head four-job matrix, complete raw job logs and hosted totals.')
+
+court_path = E / 'hosted-receipt-court.json'
+if court_path.exists():
+    court = json.loads(court_path.read_text())
+    assert court['published_sha'] == '38cf9c7f0f879c883a307cbeb54d51c67f6c1476'
+    assert court['old_tooling_sha'] == 'eb240ffa7a11576525938b96491a2c94027aeba0'
+    for path, expected in court['script_sha256'].items():
+        assert digest((E / path).read_bytes()) == expected, path
+    assert len(court['cases']) == 12
+    assert {c['tool'] for c in court['cases']} == {'collect-hosted.py', 'verify.py'}
+    assert {c['case'] for c in court['cases']} == {'wrong-run', 'wrong-head', 'wrong-attempt',
+        'wrong-checkout', 'wrong-suite-count', 'missing-suite-completion'}
+    tools = {'collect-hosted.py', 'verify.py'}
+    cases = {'wrong-run', 'wrong-head', 'wrong-attempt', 'wrong-checkout',
+             'wrong-suite-count', 'missing-suite-completion'}
+    assert {(c['tool'], c['case']) for c in court['cases']} == {(t, c) for t in tools for c in cases}
+    assert all(c['old_exit'] == 0 and c['current_exit'] == 1 for c in court['cases'])
+    observations = [json.loads(line) for line in raw('runs/hosted-receipt-court.jsonl').decode().splitlines()]
+    assert len(observations) == 26
+    expected_observations = {(t, v, c) for t in tools for v in ['old', 'current'] for c in cases}
+    expected_observations.update((t, 'current', None) for t in tools)
+    assert {(o['tool'], o['version'], o['case']) for o in observations} == expected_observations
+    for c in court['cases']:
+        old = next(o for o in observations if o['tool'] == c['tool'] and o['case'] == c['case'] and o['version'] == 'old')
+        current = next(o for o in observations if o['tool'] == c['tool'] and o['case'] == c['case'] and o['version'] == 'current')
+        assert old['exit'] == 0 and current['exit'] == 1
+        assert 'AssertionError: ' + c['named_assertion'] in current['stderr']
+    assert all(o['exit'] == 0 for o in observations if o['case'] is None)
+    print('Verified two clean hosted-receipt controls and twelve named refusals with old-tooling positive controls.')
