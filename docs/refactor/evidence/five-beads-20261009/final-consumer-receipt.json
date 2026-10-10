@@ -1,0 +1,101 @@
+{
+  "source_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+  "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "qualification": "LocallyObserved",
+  "grakern_override_sha": "8efc5efade4e56c6e0b29745bd1b108d4c9a9d57",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-s2b3-build",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exit": 0,
+  "tasks": 10,
+  "totals": {
+    "total": 485,
+    "failed": 0,
+    "errors": 0,
+    "passed": 485,
+    "skipped": 0
+  },
+  "per_task": [
+    {
+      "total": 22,
+      "failed": 0,
+      "errors": 0,
+      "passed": 22,
+      "skipped": 0
+    },
+    {
+      "total": 26,
+      "failed": 0,
+      "errors": 0,
+      "passed": 26,
+      "skipped": 0
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100,
+      "skipped": 0
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100,
+      "skipped": 0
+    },
+    {
+      "total": 13,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13,
+      "skipped": 0
+    },
+    {
+      "total": 13,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13,
+      "skipped": 0
+    },
+    {
+      "total": 74,
+      "failed": 0,
+      "errors": 0,
+      "passed": 74,
+      "skipped": 0
+    },
+    {
+      "total": 74,
+      "failed": 0,
+      "errors": 0,
+      "passed": 74,
+      "skipped": 0
+    },
+    {
+      "total": 59,
+      "failed": 0,
+      "errors": 0,
+      "passed": 59,
+      "skipped": 0
+    },
+    {
+      "total": 4,
+      "failed": 0,
+      "errors": 0,
+      "passed": 4,
+      "skipped": 0
+    }
+  ],
+  "raw_log_sha256": "d8ac2a5bd36eaa8802c4863ecd1da3f03d1c8c0cecd61c1446f963363659446a",
+  "raw_log_bytes": 22601,
+  "archive": "logs/final-consumer.log.gz"
+}

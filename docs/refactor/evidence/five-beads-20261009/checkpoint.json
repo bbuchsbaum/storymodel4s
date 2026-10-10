@@ -5,12 +5,12 @@
   "actor": "codex-five-beads-20261009",
   "dashboard": "codex-c4898f51",
   "mutation_session": null,
-  "source_gate_session": 75580,
-  "consumer_session": 28933,
+  "source_gate_session": null,
+  "consumer_session": null,
   "clone": "/private/tmp/storymodel4s-s2b3-build",
   "mutation_output": ".agent-work/five-beads/integration-mutations",
   "source_log": ".agent-work/five-beads/final-checkAll.log",
   "consumer_log": ".agent-work/five-beads/final-consumer.log",
-  "state": "Exactfa80 source independentPASS. All15 integration mutants qualified; initial control-filter miss preserved inconclusive. Full checkAll active75580; pinnedStoryAtlas28933 queued. Earlier reconstruction12kills/source9389/consumer485 alreadyqualified. No beadsclosed, main and remote untouched.",
-  "next": "Inspect named mutation results; fix any inconclusive witness before gate. Check final full totals/exits and independent verdict; archive logs/hashes, acceptance crosswalk; refresh ownership and integrate locally then close all five."
+  "state": "Exact fa80dfa source and 15 integration mutations independently reviewed PASS. Full checkAll: 10004 passed, 0 failed/errors, 5 optional skips, 56 tasks. Pinned StoryAtlas: 485 passed, 0 failed/errors/skips, 10 tasks. Both exit0 incl format; raw logs archived. Final independent receipt review/local integration/closure pending; remote unchanged.",
+  "next": "Review exact evidence/docs commit, refresh live ownership, integrate locally and close all five; commit narrow closure audit and verify main."
 }

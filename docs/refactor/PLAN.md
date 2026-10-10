@@ -181,36 +181,32 @@ This is the first visible product milestone: one ordinary UTF-8 source and two u
 files produce both mappings, independently readable exchange and a package that StoryAtlas
 actually opens. Inputs use synthetic or admitted text under rule 14.
 
-Continue the smallest complete path in this order, after the current CI P0:
+The October 9 integration at source `fa80dfa` implements named reconstruction, G1 shared
+evidence, recall words/timing/support, the typed mapping facade and ordinary-file preparation.
+The [five-bead acceptance crosswalk](evidence/five-beads-20261009/README.md) binds these
+implementations to their existing tickets and exact qualification receipts. Source and pinned consumer gates pass;
+local integration and Mote closure follow exact-revision review. The public reference and strict registered ONNX
+prerequisites already have their own qualified receipts. Both mappings now consume the same
+checked evidence, and the local ONNX provider/replay path has an actual paired consumer.
 
-1. Preserve the completed eligibility migration `bd-01M16DBEH9PKER423BZ47ZKBMV`:
-   ineligible, missing and observed zero differ through construction, reduction, codecs and
-   the qualified consumer. Apply the stable-signature/construction
-   review `bd-01M19N0W937KVZCK78F6X57X1D` to each new public seam, with final closure before freeze.
-2. Reuse completed strict content wiring `bd-01M379N8HK5ZCV9W252X9MQ4VV` and the reconciled
-   S2a-4 courts. Preserve canonical rename/permutation laws and the separately frozen historical
-   path. Finish registered controlled embedding/replay and the shared immutable local-evidence
-   seam under G1 `bd-01M2TACM78289S4TECE91GT5K2`; G1 remains open.
-3. Extract the public reference `bd-01M2WVF86T8QEEA1TK8Z0ASJHW` and reconstruction
-   `bd-01M2TAD04SR823TQVG9VPNH6R3` operations. Reference executes before HSMM; both use the same
-   checked evidence digest. Reconstruction retains its named policies and historical parity.
-4. Finish the necessary stable words/unit membership/support integration
-   `bd-01M2WVH1DC8ZPDC992G4MX3TXG`. Wire offline source `bd-01M35PB1H5PDD55YVKR4TQ8M66`
-   and prepare `bd-01M35B05TC6GBED9Z3HZMX618E` into facade `bd-01M2TADC4VKSDZ2S9SXETH2MYM`,
-   exchange `bd-01M2WVHF4B5DAXJYY4W91VK4WV` and workspace CLI `bd-01M35B103S2KHRSF853GD2FYHW`.
-   Preserve a typed recall-text disclosure basis for non-public inputs
-   `bd-01M168TZ3VRQYSE7TNT5JKJTSJ`, and separate admitted source headers
-   `bd-01M17010MM68DG7B49DMEKA2AA`. Reuse TextSourceCli, MappingExchangeCli and canonical M1
-   serializers; choose and test the
-   public command spelling during implementation rather than promising a nonexistent command.
+Continue the smallest complete product path:
 
-The registered embedding adapter remains G1/1.0 work and is the default next implementation
-after CI recovery. An earlier lexical development milestone is possible only through the explicit
-recorded dependency refinement below; a strict embedding request remains typed unavailable until
-its receipt/replay court passes. Keep G1 open. A coarse dependency on the full G1 container must not be bypassed silently:
-when scheduling consumer work, identify the independently verified executable prerequisite,
-split oversized existing work under T1 if necessary, and record the justified edge refinement.
-Retain the embedding requirement and full parent acceptance at the release gate.
+1. Independently read back paired exchange `bd-01M2WVHF4B5DAXJYY4W91VK4WV`, then open the
+   ordinary-file study in StoryAtlas under workspace CLI `bd-01M35B103S2KHRSF853GD2FYHW`.
+   Preserve the source, recall, execution and member-profile bindings emitted by the facade.
+2. Add the explicit lambda/readout operation `bd-01M35MHPFFKQHSJKC07VMWC7CW` and retain the
+   fixed units, cut and denominators across paired members.
+3. Preserve the typed recall-text disclosure basis for non-public inputs
+   `bd-01M168TZ3VRQYSE7TNT5JKJTSJ` and admitted source headers
+   `bd-01M17010MM68DG7B49DMEKA2AA`. The ordinary-file adapters do not grant admission to
+   restricted text. Reconcile the offline-source parent `bd-01M35PB1H5PDD55YVKR4TQ8M66`
+   against its own remaining integration acceptance.
+
+The completed eligibility migration `bd-01M16DBEH9PKER423BZ47ZKBMV` remains binding:
+ineligible, missing and observed zero differ through construction, reduction, codecs and the
+qualified consumer. Apply stable construction review `bd-01M19N0W937KVZCK78F6X57X1D` to new
+public seams, with final closure before freeze. Broader release and scientific qualification
+remain separate from the locally exercised engineering contracts.
 
 Exit witnesses for the text milestone:
 
@@ -304,7 +300,7 @@ compilation and organization analyses stay in 1.1; benchmark/LLM campaigns, corp
 empirical calibration remain on their existing research lanes. No calendar release promise is
 made before the fresh baseline and first public journey expose the remaining integration cost.
 
-**Current action, 7 October:** recovery, approved-host/data handoff, numerical determinism and
+**Historical checkpoint, 7 October:** recovery, approved-host/data handoff, numerical determinism and
 the [eligibility migration](evidence/estimate-eligibility-20261006/README.md) are complete.
 [S2a-3](evidence/strict-content-wiring-20261007/README.md) is qualified at source `a2d795b` and
 consumer `0cd43ffd`; the strict route, canonical contradiction order, unavailable/abstaining
@@ -316,6 +312,10 @@ recorded in `bd-01M4B896MCEE43Q9QMR4HT60R0`; resolve it before G1 registered emb
 evidence, then public reference/reconstruction and ordinary-file facade. G1, stable construction,
 broader integration and release acceptance stay open. Use RELEASE-QUEUE and live Mote, rather
 than dated next-task prose.
+
+**Current action, 9 October:** finish qualification and local landing of the five-bead
+integration above, then independent paired-exchange readback and an actual StoryAtlas opening.
+Use the [current queue](RELEASE-QUEUE.md#9-october-five-bead-integration) and live Mote.
 
 ## Completed fixture milestone: M1 (22 September 2026)
 

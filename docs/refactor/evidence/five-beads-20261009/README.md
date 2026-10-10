@@ -4,8 +4,9 @@ Source candidate: `fa80dfa388d6470dfde51322f8e1035b6d8521a4`, over
 `908b935ca55fb6a4bc0f1e10b16a5b42c93adff4`. Actor: `codex-five-beads-20261009`.
 The owner requested all five existing beads be completed in this effort. Mote remains authoritative.
 
-All fifteen integration mutations are independently verified. Qualification is pending the full
-source and pinned consumer gates. Source
+All fifteen integration mutations are independently verified. The full source gate passed:
+10,004 passed, zero failed/errors, five optional skips over 56 tasks. The pinned consumer gate passed all 485 tests across ten tasks, with no skips or failures.
+Both gates exited zero, including formatting. Final receipt review and local landing are pending. Source
 review PASS by independent `/root/reconstruction_review` covers exact `902eaa..fa80dfa`;
 reconstruction source and receipts have a separate exact `902eaa` PASS in the adjacent evidence
 folder. A source verdict alone does not authorize closure.
@@ -25,14 +26,14 @@ folder. A source verdict alone does not authorize closure.
 Focused pre-gate runs: alignment/probes 60 passed (`compile-07`); annotation core 5,
 pipeline 69 and historical bench 11 passed (`compile-11`); ordinary annotation codec 2 passed
 (`compile-12`). Failures found during development remain in the retained logs. No compile
-failure is counted as a mutation kill. The final gate will bind the exact candidate and replace
-these development counts as landing evidence.
+failure is counted as a mutation kill. The final source gate binds the exact candidate; its 10,004 passes supersede
+these development counts as source landing evidence.
 
 Fifteen new mutation specifications each name a failing witness and a passing control. The
 runner restores source after each test and verifies clean exact HEAD before the full gate starts.
 `gate-after-mutations.py` runs fatal-warning `checkAll`, with relevant JVM compile-time probes
-cleaned first, plus generated-workflow verification. The pinned StoryAtlas source consumer runs
-only after this gate succeeds. All tools run serially in owned standalone clones.
+cleaned first, plus generated-workflow verification. The pinned StoryAtlas source consumer ran
+only after this gate succeeded. All tools run serially in owned standalone clones.
 
 Local runs use the recorded grakern checkout override; these are LocallyObserved engineering
 checks, not hosted-CI, scientific-efficacy, calibration, scanner-clock or release qualification.
@@ -55,3 +56,19 @@ passing sibling because its filter contained a comma. It is retained as inconclu
 The corrected filter ran two tests: one named assertion failure and one passing control.
 The runner now refuses pre-existing log paths to prevent stale-log reuse on a retry.
 All fifteen final mutation witnesses qualify on exact `fa80dfa`.
+
+## Final local gates
+
+- [Full source receipt](final-checkAll-receipt.json): exact `fa80dfa`, 56 tasks,
+  10,004 passed, zero failed/errors, five optional skips; fatal warnings, workflow check and
+  final formatting all exited zero. Compile-time probe modules were cleaned first.
+- [Pinned consumer receipt](final-consumer-receipt.json): StoryAtlas `90f682d1` built against
+  exact `fa80dfa`, ten tasks, 485 passed, zero failed/errors/skips; compile, tests and final
+  formatting exited zero. Both standalone checkouts remained clean.
+- Source and consumer use clean grakern override `8efc5efade4e56c6e0b29745bd1b108d4c9a9d57`.
+  Raw compressed logs, command metadata, byte counts and SHA-256 digests are committed here.
+- The five optional source skips are the existing live provider smoke, production neural
+  channel and three live media-worker checks. No skipped check is counted as passed.
+
+The full source gate includes all platforms (JVM, JavaScript, Native) for portable modules and
+all JVM-only modules. See [reference scope](reference-scope.txt) and the receipts for commands.

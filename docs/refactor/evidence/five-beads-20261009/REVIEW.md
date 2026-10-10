@@ -17,5 +17,6 @@ inconclusive (one failure, no passing control), and excluded from qualification.
 The acceptance crosswalk agrees with the implementation and existing ticket boundaries.
 `TemporalQuery.Region.on` remains edition-only, explicitly documented as a separate capability.
 
-Full source and pinned StoryAtlas gate qualification remains pending. This source/mutation
-verdict alone is not a landing verdict or hosted/scientific qualification.
+Full source and pinned StoryAtlas gates exited zero: 10,004 source passes / five optional
+skips and 485 consumer passes / zero skips, with zero failed/errors. The independent final
+receipt/local-landing verdict remains pending. This is not hosted/scientific qualification.
