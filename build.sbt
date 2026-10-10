@@ -414,7 +414,9 @@ lazy val pipeline = project
       "io.circe" %% "circe-core" % circeV,
       "io.circe" %% "circe-parser" % circeV
     ),
-    Test / fork := true
+    Test / unmanagedResourceDirectories += (media / Test / resourceDirectory).value,
+    Test / fork := true,
+    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
   )
   .dependsOn(
     providerAgent,
@@ -423,9 +425,12 @@ lazy val pipeline = project
     proposition.jvm,
     acquire.jvm,
     document.jvm,
+    align.jvm,
     story.jvm,
     codec.jvm,
     corpusIntake,
+    embedOnnx % "compile->compile;test->test",
+    media,
     fixtures.jvm % Test
   )
 

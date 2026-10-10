@@ -115,6 +115,10 @@ object RecallTimingIntake:
         .map(Refusal.InvalidTiming(_))
     yield new Result(timing, records, columns, snapshot.length)
 
+  /** Reuse the same strict UTF-8 and quoting rules for explicit ordinary-file adapters. */
+  def records(bytes: Array[Byte]): Either[Refusal, Vector[Vector[String]]] =
+    utf8(bytes.clone()).flatMap(text => csv(text.stripPrefix("\ufeff")))
+
   private def bind(
       words: Vector[String],
       values: Vector[Observation],
