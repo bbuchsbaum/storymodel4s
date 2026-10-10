@@ -1,0 +1,10 @@
+{
+  "branch": "codex/workflow-five-20261010",
+  "actor": "codex-workflow-five-20261010",
+  "dashboard": "codex-410e8e59",
+  "active_bead": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+  "development_session": 30959,
+  "development_log": ".agent-work/workflow-five/exchange-dev-01.log",
+  "clone": "/private/tmp/storymodel4s-s2b3-build",
+  "next": "Inspect focused compilation/test result, run independent reader fixtures, repair failures, commit compiling slice, qualify named mutations and exact-scope/consumer gates with independent review. Continue remaining four beads."
+}

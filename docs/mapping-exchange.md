@@ -5,8 +5,8 @@
 lossless projections of that same record. The manifest binds its source, recall
 inventory, segmentation, policies, roles and exact payload bytes.
 
-This is the single-record component. The public facade's paired reference,
-reconstruction and λ outputs still need their shared evidence/profile envelope.
+The single-record component also forms each member of the paired exchange below.
+Reference and reconstruction retain separate measure kinds and policies.
 The base package explicitly marks that capability unavailable, together with recall
 timing, temporal projection, scanner alignment, organization and calibration.
 Support geometry does not imply any of those capabilities.
@@ -69,8 +69,7 @@ owns ordinary-file input admission and inference execution.
 
 Every table row carries `mapping_digest`. The declared target universe remains in
 the manifest's policies; it is distinct from the full target dictionary. Copied
-`support_coverage` is the existing immediate-child field, not a claim of transitive
-temporal coverage. External destinations are explicit states. Failed units retain
+`support_coverage` accounts for declared descendants, including missing nested support. External destinations are explicit states. Failed units retain
 their outcome rows even when they have no alternatives. No measure is renormalized.
 
 TSV is UTF-8 without BOM, tab-delimited, with every cell double-quoted, embedded
@@ -111,3 +110,31 @@ storymodel4s.codec.MappingExchangeFixture`, save the log, then run the reader wi
 `--fixture-log LOG` and `check_corruptions.py LOG`. The additional raw-score and
 large-tick controls distinguish decoded choice from raw argmax and exercise exact
 coordinates above the binary64 integer limit.
+
+## Paired public workflow
+
+The ordinary-file facade can publish both members and their lossless exchange tables:
+
+```sh
+sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun exchange study.json mapping.json analysis/paired'
+python3 examples/mapping/read_mapping.py --directory analysis/paired
+```
+
+Use the configuration and installation instructions in [study inputs](guide/study-inputs.md).
+Add `--resume` to the mapping command only to reuse an identical completed publication; foreign,
+interrupted or corrupted output refuses. Existing files are never overwritten.
+
+`MappingPipeline.publishExchange` accepts either an actual registered `Run` or a prepared
+`Batch`. Its completion envelope is `mapping-exchange-run/v1` or `mapping-exchange-batch/v1`.
+Each run contains a `mapping-exchange-pair/v1` manifest and the unchanged single-record files,
+with flat deterministic filename prefixes. Every checksum binds the exact UTF-8 bytes.
+The pair names the original execution, shared evidence, source, inventory and both profiles.
+The outer run retains provider registration and explicit capability readiness. A batch retains
+every attempted participant/session, including failed attempts, and the prepared recall joins.
+
+The Python `read_publication(files)` API checks the complete envelopes, member/stage joins,
+measure kinds, unit/participant denominators and exact coordinates. Reference normalized score
+mass and reconstruction model posterior remain distinct; neither is calibrated correctness.
+The reader verifies package consistency, not the truth of an untrusted producer's execution
+claim. `MappingExchange.decodePair(files, execution)` additionally requires the actual owning
+execution and matches the complete canonical pair.

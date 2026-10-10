@@ -227,6 +227,140 @@ def fixture_answers(name, record, tables):
         require("9007199254740993" in encoded, "lost exact large tick")
 
 
+def envelope(files, schema):
+    """Check a flat completion-marker envelope before interpreting its owned members."""
+    require("manifest.json" in files, "incomplete publication")
+    manifest = parse(files["manifest.json"])
+    require(set(manifest) == {"schemaVersion", "metadata", "files"}, "envelope fields")
+    require(manifest["schemaVersion"] == schema, "unsupported envelope schema")
+    names = []
+    for entry in manifest["files"]:
+        require(set(entry) in ({"path", "sha256"}, {"path", "sha256", "bytes"}), "envelope descriptor")
+        name = entry["path"]
+        require(isinstance(name, str) and re.fullmatch(r"[a-zA-Z0-9._-]+", name)
+                and name not in {".", "..", "manifest.json"}, "unsafe envelope path")
+        require(name in files and name not in names, "duplicate or missing payload")
+        names.append(name)
+        raw = files[name].encode("utf-8", errors="strict")
+        require(hashlib.sha256(raw).hexdigest() == entry["sha256"], "envelope hash mismatch")
+        if "bytes" in entry:
+            require(entry["bytes"] == str(len(raw)), "envelope byte count")
+    require(set(files) == set(names) | {"manifest.json"}, "partial or extra publication")
+    return manifest["metadata"]
+
+
+def digest(value):
+    require(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value), "invalid digest")
+    return value
+
+
+def read_pair(files):
+    metadata = envelope(files, "mapping-exchange-pair/v1")
+    require(set(metadata) == {"execution", "sharedEvidence", "inventory", "source", "members"}, "pair metadata")
+    for key in ("execution", "sharedEvidence", "inventory", "source"):
+        digest(metadata[key])
+    require([m["member"] for m in metadata["members"]] == ["reference", "reconstruction"], "pair members")
+    loaded = {}
+    expected_files = {"manifest.json"}
+    for member in metadata["members"]:
+        require(set(member) == {"member", "profile", "record", "manifest"}, "member descriptor")
+        name = member["member"]
+        prefix = name + "--"
+        supplied = {p[len(prefix):]: text for p, text in files.items() if p.startswith(prefix)}
+        record, tables = read(supplied)
+        expected_files |= {prefix + p for p in supplied}
+        require(hashlib.sha256(supplied["manifest.json"].encode("utf-8")).hexdigest() == member["manifest"], "member manifest digest")
+        require(record["record_digest"] == member["record"], "member record digest")
+        require(record["inventory"]["digest"] == metadata["inventory"], "foreign pair inventory")
+        require(record["source"]["digest"] == metadata["source"], "foreign pair source")
+        require(record["policies"]["decision_policy_id"] == {"status": "declared", "id": "mapping-run:" + digest(member["profile"])}, "foreign member profile")
+        derived = [s for s in tables["stages"] if s["provenance"]["status"] == "derived"]
+        require({s["stage"] for s in derived} == {"Inference", "Decision"} and len(derived) == 2, "missing executed stages")
+        for stage in derived:
+            receipt = stage["provenance"]["receipt"]
+            require(receipt["stage"] == stage["stage"] and receipt["config"] == metadata["execution"], "foreign execution receipt")
+            require(receipt["inputs"] == [metadata["sharedEvidence"], metadata["inventory"], metadata["source"]], "foreign originating evidence")
+            require(receipt["policy"] == f"mapping-run/v1/{name.capitalize()}/{stage['stage']}", "foreign member authority")
+        expected_kind = "NormalizedScoreMass" if name == "reference" else "ModelPosterior"
+        allowed_kinds = {expected_kind} if name == "reference" else {expected_kind, "RawScore"}
+        require(all(r["measure_kind"] in allowed_kinds for r in tables["alternatives"]), "conflated paired measure kind")
+        for unit in tables["units"]:
+            values = [number(r["raw_value"]) for r in tables["alternatives"] if r["unit"] == unit["id"] and r["measure_kind"] == expected_kind]
+            if values:
+                require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= 1e-12, "invalid paired mass")
+        loaded[name] = (record, tables)
+    require(set(files) == expected_files, "unknown paired payload")
+    reference, reconstruction = loaded["reference"][0], loaded["reconstruction"][0]
+    require(reference["inventory"] == reconstruction["inventory"], "different paired inventories")
+    require(reference["source"] == reconstruction["source"], "different paired sources")
+    return metadata, loaded
+
+
+def check_run(metadata, files):
+    required = {"run", "registration", "execution", "sharedEvidence", "config", "readiness", "members"}
+    require(set(metadata) == required, "run metadata")
+    prefix = digest(metadata["run"]) + "--"
+    pair_files = {p[len(prefix):]: text for p, text in files.items() if p.startswith(prefix)}
+    pair, loaded = read_pair(pair_files)
+    digest(metadata["registration"])
+    require(metadata["execution"] == pair["execution"] and metadata["sharedEvidence"] == pair["sharedEvidence"], "foreign run execution")
+    require(metadata["members"] == [
+        {"member": name.capitalize(), "kind": "NormalizedScoreMass" if name == "reference" else "ModelPosterior",
+         "profile": member["profile"], "record": member["record"]}
+        for name, member in zip(("reference", "reconstruction"), pair["members"])], "run member join")
+    return loaded, {prefix + p for p in pair_files}
+
+
+def read_publication(files):
+    schema = parse(files.get("manifest.json", "{}" )).get("schemaVersion")
+    if schema == "mapping-exchange-pair/v1":
+        metadata, loaded = read_pair(files)
+        return {"schema": schema, "pairs": [loaded], "outcomes": [], "metadata": metadata}
+    require(schema in {"mapping-exchange-run/v1", "mapping-exchange-batch/v1"}, "unsupported publication schema")
+    metadata = envelope(files, schema)
+    if schema == "mapping-exchange-run/v1":
+        loaded, names = check_run(metadata, files)
+        require(set(files) == names | {"manifest.json"}, "unexpected run payload")
+        return {"schema": schema, "pairs": [loaded], "outcomes": [], "metadata": metadata}
+    require(set(metadata) == {"plan", "sourceEdition", "config", "attempts", "outcomes"}, "batch metadata")
+    digest(metadata["plan"])
+    digest(metadata["sourceEdition"])
+    require(len(metadata["attempts"]) == len(metadata["outcomes"]), "attempt denominator")
+    for attempt in metadata["attempts"]:
+        digest(attempt)
+    names, identities, loaded_pairs = {"manifest.json"}, set(), []
+    for outcome in metadata["outcomes"]:
+        key = (outcome["participant"], outcome["session"])
+        require(key not in identities, "duplicate participant/session")
+        identities.add(key)
+        observation = outcome.get("observation")
+        prepared = None
+        if observation is not None:
+            recall_name = digest(observation) + "-recall.json"
+            require(recall_name in files, "missing prepared recall")
+            prepared = parse(files[recall_name])
+            require(prepared["schemaVersion"] == "prepared-recall/v1", "prepared recall schema")
+            require((prepared["participant"], prepared["session"]) == key and prepared["observation"] == observation, "foreign recall observation")
+            require(prepared["sourceEdition"] == metadata["sourceEdition"], "foreign recall source edition")
+            names.add(recall_name)
+        if outcome["execution"] == "failed":
+            require(outcome.get("failure") is not None and outcome.get("mapping") is None
+                    and outcome.get("run") is None and outcome["structuralValidity"] == "not-produced", "failed outcome masquerades as success")
+            continue
+        require(outcome["execution"] == "complete" and outcome["structuralValidity"] == "checked"
+                and outcome.get("failure") is None and prepared is not None, "invalid complete outcome")
+        run = outcome["mapping"]
+        require(run["config"] == metadata["config"] and run["run"] == outcome["run"]
+                and run["registration"] == outcome["registration"] and run["readiness"] == outcome["readiness"], "foreign batch run")
+        pair, payloads = check_run(run, files)
+        names |= payloads
+        require(pair["reference"][0]["inventory"]["digest"] == prepared["inventory"], "foreign prepared inventory")
+        require([u["unit"] for u in outcome["units"]] == [u["id"] for u in pair["reference"][1]["units"]], "unit outcome denominator")
+        loaded_pairs.append(pair)
+    require(set(files) == names, "unaccounted batch payload")
+    return {"schema": schema, "pairs": loaded_pairs, "outcomes": metadata["outcomes"], "metadata": metadata}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group(required=True)
@@ -236,11 +370,16 @@ def main():
     if args.directory:
         files = {}
         for path in args.directory.iterdir():
-            require(path.is_file(), "unsupported directory entry")
+            require(path.is_file() and not path.is_symlink(), "unsupported directory entry")
             with path.open(encoding="utf-8", newline="") as stream:
                 files[path.name] = stream.read()
-        record, tables = read(files)
-        print(json.dumps({"status": "pass", "mapping": record["record_digest"], "units": len(tables["units"]), "qualification": "package/schema/projection checks; not contextual derivation admission"}))
+        if parse(files.get("manifest.json", "{}" )).get("schemaVersion") == "mapping-exchange/v0.1":
+            record, tables = read(files)
+            result = {"mapping": record["record_digest"], "units": len(tables["units"])}
+        else:
+            publication = read_publication(files)
+            result = {"schema": publication["schema"], "pairs": len(publication["pairs"]), "attempts": len(publication["outcomes"])}
+        print(json.dumps({"status": "pass", **result, "qualification": "package/schema/projection checks; not contextual derivation admission"}))
     else:
         values = {}
         for line in args.fixture_log.read_text().splitlines():

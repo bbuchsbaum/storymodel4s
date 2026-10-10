@@ -5,6 +5,7 @@ import io.circe.Json
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{FileAlreadyExistsException, Files, LinkOption, Path, StandardOpenOption}
 import scala.util.control.NonFatal
+import scala.jdk.CollectionConverters.*
 import storymodel4s.codec.Canonical
 import storymodel4s.core.Checksum
 
@@ -47,6 +48,18 @@ private[pipeline] object StudyArtifacts:
           )
           json <- Canonical.parse(expectedManifest).left.map(_ => Refusal.Corrupt)
           entries <- json.hcursor.get[Vector[Json]]("files").left.map(_ => Refusal.Corrupt)
+          names <- entries.traverse(_.hcursor.get[String]("path").left.map(_ => Refusal.Corrupt))
+          _ <- Either.cond(
+            {
+              val listing = Files.list(output)
+              try
+                listing.iterator().asScala.map(_.getFileName.toString).toSet ==
+                  (names.toSet + "manifest.json") && names.distinct.size == names.size
+              finally listing.close()
+            },
+            (),
+            Refusal.Corrupt
+          )
           _ <- entries.traverse_ { entry =>
             for
               name <- entry.hcursor.get[String]("path").left.map(_ => Refusal.Corrupt)

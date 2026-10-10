@@ -222,3 +222,15 @@ for both declared annotation timelines and edition playback. Existing `on` facto
 edition-only. Axis identity/kind and exact integer extents remain checked; codecs and temporal
 support retain annotation clocks. Rejected alternative: fabricate a film edition so ordinary
 annotation ticks pass an edition-only constructor.
+
+### 2026-10-10 paired exchange adoption
+
+The public mapping facade publishes `mapping-exchange-pair/v1` over two unchanged
+`mapping-exchange/v0.1` members. The pair is constructed from one checked `MappingRun.Execution`;
+its execution, originating evidence, source, inventory and member profiles remain bound.
+The JVM run/batch envelopes retain provider registration and every participant outcome, including
+failed attempts without a mapping. Completion manifests are written last and resume verifies
+exact bytes. Rejected alternative: a second set of mapping tables or caller-assembled pairs,
+which would duplicate semantics or permit unrelated records to imply common evidence.
+The independent Python consumer checks the wire and relational joins; it does not certify
+execution from untrusted self-described bytes or replace contextual Scala admission.

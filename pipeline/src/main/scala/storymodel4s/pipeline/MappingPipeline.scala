@@ -3,7 +3,7 @@ package storymodel4s.pipeline
 import io.circe.Json
 import java.nio.file.Path
 import storymodel4s.align.*
-import storymodel4s.codec.{Canonical, MappingCodecs}
+import storymodel4s.codec.{Canonical, MappingCodecs, MappingExchange}
 import storymodel4s.core.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.recall.*
@@ -462,6 +462,37 @@ object MappingPipeline:
     val (files, manifest) = artifacts(batch)
     StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
 
+  private def exchangeFiles(run: Run): Either[String, Vector[(String, String)]] =
+    MappingExchange.encode(run.execution).left.map(_.toString).map { bundle =>
+      bundle.files.map { (name, text) => s"${run.identity.hex}--$name" -> text }
+    }
+
+  /** Export the original pair and lossless tables, retaining the facade's provider registration. */
+  def publishExchange(run: Run, output: Path, resume: Boolean): Either[String, Checksum] =
+    exchangeFiles(run).flatMap { files =>
+      val manifest = StudyArtifacts.manifest("mapping-exchange-run/v1", files, runMetadata(run))
+      StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
+    }
+
+  /** Failed attempts stay in the batch manifest even when they have no mapping files. */
+  private[pipeline] def exchangeArtifacts(
+      batch: Batch
+  ): Either[String, (Vector[(String, String)], String)] =
+    import cats.syntax.all.*
+    batch.outcomes.flatMap(_.run).traverse(exchangeFiles).map { pairs =>
+      val (original, manifest) = artifacts(batch)
+      val inputs = original.filter(_._1.endsWith("-recall.json"))
+      val files = inputs ++ pairs.flatten
+      val metadata = Canonical.parse(manifest).toOption.get.hcursor.downField("metadata").focus.get
+      files -> StudyArtifacts.manifest("mapping-exchange-batch/v1", files, metadata)
+    }
+
+  /** Complete paired exchange through the same source, outcomes and publication boundary. */
+  def publishExchange(batch: Batch, output: Path, resume: Boolean): Either[String, Checksum] =
+    exchangeArtifacts(batch).flatMap { (files, manifest) =>
+      StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
+    }
+
 /** A thin offline command shares preparation, execution and publication with the typed API. */
 object MappingCli:
   val Template: String =
@@ -506,7 +537,13 @@ object MappingCli:
     */
   def run(args: List[String], out: String => Unit, err: String => Unit): Int =
     def refuse(reason: String): Int = { err(reason); 2 }
-    def execute(study: String, settings: String, output: String, resume: Boolean): Int =
+    def execute(
+        study: String,
+        settings: String,
+        output: String,
+        resume: Boolean,
+        exchange: Boolean
+    ): Int =
       val result = for
         configPath <- scala.util
           .Try(Path.of(settings).toAbsolutePath)
@@ -527,7 +564,9 @@ object MappingCli:
         prepared <- StudyCli.load(study).left.map(_.toString)
         outcomes <- MappingPipeline.batch(prepared, resolved).left.map(_.toString)
         destination <- scala.util.Try(Path.of(output)).toEither.left.map(_.getMessage)
-        receipt <- MappingPipeline.publish(outcomes, destination, resume)
+        receipt <-
+          if exchange then MappingPipeline.publishExchange(outcomes, destination, resume)
+          else MappingPipeline.publish(outcomes, destination, resume)
       yield (outcomes.outcomes, receipt)
       result match
         case Left(reason)               => refuse(reason)
@@ -546,10 +585,15 @@ object MappingCli:
           then 4
           else 0
     args match
-      case List("template")                               => out(Template); 0
-      case List("run", study, config, output)             => execute(study, config, output, false)
-      case List("run", study, config, output, "--resume") => execute(study, config, output, true)
-      case _ => refuse("mappingRun template | run STUDY.json CONFIG.json OUTPUT [--resume]")
+      case List("template")                   => out(Template); 0
+      case List("run", study, config, output) => execute(study, config, output, false, false)
+      case List("run", study, config, output, "--resume") =>
+        execute(study, config, output, true, false)
+      case List("exchange", study, config, output) => execute(study, config, output, false, true)
+      case List("exchange", study, config, output, "--resume") =>
+        execute(study, config, output, true, true)
+      case _ =>
+        refuse("mappingRun template | run|exchange STUDY.json CONFIG.json OUTPUT [--resume]")
 
 object mappingRun:
   def main(args: Array[String]): Unit =
