@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala
+@@ -252,7 +252,7 @@
+         Refusal.InvalidTiming
+       )
+       _ <- require(
+-        rows.forall(r => r(0) == value.participant && r(1) == value.session),
++        rows.forall(_ => true),
+         Refusal.ForeignTiming
+       )
+       artifact = Checksum.ofBytes(bytes)

@@ -1,0 +1,498 @@
+[
+  {
+    "name": "derived-record-values",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "align/src/main/scala/storymodel4s/align/mappingresult.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingRunSuite -- \"--tests=genuine derived stages cannot certify changed normalized values|one strict content evidence object supplies both actual projections\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        4
+      ]
+    ],
+    "named_failure": "genuine derived stages cannot certify changed normalized values",
+    "failures": [
+      "==> X storymodel4s.align.MappingRunSuite.genuine derived stages cannot certify changed normalized values 0.047s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/MappingRunSuite.scala:122"
+    ],
+    "test_selection": "genuine derived stages cannot certify changed normalized values|one strict content evidence object supplies both actual projections",
+    "source_sha256": "ab6d678a1f29158fbc058056efa5cd3183549267b5022f411ac2f3600920637d",
+    "patch_sha256": "23fc3a8b680b16670851baa3d3e1a7f6dfd171a4791bb030ae77443416327420",
+    "log_sha256": "6f89c48b358f298f3a75081e20cb52f0e46eaf2a9eb0182d6222556aa48ae9ef"
+  },
+  {
+    "name": "stripped-execution",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "align/src/main/scala/storymodel4s/align/mappingresult.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingRunSuite -- \"--tests=local evaluated links cannot shed their execution and move to foreign source content|one strict content evidence object supplies both actual projections\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        4
+      ]
+    ],
+    "named_failure": "local evaluated links cannot shed their execution and move to foreign source content",
+    "failures": [
+      "==> X storymodel4s.align.MappingRunSuite.local evaluated links cannot shed their execution and move to foreign source content 0.05s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/MappingRunSuite.scala:179"
+    ],
+    "test_selection": "local evaluated links cannot shed their execution and move to foreign source content|one strict content evidence object supplies both actual projections",
+    "source_sha256": "bf0bca45412bc66cf66bea2a6b96f35b01049eeaa170add621c9878f997d1f9e",
+    "patch_sha256": "718b9909c20998882774ea416cc2e6ec48c764600c55a3c988d650635346c8b0",
+    "log_sha256": "3651cb0d0b74769ff70e99b1173042b574ff2b5ea7109d5131e3712594716f60"
+  },
+  {
+    "name": "zero-mass-fill-origin",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "align/src/main/scala/storymodel4s/align/mapping.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingRunSuite -- \"--tests=requested fill into an admitted zero-mass candidate retains fill origin and zero mass|one strict content evidence object supplies both actual projections\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        4
+      ]
+    ],
+    "named_failure": "requested fill into an admitted zero-mass candidate retains fill origin and zero mass",
+    "failures": [
+      "==> X storymodel4s.align.MappingRunSuite.requested fill into an admitted zero-mass candidate retains fill origin and zero mass 0.093s munit.FailException: align/src/test/scala/storymodel4s/align/MappingRunSuite.scala:223 assertion failed"
+    ],
+    "test_selection": "requested fill into an admitted zero-mass candidate retains fill origin and zero mass|one strict content evidence object supplies both actual projections",
+    "source_sha256": "d3229a932176e21c948af29f15642fbb959238eef341b1080a64cee3fef64e03",
+    "patch_sha256": "7d3777f25080f510f4703da6581a2d43791337d8491161f4689cc99858d80735",
+    "log_sha256": "646d18f11924f8d62f7978a6e19f461a9bee4fd3a38d7e20db65a68f2bb32f6b"
+  },
+  {
+    "name": "failed-batch-config",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.MappingPipelineSuite -- \"--tests=all-failed batches bind configuration source and attempted input bytes|explicit profile and budgets reject invalid settings without environment fallback\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        5
+      ]
+    ],
+    "named_failure": "all-failed batches bind configuration source and attempted input bytes",
+    "failures": [
+      "==> X storymodel4s.pipeline.MappingPipelineSuite.all-failed batches bind configuration source and attempted input bytes 0.265s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingPipelineSuite.scala:215 values are the same, expected 2 different values: 131b68357ce15942ba85bf2c9a953c7c21047d3944ddddd5bf8257069a25e14a is equal to 131b68357ce15942ba85bf2c9a953c7c21047d3944ddddd5bf8257069a25e14a"
+    ],
+    "test_selection": "all-failed batches bind configuration source and attempted input bytes|explicit profile and budgets reject invalid settings without environment fallback",
+    "source_sha256": "a79477932d909ad1b89773d756b851a2fa6d8ac5ad77505706934df2a1fb155e",
+    "patch_sha256": "88126e8c1cef548e112380b9bd052df84c80c5faa50d3a0286ea45b5ee184f92",
+    "log_sha256": "d85707226f580db804ab180152a04e5278aef32fcf23f6e0850c2d5d73d16226"
+  },
+  {
+    "name": "failed-batch-attempts",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.MappingPipelineSuite -- \"--tests=all-failed batches bind configuration source and attempted input bytes|explicit profile and budgets reject invalid settings without environment fallback\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        5
+      ]
+    ],
+    "named_failure": "all-failed batches bind configuration source and attempted input bytes",
+    "failures": [
+      "==> X storymodel4s.pipeline.MappingPipelineSuite.all-failed batches bind configuration source and attempted input bytes 0.319s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingPipelineSuite.scala:230 values are the same, expected 2 different values: 98d3031e77ce5d3e1c8961ea76466cf7185e78173ee53646b352a00543e1ddab is equal to 98d3031e77ce5d3e1c8961ea76466cf7185e78173ee53646b352a00543e1ddab"
+    ],
+    "test_selection": "all-failed batches bind configuration source and attempted input bytes|explicit profile and budgets reject invalid settings without environment fallback",
+    "source_sha256": "8a27362709afb9cd13a4583e605ef0fd2f4e462d7fa32204b1fe817b9c5e25c9",
+    "patch_sha256": "07d9482d801bf6b3444e9047d81345d3ac1712404a9c924eda9ecd97896d6072",
+    "log_sha256": "b23411b1f604c9781832c88ffde7fba2a69300ea9f27d901138258ec3e47b31e"
+  },
+  {
+    "name": "resume-bytes",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.MappingPipelineSuite -- \"--tests=resume verifies every output and never silently overwrites historical runs|explicit profile and budgets reject invalid settings without environment fallback\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        5
+      ]
+    ],
+    "named_failure": "resume verifies every output and never silently overwrites historical runs",
+    "failures": [
+      "==> X storymodel4s.pipeline.MappingPipelineSuite.resume verifies every output and never silently overwrites historical runs 0.765s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingPipelineSuite.scala:91"
+    ],
+    "test_selection": "resume verifies every output and never silently overwrites historical runs|explicit profile and budgets reject invalid settings without environment fallback",
+    "source_sha256": "a7a0252552bb772e69f3f932295fb0e506d238eb57af5e763ed05eac2b9979b8",
+    "patch_sha256": "c8f9d6d84680c0df66f29cd88ca644bb3a10b5a604cdd9a1a034feb5f5b79f8f",
+    "log_sha256": "0ac696e0ad2771cc453f391928f0b867cc3f1cab14753e56ced7939e39cd6889"
+  },
+  {
+    "name": "foreign-timing",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyPreparationSuite -- \"--tests=timing preserves exact onset missingness and intervals without changing words|duplicate observations and invalid config refuse before output\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        13
+      ]
+    ],
+    "named_failure": "timing preserves exact onset missingness and intervals without changing words",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyPreparationSuite.timing preserves exact onset missingness and intervals without changing words 0.641s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyPreparationSuite.scala:105"
+    ],
+    "test_selection": "timing preserves exact onset missingness and intervals without changing words|duplicate observations and invalid config refuse before output",
+    "source_sha256": "43cdc18ae07b26e4408021ceb3ad196b98b0f7944568885a6d5d49253864e2b9",
+    "patch_sha256": "ab5b6060daaea7eab1a8c698e34ce04f7251b9324b0ba3d1e1181b9a2752efeb",
+    "log_sha256": "534ea33ffb609d9fbf37b572e2b84b89e32251398c59b51b4ee5a64f6560be3e"
+  },
+  {
+    "name": "recall-source-edition",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyPreparationSuite -- \"--tests=changed source edition refuses an old prepared recall|duplicate observations and invalid config refuse before output\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        13
+      ]
+    ],
+    "named_failure": "changed source edition refuses an old prepared recall",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyPreparationSuite.changed source edition refuses an old prepared recall 0.442s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyPreparationSuite.scala:76"
+    ],
+    "test_selection": "changed source edition refuses an old prepared recall|duplicate observations and invalid config refuse before output",
+    "source_sha256": "db206336c91d053b984cf44fec3b82083bd6882c94415d11369f1a55b0ef0f08",
+    "patch_sha256": "e777ed6516249c3c9b128408ce05ff14e2c353ebdd621b25f44c3f31c22a255f",
+    "log_sha256": "164ba1386702f561faa09025a6870dd38e9f57db64c002cc328b49592a80db84"
+  },
+  {
+    "name": "completion-marker",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyPreparationSuite -- \"--tests=a truncated completion write never becomes a published manifest|duplicate observations and invalid config refuse before output\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        13
+      ]
+    ],
+    "named_failure": "a truncated completion write never becomes a published manifest",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyPreparationSuite.a truncated completion write never becomes a published manifest 0.372s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyPreparationSuite.scala:265 assertion failed"
+    ],
+    "test_selection": "a truncated completion write never becomes a published manifest|duplicate observations and invalid config refuse before output",
+    "source_sha256": "eac0f53485ba0a1f2cf6069616df924ae11008ad2681f32e57035d4ad9f00322",
+    "patch_sha256": "072df3633d3ba36135075a99fb308f0b4e99b92234514e78dea418f4fc028622",
+    "log_sha256": "02599dd74ef8c7fa17dcdccc0f5ea597ac481f2c2f9155c70e23c59c0e366d6e"
+  },
+  {
+    "name": "group-support-union",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "align/src/main/scala/storymodel4s/align/bridge/TimedSourceView.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyPreparationSuite -- \"--tests=timed annotations preserve points disjoint intervals missing loci and part clocks|duplicate observations and invalid config refuse before output\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        13
+      ]
+    ],
+    "named_failure": "timed annotations preserve points disjoint intervals missing loci and part clocks",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyPreparationSuite.timed annotations preserve points disjoint intervals missing loci and part clocks 0.414s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyPreparationSuite.scala:367"
+    ],
+    "test_selection": "timed annotations preserve points disjoint intervals missing loci and part clocks|duplicate observations and invalid config refuse before output",
+    "source_sha256": "a8c8a20d14240727c548146a0d1da2b047126cac86ca03ceb13d4bcdc5b9d9a0",
+    "patch_sha256": "d3a1104097eef772a5ab39219eb4dc6a782ea299a4337b97bdd84c7bf87eeb30",
+    "log_sha256": "0c6079b7242a3ac4b5e8e630ff3afe2964d87c65e0c3e08ea76e033371af1d36"
+  },
+  {
+    "name": "independent-frame-pin",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.CaptionMappingSuite -- \"--tests=wrong outcome bytes independent frame pins and source support refuse|verified replay retains draft authority and both consumers retain each profile evidence\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        5
+      ]
+    ],
+    "named_failure": "wrong outcome bytes independent frame pins and source support refuse",
+    "failures": [
+      "==> X storymodel4s.pipeline.CaptionMappingSuite.wrong outcome bytes independent frame pins and source support refuse 0.034s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/CaptionMappingSuite.scala:222"
+    ],
+    "test_selection": "wrong outcome bytes independent frame pins and source support refuse|verified replay retains draft authority and both consumers retain each profile evidence",
+    "source_sha256": "44e26908a1431eb505ec1ee3e20600f004a15b1279ec248edf20a21afee7bc2c",
+    "patch_sha256": "77b53cd8259b827004d49fd1f0985f54f9b2d210bf36cbdd7a38e4a2c465b585",
+    "log_sha256": "8a3e0e129fdcf6261b239e9d2e76aa0aa7fb7e350b2cbd040433a10960d22aac"
+  },
+  {
+    "name": "run-constructor",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/Test/clean",
+      "pipeline/testOnly storymodel4s.probes.MappingBoundarySuite -- \"--tests=MappingPipeline.Run constructor refuses with matching positive control|MappingPipeline.Run copy refuses with matching positive control\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        38
+      ]
+    ],
+    "named_failure": "MappingPipeline.Run constructor refuses with matching positive control",
+    "failures": [
+      "==> X storymodel4s.probes.MappingBoundarySuite.MappingPipeline.Run constructor refuses with matching positive control 0.027s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingBoundarySuite.scala:37 assertion failed"
+    ],
+    "test_selection": "MappingPipeline.Run constructor refuses with matching positive control|MappingPipeline.Run copy refuses with matching positive control",
+    "source_sha256": "3ac8fcda0c6db22ca46d4ee1e75c9c8fca152bff84dab0890e7e0d3c644f5bde",
+    "patch_sha256": "0162245b4ace13edb30ea1457ef829a2c957cc1ed101568167e05b70685ecc10",
+    "log_sha256": "679706f833053f615471522663095fbff4855dea5f8d60053f82671d568bdc49"
+  },
+  {
+    "name": "annotation-interval-codec",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "codecJVM/testOnly storymodel4s.codec.AnnotationMappingCodecSuite -- \"--tests=ordinary annotation interval and point codec preserves exact large ticks without execution|ordinary text codec remains available without execution\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        0
+      ]
+    ],
+    "named_failure": "ordinary annotation interval and point codec preserves exact large ticks without execution",
+    "failures": [
+      "==> X storymodel4s.codec.AnnotationMappingCodecSuite.ordinary annotation interval and point codec preserves exact large ticks without execution 0.611s munit.FailException: codec/src/test/scala/storymodel4s/codec/AnnotationMappingCodecSuite.scala:10 Wire(Domain(InvariantViolation(interval/playback,axis is not an edition-playback axis)))"
+    ],
+    "test_selection": "ordinary annotation interval and point codec preserves exact large ticks without execution|ordinary text codec remains available without execution",
+    "source_sha256": "c3ad72d1459d49ca7e34fd3a7df83867fb1562be5054e0482507b53979998941",
+    "patch_sha256": "5c3242f7aa81bffece2a1bfaf75ca3ef320101031ecd44ee2a01e4a7b5a291c0",
+    "log_sha256": "fa05d1feb570cd57ed32eee89e090162c6c033e0fa78090b47a1e96ada4ac930"
+  },
+  {
+    "name": "annotation-point-codec",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "codecJVM/testOnly storymodel4s.codec.AnnotationMappingCodecSuite -- \"--tests=ordinary annotation interval and point codec preserves exact large ticks without execution|ordinary text codec remains available without execution\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        0
+      ]
+    ],
+    "named_failure": "ordinary annotation interval and point codec preserves exact large ticks without execution",
+    "failures": [
+      "==> X storymodel4s.codec.AnnotationMappingCodecSuite.ordinary annotation interval and point codec preserves exact large ticks without execution 0.61s munit.FailException: codec/src/test/scala/storymodel4s/codec/AnnotationMappingCodecSuite.scala:10 Wire(Domain(InvariantViolation(coordinate/playback,axis is not an edition-playback axis)))"
+    ],
+    "test_selection": "ordinary annotation interval and point codec preserves exact large ticks without execution|ordinary text codec remains available without execution",
+    "source_sha256": "14c7fb6ec8e043287b93301a5113ff6d5edec1554875f969b280a743ff3d7b17",
+    "patch_sha256": "ba9808d07c8d6aa8ba50227c45b026c8c404b9890ccd6bea658d83da46b7797f",
+    "log_sha256": "41a440d48308131a1428cedf34e5c962f6908741eb495f66a66b15a1c96b1817"
+  },
+  {
+    "name": "annotation-extent",
+    "kind": "guard",
+    "candidate_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+    "path": "core/src/main/scala/storymodel4s/core/source.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "coreJVM/testOnly storymodel4s.core.AnnotationAxisSuite -- \"--tests=explicit annotation ticks intervals and points preserve kind extent and exact large ticks|a non-positive extent is refused, as for any playback-shaped axis\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": false,
+    "totals": [
+      [
+        1,
+        1,
+        0,
+        0,
+        4
+      ]
+    ],
+    "named_failure": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks",
+    "failures": [
+      "==> X storymodel4s.core.AnnotationAxisSuite.explicit annotation ticks intervals and points preserve kind extent and exact large ticks 0.031s munit.FailException: core/src/test/scala/storymodel4s/core/AnnotationAxisSuite.scala:68 assertion failed"
+    ],
+    "test_selection": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks|a non-positive extent is refused, as for any playback-shaped axis",
+    "source_sha256": "d18d622e8e8d749e37d9a5db7add78c5485ef40d7f14cc53ecffc685d8db1382",
+    "patch_sha256": "9544340b77bcd8a718f371ba80f125550113fa02246aa6bf984b2d7f0312bf8f",
+    "log_sha256": "71de0c389910ed2a2e7e37f5ae1b1d4404fcbda94066e73ae36537501df2106b"
+  }
+]

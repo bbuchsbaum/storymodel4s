@@ -1,0 +1,11 @@
+--- a/codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala
+@@ -308,7 +308,7 @@
+             id <- field[String](value, "axis")
+             axis <- lookupAxis(id)
+             tick <- field[Json](value, "tick").flatMap(decimal(_, "anchor.tick"))
+-            at <- domain(PlaybackInstant.onTimeAxis(axis, tick))
++            at <- domain(PlaybackInstant.on(axis, tick))
+           yield EvidenceAnchor.MediaPoint(b, s, at)
+         case "shot" =>
+           for

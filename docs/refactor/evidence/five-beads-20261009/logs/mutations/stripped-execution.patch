@@ -1,0 +1,11 @@
+--- a/align/src/main/scala/storymodel4s/align/mappingresult.scala
++++ b/align/src/main/scala/storymodel4s/align/mappingresult.scala
+@@ -50,7 +50,7 @@
+           link.fidelity.isInstanceOf[FidelityStatus.Assessed] ||
+           link.termSupport.isInstanceOf[TermSupportStatus.Evaluated])
+       }
+-      if owners.isEmpty && unboundLocalLinks then
++      if owners.isEmpty && unboundLocalLinks && false then
+         Left(MappingRefusal.BindingMismatch("local evidence execution required"))
+       else if owners.isEmpty then Right(result)
+       else if owners.size != 1 then Left(MappingRefusal.BindingMismatch("execution"))

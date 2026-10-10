@@ -1,0 +1,11 @@
+--- a/core/src/main/scala/storymodel4s/core/source.scala
++++ b/core/src/main/scala/storymodel4s/core/source.scala
+@@ -770,7 +770,7 @@
+       Left(SourceCanon.inv("coordinate/time", "axis is not a declared time axis"))
+     else
+       axis.extent match
+-        case pt: AxisExtent.PlaybackTicks if tick < pt.start || tick >= pt.endExclusive =>
++        case pt: AxisExtent.PlaybackTicks if tick < pt.start && tick >= pt.endExclusive =>
+           Left(
+             SourceCanon.fmt(
+               "PlaybackCoordinate",

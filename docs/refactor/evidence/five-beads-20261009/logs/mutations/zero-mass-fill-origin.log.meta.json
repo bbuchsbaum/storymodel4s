@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-10T02:44:46.694930+00:00",
+  "finished_utc": "2026-10-10T02:45:15.643344+00:00",
+  "duration_seconds": 28.948022,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.MappingRunSuite -- \"--tests=requested fill into an admitted zero-mass candidate retains fill origin and zero mass|one strict content evidence object supplies both actual projections\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/five-beads/integration-mutations/zero-mass-fill-origin.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3057
+}

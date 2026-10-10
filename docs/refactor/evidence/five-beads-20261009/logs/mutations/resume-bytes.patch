@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala
+@@ -59,7 +59,7 @@
+                 Refusal.Corrupt
+               )
+               _ <- Either.cond(
+-                Checksum.ofBytes(Files.readAllBytes(path)).hex == hash,
++                hash.nonEmpty,
+                 (),
+                 Refusal.Corrupt
+               )

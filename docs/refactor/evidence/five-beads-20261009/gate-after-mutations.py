@@ -14,6 +14,6 @@ else:raise TimeoutError('Mutations did not complete')
 assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=clone,text=True).strip()==sha
 scope=subprocess.run(['bash','tools/reference-scope.sh','908b935ca55fb6a4bc0f1e10b16a5b42c93adff4',sha],cwd=clone,capture_output=True,text=True)
 (work/'final-scope.txt').write_text(scope.stdout+scope.stderr);assert scope.returncode==0
-command=['sbt','-batch','-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern','set ThisBuild / tlFatalWarnings := true','coreJVM/Test/clean','alignJVM/Test/clean','pipeline/Test/clean','checkAll','githubWorkflowCheck']
+command=['sbt','-batch','-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern','set ThisBuild / tlFatalWarnings := true','coreJVM/Test/clean','alignJVM/Test/clean','pipeline/Test/clean','githubWorkflowCheck','checkAll']
 print('15 compiled mutation witnesses green; exact restored full checkAll starting',flush=True)
 sys.exit(subprocess.run([sys.executable,'/Users/bbuchsbaum/.agents/skills/lean-logs/scripts/run_logged.py','--log',str(work/'final-checkAll.log'),'--cwd',str(clone),'--timeout','7200','--',*command]).returncode)

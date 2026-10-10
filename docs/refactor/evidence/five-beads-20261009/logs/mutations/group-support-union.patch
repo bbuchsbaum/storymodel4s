@@ -1,0 +1,11 @@
+--- a/align/src/main/scala/storymodel4s/align/bridge/TimedSourceView.scala
++++ b/align/src/main/scala/storymodel4s/align/bridge/TimedSourceView.scala
+@@ -193,7 +193,7 @@
+             Right(group(g) -> SourceSupportStatus.unlocated(UnlocatedReason.NoLocusInSource))
+           else
+             EvidenceSupport
+-              .of(located.head._1, located.map(_._2))
++              .of(located.head._1, located.take(1).map(_._2))
+               .left
+               .map(e => invalid(e.message))
+               .map(v => group(g) -> SourceSupportStatus.located(TypedSupport.Anchored(v)))

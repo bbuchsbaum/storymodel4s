@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala
+@@ -92,7 +92,7 @@
+         else
+           val pending = output.resolve(".manifest.pending")
+           write(pending, completion.getBytes(UTF_8))
+-          if !Files.readAllBytes(pending).sameElements(completion.getBytes(UTF_8)) then
++          if !Files.readAllBytes(pending).sameElements(completion.getBytes(UTF_8)) && false then
+             Left(Refusal.Corrupt)
+           else
+             Files.createLink(output.resolve("manifest.json"), pending): Unit

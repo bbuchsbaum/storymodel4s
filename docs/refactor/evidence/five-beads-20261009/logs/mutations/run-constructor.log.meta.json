@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-10T02:49:23.080083+00:00",
+  "finished_utc": "2026-10-10T02:50:01.283267+00:00",
+  "duration_seconds": 38.202691,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/Test/clean",
+    "pipeline/testOnly storymodel4s.probes.MappingBoundarySuite -- \"--tests=MappingPipeline.Run constructor refuses with matching positive control|MappingPipeline.Run copy refuses with matching positive control\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/five-beads/integration-mutations/run-constructor.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 8094
+}

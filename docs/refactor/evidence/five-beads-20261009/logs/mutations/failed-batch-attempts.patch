@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -311,7 +311,7 @@
+         prepared.source.representation.digest.hex,
+         prepared.config.profile,
+         configText(config)
+-      ) ++ prepared.outcomes.map(_.attempt.hex)
++      ) ++ prepared.outcomes.map(_.input.participant)
+     )
+     override def equals(other: Any): Boolean = other match
+       case b: Batch => identity == b.identity

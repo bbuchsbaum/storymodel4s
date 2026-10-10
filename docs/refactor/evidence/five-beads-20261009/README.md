@@ -4,7 +4,8 @@ Source candidate: `fa80dfa388d6470dfde51322f8e1035b6d8521a4`, over
 `908b935ca55fb6a4bc0f1e10b16a5b42c93adff4`. Actor: `codex-five-beads-20261009`.
 The owner requested all five existing beads be completed in this effort. Mote remains authoritative.
 
-Current qualification is pending final mutation, full source and pinned consumer gates. Source
+All fifteen integration mutations are independently verified. Qualification is pending the full
+source and pinned consumer gates. Source
 review PASS by independent `/root/reconstruction_review` covers exact `902eaa..fa80dfa`;
 reconstruction source and receipts have a separate exact `902eaa` PASS in the adjacent evidence
 folder. A source verdict alone does not authorize closure.
@@ -36,7 +37,8 @@ only after this gate succeeds. All tools run serially in owned standalone clones
 Local runs use the recorded grakern checkout override; these are LocallyObserved engineering
 checks, not hosted-CI, scientific-efficacy, calibration, scanner-clock or release qualification.
 Caption fixtures are existing admitted F0 artifacts and explicitly synthetic replay controls;
-no participant or licensed corpus inputs, provider calls or model downloads were used.
+no participant or licensed corpus inputs, remote provider calls or model downloads were used.
+The ONNX fixtures execute the local provider and verify its checked replay.
 
 Existing qualification remains available in `../local-reference-20261009/`,
 `../s2b3-onnx-registration-20261007/`, `../s2b4-historical-parity-20261008/`,
@@ -47,3 +49,9 @@ the final gate here establishes the integrated local revision.
 The legacy TSV confidence mismatch remains the existing follow-up
 `bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ`. `TemporalQuery.Region.on` remains edition-only;
 ordinary annotation preparation and support do not claim that query capability.
+
+The first annotation-extent mutation attempt reached its named assertion but selected no
+passing sibling because its filter contained a comma. It is retained as inconclusive, not a kill.
+The corrected filter ran two tests: one named assertion failure and one passing control.
+The runner now refuses pre-existing log paths to prevent stale-log reuse on a retry.
+All fifteen final mutation witnesses qualify on exact `fa80dfa`.

@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -310,7 +310,7 @@
+         prepared.source.edition.hex,
+         prepared.source.representation.digest.hex,
+         prepared.config.profile,
+-        configText(config)
++        "configuration-erased"
+       ) ++ prepared.outcomes.map(_.attempt.hex)
+     )
+     override def equals(other: Any): Boolean = other match

@@ -1,0 +1,11 @@
+--- a/codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala
+@@ -286,7 +286,7 @@
+       end <- field[Json](value, "end_exclusive_tick").flatMap(
+         decimal(_, "interval.end_exclusive_tick")
+       )
+-      interval <- domain(PlaybackInterval.onTimeAxis(axis, start, end))
++      interval <- domain(PlaybackInterval.on(axis, start, end))
+     yield interval
+     def intervals(value: Json): Result[PlaybackIntervalSet] = read[Vector[Json]](value)
+       .flatMap(_.traverse(readInterval))

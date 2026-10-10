@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -37,7 +37,7 @@
+   val CaptionProfile: String = "mapping-caption-pair/v1"
+ 
+   /** The facade mints this value by consuming its registration's actual originating evidence. */
+-  final class Run private[MappingPipeline] (
++  final class Run (
+       val execution: MappingRun.Execution,
+       val reference: MappingResult,
+       val reconstruction: MappingResult,

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-10T02:44:19.752997+00:00",
+  "finished_utc": "2026-10-10T02:44:46.600322+00:00",
+  "duration_seconds": 26.846936,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.MappingRunSuite -- \"--tests=local evaluated links cannot shed their execution and move to foreign source content|one strict content evidence object supplies both actual projections\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/five-beads/integration-mutations/stripped-execution.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3279
+}

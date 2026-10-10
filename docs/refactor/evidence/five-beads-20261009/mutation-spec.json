@@ -161,7 +161,7 @@
     "module": "coreJVM",
     "suite": "storymodel4s.core.AnnotationAxisSuite",
     "expected": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks",
-    "selection": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks|a non-positive extent is refused, as for any playback-shaped axis",
+    "selection": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks|an annotation table gets a bundle with NO edition and no media claim",
     "clean": false
   }
 ]

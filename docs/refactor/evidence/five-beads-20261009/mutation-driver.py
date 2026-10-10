@@ -1,19 +1,22 @@
 import argparse,difflib,hashlib,json,re,subprocess,sys
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--clone',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--sha',required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--clone',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--sha',required=True);p.add_argument('--resume',action='store_true');a=p.parse_args()
 sha=a.sha
 assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=a.clone,text=True).strip()==sha
 assert not subprocess.check_output(['git','status','--porcelain'],cwd=a.clone,text=True).strip()
 a.out.mkdir(parents=True,exist_ok=True)
 mutations=json.loads(Path(__file__).with_name('mutation-spec.json').read_text())
-results=[]
+results=json.loads((a.out/'mutations.json').read_text()) if a.resume else []
 for m in mutations:
+ if a.resume and any(r['name']==m['name'] and r['qualified'] and r['candidate_sha']==sha for r in results):continue
+ results=[r for r in results if r['name']!=m['name']]
  name,rel,old,new,expected,pattern,suite=[m[k] for k in ('name','path','old','new','expected','selection','suite')]
  path=a.clone/rel;original=path.read_text();assert original.count(old)==1,(name,original.count(old));mutant=original.replace(old,new)
  patch=''.join(difflib.unified_diff(original.splitlines(True),mutant.splitlines(True),fromfile='a/'+rel,tofile='b/'+rel));(a.out/(name+'.patch')).write_text(patch);path.write_text(mutant)
  command=['sbt','-batch','-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern','set ThisBuild / tlFatalWarnings := true',*([m['module']+'/Test/clean'] if m.get('clean',False) else []),m['module']+'/testOnly '+suite+' -- "--tests='+pattern+'"']
  log=a.out/(name+'.log')
  try:
+  assert not log.exists(), 'Refuse stale log reuse: '+str(log)
   status=subprocess.run([sys.executable,'/Users/bbuchsbaum/.agents/skills/lean-logs/scripts/run_logged.py','--log',str(log),'--cwd',str(a.clone),'--timeout','1200','--',*command],capture_output=True,text=True)
   text=log.read_text();failures=[s for s in text.splitlines() if '==> X ' in s]
   rows=[[int(v or 0) for v in m] for m in re.findall(r'(?:Passed|Failed): Total (\d+), Failed (\d+), Errors (\d+), Passed (\d+)(?:, (?:Ignored|Skipped) (\d+))?',text)]
