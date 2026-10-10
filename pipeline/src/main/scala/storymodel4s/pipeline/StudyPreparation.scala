@@ -1,19 +1,21 @@
 package storymodel4s.pipeline
 
 import cats.syntax.all.*
+import cats.data.NonEmptyVector
 import io.circe.{Decoder, Json}
 import io.circe.jawn.JawnParser
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{Files, LinkOption, Path}
 import scala.util.control.NonFatal
 import storymodel4s.align.*
-import storymodel4s.align.bridge.TextSourceView
-import storymodel4s.codec.{Canonical, RecallTimingCodecs, TextSourceArtifactCodec}
+import storymodel4s.align.bridge.{StorySourceView, TextSourceView}
+import storymodel4s.codec.{Canonical, RecallTimingCodecs, StoryModelCodec, TextSourceArtifactCodec}
 import storymodel4s.codec.RecallCodecs.given
 import storymodel4s.core.*
 import storymodel4s.corpus.intake.RecallTimingIntake
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.story.{ModelStatus, StoryValidator, TextModel}
 
 /** Offline ordinary-file adaptation preserves observation identity before any mapping runs. */
 object StudyPreparation:
@@ -30,6 +32,8 @@ object StudyPreparation:
   enum SourceInput:
     case Text(path: String, kind: SurfaceUnitKind)
     case CheckedText(path: String, kind: SurfaceUnitKind)
+    case SurfaceAtlas(path: String, atlas: String, kind: SurfaceUnitKind)
+    case StoryModel(path: String)
     case TimedAnnotations(path: String, parts: String)
     case CheckedTimed(path: String)
     case Video(path: String)
@@ -75,6 +79,19 @@ object StudyPreparation:
       val representation: SourceRepresentation,
       val artifact: String
   ) extends SourceView:
+    private val textPackage: Option[TextSourcePackage] = underlying match
+      case text: TextSourceView => Some(text.sourcePackage)
+      case _                    => None
+    private val model: Option[TextModel[ModelStatus.Validated]] =
+      StoryModelCodec.decode(artifact).toOption.flatMap(StoryValidator.validate(_).validated)
+
+    /** Existing source exchange is available only when the input was a checked text package. */
+    def textSourceExchange: Option[TextSourceArtifactCodec.Bundle] =
+      textPackage.map(TextSourceArtifactCodec.exchange)
+
+    /** Narrative targets are available only from a decoded and revalidated StoryModel. */
+    def narrativeModel: Option[TextModel[ModelStatus.Validated]] = model
+
     val edition: Checksum = Checksum.ofText(artifact)
     val nodes: Vector[NodeSummary] = underlying.nodes
     def node(ref: SourceNodeRef): Option[NodeSummary] = underlying.node(ref)
@@ -159,6 +176,34 @@ object StudyPreparation:
             .map(v =>
               new Source(v, v.representation, TextSourceArtifactCodec.encode(v.sourcePackage))
             )
+        case SourceInput.SurfaceAtlas(path, atlas, kind) =>
+          for
+            text <- read(root, path)
+            generated <- TextSourcePackage.fromUtf8(text).left.map(_ => Refusal.InvalidSource)
+            atlasBytes <- read(root, atlas)
+            supplied <- TextSourceCli
+              .checkedAtlas(generated, atlasBytes)
+              .left
+              .map(_ => Refusal.InvalidSource)
+            view <- TextSourceView.of(supplied, kind).left.map(_ => Refusal.InvalidSource)
+          yield new Source(view, view.representation, TextSourceArtifactCodec.encode(supplied))
+        case SourceInput.StoryModel(path) =>
+          for
+            bytes <- read(root, path)
+            text <- utf8(bytes)
+            draft <- StoryModelCodec.decode(text).left.map(_ => Refusal.InvalidSource)
+            model <- StoryValidator.validate(draft).validated.toRight(Refusal.InvalidSource)
+            view = StorySourceView.validated(model)
+            representation <- SourceRepresentation
+              .of(
+                view,
+                NonEmptyVector.one(BundleEntry.text(model.source.canonicalChecksum)),
+                None,
+                view.nodes.map(node => node.ref -> SourceSupportStatus.located(node.support)).toMap
+              )
+              .left
+              .map(_ => Refusal.InvalidSource)
+          yield new Source(view, representation, StoryModelCodec.encode(model))
         case SourceInput.TimedAnnotations(path, parts) =>
           for
             csv <- read(root, path)
@@ -372,17 +417,24 @@ object StudyPreparation:
         else if format == "checked-timed" then
           require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
             .map(_ => SourceInput.CheckedTimed(path))
+        else if format == "story-model" then
+          require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
+            .map(_ => SourceInput.StoryModel(path))
         else
           for
             kind <- field[String](s, "kind")
             k <- SurfaceUnitKind.values.find(_.toString == kind).toRight(Refusal.InvalidConfig)
             _ <- require(
-              s.asObject.exists(_.keys.toSet == Set("format", "path", "kind")),
+              s.asObject.exists(_.keys.toSet ==
+                (if format == "surface-atlas" then Set("format", "path", "atlas", "kind")
+                 else Set("format", "path", "kind"))),
               Refusal.InvalidConfig
             )
             value <- format match
               case "text"         => Right(SourceInput.Text(path, k))
               case "checked-text" => Right(SourceInput.CheckedText(path, k))
+              case "surface-atlas" =>
+                field[String](s, "atlas").map(SourceInput.SurfaceAtlas(path, _, k))
               case "video"        => Right(SourceInput.Video(path))
               case _              => Left(Refusal.InvalidConfig)
           yield value

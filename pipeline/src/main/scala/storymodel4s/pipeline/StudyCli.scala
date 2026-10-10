@@ -134,7 +134,10 @@ object StudyCli:
     val recalls = value.outcomes
       .flatMap(_.result.toOption)
       .map(r => s"recall-${r.observation.hex}.json" -> StudyPreparation.encode(r))
-    val files = source +: recalls
+    val sourceTables = value.source.textSourceExchange.toVector.flatMap(_.files).collect {
+      case (name, content) if name != "source.json" => s"source-$name" -> content
+    }
+    val files = (source +: sourceTables) ++ recalls
     val metadata = preview(value)
     files -> StudyArtifacts.manifest("prepared-study/v1", files, metadata)
 
@@ -142,6 +145,8 @@ object StudyCli:
     "sourceEdition" -> Json.fromString(StudyPreparation.edition(value.source).hex),
     "sourceRepresentation" -> Json.fromString(value.source.representation.digest.hex),
     "sourceTargets" -> Json.fromInt(value.source.nodes.size),
+    "narrativeModel" -> Json.fromBoolean(value.source.narrativeModel.nonEmpty),
+    "textSourceExchange" -> Json.fromBoolean(value.source.textSourceExchange.nonEmpty),
     "profile" -> Json.fromString(value.config.profile),
     "network" -> Json.fromString("offline"),
     "runtime" -> Json.fromString("JVM"),

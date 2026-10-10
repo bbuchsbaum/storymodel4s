@@ -19,32 +19,37 @@ private[pipeline] object TextSourceCli:
     try Right(Files.readAllBytes(Path.of(path)))
     catch case NonFatal(_) => Left(Refusal.InputRead)
 
+  /** Bind a supplied atlas to these exact raw UTF-8 bytes before accepting its target units. */
+  private[pipeline] def checkedAtlas(
+      generated: TextSourcePackage,
+      atlasBytes: Array[Byte]
+  ): Either[Refusal, TextSourcePackage] =
+    for
+      raw <- Canonical
+        .parse(new String(atlasBytes, StandardCharsets.UTF_8))
+        .left
+        .map(_ => Refusal.AtlasRefused)
+      idText <- raw.hcursor.get[String]("storyId").left.map(_ => Refusal.AtlasRefused)
+      id <- StoryId.from(idText).left.map(_ => Refusal.AtlasRefused)
+      // Atlas IDs may be caller-selected. Its checksum must still bind these actual bytes.
+      text <- StorySource
+        .fromText(generated.source.rawText, explicitId = Some(id))
+        .left
+        .map(_ => Refusal.InputRefused)
+      checked <- SurfaceAtlasArtifactCodec
+        .decode(text, atlasBytes)
+        .left
+        .map(_ => Refusal.AtlasRefused)
+      supplied <- TextSourcePackage.fromAtlas(checked).left.map(_ => Refusal.AtlasRefused)
+    yield supplied
+
   private def load(input: String, atlas: Option[String]): Either[Refusal, TextSourcePackage] =
     for
       bytes <- read(input)
       generated <- TextSourcePackage.fromUtf8(bytes).left.map(_ => Refusal.InputRefused)
       source <- atlas match
         case None       => Right(generated)
-        case Some(path) =>
-          for
-            atlasBytes <- read(path)
-            raw <- Canonical
-              .parse(new String(atlasBytes, StandardCharsets.UTF_8))
-              .left
-              .map(_ => Refusal.AtlasRefused)
-            idText <- raw.hcursor.get[String]("storyId").left.map(_ => Refusal.AtlasRefused)
-            id <- StoryId.from(idText).left.map(_ => Refusal.AtlasRefused)
-            // Atlas IDs may be caller-selected. Its checksum must still bind these actual bytes.
-            text <- StorySource
-              .fromText(generated.source.rawText, explicitId = Some(id))
-              .left
-              .map(_ => Refusal.InputRefused)
-            checked <- SurfaceAtlasArtifactCodec
-              .decode(text, atlasBytes)
-              .left
-              .map(_ => Refusal.AtlasRefused)
-            supplied <- TextSourcePackage.fromAtlas(checked).left.map(_ => Refusal.AtlasRefused)
-          yield supplied
+        case Some(path) => read(path).flatMap(checkedAtlas(generated, _))
     yield source
 
   private[pipeline] def publish(

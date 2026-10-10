@@ -138,3 +138,21 @@ mass and reconstruction model posterior remain distinct; neither is calibrated c
 The reader verifies package consistency, not the truth of an untrusted producer's execution
 claim. `MappingExchange.decodePair(files, execution)` additionally requires the actual owning
 execution and matches the complete canonical pair.
+
+## Offline source preparation
+
+`studyPrepare prepare STUDY.json OUTPUT` accepts `text`, `checked-text`,
+`surface-atlas` (raw `path`, `atlas`, and segment `kind`), and `story-model` source
+formats. Supplied atlases must match the exact raw source. Story models are decoded
+and structurally revalidated before their narrative targets enter mapping.
+
+For a text package, prepared output includes `source.json`, `source-segments.tsv`,
+and `source-manifest.json`: the last two retain the original text-source exchange
+bytes under explicit names. The outer completion manifest binds all three. Segment
+offsets are UTF-16 code units; the source keeps raw and canonical text separately.
+The source exchange declares narrative-model and encoding-seconds capabilities
+unavailable when absent. No presentation schedule is inferred from text length.
+
+The independent `examples/mapping/test_offline_source.py` court reads an actual
+public preparation output, checks both manifests and exact Unicode slices, and
+checks the absent capabilities. It is a synthetic interoperability control.
