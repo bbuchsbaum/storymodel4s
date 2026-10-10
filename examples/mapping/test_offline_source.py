@@ -73,6 +73,12 @@ class OfflineSourceReaderTests(unittest.TestCase):
         self.assertTrue(canonical.startswith("\ufeffA\u0301😀"))
         self.assertIn("\n", canonical)
         self.assertEqual(source["atlas"]["canonicalSourceChecksum"], sha(canonical.encode("utf-8")))
+        tokens = {unit["ordinal"]: unit for unit in source["atlas"]["units"]
+                  if unit["kind"] == "Token"}
+        for ordinal, start, end, expected in ((2, 3, 5, "😀"), (4, 7, 8, "B")):
+            span = tokens[ordinal]["span"]
+            self.assertEqual(span, {"start": start, "end": end})
+            self.assertEqual(utf16_slice(canonical, span["start"], span["end"]), expected)
         rows = list(csv.DictReader(io.StringIO(payloads["segments.tsv"]), delimiter="\t"))
         self.assertEqual(len(rows), len(source["segments"]))
         for row, segment in zip(rows, source["segments"]):
