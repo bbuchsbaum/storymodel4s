@@ -272,7 +272,7 @@ object StructuredReconstruction:
     val units = rows.map(_.unit).toSet
     if !rows.map(_.total).sum.isFinite || rows.map(_.unit).distinct.size != rows.size || rows
         .exists(r =>
-          !r.isWellFormed || !r.total.isFinite ||
+          !r.isWellFormed || !r.total.isFinite || !r.anchorMass.values.forall(_.isFinite) ||
             r.mass.keys.flatMap(_.anchor).exists(ref => grouping.source.node(ref).isEmpty)
         )
     then Left(refused("rows contain duplicate units, invalid mass or foreign source targets"))
@@ -281,7 +281,7 @@ object StructuredReconstruction:
           f.targets.keys.exists((unit, _) => !units(unit))
       )
     then Left(refused("fill is disabled or belongs to different grouping/units"))
-    else Right(decode(rows, grouping, policy, fill))
+    else decode(rows, grouping, policy, fill)
 
   private def decision(
       row: AlignmentRow,
@@ -313,15 +313,17 @@ object StructuredReconstruction:
       grouping: Grouping,
       policy: DecisionPolicy,
       fill: Option[FillRequest]
-  ): Vector[Decision] =
+  ): Either[AlignError, Vector[Decision]] =
     val massByScene: Vector[Map[Int, Double]] = rows.map { r =>
       r.anchorMass.toVector
         .flatMap { case (ref, m) => grouping.membership.get(ref).filter(_ => m > 0.0).map(_ -> m) }
         .groupMapReduce(_._1)(_._2)(_ + _)
     }
+    if !massByScene.forall(_.values.forall(_.isFinite)) then
+      return Left(refused("group mass overflow"))
     val scenes = massByScene.flatMap(_.keys).distinct.sorted
     if rows.isEmpty || scenes.isEmpty || policy.order == OrderPolicy.Unconstrained then
-      rows.map(r => decision(r, r.mapSource, None, Origin.RawSourceMaximum))
+      Right(rows.map(r => decision(r, r.mapSource, None, Origin.RawSourceMaximum)))
     else
       val n = rows.size
       val s = scenes.size
@@ -362,6 +364,7 @@ object StructuredReconstruction:
                   // ordinary step forward costs nothing and only leaps are discouraged.
                   val skipped = math.max(0L, scenes(j).toLong - scenes(k).toLong - 1L)
                   val step = best(i - 1)(k) - fwd * skipped
+                  if !step.isFinite then return Left(refused("forward score overflow"))
                   if step > bestVal then
                     bestVal = step
                     bestArg = k
@@ -379,6 +382,7 @@ object StructuredReconstruction:
               var k = 0
               while k < s do
                 val step = best(i - 1)(k) - (if k > j then lambda * (k - j) else 0.0)
+                if !step.isFinite then return Left(refused("backward score overflow"))
                 if step > bestVal then
                   bestVal = step
                   bestArg = k
@@ -386,6 +390,7 @@ object StructuredReconstruction:
               best(i)(j) = bestVal + massByScene(i).getOrElse(scenes(j), 0.0)
               back(i)(j) = bestArg
               j += 1
+        if !best(i).forall(_.isFinite) then return Left(refused("accumulated score overflow"))
         i += 1
       var cur = 0
       j = 1
@@ -398,7 +403,7 @@ object StructuredReconstruction:
         chosen(i) = cur
         if i > 0 then cur = back(i)(cur)
         i -= 1
-      rows.zipWithIndex.map { case (row, idx) =>
+      Right(rows.zipWithIndex.map { case (row, idx) =>
         val scene = scenes(chosen(idx))
         val inScene = row.anchorMass.toVector.filter { case (ref, m) =>
           m > 0.0 && grouping.membership.get(ref).contains(scene)
@@ -414,4 +419,4 @@ object StructuredReconstruction:
             Some(scene),
             Origin.GroupConstrained
           )
-      }
+      })

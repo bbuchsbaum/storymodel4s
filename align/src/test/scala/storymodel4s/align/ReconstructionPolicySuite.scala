@@ -164,3 +164,33 @@ class ReconstructionPolicySuite extends FunSuite:
     assert(Grouping.of(nested, Vector(a -> 1, b -> 9)).isLeft)
     assert(Grouping.of(view, Vector(a -> 1, b -> 9)).isRight)
   }
+
+  test("regrouped finite row mass overflow refuses") {
+    val m = Double.MaxValue
+    val x = math.ulp(m) * 0.3
+    val nested = view.copy(nodes =
+      view.nodes.map(n => if n.ref == a then n.copy(level = 1) else n.copy(parent = Some(a)))
+    )
+    val grouped = right(Grouping.of(nested, Vector(a -> 1)))
+    val distorted = AlignState.Distorted(b, cats.data.NonEmptySet.one(Facet.Polarity))
+    val row = right(
+      AlignmentRow.of(
+        unit.id,
+        Map(AlignState.Source(a) -> m, AlignState.Source(b) -> x, distorted -> x)
+      )
+    )
+    assert(row.total.isFinite)
+    assert(row.anchorMass.values.forall(_.isFinite))
+    assert(!(m + (x + x)).isFinite)
+    assert(StructuredReconstruction.decide(Vector(row), grouped, hard).isLeft)
+  }
+
+  test("overflowing transition penalties refuse") {
+    val rows = Vector(
+      right(AlignmentRow.of(unit.id, Map(AlignState.Source(a) -> 1.0))),
+      right(AlignmentRow.of(AnnaFixture.u1.id, Map(AlignState.Source(b) -> 1.0)))
+    )
+    val policy =
+      right(DecisionPolicy.of(OrderPolicy.Nondecreasing, forwardPenalty = Double.MaxValue))
+    assert(StructuredReconstruction.decide(rows, grouping, policy).isLeft)
+  }
