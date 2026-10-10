@@ -1,0 +1,167 @@
+[
+  {
+    "name": "derived-record-values",
+    "path": "align/src/main/scala/storymodel4s/align/mappingresult.scala",
+    "old": "result.digest == expected.digest",
+    "new": "result.digest == expected.digest || true",
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.MappingRunSuite",
+    "expected": "genuine derived stages cannot certify changed normalized values",
+    "selection": "genuine derived stages cannot certify changed normalized values|one strict content evidence object supplies both actual projections",
+    "clean": false
+  },
+  {
+    "name": "stripped-execution",
+    "path": "align/src/main/scala/storymodel4s/align/mappingresult.scala",
+    "old": "owners.isEmpty && unboundLocalLinks",
+    "new": "owners.isEmpty && unboundLocalLinks && false",
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.MappingRunSuite",
+    "expected": "local evaluated links cannot shed their execution and move to foreign source content",
+    "selection": "local evaluated links cannot shed their execution and move to foreign source content|one strict content evidence object supplies both actual projections",
+    "clean": false
+  },
+  {
+    "name": "zero-mass-fill-origin",
+    "path": "align/src/main/scala/storymodel4s/align/mapping.scala",
+    "old": "actual.origin != StructuredReconstruction.Origin.RequestedFill",
+    "new": "actual.origin != StructuredReconstruction.Origin.RequestedFill || true",
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.MappingRunSuite",
+    "expected": "requested fill into an admitted zero-mass candidate retains fill origin and zero mass",
+    "selection": "requested fill into an admitted zero-mass candidate retains fill origin and zero mass|one strict content evidence object supplies both actual projections",
+    "clean": false
+  },
+  {
+    "name": "failed-batch-config",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "old": "prepared.config.profile,\n        configText(config)",
+    "new": "prepared.config.profile,\n        \"configuration-erased\"",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.MappingPipelineSuite",
+    "expected": "all-failed batches bind configuration source and attempted input bytes",
+    "selection": "all-failed batches bind configuration source and attempted input bytes|explicit profile and budgets reject invalid settings without environment fallback",
+    "clean": false
+  },
+  {
+    "name": "failed-batch-attempts",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "old": "prepared.outcomes.map(_.attempt.hex)",
+    "new": "prepared.outcomes.map(_.input.participant)",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.MappingPipelineSuite",
+    "expected": "all-failed batches bind configuration source and attempted input bytes",
+    "selection": "all-failed batches bind configuration source and attempted input bytes|explicit profile and budgets reject invalid settings without environment fallback",
+    "clean": false
+  },
+  {
+    "name": "resume-bytes",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "old": "Checksum.ofBytes(Files.readAllBytes(path)).hex == hash",
+    "new": "hash.nonEmpty",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.MappingPipelineSuite",
+    "expected": "resume verifies every output and never silently overwrites historical runs",
+    "selection": "resume verifies every output and never silently overwrites historical runs|explicit profile and budgets reject invalid settings without environment fallback",
+    "clean": false
+  },
+  {
+    "name": "foreign-timing",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "old": "rows.forall(r => r(0) == value.participant && r(1) == value.session)",
+    "new": "rows.forall(_ => true)",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyPreparationSuite",
+    "expected": "timing preserves exact onset missingness and intervals without changing words",
+    "selection": "timing preserves exact onset missingness and intervals without changing words|duplicate observations and invalid config refuse before output",
+    "clean": false
+  },
+  {
+    "name": "recall-source-edition",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "old": "Canonical.parse(encode(value)).contains(json)",
+    "new": "Canonical.parse(encode(value)).contains(json) || true",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyPreparationSuite",
+    "expected": "changed source edition refuses an old prepared recall",
+    "selection": "changed source edition refuses an old prepared recall|duplicate observations and invalid config refuse before output",
+    "clean": false
+  },
+  {
+    "name": "completion-marker",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "old": "!Files.readAllBytes(pending).sameElements(completion.getBytes(UTF_8))",
+    "new": "!Files.readAllBytes(pending).sameElements(completion.getBytes(UTF_8)) && false",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyPreparationSuite",
+    "expected": "a truncated completion write never becomes a published manifest",
+    "selection": "a truncated completion write never becomes a published manifest|duplicate observations and invalid config refuse before output",
+    "clean": false
+  },
+  {
+    "name": "group-support-union",
+    "path": "align/src/main/scala/storymodel4s/align/bridge/TimedSourceView.scala",
+    "old": "located.map(_._2)",
+    "new": "located.take(1).map(_._2)",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyPreparationSuite",
+    "expected": "timed annotations preserve points disjoint intervals missing loci and part clocks",
+    "selection": "timed annotations preserve points disjoint intervals missing loci and part clocks|duplicate observations and invalid config refuse before output",
+    "clean": false
+  },
+  {
+    "name": "independent-frame-pin",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala",
+    "old": "frames.identity == expected.framesIdentity",
+    "new": "(frames.identity == expected.framesIdentity || true)",
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.CaptionMappingSuite",
+    "expected": "wrong outcome bytes independent frame pins and source support refuse",
+    "selection": "wrong outcome bytes independent frame pins and source support refuse|verified replay retains draft authority and both consumers retain each profile evidence",
+    "clean": false
+  },
+  {
+    "name": "run-constructor",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "old": "final class Run private[MappingPipeline] (",
+    "new": "final class Run (",
+    "module": "pipeline",
+    "suite": "storymodel4s.probes.MappingBoundarySuite",
+    "expected": "MappingPipeline.Run constructor refuses with matching positive control",
+    "selection": "MappingPipeline.Run constructor refuses with matching positive control|MappingPipeline.Run copy refuses with matching positive control",
+    "clean": true
+  },
+  {
+    "name": "annotation-interval-codec",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala",
+    "old": "PlaybackInterval.onTimeAxis(axis, start, end)",
+    "new": "PlaybackInterval.on(axis, start, end)",
+    "module": "codecJVM",
+    "suite": "storymodel4s.codec.AnnotationMappingCodecSuite",
+    "expected": "ordinary annotation interval and point codec preserves exact large ticks without execution",
+    "selection": "ordinary annotation interval and point codec preserves exact large ticks without execution|ordinary text codec remains available without execution",
+    "clean": false
+  },
+  {
+    "name": "annotation-point-codec",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala",
+    "old": "PlaybackInstant.onTimeAxis(axis, tick)",
+    "new": "PlaybackInstant.on(axis, tick)",
+    "module": "codecJVM",
+    "suite": "storymodel4s.codec.AnnotationMappingCodecSuite",
+    "expected": "ordinary annotation interval and point codec preserves exact large ticks without execution",
+    "selection": "ordinary annotation interval and point codec preserves exact large ticks without execution|ordinary text codec remains available without execution",
+    "clean": false
+  },
+  {
+    "name": "annotation-extent",
+    "path": "core/src/main/scala/storymodel4s/core/source.scala",
+    "old": "tick < pt.start || tick >= pt.endExclusive",
+    "new": "tick < pt.start && tick >= pt.endExclusive",
+    "module": "coreJVM",
+    "suite": "storymodel4s.core.AnnotationAxisSuite",
+    "expected": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks",
+    "selection": "explicit annotation ticks intervals and points preserve kind extent and exact large ticks|a non-positive extent is refused, as for any playback-shaped axis",
+    "clean": false
+  }
+]

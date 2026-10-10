@@ -1,0 +1,110 @@
+[
+  {
+    "name": "chosen-mass",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "anchor.map(row.sourceMassOn)",
+    "new": "row.mapSource.map(row.sourceMassOn)",
+    "expected": "noncandidate fill has zero posterior mass and preserves original rows",
+    "selection": "noncandidate fill has zero posterior mass and preserves original rows|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "rank-overflow",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "math.max(0L, scenes(j).toLong - scenes(k).toLong - 1L)",
+    "new": "math.max(0, scenes(j) - scenes(k) - 1)",
+    "expected": "forward rank differences cannot overflow into a free leap",
+    "selection": "forward rank differences cannot overflow into a free leap|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "sum-overflow",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "!rows.map(_.total).sum.isFinite || rows.map(_.unit).distinct.size != rows.size || rows\n        .exists(r =>\n          !r.isWellFormed || !r.total.isFinite || !r.anchorMass.values.forall(_.isFinite) ||",
+    "new": "rows.map(_.unit).distinct.size != rows.size || rows\n        .exists(r =>\n          !r.isWellFormed || !r.anchorMass.values.forall(_.isFinite) ||",
+    "expected": "finite individual masses with overflowing sum refuse",
+    "selection": "finite individual masses with overflowing sum refuse|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "recall-fill-binding",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "fill.forall(_.recallBinding == recallIdentity(recall))",
+    "new": "fill.forall(_ => true)",
+    "expected": "same unit IDs do not permit foreign recall fill reuse",
+    "selection": "same unit IDs do not permit foreign recall fill reuse|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "fill-policy",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "policy.fill == FillPolicy.Disabled || f.grouping != grouping ||",
+    "new": "false || f.grouping != grouping ||",
+    "expected": "disabled fill refuses a supplied request",
+    "selection": "disabled fill refuses a supplied request|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "overlapping-groups",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "if found.size > 1 then",
+    "new": "if false then",
+    "expected": "overlapping hierarchy roots refuse while siblings are accepted",
+    "selection": "overlapping hierarchy roots refuse while siblings are accepted|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "backward-distance",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "lambda * (k - j)",
+    "new": "lambda * (scenes(k).toDouble - scenes(j).toDouble)",
+    "expected": "historical backward penalty uses group index distance",
+    "selection": "historical backward penalty uses group index distance|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "source-group-binding",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "ViewFingerprint.of(view) == ViewFingerprint.of(grouping.source) &&\n          MappingSourceRender.scope(view.nodes) == MappingSourceRender.scope(grouping.source.nodes)",
+    "new": "true",
+    "expected": "foreign source grouping and wrong-group fill refuse",
+    "selection": "foreign source grouping and wrong-group fill refuse|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "result-constructor",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "final class Result private[StructuredReconstruction] (",
+    "new": "final class Result (",
+    "expected": "Result refuses constructor with same-shape positive control",
+    "selection": "Result refuses constructor with same-shape positive control|Profile refuses Mirror with same-shape positive control",
+    "suite": "storymodel4s.probes.ReconstructionBoundarySuite"
+  },
+  {
+    "name": "regrouped-overflow",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "if !massByScene.forall(_.values.forall(_.isFinite)) then",
+    "new": "if false then",
+    "expected": "regrouped finite row mass overflow refuses",
+    "selection": "regrouped finite row mass overflow refuses|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "penalty-overflow",
+    "path": "align/src/main/scala/storymodel4s/align/reconstruction.scala",
+    "old": "if !step.isFinite then return Left(refused(\"forward score overflow\"))",
+    "new": "if false then return Left(refused(\"forward score overflow\"))",
+    "expected": "overflowing transition penalties refuse",
+    "selection": "overflowing transition penalties refuse|profile defaults disable fill and changes have distinct identities",
+    "suite": "storymodel4s.align.ReconstructionPolicySuite"
+  },
+  {
+    "name": "recursive-support",
+    "path": "align/src/main/scala/storymodel4s/align/mappingsource.scala",
+    "old": "val declared = descendants(children.getOrElse(ref, Vector.empty).toList, Set(ref))",
+    "new": "val declared = descendants(Nil, Set(ref)) ++ children.getOrElse(ref, Vector.empty).toSet",
+    "expected": "transitive unlocated descendants make a group support coverage partial",
+    "selection": "transitive unlocated descendants make a group support coverage partial|unlocated parent remains unavailable even with located children",
+    "suite": "storymodel4s.align.TemporalSupportSuite"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "actor": "codex-five-beads-20261009",
+  "issue": "bd-01M2TAD04SR823TQVG9VPNH6R3",
+  "branch": "codex/five-beads-20261009",
+  "base": "908b935ca55fb6a4bc0f1e10b16a5b42c93adff4",
+  "dashboard_session": "codex-c4898f51",
+  "clone": "/private/tmp/storymodel4s-s2b3-build",
+  "active_session": null,
+  "log": ".agent-work/five-beads/compile-04.log",
+  "state": "Exact902 reconstruction qualified: source9389pass5skip, pinnedconsumer485pass, 12mutation kills, independent local landing PASS. Integration drafts align tests60pass, pipeline main compiled; focused pipeline tests running.",
+  "next": "Finish focused integration tests; format and commit source; qualify new mutations and exact review; final checkAll and StoryAtlas before local integration/closing all five.",
+  "source_sha": "902eaa715e7d7810116f3b7ed725b7d2626cb3c2",
+  "mutation_session": null,
+  "mutation_output": ".agent-work/five-beads/mutations-v2",
+  "source_session": null,
+  "consumer_session": null,
+  "review": "PASS exact902 source and final receipts /root/reconstruction_review",
+  "draft_compile_session": 71228,
+  "draft_snapshot": ".agent-work/five-beads/draft-snapshot/manifest.json",
+  "draft_compile_log": ".agent-work/five-beads/compile-08.log"
+}

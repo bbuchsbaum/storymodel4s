@@ -1,0 +1,77 @@
+types defined by this candidate:
+  BundleEntry
+  BundleRole
+  Complete
+  Coverage
+  CoverageUnknownReason
+  Decision
+  DecisionPolicy
+  DeclaredComposition
+  FillPolicy
+  FillRequest
+  FrozenMonotoneScene
+  Grouping
+  LocalReferenceConsumerSuite
+  Located
+  MappingTarget
+  Media
+  MonotoneScene
+  OrderPolicy
+  Origin
+  PartOrder
+  Partial
+  Profile
+  ReconstructionBoundarySuite
+  ReconstructionDecisionControl
+  ReconstructionDecisionPolicyControl
+  ReconstructionFillRequestControl
+  ReconstructionGroupingControl
+  ReconstructionParitySuite
+  ReconstructionPolicySuite
+  ReconstructionProfileControl
+  ReconstructionResultControl
+  Result
+  SourceRepresentation
+  SourceSupportStatus
+  StructuredReconstruction
+  SupportCoverage
+  SupportRelation
+  Target
+  TemporalQuerySuite
+  TemporalSupportSuite
+  TextSource
+  Unknown
+  Unlocated
+  UnlocatedReason
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  amr-interop
+  codec
+  core
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  embed-grakern
+  embed-onnx
+  features
+  fixtures
+  interview
+  laws
+  media
+  pipeline
+  proposition
+  provider-agent
+  provider-parser
+  recall
+  story
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedGrakern/test; embedOnnx/test; featuresJVM/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

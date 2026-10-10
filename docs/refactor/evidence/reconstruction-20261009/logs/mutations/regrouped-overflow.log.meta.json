@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-10T01:47:40.865737+00:00",
+  "finished_utc": "2026-10-10T01:48:24.541138+00:00",
+  "duration_seconds": 43.674748,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJVM/testOnly storymodel4s.align.ReconstructionPolicySuite -- \"--tests=regrouped finite row mass overflow refuses|profile defaults disable fill and changes have distinct identities\""
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/five-beads/mutations-v2/regrouped-overflow.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 4198
+}

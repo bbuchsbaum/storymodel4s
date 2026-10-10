@@ -1,0 +1,86 @@
+{
+  "source_sha": "902eaa715e7d7810116f3b7ed725b7d2626cb3c2",
+  "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "exit_code": 0,
+  "totals": {
+    "total": 485,
+    "failed": 0,
+    "errors": 0,
+    "passed": 485,
+    "skipped": 0
+  },
+  "task_totals": [
+    {
+      "total": 22,
+      "failed": 0,
+      "errors": 0,
+      "passed": 22,
+      "skipped": 0
+    },
+    {
+      "total": 26,
+      "failed": 0,
+      "errors": 0,
+      "passed": 26,
+      "skipped": 0
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100,
+      "skipped": 0
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100,
+      "skipped": 0
+    },
+    {
+      "total": 13,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13,
+      "skipped": 0
+    },
+    {
+      "total": 13,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13,
+      "skipped": 0
+    },
+    {
+      "total": 74,
+      "failed": 0,
+      "errors": 0,
+      "passed": 74,
+      "skipped": 0
+    },
+    {
+      "total": 74,
+      "failed": 0,
+      "errors": 0,
+      "passed": 74,
+      "skipped": 0
+    },
+    {
+      "total": 59,
+      "failed": 0,
+      "errors": 0,
+      "passed": 59,
+      "skipped": 0
+    },
+    {
+      "total": 4,
+      "failed": 0,
+      "errors": 0,
+      "passed": 4,
+      "skipped": 0
+    }
+  ],
+  "raw_log_sha256": "bc23e19bec62fe93b2de5a5d2679893209ccc3422e2c6b12fb86035a98119750",
+  "qualification": "LocallyObserved; configured grakern override; no hosted CI claim"
+}
