@@ -126,6 +126,41 @@ class PairedReaderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "masquerades"):
             read_publication(files)
 
+    def test_completed_unit_summary_must_match_member_tables(self):
+        files = self.metadata(lambda m: m["outcomes"][0]["units"][0].update(reference="Failed", reconstruction="Excluded"))
+        with self.assertRaisesRegex(ValueError, "unit outcome status"):
+            read_publication(files)
+
+    def test_failed_attempt_cannot_invent_units_or_execution(self):
+        for field, value in (("units", [{"unit": "invented", "reference": "Failed", "reconstruction": "Failed"}]),
+                             ("registration", "0" * 64), ("readiness", "Ready")):
+            files = self.metadata(lambda m: m["outcomes"][-1].update({field: value}))
+            with self.assertRaises(ValueError):
+                read_publication(files)
+
+    def test_prepared_but_failed_attempt_preserves_every_unit(self):
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        first = manifest["metadata"]["outcomes"][0]
+        run_prefix = first["run"] + "--"
+        for name in list(files):
+            if name.startswith(run_prefix):
+                del files[name]
+        manifest["files"] = [e for e in manifest["files"] if not e["path"].startswith(run_prefix)]
+        first.update(execution="failed", structuralValidity="not-produced", failure="synthetic-failure-control",
+                     mapping=None, run=None, registration=None, readiness="not-executed")
+        for unit in first["units"]:
+            unit.update(reference="Failed", reconstruction="Failed")
+        files["manifest.json"] = json.dumps(manifest)
+        # Consistent failed-attempt control still accounts for the imported recall's unit.
+        self.assertEqual(len(read_publication(files)["pairs"]), 1)
+        for replacement in ([], [{**first["units"][0], "reference": "Complete"}]):
+            altered = copy.deepcopy(manifest)
+            altered["metadata"]["outcomes"][0]["units"] = replacement
+            bad = dict(files, **{"manifest.json": json.dumps(altered)})
+            with self.assertRaisesRegex(ValueError, "failed unit denominator or status"):
+                read_publication(bad)
+
     def test_duplicate_json_keys_refuse(self):
         files = self.files()
         files["manifest.json"] = files["manifest.json"].replace('{', '{"schemaVersion":"foreign",', 1)

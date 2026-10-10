@@ -408,6 +408,10 @@ object MappingPipeline:
     StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
 
   private[pipeline] def artifacts(batch: Batch): (Vector[(String, String)], String) =
+    def processingLabel(status: ProcessingStatus): String = status match
+      case ProcessingStatus.Complete                 => "Complete"
+      case ProcessingStatus.ExcludedByInputPolicy(_) => "Excluded"
+      case ProcessingStatus.Failed(_)                => "Failed"
     val outcomes = batch.outcomes
     val inputs = outcomes
       .flatMap(_.prepared)
@@ -436,13 +440,13 @@ object MappingPipeline:
               "reference" -> Json.fromString(
                 o.run
                   .flatMap(_.reference.outcome(u.id))
-                  .map(_.processing.toString)
+                  .map(o => processingLabel(o.processing))
                   .getOrElse("Failed")
               ),
               "reconstruction" -> Json.fromString(
                 o.run
                   .flatMap(_.reconstruction.outcome(u.id))
-                  .map(_.processing.toString)
+                  .map(o => processingLabel(o.processing))
                   .getOrElse("Failed")
               )
             )

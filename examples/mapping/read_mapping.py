@@ -345,7 +345,13 @@ def read_publication(files):
             names.add(recall_name)
         if outcome["execution"] == "failed":
             require(outcome.get("failure") is not None and outcome.get("mapping") is None
-                    and outcome.get("run") is None and outcome["structuralValidity"] == "not-produced", "failed outcome masquerades as success")
+                    and outcome.get("run") is None and outcome.get("registration") is None
+                    and outcome["readiness"] == "not-executed"
+                    and outcome["structuralValidity"] == "not-produced", "failed outcome masquerades as success")
+            expected_units = [] if prepared is None else [
+                {"unit": u["id"], "reference": "Failed", "reconstruction": "Failed"}
+                for u in prepared["graph"]["units"]]
+            require(outcome["units"] == expected_units, "failed unit denominator or status")
             continue
         require(outcome["execution"] == "complete" and outcome["structuralValidity"] == "checked"
                 and outcome.get("failure") is None and prepared is not None, "invalid complete outcome")
@@ -356,6 +362,9 @@ def read_publication(files):
         names |= payloads
         require(pair["reference"][0]["inventory"]["digest"] == prepared["inventory"], "foreign prepared inventory")
         require([u["unit"] for u in outcome["units"]] == [u["id"] for u in pair["reference"][1]["units"]], "unit outcome denominator")
+        for name in ("reference", "reconstruction"):
+            for summary, decision in zip(outcome["units"], pair[name][1]["decisions"]):
+                require(summary[name] == decision["processing_status"]["status"].capitalize(), "unit outcome status")
         loaded_pairs.append(pair)
     require(set(files) == names, "unaccounted batch payload")
     return {"schema": schema, "pairs": loaded_pairs, "outcomes": metadata["outcomes"], "metadata": metadata}
