@@ -185,7 +185,7 @@ The October 9 integration at source `fa80dfa` implements named reconstruction, G
 evidence, recall words/timing/support, the typed mapping facade and ordinary-file preparation.
 The [five-bead acceptance crosswalk](evidence/five-beads-20261009/README.md) binds these
 implementations to their existing tickets and exact qualification receipts. Source and pinned consumer gates pass;
-local integration and Mote closure follow exact-revision review. The public reference and strict registered ONNX
+independent review passed, local integration is complete, and all five beads are closed. The public reference and strict registered ONNX
 prerequisites already have their own qualified receipts. Both mappings now consume the same
 checked evidence, and the local ONNX provider/replay path has an actual paired consumer.
 
@@ -313,8 +313,8 @@ evidence, then public reference/reconstruction and ordinary-file facade. G1, sta
 broader integration and release acceptance stay open. Use RELEASE-QUEUE and live Mote, rather
 than dated next-task prose.
 
-**Current action, 9 October:** finish qualification and local landing of the five-bead
-integration above, then independent paired-exchange readback and an actual StoryAtlas opening.
+**Current action, 9 October:** the five-bead integration above is locally qualified and landed.
+Next are independent paired-exchange readback and an actual StoryAtlas opening.
 Use the [current queue](RELEASE-QUEUE.md#9-october-five-bead-integration) and live Mote.
 
 ## Completed fixture milestone: M1 (22 September 2026)

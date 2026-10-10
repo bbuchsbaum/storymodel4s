@@ -1,0 +1,59 @@
+{
+  "source_sha": "fa80dfa388d6470dfde51322f8e1035b6d8521a4",
+  "reviewed_local_landing_sha": "267e1405a9e9d878a04fe7d2143793ae7115868a",
+  "previous_main": "908b935ca55fb6a4bc0f1e10b16a5b42c93adff4",
+  "reviewer": "/root/reconstruction_review",
+  "verdict": "PASS for local landing; no BLOCKs or corrections",
+  "qualification": "LocallyObserved",
+  "mote_verified_at": "2026-10-10T03:41:32.796232Z",
+  "beads": [
+    {
+      "id": "bd-01M2TACM78289S4TECE91GT5K2",
+      "title": "G1: extract shared local mapping evidence and receipted scoring channels",
+      "status": "closed"
+    },
+    {
+      "id": "bd-01M2TAD04SR823TQVG9VPNH6R3",
+      "title": "G1: extract named structured reconstruction and decision policies",
+      "status": "closed"
+    },
+    {
+      "id": "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+      "title": "G2: typed mapping facade, explicit config and safe batch publication",
+      "status": "closed"
+    },
+    {
+      "id": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+      "title": "G2: stable recall words, timing and honest support projections",
+      "status": "closed"
+    },
+    {
+      "id": "bd-01M35B05TC6GBED9Z3HZMX618E",
+      "title": "[Workflow] Prepare source and recall inputs from ordinary local files",
+      "status": "closed"
+    }
+  ],
+  "live_claims_for_beads": 0,
+  "live_reservations_for_beads": 0,
+  "source_gate": {
+    "passed": 10004,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5,
+    "tasks": 56,
+    "exit": 0
+  },
+  "consumer_gate": {
+    "passed": 485,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "tasks": 10,
+    "exit": 0
+  },
+  "remote_push": false,
+  "preserved_unrelated_paths": [
+    ".mote/FORMAT.json",
+    ".mote/authority/"
+  ]
+}

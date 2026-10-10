@@ -19,4 +19,9 @@ The acceptance crosswalk agrees with the implementation and existing ticket boun
 
 Full source and pinned StoryAtlas gates exited zero: 10,004 source passes / five optional
 skips and 485 consumer passes / zero skips, with zero failed/errors. The independent final
-receipt/local-landing verdict remains pending. This is not hosted/scientific qualification.
+receipt/local-landing verdict is **PASS** for exact evidence candidate
+`267e1405a9e9d878a04fe7d2143793ae7115868a`, with no BLOCKs or corrections. The reviewer
+recomputed compressed-log hashes, byte counts, commands, exits and per-task totals, verified
+clean source/consumer/grakern revisions, and confirmed the successors of `fa80dfa` are docs-only.
+Current-queue wording preserves the separate exchange, actual Atlas-opening, lambda and broader
+release acceptance. This is LocallyObserved, not hosted/scientific qualification.

@@ -88,7 +88,7 @@ mote --actor YOUR-SESSION begin EXISTING-ID --paths PATH --note 'bounded accepta
 The reconstruction, shared-evidence G1, recall words/timing/support, mapping facade and
 ordinary-file preparation implementations are integrated at source `fa80dfa`. Their exact
 [acceptance crosswalk and qualification receipts](evidence/five-beads-20261009/README.md)
-cover all five existing beads. Source and pinned consumer gates pass; local integration and Mote closure follow exact-revision review.
+cover all five existing beads. Source and pinned consumer gates pass; independent review passed, local integration is complete, and all five beads are closed.
 
 The next product acceptance is:
 

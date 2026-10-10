@@ -6,7 +6,8 @@ The owner requested all five existing beads be completed in this effort. Mote re
 
 All fifteen integration mutations are independently verified. The full source gate passed:
 10,004 passed, zero failed/errors, five optional skips over 56 tasks. The pinned consumer gate passed all 485 tests across ten tasks, with no skips or failures.
-Both gates exited zero, including formatting. Final receipt review and local landing are pending. Source
+Both gates exited zero, including formatting. Independent final receipt review passed, and local `main` advanced to reviewed
+`267e1405a9e9d878a04fe7d2143793ae7115868a`. Source
 review PASS by independent `/root/reconstruction_review` covers exact `902eaa..fa80dfa`;
 reconstruction source and receipts have a separate exact `902eaa` PASS in the adjacent evidence
 folder. A source verdict alone does not authorize closure.
@@ -72,3 +73,11 @@ All fifteen final mutation witnesses qualify on exact `fa80dfa`.
 
 The full source gate includes all platforms (JVM, JavaScript, Native) for portable modules and
 all JVM-only modules. See [reference scope](reference-scope.txt) and the receipts for commands.
+
+## Local completion
+
+All five beads are closed in Mote, verified together after their completion commands. Their
+claims and reservations are released. [Completion receipt](local-completion.json) binds the
+reviewed local landing `267e1405`, exact source `fa80dfa`, gate totals and tracker state.
+Subsequent documentation/Mote commits record this audit without changing the tested source.
+No remote push was performed; unrelated Mote configuration/authority state was preserved.

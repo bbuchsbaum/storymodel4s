@@ -11,6 +11,14 @@
   "mutation_output": ".agent-work/five-beads/integration-mutations",
   "source_log": ".agent-work/five-beads/final-checkAll.log",
   "consumer_log": ".agent-work/five-beads/final-consumer.log",
-  "state": "Exact fa80dfa source and 15 integration mutations independently reviewed PASS. Full checkAll: 10004 passed, 0 failed/errors, 5 optional skips, 56 tasks. Pinned StoryAtlas: 485 passed, 0 failed/errors/skips, 10 tasks. Both exit0 incl format; raw logs archived. Final independent receipt review/local integration/closure pending; remote unchanged.",
-  "next": "Review exact evidence/docs commit, refresh live ownership, integrate locally and close all five; commit narrow closure audit and verify main."
+  "state": "Complete: all five beads closed, no live claims/reservations. Reviewed local main landing267e1405 includes exact sourcefa80dfa, full source10004passes/5optional skips and consumer485passes/0skips. All zero failures/errors. Fifteen integration plus twelve reconstruction mutants at recorded sources independently qualified. Closure metadata follows as docs/Mote-only successor; no remote push.",
+  "next": "No remaining work for these five beads. Existing paired-exchange independent reader, actual Atlas-opening and lambda follow-ons remain in the delivery queue.",
+  "local_landing_sha": "267e1405a9e9d878a04fe7d2143793ae7115868a",
+  "closed_beads": [
+    "bd-01M2TACM78289S4TECE91GT5K2",
+    "bd-01M2TAD04SR823TQVG9VPNH6R3",
+    "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+    "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+    "bd-01M35B05TC6GBED9Z3HZMX618E"
+  ]
 }
