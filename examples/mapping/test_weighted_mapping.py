@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from read_weighted_mapping import fraction, read_sweep
+from read_weighted_mapping import fraction, read_sweep, selected
+from check_corruptions import repack
 
 
 class WeightedReaderTests(unittest.TestCase):
@@ -50,6 +51,55 @@ class WeightedReaderTests(unittest.TestCase):
         files["manifest.json"] = json.dumps(manifest)
         with self.assertRaisesRegex(ValueError, "weighted member table"):
             read_sweep(files)
+
+    def interior(self):
+        files = self.fixtures["text"]
+        prefix = json.loads(files["manifest.json"])["metadata"]["members"][1]["prefix"]
+        return {name[len(prefix):]: value for name, value in files.items() if name.startswith(prefix)}
+
+    def change_record(self, change):
+        files = self.interior()
+        payload = {name[len("record--"):]: value for name, value in files.items() if name.startswith("record--")}
+        record = json.loads(payload["mapping.json"])
+        change(record)
+        files.update({"record--" + name: value for name, value in repack(payload, record).items()})
+        manifest = json.loads(files["manifest.json"])
+        for entry in manifest["files"]:
+            raw = files[entry["path"]].encode()
+            entry["sha256"] = hashlib.sha256(raw).hexdigest()
+            if "bytes" in entry:
+                entry["bytes"] = str(len(raw))
+        files["manifest.json"] = json.dumps(manifest)
+        return files
+
+    def test_interior_positive_control(self):
+        self.assertEqual(selected(self.interior())[0]["measure_kind"], "ModelPosterior")
+
+    def test_coherently_rehashed_wrong_measure_kind_refuses(self):
+        def change(record):
+            for outcome in record["outcomes"]:
+                for row in outcome["mapping_links"]:
+                    if row["measure_kind"] == "ModelPosterior":
+                        row["measure_kind"] = "NormalizedScoreMass"
+        with self.assertRaisesRegex(ValueError, "conflated weighted measure kind"):
+            selected(self.change_record(change))
+
+    def test_coherently_rehashed_unnormalized_mass_refuses(self):
+        def change(record):
+            for outcome in record["outcomes"]:
+                for row in outcome["mapping_links"]:
+                    if row["measure_kind"] == "ModelPosterior":
+                        row["raw_value"] = "0x0000000000000000"
+        with self.assertRaisesRegex(ValueError, "invalid weighted mass"):
+            selected(self.change_record(change))
+
+    def test_coherently_rehashed_wrong_decision_basis_refuses(self):
+        def change(record):
+            for outcome in record["outcomes"]:
+                if outcome["decision"]["status"] == "present":
+                    outcome["decision"]["value"]["basis"]["measure_kind"] = "RawScore"
+        with self.assertRaisesRegex(ValueError, "weighted decision basis"):
+            selected(self.change_record(change))
 
 
 if __name__ == "__main__":

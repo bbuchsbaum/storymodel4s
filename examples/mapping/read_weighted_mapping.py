@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-from read_mapping import digest, envelope, parse, read, read_publication, require
+from read_mapping import digest, envelope, number, parse, read, read_publication, require
 
 COLUMNS = ["lambda", "profile_id", "record_profile_id", "selection_id", "execution_id",
            "shared_evidence_id", "measure_kind", "record_digest"]
@@ -38,6 +38,18 @@ def selected(files):
     require(set(files) == {"manifest.json", "members.tsv"} | {"record--" + k for k in payloads}, "weighted payload set")
     require(meta["record_digest"] == record["record_digest"], "weighted record digest")
     require(meta["measure_kind"] == ("NormalizedScoreMass" if n == 0 else "ModelPosterior"), "weighted measure kind")
+    expected_kind = meta["measure_kind"]
+    allowed_kinds = {expected_kind} if n == 0 else {expected_kind, "RawScore"}
+    require(all(row["measure_kind"] in allowed_kinds for row in tables["alternatives"]), "conflated weighted measure kind")
+    for unit in tables["units"]:
+        values = [number(row["raw_value"]) for row in tables["alternatives"]
+                  if row["unit"] == unit["id"] and row["measure_kind"] == expected_kind]
+        if values:
+            require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= 1e-12, "invalid weighted mass")
+    for outcome in record["outcomes"]:
+        decision = outcome["decision"]
+        if decision["status"] == "present":
+            require(decision["value"]["basis"]["measure_kind"] == expected_kind, "weighted decision basis")
     require(record["policies"]["decision_policy_id"] == {"status": "declared", "id": "mapping-run:" + meta["record_profile_id"]}, "weighted record profile")
     if 0 < n < d:
         require(meta["record_profile_id"] == meta["profile_id"], "interior profile")
@@ -45,6 +57,7 @@ def selected(files):
     require(len(derived) == 2 and {s["stage"] for s in derived} == {"Inference", "Decision"}, "weighted stages")
     for stage in derived:
         receipt = stage["provenance"]["receipt"]
+        require(receipt["stage"] == stage["stage"], "weighted receipt stage")
         member = "Reference" if n == 0 else "Reconstruction" if n == d else f"Weighted/{meta['profile_id']}/{meta['lambda']}"
         require(receipt["policy"] == f"mapping-run/v1/{member}/{stage['stage']}", "weighted stage policy")
         require(receipt["config"] == meta["execution_id" if n in (0, d) else "selection_id"], "weighted stage identity")
