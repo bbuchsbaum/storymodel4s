@@ -40,7 +40,7 @@ The parser supports quoted commas/newlines and escaped quotes. Decimal times are
 seconds. Blank onset and end mean missing; onset alone means onset-only; both mean the supplied
 half-open interval. An end without onset refuses. No duration or scanner alignment is inferred.
 
-The output contains the canonical checked source, one `prepared-recall/v1` wrapper per successful
+The output contains the canonical checked source, one `prepared-recall/v2` wrapper per successful
 observation, and a completion manifest listing all outcomes and file hashes. `StudyPreparation.decode`
 requires the expected source edition, reconstructs inventory identity, and invokes the public graph
 and timing codecs. Failed participants remain in the manifest and do not discard successes.
@@ -110,3 +110,11 @@ order readouts remain missing capabilities. `--resume` verifies the complete man
 files; it never accepts an incomplete or changed output directory. Retry into a new directory to
 preserve the failed attempt. This deterministic offline profile executes once and rejects a
 nonzero network or retry budget.
+
+## Open the results in Atlas
+
+The [local workspace workflow](study-workspaces.md) connects these prepared inputs
+and paired mappings to a cohort manifest and one Atlas inspection packet per
+successful observation. It describes the required disclosure basis, source-cache
+reuse, exact resume behavior and the distinction between imported claims and live
+execution authority.

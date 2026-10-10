@@ -113,7 +113,10 @@ coordinates above the binary64 integer limit.
 
 ## Paired public workflow
 
-The ordinary-file facade can publish both members and their lossless exchange tables:
+The ordinary-file facade can publish both members and their lossless exchange tables.
+Batch exports require the retained recall disclosure basis described in the
+[local workflow guide](guide/study-workspaces.md#admit-recall-disclosure); ordinary
+local preparation alone does not authorize an exchange containing recall text:
 
 ```sh
 sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun exchange study.json mapping.json analysis/paired'

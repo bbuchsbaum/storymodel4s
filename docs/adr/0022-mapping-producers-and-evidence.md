@@ -234,3 +234,38 @@ exact bytes. Rejected alternative: a second set of mapping tables or caller-asse
 which would duplicate semantics or permit unrelated records to imply common evidence.
 The independent Python consumer checks the wire and relational joins; it does not certify
 execution from untrusted self-described bytes or replace contextual Scala admission.
+
+### 2026-10-10 recall disclosure provenance
+
+Recall preparation retains a closed, text-bound `RecallDisclosure.Input`: local-only,
+checksum-admitted public-corpus replay, or an actual `embed.PseudonymizedText` witness.
+The public-corpus adapter executes its pinned CSV-to-text replay; a generic caller label
+cannot mint that basis. A fixed project-synthetic control supports executable examples.
+The existing embed dependency supplies the pseudonymization boundary; no key provider or
+re-identification map enters preparation or the workspace.
+
+Ordinary private text may be prepared and checkpointed locally. Returning its text for
+workspace or batch exchange publication requires an admitted basis scoped to the local workspace and exact
+text equality. Receipt descriptions preserve identities and detector-relative provenance;
+they do not recreate witnesses, establish consent, or authorize hosted/Git disclosure.
+Contextual prepared-recall decoding needs the retained witness to recover its authority.
+Rejected alternative: infer permission from an approved machine, a caller boolean, or a
+serialized receipt. Disclosure basis participates in attempt/publication identity while
+semantic observation and word identity remain tied to the actual recall text.
+
+### 2026-10-10 ordinary-source workspace extension
+
+The canonical workspace archive gains a versioned ordinary-source role alongside the
+existing semantic-model variant. Text packages and annotation sources remain their actual
+kinds; lack of a narrative model is an explicit capability. Portable annotation decoding
+replays the existing deterministic adapter, with identical CSV and exact-tick rules; the JVM
+entry delegates to that codec. Rejected alternative: synthesize a narrative model, clock,
+or fixture source to satisfy the existing semantic-model role.
+
+The new consumer projection preserves original mapping bytes, claimed record digests,
+policy declarations and receipts as imported inspection data. It does not manufacture a
+`MappingRun.Execution` or promote serialized derived-stage claims to live authority.
+Both members must join the same source and recall inventory; their declared universes may
+differ. The existing narrative workspace variant remains supported. The ordinary-file
+producer uses the retained disclosure basis before emitting recall text and supplies the
+same archive to StoryAtlas's real input decoder.

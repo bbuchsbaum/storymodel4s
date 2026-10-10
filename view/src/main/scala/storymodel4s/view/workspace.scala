@@ -6,6 +6,7 @@ import storymodel4s.acquire.{OutputLabel, OutputNamespace}
 /** Artifact roles in a joined investigation, distinct from a story-build output profile. */
 enum WorkspaceRole:
   case SourceModel, Recall, Inventory, Derivation, Capabilities, Receipt
+  case SourceInput
   case PresentationClocks
   case Mapping(id: ArtifactId)
   case Features(id: ArtifactId)
@@ -56,6 +57,7 @@ enum WorkspaceRefusal:
 
 /** Exact-byte admission only. Identity is not permission or scientific authority. */
 final class WorkspaceManifest private (
+    val schemaVersion: String,
     val entries: Vector[WorkspaceEntry],
     private val files: Map[BundlePath, Vector[Byte]]
 ):
@@ -71,6 +73,7 @@ final class WorkspaceManifest private (
 
 object WorkspaceManifest:
   val SchemaVersion: String = "workspace-manifest/v0.1"
+  val SurfaceSchemaVersion: String = "workspace-manifest/v0.2"
   val Required: Set[WorkspaceRole] = Set(
     WorkspaceRole.SourceModel,
     WorkspaceRole.Recall,
@@ -95,11 +98,20 @@ object WorkspaceManifest:
       _.path.value.map(c => if c >= 'A' && c <= 'Z' then (c.toInt + ('a' - 'A')).toChar else c)
     )
     val ids = supplied.map(_._3.id)
-    if schemaVersion != SchemaVersion then Left(WorkspaceRefusal.UnsupportedVersion)
+    val required =
+      if schemaVersion == SurfaceSchemaVersion then
+        (Required - WorkspaceRole.SourceModel) + WorkspaceRole.SourceInput
+      else Required
+    if schemaVersion != SchemaVersion && schemaVersion != SurfaceSchemaVersion then
+      Left(WorkspaceRefusal.UnsupportedVersion)
     else if roles.distinct.size != roles.size then Left(WorkspaceRefusal.DuplicateRole)
     else if paths.distinct.size != paths.size then Left(WorkspaceRefusal.DuplicatePath)
     else if ids.distinct.size != ids.size then Left(WorkspaceRefusal.DuplicateArtifact)
-    else if !Required.subsetOf(roles.toSet) || !roles.exists {
+    else if !required.subsetOf(roles.toSet) ||
+      roles.contains(
+        if schemaVersion == SurfaceSchemaVersion then WorkspaceRole.SourceModel
+        else WorkspaceRole.SourceInput
+      ) || !roles.exists {
         case WorkspaceRole.Mapping(_) => true
         case _                        => false
       }
@@ -117,7 +129,7 @@ object WorkspaceManifest:
         ref.checksum != Checksum.ofBytes(files(path).toArray)
       }
     then Left(WorkspaceRefusal.ArtifactDigestMismatch)
-    else Right(new WorkspaceManifest(entries.sortBy(_.role.key), files))
+    else Right(new WorkspaceManifest(schemaVersion, entries.sortBy(_.role.key), files))
 
 /** A declaration made by the artifact owner; a digest alone never creates a grant. */
 enum WorkspaceContentGrant:

@@ -206,7 +206,7 @@ object WorkspaceCodecs:
         yield WorkspaceTiming.Interval(span)
       case _ => Left(WorkspaceRefusal.UnsupportedContent)
     }
-  private def inventoryJson(
+  private[codec] def inventoryJson(
       inventory: RecallInventory,
       timing: Map[RecallUnitId, WorkspaceTiming]
   ): Json = obj(
@@ -218,7 +218,7 @@ object WorkspaceCodecs:
       inventory.units.map(u => obj("unit" -> u.id.asJson, "clock" -> timingJson(timing(u.id))))
     )
   )
-  private def readInventory(
+  private[codec] def readInventory(
       json: Json,
       recall: RecallGraph[Checked]
   ): Result[(RecallInventory, Map[RecallUnitId, WorkspaceTiming])] =
@@ -554,7 +554,7 @@ object WorkspaceCodecs:
         workspace <- decode(encoded)
       yield workspace
 
-  private def member(
+  private[codec] def member(
       role: WorkspaceRole,
       path: String,
       content: String

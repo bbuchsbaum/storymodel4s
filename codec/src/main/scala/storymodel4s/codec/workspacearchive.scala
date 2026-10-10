@@ -30,6 +30,7 @@ object WorkspaceArchive:
       capabilities <- WorkspaceArchiveCodec.decodeCapabilities(text)
       model <- manifest
         .artifact(WorkspaceRole.SourceModel)
+        .orElse(manifest.artifact(WorkspaceRole.SourceInput))
         .toRight(WorkspaceRefusal.MissingRequiredRole)
       recall <- manifest
         .artifact(WorkspaceRole.Recall)
@@ -51,6 +52,7 @@ object WorkspaceArchive:
   */
 object WorkspaceArchiveCodec:
   val SchemaVersion: String = "workspace-archive/v0.1"
+  val SurfaceSchemaVersion: String = "workspace-archive/v0.2"
   val CapabilitiesVersion: String = "workspace-capabilities/v0.1"
 
   private type Result[A] = Either[WorkspaceRefusal, A]
@@ -116,6 +118,7 @@ object WorkspaceArchiveCodec:
       case "Mapping"            => field[ArtifactId](json, "id").map(WorkspaceRole.Mapping(_))
       case "Features"           => field[ArtifactId](json, "id").map(WorkspaceRole.Features(_))
       case "PresentationClocks" => Right(WorkspaceRole.PresentationClocks)
+      case "SourceInput"        => Right(WorkspaceRole.SourceInput)
       case other                =>
         WorkspaceManifest.Required
           .find(_.toString == other)
@@ -156,8 +159,12 @@ object WorkspaceArchiveCodec:
       }
       .map(files =>
         obj(
-          "schemaVersion" -> str(SchemaVersion),
-          "manifestVersion" -> str(WorkspaceManifest.SchemaVersion),
+          "schemaVersion" -> str(
+            if manifest.schemaVersion == WorkspaceManifest.SurfaceSchemaVersion then
+              SurfaceSchemaVersion
+            else SchemaVersion
+          ),
+          "manifestVersion" -> str(manifest.schemaVersion),
           "entries" -> Json.fromValues(manifest.entries.map(entryJson)),
           "files" -> Json.fromValues(files.flatten)
         )
@@ -175,8 +182,18 @@ object WorkspaceArchiveCodec:
     for
       json <- parse(text)
       version <- field[String](json, "schemaVersion")
-      _ <- Either.cond(version == SchemaVersion, (), WorkspaceRefusal.UnsupportedVersion)
+      _ <- Either.cond(
+        version == SchemaVersion || version == SurfaceSchemaVersion,
+        (),
+        WorkspaceRefusal.UnsupportedVersion
+      )
       manifestVersion <- field[String](json, "manifestVersion")
+      _ <- Either.cond(
+        (version == SchemaVersion && manifestVersion == WorkspaceManifest.SchemaVersion) ||
+          (version == SurfaceSchemaVersion && manifestVersion == WorkspaceManifest.SurfaceSchemaVersion),
+        (),
+        WorkspaceRefusal.UnsupportedVersion
+      )
       entries <- field[Vector[Json]](json, "entries").flatMap(_.traverse(readEntry))
       files <- field[Vector[Json]](json, "files").flatMap(
         _.traverse(value =>
