@@ -28,6 +28,7 @@ object StudyPreparation:
     case InvalidConfig, InputRead, UnsafePath, InvalidUtf8, InvalidSource, InvalidRecall
     case DuplicateObservation, InvalidTiming, ForeignTiming, ArtifactMismatch
     case MissingCapability(capability: String)
+    case DisclosureRefused
 
   enum SourceInput:
     case Text(path: String, kind: SurfaceUnitKind)
@@ -38,12 +39,18 @@ object StudyPreparation:
     case CheckedTimed(path: String)
     case Video(path: String)
 
+  /** A request selects a checked adapter, never grants publication by assertion. */
+  enum Admission:
+    case LocalOnly, ProjectSyntheticControl
+    case Sherlock(sourceId: String, lineage: String)
+
   /** Participant and session identify the observation; a filename never does. */
   final case class RecallInput(
       participant: String,
       session: String,
       path: String,
-      timing: Option[String] = None
+      timing: Option[String] = None,
+      admission: Admission = Admission.LocalOnly
   )
   final case class Config(source: SourceInput, recalls: Vector[RecallInput], profile: String)
 
@@ -55,7 +62,8 @@ object StudyPreparation:
       val observation: Checksum,
       val graph: RecallGraph[Checked],
       val inventory: RecallInventory,
-      val timing: Option[RecallTiming]
+      val timing: Option[RecallTiming],
+      val disclosure: RecallDisclosure.Input
   ):
     private def parts = (
       participant,
@@ -64,7 +72,8 @@ object StudyPreparation:
       observation,
       graph,
       inventory.digest,
-      timing.map(_.digest)
+      timing.map(_.digest),
+      RecallDisclosure.receiptDescription(disclosure)
     )
     override def equals(other: Any): Boolean = other match
       case r: Recall => parts == r.parts
@@ -149,8 +158,20 @@ object StudyPreparation:
 
   /** Source preparation occurs once; one malformed recall never discards its siblings. */
   def prepare(root: Path, config: Config): Either[Refusal, Prepared] =
+    prepare(root, config, Map.empty)
+
+  /** Retained disclosure witnesses must bind the exact ordinary recall file being prepared. */
+  def prepare(
+      root: Path,
+      config: Config,
+      disclosures: Map[(String, String), RecallDisclosure.Input]
+  ): Either[Refusal, Prepared] =
     for
       _ <- require(config.profile == RecallProfile, Refusal.InvalidConfig)
+      _ <- require(
+        disclosures.keySet.subsetOf(config.recalls.map(r => (r.participant, r.session)).toSet),
+        Refusal.InvalidConfig
+      )
       _ <- require(
         config.recalls.forall(r => validLabel(r.participant) && validLabel(r.session)),
         Refusal.InvalidConfig
@@ -223,8 +244,28 @@ object StudyPreparation:
       outcomes = config.recalls.map { input =>
         val transcript = read(root, input.path)
         val timing = input.timing.map(path => read(root, path))
+        val lineage = input.admission match
+          case Admission.Sherlock(_, path) => Some(read(root, path))
+          case _                           => None
+        val supplied = disclosures.get((input.participant, input.session))
         def readIdentity(value: Either[Refusal, Array[Byte]]): String =
           value.fold(e => "refused:" + e.toString, b => "bytes:" + Checksum.ofBytes(b).hex)
+        val result = for
+          bytes <- transcript
+          admitted <- admit(input, bytes, lineage)
+          disclosure = supplied.getOrElse(admitted)
+          _ <- require(
+            disclosure.text == admitted.text &&
+              (!disclosures.contains(
+                (input.participant, input.session)
+              ) || input.admission == Admission.LocalOnly),
+            Refusal.DisclosureRefused
+          )
+          value <- recall(input.participant, input.session, edition(source), disclosure, None)
+          timed <- timing match
+            case None           => Right(value)
+            case Some(observed) => observed.flatMap(timingCsv(value, _))
+        yield timed
         val attempt = digest(
           "study-input-attempt/v1",
           input.participant,
@@ -232,30 +273,50 @@ object StudyPreparation:
           input.path,
           readIdentity(transcript),
           input.timing.getOrElse(""),
-          timing.fold("not-requested")(readIdentity)
+          timing.fold("not-requested")(readIdentity),
+          input.admission.toString,
+          lineage.fold("not-required")(readIdentity),
+          supplied.fold("not-supplied")(RecallDisclosure.receiptDescription),
+          result.fold(
+            e => "refused:" + e.toString,
+            r => RecallDisclosure.receiptDescription(r.disclosure)
+          )
         )
-        val result = for
-          bytes <- transcript
-          text <- utf8(bytes)
-          value <- recall(input.participant, input.session, edition(source), text, None)
-          timed <- timing match
-            case None           => Right(value)
-            case Some(observed) => observed.flatMap(timingCsv(value, _))
-        yield timed
         Outcome(input, result, attempt)
       }
     yield new Prepared(source, outcomes, config)
+
+  private def admit(
+      input: RecallInput,
+      bytes: Array[Byte],
+      lineage: Option[Either[Refusal, Array[Byte]]]
+  ): Either[Refusal, RecallDisclosure.Input] =
+    input.admission match
+      case Admission.LocalOnly               => utf8(bytes).map(RecallDisclosure.local)
+      case Admission.ProjectSyntheticControl =>
+        utf8(bytes).flatMap(
+          RecallDisclosure.projectSynthetic(_).left.map(_ => Refusal.DisclosureRefused)
+        )
+      case Admission.Sherlock(source, _) =>
+        lineage
+          .getOrElse(Left(Refusal.DisclosureRefused))
+          .flatMap(record =>
+            RecallDisclosure
+              .sherlock(source, bytes, record)
+              .left
+              .map(_ => Refusal.DisclosureRefused)
+          )
 
   private def recall(
       participant: String,
       session: String,
       edition: Checksum,
-      raw: String,
+      disclosure: RecallDisclosure.Input,
       suppliedTiming: Option[String]
   ): Either[Refusal, Recall] =
     for
       _ <- require(validLabel(participant) && validLabel(session), Refusal.InvalidRecall)
-      text <- TextSourcePackage.fromText(raw).left.map(_ => Refusal.InvalidRecall)
+      text <- TextSourcePackage.fromText(disclosure.text).left.map(_ => Refusal.InvalidRecall)
       observation = digest(
         "recall-observation/v1",
         participant,
@@ -264,7 +325,7 @@ object StudyPreparation:
         "surface-lexical-token-parser/v1"
       )
       source <- StorySource
-        .fromText(raw, explicitId = Some(StoryId.unsafe("recall:" + observation.hex)))
+        .fromText(disclosure.text, explicitId = Some(StoryId.unsafe("recall:" + observation.hex)))
         .left
         .map(_ => Refusal.InvalidRecall)
       graph <-
@@ -282,7 +343,16 @@ object StudyPreparation:
       timing <- suppliedTiming.traverse(
         RecallTimingCodecs.decode(_, inventory).left.map(_ => Refusal.ForeignTiming)
       )
-    yield new Recall(participant, session, edition, observation, graph, inventory, timing)
+    yield new Recall(
+      participant,
+      session,
+      edition,
+      observation,
+      graph,
+      inventory,
+      timing,
+      disclosure
+    )
 
   /** CSV observations attach by exact lexical word and participant/session, never fuzzy matching.
     */
@@ -347,14 +417,19 @@ object StudyPreparation:
       value.observation,
       value.graph,
       value.inventory,
-      Some(timing)
+      Some(timing),
+      value.disclosure
     )
 
   /** The wrapper reuses public graph/timing codecs and reconstructs the inventory from its parser.
     */
   def encode(value: Recall): String = Canonical.print(
     Json.obj(
-      "schemaVersion" -> Json.fromString("prepared-recall/v1"),
+      "schemaVersion" -> Json.fromString("prepared-recall/v2"),
+      "disclosure" -> Canonical
+        .parse(RecallDisclosure.receiptDescription(value.disclosure))
+        .toOption
+        .get,
       "participant" -> Json.fromString(value.participant),
       "session" -> Json.fromString(value.session),
       "sourceEdition" -> Json.fromString(value.sourceEdition.hex),
@@ -368,6 +443,28 @@ object StudyPreparation:
 
   /** A source edition is required externally; a self-described package cannot change that join. */
   def decode(text: String, sourceEdition: Checksum): Either[Refusal, Recall] =
+    decodeWith(text, sourceEdition, None)
+
+  /** A serialized description is not authority; reconstruction requires the retained input. */
+  def decode(
+      text: String,
+      sourceEdition: Checksum,
+      disclosure: RecallDisclosure.Input
+  ): Either[Refusal, Recall] =
+    decodeWith(text, sourceEdition, Some(disclosure))
+
+  /** The disclosure boundary is checked before returning any recall text for a workspace. */
+  def publishRecall(value: Recall): Either[Refusal, String] =
+    require(
+      RecallDisclosure.canPublishLocalWorkspace(value.disclosure, value.graph.transcript.rawText),
+      Refusal.DisclosureRefused
+    ).map(_ => encode(value))
+
+  private def decodeWith(
+      text: String,
+      sourceEdition: Checksum,
+      supplied: Option[RecallDisclosure.Input]
+  ): Either[Refusal, Recall] =
     for
       json <- parser.parse(text).left.map(_ => Refusal.ArtifactMismatch)
       participant <- field[String](json, "participant")
@@ -382,7 +479,7 @@ object StudyPreparation:
         participant,
         session,
         sourceEdition,
-        graph.transcript.rawText,
+        supplied.getOrElse(RecallDisclosure.local(graph.transcript.rawText)),
         timing.map(Canonical.print)
       )
       _ <- require(Canonical.parse(encode(value)).contains(json), Refusal.ArtifactMismatch)
@@ -444,13 +541,45 @@ object StudyPreparation:
       inputs <- rows.traverse { r =>
         for
           _ <- require(
-            r.asObject.exists(_.keys.toSet == Set("participant", "session", "path", "timing")),
+            r.asObject.exists(o =>
+              o.keys.toSet == Set(
+                "participant",
+                "session",
+                "path",
+                "timing"
+              ) || o.keys.toSet == Set("participant", "session", "path", "timing", "admission")
+            ),
             Refusal.InvalidConfig
           )
           p <- field[String](r, "participant")
           session <- field[String](r, "session")
           path <- field[String](r, "path")
           timing <- field[Option[String]](r, "timing")
-        yield RecallInput(p, session, path, timing)
+          admission <- r.hcursor
+            .get[Option[Json]]("admission")
+            .left
+            .map(_ => Refusal.InvalidConfig)
+            .flatMap {
+              case None        => Right(Admission.LocalOnly)
+              case Some(value) =>
+                field[String](value, "kind").flatMap {
+                  case "project-synthetic-control" =>
+                    require(
+                      value.asObject.exists(_.keys.toSet == Set("kind")),
+                      Refusal.InvalidConfig
+                    ).map(_ => Admission.ProjectSyntheticControl)
+                  case "sherlock" =>
+                    for
+                      _ <- require(
+                        value.asObject.exists(_.keys.toSet == Set("kind", "sourceId", "lineage")),
+                        Refusal.InvalidConfig
+                      )
+                      id <- field[String](value, "sourceId")
+                      lineage <- field[String](value, "lineage")
+                    yield Admission.Sherlock(id, lineage)
+                  case _ => Left(Refusal.InvalidConfig)
+                }
+            }
+        yield RecallInput(p, session, path, timing, admission)
       }
     yield Config(source, inputs, profile)

@@ -56,6 +56,30 @@ class WeightedMappingSuite extends FunSuite:
       assertEquals(right(WeightedMappingExchange.decode(bundle.files, selected)), selected)
     }
 
+  private def certifiedMultipart: RecallDisclosure.Input =
+    import storymodel4s.embed.*
+    val key = KeyId.unsafe("synthetic-multipart-key")
+    val keys = SensitiveKeyProvider.static(key, Array[Byte](3, 5, 7, 11))
+    val detector = right(
+      PseudonymizationDetector.wholeWordTable(Vector(PseudonymizationTableEntry("Jane", "Anna")))
+    )
+    val original = "Jane arrived. Bob left."
+    val rendered = "Anna arrived. Bob left."
+    val detected = right(detector.detect(original, key, keys))
+    val actual = right(
+      PseudonymizedText.checked(
+        PrivacyPolicyId.unsafe("synthetic-multipart-policy"),
+        key,
+        original,
+        rendered,
+        Vector(storymodel4s.core.TextSpan.unsafe(0, 4) -> storymodel4s.core.TextSpan.unsafe(0, 4)),
+        detected,
+        detector,
+        keys
+      )
+    )
+    RecallDisclosure.certified(actual)
+
   test("WOG miniature dispatch preserves both endpoint canonical byte packages") {
     val workspace = WorkspaceFixtures.all("a" * 40, includeHistorical = false).toMap.apply("wog")
     val (fullView, fullSource) = right(WorkspaceCodecs.sourceFor(workspace.model))
@@ -122,7 +146,8 @@ class WeightedMappingSuite extends FunSuite:
             StudyPreparation.SourceInput.TimedAnnotations("annotations.csv", "parts.json"),
             Vector(StudyPreparation.RecallInput("p1", "s1", "recall.txt")),
             StudyPreparation.RecallProfile
-          )
+          ),
+          Map(("p1", "s1") -> certifiedMultipart)
         )
       )
       val batch = right(MappingPipeline.batch(prepared, config))
@@ -152,19 +177,22 @@ class WeightedMappingSuite extends FunSuite:
                 "participant" -> Json.fromString("p1"),
                 "session" -> Json.fromString("s1"),
                 "path" -> Json.fromString("recall.txt"),
-                "timing" -> Json.Null
+                "timing" -> Json.Null,
+                "admission" -> Json.obj("kind" -> Json.fromString("project-synthetic-control"))
               ),
               Json.obj(
                 "participant" -> Json.fromString("p2"),
                 "session" -> Json.fromString("s1"),
                 "path" -> Json.fromString("recall.txt"),
-                "timing" -> Json.Null
+                "timing" -> Json.Null,
+                "admission" -> Json.obj("kind" -> Json.fromString("project-synthetic-control"))
               ),
               Json.obj(
                 "participant" -> Json.fromString("p3"),
                 "session" -> Json.fromString("s1"),
                 "path" -> Json.fromString("missing.txt"),
-                "timing" -> Json.Null
+                "timing" -> Json.Null,
+                "admission" -> Json.obj("kind" -> Json.fromString("project-synthetic-control"))
               )
             )
           )

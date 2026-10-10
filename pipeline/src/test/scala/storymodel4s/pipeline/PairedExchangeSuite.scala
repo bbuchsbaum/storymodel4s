@@ -45,8 +45,18 @@ class PairedExchangeSuite extends FunSuite:
         StudyPreparation.Config(
           StudyPreparation.SourceInput.Text("source.txt", SurfaceUnitKind.Sentence),
           Vector(
-            StudyPreparation.RecallInput("p1", "s1", "recall.txt"),
-            StudyPreparation.RecallInput("p2", "s1", "recall.txt"),
+            StudyPreparation.RecallInput(
+              "p1",
+              "s1",
+              "recall.txt",
+              admission = StudyPreparation.Admission.ProjectSyntheticControl
+            ),
+            StudyPreparation.RecallInput(
+              "p2",
+              "s1",
+              "recall.txt",
+              admission = StudyPreparation.Admission.ProjectSyntheticControl
+            ),
             StudyPreparation.RecallInput("p3", "s1", "missing.txt")
           ),
           StudyPreparation.RecallProfile
@@ -95,7 +105,14 @@ class PairedExchangeSuite extends FunSuite:
   test("public exchange CLI refuses changed bytes on resume and preserves prior output") {
     inTemp { root =>
       val _ = batch(root)
-      write(root, "study.json", StudyCli.Template)
+      write(
+        root,
+        "study.json",
+        StudyCli.Template.replace(
+          "\"timing\":null",
+          "\"timing\":null,\"admission\":{\"kind\":\"project-synthetic-control\"}"
+        )
+      )
       write(root, "config.json", MappingCli.Template)
       val output = root.resolve("published")
       val args = List(
@@ -174,7 +191,14 @@ class PairedExchangeSuite extends FunSuite:
           root,
           StudyPreparation.Config(
             StudyPreparation.SourceInput.TimedAnnotations("annotations.csv", "parts.json"),
-            Vector(StudyPreparation.RecallInput("p1", "s1", "recall.txt")),
+            Vector(
+              StudyPreparation.RecallInput(
+                "p1",
+                "s1",
+                "recall.txt",
+                admission = StudyPreparation.Admission.ProjectSyntheticControl
+              )
+            ),
             StudyPreparation.RecallProfile
           )
         )

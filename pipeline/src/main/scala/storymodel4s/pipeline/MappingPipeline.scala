@@ -483,13 +483,17 @@ object MappingPipeline:
       batch: Batch
   ): Either[String, (Vector[(String, String)], String)] =
     import cats.syntax.all.*
-    batch.outcomes.flatMap(_.run).traverse(exchangeFiles).map { pairs =>
+    for
+      _ <- batch.outcomes
+        .flatMap(_.prepared)
+        .traverse(r => StudyPreparation.publishRecall(r).left.map(_.toString))
+      pairs <- batch.outcomes.flatMap(_.run).traverse(exchangeFiles)
+    yield
       val (original, manifest) = artifacts(batch)
       val inputs = original.filter(_._1.endsWith("-recall.json"))
       val files = inputs ++ pairs.flatten
       val metadata = Canonical.parse(manifest).toOption.get.hcursor.downField("metadata").focus.get
       files -> StudyArtifacts.manifest("mapping-exchange-batch/v1", files, metadata)
-    }
 
   /** Complete paired exchange through the same source, outcomes and publication boundary. */
   def publishExchange(batch: Batch, output: Path, resume: Boolean): Either[String, Checksum] =

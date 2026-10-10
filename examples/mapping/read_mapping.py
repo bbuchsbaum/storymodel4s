@@ -339,7 +339,15 @@ def read_publication(files):
             recall_name = digest(observation) + "-recall.json"
             require(recall_name in files, "missing prepared recall")
             prepared = parse(files[recall_name])
-            require(prepared["schemaVersion"] == "prepared-recall/v1", "prepared recall schema")
+            require(prepared["schemaVersion"] in {"prepared-recall/v1", "prepared-recall/v2"}, "prepared recall schema")
+            if prepared["schemaVersion"] == "prepared-recall/v2":
+                disclosure = prepared["disclosure"]
+                require(disclosure["schemaVersion"] == "recall-disclosure-receipt/v1"
+                        and disclosure["scope"] == "local-workspace", "recall disclosure description")
+                # This validates a wire claim; it does not admit disclosure authority.
+                require(disclosure["basis"]["kind"] in {"local-only", "public-corpus-admitted", "certified-pseudonymized"}, "recall disclosure basis")
+                require(disclosure["textDigest"] == hashlib.sha256(
+                    prepared["graph"]["transcript"]["rawText"].encode()).hexdigest(), "recall disclosure text")
             require((prepared["participant"], prepared["session"]) == key and prepared["observation"] == observation, "foreign recall observation")
             require(prepared["sourceEdition"] == metadata["sourceEdition"], "foreign recall source edition")
             names.add(recall_name)
