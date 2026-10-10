@@ -18,6 +18,13 @@ for gate in exchange['gates']:
     assert gate['exit'] == gate['totals']['failed'] == gate['totals']['errors'] == 0
     count += 1
 
+exchange_mutants = root / 'exchange/exchange-final-mutations'
+for mutant in json.loads((exchange_mutants / 'mutations.json').read_text()):
+    raw = (exchange_mutants / mutant['patch_archive']).read_bytes()
+    assert sha(raw) == mutant['patch_archive_sha256']
+    assert sha(gzip.decompress(raw)) == mutant['patch_sha256']
+    count += 1
+
 for name in ['offline', 'lambda', 'workspace']:
     receipt = json.loads((root / name / 'receipt.json').read_text())
     for item in receipt['archives'].values():

@@ -30,7 +30,9 @@
     "test_selection": ".*",
     "source_sha256": "e64a76496cf7112ecf8891c7f245ddef253dab889ba4aa1341077bc3235eb992",
     "patch_sha256": "87e4ee44da4d68cf3ab74d760323987c80f265ddc502fb84617b3db578491c82",
-    "log_sha256": "c0da7955c34c8ae8205eccc51cf692d870798f3021230fe306c992fe712498ba"
+    "log_sha256": "c0da7955c34c8ae8205eccc51cf692d870798f3021230fe306c992fe712498ba",
+    "patch_archive": "pair-authority-bytes.patch.gz",
+    "patch_archive_sha256": "e11298b8e6f88f5128c1ca503969414f47afe682e0c692f8e6873ff9408e160a"
   },
   {
     "name": "pair-duplicate-files",
@@ -63,7 +65,9 @@
     "test_selection": ".*",
     "source_sha256": "ba3219c6788dd53bd8b5dba42cd0a555b20bb3296654d6acadd5d98bb80e27fd",
     "patch_sha256": "39480a105ed37a23757ff9070cf886000720b1b648b4fe469efad5ea46532757",
-    "log_sha256": "fb2603a916dea45594e8244622c79064334114be4dc03dd1da96bfae8d72dd67"
+    "log_sha256": "fb2603a916dea45594e8244622c79064334114be4dc03dd1da96bfae8d72dd67",
+    "patch_archive": "pair-duplicate-files.patch.gz",
+    "patch_archive_sha256": "93555dfa1bb8cc2870c20d4d5bf7d78262d7e5b6e21906987cffb2a5cf097517"
   },
   {
     "name": "resume-foreign-files",
@@ -96,6 +100,8 @@
     "test_selection": ".*",
     "source_sha256": "d2e342da263c3261372daaf6b67f0a9ccceab129cee7828cb958c1d9af6b22dc",
     "patch_sha256": "9db92fa2ecca96d5775e4c15bce32ee2bc1642f659cf1b160fba28c2977d4784",
-    "log_sha256": "a44a8f60ca141985efef15466dac0376869669047f9321f43a7969b8a136ad2a"
+    "log_sha256": "a44a8f60ca141985efef15466dac0376869669047f9321f43a7969b8a136ad2a",
+    "patch_archive": "resume-foreign-files.patch.gz",
+    "patch_archive_sha256": "0ca6c4927e5ad42a1d67b918200c55f18e8dc8eea68a3c02910254ecb7845046"
   }
 ]
