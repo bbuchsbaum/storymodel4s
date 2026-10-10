@@ -9,6 +9,7 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 object MappingRun:
   enum Member:
     case Reference, Reconstruction
+    case Weighted(selection: StructuralSelection)
 
   /** Execution authority can only originate in the two actual producers. */
   final class Execution private[MappingRun] (
@@ -36,14 +37,28 @@ object MappingRun:
     lazy val reconstructionRecord: Either[MappingRefusal, MappingResult] =
       MappingResult.executed(this, Member.Reconstruction)
     def record(member: Member): Either[MappingRefusal, MappingResult] = member match
-      case Member.Reference      => referenceRecord
-      case Member.Reconstruction => reconstructionRecord
+      case Member.Reference           => referenceRecord
+      case Member.Reconstruction      => reconstructionRecord
+      case Member.Weighted(selection) =>
+        if selection.execution.identity != identity then
+          Left(MappingRefusal.BindingMismatch("weighted execution"))
+        else if selection.weight.isReference then referenceRecord
+        else if selection.weight.isReconstruction then reconstructionRecord
+        else MappingResult.executed(this, member)
+    def weighted(weight: StructuralWeight): Either[AlignError, StructuralSelection] =
+      StructuralSelection.of(this, weight)
     private[align] def receipt(member: Member, stage: Stage): StageReceipt =
+      val label = member match
+        case Member.Weighted(selection) =>
+          s"Weighted/${selection.profile.fingerprint.hex}/${selection.weight}"
+        case _ => member.toString
       StageReceipt
         .of(
           stage,
-          s"mapping-run/v1/$member/$stage",
-          identity,
+          s"mapping-run/v1/$label/$stage",
+          member match
+            case Member.Weighted(selection) => selection.identity
+            case _                          => identity,
           Vector(reference.evidence.identity.checksum, inventory.digest, source.digest),
           ProviderStatus.NotApplicable("portable deterministic execution")
         )
@@ -96,8 +111,10 @@ object MappingRun:
   /** All rows and receipts come from the retained producer outputs, never caller-supplied parts. */
   private[align] def parts(e: Execution, member: Member): Either[MappingRefusal, Parts] =
     val isReference = member == Member.Reference
-    val profile =
-      if isReference then e.reference.profile.fingerprint else e.reconstruction.profile.fingerprint
+    val profile = member match
+      case Member.Reference           => e.reference.profile.fingerprint
+      case Member.Reconstruction      => e.reconstruction.profile.fingerprint
+      case Member.Weighted(selection) => selection.profile.fingerprint
     val decisionId = DecisionPolicyId.unsafe("mapping-run:" + profile.hex)
     val prior = ReferencePriorId.unsafe("uniform-admitted-states/v1")
     for
@@ -126,7 +143,14 @@ object MappingRun:
       policies <- MappingPolicies.of(
         if isReference then
           InferencePolicy.Unspecified("local-reference/shifted-exponential-cost/v1")
-        else InferencePolicy.HistoricalReconstruction("structured-reconstruction:" + profile.hex),
+        else
+          member match
+            case Member.Weighted(selection) =>
+              InferencePolicy.Unspecified(
+                s"structural-coefficients/sherlock/v1;lambda=${selection.weight};profile=${profile.hex}"
+              )
+            case _ =>
+              InferencePolicy.HistoricalReconstruction("structured-reconstruction:" + profile.hex),
         ContextPolicy.Unspecified("exact originating evidence retained by execution"),
         CandidatePolicy.Unknown("upstream registration belongs to enclosing run"),
         if isReference then ReferencePrior.Declared(prior)
@@ -139,8 +163,8 @@ object MappingRun:
         AnalysisGrain.InferenceUnit(e.inventory.segmentation),
         AnalysisGrain.Targets(universe.grain)
       )
-      outcomes <-
-        if isReference then
+      outcomes <- member match
+        case Member.Reference =>
           e.reference.outcomes.traverse {
             case n: LocalReference.NotComputed =>
               Right(UnitOutcome.excluded(n.unit, "local-reference:" + n.reason.toString))
@@ -179,7 +203,58 @@ object MappingRun:
                 )
               yield outcome
           }
-        else
+        case Member.Weighted(selection) =>
+          selection.inference
+            .toRight(MappingRefusal.BindingMismatch("interior inference"))
+            .flatMap { result =>
+              for
+                binding <- DerivationBinding.of(result, e.recall, e.inventory, e.view, e.source)
+                rows <- e.inventory.units.traverse { unit =>
+                  for
+                    posterior <- ModelPosterior.of(result, unit.id, binding, stages.inference)
+                    candidates = CandidateSetId.of(
+                      stages.candidates,
+                      unit.id,
+                      posterior.mass.keys.map(Destination.of).toSet
+                    )
+                    states = (posterior.mass.keySet ++ result.costs
+                      .get(unit.id)
+                      .toVector
+                      .flatMap(_.keys)).toVector.sorted
+                    links <- states.traverse(
+                      MappingLink.fromResult(
+                        result,
+                        binding,
+                        e.recall,
+                        e.view,
+                        e.source,
+                        unit.id,
+                        _,
+                        stages,
+                        candidates
+                      )
+                    )
+                    raw <- RawScores.fromCosts(
+                      result,
+                      unit.id,
+                      binding,
+                      ledger.at(Stage.Scoring).head.id
+                    )
+                    measures <- UnitMeasures.of(Vector(raw), None, None, Some(posterior))
+                    basis <- DecisionBasis.of(MeasureKind.ModelPosterior, None)
+                    outcome <- UnitOutcome.computed(
+                      unit.id,
+                      measures,
+                      links,
+                      basis,
+                      DecisionRequest.RawArgmax,
+                      stages
+                    )
+                  yield outcome
+                }
+              yield rows
+            }
+        case Member.Reconstruction =>
           val result = e.reconstruction.inference
           for
             binding <- DerivationBinding.of(result, e.recall, e.inventory, e.view, e.source)

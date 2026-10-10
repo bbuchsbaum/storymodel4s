@@ -974,3 +974,38 @@ shared evidence. Neither supplies strict-reference or calibrated authority.
 Rejected alternatives: keeping environment reads in the portable decoder; deriving group ranks
 from node storage positions; replacing shared base costs with refined or fill scores; attaching
 raw-argmax mass to a different chosen anchor; exposing a public result constructor.
+
+### 2026-10-10 — exact structural coefficient profile
+
+The 1.0 weighted profile is `structural-coefficients/sherlock/v1`. Its wire weight is a
+reduced fraction `n/d` with signed-64-bit components, `0 <= n <= d` and `d > 0`.
+Construction checks reduction before numerical conversion. Endpoint dispatch compares the
+integers, so an interior fraction whose binary64 coefficient rounds to one remains interior.
+
+At zero the requested member returns the existing reference record; at one it returns the
+existing named Sherlock reconstruction record. Those records retain their canonical bytes.
+The containing weighted member records the exact requested fraction, profile, execution,
+record and bundle identities. Interior records bind the same information through their
+policy and stage receipts. The weighted identity includes the exact rational even when two
+fractions round to the same floating coefficient.
+
+For `0 < lambda < 1`, run the existing sparse forward/backward engine on the originating
+`LocalEvidence`, with every Sherlock transition coefficient replaced by
+`theta_lambda(k) = lambda * theta_sherlock(k)`, including `ExternalIn` and `ExternalStay`.
+Keep the preset emission temperature 0.15. There are no refinement passes, no fill and no
+monotone/group decision constraint; the published decision is the raw posterior argmax.
+Only the named no-fill Sherlock preset is admitted by this profile version.
+
+For a path z through the evidence's admitted state sets, its unnormalized weight is
+`(1 / |S_1|) * product_i exp(-cost_i(z_i)/0.15) * product_i A_lambda(z_i,z_(i+1))`.
+Initial states are uniform, each recall unit contributes one state (no additional duration
+factor), and the terminal factor is one. Unavailable states stay absent. Source transitions
+use the existing feature softmax multiplied by the probability of staying in-source;
+external destinations share the external probability uniformly. The external probabilities
+are the sigmoid of the scaled entry/stay logits. When no next source state exists the
+external probability is forced to one, as in the underlying engine. This defines model
+posterior mass, not calibrated correctness, and makes no endpoint-continuity claim.
+
+Rejected alternatives remain output interpolation, decimal/Double identity, and adding fill
+or monotone decisions to interior members. Organization/order requests remain unavailable;
+this version supplies mapping, localization and downstream temporal projections only.
