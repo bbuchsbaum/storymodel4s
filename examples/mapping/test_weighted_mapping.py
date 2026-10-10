@@ -93,6 +93,20 @@ class WeightedReaderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "invalid weighted mass"):
             selected(self.change_record(change))
 
+    def test_removed_posterior_alternatives_refuse(self):
+        def change(record):
+            for outcome in record["outcomes"]:
+                outcome["mapping_links"] = [r for r in outcome["mapping_links"] if r["measure_kind"] != "ModelPosterior"]
+        with self.assertRaisesRegex(ValueError, "weighted measure alternatives presence"):
+            selected(self.change_record(change))
+
+    def test_absent_posterior_metadata_with_alternatives_refuses(self):
+        def change(record):
+            for outcome in record["outcomes"]:
+                outcome["measures"]["posterior"] = {"status": "absent", "reason": "not-supplied"}
+        with self.assertRaisesRegex(ValueError, "weighted measure alternatives presence"):
+            selected(self.change_record(change))
+
     def test_coherently_rehashed_wrong_decision_basis_refuses(self):
         def change(record):
             for outcome in record["outcomes"]:

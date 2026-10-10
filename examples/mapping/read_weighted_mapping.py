@@ -41,15 +41,21 @@ def selected(files):
     expected_kind = meta["measure_kind"]
     allowed_kinds = {expected_kind} if n == 0 else {expected_kind, "RawScore"}
     require(all(row["measure_kind"] in allowed_kinds for row in tables["alternatives"]), "conflated weighted measure kind")
-    for unit in tables["units"]:
-        values = [number(row["raw_value"]) for row in tables["alternatives"]
-                  if row["unit"] == unit["id"] and row["measure_kind"] == expected_kind]
-        if values:
-            require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= 1e-12, "invalid weighted mass")
     for outcome in record["outcomes"]:
+        values = [number(row["raw_value"]) for row in tables["alternatives"]
+                  if row["unit"] == outcome["unit"] and row["measure_kind"] == expected_kind]
+        family = "normalized" if n == 0 else "posterior"
+        measure = outcome["measures"][family]
+        require(measure["status"] in {"present", "absent"}, "weighted measure presence")
+        present = measure["status"] == "present"
+        require(present == bool(values), "weighted measure alternatives presence")
+        require(all(outcome["measures"][other]["status"] == "absent"
+                    for other in {"normalized", "posterior", "transport"} - {family}), "weighted measure family")
+        if present:
+            require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= 1e-12, "invalid weighted mass")
         decision = outcome["decision"]
         if decision["status"] == "present":
-            require(decision["value"]["basis"]["measure_kind"] == expected_kind, "weighted decision basis")
+            require(present and decision["value"]["basis"]["measure_kind"] == expected_kind, "weighted decision basis")
     require(record["policies"]["decision_policy_id"] == {"status": "declared", "id": "mapping-run:" + meta["record_profile_id"]}, "weighted record profile")
     if 0 < n < d:
         require(meta["record_profile_id"] == meta["profile_id"], "interior profile")
