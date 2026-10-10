@@ -172,3 +172,53 @@ still owns LLM-versus-structured comparisons: freeze observation units, evidence
 conditions, target grain and evaluation denominators; measure shortlist candidate
 recall for retrieval-plus-LLM systems. This ADR neither establishes a winning
 method nor makes a benchmark victory a prerequisite for the producer contract.
+
+
+### 2026-10-09 — ordinary-file preparation
+
+The study preparation boundary lives in `pipeline` and reuses the checked source, recall graph,
+word inventory and timing constructors. Its versioned wrapper records participant/session,
+raw-transcript/parser-qualified observation identity, exact source-artifact edition, and the
+existing canonical graph/timing payloads. Decoding reconstructs the inventory and compares the
+whole artifact. Word identity excludes segmentation and timing, so correcting those does not
+rename the observation's words. Source preparation is independent of recalls.
+
+The offline recall profile names the existing heuristic RecallSegmenter and lexical token
+projection. It does not assert validated language analysis. A timing CSV declares participant,
+session, lexical word, optional onset and optional end; decimal seconds remain exact rationals.
+Missing/onset-only/interval observations remain distinct. Recording/scanner identity stays
+unestablished. The CSV parser is the same strict quoting-correct parser used by RecallTimingIntake.
+Input paths resolve under the study directory; external symlinks and special files refuse.
+
+Reject filename-derived participant identity, timing-dependent word IDs, inferred durations,
+reconstruction of a source from its recalls, and automatic hosted/model fallback. The preparation
+wrapper is a checked-input artifact, not a second mapping estimator or a workspace schema.
+
+The ordinary timed-annotation adapter reuses the portable `TimedSegment`/`MediaLocus`
+contract moved from `embed-bench`; the historical benchmark builder keeps aliases for
+compatibility. A checked `TimedSourceView` binds declared part bundles and their axes,
+preserves point observations and disjoint intervals, and leaves world order unknown.
+The rejected alternative is importing the benchmark builder or inferring a movie clock
+from annotation endpoints. The prepared artifact stores original CSV plus explicit
+part declarations and adapter version, then replays checked construction on read; it
+is not a new normalized Segmentation/SegmentLink interchange schema.
+
+The typed JVM facade depends directly on `align`, `corpus-intake`, and `embed-onnx`
+(and the existing media replay adapter). It accepts an actual registered ONNX or
+caption execution envelope and invokes both mapping producers from that envelope's
+originating evidence. The rejected alternative pairs arbitrary runs with caller-supplied
+receipts. Portable projections derive only their executed inference and decision stages;
+upstream authority remains in the checked JVM run envelope. An explicit execution
+context is required to decode such a derived projection, and every field must match
+its regenerated canonical record.
+
+Ordinary annotation-only parts use the existing `SourceBundle.annotationTable` and
+`AnnotationTimeline`, with adapter-derived checksums. Users supply no checksum or
+internal identifier. Treating annotation coverage as a `FilmEdition` is rejected;
+actual media editions remain the separate checked media-intake path.
+
+The ordinary annotation adapter uses explicit `onTimeAxis` coordinate/point/interval factories
+for both declared annotation timelines and edition playback. Existing `on` factories remain
+edition-only. Axis identity/kind and exact integer extents remain checked; codecs and temporal
+support retain annotation clocks. Rejected alternative: fabricate a film edition so ordinary
+annotation ticks pass an edition-only constructor.

@@ -237,7 +237,7 @@ object TemporalSupport:
       else
         for
           intervals <- bounds.traverse((a, b) =>
-            PlaybackInterval.on(axis, a, b).left.map(_ => Refusal.InvalidSupport)
+            PlaybackInterval.onTimeAxis(axis, a, b).left.map(_ => Refusal.InvalidSupport)
           )
           value <- PlaybackSupport
             .of(axis.id, intervals, points)

@@ -762,6 +762,12 @@ object PlaybackCoordinate:
   def on(axis: PresentationAxis, tick: Long): Either[DomainError, PlaybackCoordinate] =
     if axis.kind != AxisKind.EditionPlayback then
       Left(SourceCanon.inv("coordinate/playback", "axis is not an edition-playback axis"))
+    else onTimeAxis(axis, tick)
+
+  /** A declared annotation clock supports ticks without asserting a film edition. */
+  def onTimeAxis(axis: PresentationAxis, tick: Long): Either[DomainError, PlaybackCoordinate] =
+    if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline then
+      Left(SourceCanon.inv("coordinate/time", "axis is not a declared time axis"))
     else
       axis.extent match
         case pt: AxisExtent.PlaybackTicks if tick < pt.start || tick >= pt.endExclusive =>
@@ -848,6 +854,10 @@ object PlaybackInstant:
   def on(axis: PresentationAxis, at: Long): Either[DomainError, PlaybackInstant] =
     PlaybackCoordinate.on(axis, at).map(c => new PlaybackInstant(c.axis, c.tick))
 
+  /** A point retains the declared time axis identity, including annotation-only clocks. */
+  def onTimeAxis(axis: PresentationAxis, at: Long): Either[DomainError, PlaybackInstant] =
+    PlaybackCoordinate.onTimeAxis(axis, at).map(c => new PlaybackInstant(c.axis, c.tick))
+
 /** Half-open playback interval on exactly one axis. Empty intervals are unrepresentable. */
 final class PlaybackInterval private[core] (
     val axis: PresentationAxisId,
@@ -875,6 +885,16 @@ object PlaybackInterval:
   ): Either[DomainError, PlaybackInterval] =
     if axis.kind != AxisKind.EditionPlayback then
       Left(SourceCanon.inv("interval/playback", "axis is not an edition-playback axis"))
+    else onTimeAxis(axis, start, endExclusive)
+
+  /** Explicit time-axis construction preserves annotation clocks without a media-edition claim. */
+  def onTimeAxis(
+      axis: PresentationAxis,
+      start: Long,
+      endExclusive: Long
+  ): Either[DomainError, PlaybackInterval] =
+    if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline then
+      Left(SourceCanon.inv("interval/time", "axis is not a declared time axis"))
     else if endExclusive <= start then
       Left(
         SourceCanon.fmt(
@@ -884,7 +904,7 @@ object PlaybackInterval:
         )
       )
     else
-      PlaybackCoordinate.on(axis, start).flatMap { _ =>
+      PlaybackCoordinate.onTimeAxis(axis, start).flatMap { _ =>
         axis.extent match
           case pt: AxisExtent.PlaybackTicks if endExclusive > pt.endExclusive =>
             Left(

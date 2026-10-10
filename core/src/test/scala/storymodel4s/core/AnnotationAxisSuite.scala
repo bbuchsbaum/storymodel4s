@@ -49,3 +49,27 @@ class AnnotationAxisSuite extends FunSuite:
     assert(SourceBundle.annotationTable(sha, 10L, 10L, tb).isLeft)
     assert(SourceBundle.annotationTable(sha, 10L, 5L, tb).isLeft)
   }
+
+  test(
+    "explicit annotation ticks intervals and points preserve kind extent and exact large ticks"
+  ) {
+    val start = 9007199254740993L
+    val bundle = SourceBundle.annotationTable(sha, start, start + 100, tb).toOption.get
+    val axis = bundle.primaryAxis
+    val interval = PlaybackInterval.onTimeAxis(axis, start + 1, start + 3).toOption.get
+    val point = PlaybackInstant.onTimeAxis(axis, start + 2).toOption.get
+    assertEquals(interval.start, start + 1)
+    assertEquals(interval.endExclusive, start + 3)
+    assertEquals(point.at, start + 2)
+    assertEquals(interval.axis, axis.id)
+    assertEquals(point.axis, axis.id)
+    assert(PlaybackInterval.on(axis, start + 1, start + 3).isLeft)
+    assert(PlaybackInstant.on(axis, start + 2).isLeft)
+    assert(PlaybackInterval.onTimeAxis(axis, start - 1, start + 3).isLeft)
+    assert(PlaybackInterval.onTimeAxis(axis, start + 1, start + 101).isLeft)
+    assert(PlaybackInstant.onTimeAxis(axis, start + 100).isLeft)
+    val text =
+      SourceBundle.writtenText(StorySource.fromText("Anna.").toOption.get).toOption.get.primaryAxis
+    assert(PlaybackInterval.onTimeAxis(text, 0, 1).isLeft)
+    assert(PlaybackInstant.onTimeAxis(text, 0).isLeft)
+  }

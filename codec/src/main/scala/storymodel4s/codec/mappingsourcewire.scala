@@ -286,7 +286,7 @@ private[codec] object MappingSourceWire:
       end <- field[Json](value, "end_exclusive_tick").flatMap(
         decimal(_, "interval.end_exclusive_tick")
       )
-      interval <- domain(PlaybackInterval.on(axis, start, end))
+      interval <- domain(PlaybackInterval.onTimeAxis(axis, start, end))
     yield interval
     def intervals(value: Json): Result[PlaybackIntervalSet] = read[Vector[Json]](value)
       .flatMap(_.traverse(readInterval))
@@ -308,7 +308,7 @@ private[codec] object MappingSourceWire:
             id <- field[String](value, "axis")
             axis <- lookupAxis(id)
             tick <- field[Json](value, "tick").flatMap(decimal(_, "anchor.tick"))
-            at <- domain(PlaybackInstant.on(axis, tick))
+            at <- domain(PlaybackInstant.onTimeAxis(axis, tick))
           yield EvidenceAnchor.MediaPoint(b, s, at)
         case "shot" =>
           for
