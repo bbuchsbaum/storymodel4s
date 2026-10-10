@@ -72,8 +72,10 @@ def source_support(decoded, annotation_rows):
     require(len(axes) == 2, "annotation axis denominator")
     axis_part = {}
     for axis in axes.values():
+        require(axis["kind"] == "AnnotationTimeline" and axis["source_kind"] == {"status": "AnnotationTable"}
+                and axis["edition"]["status"] == "absent", "annotation scope must not claim a movie edition")
         extent = axis["extent"]
-        require(extent["kind"] == "playback-ticks" and extent["start_tick"] == "0" and
+        require(extent["status"] == "playback-ticks" and extent["start_tick"] == "0" and
                 extent["timebase"] == {"numerator": "1", "denominator": "1"},
                 "annotation axis clock")
         end = extent["end_exclusive_tick"]
@@ -89,9 +91,9 @@ def source_support(decoded, annotation_rows):
         require(":timed:" in target_id, "foreign leaf target")
         ordinal = int(target_id.rsplit(":", 1)[1])
         status = target["support_status"]
-        require(status["kind"] == "located" and status["support_relation"] == "evidence-support", "missing leaf support")
+        require(status["status"] == "located" and status["support_relation"] == "evidence-support", "missing leaf support")
         support = status["source_support"]
-        require(support["kind"] == "anchored" and len(support["anchors"]) == 1, "leaf support shape")
+        require(support["status"] == "anchored" and len(support["anchors"]) == 1, "leaf support shape")
         leaves.append((ordinal, support["anchors"][0]))
     require(sorted(ordinal for ordinal, _ in leaves) == list(range(1, 1001)), "leaf target denominator")
     require(sum(target["level"] == 1 for target in source["targets"]) == 50, "group target denominator")
@@ -160,7 +162,7 @@ def inspect_workspace(input_dir):
     for outcome in outcomes:
         participant = outcome["participant"]
         packet = output / outcome["workspace"]
-        require(outcome["failure"] is None and outcome["readiness"] == "Ready" and
+        require(outcome.get("failure") is None and outcome["readiness"] == "Ready" and
                 outcome["workspace"] in files and sha_bytes(packet.read_bytes()) == files[outcome["workspace"]],
                 "workspace packet identity")
         value = inspect(packet.read_text(encoding="utf-8"), expected_digests[participant])
@@ -177,8 +179,8 @@ def inspect_workspace(input_dir):
         decoded[participant] = value
     require(len({json.dumps(value["source"], sort_keys=True) for value in decoded.values()}) == 1,
             "foreign cohort source")
-    require(len({tuple(unit["id"] for unit in value["inventory"]["units"]) for value in decoded.values()}) == 1,
-            "foreign cohort units")
+    require(len({tuple(unit["id"] for unit in value["inventory"]["units"]) for value in decoded.values()}) == 2,
+            "distinct recalls must retain their own unit identities")
 
 
 def main():

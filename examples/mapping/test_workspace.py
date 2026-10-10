@@ -45,6 +45,17 @@ class WorkspaceReaderTests(unittest.TestCase):
     def check(self, packet):
         return inspect(json.dumps(packet, separators=(",", ":")))
 
+    def changed_reconstruction(self, change):
+        packet = self.packet()
+        entry = next(e for e in packet["entries"] if e["role"] == {"kind": "Mapping", "id": "reconstruction"})
+        body = next(f for f in packet["files"] if f["path"] == entry["path"])
+        record = json.loads(body["utf8"])
+        change(record["outcomes"][0])
+        body["utf8"] = json.dumps(record, separators=(",", ":"))
+        rehash(packet, "Mapping", "reconstruction")
+        refresh_receipt_and_capabilities(packet, "reconstruction")
+        return packet
+
     def test_positive_controls(self):
         for text in self.packets.values():
             self.assertIn("records", inspect(text))
@@ -82,6 +93,39 @@ class WorkspaceReaderTests(unittest.TestCase):
         refresh_receipt_and_capabilities(packet, "reference")
         with self.assertRaisesRegex(ValueError, "missing reference outcome"):
             self.check(packet)
+
+    def test_rehashed_wrong_measure_kind_refuses(self):
+        def change(outcome):
+            for row in outcome["mapping_links"]:
+                if row["measure_kind"] == "ModelPosterior":
+                    row["measure_kind"] = "NormalizedScoreMass"
+        with self.assertRaisesRegex(ValueError, "conflated workspace measure kind"):
+            self.check(self.changed_reconstruction(change))
+
+    def test_rehashed_missing_posterior_alternatives_refuse(self):
+        def change(outcome):
+            outcome["mapping_links"] = [r for r in outcome["mapping_links"] if r["measure_kind"] != "ModelPosterior"]
+        with self.assertRaisesRegex(ValueError, "workspace measure alternatives presence"):
+            self.check(self.changed_reconstruction(change))
+
+    def test_rehashed_absent_posterior_metadata_refuses(self):
+        def change(outcome):
+            outcome["measures"]["posterior"] = {"status": "absent", "reason": "not-supplied"}
+        with self.assertRaisesRegex(ValueError, "workspace measure alternatives presence"):
+            self.check(self.changed_reconstruction(change))
+
+    def test_rehashed_wrong_decision_basis_refuses(self):
+        def change(outcome):
+            outcome["decision"]["value"]["basis"]["measure_kind"] = "NormalizedScoreMass"
+        with self.assertRaisesRegex(ValueError, "workspace decision basis"):
+            self.check(self.changed_reconstruction(change))
+
+    def test_rehashed_swapped_stage_roles_refuse(self):
+        def change(outcome):
+            refs = outcome["stages"]["value"]
+            refs["inference"], refs["decision"] = refs["decision"], refs["inference"]
+        with self.assertRaisesRegex(ValueError, "foreign outcome stages"):
+            self.check(self.changed_reconstruction(change))
 
 
 if __name__ == "__main__":

@@ -306,6 +306,9 @@ final class HsmmResult private (
     val textWireCompatible: Boolean,
     val gateSemantics: GateSemantics
 ):
+  /** Immutable result identity is rendered once even when every mapping link checks its binding. */
+  private[align] lazy val mappingResultDigest: Checksum = MappingBindingRender.result(this)
+
   /** Digest of the derived admissibility, for the wire's drift check. */
   def admissibilityEcho: AdmissibilityEcho = AdmissibilityEcho.of(admissibility)
 

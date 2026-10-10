@@ -46,6 +46,11 @@ class NumericalPropagationSuite extends FunSuite:
     val changedRow = AlignmentRow.of(row.unit, row.mass.updated(state, adjacent)).toOption.get
     val posterior = AlignmentMatrix.of(original.posterior.rows.updated(0, changedRow)).toOption.get
     val changed = MappingMeasureFixture.revalidate(original.costs, posterior, original.flow)
+    Vector(original, changed).foreach { result =>
+      val independentlyRendered = MappingBindingRender.result(result)
+      assertEquals(result.mappingResultDigest, independentlyRendered)
+      assertEquals(result.mappingResultDigest, independentlyRendered)
+    }
     assertNotEquals(MappingBindingRender.result(original), MappingBindingRender.result(changed))
     assertEquals(binding.checkResult(original), Right(()))
     assertEquals(binding.checkResult(changed), Left(MappingRefusal.BindingMismatch("resultDigest")))

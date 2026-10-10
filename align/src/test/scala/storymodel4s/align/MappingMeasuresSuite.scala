@@ -317,6 +317,136 @@ class MappingMeasuresSuite extends FunSuite:
     )
   }
 
+  test("batched links capture one source view and retain singular result values") {
+    def assertLinkFacts(actual: MappingLink, expected: MappingLink): Unit =
+      assertEquals(actual.destination, expected.destination)
+      assertEquals(actual.inferenceStage, expected.inferenceStage)
+      assertEquals(actual.candidateSet, expected.candidateSet)
+      (actual.gate, expected.gate) match
+        case (GateOutcome.NotGated, GateOutcome.NotGated)                                     => ()
+        case (_: GateOutcome.NoContradictionDetected, _: GateOutcome.NoContradictionDetected) => ()
+        case (a: GateOutcome.Contradicted, b: GateOutcome.Contradicted)                       =>
+          assertEquals(a.facets, b.facets)
+        case other => fail(s"gate mismatch: $other")
+      (actual.fidelity, expected.fidelity) match
+        case (a: FidelityStatus.NotAssessed, b: FidelityStatus.NotAssessed) =>
+          assertEquals(a.reason, b.reason)
+        case (FidelityStatus.NotApplicable, FidelityStatus.NotApplicable) => ()
+        case (a: FidelityStatus.Assessed, b: FidelityStatus.Assessed)     =>
+          assertEquals(a.report, b.report)
+        case other => fail(s"fidelity mismatch: $other")
+      (actual.termSupport, expected.termSupport) match
+        case (a: TermSupportStatus.NotComputed, b: TermSupportStatus.NotComputed) =>
+          assertEquals(a.reason, b.reason)
+        case (a: TermSupportStatus.Evaluated, b: TermSupportStatus.Evaluated) =>
+          assertEquals(a.assessment, b.assessment)
+        case other => fail(s"support mismatch: $other")
+    def assertPublished(actual: MappingLink, expected: MappingLink): Unit =
+      assertLinkFacts(actual, expected)
+      val actualDerivation = actual.derivation.asInstanceOf[MeasureDerivation.FromResult]
+      val expectedDerivation = expected.derivation.asInstanceOf[MeasureDerivation.FromResult]
+      assertEquals(actualDerivation.unit, expectedDerivation.unit)
+      assertEquals(actualDerivation.binding, expectedDerivation.binding)
+
+    val states = Vector(
+      result.costs(unit).keys.toVector.sorted.find(_.isSource).get,
+      result.costs(unit).keys.toVector.sorted.find(state => !state.isSource).get
+    )
+    assertEquals(states.size, 2)
+    var reads = 0
+    val changing = new SourceView:
+      def nodes: Vector[NodeSummary] =
+        reads += 1
+        if reads == 1 then view.nodes
+        else view.nodes.map(_.copy(predicate = Some("changed-after-snapshot")))
+      def node(ref: SourceNodeRef): Option[NodeSummary] = view.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        view.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
+      def scoringLength: Int = view.scoringLength
+    val requests = states.map(state => (unit, state, stages, candidate(unit)))
+    val batch = MappingLink
+      .fromResultBatch(result, bind(), recall, changing, source(view), requests)
+      .toOption
+      .get
+    val singular = states.map(state => link(unit, state).toOption.get)
+    assertEquals(reads, 1)
+    assertEquals(batch.size, requests.size)
+    batch.zip(singular).foreach(assertPublished)
+
+    val evidence = LocalEvidence
+      .compute(recall, view, AnnaFixture.candidates, AnnaFixture.costModel, gate = true)
+      .toOption
+      .get
+    val availableEvidenceStates =
+      evidence.breakdowns(evidence.units.indexOf(unit)).keys.toVector.sorted
+    val evidenceStates = Vector(
+      availableEvidenceStates.find(_.isSource).get,
+      availableEvidenceStates.find(state => !state.isSource).get
+    )
+    assertEquals(evidenceStates.size, 2)
+    var evidenceReads = 0
+    val changingEvidence = new SourceView:
+      def nodes: Vector[NodeSummary] =
+        evidenceReads += 1
+        if evidenceReads == 1 then view.nodes
+        else view.nodes.map(_.copy(predicate = Some("changed-after-evidence-snapshot")))
+      def node(ref: SourceNodeRef): Option[NodeSummary] = view.node(ref)
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        view.adjacency(layer)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
+      def scoringLength: Int = view.scoringLength
+    val evidenceRequests = evidenceStates.map(state => (unit, state, stages, candidate(unit)))
+    val evidenceBatch = MappingLink
+      .fromEvidenceBatch(evidence, recall, changingEvidence, source(view), evidenceRequests)
+      .toOption
+      .get
+    val evidenceSingular = evidenceStates.map(state =>
+      MappingLink
+        .fromEvidence(evidence, recall, view, source(view), unit, state, stages, candidate(unit))
+        .toOption
+        .get
+    )
+    assertEquals(evidenceReads, 1)
+    assertEquals(evidenceBatch.size, evidenceRequests.size)
+    evidenceBatch.zip(evidenceSingular).foreach { (actual, expected) =>
+      assertLinkFacts(actual, expected)
+      assertEquals(actual.derivation, MeasureDerivation.Supplied)
+      assertEquals(expected.derivation, MeasureDerivation.Supplied)
+    }
+  }
+
+  test("batched links refuse foreign result scope and evidence") {
+    val state = result.costs(unit).keys.toVector.sorted.head
+    val request = Vector((unit, state, stages, candidate(unit)))
+    assertEquals(
+      MappingLink
+        .fromResultBatch(costVariant, bind(), recall, view, source(view), request)
+        .left
+        .toOption,
+      Some(MappingRefusal.BindingMismatch("resultDigest"))
+    )
+    val changed = view.copy(nodes =
+      view.nodes.map(
+        _.copy(propositional = PropositionalScope.Undeclared(MissingReason.ProviderAbstained))
+      )
+    )
+    assertEquals(
+      MappingLink
+        .fromResultBatch(result, bind(), recall, changed, source(view), request)
+        .left
+        .toOption,
+      Some(MappingRefusal.BindingMismatch("scopeDigest"))
+    )
+    val ungated = LocalEvidence
+      .compute(recall, view, AnnaFixture.candidates, AnnaFixture.costModel, gate = false)
+      .toOption
+      .get
+    MappingLink.fromEvidenceBatch(ungated, recall, view, source(view), request) match
+      case Left(MappingRefusal.InvalidValue("link.evidence", _)) => ()
+      case other => fail(s"expected foreign evidence refusal, got $other")
+  }
+
   test("binding construction consumes one captured node inventory") {
     var reads = 0
     val changing = new SourceView:

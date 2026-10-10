@@ -2,7 +2,6 @@ package storymodel4s.codec
 
 import cats.syntax.all.*
 import io.circe.{Decoder, Json}
-import io.circe.jawn.JawnParser
 import java.nio.charset.StandardCharsets.UTF_8
 import storymodel4s.align.bridge.{MediaLocus, TimedSegment, TimedSourceView}
 import storymodel4s.core.*
@@ -22,7 +21,11 @@ object TimedSourceArtifactCodec:
     "characters"
   )
 
-  private val parser = new JawnParser(maxValueSize = None, allowDuplicateKeys = false)
+  private def parse(text: String): Either[String, Json] =
+    for
+      _ <- MappingJson.uniqueObjectKeys(text).left.map(_.toString)
+      json <- Canonical.parse(text).left.map(_.toString)
+    yield json
 
   private def field[A: Decoder](j: Json, name: String): Either[String, A] =
     j.hcursor.get[A](name).left.map(_.message)
@@ -46,7 +49,7 @@ object TimedSourceArtifactCodec:
       table: Vector[Vector[String]]
   ): Either[String, Map[String, SourceBundle]] =
     for
-      json <- parser.parse(text).left.map(_.message)
+      json <- parse(text)
       rows <- json.asArray.map(_.toVector).toRight("parts must be an array")
       entries <- rows.traverse { row =>
         for
@@ -159,7 +162,7 @@ object TimedSourceArtifactCodec:
   /** Refuses any prepared artifact whose checked replay cannot be reconstructed exactly. */
   def decode(text: String): Either[String, TimedSourceView] =
     for
-      json <- parser.parse(text).left.map(_.message)
+      json <- parse(text)
       _ <- exact(json, Set("schemaVersion", "csv", "parts"))
       schema <- field[String](json, "schemaVersion")
       _ <- Either.cond(schema == "prepared-timed-source/v1", (), "unsupported timed source")

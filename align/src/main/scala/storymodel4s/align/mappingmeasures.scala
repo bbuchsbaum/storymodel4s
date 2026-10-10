@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import cats.data.NonEmptySet
+import cats.syntax.all.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -250,10 +251,49 @@ object MappingLink:
       stages: UnitStageRefs,
       candidateSet: CandidateSetId
   ): Either[MappingRefusal, MappingLink] =
+    fromResultBatch(
+      result,
+      binding,
+      recall,
+      view,
+      source,
+      Vector((unit, state, stages, candidateSet))
+    ).map(_.head)
+
+  /** Shares one immutable source capture when one retained result emits several link claims. */
+  private[align] def fromResultBatch(
+      result: HsmmResult,
+      binding: DerivationBinding,
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      source: SourceRepresentation,
+      requests: Vector[(RecallUnitId, AlignState, UnitStageRefs, CandidateSetId)]
+  ): Either[MappingRefusal, Vector[MappingLink]] =
     val checkedView = MappingBindingRender.snapshot(view)
     for
-      derivation <- MeasureDerivation.fromResult(result, unit, binding)
+      _ <- binding.checkResult(result)
       _ <- binding.checkContext(recall, checkedView, source)
+      derivations <- requests
+        .map(_._1)
+        .distinct
+        .traverse(unit => MeasureDerivation.fromResult(result, unit, binding).map(unit -> _))
+      derivationsByUnit = derivations.toMap
+      links <- requests.traverse(
+        fromResultLink(result, recall, checkedView, source, derivationsByUnit, _)
+      )
+    yield links
+
+  private def fromResultLink(
+      result: HsmmResult,
+      recall: RecallGraph[Checked],
+      checkedView: SourceView,
+      source: SourceRepresentation,
+      derivations: Map[RecallUnitId, MeasureDerivation.FromResult],
+      request: (RecallUnitId, AlignState, UnitStageRefs, CandidateSetId)
+  ): Either[MappingRefusal, MappingLink] =
+    val (unit, state, stages, candidateSet) = request
+    for
+      derivation <- derivations.get(unit).toRight(MappingRefusal.UnknownUnit(unit))
       recalled <- recall.byId.get(unit).toRight(MappingRefusal.UnknownUnit(unit))
       cost <- result.costs
         .get(unit)
@@ -320,6 +360,22 @@ object MappingLink:
       stages: UnitStageRefs,
       candidateSet: CandidateSetId
   ): Either[MappingRefusal, MappingLink] =
+    fromEvidenceBatch(
+      evidence,
+      recall,
+      view,
+      source,
+      Vector((unit, state, stages, candidateSet))
+    ).map(_.head)
+
+  /** Shares one immutable source capture when local evidence emits several link claims. */
+  private[align] def fromEvidenceBatch(
+      evidence: LocalEvidence,
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      source: SourceRepresentation,
+      requests: Vector[(RecallUnitId, AlignState, UnitStageRefs, CandidateSetId)]
+  ): Either[MappingRefusal, Vector[MappingLink]] =
     val checkedView = MappingBindingRender.snapshot(view)
     for
       _ <- LocalEvidence
@@ -332,6 +388,18 @@ object MappingLink:
         (),
         MappingRefusal.BindingMismatch("link.source")
       )
+      links <- requests.traverse(fromEvidenceLink(evidence, recall, checkedView, source, _))
+    yield links
+
+  private def fromEvidenceLink(
+      evidence: LocalEvidence,
+      recall: RecallGraph[Checked],
+      checkedView: SourceView,
+      source: SourceRepresentation,
+      request: (RecallUnitId, AlignState, UnitStageRefs, CandidateSetId)
+  ): Either[MappingRefusal, MappingLink] =
+    val (unit, state, stages, candidateSet) = request
+    for
       index <- Option
         .when(evidence.units.contains(unit))(evidence.units.indexOf(unit))
         .toRight(MappingRefusal.UnknownUnit(unit))

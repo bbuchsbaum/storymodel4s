@@ -64,6 +64,8 @@ def archive(text):
         roles[key] = body
     required = {"SourceInput", "Recall", "Inventory", "Derivation", "Receipt", "Capabilities", "Mapping:reference", "Mapping:reconstruction"}
     require(set(roles) == required, "archive roles")
+    require(len(value["entries"]) == len(paths) and
+            {e["path"] for e in value["entries"]} == set(paths), "archive file set")
     capabilities = parse(roles["Capabilities"])
     require(capabilities["schemaVersion"] == "workspace-capabilities/v0.1" and capabilities["inspection"] == "Granted" and capabilities["export"] == "Granted", "workspace grants")
     entry_by_key = {role_key(e["role"]): e for e in value["entries"]}
@@ -90,7 +92,10 @@ def stage_join(record, member):
         if outcome["processing_status"]["status"] == "complete":
             refs = outcome["stages"]
             require(refs["status"] == "present", "complete outcome missing stages")
-            require({stages[v]["stage"] for v in refs["value"].values()} == {"Inference", "Candidates", "Decision"}, "foreign outcome stages")
+            required = {"inference": "Inference", "candidates": "Candidates", "decision": "Decision"}
+            require(set(refs["value"]) == set(required) and all(
+                stages.get(refs["value"][key], {}).get("stage") == expected
+                for key, expected in required.items()), "foreign outcome stages")
             for link in outcome["links"]:
                 require(stages[link["inference_stage_id"]]["stage"] == "Inference", "foreign link stage")
     require(len(bindings) == 2 and len(set(bindings)) == 1, "foreign execution receipt")
@@ -103,6 +108,7 @@ def inspect(text, expected_recall_text_digest=None):
     recall = parse(roles["Recall"])
     workspace_inventory = parse(roles["Inventory"])
     receipt = parse(roles["Receipt"])
+    require(parse(roles["Derivation"]) == {"schemaVersion": "imported-mapping-claims/v1", "authority": "inspection-only"}, "imported authority description")
     require(receipt["producerRevision"] and re.fullmatch(r"[0-9a-f]{40}", receipt["producerRevision"]), "producer revision")
     require(receipt["sourceEdition"] == sha(source_input["artifact"]), "source edition")
     raw_texts = []
@@ -151,9 +157,21 @@ def inspect(text, expected_recall_text_digest=None):
         require(record["inventory"] == inventory, "foreign inventory")
         expected = "NormalizedScoreMass" if name == "reference" else "ModelPosterior"
         for outcome in record["outcomes"]:
+            allowed = {expected} if name == "reference" else {expected, "RawScore"}
+            require(all(row["measure_kind"] in allowed for row in outcome["mapping_links"]), "conflated workspace measure kind")
             values = [measure_number(row["raw_value"]) for row in outcome["mapping_links"] if row["measure_kind"] == expected]
-            if values:
+            family = "normalized" if name == "reference" else "posterior"
+            measure = outcome["measures"][family]
+            require(measure["status"] in {"present", "absent"}, "workspace measure presence")
+            present = measure["status"] == "present"
+            require(present == bool(values), "workspace measure alternatives presence")
+            require(all(outcome["measures"][other]["status"] == "absent"
+                        for other in {"normalized", "posterior", "transport"} - {family}), "workspace measure family")
+            if present:
                 require(all(v >= 0 for v in values) and math.isclose(math.fsum(values), 1.0, rel_tol=0, abs_tol=1e-12), "invalid normalized measure")
+            decision = outcome["decision"]
+            if decision["status"] == "present":
+                require(present and decision["value"]["basis"]["measure_kind"] == expected, "workspace decision basis")
         bindings.append(stage_join(record, name))
     require(len(set(bindings)) == 1, "foreign paired execution")
     require([u["id"] for u in inventory["units"]] == [o["unit"] for o in documents["reference"]["outcomes"]], "missing reference outcome")

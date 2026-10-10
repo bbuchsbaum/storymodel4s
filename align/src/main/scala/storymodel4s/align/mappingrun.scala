@@ -165,74 +165,95 @@ object MappingRun:
       )
       outcomes <- member match
         case Member.Reference =>
-          e.reference.outcomes.traverse {
-            case n: LocalReference.NotComputed =>
-              Right(UnitOutcome.excluded(n.unit, "local-reference:" + n.reason.toString))
-            case c: LocalReference.Computed =>
-              val mass = c.mass.toVector.groupMapReduce((s, _) => Destination.of(s))(_._2)(_ + _)
-              val candidates = CandidateSetId.of(stages.candidates, c.unit, mass.keySet)
-              for
-                normalized <- NormalizedScoreMass.of(
-                  universe.id,
-                  prior,
-                  e.reference.profile.temperature,
-                  mass,
-                  stages.inference
-                )
-                measures <- UnitMeasures.of(Vector.empty, Some(normalized), None, None)
-                basis <- DecisionBasis.of(MeasureKind.NormalizedScoreMass, None)
-                links <- c.mass.keys.toVector.sorted.traverse(state =>
-                  MappingLink.fromEvidence(
-                    e.reference.evidence,
-                    e.recall,
-                    e.view,
-                    e.source,
-                    c.unit,
-                    state,
-                    stages,
-                    candidates
-                  )
-                )
-                outcome <- UnitOutcome.computed(
-                  c.unit,
-                  measures,
-                  links,
-                  basis,
-                  DecisionRequest.RawArgmax,
-                  stages
-                )
-              yield outcome
+          val computed = e.reference.outcomes.collect { case c: LocalReference.Computed => c }
+          val requests = computed.flatMap { c =>
+            val mass = c.mass.toVector.groupMapReduce((s, _) => Destination.of(s))(_._2)(_ + _)
+            val candidates = CandidateSetId.of(stages.candidates, c.unit, mass.keySet)
+            c.mass.keys.toVector.sorted.map(state => (c.unit, state, stages, candidates))
           }
+          for
+            batched <- MappingLink.fromEvidenceBatch(
+              e.reference.evidence,
+              e.recall,
+              e.view,
+              e.source,
+              requests
+            )
+            linksByRequest = requests
+              .zip(batched)
+              .map((request, link) => (request._1, request._2) -> link)
+              .toMap
+            rows <- e.reference.outcomes.traverse {
+              case n: LocalReference.NotComputed =>
+                Right(UnitOutcome.excluded(n.unit, "local-reference:" + n.reason.toString))
+              case c: LocalReference.Computed =>
+                val mass = c.mass.toVector.groupMapReduce((s, _) => Destination.of(s))(_._2)(_ + _)
+                for
+                  normalized <- NormalizedScoreMass.of(
+                    universe.id,
+                    prior,
+                    e.reference.profile.temperature,
+                    mass,
+                    stages.inference
+                  )
+                  measures <- UnitMeasures.of(Vector.empty, Some(normalized), None, None)
+                  basis <- DecisionBasis.of(MeasureKind.NormalizedScoreMass, None)
+                  links <- c.mass.keys.toVector.sorted.traverse(state =>
+                    linksByRequest
+                      .get((c.unit, state))
+                      .toRight(MappingRefusal.MissingCost(c.unit, state))
+                  )
+                  outcome <- UnitOutcome.computed(
+                    c.unit,
+                    measures,
+                    links,
+                    basis,
+                    DecisionRequest.RawArgmax,
+                    stages
+                  )
+                yield outcome
+            }
+          yield rows
         case Member.Weighted(selection) =>
           selection.inference
             .toRight(MappingRefusal.BindingMismatch("interior inference"))
             .flatMap { result =>
               for
                 binding <- DerivationBinding.of(result, e.recall, e.inventory, e.view, e.source)
-                rows <- e.inventory.units.traverse { unit =>
-                  for
-                    posterior <- ModelPosterior.of(result, unit.id, binding, stages.inference)
-                    candidates = CandidateSetId.of(
+                requests <- e.inventory.units.traverse { unit =>
+                  ModelPosterior.of(result, unit.id, binding, stages.inference).map { posterior =>
+                    val candidates = CandidateSetId.of(
                       stages.candidates,
                       unit.id,
                       posterior.mass.keys.map(Destination.of).toSet
                     )
-                    states = (posterior.mass.keySet ++ result.costs
+                    val states = (posterior.mass.keySet ++ result.costs
                       .get(unit.id)
                       .toVector
                       .flatMap(_.keys)).toVector.sorted
-                    links <- states.traverse(
-                      MappingLink.fromResult(
-                        result,
-                        binding,
-                        e.recall,
-                        e.view,
-                        e.source,
-                        unit.id,
-                        _,
-                        stages,
-                        candidates
-                      )
+                    (unit, posterior, candidates, states)
+                  }
+                }
+                batched <- MappingLink.fromResultBatch(
+                  result,
+                  binding,
+                  e.recall,
+                  e.view,
+                  e.source,
+                  requests.flatMap { (unit, _, candidates, states) =>
+                    states.map(state => (unit.id, state, stages, candidates))
+                  }
+                )
+                linksByRequest = requests
+                  .flatMap { (unit, _, _, states) => states.map(state => unit.id -> state) }
+                  .zip(batched)
+                  .toMap
+                rows <- requests.traverse { (unit, posterior, _, states) =>
+                  for
+                    links <- states.traverse(state =>
+                      linksByRequest
+                        .get((unit.id, state))
+                        .toRight(MappingRefusal.MissingCost(unit.id, state))
                     )
                     raw <- RawScores.fromCosts(
                       result,
@@ -258,30 +279,40 @@ object MappingRun:
           val result = e.reconstruction.inference
           for
             binding <- DerivationBinding.of(result, e.recall, e.inventory, e.view, e.source)
-            rows <- e.reconstruction.decisions.traverse { d =>
-              for
-                posterior <- ModelPosterior.of(result, d.unit, binding, stages.inference)
-                candidates = CandidateSetId.of(
+            requests <- e.reconstruction.decisions.traverse { d =>
+              ModelPosterior.of(result, d.unit, binding, stages.inference).map { posterior =>
+                val candidates = CandidateSetId.of(
                   stages.candidates,
                   d.unit,
                   posterior.mass.keys.map(Destination.of).toSet
                 )
-                states = (posterior.mass.keySet ++ result.costs
+                val states = (posterior.mass.keySet ++ result.costs
                   .get(d.unit)
                   .toVector
                   .flatMap(_.keys)).toVector.sorted
-                links <- states.traverse(
-                  MappingLink.fromResult(
-                    result,
-                    binding,
-                    e.recall,
-                    e.view,
-                    e.source,
-                    d.unit,
-                    _,
-                    stages,
-                    candidates
-                  )
+                (d, posterior, candidates, states)
+              }
+            }
+            batched <- MappingLink.fromResultBatch(
+              result,
+              binding,
+              e.recall,
+              e.view,
+              e.source,
+              requests.flatMap { (d, _, candidates, states) =>
+                states.map(state => (d.unit, state, stages, candidates))
+              }
+            )
+            linksByRequest = requests
+              .flatMap { (d, _, _, states) => states.map(state => d.unit -> state) }
+              .zip(batched)
+              .toMap
+            rows <- requests.traverse { (d, posterior, _, states) =>
+              for
+                links <- states.traverse(state =>
+                  linksByRequest
+                    .get((d.unit, state))
+                    .toRight(MappingRefusal.MissingCost(d.unit, state))
                 )
                 raw <- RawScores.fromCosts(
                   result,

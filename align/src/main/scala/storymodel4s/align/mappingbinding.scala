@@ -35,7 +35,7 @@ final class DerivationBinding private (
       Left(MappingRefusal.BindingMismatch("recallChecksum"))
     else if result.viewFingerprint != viewFingerprint then
       Left(MappingRefusal.BindingMismatch("viewFingerprint"))
-    else if MappingBindingRender.result(result) != resultDigest then
+    else if result.mappingResultDigest != resultDigest then
       Left(MappingRefusal.BindingMismatch("resultDigest"))
     else Right(())
 
@@ -83,7 +83,7 @@ object DerivationBinding:
           inventory.digest,
           source.viewFingerprint,
           source.scopeDigest,
-          MappingBindingRender.result(result)
+          result.mappingResultDigest
         )
       )
 
