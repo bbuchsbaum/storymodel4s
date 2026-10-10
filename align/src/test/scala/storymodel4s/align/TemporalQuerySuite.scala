@@ -248,7 +248,12 @@ class TemporalQuerySuite extends FunSuite:
     val nested =
       view.copy(nodes = nodes.map(n => if n.ref == e(4) then n.copy(parent = Some(e(2))) else n))
     val s = SourceRepresentation.of(nested, bundles, None, physical(false)).toOption.get
-    assert(s.target(group).get.supportCoverage.isInstanceOf[SupportCoverage.Complete])
+    assert(s.target(group).get.supportCoverage.isInstanceOf[SupportCoverage.Partial])
+    val coverage = s.target(group).get.supportCoverage.asInstanceOf[SupportCoverage.Partial]
+    assertEquals(
+      coverage.missing.toSortedSet,
+      scala.collection.immutable.SortedSet(e(4))
+    )
     val ds = Vector(declaration(group, Allocation.UniformIntervals))
     val p = prepared(mapping(s, Map(Destination.Target(group) -> 1.0)), ds)
     assertEquals(p.domains.head.availability.left.toOption, Some(Unavailable.MissingDescendant))

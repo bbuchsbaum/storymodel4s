@@ -154,11 +154,23 @@ object SourceRepresentation:
         nodes: Vector[NodeSummary],
         physical: Map[SourceNodeRef, SourceSupportStatus]
     ): Coverage =
-      val children = nodes.filter(_.parent.contains(ref)).map(_.ref)
+      val children =
+        nodes.flatMap(node => node.parent.map(_ -> node.ref)).groupMap(_._1)(_._2)
+      @annotation.tailrec
+      def descendants(
+          pending: List[SourceNodeRef],
+          found: Set[SourceNodeRef]
+      ): Set[SourceNodeRef] =
+        pending match
+          case Nil                                  => found - ref
+          case next :: rest if found.contains(next) => descendants(rest, found)
+          case next :: rest                         =>
+            descendants(children.getOrElse(next, Vector.empty).toList ++ rest, found + next)
+      val declared = descendants(children.getOrElse(ref, Vector.empty).toList, Set(ref))
       val missing = SortedSet.from(
-        children.filter(r => physical(r).isInstanceOf[SourceSupportStatus.Unlocated])
+        declared.filter(r => physical(r).isInstanceOf[SourceSupportStatus.Unlocated])
       )
-      if children.nonEmpty then
+      if declared.nonEmpty then
         NonEmptySet.fromSet(missing).fold[Coverage](Complete.derived())(Partial.derived)
       else if physical(ref).isInstanceOf[SourceSupportStatus.Located] then Complete.derived()
       else Unknown.derived()

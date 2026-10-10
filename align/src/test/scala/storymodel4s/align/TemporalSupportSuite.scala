@@ -79,13 +79,16 @@ class TemporalSupportSuite extends FunSuite:
   ): TemporalSupport =
     TemporalSupport.read(value, ref, selection).fold(e => fail(e.toString), identity)
 
-  test("transitive unlocated descendants survive located intermediate groups") {
+  test("transitive unlocated descendants make a group support coverage partial") {
     val nested =
       view.copy(nodes = nodes.map(n => if n.ref == e(4) then n.copy(parent = Some(e(2))) else n))
     val value = SourceRepresentation.of(nested, bundles, None, physical(false)).toOption.get
-    assert(
-      value.target(group).get.supportCoverage.isInstanceOf[SupportCoverage.Complete]
-    ) // Legacy wire is unchanged.
+    assert(value.target(group).get.supportCoverage.isInstanceOf[SupportCoverage.Partial])
+    val coverage = value.target(group).get.supportCoverage.asInstanceOf[SupportCoverage.Partial]
+    assertEquals(
+      coverage.missing.toSortedSet,
+      scala.collection.immutable.SortedSet(e(4))
+    )
     val result = read(value, group, Selection.Part(a.identity))
     assertEquals(result.unlocatedDescendants, Vector(e(4)))
     assertEquals(result.unavailableDescendants, Vector(e(4)))
