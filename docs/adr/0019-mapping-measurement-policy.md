@@ -942,3 +942,19 @@ Under the owner's October continuation, those two coarse edges are replaced with
 S2a-4 and S2b-3/4/5 producer prerequisites, and G1 waits for the existing consumers. Reject a
 replacement bypass ticket or premature G1 closure. Its acceptance, other dependencies and optional
 populated-cost court remain explicit in Mote.
+
+
+### 2026-10-09 — explicit structured reconstruction extraction
+
+The approved reconstruction bead introduces `StructuredReconstruction`: a checked profile
+binding HSMM configuration and the historical mass-summing group decoder, a source-bound
+hierarchy grouping with explicitly declared group ordinals, and producer-owned results retaining
+the original `LocalEvidence`, posterior, and distinct decisions. New profiles disable fill.
+The named Sherlock preset freezes its transition scaling; requested fill is explicit.
+Raw state argmax, source-anchor maximum, chosen anchor mass and fill origin remain separate.
+Group declarations and requested reconstruction-only fill have identities separate from the
+shared evidence. Neither supplies strict-reference or calibrated authority.
+
+Rejected alternatives: keeping environment reads in the portable decoder; deriving group ranks
+from node storage positions; replacing shared base costs with refined or fill scores; attaching
+raw-argmax mass to a different chosen anchor; exposing a public result constructor.
