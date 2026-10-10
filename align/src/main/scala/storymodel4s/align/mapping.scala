@@ -224,6 +224,55 @@ object UnitOutcome:
               )
       }
 
+  /** A genuine requested fill remains a fill even when its admitted posterior key has zero mass. */
+  private[align] def retainRequestedFill(
+      outcome: UnitOutcome,
+      execution: MappingRun.Execution
+  ): Either[MappingRefusal, UnitOutcome] =
+    execution.reconstruction.decisions
+      .find(_.unit == outcome.unit)
+      .toRight(MappingRefusal.UnknownUnit(outcome.unit))
+      .flatMap { actual =>
+        if actual.origin != StructuredReconstruction.Origin.RequestedFill then Right(outcome)
+        else
+          val expectedPolicy = DecisionPolicyId.unsafe(
+            "mapping-run:" + execution.reconstruction.profile.fingerprint.hex
+          )
+          for
+            decision <- outcome.decision.toRight(MappingRefusal.BindingMismatch("fill.decision"))
+            posterior <- outcome.measures.posterior.toRight(
+              MappingRefusal.BindingMismatch("fill.posterior")
+            )
+            _ <- posterior.binding.checkResult(execution.reconstruction.inference)
+            _ <- Either.cond(
+              posterior.unit == actual.unit &&
+                decision.basis.kind == MeasureKind.ModelPosterior &&
+                decision.chosen == actual.anchor.map(Destination.Target(_)) &&
+                decision.policy.contains(expectedPolicy),
+              (),
+              MappingRefusal.BindingMismatch("fill.execution")
+            )
+            retained = new Decision(
+              decision.basis,
+              decision.chosen,
+              DecisionOrigin.GapFill(expectedPolicy),
+              decision.rawArgmax,
+              decision.decodedMass,
+              decision.calibration,
+              decision.policy,
+              decision.request
+            )
+          yield new UnitOutcome(
+            outcome.unit,
+            outcome.processing,
+            outcome.localization,
+            outcome.links,
+            outcome.measures,
+            Some(retained),
+            outcome.stages
+          )
+      }
+
   def failed(unit: RecallUnitId, failure: ProcessingFailure): UnitOutcome =
     new UnitOutcome(
       unit,

@@ -17,8 +17,10 @@ enum CandidateRefusal:
   case NonFiniteScore(unit: RecallUnitId, ref: SourceNodeRef)
   case StrictScoring(unit: RecallUnitId, ref: SourceNodeRef, refusal: StrictScoringRefusal)
   case SurfaceContextRequired
+  case CaptionContextRequired
 
   def message: String = this match
+    case CaptionContextRequired => "caption candidates require their matching checked session"
     case SurfaceContextRequired =>
       "factorized surface candidates require a matching checked context"
     case NonPositivePerLevel(k)      => s"perLevel must be positive, got $k"
@@ -202,7 +204,8 @@ final class StrictCandidates private (
     val binding: StrictBinding,
     val byUnit: Map[RecallUnitId, StrictCandidateSet],
     val semanticChannel: Option[StrictSemanticChannel],
-    val surfaceContext: Option[SurfaceScoringContext]
+    val surfaceContext: Option[SurfaceScoringContext],
+    val captionSession: Option[CaptionScoring.Session] = None
 ):
   /** The unit's strict candidates, or `None` for a unit outside the bound recall. */
   def get(unit: RecallUnitId): Option[StrictCandidateSet] = byUnit.get(unit)
@@ -287,9 +290,12 @@ object StrictCandidateSet:
       config: StrictCandidateConfig,
       unit: RecallUnit,
       view: SourceView,
-      session: Option[SurfaceScoringSession]
+      session: Option[SurfaceScoringSession],
+      captionSession: Option[CaptionScoring.Session],
+      selectedLevel: Option[Int]
   ): Either[CandidateRefusal, StrictCandidateSet] =
-    val levels = view.byLevel.toVector.sortBy(_._1)
+    val levels =
+      view.byLevel.toVector.filter((level, _) => selectedLevel.forall(_ == level)).sortBy(_._1)
     levels
       .foldLeft[Either[CandidateRefusal, Vector[
         (Int, Vector[(SourceNodeRef, Double)], SemanticOutcomeSummary, Set[SourceNodeRef])
@@ -303,7 +309,7 @@ object StrictCandidateSet:
             ) { (values, node) =>
               values.flatMap { vs =>
                 StrictScoring
-                  .evaluate(semantic, unit, node, view, session)
+                  .evaluate(semantic, unit, node, view, session, captionSession)
                   .left
                   .map(r => CandidateRefusal.StrictScoring(unit.id, node.ref, r))
                   .map((u, t, _, estimate) =>
@@ -365,11 +371,16 @@ object StrictCandidates:
       config: StrictCandidateConfig,
       recall: RecallGraph[Checked],
       source: SourceView,
-      session: Option[SurfaceScoringSession] = None
+      session: Option[SurfaceScoringSession] = None,
+      captionSession: Option[CaptionScoring.Session] = None,
+      selectedLevel: Option[Int] = None
   ): Either[CandidateRefusal, StrictCandidates] =
     val view = MappingBindingRender.snapshot(source)
     val contextCheck: Either[CandidateRefusal, Unit] =
-      if semantic.isInstanceOf[StrictSemanticChannel.FactorizedSurface] &&
+      if semantic.isInstanceOf[StrictSemanticChannel.CaptionLexical] &&
+        !captionSession.exists(s => s.channel == semantic && s.binds(recall, view))
+      then Left(CandidateRefusal.CaptionContextRequired)
+      else if semantic.isInstanceOf[StrictSemanticChannel.FactorizedSurface] &&
         !session.exists(s => s.channel == semantic && s.context.binds(recall, view))
       then Left(CandidateRefusal.SurfaceContextRequired)
       else Right(())
@@ -380,7 +391,15 @@ object StrictCandidates:
         ) { (acc, unit) =>
           acc.flatMap(done =>
             StrictCandidateSet
-              .canonicalGenerated(semantic, config, unit, view, session)
+              .canonicalGenerated(
+                semantic,
+                config,
+                unit,
+                view,
+                session,
+                captionSession,
+                selectedLevel
+              )
               .map(set => done :+ (unit.id -> set))
           )
         }
@@ -390,7 +409,8 @@ object StrictCandidates:
             StrictBinding.of(recall, view),
             pairs.toMap,
             Some(semantic),
-            session.map(_.context)
+            session.map(_.context),
+            captionSession
           )
         )
     )
@@ -413,6 +433,29 @@ final class StrictCandidateGenerator(
     StrictCandidates.generated(semantic, config, recall, source)
 
 object StrictCandidateGenerator:
+  /** Nominate a declared complete hierarchy level while retaining the full source binding. */
+  def canonicalLevel(
+      semantic: StrictSemanticChannel,
+      config: StrictCandidateConfig,
+      recall: RecallGraph[Checked],
+      source: SourceView,
+      level: Int
+  ): Either[CandidateRefusal, StrictCandidates] =
+    StrictCandidates.canonical(semantic, config, recall, source, selectedLevel = Some(level))
+
+  /** Caption nomination uses the same bound session later required by pricing. */
+  def caption(
+      session: CaptionScoring.Session,
+      config: StrictCandidateConfig
+  ): Either[CandidateRefusal, StrictCandidates] =
+    StrictCandidates.canonical(
+      session.channel,
+      config,
+      session.recall,
+      session.view,
+      captionSession = Some(session)
+    )
+
   /** Strict content generation accepts only controlled adapters, never arbitrary closures. */
   def canonical(
       semantic: StrictSemanticChannel,

@@ -43,22 +43,26 @@ class MappingVocabularyUnforgeableSuite extends FunSuite:
   test("no Derived door") {
     assert(
       typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.core.*; new StageProvenance.Derived(??? : StageReceipt)"""
+        """import storymodel4s.align.*; import storymodel4s.core.*
+          new StageProvenance.Derived(
+            ??? : MappingRun.Execution, ??? : MappingRun.Member, ??? : StageReceipt
+          )"""
       ).nonEmpty
     )
     assert(
       typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.core.*; StageProvenance.Derived(??? : StageReceipt)"""
+        """import storymodel4s.align.*; import storymodel4s.core.*
+          StageProvenance.Derived(
+            ??? : MappingRun.Execution, ??? : MappingRun.Member, ??? : StageReceipt
+          )"""
       ).nonEmpty
     )
     assert(
       typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.core.*; StageProvenance.Derived.of(??? : StageReceipt)"""
-      ).nonEmpty
-    )
-    assert(
-      typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.core.*; StageProvenance.Derived.fromProduct(Tuple1(??? : StageReceipt))"""
+        """import storymodel4s.align.*; import storymodel4s.core.*
+          StageProvenance.Derived.fromProduct(Tuple3(
+            ??? : MappingRun.Execution, ??? : MappingRun.Member, ??? : StageReceipt
+          ))"""
       ).nonEmpty
     )
     assert(
@@ -70,6 +74,21 @@ class MappingVocabularyUnforgeableSuite extends FunSuite:
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; summon[scala.deriving.Mirror.ProductOf[StageProvenance.Derived]]"""
       ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+          case class DerivedControl(
+            execution: MappingRun.Execution, member: MappingRun.Member, receipt: StageReceipt
+          )
+          object DerivedControl:
+            def fromProduct(p: Product): DerivedControl =
+              summon[scala.deriving.Mirror.ProductOf[DerivedControl]].fromProduct(p)
+          DerivedControl(??? : MappingRun.Execution, ??? : MappingRun.Member, ??? : StageReceipt)
+          DerivedControl.fromProduct(Tuple3(
+            ??? : MappingRun.Execution, ??? : MappingRun.Member, ??? : StageReceipt
+          ))"""
+      ).isEmpty
     )
   }
   test("checked components have no raw product construction") {

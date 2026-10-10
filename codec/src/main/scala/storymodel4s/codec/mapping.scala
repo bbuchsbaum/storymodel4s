@@ -17,6 +17,27 @@ object MappingCodecs:
       text: String,
       context: ExpectedMappingContext
   ): Either[MappingCodecError, MappingResult] =
+    context.execution match
+      case None                      => decodeSupplied(text, context)
+      case Some((execution, member)) =>
+        for
+          json <- Canonical.parse(text).left.map(MappingCodecError.Wire(_))
+          _ <- uniqueObjectKeys(text)
+          _ <- reserved(json)
+          expected <- checked(execution.record(member))
+          _ <- Either.cond(
+            expected.inventory.digest == context.inventory.digest &&
+              expected.source.digest == context.source.digest,
+            (),
+            MappingCodecError.ValueMismatch("execution context")
+          )
+          _ <- exact(json, toJson(expected), "executed record")
+        yield expected
+
+  private def decodeSupplied(
+      text: String,
+      context: ExpectedMappingContext
+  ): Either[MappingCodecError, MappingResult] =
     for
       json <- Canonical.parse(text).left.map(MappingCodecError.Wire(_))
       version <- field[String](json, "schemaVersion")

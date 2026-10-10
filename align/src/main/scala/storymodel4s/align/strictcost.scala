@@ -11,6 +11,7 @@ enum StrictScoringRefusal:
   case AmbiguousGates(readings: Set[GateReading])
   case InvalidTable(detail: String)
   case SurfaceContextRequired
+  case CaptionContextRequired
   case Surface(reason: SurfaceEmbeddingRefusal)
 
   def message: String = this match
@@ -19,6 +20,7 @@ enum StrictScoringRefusal:
       s"single-facet model cannot consume ${rs.size} distinct measured gate readings"
     case InvalidTable(d)        => s"content table: $d"
     case SurfaceContextRequired => "factorized surface scoring requires its checked context"
+    case CaptionContextRequired => "caption scoring requires its matching checked context"
     case Surface(r)             => s"surface scoring refused: $r"
 
 /** Closed content adapters prevent a strict scorer from reading coordinate-bearing originals. */
@@ -65,6 +67,22 @@ object StrictSemanticChannel:
 
   object FactorizedSurface:
     def declared(data: SurfaceEmbedding.Data): FactorizedSurface = new FactorizedSurface(data)
+
+  /** Coordinate-free blend parameters; a checked session supplies the selected caption content. */
+  final class CaptionLexical private (val blend: Double) extends StrictSemanticChannel:
+    val kind: String = "caption-lexical/v1"
+    private[align] def score(
+        u: UnitContent[GraphOrder.Canonical],
+        t: TargetContent[GraphOrder.Canonical]
+    ): Estimate[Double] =
+      Estimate.missing(MissingReason.InputUnresolved)
+    override def equals(other: Any): Boolean = other match
+      case c: CaptionLexical => blend == c.blend
+      case _                 => false
+    override def hashCode: Int = blend.hashCode
+    override def toString: String = s"CaptionLexical($blend)"
+  object CaptionLexical:
+    private[align] def of(blend: Double): CaptionLexical = new CaptionLexical(blend)
 
   /** A frozen fixture adapter keyed only by canonical content, never by original identifiers.
     * Declared outcomes are fixture measurements, not evidence of provider execution.
@@ -198,7 +216,8 @@ final class StrictCostModel private (
     val externalMismatch: Double,
     val missingSemantic: Double,
     val distortionPenalty: Double,
-    val surfaceSession: Option[SurfaceScoringSession]
+    val surfaceSession: Option[SurfaceScoringSession],
+    val captionSession: Option[CaptionScoring.Session]
 ):
   private[align] def externalCost(unit: RecallUnit, state: ExternalState): Double =
     if state == ExternalState.Unranked || ExternalStates.natural(unit.function) == state then
@@ -212,7 +231,7 @@ final class StrictCostModel private (
       view: SourceView
   ): Either[AlignError, CostBreakdown] =
     StrictScoring
-      .evaluate(semantic, unit, node, view, surfaceSession)
+      .evaluate(semantic, unit, node, view, surfaceSession, captionSession)
       .left
       .map(r => AlignError.StrictScoring(unit.id, node.ref, r))
       .flatMap { (u, t, grain, semanticEstimate) =>
@@ -258,11 +277,20 @@ object StrictCostModel:
       externalMismatch: Double = 0.5,
       missingSemantic: Double = 0.5,
       distortionPenalty: Double = 0.3,
-      surfaceSession: Option[SurfaceScoringSession] = None
+      surfaceSession: Option[SurfaceScoringSession] = None,
+      captionSession: Option[CaptionScoring.Session] = None
   ): Either[AlignError, StrictCostModel] =
     val finiteNonnegative =
       Vector(externalFloor, externalMismatch, distortionPenalty) ++ functionPrior.costs.values
-    if semantic.isInstanceOf[StrictSemanticChannel.FactorizedSurface] &&
+    if semantic.isInstanceOf[StrictSemanticChannel.CaptionLexical] && !captionSession.exists(
+        _.channel == semantic
+      )
+    then
+      Left(AlignError.InvalidConfig("strict cost", "caption channel requires its matching session"))
+    else if !semantic.isInstanceOf[StrictSemanticChannel.CaptionLexical] && captionSession.nonEmpty
+    then
+      Left(AlignError.InvalidConfig("strict cost", "caption session supplied to another channel"))
+    else if semantic.isInstanceOf[StrictSemanticChannel.FactorizedSurface] &&
       !surfaceSession.exists(_.channel == semantic)
     then
       Left(
@@ -294,7 +322,8 @@ object StrictCostModel:
           externalMismatch,
           missingSemantic,
           distortionPenalty,
-          surfaceSession
+          surfaceSession,
+          captionSession
         )
       )
 
@@ -311,7 +340,8 @@ private[align] object StrictScoring:
       unit: RecallUnit,
       node: NodeSummary,
       view: SourceView,
-      session: Option[SurfaceScoringSession]
+      session: Option[SurfaceScoringSession],
+      captionSession: Option[CaptionScoring.Session] = None
   ): Either[
     StrictScoringRefusal,
     (
@@ -334,6 +364,18 @@ private[align] object StrictScoring:
               .map(_ => StrictScoringRefusal.Surface(SurfaceEmbeddingRefusal.ContextMismatch))
           yield (pair.unit, pair.target, pair.grain, scored.estimate)
       }
+    case _: StrictSemanticChannel.CaptionLexical =>
+      for
+        context <- captionSession
+          .filter(_.channel == semantic)
+          .toRight(StrictScoringRefusal.CaptionContextRequired)
+        pair <- ContentProjection
+          .canonical(unit, node, view)
+          .left
+          .map(StrictScoringRefusal.Projection.apply)
+        (u, t, grain) = pair
+        estimate <- context.evaluate(unit, node, u, t)
+      yield (u, t, grain, estimate)
     case _ =>
       ContentProjection
         .canonical(unit, node, view)

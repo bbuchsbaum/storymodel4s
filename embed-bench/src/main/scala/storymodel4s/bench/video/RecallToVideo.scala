@@ -42,59 +42,10 @@ import storymodel4s.recall.{
 /** Where a source node lives in a playable video: one part, one exact playback coordinate. A
   * zero-duration description is an [[MediaLocus.Instant]], never a fabricated interval.
   */
-enum MediaLocus:
-  case Extent(partId: String, interval: PlaybackInterval)
-  case Instant(partId: String, at: PlaybackInstant)
-
-  def part: String = this match
-    case Extent(p, _)  => p
-    case Instant(p, _) => p
-
-  def startTick: Long = this match
-    case Extent(_, iv)  => iv.start
-    case Instant(_, at) => at.at
-
-  def endTick: Long = this match
-    case Extent(_, iv)  => iv.endExclusive
-    case Instant(_, at) => at.at
-
-/** One time-aligned description of a video interval: the general input contract of the pipeline.
-  *
-  * `ordinal` is the segment's 1-based position in video time and must be unique; `locus` is its
-  * playback coordinate when the adapter can supply one; `group` is optional coarse structure
-  * (scenes, chapters) - a flat annotation simply leaves it empty and the built view has no level-1
-  * nodes. `extraLemmas` carries adapter-known match material beyond the text itself (character
-  * names, locations), already stemmed.
-  */
-final case class TimedSegment(
-    ordinal: Int,
-    text: String,
-    locus: Option[MediaLocus],
-    group: Option[TimedSegment.Group] = None,
-    extraLemmas: Set[String] = Set.empty,
-    locations: Vector[String] = Vector.empty,
-    embedText: Option[String] = None,
-    lexicalText: Option[String] = None
-)
-
-object TimedSegment:
-  /** Coarse grouping of segments (a scene, a chapter). Ordinals are 1-based in video order. */
-  /** Coarse grouping of segments. `embedText` is the rendering an embedding channel sees; a bare
-    * scene label carries almost no content, so an adapter that can say more about a scene should.
-    */
-  /** `lexicalText` is appended for the lexical index only and is never seen by the encoder.
-    *
-    * The two channels fail on opposite inputs, which the study measured rather than assumed. A
-    * mean-pooled embedding is diluted by vocabulary that recurs across the episode, while a
-    * rarity-weighted lexical index prices exactly that vocabulary correctly. So a signal that is
-    * long, or that repeats across neighbouring nodes, belongs here rather than in `embedText`.
-    */
-  final case class Group(
-      ordinal: Int,
-      label: String,
-      embedText: Option[String] = None,
-      lexicalText: Option[String] = None
-  )
+type MediaLocus = storymodel4s.align.bridge.MediaLocus
+val MediaLocus = storymodel4s.align.bridge.MediaLocus
+type TimedSegment = storymodel4s.align.bridge.TimedSegment
+val TimedSegment = storymodel4s.align.bridge.TimedSegment
 
 /** Builds the aligner's `SourceView` from timed segments: the general recipe extracted from the
   * Sherlock bridge. The view's text axis is a derived document (segment texts joined by newlines),

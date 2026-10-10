@@ -77,8 +77,18 @@ object StageProvenance:
         asserted: Option[StageReceipt]
     ): Unknown = new Unknown(reason, asserted)
 
-  /** Reserved for a later executed-stage producer. G1 supplies no construction door. */
-  final class Derived private (val receipt: StageReceipt) extends StageProvenance
+  /** The receipt and its projection are owned by the same actual execution. */
+  final class Derived private[StageProvenance] (
+      val execution: MappingRun.Execution,
+      val member: MappingRun.Member,
+      val receipt: StageReceipt
+  ) extends StageProvenance
+
+  private[align] def executed(
+      execution: MappingRun.Execution,
+      member: MappingRun.Member,
+      stage: Stage
+  ): Derived = new Derived(execution, member, execution.receipt(member, stage))
 
   def unknown(reason: UnknownProvenanceReason, asserted: Option[StageReceipt]): Unknown =
     Unknown.of(reason, asserted)

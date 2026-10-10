@@ -691,6 +691,22 @@ with the lemma of a concept that scores nothing.
   BLOCK on 88675d29, Fray #105 seq 870); and refusing on a gate-divergent tie, which would turn a
   measurable, typed ambiguity into missing evidence.
 
+### 2026-10-10 — declared caption evidence and AV profiles
+
+A portable caption declaration records a full `SourceBundle` identity, frame identity and checksum,
+the `SourceDerivationReceipt` binding identity, and each caption's text, sampled frames and exact
+support. It establishes consistency only; it grants no media acquisition or caption-provider
+authority. The JVM pipeline alone joins the admitted frame/request/envelope/outcome records before
+it creates that declaration.
+
+Annotation-only and caption-assisted profiles bind the same fixed recall inventory and strict
+candidate cut. A caption-assisted profile retains its original `LocalEvidence` and adds a separate
+profile digest over the caption declaration, scoring configuration and candidate configuration.
+Caption data may affect only its AV scores and that profile digest; absent or empty captions remain
+typed unavailable and never fall back to annotation scores. The pipeline has explicit direct
+dependencies on `align` and `media`: the first exposes the portable scoring contract and the
+second is the sole owner of checked media authority.
+
 ### 2026-10-07 — controlled strict wiring and downstream ambiguity (S2a-3)
 
 Within the accepted S2 direction, strict generation and pricing share a sealed

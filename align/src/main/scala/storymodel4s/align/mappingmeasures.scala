@@ -308,3 +308,84 @@ object MappingLink:
       candidateSet,
       derivation
     )
+
+  /** Preserve actual local gate/support evaluation without fabricating an HSMM result. */
+  def fromEvidence(
+      evidence: LocalEvidence,
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      source: SourceRepresentation,
+      unit: RecallUnitId,
+      state: AlignState,
+      stages: UnitStageRefs,
+      candidateSet: CandidateSetId
+  ): Either[MappingRefusal, MappingLink] =
+    val checkedView = MappingBindingRender.snapshot(view)
+    for
+      _ <- LocalEvidence
+        .bound(evidence, recall, checkedView, gate = true)
+        .left
+        .map(e => MappingRefusal.InvalidValue("link.evidence", e.toString))
+      _ <- Either.cond(
+        source.viewFingerprint == ViewFingerprint.of(checkedView) &&
+          source.scopeDigest == MappingSourceRender.scope(checkedView.nodes),
+        (),
+        MappingRefusal.BindingMismatch("link.source")
+      )
+      index <- Option
+        .when(evidence.units.contains(unit))(evidence.units.indexOf(unit))
+        .toRight(MappingRefusal.UnknownUnit(unit))
+      recalled <- recall.byId.get(unit).toRight(MappingRefusal.UnknownUnit(unit))
+      cost <- evidence
+        .breakdowns(index)
+        .get(state)
+        .toRight(MappingRefusal.MissingCost(unit, state))
+      statuses <- state.anchor match
+        case None =>
+          Right(
+            (
+              Gate.NotGated,
+              Fidelity.NotApplicable,
+              TermSupport.Evaluated.derived(SupportAssessment.externalState)
+            )
+          )
+        case Some(ref) =>
+          for
+            target <- source.target(ref).toRight(MappingRefusal.UnknownTarget(ref))
+            node <- checkedView.node(ref).toRight(MappingRefusal.UnknownTarget(ref))
+            admitted <- evidence
+              .admissibility(index)
+              .get(ref)
+              .toRight(MappingRefusal.UnknownTarget(ref))
+            gate <-
+              if admitted.faithful then Right(Gate.NoContradictionDetected.derived())
+              else
+                admitted.distortion
+                  .map(Gate.Contradicted.derived)
+                  .toRight(
+                    MappingRefusal.InvalidValue("link.gate", "contradicted admission has no facets")
+                  )
+            mode <- state.mode.toRight(
+              MappingRefusal.InvalidValue("link.mode", "anchored state must have a mode")
+            )
+            fidelity = target.propositional match
+              case PropositionalScope.Declared =>
+                Fidelity.Assessed.derived(
+                  FidelityFacets.assess(
+                    recalled.proposition,
+                    node.copy(propositional = target.propositional),
+                    mode
+                  )
+                )
+              case PropositionalScope.Undeclared(_) =>
+                Fidelity.NotAssessed.derived(FidelityNotAssessedReason.ScopeUndeclared)
+          yield (gate, fidelity, TermSupport.Evaluated.derived(cost.support))
+    yield new MappingLink(
+      Destination.of(state),
+      statuses._1,
+      statuses._2,
+      statuses._3,
+      stages.inference,
+      candidateSet,
+      MeasureDerivation.Supplied
+    )

@@ -38,6 +38,51 @@ object MappingResult:
       ledger: StageLedger,
       outcomes: Vector[UnitOutcome]
   ): Either[MappingRefusal, MappingResult] =
+    validate(inventory, source, policies, roles, ledger, outcomes).flatMap { result =>
+      val owners = ledger.entries.collect {
+        case entry if entry.provenance.isInstanceOf[StageProvenance.Derived] =>
+          val derived = entry.provenance.asInstanceOf[StageProvenance.Derived]
+          (derived.execution, derived.member)
+      }.distinct
+      val unboundLocalLinks = outcomes.flatMap(_.links).exists { link =>
+        link.derivation == MeasureDerivation.Supplied &&
+        (link.gate != GateOutcome.NotGated ||
+          link.fidelity.isInstanceOf[FidelityStatus.Assessed] ||
+          link.termSupport.isInstanceOf[TermSupportStatus.Evaluated])
+      }
+      if owners.isEmpty && unboundLocalLinks then
+        Left(MappingRefusal.BindingMismatch("local evidence execution required"))
+      else if owners.isEmpty then Right(result)
+      else if owners.size != 1 then Left(MappingRefusal.BindingMismatch("execution"))
+      else
+        owners.head._1.record(owners.head._2).flatMap { expected =>
+          Either.cond(
+            result.digest == expected.digest,
+            result,
+            MappingRefusal.BindingMismatch("executed projection")
+          )
+        }
+    }
+
+  /** This internal door takes only a genuine execution and derives every record field itself. */
+  private[align] def executed(
+      execution: MappingRun.Execution,
+      member: MappingRun.Member
+  ): Either[MappingRefusal, MappingResult] =
+    MappingRun
+      .parts(execution, member)
+      .flatMap(p =>
+        validate(execution.inventory, execution.source, p.policies, p.roles, p.ledger, p.outcomes)
+      )
+
+  private def validate(
+      inventory: RecallInventory,
+      source: SourceRepresentation,
+      policies: MappingPolicies,
+      roles: UnitRoles,
+      ledger: StageLedger,
+      outcomes: Vector[UnitOutcome]
+  ): Either[MappingRefusal, MappingResult] =
     val universe = policies.universe.targets.toSet
     val dictionary = source.targets.map(_.ref).toSet
     val mentioned = outcomes

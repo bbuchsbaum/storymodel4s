@@ -16,7 +16,8 @@ final case class DerivationContext(
 final case class ExpectedMappingContext(
     inventory: RecallInventory,
     source: SourceRepresentation,
-    derivation: Option[DerivationContext] = None
+    derivation: Option[DerivationContext] = None,
+    execution: Option[(MappingRun.Execution, MappingRun.Member)] = None
 )
 
 enum MappingCodecError:
