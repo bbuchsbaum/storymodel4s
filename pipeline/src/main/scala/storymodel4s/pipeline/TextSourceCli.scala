@@ -19,7 +19,7 @@ private[pipeline] object TextSourceCli:
     try Right(Files.readAllBytes(Path.of(path)))
     catch case NonFatal(_) => Left(Refusal.InputRead)
 
-  /** Bind a supplied atlas to these exact raw UTF-8 bytes before accepting its target units. */
+  /** Match supplied atlas coordinates to the canonical source while retaining the raw input. */
   private[pipeline] def checkedAtlas(
       generated: TextSourcePackage,
       atlasBytes: Array[Byte]

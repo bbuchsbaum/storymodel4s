@@ -143,7 +143,8 @@ execution and matches the complete canonical pair.
 
 `studyPrepare prepare STUDY.json OUTPUT` accepts `text`, `checked-text`,
 `surface-atlas` (raw `path`, `atlas`, and segment `kind`), and `story-model` source
-formats. Supplied atlases must match the exact raw source. Story models are decoded
+formats. Supplied atlas coordinates must match the canonical source; preparation retains the exact raw
+input. Story models are decoded
 and structurally revalidated before their narrative targets enter mapping.
 
 For a text package, prepared output includes `source.json`, `source-segments.tsv`,
