@@ -425,18 +425,20 @@ object StudyPreparation:
             kind <- field[String](s, "kind")
             k <- SurfaceUnitKind.values.find(_.toString == kind).toRight(Refusal.InvalidConfig)
             _ <- require(
-              s.asObject.exists(_.keys.toSet ==
-                (if format == "surface-atlas" then Set("format", "path", "atlas", "kind")
-                 else Set("format", "path", "kind"))),
+              s.asObject.exists(
+                _.keys.toSet ==
+                  (if format == "surface-atlas" then Set("format", "path", "atlas", "kind")
+                   else Set("format", "path", "kind"))
+              ),
               Refusal.InvalidConfig
             )
             value <- format match
-              case "text"         => Right(SourceInput.Text(path, k))
-              case "checked-text" => Right(SourceInput.CheckedText(path, k))
+              case "text"          => Right(SourceInput.Text(path, k))
+              case "checked-text"  => Right(SourceInput.CheckedText(path, k))
               case "surface-atlas" =>
                 field[String](s, "atlas").map(SourceInput.SurfaceAtlas(path, _, k))
-              case "video"        => Right(SourceInput.Video(path))
-              case _              => Left(Refusal.InvalidConfig)
+              case "video" => Right(SourceInput.Video(path))
+              case _       => Left(Refusal.InvalidConfig)
           yield value
       rows <- field[Vector[Json]](json, "recalls")
       inputs <- rows.traverse { r =>

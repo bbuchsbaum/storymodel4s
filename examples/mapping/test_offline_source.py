@@ -34,6 +34,9 @@ def utf16_slice(text, start, end):
 class OfflineSourceReaderTests(unittest.TestCase):
     exchange = None
 
+    def test_ascii_positive_control(self):
+        self.assertEqual(utf16_slice("Alpha", 0, 3), "Alp")
+
     def test_checked_exchange_preserves_unicode_coordinates_and_capabilities(self):
         paths = {path.name for path in self.exchange.iterdir()}
         self.assertEqual(paths, {"source.json", "source-segments.tsv", "source-manifest.json", "manifest.json"})
