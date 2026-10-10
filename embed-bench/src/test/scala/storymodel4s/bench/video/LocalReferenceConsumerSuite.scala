@@ -129,3 +129,50 @@ class LocalReferenceConsumerSuite extends FunSuite:
     assert(LocalReference.compute(r, built.view, historical.evidence, profile).isLeft)
     assertEquals(StageTrace.localMass(Vector(0.0, 0.0), 1.0), Vector(0.5, 0.5))
   }
+
+  test("registered reference and named reconstruction consume identical originating prices") {
+    val (_, registration, profile) = fixture
+    val context = registration.context
+    val evidence = registration.evidence
+    val reference = right(LocalReference.compute(context.recall, context.source, evidence, profile))
+    val grouping = right(StructuredReconstruction.Grouping.of(context.source, Vector.empty))
+    val reconstruction = right(
+      StructuredReconstruction.compute(
+        context.recall,
+        context.source,
+        evidence,
+        StructuredReconstruction.Profile.sherlock(),
+        grouping
+      )
+    )
+    assert(reference.evidence eq reconstruction.evidence)
+    assert(reconstruction.evidence eq registration.evidence)
+    assertEquals(reference.evidenceId, reconstruction.evidenceId)
+    assertEquals(
+      reconstruction.inference.candidateAnchors,
+      evidence.units.zip(evidence.nominated).toMap
+    )
+    assertEquals(reconstruction.inference.costs, evidence.units.zip(evidence.breakdowns).toMap)
+    reference.outcomes.foreach { row =>
+      assertEquals(row.costs, reconstruction.inference.costs(row.unit))
+    }
+    assertEquals(reconstruction.profile.kind, MeasureKind.ModelPosterior)
+    val replayed = right(
+      registration.replay(
+        context,
+        registration.config,
+        HistoricalParityFixture.model,
+        registration.queryRecord.provider
+      )
+    )
+    val replay = right(
+      StructuredReconstruction.compute(
+        context.recall,
+        context.source,
+        replayed.evidence,
+        reconstruction.profile,
+        grouping
+      )
+    )
+    assertEquals(replay, reconstruction)
+  }
