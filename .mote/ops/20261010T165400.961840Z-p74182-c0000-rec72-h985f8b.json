@@ -1,0 +1,1 @@
+{"actor":"codex-workflow-five-20261010","entity":"bd-01M35B103S2KHRSF853GD2FYHW","kind":"reserve_open","mode":"exclusive","op":"20261010T165400.961840Z-p74182-c0000-rec72-h985f8b","paths":["examples/mapping/read_sherlock_workspace.py"],"reservation_id":"rv-01M4KBRQ01PS2SYV2FGNXJE0CY","ts":"2026-10-10T16:54:00.961840Z","ttl_s":21600,"v":2}

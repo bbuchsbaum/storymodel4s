@@ -1,0 +1,164 @@
+{
+  "sha": "fb1c160f6f103ac779db23703f28b40e74b85234",
+  "consumer": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "source": "checkAll",
+  "reader": true,
+  "archives": {
+    "lambda-final-checkAll.log": {
+      "path": "lambda-final-checkAll.log.gz",
+      "originalSha256": "450520e953fd070e310e39bc3554923d1e30463f3178709278eea867259bbe58",
+      "gzipSha256": "6d684155680eb47a8eac400dc0f922475a6ffdab24ae97eeac2ab63da550c478"
+    },
+    "lambda-final-checkAll.log.meta.json": {
+      "path": "lambda-final-checkAll.log.meta.json.gz",
+      "originalSha256": "5df03eff103e4613bde3068353692171f7937d5c1df7c902ac027600f6fda551",
+      "gzipSha256": "f71967f3dbc740ab68f37ae2afdc375975f3c7418e4075af92a2a891d9df9731"
+    },
+    "lambda-final-consumer.log": {
+      "path": "lambda-final-consumer.log.gz",
+      "originalSha256": "5b63b67953e79cd757e06113b6de0b209a353821813048e1ebea49791686c0e4",
+      "gzipSha256": "5f0bf302e2d42244a3337db1723d2c259305fc14d781a5a8d4a7a7a02360be00"
+    },
+    "lambda-final-consumer.log.meta.json": {
+      "path": "lambda-final-consumer.log.meta.json.gz",
+      "originalSha256": "18b18c6a34a0d6fa32f9412eb337689ac479ef810c65c48c6704c503f32ca04c",
+      "gzipSha256": "00657bb1df51a88edd0e998ac538e711457d1855fa5580b31ff159b7615f5f2d"
+    },
+    "lambda-final-reader.log": {
+      "path": "lambda-final-reader.log.gz",
+      "originalSha256": "bab53fa58c4b09a970a79f4edb9d0dae3e55e85315466ef13036f68944ed2fdd",
+      "gzipSha256": "d6f62a27f9a44cc1c3375ba98446b1ad024f2f179ded48196d51aa66725a8c82"
+    },
+    "lambda-final-reader.log.meta.json": {
+      "path": "lambda-final-reader.log.meta.json.gz",
+      "originalSha256": "e8331532ba940cb8ff6e27eb68638eff3408e7f22fb6c38c295d6f05821294a9",
+      "gzipSha256": "5555c6dde67e3b09927b50f91e7ce5bce1582bd34dcb4b3aa22a515ce904cd45"
+    },
+    "lambda-reference-scope.txt": {
+      "path": "lambda-reference-scope.txt.gz",
+      "originalSha256": "f9326835642c0d90ca8938bc228dc36dce06756bb899862692b788fafe0e3058",
+      "gzipSha256": "9bea4f1ae124d255410bd6d0561eb97f59b4a339154f01c1a743cbcd9ea2a58d"
+    }
+  },
+  "final-checkAll": {
+    "totals": {
+      "total": 10085,
+      "failed": 0,
+      "errors": 0,
+      "passed": 10080,
+      "skipped": 5
+    },
+    "moduleCells": 56
+  },
+  "final-consumer": {
+    "totals": {
+      "total": 485,
+      "failed": 0,
+      "errors": 0,
+      "passed": 485,
+      "skipped": 0
+    },
+    "moduleCells": 10
+  },
+  "mutations": [
+    {
+      "name": "weighted-exact-endpoint",
+      "kind": "guard",
+      "candidate_sha": "fb1c160f6f103ac779db23703f28b40e74b85234",
+      "path": "align/src/main/scala/storymodel4s/align/structuralweight.scala",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+        "set ThisBuild / tlFatalWarnings := true",
+        "alignJVM/testOnly storymodel4s.align.StructuralWeightSuite -- \"--tests=.*\""
+      ],
+      "exit": 1,
+      "compiled": true,
+      "qualified": true,
+      "totals": [
+        [
+          6,
+          1,
+          0,
+          5,
+          0
+        ]
+      ],
+      "named_failure": "rounded interior coefficient never becomes an endpoint or loses its identity",
+      "failures": [
+        "==> X storymodel4s.align.StructuralWeightSuite.rounded interior coefficient never becomes an endpoint or loses its identity 0.009s munit.FailException: align/src/test/scala/storymodel4s/align/StructuralWeightSuite.scala:33 assertion failed"
+      ],
+      "test_selection": ".*",
+      "source_sha256": "eadfe8da5b8a7ebfae8d1fffc23c8c04423b6ec3fb4edc9457e66d9ecbec6a82",
+      "patch_sha256": "94700f90e176163d734300ec62c02fb3ff40b5df2d1b531074c3a34044ef21c4",
+      "log_sha256": "ae470cbf13fcb30fcedf0d71d16e2bea42ba70e892b8f268a04d0d4634e4dd2c"
+    },
+    {
+      "name": "weighted-external-coefficients",
+      "kind": "guard",
+      "candidate_sha": "fb1c160f6f103ac779db23703f28b40e74b85234",
+      "path": "align/src/main/scala/storymodel4s/align/structuralweight.scala",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+        "set ThisBuild / tlFatalWarnings := true",
+        "alignJVM/testOnly storymodel4s.align.StructuralWeightSuite -- \"--tests=.*(three-unit exhaustive|endpoint selections).*\""
+      ],
+      "exit": 1,
+      "compiled": true,
+      "qualified": true,
+      "totals": [
+        [
+          2,
+          1,
+          0,
+          1,
+          4
+        ]
+      ],
+      "named_failure": "three-unit exhaustive oracle checks every marginal and transition including external states",
+      "failures": [
+        "==> X storymodel4s.align.StructuralWeightSuite.three-unit exhaustive oracle checks every marginal and transition including external states 0.031s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/StructuralWeightSuite.scala:129 values are not the same expected: -5.6678031197444 but was: -5.334400322100124"
+      ],
+      "test_selection": ".*(three-unit exhaustive|endpoint selections).*",
+      "source_sha256": "04cead0969ed3ff5a4a70f88ae86b2d1aa2bca3251aaf6debfaac0edb51a9b83",
+      "patch_sha256": "f4f8340f3001ce07042ddb1ee594ab1f1593f13a5f43439f943a8441bd67f496",
+      "log_sha256": "9827344475632e8612ba818d147541d54323cb6b6cfe459c91f92b203e7f8dd6"
+    },
+    {
+      "name": "weighted-originating-execution",
+      "kind": "guard",
+      "candidate_sha": "fb1c160f6f103ac779db23703f28b40e74b85234",
+      "path": "align/src/main/scala/storymodel4s/align/mappingrun.scala",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+        "set ThisBuild / tlFatalWarnings := true",
+        "alignJVM/testOnly storymodel4s.align.StructuralWeightSuite -- \"--tests=.*\""
+      ],
+      "exit": 1,
+      "compiled": true,
+      "qualified": true,
+      "totals": [
+        [
+          6,
+          1,
+          0,
+          5,
+          0
+        ]
+      ],
+      "named_failure": "interior raw decision may remain external and foreign selection authority refuses",
+      "failures": [
+        "==> X storymodel4s.align.StructuralWeightSuite.interior raw decision may remain external and foreign selection authority refuses 0.201s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/StructuralWeightSuite.scala:165"
+      ],
+      "test_selection": ".*",
+      "source_sha256": "9d2e1820e70fffdd7082cb86d213932a89b6d7a55b7c6c7f1a670ec1ec38e5da",
+      "patch_sha256": "9ba8991922df1f1463eae78391149b08f49909e750da50216ed6199cf0ab3271",
+      "log_sha256": "98e1b2b6c8dbe65159ede7bb27b0405b018564f4bb55758e8a049e0a4cc973b6"
+    }
+  ]
+}

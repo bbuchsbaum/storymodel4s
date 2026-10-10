@@ -1,0 +1,38 @@
+[
+  {
+    "name": "unit-status",
+    "candidate_sha": "efba130cfc867c566ea83ca19ebded0d4914c240",
+    "qualified": true,
+    "exit": 1,
+    "totals": {
+      "ran": 2,
+      "failed": 1,
+      "errors": 0,
+      "named": [
+        "test_completed_unit_summary_must_match_member_tables"
+      ]
+    },
+    "old": "summary[name] == decision[\"processing_status\"][\"status\"].capitalize()",
+    "new": "True",
+    "mutant_sha256": "b99e4288ff7bb75a2600a0af36f61de63cca86a4bb3a6cf3c034de29086d6646",
+    "fixture_log_sha256": "e04bed3265e0172a702a4690f9d2ccc0a09c718df6ff8138f717a419d74571ad"
+  },
+  {
+    "name": "failed-denominator",
+    "candidate_sha": "efba130cfc867c566ea83ca19ebded0d4914c240",
+    "qualified": true,
+    "exit": 1,
+    "totals": {
+      "ran": 2,
+      "failed": 1,
+      "errors": 0,
+      "named": [
+        "test_prepared_but_failed_attempt_preserves_every_unit"
+      ]
+    },
+    "old": "outcome[\"units\"] == expected_units",
+    "new": "expected_units is not None",
+    "mutant_sha256": "57a33037f218daf5840ab4e72893e52e1d31285026651964c38903706f5f1009",
+    "fixture_log_sha256": "e04bed3265e0172a702a4690f9d2ccc0a09c718df6ff8138f717a419d74571ad"
+  }
+]

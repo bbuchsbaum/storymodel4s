@@ -1,10 +1,73 @@
 {
-  "branch": "codex/workflow-five-20261010",
   "actor": "codex-workflow-five-20261010",
   "dashboard": "codex-410e8e59",
-  "active_bead": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
-  "development_session": 30959,
-  "development_log": ".agent-work/workflow-five/exchange-dev-01.log",
-  "clone": "/private/tmp/storymodel4s-s2b3-build",
-  "next": "Inspect focused compilation/test result, run independent reader fixtures, repair failures, commit compiling slice, qualify named mutations and exact-scope/consumer gates with independent review. Continue remaining four beads."
+  "branch": "codex/workflow-five-20261010",
+  "status": "five beads completed and locally integrated",
+  "beads": [
+    {
+      "id": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+      "status": "closed",
+      "title": "G2: mapping exchange tables and an independent Python or R consumer"
+    },
+    {
+      "id": "bd-01M35PB1H5PDD55YVKR4TQ8M66",
+      "status": "closed",
+      "title": "[Workflow] Offline story ingestion: text to a deterministic segmented source with exact offsets"
+    },
+    {
+      "id": "bd-01M35MHPFFKQHSJKC07VMWC7CW",
+      "status": "closed",
+      "title": "[G2] Tunable weight between local reference and structured reconstruction"
+    },
+    {
+      "id": "bd-01M168TZ3VRQYSE7TNT5JKJTSJ",
+      "status": "closed",
+      "title": "[maintenance] recall: segmenting a PseudonymizedTranscript loses its certification - RecallGraph carries no privacy witness"
+    },
+    {
+      "id": "bd-01M35B103S2KHRSF853GD2FYHW",
+      "status": "closed",
+      "title": "[Workflow] Create an Atlas-openable investigation through the public CLI"
+    }
+  ],
+  "producerSource": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+  "consumerSource": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "sourceGate": {
+    "passed": 10170,
+    "skipped": 5,
+    "failed": 0,
+    "cells": 56
+  },
+  "consumerGate": {
+    "passed": 488,
+    "skipped": 0,
+    "failed": 0,
+    "cells": 10
+  },
+  "declaredDependencySupplement": {
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+    "passed": 203,
+    "skipped": 1
+  },
+  "mutations": 11,
+  "publicDisclosureSources": 17,
+  "actualCorpus": {
+    "annotationRows": 1000,
+    "recalls": 2,
+    "producerReadback": true,
+    "exactResume": true,
+    "consumerJvmImport": true,
+    "browserQualification": false
+  },
+  "browser": {
+    "syntheticPackets": 4,
+    "screenshotsInspected": 8,
+    "errors": 0,
+    "closed": true
+  },
+  "foreignConsumerBead": "bd-01M35AX3TA97BRYF29Z21RX6EF remains blocked; exact handoff recorded, broader film workflow acceptance not closed",
+  "evidence": "workspace/receipt.json; run python3 docs/refactor/evidence/workflow-five-20261010/verify.py",
+  "remotePublication": false,
+  "activeJobs": [],
+  "remaining": "Evidence-only commit review; no remaining implementation or runtime checks for these five."
 }

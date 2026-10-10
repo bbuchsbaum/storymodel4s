@@ -1,0 +1,101 @@
+[
+  {
+    "name": "pair-authority-bytes",
+    "kind": "guard",
+    "candidate_sha": "efba130cfc867c566ea83ca19ebded0d4914c240",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.PairedExchangeSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4,
+        0
+      ]
+    ],
+    "named_failure": "paired context refuses foreign executions duplicate files and swapped members",
+    "failures": [
+      "==> X storymodel4s.pipeline.PairedExchangeSuite.paired context refuses foreign executions duplicate files and swapped members 0.145s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/PairedExchangeSuite.scala:83 assertion failed"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "e64a76496cf7112ecf8891c7f245ddef253dab889ba4aa1341077bc3235eb992",
+    "patch_sha256": "87e4ee44da4d68cf3ab74d760323987c80f265ddc502fb84617b3db578491c82",
+    "log_sha256": "c0da7955c34c8ae8205eccc51cf692d870798f3021230fe306c992fe712498ba"
+  },
+  {
+    "name": "pair-duplicate-files",
+    "kind": "guard",
+    "candidate_sha": "efba130cfc867c566ea83ca19ebded0d4914c240",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.PairedExchangeSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4,
+        0
+      ]
+    ],
+    "named_failure": "paired context refuses foreign executions duplicate files and swapped members",
+    "failures": [
+      "==> X storymodel4s.pipeline.PairedExchangeSuite.paired context refuses foreign executions duplicate files and swapped members 0.166s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/PairedExchangeSuite.scala:84 assertion failed"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "ba3219c6788dd53bd8b5dba42cd0a555b20bb3296654d6acadd5d98bb80e27fd",
+    "patch_sha256": "39480a105ed37a23757ff9070cf886000720b1b648b4fe469efad5ea46532757",
+    "log_sha256": "fb2603a916dea45594e8244622c79064334114be4dc03dd1da96bfae8d72dd67"
+  },
+  {
+    "name": "resume-foreign-files",
+    "kind": "guard",
+    "candidate_sha": "efba130cfc867c566ea83ca19ebded0d4914c240",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.PairedExchangeSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4,
+        0
+      ]
+    ],
+    "named_failure": "public exchange CLI refuses changed bytes on resume and preserves prior output",
+    "failures": [
+      "==> X storymodel4s.pipeline.PairedExchangeSuite.public exchange CLI refuses changed bytes on resume and preserves prior output 0.431s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/PairedExchangeSuite.scala:112"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "d2e342da263c3261372daaf6b67f0a9ccceab129cee7828cb958c1d9af6b22dc",
+    "patch_sha256": "9db92fa2ecca96d5775e4c15bce32ee2bc1642f659cf1b160fba28c2977d4784",
+    "log_sha256": "a44a8f60ca141985efef15466dac0376869669047f9321f43a7969b8a136ad2a"
+  }
+]

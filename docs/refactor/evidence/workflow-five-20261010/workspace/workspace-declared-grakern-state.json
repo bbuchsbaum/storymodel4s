@@ -1,0 +1,10 @@
+{
+  "path": "/private/tmp/storymodel4s-workflow-grakern-pin",
+  "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "status": [],
+  "scope": [
+    "embedGrakern",
+    "embedBench"
+  ],
+  "reason": "Supplement full checkAll using clean8efc5efa override with genuinely recompiled consumers of declared0329c43c pin."
+}

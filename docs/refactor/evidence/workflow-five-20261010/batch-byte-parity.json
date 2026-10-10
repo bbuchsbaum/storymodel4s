@@ -1,0 +1,24 @@
+{
+  "comparison": "Every completed corpus output byte, before and after batching",
+  "developmentProducerRevision": "d9dd3053f01cc58d292ec8804c813f48e0b27b34",
+  "packets": 2,
+  "annotationRows": 1000,
+  "files": [
+    {
+      "path": "3baf2937aaf5a41b95451d4576e6397ddd96237c30a5f31250b31ca59601965a-workspace.json",
+      "bytes": 15280551,
+      "sha256": "c4ddf3720879432f629298797d6f93483611c0701a581084ea35162657183c6d"
+    },
+    {
+      "path": "ec15e24e211346e1e962ba6bb75ee2b9acb39f45c945330537bbaaeb9343e10b-workspace.json",
+      "bytes": 16495128,
+      "sha256": "e5162a1bcdffbbadf3fabafaa9ff5e2b5503c64c1a98d13823343ab3ebb0cc0b"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 17338,
+      "sha256": "a92f3d7f5f291e73557c6a6fb068ee58a1995539a766063c3e10cc05130b1843"
+    }
+  ],
+  "qualification": "Development comparison; final exact-source gate still required."
+}

@@ -1,0 +1,34 @@
+{
+  "producerRevision": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+  "checks": [
+    {
+      "kind": "text-0",
+      "packetSha256": "65a7a72ab66d7d715362d6c36489c8e5d6ed0018d8a6a586b5821b5dac04ddf4",
+      "opened": true,
+      "policies": 2,
+      "exactSelectionsRestored": true
+    },
+    {
+      "kind": "text-1",
+      "packetSha256": "afa5db3135bfbb2b562a34554393b7d34fa528c8eddbac969968f28a6563a893",
+      "opened": true,
+      "policies": 2,
+      "exactSelectionsRestored": true
+    },
+    {
+      "kind": "timed-0",
+      "packetSha256": "16d09d709a807275e0838d6c3c6961af93de7491c86693885be14d76b6b70f30",
+      "opened": true,
+      "policies": 2,
+      "exactSelectionsRestored": true
+    },
+    {
+      "kind": "timed-1",
+      "packetSha256": "a343f3b26c288ba639f1d405b98811ed282cd27d674a20b683bc2d7e10db169c",
+      "opened": true,
+      "policies": 2,
+      "exactSelectionsRestored": true
+    }
+  ],
+  "errors": []
+}

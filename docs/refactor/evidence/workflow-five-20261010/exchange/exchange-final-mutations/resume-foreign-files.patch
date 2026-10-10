@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala
+@@ -54,7 +54,7 @@
+               val listing = Files.list(output)
+               try
+                 listing.iterator().asScala.map(_.getFileName.toString).toSet ==
+-                  (names.toSet + "manifest.json") && names.distinct.size == names.size
++                  (names.toSet + "manifest.json") || names.nonEmpty
+               finally listing.close()
+             },
+             (),

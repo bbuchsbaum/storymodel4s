@@ -1,0 +1,142 @@
+{
+  "producer": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+  "qualification": "local-disclosure-replay",
+  "sources": [
+    {
+      "csvDigest": "a3ef639814ea34f2e7c9ceb0900bbd6e133d27b0d0da0065e4ebc3e92f3c6649",
+      "publicationDigest": "9b85c683f0558090e049da6fc8dda1d097cf6af928c001392ce170641063c717",
+      "replayDigest": "24c0ad88ab2e540b0497f4d692129435caf11812c77659b7f9bb6695ad89fcb3",
+      "source": "recall-source-01",
+      "units": 101,
+      "words": 1616
+    },
+    {
+      "csvDigest": "6389e169c4cc23bcd35bb490417efd60ae8f891e3ecce0772679056357fd6488",
+      "publicationDigest": "edddbdc263f8fb66583f6c8e0d0f523e918dabf592a18928d7faa70dac2eec47",
+      "replayDigest": "49082204463edb6ce16d78b1fd5c1003f1ee0b9b36fb535f9a61d7fe09e8fa2c",
+      "source": "recall-source-02",
+      "units": 105,
+      "words": 2152
+    },
+    {
+      "csvDigest": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+      "publicationDigest": "1f08ad36c5f69a00a78926841de5a07f430f28d24bb4de841ef7b2b3b5b6f01d",
+      "replayDigest": "143058390582db7819ef06ddb26f7cb2123667f7897aeceeab1b04b6ced02665",
+      "source": "recall-source-03",
+      "units": 173,
+      "words": 2495
+    },
+    {
+      "csvDigest": "0488180df8bc19f9307e2eed1ebc72d01958e35f8fb9ede81ce00cc82fc4c5db",
+      "publicationDigest": "7fd0d9959f78f1dbf0d18b821c76a13deaef21cae231383e0fbd8734cf39e206",
+      "replayDigest": "be4e3629a3bfa83631e578417b870869faaf1be4c44c23df5747c41ec9dfc8b0",
+      "source": "recall-source-04",
+      "units": 96,
+      "words": 1709
+    },
+    {
+      "csvDigest": "a20cc241597b6366496175c6b33706adc01afd25caf50373fe6cd03a510fc7ff",
+      "publicationDigest": "fd54be37b298eebc9ff3c24c99b61259a32d40a871fe0405a2185c5bb1c70c91",
+      "replayDigest": "df84b7c0cb562f01a39ad90d51b6eb19ad9a02e19f1b903b2478f2a24bfe565c",
+      "source": "recall-source-05",
+      "units": 68,
+      "words": 1449
+    },
+    {
+      "csvDigest": "0f9426b27251f7f0d66b4d6281584438330e682fe236b3730fa9fb456a9235a6",
+      "publicationDigest": "fefdd1370c33bec5ea688f079a9ffb4564e94ab0382199b8e71a8b12d5649dff",
+      "replayDigest": "e7a6a1fc41c6a316f1233e34508aa176682aa36499e14eac64d11074d7f1bece",
+      "source": "recall-source-06",
+      "units": 104,
+      "words": 2414
+    },
+    {
+      "csvDigest": "797fc2996485e4013b2236e4cd54abcb73d47d147c0bf6d5a1809bc582faec04",
+      "publicationDigest": "b8deefe3e2adadd3ea0ba7ce19541809088a484267766b454ba30d90cc1871db",
+      "replayDigest": "e2d4aa1031a52680d47f73202764dc66796378d62efa3152b10d9b94137b42d8",
+      "source": "recall-source-07",
+      "units": 98,
+      "words": 1994
+    },
+    {
+      "csvDigest": "51420d0615480b749e2408b52b8d8aceba9284f6fd476b62541df17fad1cfe19",
+      "publicationDigest": "70a39eb0ecd4cdcae8637b69572fcd5a0305dad90f9c7caffb683b01b181073a",
+      "replayDigest": "d9c228fb922354b6c22254715ac9f8efc02a3b27636150753c95bfb9fa78df2a",
+      "source": "recall-source-08",
+      "units": 181,
+      "words": 3194
+    },
+    {
+      "csvDigest": "5ec95404e8531f91b59e45242246fd52846ddc7936b29297c5bf5f203cc3fe17",
+      "publicationDigest": "f23cd4700d7a18b3a6cb8fd1679ad8e5187fca5bae469c9ef0ed1b28edcbfb0a",
+      "replayDigest": "91d1dad0f0c0954e01ae1a89e69b646fe2dfa5aef1f3b876be2e67f09cff0352",
+      "source": "recall-source-09",
+      "units": 71,
+      "words": 1659
+    },
+    {
+      "csvDigest": "f8f0d2371f38057353811dca9c7409b321cc8bb98a043f7798d7dfe03602cf62",
+      "publicationDigest": "767ad7d3a707fb45ecd228180b9843539516b629daee4634e140d8003d311971",
+      "replayDigest": "1f1e01860715f6fc7ffc13bffa24febcfe1fb0f25ea3715a4e4f97dff4d2649f",
+      "source": "recall-source-10",
+      "units": 180,
+      "words": 2605
+    },
+    {
+      "csvDigest": "2f0e1c6f7f727efb36ff090f6b740c7cab7c4a487f97ba2387079ae1a9e965bf",
+      "publicationDigest": "251bb0c68ede96079854fdbd4fdc1d7e82b74b87fba42d2b45a1132d8aa9b557",
+      "replayDigest": "dc6a5ec6eda0ec6605d1d828f89b5ef73a4c836035731dec9daa1a310ef30065",
+      "source": "recall-source-11",
+      "units": 148,
+      "words": 1949
+    },
+    {
+      "csvDigest": "785717e33837aaa83fb8afd40248e27e4222cf93ff53b70bcc2b93d5a24004cc",
+      "publicationDigest": "c10312a40e7424ccaddf696cfb4e1a8ad2def6bc1731c0fea89e3f393b226b0a",
+      "replayDigest": "fc2e1ca4f4e8c6896908c73f8e2669f14c29995d723a4553fc25e4c5b01ccfc0",
+      "source": "recall-source-12",
+      "units": 212,
+      "words": 4134
+    },
+    {
+      "csvDigest": "18c51ec8a08c1c3ce7f33750f77c8ac709d396f7edbee60e56c5db5c6d9efa83",
+      "publicationDigest": "efab2c74bd217b5d8771ec700bb722599c1b77c336d4255c9ee2bf03b86b063f",
+      "replayDigest": "93e9abc64caa3cdd4c945202a561485c40fb80d5a4801f4a8a515cb4685b9da5",
+      "source": "recall-source-13",
+      "units": 338,
+      "words": 5901
+    },
+    {
+      "csvDigest": "f2e9efa9d05347ca0535618df5ff682c28df7d0e71e34fd98bfd067db224a1e6",
+      "publicationDigest": "216e993e79ed2357e1da1b707078583f6f58c100aaa54d301bfe9077950c18d4",
+      "replayDigest": "8d91427ad40b71dd3f0bbbe8379692174ebd30bce256855e586918a46972c1c1",
+      "source": "recall-source-14",
+      "units": 164,
+      "words": 3565
+    },
+    {
+      "csvDigest": "9e805df1232634987dda35caccfc171a1da327dc458dd391dbdec0279d5d5ed8",
+      "publicationDigest": "b67458b8aa4312323651b9692891b60b1cd342fc89cc5a597a85bc15532353cf",
+      "replayDigest": "e0cfed452beccfeb88e1728f57e6347f5849130fd77ed59305baf612afa35524",
+      "source": "recall-source-15",
+      "units": 97,
+      "words": 2008
+    },
+    {
+      "csvDigest": "9b1213d49ccb6412c2ae51b7c0e8aacc037cadc3d9527c812261d082d2f997f5",
+      "publicationDigest": "143130bc03da2ba78c0665e4230a32eaff3feee6923b7573af1648fd51be62d1",
+      "replayDigest": "099d92eccd53ef54f99a2878d2d22482b274fdec8bda4ea0ff6cee698289262e",
+      "source": "recall-source-16",
+      "units": 89,
+      "words": 2738
+    },
+    {
+      "csvDigest": "dc560db33ff99d502b9ff09daa20f790f068ddea858b20f4ae1e2df6c69d56c2",
+      "publicationDigest": "2c76163e759f6b0936cfd88b809c59ef765bacc896324b93ba8ee811ecbef5c0",
+      "replayDigest": "87dce0ea8ecb6c30e87e1740c0e075f84bb299a99c50e6710b04fe1f0826ad15",
+      "source": "recall-source-17",
+      "units": 352,
+      "words": 4952
+    }
+  ]
+}

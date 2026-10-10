@@ -1,0 +1,45 @@
+{
+  "source_sha": "efba130cfc867c566ea83ca19ebded0d4914c240",
+  "consumer_sha": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "qualification": "LocallyObserved",
+  "gates": [
+    {
+      "name": "exchange-final-checkAll",
+      "totals": {
+        "total": 10014,
+        "failed": 0,
+        "errors": 0,
+        "passed": 10009,
+        "skipped": 5
+      },
+      "sha256": "4357744e17474e19fb27e6d562f502ff2bcd0fbd8e6c69686335506a5b54c738",
+      "compressed_sha256": "48291dd49e23416e4f1f5f3ece1b5037f80d90408e3dd4990e99e735bd2d332c",
+      "exit": 0
+    },
+    {
+      "name": "exchange-final-reader",
+      "totals": {
+        "passed": 15,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "sha256": "dca22d5c4790072ad21671c48a09e61e0ae638da6a348bfe5f8f21516f367f40",
+      "compressed_sha256": "d4243db1aa64f02704c275b6664592a5799fe7bacb65367399c975dc9f611d36",
+      "exit": 0
+    },
+    {
+      "name": "exchange-final-consumer",
+      "totals": {
+        "total": 485,
+        "failed": 0,
+        "errors": 0,
+        "passed": 485,
+        "skipped": 0
+      },
+      "sha256": "8080f1685a44a859c81f4b466a84ef580d6ff0c32b24958d208fe4e1c447731a",
+      "compressed_sha256": "6e705d4b936c47dcb76a04b13bf0fe31bfdb15f409c07aef7523f6f7f9a58cb2",
+      "exit": 0
+    }
+  ]
+}

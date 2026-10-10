@@ -1,0 +1,27 @@
+[
+  {
+    "id": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+    "status": "closed",
+    "title": "G2: mapping exchange tables and an independent Python or R consumer"
+  },
+  {
+    "id": "bd-01M35PB1H5PDD55YVKR4TQ8M66",
+    "status": "closed",
+    "title": "[Workflow] Offline story ingestion: text to a deterministic segmented source with exact offsets"
+  },
+  {
+    "id": "bd-01M35MHPFFKQHSJKC07VMWC7CW",
+    "status": "closed",
+    "title": "[G2] Tunable weight between local reference and structured reconstruction"
+  },
+  {
+    "id": "bd-01M168TZ3VRQYSE7TNT5JKJTSJ",
+    "status": "closed",
+    "title": "[maintenance] recall: segmenting a PseudonymizedTranscript loses its certification - RecallGraph carries no privacy witness"
+  },
+  {
+    "id": "bd-01M35B103S2KHRSF853GD2FYHW",
+    "status": "closed",
+    "title": "[Workflow] Create an Atlas-openable investigation through the public CLI"
+  }
+]

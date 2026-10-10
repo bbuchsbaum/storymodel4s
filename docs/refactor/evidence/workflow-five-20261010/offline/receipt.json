@@ -1,0 +1,125 @@
+{
+  "sha": "0896301303be7f6a0d67307ce52a8fbfedf3be25",
+  "consumer": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "source": "checkAll",
+  "reader": true,
+  "readerRevision": "3f25f9995df24b1c9c2c127010f95931ce2e1ab0",
+  "archives": {
+    "offline-atlas-mutation.log": {
+      "path": "offline-atlas-mutation.log.gz",
+      "originalSha256": "c4270b6877b7a48e978dbecf44116c6f4e2586243700f78937aeb3a37e7edac1",
+      "gzipSha256": "2ab80d4686d43839f8bcbad26ef3906b3e037793591e0995c0b83c9278e6c8e2"
+    },
+    "offline-atlas-mutation.log.meta.json": {
+      "path": "offline-atlas-mutation.log.meta.json.gz",
+      "originalSha256": "40a4e0043e3d6690a3e6eeef0f0caf1f12a686a774cc5755f4f020032665f641",
+      "gzipSha256": "d89c2fda16e946ed613bcf167a500f73ff80b7764eaef80cf0d3434100d1758f"
+    },
+    "offline-atlas-mutation.patch": {
+      "path": "offline-atlas-mutation.patch.gz",
+      "originalSha256": "e74ab34d5e6a48024af4dff10491d7f18ea61d6b58fc2c63b472459ef015d8b2",
+      "gzipSha256": "351c5027b58404073516710abf3bc52400abc451b5c9fd170216b9011def1c32"
+    },
+    "offline-final-checkAll.log": {
+      "path": "offline-final-checkAll.log.gz",
+      "originalSha256": "34563329d5cb66f52b88ac9c0446397eb85f7f781e78d90e1c0a0f7c96e6f2bb",
+      "gzipSha256": "9c820e1230dd62d197911506d3e0a3cccaa92c580b94f644045a78dcec0e7ae1"
+    },
+    "offline-final-checkAll.log.meta.json": {
+      "path": "offline-final-checkAll.log.meta.json.gz",
+      "originalSha256": "acf9570d135822e49d53834952d4ef03c9f51b5307def802d6bc23f6d372c8e2",
+      "gzipSha256": "ecfaff0df11a1fb5ce89ca2c6c61172a51bd879a0e874649a00e76e2cb64e7e8"
+    },
+    "offline-final-consumer.log": {
+      "path": "offline-final-consumer.log.gz",
+      "originalSha256": "5ebad5cde0cb6cf8d038cf62455b147571a8df43a2be4a06d70560875d043152",
+      "gzipSha256": "98d82d08585eb90ea74c167b20f5a26fa78e05eb6adda92adffa78039ff1a313"
+    },
+    "offline-final-consumer.log.meta.json": {
+      "path": "offline-final-consumer.log.meta.json.gz",
+      "originalSha256": "806b91e93336b920e3db772e1159699973b7039016ffdc52f9ce0a160346f1e6",
+      "gzipSha256": "f5e69604ff6530623ffe403fb8083412cc440af43c7439772bb065cf640982c0"
+    },
+    "offline-final-reader-revised.log": {
+      "path": "offline-final-reader-revised.log.gz",
+      "originalSha256": "caae66b0547b6e132f077ef0d8474231cb33db50ba4508d6982528cac023f27a",
+      "gzipSha256": "cf662f9c69306a79c3c6bfe6d67b0fcb954512ab4b966328857467ccbc615f0b"
+    },
+    "offline-final-reader-revised.log.meta.json": {
+      "path": "offline-final-reader-revised.log.meta.json.gz",
+      "originalSha256": "b9ee6e111daa70cc31cd53b99e39df8da3d340b1823a0d275293cc650b425504",
+      "gzipSha256": "eb186e468dcfe6e240a573bbc3dd3f3cf254697adb26ae457e0992e7103243e2"
+    },
+    "offline-final-reader.log": {
+      "path": "offline-final-reader.log.gz",
+      "originalSha256": "caae66b0547b6e132f077ef0d8474231cb33db50ba4508d6982528cac023f27a",
+      "gzipSha256": "cf662f9c69306a79c3c6bfe6d67b0fcb954512ab4b966328857467ccbc615f0b"
+    },
+    "offline-final-reader.log.meta.json": {
+      "path": "offline-final-reader.log.meta.json.gz",
+      "originalSha256": "beda4df2b0c4463971932246f8896d498a7caca84631a13fbc6e7f45dc7fc1f8",
+      "gzipSha256": "bef6591e056bc8adacd545028a61e2f5ebff0e1fe1b76d0d09e189e27ad6f071"
+    },
+    "offline-final-witness.log": {
+      "path": "offline-final-witness.log.gz",
+      "originalSha256": "9fe5acbf64951716559f1590a1b51dabff76d6efe341e83d0add30272fd24557",
+      "gzipSha256": "18ec04af926832db69bdcc3498a5bc4cd6a7c3d79ec0908b7eb152389399357f"
+    },
+    "offline-final-witness.log.meta.json": {
+      "path": "offline-final-witness.log.meta.json.gz",
+      "originalSha256": "9fe0002fd0a795225639bbf275dd3e89fc21a0a761177332161b86202c434fdb",
+      "gzipSha256": "f7bfb9cbc6562dcd8d4198214d57135d18eacdb4a7b4fdd67bf0c2816d004cb2"
+    },
+    "offline-reader-mutation-revised.log": {
+      "path": "offline-reader-mutation-revised.log.gz",
+      "originalSha256": "88ac348ee50f2d7ad8c324835943793ba6e00b4a25407f125eefea3b2c083462",
+      "gzipSha256": "4a7aa0fd7a963676b89044df59fc0b59fa6073f498111f55a82ba0239827780e"
+    },
+    "offline-reader-mutation-revised.log.meta.json": {
+      "path": "offline-reader-mutation-revised.log.meta.json.gz",
+      "originalSha256": "324547eae26d835758878a8be3d5b354f10bbe0e40844e524546f14221528782",
+      "gzipSha256": "e9243a86cbe3dae1ea11fcda7fdcc51f872d9e6a46a5c9a1ae8c782c24ca427e"
+    },
+    "offline-reader-mutation.log": {
+      "path": "offline-reader-mutation.log.gz",
+      "originalSha256": "15e5051cd15ac06a29f4052a9a4256aaa30180f8949a83a09bcce82908ced06b",
+      "gzipSha256": "fc0eda11356d6e88ccf0577e5328e06ef17d59e153b2d75169326d65a4401689"
+    },
+    "offline-reader-mutation.log.meta.json": {
+      "path": "offline-reader-mutation.log.meta.json.gz",
+      "originalSha256": "9de8f2de4cab96195a1cf73d4eb50be8d9cfa7a7c311c92ee6488267c518bf90",
+      "gzipSha256": "e783c2d4c9a83158544375e3d98660fb7c6cb9f395957f145e54aa932404156b"
+    },
+    "offline-reference-scope.txt": {
+      "path": "offline-reference-scope.txt.gz",
+      "originalSha256": "8e4d011bfec8213f2d7b2b264118b71fd08e360d2ce7263809901444c271ee48",
+      "gzipSha256": "45055886dfd30916b7dd2c71285bfdbc415d0b12fe571615c4d850429b9dd4b9"
+    }
+  },
+  "final-checkAll": {
+    "totals": {
+      "total": 10018,
+      "failed": 0,
+      "errors": 0,
+      "passed": 10013,
+      "skipped": 5
+    },
+    "moduleCells": 56
+  },
+  "final-consumer": {
+    "totals": {
+      "total": 485,
+      "failed": 0,
+      "errors": 0,
+      "passed": 485,
+      "skipped": 0
+    },
+    "moduleCells": 10
+  },
+  "qualificationNotes": {
+    "originalReaderMutation": "Survived because segments span whole text; preserved as failed qualification evidence.",
+    "qualifiedReaderMutation": "offline-reader-mutation-revised.log; one named failure and passing ASCII control.",
+    "producerRevision": "0896301303be7f6a0d67307ce52a8fbfedf3be25",
+    "readerRevision": "3f25f9995df24b1c9c2c127010f95931ce2e1ab0"
+  }
+}

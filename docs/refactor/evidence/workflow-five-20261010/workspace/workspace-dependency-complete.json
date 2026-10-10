@@ -1,0 +1,34 @@
+{
+  "producer": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+  "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "graph4s": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+  "gale": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedGrakern/clean",
+    "embedBench/clean",
+    "embedGrakern/test",
+    "embedBench/test"
+  ],
+  "exit": 0,
+  "moduleCells": [
+    [
+      28,
+      0,
+      0,
+      28,
+      0
+    ],
+    [
+      176,
+      0,
+      0,
+      175,
+      1
+    ]
+  ],
+  "scope": "Clean adapter and benchmark recompile; supplements full checkAll using explicit 8efc5efa engine override."
+}

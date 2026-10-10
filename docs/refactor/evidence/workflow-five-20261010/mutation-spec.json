@@ -1,0 +1,32 @@
+[
+  {
+    "name": "pair-authority-bytes",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+    "old": "  def decodePair(\n      files: Vector[(String, String)],\n      expected: MappingRun.Execution\n  ): Either[Error, MappingRun.Execution] =\n    for\n      _ <- files\n        .groupBy(_._1)\n        .collectFirst { case (name, values) if values.size != 1 => name }\n        .toLeft(())\n        .left\n        .map(Error.DuplicateFile(_))\n      rebuilt <- encode(expected)\n      supplied = files.toMap\n      _ <- Either.cond(\n        supplied.keySet == rebuilt.files.map(_._1).toSet,\n        (),\n        Error.ContentMismatch(\"file-set\")\n      )\n      _ <- rebuilt.files.traverse_ { (name, text) =>\n        Either.cond(supplied(name) == text, (), Error.ContentMismatch(name))\n      }\n    yield expected\n\n",
+    "new": "  def decodePair(\n      files: Vector[(String, String)],\n      expected: MappingRun.Execution\n  ): Either[Error, MappingRun.Execution] =\n    for\n      _ <- files\n        .groupBy(_._1)\n        .collectFirst { case (name, values) if values.size != 1 => name }\n        .toLeft(())\n        .left\n        .map(Error.DuplicateFile(_))\n      rebuilt <- encode(expected)\n      supplied = files.toMap\n      _ <- Either.cond(\n        supplied.keySet == rebuilt.files.map(_._1).toSet,\n        (),\n        Error.ContentMismatch(\"file-set\")\n      )\n      _ <- rebuilt.files.traverse_ { (name, text) =>\n        Either.cond(supplied(name) == text || name.nonEmpty, (), Error.ContentMismatch(name))\n      }\n    yield expected\n\n",
+    "expected": "paired context refuses foreign executions duplicate files and swapped members",
+    "selection": ".*",
+    "suite": "storymodel4s.pipeline.PairedExchangeSuite",
+    "module": "pipeline"
+  },
+  {
+    "name": "pair-duplicate-files",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingexchange.scala",
+    "old": "  def decodePair(\n      files: Vector[(String, String)],\n      expected: MappingRun.Execution\n  ): Either[Error, MappingRun.Execution] =\n    for\n      _ <- files\n        .groupBy(_._1)\n        .collectFirst { case (name, values) if values.size != 1 => name }\n        .toLeft(())\n        .left\n        .map(Error.DuplicateFile(_))\n      rebuilt <- encode(expected)\n      supplied = files.toMap\n      _ <- Either.cond(\n        supplied.keySet == rebuilt.files.map(_._1).toSet,\n        (),\n        Error.ContentMismatch(\"file-set\")\n      )\n      _ <- rebuilt.files.traverse_ { (name, text) =>\n        Either.cond(supplied(name) == text, (), Error.ContentMismatch(name))\n      }\n    yield expected\n\n",
+    "new": "  def decodePair(\n      files: Vector[(String, String)],\n      expected: MappingRun.Execution\n  ): Either[Error, MappingRun.Execution] =\n    for\n      _ <- files\n        .groupBy(_._1)\n        .collectFirst { case (name, values) if values.size < 0 => name }\n        .toLeft(())\n        .left\n        .map(Error.DuplicateFile(_))\n      rebuilt <- encode(expected)\n      supplied = files.toMap\n      _ <- Either.cond(\n        supplied.keySet == rebuilt.files.map(_._1).toSet,\n        (),\n        Error.ContentMismatch(\"file-set\")\n      )\n      _ <- rebuilt.files.traverse_ { (name, text) =>\n        Either.cond(supplied(name) == text, (), Error.ContentMismatch(name))\n      }\n    yield expected\n\n",
+    "expected": "paired context refuses foreign executions duplicate files and swapped members",
+    "selection": ".*",
+    "suite": "storymodel4s.pipeline.PairedExchangeSuite",
+    "module": "pipeline"
+  },
+  {
+    "name": "resume-foreign-files",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "old": "(names.toSet + \"manifest.json\") && names.distinct.size == names.size",
+    "new": "(names.toSet + \"manifest.json\") || names.nonEmpty",
+    "expected": "public exchange CLI refuses changed bytes on resume and preserves prior output",
+    "selection": ".*",
+    "suite": "storymodel4s.pipeline.PairedExchangeSuite",
+    "module": "pipeline"
+  }
+]

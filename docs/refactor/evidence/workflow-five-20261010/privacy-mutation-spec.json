@@ -1,0 +1,32 @@
+[
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.RecallDisclosureSuite",
+    "name": "disclosure-local-refusal",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/RecallDisclosure.scala",
+    "old": "input.basis != Basis.LocalOnly",
+    "new": "true",
+    "expected": "ordinary local text cannot substitute for a certified disclosure witness",
+    "selection": ".*"
+  },
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.RecallPublicationSuite",
+    "name": "disclosure-failed-basis-identity",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "old": "supplied.fold(\"not-supplied\")(RecallDisclosure.receiptDescription)",
+    "new": "\"not-supplied\"",
+    "expected": "failed timing still binds each retained certified basis",
+    "selection": ".*(failed timing|failed admission).*"
+  },
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.RecallPublicationSuite",
+    "name": "disclosure-exchange-preflight",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "old": "StudyPreparation.publishRecall(r).left.map(_.toString)",
+    "new": "(Right(StudyPreparation.encode(r)): Either[String, String])",
+    "expected": "exchange and weighted publication refuse local-only recall before creating output",
+    "selection": ".*(exchange and weighted|fixed project-synthetic).*"
+  }
+]

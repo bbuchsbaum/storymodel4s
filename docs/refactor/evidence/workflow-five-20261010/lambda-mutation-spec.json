@@ -1,0 +1,32 @@
+[
+  {
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.StructuralWeightSuite",
+    "name": "weighted-exact-endpoint",
+    "path": "align/src/main/scala/storymodel4s/align/structuralweight.scala",
+    "old": "def isReconstruction: Boolean = numerator == denominator",
+    "new": "def isReconstruction: Boolean = coefficient == 1.0",
+    "expected": "rounded interior coefficient never becomes an endpoint or loses its identity",
+    "selection": ".*"
+  },
+  {
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.StructuralWeightSuite",
+    "name": "weighted-external-coefficients",
+    "path": "align/src/main/scala/storymodel4s/align/structuralweight.scala",
+    "old": "kind -> (weight.coefficient * coefficient)",
+    "new": "kind -> (if kind == TransitionKind.ExternalIn || kind == TransitionKind.ExternalStay then coefficient else weight.coefficient * coefficient)",
+    "expected": "three-unit exhaustive oracle checks every marginal and transition including external states",
+    "selection": ".*(three-unit exhaustive|endpoint selections).*"
+  },
+  {
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.StructuralWeightSuite",
+    "name": "weighted-originating-execution",
+    "path": "align/src/main/scala/storymodel4s/align/mappingrun.scala",
+    "old": "if selection.execution.identity != identity then",
+    "new": "if selection.execution.identity != identity && false then",
+    "expected": "interior raw decision may remain external and foreign selection authority refuses",
+    "selection": ".*"
+  }
+]

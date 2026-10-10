@@ -1,0 +1,1 @@
+{"actor":"codex-workflow-five-20261010","entity":"bd-01M35B103S2KHRSF853GD2FYHW","kind":"reserve_open","mode":"exclusive","op":"20261010T172432.492952Z-p85424-c0000-r5d37-hbe21b6","paths":["codec/src/test/scala/storymodel4s/codec/TimedSourceArtifactSuite.scala"],"reservation_id":"rv-01M4KDGKKC7TKRFEHRBJ5QPT54","ts":"2026-10-10T17:24:32.492952Z","ttl_s":3600,"v":2}

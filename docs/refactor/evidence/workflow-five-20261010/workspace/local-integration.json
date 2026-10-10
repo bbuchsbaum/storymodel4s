@@ -1,0 +1,10 @@
+{
+  "producerMain": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+  "consumerMain": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "sourcePrevious": "3f25f9995df24b1c9c2c127010f95931ce2e1ab0",
+  "consumerPrevious": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "sourceOriginTracking": "908b935ca55fb6a4bc0f1e10b16a5b42c93adff4",
+  "consumerOriginTracking": "90f682d1acddd759867098e90f6e3ef163244b0e",
+  "remotePublication": false,
+  "consumerUnrelatedStatusPreserved": true
+}

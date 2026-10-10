@@ -1,0 +1,91 @@
+[
+  {
+    "name": "disclosure-local-refusal",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/RecallDisclosure.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.RecallDisclosureSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4,
+        0
+      ]
+    ],
+    "named_failure": "ordinary local text cannot substitute for a certified disclosure witness",
+    "failures": [
+      "==> X storymodel4s.pipeline.RecallDisclosureSuite.ordinary local text cannot substitute for a certified disclosure witness 0.008s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/RecallDisclosureSuite.scala:45 assertion failed"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "8c5001d2c1eade19ec92ff6fc1cc84117d911fcc87b40d90608a83a0c7071cbe",
+    "patch_sha256": "18b63259faeef9bff56bceafb7321ff7cf4c92d68f0534ebc78fb2f00d4f8249",
+    "log_sha256": "476e2acba321dc82206fc7c81404e2e45ce512b3c0481929bc6f459ba6aeda51"
+  },
+  {
+    "name": "disclosure-failed-basis-identity",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.RecallPublicationSuite -- \"--tests=.*(failed timing|failed admission).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        6
+      ]
+    ],
+    "named_failure": "failed timing still binds each retained certified basis",
+    "failures": [
+      "==> X storymodel4s.pipeline.RecallPublicationSuite.failed timing still binds each retained certified basis 0.374s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/RecallPublicationSuite.scala:197 values are the same, expected 2 different values: caa88357ee873d99fcf16975c319d0cb1756d496d19289bcd4e7bcb05f1764a8 is equal to caa88357ee873d99fcf16975c319d0cb1756d496d19289bcd4e7bcb05f1764a8"
+    ],
+    "test_selection": ".*(failed timing|failed admission).*",
+    "source_sha256": "22032dcb0751ac9c891e0a39f0b3221f7f222bdc615e68b657baeb0c93e10113",
+    "patch_sha256": "d5965012f8c80fb39c6b2b69a807ca70573b0e78152a2c493d3e13cb9f968dca",
+    "log_sha256": "2707b45c756fad4d0fd7838934e1b3c17ee9c344e0db9dd76bc7f8aca6d23492"
+  },
+  {
+    "name": "disclosure-exchange-preflight",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.RecallPublicationSuite -- \"--tests=.*(exchange and weighted|fixed project-synthetic).*\""
+    ],
+    "exit": 1,
+    "compiled": false,
+    "qualified": false,
+    "totals": [],
+    "named_failure": "exchange and weighted publication refuse local-only recall before creating output",
+    "failures": [],
+    "test_selection": ".*(exchange and weighted|fixed project-synthetic).*",
+    "source_sha256": "3423744c5cc9bd194d0525678d2f6925490dbe4ded63fb2ed1ebeced6ac71c7c",
+    "patch_sha256": "f3eb64ac615835a3a23116fc9eb5015b72e84e844e09ccba4202d80a2fff17d9",
+    "log_sha256": "ca7a8c39e9059eb051b829cabaebb58b71288dc070050d35ac36574ad236b1c5"
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyWorkspaceSuite",
+    "name": "workspace-export-permission",
+    "path": "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+    "old": "WorkspaceArchiveCodec.encode(archive.manifest)",
+    "new": "Right(canonicalArchive)",
+    "expected": "inspection permission preserves identity while export permission refuses copying",
+    "selection": ".*"
+  },
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyWorkspaceSuite",
+    "name": "workspace-decision-mass",
+    "path": "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+    "old": "supported == basisValues\n                .contains(target) && mass == basisValues.getOrElse(target, 0.0)",
+    "new": "(supported == basisValues\n                .contains(target) && mass == basisValues.getOrElse(target, 0.0)) || true",
+    "expected": "rehashed decision mass and choice must match the retained alternatives",
+    "selection": ".*"
+  },
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyWorkspaceSuite",
+    "name": "workspace-resume-payload",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "old": "Checksum.ofBytes(Files.readAllBytes(path)).hex == hash",
+    "new": "Checksum.ofBytes(Files.readAllBytes(path)).hex == hash || hash.nonEmpty",
+    "expected": "corrupt foreign and incomplete publications refuse resume, while a new source creates a cache edition",
+    "selection": ".*(admitted recalls|corrupt foreign).*"
+  },
+  {
+    "module": "pipeline",
+    "suite": "storymodel4s.pipeline.StudyWorkspaceSuite",
+    "name": "workspace-interrupted-completion",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "old": "then Left(Refusal.Incomplete)",
+    "new": "then Right(())",
+    "expected": "corrupt foreign and incomplete publications refuse resume, while a new source creates a cache edition",
+    "selection": ".*(admitted recalls|corrupt foreign).*"
+  },
+  {
+    "module": "codecJVM",
+    "suite": "storymodel4s.codec.TimedSourceArtifactSuite",
+    "name": "workspace-portable-json-guard",
+    "path": "codec/src/main/scala/storymodel4s/codec/timedsource.scala",
+    "old": "MappingJson.uniqueObjectKeys(text).left.map(_.toString)",
+    "new": "Right(())",
+    "expected": "duplicate descriptor keys refuse even when both values agree",
+    "selection": ".*(portable annotation|duplicate descriptor).*"
+  },
+  {
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.NumericalPropagationSuite",
+    "name": "workspace-cached-result-identity",
+    "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+    "old": "MappingBindingRender.result(this)",
+    "new": "Checksum.ofText(\"wrong cached result identity\")",
+    "expected": "one adjacent posterior bit changes result binding and is refused by the old binding",
+    "selection": ".*",
+    "kind": "cache-identity"
+  },
+  {
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.MappingMeasuresSuite",
+    "name": "workspace-batch-result-context",
+    "path": "align/src/main/scala/storymodel4s/align/mappingmeasures.scala",
+    "old": "binding.checkContext(recall, checkedView, source)",
+    "new": "Right(())",
+    "expected": "batched links refuse foreign result scope and evidence",
+    "selection": ".*batched links.*"
+  },
+  {
+    "module": "alignJVM",
+    "suite": "storymodel4s.align.MappingMeasuresSuite",
+    "name": "workspace-batch-evidence-context",
+    "path": "align/src/main/scala/storymodel4s/align/mappingmeasures.scala",
+    "old": "LocalEvidence\n        .bound(evidence, recall, checkedView, gate = true)\n        .left\n        .map(e => MappingRefusal.InvalidValue(\"link.evidence\", e.toString))",
+    "new": "Right(())",
+    "expected": "batched links refuse foreign result scope and evidence",
+    "selection": ".*batched links.*"
+  }
+]

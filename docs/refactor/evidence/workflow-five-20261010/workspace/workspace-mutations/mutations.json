@@ -1,0 +1,266 @@
+[
+  {
+    "name": "workspace-export-permission",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyWorkspaceSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8,
+        0
+      ]
+    ],
+    "named_failure": "inspection permission preserves identity while export permission refuses copying",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyWorkspaceSuite.inspection permission preserves identity while export permission refuses copying 0.104s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyWorkspaceSuite.scala:454"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "ee2215144a9bab7c8c7575ec4dbeb62c422da643bc48b9dc482fcb37d05b8f7d",
+    "patch_sha256": "b37ed3e4a2f482edb660856ada2d59e3b243deb7e36a6f6f8b618e6149719ac3",
+    "log_sha256": "66e46a4afff68f28984eb7807d6a3b6dc44a43bcddd49d3ccaeac8237324ee4b"
+  },
+  {
+    "name": "workspace-decision-mass",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyWorkspaceSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8,
+        0
+      ]
+    ],
+    "named_failure": "rehashed decision mass and choice must match the retained alternatives",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyWorkspaceSuite.rehashed decision mass and choice must match the retained alternatives 0.075s munit.FailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyWorkspaceSuite.scala:597 decision mutation 0"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "eb313944bd8cd265b4ea3f40ada07a077b68b58546a5a7a66cb361591faaea59",
+    "patch_sha256": "13d2b326ab40bda6911f8163bf2d34905b4f0a5e3c9b1669805549084d82783c",
+    "log_sha256": "0a6734755a376dc5cbfe2d2b0d83c4f2dc26195bf7c2ca6c98d555b3608e31ef"
+  },
+  {
+    "name": "workspace-resume-payload",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyWorkspaceSuite -- \"--tests=.*(admitted recalls|corrupt foreign).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "corrupt foreign and incomplete publications refuse resume, while a new source creates a cache edition",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyWorkspaceSuite.corrupt foreign and incomplete publications refuse resume, while a new source creates a cache edition 0.113s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyWorkspaceSuite.scala:298"
+    ],
+    "test_selection": ".*(admitted recalls|corrupt foreign).*",
+    "source_sha256": "21928c2bf5d991ebf04e45cada1e7ae5e9b81d11794c6da0f375eb4e8678d2cf",
+    "patch_sha256": "c3a9fa601c9f3392a0efe7ab0473dafd507d02dd3a678107815df3c074b05cdd",
+    "log_sha256": "cfab6036eb5e445df326ee846aa4970c29ee7b314013904029aee9bc8533f881"
+  },
+  {
+    "name": "workspace-interrupted-completion",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyCli.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.StudyWorkspaceSuite -- \"--tests=.*(admitted recalls|corrupt foreign).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "named_failure": "corrupt foreign and incomplete publications refuse resume, while a new source creates a cache edition",
+    "failures": [
+      "==> X storymodel4s.pipeline.StudyWorkspaceSuite.corrupt foreign and incomplete publications refuse resume, while a new source creates a cache edition 0.241s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/StudyWorkspaceSuite.scala:317"
+    ],
+    "test_selection": ".*(admitted recalls|corrupt foreign).*",
+    "source_sha256": "f08e08a2ae6c7099203fe94d09baaf16cf111c54deb9f7e8cc975866032b775f",
+    "patch_sha256": "e5fef36927d39ac8937e12f89b80acff6836b90799e388598782244ebf055ba8",
+    "log_sha256": "1f69a9f433c37cf716417300ccb64f9f765716564b61d44719180ea719dd9c71"
+  },
+  {
+    "name": "workspace-portable-json-guard",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "codec/src/main/scala/storymodel4s/codec/timedsource.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "codecJVM/testOnly storymodel4s.codec.TimedSourceArtifactSuite -- \"--tests=.*(portable annotation|duplicate descriptor).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        2
+      ]
+    ],
+    "named_failure": "duplicate descriptor keys refuse even when both values agree",
+    "failures": [
+      "==> X storymodel4s.codec.TimedSourceArtifactSuite.duplicate descriptor keys refuse even when both values agree 0.012s munit.FailException: codec/src/test/scala/storymodel4s/codec/TimedSourceArtifactSuite.scala:24 assertion failed"
+    ],
+    "test_selection": ".*(portable annotation|duplicate descriptor).*",
+    "source_sha256": "5ae5e64863f336ea00a481b274405645b2e963db6b7fc123c8c259914d0009bb",
+    "patch_sha256": "2eb1ea4b23671b96035fa3e3b0cf109a3b46a2e5e6eeeac1b77eca7e963c9109",
+    "log_sha256": "3b7b4119a3eb22adf3486b1679315bd4e33f047b58632b124a57174f13d981eb"
+  },
+  {
+    "name": "workspace-cached-result-identity",
+    "kind": "cache-identity",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.NumericalPropagationSuite -- \"--tests=.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        3,
+        1,
+        0,
+        2,
+        0
+      ]
+    ],
+    "named_failure": "one adjacent posterior bit changes result binding and is refused by the old binding",
+    "failures": [
+      "==> X storymodel4s.align.NumericalPropagationSuite.one adjacent posterior bit changes result binding and is refused by the old binding 0.248s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/NumericalPropagationSuite.scala:51"
+    ],
+    "test_selection": ".*",
+    "source_sha256": "5efc4b10a11ba7038d64467c78f842de7c62aecb73d4b15734eab5b855c96641",
+    "patch_sha256": "001112646e48226202627cf9b657c5c27d178057fa139d4009556b2280ff31c7",
+    "log_sha256": "792324a6e7e1c4c06216dba322cef39b2ddd0d3a1746654c51d4cb0826c8e510"
+  },
+  {
+    "name": "workspace-batch-result-context",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "align/src/main/scala/storymodel4s/align/mappingmeasures.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingMeasuresSuite -- \"--tests=.*batched links.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        21
+      ]
+    ],
+    "named_failure": "batched links refuse foreign result scope and evidence",
+    "failures": [
+      "==> X storymodel4s.align.MappingMeasuresSuite.batched links refuse foreign result scope and evidence 0.069s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/MappingMeasuresSuite.scala:440"
+    ],
+    "test_selection": ".*batched links.*",
+    "source_sha256": "ce829025496295beb8fa46dc583771acbf28b6c3a0d5494b15ba332e04496414",
+    "patch_sha256": "5213853697225505687a119a0526a59258a2e6a85b4bb199f24981ef602e6b30",
+    "log_sha256": "f93655040cdacb70a71cbe3815703a8a43872ff1251e520a4c1a9b6a3c2c0fc5"
+  },
+  {
+    "name": "workspace-batch-evidence-context",
+    "kind": "guard",
+    "candidate_sha": "34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca",
+    "path": "align/src/main/scala/storymodel4s/align/mappingmeasures.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.align.MappingMeasuresSuite -- \"--tests=.*batched links.*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1,
+        21
+      ]
+    ],
+    "named_failure": "batched links refuse foreign result scope and evidence",
+    "failures": [
+      "==> X storymodel4s.align.MappingMeasuresSuite.batched links refuse foreign result scope and evidence 0.047s munit.FailException: align/src/test/scala/storymodel4s/align/MappingMeasuresSuite.scala:447 expected foreign evidence refusal, got Right(Vector(storymodel4s.align.MappingLink@13c98199))"
+    ],
+    "test_selection": ".*batched links.*",
+    "source_sha256": "334ef5b800b57af472af80c3080bf5f290344c5eaaff117613854a9232186a6e",
+    "patch_sha256": "90e894642d139535bb464a5d0c137d80e4c6e43560ec1b70a7a3bfe66f3dc83a",
+    "log_sha256": "2ab827a5b6bebb899705674d838c03dc00ff32e13813d8b04ff2c584fd6f1cbe"
+  }
+]

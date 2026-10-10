@@ -1,0 +1,11 @@
+--- a/codec/src/main/scala/storymodel4s/codec/mappingexchange.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mappingexchange.scala
+@@ -74,7 +74,7 @@
+     for
+       _ <- files
+         .groupBy(_._1)
+-        .collectFirst { case (name, values) if values.size != 1 => name }
++        .collectFirst { case (name, values) if values.size < 0 => name }
+         .toLeft(())
+         .left
+         .map(Error.DuplicateFile(_))

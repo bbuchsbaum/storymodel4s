@@ -1,0 +1,197 @@
+{
+  "privacy-mutations/disclosure-exchange-preflight.log": {
+    "archive": "privacy-mutations/disclosure-exchange-preflight.log.gz",
+    "originalSha256": "3bd7f1c26dfdbb6392d33da0745e75e9e4f92b95229c322ede3040b0e3e83a1a",
+    "archiveSha256": "c381854e77dafa84b88623a383550dfba4787a473ab83b4cf3c0a0084bf099df"
+  },
+  "privacy-mutations/disclosure-exchange-preflight.log.meta.json": {
+    "archive": "privacy-mutations/disclosure-exchange-preflight.log.meta.json",
+    "originalSha256": "bba9c6e9cc88798b2431bb5345649bcbe4fd1441c405d16c4ba73490aa023ded",
+    "archiveSha256": "bba9c6e9cc88798b2431bb5345649bcbe4fd1441c405d16c4ba73490aa023ded"
+  },
+  "privacy-mutations/disclosure-exchange-preflight.patch": {
+    "archive": "privacy-mutations/disclosure-exchange-preflight.patch.gz",
+    "originalSha256": "70e7827e197f406cb9bbc9f45c93ee59b1ac50764054a99690d7f8f9399749e8",
+    "archiveSha256": "2525400c9c839ddd4448a4fcce9c47f5fa22df07da22a6562fe8fa013da7ae91"
+  },
+  "privacy-mutations/disclosure-failed-basis-identity.log": {
+    "archive": "privacy-mutations/disclosure-failed-basis-identity.log.gz",
+    "originalSha256": "2707b45c756fad4d0fd7838934e1b3c17ee9c344e0db9dd76bc7f8aca6d23492",
+    "archiveSha256": "a2b1aa188523ae9aa9f0716822c86311031af8dc6674496137cfbc78993e752f"
+  },
+  "privacy-mutations/disclosure-failed-basis-identity.log.meta.json": {
+    "archive": "privacy-mutations/disclosure-failed-basis-identity.log.meta.json",
+    "originalSha256": "d032059e7fdd9c37a189f1b81d4ec3d26c74d0092729a0fb0166f76b60596239",
+    "archiveSha256": "d032059e7fdd9c37a189f1b81d4ec3d26c74d0092729a0fb0166f76b60596239"
+  },
+  "privacy-mutations/disclosure-failed-basis-identity.patch": {
+    "archive": "privacy-mutations/disclosure-failed-basis-identity.patch.gz",
+    "originalSha256": "d5965012f8c80fb39c6b2b69a807ca70573b0e78152a2c493d3e13cb9f968dca",
+    "archiveSha256": "5b8c5a005fccf3e665e463d4e7082c1758272a51bd0ebf41cc2341c558f1bfa4"
+  },
+  "privacy-mutations/disclosure-local-refusal.log": {
+    "archive": "privacy-mutations/disclosure-local-refusal.log.gz",
+    "originalSha256": "476e2acba321dc82206fc7c81404e2e45ce512b3c0481929bc6f459ba6aeda51",
+    "archiveSha256": "ae7c181d261283b5eb61028f8195c7dc163f80b9f735ed8748a08c94f8b5b2b4"
+  },
+  "privacy-mutations/disclosure-local-refusal.log.meta.json": {
+    "archive": "privacy-mutations/disclosure-local-refusal.log.meta.json",
+    "originalSha256": "a1d5c3bb630f8fe80517d84a916d9ba1589ca3a8ff2ac2aaa51c1a17bb2cc135",
+    "archiveSha256": "a1d5c3bb630f8fe80517d84a916d9ba1589ca3a8ff2ac2aaa51c1a17bb2cc135"
+  },
+  "privacy-mutations/disclosure-local-refusal.patch": {
+    "archive": "privacy-mutations/disclosure-local-refusal.patch.gz",
+    "originalSha256": "18b63259faeef9bff56bceafb7321ff7cf4c92d68f0534ebc78fb2f00d4f8249",
+    "archiveSha256": "e384da0dbd210d004a364892ed1ab117eff70a89bad8e1168a04c0fd26107632"
+  },
+  "privacy-mutations/inconclusive-compile/disclosure-exchange-preflight.log": {
+    "archive": "privacy-mutations/inconclusive-compile/disclosure-exchange-preflight.log.gz",
+    "originalSha256": "ca7a8c39e9059eb051b829cabaebb58b71288dc070050d35ac36574ad236b1c5",
+    "archiveSha256": "d9e00ae83db658c89d8822c68b41597b3f800730bae56a05ac8cc1e39e5aa210"
+  },
+  "privacy-mutations/inconclusive-compile/disclosure-exchange-preflight.log.meta.json": {
+    "archive": "privacy-mutations/inconclusive-compile/disclosure-exchange-preflight.log.meta.json",
+    "originalSha256": "52faeadbd10f90de65b8429cd13eb5e412fc1a040c2133db854f4e94e42348d0",
+    "archiveSha256": "52faeadbd10f90de65b8429cd13eb5e412fc1a040c2133db854f4e94e42348d0"
+  },
+  "privacy-mutations/inconclusive-compile/disclosure-exchange-preflight.patch": {
+    "archive": "privacy-mutations/inconclusive-compile/disclosure-exchange-preflight.patch.gz",
+    "originalSha256": "f3eb64ac615835a3a23116fc9eb5015b72e84e844e09ccba4202d80a2fff17d9",
+    "archiveSha256": "08d1848b26f10c60d9ef53f8630dfc09f1af3211504c7cdf0084e9e3917297c3"
+  },
+  "privacy-mutations/inconclusive-compile/mutations.json": {
+    "archive": "privacy-mutations/inconclusive-compile/mutations.json",
+    "originalSha256": "87ddc688956ee140d56822bd6b089c385fadc8fb425615c497c6aadb96c2bd7e",
+    "archiveSha256": "87ddc688956ee140d56822bd6b089c385fadc8fb425615c497c6aadb96c2bd7e"
+  },
+  "privacy-mutations/mutations.json": {
+    "archive": "privacy-mutations/mutations.json",
+    "originalSha256": "547a3b9cca484a0f96a1956f4eaa42f35cb73c08268d3ffa47efc15c4d2beef7",
+    "archiveSha256": "547a3b9cca484a0f96a1956f4eaa42f35cb73c08268d3ffa47efc15c4d2beef7"
+  },
+  "workspace-mutations/mutations.json": {
+    "archive": "workspace-mutations/mutations.json",
+    "originalSha256": "ddfd558b8f143c93ac4cac281539472ee701cb757a3077f598143e8871737136",
+    "archiveSha256": "ddfd558b8f143c93ac4cac281539472ee701cb757a3077f598143e8871737136"
+  },
+  "workspace-mutations/workspace-batch-evidence-context.log": {
+    "archive": "workspace-mutations/workspace-batch-evidence-context.log.gz",
+    "originalSha256": "2ab827a5b6bebb899705674d838c03dc00ff32e13813d8b04ff2c584fd6f1cbe",
+    "archiveSha256": "59d634d1804641bf1512d1863dc38b4696341b87ca84ed0e1603c168736320bf"
+  },
+  "workspace-mutations/workspace-batch-evidence-context.log.meta.json": {
+    "archive": "workspace-mutations/workspace-batch-evidence-context.log.meta.json",
+    "originalSha256": "ee85e7e202c934ba1bd33eeb9f984d4dc8536725a86f52c6d2600a0733716a43",
+    "archiveSha256": "ee85e7e202c934ba1bd33eeb9f984d4dc8536725a86f52c6d2600a0733716a43"
+  },
+  "workspace-mutations/workspace-batch-evidence-context.patch": {
+    "archive": "workspace-mutations/workspace-batch-evidence-context.patch.gz",
+    "originalSha256": "90e894642d139535bb464a5d0c137d80e4c6e43560ec1b70a7a3bfe66f3dc83a",
+    "archiveSha256": "0653e4e2f5854849e7037ccdac629dbcfd109e79c3b37f5ac1bbb4d8a190c738"
+  },
+  "workspace-mutations/workspace-batch-result-context.log": {
+    "archive": "workspace-mutations/workspace-batch-result-context.log.gz",
+    "originalSha256": "f93655040cdacb70a71cbe3815703a8a43872ff1251e520a4c1a9b6a3c2c0fc5",
+    "archiveSha256": "79f12584dacc0ad234f70352340ef4c9d3256fca69b1063a9c9ab5641c432f5b"
+  },
+  "workspace-mutations/workspace-batch-result-context.log.meta.json": {
+    "archive": "workspace-mutations/workspace-batch-result-context.log.meta.json",
+    "originalSha256": "58b9dcbefc27774b2706705ee7495301de1c04a0010281bc1f59ac5750be5d8e",
+    "archiveSha256": "58b9dcbefc27774b2706705ee7495301de1c04a0010281bc1f59ac5750be5d8e"
+  },
+  "workspace-mutations/workspace-batch-result-context.patch": {
+    "archive": "workspace-mutations/workspace-batch-result-context.patch.gz",
+    "originalSha256": "5213853697225505687a119a0526a59258a2e6a85b4bb199f24981ef602e6b30",
+    "archiveSha256": "f528e760de78f8cd5c9460d259143bea0bc5ece6d0196aec7b1128a760b3a30b"
+  },
+  "workspace-mutations/workspace-cached-result-identity.log": {
+    "archive": "workspace-mutations/workspace-cached-result-identity.log.gz",
+    "originalSha256": "792324a6e7e1c4c06216dba322cef39b2ddd0d3a1746654c51d4cb0826c8e510",
+    "archiveSha256": "a269fc9714c1c330cd83ef383591886d84ea2fa4d7ee84ec69b1fb3b2880929f"
+  },
+  "workspace-mutations/workspace-cached-result-identity.log.meta.json": {
+    "archive": "workspace-mutations/workspace-cached-result-identity.log.meta.json",
+    "originalSha256": "2ec0f99ec5f496fb9de4e1a68e0a126f3e98d5065066d6486c184341b80640c7",
+    "archiveSha256": "2ec0f99ec5f496fb9de4e1a68e0a126f3e98d5065066d6486c184341b80640c7"
+  },
+  "workspace-mutations/workspace-cached-result-identity.patch": {
+    "archive": "workspace-mutations/workspace-cached-result-identity.patch.gz",
+    "originalSha256": "001112646e48226202627cf9b657c5c27d178057fa139d4009556b2280ff31c7",
+    "archiveSha256": "e851a9b24579fd0b4d1272480bda9fe1bb298d70583fd096bf770e44e07a382e"
+  },
+  "workspace-mutations/workspace-decision-mass.log": {
+    "archive": "workspace-mutations/workspace-decision-mass.log.gz",
+    "originalSha256": "0a6734755a376dc5cbfe2d2b0d83c4f2dc26195bf7c2ca6c98d555b3608e31ef",
+    "archiveSha256": "54018bf88b9118ffd2a2605add75b9b871fe15cccd47b2cfc741ec50c2e04666"
+  },
+  "workspace-mutations/workspace-decision-mass.log.meta.json": {
+    "archive": "workspace-mutations/workspace-decision-mass.log.meta.json",
+    "originalSha256": "c73405c778c5544180a4dc5548b6772924b77f5c4fe237f9fbc05883b358ecc9",
+    "archiveSha256": "c73405c778c5544180a4dc5548b6772924b77f5c4fe237f9fbc05883b358ecc9"
+  },
+  "workspace-mutations/workspace-decision-mass.patch": {
+    "archive": "workspace-mutations/workspace-decision-mass.patch.gz",
+    "originalSha256": "13d2b326ab40bda6911f8163bf2d34905b4f0a5e3c9b1669805549084d82783c",
+    "archiveSha256": "10f8dbe8c588d31ff5e79addfcf39c3fc87b14916b2c741b592753a3df52137b"
+  },
+  "workspace-mutations/workspace-export-permission.log": {
+    "archive": "workspace-mutations/workspace-export-permission.log.gz",
+    "originalSha256": "66e46a4afff68f28984eb7807d6a3b6dc44a43bcddd49d3ccaeac8237324ee4b",
+    "archiveSha256": "1a748a90c88d9bfe6e880ad951964beea9629e9fcc12d4e1a97cb79051df29a1"
+  },
+  "workspace-mutations/workspace-export-permission.log.meta.json": {
+    "archive": "workspace-mutations/workspace-export-permission.log.meta.json",
+    "originalSha256": "d4a13e8008d639bf1eec3c30bcaf18fcc0766af8a9535421fa71e77cc6635c22",
+    "archiveSha256": "d4a13e8008d639bf1eec3c30bcaf18fcc0766af8a9535421fa71e77cc6635c22"
+  },
+  "workspace-mutations/workspace-export-permission.patch": {
+    "archive": "workspace-mutations/workspace-export-permission.patch.gz",
+    "originalSha256": "b37ed3e4a2f482edb660856ada2d59e3b243deb7e36a6f6f8b618e6149719ac3",
+    "archiveSha256": "e5d4dffea8496790ca4adbce67244ced951f2e2dbaaf376d166f6c5fb6c5b44d"
+  },
+  "workspace-mutations/workspace-interrupted-completion.log": {
+    "archive": "workspace-mutations/workspace-interrupted-completion.log.gz",
+    "originalSha256": "1f69a9f433c37cf716417300ccb64f9f765716564b61d44719180ea719dd9c71",
+    "archiveSha256": "a3f206db5eb6fadbf678bf3663b47efb3beafb863c844b71f0f72f7862ea77db"
+  },
+  "workspace-mutations/workspace-interrupted-completion.log.meta.json": {
+    "archive": "workspace-mutations/workspace-interrupted-completion.log.meta.json",
+    "originalSha256": "08a29b529b88c64b9abba0335356b07925f9fe59d404687396689af2def0cf1a",
+    "archiveSha256": "08a29b529b88c64b9abba0335356b07925f9fe59d404687396689af2def0cf1a"
+  },
+  "workspace-mutations/workspace-interrupted-completion.patch": {
+    "archive": "workspace-mutations/workspace-interrupted-completion.patch.gz",
+    "originalSha256": "e5fef36927d39ac8937e12f89b80acff6836b90799e388598782244ebf055ba8",
+    "archiveSha256": "81f8860deaa953360530b6f4b4145a911caa3ad63a2e19b3b51075626f2c0f87"
+  },
+  "workspace-mutations/workspace-portable-json-guard.log": {
+    "archive": "workspace-mutations/workspace-portable-json-guard.log.gz",
+    "originalSha256": "3b7b4119a3eb22adf3486b1679315bd4e33f047b58632b124a57174f13d981eb",
+    "archiveSha256": "7c50c07121a9a85c36532a64f8e14819728d13edac50420f91beb75845a4106f"
+  },
+  "workspace-mutations/workspace-portable-json-guard.log.meta.json": {
+    "archive": "workspace-mutations/workspace-portable-json-guard.log.meta.json",
+    "originalSha256": "c64f44abf97cf9ade0182c75f3d445f340505f11414c345b10988b362fb5ac0b",
+    "archiveSha256": "c64f44abf97cf9ade0182c75f3d445f340505f11414c345b10988b362fb5ac0b"
+  },
+  "workspace-mutations/workspace-portable-json-guard.patch": {
+    "archive": "workspace-mutations/workspace-portable-json-guard.patch.gz",
+    "originalSha256": "2eb1ea4b23671b96035fa3e3b0cf109a3b46a2e5e6eeeac1b77eca7e963c9109",
+    "archiveSha256": "821a36f2e01f8c4a668cdfa2b00a6ac32419102b650f4e5407a3c04b0d8f37d1"
+  },
+  "workspace-mutations/workspace-resume-payload.log": {
+    "archive": "workspace-mutations/workspace-resume-payload.log.gz",
+    "originalSha256": "cfab6036eb5e445df326ee846aa4970c29ee7b314013904029aee9bc8533f881",
+    "archiveSha256": "dbbafd7778a67c23d98e5b678665ab1869d6dbee8adaa71f0508e289c7bc6754"
+  },
+  "workspace-mutations/workspace-resume-payload.log.meta.json": {
+    "archive": "workspace-mutations/workspace-resume-payload.log.meta.json",
+    "originalSha256": "fac8d67f795ec4dae4380031f2ecde230f97f1cc616a82a450e86744ce254698",
+    "archiveSha256": "fac8d67f795ec4dae4380031f2ecde230f97f1cc616a82a450e86744ce254698"
+  },
+  "workspace-mutations/workspace-resume-payload.patch": {
+    "archive": "workspace-mutations/workspace-resume-payload.patch.gz",
+    "originalSha256": "c3a9fa601c9f3392a0efe7ab0473dafd507d02dd3a678107815df3c074b05cdd",
+    "archiveSha256": "cb514c7aba758a4397cf69878cb805b06a21bca8c24a19579609152c9fde9486"
+  }
+}
