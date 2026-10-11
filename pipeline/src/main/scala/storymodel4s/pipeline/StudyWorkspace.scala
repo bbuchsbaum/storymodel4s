@@ -23,6 +23,8 @@ object StudyWorkspaceProducer:
         SurfaceWorkspaceCodecs.SourceKind.Text(k)
       case StudyPreparation.SourceInput.StoryModel(_) =>
         SurfaceWorkspaceCodecs.SourceKind.NarrativeModel
+      case StudyPreparation.SourceInput.CheckedAV(_, _, _, _, _) =>
+        SurfaceWorkspaceCodecs.SourceKind.AnnotationVideo
       case StudyPreparation.SourceInput.CheckedVideo(_) =>
         SurfaceWorkspaceCodecs.SourceKind.VideoCaptions
       case StudyPreparation.SourceInput.TimedAnnotations(_, _) |

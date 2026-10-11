@@ -91,3 +91,34 @@ object CaptionMapping:
       session <- scoring.session(recall, view, source).left.map(Refusal.Media(_))
       produced <- CaptionScoring.produce(session, inventory, config).left.map(Refusal.Scoring(_))
     yield new Registered(media, produced, expected)
+
+  /** A complete checked package and the declared correspondence own one global evidence run. */
+  final class PackageRegistered private[CaptionMapping] (
+      val media: CaptionPackage,
+      val joined: storymodel4s.codec.BoundCaptionSourceCodec.Imported,
+      val produced: CaptionScoring.Produced
+  ):
+    val identity: Checksum = ContentAddress.digest(Vector("caption-package-mapping/v1",
+      media.identity.hex, joined.identity.hex, produced.identity.hex))
+    val authority: ObservationAuthority = ObservationAuthority.Draft
+    override def equals(other: Any): Boolean = other match
+      case that: PackageRegistered => identity == that.identity
+      case _ => false
+    override def hashCode(): Int = identity.hashCode
+    override def toString: String = s"PackageCaptionMapping(${identity.short()})"
+
+  /** Portable declarations cannot substitute for a byte-verified package or a different join. */
+  def fromPackage(
+      media: CaptionPackage,
+      joined: storymodel4s.codec.BoundCaptionSourceCodec.Imported,
+      recall: RecallGraph[Checked],
+      inventory: RecallInventory,
+      config: StrictCandidateConfig,
+      blend: Double
+  ): Either[Refusal, PackageRegistered] = for
+    actual <- VideoSourceInput.project(media).left.map(_ => Refusal.ArtifactMismatch)
+    _ <- Either.cond(actual.artifact == joined.media.artifact, (), Refusal.ArtifactMismatch)
+    scoring <- CaptionScoring.multipart(blend, joined.media.evidence, joined.identity).left.map(Refusal.Media(_))
+    session <- scoring.session(recall, joined.view, joined.view.representation).left.map(Refusal.Media(_))
+    produced <- CaptionScoring.produce(session, inventory, config).left.map(Refusal.Scoring(_))
+  yield new PackageRegistered(media, joined, produced)

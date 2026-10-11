@@ -1273,3 +1273,30 @@ no invented cross-part interval.
 
 Rejected alternatives: converting machine descriptions into annotation-table clocks, dropping
 provenance after constructing a bare timed view, and treating proposal hulls as observed coverage.
+
+### 2026-10-11 — strict public annotation-video correspondence
+
+The owner authorized the strict join before the BIDS and complete A+V journey. The prepared
+annotation-video artifact retains the original annotation and media artifacts and an independently
+pinned correspondence declaration. Each annotation part names its exact source and film axes and
+at least two ordered landmark pairs. All supplied landmarks must agree with one positive affine
+relation; their endpoints delimit the admitted domain. The adapter derives a `ClockRepair` in
+seconds and refuses extrapolation, fractional film ticks and overflow. It never subtracts origins
+implicitly. This checks the declaration's consistency, not the physical truth of its landmarks;
+that requires independent dataset evidence. Portable imports and captions remain Draft.
+
+Only annotation loci change. Original annotation target IDs, text, grouping and lexical fields
+remain, and crossing groups retain missing aggregate support. Every caption must have one unique
+exact annotation interval. An annotation without a caption remains channel-unavailable. One
+multipart scoring session covers the complete annotation universe; no per-part normalization is
+combined. The complete joined-artifact identity enters scoring/session provenance, so two evidence
+bases with equal numerical coordinates still produce different evidence identities.
+
+The JVM study adapter reloads the independently pinned package before minting caption registration.
+Ordinary mapping, exchange, weighted mapping and workspace publication consume that registration.
+The portable joined artifact alone never supplies verified media execution authority.
+
+Rejected alternatives: part-name matching or an implicit identity clock; nearest or overlapping
+interval association; resampling/rounding fractional endpoints; rewriting annotation target IDs;
+concatenating independently normalized per-part mappings; and storing correspondence only in an
+outer receipt while leaving the scored evidence identity unchanged.

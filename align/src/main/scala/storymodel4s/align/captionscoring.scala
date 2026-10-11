@@ -8,9 +8,16 @@ import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Explicit lexical augmentation keeps caption content apart from its coordinate-bearing join. */
-final class CaptionScoring private (val blend: Double, val evidence: CaptionEvidence):
+final class CaptionScoring private (
+    val blend: Double,
+    val evidence: CaptionEvidence,
+    val additionalEvidence: Vector[CaptionEvidence],
+    val correspondence: Option[Checksum]
+):
+  val allEvidence: Vector[CaptionEvidence] = evidence +: additionalEvidence
   val identity: Checksum = MappingRender.digest(
-    Vector("caption-scoring/v1", evidence.identity.hex, CanonicalDouble.render(blend))
+    Vector("caption-scoring/v1", evidence.identity.hex, CanonicalDouble.render(blend)) ++
+      additionalEvidence.map(_.identity.hex) ++ correspondence.toVector.map(_.hex)
   )
   override def equals(other: Any): Boolean = other match
     case s: CaptionScoring => identity == s.identity
@@ -28,7 +35,13 @@ object CaptionScoring:
   def of(blend: Double, evidence: CaptionEvidence): Either[DomainError, CaptionScoring] =
     if !blend.isFinite || blend < 0.0 || blend > 1.0 then
       Left(refused("caption blend must be finite in [0,1]"))
-    else Right(new CaptionScoring(if blend == 0.0 then 0.0 else blend, evidence))
+    else Right(new CaptionScoring(if blend == 0.0 then 0.0 else blend, evidence, Vector.empty, None))
+  /** One complete annotation universe is scored once, with every correspondence in provenance. */
+  def multipart(blend: Double, evidence: Vector[CaptionEvidence], correspondence: Checksum): Either[DomainError, CaptionScoring] =
+    if evidence.isEmpty then Left(refused("caption evidence is empty"))
+    else of(blend, evidence.head).map(valid =>
+      new CaptionScoring(valid.blend, evidence.head, evidence.tail, Some(correspondence)))
+
   private def refused(message: String): DomainError =
     DomainError.InvariantViolation("caption-scoring", message)
 
@@ -98,36 +111,35 @@ object CaptionScoring:
         source: SourceRepresentation
     ): Either[DomainError, Session] =
       val view = MappingBindingRender.snapshot(sourceView)
-      val bundlePresent = source.bundles.toVector
-        .collect { case m: BundleEntry.Media => m.bundle }
-        .exists(_ == scoring.evidence.bundle)
-      if !bundlePresent || source.viewFingerprint != ViewFingerprint.of(view) ||
+      val bundles = source.bundles.toVector.collect { case m: BundleEntry.Media => m.bundle }
+      val supplied = scoring.allEvidence
+      val allCaptions = supplied.flatMap(_.captions)
+      if !supplied.forall(e => bundles.contains(e.bundle)) ||
+        source.viewFingerprint != ViewFingerprint.of(view) ||
         source.scopeDigest != MappingSourceRender.scope(view.nodes)
       then Left(refused("source binding differs"))
       else
-        source.targets
-          .filter(_.level == 0)
-          .traverse { target =>
-            target.sourceSupport match
-              case located: SourceSupportStatus.Located =>
-                PrimaryProjection.on(scoring.evidence.bundle, located.support).flatMap {
-                  case PrimaryProjection.Playback(_, support)
-                      if support.points.isEmpty && support.intervals.size == 1 =>
-                    val hits = scoring.evidence.captions.filter(_.support == support.intervals.head)
-                    if hits.size <= 1 then Right(hits.map(target.ref -> _))
-                    else Left(refused("ambiguous caption support"))
-                  case _ => Right(Vector.empty)
-                }
-              case _ => Right(Vector.empty)
-          }
-          .map(_.flatten)
-          .flatMap { rows =>
-            if rows.size != scoring.evidence.captions.size || rows
-                .map(_._2)
-                .toSet != scoring.evidence.captions.toSet
-            then Left(refused("caption has no unique exact target"))
-            else Right(new Session(scoring, recall, view, source, rows.toMap))
-          }
+        source.targets.filter(_.level == 0).traverse { target =>
+          target.sourceSupport match
+            case located: SourceSupportStatus.Located =>
+              val local = located.support match
+                case TypedSupport.Anchored(support) => supplied.filter(_.bundle.identity == support.bundleIdentity)
+                case _ => Vector.empty
+              if local.isEmpty then Right(Vector.empty)
+              else PrimaryProjection.on(local.head.bundle, located.support).flatMap {
+                case PrimaryProjection.Playback(_, support)
+                    if support.points.isEmpty && support.intervals.size == 1 =>
+                  val hits = local.flatMap(_.captions).filter(_.support == support.intervals.head)
+                  if hits.size <= 1 then Right(hits.map(target.ref -> _))
+                  else Left(refused("ambiguous caption support"))
+                case _ => Right(Vector.empty)
+              }
+            case _ => Right(Vector.empty)
+        }.map(_.flatten).flatMap { rows =>
+          if rows.size != allCaptions.size || rows.map(_._2).toSet != allCaptions.toSet then
+            Left(refused("caption has no unique exact target"))
+          else Right(new Session(scoring, recall, view, source, rows.toMap))
+        }
 
   /** The profile binds provenance even when two frame sets happen to yield equal numeric costs. */
   final class Produced private[CaptionScoring] (

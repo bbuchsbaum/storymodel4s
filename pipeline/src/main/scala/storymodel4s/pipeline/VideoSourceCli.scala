@@ -11,7 +11,7 @@ import storymodel4s.media.VideoAcquisition
 /** Explicit local command publishes the media package and its prepared timed source together. */
 object VideoSourceCli:
   val Usage: String =
-    "videoSource build JOB.json OUTPUT | replay PACKAGE MANIFEST_SHA256 EDITION OUTPUT"
+    "videoSource build JOB.json OUTPUT | replay PACKAGE MANIFEST_SHA256 EDITION OUTPUT | join ANNOTATIONS PACKAGE MANIFEST_SHA256 EDITION CORRESPONDENCE CORRESPONDENCE_SHA256 OUTPUT"
 
   private def save(
       output: Path,
@@ -72,6 +72,26 @@ object VideoSourceCli:
                 "sourceSha256" -> Json.fromString(Checksum.ofText(source.artifact).hex)
               )
           }
+        case Vector("join", annotations, directory, checksum, localEdition, correspondence, expected, destination) =>
+          val root = Path.of(directory)
+          for
+            pin <- Checksum.from(checksum).left.map(_.message)
+            edition <- EditionId.from(localEdition).left.map(_.message)
+            media <- VideoSourceInput.load(root, Files.readAllBytes(root.resolve("manifest.json")), pin, edition)
+            correspondencePin <- Checksum.from(expected).left.map(_.message)
+            joined <- storymodel4s.codec.BoundCaptionSourceCodec.bind(Files.readString(Path.of(annotations)),
+              media.artifact, Files.readString(Path.of(correspondence)), correspondencePin)
+            result <- publish(Path.of(destination)) { temporary =>
+              val _ = Files.writeString(temporary.resolve("source.json"), joined.artifact)
+              val receipt = Json.obj("schemaVersion" -> Json.fromString("annotation-video-delivery/v1"),
+                "sourceSha256" -> Json.fromString(joined.identity.hex),
+                "packageManifestSha256" -> Json.fromString(pin.hex),
+                "correspondenceSha256" -> Json.fromString(correspondencePin.hex),
+                "authority" -> Json.fromString("Draft"))
+              val _ = Files.writeString(temporary.resolve("completion.json"), receipt.spaces2)
+              Right(receipt)
+            }
+          yield result
         case Vector("replay", directory, checksum, localEdition, destination) =>
           val root = Path.of(directory)
           for

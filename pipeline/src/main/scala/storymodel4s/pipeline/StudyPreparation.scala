@@ -39,6 +39,7 @@ object StudyPreparation:
     case TimedAnnotations(path: String, parts: String)
     case CheckedTimed(path: String)
     case CheckedVideo(path: String)
+    case CheckedAV(path: String, packagePath: String, manifest: String, edition: String, blend: Double)
     case Video(path: String)
 
   /** A request selects a checked adapter, never grants publication by assertion. */
@@ -88,7 +89,8 @@ object StudyPreparation:
   final class Source private[StudyPreparation] (
       private val underlying: SourceView,
       val representation: SourceRepresentation,
-      val artifact: String
+      val artifact: String,
+      val captionContext: Option[(storymodel4s.media.CaptionPackage, Double)] = None
   ) extends SourceView:
     private val textPackage: Option[TextSourcePackage] = underlying match
       case text: TextSourceView => Some(text.sourcePackage)
@@ -99,6 +101,10 @@ object StudyPreparation:
     /** Imported caption provenance is retained without reconstructing media execution authority. */
     val mediaCaptions: Option[storymodel4s.codec.MediaCaptionSourceCodec.Imported] =
       storymodel4s.codec.MediaCaptionSourceCodec.decode(artifact).toOption
+
+    /** Checked correspondence declarations remain available for exact package registration. */
+    val boundCaptions: Option[storymodel4s.codec.BoundCaptionSourceCodec.Imported] =
+      storymodel4s.codec.BoundCaptionSourceCodec.decode(artifact).toOption
 
     /** Existing source exchange is available only when the input was a checked text package. */
     def textSourceExchange: Option[TextSourceArtifactCodec.Bundle] =
@@ -256,6 +262,20 @@ object StudyPreparation:
             artifact <- utf8(bytes)
             view <- TimedAnnotationInput.decode(artifact).left.map(_ => Refusal.InvalidSource)
           yield new Source(view, view.representation, artifact)
+        case SourceInput.CheckedAV(path, packagePath, manifest, edition, blend) =>
+          for
+            bytes <- read(root, path)
+            artifact <- utf8(bytes)
+            joined <- storymodel4s.codec.BoundCaptionSourceCodec.decode(artifact).left.map(_ => Refusal.InvalidSource)
+            _ <- require(blend.isFinite && blend >= 0.0 && blend <= 1.0, Refusal.InvalidConfig)
+            pin <- Checksum.from(manifest).left.map(_ => Refusal.InvalidConfig)
+            expectedEdition <- EditionId.from(edition).left.map(_ => Refusal.InvalidConfig)
+            packageManifest <- read(root, packagePath + "/manifest.json")
+            pack <- storymodel4s.media.CaptionPackage.load(root.resolve(packagePath), packageManifest, pin, expectedEdition)
+              .left.map(_ => Refusal.InvalidSource)
+            media <- VideoSourceInput.project(pack).left.map(_ => Refusal.InvalidSource)
+            _ <- require(media.artifact == joined.media.artifact, Refusal.ArtifactMismatch)
+          yield new Source(joined.view, joined.view.representation, joined.artifact, Some(pack -> blend))
         case SourceInput.CheckedVideo(path) =>
           for
             bytes <- read(root, path)
@@ -538,6 +558,15 @@ object StudyPreparation:
         else if format == "checked-timed" then
           require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
             .map(_ => SourceInput.CheckedTimed(path))
+        else if format == "checked-av" then
+          for
+            _ <- require(s.asObject.exists(_.keys.toSet == Set("format", "path", "package", "manifestSha256", "edition", "blend")), Refusal.InvalidConfig)
+            pack <- field[String](s, "package")
+            pin <- field[String](s, "manifestSha256")
+            edition <- field[String](s, "edition")
+            blendText <- field[String](s, "blend")
+            blend <- blendText.toDoubleOption.toRight(Refusal.InvalidConfig)
+          yield SourceInput.CheckedAV(path, pack, pin, edition, blend)
         else if format == "checked-video" then
           require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
             .map(_ => SourceInput.CheckedVideo(path))

@@ -45,7 +45,8 @@ object MappingPipeline:
       val config: Config,
       val registration: Checksum,
       val caption: Option[CaptionMapping.Registered],
-      val onnx: Option[OnnxMappingRegistration.Registered]
+      val onnx: Option[OnnxMappingRegistration.Registered],
+      val captionPackage: Option[CaptionMapping.PackageRegistered]
   ):
     val readiness: Readiness =
       val missing = config.requested.filterNot(_ == Capability.Mapping).distinct
@@ -166,6 +167,19 @@ object MappingPipeline:
       )
     yield run
 
+  /** Multipart captions consume one registered global session, retaining correspondence provenance. */
+  def captions(registration: CaptionMapping.PackageRegistered, config: Config): Either[Refusal, Run] =
+    val produced = registration.produced
+    val session = produced.session
+    for
+      _ <- validate(config)
+      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      expected <- candidateConfig(config)
+      _ <- Either.cond(produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space, (), Refusal.ForeignRegistration)
+      run <- execute(session.recall, session.view, produced.inventory, session.source,
+        produced.evidence, config, registration.identity, None, None, Some(registration))
+    yield run
+
   /** An actual ONNX record or checked replay supplies the exact provider/render origin. */
   def registeredOnnx(
       registration: OnnxMappingRegistration.Registered,
@@ -249,7 +263,8 @@ object MappingPipeline:
       config: Config,
       registration: Checksum,
       caption: Option[CaptionMapping.Registered],
-      onnx: Option[OnnxMappingRegistration.Registered]
+      onnx: Option[OnnxMappingRegistration.Registered],
+      captionPackage: Option[CaptionMapping.PackageRegistered] = None
   ): Either[Refusal, Run] =
     for
       universe <- DeclaredUniverse
@@ -281,7 +296,7 @@ object MappingPipeline:
         .map(Refusal.Alignment(_))
       local <- execution.referenceRecord.left.map(Refusal.Projection(_))
       structured <- execution.reconstructionRecord.left.map(Refusal.Projection(_))
-    yield new Run(execution, local, structured, config, registration, caption, onnx)
+    yield new Run(execution, local, structured, config, registration, caption, onnx, captionPackage)
 
   /** Failure of one observation remains visible and does not discard its successful siblings. */
   final class Outcome private[MappingPipeline] (
@@ -312,7 +327,8 @@ object MappingPipeline:
         prepared.source.representation.digest.hex,
         prepared.config.profile,
         configText(config)
-      ) ++ prepared.outcomes.map(_.attempt.hex)
+      ) ++ prepared.source.captionContext.toVector.flatMap((pack, blend) =>
+        Vector(pack.identity.hex, blend.toString)) ++ prepared.outcomes.map(_.attempt.hex)
     )
     override def equals(other: Any): Boolean = other match
       case b: Batch => identity == b.identity
@@ -324,7 +340,8 @@ object MappingPipeline:
     validate(config)
       .flatMap(_ =>
         Either.cond(
-          config.profile == LexicalProfile,
+          config.profile == LexicalProfile || (config.profile == CaptionProfile &&
+            prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty),
           (),
           Refusal.MissingCapability(
             "registered evidence required: use the typed ONNX or caption registration entry"
@@ -344,13 +361,16 @@ object MappingPipeline:
                 None
               )
             case Right(recall) =>
-              lexical(
-                recall.graph,
-                prepared.source,
-                recall.inventory,
-                prepared.source.representation,
-                config
-              ) match
+              (if config.profile == LexicalProfile then lexical(
+                recall.graph, prepared.source, recall.inventory, prepared.source.representation, config)
+              else for
+                candidates <- candidateConfig(config)
+                context <- prepared.source.captionContext.toRight(Refusal.MissingCapability("verified caption package required"))
+                joined <- prepared.source.boundCaptions.toRight(Refusal.MissingCapability("checked correspondence required"))
+                registration <- CaptionMapping.fromPackage(context._1, joined, recall.graph,
+                  recall.inventory, candidates, context._2).left.map(_ => Refusal.ForeignRegistration)
+                run <- captions(registration, config)
+              yield run) match
                 case Left(reason) =>
                   new Outcome(
                     recall.participant,
