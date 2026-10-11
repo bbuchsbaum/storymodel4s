@@ -21,6 +21,10 @@ object TemporalProjection:
       recallWindow: Option[RecallWindow] = None
   )
 
+  /** The supplied clock is held fixed; no run-level clock uncertainty model is inferred. */
+  enum ClockUncertainty:
+    case NotModeled
+
   enum TimingState:
     case NotRequested(supplied: Boolean)
     case Missing, Provided
@@ -33,6 +37,7 @@ object TemporalProjection:
     case ForeignRecallWindow, DuplicateDeclaration
     case UnknownDeclaration(target: SourceNodeRef)
     case InvalidBins, OverlappingBins, TooManyBins
+    case InvalidRecallWindow, InvalidAllocation, ExposureUnavailable, NonFiniteExposureQuantity
 
   /** A row always preserves the mapping unit and processing status; unavailable grids are explicit.
     */
@@ -42,6 +47,30 @@ object TemporalProjection:
       val grid: Either[Refusal, TemporalGrid],
       val exposure: Option[TemporalExposure.UnitReadout]
   ):
+    /** Duration weighting retains the original assignment measure and its units. */
+    def durationWeighted: Either[Refusal, Map[Int, Double]] =
+      for
+        source <- grid
+        supplied <- exposure.toRight(Refusal.ExposureUnavailable)
+        values = source.allocated.map((bin, quantity) =>
+          bin -> (quantity * supplied.durationSeconds)
+        )
+        _ <- Either.cond(values.values.forall(_.isFinite), (), Refusal.NonFiniteExposureQuantity)
+      yield values.filter(_._2 != 0.0)
+    def durationWeightedBounds: Either[Refusal, Map[Int, (Double, Double)]] =
+      for
+        source <- grid
+        supplied <- exposure.toRight(Refusal.ExposureUnavailable)
+        values = source.bounds.map((bin, bounds) =>
+          bin ->
+            (bounds._1 * supplied.durationSeconds, bounds._2 * supplied.durationSeconds)
+        )
+        _ <- Either.cond(
+          values.values.forall((lo, hi) => lo.isFinite && hi.isFinite),
+          (),
+          Refusal.NonFiniteExposureQuantity
+        )
+      yield values.filter(_._2._2 != 0.0)
     private def fields = (unit, processing, grid, exposure)
     override def equals(other: Any): Boolean = other match
       case that: Row => fields == that.fields
@@ -58,8 +87,12 @@ object TemporalProjection:
       val rows: Vector[Row],
       val timing: Option[RecallTiming],
       val exposure: Option[TemporalExposure.Readout],
+      val coordinate: TemporalSupport.Coordinate,
+      val regions: Vector[TemporalQuery.Region],
       val digest: Checksum
   ):
+    val clockUncertainty: ClockUncertainty = ClockUncertainty.NotModeled
+    val jointPath: TemporalConcentration.JointStatus = TemporalConcentration.jointStatus
     override def equals(other: Any): Boolean = other match
       case that: Projection => digest == that.digest
       case _                => false
@@ -73,12 +106,27 @@ object TemporalProjection:
       request: Request,
       timing: Option[RecallTiming]
   ): Either[Refusal, Projection] =
-    if request.bins.size > TemporalGrid.MaximumBins then Left(Refusal.TooManyBins)
-    else if request.bins.exists((start, endExclusive) => start >= endExclusive) then Left(Refusal.InvalidBins)
+    val validWindow = request.recallWindow.forall { w =>
+      def canonical(r: ExactRational): Boolean =
+        r.denominator > 0 && BigInt(r.numerator).gcd(BigInt(r.denominator)) == 1
+      canonical(w.start) && canonical(w.endExclusive) &&
+      BigInt(w.start.numerator) * w.endExclusive.denominator < BigInt(
+        w.endExclusive.numerator
+      ) * w.start.denominator
+    }
+    val validAllocation = request.declarations.forall(_.allocation match
+      case TemporalQuery.Allocation.Mixture(share) => share.isFinite && share >= 0.0 && share <= 1.0
+      case _                                       => true)
+    if !validWindow then Left(Refusal.InvalidRecallWindow)
+    else if !validAllocation then Left(Refusal.InvalidAllocation)
+    else if request.bins.size > TemporalGrid.MaximumBins then Left(Refusal.TooManyBins)
+    else if request.bins.exists((start, endExclusive) => start >= endExclusive) then
+      Left(Refusal.InvalidBins)
     else if request.bins.sortBy(_._1).sliding(2).exists {
-      case Vector((_, end), (start, _)) => end > start
-      case _                            => false
-    } then Left(Refusal.OverlappingBins)
+        case Vector((_, end), (start, _)) => end > start
+        case _                            => false
+      }
+    then Left(Refusal.OverlappingBins)
     else if request.declarations.map(_.target).distinct.size != request.declarations.size then
       Left(Refusal.DuplicateDeclaration)
     else
@@ -154,6 +202,8 @@ object TemporalProjection:
               sourceRows,
               timing,
               checkedExposure._2,
+              coordinate,
+              regions,
               digest
             )
 

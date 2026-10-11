@@ -3,7 +3,7 @@ package storymodel4s.pipeline
 import io.circe.Json
 import java.nio.file.Path
 import storymodel4s.align.*
-import storymodel4s.codec.{Canonical, MappingCodecs, MappingExchange}
+import storymodel4s.codec.{Canonical, MappingCodecs, MappingExchange, TemporalProjectionCodecs}
 import storymodel4s.core.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.recall.*
@@ -373,7 +373,9 @@ object MappingPipeline:
         new Batch(prepared, config, outcomes)
       }
 
-  /** Project both owned mapping members over one declared source selection and optional recall clock. */
+  /** Project both owned mapping members over one declared source selection and optional recall
+    * clock.
+    */
   def temporal(
       run: Run,
       request: TemporalProjection.Request,
@@ -389,6 +391,113 @@ object MappingPipeline:
         .left
         .map(Refusal.Temporal(_))
     yield reference -> reconstruction
+
+  /** Every attempted observation survives, including missing requests and failed mapping runs. */
+  def temporal(
+      batch: Batch,
+      requests: Map[Checksum, TemporalProjection.Request]
+  ): Either[Refusal, Vector[
+    (Outcome, Either[Refusal, (TemporalProjection.Projection, TemporalProjection.Projection)])
+  ]] =
+    val known = batch.outcomes.flatMap(_.observation).toSet
+    if !requests.keySet.subsetOf(known) then Left(Refusal.InvalidConfig)
+    else
+      Right(batch.outcomes.map { outcome =>
+        val result = for
+          run <- outcome.run.toRight(Refusal.MissingCapability("mapping unavailable"))
+          request <- outcome.observation
+            .flatMap(requests.get)
+            .toRight(Refusal.MissingCapability("temporal request absent"))
+          pair <- temporal(run, request, outcome.prepared.flatMap(_.timing))
+        yield pair
+        outcome -> result
+      })
+
+  /** Cohort counts use attempted observations; missing timing never becomes zero exposure. */
+  def inspectTemporal(
+      batch: Batch,
+      requests: Map[Checksum, TemporalProjection.Request]
+  ): Either[Refusal, Json] = temporal(batch, requests).map { rows =>
+    inspect(batch).deepMerge(
+      Json.obj(
+        "temporalCompleted" -> Json.fromInt(rows.count(_._2.isRight)),
+        "temporalUnavailable" -> Json.fromInt(rows.count(_._2.isLeft)),
+        "missingRequests" -> Json.fromInt(
+          batch.outcomes.count(o => o.observation.forall(id => !requests.contains(id)))
+        ),
+        "missingTiming" -> Json.fromInt(
+          batch.outcomes.count(o =>
+            o.observation.flatMap(requests.get).exists(_.recallWindow.nonEmpty) && o.prepared
+              .flatMap(_.timing)
+              .isEmpty
+          )
+        ),
+        "clockUncertainty" -> Json.fromString("NotModeled"),
+        "jointPath" -> Json.fromString("UnavailableWithoutJointEvidence")
+      )
+    )
+  }
+
+  /** Temporal exports reuse disclosure checks and atomic byte-verified resume for the original
+    * pair.
+    */
+  def exportTemporalResults(
+      batch: Batch,
+      requests: Map[Checksum, TemporalProjection.Request],
+      output: Path,
+      resume: Boolean = false
+  ): Either[FacadeFailure, Checksum] =
+    import cats.syntax.all.*
+    for
+      rows <- temporal(batch, requests).left.map(FacadeFailure.Mapping(_))
+      summary <- inspectTemporal(batch, requests).left.map(FacadeFailure.Mapping(_))
+      original <- exchangeArtifacts(batch).left.map(FacadeFailure.Publication(_, output))
+      replacements <- rows.traverse { (outcome, result) =>
+        result.toOption.traverse { (reference, reconstruction) =>
+          val run = outcome.run.get
+          MappingExchange
+            .encodeTemporal(run.execution, reference, reconstruction)
+            .left
+            .map(e => FacadeFailure.Publication(e.toString, output))
+            .map(bundle =>
+              run.identity.hex -> bundle.files
+                .map((name, text) => s"${run.identity.hex}--$name" -> text)
+            )
+        }
+      }
+      rewritten = replacements.flatten
+      files = original._1.filterNot((name, _) =>
+        rewritten.exists((prefix, _) => name.startsWith(prefix + "--"))
+      ) ++ rewritten.flatMap(_._2)
+      metadata = Canonical
+        .parse(original._2)
+        .toOption
+        .get
+        .hcursor
+        .downField("metadata")
+        .focus
+        .get
+        .deepMerge(
+          Json.obj(
+            "temporal" -> summary,
+            "temporalOutcomes" -> Json.fromValues(rows.map { (outcome, result) =>
+              Json.obj(
+                "observation" -> outcome.observation.fold(Json.Null)(id => Json.fromString(id.hex)),
+                "status" -> Json.fromString(result.fold(_.productPrefix, _ => "Complete")),
+                "referenceProjection" -> result.toOption
+                  .fold(Json.Null)(p => Json.fromString(p._1.digest.hex)),
+                "reconstructionProjection" -> result.toOption
+                  .fold(Json.Null)(p => Json.fromString(p._2.digest.hex))
+              )
+            })
+          )
+        )
+      manifest = StudyArtifacts.manifest("mapping-temporal-batch/v1", files, metadata)
+      receipt <- StudyArtifacts
+        .publish(output, files, manifest, resume)
+        .left
+        .map(e => FacadeFailure.Publication(e.toString, output))
+    yield receipt
 
   /** Prepare ordinary local files and execute the named profile without internal proof assembly. */
   def analyze(study: Path, config: Config): Either[FacadeFailure, Batch] =
@@ -647,7 +756,59 @@ object MappingCli:
           if batch.outcomes.exists(_.failure.nonEmpty) then 3
           else if batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping) then 4
           else 0
+    def temporalExecute(
+        study: String,
+        settings: String,
+        requestFile: String,
+        output: String,
+        resume: Boolean
+    ): Int =
+      def path(value: String): Either[FacadeFailure, Path] =
+        scala.util
+          .Try(Path.of(value).toAbsolutePath)
+          .toEither
+          .left
+          .map(_ => FacadeFailure.InvalidConfiguration)
+      def text(value: Path): Either[FacadeFailure, String] = FacadeFailure
+        .read(value)
+        .flatMap(bytes => StudyPreparation.utf8(bytes).left.map(FacadeFailure.Preparation(_)))
+      val result = for
+        settingsPath <- path(settings)
+        settingsText <- text(settingsPath)
+        resolved <- config(settingsText).left.map(_ => FacadeFailure.InvalidConfiguration)
+        studyPath <- path(study)
+        batch <- MappingPipeline.analyze(studyPath, resolved)
+        requestPath <- path(requestFile)
+        requestText <- text(requestPath)
+        request <- TemporalProjectionCodecs
+          .decodeRequest(requestText, batch.prepared.source.representation)
+          .left
+          .map(_ => FacadeFailure.InvalidConfiguration)
+        requests = batch.outcomes.flatMap(_.observation).map(_ -> request).toMap
+        destination <- path(output)
+        receipt <- MappingPipeline.exportTemporalResults(batch, requests, destination, resume)
+        summary <- MappingPipeline
+          .inspectTemporal(batch, requests)
+          .left
+          .map(FacadeFailure.Mapping(_))
+      yield (batch, receipt, summary)
+      result match
+        case Left(reason)                     => refuse(reason.diagnostic.noSpaces)
+        case Right((batch, receipt, summary)) =>
+          out(
+            Canonical.print(summary.deepMerge(Json.obj("manifest" -> Json.fromString(receipt.hex))))
+          )
+          if batch.outcomes.exists(_.failure.nonEmpty) ||
+            summary.hcursor.get[Int]("temporalUnavailable").toOption.exists(_ > 0) ||
+            summary.hcursor.get[Int]("missingTiming").toOption.exists(_ > 0)
+          then 3
+          else if batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping) then 4
+          else 0
     args match
+      case List("temporal", study, config, request, output) =>
+        temporalExecute(study, config, request, output, false)
+      case List("temporal", study, config, request, output, "--resume") =>
+        temporalExecute(study, config, request, output, true)
       case List("template")                   => out(Template); 0
       case List("run", study, config, output) => execute(study, config, output, false, false)
       case List("run", study, config, output, "--resume") =>
@@ -656,7 +817,9 @@ object MappingCli:
       case List("exchange", study, config, output, "--resume") =>
         execute(study, config, output, true, true)
       case _ =>
-        refuse("mappingRun template | run|exchange STUDY.json CONFIG.json OUTPUT [--resume]")
+        refuse(
+          "mappingRun template | run|exchange STUDY.json CONFIG.json OUTPUT [--resume] | temporal STUDY.json CONFIG.json REQUEST.json OUTPUT [--resume]"
+        )
 
 object mappingRun:
   def main(args: Array[String]): Unit =

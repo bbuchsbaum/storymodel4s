@@ -783,3 +783,69 @@ class TemporalQuerySuite extends FunSuite:
     )
     assertEquals(prepared(m).ledger.suppliedTotal, 1.0)
   }
+
+  test("projection validates requests even when every mapping unit is failed") {
+    val req = TemporalProjection.Request(selection, declarations, Vector(0L -> 2L))
+    def compile(r: TemporalProjection.Request) =
+      TemporalProjection.compile(mapping(failed = true), Measure.NormalizedScoreMass, r, None)
+    val accepted = compile(req).toOption.get
+    assertEquals(accepted.rows.size, inventory.units.size)
+    assert(accepted.rows.forall(_.grid.isLeft))
+    assertEquals(
+      compile(req.copy(bins = Vector(0L -> 2L, 1L -> 3L))),
+      Left(TemporalProjection.Refusal.OverlappingBins)
+    )
+    assertEquals(
+      compile(req.copy(bins = Vector(2L -> 2L))),
+      Left(TemporalProjection.Refusal.InvalidBins)
+    )
+    assertEquals(
+      compile(req.copy(declarations = Vector(declaration(e(1), Allocation.Mixture(Double.NaN))))),
+      Left(TemporalProjection.Refusal.InvalidAllocation)
+    )
+    val invalidWindow = TemporalProjection.RecallWindow(recallClock.digest, sec(1), sec(1))
+    assertEquals(
+      compile(req.copy(recallWindow = Some(invalidWindow))),
+      Left(TemporalProjection.Refusal.InvalidRecallWindow)
+    )
+  }
+
+  test(
+    "duration-weighted transport overflow is unavailable while original finite quantities survive"
+  ) {
+    val m = mapping(
+      transport = Some(Double.MaxValue),
+      transportWeights = Some(Map(Destination.Target(e(1)) -> Double.MaxValue))
+    )
+    val words = inventory.units.head.words
+    val timing = timed(Map(words.head -> interval(0, 4)))
+    val req = TemporalProjection.Request(
+      selection,
+      Vector(declaration(e(1), Allocation.UniformIntervals)),
+      Vector(0L -> 10L),
+      recallWindow = Some(TemporalProjection.RecallWindow(recallClock.digest, sec(0), sec(4)))
+    )
+    val p = TemporalProjection.compile(m, Measure.TransportMass, req, Some(timing)).toOption.get
+    assertEquals(p.rows.head.grid.toOption.get.allocatedAt(0), Some(Double.MaxValue))
+    assertEquals(
+      p.rows.head.durationWeighted,
+      Left(TemporalProjection.Refusal.NonFiniteExposureQuantity)
+    )
+    assertEquals(
+      p.rows.head.durationWeightedBounds,
+      Left(TemporalProjection.Refusal.NonFiniteExposureQuantity)
+    )
+    val control = TemporalProjection
+      .compile(mapping(), Measure.NormalizedScoreMass, req, Some(timing))
+      .toOption
+      .get
+    assertEquals(control.rows.head.durationWeighted, Right(Map(0 -> 2.0)))
+    assertEquals(control.clockUncertainty, TemporalProjection.ClockUncertainty.NotModeled)
+    val untimed =
+      TemporalProjection.compile(mapping(), Measure.NormalizedScoreMass, req, None).toOption.get
+    assertEquals(
+      untimed.rows.head.durationWeighted,
+      Left(TemporalProjection.Refusal.ExposureUnavailable)
+    )
+    assertEquals(untimed.rows.head.grid.toOption.get.allocatedAt(0), Some(0.5))
+  }
