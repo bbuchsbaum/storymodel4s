@@ -191,36 +191,48 @@ summon[scala.deriving.Mirror.ProductOf[CaptionEvidence.Caption]]""").nonEmpty)
 
   test("CaptionScoring constructor refuses with matching positive control") {
     assertEquals(
-      typeCheckErrors("""import storymodel4s.align.*
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-case class Open(blend: Double, evidence: CaptionEvidence)
-new Open(??? : Double, ??? : CaptionEvidence)"""),
+case class Open(blend: Double, evidence: CaptionEvidence, additionalEvidence: Vector[CaptionEvidence], correspondence: Option[Checksum])
+new Open(??? : Double, ??? : CaptionEvidence, ??? : Vector[CaptionEvidence], ??? : Option[Checksum])"""
+      ),
       Nil
     )
-    assert(typeCheckErrors("""import storymodel4s.align.*
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-new CaptionScoring(??? : Double, ??? : CaptionEvidence)""").nonEmpty)
+new CaptionScoring(??? : Double, ??? : CaptionEvidence, ??? : Vector[CaptionEvidence], ??? : Option[Checksum])"""
+      ).nonEmpty
+    )
   }
 
   test("CaptionScoring apply refuses with matching positive control") {
     assertEquals(
-      typeCheckErrors("""import storymodel4s.align.*
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-case class Open(blend: Double, evidence: CaptionEvidence)
-Open(??? : Double, ??? : CaptionEvidence)"""),
+case class Open(blend: Double, evidence: CaptionEvidence, additionalEvidence: Vector[CaptionEvidence], correspondence: Option[Checksum])
+Open(??? : Double, ??? : CaptionEvidence, ??? : Vector[CaptionEvidence], ??? : Option[Checksum])"""
+      ),
       Nil
     )
-    assert(typeCheckErrors("""import storymodel4s.align.*
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-CaptionScoring(??? : Double, ??? : CaptionEvidence)""").nonEmpty)
+CaptionScoring(??? : Double, ??? : CaptionEvidence, ??? : Vector[CaptionEvidence], ??? : Option[Checksum])"""
+      ).nonEmpty
+    )
   }
 
   test("CaptionScoring copy refuses with matching positive control") {
@@ -229,7 +241,7 @@ CaptionScoring(??? : Double, ??? : CaptionEvidence)""").nonEmpty)
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-case class Open(blend: Double, evidence: CaptionEvidence);
+case class Open(blend: Double, evidence: CaptionEvidence, additionalEvidence: Vector[CaptionEvidence], correspondence: Option[Checksum]);
 (??? : Open).copy()"""),
       Nil
     )
@@ -246,7 +258,7 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-case class Open(blend: Double, evidence: CaptionEvidence)
+case class Open(blend: Double, evidence: CaptionEvidence, additionalEvidence: Vector[CaptionEvidence], correspondence: Option[Checksum])
 object Open { def fromProduct(p: Product): Open = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(p) }
 Open.fromProduct(???)"""),
       Nil
@@ -264,7 +276,7 @@ CaptionScoring.fromProduct(???)""").nonEmpty)
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
-case class Open(blend: Double, evidence: CaptionEvidence)
+case class Open(blend: Double, evidence: CaptionEvidence, additionalEvidence: Vector[CaptionEvidence], correspondence: Option[Checksum])
 summon[scala.deriving.Mirror.ProductOf[Open]]"""),
       Nil
     )

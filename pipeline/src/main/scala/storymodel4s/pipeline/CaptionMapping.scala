@@ -98,12 +98,18 @@ object CaptionMapping:
       val joined: storymodel4s.codec.BoundCaptionSourceCodec.Imported,
       val produced: CaptionScoring.Produced
   ):
-    val identity: Checksum = ContentAddress.digest(Vector("caption-package-mapping/v1",
-      media.identity.hex, joined.identity.hex, produced.identity.hex))
+    val identity: Checksum = ContentAddress.digest(
+      Vector(
+        "caption-package-mapping/v1",
+        media.identity.hex,
+        joined.identity.hex,
+        produced.identity.hex
+      )
+    )
     val authority: ObservationAuthority = ObservationAuthority.Draft
     override def equals(other: Any): Boolean = other match
       case that: PackageRegistered => identity == that.identity
-      case _ => false
+      case _                       => false
     override def hashCode(): Int = identity.hashCode
     override def toString: String = s"PackageCaptionMapping(${identity.short()})"
 
@@ -118,7 +124,13 @@ object CaptionMapping:
   ): Either[Refusal, PackageRegistered] = for
     actual <- VideoSourceInput.project(media).left.map(_ => Refusal.ArtifactMismatch)
     _ <- Either.cond(actual.artifact == joined.media.artifact, (), Refusal.ArtifactMismatch)
-    scoring <- CaptionScoring.multipart(blend, joined.media.evidence, joined.identity).left.map(Refusal.Media(_))
-    session <- scoring.session(recall, joined.view, joined.view.representation).left.map(Refusal.Media(_))
+    scoring <- CaptionScoring
+      .multipart(blend, joined.media.evidence, joined.identity)
+      .left
+      .map(Refusal.Media(_))
+    session <- scoring
+      .session(recall, joined.view, joined.view.representation)
+      .left
+      .map(Refusal.Media(_))
     produced <- CaptionScoring.produce(session, inventory, config).left.map(Refusal.Scoring(_))
   yield new PackageRegistered(media, joined, produced)

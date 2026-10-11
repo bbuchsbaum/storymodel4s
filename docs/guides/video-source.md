@@ -103,3 +103,66 @@ Live caption generation requires the configured runtime and pinned model files. 
 capability is an actionable refusal with no output publication. Replaying synthetic fixtures tests
 contracts and refusal behavior; it does not substitute for live worker validation or the admitted
 Sherlock development-participant journey.
+
+## Join annotations to a video package
+
+The strict join preserves the annotation text, target IDs and grouping. Supply a prepared
+`prepared-timed-source/v1` annotation artifact and the complete checked caption package. First
+inspect their exact axes and obtain an intentionally incomplete correspondence template:
+
+```bash
+sbt 'pipeline/runMain storymodel4s.pipeline.VideoSourceCli join-template annotations.json video-output/package MANIFEST_SHA256 EDITION'
+```
+
+Save the returned `correspondenceTemplate` object as `correspondence.json`. For every annotation
+part, choose the film occurrence and its exact axis from `filmAxes`, state the evidence `basis`,
+and supply at least two landmark pairs:
+
+```json
+"landmarks": [
+  {"annotationTick": "50", "filmTick": "0"},
+  {"annotationTick": "98", "filmTick": "48000"}
+]
+```
+
+These numbers illustrate a synthetic clock; they are not a Sherlock calibration. All landmark
+pairs must be strictly increasing and agree with one affine relation. The first and last delimit
+the valid domain: annotation coordinates outside it refuse. Clock conversion uses exact rational
+seconds and must land on integral film ticks. Origins are never implicitly subtracted. Establish
+the physical correspondence from independent source records before using it for real data;
+consistent arithmetic and a checksum alone cannot establish synchronization.
+
+Compute the SHA-256 of the exact correspondence file, then join:
+
+```bash
+shasum -a 256 correspondence.json
+sbt 'pipeline/runMain storymodel4s.pipeline.VideoSourceCli join annotations.json video-output/package MANIFEST_SHA256 EDITION correspondence.json CORRESPONDENCE_SHA256 joined-output'
+```
+
+Every supplied caption must match exactly one annotation interval on the same film axis.
+Ambiguous captions, shifted endpoints and duplicate target intervals refuse. An annotation with
+no caption remains present with an unavailable caption channel; it does not borrow a description
+from another part. There is no overlap association or temporal rounding. The complete declaration
+is retained in `joined-output/source.json`, with imported Draft authority.
+
+Use the resulting artifact in an ordinary study descriptor:
+
+```json
+"source": {
+  "format": "checked-av",
+  "path": "joined-output/source.json",
+  "package": "video-output/package",
+  "manifestSha256": "MANIFEST_SHA256",
+  "edition": "EDITION",
+  "blend": "0.8"
+}
+```
+
+Paths resolve under the study directory. Select `mapping-caption-pair/v1` in the mapping
+configuration and use the existing `mappingRun run`, `mappingRun exchange`, `mappingWeight` or
+workspace command. Preparation reloads and verifies the complete package before registration.
+All parts contribute to one global scoring and reconstruction run. `blend` is the caption share
+of the lexical cost; the weight-sweep parameter separately mixes reference and reconstruction
+results. Changing either the blend or correspondence evidence changes the executed run identity.
+The engine's numeric evidence identity deliberately remains a digest of its numeric/content
+inputs; full provider and correspondence provenance lives in the registered scoring profile.

@@ -76,9 +76,10 @@ object SurfaceWorkspaceCodecs:
   ):
     /** Portable imported Draft evidence; this never mints a JVM execution witness. */
     val mediaCaptions: Option[MediaCaptionSourceCodec.Imported] = sourceKind match
-      case SourceKind.VideoCaptions => MediaCaptionSourceCodec.decode(sourceArtifact).toOption
-      case SourceKind.AnnotationVideo => BoundCaptionSourceCodec.decode(sourceArtifact).toOption.map(_.media)
-      case _                        => None
+      case SourceKind.VideoCaptions   => MediaCaptionSourceCodec.decode(sourceArtifact).toOption
+      case SourceKind.AnnotationVideo =>
+        BoundCaptionSourceCodec.decode(sourceArtifact).toOption.map(_.media)
+      case _ => None
     val sourceEdition: Checksum = Checksum.ofText(sourceArtifact)
     val identity: Checksum = Checksum.ofText(canonicalArchive)
 
@@ -116,7 +117,7 @@ object SurfaceWorkspaceCodecs:
       case SourceKind.TimedAnnotations => "timed-annotations"
       case SourceKind.NarrativeModel   => "narrative-model"
       case SourceKind.VideoCaptions    => "video-captions"
-      case SourceKind.AnnotationVideo => "annotation-video"),
+      case SourceKind.AnnotationVideo  => "annotation-video"),
     "segmentKind" -> (kind match
       case SourceKind.Text(k) => Json.fromString(k.toString)
       case _                  => Json.Null),
@@ -161,8 +162,13 @@ object SurfaceWorkspaceCodecs:
           )
         case "annotation-video" =>
           admitted(BoundCaptionSourceCodec.decode(artifact)).map(v =>
-            (SourceKind.AnnotationVideo, v.view: SourceView, v.view.representation,
-              Option.empty[TextModel[ModelStatus.Validated]]))
+            (
+              SourceKind.AnnotationVideo,
+              v.view: SourceView,
+              v.view.representation,
+              Option.empty[TextModel[ModelStatus.Validated]]
+            )
+          )
         case "video-captions" =>
           admitted(MediaCaptionSourceCodec.decode(artifact)).map(v =>
             (

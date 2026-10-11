@@ -17,8 +17,8 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered])
-new Open(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered])"""
+case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
+new Open(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
       ),
       Nil
     )
@@ -32,7 +32,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-new MappingPipeline.Run(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered])"""
+new MappingPipeline.Run(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
       ).nonEmpty
     )
   }
@@ -48,8 +48,8 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered])
-Open(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered])"""
+case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
+Open(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
       ),
       Nil
     )
@@ -63,7 +63,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-MappingPipeline.Run(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered])"""
+MappingPipeline.Run(??? : MappingRun.Execution, ??? : MappingResult, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
       ).nonEmpty
     )
   }
@@ -78,7 +78,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered]);
+case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered]);
 (??? : Open).copy()"""),
       Nil
     )
@@ -103,7 +103,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered])
+case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
 object Open { def fromProduct(p: Product): Open = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(p) }
 Open.fromProduct(???)"""),
       Nil
@@ -129,7 +129,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered])
+case class Open(execution: MappingRun.Execution, reference: MappingResult, reconstruction: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
 summon[scala.deriving.Mirror.ProductOf[Open]]"""),
       Nil
     )
@@ -560,7 +560,8 @@ summon[scala.deriving.Mirror.ProductOf[StudyPreparation.Prepared]]""").nonEmpty)
 
   test("StudyPreparation.Source constructor refuses with matching positive control") {
     assertEquals(
-      typeCheckErrors("""import storymodel4s.align.*
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -568,12 +569,14 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String)
-new Open(??? : SourceView, ??? : SourceRepresentation, ??? : String)"""),
+case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String, captionContext: Option[(CaptionPackage, Double)])
+new Open(??? : SourceView, ??? : SourceRepresentation, ??? : String, ??? : Option[(CaptionPackage, Double)])"""
+      ),
       Nil
     )
     assert(
-      typeCheckErrors("""import storymodel4s.align.*
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -581,13 +584,15 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-new StudyPreparation.Source(??? : SourceView, ??? : SourceRepresentation, ??? : String)""").nonEmpty
+new StudyPreparation.Source(??? : SourceView, ??? : SourceRepresentation, ??? : String, ??? : Option[(CaptionPackage, Double)])"""
+      ).nonEmpty
     )
   }
 
   test("StudyPreparation.Source apply refuses with matching positive control") {
     assertEquals(
-      typeCheckErrors("""import storymodel4s.align.*
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -595,11 +600,14 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String)
-Open(??? : SourceView, ??? : SourceRepresentation, ??? : String)"""),
+case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String, captionContext: Option[(CaptionPackage, Double)])
+Open(??? : SourceView, ??? : SourceRepresentation, ??? : String, ??? : Option[(CaptionPackage, Double)])"""
+      ),
       Nil
     )
-    assert(typeCheckErrors("""import storymodel4s.align.*
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -607,7 +615,9 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-StudyPreparation.Source(??? : SourceView, ??? : SourceRepresentation, ??? : String)""").nonEmpty)
+StudyPreparation.Source(??? : SourceView, ??? : SourceRepresentation, ??? : String, ??? : Option[(CaptionPackage, Double)])"""
+      ).nonEmpty
+    )
   }
 
   test("StudyPreparation.Source copy refuses with matching positive control") {
@@ -620,7 +630,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String);
+case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String, captionContext: Option[(CaptionPackage, Double)]);
 (??? : Open).copy()"""),
       Nil
     )
@@ -645,7 +655,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String)
+case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String, captionContext: Option[(CaptionPackage, Double)])
 object Open { def fromProduct(p: Product): Open = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(p) }
 Open.fromProduct(???)"""),
       Nil
@@ -671,7 +681,7 @@ import storymodel4s.pipeline.*
 import storymodel4s.media.*
 import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
-case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String)
+case class Open(underlying: SourceView, representation: SourceRepresentation, artifact: String, captionContext: Option[(CaptionPackage, Double)])
 summon[scala.deriving.Mirror.ProductOf[Open]]"""),
       Nil
     )

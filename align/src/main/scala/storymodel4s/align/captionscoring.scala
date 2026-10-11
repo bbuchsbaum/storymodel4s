@@ -35,12 +35,20 @@ object CaptionScoring:
   def of(blend: Double, evidence: CaptionEvidence): Either[DomainError, CaptionScoring] =
     if !blend.isFinite || blend < 0.0 || blend > 1.0 then
       Left(refused("caption blend must be finite in [0,1]"))
-    else Right(new CaptionScoring(if blend == 0.0 then 0.0 else blend, evidence, Vector.empty, None))
+    else
+      Right(new CaptionScoring(if blend == 0.0 then 0.0 else blend, evidence, Vector.empty, None))
+
   /** One complete annotation universe is scored once, with every correspondence in provenance. */
-  def multipart(blend: Double, evidence: Vector[CaptionEvidence], correspondence: Checksum): Either[DomainError, CaptionScoring] =
+  def multipart(
+      blend: Double,
+      evidence: Vector[CaptionEvidence],
+      correspondence: Checksum
+  ): Either[DomainError, CaptionScoring] =
     if evidence.isEmpty then Left(refused("caption evidence is empty"))
-    else of(blend, evidence.head).map(valid =>
-      new CaptionScoring(valid.blend, evidence.head, evidence.tail, Some(correspondence)))
+    else
+      of(blend, evidence.head).map(valid =>
+        new CaptionScoring(valid.blend, evidence.head, evidence.tail, Some(correspondence))
+      )
 
   private def refused(message: String): DomainError =
     DomainError.InvariantViolation("caption-scoring", message)
@@ -119,27 +127,34 @@ object CaptionScoring:
         source.scopeDigest != MappingSourceRender.scope(view.nodes)
       then Left(refused("source binding differs"))
       else
-        source.targets.filter(_.level == 0).traverse { target =>
-          target.sourceSupport match
-            case located: SourceSupportStatus.Located =>
-              val local = located.support match
-                case TypedSupport.Anchored(support) => supplied.filter(_.bundle.identity == support.bundleIdentity)
-                case _ => Vector.empty
-              if local.isEmpty then Right(Vector.empty)
-              else PrimaryProjection.on(local.head.bundle, located.support).flatMap {
-                case PrimaryProjection.Playback(_, support)
-                    if support.points.isEmpty && support.intervals.size == 1 =>
-                  val hits = local.flatMap(_.captions).filter(_.support == support.intervals.head)
-                  if hits.size <= 1 then Right(hits.map(target.ref -> _))
-                  else Left(refused("ambiguous caption support"))
-                case _ => Right(Vector.empty)
-              }
-            case _ => Right(Vector.empty)
-        }.map(_.flatten).flatMap { rows =>
-          if rows.size != allCaptions.size || rows.map(_._2).toSet != allCaptions.toSet then
-            Left(refused("caption has no unique exact target"))
-          else Right(new Session(scoring, recall, view, source, rows.toMap))
-        }
+        source.targets
+          .filter(_.level == 0)
+          .traverse { target =>
+            target.sourceSupport match
+              case located: SourceSupportStatus.Located =>
+                val local = located.support match
+                  case TypedSupport.Anchored(support) =>
+                    supplied.filter(_.bundle.identity == support.bundleIdentity)
+                  case _ => Vector.empty
+                if local.isEmpty then Right(Vector.empty)
+                else
+                  PrimaryProjection.on(local.head.bundle, located.support).flatMap {
+                    case PrimaryProjection.Playback(_, support)
+                        if support.points.isEmpty && support.intervals.size == 1 =>
+                      val hits =
+                        local.flatMap(_.captions).filter(_.support == support.intervals.head)
+                      if hits.size <= 1 then Right(hits.map(target.ref -> _))
+                      else Left(refused("ambiguous caption support"))
+                    case _ => Right(Vector.empty)
+                  }
+              case _ => Right(Vector.empty)
+          }
+          .map(_.flatten)
+          .flatMap { rows =>
+            if rows.size != allCaptions.size || rows.map(_._2).toSet != allCaptions.toSet then
+              Left(refused("caption has no unique exact target"))
+            else Right(new Session(scoring, recall, view, source, rows.toMap))
+          }
 
   /** The profile binds provenance even when two frame sets happen to yield equal numeric costs. */
   final class Produced private[CaptionScoring] (
