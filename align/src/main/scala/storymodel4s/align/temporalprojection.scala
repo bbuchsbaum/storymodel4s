@@ -32,6 +32,7 @@ object TemporalProjection:
     case Exposure(reason: TemporalExposure.Refusal)
     case ForeignRecallWindow, DuplicateDeclaration
     case UnknownDeclaration(target: SourceNodeRef)
+    case InvalidBins, OverlappingBins, TooManyBins
 
   /** A row always preserves the mapping unit and processing status; unavailable grids are explicit.
     */
@@ -72,7 +73,13 @@ object TemporalProjection:
       request: Request,
       timing: Option[RecallTiming]
   ): Either[Refusal, Projection] =
-    if request.declarations.map(_.target).distinct.size != request.declarations.size then
+    if request.bins.size > TemporalGrid.MaximumBins then Left(Refusal.TooManyBins)
+    else if request.bins.exists((start, endExclusive) => start >= endExclusive) then Left(Refusal.InvalidBins)
+    else if request.bins.sortBy(_._1).sliding(2).exists {
+      case Vector((_, end), (start, _)) => end > start
+      case _                            => false
+    } then Left(Refusal.OverlappingBins)
+    else if request.declarations.map(_.target).distinct.size != request.declarations.size then
       Left(Refusal.DuplicateDeclaration)
     else
       request.declarations.find(d => mapping.source.target(d.target).isEmpty) match
