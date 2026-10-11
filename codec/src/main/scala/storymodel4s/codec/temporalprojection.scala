@@ -230,12 +230,13 @@ object TemporalProjectionCodecs:
       yield start -> end }
       overlapText <- field[String](value, "overlap")
       overlap <- enumValue(overlapText, TemporalExposure.Overlap.values.toVector, "overlap")
-      windowJson <- field[Json](value, "recallWindow")
-      window <- if windowJson.isNull then Right(None) else for
-        clock <- field[String](windowJson, "clock").flatMap(s => domain(Checksum.from(s)))
-        start <- field[Json](windowJson, "start").flatMap(decodeRational(_, "recallWindow.start"))
-        end <- field[Json](windowJson, "endExclusive").flatMap(decodeRational(_, "recallWindow.endExclusive"))
+      windowJson <- field[Option[Json]](value, "recallWindow")
+      window <- windowJson.fold[Result[Option[TemporalProjection.RecallWindow]]](Right(None)) { json => for
+        clock <- field[String](json, "clock").flatMap(s => domain(Checksum.from(s)))
+        start <- field[Json](json, "start").flatMap(decodeRational(_, "recallWindow.start"))
+        end <- field[Json](json, "endExclusive").flatMap(decodeRational(_, "recallWindow.endExclusive"))
       yield Some(TemporalProjection.RecallWindow(clock, start, end))
+      }
     yield TemporalProjection.Request(selected, declarations, bins, overlap, window)).left.map(_ => Error.Invalid)
 
   /** Decodes the standalone v1 request and validates its selected source coordinates. */
@@ -274,5 +275,6 @@ object TemporalProjectionCodecs:
       requestJson <- field[Json](json, "request").left.map(_ => Error.Invalid)
       decoded <- decodeRequestJson(requestJson)
       projection <- TemporalProjection.compile(mapping, measure, decoded, timing).left.map(Error.Compile(_))
-      _ <- Either.cond(toJson(projection) == json, (), Error.ContextMismatch)
+      rebuilt <- Canonical.parse(encode(projection)).left.map(_ => Error.Invalid)
+      _ <- Either.cond(rebuilt == json, (), Error.ContextMismatch)
     yield projection
