@@ -62,7 +62,7 @@ object AdmittedStoryInput:
   def plain(bytes: Array[Byte]): Either[Refusal, TextSourcePackage] =
     for
       text <- utf8(bytes)
-      header = text.takeWhile(_ != '\u0000').take(16384)
+      header = text
       recognized = header.startsWith("Format: admitted-story/") || header.contains(
         "--- BEGIN STORY TEXT ---"
       ) ||

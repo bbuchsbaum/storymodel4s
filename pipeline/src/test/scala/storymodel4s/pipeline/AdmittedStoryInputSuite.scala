@@ -102,6 +102,12 @@ class AdmittedStoryInputSuite extends FunSuite:
       AdmittedStoryInput.plain(bytes("title\n\nSource: synthetic\nAdmitted by: test\n\n" + body)),
       Left(AdmittedStoryInput.Refusal.RequiresAdmittedMode)
     )
+    assertEquals(
+      AdmittedStoryInput.plain(
+        bytes("title\n\nSource: " + ("x" * 17000) + "\nAdmitted by: test\n\n" + body)
+      ),
+      Left(AdmittedStoryInput.Refusal.RequiresAdmittedMode)
+    )
   }
 
   test("checked artifact retains separate admission metadata and body identity") {
