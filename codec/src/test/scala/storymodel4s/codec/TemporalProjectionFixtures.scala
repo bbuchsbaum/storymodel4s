@@ -32,11 +32,12 @@ object TemporalProjectionFixtures:
     ))
 
   private def miniature(
+      value: MappingResult,
       target: SourceNodeRef,
       bundle: SourceBundle,
-      bins: Vector[(Long, Long)]
+      bins: Vector[(Long, Long)],
+      allocation: TemporalQuery.Allocation = TemporalQuery.Allocation.UniformIntervals
   ): TemporalProjection.Projection =
-    val value = MappingMiniature.record
     checked(TemporalProjection.compile(
       value,
       TemporalQuery.Measure.NormalizedScoreMass,
@@ -45,9 +46,27 @@ object TemporalProjectionFixtures:
         Vector(TemporalQuery.Declaration(
           target,
           TemporalQuery.Assumption.SuppliedSupportContainsReferent,
-          TemporalQuery.Allocation.UniformIntervals
+          allocation
         )),
         bins
+      ),
+      None
+    ))
+
+  private def multimodal: TemporalProjection.Projection =
+    checked(TemporalProjection.compile(
+      mapping,
+      TemporalQuery.Measure.NormalizedScoreMass,
+      TemporalProjection.Request(
+        TemporalSupport.Selection.Part(bundle.identity),
+        Vector(target, SourceNodeRef.Situation(SituationId.unsafe("e4"))).map(ref =>
+          TemporalQuery.Declaration(
+            ref,
+            TemporalQuery.Assumption.SuppliedSupportContainsReferent,
+            TemporalQuery.Allocation.UniformIntervals
+          )
+        ),
+        Vector(10L -> 15L)
       ),
       None
     ))
@@ -73,11 +92,19 @@ object TemporalProjectionFixtures:
     "disjoint" -> projection(Vector(10L -> 11L, 14L -> 15L), TemporalQuery.Allocation.UniformIntervals),
     "mixture-half" -> projection(Vector(10L -> 15L), TemporalQuery.Allocation.Mixture(0.5)),
     "support-only" -> projection(Vector(10L -> 15L), TemporalQuery.Allocation.SupportOnly),
-    "external-mass" -> miniature(miniatureE1, miniatureBundles.head, Vector(0L -> 10L)),
-    "repeated-target-units" -> miniature(miniatureE2, miniatureBundles.head, Vector(10L -> 20L)),
-    "point-only-support" -> miniature(miniatureE8, miniatureBundles(1), Vector(30L -> 31L)),
-    "failed-unit-rows" -> miniature(miniatureE1, miniatureBundles.head, Vector(0L -> 10L)),
+    "multimodal-e2-e4" -> multimodal,
+    "external-mass" -> miniature(miniatureRecord, miniatureE1, miniatureBundles.head, Vector(0L -> 10L)),
+    "repeated-target-units" -> miniature(miniatureRecord, miniatureE2, miniatureBundles.head, Vector(10L -> 20L)),
+    "point-only-support" -> miniature(
+      miniatureRecord,
+      miniatureE8,
+      miniatureBundles(1),
+      Vector(30L -> 31L),
+      TemporalQuery.Allocation.UniformPoints
+    ),
+    "failed-unit-rows" -> miniature(miniatureRecord, miniatureE1, miniatureBundles.head, Vector(0L -> 10L)),
     "large-tick-9007199254740993" -> miniature(
+      large,
       SourceNodeRef.Situation(SituationId.unsafe("e1")),
       largeBundle,
       Vector(MappingCompositionFixture.bigTick -> (MappingCompositionFixture.bigTick + 1L))
