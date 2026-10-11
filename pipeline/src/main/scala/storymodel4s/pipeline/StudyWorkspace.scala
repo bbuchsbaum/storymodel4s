@@ -15,6 +15,8 @@ object StudyWorkspaceProducer:
   private def kind(source: StudyPreparation.SourceInput): SurfaceWorkspaceCodecs.SourceKind =
     source match
       case StudyPreparation.SourceInput.Text(_, k) => SurfaceWorkspaceCodecs.SourceKind.Text(k)
+      case StudyPreparation.SourceInput.AdmittedText(_, k) =>
+        SurfaceWorkspaceCodecs.SourceKind.Text(k)
       case StudyPreparation.SourceInput.CheckedText(_, k) =>
         SurfaceWorkspaceCodecs.SourceKind.Text(k)
       case StudyPreparation.SourceInput.SurfaceAtlas(_, _, k) =>

@@ -29,6 +29,27 @@ Source format `text` generates the existing `surface-semicolon/v1` checked text 
 are not seconds. Format `video` returns the missing configured source-perception capability.
 The source is never inferred from participants' recalls.
 
+For repository texts carrying an admission header, select `"format": "admitted-text"` with the
+same `path` and `kind` fields. The `AdmittedStoryInput.load` API returns a checked body-only
+`TextSourcePackage` and a separate `AdmissionRecord`. The text CLI accepts the same format:
+
+```sh
+sbt 'pipeline/runMain storymodel4s.pipeline.textSourcePrepare docs/design/war-of-the-ghosts-boas1901.txt prepared-wog --admitted'
+```
+
+The UTF-8 document starts with `Format: admitted-story/v1`, followed by exactly one nonempty
+`Title`, `Source`, `Basis`, `Modifications`, `Tradition`, `Admitted by`, and `Text-SHA256` field
+(each on its own `Key: value` line). The exact line `--- BEGIN STORY TEXT ---` ends the header.
+Everything after its LF is story text, including any final newline. `Text-SHA256` must match
+those exact bytes before canonicalization. Header lines use LF; unknown or duplicate fields,
+malformed UTF-8, empty text and a mismatched digest refuse. Plain text intake refuses recognized
+admission headers so they cannot silently become story segments.
+
+The checked text artifact retains the description under `admitted-story.*` metadata, including
+the whole-document checksum. This records an existing admission decision; it grants no legal,
+consent or disclosure authority. The authoritative Boas edition is
+`docs/design/war-of-the-ghosts-boas1901.txt`; the Scala fixture is a checked mirror of its body.
+
 Recall timing is optional. Set `timing` to a CSV path with exactly these columns:
 
 ```csv

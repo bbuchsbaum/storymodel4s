@@ -269,3 +269,17 @@ Both members must join the same source and recall inventory; their declared univ
 differ. The existing narrative workspace variant remains supported. The ordinary-file
 producer uses the retained disclosure basis before emitting recall text and supplies the
 same archive to StoryAtlas's real input decoder.
+
+## Admitted-story input boundary (2026-10-10)
+
+The ordinary-file producer accepts `admitted-story/v1` through `AdmittedStoryInput.load`,
+`admitted-text` study input, and `textSourcePrepare --admitted`. A checked result binds the
+separate provenance description to a body-only text package using the exact UTF-8 body hash.
+The existing text-source artifact retains descriptive header fields and document hash as source
+metadata; it carries no new publication or consent authority. The admitted Boas file is the
+text authority and its Scala fixture must match its body bytes.
+
+Rejected alternatives: caller-specific header stripping (unverifiable boundaries), treating
+metadata as story prose (false segmentation), and a new corpus/artifact framework (the existing
+checked text exchange already retains metadata). Plain public intake refuses recognized
+admission headers. Supplied-atlas and admitted modes are separate explicit CLI choices.

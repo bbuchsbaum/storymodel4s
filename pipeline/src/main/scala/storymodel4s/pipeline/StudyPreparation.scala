@@ -32,6 +32,7 @@ object StudyPreparation:
 
   enum SourceInput:
     case Text(path: String, kind: SurfaceUnitKind)
+    case AdmittedText(path: String, kind: SurfaceUnitKind)
     case CheckedText(path: String, kind: SurfaceUnitKind)
     case SurfaceAtlas(path: String, atlas: String, kind: SurfaceUnitKind)
     case StoryModel(path: String)
@@ -185,8 +186,17 @@ object StudyPreparation:
           Left(Refusal.MissingCapability("configured-video-source-perception"))
         case SourceInput.Text(path, kind) =>
           read(root, path)
-            .flatMap(TextSourcePackage.fromUtf8(_).left.map(_ => Refusal.InvalidSource))
+            .flatMap(AdmittedStoryInput.plain(_).left.map(_ => Refusal.InvalidSource))
             .flatMap(TextSourceView.of(_, kind).left.map(_ => Refusal.InvalidSource))
+            .map(v =>
+              new Source(v, v.representation, TextSourceArtifactCodec.encode(v.sourcePackage))
+            )
+        case SourceInput.AdmittedText(path, kind) =>
+          read(root, path)
+            .flatMap(AdmittedStoryInput.load(_).left.map(_ => Refusal.InvalidSource))
+            .flatMap(v =>
+              TextSourceView.of(v.sourcePackage, kind).left.map(_ => Refusal.InvalidSource)
+            )
             .map(v =>
               new Source(v, v.representation, TextSourceArtifactCodec.encode(v.sourcePackage))
             )
@@ -200,7 +210,7 @@ object StudyPreparation:
         case SourceInput.SurfaceAtlas(path, atlas, kind) =>
           for
             text <- read(root, path)
-            generated <- TextSourcePackage.fromUtf8(text).left.map(_ => Refusal.InvalidSource)
+            generated <- AdmittedStoryInput.plain(text).left.map(_ => Refusal.InvalidSource)
             atlasBytes <- read(root, atlas)
             supplied <- TextSourceCli
               .checkedAtlas(generated, atlasBytes)
@@ -531,6 +541,7 @@ object StudyPreparation:
             )
             value <- format match
               case "text"          => Right(SourceInput.Text(path, k))
+              case "admitted-text" => Right(SourceInput.AdmittedText(path, k))
               case "checked-text"  => Right(SourceInput.CheckedText(path, k))
               case "surface-atlas" =>
                 field[String](s, "atlas").map(SourceInput.SurfaceAtlas(path, _, k))

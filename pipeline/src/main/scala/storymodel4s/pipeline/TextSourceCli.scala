@@ -9,7 +9,7 @@ import storymodel4s.core.*
 
 /** Local process boundary for checked text sources; providers and time inference are absent. */
 private[pipeline] object TextSourceCli:
-  val Usage: String = "textSourcePrepare TEXT OUTPUT [--atlas SURFACE_ATLAS]"
+  val Usage: String = "textSourcePrepare TEXT OUTPUT [--admitted | --atlas SURFACE_ATLAS]"
   val ReceiptSchema: String = "text-source-prepare-receipt/v1"
 
   enum Refusal:
@@ -43,10 +43,15 @@ private[pipeline] object TextSourceCli:
       supplied <- TextSourcePackage.fromAtlas(checked).left.map(_ => Refusal.AtlasRefused)
     yield supplied
 
-  private def load(input: String, atlas: Option[String]): Either[Refusal, TextSourcePackage] =
+  private def load(
+      input: String,
+      atlas: Option[String],
+      admitted: Boolean
+  ): Either[Refusal, TextSourcePackage] =
     for
       bytes <- read(input)
-      generated <- TextSourcePackage.fromUtf8(bytes).left.map(_ => Refusal.InputRefused)
+      generated <- (if admitted then AdmittedStoryInput.load(bytes).map(_.sourcePackage)
+                    else AdmittedStoryInput.plain(bytes)).left.map(_ => Refusal.InputRefused)
       source <- atlas match
         case None       => Right(generated)
         case Some(path) => read(path).flatMap(checkedAtlas(generated, _))
@@ -88,12 +93,14 @@ private[pipeline] object TextSourceCli:
 
   private def request(args: List[String]): Either[Refusal, (TextSourcePackage, String)] =
     val paths = args match
-      case input :: output :: Nil                       => Right((input, output, None))
-      case input :: output :: "--atlas" :: atlas :: Nil => Right((input, output, Some(atlas)))
-      case _                                            => Left(Refusal.Arguments)
+      case input :: output :: Nil                       => Right((input, output, None, false))
+      case input :: output :: "--atlas" :: atlas :: Nil =>
+        Right((input, output, Some(atlas), false))
+      case input :: output :: "--admitted" :: Nil => Right((input, output, None, true))
+      case _                                      => Left(Refusal.Arguments)
     for
-      (input, output, atlas) <- paths
-      source <- load(input, atlas)
+      (input, output, atlas, admitted) <- paths
+      source <- load(input, atlas, admitted)
       digest <- publish(source, output)
     yield (source, digest)
 
