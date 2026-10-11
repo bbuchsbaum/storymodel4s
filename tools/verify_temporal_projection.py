@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent standard-library verifier for temporal-projection/v1 sparse JSON exports."""
+"""Independent temporal arithmetic and contextual paired-bundle verifier (standard library)."""
 import json
 import math
 import re
@@ -81,6 +81,7 @@ def contribution(value, components, field):
 
 
 def verify(document):
+    """Verify arithmetic within one projection; use verify_pair for original-member joins."""
     if document.get("schemaVersion") != "temporal-projection/v1":
         fail("unsupported schema")
     coordinate = document.get("coordinate")
@@ -365,6 +366,172 @@ def numeric_rows(document):
     return True
 
 
+def sequence(values):
+    # Mapping identities count UTF-16 code units, including non-BMP identifiers.
+    return str(len(values)) + ':' + ''.join(str(len(v.encode('utf-16-be')) // 2) + ':' + v for v in values)
+
+
+def alternative_key(link):
+    if link['measure_kind'] != 'ModelPosterior':
+        return sequence(['score' if link['measure_kind'] == 'NormalizedScoreMass' else 'transport', link['destination']])
+    state = link['state']['value']
+    if state['type'] == 'External':
+        parts = ['external', state['state']]
+    else:
+        ref = state['ref']
+        parts = [ref['type'].lower(), ref['id']]
+        if state['type'] == 'Distorted':
+            parts += ['distorted', ','.join(state['facets'])]
+    return sequence(['posterior'] + parts)
+
+
+def timing_context(document, timing, inventory):
+    if timing is None:
+        expected = 'Missing' if document['request'].get('recallWindow') is not None else 'NotRequested(false)'
+        if document['timingState'] != expected:fail('timing state changed')
+        if document.get('timing') is not None or document.get('exposureReadout') is not None:
+            fail('projection claims absent timing')
+        return
+    if timing['schemaVersion'] != 'recall-timing/v0.1' or timing['inventory_digest'] != inventory['digest']:
+        fail('foreign timing inventory')
+    if document.get('timing') != timing['digest']:
+        fail('foreign timing identity')
+    clock = timing['clock']['digest']
+    entries = {e['word']: e for e in timing['entries']}
+    words = {w['id']: w for w in inventory['words']}
+    if len(entries) != len(timing['entries']) or entries.keys() != words.keys():
+        fail('timing word denominator changed')
+    if any(e['clock'] != clock for e in entries.values()):
+        fail('foreign word clock')
+    window = document['request'].get('recallWindow')
+    if document['timingState'] != ('Provided' if window is not None else 'NotRequested(true)'):fail('timing state changed')
+    if window is None:
+        if document.get('exposureReadout') is not None:
+            fail('unrequested exposure')
+        return
+    if window['clock'] != clock:
+        fail('foreign requested clock')
+    lo, hi = fraction(window['start'], 'window.start'), fraction(window['endExclusive'], 'window.end')
+    intervals, onsets, missing = [], {}, {}
+    for unit in inventory['units']:
+        onsets[unit['id']] = []
+        missing[unit['id']] = 0
+        for word in unit['words']:
+            observation = entries[word]['observation']
+            status = observation['status']
+            if status == 'interval':
+                start = fraction(observation['start_seconds'], 'interval.start')
+                end = fraction(observation['end_exclusive_seconds'], 'interval.end')
+                if not start < end: fail('invalid source interval')
+                if max(start,lo) < min(end,hi): intervals.append((unit['id'], max(start,lo), min(end,hi)))
+            elif status == 'onset-only':
+                at = fraction(observation['seconds'], 'onset')
+                if lo <= at < hi and at not in onsets[unit['id']]: onsets[unit['id']].append(at)
+            elif status == 'missing': missing[unit['id']] += 1
+            else: fail('unknown timing observation')
+    boundaries = sorted({lo,hi} | {v for _,a,b in intervals for v in (a,b)})
+    durations, uncovered = {}, Fraction()
+    for a,b in zip(boundaries,boundaries[1:]):
+        active = {unit for unit,start,end in intervals if start <= a and b <= end}
+        if not active: uncovered += b-a
+        else:
+            if len(active) > 1 and document['request']['overlap'] == 'Refuse': fail('overlap policy violated')
+            for unit in active: durations[unit] = durations.get(unit,Fraction()) + (b-a)/len(active)
+    readout = document['exposureReadout']
+    if readout['unassignedWords'] != [w['id'] for w in inventory['words'] if w['membership']['status'] == 'unassigned']:fail('unassigned word inventory changed')
+    if fraction(readout['start'],'start') != lo or fraction(readout['endExclusive'],'end') != hi or fraction(readout['uncovered'],'uncovered') != uncovered:
+        fail('exposure window differs from original timing')
+    for row in document['rows']:
+        exposure = row['exposure'];unit = row['unit']
+        if fraction(exposure['duration'],'duration') != durations.get(unit,Fraction()): fail('duration differs from original word intervals')
+        if [fraction(v,'onset') for v in exposure['onsetEvents']] != onsets[unit]:fail('onsets differ from original words')
+        if integer(exposure['missingWords'],'missingWords') != missing[unit]:fail('missing-word count differs')
+
+
+def verify_pair(files):
+    """Check original paired artifacts and contextual joins, then independently recompute quantities.
+
+    As with read_mapping, this verifies a supplied bundle's consistency; Scala's contextual
+    decoder remains the admission authority for an independently expected execution.
+    """
+    import hashlib
+    import importlib.util
+    source = Path(__file__).resolve().parents[1] / 'examples/mapping/read_mapping.py'
+    spec = importlib.util.spec_from_file_location('original_mapping_reader', source)
+    mapping_reader = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mapping_reader)
+    manifest = load(files['manifest.json'])
+    if manifest['schemaVersion'] != 'mapping-exchange-pair-temporal/v1':fail('wrong temporal pair schema')
+    descriptors = manifest['files']
+    expected = {e['path'] for e in descriptors}
+    if len(expected) != len(descriptors) or set(files) != expected | {'manifest.json'}:fail('pair file set mismatch')
+    for entry in descriptors:
+        raw = files[entry['path']].encode('utf-8')
+        if len(raw) != integer(entry['bytes'],'bytes') or hashlib.sha256(raw).hexdigest() != entry['sha256']:
+            fail('pair file integrity: ' + entry['path'])
+    base = manifest['base']
+    base_names = {e['path'] for e in base['files']}
+    original = {name: files[name] for name in base_names}
+    original['manifest.json'] = json.dumps(base, ensure_ascii=False, separators=(',',':'), sort_keys=True)
+    metadata, members = mapping_reader.read_pair(original)
+    if manifest['execution'] != metadata['execution']:fail('foreign execution')
+    allowed = base_names | {'manifest.json'}
+    for member, measure in [('reference','NormalizedScoreMass'),('reconstruction','ModelPosterior')]:
+        name = member + '--temporal-projection.json';allowed.add(name)
+        document = load(files[name]);record, tables = members[member]
+        if document['mapping'] != record['record_digest'] or document['measure'] != measure:
+            fail('foreign projection mapping or measure')
+        if document['digest'] != manifest[member+'Projection']:fail('foreign projection identity')
+        if document['coordinate'] not in record['source']['axes']:fail('foreign source coordinate')
+        unit_ids = [u['id'] for u in record['inventory']['units']]
+        if [r['unit'] for r in document['rows']] != unit_ids:fail('foreign projection inventory')
+        for row,outcome in zip(document['rows'],record['outcomes']):
+            if row['unit'] != outcome['unit']:fail('foreign outcome')
+            complete = outcome['processing_status']['status'] == 'complete'
+            if (row['processing'] == 'Complete') != complete:fail('processing status changed')
+            grid = row['grid']
+            if 'unavailable' in grid:continue
+            if not complete:fail('failed unit acquired a measure')
+            links = [link for link in outcome['mapping_links'] if link['measure_kind'] == measure]
+            expected_components = {alternative_key(link):link['raw_value'] for link in links}
+            actual = {c['alternative']:c['weight'] for c in grid['components']}
+            if len(actual) != len(grid['components']) or actual != expected_components:fail('original assignment components changed')
+            original_links = {alternative_key(link):link for link in links}
+            for component in grid['components']:
+                location = component['location'];destination = original_links[component['alternative']]['destination']
+                if location['kind'] == 'external' and destination != 'ext:' + location['state']:fail('foreign external location')
+                if location['kind'] == 'resolved' and destination != location['target']:fail('foreign target location')
+                if location['kind'] == 'resolved' and 'unavailable' not in location['support']:
+                    declarations = {d['target']:d for d in document['request']['declarations']}
+                    declaration = declarations.get(destination)
+                    if declaration is None:fail('resolved undeclared target')
+                    if 'unavailable' not in location['allocation'] and location['allocation'] != declaration['allocation']:fail('allocation policy changed')
+                    if document['request']['selection']['kind'] == 'part':
+                        target = next(t for t in record['source']['targets'] if t['target_id'] == destination)
+                        anchors = target['support_status']['source_support']['anchors']
+                        intervals,points = [],[]
+                        for anchor in anchors:
+                            kind = anchor['kind']
+                            if kind == 'media-point':
+                                if anchor['axis'] != document['coordinate']['id']:fail('foreign support axis')
+                                points.append(integer(anchor['tick'],'support.tick'))
+                            else:
+                                values = [anchor['interval']] if kind == 'shot' else anchor['intervals']
+                                for value in values:
+                                    if value['axis'] != document['coordinate']['id']:fail('foreign support axis')
+                                    intervals.append((integer(value['start_tick'],'support.start'),integer(value['end_exclusive_tick'],'support.end')))
+                        original_geometry = union_geometry([(intervals,points)])
+                        if geometry(location['support']) != original_geometry:fail('support differs from original target')
+        timing_name = member + '--recall-timing.json'
+        timing = None
+        if timing_name in files:
+            allowed.add(timing_name);timing = load(files[timing_name])
+        timing_context(document,timing,record['inventory'])
+        verify(document)
+    if set(files) != allowed:fail('extra temporal pair payload')
+    return True
+
+
 def load(text):
     """Refuse duplicate keys before a JSON parser can discard contradictory values."""
     def object_pairs(items):
@@ -379,7 +546,11 @@ def load(text):
 
 if __name__ == "__main__":
     try:
-        verify(load(Path(sys.argv[1]).read_text(encoding="utf-8")))
+        if sys.argv[1] == '--pair':
+            folder = Path(sys.argv[2])
+            verify_pair({p.name:p.read_text(encoding='utf-8') for p in folder.iterdir() if p.is_file()})
+        else:
+            verify(load(Path(sys.argv[1]).read_text(encoding="utf-8")))
     except (IndexError, KeyError, TypeError, OverflowError, OSError, ValueError) as error:
         sys.stderr.write(f"temporal projection refused: {error}\n")
         sys.exit(2)

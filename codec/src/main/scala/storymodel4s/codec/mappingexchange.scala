@@ -104,10 +104,17 @@ object MappingExchange:
           reconstruction
         )
       )
-      val all = base.files.tail ++ temporal
+      val timings = Vector("reference" -> reference, "reconstruction" -> reconstruction).flatMap {
+        (member, projection) =>
+          projection.timing.map(value =>
+            s"$member--recall-timing.json" -> RecallTimingCodecs.encode(value)
+          )
+      }
+      val all = base.files.tail ++ temporal ++ timings
       val manifest = MappingJson.print(
         Json.obj(
           "schemaVersion" -> Json.fromString(PairTemporalSchemaVersion),
+          "base" -> Canonical.parse(base.files.head._2).toOption.get,
           "execution" -> Json.fromString(execution.identity.hex),
           "referenceProjection" -> Json.fromString(reference.digest.hex),
           "reconstructionProjection" -> Json.fromString(reconstruction.digest.hex),

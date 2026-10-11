@@ -38,14 +38,43 @@ def main(log, folder):
         if "unavailable" not in row["grid"]:
             check(row["grid"]["allocated"] == [], "support acquired allocation")
             reader.close(reader.binary64(row["grid"]["bounds"][0]["upper"], "upper"), .5, "support upper bound")
+    required = {"point-only-support", "large-tick-9007199254740993", "multimodal-disjoint-support",
+                "mixture-half", "repeated-media-occurrence-0", "repeated-media-occurrence-1", "failed-unit-rows"}
+    check(required <= cases.keys(), "missing temporal acceptance cases")
+    for name in ("point-only-support", "large-tick-9007199254740993"):
+        check(any(r["grid"].get("allocated") for r in cases[name]["rows"]), name + " lacks positive atomic mass")
+    for row in cases["multimodal-disjoint-support"]["rows"]:
+        if "unavailable" not in row["grid"]:
+            values = {reader.integer(v["bin"],"bin"):reader.binary64(v["mass"],"mass") for v in row["grid"]["allocated"]}
+            check(values == {0:.25,2:.25}, "disconnected peaks or gap changed")
+    for row in cases["mixture-half"]["rows"]:
+        if "unavailable" not in row["grid"]:
+            values = {reader.integer(v["bin"],"bin"):reader.binary64(v["mass"],"mass") for v in row["grid"]["allocated"]}
+            check(set(values) == {0,1,2}, "mixture lost a mode")
+            for index,value in {0:.025,1:.45,2:.025}.items():reader.close(values[index],value,"mixture known answer")
+    for name in ("repeated-media-occurrence-0", "repeated-media-occurrence-1"):
+        check(cases[name]["request"]["selection"]["kind"] == "occurrence", "not an occurrence fixture")
+        for row in cases[name]["rows"]:
+            if "unavailable" not in row["grid"]:
+                check(not row["grid"]["allocated"], "clipped occurrence was redistributed")
+                reader.close(reader.binary64(row["grid"]["ledger"]["unavailableLocation"],"missing"),.75,"clipped occurrence ledger")
+    check(any(r["processing"].startswith("Failed") and "unavailable" in r["grid"] for r in cases["failed-unit-rows"]["rows"]), "failed unit disappeared")
     root = Path(folder)
     manifest = reader.load((root / "temporal-fixtures.json").read_text())
     check(len(manifest["producerRevision"]) == 40, "producer revision missing")
     paired = []
+    bundles = []
     for case in manifest["cases"]:
         summary = case["summary"]
         check(summary["attempts"] == 2 and summary["failed"] == 1, "failed cohort member disappeared")
         check(summary["temporalCompleted"] == 1 and summary["temporalUnavailable"] == 1, "temporal denominator changed")
+        case_files = {Path(e["path"]).name:(root / e["path"]).read_text() for e in case["files"]}
+        pair_prefixes = [name[:-len("manifest.json")] for name in case_files if name.endswith("--manifest.json") and len(name) == 64 + len("--manifest.json")]
+        check(len(pair_prefixes) == 1, "one successful pair expected")
+        prefix = pair_prefixes[0]
+        bundle = {name[len(prefix):]:text for name,text in case_files.items() if name.startswith(prefix)}
+        reader.verify_pair(bundle)
+        bundles.append(bundle)
         for entry in case["files"]:
             data = (root / entry["path"]).read_bytes()
             check(hashlib.sha256(data).hexdigest() == entry["sha256"], "facade artifact hash mismatch")
@@ -98,6 +127,29 @@ def main(log, folder):
         negatives.append("duplicate JSON keys")
     else:
         raise AssertionError("duplicate JSON keys accepted")
+    # Rehash the changed projection descriptor, so contextual failures cannot be explained by bytes alone.
+    def pair_refuses(name, member, mutate):
+        files = dict(next(b for b in bundles if "reference--recall-timing.json" in b))
+        value = reader.load(files[member]);mutate(value)
+        files[member] = json.dumps(value, sort_keys=True, separators=(",", ":"))
+        pair_manifest = reader.load(files["manifest.json"])
+        for entry in pair_manifest["files"]:
+            if entry["path"] == member:
+                raw = files[member].encode()
+                entry.update(bytes=str(len(raw)), sha256=hashlib.sha256(raw).hexdigest())
+        files["manifest.json"] = json.dumps(pair_manifest, sort_keys=True, separators=(",", ":"))
+        try:reader.verify_pair(files)
+        except (ValueError, KeyError, TypeError, OverflowError):negatives.append(name)
+        else:raise AssertionError("contextual corruption accepted: " + name)
+    projection_name = "reference--temporal-projection.json"
+    pair_refuses("foreign mapping with rehashed bytes", projection_name, lambda d: d.update(mapping="0"*64))
+    pair_refuses("foreign measure with rehashed bytes", projection_name, lambda d: d.update(measure="TransportMass"))
+    pair_refuses("foreign projection with rehashed bytes", projection_name, lambda d: d.update(digest="0"*64))
+    pair_refuses("foreign inventory unit with rehashed bytes", projection_name, lambda d: d["rows"][0].update(unit="foreign-unit"))
+    pair_refuses("foreign timing with rehashed bytes", projection_name, lambda d: d.update(timing="0"*64))
+    pair_refuses("foreign recall clock with rehashed bytes", projection_name, lambda d: d["request"]["recallWindow"].update(clock="0"*64))
+    pair_refuses("foreign timing inventory with rehashed bytes", "reference--recall-timing.json", lambda d: d.update(inventory_digest="0"*64))
+    pair_refuses("foreign word clock with rehashed bytes", "reference--recall-timing.json", lambda d: d["entries"][0].update(clock="0"*64))
     print(json.dumps({"producerRevision": manifest["producerRevision"], "syntheticCases": sorted(cases), "facadeProjections": len(paired), "corruptionsRefused": negatives}, indent=2))
 
 

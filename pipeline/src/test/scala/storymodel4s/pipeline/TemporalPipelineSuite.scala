@@ -236,7 +236,7 @@ class TemporalPipelineSuite extends FunSuite:
       assertEquals(decoded, pair)
       val legacy = right(MappingExchange.encode(run.execution))
       assertEquals(
-        bundle.files.tail.filterNot(_._1.endsWith("--temporal-projection.json")),
+        bundle.files.tail.filter(file => legacy.files.tail.map(_._1).contains(file._1)),
         legacy.files.tail
       )
       assertEquals(right(MappingExchange.decodePair(legacy.files, run.execution)), run.execution)
@@ -273,6 +273,28 @@ class TemporalPipelineSuite extends FunSuite:
         )
       )
       assert(MappingExchange.decodeTemporal(rehashed, run.execution, timing, timing).isLeft)
+    }
+  }
+
+  test("failed temporal requests remain bound to receipts and exact resume") {
+    temporary { root =>
+      val batch = setup(root)
+      val id = batch.outcomes.head.observation.get
+      val first = Map(id -> request(batch).copy(bins = Vector(10L -> 10L)))
+      val second = Map(id -> request(batch).copy(bins = Vector(20L -> 20L)))
+      val output = root.resolve("first")
+      val a = right(MappingPipeline.exportTemporalResults(batch, first, output))
+      val b = right(MappingPipeline.exportTemporalResults(batch, second, root.resolve("second")))
+      assertNotEquals(a, b)
+      assertEquals(right(MappingPipeline.exportTemporalResults(batch, first, output, true)), a)
+      assert(MappingPipeline.exportTemporalResults(batch, second, output, true).isLeft)
+      val manifest = right(Canonical.parse(Files.readString(output.resolve("manifest.json"))))
+      val outcome = manifest.hcursor.downField("metadata").downField("temporalOutcomes").downArray
+      assertEquals(outcome.get[String]("reason"), Right("Temporal(InvalidBins)"))
+      assertEquals(
+        outcome.get[String]("requestDigest"),
+        Right(Checksum.ofText(TemporalProjectionCodecs.encodeRequest(first(id))).hex)
+      )
     }
   }
 

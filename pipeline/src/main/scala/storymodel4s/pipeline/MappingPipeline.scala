@@ -484,6 +484,17 @@ object MappingPipeline:
               Json.obj(
                 "observation" -> outcome.observation.fold(Json.Null)(id => Json.fromString(id.hex)),
                 "status" -> Json.fromString(result.fold(_.productPrefix, _ => "Complete")),
+                "reason" -> result.left.toOption.fold(Json.Null)(e => Json.fromString(e.toString)),
+                "request" -> outcome.observation
+                  .flatMap(requests.get)
+                  .fold(Json.Null)(r =>
+                    Canonical.parse(TemporalProjectionCodecs.encodeRequest(r)).toOption.get
+                  ),
+                "requestDigest" -> outcome.observation
+                  .flatMap(requests.get)
+                  .fold(Json.Null)(r =>
+                    Json.fromString(Checksum.ofText(TemporalProjectionCodecs.encodeRequest(r)).hex)
+                  ),
                 "referenceProjection" -> result.toOption
                   .fold(Json.Null)(p => Json.fromString(p._1.digest.hex)),
                 "reconstructionProjection" -> result.toOption
