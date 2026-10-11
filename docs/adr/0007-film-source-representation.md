@@ -1290,7 +1290,9 @@ remain, and crossing groups retain missing aggregate support. Every caption must
 exact annotation interval. An annotation without a caption remains channel-unavailable. One
 multipart scoring session covers the complete annotation universe; no per-part normalization is
 combined. The complete joined-artifact identity enters scoring/session provenance, so two evidence
-bases with equal numerical coordinates still produce different evidence identities.
+bases with equal numerical coordinates still produce different scoring, session, registration and
+`MappingPipeline.Run` identities. Numeric `LocalEvidence` and `MappingRun.Execution` identities
+remain content-derived and can be equal when their numeric inputs are equal.
 
 The JVM study adapter reloads the independently pinned package before minting caption registration.
 Ordinary mapping, exchange, weighted mapping and workspace publication consume that registration.
@@ -1299,4 +1301,4 @@ The portable joined artifact alone never supplies verified media execution autho
 Rejected alternatives: part-name matching or an implicit identity clock; nearest or overlapping
 interval association; resampling/rounding fractional endpoints; rewriting annotation target IDs;
 concatenating independently normalized per-part mappings; and storing correspondence only in an
-outer receipt while leaving the scored evidence identity unchanged.
+outer receipt while leaving the scoring/session identity unchanged.
