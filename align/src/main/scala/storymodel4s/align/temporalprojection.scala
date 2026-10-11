@@ -21,7 +21,8 @@ object TemporalProjection:
   )
 
   enum TimingState:
-    case NotRequested(supplied: Boolean), Missing, Provided
+    case NotRequested(supplied: Boolean)
+    case Missing, Provided
 
   enum Refusal:
     case Selection(reason: TemporalSupport.Refusal)
