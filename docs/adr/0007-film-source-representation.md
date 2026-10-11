@@ -1141,6 +1141,21 @@ claim. A adds no license basis and requires no component-version or wire change 
 This note records the decision and does not amend the term. F4 implements this rule; the decision
 itself implements nothing.
 
+### 2026-10-11 — `media`: caption request selection identity and v1 replay
+
+A caption request now has a versioned frame binding. Newly issued requests use wire schema v2 and
+carry the `IdentifiedFrames.identity` beside the decoded-byte digest, count, and geometry. The
+caption join requires that identity to match, so two selections over identical bytes cannot borrow
+each other's captions. The worker validates and accepts v2 but continues to emit its existing v1
+outcome: the local join holds the issued request and performs the selection check, while changing
+a recorded worker outcome would falsely represent a historical run.
+
+Recorded v1 requests remain parsed as explicitly unbound. They may replay only against a complete
+`FrameSet`, whose complete selection is fixed by the decode; they refuse for `SampledFrameSet`.
+This preserves historical F0 evidence without treating a missing selection binding as evidence for
+an arbitrary sample. `CaptionExtent` is also a final non-case checked value, constructed only by
+`CaptionExtent.of`, so malformed ordinal sequences have no public construction door.
+
 ### 2026-09-23 — `media`: sampled frame sets for captioning (video-only source, AC4 slice S1)
 
 Bead `bd-01M35JG7DXD7NSEE4WVEKT3CSF` (AC4, slice S1; steward approval on Fray #86, seq 749). The

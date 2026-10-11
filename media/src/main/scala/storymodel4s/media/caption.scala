@@ -135,8 +135,19 @@ object CaptionRecipe:
         else Left(DomainError.InvariantViolation("recipe", "empty prompt or non-positive limits"))
     yield CaptionRecipe(prompt, minPixels, maxPixels, maxNewTokens, seed)
 
-/** One extent to describe: a nonempty, strictly increasing list of frame ordinals. */
-final case class CaptionExtent(id: String, ordinals: Vector[Int])
+/** One extent to describe: a nonempty, strictly increasing list of frame ordinals.
+  *
+  * Why: a malformed extent would give a worker a frame sequence whose temporal support cannot be
+  * truthfully closed, so construction is restricted to the checked factory.
+  */
+final class CaptionExtent private (val id: String, val ordinals: Vector[Int]):
+  override def equals(other: Any): Boolean = other match
+    case that: CaptionExtent => id == that.id && ordinals == that.ordinals
+    case _                   => false
+
+  override def hashCode(): Int = 31 * id.hashCode + ordinals.hashCode
+
+  override def toString: String = s"CaptionExtent($id,$ordinals)"
 
 object CaptionExtent:
   def of(id: String, ordinals: Vector[Int]): Either[DomainError, CaptionExtent] =
@@ -154,7 +165,7 @@ object CaptionExtent:
           s"extent $id must list frame ordinals strictly increasing and non-negative"
         )
       )
-    else Right(CaptionExtent(id, ordinals))
+    else Right(new CaptionExtent(id, ordinals))
 
   def parse(json: Json): Either[DomainError, CaptionExtent] =
     val c = json.hcursor
@@ -169,6 +180,8 @@ object CaptionExtent:
 final case class CaptionRequest(
     requestId: String,
     framesSha256: Checksum,
+    /** `None` is an honestly parsed v1 replay request. New requests always bind this identity. */
+    frameIdentity: Option[Checksum],
     count: Int,
     geometry: PictureGeometry,
     extents: Vector[CaptionExtent],
@@ -180,7 +193,7 @@ final case class CaptionRequest(
     Json
       .obj(
         "schema" -> Json.fromString(CaptionRequest.Schema),
-        "schemaVersion" -> Json.fromInt(1),
+        "schemaVersion" -> Json.fromInt(if frameIdentity.isDefined then 2 else 1),
         "requestId" -> Json.fromString(requestId),
         "frames" -> Json.obj(
           "file" -> Json.fromString(frameFile),
@@ -189,6 +202,10 @@ final case class CaptionRequest(
           "width" -> Json.fromInt(geometry.width),
           "height" -> Json.fromInt(geometry.height),
           "pixelFormat" -> Json.fromString(Ffmpeg.PixelFormat)
+        ).deepMerge(
+          frameIdentity.fold(Json.obj())(identity =>
+            Json.obj("identity" -> Json.fromString(identity.hex))
+          )
         ),
         "extents" -> Json.arr(
           extents.map(e =>
@@ -228,6 +245,7 @@ object CaptionRequest:
           CaptionRequest(
             requestId,
             frames.framesSha256,
+            Some(frames.identity),
             frames.count,
             frames.geometry,
             extents,
@@ -240,10 +258,17 @@ object CaptionRequest:
     for
       json <- MediaJson.parseDocument("caption-request", text)
       c = json.hcursor
-      _ <- MediaJson.expectSchema(c, Schema, 1)
+      version <- requestSchemaVersion(c)
       requestId <- MediaJson.string(c.downField("requestId"), "requestId")
       f = c.downField("frames")
       sha <- MediaJson.string(f.downField("sha256"), "frames.sha256").flatMap(Checksum.from)
+      frameIdentity <-
+        if version == 1 then Right(None)
+        else
+          MediaJson
+            .string(f.downField("identity"), "frames.identity")
+            .flatMap(Checksum.from)
+            .map(Some(_))
       count <- MediaJson.int(f.downField("count"), "frames.count")
       width <- MediaJson.int(f.downField("width"), "frames.width")
       height <- MediaJson.int(f.downField("height"), "frames.height")
@@ -254,12 +279,23 @@ object CaptionRequest:
     yield CaptionRequest(
       requestId,
       sha,
+      frameIdentity,
       count,
       PictureGeometry(width, height),
       extents,
       model,
       recipe
     )
+
+  private def requestSchemaVersion(c: ACursor): Either[DomainError, Int] =
+    for
+      schema <- MediaJson.string(c.downField("schema"), "schema")
+      version <- MediaJson.int(c.downField("schemaVersion"), "schemaVersion")
+      _ <-
+        if schema != Schema then Left(DomainError.InvalidFormat("schema", schema, s"expected $Schema"))
+        else if version == 1 || version == 2 then Right(())
+        else Left(DomainError.InvalidFormat("schemaVersion", version.toString, "expected 1 or 2"))
+    yield version
 
 /** What the library applied, as far as it can be read back from the processor: the limits it holds
   * after assignment, its patch geometry, and the prompt digest. The evidence that the limits were
@@ -642,15 +678,27 @@ object CaptionSearch:
           s"request ${request.requestId} does not describe frame set ${frames.identity.short()}"
         )
       )
-    else if request.extents.exists(e => CaptionExtent.of(e.id, e.ordinals).isLeft) ||
-      request.extents.map(_.id).distinct.size != request.extents.size
-    then
-      // CaptionRequest and CaptionExtent are case classes, so apply and copy bypass
-      // CaptionExtent.of; the join re-admits every extent rather than trusting its shape.
+    else if request.frameIdentity.exists(_ != frames.identity) then
+      Left(
+        DomainError.InvariantViolation(
+          "caption/frame-selection",
+          s"request ${request.requestId} was issued for another frame selection"
+        )
+      )
+    else if request.frameIdentity.isEmpty && frames.isInstanceOf[SampledFrameSet] then
+      // A v1 request has no selection identity. It is replayable only against a complete FrameSet:
+      // accepting it for samples would silently conflate distinct selections with identical bytes.
+      Left(
+        DomainError.InvariantViolation(
+          "caption/frame-selection",
+          s"legacy request ${request.requestId} is unbound and cannot describe sampled frames"
+        )
+      )
+    else if request.extents.map(_.id).distinct.size != request.extents.size then
       Left(
         DomainError.InvariantViolation(
           "caption/extent-shape",
-          s"request ${request.requestId} has an extent that is empty, not strictly increasing, or not uniquely named"
+          s"request ${request.requestId} repeats an extent id"
         )
       )
     else

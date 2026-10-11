@@ -84,6 +84,23 @@ def verify_model_dir(model):
     return sha256_text(config_text), json.loads(config_text)
 
 
+def validate_request_binding(request):
+    """Return a schema-binding error, or None. This stays dependency-free for wire validation."""
+    version = request.get("schemaVersion")
+    if request.get("schema") != REQUEST_SCHEMA or version not in (1, 2):
+        return "unrecognised request schema"
+    frames = request.get("frames")
+    if not isinstance(frames, dict):
+        return "request names no frames object"
+    if version == 2:
+        identity = frames.get("identity")
+        if not isinstance(identity, str) or len(identity) != 64 or any(
+            char not in "0123456789abcdef" for char in identity
+        ):
+            return "v2 request names no frame-selection identity"
+    return None
+
+
 def frame_image(data, ordinal, width, height):
     frame_bytes = width * height * BYTES_PER_PIXEL
     chunk = data[ordinal * frame_bytes : (ordinal + 1) * frame_bytes]
@@ -97,8 +114,9 @@ def main(argv):
         fail("usage: caption_worker.py REQUEST_JSON OUTCOME_JSON")
     with open(argv[1], "r", encoding="utf-8") as f:
         request = json.load(f)
-    if request.get("schema") != REQUEST_SCHEMA or request.get("schemaVersion") != 1:
-        fail("unrecognised request schema")
+    binding_error = validate_request_binding(request)
+    if binding_error:
+        fail(binding_error)
 
     frames = request["frames"]
     width, height, count = (

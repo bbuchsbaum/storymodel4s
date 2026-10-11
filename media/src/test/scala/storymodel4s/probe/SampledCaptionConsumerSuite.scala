@@ -164,12 +164,11 @@ class SampledCaptionConsumerSuite extends FunSuite:
       CaptionRequest.issue(s, Vector(beyond), recordedRequest.model, recordedRequest.recipe, "r"),
       "extent/ordinals"
     )
-    // A request forged against the sampled bytes but naming sample 12 is refused at the join too,
-    // before the outcome is read: the outcome here also answers another request, so a join that
-    // skipped the request check would refuse at caption/request-id instead.
-    val forged = right(issue(s)).copy(extents = sampledExtents.init :+ beyond)
+    // CaptionRequest remains a transport record, so a caller can replace its checked extents.
+    // The join still refuses an ordinal the sampled set cannot present before reading the outcome.
+    val replaced = right(issue(s)).copy(extents = sampledExtents.init :+ beyond)
     refusedAt(
-      CaptionSearch.join(s, forged, sampledOutcome("another-request", 12), envelope.worker, f0),
+      CaptionSearch.join(s, replaced, sampledOutcome("another-request", 12), envelope.worker, f0),
       "caption/unsampled"
     )
 
@@ -211,50 +210,123 @@ class SampledCaptionConsumerSuite extends FunSuite:
       3
     )
 
-  test(
-    "a forged extent that is out of order, empty or repeated is refused at the join, never admitted"
-  ):
-    // CaptionExtent is a case class, so apply and copy skip CaptionExtent.of; the join re-admits.
-    // Out of order, the hull of the first and last named frames would leave out frame 11, which the
-    // model was shown (PTS 47000); empty, it would have no first frame at all.
-    val s = right(sampled())
-    val outcome = sampledOutcome("another-request", 12)
+  test("malformed extents refuse at their checked construction boundary"):
     for bad <- Vector(Vector(0, 11, 1, 2), Vector.empty[Int], Vector(1, 1)) do
-      val forged =
-        right(issue(s)).copy(extents = CaptionExtent("shot-1", bad) +: sampledExtents.tail)
-      refusedAt(CaptionSearch.join(s, forged, outcome, envelope.worker, f0), "caption/extent-shape")
-    val twice = right(issue(s))
-      .copy(extents = sampledExtents.head +: sampledExtents.tail.map(_.copy(id = "shot-1")))
-    refusedAt(CaptionSearch.join(s, twice, outcome, envelope.worker, f0), "caption/extent-shape")
-    // The full-decode path had the same door.
-    val fullForged = recordedRequest.copy(extents =
-      CaptionExtent("shot-1", Vector(13, 0)) +: recordedRequest.extents.tail
+      assert(CaptionExtent.of("shot-1", bad).isLeft)
+    val s = right(sampled())
+    val duplicate = Vector(
+      right(CaptionExtent.of("shot-1", Vector(0))),
+      right(CaptionExtent.of("shot-1", Vector(1)))
     )
     refusedAt(
+      CaptionRequest.issue(
+        s,
+        duplicate,
+        recordedRequest.model,
+        recordedRequest.recipe,
+        "duplicate"
+      ),
+      "extent/id"
+    )
+
+  test("a v2 request binds the selected frame identity, not only bytes and geometry"):
+    // Two selections of the same size over the same declared bytes digest differ only in which
+    // packets they name. A request for a must refuse b before its otherwise matching outcome is read.
+    val a = right(sampled())
+    val b = right(sampled(shown.init :+ 43))
+    assertEquals((a.count, a.framesSha256, a.geometry), (b.count, b.framesSha256, b.geometry))
+    assertNotEquals(a.identity, b.identity)
+    assertNotEquals(a.receipt.identity, b.receipt.identity)
+    val request = right(issue(a, "selection-a"))
+    val rendered = right(
+      io.circe.parser.parse(request.render("frames.bgr", "model")).left.map(e =>
+        DomainError.InvalidFormat("request", e.message, "json")
+      )
+    )
+    assertEquals(rendered.hcursor.downField("schemaVersion").as[Int], Right(2))
+    assertEquals(
+      rendered.hcursor.downField("frames").downField("identity").as[String],
+      Right(a.identity.hex)
+    )
+    assertEquals(right(CaptionRequest.parse(rendered.noSpaces)), request)
+    val v2WithoutIdentity = rendered.mapObject(
+      _.add(
+        "frames",
+        rendered.hcursor.downField("frames").focus.get.mapObject(_.remove("identity"))
+      )
+    )
+    assert(CaptionRequest.parse(v2WithoutIdentity.noSpaces).isLeft)
+    assertEquals(request.frameIdentity, Some(a.identity))
+    refusedAt(
       CaptionSearch.join(
-        full,
-        fullForged,
-        right(CaptionOutcome.parse(recordedOutcomeText)),
+        b,
+        request,
+        sampledOutcome(request.requestId, b.count),
         envelope.worker,
         f0
       ),
-      "caption/extent-shape"
+      "caption/frame-selection"
+    )
+    assertEquals(
+      right(
+        CaptionSearch.join(
+          a,
+          request,
+          sampledOutcome(request.requestId, a.count),
+          envelope.worker,
+          f0
+        )
+      )
+        .proposals
+        .size,
+      sampledExtents.size
     )
 
-  test("the selection is bound into the frame set's identity and receipt"):
-    // Two selections of the same size over the same declared bytes digest differ only in which
-    // packets they name; their identities and receipts must differ too.
-    val a = right(sampled())
-    val b = right(sampled(shown.init :+ 43))
-    assertEquals(a.count, b.count)
-    assertEquals(a.framesSha256, b.framesSha256)
-    assertNotEquals(a.identity, b.identity)
-    assertNotEquals(a.receipt.identity, b.receipt.identity)
+  test("an unbound v1 request refuses sampled frames but recorded v1 remains lawful for full frames"):
+    val s = right(sampled())
+    val issued = right(issue(s, "sampled-v2"))
+    val json = right(
+      io.circe.parser.parse(issued.render("frames.bgr", "model")).left.map(e =>
+        DomainError.InvalidFormat("request", e.message, "json")
+      )
+    )
+    val legacy = json.mapObject(
+      _.add("schemaVersion", io.circe.Json.fromInt(1))
+        .add(
+          "frames",
+          json.hcursor.downField("frames").focus.get.mapObject(_.remove("identity"))
+        )
+    )
+    val parsedLegacy = right(CaptionRequest.parse(legacy.noSpaces))
+    assertEquals(parsedLegacy.frameIdentity, None)
+    refusedAt(
+      CaptionSearch.join(
+        s,
+        parsedLegacy,
+        sampledOutcome(parsedLegacy.requestId, s.count),
+        envelope.worker,
+        f0
+      ),
+      "caption/frame-selection"
+    )
+    assertEquals(recordedRequest.frameIdentity, None)
+    assertEquals(
+      right(
+        CaptionSearch.join(
+          full,
+          recordedRequest,
+          right(CaptionOutcome.parse(recordedOutcomeText)),
+          envelope.worker,
+          f0
+        )
+      ).proposals.size,
+      3
+    )
 
   test("a full-decode request naming a frame beyond the decode refuses as unsampled"):
     val outcome = right(CaptionOutcome.parse(recordedOutcomeText))
     val beyond = recordedRequest.copy(extents =
-      recordedRequest.extents.init :+ CaptionExtent("shot-3", Vector(29, 45))
+      recordedRequest.extents.init :+ right(CaptionExtent.of("shot-3", Vector(29, 45)))
     )
     refusedAt(CaptionSearch.join(full, beyond, outcome, envelope.worker, f0), "caption/unsampled")
 
