@@ -69,14 +69,18 @@ object MappingExchange:
       )
       new Bundle(("manifest.json" -> manifest) +: contents)
 
-  /** Additive paired exchange binds projections to their owning reference and reconstruction records. */
+  /** Additive paired exchange binds projections to their owning reference and reconstruction
+    * records.
+    */
   def encodeTemporal(
       execution: MappingRun.Execution,
       reference: TemporalProjection.Projection,
       reconstruction: TemporalProjection.Projection
   ): Either[Error, Bundle] =
     for
-      referenceRecord <- execution.referenceRecord.left.map(e => Error.Mapping(MappingCodecError.Rejected(e)))
+      referenceRecord <- execution.referenceRecord.left.map(e =>
+        Error.Mapping(MappingCodecError.Rejected(e))
+      )
       reconstructionRecord <- execution.reconstructionRecord.left.map(e =>
         Error.Mapping(MappingCodecError.Rejected(e))
       )
@@ -96,20 +100,26 @@ object MappingExchange:
     yield
       val temporal = Vector(
         "reference--temporal-projection.json" -> TemporalProjectionCodecs.encode(reference),
-        "reconstruction--temporal-projection.json" -> TemporalProjectionCodecs.encode(reconstruction)
+        "reconstruction--temporal-projection.json" -> TemporalProjectionCodecs.encode(
+          reconstruction
+        )
       )
       val all = base.files.tail ++ temporal
-      val manifest = MappingJson.print(Json.obj(
-        "schemaVersion" -> Json.fromString(PairTemporalSchemaVersion),
-        "execution" -> Json.fromString(execution.identity.hex),
-        "referenceProjection" -> Json.fromString(reference.digest.hex),
-        "reconstructionProjection" -> Json.fromString(reconstruction.digest.hex),
-        "files" -> Json.fromValues(all.map { (name, text) => Json.obj(
-          "path" -> Json.fromString(name),
-          "sha256" -> Json.fromString(Checksum.ofText(text).hex),
-          "bytes" -> Json.fromString(text.getBytes("UTF-8").length.toString)
-        )})
-      ))
+      val manifest = MappingJson.print(
+        Json.obj(
+          "schemaVersion" -> Json.fromString(PairTemporalSchemaVersion),
+          "execution" -> Json.fromString(execution.identity.hex),
+          "referenceProjection" -> Json.fromString(reference.digest.hex),
+          "reconstructionProjection" -> Json.fromString(reconstruction.digest.hex),
+          "files" -> Json.fromValues(all.map { (name, text) =>
+            Json.obj(
+              "path" -> Json.fromString(name),
+              "sha256" -> Json.fromString(Checksum.ofText(text).hex),
+              "bytes" -> Json.fromString(text.getBytes("UTF-8").length.toString)
+            )
+          })
+        )
+      )
       new Bundle(("manifest.json" -> manifest) +: all)
 
   /** Decodes a paired temporal exchange only against its owning execution and supplied timings. */
@@ -133,7 +143,9 @@ object MappingExchange:
       reconstructionText <- supplied
         .get("reconstruction--temporal-projection.json")
         .toRight(Error.MissingFile("reconstruction--temporal-projection.json"))
-      referenceRecord <- expected.referenceRecord.left.map(e => Error.Mapping(MappingCodecError.Rejected(e)))
+      referenceRecord <- expected.referenceRecord.left.map(e =>
+        Error.Mapping(MappingCodecError.Rejected(e))
+      )
       reconstructionRecord <- expected.reconstructionRecord.left.map(e =>
         Error.Mapping(MappingCodecError.Rejected(e))
       )

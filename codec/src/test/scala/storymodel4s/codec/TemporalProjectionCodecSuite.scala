@@ -42,9 +42,15 @@ class TemporalProjectionCodecSuite extends FunSuite:
     Vector(-0.0, 0.5).foreach { share =>
       val (mapping, value) = projection(TemporalQuery.Allocation.Mixture(share))
       val requestText = TemporalProjectionCodecs.encodeRequest(value.request)
-      assertEquals(TemporalProjectionCodecs.decodeRequest(requestText, mapping.source), Right(value.request))
+      assertEquals(
+        TemporalProjectionCodecs.decodeRequest(requestText, mapping.source),
+        Right(value.request)
+      )
       val text = TemporalProjectionCodecs.encode(value)
-      assertEquals(TemporalProjectionCodecs.decode(text, mapping, None).map(TemporalProjectionCodecs.encode), Right(text))
+      assertEquals(
+        TemporalProjectionCodecs.decode(text, mapping, None).map(TemporalProjectionCodecs.encode),
+        Right(text)
+      )
     }
   }
 
@@ -55,19 +61,28 @@ class TemporalProjectionCodecSuite extends FunSuite:
     assert(TemporalProjectionCodecs.decodeRequest(numericTick, mapping.source).isLeft)
 
     val text = TemporalProjectionCodecs.encode(value)
-    val rehashedCell = text.replaceFirst("\"mass\":\"0x[0-9a-f]{16}\"", "\"mass\":\"0x3ff0000000000000\"")
+    val rehashedCell =
+      text.replaceFirst("\"mass\":\"0x[0-9a-f]{16}\"", "\"mass\":\"0x3ff0000000000000\"")
     assertNotEquals(rehashedCell, text)
     assert(TemporalProjectionCodecs.decode(rehashedCell, mapping, None).isLeft)
     assert(TemporalProjectionCodecs.decode(text, MappingMiniature.record, None).isLeft)
   }
 
-  test("request decoder refuses unknown and duplicated fields without requiring canonical whitespace") {
+  test(
+    "request decoder refuses unknown and duplicated fields without requiring canonical whitespace"
+  ) {
     val (mapping, value) = projection()
     val text = TemporalProjectionCodecs.encodeRequest(value.request)
     val withWhitespace = text.replace("{", "{ ").replace(",", ", ")
-    assertEquals(TemporalProjectionCodecs.decodeRequest(withWhitespace, mapping.source), Right(value.request))
+    assertEquals(
+      TemporalProjectionCodecs.decodeRequest(withWhitespace, mapping.source),
+      Right(value.request)
+    )
     val unknown = text.dropRight(1) + ",\"unexpected\":true}"
     assert(TemporalProjectionCodecs.decodeRequest(unknown, mapping.source).isLeft)
-    val duplicated = text.replace("\"schemaVersion\":\"temporal-request/v1\"", "\"schemaVersion\":\"temporal-request/v1\",\"schemaVersion\":\"temporal-request/v1\"")
+    val duplicated = text.replace(
+      "\"schemaVersion\":\"temporal-request/v1\"",
+      "\"schemaVersion\":\"temporal-request/v1\",\"schemaVersion\":\"temporal-request/v1\""
+    )
     assert(TemporalProjectionCodecs.decodeRequest(duplicated, mapping.source).isLeft)
   }
