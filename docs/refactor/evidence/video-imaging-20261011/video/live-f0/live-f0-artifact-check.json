@@ -1,0 +1,31 @@
+{
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "verifiedPackageFiles": 15,
+  "selectedOrdinals": [
+    0,
+    6,
+    13,
+    14,
+    21,
+    28,
+    29,
+    36,
+    44
+  ],
+  "captionCount": 3,
+  "presentedFrames": 45,
+  "examinedOrdinals": [
+    0,
+    6,
+    13,
+    14,
+    21,
+    28,
+    29,
+    36,
+    44
+  ],
+  "authority": "Draft",
+  "fixture": "project-authored F0 arithmetic video",
+  "scope": "actual PySceneDetect and MLX execution, no caption accuracy claim"
+}

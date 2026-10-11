@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T17:02:29.025699+00:00",
+  "finished_utc": "2026-10-11T17:05:11.820664+00:00",
+  "duration_seconds": 162.79546,
+  "command": [
+    "media/worker-vlm/.venv/bin/python",
+    ".agent-work/video-imaging-20261011/restore-model.py"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/runtime-model-restore.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 590
+}

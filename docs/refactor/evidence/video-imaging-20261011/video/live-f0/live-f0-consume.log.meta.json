@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T17:07:12.485061+00:00",
+  "finished_utc": "2026-10-11T17:07:29.597406+00:00",
+  "duration_seconds": 17.112187,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/runMain storymodel4s.pipeline.VideoSourceCli replay /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/live-f0-output/package 06115cad0ef41f893b25aa1e395f2ca90296c986a4c277afcfa2d4d1858cfc45 live-worker-f0 /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/live-f0-replay",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun exchange /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/live-f0-study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/live-f0-mapping"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/live-f0-consume.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 2593
+}

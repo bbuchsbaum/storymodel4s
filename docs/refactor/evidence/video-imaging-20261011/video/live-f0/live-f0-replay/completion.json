@@ -1,0 +1,7 @@
+{
+  "schemaVersion" : "video-source-delivery/v1",
+  "sourceSha256" : "13d96f315d5626610bcde51cc9ce69deb86ad2284417a3bb29c1e8c6a2d490e1",
+  "packageManifestSha256" : "06115cad0ef41f893b25aa1e395f2ca90296c986a4c277afcfa2d4d1858cfc45",
+  "authority" : "Draft",
+  "qualification" : "local-media-replay; no caption-accuracy claim"
+}

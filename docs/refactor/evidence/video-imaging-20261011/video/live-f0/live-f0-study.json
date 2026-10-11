@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "storymodel-study/v1",
+  "source": {
+    "format": "checked-video",
+    "path": "live-f0-output/source.json"
+  },
+  "profile": "recall-baseline-lexical-words/v1",
+  "recalls": [
+    {
+      "participant": "project-synthetic-control",
+      "session": "external-control",
+      "path": "journey-text-input/recall.txt",
+      "timing": null,
+      "admission": {
+        "kind": "project-synthetic-control"
+      }
+    }
+  ]
+}

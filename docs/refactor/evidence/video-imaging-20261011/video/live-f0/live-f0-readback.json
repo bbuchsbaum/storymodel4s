@@ -1,0 +1,6 @@
+{
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "replaySourceIdentical": true,
+  "mappingPairs": 1,
+  "scope": "actual workers on admitted synthetic F0; fixed external recall control; no caption quality or annotation-sidecar qualification"
+}

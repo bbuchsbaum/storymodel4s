@@ -1,0 +1,3 @@
+"mapping_digest"	"id"	"index"	"start"	"end_exclusive"	"membership"
+"c23e076ce1c28da264b0203396f1f1354e8a6f7d5b61222c41a0706fe9c7b775"	"96edf1917e48cc12ec899c9b9a8b86bd36e56339d7a10af575999e27d0fa331b:word:0"	"0"	"0"	"4"	"{""status"":""member"",""unit"":""recall:96edf1917e48cc12ec899c9b9a8b86bd36e56339d7a10af575999e27d0fa331b:u0""}"
+"c23e076ce1c28da264b0203396f1f1354e8a6f7d5b61222c41a0706fe9c7b775"	"96edf1917e48cc12ec899c9b9a8b86bd36e56339d7a10af575999e27d0fa331b:word:1"	"1"	"5"	"12"	"{""status"":""member"",""unit"":""recall:96edf1917e48cc12ec899c9b9a8b86bd36e56339d7a10af575999e27d0fa331b:u0""}"
