@@ -1,0 +1,35 @@
+{
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "files": [
+    {
+      "path": "journey-public-path.log.gz",
+      "bytes": 2328,
+      "sha256": "8e93a893370e738b0fb359bfdbc0f95d789ee079fe537d5f169f1cf62df708a1"
+    },
+    {
+      "path": "journey-public-path.log.meta.json",
+      "bytes": 3469,
+      "sha256": "cbe29e84a372c947dd30555d670825bb56afe41f3c5c3686e07bbbaae080fdea"
+    },
+    {
+      "path": "journey-qualification.json",
+      "bytes": 76330,
+      "sha256": "02c5c1105f8be6dc5d53f3580937c5ce2531364bbbc667f844e61dcb5e183e4e"
+    },
+    {
+      "path": "journey-sandbox-refusal.log.gz",
+      "bytes": 438,
+      "sha256": "61be1ec97c5e40cca3b5721f560dba61de0b934fe6deebddd6dac972afb741b9"
+    },
+    {
+      "path": "journey-sandbox-refusal.log.meta.json",
+      "bytes": 3467,
+      "sha256": "34489107ccdc2044ec1383de60076eb14e317bbbf10b3615e00119e450e74966"
+    },
+    {
+      "path": "run-journey.py",
+      "bytes": 3201,
+      "sha256": "81f15bc992a4c5a0543578c096a7d1f5d5d21a0f269f0a576ae54824312016df"
+    }
+  ]
+}

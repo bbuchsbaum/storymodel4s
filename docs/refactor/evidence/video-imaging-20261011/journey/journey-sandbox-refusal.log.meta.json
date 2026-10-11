@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T16:58:16.516628+00:00",
+  "finished_utc": "2026-10-11T16:58:16.906069+00:00",
+  "duration_seconds": 0.389394,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/runMain storymodel4s.pipeline.studyPrepare prepare /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text/prepared",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun run /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text/paired",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun exchange /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text/exchange",
+    "pipeline/runMain storymodel4s.pipeline.mappingWeight /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text-input/mapping.json 0/1,1/2,1/1 /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-text/weighted",
+    "pipeline/runMain storymodel4s.pipeline.studyPrepare prepare /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-sherlock-A/prepared",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun run /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-sherlock-A/paired",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun exchange /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-sherlock-A/exchange",
+    "pipeline/runMain storymodel4s.pipeline.mappingWeight /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/workflow-five/sherlock-workspace-input/mapping.json 0/1,1/2,1/1 /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-sherlock-A/weighted"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/journey-public-path.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 1377
+}
