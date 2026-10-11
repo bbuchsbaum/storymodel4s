@@ -372,6 +372,47 @@ object MappingPipeline:
         new Batch(prepared, config, outcomes)
       }
 
+  /** Prepare ordinary local files and execute the named profile without internal proof assembly. */
+  def analyze(study: Path, config: Config): Either[FacadeFailure, Batch] =
+    val input = study.toAbsolutePath
+    for
+      bytes <- FacadeFailure.read(input)
+      text <- StudyPreparation.utf8(bytes).left.map(FacadeFailure.Preparation(_))
+      request <- StudyPreparation.config(text).left.map(FacadeFailure.Preparation(_))
+      prepared <- StudyPreparation
+        .prepare(input.getParent, request)
+        .left
+        .map(FacadeFailure.Preparation(_))
+      result <- batch(prepared, config).left.map(FacadeFailure.Mapping(_))
+    yield result
+
+  /** Inspect counts and requested capabilities without publishing participant or source content. */
+  def inspect(batch: Batch): Json = Json.obj(
+    "plan" -> Json.fromString(batch.identity.hex),
+    "attempts" -> Json.fromInt(batch.outcomes.size),
+    "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+    "failed" -> Json.fromInt(batch.outcomes.count(_.failure.nonEmpty)),
+    "missingCapabilities" -> Json.fromValues(
+      batch.outcomes
+        .flatMap(_.run)
+        .flatMap { run =>
+          run.readiness match
+            case Readiness.Ready           => Vector.empty
+            case Readiness.Missing(values) => values
+        }
+        .distinct
+        .map(v => Json.fromString(v.toString))
+    )
+  )
+
+  /** Export the same checked paired results, preserving publication and resume guards. */
+  def exportResults(
+      batch: Batch,
+      output: Path,
+      resume: Boolean = false
+  ): Either[FacadeFailure, Checksum] =
+    publishExchange(batch, output, resume).left.map(FacadeFailure.Publication(_, output))
+
   private def runMetadata(run: Run): Json = Json.obj(
     "run" -> Json.fromString(run.identity.hex),
     "registration" -> Json.fromString(run.registration.hex),
@@ -510,7 +551,7 @@ object MappingCli:
   def config(text: String): Either[String, MappingPipeline.Config] =
     import cats.syntax.all.*
     for
-      json <- parser.parse(text).left.map(_.message)
+      json <- parser.parse(text).left.map(_ => "invalid configuration")
       _ <- Either.cond(
         json.asObject.exists(
           _.keys.toSet == Set(
@@ -526,17 +567,17 @@ object MappingCli:
         (),
         "unknown or missing config fields"
       )
-      profile <- json.hcursor.get[String]("profile").left.map(_.message)
-      temperature <- json.hcursor.get[String]("temperature").left.map(_.message)
+      profile <- json.hcursor.get[String]("profile").left.map(_ => "invalid configuration")
+      temperature <- json.hcursor.get[String]("temperature").left.map(_ => "invalid configuration")
       t <- scala.util.Try(temperature.toDouble).toEither.left.map(_ => "invalid temperature")
-      perLevel <- json.hcursor.get[Int]("perLevel").left.map(_.message)
-      budget <- json.hcursor.get[Int]("tieBudget").left.map(_.message)
-      names <- json.hcursor.get[Vector[String]]("requested").left.map(_.message)
+      perLevel <- json.hcursor.get[Int]("perLevel").left.map(_ => "invalid configuration")
+      budget <- json.hcursor.get[Int]("tieBudget").left.map(_ => "invalid configuration")
+      names <- json.hcursor.get[Vector[String]]("requested").left.map(_ => "invalid configuration")
       requested <- names.traverse(n =>
         MappingPipeline.Capability.values.find(_.toString == n).toRight("unknown capability")
       )
-      network <- json.hcursor.get[Int]("networkRequests").left.map(_.message)
-      retries <- json.hcursor.get[Int]("retries").left.map(_.message)
+      network <- json.hcursor.get[Int]("networkRequests").left.map(_ => "invalid configuration")
+      retries <- json.hcursor.get[Int]("retries").left.map(_ => "invalid configuration")
       result = MappingPipeline.Config(profile, t, perLevel, budget, requested, network, retries)
       _ <- MappingPipeline.validate(result).left.map(_.toString)
     yield result
@@ -557,27 +598,31 @@ object MappingCli:
           .Try(Path.of(settings).toAbsolutePath)
           .toEither
           .left
-          .map(_.getMessage)
-        bytes <- StudyPreparation
-          .read(configPath.getParent, configPath.getFileName.toString)
+          .map(_ => FacadeFailure.InvalidConfiguration)
+        bytes <- FacadeFailure.read(configPath)
+        text <- StudyPreparation.utf8(bytes).left.map(FacadeFailure.Preparation(_))
+        resolved <- config(text).left.map(_ => FacadeFailure.InvalidConfiguration)
+        studyPath <- scala.util
+          .Try(Path.of(study))
+          .toEither
           .left
-          .map(_.toString)
-        text = new String(bytes, java.nio.charset.StandardCharsets.UTF_8)
-        _ <- Either.cond(
-          text.getBytes(java.nio.charset.StandardCharsets.UTF_8).sameElements(bytes),
-          (),
-          "invalid config UTF-8"
-        )
-        resolved <- config(text)
-        prepared <- StudyCli.load(study).left.map(_.toString)
-        outcomes <- MappingPipeline.batch(prepared, resolved).left.map(_.toString)
-        destination <- scala.util.Try(Path.of(output)).toEither.left.map(_.getMessage)
+          .map(_ => FacadeFailure.InvalidConfiguration)
+        outcomes <- MappingPipeline.analyze(studyPath, resolved)
+        destination <- scala.util
+          .Try(Path.of(output))
+          .toEither
+          .left
+          .map(_ => FacadeFailure.InvalidConfiguration)
         receipt <-
-          if exchange then MappingPipeline.publishExchange(outcomes, destination, resume)
-          else MappingPipeline.publish(outcomes, destination, resume)
+          if exchange then MappingPipeline.exportResults(outcomes, destination, resume)
+          else
+            MappingPipeline
+              .publish(outcomes, destination, resume)
+              .left
+              .map(FacadeFailure.Publication(_, destination))
       yield (outcomes.outcomes, receipt)
       result match
-        case Left(reason)               => refuse(reason)
+        case Left(reason)               => refuse(reason.diagnostic.noSpaces)
         case Right((outcomes, receipt)) =>
           out(
             Canonical.print(

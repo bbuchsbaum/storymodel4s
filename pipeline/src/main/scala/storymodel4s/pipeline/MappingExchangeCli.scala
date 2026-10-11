@@ -44,13 +44,17 @@ private[pipeline] object MappingExchangeCli:
           case MappingExchangeBuild.Error.InputRead    => ("InputRead", None)
           case MappingExchangeBuild.Error.OutputExists => ("OutputExists", None)
           case MappingExchangeBuild.Error.OutputWrite  => ("OutputWrite", None)
+          case MappingExchangeBuild.Error.Io(_)        => ("Io", None)
     val fields = Vector(
       "schemaVersion" -> Json.fromString(ReceiptSchema),
       "status" -> Json.fromString("refused"),
       "error" -> Json.fromString(code)
     ) ++ reason.map(value => "reason" -> Json.fromString(value)) ++
       Option.when(error == Refusal.Arguments)("usage" -> Json.fromString(Usage))
-    Json.obj(fields*)
+    error match
+      case Refusal.Producer(MappingExchangeBuild.Error.Io(value)) =>
+        Json.obj(fields*).deepMerge(value.diagnostic)
+      case _ => Json.obj(fields*)
 
   /** Returns the process status; output callbacks make stdout/stderr separation testable. */
   def run(args: List[String], out: String => Unit, err: String => Unit): Int =

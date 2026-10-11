@@ -1602,3 +1602,42 @@ class StoryBuildSuite extends FunSuite:
     assert(line.contains("encodingDigest(timestamp-bearing)="), line)
     assert(!line.contains("Egulac"), line)
   }
+
+  test("a written invalid draft cannot inherit the compilation validation or success exit") {
+    import storymodel4s.story.{StoryModel, StoryValidator}
+    val dir = work("invalid-written-draft")
+    val value = parsed(writeText(dir, "three.txt", threeText), threeRecordings)
+    val proposals =
+      ChartProposalProvider.propose(value.story, value.atlas, value.charts).toOption.get
+    val compilation = ChartProposalProvider
+      .input(value.story, value.atlas, value.charts, Some(value.parserStage._1), Now)
+      .flatMap(NarrativeCompiler.compile)
+      .toOption
+      .get
+    val d = compilation.draft
+    val valid = BuildSummary
+      .derive(value, proposals, compilation, d, StoryPipeline.files(dir.resolve("valid")))
+      .toOption
+      .get
+    assert(valid.validated)
+    assertEquals(ExitStatus.of(Right(valid)), ExitStatus.Complete)
+    val broken = StoryModel
+      .draftText(
+        d.atlas,
+        d.graph.copy(contexts = Map.empty),
+        d.hierarchy,
+        d.trajectory,
+        receipt = d.receipt
+      )
+      .toOption
+      .get
+    assert(StoryValidator.validate(broken).validated.isEmpty)
+    val invalid = BuildSummary
+      .derive(value, proposals, compilation, broken, StoryPipeline.files(dir.resolve("invalid")))
+      .toOption
+      .get
+    assert(!invalid.validated)
+    assert(invalid.errors > 0)
+    assertEquals(ExitStatus.of(Right(invalid)), ExitStatus.InvalidDraft)
+    assertEquals(ExitStatus.InvalidDraft.code, 3)
+  }

@@ -40,7 +40,14 @@ class MappingExchangeBuildSuite extends FunSuite:
       out,
       (_, _) => throw new java.io.IOException("injected failure")
     )
-    assertEquals(result, Left(MappingExchangeBuild.Error.OutputWrite))
+    assertEquals(
+      result,
+      Left(
+        MappingExchangeBuild.Error.Io(
+          FacadeFailure.Io(FacadeFailure.Operation.Write, out, "java.io.IOException")
+        )
+      )
+    )
     assert(!Files.exists(out.resolve("manifest.json")))
     assert(MappingExchangeBuild.read(out, ExpectedMappingContext(m.inventory, m.source)).isLeft)
     Files.delete(out)
@@ -60,7 +67,14 @@ class MappingExchangeBuildSuite extends FunSuite:
         throw new java.io.IOException("partial manifest write")
       }
     )
-    assertEquals(result, Left(MappingExchangeBuild.Error.OutputWrite))
+    assertEquals(
+      result,
+      Left(
+        MappingExchangeBuild.Error.Io(
+          FacadeFailure.Io(FacadeFailure.Operation.Write, out, "java.io.IOException")
+        )
+      )
+    )
     assert(!Files.exists(out.resolve("manifest.json")))
     assert(MappingExchangeBuild.read(out, ExpectedMappingContext(m.inventory, m.source)).isLeft)
     val files = Files.list(out)

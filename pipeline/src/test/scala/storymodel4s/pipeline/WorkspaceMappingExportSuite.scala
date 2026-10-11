@@ -172,7 +172,15 @@ class WorkspaceMappingExportSuite extends FunSuite:
       val out = root.resolve("malformed")
       assertEquals(
         MappingExchangeBuild.exportWorkspace(source, workspace.policies.head.id, out),
-        Left(MappingExchangeBuild.Error.InputRead)
+        Left(
+          MappingExchangeBuild.Error.Io(
+            FacadeFailure.Io(
+              FacadeFailure.Operation.Read,
+              source,
+              "java.nio.charset.MalformedInputException"
+            )
+          )
+        )
       )
       assert(!Files.exists(out))
     }

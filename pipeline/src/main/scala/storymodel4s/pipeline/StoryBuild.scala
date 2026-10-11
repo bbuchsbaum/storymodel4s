@@ -9,7 +9,7 @@ import storymodel4s.codec.{
   FeaturesRecordCodec,
   StoryModelCodec
 }
-import storymodel4s.story.{ModelStatus, TextModel}
+import storymodel4s.story.{ModelStatus, StoryValidator, TextModel}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
@@ -56,17 +56,21 @@ enum PipelineError:
   case FeatureRefused(detail: String)
 
   /** A bundle file could not be written; the reason is digested, never echoed. */
-  case OutputUnwritable(path: String, reasonChecksum: Checksum)
+  case OutputUnwritable(path: String, reasonChecksum: Checksum, exceptionClass: String = "unknown")
 
-  def message: String = this match
-    case NotStarted(error)        => error.message
-    case ProposalRefused(error)   => s"proposal provider refused: ${error.message}"
-    case InputRefused(error)      => s"compiler input refused: ${error.message}"
-    case CompileRefused(error)    => s"compiler refused: ${error.message}"
-    case ReceiptMismatch(detail)  => s"compilation receipt refused: $detail"
-    case RecordRefused(error)     => s"derivation record refused: ${error.message}"
-    case FeatureRefused(detail)   => s"feature refused: $detail"
-    case OutputUnwritable(p, sum) => s"cannot write $p (reason ${sum.short()})"
+  def message: String =
+    def safe(label: String, detail: String): String =
+      s"$label (reason ${Checksum.ofText(detail).hex})"
+    this match
+      case NotStarted(error) => safe(s"parse driver refused: ${error.productPrefix}", error.message)
+      case ProposalRefused(error)         => safe("proposal provider refused", error.message)
+      case InputRefused(error)            => safe("compiler input refused", error.message)
+      case CompileRefused(error)          => safe("compiler refused", error.message)
+      case ReceiptMismatch(detail)        => safe("compilation receipt refused", detail)
+      case RecordRefused(error)           => safe("derivation record refused", error.message)
+      case FeatureRefused(detail)         => safe("feature refused", detail)
+      case OutputUnwritable(p, sum, kind) =>
+        s"cannot write path ${Checksum.ofText(p).hex} ($kind; reason ${sum.hex})"
 
 /** The process exit status of a story build, as a closed set with its numeric code attached.
   *
@@ -76,9 +80,13 @@ enum PipelineError:
   */
 enum ExitStatus(val code: Int):
   /** Every sentence reached the parser court, the compiler accepted the input, and the four files
-    * were written. Says nothing about validation: a partial draft is a complete bundle.
+    * were written. The emitted model passed validation; partial coverage remains explicit in its
+    * receipt.
     */
   case Complete extends ExitStatus(0)
+
+  /** Files were written but the emitted draft failed validation. */
+  case InvalidDraft extends ExitStatus(3)
 
   /** The court ran but the bundle is not complete: a sentence never reached the parser court, the
     * parser's build receipt was refused after the court, the compiler refused the input, or a file
@@ -102,6 +110,7 @@ object ExitStatus:
     case Left(PipelineError.NotStarted(_))                             => CouldNotStart
     case Left(_)                                                       => Incomplete
     case Right(summary) if summary.parser.transportFailures > 0        => Incomplete
+    case Right(summary) if !summary.validated                          => InvalidDraft
     case Right(_)                                                      => Complete
 
 /** The bundle files a build writes, in write order.
@@ -195,7 +204,8 @@ object BuildSummary:
       files: BundleFiles
   ): Either[PipelineError, BuildSummary] =
     val receipt = written.receipt.getOrElse(compilation.receipt)
-    val report = compilation.validation.report
+    val validation = StoryValidator.validate(written)
+    val report = validation.report
     val expectedParserStage =
       (parsed.parserStage._1, ChartProposalProvider.chartsDigest(parsed.charts))
     if !receipt.stages.contains(expectedParserStage) then
@@ -225,7 +235,7 @@ object BuildSummary:
           gaps = compilation.derivation.gaps.size,
           errors = report.errors.size,
           warnings = report.warnings.size,
-          validated = compilation.validated.isDefined,
+          validated = validation.validated.isDefined,
           fingerprint = compilation.fingerprint,
           candidateSet = compilation.derivation.candidateSet,
           encodingDigest = StoryModelCodec.contentChecksum(written),
@@ -345,7 +355,13 @@ object StoryPipeline:
       Right(())
     catch
       case NonFatal(error) =>
-        Left(PipelineError.OutputUnwritable(path.toString, Checksum.ofText(describe(error))))
+        Left(
+          PipelineError.OutputUnwritable(
+            path.toString,
+            Checksum.ofText(describe(error)),
+            error.getClass.getName
+          )
+        )
 
   /** One line of counts, checksums, and the output directory; never source prose. */
   def render(summary: BuildSummary, outDir: Path): String =
@@ -371,7 +387,8 @@ object StoryPipeline:
   * `ANTHROPIC_API_KEY`), exactly as `claudeParse` does. Writes `storymodel.json`,
   * `compilation-report.json`, `receipts.json`, and `derivation.json` under `<out-dir>`. Only
   * counts, checksums, and paths are printed. Exit status: 2 when the run could not start, 1 when
-  * any sentence never reached the parser court or the compiler refused the input, 0 otherwise.
+  * any sentence never reached the parser court or the compiler refused the input, 3 when files were
+  * written but the draft is invalid, 0 for a validated complete run.
   *
   * The fifth argument, when given, is the story's title as the *caller's* claim, recorded with
   * caller-supplied provenance. Omit it and the story has no title and the summary family resolves

@@ -230,3 +230,78 @@ class MappingPipelineSuite extends FunSuite:
       assertNotEquals(malformed.identity, otherMalformed.identity)
     }
   }
+
+  test("newcomer analyze inspect export uses ordinary files and preserves paired identities") {
+    inTemp { root =>
+      val _ = prepared(root)
+      write(root, "study.json", StudyCli.Template)
+      val local = right(MappingPipeline.analyze(root.resolve("study.json"), config))
+      assertEquals(
+        MappingPipeline.exportResults(local, root.resolve("refused")),
+        Left(FacadeFailure.Publication("DisclosureRefused", root.resolve("refused")))
+      )
+      assert(!Files.exists(root.resolve("refused")))
+      write(
+        root,
+        "study.json",
+        StudyCli.Template.replace(
+          "\"timing\":null",
+          "\"timing\":null,\"admission\":{\"kind\":\"project-synthetic-control\"}"
+        )
+      )
+      val batch = right(MappingPipeline.analyze(root.resolve("study.json"), config))
+      val summary = MappingPipeline.inspect(batch)
+      assertEquals(summary.hcursor.get[Int]("attempts").toOption, Some(1))
+      assertEquals(summary.hcursor.get[Int]("completed").toOption, Some(1))
+      assert(!summary.noSpaces.contains("Anna"))
+      val output = root.resolve("exchange")
+      val receipt = right(MappingPipeline.exportResults(batch, output))
+      assertEquals(right(MappingPipeline.exportResults(batch, output, resume = true)), receipt)
+      assert(MappingPipeline.exportResults(batch, output).isLeft)
+      val run = batch.outcomes.head.run.get
+      val allFiles = Files.walk(output)
+      val bytes =
+        try
+          allFiles
+            .iterator()
+            .asScala
+            .filter(Files.isRegularFile(_))
+            .map(Files.readString(_))
+            .mkString
+        finally allFiles.close()
+      assert(bytes.contains(run.reference.digest.hex))
+      assert(bytes.contains(run.reconstruction.digest.hex))
+    }
+  }
+
+  test("CLI capability missing and partial observation have advertised nonzero statuses") {
+    inTemp { root =>
+      val _ = prepared(root)
+      write(root, "study.json", StudyCli.Template)
+      write(
+        root,
+        "mapping.json",
+        MappingCli.Template.replace("[\"Mapping\"]", "[\"Mapping\",\"Organization\"]")
+      )
+      def run(name: String): Int = MappingCli.run(
+        List(
+          "run",
+          root.resolve("study.json").toString,
+          root.resolve("mapping.json").toString,
+          root.resolve(name).toString
+        ),
+        _ => (),
+        _ => ()
+      )
+      assertEquals(run("capability"), 4)
+      write(root, "study.json", StudyCli.Template.replace("recall.txt", "absent.txt"))
+      assertEquals(run("partial"), 3)
+      write(
+        root,
+        "mapping.json",
+        MappingCli.Template.replace("mapping-lexical-pair/v1", "mapping-onnx-pair/v1")
+      )
+      assertEquals(run("unregistered"), 2)
+      assert(!Files.exists(root.resolve("unregistered")))
+    }
+  }

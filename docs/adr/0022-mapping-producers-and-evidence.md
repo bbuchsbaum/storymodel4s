@@ -283,3 +283,17 @@ Rejected alternatives: caller-specific header stripping (unverifiable boundaries
 metadata as story prose (false segmentation), and a new corpus/artifact framework (the existing
 checked text exchange already retains metadata). Plain public intake refuses recognized
 admission headers. Supplied-atlas and admitted modes are separate explicit CLI choices.
+
+## Concrete public facade diagnostics (2026-10-10)
+
+`MappingPipeline.analyze`, `inspect` and `exportResults` adapt ordinary files through the existing checked
+preparation, paired execution and exchange. `FacadeFailure` unifies only errors crossing these
+entry points. Typed I/O diagnostics retain operation, local path and exception class; default log
+JSON contains the path digest and no exception message. `MappingExchangeBuild` carries these
+I/O diagnostics while retaining its existing scientific refusals. `storyBuild` reserves exit 3
+for a completed invalid draft and validates the actual written model before reporting validity.
+
+Rejected alternatives: a universal refusal supertype across modules (no concrete consumer need),
+echoing parser/exception messages (can disclose input text), and treating successful execution as
+validation or requested-capability readiness (different outcomes). Existing mapping status 3 for
+partial batches and 4 for missing capabilities remain distinct and documented.

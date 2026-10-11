@@ -16,6 +16,7 @@ object MappingExchangeBuild:
     case Exchange(error: MappingExchange.Error)
     case Workspace(error: WorkspaceRefusal)
     case OutputExists, OutputWrite, InputRead
+    case Io(failure: FacadeFailure)
 
   /** Digests bind the exact input bytes, explicitly selected policy and completed publication. */
   final case class WorkspaceExportReceipt(
@@ -34,7 +35,11 @@ object MappingExchangeBuild:
     val loaded = try
       val bytes = Files.readAllBytes(input)
       Right((decodeUtf8(bytes), Checksum.ofBytes(bytes)))
-    catch case NonFatal(_) => Left(Error.InputRead)
+    catch
+      case NonFatal(error) =>
+        Left(
+          Error.Io(FacadeFailure.Io(FacadeFailure.Operation.Read, input, error.getClass.getName))
+        )
     for
       (text, inputDigest) <- loaded
       workspace <- WorkspaceCodecs.decode(text).left.map(Error.Workspace(_))
@@ -78,7 +83,10 @@ object MappingExchangeBuild:
       Right(bundle.digest)
     catch
       case _: FileAlreadyExistsException => Left(Error.OutputExists)
-      case NonFatal(_)                   => Left(Error.OutputWrite)
+      case NonFatal(error)               =>
+        Left(
+          Error.Io(FacadeFailure.Io(FacadeFailure.Operation.Write, output, error.getClass.getName))
+        )
     finally
       pending.foreach { path =>
         try { Files.deleteIfExists(path): Unit }
@@ -95,7 +103,13 @@ object MappingExchangeBuild:
           path.getFileName.toString -> text
         })
       finally stream.close()
-    catch case NonFatal(_) => Left(Error.InputRead)
+    catch
+      case NonFatal(error) =>
+        Left(
+          Error.Io(
+            FacadeFailure.Io(FacadeFailure.Operation.List, directory, error.getClass.getName)
+          )
+        )
     files.flatMap(MappingExchange.decode(_, expected).left.map(Error.Exchange(_)))
 
   private def decodeUtf8(bytes: Array[Byte]): String = StandardCharsets.UTF_8
