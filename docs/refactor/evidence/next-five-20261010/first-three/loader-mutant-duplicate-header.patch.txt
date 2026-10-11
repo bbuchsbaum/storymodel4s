@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala b/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
+index 5801569e..8d98ee2b 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
+@@ -91,7 +91,7 @@ object AdmittedStoryInput:
+             key = line.substring(0, colon)
+             value = line.substring(colon + 1).trim
+             _ <- Either.cond(
+-              fields(key) && value.nonEmpty && !previous.exists(_._1 == key),
++              fields(key) && value.nonEmpty && (!previous.exists(_._1 == key) || value.nonEmpty),
+               (),
+               Refusal.InvalidHeader
+             )

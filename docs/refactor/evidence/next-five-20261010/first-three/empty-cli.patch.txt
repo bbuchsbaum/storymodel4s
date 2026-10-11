@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+index 959a5351..e44c52bf 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -627,7 +627,7 @@ object MappingCli:
+             )
+           )
+           if batch.outcomes.exists(_.failure.nonEmpty) then 3
+-          else if batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping) then 4
++          else if batch.outcomes.flatMap(_.run).exists(_.config.requested.exists(_ != MappingPipeline.Capability.Mapping)) then 4
+           else 0
+     args match
+       case List("template")                   => out(Template); 0

@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+index 959a5351..8cd4acb4 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -393,7 +393,7 @@ object MappingPipeline:
+     "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+     "failed" -> Json.fromInt(batch.outcomes.count(_.failure.nonEmpty)),
+     "missingCapabilities" -> Json.fromValues(
+-      batch.config.requested
++      batch.outcomes.flatMap(_.run.toVector.flatMap(_.config.requested))
+         .filterNot(_ == Capability.Mapping)
+         .distinct
+         .map(v => Json.fromString(v.toString))

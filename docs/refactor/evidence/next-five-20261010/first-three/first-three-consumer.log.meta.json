@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:33:47.902844+00:00",
+  "finished_utc": "2026-10-11T04:35:34.584715+00:00",
+  "duration_seconds": 106.682274,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-s2b3-build",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "-Dstoryatlas.surfaceWorkspace.fixture=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/first-three-witness/text-workspace/2feb9f62b6c00dabc474a32f3f69189f381e426fdf60db49821a1a857017892d-workspace.json",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storyatlas4s-study-workflow",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/first-three-consumer.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 22867
+}

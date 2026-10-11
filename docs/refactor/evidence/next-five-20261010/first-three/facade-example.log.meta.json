@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:01:44.149000+00:00",
+  "finished_utc": "2026-10-11T04:02:25.211450+00:00",
+  "duration_seconds": 41.06211,
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "set pipeline / Compile / unmanagedSources += file(\"/private/tmp/storymodel4s-s2b3-build/docs-site/examples/PublicMappingFacade.scala\")",
+    "pipeline/runMain docsprobe.mappingFacade",
+    "pipeline/scalafmt"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/facade-example.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 2391
+}

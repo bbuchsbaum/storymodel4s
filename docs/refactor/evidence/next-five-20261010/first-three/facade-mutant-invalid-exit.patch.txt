@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala b/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala
+index fcb8478a..fa052cf2 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala
+@@ -110,7 +110,7 @@ object ExitStatus:
+     case Left(PipelineError.NotStarted(_))                             => CouldNotStart
+     case Left(_)                                                       => Incomplete
+     case Right(summary) if summary.parser.transportFailures > 0        => Incomplete
+-    case Right(summary) if !summary.validated                          => InvalidDraft
++    case Right(summary) if !summary.validated && summary.errors < 0                          => InvalidDraft
+     case Right(_)                                                      => Complete
+ 
+ /** The bundle files a build writes, in write order.

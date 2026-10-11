@@ -1,0 +1,29 @@
+[
+  {
+    "mutant": "written-validation",
+    "exit": 1,
+    "compiled": true,
+    "namedFailure": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ]
+  },
+  {
+    "mutant": "invalid-exit",
+    "exit": 1,
+    "compiled": true,
+    "namedFailure": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ]
+  },
+  {
+    "mutant": "config-redaction",
+    "exit": 1,
+    "compiled": true,
+    "namedFailure": true,
+    "totals": [
+      "[error] Failed: Total 4, Failed 1, Errors 0, Passed 3"
+    ]
+  }
+]

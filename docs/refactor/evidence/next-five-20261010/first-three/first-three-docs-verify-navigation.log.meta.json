@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:32:48.872930+00:00",
+  "finished_utc": "2026-10-11T04:32:49.015700+00:00",
+  "duration_seconds": 0.142653,
+  "command": [
+    "npm",
+    "run",
+    "verify:navigation"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build/docs-site",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/first-three-docs-verify-navigation.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 169
+}

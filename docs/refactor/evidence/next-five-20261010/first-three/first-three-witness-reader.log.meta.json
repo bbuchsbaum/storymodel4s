@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:33:47.757861+00:00",
+  "finished_utc": "2026-10-11T04:33:47.840419+00:00",
+  "duration_seconds": 0.08247,
+  "command": [
+    "python3",
+    "examples/mapping/test_workspace.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/first-three-witness"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/first-three-witness-reader.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 1273
+}

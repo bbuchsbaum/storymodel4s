@@ -1,0 +1,6 @@
+Independent reviewer: /root/docs_salvage (did not author loader or facade)
+Review scope: base a76c0477b5f9fbc108f57a88db7c5277b389f100 to 15d00da1190bac8cbb12bdba4ddc396459dcc1eb, loader/facade paths only.
+Initial finding BLOCK: capability readiness derived from successful runs omitted requested capabilities on zero/all-failed batches.
+Amendment 15d00da1 derives missing capabilities from batch config and CLI exit status from that same request, with zero/all-refused and partial-precedence regression cases.
+Final verdict PASS (read-only; reviewer did not execute tests). Loader header/body checks, checked boundaries, actual written-model validation and diagnostic redaction reviewed.
+Docs facade extension: independent PASS at 9b7e830c over15d00da1, four paths only; public signatures, synthetic admission limits, manifest and recorded program behavior reviewed.

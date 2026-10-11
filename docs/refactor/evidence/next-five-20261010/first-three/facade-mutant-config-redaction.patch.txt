@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+index fb389d36..bcb972c0 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -551,7 +551,7 @@ object MappingCli:
+   def config(text: String): Either[String, MappingPipeline.Config] =
+     import cats.syntax.all.*
+     for
+-      json <- parser.parse(text).left.map(_ => "invalid configuration")
++      json <- parser.parse(text).left.map(_.message)
+       _ <- Either.cond(
+         json.asObject.exists(
+           _.keys.toSet == Set(

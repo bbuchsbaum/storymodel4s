@@ -1,0 +1,8 @@
+{
+  "producer": "9b7e830cfcf06e2a87209c658558ccd2432c023d",
+  "consumer": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "consumerSource": "explicit local source override; consumer pin not changed",
+  "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "docsExamples": 14,
+  "browser": "not run; prose/code examples only"
+}

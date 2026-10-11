@@ -1,0 +1,4 @@
+Reviewer: codex-next-five-20261010 (parent; did not author docs salvage)
+Exact candidate: 2c4a5d66ce49240a8ac69245516185619a71e6cc, authored docs commits256a760b and2c4a5d66.
+Verdict PASS. Read entire ten-page diff. Verified16 portable and8 JVM aggregate modules, declared grakern auto-fetch pin0329c43, SaveModel source/output hashes and raw isolated13-example replay exit0. No browser/layout run for prose-only changes.
+Static site author checks reported exit0 in tool receipts; no separately retained raw log. Parent will rerun static checks on final docs candidate and retain raw logs.

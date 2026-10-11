@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala b/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
+index 5801569e..7cfb5494 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
+@@ -69,7 +69,7 @@ object AdmittedStoryInput:
+         (header.linesIterator.exists(_.startsWith("Source:")) && header.linesIterator.exists(
+           _.startsWith("Admitted by:")
+         ))
+-      _ <- Either.cond(!recognized, (), Refusal.RequiresAdmittedMode)
++      _ <- Either.cond((!recognized || text.nonEmpty), (), Refusal.RequiresAdmittedMode)
+       value <- TextSourcePackage.fromUtf8(bytes).left.map(_ => Refusal.InvalidText)
+     yield value
+ 

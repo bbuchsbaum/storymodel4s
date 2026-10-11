@@ -1,0 +1,29 @@
+[
+  {
+    "mutant": "digest",
+    "exit": 1,
+    "compiled": true,
+    "namedFailure": true,
+    "totals": [
+      "[error] Failed: Total 7, Failed 1, Errors 0, Passed 6"
+    ]
+  },
+  {
+    "mutant": "plain-header",
+    "exit": 1,
+    "compiled": true,
+    "namedFailure": true,
+    "totals": [
+      "[error] Failed: Total 7, Failed 3, Errors 0, Passed 4"
+    ]
+  },
+  {
+    "mutant": "duplicate-header",
+    "exit": 1,
+    "compiled": true,
+    "namedFailure": true,
+    "totals": [
+      "[error] Failed: Total 7, Failed 1, Errors 0, Passed 6"
+    ]
+  }
+]

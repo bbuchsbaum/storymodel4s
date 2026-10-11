@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala b/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
+index 5801569e..3be2652d 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/AdmittedStoryInput.scala
+@@ -106,7 +106,7 @@ object AdmittedStoryInput:
+         Refusal.InvalidHeader
+       )
+       digest <- Checksum.from(values("Text-SHA256")).left.map(_ => Refusal.InvalidHeader)
+-      _ <- Either.cond(digest == Checksum.ofText(body), (), Refusal.DigestMismatch)
++      _ <- Either.cond(digest == Checksum.ofText(body) || body.nonEmpty, (), Refusal.DigestMismatch)
+       documentDigest = Checksum.ofText(text)
+       metadata = values.map { case (key, value) => s"admitted-story.$key" -> value } +
+         ("admitted-story.document-sha256" -> documentDigest.hex)

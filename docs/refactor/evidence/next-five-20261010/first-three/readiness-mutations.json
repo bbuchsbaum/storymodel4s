@@ -1,0 +1,20 @@
+[
+  {
+    "mutant": "empty-inspect",
+    "compiled": true,
+    "namedFailure": true,
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 10, Failed 1, Errors 0, Passed 9"
+    ]
+  },
+  {
+    "mutant": "empty-cli",
+    "compiled": true,
+    "namedFailure": true,
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 10, Failed 1, Errors 0, Passed 9"
+    ]
+  }
+]

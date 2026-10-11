@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala b/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala
+index fcb8478a..10c2ae3b 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala
+@@ -204,7 +204,7 @@ object BuildSummary:
+       files: BundleFiles
+   ): Either[PipelineError, BuildSummary] =
+     val receipt = written.receipt.getOrElse(compilation.receipt)
+-    val validation = StoryValidator.validate(written)
++    val validation = StoryValidator.validate(compilation.draft)
+     val report = validation.report
+     val expectedParserStage =
+       (parsed.parserStage._1, ChartProposalProvider.chartsDigest(parsed.charts))
