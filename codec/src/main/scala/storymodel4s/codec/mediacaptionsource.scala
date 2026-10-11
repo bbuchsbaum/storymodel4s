@@ -82,7 +82,11 @@ object MediaCaptionSourceCodec:
         parts.map(_.bundle.identity).distinct.size == parts.size,
         "repeated local media requires an explicit composition"
       )
-      captions = parts.flatMap(p => p.captions.map(c => (p.occurrence, c._1, c._2)))
+      captions = parts.flatMap(p =>
+        p.captions
+          .sortBy(c => (c._2.captions.head.support.start, c._1))
+          .map(c => (p.occurrence, c._1, c._2))
+      )
       groupIds = captions.map(_._2).distinct.zipWithIndex.toMap
       segments = captions.zipWithIndex.map { case ((occurrence, id, evidence), n) =>
         val caption = evidence.captions.head
@@ -160,6 +164,13 @@ object MediaCaptionSourceCodec:
           .forall(w => w.size < 2 || (w(0).ordinal < w(1).ordinal && w(0).pts < w(1).pts)),
         "samples must have increasing ordinals and PTS"
       )
+      _ <- check(
+        samples.forall(s =>
+          (s.ordinal != 0 || s.pts == start) &&
+            (s.ordinal != count - 1 || s.duration.exists(d => BigInt(s.pts) + d == BigInt(end)))
+        ),
+        "sample endpoint differs from declared presentation axis"
+      )
       framesIdentity <- hash(j, "framesIdentity")
       framesChecksum <- hash(j, "framesChecksum")
       model <- hash(j, "model")
@@ -211,8 +222,8 @@ object MediaCaptionSourceCodec:
         yield id -> evidence
       }
       _ <- check(
-        captions.nonEmpty && captions.map(_._1).distinct.size == captions.size,
-        "empty or duplicate caption extents"
+        captions.map(_._1).distinct.size == captions.size,
+        "duplicate caption extents"
       )
       examined = captions.flatMap(_._2.captions.head.frames).distinct.sorted.map(samples(_).ordinal)
     yield Part(occurrence, bundle, count, samples, captions, examined)

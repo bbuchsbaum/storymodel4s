@@ -314,6 +314,9 @@ class VideoSourceSuite extends FunSuite:
         right(MappingPipeline.batch(prepared, right(MappingCli.config(MappingCli.Template))))
       val artifacts = right(StudyWorkspaceProducer.artifacts(batch, "a" * 40))._1
       val packet = artifacts.find(_._1.endsWith("workspace.json")).get._2
+      sys.props.get("storymodel4s.videoWorkspace.fixture").foreach { path =>
+        val _ = Files.writeString(Path.of(path), packet)
+      }
       val readback = right(SurfaceWorkspaceCodecs.decode(packet))
       assertEquals(readback.sourceKind, SurfaceWorkspaceCodecs.SourceKind.VideoCaptions)
       assertEquals(readback.source.digest, imported.view.representation.digest)

@@ -163,7 +163,8 @@ class MediaCaptionSourceSuite extends FunSuite:
     )
 
   test("unknown unexamined sample duration survives canonical round trip"):
-    val value = first(document) { p =>
+    val value = first(document) { original =>
+      val p = change(original, "presentedCount", Json.fromInt(6))
       val samples = p.hcursor.get[Vector[Json]]("samples").toOption.get
       change(
         p,
@@ -174,3 +175,50 @@ class MediaCaptionSourceSuite extends FunSuite:
     val imported = right(MediaCaptionSourceCodec.decode(value.noSpaces))
     assertEquals(right(MediaCaptionSourceCodec.decode(imported.artifact)), imported)
     assert(imported.artifact.contains("\"duration\":null"))
+
+  test("caption request order cannot reverse native source order"):
+    val original = document.hcursor.get[Vector[Json]]("parts").toOption.get.head
+    val early = original.hcursor.get[Vector[Json]]("proposals").toOption.get.head
+    val late = early.mapObject(
+      _.add("id", str("late"))
+        .add("text", str("late"))
+        .add("samples", Json.arr(Json.fromInt(1)))
+        .add("start", str("40"))
+        .add("end", str("50"))
+    )
+    val reverse = change(original, "proposals", Json.arr(late, early))
+    val forward = change(original, "proposals", Json.arr(early, late))
+    val reversed =
+      right(MediaCaptionSourceCodec.decode(change(document, "parts", Json.arr(reverse)).noSpaces))
+    val ordered =
+      right(MediaCaptionSourceCodec.decode(change(document, "parts", Json.arr(forward)).noSpaces))
+    assertEquals(reversed.view.segments.map(_.text), Vector("red", "late"))
+    assertEquals(reversed.evidence.map(_.captions.head.support.start), Vector(0L, 40L))
+    assertEquals(reversed.view.segments, ordered.view.segments)
+    val leaves = reversed.view.nodes.filter(_.level == 0).sortBy(_.discoursePosition)
+    assertEquals(
+      reversed.view.adjacency(storymodel4s.align.RelationLayer.DiscourseSuccession),
+      Map(leaves(0).ref -> Map(leaves(1).ref -> 1.0))
+    )
+
+  test("sampled endpoint ordinals must agree with the declared full-part axis"):
+    val wrongStart = first(document)(p => change(p, "start", str("-1")))
+    val wrongEnd = first(document)(p => change(p, "end", str("51")))
+    assert(
+      MediaCaptionSourceCodec
+        .decode(wrongStart.noSpaces)
+        .left
+        .toOption
+        .exists(_.contains("endpoint"))
+    )
+    assert(
+      MediaCaptionSourceCodec.decode(wrongEnd.noSpaces).left.toOption.exists(_.contains("endpoint"))
+    )
+
+  test("an entirely unexamined part retains its clock and all missing coverage"):
+    val value = first(document)(p => change(p, "proposals", Json.arr()))
+    val imported = right(MediaCaptionSourceCodec.decode(value.noSpaces))
+    assertEquals(imported.examinedOrdinals("a"), Some(Vector.empty))
+    assertEquals(imported.unexaminedOrdinalRanges("a"), Some(Vector(0 until 5)))
+    assertEquals(imported.view.parts.size, 2)
+    assertEquals(imported.evidence.size, 1)

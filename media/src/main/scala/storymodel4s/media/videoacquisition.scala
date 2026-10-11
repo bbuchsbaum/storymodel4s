@@ -357,9 +357,22 @@ object VideoAcquisition:
         val _ = Files.copy(source, out.resolve(name("media")))
       }
       probeTool <- ToolRealization.observe("ffprobe", runtime.ffprobe)
-      stdout <- Ffprobe.invoke(runtime.ffprobe, out.resolve(name("media")))
+      probeArgs = Ffprobe.CanonicalArgs ++ Vector(
+        "-format_whitelist",
+        "mov,matroska,avi,mpegts,mpeg,ogg"
+      )
+      probeRun <- Subprocess.run(
+        (runtime.ffprobe.toString +: probeArgs) :+ out.resolve(name("media")).toString,
+        timeout
+      )
+      _ <- requireThat(
+        probeRun.exitCode == 0,
+        "probe",
+        "configured probe refused input; no package published"
+      )
+      stdout = probeRun.stdout
       parsed <- FfprobeJson.parse(stdout)
-      probe <- MediaProbe.join(manifest, observed, probeTool, Ffprobe.CanonicalArgs, parsed)
+      probe <- MediaProbe.join(manifest, observed, probeTool, probeArgs, parsed)
       geometry <- manifest
         .stream(stream)
         .flatMap(_.picture)
@@ -473,7 +486,7 @@ object VideoAcquisition:
               "fixtureId" -> str(manifest.fixtureId),
               "inputSha256" -> str(observed.hex),
               "tool" -> tool(probeTool),
-              "args" -> Json.fromValues(Ffprobe.CanonicalArgs.map(str)),
+              "args" -> Json.fromValues(probeArgs.map(str)),
               "stdoutFile" -> str(name("probe.json")),
               "stdoutSha256" -> str(Checksum.ofText(stdout).hex)
             )
