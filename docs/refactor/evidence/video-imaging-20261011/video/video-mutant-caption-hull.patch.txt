@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+index e9d4db52..1280a6be 100644
+--- a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+@@ -210,7 +210,7 @@ object MediaCaptionSourceCodec:
+           last = samples(indices.last)
+           duration <- last.duration.toRight("caption end sample has unknown duration")
+           _ <- check(
+-            onset == samples(indices.head).pts && BigInt(until) == BigInt(last.pts) + duration,
++            onset == samples(indices.head).pts && BigInt(until) == BigInt(until) && duration > 0L,
+             "caption support differs from sampled timestamps"
+           )
+           support <- PlaybackInterval.on(bundle.primaryAxis, onset, until).left.map(_.message)

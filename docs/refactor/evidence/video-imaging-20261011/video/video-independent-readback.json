@@ -1,0 +1,43 @@
+{
+  "status": "pass",
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "packetSha256": "f10bfc5f641d1b03cca10d9ec3cb50d0850c75dda962d820f0c488c881835c19",
+  "answers": [
+    {
+      "part": "a",
+      "sampled": [
+        0,
+        4,
+        9
+      ],
+      "examined": [
+        0,
+        4
+      ],
+      "missingCount": 43,
+      "nativeHullSeconds": [
+        "0",
+        "7/24"
+      ]
+    },
+    {
+      "part": "b",
+      "sampled": [
+        2,
+        13
+      ],
+      "examined": [
+        2,
+        13
+      ],
+      "missingCount": 43,
+      "nativeHullSeconds": [
+        "1/16",
+        "17/48"
+      ]
+    }
+  ],
+  "targets": 3,
+  "crossPartGroup": "unlocated",
+  "scope": "synthetic imported Draft native-clock/provenance and paired workspace readback; not JVM execution authority or empirical caption validation"
+}

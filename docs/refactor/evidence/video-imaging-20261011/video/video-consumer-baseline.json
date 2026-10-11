@@ -1,0 +1,40 @@
+{
+  "consumer": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "source": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "preexistingNonBuildFiles": [
+    {
+      "path": "consumer-dev-01.log",
+      "sha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b"
+    },
+    {
+      "path": "consumer-dev-01.log.meta.json",
+      "sha256": "e98f902863b0cd00be160f22ddf9e6ac1a57ecb3a6c2eb0422e286aae0022027"
+    },
+    {
+      "path": "consumer-dev-02.log",
+      "sha256": "21e1786fce9199ed58901abff754cba6ca611545c834d65c6acf361ff70105f4"
+    },
+    {
+      "path": "consumer-dev-02.log.meta.json",
+      "sha256": "078edd4bd4381e867d9a1280c209bf806fb5017d0f45afed6318b2c00f5e9519"
+    },
+    {
+      "path": "consumer-dev-03.log",
+      "sha256": "bd6f773d56d11e485b198df608b50a3356928cd7d6760f004e7445aa5221e7d4"
+    },
+    {
+      "path": "consumer-dev-03.log.meta.json",
+      "sha256": "9f7498cde77d358d2a9da6a7f441e9ab66eea9cd8cf8c7700c30cfa9fc27b009"
+    },
+    {
+      "path": "consumer-dev-04.log",
+      "sha256": "ab950f83304ace23d2f456d0d79cf259ed1fa746ea5afffe3f2c26cac5075325"
+    },
+    {
+      "path": "consumer-dev-04.log.meta.json",
+      "sha256": "8c5644c18e930e473f8b962fecebba3b7daea4225fa266534f57b1aba69fb97e"
+    }
+  ],
+  "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "grakernStatus": ""
+}

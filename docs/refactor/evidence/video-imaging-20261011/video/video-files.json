@@ -1,0 +1,15 @@
+[
+  "media/src/main/scala/storymodel4s/media/videoacquisition.scala",
+  "media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala",
+  "codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala",
+  "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+  "codec/src/test/scala/storymodel4s/codec/MediaCaptionSourceSuite.scala",
+  "codec/src/test/scala/storymodel4s/codecprobe/MediaCaptionSourceBoundarySuite.scala",
+  "pipeline/src/main/scala/storymodel4s/pipeline/VideoSourceCli.scala",
+  "pipeline/src/main/scala/storymodel4s/pipeline/VideoSourceInput.scala",
+  "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+  "pipeline/src/main/scala/storymodel4s/pipeline/StudyWorkspace.scala",
+  "pipeline/src/test/scala/storymodel4s/pipeline/VideoSourceSuite.scala",
+  "docs/guides/video-source.md",
+  "docs/adr/0007-film-source-representation.md"
+]

@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+index e9d4db52..cea8a93d 100644
+--- a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+@@ -166,7 +166,7 @@ object MediaCaptionSourceCodec:
+       )
+       _ <- check(
+         samples.forall(s =>
+-          (s.ordinal != 0 || s.pts == start) &&
++          (s.ordinal >= 0) &&
+             (s.ordinal != count - 1 || s.duration.exists(d => BigInt(s.pts) + d == BigInt(end)))
+         ),
+         "sample endpoint differs from declared presentation axis"

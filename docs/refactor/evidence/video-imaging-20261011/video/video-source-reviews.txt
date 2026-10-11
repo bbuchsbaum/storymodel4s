@@ -1,0 +1,25 @@
+Independent read-only reviewer: /root/package_contract_review.
+Summarized verdicts (no reviewer builds):
+
+4951a79e95c10535c26bbbbcbb96c4a64240f236: BLOCK.
+Proposal array order could assert reversed video chronology; sample ordinal endpoints could
+contradict the declared full-part axis; the first ffprobe call lacked the acquisition demuxer
+restriction. FOLLOW-UP: retain entirely unexamined parts rather than refusing empty proposals.
+
+13bdc9aad68bba8493577f79f212fa07f3b57f44: SOURCE PASS after fixes.
+Checked onset orders captions within declared part order, with deterministic extent-ID ties.
+The reversed-proposal test checks directed adjacency. First/final sampled ordinal endpoints
+agree with the full-part axis; unexamined parts retain all missing coverage. First probing
+restricts and records its demuxers and observes the configured timeout. Process tests exercise
+real extraction with explicitly synthetic worker responses, publication/replay and refusals.
+No remaining source correctness BLOCK found in the fix delta.
+The absolute-path concat control proves first-probe refusal only; concat safe-path defaults
+also refuse it. It is not a whitelist-deletion mutation kill. No such kill is counted here.
+The eight counted mutants concern chronology, two endpoints, hull, coverage, constructor,
+model digest and storage budget. S3's distinct mutation proof is not inherited as S4 evidence.
+Portable imports remain Draft; full producer/consumer gates and actual MLX/PySceneDetect
+acceptance are separate. This source verdict does not close the full video bead.
+
+67dff60292bcfb6b839f3027833508ab9aa8f4f7: DOCS PASS.
+Both links resolve; checked-video origin, coverage, cached reuse and separate typed provider
+registration match source. Only two guides change and git diff --check passes.

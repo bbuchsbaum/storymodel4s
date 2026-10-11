@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+index e9d4db52..f0b08a6c 100644
+--- a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+@@ -84,7 +84,7 @@ object MediaCaptionSourceCodec:
+       )
+       captions = parts.flatMap(p =>
+         p.captions
+-          .sortBy(c => (c._2.captions.head.support.start, c._1))
++          
+           .map(c => (p.occurrence, c._1, c._2))
+       )
+       groupIds = captions.map(_._2).distinct.zipWithIndex.toMap

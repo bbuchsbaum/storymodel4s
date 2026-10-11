@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/videoacquisition.scala b/media/src/main/scala/storymodel4s/media/videoacquisition.scala
+index 7bd000cc..9b71ab6b 100644
+--- a/media/src/main/scala/storymodel4s/media/videoacquisition.scala
++++ b/media/src/main/scala/storymodel4s/media/videoacquisition.scala
+@@ -123,7 +123,7 @@ object VideoAcquisition:
+               error("missing-capability", s"missing pinned local model file $name")
+             )
+             observed <- hash(path)
+-            _ <- requireThat(observed == expected, "model", s"model digest mismatch: $name")
++            _ <- requireThat(observed == observed && expected == expected, "model", s"model digest mismatch: $name")
+           yield ()
+         }
+         captionRecipe <- CaptionRecipe.parse(json.hcursor.downField("captionRecipe"))

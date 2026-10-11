@@ -1,0 +1,104 @@
+{
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "mutations": [
+    {
+      "name": "order",
+      "compiled": true,
+      "witness": "caption request order cannot reverse",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "first-endpoint",
+      "compiled": true,
+      "witness": "sampled endpoint ordinals must agree",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "last-endpoint",
+      "compiled": true,
+      "witness": "sampled endpoint ordinals must agree",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "caption-hull",
+      "compiled": true,
+      "witness": "changing a caption hull",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "coverage",
+      "compiled": true,
+      "witness": "native film clocks, Draft provenance",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "boundary",
+      "compiled": true,
+      "witness": "Imported media source constructor",
+      "totals": [
+        "[error] Failed: Total 5, Failed 2, Errors 0, Passed 3"
+      ]
+    },
+    {
+      "name": "model",
+      "compiled": true,
+      "witness": "pinned model bytes and decode budget",
+      "totals": [
+        "[error] Failed: Total 5, Failed 1, Errors 0, Passed 4"
+      ]
+    },
+    {
+      "name": "budget",
+      "compiled": true,
+      "witness": "pinned model bytes and decode budget",
+      "totals": [
+        "[error] Failed: Total 5, Failed 1, Errors 0, Passed 4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "name": "video-restored-checkAll",
+      "exit": 0,
+      "cells": 56,
+      "totalFailedErrorsPassed": [
+        10516,
+        0,
+        0,
+        10511
+      ]
+    },
+    {
+      "name": "video-workspace-export",
+      "exit": 0,
+      "cells": 1,
+      "totalFailedErrorsPassed": [
+        2,
+        0,
+        0,
+        2
+      ]
+    },
+    {
+      "name": "video-storyatlas",
+      "exit": 0,
+      "cells": 10,
+      "totalFailedErrorsPassed": [
+        488,
+        0,
+        0,
+        488
+      ]
+    }
+  ]
+}

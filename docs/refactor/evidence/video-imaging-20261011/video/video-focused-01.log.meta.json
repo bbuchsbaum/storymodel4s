@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T16:24:27.107163+00:00",
+  "finished_utc": "2026-10-11T16:24:58.950124+00:00",
+  "duration_seconds": 31.842685,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "media/testOnly *VideoAcquisitionSuite",
+    "codecJVM/testOnly *MediaCaptionSourceSuite *MediaCaptionSourceBoundarySuite",
+    "pipeline/testOnly *VideoSourceSuite",
+    "scalafmtAll"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/video-focused-01.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 8873
+}

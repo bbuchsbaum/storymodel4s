@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T16:35:53.610750+00:00",
+  "finished_utc": "2026-10-11T16:53:49.880293+00:00",
+  "duration_seconds": 1076.262413,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "checkAll"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/video-restored-checkAll.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 2690033
+}

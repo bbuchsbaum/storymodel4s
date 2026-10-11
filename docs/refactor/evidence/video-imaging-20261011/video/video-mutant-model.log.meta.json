@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T16:35:10.477488+00:00",
+  "finished_utc": "2026-10-11T16:35:32.452835+00:00",
+  "duration_seconds": 21.975074,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "media/testOnly *VideoAcquisitionSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/video-imaging-20261011/video-mutant-model.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 3377
+}

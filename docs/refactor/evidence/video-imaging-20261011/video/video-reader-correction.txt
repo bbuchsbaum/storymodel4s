@@ -1,0 +1,1 @@
+Initial independent readback asserted receipt input order identity,checksum. Actual v3 contract is checksum,identity (caption.scala receipt construction); corrected reader to exact ordered contract. Native clock/sample/hull assertions had passed before this reader assertion. No producer change.

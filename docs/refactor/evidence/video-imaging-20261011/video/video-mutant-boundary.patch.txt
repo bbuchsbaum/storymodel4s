@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+index e9d4db52..33184b70 100644
+--- a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+@@ -13,7 +13,7 @@ object MediaCaptionSourceCodec:
+   private def render(j: Json): String = Canonical.printer.copy(dropNullValues = false).print(j)
+ 
+   /** A checked internal join preserves Draft origin and separates sample coverage from hulls. */
+-  final class Imported private[MediaCaptionSourceCodec] (
++  final class Imported (
+       val view: TimedSourceView,
+       val document: Json,
+       val evidence: Vector[CaptionEvidence],

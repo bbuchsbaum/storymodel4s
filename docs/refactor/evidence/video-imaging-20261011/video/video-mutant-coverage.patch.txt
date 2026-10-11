@@ -1,0 +1,11 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+index e9d4db52..f8583e27 100644
+--- a/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/mediacaptionsource.scala
+@@ -225,5 +225,5 @@ object MediaCaptionSourceCodec:
+         captions.map(_._1).distinct.size == captions.size,
+         "duplicate caption extents"
+       )
+-      examined = captions.flatMap(_._2.captions.head.frames).distinct.sorted.map(samples(_).ordinal)
++      examined = captions.flatMap(_._2.captions.head.frames).distinct.sorted
+     yield Part(occurrence, bundle, count, samples, captions, examined)

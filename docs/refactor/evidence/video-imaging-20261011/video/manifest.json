@@ -1,0 +1,255 @@
+{
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "files": [
+    {
+      "path": "qualify-video.py",
+      "sha256": "6f7858e55928d12e381b73f579aacf1fae83fa689f56f56df5f28d673ba77bed",
+      "bytes": 4813
+    },
+    {
+      "path": "read-video-workspace.py",
+      "sha256": "fd08974f1beb3fcb624819331897b6b8e96806a2da99d24265450057ad6d8811",
+      "bytes": 2599
+    },
+    {
+      "path": "video-consumer-baseline.json",
+      "sha256": "61fc90db1acef05c2b43745b2b0fc704a20d894f089eed9ae6cddd51cb3870ba",
+      "bytes": 1337
+    },
+    {
+      "path": "video-consumer-postcheck.json",
+      "sha256": "4bd62a605880b8dfea5ace418e1454d9a3b1ec32cf0d0cd9962d84d53982552b",
+      "bytes": 122
+    },
+    {
+      "path": "video-files.json",
+      "sha256": "b92bebb346936335545a614eafd900c6c32ee5bb4df30e7a546c6e26219ccfe9",
+      "bytes": 892
+    },
+    {
+      "path": "video-focused-01.log.gz",
+      "sha256": "3715e0039669bba1f9b6eba58f487ef7a6ec9a8ecf1875418251cdfcdf9ba322",
+      "bytes": 2202
+    },
+    {
+      "path": "video-focused-01.log.meta.json",
+      "sha256": "0b94083a9b00bcbf72d0f7a93f9aa7fbb4cce7c471d4767a04ffefd4ea7f2ced",
+      "bytes": 822
+    },
+    {
+      "path": "video-focused-02.log.gz",
+      "sha256": "5bef4e01ff7f96372cb9e6672aab8c5e3468ee6383d017479d77144ff6bcc16e",
+      "bytes": 2107
+    },
+    {
+      "path": "video-focused-02.log.meta.json",
+      "sha256": "b4f48106caa2f2689112eaea8cc19e1470a0f3d54d836ad9298031318ef6789a",
+      "bytes": 777
+    },
+    {
+      "path": "video-focused-03.log.gz",
+      "sha256": "f26fea27836dfc53286fbda4d43d6d55c4cb52e4aa49eace123faca071a3545e",
+      "bytes": 2171
+    },
+    {
+      "path": "video-focused-03.log.meta.json",
+      "sha256": "8369b67f5aff8ad14461bdd07947f5374096f21e8ab73fe44818e65270b110db",
+      "bytes": 965
+    },
+    {
+      "path": "video-independent-readback.json",
+      "sha256": "e5099cb791f1669aae9e0aba0122a0090fd8beda1f88f1557bed226a78120eb0",
+      "bytes": 850
+    },
+    {
+      "path": "video-mutant-boundary.log.gz",
+      "sha256": "9d76c9e20215c41a0c428c8f7b00f996f41ecf9eac83c88bfbe557c6c3cf8a73",
+      "bytes": 999
+    },
+    {
+      "path": "video-mutant-boundary.log.meta.json",
+      "sha256": "f21d73892a03d2987314ee6cf25ae83b248896cb51e7eba786564f3c47d3c168",
+      "bytes": 895
+    },
+    {
+      "path": "video-mutant-boundary.patch.txt",
+      "sha256": "c434b2dc6d6810808a9cb68d3f7b747c58ac21cd28389b4a14bb47586329b23b",
+      "bytes": 759
+    },
+    {
+      "path": "video-mutant-budget.log.gz",
+      "sha256": "63ecf7e890199b2acffb543a8fbe86dcc8c176e10f212b13f9f3aecb9769a9a4",
+      "bytes": 1200
+    },
+    {
+      "path": "video-mutant-budget.log.meta.json",
+      "sha256": "990205bb1b59694e93cf6ca734d46312261d3044fc0b02d2f5955c2656bb5eeb",
+      "bytes": 680
+    },
+    {
+      "path": "video-mutant-budget.patch.txt",
+      "sha256": "f3de5b5c1838f7a51b44c55819ad287f7f6b2427ca4cb6ae67374b66a5956195",
+      "bytes": 731
+    },
+    {
+      "path": "video-mutant-caption-hull.log.gz",
+      "sha256": "3a3076cac15f0047a3d4205ed8e198cbc536f3511f850f9732c614ec70ed9ebc",
+      "bytes": 1970
+    },
+    {
+      "path": "video-mutant-caption-hull.log.meta.json",
+      "sha256": "aa60ef91e9d75e5bdd5fbb9b88db9e20435f7bc8f86e280197de661f8c137f00",
+      "bytes": 724
+    },
+    {
+      "path": "video-mutant-caption-hull.patch.txt",
+      "sha256": "2b0f6269918ad33cf2de03878d57dcf1767b6138f95db59509949af88de8cfd8",
+      "bytes": 891
+    },
+    {
+      "path": "video-mutant-coverage.log.gz",
+      "sha256": "1fe31c29ff6481058f610743d105c1463e8e26b97dbe63c87861118332c835e5",
+      "bytes": 1123
+    },
+    {
+      "path": "video-mutant-coverage.log.meta.json",
+      "sha256": "14e79df154c22c0dfd5cf619be40a5c27c0f8131ee54cd025b7b1308336055b7",
+      "bytes": 720
+    },
+    {
+      "path": "video-mutant-coverage.patch.txt",
+      "sha256": "bdcb87ea521394031c1301e471a9513b974ee0678ea8dc2b2b6afaca3bf4084a",
+      "bytes": 729
+    },
+    {
+      "path": "video-mutant-first-endpoint.log.gz",
+      "sha256": "52d8756d12d09a79cf8d35191a4e52f98b78e9c3d08007f17c15520cd9ff2436",
+      "bytes": 1974
+    },
+    {
+      "path": "video-mutant-first-endpoint.log.meta.json",
+      "sha256": "9aab679308cacad32469a5caf17497f08cc2eca06fdad579ba01f9584c903136",
+      "bytes": 726
+    },
+    {
+      "path": "video-mutant-first-endpoint.patch.txt",
+      "sha256": "ac0c974ab09cf3a2f1648f65de185e97e1026be7d96cbab52ca192e90e3bb553",
+      "bytes": 685
+    },
+    {
+      "path": "video-mutant-last-endpoint.log.gz",
+      "sha256": "498905087c2faddb5c364b68fee5deb7710e0c04f6a1f7417d7d66a40ab28c64",
+      "bytes": 2004
+    },
+    {
+      "path": "video-mutant-last-endpoint.log.meta.json",
+      "sha256": "fef2583a721833a42e2e39a5596c3a1a37a7f9265363ed206dda8768e70a8919",
+      "bytes": 725
+    },
+    {
+      "path": "video-mutant-last-endpoint.patch.txt",
+      "sha256": "98d18b26808b214006a46745faf965bb2661f54e5799ac209352799731377d62",
+      "bytes": 687
+    },
+    {
+      "path": "video-mutant-model.log.gz",
+      "sha256": "b603383e64e7062b4c1a3f7a6ef5650162c2b96cbac713bfbfe5a576bec92ea9",
+      "bytes": 1173
+    },
+    {
+      "path": "video-mutant-model.log.meta.json",
+      "sha256": "88b9f87ce7e886f0fa418726a8fe895346238e913cabe66d0a678fb7a7222883",
+      "bytes": 679
+    },
+    {
+      "path": "video-mutant-model.patch.txt",
+      "sha256": "2fecb90a6daf527f6a18ffe5b7f00197c42d008d3a81f9b74a7a6ddcfc6e106e",
+      "bytes": 822
+    },
+    {
+      "path": "video-mutant-order.log.gz",
+      "sha256": "1a9737c81ad37b21ac4049cfa6c7ac3c8b4bb14c0b66d133f8c5a15785f236e9",
+      "bytes": 2148
+    },
+    {
+      "path": "video-mutant-order.log.meta.json",
+      "sha256": "e0cf199a3afe459538e9c0c9a7cf5b6f4899f1802f69445e151772265f6bbbd6",
+      "bytes": 717
+    },
+    {
+      "path": "video-mutant-order.patch.txt",
+      "sha256": "e407323d092ad2542d616dbcc1269593d8a297fcdce9a89a27f617b1d84f7388",
+      "bytes": 636
+    },
+    {
+      "path": "video-process-01.log.gz",
+      "sha256": "691972d608b2f90866f3f57c28519f3547d067b46f7005007c1516dbf022a3f0",
+      "bytes": 955
+    },
+    {
+      "path": "video-process-01.log.meta.json",
+      "sha256": "70900e5abb3d1bd80385c74c2203baf730424e71007c2089be24817e2e748c51",
+      "bytes": 696
+    },
+    {
+      "path": "video-progress.txt",
+      "sha256": "f96a9bdc656fce9a852a8e2679b2408569ed39326ef11a167740c5f580f26480",
+      "bytes": 790
+    },
+    {
+      "path": "video-qualification.json",
+      "sha256": "927d83c8cae1c06913fe1440167bcade1a2deabb6840978f8fd037b503b63be0",
+      "bytes": 2311
+    },
+    {
+      "path": "video-reader-correction.txt",
+      "sha256": "7c864ed7cf8cdae99762dcc88b34397d68c0312bc3fb51251aeff30dbb7883ec",
+      "bytes": 296
+    },
+    {
+      "path": "video-restored-checkAll.log.gz",
+      "sha256": "d216bdaa8c617b76de8dc7bd67af31416bafef225644e107686df45f7aa0dc40",
+      "bytes": 237459
+    },
+    {
+      "path": "video-restored-checkAll.log.meta.json",
+      "sha256": "3196359abf1127d201e7f986721eafb156a4af813a728cf70745e66b96442ca4",
+      "bytes": 660
+    },
+    {
+      "path": "video-scope.txt",
+      "sha256": "ce96c37a64ddb0a085bfae51c328920e84776acd37f5eb1cba99fca62e0befef",
+      "bytes": 1516
+    },
+    {
+      "path": "video-source-reviews.txt",
+      "sha256": "f3c31244a24bd4008076649eb0ac1d14c08adfe0c6ef93a36463c7c2339c7741",
+      "bytes": 1795
+    },
+    {
+      "path": "video-storyatlas.log.gz",
+      "sha256": "7039ff6e0d8f3ce983107e55a7e3b6286dfda6a77519471c9a0a2429a30c52e0",
+      "bytes": 2547
+    },
+    {
+      "path": "video-storyatlas.log.meta.json",
+      "sha256": "a722adf894b5680ff816ce86f90c135d85219c1fbf84fa7e52a77d555b1d3fee",
+      "bytes": 940
+    },
+    {
+      "path": "video-workspace-export.log.gz",
+      "sha256": "f50f0bcef3a42a6a90843d1ef9eb08622f715c6bdd60740d96b236c45dbe06ed",
+      "bytes": 893
+    },
+    {
+      "path": "video-workspace-export.log.meta.json",
+      "sha256": "1a78f1b27d97a059bc02535c563cfecda2f486a5cb84998788c38662a2065d02",
+      "bytes": 883
+    },
+    {
+      "path": "video-workspace.json",
+      "sha256": "f10bfc5f641d1b03cca10d9ec3cb50d0850c75dda962d820f0c488c881835c19",
+      "bytes": 62114
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/videoacquisition.scala b/media/src/main/scala/storymodel4s/media/videoacquisition.scala
+index 7bd000cc..52f9cf0e 100644
+--- a/media/src/main/scala/storymodel4s/media/videoacquisition.scala
++++ b/media/src/main/scala/storymodel4s/media/videoacquisition.scala
+@@ -380,7 +380,7 @@ object VideoAcquisition:
+         .toRight(error("stream", "selected stream is not a declared picture stream"))
+       index <- FrameSet.admittedStream(probe, stream, geometry)
+       _ <- requireThat(
+-        BigInt(geometry.frameBytes) * index.entries.size <= BigInt(budget),
++        BigInt(budget) > 0,
+         "storage-budget",
+         "full detector decode exceeds maxDecodedBytes"
+       )
