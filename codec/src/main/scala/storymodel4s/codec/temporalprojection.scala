@@ -92,6 +92,41 @@ object TemporalProjectionCodecs:
       Json.obj("bin" -> Json.fromString(bin.toString), "lower" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(bounds._1)), "upper" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(bounds._2)))
     }))
   )
+  private def support(value: PlaybackSupport): Json = Json.obj(
+    "intervals" -> Json.fromValues(value.intervals.map(i => Json.obj(
+      "start" -> Json.fromString(i.start.toString), "endExclusive" -> Json.fromString(i.endExclusive.toString)
+    ))),
+    "points" -> Json.fromValues(value.points.map(p => Json.fromString(p.at.toString)))
+  )
+  private def component(value: TemporalQuery.Component): Json =
+    val location = value.location match
+      case TemporalQuery.Location.Resolved(domain) => Json.obj(
+        "kind" -> Json.fromString("resolved"),
+        "target" -> Json.fromString(domain.declaration.target.key),
+        "support" -> domain.availability.fold(
+          unavailable => Json.obj("unavailable" -> Json.fromString(unavailable.toString)),
+          support
+        ),
+        "allocation" -> domain.allocation.fold(
+          unavailable => Json.obj("unavailable" -> Json.fromString(unavailable.toString)),
+          allocation
+        )
+      )
+      case TemporalQuery.Location.Unresolved(reason) =>
+        Json.obj("kind" -> Json.fromString("unresolved"), "reason" -> Json.fromString(reason.toString))
+      case TemporalQuery.Location.External(state) =>
+        Json.obj("kind" -> Json.fromString("external"), "state" -> Json.fromString(state.toString))
+    Json.obj(
+      "alternative" -> Json.fromString(value.alternative.key),
+      "weight" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(value.weight)),
+      "location" -> location
+    )
+  private def contribution(value: TemporalQuery.Contribution): Json =
+    component(value.component).deepMerge(Json.obj(
+      "lower" -> value.resolvedBounds.fold(Json.Null)(b => Json.fromString(storymodel4s.features.CanonicalDouble.render(b.lower))),
+      "upper" -> value.resolvedBounds.fold(Json.Null)(b => Json.fromString(storymodel4s.features.CanonicalDouble.render(b.upper))),
+      "allocated" -> value.allocated.fold(Json.Null)(v => Json.fromString(storymodel4s.features.CanonicalDouble.render(v)))
+    ))
 
   def toJson(value: TemporalProjection.Projection): Json =
     val base = Json.obj(
@@ -124,8 +159,17 @@ object TemporalProjectionCodecs:
           "allocatedSource" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(g.prepared.ledger.allocatedSource)),
           "supportWithoutAllocation" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(g.prepared.ledger.supportWithoutAllocation)),
           "unavailableLocation" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(g.prepared.ledger.unavailableLocation)),
-          "rowBudget" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(g.prepared.ledger.rowBudget))
-        )
+          "rowBudget" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(g.prepared.ledger.rowBudget)),
+          "discrepancy" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(g.allocationDiscrepancy)),
+          "external" -> Json.fromValues(g.prepared.ledger.external.map { (state, mass) => Json.obj(
+            "state" -> Json.fromString(state.toString),
+            "mass" -> Json.fromString(storymodel4s.features.CanonicalDouble.render(mass))
+          )})
+        ),
+        "components" -> Json.fromValues(g.prepared.components.map(component)),
+        "cells" -> Json.fromValues(g.cells.toVector.sortBy(_._1).flatMap { (bin, values) =>
+          values.map(value => Json.obj("bin" -> Json.fromString(bin.toString), "component" -> contribution(value)))
+        })
       )),
       "exposure" -> row.exposure.fold(Json.Null)(e => Json.obj(
         "duration" -> fraction(e.duration),
@@ -136,7 +180,7 @@ object TemporalProjectionCodecs:
       )),
       "durationWeighted" -> quantities(row.durationWeighted),
       "durationWeightedBounds" -> quantityBounds(row.durationWeightedBounds)
-    )))
+    ))))
     value.exposure.fold(base)(e => base.deepMerge(Json.obj("exposureReadout" -> Json.obj(
       "start" -> rational(e.start),
       "endExclusive" -> rational(e.endExclusive),
