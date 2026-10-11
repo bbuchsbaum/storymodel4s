@@ -10,7 +10,7 @@ class TemporalProjectionCodecSuite extends FunSuite:
 
   private def request(
       m: MappingResult,
-      allocation: TemporalQuery.Allocation = TemporalQuery.Allocation.Mixture(0.5)
+      allocation: TemporalQuery.Allocation
   ): TemporalProjection.Request =
     val bundle = m.source.bundles.head.asInstanceOf[BundleEntry.Media].bundle
     TemporalProjection.Request(
