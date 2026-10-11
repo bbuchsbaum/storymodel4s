@@ -63,13 +63,6 @@ object TemporalProjectionCodecs:
     "request" -> request(value)
   ))
 
-  private def axis(value: PresentationAxis): Json = Json.obj(
-    "id" -> Json.fromString(value.id.value),
-    "fingerprint" -> Json.fromString(value.fingerprint.hex),
-    "kind" -> Json.fromString(value.kind.toString),
-    "extent" -> Json.fromString(value.extent.toString),
-    "timebase" -> value.timebase.fold(Json.Null)(v => Json.fromString(v.toString))
-  )
   private def region(value: TemporalQuery.Region): Json = Json.obj(
     "axis" -> Json.fromString(value.axis.id.value),
     "intervals" -> Json.fromValues(value.geometry.toVector.flatMap(_.intervals).map(i => Json.obj(
@@ -137,7 +130,7 @@ object TemporalProjectionCodecs:
     "request" -> request(value.request),
     "timingState" -> Json.fromString(value.timingState.toString),
     "timing" -> value.timing.fold(Json.Null)(t => Json.fromString(t.digest.hex)),
-    "coordinate" -> axis(value.coordinate.axis),
+    "coordinate" -> MappingSourceWire.axis(value.coordinate.axis),
     "regions" -> Json.fromValues(value.regions.map(region)),
     "clockUncertainty" -> Json.fromString(value.clockUncertainty.toString),
     "jointPath" -> Json.fromString(value.jointPath.toString),
