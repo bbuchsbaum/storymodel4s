@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/caption.scala b/media/src/main/scala/storymodel4s/media/caption.scala
+index d4c2be8e..9463ebd5 100644
+--- a/media/src/main/scala/storymodel4s/media/caption.scala
++++ b/media/src/main/scala/storymodel4s/media/caption.scala
+@@ -687,7 +687,7 @@ object CaptionSearch:
+           s"request ${request.requestId} was issued for another frame selection"
+         )
+       )
+-    else if request.frameIdentity.isEmpty && frames.isInstanceOf[SampledFrameSet] then
++    else if false && request.frameIdentity.isEmpty && frames.isInstanceOf[SampledFrameSet] then
+       // A v1 request has no selection identity. It is replayable only against a complete FrameSet:
+       // accepting it for samples would silently conflate distinct selections with identical bytes.
+       Left(

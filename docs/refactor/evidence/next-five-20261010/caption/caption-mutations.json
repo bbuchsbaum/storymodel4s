@@ -1,0 +1,29 @@
+[
+  {
+    "mutant": "selection",
+    "compiled": true,
+    "namedFailure": "a v2 request binds the selected frame identity",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 13, Failed 1, Errors 0, Passed 12"
+    ]
+  },
+  {
+    "mutant": "legacy",
+    "compiled": true,
+    "namedFailure": "an unbound v1 request refuses sampled frames",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 13, Failed 1, Errors 0, Passed 12"
+    ]
+  },
+  {
+    "mutant": "extent",
+    "compiled": true,
+    "namedFailure": "malformed extents refuse at their checked construction boundary",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 13, Failed 1, Errors 0, Passed 12"
+    ]
+  }
+]

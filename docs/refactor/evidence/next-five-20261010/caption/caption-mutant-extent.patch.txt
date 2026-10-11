@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/caption.scala b/media/src/main/scala/storymodel4s/media/caption.scala
+index d4c2be8e..9e780f98 100644
+--- a/media/src/main/scala/storymodel4s/media/caption.scala
++++ b/media/src/main/scala/storymodel4s/media/caption.scala
+@@ -155,7 +155,7 @@ object CaptionExtent:
+     else if ordinals.isEmpty then
+       Left(DomainError.InvariantViolation("extent/ordinals", s"extent $id names no frames"))
+     else if ordinals.exists(_ < 0) || ordinals.iterator.sliding(2).exists {
+-        case Seq(a, b) => b <= a
++        case Seq(a, b) => b < a
+         case _         => false
+       }
+     then

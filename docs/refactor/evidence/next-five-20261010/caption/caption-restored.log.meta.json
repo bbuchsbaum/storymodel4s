@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:44:42.202510+00:00",
+  "finished_utc": "2026-10-11T04:44:59.847384+00:00",
+  "duration_seconds": 17.644633,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "media/testOnly *SampledCaptionConsumerSuite *CaptionExtentBoundarySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-caption-nextfive",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/caption-restored.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 2400.0,
+  "log_bytes": 2663
+}

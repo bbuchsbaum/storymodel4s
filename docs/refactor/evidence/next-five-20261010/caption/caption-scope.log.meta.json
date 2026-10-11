@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:40:37.465521+00:00",
+  "finished_utc": "2026-10-11T04:40:40.025730+00:00",
+  "duration_seconds": 2.560008,
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "9b7e830c",
+    "8845f55cfcb1412eb1ada9bd6c90a947980fce29"
+  ],
+  "cwd": "/private/tmp/storymodel4s-caption-nextfive",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/caption-scope.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 2400.0,
+  "log_bytes": 725
+}

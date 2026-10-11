@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/caption.scala b/media/src/main/scala/storymodel4s/media/caption.scala
+index d4c2be8e..a04ca401 100644
+--- a/media/src/main/scala/storymodel4s/media/caption.scala
++++ b/media/src/main/scala/storymodel4s/media/caption.scala
+@@ -680,7 +680,7 @@ object CaptionSearch:
+           s"request ${request.requestId} does not describe frame set ${frames.identity.short()}"
+         )
+       )
+-    else if request.frameIdentity.exists(_ != frames.identity) then
++    else if request.frameIdentity.exists(_ => false) then
+       Left(
+         DomainError.InvariantViolation(
+           "caption/frame-selection",
