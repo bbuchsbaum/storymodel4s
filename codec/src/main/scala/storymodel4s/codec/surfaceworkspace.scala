@@ -17,7 +17,7 @@ import HsmmResultCodec.given
 object SurfaceWorkspaceCodecs:
   enum SourceKind:
     case Text(kind: SurfaceUnitKind)
-    case TimedAnnotations, NarrativeModel
+    case TimedAnnotations, NarrativeModel, VideoCaptions
 
   private type Result[A] = Either[WorkspaceRefusal, A]
   private def admitted[E, A](value: Either[E, A]): Result[A] =
@@ -74,6 +74,10 @@ object SurfaceWorkspaceCodecs:
       val producerRevision: String,
       private val canonicalArchive: String
   ):
+    /** Portable imported Draft evidence; this never mints a JVM execution witness. */
+    val mediaCaptions: Option[MediaCaptionSourceCodec.Imported] = sourceKind match
+      case SourceKind.VideoCaptions => MediaCaptionSourceCodec.decode(sourceArtifact).toOption
+      case _                        => None
     val sourceEdition: Checksum = Checksum.ofText(sourceArtifact)
     val identity: Checksum = Checksum.ofText(canonicalArchive)
 
@@ -109,7 +113,8 @@ object SurfaceWorkspaceCodecs:
     "kind" -> Json.fromString(kind match
       case SourceKind.Text(_)          => "text"
       case SourceKind.TimedAnnotations => "timed-annotations"
-      case SourceKind.NarrativeModel   => "narrative-model"),
+      case SourceKind.NarrativeModel   => "narrative-model"
+      case SourceKind.VideoCaptions    => "video-captions"),
     "segmentKind" -> (kind match
       case SourceKind.Text(k) => Json.fromString(k.toString)
       case _                  => Json.Null),
@@ -149,6 +154,15 @@ object SurfaceWorkspaceCodecs:
               SourceKind.TimedAnnotations,
               v: SourceView,
               v.representation,
+              Option.empty[TextModel[ModelStatus.Validated]]
+            )
+          )
+        case "video-captions" =>
+          admitted(MediaCaptionSourceCodec.decode(artifact)).map(v =>
+            (
+              SourceKind.VideoCaptions,
+              v.view: SourceView,
+              v.view.representation,
               Option.empty[TextModel[ModelStatus.Validated]]
             )
           )

@@ -38,6 +38,7 @@ object StudyPreparation:
     case StoryModel(path: String)
     case TimedAnnotations(path: String, parts: String)
     case CheckedTimed(path: String)
+    case CheckedVideo(path: String)
     case Video(path: String)
 
   /** A request selects a checked adapter, never grants publication by assertion. */
@@ -94,6 +95,10 @@ object StudyPreparation:
       case _                    => None
     private val model: Option[TextModel[ModelStatus.Validated]] =
       StoryModelCodec.decode(artifact).toOption.flatMap(StoryValidator.validate(_).validated)
+
+    /** Imported caption provenance is retained without reconstructing media execution authority. */
+    val mediaCaptions: Option[storymodel4s.codec.MediaCaptionSourceCodec.Imported] =
+      storymodel4s.codec.MediaCaptionSourceCodec.decode(artifact).toOption
 
     /** Existing source exchange is available only when the input was a checked text package. */
     def textSourceExchange: Option[TextSourceArtifactCodec.Bundle] =
@@ -251,6 +256,15 @@ object StudyPreparation:
             artifact <- utf8(bytes)
             view <- TimedAnnotationInput.decode(artifact).left.map(_ => Refusal.InvalidSource)
           yield new Source(view, view.representation, artifact)
+        case SourceInput.CheckedVideo(path) =>
+          for
+            bytes <- read(root, path)
+            artifact <- utf8(bytes)
+            imported <- storymodel4s.codec.MediaCaptionSourceCodec
+              .decode(artifact)
+              .left
+              .map(_ => Refusal.InvalidSource)
+          yield new Source(imported.view, imported.view.representation, imported.artifact)
       outcomes = config.recalls.map { input =>
         val transcript = read(root, input.path)
         val timing = input.timing.map(path => read(root, path))
@@ -524,6 +538,9 @@ object StudyPreparation:
         else if format == "checked-timed" then
           require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
             .map(_ => SourceInput.CheckedTimed(path))
+        else if format == "checked-video" then
+          require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
+            .map(_ => SourceInput.CheckedVideo(path))
         else if format == "story-model" then
           require(s.asObject.exists(_.keys.toSet == Set("format", "path")), Refusal.InvalidConfig)
             .map(_ => SourceInput.StoryModel(path))

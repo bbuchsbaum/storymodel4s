@@ -1258,3 +1258,18 @@ Rejected alternatives: seek timestamps as evidence of returned frames, a count-o
 sampled bytes, and replay metadata as proof that extraction executed. The result establishes
 this tool execution's timestamp correspondence; it does not establish caption accuracy or turn
 Draft observations into accepted narrative claims.
+
+### 2026-10-11 — public prepared media-caption source
+
+The raw-video command produces the checked multipart package and a media-caption variant of the
+prepared timed-source contract. `MediaCaptionSourceCodec` reconstructs native `FilmEdition`
+bundles and `TimedSourceView` descriptions, retaining recipe/model/worker receipts and separate
+sampled/examined coverage. Portable import checks declared consistency and remains imported
+`Draft`; it does not recreate JVM execution or byte-verification authority. Full media replay
+continues through `CaptionPackage.load`. Study and workspace inputs name this origin explicitly.
+Repeated identical local bundle occurrences refuse projection until an explicit composition is
+provided; per-part children of crossing extents remain located while their aggregate group has
+no invented cross-part interval.
+
+Rejected alternatives: converting machine descriptions into annotation-table clocks, dropping
+provenance after constructing a bare timed view, and treating proposal hulls as observed coverage.
