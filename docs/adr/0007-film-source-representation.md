@@ -1240,3 +1240,21 @@ of cross-part membership, pinning only media bytes while allowing request/envelo
 and treating all stored samples as examined. Existing single-part and historical bench formats
 remain replayable through their own APIs. Executed extraction correspondence is the separate S3
 acceptance; this loader does not infer it from a self-consistent replay.
+
+### 2026-10-11 — executed ordinal extraction (AC4 S3)
+
+`SampledExtraction.run` selects decoded presentation ordinals with ffmpeg's streaming `select`
+filter, preserves native timestamps, and checks every `showinfo` timestamp and its rational
+clock against the selected packet index. Its checked result binds the observed transcript,
+actual tool realization, exact selection arguments, input identity and emitted byte digest.
+Input and output are streamed; an existing output is refused and a temporary output is published
+only after correspondence and byte-count checks. Automatic display rotation is disabled so stored
+pixel geometry is preserved. The demuxer allowlist excludes playlists and image sequences that
+could reference unpinned local files. MOV external data references remain disabled by the recorded
+binary's default. The result supplies a replay frames envelope and a separate execution transcript
+with the selection and observed PTS. The existing full-decode API is unchanged.
+
+Rejected alternatives: seek timestamps as evidence of returned frames, a count-only check over
+sampled bytes, and replay metadata as proof that extraction executed. The result establishes
+this tool execution's timestamp correspondence; it does not establish caption accuracy or turn
+Draft observations into accepted narrative claims.
