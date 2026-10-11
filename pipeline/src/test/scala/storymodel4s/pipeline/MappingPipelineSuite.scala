@@ -305,3 +305,88 @@ class MappingPipelineSuite extends FunSuite:
       assert(!Files.exists(root.resolve("unregistered")))
     }
   }
+
+  test("zero and all-refused batches retain requested missing capabilities and CLI status") {
+    inTemp { root =>
+      val base = prepared(root)
+      val requested = config.copy(requested =
+        Vector(
+          MappingPipeline.Capability.Mapping,
+          MappingPipeline.Capability.Organization,
+          MappingPipeline.Capability.Order
+        )
+      )
+      val empty = right(StudyPreparation.prepare(root, base.config.copy(recalls = Vector.empty)))
+      val failed = right(
+        StudyPreparation.prepare(
+          root,
+          base.config.copy(recalls = Vector(StudyPreparation.RecallInput("p1", "s1", "absent.txt")))
+        )
+      )
+      Vector(empty -> 0, failed -> 1).foreach { (input, count) =>
+        val batch = right(MappingPipeline.batch(input, requested))
+        val fields = MappingPipeline.inspect(batch).hcursor
+        assertEquals(fields.get[Int]("attempts").toOption, Some(count))
+        assertEquals(fields.get[Int]("completed").toOption, Some(0))
+        assertEquals(
+          fields.get[Vector[String]]("missingCapabilities").toOption,
+          Some(Vector("Organization", "Order"))
+        )
+      }
+      val template = io.circe.parser.parse(StudyCli.Template).toOption.get
+      write(root, "study.json", template.mapObject(_.add("recalls", io.circe.Json.arr())).noSpaces)
+      write(
+        root,
+        "mapping.json",
+        MappingCli.Template.replace("[\"Mapping\"]", "[\"Mapping\",\"Organization\"]")
+      )
+      var receipt = ""
+      assertEquals(
+        MappingCli.run(
+          List(
+            "run",
+            root.resolve("study.json").toString,
+            root.resolve("mapping.json").toString,
+            root.resolve("empty-run").toString
+          ),
+          s => receipt = s,
+          _ => ()
+        ),
+        4
+      )
+      assertEquals(
+        io.circe.parser
+          .parse(receipt)
+          .toOption
+          .get
+          .hcursor
+          .get[Vector[String]]("missingCapabilities")
+          .toOption,
+        Some(Vector("Organization"))
+      )
+      write(root, "study.json", StudyCli.Template.replace("recall.txt", "absent.txt"))
+      assertEquals(
+        MappingCli.run(
+          List(
+            "run",
+            root.resolve("study.json").toString,
+            root.resolve("mapping.json").toString,
+            root.resolve("failed-run").toString
+          ),
+          s => receipt = s,
+          _ => ()
+        ),
+        3
+      )
+      assertEquals(
+        io.circe.parser
+          .parse(receipt)
+          .toOption
+          .get
+          .hcursor
+          .get[Vector[String]]("missingCapabilities")
+          .toOption,
+        Some(Vector("Organization"))
+      )
+    }
+  }

@@ -393,13 +393,8 @@ object MappingPipeline:
     "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
     "failed" -> Json.fromInt(batch.outcomes.count(_.failure.nonEmpty)),
     "missingCapabilities" -> Json.fromValues(
-      batch.outcomes
-        .flatMap(_.run)
-        .flatMap { run =>
-          run.readiness match
-            case Readiness.Ready           => Vector.empty
-            case Readiness.Missing(values) => values
-        }
+      batch.config.requested
+        .filterNot(_ == Capability.Mapping)
         .distinct
         .map(v => Json.fromString(v.toString))
     )
@@ -620,22 +615,19 @@ object MappingCli:
               .publish(outcomes, destination, resume)
               .left
               .map(FacadeFailure.Publication(_, destination))
-      yield (outcomes.outcomes, receipt)
+      yield (outcomes, receipt)
       result match
-        case Left(reason)               => refuse(reason.diagnostic.noSpaces)
-        case Right((outcomes, receipt)) =>
+        case Left(reason)            => refuse(reason.diagnostic.noSpaces)
+        case Right((batch, receipt)) =>
           out(
             Canonical.print(
-              Json.obj(
-                "manifest" -> Json.fromString(receipt.hex),
-                "attempts" -> Json.fromInt(outcomes.size),
-                "completed" -> Json.fromInt(outcomes.count(_.run.nonEmpty))
-              )
+              MappingPipeline
+                .inspect(batch)
+                .deepMerge(Json.obj("manifest" -> Json.fromString(receipt.hex)))
             )
           )
-          if outcomes.exists(_.failure.nonEmpty) then 3
-          else if outcomes.flatMap(_.run).exists(_.readiness != MappingPipeline.Readiness.Ready)
-          then 4
+          if batch.outcomes.exists(_.failure.nonEmpty) then 3
+          else if batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping) then 4
           else 0
     args match
       case List("template")                   => out(Template); 0
