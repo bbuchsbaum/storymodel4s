@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Run one complete story-to-recall comparison and inspect the result.
+description: Analyze ordinary story and recall files, then inspect and export the result.
 sidebar:
   order: 1
 ---
@@ -11,6 +11,9 @@ import { sourceLink } from '../../../lib/provenance';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
+
+export const facadeProgram = readFileSync(resolve(process.cwd(), 'examples/PublicMappingFacade.scala'), 'utf8');
+export const facadeOutput = readFileSync(resolve(process.cwd(), 'examples/mapping-facade.output.txt'), 'utf8');
 
 export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
 export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
@@ -40,9 +43,40 @@ likely route, the mass assigned inside and outside the story, and summaries such
 specificity, and compression. Story and recall records cite exact text. Support-aware estimates
 keep their support, and unavailable estimates remain unavailable.
 
-Today the analysis starts from an existing `StoryModel`. The repository includes a reviewed model
-of *The War of the Ghosts*, which the example below uses. The software that builds a complete model
-from arbitrary prose is under development.
+## Start with ordinary files
+
+`MappingPipeline.analyze` prepares a study from story and recall files, runs the configured mapping,
+and returns a batch with explicit failures and missing capabilities. `inspect` gives a compact
+readout; `exportResults` writes the paired exchange and verifies existing bytes when resuming.
+The lexical baseline supplies mapping only. Requesting Organization or Order retains those missing
+capabilities even when no observation succeeds.
+
+This runnable program creates a fixed synthetic study, analyzes it, exports the exchange, and checks
+resume and overwrite behavior:
+
+<pre><code class="language-scala">{facadeProgram}</code></pre>
+
+From a source checkout, save it as `pipeline/src/main/scala/docsprobe/PublicMappingFacade.scala`, then run:
+
+```sh
+sbt "pipeline/runMain docsprobe.mappingFacade"
+```
+
+Its recorded output is:
+
+<pre><code>{facadeOutput}</code></pre>
+
+The example's text-export admission applies only to its exact synthetic control. Ordinary local
+recall can be analyzed, but exporting recall text needs a matching recorded admission. The
+[facade guide](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guide/mapping-facade.md)
+explains the file layout, refusal diagnostics, and CLI exit statuses. This demonstrates the API
+workflow; it does not establish the baseline's scientific accuracy.
+
+## Work with a structured story model
+
+For graph inference and narrative summaries, the repository also includes a reviewed `StoryModel`
+of *The War of the Ghosts*. The example below starts from that model. Building a complete narrative
+model from arbitrary prose remains under development.
 
 ## What this program does
 

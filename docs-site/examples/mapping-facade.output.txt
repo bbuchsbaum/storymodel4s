@@ -1,0 +1,7 @@
+attempts: 1
+completed: 1
+failed: 0
+missing capabilities: 0
+paired exchange complete: true
+resume verifies identical bytes: true
+existing output refuses overwrite: true

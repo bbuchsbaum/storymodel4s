@@ -91,6 +91,13 @@
       "source": "examples-grakern/StructuralDistance.scala",
       "main": "docsprobe.structuralDistance",
       "output": "examples-grakern/structural-distance.output.txt"
+    },
+    {
+      "id": "mapping-facade",
+      "project": "pipeline",
+      "source": "examples/PublicMappingFacade.scala",
+      "main": "docsprobe.mappingFacade",
+      "output": "examples/mapping-facade.output.txt"
     }
   ]
 }
