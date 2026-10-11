@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T05:19:42.023082+00:00",
+  "finished_utc": "2026-10-11T05:20:06.009273+00:00",
+  "duration_seconds": 23.985848,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/testOnly *TemporalPipelineSuite *TemporalProjectionConsumerContractSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-final-mutant-failed-request-identity.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 4128
+}

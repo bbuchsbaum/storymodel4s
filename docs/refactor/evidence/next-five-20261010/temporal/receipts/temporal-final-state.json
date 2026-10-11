@@ -1,0 +1,66 @@
+{
+  "producerRevision": "c89136192cdde5929bec7900b9e954741e387340",
+  "readerRevision": "59bd1fecac628b6c7667920a5b9d2d79a0d512d2",
+  "sourceDelta": [
+    "tools/test_temporal_projection.py",
+    "tools/verify_temporal_projection.py"
+  ],
+  "qualification": {
+    "temporal-final-gate": {
+      "total": 10411,
+      "failed": 0,
+      "errors": 0,
+      "passed": 10406,
+      "skipped": 5,
+      "cells": 56
+    },
+    "temporal-final-fixtures": {
+      "total": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 0,
+      "skipped": 0,
+      "cells": 0
+    },
+    "temporal-final-reader": {
+      "total": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 0,
+      "skipped": 0,
+      "cells": 0
+    },
+    "temporal-workspace-reader": {
+      "total": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 0,
+      "skipped": 0,
+      "cells": 0
+    },
+    "temporal-consumer": {
+      "total": 488,
+      "failed": 0,
+      "errors": 0,
+      "passed": 488,
+      "skipped": 0,
+      "cells": 10
+    },
+    "temporal-consumer-timed": {
+      "total": 3,
+      "failed": 0,
+      "errors": 0,
+      "passed": 3,
+      "skipped": 0,
+      "cells": 1
+    }
+  },
+  "evidenceStatus": "LocallyObserved",
+  "pushPerformed": false,
+  "hostedCiClaim": false,
+  "browserClaim": false,
+  "scientificEfficacyClaim": false,
+  "sourceReview": "SOURCE PASS at 59bd1fecac628b6c7667920a5b9d2d79a0d512d2; final evidence review separately recorded",
+  "consumerRevision": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "consumerSource": "explicit local source override; source pin not changed"
+}

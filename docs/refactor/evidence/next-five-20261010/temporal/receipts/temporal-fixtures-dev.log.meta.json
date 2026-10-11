@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T05:01:52.013102+00:00",
+  "finished_utc": "2026-10-11T05:02:17.349341+00:00",
+  "duration_seconds": 25.335929,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "codecJVM/Test/runMain storymodel4s.codec.TemporalProjectionFixtures",
+    "pipeline/Test/runMain storymodel4s.pipeline.TemporalPipelineWitness /private/tmp/temporal-pipeline-witness-dev 8f47bd7f235b5bb7e2650116397d0de4125ed068"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-fixtures-dev.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 68897
+}

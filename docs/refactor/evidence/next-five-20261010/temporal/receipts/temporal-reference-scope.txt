@@ -1,0 +1,101 @@
+types defined by this candidate:
+  Allocation
+  AllocationUnavailable
+  Alternative
+  Assumption
+  Batch
+  Bounds
+  Bundle
+  Capability
+  CellType
+  ClockUncertainty
+  Column
+  Component
+  Config
+  Contribution
+  Declaration
+  Disconnected
+  Domain
+  Error
+  JointStatus
+  Ledger
+  Location
+  MappingCli
+  MappingExchange
+  MappingPipeline
+  Measure
+  Outcome
+  Overlap
+  Partition
+  Prepared
+  Projection
+  Ranked
+  Rat
+  Readiness
+  Readout
+  RecallWindow
+  Refusal
+  Region
+  Request
+  Row
+  Run
+  Table
+  Target
+  TemporalConcentration
+  TemporalExposure
+  TemporalExposureBoundarySuite
+  TemporalGrid
+  TemporalGridBoundarySuite
+  TemporalGridView
+  TemporalGridViewSuite
+  TemporalPipelineFixture
+  TemporalPipelineSuite
+  TemporalPipelineWitness
+  TemporalProjection
+  TemporalProjectionBoundarySuite
+  TemporalProjectionCodecSuite
+  TemporalProjectionCodecs
+  TemporalProjectionConsumerContractSuite
+  TemporalProjectionFixtures
+  TemporalQuery
+  TemporalQueryCodecSuite
+  TemporalQueryCodecs
+  TemporalQueryFixture
+  TemporalQuerySuite
+  TimingState
+  Unavailable
+  UnitReadout
+  Window
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  amr-interop
+  codec
+  core
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  embed-core
+  embed-grakern
+  embed-onnx
+  features
+  fixtures
+  interview
+  laws
+  media
+  pipeline
+  proposition
+  provider-agent
+  provider-parser
+  recall
+  story
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedCoreJVM/test; embedGrakern/test; embedOnnx/test; featuresJVM/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

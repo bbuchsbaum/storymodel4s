@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T04:53:49.584006+00:00",
+  "finished_utc": "2026-10-11T04:54:13.020578+00:00",
+  "duration_seconds": 23.436261,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly *TemporalQuerySuite *TemporalProjectionBoundarySuite",
+    "codecJVM/testOnly *TemporalProjectionCodecSuite",
+    "pipeline/testOnly *TemporalPipelineSuite *TemporalProjectionConsumerContractSuite",
+    "scalafmtAll"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-integration-dev-2.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3130
+}

@@ -1,0 +1,17 @@
+{
+  "mutationRevision": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+  "producerRevision": "c89136192cdde5929bec7900b9e954741e387340",
+  "byteIdenticalInputs": {
+    "align/src/main/scala/storymodel4s/align/temporalquery.scala": "396edc5701efa172afb2d08a467e6706712fc6e11ccd11a17d8dd507fbad8707",
+    "align/src/main/scala/storymodel4s/align/temporalexposure.scala": "2b2349f005fdc1087c6647d505a2eb14f972550ba8c5510ded87d42dcb480305",
+    "align/src/main/scala/storymodel4s/align/temporalgrid.scala": "7007e6428b1eea09049636496476705627ac628ce26f54f5b90401469871b5bc",
+    "align/src/main/scala/storymodel4s/align/temporalconcentration.scala": "4d63743512dcb599a088ca32b2823c4babedd2cd19626abc5d29b31ef8873b61",
+    "align/src/main/scala/storymodel4s/align/temporalprojection.scala": "13b424928d4155409c7da71a31fa984453015e101f3ac3d5d0c426606232723a",
+    "view/src/main/scala/storymodel4s/view/temporalgrid.scala": "a27ccb01aa305769bba2b22de61989814bd2f7da1c2e9609eb25183b7a6b23a3",
+    "align/src/test/scala/storymodel4s/align/TemporalQuerySuite.scala": "ed69bc91f222a516cb98e29a277ccd7155fb487de1a43595f6deb67310c9daa8",
+    "align/src/test/scala/storymodel4s/probes/TemporalExposureBoundarySuite.scala": "f1313a12b85966197dad64105f16176089985c38fe5538c91253be0e930b915a",
+    "align/src/test/scala/storymodel4s/probes/TemporalGridBoundarySuite.scala": "c8db47d779667f216c1918bbe295b8c0189da4b532a9825792091dc67b6fe7f9",
+    "align/src/test/scala/storymodel4s/probes/TemporalProjectionBoundarySuite.scala": "6d3423e524257242395ca46b61527b360392281f39382cd70f34b930fb5703d4",
+    "codec/src/test/scala/storymodel4s/codec/TemporalGridViewSuite.scala": "0df97ed09cda33dfb64fa2f50438ff4ce999b99f58d0a4e86a888ce94b4d1d08"
+  }
+}

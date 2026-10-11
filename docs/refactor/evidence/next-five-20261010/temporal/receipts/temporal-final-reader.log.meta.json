@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T05:39:35.972055+00:00",
+  "finished_utc": "2026-10-11T05:39:36.122408+00:00",
+  "duration_seconds": 0.150236,
+  "command": [
+    "python3",
+    "tools/test_temporal_projection.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-final-fixtures.log",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-facade-fixtures"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-final-reader.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 1230
+}

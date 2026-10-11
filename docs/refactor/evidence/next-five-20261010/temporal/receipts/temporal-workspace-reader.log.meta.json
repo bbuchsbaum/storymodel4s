@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T05:39:36.169237+00:00",
+  "finished_utc": "2026-10-11T05:39:36.257294+00:00",
+  "duration_seconds": 0.087924,
+  "command": [
+    "python3",
+    "examples/mapping/test_workspace.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-workspace-fixtures"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-workspace-reader.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 1273
+}

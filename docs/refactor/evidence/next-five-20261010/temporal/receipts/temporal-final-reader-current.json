@@ -1,0 +1,16 @@
+{
+  "readerRevision": "59bd1fecac628b6c7667920a5b9d2d79a0d512d2",
+  "producerRevision": "c89136192cdde5929bec7900b9e954741e387340",
+  "command": [
+    "python3",
+    "tools/test_temporal_projection.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-final-fixtures.log",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-facade-fixtures"
+  ],
+  "exit": 0,
+  "output": "{\n  \"producerRevision\": \"c89136192cdde5929bec7900b9e954741e387340\",\n  \"syntheticCases\": [\n    \"broad\",\n    \"disjoint\",\n    \"external-mass\",\n    \"failed-unit-rows\",\n    \"incompatible-mixture\",\n    \"large-tick-9007199254740993\",\n    \"mixture-half\",\n    \"multimodal-disjoint-support\",\n    \"narrow\",\n    \"point-only-support\",\n    \"repeated-media-occurrence-0\",\n    \"repeated-media-occurrence-1\",\n    \"repeated-target-units\",\n    \"support-only\"\n  ],\n  \"facadeProjections\": 4,\n  \"corruptionsRefused\": [\n    \"allocated quantity\",\n    \"missing sparse cell\",\n    \"original component weight\",\n    \"crop outside quantity\",\n    \"external ledger\",\n    \"support upper bound\",\n    \"foreign axis\",\n    \"numeric tick conversion\",\n    \"numeric axis extent\",\n    \"lost exposure gap\",\n    \"duration weighted quantity\",\n    \"lossy 2^53 conversion\",\n    \"duplicate JSON keys\",\n    \"foreign selected bundle with rehashed bytes\",\n    \"suppressed available measure with rehashed bytes\",\n    \"foreign mapping with rehashed bytes\",\n    \"foreign measure with rehashed bytes\",\n    \"foreign projection with rehashed bytes\",\n    \"foreign inventory unit with rehashed bytes\",\n    \"foreign timing with rehashed bytes\",\n    \"foreign recall clock with rehashed bytes\",\n    \"foreign timing inventory with rehashed bytes\",\n    \"foreign word clock with rehashed bytes\"\n  ]\n}\n",
+  "readerFiles": {
+    "tools/test_temporal_projection.py": "cb1e4a08083e8646195fac0fb2c65d2b7dc2c973f40fdf2e7e27f61c113db817",
+    "tools/verify_temporal_projection.py": "b4b09de4eeb424641b3ed1636cdd1920ab8c457a3decd848bab0925d08502e43"
+  }
+}

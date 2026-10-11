@@ -1,0 +1,95 @@
+{
+  "producer": "c89136192cdde5929bec7900b9e954741e387340",
+  "localBase": "198550727aa09dcc52d05662652c51f2565a79dd",
+  "consumer": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "consumerSource": "explicit local source override; source pin not changed",
+  "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "runs": [
+    {
+      "name": "temporal-final-gate",
+      "exit": 0,
+      "cells": 56,
+      "totals": {
+        "total": 10411,
+        "failed": 0,
+        "errors": 0,
+        "passed": 10406
+      }
+    },
+    {
+      "name": "temporal-final-fixtures",
+      "exit": 0,
+      "cells": 0,
+      "totals": {
+        "total": 0,
+        "failed": 0,
+        "errors": 0,
+        "passed": 0
+      }
+    },
+    {
+      "name": "temporal-final-reader",
+      "exit": 0,
+      "cells": 0,
+      "totals": {
+        "total": 0,
+        "failed": 0,
+        "errors": 0,
+        "passed": 0
+      }
+    },
+    {
+      "name": "temporal-workspace-reader",
+      "exit": 0,
+      "cells": 0,
+      "totals": {
+        "total": 0,
+        "failed": 0,
+        "errors": 0,
+        "passed": 0
+      }
+    },
+    {
+      "name": "temporal-consumer",
+      "exit": 0,
+      "cells": 10,
+      "totals": {
+        "total": 488,
+        "failed": 0,
+        "errors": 0,
+        "passed": 488
+      }
+    },
+    {
+      "name": "temporal-consumer-timed",
+      "exit": 0,
+      "cells": 1,
+      "totals": {
+        "total": 3,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3
+      }
+    }
+  ],
+  "newMutations": [
+    {
+      "name": "weighted-overflow",
+      "sha": "c89136192cdde5929bec7900b9e954741e387340",
+      "compiled": true,
+      "witness": "duration-weighted transport overflow",
+      "totals": [
+        "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+      ]
+    },
+    {
+      "name": "failed-request-identity",
+      "sha": "c89136192cdde5929bec7900b9e954741e387340",
+      "compiled": true,
+      "witness": "failed temporal requests remain bound",
+      "totals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ]
+    }
+  ]
+}

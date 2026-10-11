@@ -1,0 +1,58 @@
+[
+  [
+    "exposure-boundary",
+    "align/src/main/scala/storymodel4s/align/temporalexposure.scala",
+    "final class TemporalExposure private (",
+    "final class TemporalExposure (",
+    "alignJVM/testOnly *TemporalExposureBoundarySuite",
+    "TemporalExposure constructor refuses"
+  ],
+  [
+    "grid-boundary",
+    "align/src/main/scala/storymodel4s/align/temporalgrid.scala",
+    "final class TemporalGrid private (",
+    "final class TemporalGrid (",
+    "alignJVM/testOnly *TemporalGridBoundarySuite",
+    "TemporalGrid constructor refuses"
+  ],
+  [
+    "window-boundary",
+    "align/src/main/scala/storymodel4s/align/temporalconcentration.scala",
+    "final class Window private[TemporalConcentration] (",
+    "final class Window (",
+    "alignJVM/testOnly *TemporalGridBoundarySuite",
+    "TemporalConcentration.Window constructor refuses"
+  ],
+  [
+    "set-boundary",
+    "align/src/main/scala/storymodel4s/align/temporalconcentration.scala",
+    "final class Disconnected private[TemporalConcentration] (",
+    "final class Disconnected (",
+    "alignJVM/testOnly *TemporalGridBoundarySuite",
+    "TemporalConcentration.Disconnected constructor refuses"
+  ],
+  [
+    "projection-boundary",
+    "align/src/main/scala/storymodel4s/align/temporalprojection.scala",
+    "final class Projection private[TemporalProjection] (",
+    "final class Projection (",
+    "alignJVM/testOnly *TemporalProjectionBoundarySuite",
+    "TemporalProjection.Projection constructor refuses"
+  ],
+  [
+    "projection-row-boundary",
+    "align/src/main/scala/storymodel4s/align/temporalprojection.scala",
+    "final class Row private[TemporalProjection] (",
+    "final class Row (",
+    "alignJVM/testOnly *TemporalProjectionBoundarySuite",
+    "TemporalProjection.Row constructor refuses"
+  ],
+  [
+    "view-boundary",
+    "view/src/main/scala/storymodel4s/view/temporalgrid.scala",
+    "final class TemporalGridView private (",
+    "final class TemporalGridView (",
+    "codecJVM/testOnly *TemporalGridViewSuite",
+    "constructor refuses"
+  ]
+]

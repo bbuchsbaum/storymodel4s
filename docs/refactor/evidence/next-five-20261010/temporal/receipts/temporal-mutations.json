@@ -1,0 +1,142 @@
+[
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "inventory",
+    "compiled": true,
+    "namedFailure": "exposure rejects foreign inventory",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "overlap",
+    "compiled": true,
+    "namedFailure": "overlap is refused or shared",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "word-dedup",
+    "compiled": true,
+    "namedFailure": "overlap is refused or shared",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "support-only",
+    "compiled": true,
+    "namedFailure": "sparse crop and rebin",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "cropped-mass",
+    "compiled": true,
+    "namedFailure": "sparse crop and rebin",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "atom-entry",
+    "compiled": true,
+    "namedFailure": "half-open atom concentration",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 2, Errors 0, Passed 23"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "finite-transport",
+    "compiled": true,
+    "namedFailure": "finite transport entries cannot publish",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 25, Failed 1, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "exposure-boundary-clean2",
+    "compiled": true,
+    "namedFailure": "TemporalExposure constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "grid-boundary-clean2",
+    "compiled": true,
+    "namedFailure": "TemporalGrid constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "window-boundary-clean2",
+    "compiled": true,
+    "namedFailure": "TemporalConcentration.Window constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "set-boundary-clean2",
+    "compiled": true,
+    "namedFailure": "TemporalConcentration.Disconnected constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "projection-boundary-clean2",
+    "compiled": true,
+    "namedFailure": "TemporalProjection.Projection constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 10, Failed 2, Errors 0, Passed 8"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "projection-row-boundary-clean2",
+    "compiled": true,
+    "namedFailure": "TemporalProjection.Row constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 10, Failed 2, Errors 0, Passed 8"
+    ]
+  },
+  {
+    "sha": "e08bf64d058470b3d939b34bc2d42549382e6b79",
+    "mutant": "view-boundary-clean3",
+    "compiled": true,
+    "namedFailure": "constructor refuses",
+    "exit": 1,
+    "totals": [
+      "[error] Failed: Total 6, Failed 2, Errors 0, Passed 4"
+    ]
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T05:13:09.006898+00:00",
+  "finished_utc": "2026-10-11T05:13:34.657753+00:00",
+  "duration_seconds": 25.65043,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "set LocalProject(\"codecJVM\") / Test / sources := (LocalProject(\"codecJVM\") / Test / unmanagedSources).value.filter(_.getName == \"TemporalGridViewSuite.scala\")",
+    "codecJVM/Test/clean",
+    "codecJVM/testOnly *TemporalGridViewSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/next-five-20261010/temporal-mutant-view-boundary-clean2.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5699
+}

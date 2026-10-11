@@ -1,0 +1,10 @@
+Reviewer: /root/reconstruction_review; independent read-only agent, not an author.
+
+Initial exact e08bf64d058470b3d939b34bc2d42549382e6b79 versus main198550727aa09dcc52d05662652c51f2565a79dd: SOURCE BLOCK.
+1. Standalone arithmetic reader accepted foreign mapping/measure/unit/timing/digest fields. Add contextual original-member joins.
+2. Failed temporal requests were absent from publication identity; different invalid bins shared receipts and resume. Retain canonical request/digest and refusal.
+No additional consequential defect found in exposure arithmetic, transport accounting, concentration, sparse grids, checked construction or contextual Scala decoder.
+
+Exact c89136192cdde5929bec7900b9e954741e387340: failed-request repair sound. Independent Python replay passed14 synthetic cases,4 facade projections,21 corruptions. SOURCE BLOCK remained for selection->bundle/axis join and suppression of a complete measured row as Region(MissingMeasure). Both reproduced after descriptor rehash.
+
+Exact 59bd1fecac628b6c7667920a5b9d2d79a0d512d2: SOURCE PASS contingent on final qualification gates. Both remaining reader BLOCKs repaired. Independently reran exact committed reader:14 synthetic cases,4 facade projections,23 corruptions refused, unchanged controls passed. Diff fromc891 is only two Python files; Scala/build inputs unchanged. No additional BLOCK found. Final regenerated artifacts, gate receipts and consumer qualification pending at this verdict.
