@@ -55,8 +55,7 @@ Save this file as `fixtures/src/main/scala/docsprobe/PublicAlignAndInterpret.sca
 Then run:
 
 ```sh
-sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
-  "fixturesJVM/runMain docsprobe.alignAndInterpret"
+sbt "fixturesJVM/runMain docsprobe.alignAndInterpret"
 ```
 
 The copy under `docs-site/examples/` supplies the exact bytes shown on this page. That directory is

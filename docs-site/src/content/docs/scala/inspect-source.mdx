@@ -47,7 +47,9 @@ storymodel4s is currently used from a source checkout. It has no released packag
 - JDK 17 or 21
 - sbt 1.12.14
 - Scala 3.7.4, supplied by the build
-- a local `grakern` checkout for aggregate gates while that dependency remains unpublished
+
+For aggregate gates, sbt fetches its pinned `grakern` source revision unless you supply a local
+checkout override.
 
 Clone the repository and run its JVM tests:
 
@@ -55,7 +57,7 @@ Clone the repository and run its JVM tests:
 git clone https://github.com/bbuchsbaum/storymodel4s.git
 cd storymodel4s
 
-sbt -Dstorymodel4s.grakern.build=/absolute/path/to/grakern testJVM
+sbt testJVM
 ```
 
 ## Run the example
