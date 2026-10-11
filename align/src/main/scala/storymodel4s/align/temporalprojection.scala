@@ -4,7 +4,8 @@ import cats.syntax.all.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
 
-/** Binds per-unit conditional source grids to optional, explicitly declared recall-time exposure. */
+/** Binds per-unit conditional source grids to optional, explicitly declared recall-time exposure.
+  */
 object TemporalProjection:
   val Version: String = "temporal-projection/v1"
 
@@ -32,7 +33,8 @@ object TemporalProjection:
     case ForeignRecallWindow, DuplicateDeclaration
     case UnknownDeclaration(target: SourceNodeRef)
 
-  /** A row always preserves the mapping unit and processing status; unavailable grids are explicit. */
+  /** A row always preserves the mapping unit and processing status; unavailable grids are explicit.
+    */
   final class Row private[TemporalProjection] (
       val unit: RecallUnitId,
       val processing: ProcessingStatus,
@@ -72,56 +74,81 @@ object TemporalProjection:
   ): Either[Refusal, Projection] =
     if request.declarations.map(_.target).distinct.size != request.declarations.size then
       Left(Refusal.DuplicateDeclaration)
-    else request.declarations.find(d => mapping.source.target(d.target).isEmpty) match
-      case Some(declaration) => Left(Refusal.UnknownDeclaration(declaration.target))
-      case None =>
-        for
-          coordinate <- TemporalSupport.select(mapping.source, request.selection).left.map(Refusal.Selection(_))
-          regions <- request.bins.traverse { (start, endExclusive) =>
-            TemporalQuery.Region
-              .onTimeAxis(coordinate.axis, Vector(start -> endExclusive), Vector.empty)
+    else
+      request.declarations.find(d => mapping.source.target(d.target).isEmpty) match
+        case Some(declaration) => Left(Refusal.UnknownDeclaration(declaration.target))
+        case None              =>
+          for
+            coordinate <- TemporalSupport
+              .select(mapping.source, request.selection)
               .left
-              .map(Refusal.Region(_))
-          }
-          checkedExposure <- exposure(mapping, timing, request)
-        yield
-          val sourceRows = mapping.inventory.units.map { inventoryUnit =>
-            val unitDeclarations = request.declarations.filter(d => measuredTargets(mapping, inventoryUnit.id, measure)(d.target))
-            val result = for
-              prepared <- TemporalQuery
-                .prepare(mapping, inventoryUnit.id, measure, request.selection, unitDeclarations)
+              .map(Refusal.Selection(_))
+            regions <- request.bins.traverse { (start, endExclusive) =>
+              TemporalQuery.Region
+                .onTimeAxis(coordinate.axis, Vector(start -> endExclusive), Vector.empty)
                 .left
                 .map(Refusal.Region(_))
-              grid <- TemporalGrid.checked(prepared, regions).left.map(Refusal.Grid(_))
-            yield grid
-            new Row(
-              inventoryUnit.id,
-              mapping.outcome(inventoryUnit.id).get.processing,
-              result,
-              checkedExposure._2.flatMap(_.units.find(_.unit == inventoryUnit.id))
+            }
+            checkedExposure <- exposure(mapping, timing, request)
+          yield
+            val sourceRows = mapping.inventory.units.map { inventoryUnit =>
+              val unitDeclarations = request.declarations.filter(d =>
+                measuredTargets(mapping, inventoryUnit.id, measure)(d.target)
+              )
+              val result = for
+                prepared <- TemporalQuery
+                  .prepare(mapping, inventoryUnit.id, measure, request.selection, unitDeclarations)
+                  .left
+                  .map(Refusal.Region(_))
+                grid <- TemporalGrid.checked(prepared, regions).left.map(Refusal.Grid(_))
+              yield grid
+              new Row(
+                inventoryUnit.id,
+                mapping.outcome(inventoryUnit.id).get.processing,
+                result,
+                checkedExposure._2.flatMap(_.units.find(_.unit == inventoryUnit.id))
+              )
+            }
+            val timingState = request.recallWindow match
+              case None if timing.isDefined  => TimingState.NotRequested(true)
+              case None                      => TimingState.NotRequested(false)
+              case Some(_) if timing.isEmpty => TimingState.Missing
+              case Some(_)                   => TimingState.Provided
+            val selection = request.selection match
+              case TemporalSupport.Selection.Part(bundle) => s"part:${bundle.hex}"
+              case TemporalSupport.Selection.Occurrence(mapping, occurrence) =>
+                s"occurrence:${mapping.hex}:${occurrence.value}"
+            val recallWindow = request.recallWindow.fold("absent")(w =>
+              s"${w.clock.hex}:${w.start.numerator}/${w.start.denominator}:${w.endExclusive.numerator}/${w.endExclusive.denominator}"
             )
-          }
-          val timingState = request.recallWindow match
-            case None if timing.isDefined => TimingState.NotRequested(true)
-            case None                     => TimingState.NotRequested(false)
-            case Some(_) if timing.isEmpty => TimingState.Missing
-            case Some(_)                  => TimingState.Provided
-          val selection = request.selection match
-            case TemporalSupport.Selection.Part(bundle) => s"part:${bundle.hex}"
-            case TemporalSupport.Selection.Occurrence(mapping, occurrence) =>
-              s"occurrence:${mapping.hex}:${occurrence.value}"
-          val recallWindow = request.recallWindow.fold("absent")(w =>
-            s"${w.clock.hex}:${w.start.numerator}/${w.start.denominator}:${w.endExclusive.numerator}/${w.endExclusive.denominator}"
-          )
-          val digest = MappingRender.digest(
-            Vector(Version, mapping.digest.hex, measure.toString, coordinate.axis.id.value, selection,
-              request.overlap.toString, recallWindow, timingState.toString) ++
-              request.bins.flatMap((a, b) => Vector(a.toString, b.toString)) ++
-              request.declarations.map(d => s"${d.target.key}:${d.assumption}:${d.allocation}") ++
-              timing.toVector.map(_.digest.hex) ++ sourceRows.map(_.grid.toOption.map(_.digest.hex).getOrElse("unavailable")) ++
-              checkedExposure._2.toVector.map(_.digest.hex)
-          )
-          new Projection(mapping, measure, request, timingState, sourceRows, timing, checkedExposure._2, digest)
+            val digest = MappingRender.digest(
+              Vector(
+                Version,
+                mapping.digest.hex,
+                measure.toString,
+                coordinate.axis.id.value,
+                selection,
+                request.overlap.toString,
+                recallWindow,
+                timingState.toString
+              ) ++
+                request.bins.flatMap((a, b) => Vector(a.toString, b.toString)) ++
+                request.declarations.map(d => s"${d.target.key}:${d.assumption}:${d.allocation}") ++
+                timing.toVector.map(_.digest.hex) ++ sourceRows.map(
+                  _.grid.toOption.map(_.digest.hex).getOrElse("unavailable")
+                ) ++
+                checkedExposure._2.toVector.map(_.digest.hex)
+            )
+            new Projection(
+              mapping,
+              measure,
+              request,
+              timingState,
+              sourceRows,
+              timing,
+              checkedExposure._2,
+              digest
+            )
 
   private def exposure(
       mapping: MappingResult,
@@ -129,13 +156,20 @@ object TemporalProjection:
       request: Request
   ): Either[Refusal, (Option[TemporalExposure], Option[TemporalExposure.Readout])] =
     (request.recallWindow, timing) match
-      case (Some(_), None) => Right(None -> None)
-      case (None, None)    => Right(None -> None)
+      case (Some(_), None)     => Right(None -> None)
+      case (None, None)        => Right(None -> None)
       case (None, Some(value)) =>
-        TemporalExposure.checked(mapping, value, request.overlap).left.map(Refusal.Exposure(_)).map(v => Some(v) -> None)
+        TemporalExposure
+          .checked(mapping, value, request.overlap)
+          .left
+          .map(Refusal.Exposure(_))
+          .map(v => Some(v) -> None)
       case (Some(window), Some(value)) =>
         for
-          checked <- TemporalExposure.checked(mapping, value, request.overlap).left.map(Refusal.Exposure(_))
+          checked <- TemporalExposure
+            .checked(mapping, value, request.overlap)
+            .left
+            .map(Refusal.Exposure(_))
           _ <- Either.cond(window.clock == value.clock.digest, (), Refusal.ForeignRecallWindow)
           readout <- checked
             .query(value.clock, window.start, window.endExclusive)
@@ -150,8 +184,11 @@ object TemporalProjection:
   ): Set[SourceNodeRef] =
     val destinations = mapping.outcome(unit).toVector.flatMap { outcome =>
       measure match
-        case TemporalQuery.Measure.NormalizedScoreMass => outcome.measures.normalized.toVector.flatMap(_.mass.keys)
-        case TemporalQuery.Measure.ModelPosterior => outcome.measures.posterior.toVector.flatMap(_.mass.keys.map(Destination.of))
-        case TemporalQuery.Measure.TransportMass => outcome.measures.transport.toVector.flatMap(_.mass.keys)
+        case TemporalQuery.Measure.NormalizedScoreMass =>
+          outcome.measures.normalized.toVector.flatMap(_.mass.keys)
+        case TemporalQuery.Measure.ModelPosterior =>
+          outcome.measures.posterior.toVector.flatMap(_.mass.keys.map(Destination.of))
+        case TemporalQuery.Measure.TransportMass =>
+          outcome.measures.transport.toVector.flatMap(_.mass.keys)
     }
     destinations.collect { case Destination.Target(target) => target }.toSet
