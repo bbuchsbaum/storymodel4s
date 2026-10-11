@@ -195,18 +195,19 @@ final case class CaptionRequest(
         "schema" -> Json.fromString(CaptionRequest.Schema),
         "schemaVersion" -> Json.fromInt(if frameIdentity.isDefined then 2 else 1),
         "requestId" -> Json.fromString(requestId),
-        "frames" -> Json.obj(
-          "file" -> Json.fromString(frameFile),
-          "sha256" -> Json.fromString(framesSha256.hex),
-          "count" -> Json.fromInt(count),
-          "width" -> Json.fromInt(geometry.width),
-          "height" -> Json.fromInt(geometry.height),
-          "pixelFormat" -> Json.fromString(Ffmpeg.PixelFormat)
-        ).deepMerge(
-          frameIdentity.fold(Json.obj())(identity =>
-            Json.obj("identity" -> Json.fromString(identity.hex))
+        "frames" -> Json
+          .obj(
+            "file" -> Json.fromString(frameFile),
+            "sha256" -> Json.fromString(framesSha256.hex),
+            "count" -> Json.fromInt(count),
+            "width" -> Json.fromInt(geometry.width),
+            "height" -> Json.fromInt(geometry.height),
+            "pixelFormat" -> Json.fromString(Ffmpeg.PixelFormat)
           )
-        ),
+          .deepMerge(
+            frameIdentity
+              .fold(Json.obj())(identity => Json.obj("identity" -> Json.fromString(identity.hex)))
+          ),
         "extents" -> Json.arr(
           extents.map(e =>
             Json.obj(
@@ -292,7 +293,8 @@ object CaptionRequest:
       schema <- MediaJson.string(c.downField("schema"), "schema")
       version <- MediaJson.int(c.downField("schemaVersion"), "schemaVersion")
       _ <-
-        if schema != Schema then Left(DomainError.InvalidFormat("schema", schema, s"expected $Schema"))
+        if schema != Schema then
+          Left(DomainError.InvalidFormat("schema", schema, s"expected $Schema"))
         else if version == 1 || version == 2 then Right(())
         else Left(DomainError.InvalidFormat("schemaVersion", version.toString, "expected 1 or 2"))
     yield version

@@ -239,9 +239,10 @@ class SampledCaptionConsumerSuite extends FunSuite:
     assertNotEquals(a.receipt.identity, b.receipt.identity)
     val request = right(issue(a, "selection-a"))
     val rendered = right(
-      io.circe.parser.parse(request.render("frames.bgr", "model")).left.map(e =>
-        DomainError.InvalidFormat("request", e.message, "json")
-      )
+      io.circe.parser
+        .parse(request.render("frames.bgr", "model"))
+        .left
+        .map(e => DomainError.InvalidFormat("request", e.message, "json"))
     )
     assertEquals(rendered.hcursor.downField("schemaVersion").as[Int], Right(2))
     assertEquals(
@@ -276,19 +277,20 @@ class SampledCaptionConsumerSuite extends FunSuite:
           envelope.worker,
           f0
         )
-      )
-        .proposals
-        .size,
+      ).proposals.size,
       sampledExtents.size
     )
 
-  test("an unbound v1 request refuses sampled frames but recorded v1 remains lawful for full frames"):
+  test(
+    "an unbound v1 request refuses sampled frames but recorded v1 remains lawful for full frames"
+  ):
     val s = right(sampled())
     val issued = right(issue(s, "sampled-v2"))
     val json = right(
-      io.circe.parser.parse(issued.render("frames.bgr", "model")).left.map(e =>
-        DomainError.InvalidFormat("request", e.message, "json")
-      )
+      io.circe.parser
+        .parse(issued.render("frames.bgr", "model"))
+        .left
+        .map(e => DomainError.InvalidFormat("request", e.message, "json"))
     )
     val legacy = json.mapObject(
       _.add("schemaVersion", io.circe.Json.fromInt(1))
