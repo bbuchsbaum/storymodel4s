@@ -142,6 +142,11 @@ def main(log, folder):
         except (ValueError, KeyError, TypeError, OverflowError):negatives.append(name)
         else:raise AssertionError("contextual corruption accepted: " + name)
     projection_name = "reference--temporal-projection.json"
+    pair_refuses("foreign selected bundle with rehashed bytes", projection_name, lambda d: d["request"]["selection"].update(bundle="0"*64))
+    def suppress_available(d):
+        row = d["rows"][0]
+        for field in ["grid", "durationWeighted", "durationWeightedBounds"]:row[field] = {"unavailable":"Region(MissingMeasure)"}
+    pair_refuses("suppressed available measure with rehashed bytes", projection_name, suppress_available)
     pair_refuses("foreign mapping with rehashed bytes", projection_name, lambda d: d.update(mapping="0"*64))
     pair_refuses("foreign measure with rehashed bytes", projection_name, lambda d: d.update(measure="TransportMass"))
     pair_refuses("foreign projection with rehashed bytes", projection_name, lambda d: d.update(digest="0"*64))

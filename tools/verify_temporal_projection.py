@@ -443,6 +443,7 @@ def timing_context(document, timing, inventory):
         fail('exposure window differs from original timing')
     for row in document['rows']:
         exposure = row['exposure'];unit = row['unit']
+        if exposure['processing'] != row['processing']:fail('exposure processing changed')
         if fraction(exposure['duration'],'duration') != durations.get(unit,Fraction()): fail('duration differs from original word intervals')
         if [fraction(v,'onset') for v in exposure['onsetEvents']] != onsets[unit]:fail('onsets differ from original words')
         if integer(exposure['missingWords'],'missingWords') != missing[unit]:fail('missing-word count differs')
@@ -483,15 +484,38 @@ def verify_pair(files):
             fail('foreign projection mapping or measure')
         if document['digest'] != manifest[member+'Projection']:fail('foreign projection identity')
         if document['coordinate'] not in record['source']['axes']:fail('foreign source coordinate')
+        selection = document['request']['selection']
+        if selection['kind'] == 'part':
+            selected = [b for b in record['source']['bundles'] if b.get('identity') == selection['bundle'] and b.get('status') == 'media']
+            if len(selected) != 1 or selected[0]['primary_axis'] != document['coordinate']['id']:fail('foreign part selection')
+        elif selection['kind'] == 'occurrence':
+            selected = [m for m in record['source']['coordinate_mappings'] if m['identity'] == selection['mapping'] and m['family'] == 'TrackComposition']
+            if len(selected) != 1 or selected[0]['target_axis'] != document['coordinate']['id']:fail('foreign occurrence mapping')
+            if sum(segment['occurrence'] == selection['occurrence'] for segment in selected[0]['segments']) != 1:fail('foreign occurrence selection')
+        else:fail('unknown selection')
         unit_ids = [u['id'] for u in record['inventory']['units']]
         if [r['unit'] for r in document['rows']] != unit_ids:fail('foreign projection inventory')
         for row,outcome in zip(document['rows'],record['outcomes']):
             if row['unit'] != outcome['unit']:fail('foreign outcome')
-            complete = outcome['processing_status']['status'] == 'complete'
-            if (row['processing'] == 'Complete') != complete:fail('processing status changed')
+            processing = outcome['processing_status']
+            complete = processing['status'] == 'complete'
+            if complete: expected_processing = 'Complete'
+            elif processing['status'] == 'excluded': expected_processing = 'ExcludedByInputPolicy(' + processing['reason'] + ')'
+            elif processing['status'] == 'failed':
+                failure = processing['failure']
+                kind = {'provider-failure':'ProviderFailure','invalid-output':'InvalidOutput','inference-refused':'InferenceRefused'}[failure['status']]
+                expected_processing = 'Failed(' + kind + '(' + failure['detail'] + '))'
+            else:fail('unknown processing status')
+            if row['processing'] != expected_processing:fail('processing status changed')
+            measure_field = 'normalized' if member == 'reference' else 'posterior'
+            available = outcome['measures'][measure_field]['status'] == 'present'
+            expected_refusal = None if complete and available else ('Region(MissingMeasure)' if complete else 'Region(Processing(' + expected_processing + '))')
             grid = row['grid']
-            if 'unavailable' in grid:continue
-            if not complete:fail('failed unit acquired a measure')
+            if expected_refusal is not None:
+                if grid != {'unavailable':expected_refusal}:fail('unavailable measure changed')
+                if any(row[field] != {'unavailable':expected_refusal} for field in ['durationWeighted','durationWeightedBounds']):fail('unavailable row acquired duration weights')
+                continue
+            if 'unavailable' in grid:fail('available measure was suppressed')
             links = [link for link in outcome['mapping_links'] if link['measure_kind'] == measure]
             expected_components = {alternative_key(link):link['raw_value'] for link in links}
             actual = {c['alternative']:c['weight'] for c in grid['components']}
