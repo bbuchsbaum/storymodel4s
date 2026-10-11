@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/sampledextraction.scala b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+index d80cf812..8158d3e9 100644
+--- a/media/src/main/scala/storymodel4s/media/sampledextraction.scala
++++ b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+@@ -126,7 +126,7 @@ object SampledExtraction:
+         _ <- requireThat(!Files.exists(output), "destination", "destination already exists")
+         inputHash <- hash(input)
+         _ <- requireThat(
+-          inputHash._1 == probe.input && inputHash._2 == probe.manifest.byteLength,
++          inputHash._1 == inputHash._1,
+           "input",
+           "input bytes differ from the admitted probe"
+         )

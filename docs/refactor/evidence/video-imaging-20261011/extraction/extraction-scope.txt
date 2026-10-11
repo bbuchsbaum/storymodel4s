@@ -1,0 +1,14 @@
+types defined by this candidate:
+  SampledExtraction
+  SampledExtractionBoundarySuite
+  SampledExtractionSuite
+
+modules that reference them (the gate must cover all of these):
+  media
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "media/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

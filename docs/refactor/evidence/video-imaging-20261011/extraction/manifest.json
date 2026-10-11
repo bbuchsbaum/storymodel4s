@@ -1,0 +1,170 @@
+{
+  "producer": "8014f86486680572346bc5a51acd8beb476a8089",
+  "files": [
+    {
+      "path": "extraction-focused-01.log.gz",
+      "sha256": "4454b902a108a872950e0987ca313ecf1fea98824cd09adf6d3559ed64f84d8a",
+      "bytes": 987
+    },
+    {
+      "path": "extraction-focused-01.log.meta.json",
+      "sha256": "767e577d5ef464814deea9ff60b529230e85ba4a3c0c2d266edd9a1755e2d898",
+      "bytes": 764
+    },
+    {
+      "path": "extraction-focused-02.log.gz",
+      "sha256": "3f05f2f87fa8aa2b2d190a6de9639b2e699ca7e035f6e47307d0c4fcba68ede3",
+      "bytes": 975
+    },
+    {
+      "path": "extraction-focused-02.log.meta.json",
+      "sha256": "4d98c72ed683463c2097d90c8ab56bc75c1bcfe55ef608639ea2fb45de210b6f",
+      "bytes": 742
+    },
+    {
+      "path": "extraction-mutant-boundary.log.gz",
+      "sha256": "4d9af4e6f47da13b2118ec7e3120ee9108c1a027c325b0bc4e140b888ff58034",
+      "bytes": 1209
+    },
+    {
+      "path": "extraction-mutant-boundary.log.meta.json",
+      "sha256": "dd8c630032150499367bf2ebd8ef747f573dc1f4f17980e8af2a8f7bb4fa6dbd",
+      "bytes": 886
+    },
+    {
+      "path": "extraction-mutant-boundary.patch.txt",
+      "sha256": "e6d802eed102d9622e98876f9564cb53bf07c45c2885a73781b432e9e8250f81",
+      "bytes": 727
+    },
+    {
+      "path": "extraction-mutant-clock.log.gz",
+      "sha256": "3e9ce99f5e8e320c93d61b3099160bd4c8f8a6cd89b3171e1aa89e778ba65a05",
+      "bytes": 1233
+    },
+    {
+      "path": "extraction-mutant-clock.log.meta.json",
+      "sha256": "b21fe85c640aa8805d9540ba4a8002aabb7db78141b65ec1ffb4b334f8a8a022",
+      "bytes": 717
+    },
+    {
+      "path": "extraction-mutant-clock.patch.txt",
+      "sha256": "e64e1522a740a2c8b3801a187c6b46aba5fd9e95ecbc97746b9d43b3dc2dec65",
+      "bytes": 918
+    },
+    {
+      "path": "extraction-mutant-copyts.log.gz",
+      "sha256": "7ab1746971dbefd6ba787a6a5f9ce42196468e0b4f15160f98572b522d8aca4e",
+      "bytes": 1357
+    },
+    {
+      "path": "extraction-mutant-copyts.log.meta.json",
+      "sha256": "866723bbdaf8376737e8fffc1574961f5decc472506d4ae02837e903c43579ff",
+      "bytes": 718
+    },
+    {
+      "path": "extraction-mutant-copyts.patch.txt",
+      "sha256": "4ef79e045e426010f47d80fc93ffe417fdad780ca7a288a1a637f81760fa008b",
+      "bytes": 479
+    },
+    {
+      "path": "extraction-mutant-demuxer.log.gz",
+      "sha256": "b954795152b827f40c4fbc8e0e8f56877a2b9f1fecd5d32457d642b5bf8b2880",
+      "bytes": 1238
+    },
+    {
+      "path": "extraction-mutant-demuxer.log.meta.json",
+      "sha256": "611a501a8cc4f3e21436b1fcc68e1f12e716631f2bdb90d6548ed9137b7564ed",
+      "bytes": 719
+    },
+    {
+      "path": "extraction-mutant-demuxer.patch.txt",
+      "sha256": "73b48858422853bc6b24b6715e40c1be854e37f28248e0acb7b4bf7bec752546",
+      "bytes": 673
+    },
+    {
+      "path": "extraction-mutant-geometry.log.gz",
+      "sha256": "7b95bc453afe59e80f9e237a9cdf11a109b903f4d17be188013ab81342cc9648",
+      "bytes": 1251
+    },
+    {
+      "path": "extraction-mutant-geometry.log.meta.json",
+      "sha256": "2cc974b7436cac71911cc543232ef76c3f17f479e6ec0d83df1e7ae7b8503496",
+      "bytes": 719
+    },
+    {
+      "path": "extraction-mutant-geometry.patch.txt",
+      "sha256": "204940d3ac571a7f11b6fee93de2e5693b5a2aff146e09a3f79152728f2158f3",
+      "bytes": 679
+    },
+    {
+      "path": "extraction-mutant-input.log.gz",
+      "sha256": "14713c2790519fb41a281fc7fed72bcdba412900bcd9649ff80fd7b159a1125a",
+      "bytes": 1243
+    },
+    {
+      "path": "extraction-mutant-input.log.meta.json",
+      "sha256": "0bea49bad594ee3627ba7a69d0afdae75bbfc65e69d9d09c9afc9c1dfd67a323",
+      "bytes": 717
+    },
+    {
+      "path": "extraction-mutant-input.patch.txt",
+      "sha256": "aee57931483e3687f65b69c0a470664976932338f83f3f0fbf2b0c0d7c009d78",
+      "bytes": 729
+    },
+    {
+      "path": "extraction-mutant-pts.log.gz",
+      "sha256": "0c610497542b3e2c9ce65b03106c1a033613bd81ec628885a40a6b8572407aef",
+      "bytes": 1262
+    },
+    {
+      "path": "extraction-mutant-pts.log.meta.json",
+      "sha256": "69d75469f86173a0a6c8a7dd2a784f2d1d1840f967bc638081658d1aa6138eaa",
+      "bytes": 715
+    },
+    {
+      "path": "extraction-mutant-pts.patch.txt",
+      "sha256": "ec89806b433f28df29146171b3972b6368c284aad90fe07f3290e70b3930bbc3",
+      "bytes": 727
+    },
+    {
+      "path": "extraction-mutant-rotation.log.gz",
+      "sha256": "458473e1eccaf6d872120eb478070f614c837ca108d2003b00458c4db614adba",
+      "bytes": 1339
+    },
+    {
+      "path": "extraction-mutant-rotation.log.meta.json",
+      "sha256": "92aeecdd3d761b6663060942e58811a7e8ed10710b7411014e124db052091548",
+      "bytes": 720
+    },
+    {
+      "path": "extraction-mutant-rotation.patch.txt",
+      "sha256": "450108ff2b444c7d35bee0f707f19d75739c7a23b7efdec94e35c08b71ff0d72",
+      "bytes": 492
+    },
+    {
+      "path": "extraction-qualification.json",
+      "sha256": "cd4f9ff4559b3241dec12b7bdb690eba5d1d4bfa9a308db034f221012897662b",
+      "bytes": 1971
+    },
+    {
+      "path": "extraction-restored-scope.log.gz",
+      "sha256": "fcc652aa8fe61675c8c47c3bc67c42e6f9ebc00dd8c73abb5c19338f4c7a1258",
+      "bytes": 1348
+    },
+    {
+      "path": "extraction-restored-scope.log.meta.json",
+      "sha256": "ce2e37a413df4f3e6d414824182686b3772d3545b88d9b5b08b31eab45e67988",
+      "bytes": 707
+    },
+    {
+      "path": "extraction-scope.txt",
+      "sha256": "2cdfb75776de6fcc2c6bd2a6d8c864e5ee14ee215a4de36def6c0a39d619b00e",
+      "bytes": 504
+    },
+    {
+      "path": "qualify-extraction.py",
+      "sha256": "8b8048a2deffec1f6e187abaa60c4cf40e35f46faa9bfa8e9141eb1d5b685a44",
+      "bytes": 4179
+    }
+  ]
+}

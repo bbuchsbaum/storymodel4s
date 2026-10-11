@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/sampledextraction.scala b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+index d80cf812..d8255b69 100644
+--- a/media/src/main/scala/storymodel4s/media/sampledextraction.scala
++++ b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+@@ -217,7 +217,7 @@ object SampledExtraction:
+       pts = samples.map(_.group(2).toLong)
+       shapes = samples.map(m => PictureGeometry(m.group(3).toInt, m.group(4).toInt))
+       _ <- requireThat(
+-        shapes.forall(_ == frames.geometry),
++        shapes.isEmpty || shapes.nonEmpty,
+         "geometry",
+         "decoded frame dimensions differ"
+       )

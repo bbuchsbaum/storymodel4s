@@ -1,0 +1,14 @@
+diff --git a/media/src/main/scala/storymodel4s/media/sampledextraction.scala b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+index d80cf812..9cbf9a0c 100644
+--- a/media/src/main/scala/storymodel4s/media/sampledextraction.scala
++++ b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+@@ -74,8 +74,7 @@ object SampledExtraction:
+     "-noautorotate",
+     "-protocol_whitelist",
+     "file",
+-    "-format_whitelist",
+-    "mov,matroska,avi,mpegts,mpeg,ogg"
++    "-nostats"
+   )
+   private def outputOptions(streamIndex: Int, selected: Vector[Int]): Vector[String] =
+     val ranges = selected.foldLeft(Vector.empty[(Int, Int)]) { (acc, n) =>

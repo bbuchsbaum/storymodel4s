@@ -1,0 +1,82 @@
+{
+  "producer": "8014f86486680572346bc5a51acd8beb476a8089",
+  "mutations": [
+    {
+      "name": "pts",
+      "compiled": true,
+      "witness": "wrong probe PTS refuses",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "clock",
+      "compiled": true,
+      "witness": "equal tick numbers on a different probe clock",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "geometry",
+      "compiled": true,
+      "witness": "observed geometry refuses a same-area",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "rotation",
+      "compiled": true,
+      "witness": "display rotation cannot silently change",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "copyts",
+      "compiled": true,
+      "witness": "display rotation cannot silently change",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "demuxer",
+      "compiled": true,
+      "witness": "concat cannot substitute",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "input",
+      "compiled": true,
+      "witness": "wrong input bytes refuse before attempting",
+      "totals": [
+        "[error] Failed: Total 16, Failed 1, Errors 0, Passed 15"
+      ]
+    },
+    {
+      "name": "boundary",
+      "compiled": true,
+      "witness": "SampledExtraction constructor",
+      "totals": [
+        "[error] Failed: Total 5, Failed 2, Errors 0, Passed 3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "name": "media/test; scalafmtCheckAll; scalafmtSbtCheck",
+      "exit": 0,
+      "cells": 1,
+      "totalFailedErrorsPassed": [
+        121,
+        0,
+        0,
+        118
+      ]
+    }
+  ]
+}

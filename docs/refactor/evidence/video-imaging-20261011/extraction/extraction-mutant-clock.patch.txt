@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/sampledextraction.scala b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+index d80cf812..1b0c6765 100644
+--- a/media/src/main/scala/storymodel4s/media/sampledextraction.scala
++++ b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+@@ -212,7 +212,7 @@ object SampledExtraction:
+     for
+       _ <- requireThat(clocks.size == 1, "clock", "missing or ambiguous decoder timebase")
+       clock <- RationalTimebase.of(clocks.head.group(1).toLong, clocks.head.group(2).toLong)
+-      _ <- requireThat(clock == frames.index.timebase, "clock", "decoder and probe clocks differ")
++      _ <- requireThat(clock == clock, "clock", "decoder and probe clocks differ")
+       ordinals = samples.map(_.group(1).toInt)
+       pts = samples.map(_.group(2).toLong)
+       shapes = samples.map(m => PictureGeometry(m.group(3).toInt, m.group(4).toInt))

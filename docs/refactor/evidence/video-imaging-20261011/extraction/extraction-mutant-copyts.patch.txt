@@ -1,0 +1,12 @@
+diff --git a/media/src/main/scala/storymodel4s/media/sampledextraction.scala b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+index d80cf812..ca86045c 100644
+--- a/media/src/main/scala/storymodel4s/media/sampledextraction.scala
++++ b/media/src/main/scala/storymodel4s/media/sampledextraction.scala
+@@ -70,7 +70,6 @@ object SampledExtraction:
+     "info",
+     "-nostdin",
+     "-y",
+-    "-copyts",
+     "-noautorotate",
+     "-protocol_whitelist",
+     "file",
