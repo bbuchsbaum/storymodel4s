@@ -10,7 +10,7 @@ object TemporalQuery:
   val Version: String = "conditional-temporal-query/v1"
 
   enum Measure:
-    case NormalizedScoreMass, ModelPosterior
+    case NormalizedScoreMass, ModelPosterior, TransportMass
 
   /** A caller's scientific assumption, never inferred from support coverage or model confidence. */
   enum Assumption:
@@ -34,7 +34,8 @@ object TemporalQuery:
     case SupportOnly, IncompatibleGeometry
 
   enum Refusal:
-    case UnknownUnit, MissingMeasure, DuplicateDeclaration, UnmeasuredTarget, InvalidMixture
+    case UnknownUnit, MissingMeasure, DuplicateDeclaration, UnmeasuredTarget, InvalidMixture,
+      NonFiniteAggregate
     case Processing(status: ProcessingStatus)
     case Support(reason: TemporalSupport.Refusal)
     case InvalidRegion, ForeignRegion, OverlappingRegions, InvalidTopK
@@ -42,12 +43,15 @@ object TemporalQuery:
   /** Posterior states retain their admitted fidelity mode instead of reducing to target IDs. */
   enum Alternative:
     case Score(value: Destination)
+    case Transport(value: Destination)
     case Posterior(state: AlignState)
     def destination: Destination = this match
       case Score(d)     => d
+      case Transport(d) => d
       case Posterior(s) => Destination.of(s)
     def key: String = this match
       case Score(d)     => MappingRender.sequence(Vector("score", d.key))
+      case Transport(d) => MappingRender.sequence(Vector("transport", d.key))
       case Posterior(s) => MappingRender.sequence(Vector("posterior") ++ AlignState.keyParts(s))
 
   final class Domain private[TemporalQuery] (
@@ -76,12 +80,22 @@ object TemporalQuery:
         intervals: Vector[(Long, Long)],
         points: Vector[Long]
     ): Either[Refusal, Region] =
+      if axis.kind != AxisKind.EditionPlayback then Left(Refusal.InvalidRegion)
+      else onTimeAxis(axis, intervals, points)
+
+    /** Preserve the actual time-axis kind, including an explicitly declared annotation timeline. */
+    def onTimeAxis(
+        axis: PresentationAxis,
+        intervals: Vector[(Long, Long)],
+        points: Vector[Long]
+    ): Either[Refusal, Region] =
       for
-        _ <- Either.cond(axis.kind == AxisKind.EditionPlayback, (), Refusal.InvalidRegion)
         is <- intervals.traverse((a, b) =>
-          PlaybackInterval.on(axis, a, b).left.map(_ => Refusal.InvalidRegion)
+          PlaybackInterval.onTimeAxis(axis, a, b).left.map(_ => Refusal.InvalidRegion)
         )
-        ps <- points.traverse(p => PlaybackInstant.on(axis, p).left.map(_ => Refusal.InvalidRegion))
+        ps <- points.traverse(p =>
+          PlaybackInstant.onTimeAxis(axis, p).left.map(_ => Refusal.InvalidRegion)
+        )
         geometry <-
           if is.isEmpty && ps.isEmpty then Right(None)
           else PlaybackSupport.of(axis.id, is, ps).left.map(_ => Refusal.InvalidRegion).map(Some(_))
@@ -98,10 +112,11 @@ object TemporalQuery:
       val allocatedSource: Double,
       val supportWithoutAllocation: Double,
       val unavailableLocation: Double,
-      val external: Vector[(ExternalState, Double)]
+      val external: Vector[(ExternalState, Double)],
+      val rowBudget: Double
   ):
     /** Shape tolerance is not rescaling; even a small admitted discrepancy is preserved. */
-    def rowSumDiscrepancy: Double = suppliedTotal - 1.0
+    def rowSumDiscrepancy: Double = suppliedTotal - rowBudget
 
   final class Readout private[TemporalQuery] (
       val prepared: Prepared,
@@ -168,7 +183,7 @@ object TemporalQuery:
       else
         for
           bins <- regions.traverse(query)
-          union <- Region.on(
+          union <- Region.onTimeAxis(
             coordinate.axis,
             regions.flatMap(
               _.geometry.toVector.flatMap(_.intervals).map(i => i.start -> i.endExclusive)
@@ -235,13 +250,17 @@ object TemporalQuery:
       row <- measure match
         case Measure.NormalizedScoreMass =>
           outcome.measures.normalized.toRight(Refusal.MissingMeasure).map { m =>
-            (m.stage, m.mass.toVector.map((d, w) => (Alternative.Score(d), w)))
+            (m.stage, m.mass.toVector.map((d, w) => (Alternative.Score(d), w)), 1.0)
           }
         case Measure.ModelPosterior =>
           outcome.measures.posterior.toRight(Refusal.MissingMeasure).map { m =>
-            (m.stage, m.mass.toVector.map((s, w) => (Alternative.Posterior(s), w)))
+            (m.stage, m.mass.toVector.map((s, w) => (Alternative.Posterior(s), w)), 1.0)
           }
-      (stage, entries) = row
+        case Measure.TransportMass =>
+          outcome.measures.transport.toRight(Refusal.MissingMeasure).map { m =>
+            (m.stage, m.mass.toVector.map((d, w) => (Alternative.Transport(d), w)), m.rowBudget)
+          }
+      (stage, entries, budget) = row
       targets = entries.map(_._1.destination).collect { case Destination.Target(ref) => ref }.toSet
       _ <- Either.cond(
         declarations.map(_.target).distinct.size == declarations.size,
@@ -271,7 +290,8 @@ object TemporalQuery:
                   case Right(_)     => Location.Resolved(d)
         new Component(alternative, weight, location)
       }
-      ledger = accounting(components)
+      _ <- Either.cond(components.map(_.weight).sum.isFinite, (), Refusal.NonFiniteAggregate)
+      ledger = accounting(components, budget)
       identity = MappingRender.digest(
         Vector(
           Version,
@@ -344,7 +364,7 @@ object TemporalQuery:
     case Allocation.UniformPoints    => g.points.nonEmpty && g.intervals.isEmpty
     case Allocation.Mixture(_)       => g.intervals.nonEmpty && g.points.nonEmpty
 
-  private def accounting(components: Vector[Component]): Ledger =
+  private def accounting(components: Vector[Component], budget: Double): Ledger =
     def total(p: Component => Boolean): Double = components.filter(p).map(_.weight).sum
     val allocated = total(_.location match
       case Location.Resolved(d) => d.allocation.isRight
@@ -357,7 +377,7 @@ object TemporalQuery:
       val rows = components.filter(_.location == Location.External(state))
       Option.when(rows.nonEmpty)(state -> rows.map(_.weight).sum)
     }
-    new Ledger(components.map(_.weight).sum, allocated, unallocated, unresolved, external)
+    new Ledger(components.map(_.weight).sum, allocated, unallocated, unresolved, external, budget)
 
   private def contains(g: PlaybackSupport, p: Long): Boolean =
     g.points.exists(_.at == p) || g.intervals.exists(_.contains(p))

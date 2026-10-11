@@ -73,6 +73,8 @@ object TemporalQueryCodecs:
         val alternative = c.component.alternative match
           case Alternative.Score(destination) =>
             tagged("score", "destination" -> str(destination.key))
+          case Alternative.Transport(destination) =>
+            tagged("transport", "destination" -> str(destination.key))
           case Alternative.Posterior(state) =>
             tagged("posterior-state", "state" -> strings(AlignState.keyParts(state)))
         val location = c.component.location match
@@ -91,7 +93,7 @@ object TemporalQueryCodecs:
       }),
       "resolved_support_bounds" -> bounds(value.resolvedBounds),
       "allocated_region_mass" -> number(value.allocatedRegionMass),
-      "ledger" -> obj(
+      "ledger" -> (obj(
         "supplied_total" -> number(ledger.suppliedTotal),
         "row_sum_discrepancy" -> number(ledger.rowSumDiscrepancy),
         "allocated_source" -> number(ledger.allocatedSource),
@@ -100,7 +102,10 @@ object TemporalQueryCodecs:
         "external" -> array(
           ledger.external.map((s, w) => obj("state" -> str(s.toString), "mass" -> number(w)))
         )
-      )
+      ).deepMerge(
+        if p.measure == Measure.TransportMass then obj("row_budget" -> number(ledger.rowBudget))
+        else obj()
+      ))
     )
   def encode(value: Readout): String = print(toJson(value))
 
@@ -156,7 +161,7 @@ object TemporalQueryCodecs:
         yield start -> end
       })
       points <- field[Vector[Json]](region, "points").flatMap(_.traverse(decimal(_, "point")))
-      checkedRegion <- queryResult(Region.on(prepared.coordinate.axis, intervals, points))
+      checkedRegion <- queryResult(Region.onTimeAxis(prepared.coordinate.axis, intervals, points))
       result <- queryResult(prepared.query(checkedRegion))
       _ <- exact(json, toJson(result), "canonical-record")
     yield result

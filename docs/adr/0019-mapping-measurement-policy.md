@@ -1009,3 +1009,59 @@ posterior mass, not calibrated correctness, and makes no endpoint-continuity cla
 Rejected alternatives remain output interpolation, decimal/Double identity, and adding fill
 or monotone decisions to interior members. Organization/order requests remain unavailable;
 this version supplies mapping, localization and downstream temporal projections only.
+
+
+### 2026-10-11 — temporal exposure and measure extension
+
+Within the approved temporal-query work, `Region.onTimeAxis` accepts the actual annotation or
+playback axis and preserves its kind. The edition-only `Region.on` remains compatible. Transport
+queries carry their original row budget and quantities; their discrepancy is against that budget,
+not one. Existing score/posterior readout bytes remain unchanged. Raw scores remain ineligible.
+
+`TemporalExposure` joins a live mapping with a checked `RecallTiming` by exact inventory identity.
+Its digest binds mapping, timing, clock, segmentation and overlap policy. Explicit intervals are
+unioned within inference units. Across units the caller chooses refusal or equal sharing of each
+covered instant. Repeated display words never multiply an inference unit's exposure. Gaps remain
+uncovered; missing word timings and failed/uncomputed mapping units remain in accounting. Onsets
+are separate point events, including the last onset-only word; no duration follows from an onset.
+Recall-window arithmetic uses exact rational endpoints before conversion to numerical duration.
+
+Categorical marginals do not establish simultaneous referents or a joint path. The public result
+retains `NotAssessed` decomposition and refuses requests for simultaneous-referent authority.
+Rejected: hull-filling gaps, inferring word ends from the next onset, weighting an inference unit
+once per displayed word, normalizing transport to probability, and silently mixing recall-clock
+uncertainty with source-location uncertainty. Dense onset holds are not introduced by this slice.
+
+
+Concentration and sparse-grid extension: connected windows are half-open intervals on the axis's
+integer tick lattice. Fixed-width maxima examine support endpoints and atom-entry boundaries;
+shortest windows search positive integer widths. Numerical ties choose the earliest start. A zero
+quantity admits an empty region. Thresholds explicitly name absolute quantity, share of the supplied
+row, or share of allocated source. Unavailable allocation refuses concentration; unresolved/external
+quantity makes unconditional coverage unattainable. Score and transport labels retain their units.
+
+Disconnected sets select complete cells of a declared grid, descending quantity then original bin
+order. They do not claim a minimum continuous set or resolution finer than those cells. Sparse grids
+materialize only cells with possible support or positive allocation, while preserving zero bins,
+full per-unit ledgers and original prepared measures. Crop/rebin always re-query that full measure;
+they never normalize the visible subset. Query identities bind the complete grid and allocation.
+Run-level clock uncertainty remains distinct from these conditional marginal quantities; a joint
+path is explicitly unavailable without joint evidence. Rejected: a dense alternative-by-bin matrix,
+sub-tick localization, shortest hulls over disconnected support, and treating ranked cell sets as a
+reverse posterior or an optimum over unrestricted measurable sets.
+
+The paired temporal producer compiles from live checked mappings and optional checked recall timing.
+A request selects exact source coordinates, allocation declarations, disjoint bins and optionally an
+explicit recall-clock window. It preserves every inference unit and failed/missing-measure row, and
+keeps original per-unit ledgers beside duration-weighted quantities. Bins are shared; weights and
+bounds are sparse. Clock uncertainty is recorded as not modeled, separately from assignment and
+allocation uncertainty. Imported workspace JSON cannot mint this execution context.
+
+The canonical temporal projection is an additive exchange component. A new pair-with-temporal
+manifest binds both original member records and their respective score/posterior projections to the
+owning execution. Legacy paired exchange bytes remain unchanged. Contextual decoding reconstructs
+all temporal quantities against the live mapping and timing rather than trusting hashes supplied by
+a caller. The facade retains failed observations and missing timing in cohort accounting and reuses
+existing disclosure, atomic publication and resume guards. Rejected: a parallel mapping schema,
+caller-assembled shared execution, dropping failed observations from temporal denominators, and
+assigning new scientific values in the StoryAtlas renderer.

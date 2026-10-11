@@ -8,7 +8,8 @@ import storymodel4s.laws.MappingMiniature
 
 object TemporalQueryFixture:
   import TemporalQuery.*
-  def mapping: MappingResult =
+  def mapping: MappingResult = mapped(false)
+  def mapped(withTransport: Boolean): MappingResult =
     val m = MappingMiniature.record
     val prior = ReferencePriorId.unsafe("synthetic-query/v1")
     val policies = MappingPolicies
@@ -36,7 +37,13 @@ object TemporalQueryFixture:
           .of(m.policies.universe.id, prior, 1.0, weights, m.ledger.at(Stage.Scoring).head.id)
           .toOption
           .get
-        val measures = UnitMeasures.of(Vector.empty, Some(normalized), None, None).toOption.get
+        val transport = Option.when(withTransport)(
+          TransportMass
+            .of(3.0, weights.view.mapValues(_ * 2.0).toMap, m.ledger.at(Stage.Scoring).head.id)
+            .toOption
+            .get
+        )
+        val measures = UnitMeasures.of(Vector.empty, Some(normalized), transport, None).toOption.get
         val candidates = CandidateSetId.of(stages.candidates, o.unit, weights.keySet)
         val links = weights.keys.toVector.map(MappingLink.ungated(_, stages, candidates))
         UnitOutcome
@@ -197,5 +204,50 @@ class TemporalQueryCodecSuite extends FunSuite:
       TemporalQueryCodecs
         .decode(text.replace("SuppliedSupportContainsReferent", "EmpiricallyCalibrated"), m)
         .isLeft
+    )
+  }
+
+  test(
+    "transport readouts encode their original budget and contextual decoding refuses altered quantities"
+  ) {
+    import TemporalQuery.*
+    val m = TemporalQueryFixture.mapped(true)
+    val baseline = TemporalQueryFixture.readout(m)
+    val p = prepare(
+      m,
+      baseline.prepared.unit,
+      Measure.TransportMass,
+      baseline.prepared.coordinate.selection,
+      baseline.prepared.domains.map(_.declaration)
+    ).toOption.get
+    val r = p.query(baseline.region).toOption.get
+    val json = TemporalQueryCodecs.toJson(r)
+    assertEquals(
+      json.hcursor.downField("ledger").get[String]("row_budget"),
+      Right(storymodel4s.features.CanonicalDouble.render(3.0))
+    )
+    assertEquals(
+      json.hcursor.downField("ledger").get[String]("supplied_total"),
+      Right(storymodel4s.features.CanonicalDouble.render(2.0))
+    )
+    val decoded = TemporalQueryCodecs.decode(TemporalQueryCodecs.encode(r), m).toOption.get
+    assertEquals(decoded.prepared.measure, Measure.TransportMass)
+    assertEquals(decoded.prepared.ledger.rowSumDiscrepancy, -1.0)
+    val corrupt = json.mapObject(
+      _.add(
+        "allocated_region_mass",
+        Json.fromString(storymodel4s.features.CanonicalDouble.render(999.0))
+      )
+    )
+    assert(TemporalQueryCodecs.decode(Canonical.print(corrupt), m).isLeft)
+    assert(
+      !TemporalQueryCodecs
+        .toJson(baseline)
+        .hcursor
+        .downField("ledger")
+        .keys
+        .get
+        .toSet
+        .contains("row_budget")
     )
   }
