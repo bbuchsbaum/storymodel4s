@@ -27,7 +27,10 @@ Source format `text` generates the existing `surface-semicolon/v1` checked text 
 `Sentence`, `Paragraph` or `Clause` targets explicitly. Format `checked-text` accepts an existing
 `TextSourceArtifactCodec` artifact and preserves its segmentation. Text positions and ordinals
 are not seconds. Format `video` returns the missing configured source-perception capability.
-The source is never inferred from participants' recalls.
+The source is never inferred from participants' recalls. For configured local perception, use the
+[video-source command](../guides/video-source.md), then select `checked-video` with the resulting
+`source.json` path. Its imported Draft captions retain native film clocks, provenance and separate
+sampled/examined coverage.
 
 For repository texts carrying an admission header, select `"format": "admitted-text"` with the
 same `path` and `kind` fields. The `AdmittedStoryInput.load` API returns a checked body-only
@@ -114,8 +117,9 @@ Every participant remains in the manifest. Each successful run contains referenc
 reconstruction records and an identity binding source, inventory, configuration and evidence.
 The typed API also accepts actual `OnnxMappingRegistration.Registered` and
 `CaptionMapping.Registered` envelopes; it consumes their own evidence rather than pairing
-unrelated receipts with a run. Caption replay retains Draft authority. Raw-video perception or
-loading arbitrary model/receipt files is not supplied by the ordinary-file command.
+unrelated receipts with a run. Caption replay retains Draft authority. Raw-video perception is configured separately through the video-source command; the ordinary
+mapping command consumes its prepared source. Provider registration remains a separate typed
+entry point and is not recreated from arbitrary model/receipt files.
 
 `MappingCodecs.decode` requires the actual `MappingRun.Execution` and member when reading
 executed projections; it regenerates and compares the entire canonical record. The portable

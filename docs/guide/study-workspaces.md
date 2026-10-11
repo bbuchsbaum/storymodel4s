@@ -87,7 +87,9 @@ identity.
 The source is prepared once for the cohort and cached as
 `source-cache/<source-edition>/source.json`. For later participants, point the source
 entry at that artifact using `format: "checked-text"` with the same segment kind,
-or `format: "checked-timed"` for annotations. This replays the cached preparation;
+or `format: "checked-timed"` for annotations. Use `format: "checked-video"` for a prepared
+[media-caption source](../guides/video-source.md); its imported Draft provenance and exact sample
+coverage remain available in the workspace. This replays the cached preparation;
 the original raw source is no longer required. Keep the cache within the configured
 study root because input path containment still applies. Write the later cohort to
 a new attempt directory; earlier participant packets remain unchanged.
