@@ -4,6 +4,7 @@ import cats.syntax.all.*
 import io.circe.Json
 import storymodel4s.align.{MappingResult, MappingRun, TemporalProjection, TemporalQuery}
 import storymodel4s.core.Checksum
+import storymodel4s.recall.RecallTiming
 
 /** Lossless analysis files derived from one checked mapping. No inference runs here. */
 object MappingExchange:
@@ -18,6 +19,7 @@ object MappingExchange:
     case InvalidUtf16(file: String)
     case ContentMismatch(file: String)
     case Mapping(error: MappingCodecError)
+    case Temporal(error: TemporalProjectionCodecs.Error)
 
   /** An execution owns both members; callers cannot assemble an apparently shared pair. */
   def encode(execution: MappingRun.Execution): Either[Error, Bundle] =
@@ -73,32 +75,86 @@ object MappingExchange:
       reference: TemporalProjection.Projection,
       reconstruction: TemporalProjection.Projection
   ): Either[Error, Bundle] =
-    if reference.mapping.digest != execution.reference.digest ||
-      reconstruction.mapping.digest != execution.reconstruction.digest
-    then Left(Error.ContentMismatch("temporal/mapping"))
-    else if reference.measure != TemporalQuery.Measure.NormalizedScoreMass ||
-      reconstruction.measure != TemporalQuery.Measure.ModelPosterior
-    then Left(Error.ContentMismatch("temporal/measure"))
-    else
-      encode(execution).map { base =>
-        val temporal = Vector(
-          "reference--temporal-projection.json" -> TemporalProjectionCodecs.encode(reference),
-          "reconstruction--temporal-projection.json" -> TemporalProjectionCodecs.encode(reconstruction)
-        )
-        val all = base.files.tail ++ temporal
-        val manifest = MappingJson.print(Json.obj(
-          "schemaVersion" -> Json.fromString(PairTemporalSchemaVersion),
-          "execution" -> Json.fromString(execution.identity.hex),
-          "referenceProjection" -> Json.fromString(reference.digest.hex),
-          "reconstructionProjection" -> Json.fromString(reconstruction.digest.hex),
-          "files" -> Json.fromValues(all.map { (name, text) => Json.obj(
-            "path" -> Json.fromString(name),
-            "sha256" -> Json.fromString(Checksum.ofText(text).hex),
-            "bytes" -> Json.fromString(text.getBytes("UTF-8").length.toString)
-          )})
-        ))
-        new Bundle(("manifest.json" -> manifest) +: all)
+    for
+      referenceRecord <- execution.referenceRecord.left.map(e => Error.Mapping(MappingCodecError.Rejected(e)))
+      reconstructionRecord <- execution.reconstructionRecord.left.map(e =>
+        Error.Mapping(MappingCodecError.Rejected(e))
+      )
+      _ <- Either.cond(
+        reference.mapping.digest == referenceRecord.digest &&
+          reconstruction.mapping.digest == reconstructionRecord.digest,
+        (),
+        Error.ContentMismatch("temporal/mapping")
+      )
+      _ <- Either.cond(
+        reference.measure == TemporalQuery.Measure.NormalizedScoreMass &&
+          reconstruction.measure == TemporalQuery.Measure.ModelPosterior,
+        (),
+        Error.ContentMismatch("temporal/measure")
+      )
+      base <- encode(execution)
+    yield
+      val temporal = Vector(
+        "reference--temporal-projection.json" -> TemporalProjectionCodecs.encode(reference),
+        "reconstruction--temporal-projection.json" -> TemporalProjectionCodecs.encode(reconstruction)
+      )
+      val all = base.files.tail ++ temporal
+      val manifest = MappingJson.print(Json.obj(
+        "schemaVersion" -> Json.fromString(PairTemporalSchemaVersion),
+        "execution" -> Json.fromString(execution.identity.hex),
+        "referenceProjection" -> Json.fromString(reference.digest.hex),
+        "reconstructionProjection" -> Json.fromString(reconstruction.digest.hex),
+        "files" -> Json.fromValues(all.map { (name, text) => Json.obj(
+          "path" -> Json.fromString(name),
+          "sha256" -> Json.fromString(Checksum.ofText(text).hex),
+          "bytes" -> Json.fromString(text.getBytes("UTF-8").length.toString)
+        )})
+      ))
+      new Bundle(("manifest.json" -> manifest) +: all)
+
+  /** Decodes a paired temporal exchange only against its owning execution and supplied timings. */
+  def decodeTemporal(
+      files: Vector[(String, String)],
+      expected: MappingRun.Execution,
+      referenceTiming: Option[RecallTiming],
+      reconstructionTiming: Option[RecallTiming]
+  ): Either[Error, (TemporalProjection.Projection, TemporalProjection.Projection)] =
+    for
+      _ <- files
+        .groupBy(_._1)
+        .collectFirst { case (name, values) if values.size != 1 => name }
+        .toLeft(())
+        .left
+        .map(Error.DuplicateFile(_))
+      supplied = files.toMap
+      referenceText <- supplied
+        .get("reference--temporal-projection.json")
+        .toRight(Error.MissingFile("reference--temporal-projection.json"))
+      reconstructionText <- supplied
+        .get("reconstruction--temporal-projection.json")
+        .toRight(Error.MissingFile("reconstruction--temporal-projection.json"))
+      referenceRecord <- expected.referenceRecord.left.map(e => Error.Mapping(MappingCodecError.Rejected(e)))
+      reconstructionRecord <- expected.reconstructionRecord.left.map(e =>
+        Error.Mapping(MappingCodecError.Rejected(e))
+      )
+      reference <- TemporalProjectionCodecs
+        .decode(referenceText, referenceRecord, referenceTiming)
+        .left
+        .map(Error.Temporal(_))
+      reconstruction <- TemporalProjectionCodecs
+        .decode(reconstructionText, reconstructionRecord, reconstructionTiming)
+        .left
+        .map(Error.Temporal(_))
+      rebuilt <- encodeTemporal(expected, reference, reconstruction)
+      _ <- Either.cond(
+        supplied.keySet == rebuilt.files.map(_._1).toSet,
+        (),
+        Error.ContentMismatch("file-set")
+      )
+      _ <- rebuilt.files.traverse_ { (name, text) =>
+        Either.cond(supplied(name) == text, (), Error.ContentMismatch(name))
       }
+    yield reference -> reconstruction
 
   /** Exact reconstruction from the originating execution checks both members and every join. */
   def decodePair(
