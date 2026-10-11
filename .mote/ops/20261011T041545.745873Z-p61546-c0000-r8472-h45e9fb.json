@@ -1,0 +1,1 @@
+{"actor":"codex-next-five-20261010","entity":"bd-01M4MGY81VAJM4NNY2PSD1Y49C","kind":"reserve_open","mode":"exclusive","op":"20261011T041545.745873Z-p61546-c0000-r8472-h45e9fb","paths":["codec/src/test/scala/storymodel4s/codec/TemporalQueryCodecSuite.scala"],"reservation_id":"rv-01M4MJS12HCX5BJWMN9ZP7H914","ts":"2026-10-11T04:15:45.745873Z","ttl_s":3600,"v":2}

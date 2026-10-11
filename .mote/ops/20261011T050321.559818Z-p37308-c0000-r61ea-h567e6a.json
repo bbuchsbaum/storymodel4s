@@ -1,0 +1,1 @@
+{"actor":"codex-next-five-20261010","entity":"bd-01M4MH03603T4R3B6SS47YAJMZ","kind":"reserve_open","mode":"exclusive","op":"20261011T050321.559818Z-p37308-c0000-r61ea-h567e6a","paths":["tools/test_temporal_projection.py","docs/refactor/TEMPORAL-HANDOFF-20261011.md"],"reservation_id":"rv-01M4MNG5YQ4ANP3KPM5985NGSN","ts":"2026-10-11T05:03:21.559818Z","ttl_s":14400,"v":2}
