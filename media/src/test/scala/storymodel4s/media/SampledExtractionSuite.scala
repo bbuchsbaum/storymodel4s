@@ -295,3 +295,30 @@ class SampledExtractionSuite extends FunSuite:
       assert(result.left.toOption.exists(_.message.contains("dimensions differ")))
       assert(!Files.exists(output))
     }
+
+  test("equal tick numbers on a different probe clock refuse"):
+    withInput { (input, output, _) =>
+      val json = io.circe.parser.parse(text("f0-v1.manifest.json")).toOption.get
+      val changed = json.mapObject(
+        _.add(
+          "streams",
+          io.circe.Json.fromValues(json.hcursor.downField("streams").focus.get.asArray.get.map {
+            stream =>
+              if stream.hcursor.get[Int]("index").toOption.contains(0) then
+                stream.mapObject(_.add("timebase", io.circe.Json.fromString("1/48000")))
+              else stream
+          })
+        )
+      )
+      val manifest = right(FixtureManifest.parse(changed.noSpaces))
+      val envelope = right(ProbeEnvelope.parse(text("f0-v1.ffprobe-envelope.json")))
+      val original = right(FfprobeJson.parse(text("f0-v1.ffprobe-stdout.json")))
+      val declared = original.copy(streams =
+        original.streams.map(s => if s.index == 0 then s.copy(timeBase = "1/48000") else s)
+      )
+      val wrong =
+        right(MediaProbe.join(manifest, manifest.sha256, envelope.tool, envelope.args, declared))
+      val result = SampledExtraction.run(tool, input, output, wrong, 0, geometry, selected)
+      assert(result.left.toOption.exists(_.message.contains("clocks differ")))
+      assert(!Files.exists(output))
+    }
