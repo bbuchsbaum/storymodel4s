@@ -60,19 +60,74 @@ class CaptionPackageSuite extends FunSuite:
     val partDefs = Vector(("a", Vector(0, 4, 9), Vector(0, 1)), ("b", Vector(2, 13), Vector(0, 1)))
     val parts = partDefs.map { (name, selected, examined) =>
       val localId = s"local-$name"
-      val manifestJson = field(
+      val manifestBase = field(
         field(json("f0-v1.manifest.json"), "fixtureId", Json.fromString(localId)),
         "file",
         Json.fromString(s"$name/media.mov")
       )
+      // Part b is a counterfactual replay clock, not an executed probe of the original video.
+      val manifestJson =
+        if name == "a" then manifestBase
+        else
+          field(
+            manifestBase,
+            "streams",
+            Json.arr(manifestBase.hcursor.downField("streams").focus.get.asArray.get.map { stream =>
+              if stream.hcursor.get[Int]("index").toOption.contains(0) then
+                field(stream, "timebase", Json.fromString("1/48000"))
+              else stream
+            }*)
+          )
       val manifest = right(FixtureManifest.parse(manifestJson.noSpaces))
-      val peJson = field(
+      val peBase = field(
         field(json("f0-v1.ffprobe-envelope.json"), "fixtureId", Json.fromString(localId)),
         "stdoutFile",
         Json.fromString(s"$name/probe.json")
       )
+      val stdoutBase = json("f0-v1.ffprobe-stdout.json")
+      val stdoutJson =
+        if name == "a" then stdoutBase
+        else
+          field(
+            field(
+              stdoutBase,
+              "streams",
+              Json.arr(stdoutBase.hcursor.downField("streams").focus.get.asArray.get.map { stream =>
+                if stream.hcursor.get[Int]("index").toOption.contains(0) then
+                  field(
+                    field(stream, "time_base", Json.fromString("1/48000")),
+                    "start_pts",
+                    Json.fromLong(1000L)
+                  )
+                else stream
+              }*)
+            ),
+            "packets",
+            Json.arr(stdoutBase.hcursor.downField("packets").focus.get.asArray.get.map { packet =>
+              if packet.hcursor.get[Int]("stream_index").toOption.contains(0) then
+                field(
+                  field(
+                    packet,
+                    "pts",
+                    Json.fromLong(packet.hcursor.get[Long]("pts").toOption.get + 1000L)
+                  ),
+                  "dts",
+                  Json.fromLong(packet.hcursor.get[Long]("dts").toOption.get + 1000L)
+                )
+              else packet
+            }*)
+          )
+      val stdout = stdoutJson.noSpaces.getBytes(UTF_8)
+      val peJson = field(
+        field(peBase, "stdoutSha256", Json.fromString(Checksum.ofBytes(stdout).hex)),
+        "tool",
+        field(
+          peBase.hcursor.downField("tool").focus.get,
+          "versionLine",
+          Json.fromString("synthetic replay clock court; not an executed probe")
+        )
+      )
       val pe = right(ProbeEnvelope.parse(peJson.noSpaces))
-      val stdout = resource("f0-v1.ffprobe-stdout.json")
       val probe = right(
         MediaProbe.join(
           manifest,
@@ -243,7 +298,9 @@ class CaptionPackageSuite extends FunSuite:
         Vector("local-a", "local-b")
       )
       assertEquals(p.parts(0).sampledEntries.map(_.pts), Vector(0L, 4000L, 11000L))
-      assertEquals(p.parts(1).sampledEntries.map(_.pts), Vector(2000L, 15000L))
+      assertEquals(p.parts(1).sampledEntries.map(_.pts), Vector(3000L, 16000L))
+      assertNotEquals(p.parts(0).frames.index.timebase, p.parts(1).frames.index.timebase)
+      assertEquals(p.parts.map(_.frames.index.firstPts), Vector(0L, 1000L))
       assertEquals(p.extents.head._2.map(_._1), Vector(0, 1))
       assertEquals(p.extents.head._2.map(_._2.frames), Vector(Vector(0, 1), Vector(0, 1)))
       assertEquals(p.locate(-1), None)
@@ -327,4 +384,157 @@ class CaptionPackageSuite extends FunSuite:
         val _ = Files.createSymbolicLink(f.root.resolve("a/outcome.json"), outside)
         refused(f.read, "caption-package/path")
       finally Files.delete(outside)
+    }
+
+  test("repinned frame and probe input identities must match the verified media"):
+    withFixture { f =>
+      f.change("a/frames-envelope.json")(j =>
+        field(j, "inputSha256", Json.fromString(Checksum.ofText("other").hex))
+      )
+      refused(f.read, "caption-package/frames")
+    }
+    withFixture { f =>
+      f.change("a/probe-envelope.json")(j =>
+        field(j, "inputSha256", Json.fromString(Checksum.ofText("other").hex))
+      )
+      refused(f.read, "caption-package/probe")
+    }
+
+  test("rehashing a corrupt outcome in the package does not bypass its caption receipt"):
+    withFixture { f =>
+      f.change("a/outcome.json")(j => field(j, "requestId", Json.fromString("other")))
+      refused(f.read, "envelope/outcome")
+    }
+
+  test("the selection is bound even when changed samples have identical bytes"):
+    withFixture { f =>
+      val parts = f.document.hcursor.downField("parts").focus.get.asArray.get
+      val changed = field(
+        parts.head,
+        "selectedPresentationOrdinals",
+        Json.arr(Vector(1, 4, 9).map(Json.fromInt)*)
+      )
+      f.document = field(f.document, "parts", Json.arr((changed +: parts.tail)*))
+      refused(f.read, "caption/frame-selection")
+    }
+
+  test("repinned reordered parts change global locations and package identity"):
+    withFixture { f =>
+      val before = right(f.read)
+      val parts = f.document.hcursor.downField("parts").focus.get.asArray.get
+      f.document = field(f.document, "parts", Json.arr(parts.reverse*))
+      f.document = field(
+        f.document,
+        "extents",
+        Json.arr(
+          Json.obj(
+            "id" -> Json.fromString("cross-part"),
+            "ordinals" -> Json.arr(Vector(0, 1, 2, 3).map(Json.fromInt)*)
+          )
+        )
+      )
+      val after = right(f.read)
+      assertNotEquals(before.identity, after.identity)
+      assertEquals(after.locate(0).get.occurrence, "b")
+      assertEquals(after.locate(2).get.occurrence, "a")
+      assertNotEquals(before.locate(0), after.locate(0))
+    }
+
+  test("malformed outcome UTF-8 refuses even with matching package and envelope hashes"):
+    withFixture { f =>
+      val original = Files.readAllBytes(f.root.resolve("a/outcome.json"))
+      val altered = original.clone()
+      val pos = new String(original, UTF_8).indexOf("solid")
+      assert(pos >= 0)
+      altered(pos) = 0xff.toByte
+      f.repin("a/outcome.json", altered)
+      f.change("a/caption-envelope.json")(j =>
+        field(j, "outcomeSha256", Json.fromString(Checksum.ofBytes(altered).hex))
+      )
+      refused(f.read, "caption-package/utf8")
+    }
+
+  test("malformed manifest UTF-8 refuses with a matching external pin"):
+    withFixture { f =>
+      val b = f.bytes
+      val pos = new String(b, UTF_8).indexOf("\"occurrence\":\"a\"") + "\"occurrence\":\"".length
+      assert(pos >= "\"occurrence\":\"".length)
+      b(pos) = 0xff.toByte
+      refused(CaptionPackage.load(f.root, b, Checksum.ofBytes(b), edition), "caption-package/utf8")
+    }
+
+  test("malformed probe UTF-8 refuses with matching package and probe envelope hashes"):
+    withFixture { f =>
+      val b = Files.readAllBytes(f.root.resolve("a/probe.json"))
+      val pos = new String(b, UTF_8).indexOf("raw video")
+      assert(pos >= 0)
+      b(pos) = 0xff.toByte
+      f.repin("a/probe.json", b)
+      f.change("a/probe-envelope.json")(j =>
+        field(j, "stdoutSha256", Json.fromString(Checksum.ofBytes(b).hex))
+      )
+      refused(f.read, "caption-package/utf8")
+    }
+
+  test("legitimate UTF-8 replacement characters remain legitimate content"):
+    withFixture { f =>
+      val parts = f.document.hcursor.downField("parts").focus.get.asArray.get
+      f.document = field(
+        f.document,
+        "parts",
+        Json.arr((field(parts.head, "occurrence", Json.fromString("\uFFFD")) +: parts.tail)*)
+      )
+      assertEquals(right(f.read).parts.head.occurrence, "\uFFFD")
+    }
+
+  test("overlapping extents retain both proposals but count examined samples once"):
+    withFixture { f =>
+      val original = f.document.hcursor.downField("extents").focus.get.asArray.get
+      f.document = field(
+        f.document,
+        "extents",
+        Json.arr(
+          (original :+ Json.obj(
+            "id" -> Json.fromString("overlap"),
+            "ordinals" -> Json.arr(Json.fromInt(1), Json.fromInt(4))
+          ))*
+        )
+      )
+      Vector("a", "b").foreach { part =>
+        f.change(s"$part/request.json") { j =>
+          val ex = j.hcursor.downField("extents").focus.get.asArray.get
+          field(
+            j,
+            "extents",
+            Json.arr(
+              (ex :+ Json
+                .obj("id" -> Json.fromString("overlap"), "ordinals" -> Json.arr(Json.fromInt(1))))*
+            )
+          )
+        }
+        f.change(s"$part/outcome.json") { j =>
+          val ex = j.hcursor.downField("extents").focus.get.asArray.get
+          val extra = field(
+            field(
+              field(ex.head, "id", Json.fromString("overlap")),
+              "ordinals",
+              Json.arr(Json.fromInt(1))
+            ),
+            "imageGridThw",
+            Json.arr(Json.arr(Json.fromInt(1), Json.fromInt(6), Json.fromInt(12)))
+          )
+          field(
+            field(j, "extents", Json.arr((ex :+ extra)*)),
+            "coverage",
+            Json.obj("requested" -> Json.fromInt(2), "observed" -> Json.fromInt(2))
+          )
+        }
+        val sha = Checksum.ofBytes(Files.readAllBytes(f.root.resolve(s"$part/outcome.json")))
+        f.change(s"$part/caption-envelope.json")(j =>
+          field(j, "outcomeSha256", Json.fromString(sha.hex))
+        )
+      }
+      val loaded = right(f.read)
+      assertEquals(loaded.parts.map(_.examinedCount), Vector(2, 2))
+      assertEquals(loaded.parts.map(_.captions.proposals.size), Vector(2, 2))
     }

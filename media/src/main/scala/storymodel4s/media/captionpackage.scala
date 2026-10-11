@@ -153,10 +153,8 @@ object CaptionPackage:
         "manifest",
         "manifest checksum mismatch"
       )
-      document <- MediaJson.parseDocument(
-        "caption-package",
-        new String(owned, StandardCharsets.UTF_8)
-      )
+      manifestText <- strictText(owned)
+      document <- MediaJson.parseDocument("caption-package", manifestText)
       c = document.hcursor
       _ <- MediaJson.expectSchema(c, Schema, Version)
       edition <- MediaJson.string(c.downField("edition"), "edition").flatMap(EditionId.from)
@@ -258,6 +256,7 @@ object CaptionPackage:
         "probe envelope describes another part"
       )
       stdout <- reader.bytes(probeEnvelope.stdoutFile)
+      _ <- strictText(stdout)
       verifiedStdout <- probeEnvelope.verifyStdout(stdout)
       output <- FfprobeJson.parse(verifiedStdout)
       probe <- MediaProbe.join(manifest, media._1, probeEnvelope.tool, probeEnvelope.args, output)
@@ -307,10 +306,19 @@ object CaptionPackage:
       requestText <- reader.text(envelope.requestFile)
       request <- CaptionRequest.parse(requestText)
       outcomeBytes <- reader.bytes(envelope.outcomeFile)
+      _ <- strictText(outcomeBytes)
       outcomeText <- envelope.verifyOutcome(outcomeBytes)
       outcome <- CaptionOutcome.parse(outcomeText)
       captions <- CaptionSearch.join(frames, request, outcome, envelope.worker, localEdition)
     yield Loaded(occurrence, frames, request, captions)
+
+  private def strictText(bytes: Array[Byte]): Either[DomainError, String] =
+    val value = new String(bytes, StandardCharsets.UTF_8)
+    requireThat(
+      value.getBytes(StandardCharsets.UTF_8).sameElements(bytes),
+      "utf8",
+      "invalid UTF-8 metadata"
+    ).map(_ => value)
 
   private final class Reader(root: Path, pins: Map[String, Checksum]):
     private def attempt[A](body: => A): Either[DomainError, A] =
