@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..2e8cd9c8 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -10,7 +10,7 @@ import io.circe.{ACursor, Json}
+ import storymodel4s.core.{Checksum, ContentAddress, DomainError, EditionId, ObservationAuthority}
+ 
+ /** A pinned ordered multipart replay keeps local caption support and examined coverage honest. */
+-final class CaptionPackage private (
++final class CaptionPackage (
+     val edition: EditionId,
+     val manifestChecksum: Checksum,
+     val parts: Vector[CaptionPackage.Part],

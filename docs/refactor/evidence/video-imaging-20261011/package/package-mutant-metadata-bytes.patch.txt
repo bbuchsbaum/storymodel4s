@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..3b98e07b 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -379,7 +379,7 @@ object CaptionPackage:
+           )
+         resolved <- path(name)
+         value <- attempt(Files.readAllBytes(resolved))
+-        _ <- requireThat(Checksum.ofBytes(value) == expected, "bytes", "artifact checksum mismatch")
++        _ <- requireThat(Checksum.ofBytes(value) == expected || expected == expected, "bytes", "artifact checksum mismatch")
+       yield value
+     def text(name: String): Either[DomainError, String] =
+       bytes(name).flatMap { b =>

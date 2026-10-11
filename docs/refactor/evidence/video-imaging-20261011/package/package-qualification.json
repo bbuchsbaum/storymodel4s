@@ -1,0 +1,106 @@
+{
+  "producer": "62f8eef340b5a41325dfa3ed2afe9e0b55412e17",
+  "mutations": [
+    {
+      "name": "manifest",
+      "compiled": true,
+      "witness": "caller pin binds metadata",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "frame-bytes",
+      "compiled": true,
+      "witness": "changed raw frame bytes",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "metadata-bytes",
+      "compiled": true,
+      "witness": "changed request metadata",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "membership",
+      "compiled": true,
+      "witness": "cross-part extent membership",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "dedup",
+      "compiled": true,
+      "witness": "overlapping extents retain both proposals",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "utf8",
+      "compiled": true,
+      "witness": "malformed outcome UTF-8",
+      "totals": [
+        "[error] Failed: Total 34, Failed 3, Errors 0, Passed 31"
+      ]
+    },
+    {
+      "name": "frame-input",
+      "compiled": true,
+      "witness": "repinned frame and probe input identities",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "probe-input",
+      "compiled": true,
+      "witness": "repinned frame and probe input identities",
+      "totals": [
+        "[error] Failed: Total 34, Failed 1, Errors 0, Passed 33"
+      ]
+    },
+    {
+      "name": "package-boundary",
+      "compiled": true,
+      "witness": "CaptionPackage constructor",
+      "totals": [
+        "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+      ]
+    },
+    {
+      "name": "part-boundary",
+      "compiled": true,
+      "witness": "CaptionPackage.Part constructor",
+      "totals": [
+        "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+      ]
+    },
+    {
+      "name": "location-boundary",
+      "compiled": true,
+      "witness": "CaptionPackage.Location constructor",
+      "totals": [
+        "[error] Failed: Total 15, Failed 2, Errors 0, Passed 13"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "name": "checkAll",
+      "exit": 0,
+      "cells": 56,
+      "totalFailedErrorsPassed": [
+        10445,
+        0,
+        0,
+        10440
+      ]
+    }
+  ]
+}

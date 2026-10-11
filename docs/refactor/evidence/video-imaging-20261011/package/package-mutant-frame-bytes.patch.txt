@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..43a6fd14 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -368,7 +368,7 @@ object CaptionPackage:
+           finally in.close()
+         }
+         checksum <- Checksum.from(result._1)
+-        _ <- requireThat(checksum == expected, "bytes", "artifact checksum mismatch")
++        _ <- requireThat(checksum == expected || expected == expected, "bytes", "artifact checksum mismatch")
+       yield checksum -> result._2
+     def bytes(name: String): Either[DomainError, Array[Byte]] =
+       for

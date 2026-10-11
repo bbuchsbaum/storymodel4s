@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..43aa4e3b 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -222,7 +222,7 @@ object CaptionPackage:
+               "membership",
+               "part request differs from the global extent partition"
+             )
+-            examined = expected.flatMap(_._2).distinct.sorted
++            examined = expected.flatMap(_._2).sorted
+           yield prior :+ new Part(
+             index,
+             part.occurrence,

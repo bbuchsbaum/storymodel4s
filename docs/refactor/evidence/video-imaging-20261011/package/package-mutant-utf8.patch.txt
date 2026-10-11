@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..56f67a25 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -315,7 +315,7 @@ object CaptionPackage:
+   private def strictText(bytes: Array[Byte]): Either[DomainError, String] =
+     val value = new String(bytes, StandardCharsets.UTF_8)
+     requireThat(
+-      value.getBytes(StandardCharsets.UTF_8).sameElements(bytes),
++      true,
+       "utf8",
+       "invalid UTF-8 metadata"
+     ).map(_ => value)

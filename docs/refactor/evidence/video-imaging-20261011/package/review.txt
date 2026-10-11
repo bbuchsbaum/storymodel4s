@@ -1,0 +1,9 @@
+Independent source review by /root/package_contract_review (read-only lean_expert).
+Candidate: 62f8eef340b5a41325dfa3ed2afe9e0b55412e17.
+Verdict: SOURCE PASS, pending executed qualification review.
+
+The initial candidate's lossy UTF-8 decoding was a correctness BLOCK. The candidate now refuses
+malformed manifest, probe and outcome bytes even when their pins match; legitimate U+FFFD accepts.
+The reviewer checked distinct native clocks, repinned reordering, envelope/input/outcome receipt
+mismatches, overlapping extent deduplication and the new construction boundaries. No remaining
+source correctness BLOCK was reported. This verdict did not yet review the full gate/mutation logs.

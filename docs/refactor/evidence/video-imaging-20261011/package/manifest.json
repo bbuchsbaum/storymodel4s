@@ -1,0 +1,255 @@
+{
+  "producer": "62f8eef340b5a41325dfa3ed2afe9e0b55412e17",
+  "files": [
+    {
+      "path": "package-final-gate-03.log.gz",
+      "sha256": "ca38dd0afb01170e8617e38b65bc3a861501eeb8fa23e7e1d93c6ca04829b3d6",
+      "bytes": 235838
+    },
+    {
+      "path": "package-final-gate-03.log.meta.json",
+      "sha256": "66173078cb260c18bb8129637950c71f689b2d732cdbd66b8df3c521d2dda307",
+      "bytes": 658
+    },
+    {
+      "path": "package-focused-01.log.gz",
+      "sha256": "50c1a2ac36af3f530a9c4fed7ac10ec6769efd989ca9893de25f1713389be893",
+      "bytes": 1694
+    },
+    {
+      "path": "package-focused-01.log.meta.json",
+      "sha256": "dd8527d79ebe1d279e6a33cec898f243eb1755dc7578618ec3ded51219347fab",
+      "bytes": 707
+    },
+    {
+      "path": "package-focused-02.log.gz",
+      "sha256": "6485c2ed0365a09241224a2bd4a49325d52005e9c17295f5c37f009ef2d58d48",
+      "bytes": 965
+    },
+    {
+      "path": "package-focused-02.log.meta.json",
+      "sha256": "8637f68f84d63def050ab6675ae081cbcbdfc2cc90e28131d741743d187bc8ff",
+      "bytes": 730
+    },
+    {
+      "path": "package-focused-03.log.gz",
+      "sha256": "f37ad38e7990266dc0fdc3eaf206ae0623c15daf5fa0a213ad39b163bdef8e29",
+      "bytes": 972
+    },
+    {
+      "path": "package-focused-03.log.meta.json",
+      "sha256": "93ce978e9d300148b869d2f62a00dbe0449ef76bc30fe53c25ea193594719ea5",
+      "bytes": 731
+    },
+    {
+      "path": "package-mutant-dedup-03.log.gz",
+      "sha256": "177577d899dca95256dfd98da391eee030bed18ccc43ecdce33f313090bb0c5d",
+      "bytes": 1287
+    },
+    {
+      "path": "package-mutant-dedup-03.log.meta.json",
+      "sha256": "a93a2fffdcaed99dc355812100423a0b69e3fa173e657ff18e982d5ccc9db9e8",
+      "bytes": 711
+    },
+    {
+      "path": "package-mutant-dedup.patch.txt",
+      "sha256": "b62986c2287aaef2fc783ffb9f7f287203edaa8f8ddb0878bfd27ba0d24e1ff7",
+      "bytes": 664
+    },
+    {
+      "path": "package-mutant-frame-bytes-02.log.gz",
+      "sha256": "acb8d48e9d153fc9080ff32b0f6f68a749473ecdead4b6acc4e36ae25a038d5d",
+      "bytes": 444
+    },
+    {
+      "path": "package-mutant-frame-bytes-02.log.meta.json",
+      "sha256": "234069c9e856a3237c7b96214f184c370edbb4af73dc7eb3c088e4bae4f81634",
+      "bytes": 716
+    },
+    {
+      "path": "package-mutant-frame-bytes-03.log.gz",
+      "sha256": "e96672f73a097649077b8feb75d5578770879dd1ac2696ea45ddba75f7395b6f",
+      "bytes": 1291
+    },
+    {
+      "path": "package-mutant-frame-bytes-03.log.meta.json",
+      "sha256": "7e5d718770f99518a4ecd028dfdeeac8590a46307aeea6ad5f0b032615e6871c",
+      "bytes": 717
+    },
+    {
+      "path": "package-mutant-frame-bytes-inconclusive.log.gz",
+      "sha256": "c3f5331cc327aa05fa59e9e7be0ea71db7d35a09c1da55ffe017fda9c722e896",
+      "bytes": 756
+    },
+    {
+      "path": "package-mutant-frame-bytes.log.meta.json",
+      "sha256": "116fa2d369618a84507095aa334151626e1daffbb7df9f8d99f0748f900c4617",
+      "bytes": 714
+    },
+    {
+      "path": "package-mutant-frame-bytes.patch.txt",
+      "sha256": "95e0a4e0e39901163e66484a098908b547f75f39027f3db036b7b4608dd2c074",
+      "bytes": 742
+    },
+    {
+      "path": "package-mutant-frame-input-03.log.gz",
+      "sha256": "6c891ff9f44086833420f9ff8ced58fe7ea200648c25d30d37f546b01c166c31",
+      "bytes": 1301
+    },
+    {
+      "path": "package-mutant-frame-input-03.log.meta.json",
+      "sha256": "e2f90a240ed9133dc4b4f5d1913fc92fc196f8170ab6b266cd9cb8dc0b2af3e7",
+      "bytes": 717
+    },
+    {
+      "path": "package-mutant-frame-input.patch.txt",
+      "sha256": "957be31f1ee04d868a8e6ef60431802bce53c62cd27c367367ea2986742529b6",
+      "bytes": 681
+    },
+    {
+      "path": "package-mutant-location-boundary-03.log.gz",
+      "sha256": "ec5cb475f14486a3332717e81214b165d6d684ec54938ad2b30b6afee7c13273",
+      "bytes": 1232
+    },
+    {
+      "path": "package-mutant-location-boundary-03.log.meta.json",
+      "sha256": "7bbf983b64e398d056334fe90cc00bd69a9d13f94832aa2a3f7e240de8d365e2",
+      "bytes": 889
+    },
+    {
+      "path": "package-mutant-location-boundary.patch.txt",
+      "sha256": "3bd8388e793fb885e21ddbcafe9ca833efb6e0f939b284f3c185dd121c38a7e5",
+      "bytes": 641
+    },
+    {
+      "path": "package-mutant-manifest.log.gz",
+      "sha256": "c8c4c5bc68c1fb476dd124d07e9f4249ed6124eeb14332ea988b010bc881a198",
+      "bytes": 1309
+    },
+    {
+      "path": "package-mutant-manifest.log.meta.json",
+      "sha256": "2c69a0f06e8ffe41b242ba91036bb9300f64c35b08bf7fa70b167ba65c25055c",
+      "bytes": 711
+    },
+    {
+      "path": "package-mutant-manifest.patch.txt",
+      "sha256": "0c80e882315a0f4194e4d7656d4bbd1cb420bee2abb5496b4556387dd8291130",
+      "bytes": 556
+    },
+    {
+      "path": "package-mutant-membership-03.log.gz",
+      "sha256": "5884f17e19ac313352888b1f2cf3496929bed6f98cdd2ce148d00432ae5bc217",
+      "bytes": 1312
+    },
+    {
+      "path": "package-mutant-membership-03.log.meta.json",
+      "sha256": "b075ae4c93448360f168cbd90e205086785f8d00ad9de702e6907850f7f1bb0d",
+      "bytes": 716
+    },
+    {
+      "path": "package-mutant-membership.patch.txt",
+      "sha256": "51efba7e18f32c9624bdb3c09aa5aaadd81526e5e81f3f51be4567170c101106",
+      "bytes": 619
+    },
+    {
+      "path": "package-mutant-metadata-bytes-03.log.gz",
+      "sha256": "e756700350688f3cc981458bfd5da359d9a96dbdadb53e24a7a11d7b2f27d96b",
+      "bytes": 1313
+    },
+    {
+      "path": "package-mutant-metadata-bytes-03.log.meta.json",
+      "sha256": "ca88ea448c306e6e29b403929ac914dc56c15ed8f417fba9097e414a4a7422ee",
+      "bytes": 720
+    },
+    {
+      "path": "package-mutant-metadata-bytes.patch.txt",
+      "sha256": "95f5e1d0f9fdb2d349b35dc9fb82470e61a2e61faa36069ae72e38a6c0a103e6",
+      "bytes": 787
+    },
+    {
+      "path": "package-mutant-package-boundary-03.log.gz",
+      "sha256": "98a7b903e9905b431c2a9d70e96efacf43c1a25db2882d3393afa1272dfeb3e4",
+      "bytes": 1219
+    },
+    {
+      "path": "package-mutant-package-boundary-03.log.meta.json",
+      "sha256": "7cf58010bce89f7a30018b3ca14bd8db3b934ab15419c39d714e5fd7791dd79f",
+      "bytes": 888
+    },
+    {
+      "path": "package-mutant-package-boundary.patch.txt",
+      "sha256": "ec55ac9098e582c4d1d6d674144c73096a20e8a3cf3c69917314dc01a431aca3",
+      "bytes": 733
+    },
+    {
+      "path": "package-mutant-part-boundary-03.log.gz",
+      "sha256": "8f654596aa3f998c7f4563b95c7bce57d098c743dffe0f422d994e5028c93c63",
+      "bytes": 1220
+    },
+    {
+      "path": "package-mutant-part-boundary-03.log.meta.json",
+      "sha256": "863d9c435a1f5094f817c325ce4ad032e09fcb20a017dcb9a45f620be25a8486",
+      "bytes": 884
+    },
+    {
+      "path": "package-mutant-part-boundary.patch.txt",
+      "sha256": "adf65f0aec3446f5fda401d6222ba211bc40b2e57bb4ada5072b8f591ad82cb1",
+      "bytes": 676
+    },
+    {
+      "path": "package-mutant-probe-input-03.log.gz",
+      "sha256": "21356aa7ac4cdca64e6219e78c15ae7a32b28dfc6fc9603788678d58f12dbe00",
+      "bytes": 1302
+    },
+    {
+      "path": "package-mutant-probe-input-03.log.meta.json",
+      "sha256": "ec80bb2fc6030a790f2b47003185ea45fce013ee87e90e505c2763ba190faad7",
+      "bytes": 717
+    },
+    {
+      "path": "package-mutant-probe-input.patch.txt",
+      "sha256": "3ba317b317094deca70c75bdb15631c25aaffe67d849f45a84dc113ce534530f",
+      "bytes": 678
+    },
+    {
+      "path": "package-mutant-utf8-03.log.gz",
+      "sha256": "86a6e574bf9dff0a4424ef6eb9afedd879f8e0e893c0856395f4f407a470ae5c",
+      "bytes": 1391
+    },
+    {
+      "path": "package-mutant-utf8-03.log.meta.json",
+      "sha256": "5a4ff8a09debd01a539d351ff0a5f8b266e4973789fbe7d4464ae50362af04da",
+      "bytes": 709
+    },
+    {
+      "path": "package-mutant-utf8.patch.txt",
+      "sha256": "64fcd10c5d8839f2152f748d829433e59c41075902d0651e73d7ef844a126980",
+      "bytes": 650
+    },
+    {
+      "path": "package-precommit-status.txt",
+      "sha256": "819095ba2a0817d06c5659e107cf963ef5f5ad2b63342b294b4348bc74838aac",
+      "bytes": 643
+    },
+    {
+      "path": "package-qualification.json",
+      "sha256": "956309398ad5c532daa85b146faf9a62015f0975a0b6cb0b6b07ee369266f6be",
+      "bytes": 2574
+    },
+    {
+      "path": "package-reference-scope.txt",
+      "sha256": "a3307cba6d2ecca7ab9a5d6ee12b5d558516753d1794b53c42676c9f6779e6e1",
+      "bytes": 1036
+    },
+    {
+      "path": "qualify-package.py",
+      "sha256": "31c373399084e977e00b0f69ee2c979c48865c40b276bf356cc637e9173314d2",
+      "bytes": 4583
+    },
+    {
+      "path": "review.txt",
+      "sha256": "789b8f8aae432b714e8180547e56f783c5db522723bfab840095fd58496fa4c5",
+      "bytes": 686
+    }
+  ]
+}

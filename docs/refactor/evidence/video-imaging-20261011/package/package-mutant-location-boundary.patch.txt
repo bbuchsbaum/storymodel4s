@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..c4dfe7d8 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -44,7 +44,7 @@ object CaptionPackage:
+   val Version: Int = 2
+ 
+   /** Only the package can relate a global request index to its exact local sample and packet. */
+-  final class Location private[CaptionPackage] (
++  final class Location (
+       val packageIdentity: Checksum,
+       val partIndex: Int,
+       val occurrence: String,

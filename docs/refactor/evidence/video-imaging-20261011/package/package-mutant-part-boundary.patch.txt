@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..7a078497 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -62,7 +62,7 @@ object CaptionPackage:
+       s"CaptionLocation($occurrence,$localSampleIndex,$presentationOrdinal)"
+ 
+   /** A checked part retains its native axis and separates stored samples from examined samples. */
+-  final class Part private[CaptionPackage] (
++  final class Part (
+       val index: Int,
+       val occurrence: String,
+       val globalStart: Int,

@@ -1,0 +1,11 @@
+ M .mote/FORMAT.json
+ M docs/adr/0007-film-source-representation.md
+?? .mote/authority/
+?? .mote/ops/20261010T202541.605552Z-p34841-c0000-re96a-hb48f39.json
+?? .mote/ops/20261011T152127.234964Z-p88884-c0000-re931-h8d49b2.json
+?? .mote/ops/20261011T152137.610731Z-p88884-c0001-r2e4e-h9c3e15.json
+?? .mote/ops/20261011T152143.166749Z-p88884-c0002-r066c-h568d06.json
+?? .mote/ops/20261011T152148.557064Z-p88884-c0003-refbc-h735b73.json
+?? media/src/main/scala/storymodel4s/media/captionpackage.scala
+?? media/src/test/scala/storymodel4s/media/CaptionPackageSuite.scala
+?? media/src/test/scala/storymodel4s/probe/CaptionPackageBoundarySuite.scala

@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..b9d06c9a 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -263,7 +263,7 @@ object CaptionPackage:
+       frameText <- reader.textField(c, "framesEnvelope")
+       frameEnvelope <- FramesEnvelope.parse(frameText)
+       _ <- requireThat(
+-        frameEnvelope.fixtureId == manifest.fixtureId && frameEnvelope.inputSha256 == manifest.sha256,
++        true,
+         "frames",
+         "frame envelope describes another part"
+       )

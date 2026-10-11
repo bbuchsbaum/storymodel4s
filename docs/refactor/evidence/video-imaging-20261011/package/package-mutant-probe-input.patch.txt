@@ -1,0 +1,13 @@
+diff --git a/media/src/main/scala/storymodel4s/media/captionpackage.scala b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+index 91b65ec8..ed9e9a79 100644
+--- a/media/src/main/scala/storymodel4s/media/captionpackage.scala
++++ b/media/src/main/scala/storymodel4s/media/captionpackage.scala
+@@ -251,7 +251,7 @@ object CaptionPackage:
+       probeText <- reader.textField(c, "probeEnvelope")
+       probeEnvelope <- ProbeEnvelope.parse(probeText)
+       _ <- requireThat(
+-        probeEnvelope.fixtureId == manifest.fixtureId && probeEnvelope.inputSha256 == manifest.sha256,
++        true,
+         "probe",
+         "probe envelope describes another part"
+       )
