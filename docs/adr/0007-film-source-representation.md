@@ -1214,3 +1214,29 @@ Rejected alternatives:
 3. Rerouting the bench sidecar (`SherlockAnnotationView.sceneCaptions`) through the new join. That
    would change the frozen Sherlock-development AV arm. It stays as documented legacy, and the
    checked path is additive.
+
+### 2026-10-11 — multipart caption replay package (AC4 S2)
+
+`CaptionPackage` admits an externally pinned v2 manifest with an ordered table of part
+occurrences, local fixture editions, selected presentation ordinals, and global caption extents.
+The manifest pins every input/metadata/frame/request/outcome file. The disk loader verifies the
+bytes it reads and the existing probe/frame/caption joins, including envelope fields those joins
+do not receive. Relative nested paths must resolve inside the package root. Large media and raw
+frames are hashed by streaming; replay stays `Draft`.
+
+Global extent ordinals address the concatenated sampled bytes in declared part order. Their
+partition must exactly equal each local request's extent IDs and local sample indices. The
+package exposes the part occurrence, local sample index and presentation ordinal separately.
+A crossing extent retains separate per-part caption proposals. Every local edition and native
+clock remains local; checked composition is required to obtain a package-wide playback axis.
+
+Selected samples and samples actually examined by caption extents have separate counts and PTS
+entries. Coverage gaps are exact unexamined presentation-ordinal ranges. Count density publishes
+its numerator and denominator; it is not temporal coverage. Unknown packet durations remain
+unknown, and proposal hulls never imply that intervening frames were examined.
+
+Rejected alternatives: concatenating local clock ticks, treating a shared caption label as proof
+of cross-part membership, pinning only media bytes while allowing request/envelope substitution,
+and treating all stored samples as examined. Existing single-part and historical bench formats
+remain replayable through their own APIs. Executed extraction correspondence is the separate S3
+acceptance; this loader does not infer it from a self-consistent replay.
