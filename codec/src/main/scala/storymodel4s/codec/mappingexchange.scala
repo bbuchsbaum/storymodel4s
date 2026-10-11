@@ -2,13 +2,14 @@ package storymodel4s.codec
 
 import cats.syntax.all.*
 import io.circe.Json
-import storymodel4s.align.{MappingResult, MappingRun}
+import storymodel4s.align.{MappingResult, MappingRun, TemporalProjection, TemporalQuery}
 import storymodel4s.core.Checksum
 
 /** Lossless analysis files derived from one checked mapping. No inference runs here. */
 object MappingExchange:
   val SchemaVersion: String = "mapping-exchange/v0.1"
   val PairSchemaVersion: String = "mapping-exchange-pair/v1"
+  val PairTemporalSchemaVersion: String = "mapping-exchange-pair-temporal/v1"
 
   enum Error:
     case DuplicateFile(name: String)
@@ -65,6 +66,39 @@ object MappingExchange:
         )
       )
       new Bundle(("manifest.json" -> manifest) +: contents)
+
+  /** Additive paired exchange binds projections to their owning reference and reconstruction records. */
+  def encodeTemporal(
+      execution: MappingRun.Execution,
+      reference: TemporalProjection.Projection,
+      reconstruction: TemporalProjection.Projection
+  ): Either[Error, Bundle] =
+    if reference.mapping.digest != execution.reference.digest ||
+      reconstruction.mapping.digest != execution.reconstruction.digest
+    then Left(Error.ContentMismatch("temporal/mapping"))
+    else if reference.measure != TemporalQuery.Measure.NormalizedScoreMass ||
+      reconstruction.measure != TemporalQuery.Measure.ModelPosterior
+    then Left(Error.ContentMismatch("temporal/measure"))
+    else
+      encode(execution).map { base =>
+        val temporal = Vector(
+          "reference--temporal-projection.json" -> TemporalProjectionCodecs.encode(reference),
+          "reconstruction--temporal-projection.json" -> TemporalProjectionCodecs.encode(reconstruction)
+        )
+        val all = base.files.tail ++ temporal
+        val manifest = MappingJson.print(Json.obj(
+          "schemaVersion" -> Json.fromString(PairTemporalSchemaVersion),
+          "execution" -> Json.fromString(execution.identity.hex),
+          "referenceProjection" -> Json.fromString(reference.digest.hex),
+          "reconstructionProjection" -> Json.fromString(reconstruction.digest.hex),
+          "files" -> Json.fromValues(all.map { (name, text) => Json.obj(
+            "path" -> Json.fromString(name),
+            "sha256" -> Json.fromString(Checksum.ofText(text).hex),
+            "bytes" -> Json.fromString(text.getBytes("UTF-8").length.toString)
+          )})
+        ))
+        new Bundle(("manifest.json" -> manifest) +: all)
+      }
 
   /** Exact reconstruction from the originating execution checks both members and every join. */
   def decodePair(

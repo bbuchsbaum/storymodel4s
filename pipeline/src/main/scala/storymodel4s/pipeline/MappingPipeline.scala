@@ -21,6 +21,7 @@ object MappingPipeline:
     case MissingCapability(detail: String)
     case Alignment(error: AlignError)
     case Projection(error: MappingRefusal)
+    case Temporal(error: TemporalProjection.Refusal)
 
   /** Network and retry budgets are explicit: this deterministic profile executes locally once. */
   final case class Config(
@@ -371,6 +372,23 @@ object MappingPipeline:
         }
         new Batch(prepared, config, outcomes)
       }
+
+  /** Project both owned mapping members over one declared source selection and optional recall clock. */
+  def temporal(
+      run: Run,
+      request: TemporalProjection.Request,
+      timing: Option[RecallTiming]
+  ): Either[Refusal, (TemporalProjection.Projection, TemporalProjection.Projection)] =
+    for
+      reference <- TemporalProjection
+        .compile(run.reference, TemporalQuery.Measure.NormalizedScoreMass, request, timing)
+        .left
+        .map(Refusal.Temporal(_))
+      reconstruction <- TemporalProjection
+        .compile(run.reconstruction, TemporalQuery.Measure.ModelPosterior, request, timing)
+        .left
+        .map(Refusal.Temporal(_))
+    yield reference -> reconstruction
 
   /** Prepare ordinary local files and execute the named profile without internal proof assembly. */
   def analyze(study: Path, config: Config): Either[FacadeFailure, Batch] =
