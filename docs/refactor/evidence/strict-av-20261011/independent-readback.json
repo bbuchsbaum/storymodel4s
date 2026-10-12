@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "producer": "29997f88d159de8b4dc2620a4ce23c071e9b51ca",
+  "packetSha256": "55bc7caffb254eb002e5068fe495e6de4bec18e0e5c52677c0b121e53ecc376e",
+  "answers": [
+    {
+      "part": "a",
+      "annotationTicks": [
+        50,
+        57
+      ],
+      "filmTicks": [
+        0,
+        7000
+      ],
+      "nativeSeconds": [
+        "0",
+        "7/24"
+      ]
+    },
+    {
+      "part": "b",
+      "annotationTicks": [
+        203,
+        217
+      ],
+      "filmTicks": [
+        3000,
+        17000
+      ],
+      "nativeSeconds": [
+        "1/16",
+        "17/48"
+      ]
+    }
+  ],
+  "crossPartGroup": "unlocated",
+  "scope": "synthetic declared correspondence and independently read publication; no physical synchronization or empirical accuracy claim"
+}

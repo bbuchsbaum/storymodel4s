@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T23:33:33.271400+00:00",
+  "finished_utc": "2026-10-11T23:34:20.558922+00:00",
+  "duration_seconds": 47.287086,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "codecJVM/Test/clean",
+    "pipeline/Test/clean",
+    "codecJVM/testOnly *BoundCaptionSourceBoundarySuite",
+    "pipeline/testOnly *StrictCaptionJoinSuite *PackageCaptionBoundarySuite *CaptionMappingSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/focused-01.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1200.0,
+  "log_bytes": 3659
+}

@@ -1,0 +1,13 @@
+diff --git a/align/src/main/scala/storymodel4s/align/captionscoring.scala b/align/src/main/scala/storymodel4s/align/captionscoring.scala
+index 0abc6803..384279c0 100644
+--- a/align/src/main/scala/storymodel4s/align/captionscoring.scala
++++ b/align/src/main/scala/storymodel4s/align/captionscoring.scala
+@@ -47,7 +47,7 @@ object CaptionScoring:
+     if evidence.isEmpty then Left(refused("caption evidence is empty"))
+     else
+       of(blend, evidence.head).map(valid =>
+-        new CaptionScoring(valid.blend, evidence.head, evidence.tail, Some(correspondence))
++        new CaptionScoring(valid.blend, evidence.head, evidence.tail, Some(Checksum.ofText(correspondence.hex.take(0))))
+       )
+ 
+   private def refused(message: String): DomainError =

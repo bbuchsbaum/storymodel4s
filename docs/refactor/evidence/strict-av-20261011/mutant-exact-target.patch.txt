@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+index 828170e1..44668f1b 100644
+--- a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+@@ -224,7 +224,7 @@ object BoundCaptionSourceCodec:
+         segments.count(_.locus.exists {
+           case MediaLocus.Extent(_, interval) => interval == caption.support
+           case _                              => false
+-        }) == 1,
++        }) >= 0,
+         "caption needs one unique exact annotation interval"
+       )
+     )

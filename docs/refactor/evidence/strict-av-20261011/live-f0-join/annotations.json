@@ -1,0 +1,1 @@
+{"csv":"ordinal,text,part,onset,end,group,group_label,locations,characters\n1,Anna arrived.,synthetic,0,16000,,,,\n2,Anna arrived.,synthetic,16000,32000,,,,\n3,Anna arrived.,synthetic,32000,48000,,,,\n","parts":"[{\"denominator\":\"24000\",\"end\":\"48000\",\"numerator\":\"1\",\"part\":\"synthetic\",\"start\":\"0\"}]","schemaVersion":"prepared-timed-source/v1"}

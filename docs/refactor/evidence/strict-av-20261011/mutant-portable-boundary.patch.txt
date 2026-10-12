@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+index 828170e1..69e6719b 100644
+--- a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+@@ -11,7 +11,7 @@ object BoundCaptionSourceCodec:
+   val CorrespondenceSchema: String = "annotation-film-correspondence/v1"
+ 
+   /** Imported declarations prove consistency, never empirical synchronization or JVM execution. */
+-  final class Imported private[BoundCaptionSourceCodec] (
++  final class Imported (
+       val view: TimedSourceView,
+       val annotations: TimedSourceView,
+       val media: MediaCaptionSourceCodec.Imported,

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-12T00:09:11.527855+00:00",
+  "finished_utc": "2026-10-12T00:10:53.620359+00:00",
+  "duration_seconds": 102.091837,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-s2b3-build",
+    "-Dstoryatlas.surfaceWorkspace.fixture=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/synthetic-workspace.json",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storyatlas4s-study-workflow",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/storyatlas.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 22990
+}

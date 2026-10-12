@@ -1,0 +1,5 @@
+Reviewer: /root/package_contract_review, independent read-only lean_expert.
+SOURCE PASS 29997f88d159de8b4dc2620a4ce23c071e9b51ca. DOCS PASS c3ae9260a948b2011e5ae4144b6f28d65eb5e9cb. No remaining BLOCK or FOLLOW-UP.
+Checked affine conversion dimensions/offsets, domain/integer/overflow refusal; stable annotation identities; unique exact intervals; bundle-specific multipart dispatch and one global mapping; pinned package reload and complete projected artifact comparison; scoring/session/registration/run provenance versus numeric engine identity; outside-package matching-shape constructor courts.
+ADR wording corrected to explicitly retain content-derived LocalEvidence/MappingRun.Execution identities.
+No builds run by reviewer. Final qualification review awaits mutation, cross-platform, consumer and readback receipts. No physical Sherlock synchronization or actual BIDS acceptance established.

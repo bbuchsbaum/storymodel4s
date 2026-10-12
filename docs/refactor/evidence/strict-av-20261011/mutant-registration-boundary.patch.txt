@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala b/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala
+index 9c3fb211..0fb525e2 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala
+@@ -93,7 +93,7 @@ object CaptionMapping:
+     yield new Registered(media, produced, expected)
+ 
+   /** A complete checked package and the declared correspondence own one global evidence run. */
+-  final class PackageRegistered private[CaptionMapping] (
++  final class PackageRegistered (
+       val media: CaptionPackage,
+       val joined: storymodel4s.codec.BoundCaptionSourceCodec.Imported,
+       val produced: CaptionScoring.Produced

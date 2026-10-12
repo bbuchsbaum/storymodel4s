@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-11T23:45:47.617505+00:00",
+  "finished_utc": "2026-10-11T23:46:24.018251+00:00",
+  "duration_seconds": 36.400335,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "codecJVM/Test/clean",
+    "set LocalProject(\"codecJVM\") / Test / sources := (LocalProject(\"codecJVM\") / Test / sources).value.filter(_.getName == \"BoundCaptionSourceBoundarySuite.scala\")",
+    "codecJVM/testOnly *BoundCaptionSourceBoundarySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/mutant-portable-boundary.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 3566
+}

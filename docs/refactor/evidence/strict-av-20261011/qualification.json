@@ -1,0 +1,146 @@
+{
+  "producer": "29997f88d159de8b4dc2620a4ce23c071e9b51ca",
+  "mutations": [
+    {
+      "name": "pin",
+      "compiled": true,
+      "witness": "wrong pins or axes",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "axes",
+      "compiled": true,
+      "witness": "wrong pins or axes",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "domain",
+      "compiled": true,
+      "witness": "fractional projection and out-of-domain",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "fractional",
+      "compiled": true,
+      "witness": "fractional projection and out-of-domain",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "exact-target",
+      "compiled": true,
+      "witness": "shifted exact endpoints",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "provenance",
+      "compiled": true,
+      "witness": "changed correspondence basis",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "package",
+      "compiled": true,
+      "witness": "a genuine different package",
+      "totals": [
+        [
+          9,
+          1,
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "portable-boundary",
+      "compiled": true,
+      "witness": "constructor",
+      "totals": [
+        [
+          5,
+          2,
+          0,
+          3
+        ]
+      ]
+    },
+    {
+      "name": "registration-boundary",
+      "compiled": true,
+      "witness": "constructor",
+      "totals": [
+        [
+          5,
+          2,
+          0,
+          3
+        ]
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "name": "restored-checkAll",
+      "exit": 0,
+      "cells": 56,
+      "totalFailedErrorsPassed": [
+        10545,
+        0,
+        0,
+        10540
+      ]
+    },
+    {
+      "name": "storyatlas",
+      "exit": 0,
+      "cells": 10,
+      "totalFailedErrorsPassed": [
+        488,
+        0,
+        0,
+        488
+      ]
+    }
+  ]
+}

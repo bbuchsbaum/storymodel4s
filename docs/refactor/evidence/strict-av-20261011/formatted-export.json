@@ -1,0 +1,62 @@
+[
+  {
+    "path": "align/src/main/scala/storymodel4s/align/captionscoring.scala",
+    "sha256": "05a94c1e7733bf04d06e61cf4e4e51a4d0abc72cfcd9e7121aa3e77b8baae75e"
+  },
+  {
+    "path": "codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala",
+    "sha256": "89c4e4839b313d5ea26cc0c35ea9cfdd8743b6c16487e4406e0c294a0ef17748"
+  },
+  {
+    "path": "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+    "sha256": "e7dfce1ef5adcc5dc584e664a2ef110302a963df2c20637cfef59d176dd5a0d3"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala",
+    "sha256": "0bbe24d7e2d28f3f6dc66c87cccd64e737fbcd39d63f0c30b0bb23936a0a4fc3"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "sha256": "538d1cd9d7903701c1dcf80be28ab461bb6bcc642e2bec53c137e790aa401894"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "sha256": "4cbdb9c1d3195303c220bbf728dd6468cbdecf7863bc9f2b6bf02e10b717163a"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyWorkspace.scala",
+    "sha256": "a16dd1deb38193a736ad5286cc15e0ecc93e4f54870a311c0f363941e8d6b038"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/VideoSourceCli.scala",
+    "sha256": "1e63be4793ffc2128971946603dc0da89001662f2eb9617a10f4d8cf093bb812"
+  },
+  {
+    "path": "pipeline/src/test/scala/storymodel4s/pipeline/StrictCaptionJoinSuite.scala",
+    "sha256": "aa8cff36166e3179ed6b551f5e754d94991fbd8404df438979546e36ae7e3dcb"
+  },
+  {
+    "path": "codec/src/test/scala/storymodel4s/codecprobe/BoundCaptionSourceBoundarySuite.scala",
+    "sha256": "50683a911d5bd2a4ebd2c4caff3a2f47a9dea180886d22d0a55b4bff8d0179e7"
+  },
+  {
+    "path": "docs/adr/0007-film-source-representation.md",
+    "sha256": "3f00a929599563cf3314911b5f0fe7125a81dfb96c70d00825ff338243824569"
+  },
+  {
+    "path": "docs/guides/video-source.md",
+    "sha256": "2fc791e23a408b05fe7e4e15a6050b087bd2b1325e2e5b96fc8298b71f25c60c"
+  },
+  {
+    "path": "pipeline/src/test/scala/storymodel4s/pipelineprobe/PackageCaptionBoundarySuite.scala",
+    "sha256": "c274f93637fa07b26188aef6ee5b8bb5e1b2120aecb77b32ce2ae4ea1175f656"
+  },
+  {
+    "path": "align/src/test/scala/storymodel4s/probes/CaptionEvidenceBoundarySuite.scala",
+    "sha256": "1ea15efc97e80b91b3e164705f6fbdca57655f811d0fca8d65b567fb61bae741"
+  },
+  {
+    "path": "pipeline/src/test/scala/storymodel4s/pipeline/MappingBoundarySuite.scala",
+    "sha256": "f919f98772bb4ada9f333fc20589115ca11ed2b87dfbe2d750d0087254cc63d3"
+  }
+]

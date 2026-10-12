@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+index 828170e1..a6b6c8b9 100644
+--- a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+@@ -72,7 +72,7 @@ object BoundCaptionSourceCodec:
+       n = BigInt(mapped.numerator) * scale.denominator
+       d = BigInt(mapped.denominator) * scale.numerator
+       _ <- check(
+-        n % d == 0 && (n / d).isValidLong,
++        (n / d).isValidLong,
+         "projection requires exact representable film ticks"
+       )
+     yield (n / d).toLong

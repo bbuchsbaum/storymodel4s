@@ -1,0 +1,13 @@
+diff --git a/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala b/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala
+index 9c3fb211..1f5ee650 100644
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala
+@@ -123,7 +123,7 @@ object CaptionMapping:
+       blend: Double
+   ): Either[Refusal, PackageRegistered] = for
+     actual <- VideoSourceInput.project(media).left.map(_ => Refusal.ArtifactMismatch)
+-    _ <- Either.cond(actual.artifact == joined.media.artifact, (), Refusal.ArtifactMismatch)
++    _ <- Either.cond(actual.artifact.nonEmpty && joined.media.artifact.nonEmpty, (), Refusal.ArtifactMismatch)
+     scoring <- CaptionScoring
+       .multipart(blend, joined.media.evidence, joined.identity)
+       .left

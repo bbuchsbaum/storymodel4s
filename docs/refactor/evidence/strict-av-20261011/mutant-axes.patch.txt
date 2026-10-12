@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+index 828170e1..8f1efd8c 100644
+--- a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+@@ -92,7 +92,7 @@ object BoundCaptionSourceCodec:
+       a <- field[String](j, "annotationAxis")
+       b <- field[String](j, "filmAxis")
+       _ <- check(
+-        a == source.primaryAxis.id.value && b == target.primaryAxis.id.value,
++        a.nonEmpty && b.nonEmpty,
+         "correspondence axes differ"
+       )
+       raw <- field[Vector[Json]](j, "landmarks")

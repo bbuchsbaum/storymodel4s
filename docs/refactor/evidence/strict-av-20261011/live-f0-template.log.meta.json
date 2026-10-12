@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-12T00:11:00.377971+00:00",
+  "finished_utc": "2026-10-12T00:11:38.679240+00:00",
+  "duration_seconds": 38.300968,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/runMain storymodel4s.pipeline.VideoSourceCli join-template /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/annotations.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/package 06115cad0ef41f893b25aa1e395f2ca90296c986a4c277afcfa2d4d1858cfc45 live-worker-f0"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-template.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 4669
+}

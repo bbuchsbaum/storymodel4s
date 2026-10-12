@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+index 828170e1..791f7ad7 100644
+--- a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+@@ -62,7 +62,7 @@ object BoundCaptionSourceCodec:
+       repair: ClockRepair
+   ):
+     def apply(value: Long): Either[String, Long] = for
+-      _ <- check(value >= low && value <= high, "annotation outside correspondence domain")
++      _ <- check(value >= low || value <= high, "annotation outside correspondence domain")
+       seconds <- ExactRational.integer(value).*(extent(source).timebase.scale).left.map(_.message)
+       mapped <- ClockRepair
+         .projectRunLocalSeconds(seconds, source.primaryAxis.id, target.primaryAxis.id, repair)

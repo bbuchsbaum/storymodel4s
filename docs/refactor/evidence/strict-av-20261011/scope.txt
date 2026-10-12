@@ -1,0 +1,74 @@
+types defined by this candidate:
+  Admission
+  Batch
+  BoundCaptionSourceBoundarySuite
+  BoundCaptionSourceCodec
+  Capability
+  CaptionEvidenceBoundarySuite
+  CaptionMapping
+  CaptionScoring
+  Config
+  Expected
+  Fixture
+  Imported
+  Investigation
+  MappingBoundarySuite
+  MappingCli
+  MappingPipeline
+  Open
+  Outcome
+  PackageCaptionBoundarySuite
+  PackageRegistered
+  Policy
+  Prepared
+  Produced
+  Projection
+  Readiness
+  Recall
+  RecallInput
+  Refusal
+  Registered
+  Result
+  Run
+  Session
+  Source
+  SourceInput
+  SourceKind
+  StrictCaptionJoinSuite
+  StudyPreparation
+  StudyWorkspaceCli
+  StudyWorkspaceProducer
+  SurfaceWorkspaceCodecs
+  VideoSourceCli
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  amr-interop
+  codec
+  core
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  embed-core
+  embed-grakern
+  embed-onnx
+  fixtures
+  interview
+  laws
+  media
+  pipeline
+  proposition
+  provider-agent
+  provider-parser
+  recall
+  story
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedCoreJVM/test; embedGrakern/test; embedOnnx/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

@@ -1,0 +1,42 @@
+[
+  {
+    "path": "align/src/main/scala/storymodel4s/align/captionscoring.scala",
+    "sha256": "31cdc564656863f55baa13798d73932fb96b6923eab861ea43710cdfcd6501bf"
+  },
+  {
+    "path": "codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala",
+    "sha256": "0ab7bfd59a2817432503db7d874bd376a8baa7dfe908a168a23d348d289ec34d"
+  },
+  {
+    "path": "codec/src/main/scala/storymodel4s/codec/surfaceworkspace.scala",
+    "sha256": "a9692dd16f7adf5fb19b4b48fa15a653ea2705610ae87ec512ce4379a8727789"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/CaptionMapping.scala",
+    "sha256": "1a6e2c374ee1984883c32d2574b1b762a0377cc8ecc365d4b407c1a8bab39822"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "sha256": "d1103c18fbe327de462f0b639875f18404d038e4f4b467290bb92816fd787e58"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyPreparation.scala",
+    "sha256": "b7bca75104243be35132140ba4b58859bdddcfae82d66718010ab3227ff29ff5"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/StudyWorkspace.scala",
+    "sha256": "a16dd1deb38193a736ad5286cc15e0ecc93e4f54870a311c0f363941e8d6b038"
+  },
+  {
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/VideoSourceCli.scala",
+    "sha256": "17ef71a96dc67797c2a98691a9270d6facc246de23749a6f67380c556635ada2"
+  },
+  {
+    "path": "docs/adr/0007-film-source-representation.md",
+    "sha256": "3f00a929599563cf3314911b5f0fe7125a81dfb96c70d00825ff338243824569"
+  },
+  {
+    "path": "docs/guides/video-source.md",
+    "sha256": "46c5770740db874413f90d5fc604af1d048534a9563bc955050659eb61d88f0f"
+  }
+]

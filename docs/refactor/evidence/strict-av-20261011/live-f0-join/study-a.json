@@ -1,0 +1,1 @@
+{"profile":"recall-baseline-lexical-words/v1","recalls":[{"admission":{"kind":"project-synthetic-control"},"participant":"project-synthetic-control","path":"recall.txt","session":"s1","timing":null}],"schemaVersion":"storymodel-study/v1","source":{"format":"checked-timed","path":"annotations.json"}}

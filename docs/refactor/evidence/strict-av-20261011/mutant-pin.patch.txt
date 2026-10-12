@@ -1,0 +1,13 @@
+diff --git a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+index 828170e1..fa029651 100644
+--- a/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
++++ b/codec/src/main/scala/storymodel4s/codec/boundcaptionsource.scala
+@@ -151,7 +151,7 @@ object BoundCaptionSourceCodec:
+       correspondence: String,
+       expected: Checksum
+   ): Either[String, Imported] = for
+-    _ <- check(Checksum.ofText(correspondence) == expected, "correspondence checksum differs")
++    _ <- check(Checksum.ofText(correspondence).hex.length == expected.hex.length, "correspondence checksum differs")
+     annotations <- TimedSourceArtifactCodec.decode(annotationArtifact)
+     media <- MediaCaptionSourceCodec.decode(mediaArtifact)
+     c <- parse(correspondence)

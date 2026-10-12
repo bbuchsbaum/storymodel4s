@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-12T00:11:38.764324+00:00",
+  "finished_utc": "2026-10-12T00:11:57.615576+00:00",
+  "duration_seconds": 18.85096,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/runMain storymodel4s.pipeline.VideoSourceCli join /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/annotations.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/package 06115cad0ef41f893b25aa1e395f2ca90296c986a4c277afcfa2d4d1858cfc45 live-worker-f0 /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/correspondence.json c8ec1f0023cb32a187f26cb6f2a22921e30db9457be814a4e951ea32163513d2 /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/joined",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun exchange /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/study-a.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/mapping-a.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/exchange-a",
+    "pipeline/runMain storymodel4s.pipeline.mappingRun exchange /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/exchange",
+    "pipeline/runMain storymodel4s.pipeline.mappingWeight /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/mapping.json 0/1,1/2,1/1 /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/weighted",
+    "pipeline/runMain storymodel4s.pipeline.studyWorkspace run /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/study.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/mapping.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/cache /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-join/workspace 29997f88d159de8b4dc2620a4ce23c071e9b51ca"
+  ],
+  "cwd": "/private/tmp/storymodel4s-s2b3-build",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/strict-av-20261011/live-f0-public-join.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 5034
+}
