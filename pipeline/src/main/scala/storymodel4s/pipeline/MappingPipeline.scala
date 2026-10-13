@@ -11,6 +11,8 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** One offline execution boundary owns profiles, registrations and both published estimands. */
 object MappingPipeline:
+  private enum OrganizationOrigin:
+    case Lexical, Captions, Onnx
   enum Capability:
     case Mapping, Organization, Order
   enum Readiness:
@@ -48,6 +50,10 @@ object MappingPipeline:
       val onnx: Option[OnnxMappingRegistration.Registered],
       val captionPackage: Option[CaptionMapping.PackageRegistered]
   ):
+    private[MappingPipeline] val organizationOrigin: OrganizationOrigin =
+      if onnx.nonEmpty then OrganizationOrigin.Onnx
+      else if caption.nonEmpty || captionPackage.nonEmpty then OrganizationOrigin.Captions
+      else OrganizationOrigin.Lexical
     val readiness: Readiness =
       val missing = config.requested.filterNot(_ == Capability.Mapping).distinct
       if missing.isEmpty then Readiness.Ready else Readiness.Missing(missing)
@@ -66,6 +72,83 @@ object MappingPipeline:
       case _      => false
     override def hashCode: Int = identity.hashCode
     override def toString: String = s"MappingPipeline.Run(${identity.short()}, $readiness)"
+
+  /** The genuine producer certifies only the exact reference member and original-unit readout. */
+  final class Organization private[MappingPipeline] (
+      val run: Run,
+      val request: MeasurementCompatibility.Request,
+      val result: OrganizationReadout.Result,
+      val stages: Vector[StageReceipt]
+  ):
+    val verdict: MeasurementCompatibility.Verdict =
+      MeasurementCompatibility.Verdict.CompatibleWithDeclaredPolicy
+    val reasons: Vector[MeasurementCompatibility.Reason] =
+      Vector(MeasurementCompatibility.Reason.ExecutedIndependentContent)
+    val identity: Checksum = ContentAddress.digest(Vector(
+      "pipeline-organization/v1", run.identity.hex, run.execution.identity.hex,
+      run.reference.digest.hex, request.digest.hex, result.order.digest.hex
+    ))
+    override def equals(other: Any): Boolean = other match
+      case o: Organization => identity == o.identity
+      case _ => false
+    override def hashCode: Int = identity.hashCode
+    override def toString: String = s"Organization(${identity.short()}, $verdict)"
+
+  /** Provider declarations and unregistered numerical records cannot enter this producer door. */
+  def organization(
+      run: Run,
+      request: MeasurementCompatibility.Request,
+      member: MappingRun.Member = MappingRun.Member.Reference
+  ): Either[MeasurementCompatibility.Reason, Organization] =
+    import cats.syntax.all.*
+    import MeasurementCompatibility.{Axis, Reason}
+    import OrganizationReadout.{Dependence, Order, Row}
+    val referenceMember = member match
+      case MappingRun.Member.Reference => true
+      case MappingRun.Member.Weighted(s) => s.weight.isReference && s.execution.identity == run.execution.identity
+      case _ => false
+    if !referenceMember then Left(Reason.StructuredInference)
+    else if request.organization != AnalysisGrain.InferenceUnit(run.execution.inventory.segmentation) then
+      Left(Reason.ForeignSegmentation)
+    else if request.level != run.execution.reference.profile.level then Left(Reason.WrongResolution)
+    else
+      val originMatches = run.organizationOrigin match
+        case OrganizationOrigin.Lexical => run.config.profile == LexicalProfile
+        case OrganizationOrigin.Captions => run.config.profile == CaptionProfile &&
+          run.caption.map(_.evidence).orElse(run.captionPackage.map(_.produced.evidence)).contains(run.execution.reference.evidence)
+        case OrganizationOrigin.Onnx => run.config.profile == OnnxProfile &&
+          run.onnx.exists(_.evidence == run.execution.reference.evidence)
+      if !originMatches then Left(Reason.UnsupportedOrigin)
+      else
+        val view = run.execution.view
+        // This named axis uses declared discourse rank, never scoring-space midpoint or part ID.
+        val positions = run.execution.reference.profile.universe.targets.flatMap { ref =>
+          val position = request.axis match
+            case Axis.Discourse => view.node(ref).map(_.discoursePosition.toDouble)
+            case Axis.StoryWorld => view.worldOrder.flatMap(_.get(ref)).map(_.toDouble)
+          position.map(ref -> _)
+        }
+        val result = for
+          order <- Order.onSource(positions, run.execution.source, request.axis)
+          rows <- run.reference.inventory.units.traverse { unit =>
+            run.reference.outcome(unit.id) match
+              case Some(outcome) if outcome.processing == ProcessingStatus.Complete =>
+                outcome.measures.normalized match
+                  case Some(m) => Row.of(unit.id, m.mass, m.mass.keys.toVector)
+                  case _ => Right(Row.unavailable(unit.id))
+              case Some(outcome) => Right(Row.unavailable(unit.id, outcome.processing.isInstanceOf[ProcessingStatus.Failed]))
+              case _ => Right(Row.unavailable(unit.id, true))
+          }
+          result <- OrganizationReadout.compute(rows, order, Dependence.DeclaredIndependentRows)
+        yield result
+        result.left.map(_ => Reason.UnsupportedOrigin).flatMap { computed =>
+          Stage.values.toVector.traverse { stage =>
+            StageReceipt.of(stage, s"pipeline-organization/v1/${run.organizationOrigin}/$stage",
+              run.identity, Vector(run.registration, run.execution.reference.evidence.identity.checksum,
+                run.reference.digest, request.digest), ProviderStatus.NotApplicable(
+                "provider and rendering origin retained by owning pipeline registration"))
+          }.left.map(_ => Reason.UnsupportedOrigin).map(stages => new Organization(run, request, computed, stages))
+        }
 
   private def configText(c: Config): String = Canonical.print(
     Json.obj(

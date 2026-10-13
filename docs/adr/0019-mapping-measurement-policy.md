@@ -1065,3 +1065,31 @@ a caller. The facade retains failed observations and missing timing in cohort ac
 existing disclosure, atomic publication and resume guards. Rejected: a parallel mapping schema,
 caller-assembled shared execution, dropping failed observations from temporal denominators, and
 assigning new scientific values in the StoryAtlas renderer.
+
+### 2026-10-13 — organization compatibility and conditional readouts
+
+Within the owner-authorized organization tranche, portable `align` owns conservative
+`MeasurementCompatibility` inspection and checked `OrganizationReadout` arithmetic. A
+numerical record or supplied receipt cannot certify unknown upstream information use.
+`MappingPipeline.Organization` is a final non-case producer-owned result, minted only by
+consuming its genuine run and exact reference member. Its identity binds registration,
+execution, reference record, requested axis/resolution/original segmentation and derived
+order. Exact zero structural weight may use reference; every positive weight is refused.
+Existing mapping ledgers retain their unknown upstream stages. The additional receipts
+explain the enclosing producer; they do not rewrite those ledgers or certify calibration.
+
+Counts preserve original adjacent units and explicit external/incomparable/unresolved/failed
+outcomes. Independent row products are score-conditional under the executed local policy.
+Supplied joints are checked against both actual row marginals and remain conditional data.
+Product bounds use sparse dynamic programming with one coherent assignment per middle unit;
+coupled bounds are refused. Missing admissible rows make bounds unavailable. Discourse order
+uses the source's declared discourse ranks; story-world order uses its separately supplied
+partial ranks. Equal ranks of distinct nodes remain incomparable. Bounds describe the
+explicit admitted positive-mass sets and carry candidate coverage; they are not confidence
+intervals or evidence of human recovery.
+
+Rejected: a generic public attestation constructor, accepting a profile label or caller
+checksum as execution, interpreting scoring-space positions as chronology, summing pairwise
+bound extrema, promoting model posterior marginals to independent transition probabilities,
+and changing the legacy 1.0 mapping command's capability semantics. The 1.1 organization
+entry point is additive and requires its own axis declaration and public exchange checks.
