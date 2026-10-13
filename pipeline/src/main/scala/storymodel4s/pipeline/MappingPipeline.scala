@@ -84,13 +84,19 @@ object MappingPipeline:
       MeasurementCompatibility.Verdict.CompatibleWithDeclaredPolicy
     val reasons: Vector[MeasurementCompatibility.Reason] =
       Vector(MeasurementCompatibility.Reason.ExecutedIndependentContent)
-    val identity: Checksum = ContentAddress.digest(Vector(
-      "pipeline-organization/v1", run.identity.hex, run.execution.identity.hex,
-      run.reference.digest.hex, request.digest.hex, result.order.digest.hex
-    ))
+    val identity: Checksum = ContentAddress.digest(
+      Vector(
+        "pipeline-organization/v1",
+        run.identity.hex,
+        run.execution.identity.hex,
+        run.reference.digest.hex,
+        request.digest.hex,
+        result.order.digest.hex
+      )
+    )
     override def equals(other: Any): Boolean = other match
       case o: Organization => identity == o.identity
-      case _ => false
+      case _               => false
     override def hashCode: Int = identity.hashCode
     override def toString: String = s"Organization(${identity.short()}, $verdict)"
 
@@ -104,19 +110,27 @@ object MappingPipeline:
     import MeasurementCompatibility.{Axis, Reason}
     import OrganizationReadout.{Dependence, Order, Row}
     val referenceMember = member match
-      case MappingRun.Member.Reference => true
-      case MappingRun.Member.Weighted(s) => s.weight.isReference && s.execution.identity == run.execution.identity
+      case MappingRun.Member.Reference   => true
+      case MappingRun.Member.Weighted(s) =>
+        s.weight.isReference && s.execution.identity == run.execution.identity
       case _ => false
     if !referenceMember then Left(Reason.StructuredInference)
-    else if request.organization != AnalysisGrain.InferenceUnit(run.execution.inventory.segmentation) then
-      Left(Reason.ForeignSegmentation)
+    else if request.organization != AnalysisGrain.InferenceUnit(
+        run.execution.inventory.segmentation
+      )
+    then Left(Reason.ForeignSegmentation)
     else if request.level != run.execution.reference.profile.level then Left(Reason.WrongResolution)
     else
       val originMatches = run.organizationOrigin match
-        case OrganizationOrigin.Lexical => run.config.profile == LexicalProfile
-        case OrganizationOrigin.Captions => run.config.profile == CaptionProfile &&
-          run.caption.map(_.evidence).orElse(run.captionPackage.map(_.produced.evidence)).contains(run.execution.reference.evidence)
-        case OrganizationOrigin.Onnx => run.config.profile == OnnxProfile &&
+        case OrganizationOrigin.Lexical  => run.config.profile == LexicalProfile
+        case OrganizationOrigin.Captions =>
+          run.config.profile == CaptionProfile &&
+          run.caption
+            .map(_.evidence)
+            .orElse(run.captionPackage.map(_.produced.evidence))
+            .contains(run.execution.reference.evidence)
+        case OrganizationOrigin.Onnx =>
+          run.config.profile == OnnxProfile &&
           run.onnx.exists(_.evidence == run.execution.reference.evidence)
       if !originMatches then Left(Reason.UnsupportedOrigin)
       else
@@ -124,7 +138,7 @@ object MappingPipeline:
         // This named axis uses declared discourse rank, never scoring-space midpoint or part ID.
         val positions = run.execution.reference.profile.universe.targets.flatMap { ref =>
           val position = request.axis match
-            case Axis.Discourse => view.node(ref).map(_.discoursePosition.toDouble)
+            case Axis.Discourse  => view.node(ref).map(_.discoursePosition.toDouble)
             case Axis.StoryWorld => view.worldOrder.flatMap(_.get(ref)).map(_.toDouble)
           position.map(ref -> _)
         }
@@ -135,19 +149,65 @@ object MappingPipeline:
               case Some(outcome) if outcome.processing == ProcessingStatus.Complete =>
                 outcome.measures.normalized match
                   case Some(m) => Row.of(unit.id, m.mass, m.mass.keys.toVector)
-                  case _ => Right(Row.unavailable(unit.id))
-              case Some(outcome) => Right(Row.unavailable(unit.id, outcome.processing.isInstanceOf[ProcessingStatus.Failed]))
+                  case _       => Right(Row.unavailable(unit.id))
+              case Some(outcome) =>
+                Right(
+                  Row.unavailable(unit.id, outcome.processing.isInstanceOf[ProcessingStatus.Failed])
+                )
               case _ => Right(Row.unavailable(unit.id, true))
           }
           result <- OrganizationReadout.compute(rows, order, Dependence.DeclaredIndependentRows)
         yield result
         result.left.map(_ => Reason.UnsupportedOrigin).flatMap { computed =>
-          Stage.values.toVector.traverse { stage =>
-            StageReceipt.of(stage, s"pipeline-organization/v1/${run.organizationOrigin}/$stage",
-              run.identity, Vector(run.registration, run.execution.reference.evidence.identity.checksum,
-                run.reference.digest, request.digest), ProviderStatus.NotApplicable(
-                "provider and rendering origin retained by owning pipeline registration"))
-          }.left.map(_ => Reason.UnsupportedOrigin).map(stages => new Organization(run, request, computed, stages))
+          Stage.values.toVector
+            .traverse { stage =>
+              val policy = stage match
+                case Stage.Candidates =>
+                  s"canonical-content/tie-complete/k=${run.config.perLevel}/budget=${run.config.tieBudget}"
+                case Stage.Rendering =>
+                  run.onnx.fold(s"canonical-content/${run.organizationOrigin}")(_.context.policy)
+                case Stage.Scoring =>
+                  s"checked-local-pricing/${run.organizationOrigin}/registration=${run.registration.hex}"
+                case Stage.Context    => "fixed-unit-content/no-neighbor-context"
+                case Stage.Refinement => "not-run/reference-no-refinement"
+                case Stage.Inference  =>
+                  s"independent-local-score-mass/${run.execution.reference.profile.fingerprint.hex}"
+                case Stage.Decision   => "raw-argmax-diagnostic/counts-consume-full-rows"
+                case Stage.Projection =>
+                  "original-inference-units/preserve-adjacencies/no-word-copy"
+              val provider = run.onnx.filter(_ => stage == Stage.Scoring) match
+                case Some(registration) =>
+                  ProviderIdentity
+                    .of(
+                      registration.queryRecord.provider.render + "/" + registration.documentRecord.provider.render,
+                      registration.queryRecord.model.modelId + "/" + registration.documentRecord.model.modelId,
+                      run.registration
+                    )
+                    .map(ProviderStatus.Identified(_))
+                case _ =>
+                  Right(
+                    ProviderStatus.NotApplicable(
+                      "deterministic stage; acquisition origin retained by pipeline registration"
+                    )
+                  )
+              provider.flatMap(p =>
+                StageReceipt.of(
+                  stage,
+                  policy,
+                  run.identity,
+                  Vector(
+                    run.registration,
+                    run.execution.reference.evidence.identity.checksum,
+                    run.reference.digest,
+                    request.digest
+                  ),
+                  p
+                )
+              )
+            }
+            .left
+            .map(_ => Reason.UnsupportedOrigin)
+            .map(stages => new Organization(run, request, computed, stages))
         }
 
   private def configText(c: Config): String = Canonical.print(

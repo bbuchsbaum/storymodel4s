@@ -136,6 +136,24 @@ class CaptionMappingSuite extends FunSuite:
       )
     )
     right(LocalEvidence.compute(recall, view, candidates, costs))
+  test("registered caption replay authorizes organization without losing draft origin") {
+    val registered = right(replay())
+    val settings = MappingPipeline.Config(
+      MappingPipeline.CaptionProfile,
+      1.0,
+      3,
+      3,
+      Vector(MappingPipeline.Capability.Mapping)
+    )
+    val run = right(MappingPipeline.captions(registered, settings))
+    val request = right(OrganizationPipeline.request(run, MeasurementCompatibility.Axis.Discourse))
+    val result = right(MappingPipeline.organization(run, request))
+    assertEquals(result.verdict, MeasurementCompatibility.Verdict.CompatibleWithDeclaredPolicy)
+    assertEquals(result.run.caption, Some(registered))
+    assertEquals(result.result.rows.map(_.unit), inventory.units.map(_.id))
+    assert(result.stages.forall(_.inputs.contains(registered.identity)))
+    assertEquals(result.result.transitions.size, 0)
+  }
   private def pair(e: LocalEvidence): Unit =
     val universe = right(DeclaredUniverse.of(view.nodes.map(_.ref), TargetGrain.SingleLevel(0)))
     val local = right(

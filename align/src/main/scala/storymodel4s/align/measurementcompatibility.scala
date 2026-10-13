@@ -25,12 +25,18 @@ object MeasurementCompatibility:
       val unknown: UnknownTransitions
   ):
     val quantity: Quantity = Quantity.OrganizationCounts
-    val digest: Checksum = MappingRender.digest(Vector(
-      "organization-request/v1", axis.toString, organization match
-        case AnalysisGrain.InferenceUnit(s) => s.digest.hex
-        case other                         => other.toString
-      , level.toString, unknown.toString
-    ))
+    val digest: Checksum = MappingRender.digest(
+      Vector(
+        "organization-request/v1",
+        axis.toString,
+        organization match
+          case AnalysisGrain.InferenceUnit(s) => s.digest.hex
+          case other                          => other.toString
+        ,
+        level.toString,
+        unknown.toString
+      )
+    )
     override def equals(other: Any): Boolean = other match
       case r: Request => digest == r.digest
       case _          => false
@@ -62,13 +68,16 @@ object MeasurementCompatibility:
     val mismatch = request.organization != record.roles.organization ||
       request.organization != AnalysisGrain.InferenceUnit(record.inventory.segmentation)
     if mismatch then new Assessment(Verdict.Incompatible, Vector(Reason.ForeignSegmentation))
-    else if record.ledger.entries.exists(e => e.provenance match
-        case p: StageProvenance.Derived => p.member match
-          case MappingRun.Member.Reference => false
-          case MappingRun.Member.Weighted(s) => !s.weight.isReference
-          case _ => true
-        case _ => false
-      ) then new Assessment(Verdict.ModelDependentOnly, Vector(Reason.StructuredInference))
+    else if record.ledger.entries.exists(e =>
+        e.provenance match
+          case p: StageProvenance.Derived =>
+            p.member match
+              case MappingRun.Member.Reference   => false
+              case MappingRun.Member.Weighted(s) => !s.weight.isReference
+              case _                             => true
+          case _ => false
+      )
+    then new Assessment(Verdict.ModelDependentOnly, Vector(Reason.StructuredInference))
     else if record.policies.universe.grain != TargetGrain.SingleLevel(request.level) then
       new Assessment(Verdict.Incompatible, Vector(Reason.WrongResolution))
     else new Assessment(Verdict.UnknownProvenance, Vector(Reason.UnprovenUpstreamStages))

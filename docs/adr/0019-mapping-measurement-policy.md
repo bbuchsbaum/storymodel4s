@@ -1085,7 +1085,7 @@ Product bounds use sparse dynamic programming with one coherent assignment per m
 coupled bounds are refused. Missing admissible rows make bounds unavailable. Discourse order
 uses the source's declared discourse ranks; story-world order uses its separately supplied
 partial ranks. Equal ranks of distinct nodes remain incomparable. Bounds describe the
-explicit admitted positive-mass sets and carry candidate coverage; they are not confidence
+explicit admitted sets, including retained underflow-zero states, and carry candidate coverage; they are not confidence
 intervals or evidence of human recovery.
 
 Rejected: a generic public attestation constructor, accepting a profile label or caller

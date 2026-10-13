@@ -1,6 +1,7 @@
 package storymodel4s.pipeline
 
 import io.circe.Json
+import cats.syntax.all.*
 import io.circe.jawn.JawnParser
 import java.nio.charset.StandardCharsets.UTF_8
 import storymodel4s.codec.Canonical
@@ -104,6 +105,28 @@ object RecallDisclosure:
   private val SyntheticText = "Anna arrived."
   private val SyntheticChecksum =
     Checksum.unsafe("6a13364a36a31e930e61ae1eb25bdc9b777e744b4a775699d937e7f0a5882d4b")
+  // Exact checksums derived from independently admitted organization-language/v1, not caller flags.
+  private val OrganizationAdmissionPin =
+    Checksum.unsafe("264b50465b40c617dce23ca7aa4898f3ce4398fc9476c5c1ccc8028e473b82d7")
+  private lazy val OrganizationSyntheticChecksums: Set[Checksum] =
+    val bytes =
+      Option(getClass.getResourceAsStream("/organization-language-admission-v1.json")).flatMap {
+        in =>
+          try scala.util.Try(in.readAllBytes()).toOption
+          finally in.close()
+      }
+    bytes
+      .filter(b => Checksum.ofBytes(b) == OrganizationAdmissionPin)
+      .flatMap { snapshot =>
+        for
+          json <- parser.parse(new String(snapshot, UTF_8)).toOption
+          schema <- json.hcursor.get[String]("schemaVersion").toOption
+          if schema == "organization-language-admission/v1"
+          hashes <- json.hcursor.get[Vector[String]]("textSha256").toOption
+          values <- hashes.traverse(Checksum.from).toOption
+        yield values.toSet
+      }
+      .getOrElse(Set.empty)
 
   /** Binds ordinary supplied text to the local-only scope. */
   def local(raw: String): Input = new Input(raw, Basis.LocalOnly, Scope.LocalWorkspace)
@@ -112,25 +135,46 @@ object RecallDisclosure:
   def certified(payload: PseudonymizedText): Input =
     new Input(payload.text, new Basis.CertifiedPseudonymized(payload), Scope.LocalWorkspace)
 
-  /** Admits only the fixed project-synthetic control text for courts and CLI examples. */
+  /** Admits only fixed independently reviewed project-synthetic bytes for courts and CLI examples.
+    */
   def projectSynthetic(raw: String): Either[Refusal, Input] =
-    Either.cond(
-      raw == SyntheticText && Checksum.ofText(raw) == SyntheticChecksum,
-      new Input(
-        raw,
-        new Basis.PublicCorpusAdmitted(
-          new PublicRecord(
-            ContentAddress.digest(Vector("project-synthetic-control/v1", SyntheticChecksum.hex)),
-            "project-synthetic-control/v1",
-            "project-synthetic-anna-arrived",
-            "fixed-text/v1",
-            SyntheticChecksum
-          )
+    val digest = Checksum.ofText(raw)
+    if OrganizationSyntheticChecksums(digest) && raw != SyntheticText then
+      Right(
+        new Input(
+          raw,
+          new Basis.PublicCorpusAdmitted(
+            new PublicRecord(
+              ContentAddress.digest(
+                Vector("organization-language/v1", OrganizationAdmissionPin.hex, digest.hex)
+              ),
+              "organization-language/v1",
+              "organization-synthetic-" + digest.hex,
+              "fixed-text/v1",
+              digest
+            )
+          ),
+          Scope.LocalWorkspace
+        )
+      )
+    else
+      Either.cond(
+        raw == SyntheticText && Checksum.ofText(raw) == SyntheticChecksum,
+        new Input(
+          raw,
+          new Basis.PublicCorpusAdmitted(
+            new PublicRecord(
+              ContentAddress.digest(Vector("project-synthetic-control/v1", SyntheticChecksum.hex)),
+              "project-synthetic-control/v1",
+              "project-synthetic-anna-arrived",
+              "fixed-text/v1",
+              SyntheticChecksum
+            )
+          ),
+          Scope.LocalWorkspace
         ),
-        Scope.LocalWorkspace
-      ),
-      Refusal.SyntheticTextMismatch
-    )
+        Refusal.SyntheticTextMismatch
+      )
 
   /** Replays one trusted Sherlock CSV's word column after checking its version-pinned lineage. */
   def sherlock(
