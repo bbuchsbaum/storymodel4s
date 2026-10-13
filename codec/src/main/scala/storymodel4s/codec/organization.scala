@@ -77,10 +77,16 @@ object OrganizationCodecs:
       text: String,
       expected: OrganizationReadout.Result
   ): Either[String, OrganizationReadout.Result] =
-    val parser = new io.circe.jawn.JawnParser(maxValueSize = None, allowDuplicateKeys = false)
-    parser.parse(text).left.map(_ => "invalid organization JSON").flatMap { json =>
-      Either.cond(json == toJson(expected), expected, "organization context or contents differ")
-    }
+    for
+      json <- Canonical.parse(text).left.map(_ => "invalid organization JSON")
+      _ <- MappingJson.uniqueObjectKeys(text).left.map(_.toString)
+      expectedJson <- Canonical.parse(encode(expected)).left.map(_.toString)
+      result <- Either.cond(
+        json == expectedJson,
+        expected,
+        "organization context or contents differ"
+      )
+    yield result
 
   /** Quoted TSV exposes original adjacencies and all mutually exclusive accounting categories. */
   def transitions(result: OrganizationReadout.Result): String =
