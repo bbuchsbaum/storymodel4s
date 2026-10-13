@@ -1,0 +1,77 @@
+{
+  "consumer_sha": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "producer_sha": "f47a9e471f1e000987a756443cdea58ecb30a8a6",
+  "Passed": 488,
+  "Failed": 0,
+  "Errors": 0,
+  "Skipped": 0,
+  "groups": [
+    [
+      22,
+      0,
+      0,
+      22
+    ],
+    [
+      26,
+      0,
+      0,
+      26
+    ],
+    [
+      100,
+      0,
+      0,
+      100
+    ],
+    [
+      100,
+      0,
+      0,
+      100
+    ],
+    [
+      13,
+      0,
+      0,
+      13
+    ],
+    [
+      13,
+      0,
+      0,
+      13
+    ],
+    [
+      77,
+      0,
+      0,
+      77
+    ],
+    [
+      74,
+      0,
+      0,
+      74
+    ],
+    [
+      59,
+      0,
+      0,
+      59
+    ],
+    [
+      4,
+      0,
+      0,
+      4
+    ]
+  ],
+  "compile": "pass",
+  "link": "app/fastLinkJS pass",
+  "format": "pass",
+  "exit": 0,
+  "classification": "LocallyObserved",
+  "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "intaglio": "2fa5c682f4a95b8e73daad78dd9302d7aff46e11"
+}

@@ -1,8 +1,8 @@
 {
-  "candidate": "349801767b3971efb41287fe0303364bcfdb46e6",
+  "candidate": "f47a9e471f1e000987a756443cdea58ecb30a8a6",
   "scala_gate_sha": "87151d4bb7240cbc037cd13f0b71f5929c7d1fef",
-  "gate": "running",
-  "consumer": "pending",
+  "gate": "pass:10625passed,0failed,5skipped;fmt pass",
+  "consumer": "pass:488passed,0failed,0skipped;compile/link/fmt pass",
   "python": {
     "sha": "349801767b3971efb41287fe0303364bcfdb46e6",
     "passed": 190,
@@ -18,7 +18,7 @@
     "scala": "mutations-3a53bc09/receipts.json",
     "python": "missing-diagnostics-mutation.json"
   },
-  "next_action": "Await producer gate session6436; then exact source consumer gate and final frozen campaign. No concurrent sbt.",
+  "next_action": "Commit final receipts; independent exact-SHA verdict; refresh Git/Mote and locally integrate. Preview real-data acceptance remains open.",
   "consumer_checkouts": {
     "storyatlas4s": {
       "path": "/private/tmp/storyatlas4s-organization-20261013",
@@ -32,5 +32,7 @@
       "path": "/private/tmp/intaglio-organization-20261013",
       "head": "2fa5c682f4a95b8e73daad78dd9302d7aff46e11"
     }
-  }
+  },
+  "cold_boundary": "36 passed,0failed,0skipped;clean-recompiled f47",
+  "recovery": "188 artifacts:8+144+36,0language failures;128biased packets"
 }

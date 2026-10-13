@@ -1,0 +1,25 @@
+{
+  "producer": "f47a9e471f1e000987a756443cdea58ecb30a8a6",
+  "checker": "f47a9e471f1e000987a756443cdea58ecb30a8a6",
+  "freeze": "38acb01afc05fe162e70d2de6b8789b687cc6672",
+  "frozen_manifest_sha256": "a7365953209b28b48973ad1f4709bea03a1e303f24a938a6fa8228380e19f453",
+  "status": "engineering arithmetic pass; scientific recovery claim adverse/unestablished",
+  "files": [
+    {
+      "path": "recovery-artifacts-f47a9e47.tar.gz",
+      "sha256": "30aa4ec220a93d94deb55d6685ad42185239c83ff21ebecf9096f7a3f3db9c98",
+      "bytes": 34778
+    },
+    {
+      "path": "recovery-report-f47a9e47.json",
+      "sha256": "5c0c9f91ecbe0b74d5de2a46b9f7c5811e7ae55adc250f0e9f8c0ae56df5b218",
+      "bytes": 131060
+    },
+    {
+      "path": "readback-f47a9e47.json",
+      "sha256": "3061ecd8a20f41c3509823009c76c7920f14f6b41c08a884ce74f2e26fbb0ee1",
+      "bytes": 510
+    }
+  ],
+  "numerical_baseline_equal": 188
+}
