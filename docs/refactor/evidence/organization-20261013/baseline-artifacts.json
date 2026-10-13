@@ -1,0 +1,28 @@
+{
+  "producer": "7b8f6bf17b1445285bfce879ca10303bf2ac4671",
+  "checker": "ab20e7e5b8ba8a79f9112f4f26bd9ace8c62fd3e",
+  "freeze": "38acb01afc05fe162e70d2de6b8789b687cc6672",
+  "status": "baseline; final exact-revision evidence pending",
+  "files": [
+    {
+      "path": "recovery-artifacts-7b8f6bf1.tar.gz",
+      "sha256": "e402d3c955d74ae04e91f981500a1ef6e462c3d5ee982337408ec566a282036f",
+      "bytes": 34761
+    },
+    {
+      "path": "recovery-report-7b8f6bf1.json",
+      "sha256": "e93eb1f401fca17c02a917bed212e09bb1238a42f9f63c0ee00af4a57cbe95c7",
+      "bytes": 116323
+    },
+    {
+      "path": "recovery-report-7b8f6bf1-checked-ab20e7e5.json",
+      "sha256": "ecf83812078f678e6154b7ede82a00978cc424f5b9f82f674870f07209393b36",
+      "bytes": 129120
+    },
+    {
+      "path": "readback-7b8f6bf1-checked-ab20e7e5.json",
+      "sha256": "3061ecd8a20f41c3509823009c76c7920f14f6b41c08a884ce74f2e26fbb0ee1",
+      "bytes": 510
+    }
+  ]
+}

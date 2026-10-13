@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-13T13:12:24.731383+00:00",
+  "finished_utc": "2026-10-13T13:13:11.836688+00:00",
+  "duration_seconds": 47.105491,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "codecJVM/testOnly *OrganizationCodecSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/organization-20261013/portable-codec-control-01.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 300.0,
+  "log_bytes": 3231
+}

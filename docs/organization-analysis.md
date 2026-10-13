@@ -71,7 +71,12 @@ python3 tools/recall-study/organization_recovery.py \
   --results /absolute/results --output /absolute/recovery-report.json
 ```
 
-The campaign retains all cases and failures, reports bias and effect attenuation, and checks
-committed freeze ancestry. Synthetic arithmetic and language-path results qualify the tested
+The campaign checks the frozen row masses, omitted indices, admissible sets and order before
+checking arithmetic. It retains all cases and failures, reports bias and effect attenuation,
+and checks committed freeze ancestry. Language diagnostics read true-target mass from the
+actual rows, count admitted source destinations, and report localization and margins with
+original/measured unit counts. Any unavailable row leaves the scalar means unavailable.
+Conditional bounds inclusion is a support diagnostic; it does not establish interval calibration.
+Synthetic arithmetic and language-path results qualify the tested
 engineering behavior. Human recovery, calibration and the real annotated-video preview require
 their separately named evidence.

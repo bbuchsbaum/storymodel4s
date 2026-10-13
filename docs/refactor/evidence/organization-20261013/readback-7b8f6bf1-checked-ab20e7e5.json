@@ -1,0 +1,20 @@
+{
+  "validation": "structural and conditional numerical readback; no restored execution authority",
+  "results": [
+    {
+      "counts": {
+        "Backward": 0.06710992975481972,
+        "Forward": 2.868552056566155,
+        "SameTarget": 0.027425629339574428,
+        "External": 0.036912384339450544,
+        "Incomparable": 0.0,
+        "Unresolved": 0.0,
+        "Failed": 0.0
+      },
+      "units": 4,
+      "adjacencies": 3,
+      "bounds_check": "exhaustive-enumeration"
+    }
+  ],
+  "outcomes": []
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-13T09:22:40.558646+00:00",
+  "finished_utc": "2026-10-13T09:23:27.389640+00:00",
+  "duration_seconds": 46.831792,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/compile; pipeline/compile"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/organization-20261013/draft-compile-01.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5164
+}

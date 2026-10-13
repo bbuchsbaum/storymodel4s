@@ -1,0 +1,145 @@
+[
+  {
+    "name": "weighted-license",
+    "head": "3a53bc09706a647ce54a2c052a530ec06aaf73b0",
+    "source": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly *OrganizationPipelineSuite"
+    ],
+    "original_sha256": "3a80ffb77f7e102a745bde31f5fd6bcf29fc2b10a6053e7dbc30e9800853e95f",
+    "mutant_sha256": "a25f2e8c45157968fe72feac9de75be28bbd6bae1629f22fb518c4d883e89a0a",
+    "exit": 1,
+    "totals": [
+      [
+        "9",
+        "1",
+        "0",
+        "8"
+      ]
+    ],
+    "failures": [
+      "exact zero succeeds every positive structural weight and reconstruction refuse"
+    ],
+    "witness": "exact zero succeeds every positive structural weight and reconstruction refuse",
+    "compilation_error": false,
+    "killed": true
+  },
+  {
+    "name": "bridge-missing",
+    "head": "3a53bc09706a647ce54a2c052a530ec06aaf73b0",
+    "source": "align/src/main/scala/storymodel4s/align/organizationreadout.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly *OrganizationReadoutSuite"
+    ],
+    "original_sha256": "e36d6edb84e4d83450b6960109df94da87257771454c73d4353a6e755ba8780f",
+    "mutant_sha256": "38c484b0e01f22b9180cf5f1231163d061478d2a6f07bbc023f7b980c379759e",
+    "exit": 1,
+    "totals": [
+      [
+        "10",
+        "1",
+        "0",
+        "9"
+      ]
+    ],
+    "failures": [
+      "missing middle retains two unresolved adjacencies and no direct observation"
+    ],
+    "witness": "missing middle retains two unresolved adjacencies and no direct observation",
+    "compilation_error": false,
+    "killed": true
+  },
+  {
+    "name": "independent-pair-bounds",
+    "head": "3a53bc09706a647ce54a2c052a530ec06aaf73b0",
+    "source": "align/src/main/scala/storymodel4s/align/organizationreadout.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly *OrganizationReadoutSuite"
+    ],
+    "original_sha256": "e36d6edb84e4d83450b6960109df94da87257771454c73d4353a6e755ba8780f",
+    "mutant_sha256": "3b105e5533ead63bfe1abb6e5bed72aca8ab73deaa2873132d70df9c2aca40bb",
+    "exit": 1,
+    "totals": [
+      [
+        "10",
+        "2",
+        "0",
+        "8"
+      ]
+    ],
+    "failures": [
+      "coherent middle assignment forbids the unattainable pairwise maximum of two",
+      "sparse DP and expected counts agree with complete independent enumeration"
+    ],
+    "witness": "coherent middle assignment forbids the unattainable pairwise maximum of two",
+    "compilation_error": false,
+    "killed": true
+  },
+  {
+    "name": "invent-media-order",
+    "head": "3a53bc09706a647ce54a2c052a530ec06aaf73b0",
+    "source": "align/src/main/scala/storymodel4s/align/organizationreadout.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly *OrganizationReadoutSuite"
+    ],
+    "original_sha256": "e36d6edb84e4d83450b6960109df94da87257771454c73d4353a6e755ba8780f",
+    "mutant_sha256": "c73302fe7f08773521fee340fdfa3079a69c1a01de9045cee263cbc2fdfa0b72",
+    "exit": 1,
+    "totals": [
+      [
+        "10",
+        "1",
+        "0",
+        "9"
+      ]
+    ],
+    "failures": [
+      "media order uses native parts preserves checked composition and refuses unlocated targets"
+    ],
+    "witness": "media order uses native parts preserves checked composition and refuses unlocated targets",
+    "compilation_error": false,
+    "killed": true
+  },
+  {
+    "name": "forgeable-result",
+    "head": "3a53bc09706a647ce54a2c052a530ec06aaf73b0",
+    "source": "align/src/main/scala/storymodel4s/align/organizationreadout.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/Test/clean; pipeline/testOnly *OrganizationBoundarySuite"
+    ],
+    "original_sha256": "e36d6edb84e4d83450b6960109df94da87257771454c73d4353a6e755ba8780f",
+    "mutant_sha256": "0bd59b5c4b740f6f246d4ba1139c81580ffa6a50b956985ea6de11dde77f2958",
+    "exit": 1,
+    "totals": [
+      [
+        "36",
+        "3",
+        "0",
+        "33"
+      ]
+    ],
+    "failures": [
+      "Result closes fromProduct with an accepting control",
+      "Result closes product construction with an accepting control",
+      "Result closes Mirror with an accepting control"
+    ],
+    "witness": "Result closes Mirror with an accepting control",
+    "compilation_error": false,
+    "killed": true
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "candidate": "349801767b3971efb41287fe0303364bcfdb46e6",
+  "scala_gate_sha": "87151d4bb7240cbc037cd13f0b71f5929c7d1fef",
+  "gate": "running",
+  "consumer": "pending",
+  "python": {
+    "sha": "349801767b3971efb41287fe0303364bcfdb46e6",
+    "passed": 190,
+    "failed": 0,
+    "skipped": 0,
+    "log": "python-final-01.log"
+  },
+  "gated_input_delta": [
+    "tools/recall-study/organization_recovery.py",
+    "tools/recall-study/tests/test_organization_recovery.py"
+  ],
+  "mutations": {
+    "scala": "mutations-3a53bc09/receipts.json",
+    "python": "missing-diagnostics-mutation.json"
+  },
+  "next_action": "Await producer gate session6436; then exact source consumer gate and final frozen campaign. No concurrent sbt.",
+  "consumer_checkouts": {
+    "storyatlas4s": {
+      "path": "/private/tmp/storyatlas4s-organization-20261013",
+      "head": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d"
+    },
+    "grakern": {
+      "path": "/private/tmp/grakern-organization-20261013",
+      "head": "0329c43c88a0b71e9aa4456723bb16bac2fa3841"
+    },
+    "intaglio": {
+      "path": "/private/tmp/intaglio-organization-20261013",
+      "head": "2fa5c682f4a95b8e73daad78dd9302d7aff46e11"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-13T12:53:32.122235+00:00",
+  "finished_utc": "2026-10-13T12:54:08.507814+00:00",
+  "duration_seconds": 36.385614,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/Test/runMain storymodel4s.pipeline.OrganizationRecoveryWitness /Users/bbuchsbaum/code/scala/storymodel4s/tools/recall-study/fixtures/organization-recovery/manifest.json /private/tmp/storymodel4s-organization-results-7b8f6bf1 38acb01afc05fe162e70d2de6b8789b687cc6672 7b8f6bf1"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/organization-20261013/recovery-7b8f6bf1.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 2546
+}

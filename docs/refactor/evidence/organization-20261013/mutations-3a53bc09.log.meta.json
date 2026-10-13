@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-13T13:04:57.317501+00:00",
+  "finished_utc": "2026-10-13T13:07:42.053978+00:00",
+  "duration_seconds": 164.73714,
+  "command": [
+    "python3",
+    "docs/refactor/evidence/organization-20261013/mutation_courts.py",
+    "/private/tmp/storymodel4s-organization-20261013",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/organization-20261013/mutations-3a53bc09"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/organization-20261013/mutations-3a53bc09.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3829
+}

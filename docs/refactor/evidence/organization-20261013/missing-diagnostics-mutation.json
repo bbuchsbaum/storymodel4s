@@ -1,0 +1,35 @@
+{
+  "head": "349801767b3971efb41287fe0303364bcfdb46e6",
+  "source": "tools/recall-study/organization_recovery.py",
+  "original_sha256": "2b4782532330f678704e4576e36b19c619ae97c3964df8ab8877c7dc33d42668",
+  "mutant_sha256": "e0e3ae9a6cd5bb016c9446ac94b88242ca6cab78a014fb140b0591a3bb5dcc06",
+  "compiled": true,
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/recall-study/tests",
+    "-p",
+    "test_organization_recovery.py",
+    "-v"
+  ],
+  "exit": 1,
+  "Passed": 9,
+  "Failed": 1,
+  "Errors": 0,
+  "Skipped": 0,
+  "witness": "test_missing_language_rows_leave_scalar_means_unavailable",
+  "restored": true,
+  "replacements": [
+    [
+      "return None if any(value is None for value in actual) else sum(actual) / len(path)",
+      "return sum(value or 0.0 for value in actual) / len(path)"
+    ],
+    [
+      "None if measured != len(rows) else ",
+      ""
+    ]
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-13T12:31:33.681612+00:00",
+  "finished_utc": "2026-10-13T12:32:08.393687+00:00",
+  "duration_seconds": 34.71185,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly storymodel4s.align.OrganizationReadoutSuite; pipeline/testOnly storymodel4s.pipeline.OrganizationPipelineSuite storymodel4s.consumer.OrganizationBoundarySuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/organization-20261013/draft-integration-03.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5345
+}
