@@ -165,13 +165,62 @@ def read_exchange(root):
         raise ValueError("unsupported exchange manifest")
     if {p.name for p in Path(root).iterdir()} != {"manifest.json", *files}:
         raise ValueError("unexpected output files")
+    metadata = manifest["metadata"]
+    if manifest["schemaVersion"] == "organization-exchange/v1":
+        prefixes = {"": metadata}
+        outcomes = []
+    else:
+        outcomes = metadata["outcomes"]
+        if (not isinstance(outcomes, list) or type(metadata["attempts"]) is not int
+                or metadata["attempts"] != len(outcomes)):
+            raise ValueError("cohort attempt accounting mismatch")
+        prefixes = {}
+        observations = set()
+        for outcome in outcomes:
+            identity = (outcome["participant"], outcome["session"])
+            if identity in observations:
+                raise ValueError("duplicate cohort observation")
+            observations.add(identity)
+            if outcome["status"] == "complete":
+                run = outcome["run"]
+                if not re.fullmatch(r"[0-9a-f]{64}", run) or run + "--" in prefixes:
+                    raise ValueError("invalid or duplicate completed run")
+                if (outcome["metadata"]["run"] != run
+                        or outcome["metadata"]["organization"] != outcome["organization"]):
+                    raise ValueError("cohort result identity mismatch")
+                prefixes[run + "--"] = outcome["metadata"]
+            elif outcome["status"] != "failed" or not isinstance(outcome.get("reason"), str) or not outcome["reason"]:
+                raise ValueError("unaccounted cohort outcome")
+    expected_files = set()
+    component_names = {"manifest.json", "mapping.json", "words.tsv", "units.tsv", "targets.tsv",
+                       "target-support.tsv", "alternatives.tsv", "measure-metadata.tsv", "decisions.tsv", "links.tsv", "stages.tsv"}
+    for prefix in prefixes:
+        required = {prefix + name for name in ("organization.json", "compatibility.json", "transitions.tsv", "mapping--manifest.json")}
+        if not required <= files.keys():
+            raise ValueError("missing complete organization payload")
+        pair = load(files[prefix + "mapping--manifest.json"])
+        members = [m["member"] for m in pair["metadata"]["members"]]
+        if (len(set(members)) != len(members) or not {"reference", "reconstruction"} <= set(members)
+                or not set(members) <= {"reference", "reconstruction", "weighted"}):
+            raise ValueError("invalid mapping pair members")
+        pair_names = {f"{member}--{name}" for member in members for name in component_names}
+        entries = pair["files"]
+        if len(entries) != len(pair_names) or {e["path"] for e in entries} != pair_names:
+            raise ValueError("incomplete mapping pair manifest")
+        for entry in entries:
+            name = prefix + "mapping--" + entry["path"]
+            if name not in files or hashlib.sha256(files[name].encode()).hexdigest() != entry["sha256"]:
+                raise ValueError("incomplete mapping pair payload")
+            required.add(name)
+        expected_files.update(required)
+    if set(files) != expected_files:
+        raise ValueError("payloads differ from accounted outcomes")
     results = []
-    for name, text in files.items():
-        if not name.endswith("organization.json"):
-            continue
-        prefix = name[:-len("organization.json")]
-        result = load(text)
+    for prefix, expected_metadata in prefixes.items():
+        result = load(files[prefix + "organization.json"])
         compatibility = load(files[prefix + "compatibility.json"])
+        if compatibility != expected_metadata:
+            raise ValueError("result metadata differs from manifest outcome")
         if compatibility["member"] != "Reference" or compatibility["measure"] != "NormalizedScoreMass" or compatibility["calibration"] != "not-established":
             raise ValueError("unsupported measurement interpretation")
         if compatibility["verdict"] != "CompatibleWithDeclaredPolicy" or compatibility["request"]["axis"] != result["axis"]:
@@ -190,9 +239,9 @@ def read_exchange(root):
         units = record["inventory"]["units"]
         if [r["unit"] for r in result["rows"]] != [u["id"] for u in units]:
             raise ValueError("organization rows differ from original mapping inventory")
-        outcomes = {o["unit"]: o for o in record["outcomes"]}
+        mapping_outcomes = {o["unit"]: o for o in record["outcomes"]}
         for row in result["rows"]:
-            original = outcomes[row["unit"]]
+            original = mapping_outcomes[row["unit"]]
             mass = {v["destination"]: number(v["raw_value"]) for v in original["mapping_links"]
                     if v["measure_kind"] == "NormalizedScoreMass"}
             retained = {v["destination"]: number(v["mass"]) for v in row["mass"]}
@@ -209,9 +258,6 @@ def read_exchange(root):
                 if number(cell) != number(transition["counts"][c]):
                     raise ValueError("transition table data mismatch")
         results.append(summary)
-    outcomes = manifest["metadata"].get("outcomes", [])
-    if outcomes and sum(o["status"] == "complete" for o in outcomes) != len(results):
-        raise ValueError("cohort completion accounting mismatch")
     return {"validation": "structural and conditional numerical readback; no restored execution authority", "results": results, "outcomes": outcomes}
 
 

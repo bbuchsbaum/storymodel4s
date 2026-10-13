@@ -33,6 +33,52 @@ def integer_counts(path):
     return [sum(b < a for a, b in pairs), sum(b > a for a, b in pairs), sum(b == a for a, b in pairs)]
 
 
+def check_frozen_rows(result, expected, ranks, tolerance=1e-10):
+    """Bind the arithmetic oracle to independently reconstructed frozen inputs."""
+    key = lambda rank: f"sit:synthetic-rank-{rank}"
+    order = {r["target"]: number(r["position"]) for r in result["order"]}
+    if (result["orderKind"] != "DeclaredPositions" or result["axis"] != "Discourse"
+            or len(order) != len(result["order"]) or order != {key(n): n for n in ranks}):
+        raise ValueError("frozen target order substituted")
+    rows = result["rows"]
+    if len(rows) != len(expected):
+        raise ValueError("frozen unit inventory substituted")
+    for index, (row, mass) in enumerate(zip(rows, expected)):
+        status = "Unresolved" if mass is None else "Available"
+        expected_mass = {} if mass is None else {key(n): p for n, p in mass.items()}
+        actual = {v["destination"]: number(v["mass"]) for v in row["mass"]}
+        if row["unit"] != f"u{index}" or row["status"] != status:
+            raise ValueError("frozen unit status substituted")
+        if (len(actual) != len(row["mass"]) or actual.keys() != expected_mass.keys()
+                or any(abs(actual[k] - p) > tolerance for k, p in expected_mass.items())):
+            raise ValueError("frozen row mass substituted")
+        if (set(row["admissible"]) != expected_mass.keys()
+                or len(row["admissible"]) != len(expected_mass)):
+            raise ValueError("frozen admissible population substituted")
+
+
+def check_packet_inputs(result, path, quality, omitted, storage, tolerance=1e-10):
+    expected = [None if i == omitted else {
+        n: quality if n == target else (1 - quality) / (len(storage) - 1)
+        for n in storage} for i, target in enumerate(path)]
+    check_frozen_rows(result, expected, storage, tolerance)
+
+
+def language_true_mass(result, path, source_size, reported, tolerance=1e-10):
+    """Read the true-target mass from rows, rather than trusting an emitted summary."""
+    ranks = {number(r["position"]): r["target"] for r in result["order"]}
+    if (result["orderKind"] != "TextDiscourseRanks" or result["axis"] != "Discourse"
+            or len(ranks) != len(result["order"]) or set(ranks) != set(range(source_size))
+            or len(set(ranks.values())) != source_size or len(result["rows"]) != len(path)):
+        raise ValueError("language truth inventory substituted")
+    actual = [next((number(v["mass"]) for v in row["mass"]
+                    if v["destination"] == ranks[target]), 0.0)
+              for row, target in zip(result["rows"], path)]
+    if len(reported) != len(actual) or any(abs(number(a) - b) > tolerance for a, b in zip(reported, actual)):
+        raise ValueError("incorrect reported true-target mass")
+    return sum(actual) / len(path)
+
+
 def evaluate(manifest_path, results_path):
     frozen_bytes = Path(manifest_path).read_bytes()
     frozen = load(frozen_bytes.decode())
@@ -53,6 +99,9 @@ def evaluate(manifest_path, results_path):
         artifact = load(files[f"case-{case['id']}.json"])
         if artifact["fixture"] != case:
             raise ValueError("fixture substituted")
+        expected = [None if row is None else {n: 1 / len(row) for n in row} for row in case["rows"]]
+        ranks = {n for row in case["rows"] if row is not None for n in row}
+        check_frozen_rows(artifact["result"], expected, ranks, tolerance)
         summary = check_result(artifact["result"], tolerance)
         actual = [summary["counts"][c] for c in CATEGORIES[:3]]
         if any(abs(a - e) > tolerance for a, e in zip(actual, case["counts"])):
@@ -65,6 +114,7 @@ def evaluate(manifest_path, results_path):
         artifact = load(files[f"experiment-{index}.json"])
         if (artifact["truth"], artifact["correctMass"], artifact.get("omitted"), artifact["storage"], artifact["displayCopies"]) != (path, quality, omitted, storage, copies):
             raise ValueError("experimental condition substituted")
+        check_packet_inputs(artifact["result"], path, quality, omitted, storage, tolerance)
         summary = check_result(artifact["result"], tolerance)
         truth = integer_counts(path)
         if artifact["truthCounts"] != truth:
@@ -83,6 +133,7 @@ def evaluate(manifest_path, results_path):
             language.append({"path": path, "quality": quality, "temperature": temperature, "status": "failed", "reason": artifact["reason"]})
             continue
         summary = check_result(artifact["result"], tolerance)
+        mean_true_mass = language_true_mass(artifact["result"], path, len(frozen["language"]["sentences"]), artifact["trueTargetMass"], tolerance)
         truth = integer_counts(path)
         if artifact["truthCounts"] != truth:
             raise ValueError("wrong language truth")
@@ -90,7 +141,7 @@ def evaluate(manifest_path, results_path):
         if any(abs(a - e) > tolerance for a, e in zip(bias, artifact["countBias"])):
             raise ValueError("incorrect reported bias")
         language.append({"path": path, "quality": quality, "temperature": temperature, "status": "complete", "counts": summary["counts"],
-                         "bias": bias, "mean_true_target_mass": sum(artifact["trueTargetMass"]) / len(path), "bounds_check": summary["bounds_check"]})
+                         "bias": bias, "mean_true_target_mass": mean_true_mass, "bounds_check": summary["bounds_check"]})
     expected_names = {f"case-{case['id']}.json" for case in frozen["cases"]} | {f"experiment-{i}.json" for i in range(len(experiments))} | {f"language-{i}.json" for i in range(len(language))}
     if set(files) != expected_names or metadata["packetExperiments"] != len(experiments) or metadata["languageExperiments"] != len(language):
         raise ValueError("missing, extra or dropped recovery cases")

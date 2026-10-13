@@ -4,11 +4,12 @@ import copy
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from read_organization import CATEGORIES, check_result, load, number
-from organization_recovery import integer_counts
+from read_organization import CATEGORIES, check_result, load, number, read_exchange
+from organization_recovery import check_packet_inputs, integer_counts, language_true_mass
 
 
 def point_result():
@@ -29,6 +30,59 @@ def point_result():
 
 
 class OrganizationRecoveryTest(unittest.TestCase):
+    def test_frozen_quality_and_omission_checked_against_rows(self):
+        r = point_result()
+        r.update(axis="Discourse")
+        for entry in r["order"]:
+            entry["target"] = f"sit:synthetic-rank-{int(entry['position'])}"
+        storage = [2, 3, 7, 8]
+        for row, target in zip(r["rows"], [2, 7, 3, 8]):
+            row["mass"] = [{"destination": f"sit:synthetic-rank-{n}", "mass": float(n == target)} for n in storage]
+            row["admissible"] = [v["destination"] for v in row["mass"]]
+        check_packet_inputs(r, [2, 7, 3, 8], 1.0, None, storage)
+        # The same self-consistent point rows cannot stand in for the ambiguous condition.
+        with self.assertRaisesRegex(ValueError, "frozen row mass"):
+            check_packet_inputs(r, [2, 7, 3, 8], 0.5, None, storage)
+        with self.assertRaisesRegex(ValueError, "frozen unit status"):
+            check_packet_inputs(r, [2, 7, 3, 8], 1.0, 1, storage)
+        r["rows"][0]["admissible"].pop()
+        with self.assertRaisesRegex(ValueError, "frozen admissible"):
+            check_packet_inputs(r, [2, 7, 3, 8], 1.0, None, storage)
+
+    def test_language_summary_must_equal_true_target_row_mass(self):
+        r = point_result()
+        r.update(axis="Discourse", orderKind="TextDiscourseRanks")
+        for index, entry in enumerate(r["order"]):
+            entry["position"] = index
+        self.assertEqual(language_true_mass(r, [0, 1, 2, 3], 4, [1.0] * 4), 1.0)
+        with self.assertRaisesRegex(ValueError, "true-target mass"):
+            language_true_mass(r, [0, 1, 2, 3], 4, [0.5] * 4)
+        with self.assertRaisesRegex(ValueError, "true-target mass"):
+            language_true_mass(r, [3, 2, 1, 0], 4, [1.0] * 4)
+
+    def test_empty_single_refuses_failed_only_cohort_is_accounted(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "manifest.json"
+            path.write_text(json.dumps({"schemaVersion": "organization-exchange/v1", "files": [], "metadata": {}}))
+            with self.assertRaisesRegex(ValueError, "complete organization payload"):
+                read_exchange(root)
+            cohort = {"schemaVersion": "organization-cohort/v1", "files": [], "metadata": {
+                "attempts": 1, "outcomes": [{"participant": "synthetic", "session": "one", "status": "failed", "reason": "refused"}]}}
+            path.write_text(json.dumps(cohort))
+            result = read_exchange(root)
+            self.assertEqual(len(result["outcomes"]), 1)
+            self.assertEqual(result["results"], [])
+            cohort["metadata"]["attempts"] = 2
+            path.write_text(json.dumps(cohort))
+            with self.assertRaisesRegex(ValueError, "attempt accounting"):
+                read_exchange(root)
+            cohort["metadata"]["attempts"] = 1
+            cohort["metadata"]["outcomes"][0] = {"participant": "synthetic", "session": "one", "status": "complete", "run": "a" * 64,
+                "organization": "b" * 64, "metadata": {"run": "a" * 64, "organization": "b" * 64}}
+            path.write_text(json.dumps(cohort))
+            with self.assertRaisesRegex(ValueError, "complete organization payload"):
+                read_exchange(root)
+
     def test_point_known_answer(self):
         r = point_result()
         self.assertEqual(check_result(r)["counts"]["Backward"], 1.0)
