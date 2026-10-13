@@ -79,6 +79,25 @@ def language_true_mass(result, path, source_size, reported, tolerance=1e-10):
     return sum(actual) / len(path)
 
 
+def language_diagnostics(result, path, truth):
+    """Conditional localization and support diagnostics on the retained original units."""
+    ranks = {number(r["position"]): r["target"] for r in result["order"]}
+    rows = result["rows"]
+    true_keys = [ranks[target] for target in path]
+    masses = [{v["destination"]: number(v["mass"]) for v in row["mass"]} for row in rows]
+    bounds = result.get("bounds")
+    return {
+        "true_target_admitted_fraction": sum(k in row["admissible"] for k, row in zip(true_keys, rows)) / len(path),
+        "source_candidate_fraction": sum(sum(k in row["admissible"] for k in ranks.values()) / len(ranks) for row in rows) / len(path),
+        "unique_true_argmax_fraction": sum(m.get(k, 0.0) > max((v for other, v in m.items() if other != k), default=0.0)
+                                          for k, m in zip(true_keys, masses)) / len(path),
+        "mean_true_vs_best_other_margin": sum(m.get(k, 0.0) - max((v for other, v in m.items() if other != k), default=0.0)
+                                               for k, m in zip(true_keys, masses)) / len(path),
+        "truth_in_conditional_bounds": None if bounds is None else {
+            c: bounds[c]["minimum"] <= n <= bounds[c]["maximum"] for c, n in zip(CATEGORIES[:3], truth)},
+    }
+
+
 def evaluate(manifest_path, results_path):
     frozen_bytes = Path(manifest_path).read_bytes()
     frozen = load(frozen_bytes.decode())
@@ -141,7 +160,8 @@ def evaluate(manifest_path, results_path):
         if any(abs(a - e) > tolerance for a, e in zip(bias, artifact["countBias"])):
             raise ValueError("incorrect reported bias")
         language.append({"path": path, "quality": quality, "temperature": temperature, "status": "complete", "counts": summary["counts"],
-                         "bias": bias, "mean_true_target_mass": mean_true_mass, "bounds_check": summary["bounds_check"]})
+                         "bias": bias, "mean_true_target_mass": mean_true_mass, "bounds_check": summary["bounds_check"],
+                         **language_diagnostics(artifact["result"], path, truth)})
     expected_names = {f"case-{case['id']}.json" for case in frozen["cases"]} | {f"experiment-{i}.json" for i in range(len(experiments))} | {f"language-{i}.json" for i in range(len(language))}
     if set(files) != expected_names or metadata["packetExperiments"] != len(experiments) or metadata["languageExperiments"] != len(language):
         raise ValueError("missing, extra or dropped recovery cases")
@@ -159,10 +179,20 @@ def evaluate(manifest_path, results_path):
         values = [r["counts"] for r in experiments if (r["path"], r["correct_mass"], r["omitted"]) == (path, quality, omitted)]
         if any(any(abs(x - y) > tolerance for x, y in zip(v, values[0])) for v in values[1:]):
             raise ValueError("storage or word-copy inflation")
+    language_attenuation = []
+    for quality, temperature in itertools.product(frozen["language"]["quality"], frozen["language"]["temperatures"]):
+        pair = [next(r for r in language if (r["quality"], r["temperature"], r["path"]) == (quality, temperature, path))
+                for path in frozen["language"]["paths"][:2]]
+        available = all(r["status"] == "complete" for r in pair)
+        effect = pair[1]["counts"]["Backward"] - pair[0]["counts"]["Backward"] if available else None
+        language_attenuation.append({"quality": quality, "temperature": temperature,
+                                     "true_backward_contrast": 3, "observed_backward_contrast": effect,
+                                     "retained_effect_fraction": effect / 3 if available else None})
     return {"schema": "organization-recovery-report/v1", "freeze": metadata,
             "arithmetic_gate": "pass", "scientific_claim": "human recovery and calibration not established",
             "recovery_claim_gate": "adverse bias retained; no general recovery claim",
             "known_answers": witnesses, "experiments": experiments, "effect_attenuation": attenuation, "language": language,
+            "language_effect_attenuation": language_attenuation,
             "totals": {"known_answers": len(witnesses), "packet_experiments": len(experiments), "language_experiments": len(language),
                        "language_failures": sum(r["status"] == "failed" for r in language),
                        "biased_packet_conditions": sum(any(abs(b) > tolerance for b in r["bias"]) for r in experiments)}}

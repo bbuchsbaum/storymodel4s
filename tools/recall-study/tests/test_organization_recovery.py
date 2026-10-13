@@ -9,7 +9,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from read_organization import CATEGORIES, check_result, load, number, read_exchange
-from organization_recovery import check_packet_inputs, integer_counts, language_true_mass
+from organization_recovery import check_packet_inputs, integer_counts, language_diagnostics, language_true_mass
 
 
 def point_result():
@@ -39,12 +39,18 @@ class OrganizationRecoveryTest(unittest.TestCase):
         for row, target in zip(r["rows"], [2, 7, 3, 8]):
             row["mass"] = [{"destination": f"sit:synthetic-rank-{n}", "mass": float(n == target)} for n in storage]
             row["admissible"] = [v["destination"] for v in row["mass"]]
+        for category in CATEGORIES[:3]:
+            r["bounds"][category] = {"minimum": 0, "maximum": 3}
+        self.assertEqual(check_result(r)["counts"]["Backward"], 1.0)
         check_packet_inputs(r, [2, 7, 3, 8], 1.0, None, storage)
         # The same self-consistent point rows cannot stand in for the ambiguous condition.
         with self.assertRaisesRegex(ValueError, "frozen row mass"):
             check_packet_inputs(r, [2, 7, 3, 8], 0.5, None, storage)
         with self.assertRaisesRegex(ValueError, "frozen unit status"):
             check_packet_inputs(r, [2, 7, 3, 8], 1.0, 1, storage)
+        # A self-consistent jump cannot be relabeled as the monotone frozen path either.
+        with self.assertRaisesRegex(ValueError, "frozen row mass"):
+            check_packet_inputs(r, [2, 3, 7, 8], 1.0, None, storage)
         r["rows"][0]["admissible"].pop()
         with self.assertRaisesRegex(ValueError, "frozen admissible"):
             check_packet_inputs(r, [2, 7, 3, 8], 1.0, None, storage)
@@ -59,6 +65,10 @@ class OrganizationRecoveryTest(unittest.TestCase):
             language_true_mass(r, [0, 1, 2, 3], 4, [0.5] * 4)
         with self.assertRaisesRegex(ValueError, "true-target mass"):
             language_true_mass(r, [3, 2, 1, 0], 4, [1.0] * 4)
+        diagnostic = language_diagnostics(r, [0, 1, 2, 3], [1, 2, 0])
+        self.assertEqual(diagnostic["unique_true_argmax_fraction"], 1.0)
+        self.assertEqual(diagnostic["mean_true_vs_best_other_margin"], 1.0)
+        self.assertEqual(diagnostic["source_candidate_fraction"], 0.25)
 
     def test_empty_single_refuses_failed_only_cohort_is_accounted(self):
         with tempfile.TemporaryDirectory() as root:
