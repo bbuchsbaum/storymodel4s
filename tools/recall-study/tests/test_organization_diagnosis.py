@@ -7,7 +7,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from organization_diagnosis import (closed_form_pair, conditional_counts, cost_readback,
-                                     generative_control, packet_diagnosis)
+                                     generative_control, packet_diagnosis, rank_interval)
 
 
 class OrganizationDiagnosisTests(unittest.TestCase):
@@ -61,6 +61,17 @@ class OrganizationDiagnosisTests(unittest.TestCase):
             self.assertGreater(result['maximum_path_conditional_discrepancy'], 0)
             for a, b in zip(result['population_truth'], result['population_posterior_expected_counts']):
                 self.assertAlmostEqual(a, b, places=11)
+
+    def test_mass_rank_uses_score_order_and_preserves_ties(self):
+        scores = {'third-source': .4, 'first-source': .4, 'second-source': .2}
+        self.assertEqual(rank_interval(scores, 'third-source', 1e-10), {'first': 1, 'last': 2, 'population_size': 3})
+        self.assertEqual(rank_interval(scores, 'second-source', 1e-10), {'first': 3, 'last': 3, 'population_size': 3})
+        self.assertIsNone(rank_interval(scores, 'absent', 1e-10))
+
+    def test_cost_rank_reverses_preference_without_changing_source_positions(self):
+        costs = {'third-source': .1, 'first-source': .5, 'second-source': .2}
+        self.assertEqual(rank_interval(costs, 'third-source', 1e-10, True), {'first': 1, 'last': 1, 'population_size': 3})
+        self.assertEqual(rank_interval(costs, 'first-source', 1e-10, True), {'first': 3, 'last': 3, 'population_size': 3})
 
     def cost_artifact(self):
         weights = {'sit:a': 2 / (3 + math.exp(-1)), 'sit:b': 1 / (3 + math.exp(-1)), 'ext:Extra': math.exp(-1) / (3 + math.exp(-1))}

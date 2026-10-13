@@ -116,6 +116,16 @@ def generative_control(k, units, p, infer=bayes_rows, tolerance=1e-10):
             'maximum_path_conditional_discrepancy': max_conditional_discrepancy}
 
 
+def rank_interval(values, key, tolerance, smaller_is_better=False):
+    """One-based diagnostic rank interval; absent targets have no rank."""
+    if key not in values:
+        return None
+    value = values[key]
+    better = sum(v < value - tolerance if smaller_is_better else v > value + tolerance for v in values.values())
+    tied = sum(abs(v - value) <= tolerance for v in values.values())
+    return {'first': better + 1, 'last': better + tied, 'population_size': len(values)}
+
+
 def mass_diagnostics(result, path, tolerance):
     truth = integer_counts(path)
     summary = check_result(result, tolerance)
@@ -131,7 +141,8 @@ def mass_diagnostics(result, path, tolerance):
         top = max(masses.values())
         # Tolerance defines diagnostic tie reporting only, never production selection.
         best = sorted(k for k, v in masses.items() if abs(v - top) <= tolerance)
-        details.append({'unit_index': index, 'status': 'Available', 'true_rank': t,
+        details.append({'unit_index': index, 'status': 'Available', 'true_source_position': t,
+                        'true_destination_mass_rank': rank_interval(masses, target, tolerance),
                         'true_mass': masses.get(target, 0), 'best_destinations': best,
                         'true_is_tied_best': target in best, 'top_tie_size': len(best),
                         'external_mass': sum(v for k, v in masses.items() if k.startswith('ext:'))})
@@ -148,7 +159,9 @@ def cost_readback(artifact, tolerance):
     temperature = number(artifact['temperature'])
     maximum = 0.0
     limits = []
-    for row, cost_row in zip(rows, costs):
+    cost_ranks = []
+    rank_targets = {number(r['position']): r['target'] for r in artifact['result']['order']}
+    for index, (row, cost_row) in enumerate(zip(rows, costs)):
         if row['unit'] != cost_row['unit'] or row['status'] != 'Available':
             raise ValueError('cost row binding or availability mismatch')
         states = cost_row['states']
@@ -171,6 +184,17 @@ def cost_readback(artifact, tolerance):
         if error > tolerance:
             raise ValueError('emitted costs do not reproduce destination masses')
         limits.append(dict(limit))
+        if 'path' in artifact:
+            source_costs = {}
+            for state in admitted:
+                key = state['destination']
+                if not key.startswith('ext:'):
+                    source_costs[key] = min(source_costs.get(key, math.inf), number(state['cost']))
+            target = rank_targets[artifact['path'][index]]
+            competitors = [v for key, v in source_costs.items() if key != target]
+            cost_ranks.append({'unit_index': index, 'true_source_cost_rank': rank_interval(source_costs, target, tolerance, True),
+                               'true_cost': source_costs.get(target),
+                               'best_other_minus_true_cost': min(competitors) - source_costs[target] if target in source_costs and competitors else None})
     positions = {r['target']: number(r['position']) for r in artifact['result']['order']}
     limit_counts = {c: 0.0 for c in CATEGORIES}
     from read_organization import classify
@@ -179,7 +203,7 @@ def cost_readback(artifact, tolerance):
             for y, py in b.items():
                 limit_counts[classify(x, y, positions)] += px * py
     return {'maximum_mass_readback_error': maximum, 'zero_temperature_limit_counts': limit_counts,
-            'zero_temperature_limit_rows': limits}
+            'zero_temperature_limit_rows': limits, 'source_cost_ranks': cost_ranks}
 
 
 def evaluate_diagnosis(manifest, baseline_results, plan_path, results):
@@ -250,7 +274,8 @@ def evaluate_diagnosis(manifest, baseline_results, plan_path, results):
             'packet': packet_diagnosis(baseline, tolerance), 'language': language, 'contrasts': contrasts,
             'generative_control': control,
             'dependence_control': {'marginals': [[0.5, 0.5], [0.5, 0.5]], 'same_target_independent': 0.5,
-                                   'same_target_shared_draw': 1.0, 'same_target_opposite_draw': 0.0},
+                                   'same_target_shared_draw': 1.0, 'same_target_opposite_draw': 0.0,
+                                   'interpretation': 'Analytical joint-distribution examples, not an executed production joint-readout test'},
             'totals': {'language_conditions': len(language), 'language_failures': sum(r['status'] == 'failed' for r in language),
                        'original_lexical_conditions_reproduced': baseline_matches},
             'interpretation': 'Exploratory diagnostic controls; no selected default, human efficacy or calibration claim'}
