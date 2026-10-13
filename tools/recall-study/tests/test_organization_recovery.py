@@ -74,8 +74,8 @@ class OrganizationRecoveryTest(unittest.TestCase):
         for missing in [[0], [0, 1, 2, 3]]:
             r = point_result()
             r.update(axis="Discourse", orderKind="TextDiscourseRanks")
-            for index, entry in enumerate(r["order"]):
-                entry["position"] = index
+            for entry in r["order"]:
+                entry["position"] = {2: 0, 3: 1, 7: 2, 8: 3}[entry["position"]]
             for index in missing:
                 r["rows"][index].update(status="Unresolved", mass=[], admissible=[])
             total = dict.fromkeys(CATEGORIES, 0.0)
@@ -94,8 +94,8 @@ class OrganizationRecoveryTest(unittest.TestCase):
                 del r["backwardRate"]
             check_result(r)
             reported = [0.0 if i in missing else 1.0 for i in range(4)]
-            self.assertIsNone(language_true_mass(r, [0, 1, 2, 3], 4, reported))
-            diagnostic = language_diagnostics(r, [0, 1, 2, 3], [1, 2, 0])
+            self.assertIsNone(language_true_mass(r, [0, 2, 1, 3], 4, reported))
+            diagnostic = language_diagnostics(r, [0, 2, 1, 3], [1, 2, 0])
             self.assertEqual((diagnostic["original_units"], diagnostic["measured_units"]), (4, 4-len(missing)))
             self.assertIsNone(diagnostic["unique_true_argmax_fraction"])
             self.assertIsNone(diagnostic["mean_true_vs_best_other_margin"])
