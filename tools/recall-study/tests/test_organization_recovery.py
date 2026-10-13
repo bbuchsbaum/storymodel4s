@@ -68,7 +68,38 @@ class OrganizationRecoveryTest(unittest.TestCase):
         diagnostic = language_diagnostics(r, [0, 1, 2, 3], [1, 2, 0])
         self.assertEqual(diagnostic["unique_true_argmax_fraction"], 1.0)
         self.assertEqual(diagnostic["mean_true_vs_best_other_margin"], 1.0)
-        self.assertEqual(diagnostic["source_candidate_fraction"], 0.25)
+        self.assertEqual(diagnostic["admitted_source_fraction"], 0.25)
+
+    def test_missing_language_rows_leave_scalar_means_unavailable(self):
+        for missing in [[0], [0, 1, 2, 3]]:
+            r = point_result()
+            r.update(axis="Discourse", orderKind="TextDiscourseRanks")
+            for index, entry in enumerate(r["order"]):
+                entry["position"] = index
+            for index in missing:
+                r["rows"][index].update(status="Unresolved", mass=[], admissible=[])
+            total = dict.fromkeys(CATEGORIES, 0.0)
+            for i, transition in enumerate(r["transitions"]):
+                counts = dict.fromkeys(CATEGORIES, 0.0)
+                counts["Unresolved" if i in missing or i + 1 in missing else ["Forward", "Backward", "Forward"][i]] = 1.0
+                transition["counts"] = counts
+                for category in CATEGORIES:
+                    total[category] += counts[category]
+            r.update(counts=total, comparable=total["Backward"] + total["Forward"],
+                     measuredUnits=4-len(missing), measuredTransitions=3-int(total["Unresolved"]))
+            del r["bounds"]
+            if r["comparable"]:
+                r["backwardRate"] = total["Backward"] / r["comparable"]
+            else:
+                del r["backwardRate"]
+            check_result(r)
+            reported = [0.0 if i in missing else 1.0 for i in range(4)]
+            self.assertIsNone(language_true_mass(r, [0, 1, 2, 3], 4, reported))
+            diagnostic = language_diagnostics(r, [0, 1, 2, 3], [1, 2, 0])
+            self.assertEqual((diagnostic["original_units"], diagnostic["measured_units"]), (4, 4-len(missing)))
+            self.assertIsNone(diagnostic["unique_true_argmax_fraction"])
+            self.assertIsNone(diagnostic["mean_true_vs_best_other_margin"])
+            self.assertIsNone(diagnostic["truth_in_conditional_bounds"])
 
     def test_empty_single_refuses_failed_only_cohort_is_accounted(self):
         with tempfile.TemporaryDirectory() as root:

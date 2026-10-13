@@ -72,11 +72,11 @@ def language_true_mass(result, path, source_size, reported, tolerance=1e-10):
             or len(set(ranks.values())) != source_size or len(result["rows"]) != len(path)):
         raise ValueError("language truth inventory substituted")
     actual = [next((number(v["mass"]) for v in row["mass"]
-                    if v["destination"] == ranks[target]), 0.0)
+                    if v["destination"] == ranks[target]), 0.0) if row["status"] == "Available" else None
               for row, target in zip(result["rows"], path)]
-    if len(reported) != len(actual) or any(abs(number(a) - b) > tolerance for a, b in zip(reported, actual)):
+    if len(reported) != len(actual) or any(abs(number(a) - b) > tolerance for a, b in zip(reported, actual) if b is not None):
         raise ValueError("incorrect reported true-target mass")
-    return sum(actual) / len(path)
+    return None if any(value is None for value in actual) else sum(actual) / len(path)
 
 
 def language_diagnostics(result, path, truth):
@@ -86,12 +86,15 @@ def language_diagnostics(result, path, truth):
     true_keys = [ranks[target] for target in path]
     masses = [{v["destination"]: number(v["mass"]) for v in row["mass"]} for row in rows]
     bounds = result.get("bounds")
+    measured = sum(row["status"] == "Available" for row in rows)
     return {
+        "original_units": len(rows),
+        "measured_units": measured,
         "true_target_admitted_fraction": sum(k in row["admissible"] for k, row in zip(true_keys, rows)) / len(path),
-        "source_candidate_fraction": sum(sum(k in row["admissible"] for k in ranks.values()) / len(ranks) for row in rows) / len(path),
-        "unique_true_argmax_fraction": sum(m.get(k, 0.0) > max((v for other, v in m.items() if other != k), default=0.0)
+        "admitted_source_fraction": sum(sum(k in row["admissible"] for k in ranks.values()) / len(ranks) for row in rows) / len(path),
+        "unique_true_argmax_fraction": None if measured != len(rows) else sum(m.get(k, 0.0) > max((v for other, v in m.items() if other != k), default=0.0)
                                           for k, m in zip(true_keys, masses)) / len(path),
-        "mean_true_vs_best_other_margin": sum(m.get(k, 0.0) - max((v for other, v in m.items() if other != k), default=0.0)
+        "mean_true_vs_best_other_margin": None if measured != len(rows) else sum(m.get(k, 0.0) - max((v for other, v in m.items() if other != k), default=0.0)
                                                for k, m in zip(true_keys, masses)) / len(path),
         "truth_in_conditional_bounds": None if bounds is None else {
             c: bounds[c]["minimum"] <= n <= bounds[c]["maximum"] for c, n in zip(CATEGORIES[:3], truth)},
