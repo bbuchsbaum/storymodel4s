@@ -18,7 +18,7 @@
     "scala": "mutations-3a53bc09/receipts.json",
     "python": "missing-diagnostics-mutation.json"
   },
-  "next_action": "Commit final receipts; independent exact-SHA verdict; refresh Git/Mote and locally integrate. Preview real-data acceptance remains open.",
+  "next_action": "Real-data preview AC1: reconnect Passport or locate exact inputs; verify timing and disclosure, then execute the public journey.",
   "consumer_checkouts": {
     "storyatlas4s": {
       "path": "/private/tmp/storyatlas4s-organization-20261013",
@@ -34,5 +34,20 @@
     }
   },
   "cold_boundary": "36 passed,0failed,0skipped;clean-recompiled f47",
-  "recovery": "188 artifacts:8+144+36,0language failures;128biased packets"
+  "recovery": "188 artifacts:8+144+36,0language failures;128biased packets",
+  "engineering_status": "reviewed_and_locally_landed",
+  "local_source_main": "f3d5409c3a6df6930f48335c7cf28474ef0d3fc8",
+  "active_jobs": [],
+  "coordination": {
+    "actor": "codex-organization-20261013",
+    "session": "sess-01M4T8H1NCZ26C31HWFW5WYRR2",
+    "session_status": "ended",
+    "claims": "released",
+    "reservations": "released",
+    "compatibility": "closed",
+    "counts": "closed",
+    "recovery": "closed",
+    "real_data_preview": "open",
+    "parent": "open"
+  }
 }

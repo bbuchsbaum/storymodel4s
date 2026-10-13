@@ -1,0 +1,1 @@
+{"actor":"codex-organization-20261013","entity":"bd-01M2WVFV2WGF5BVQHX7JTYYWRH","kind":"reserve_open","mode":"exclusive","op":"20261013T131102.901467Z-p20046-c0000-r95d3-h074a64","paths":["codec/src/test/scala/storymodel4s/codec/OrganizationCodecSuite.scala"],"reservation_id":"rv-01M4TP6KFN086KEADEYKX948FS","ts":"2026-10-13T13:11:02.901467Z","ttl_s":28800,"v":2}
