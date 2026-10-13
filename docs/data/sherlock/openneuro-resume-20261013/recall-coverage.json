@@ -1,0 +1,105 @@
+{
+  "schema": "sherlock-released-recall-coverage-observation/v1",
+  "sourceIdentity": {
+    "artifactSetId": "sherlock-recall-export-set-v1",
+    "sourceId": "recall-source-03",
+    "csvSha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+    "csvByteLength": 91928,
+    "lineageSha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e",
+    "alias": {
+      "status": "verified-byte-identity",
+      "id": "recall-alias-03",
+      "sourceId": "recall-source-03",
+      "mapSha256": "b3c4dace92f8d49b7daeaa1216e4474f2e84883d07a41fbe5e37fab252bbedc0"
+    }
+  },
+  "participant": "sub-03",
+  "task": "freerecall",
+  "inputVerificationSha256": "9695f5461a5ca11c5762e4f2c9673a957933e1b986f66d98b69b8ab368e064b4",
+  "releaseDefinitionEvidence": {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10460947/",
+    "locations": [
+      "Table 1: subject mapping",
+      "Table 3: columns E-G",
+      "Methods: TR indices start at one; no hemodynamic shift"
+    ],
+    "authority": "published-release-definition-not-independent-trigger-measurement"
+  },
+  "assignment": {
+    "clock": "released-openneuro",
+    "appliedOffsetSeconds": "0",
+    "indexBase": 0,
+    "trSeconds": "3/2",
+    "bins": "[3*i/2, 3*(i+1)/2)",
+    "binMeaning": "declared TR support, not measured slice-exposure windows",
+    "storedVolumes": 716,
+    "exclusiveCoverageEndSeconds": "1074"
+  },
+  "counts": {
+    "requestedRecords": 2495,
+    "assignedRecords": 2489,
+    "outsideStoredCoverage": 6,
+    "missingOnsets": 0,
+    "occupiedStoredBins": 624
+  },
+  "onsetRangeSeconds": [
+    "33/2",
+    "10759/10"
+  ],
+  "outsideStoredCoverage": [
+    {
+      "csvDataRecord": 2490,
+      "onsetSeconds": "1074.4",
+      "releasedTrNumber": 717,
+      "requestedStoredIndex": 716,
+      "status": "outside-stored-sample-coverage"
+    },
+    {
+      "csvDataRecord": 2491,
+      "onsetSeconds": "1075.2",
+      "releasedTrNumber": 717,
+      "requestedStoredIndex": 716,
+      "status": "outside-stored-sample-coverage"
+    },
+    {
+      "csvDataRecord": 2492,
+      "onsetSeconds": "1075.5",
+      "releasedTrNumber": 718,
+      "requestedStoredIndex": 717,
+      "status": "outside-stored-sample-coverage"
+    },
+    {
+      "csvDataRecord": 2493,
+      "onsetSeconds": "1075.6",
+      "releasedTrNumber": 718,
+      "requestedStoredIndex": 717,
+      "status": "outside-stored-sample-coverage"
+    },
+    {
+      "csvDataRecord": 2494,
+      "onsetSeconds": "1075.7",
+      "releasedTrNumber": 718,
+      "requestedStoredIndex": 717,
+      "status": "outside-stored-sample-coverage"
+    },
+    {
+      "csvDataRecord": 2495,
+      "onsetSeconds": "1075.9",
+      "releasedTrNumber": 718,
+      "requestedStoredIndex": 717,
+      "status": "outside-stored-sample-coverage"
+    }
+  ],
+  "controls": {
+    "acceptedBoundaryControls": 5,
+    "refusedContradictions": 5
+  },
+  "unavailable": [
+    "independent acquisition-trigger/audio synchronization",
+    "full-media scanner binding",
+    "word offsets or durations",
+    "semantic weights or canonical mapping-word join",
+    "measured slice acquisition windows"
+  ],
+  "scope": "Published OpenNeuro clock interpretation and raw coverage audit only; no fitted offset, crop application, HRF shift, clamping or voxel analysis."
+}
