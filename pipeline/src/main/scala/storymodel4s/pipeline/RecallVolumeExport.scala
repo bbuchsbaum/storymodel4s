@@ -105,7 +105,7 @@ object RecallVolumeExport:
           "assigned" -> Json.fromInt(assigned), "outside" -> Json.fromInt(count("outside-stored-coverage")),
           "missing" -> Json.fromInt(count("missing-onset")),
           "attachment" -> str(if assigned == 0 then "none" else if assigned == unit.words.size then "complete" else "partial"))
-      }))
+      })
     )
 
   /** Execute the public paired mapper and publish its unchanged exchange with checked timing. */
