@@ -3,15 +3,75 @@
   "baseline_commit": "baec59758d1bedc5491c44520522c267808e2cb9",
   "frozen_manifest_sha256": "a7365953209b28b48973ad1f4709bea03a1e303f24a938a6fa8228380e19f453",
   "purpose": "Exploratory mechanism diagnosis, not held-out model selection or calibration",
-  "channels": ["lexical", "minilm"],
-  "temperatures": [0.05, 0.15, 0.5, 1.0],
+  "channels": [
+    "lexical",
+    "minilm"
+  ],
+  "temperatures": [
+    0.05,
+    0.15,
+    0.5,
+    1.0
+  ],
   "new_temperature_basis": "Fixed low-temperature sensitivity probe declared before semantic-channel comparison; not selected against organization counts",
   "conditions": "All four original language paths and all three original text transformations; 96 total channel/path/quality/temperature cases; retain failures",
-  "pricing": {"weights": "semanticOnly", "functionPrior": "none", "externalFloor": 1.0, "externalMismatch": 0.0, "missingSemantic": 0.5, "distortionPenalty": 0.0},
-  "candidates": {"perLevel": 20, "tieBudget": 200, "lexicalOverlap": false},
-  "model": {"id": "sentence-transformers/all-MiniLM-L6-v2", "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41", "model_sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452", "tokenizer_sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037", "metric": "HalfCosineDistance"},
-  "diagnostics": ["complete truth versus truth on measurable original adjacencies", "independent closed-form packet count oracle", "true-target rank and tied-best destinations", "true-target versus best-other score mass", "external mass", "original count discrepancies and reversal attenuation", "low-temperature limit over all tied minima", "exact finite generative calibration control", "dependence sensitivity with identical marginals"],
-  "generative_control": {"destinations": 4, "units": 3, "latent_prior": "independent uniform", "observation_channel": "symmetric independent confusion", "correct_probabilities": [0.25, 0.5, 0.75, 1.0], "inference": "exact Bayes under the same known channel", "evaluation": "exact enumeration of every latent path and observation; population mean expected counts and truth"},
+  "pricing": {
+    "weights": "semanticOnly",
+    "functionPrior": "none",
+    "externalFloor": 1.0,
+    "externalMismatch": 0.0,
+    "missingSemantic": 0.5,
+    "distortionPenalty": 0.0
+  },
+  "candidates": {
+    "perLevel": 20,
+    "tieBudget": 200,
+    "lexicalOverlap": false
+  },
+  "model": {
+    "id": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "model_sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+    "tokenizer_sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+    "metric": "HalfCosineDistance"
+  },
+  "diagnostics": [
+    "complete truth versus truth on measurable original adjacencies",
+    "independent closed-form packet count oracle",
+    "true-target rank and tied-best destinations",
+    "true-target versus best-other score mass",
+    "external mass",
+    "original count discrepancies and reversal attenuation",
+    "low-temperature limit over all tied minima",
+    "exact finite generative calibration control",
+    "dependence sensitivity with identical marginals"
+  ],
+  "generative_control": {
+    "destinations": 4,
+    "units": 3,
+    "latent_prior": "independent uniform",
+    "observation_channel": "symmetric independent confusion",
+    "correct_probabilities": [
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "inference": "exact Bayes under the same known channel",
+    "evaluation": "exact enumeration of every latent path and observation; population mean expected counts and truth",
+    "required_controls": [
+      "Observation-conditional marginals and expected counts match explicit joint enumeration",
+      "p=1 recovers every positive-probability observed path exactly",
+      "p=.25 yields uniform marginals and counts [.75,.75,.5]",
+      "Ignoring observations mutant fails informative controls"
+    ]
+  },
   "tolerance": 1e-10,
-  "constraints": ["Original report and frozen manifest remain byte-identical", "Local reference only; no chronological information in scoring", "No confidence or posterior interpretation of uncalibrated score mass", "No default changes selected on these diagnostic controls", "No participant or sealed data"]
+  "constraints": [
+    "Original report and frozen manifest remain byte-identical",
+    "Local reference only; no chronological information in scoring",
+    "No confidence or posterior interpretation of uncalibrated score mass",
+    "No default changes selected on these diagnostic controls",
+    "No participant or sealed data"
+  ]
 }
