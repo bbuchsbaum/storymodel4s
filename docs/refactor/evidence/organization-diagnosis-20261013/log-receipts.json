@@ -1,0 +1,310 @@
+[
+  {
+    "name": "comparison-01.log",
+    "raw_sha256": "846cf99ea85ff30b11ea91367a8bb0f7025f8a0c1ec211e227d83a696252cf71",
+    "raw_bytes": 3399,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:25:29.852465+00:00",
+      "finished_utc": "2026-10-13T22:25:58.544642+00:00",
+      "duration_seconds": 28.691811,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/runMain storymodel4s.pipeline.OrganizationDiagnosisWitness tools/recall-study/fixtures/organization-recovery/manifest.json docs/refactor/evidence/organization-diagnosis-20261013/PLAN.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/results-2e45ebaf /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json 2e45ebaf3b0415dd98541346a5c2f66b381ac4b2 f0629a4b79a5388554dc873b31bf932367dc0233"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/comparison-01.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 3399
+    },
+    "published_content": "lossless full raw log",
+    "archive": "comparison-01.log.gz",
+    "archive_sha256": "9d6a97b0e98c6133287228e06480b79a3f367c19d2005186cec6b98ebc66b245"
+  },
+  {
+    "name": "comparison-02.log",
+    "raw_sha256": "495932cbc938bf1714ba58c1fa0a7abf5c84ed1f7ed38cbae17de9212c1a18f1",
+    "raw_bytes": 3420,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:26:29.960126+00:00",
+      "finished_utc": "2026-10-13T22:27:07.130406+00:00",
+      "duration_seconds": 37.169849,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/runMain storymodel4s.pipeline.OrganizationDiagnosisWitness /private/tmp/storymodel4s-organization-20261013/tools/recall-study/fixtures/organization-recovery/manifest.json /private/tmp/storymodel4s-organization-20261013/docs/refactor/evidence/organization-diagnosis-20261013/PLAN.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/results-2e45ebaf /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json 2e45ebaf3b0415dd98541346a5c2f66b381ac4b2 f0629a4b79a5388554dc873b31bf932367dc0233"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/comparison-02.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 3420
+    },
+    "published_content": "lossless full raw log",
+    "archive": "comparison-02.log.gz",
+    "archive_sha256": "338eb8c4a0d88776897439eb129b85af789edf4e6b9fc05bea588dc65c96586d"
+  },
+  {
+    "name": "compile-01.log",
+    "raw_sha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b",
+    "raw_bytes": 1377,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:20:33.101270+00:00",
+      "finished_utc": "2026-10-13T22:20:33.875945+00:00",
+      "duration_seconds": 0.774578,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/compile",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/compile-01.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 1377
+    },
+    "published_content": "lossless full raw log",
+    "archive": "compile-01.log.gz",
+    "archive_sha256": "c9633d987d63831ae67a28e866d27d4eb52e49b815f53f32de02e981d8182e5c"
+  },
+  {
+    "name": "compile-02.log",
+    "raw_sha256": "97b04be9719bf6ccfa7043dc0025a45bc99f3a44476cda7768f3700780549293",
+    "raw_bytes": 1908,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:20:42.841819+00:00",
+      "finished_utc": "2026-10-13T22:21:15.497166+00:00",
+      "duration_seconds": 32.654899,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/compile",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/compile-02.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 1908
+    },
+    "published_content": "lossless full raw log",
+    "archive": "compile-02.log.gz",
+    "archive_sha256": "4ad546a36a8661597dd232a28e476e148c4c0b37333e88f2a01cd41f41d517b8"
+  },
+  {
+    "name": "compile-03.log",
+    "raw_sha256": "06ac3f000c8d1041501f0ef1054661129a155cf2119d1930dab4edb249aa579c",
+    "raw_bytes": 1909,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:24:09.512178+00:00",
+      "finished_utc": "2026-10-13T22:24:49.073057+00:00",
+      "duration_seconds": 39.560438,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/compile",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/compile-03.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 1909
+    },
+    "published_content": "lossless full raw log",
+    "archive": "compile-03.log.gz",
+    "archive_sha256": "e7a64843ceb7135c26aa3eefceeea36567f0ba7fd0aeb512a489d503e8516294"
+  },
+  {
+    "name": "gate-01.log",
+    "raw_sha256": "279736b3f93fc7bbedbf6b5038a6a77f37691eeff38d2ea5f418f0fa4123db23",
+    "raw_bytes": 2307364,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:29:14.146862+00:00",
+      "finished_utc": "2026-10-13T22:30:16.379357+00:00",
+      "duration_seconds": 62.231925,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/test",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/gate-01.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 2307364
+    },
+    "private_raw_path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/gate-01.log",
+    "published_content": "selected status lines only; not the full raw log",
+    "archive": "gate-01.status.log.gz",
+    "archive_sha256": "922254b0635a3d527584402cfbae1a2b059cbbdc5ce2993ceab889a3cf96ccda"
+  },
+  {
+    "name": "python-01.log",
+    "raw_sha256": "8c5393a4b522742a726c74354cb25bf4093617669ab742242003fc64eac0054b",
+    "raw_bytes": 31959,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:25:50.675407+00:00",
+      "finished_utc": "2026-10-13T22:26:29.291521+00:00",
+      "duration_seconds": 38.615749,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/recall-study/tests",
+        "-v"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/python-01.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 31959
+    },
+    "published_content": "lossless full raw log",
+    "archive": "python-01.log.gz",
+    "archive_sha256": "d5d83a9c5a0c63d751dc717e2a058a391d0524752545bf28b841416aa5838b6f"
+  },
+  {
+    "name": "python-02.log",
+    "raw_sha256": "b977086d620972c535ad18000bc68e6f5b53b288fb8d22e1ed8da2e5e3292617",
+    "raw_bytes": 32327,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:29:12.850093+00:00",
+      "finished_utc": "2026-10-13T22:30:00.034007+00:00",
+      "duration_seconds": 47.183494,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/recall-study/tests",
+        "-v"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/python-02.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 32327
+    },
+    "published_content": "lossless full raw log",
+    "archive": "python-02.log.gz",
+    "archive_sha256": "b4b1d03268578b3d28d1c690e16f4e84e36c6ded8947f82c65e8ce1e8b32a932"
+  },
+  {
+    "name": "readback-01.log",
+    "raw_sha256": "0993d4321368e51f2be905180c2cd23310bfaa19fb082c7e71fcb78b7dd75456",
+    "raw_bytes": 98,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:27:34.933803+00:00",
+      "finished_utc": "2026-10-13T22:27:36.984914+00:00",
+      "duration_seconds": 2.051009,
+      "command": [
+        "python3",
+        "tools/recall-study/organization_diagnosis.py",
+        "--manifest",
+        "tools/recall-study/fixtures/organization-recovery/manifest.json",
+        "--baseline-results",
+        "/private/tmp/storymodel4s-organization-results-f47a9e47",
+        "--plan",
+        "docs/refactor/evidence/organization-diagnosis-20261013/PLAN.json",
+        "--results",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/results-2e45ebaf",
+        "--output",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/report-2e45ebaf.json"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/readback-01.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 98
+    },
+    "published_content": "lossless full raw log",
+    "archive": "readback-01.log.gz",
+    "archive_sha256": "e313b350b1cab1f21e8027b7e53125a02bd064f211fac1af516f655b5814759f"
+  },
+  {
+    "name": "readback-02.log",
+    "raw_sha256": "0993d4321368e51f2be905180c2cd23310bfaa19fb082c7e71fcb78b7dd75456",
+    "raw_bytes": 98,
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-10-13T22:29:12.828804+00:00",
+      "finished_utc": "2026-10-13T22:29:15.163123+00:00",
+      "duration_seconds": 2.334225,
+      "command": [
+        "python3",
+        "tools/recall-study/organization_diagnosis.py",
+        "--manifest",
+        "tools/recall-study/fixtures/organization-recovery/manifest.json",
+        "--baseline-results",
+        "/private/tmp/storymodel4s-organization-results-f47a9e47",
+        "--plan",
+        "docs/refactor/evidence/organization-diagnosis-20261013/PLAN.json",
+        "--results",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/results-2e45ebaf",
+        "--output",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/report-a33888f8.json"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-diagnosis-20261013/readback-02.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 98
+    },
+    "published_content": "lossless full raw log",
+    "archive": "readback-02.log.gz",
+    "archive_sha256": "e313b350b1cab1f21e8027b7e53125a02bd064f211fac1af516f655b5814759f"
+  }
+]

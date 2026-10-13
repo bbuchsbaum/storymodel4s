@@ -1,0 +1,24 @@
+{
+  "schema": "organization-diagnosis-evidence/v1",
+  "baseline": "baec59758d1bedc5491c44520522c267808e2cb9",
+  "freeze": "f0629a4b79a5388554dc873b31bf932367dc0233",
+  "producer": "2e45ebaf3b0415dd98541346a5c2f66b381ac4b2",
+  "checker": "a33888f8e9198c49e6108c6f24ab292ddfe67433",
+  "files": [
+    {
+      "path": "PLAN.json",
+      "sha256": "d18a2331c666b0d5487bcc9b4e28e9c0ea9915bd0120b84127776e835232e526",
+      "bytes": 2965
+    },
+    {
+      "path": "diagnosis-report.json",
+      "sha256": "d367e10b875f264f0348e2ec1e102c0d98f861123b0d45d2e4b64fd3041fb1ce",
+      "bytes": 670291
+    },
+    {
+      "path": "diagnostic-artifacts.tar.gz",
+      "sha256": "a8eb49dcafce0f0c4bc86527e49b20d6c27c8db456d3cb3cf3a2da8c9c9728b4",
+      "bytes": 61727
+    }
+  ]
+}
