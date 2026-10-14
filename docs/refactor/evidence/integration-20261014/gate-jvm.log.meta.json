@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T02:25:49.159064+00:00",
+  "finished_utc": "2026-10-14T02:29:02.848114+00:00",
+  "duration_seconds": 193.687411,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; corpusIntake/test; documentJVM/test; embedOnnx/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/gate-jvm.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 2428149
+}

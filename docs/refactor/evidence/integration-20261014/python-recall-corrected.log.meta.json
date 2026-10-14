@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T02:54:32.642942+00:00",
+  "finished_utc": "2026-10-14T02:54:32.779190+00:00",
+  "duration_seconds": 0.136086,
+  "command": [
+    "python3",
+    "examples/mapping/test_recall_volumes.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/synthetic-recall"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/python-recall-corrected.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 110
+}

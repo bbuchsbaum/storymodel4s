@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T02:53:12.699882+00:00",
+  "finished_utc": "2026-10-14T02:53:14.750347+00:00",
+  "duration_seconds": 2.0503,
+  "command": [
+    "python3",
+    "examples/mapping/read_recall_volumes.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/recall-output",
+    "--csv",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/recall-volumes-20261013/input/recall-source-03.csv"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/recall-readback.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 365
+}
