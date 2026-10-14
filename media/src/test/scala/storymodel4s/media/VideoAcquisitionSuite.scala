@@ -251,6 +251,54 @@ class VideoAcquisitionSuite extends FunSuite:
       assertEquals(replay.map(_.identity), Right(result.identity))
     }
 
+  test("planned provenance files remain required and pinned during replay"):
+    withSyntheticWorkers { (root, job) =>
+      val out = root.resolve("planned-output")
+      val result = VideoAcquisition
+        .run(root, plannedJob(job).noSpaces, out)
+        .fold(e => fail(e.message), identity)
+      val manifest = Files.readAllBytes(out.resolve("manifest.json"))
+      def replay(bytes: Array[Byte] = manifest) =
+        storymodel4s.media.CaptionPackage.load(
+          out,
+          bytes,
+          storymodel4s.core.Checksum.ofBytes(bytes),
+          result.edition
+        )
+      assertEquals(replay().map(_.identity), Right(result.identity))
+      Vector("plan.json", "selection-rule.json", "part-0/realized-selections.json").foreach {
+        name =>
+          val path = out.resolve(name)
+          val original = Files.readAllBytes(path)
+          try
+            val _ = Files.writeString(path, "corrupted provenance")
+            assert(replay().isLeft, s"corrupted $name was accepted")
+            Files.delete(path)
+            assert(replay().isLeft, s"missing $name was accepted")
+          finally
+            val _ = Files.write(path, original)
+          assertEquals(replay().map(_.identity), Right(result.identity))
+      }
+      val document = io.circe.parser
+        .parse(new String(manifest, java.nio.charset.StandardCharsets.UTF_8))
+        .toOption
+        .get
+      Vector("planFile", "selectionRuleFile", "realizedSelectionsFile").foreach { key =>
+        val partial = document
+          .mapObject(o =>
+            o.add(
+              "parts",
+              o("parts").get.mapArray(
+                _.map(_.mapObject(_.remove(key)))
+              )
+            )
+          )
+          .noSpaces
+          .getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        assert(replay(partial).left.toOption.exists(_.message.contains("all three")))
+      }
+    }
+
   test("planned intervals refuse off-boundary, wrong pins and insufficient multi-frame samples"):
     withSyntheticWorkers { (root, job) =>
       val base = plannedJob(job)

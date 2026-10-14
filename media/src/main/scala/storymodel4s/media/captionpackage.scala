@@ -239,6 +239,15 @@ object CaptionPackage:
     for
       occurrence <- MediaJson.string(c.downField("occurrence"), "parts[].occurrence")
       _ <- requireThat(occurrence.trim.nonEmpty, "parts", "empty part occurrence")
+      // Planned attachments are retained provenance; checked frame support remains the authority.
+      provenance = Vector("planFile", "selectionRuleFile", "realizedSelectionsFile")
+      present = provenance.filter(field => c.downField(field).succeeded)
+      _ <- requireThat(
+        present.isEmpty || present.size == provenance.size,
+        "planned-provenance",
+        "planned provenance requires all three attachment references"
+      )
+      _ <- present.traverse_(field => reader.textField(c, field))
       manifestText <- reader.textField(c, "manifest")
       manifest <- FixtureManifest.parse(manifestText)
       localEdition <- EditionId.from(manifest.fixtureId)
