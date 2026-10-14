@@ -1,0 +1,32 @@
+{
+  "schema": "entity-hypothesis-experiment-plan/v1",
+  "basis": "Development-only engineering probe following opened challenge; no generalization, participant efficacy, or calibration claim",
+  "baseline_commit": "39fe44354971e03b8c2b006406acfe463fb3010c",
+  "manifest_path": "tools/recall-study/fixtures/organization-challenge/manifest.json",
+  "manifest_sha256": "7bf4279a0678f14cf5c8ea21ef19df066c4d017a6c5cc2fe0294894d2c742e61",
+  "split": "development",
+  "inventory": "All four development source groups, all seven cases per group, all four rows, all generated hypotheses; no heldout use or selection",
+  "temperatures": [
+    0.5,
+    0.15
+  ],
+  "temperature_basis": "Previously selected development MiniLM temperature .5; .15 is the predeclared stock sensitivity, no fitting or selection here",
+  "hypotheses": "Source vocabulary from first ASCII-capitalized token, deduplicated and sorted. Exact known token has that one identity. Nonexact token: each source name admitted by existing Levenshtein<=1 or prefix>=half-length rule, plus distinct identity; none/multiple remain explicit. No-token rows retain unconstrained identity. Weights unknown (null), never uniform. No labels, condition names, or source positions used for candidate construction.",
+  "native": "Original whole recall and each single-row candidate rendering pass real LocalOnly preparation and pinned ONNX registration; keep original/rendered hashes, native unit correspondence, registration and state costs. Each candidate replaces only its row token. Labels joined only in readback. Existing baselines retained.",
+  "conditional_scoring": "A separate diagnostic closed-world fixture assumption conditions each native row on identity: retain all external states plus all states at source events whose first token matches hypothesized identity. Distinct identity excludes all source states. Unconstrained retains all. Preserve original state multiplicity and exclusions. This excludes cross-identity distortion by assumption, not a production truth. Derived distributions never reuse a native execution certificate.",
+  "organization": "Four-row complete interpretation assignments z; conditionally independent destination costs within z as in native local content baseline. Enumerate all assignments and report category-wise min/max of C(z), with original adjacencies only. Unknown arbitrary joint weights over z; do not multiply averaged rows. No mixing weights or point counts. No claim ranges contain realized truth.",
+  "metrics": "Report row/hypothesis distributions, proper destination NLL and Brier conditional on evaluation label, exact unique winner or ties, robust winner only unanimous unique winner over every hypothesis, unknown/unavailable coverage and range width. Per group/condition/temperature: baseline and conditional organization discrepancies only for point source paths; no organization truth for ambiguous collision. Report each alternative; no best-hypothesis/oracle selection presented as achieved performance.",
+  "falsifiers": [
+    "Label/condition metadata cannot affect candidate outputs",
+    "Source order cannot affect candidate identities (positions remap by source identity)",
+    "Original endpoint preserved, clause/unit correspondence bound",
+    "Identical observed input with typo versus novel labels produces identical hypotheses",
+    "Distinct alternative cannot be dropped and unknown weights cannot become uniform",
+    "Multiple matches retained; exact names preserved",
+    "Full assignment extrema and conditional counts match independent exhaustive destination-path enumeration",
+    "Missing row preserves adjacency gaps; no bridging",
+    "Nonfinite scores/temperatures or source mismatch refuse",
+    "Native inventory, assets and frozen plan pinned; no partial-success dropping"
+  ],
+  "acceptance": "Engineering acceptance requires complete native and derived inventory, adversarial numerical witnesses, independent exact-SHA review and scoped gate. Any point/default requiring unsupported weights, dropping distinct identity, or label-selected interpretation is rejected. Record adverse or no-improvement findings. No production promotion."
+}
