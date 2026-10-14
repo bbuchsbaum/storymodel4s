@@ -1,0 +1,28 @@
+{
+  "qualification": "LocallyObserved preliminary JVM source compile and focused JUnit run; cross-platform gate, mutation falsifiers, independent review, and consumer adoption remain pending.",
+  "base": "64d787c56ca3e98e7bc625b87cbd4fcf39475c31",
+  "runtime_distribution": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "scala": "3.7.4",
+  "java_options": [
+    "-Xmx1g",
+    "-XX:ActiveProcessorCount=2"
+  ],
+  "compiler_options": [
+    "-Werror",
+    "-Wunused:all",
+    "-Wvalue-discard"
+  ],
+  "passed": 86,
+  "failed": 0,
+  "skipped": 0,
+  "source_sha256": {
+    "align/src/main/scala/storymodel4s/align/temporalquery.scala": "c6bbded34bbf720804d0b7a1cc6d8d887f2113384352946d43a3a0d594b978c8",
+    "align/src/main/scala/storymodel4s/align/temporalexposure.scala": "ad0da6a6a1d724fa579af58f01bc5f03af4ba0736548fd91594cdc28665d7909",
+    "align/src/main/scala/storymodel4s/align/temporalinspection.scala": "ffd4c64b528ae613490922a5a15d115a2496aaeef8380edbe0e4db8cddf45a2f",
+    "codec/src/main/scala/storymodel4s/codec/temporalinspection.scala": "ecb9f33a003fec8a3e7e52c702519b64a0c39d5c5498f6670bf8579e197349aa",
+    "align/src/test/scala/storymodel4s/align/TemporalInspectionSuite.scala": "b7d369544b30201e7b73706512b244b589f601a3dc6bc509993b922273407d3b",
+    "align/src/test/scala/inspectionprobe/TemporalInspectionBoundarySuite.scala": "3ed22852e34b77807c09842d8313e495d649ec044e04423d4af15e7534bd42c0",
+    "codec/src/test/scala/storymodel4s/codec/TemporalInspectionSuite.scala": "3e3464e7812283ef42a8c67fedefe1acdebd8124fe51452e4f7ef757ee18cb11"
+  },
+  "log": "logs/temporal-inspection-preliminary.log.gz"
+}

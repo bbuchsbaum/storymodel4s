@@ -1110,3 +1110,26 @@ attachments are counts, not estimated excluded semantic mass. Temporal mass allo
 is unavailable with onset-only observations. Rejected: copying a unit's full mass into
 every touched volume, uniform per-word allocation, deriving durations from adjacent
 onsets, clamping outside records, and inferring movie origin, crop or HRF adjustments.
+
+### 2026-10-14 — temporal inspection of imported mapping claims
+
+The authorized StoryAtlas temporal adoption needs autonomous queries over imported workspaces.
+The existing live projection decoder still requires its originating checked mapping or execution.
+An additive inspection facade instead validates supplied rows, source/inventory joins, measure
+families, processing states, support declarations and optional original recall timing. It uses the
+same producer-owned conditional arithmetic, with separate result types and no conversion into
+`MappingResult`, `MappingRun.Execution` or live stage receipts.
+
+Inspection identities bind actual workspace and policy bytes, the checked source and inventory,
+the declared coordinate, timing and complete request. A caller's claimed record digest is retained
+as a claim; it cannot substitute for these byte identities. Arbitrary crops, disjoint regions,
+rebinning and top-k query the original supplied rows and preserve unavailable, external, outside
+and omitted quantities. Missing timing stays unavailable, and onset-only timing supplies no
+duration. A versioned optional timing attachment must join the exact original inventory and clock.
+
+Rejected: reconstructing execution authority from self-consistent imported bytes; moving temporal
+arithmetic into the renderer; deriving recall time from source coordinates or unit order; binding
+cache identity only to a claimed record digest; and requiring an always-running producer process
+for local inspection. Numerical consistency of imported claims does not authenticate their origin
+or establish calibration or physical synchronization. This amendment is within workstream 5,
+tracked by `bd-01M4XK48BE4DA638YZTDR4TJ5D`; it does not change the completed live-producer contract.
