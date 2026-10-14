@@ -48,7 +48,13 @@ jq -e '
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.Upper ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.SignatureFixtures$package.OpaqueOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.core.OpaqueId.T ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ConstructorParameterOnly ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ParentOnly ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.FactoryParameterOnly ::"))) and
   (any(.edges[]; .kind | contains("parameter"))) and
   (any(.edges[]; .kind | contains("upper-bound"))) and
-  (any(.edges[]; .kind | contains("lower-bound")))
+  (any(.edges[]; .kind | contains("lower-bound"))) and
+  (any(.edges[]; .kind == "constructor:parameter:nominal")) and
+  (any(.edges[]; .kind == "parent-term:nominal")) and
+  (any(.edges[]; .kind == "companion-factory:parameter:nominal"))
 ' "$work/fixtures.json" >/dev/null

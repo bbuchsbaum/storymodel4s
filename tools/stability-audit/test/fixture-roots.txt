@@ -5,3 +5,6 @@ storymodel4s.stabilityfixture.FixtureFacade.inheritedOpaque
 storymodel4s.stabilityfixture.FixtureFacade.extensionResult
 storymodel4s.stabilityfixture.FixtureFacade.given_Conversion_ParameterOnly_BoundOnly
 storymodel4s.stabilityfixture.Construction
+storymodel4s.stabilityfixture.Constructed
+storymodel4s.stabilityfixture.ParentRoot
+storymodel4s.stabilityfixture.ConstructorFacade.returned

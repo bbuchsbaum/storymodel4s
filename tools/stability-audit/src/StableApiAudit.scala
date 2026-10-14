@@ -63,8 +63,16 @@ object StableApiAudit extends Inspector:
         typeEdge(symbol, symbol.info, "signature")
         symbol.tree match
           case d: ClassDef =>
-            d.parents.collect { case p: TypeTree => p }.foreach(p => typeEdge(symbol, p.tpe, "parent"))
+            // `parents` can be a TypeTree or an applied Term (`extends Parent(1)`).  The latter
+            // carries both the parent type and its constructor MethodType only as a Term.
+            d.parents.foreach {
+              case p: TypeTree => typeEdge(symbol, p.tpe, "parent")
+              case p: Term     => typeEdge(symbol, p.tpe, "parent-term")
+              case _           => ()
+            }
+            typeEdge(symbol, d.constructor.symbol.info, "constructor")
             memberEdges(symbol)
+            companionFactoryEdges(symbol)
           case d: DefDef => typeEdge(symbol, d.returnTpt.tpe, "return")
           case d: ValDef => typeEdge(symbol, d.tpt.tpe, "accessor")
           case _ => ()
@@ -112,6 +120,15 @@ object StableApiAudit extends Inspector:
       members.filter(public).foreach { m =>
         typeEdge(owner, m.info, "member")
         if m.flags.is(Flags.Protected) then edges += Edge(key(owner), key(m), "protected-member", m.name)
+      }
+    /** Constructor-shaped companion methods are caller construction doors when their result type
+      * is in the closure. Deliberately do not traverse arbitrary companion behavior.
+      */
+    def companionFactoryEdges(owner: Symbol): Unit =
+      val factoryNames = Set("apply", "from", "of", "create", "unsafe", "checked")
+      owner.companionModule.methodMembers.filter(m => public(m) && factoryNames(m.name)).foreach { m =>
+        edges += Edge(key(owner), key(m), "companion-factory", m.name)
+        typeEdge(owner, m.info, "companion-factory")
       }
     roots.foreach(visit)
     val out = sys.props("audit.output")

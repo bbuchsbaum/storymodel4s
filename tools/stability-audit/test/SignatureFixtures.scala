@@ -25,3 +25,14 @@ object FixtureFacade:
     def apply(value: ParameterOnly): BoundOnly = new BoundOnly
 
 final case class Construction(value: ParameterOnly = new ParameterOnly)
+
+final class ConstructorParameterOnly
+final class Constructed(value: ConstructorParameterOnly)
+class ParentOnly(value: Int)
+final class ParentRoot extends ParentOnly(1)
+final class FactoryParameterOnly
+final class Returned private ()
+object Returned:
+  def create(value: FactoryParameterOnly): Returned = new Returned
+object ConstructorFacade:
+  def returned: Returned = ???

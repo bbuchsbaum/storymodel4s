@@ -19,3 +19,7 @@ method parameters/results, polymorphic bounds, overloads, opaque aliases, inheri
 case-class construction metadata, givens, and extensions. JVM ABI representation, bytecode
 bridges/default-getter compatibility, and Java/Scala binary compatibility still need dedicated
 review.
+
+For each reached class, the walker follows its constructor, both type- and term-shaped parents,
+and public companion methods named `apply`, `from`, `of`, `create`, `unsafe`, or `checked`. This
+is deliberately a bounded construction vocabulary: arbitrary companion behavior is not rooted.
