@@ -1,0 +1,73 @@
+{
+  "execution_head": "39fe44354971e03b8c2b006406acfe463fb3010c",
+  "authority": "LocallyObserved",
+  "gate": "passed",
+  "platforms": {
+    "jvm": {
+      "exit": 0,
+      "module_summaries": 18,
+      "total": 3483,
+      "passed": 3479,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 4
+    },
+    "js": {
+      "exit": 0,
+      "module_summaries": 12,
+      "total": 2594,
+      "passed": 2594,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "native": {
+      "exit": 0,
+      "module_summaries": 12,
+      "total": 2594,
+      "passed": 2594,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "python": {
+    "organization_passed": 213,
+    "recall_corruption_passed": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "format": "passed-last",
+  "recall_readback": {
+    "attachedVolumes": 614,
+    "canonicalWords": 2495,
+    "mappingMembers": 2,
+    "occupiedVolumes": 624,
+    "originalUnits": 173,
+    "records": 2495,
+    "semantics": "non-additive-original-unit-onset-attachments",
+    "timingDispositions": {
+      "assigned": 2489,
+      "outside-stored-coverage": 6
+    },
+    "unassignedWords": 94,
+    "unitAttachments": {
+      "complete": 172,
+      "partial": 1
+    },
+    "volumeUnitLinks": 686
+  },
+  "adverse": "Initial unittest discovery invocation did not supply the required synthetic fixture root; it failed import before tests. Retained python-recall.log.gz. Documented RecallVolumeFixture launch and direct test script then passed all11 witnesses. No source change or repeated heavy gate.",
+  "consumer_scope": {
+    "storyatlas_head": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+    "consumes": [
+      "view",
+      "codec",
+      "fixtures"
+    ],
+    "changed_consumed_contracts": false,
+    "evidence": "Source search found no references to RecallTimingIntake, RecallVolumeExport, OrganizationChallengeWitness or OrganizationDiagnosisWitness. None of view/codec/fixtures changed."
+  },
+  "hosted_ci": "not-run",
+  "publication": "not-performed"
+}

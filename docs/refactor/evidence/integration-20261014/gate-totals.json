@@ -1,0 +1,29 @@
+{
+  "jvm": {
+    "exit": 0,
+    "module_summaries": 18,
+    "total": 3483,
+    "passed": 3479,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 4
+  },
+  "js": {
+    "exit": 0,
+    "module_summaries": 12,
+    "total": 2594,
+    "passed": 2594,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native": {
+    "exit": 0,
+    "module_summaries": 12,
+    "total": 2594,
+    "passed": 2594,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

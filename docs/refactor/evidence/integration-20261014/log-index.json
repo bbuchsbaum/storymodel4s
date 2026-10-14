@@ -1,0 +1,62 @@
+[
+  {
+    "path": "format.log.gz",
+    "raw_sha256": "d62c40ebb52f1cf0438e1e7e2a2d91d1e9a12b40ca052f948be32cf12cc1e4dd",
+    "raw_bytes": 1714,
+    "metadata": "format.log.meta.json"
+  },
+  {
+    "path": "gate-js.log.gz",
+    "raw_sha256": "04ebcb25da2df61554b970688c7844e447227f9d2f5ae6180b521c4c981fce00",
+    "raw_bytes": 111948,
+    "metadata": "gate-js.log.meta.json"
+  },
+  {
+    "path": "gate-jvm.log.gz",
+    "raw_sha256": "d5b61a5b2b1133e8ab7d8ff7f3c056c13e0b7b9cd8019b7f016a4de099bb3c6a",
+    "raw_bytes": 2428149,
+    "metadata": "gate-jvm.log.meta.json"
+  },
+  {
+    "path": "gate-native.log.gz",
+    "raw_sha256": "65643b4ff5963727b07fc4332b157d5eae8c62dc00150f0f4faa4f98aa1b8b93",
+    "raw_bytes": 109813,
+    "metadata": "gate-native.log.meta.json"
+  },
+  {
+    "path": "native-replays.log.gz",
+    "raw_sha256": "ff0855abb44127a01586d5e24f33b30bdf2fb42de36dbb072d192ec9576c996f",
+    "raw_bytes": 5910,
+    "metadata": "native-replays.log.meta.json"
+  },
+  {
+    "path": "python-organization.log.gz",
+    "raw_sha256": "2e09e3dd7db11202c6a055fbf539c689fd118fcc529d9ad567ce2df104c83357",
+    "raw_bytes": 1921,
+    "metadata": "python-organization.log.meta.json"
+  },
+  {
+    "path": "python-recall-corrected.log.gz",
+    "raw_sha256": "5e765c14cb31806ec19aa555dca730c7006c90817928b2b8c24f5e110aab020a",
+    "raw_bytes": 110,
+    "metadata": "python-recall-corrected.log.meta.json"
+  },
+  {
+    "path": "python-recall.log.gz",
+    "raw_sha256": "6fa47a5dc62895e840c1be34ae2b04ec092925d841ea7f641060745354dc5647",
+    "raw_bytes": 1397,
+    "metadata": "python-recall.log.meta.json"
+  },
+  {
+    "path": "recall-readback.log.gz",
+    "raw_sha256": "002db12f7ab2faa3980b6cb2d326d24ef35f34d6090822513f971b698d257daf",
+    "raw_bytes": 365,
+    "metadata": "recall-readback.log.meta.json"
+  },
+  {
+    "path": "synthetic-recall-fixture.log.gz",
+    "raw_sha256": "8896049ad8467027868eebc8822198d74668af11cd9c6cde30ce62d9c991fb05",
+    "raw_bytes": 2280,
+    "metadata": "synthetic-recall-fixture.log.meta.json"
+  }
+]

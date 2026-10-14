@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T02:51:44.275778+00:00",
+  "finished_utc": "2026-10-14T02:53:12.273328+00:00",
+  "duration_seconds": 87.996686,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/runMain storymodel4s.pipeline.recallVolumes /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/recall-volumes-20261013/input/job.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/recall-output",
+    "pipeline/Test/runMain storymodel4s.pipeline.OrganizationChallengeWitness /private/tmp/storymodel4s-organization-20261013/tools/recall-study/fixtures/organization-challenge/manifest.json /private/tmp/storymodel4s-organization-20261013/docs/refactor/evidence/organization-challenge-20261014/PLAN.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/challenge-development /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json 39fe44354971e03b8c2b006406acfe463fb3010c 0389f93c4a4f47e8457edc2c3e6093cb71383587 development - -",
+    "pipeline/Test/runMain storymodel4s.pipeline.OrganizationChallengeWitness /private/tmp/storymodel4s-organization-20261013/tools/recall-study/fixtures/organization-challenge/manifest.json /private/tmp/storymodel4s-organization-20261013/docs/refactor/evidence/organization-challenge-20261014/PLAN.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/challenge-heldout /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx /Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json 39fe44354971e03b8c2b006406acfe463fb3010c 0389f93c4a4f47e8457edc2c3e6093cb71383587 heldout /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/replay-fit.json 39fe44354971e03b8c2b006406acfe463fb3010c"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/integration-20261014/native-replays.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5910
+}

@@ -1,0 +1,12 @@
+{
+  "source_sha256": "cf76d2b50c52bbae6033048fa03dbf7bed08cec2acd48b14d58233436f0525a0",
+  "controls": {
+    "positive": 7,
+    "refused": 6
+  },
+  "compiled_mutant": {
+    "change": "add three extra raw volumes to both interval endpoints",
+    "status": "killed",
+    "named_assertion": "scene TR1-26 maps to raw [20,46), not [23,49)"
+  }
+}

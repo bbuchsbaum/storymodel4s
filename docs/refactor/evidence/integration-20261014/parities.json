@@ -1,0 +1,24 @@
+{
+  "execution_head": "39fe44354971e03b8c2b006406acfe463fb3010c",
+  "purpose": "integration replay, no new holdout or refit",
+  "parities": {
+    "recall": {
+      "files": 30,
+      "mismatches": [],
+      "old_manifest_sha256": "1d9027e543c32dab89cd2bb8888cfa727c50261dd0c1ff65876f55867dc763f4",
+      "new_manifest_sha256": "1d9027e543c32dab89cd2bb8888cfa727c50261dd0c1ff65876f55867dc763f4"
+    },
+    "development": {
+      "files": 84,
+      "mismatches": [],
+      "old_manifest_sha256": "7d384d40c095ab581ceb5951aeed373d0a64e5bb2551c805a33051d73cfdd094",
+      "new_manifest_sha256": "392aa9b669e6435180c90993473209bd0e4f1d0c7d392031e004854f166c89a2"
+    },
+    "heldout": {
+      "files": 140,
+      "mismatches": [],
+      "old_manifest_sha256": "9136e139069e86fead1f680af945edefaffbfc7b6ef6ab0022609a54c2d8266d",
+      "new_manifest_sha256": "a71896874cdcf07136a5f0bb967733c823e622a78a5f40c4ea829f727bc22d43"
+    }
+  }
+}

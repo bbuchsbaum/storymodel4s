@@ -1,0 +1,28 @@
+{
+  "schema": "encoding-landmark-probe/v1",
+  "purpose": "Check exact presentation edition versus primary annotation timestamps, without fitting a scanner offset",
+  "parts": {
+    "1": {
+      "expected_sha256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+      "landmarks_seconds": [
+        39,
+        349,
+        752,
+        1308
+      ]
+    },
+    "2": {
+      "expected_sha256": "f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907",
+      "landmarks_seconds": [
+        39,
+        118,
+        475,
+        995,
+        1500
+      ]
+    }
+  },
+  "selection": "Published segment/scene starts near beginning, middle and end, fixed before media probing; retain every selected landmark, failures and residuals. The coarse and fine annotations differ by up to 3s per authors.",
+  "probe": "Seek each exact media part to landmark minus 3 seconds, decode 6 second window; nearest FFmpeg scene score >0.3 cut. Decode visual frames around retained failures if needed; cuts support media-edition correspondence only, not scanner triggers.",
+  "acceptance": "No optimized offset. Report signed residuals and broad-window ambiguity; annotation seconds remain a published convention, scanner physical onset inference remains conditional absent recording trigger."
+}

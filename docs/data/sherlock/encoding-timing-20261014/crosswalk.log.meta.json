@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T02:42:17.785456+00:00",
+  "finished_utc": "2026-10-14T02:42:18.128077+00:00",
+  "duration_seconds": 0.342545,
+  "command": [
+    "python3",
+    ".agent-work/encoding-timing-20261014/qualify_timing.py",
+    "/Volumes/My Passport for Mac/data/openneuro/ds001132-1.0.0",
+    ".agent-work/encoding-timing-20261014",
+    "docs/data/sherlock/openneuro-resume-20261013/verification.json",
+    ".agent-work/encoding-timing-20261014/crosswalk.json"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/encoding-timing-20261014/crosswalk.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 120.0,
+  "log_bytes": 123
+}

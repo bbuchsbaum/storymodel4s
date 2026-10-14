@@ -1,0 +1,8 @@
+{
+  "purpose": "Integration replay of already opened development and heldout artifacts; no refit or fresh heldout claim",
+  "execution_head": "39fe44354971e03b8c2b006406acfe463fb3010c",
+  "original_fit_commit": "c9cd7fe278661488c5e9b914ba45f3a24793466b",
+  "original_producer": "7a58aab66e3d793c5ad582aac48c896c51415ef4",
+  "replay_fit_change": "Only producer_commit rebound for actual merged execution. Original temperature selections and objective grid unchanged. Direct native test witness, not original prospective checked-launch path. Replay-fit is deliberately not offered as a new committed pre-heldout fit.",
+  "original_plan_commit": "0389f93c4a4f47e8457edc2c3e6093cb71383587"
+}
