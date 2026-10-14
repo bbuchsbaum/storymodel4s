@@ -81,6 +81,10 @@ class RecallVolumeExportSuite extends FunSuite:
       Left(RecallTimingIntake.Refusal.WordSpansMismatch)
     )
     assertEquals(
+      intake("word,onset\n!,0\nalpha beta,1\n", "! alpha beta")._1,
+      Left(RecallTimingIntake.Refusal.WordSpansMismatch)
+    )
+    assertEquals(
       intake("word,onset\nalpha/beta,0\n", "alpha/beta")._1,
       Left(RecallTimingIntake.Refusal.WordSpansMismatch)
     )
