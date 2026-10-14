@@ -1,0 +1,14 @@
+{
+  "revision": "703dacbe99981b7ead94a4ef32681918247b959a",
+  "reviewer": "independent package_contract_review agent",
+  "verdict": "EVIDENCE/DOCS PASS",
+  "validated": [
+    "29 output SHA256 pins, outputmanifest and job identity match local artifacts",
+    "reference151complete+22excluded; reconstruction173complete; measure counts match",
+    "11 archived log hashes and lengths match; sha256 hashes decompressed bytes",
+    "adverse containment survivor, compiled kills, reader before/after repair substantiated",
+    "no participant prose in archive",
+    "evidence-only vs approved source5dced342; diff check passes"
+  ],
+  "scope": "Interim archive; broader gates and final production rerun still pending at this revision"
+}

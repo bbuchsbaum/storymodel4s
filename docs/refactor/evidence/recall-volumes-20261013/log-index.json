@@ -1,0 +1,82 @@
+[
+  {
+    "file": "recall-volume-actual-01.log.gz",
+    "uncompressedBytes": 1876,
+    "sha256": "ecb00c6a03c1bf5df06ff50c0a2bc5bc23b6f499d3724ff93d4c5289cac189e3"
+  },
+  {
+    "file": "recall-volume-compile-01.log.gz",
+    "uncompressedBytes": 4897,
+    "sha256": "a9f8d039b921375efeeb396da3199dfb89eba11da331b0ecb1940ba4a2ac0931"
+  },
+  {
+    "file": "recall-volume-focused-01.log.gz",
+    "uncompressedBytes": 5233,
+    "sha256": "52691acba88d00734f8032830d72a0a0e62e7a5369f86838c83792d37b36b047"
+  },
+  {
+    "file": "recall-volume-focused-02.log.gz",
+    "uncompressedBytes": 3215,
+    "sha256": "1ce311791090a2b0740b11b1df4336e42aeaebabeef7aeda5783b42236dd36dc"
+  },
+  {
+    "file": "recall-volume-focused-format-03.log.gz",
+    "uncompressedBytes": 15221,
+    "sha256": "92ccd2885f72a677904c7f6f29f2d6d0d69dd21531fc604d41e7b58f78eceb69"
+  },
+  {
+    "file": "recall-volume-gate-actual-final.log.gz",
+    "uncompressedBytes": 1879,
+    "sha256": "0b8e36d3aa1190099ac049b9f8f0169a3119afb2929e029c9d918b8b9459b704"
+  },
+  {
+    "file": "recall-volume-gate-format.log.gz",
+    "uncompressedBytes": 2036,
+    "sha256": "4e4c46fc4d36c6339af0f4cf33439265394c48a9687ba7c1a7ba4b60998b6689"
+  },
+  {
+    "file": "recall-volume-gate-js.log.gz",
+    "uncompressedBytes": 111989,
+    "sha256": "8324dd750f1c5ecc1deaaa5a476d12fcf551905ee1b295b996e47bb51aed141b"
+  },
+  {
+    "file": "recall-volume-gate-jvm.log.gz",
+    "uncompressedBytes": 2429184,
+    "sha256": "3e5088917ae39146cd595e0c198debcbce1483904908448643c3daf95a591474"
+  },
+  {
+    "file": "recall-volume-gate-native.log.gz",
+    "uncompressedBytes": 121445,
+    "sha256": "f268766188f9589293ce2c4cd7abc8827f7e21757a38c8f853678beabdf9291f"
+  },
+  {
+    "file": "recall-volume-mutant-drop-containment-02.log.gz",
+    "uncompressedBytes": 3539,
+    "sha256": "56bcfa994264a6352dce8abf2d2711f7e297f9761a703377176cfebad86f1421"
+  },
+  {
+    "file": "recall-volume-mutant-drop-containment.log.gz",
+    "uncompressedBytes": 2614,
+    "sha256": "1b2ded3de8ef1dc2437421f7266540fe1a901f76449a06e744fd4edf3423ac87"
+  },
+  {
+    "file": "recall-volume-mutant-erase-recipe.log.gz",
+    "uncompressedBytes": 3302,
+    "sha256": "cb2ecaa52f54705afb49fb83a5c1a42c28430ee02970bf2dd4a4548eee47b4af"
+  },
+  {
+    "file": "recall-volume-mutant-inclusive-end.log.gz",
+    "uncompressedBytes": 4314,
+    "sha256": "57df21933cb240a88b3dcb37d6675d3dbd9049acd8e272a9f4cf4e7d61b2ede2"
+  },
+  {
+    "file": "recall-volume-reader-adverse.log.gz",
+    "uncompressedBytes": 715,
+    "sha256": "530db4e3ec01307872c331b821f510ea3b6eec9be334d51ab4196d4304f3f146"
+  },
+  {
+    "file": "recall-volume-reader-control.log.gz",
+    "uncompressedBytes": 123,
+    "sha256": "af8e677a14a31a7de42d132c3320242067f9ed85cbef7d9fa5d3dda30f6ff71f"
+  }
+]

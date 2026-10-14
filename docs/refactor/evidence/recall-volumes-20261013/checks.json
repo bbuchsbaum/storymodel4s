@@ -1,0 +1,77 @@
+{
+  "sourceRevision": "5dced342139f4ae212bdcc8af6741700296bcfb6",
+  "executionHead": "703dacbe99981b7ead94a4ef32681918247b959a",
+  "authority": "LocallyObserved",
+  "gateStatus": "passed",
+  "platforms": {
+    "jvm": {
+      "exit": 0,
+      "log": "recall-volume-gate-jvm.log.gz",
+      "sha256": "3e5088917ae39146cd595e0c198debcbce1483904908448643c3daf95a591474",
+      "metadata": "recall-volume-gate-jvm.log.meta.json",
+      "moduleSummaries": 18,
+      "total": 3479,
+      "passed": 3475,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 4,
+      "skippedWitnesses": [
+        "==> s storymodel4s.media.BoundarySearchSuite.live ffmpeg and worker, when this machine has both, reproduce the recorded proposals skipped 0.003s",
+        "==> s storymodel4s.media.CaptionSearchSuite.live worker and weights, when this machine has them, reproduce the recorded proposals skipped 0.002s",
+        "==> s storymodel4s.media.F1ExcerptSuite.live tools, when this machine has them and the excerpt, reproduce the recorded packet table and proposals skipped 0.001s",
+        "==> s storymodel4s.provider.agent.LiveSmokeSuite.live smoke: one WOG sentence through the model, recorded as captured, judged by the court skipped 0.005s"
+      ]
+    },
+    "js": {
+      "exit": 0,
+      "log": "recall-volume-gate-js.log.gz",
+      "sha256": "8324dd750f1c5ecc1deaaa5a476d12fcf551905ee1b295b996e47bb51aed141b",
+      "metadata": "recall-volume-gate-js.log.meta.json",
+      "moduleSummaries": 12,
+      "total": 2594,
+      "passed": 2594,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skippedWitnesses": []
+    },
+    "native": {
+      "exit": 0,
+      "log": "recall-volume-gate-native.log.gz",
+      "sha256": "f268766188f9589293ce2c4cd7abc8827f7e21757a38c8f853678beabdf9291f",
+      "metadata": "recall-volume-gate-native.log.meta.json",
+      "moduleSummaries": 12,
+      "total": 2594,
+      "passed": 2594,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skippedWitnesses": []
+    },
+    "actual-final": {
+      "exit": 0,
+      "log": "recall-volume-gate-actual-final.log.gz",
+      "sha256": "0b8e36d3aa1190099ac049b9f8f0169a3119afb2929e029c9d918b8b9459b704",
+      "metadata": "recall-volume-gate-actual-final.log.meta.json"
+    },
+    "format": {
+      "exit": 0,
+      "log": "recall-volume-gate-format.log.gz",
+      "sha256": "4e4c46fc4d36c6339af0f4cf33439265394c48a9687ba7c1a7ba4b60998b6689",
+      "metadata": "recall-volume-gate-format.log.meta.json"
+    }
+  },
+  "focusedScala": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0
+  },
+  "python": {
+    "passed": 11,
+    "failed": 0
+  },
+  "mutations": "See mutations.json:3 compiled mutations killed by named witnesses. Original containment survivor and reader failure retained.",
+  "consumerScope": "StoryAtlas consumes view/codec/fixtures. No dependency or call to RecallTimingIntake or RecallVolumeExport; original paired exchange unchanged.",
+  "hostedCI": "not-run",
+  "parentAcceptance": "open:encoding movie/scanner origin unresolved"
+}

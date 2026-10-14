@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T00:45:32.139890+00:00",
+  "finished_utc": "2026-10-14T00:45:53.628544+00:00",
+  "duration_seconds": 21.501032,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/private/tmp/storymodel4s-recall-volume-20261013",
+  "log": "/private/tmp/recall-volume-gate-format.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 2036
+}

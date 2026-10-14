@@ -1,0 +1,14 @@
+{
+  "revision": "5dced342139f4ae212bdcc8af6741700296bcfb6",
+  "reviewer": "independent package_contract_review agent",
+  "verdict": "SOURCE PASS",
+  "blockAt05d19ca5": "Python reader accepted repinned equal-length different transcript",
+  "fix": "Exact CSV replay against prepared canonical transcript; independently reproduced before repair",
+  "validation": {
+    "pythonTestsPassed": 11,
+    "pythonTestsFailed": 0,
+    "actualReadback": "2495 words,2489 covered,6 outside,94 unassigned,173 units,686 links,614 attached bins,624 timed bins",
+    "diffCheck": "pass"
+  },
+  "scope": "Source verdict; full gates and final evidence review pending"
+}

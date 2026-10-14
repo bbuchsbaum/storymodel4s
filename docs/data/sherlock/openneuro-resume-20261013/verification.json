@@ -1,0 +1,142 @@
+{
+  "schema": "sherlock-development-input-recheck/v1",
+  "checkedUtc": "2026-10-13T22:16:11.009510+00:00",
+  "dataset": "ds001132",
+  "release": "1.0.0",
+  "revision": "fc91edbbe1b8117f96b40bb4d1f5df43aa1afdce",
+  "participant": "sub-03",
+  "priorReceiptSha256": "f562e860e23c67f182ad466372d10a2ceb7673e31cbe5bf64aa702bc590f9f35",
+  "files": [
+    {
+      "file": "README",
+      "sha256": "092397eaa5a9759c2aa382db51e1fa70664ccbdb3708f07659bdf0b4c50ef5fe",
+      "bytes": 20856
+    },
+    {
+      "file": "sub-03/func/sub-03_task-freerecall_bold.nii.gz",
+      "sha256": "2991d3e964dea74b9bda7b39934f3524042bb53438eb7e6ca6a399f8a5483a26",
+      "bytes": 92871350
+    },
+    {
+      "file": "task-freerecall_bold.json",
+      "sha256": "8b96e1fe2abc0b26540bacc627fc680ecbb57ef28d0d524284c60c3846328889",
+      "bytes": 195
+    },
+    {
+      "file": "sub-03/func/sub-03_task-freerecall_events.tsv",
+      "sha256": "d35fa46d027bba2a3f3e6f931001c0b0a5c3b4ff196db7f01e040bcc7feda4ab",
+      "bytes": 24
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart1_bold.nii.gz",
+      "sha256": "c53a1480fa783f419c114917d03e2302692e2541fcb6aceced45a302ce7c0971",
+      "bytes": 127184838
+    },
+    {
+      "file": "task-sherlockPart1_bold.json",
+      "sha256": "d22304e42c6d0e165d813437017dffdc114bc7667bc3f6585bbc34786404582a",
+      "bytes": 210
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart1_events.tsv",
+      "sha256": "1f4446b9be7c9741e9e1a44ee30833770adfb934aa9028aaa479e816a0c27da9",
+      "bytes": 22
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart2_bold.nii.gz",
+      "sha256": "492229cd4a09dd580988b308ac4c9eef384b2e8f0571cf061d30cbafe057e14f",
+      "bytes": 138769977
+    },
+    {
+      "file": "task-sherlockPart2_bold.json",
+      "sha256": "5f51927448ded19a11617cb47b85cbfe729973b8eacea34a2478712c3d62153a",
+      "bytes": 210
+    },
+    {
+      "file": "sub-03/func/sub-03_task-sherlockPart2_events.tsv",
+      "sha256": "5a74f4cc34bf9e93d521a4316f61687e4a4ce12d7b61d82c64103e580409249c",
+      "bytes": 22
+    }
+  ],
+  "runs": [
+    {
+      "task": "freerecall",
+      "storedVolumes": 716,
+      "trSeconds": "3/2",
+      "header348Sha256": "308dfc8e026f9f2c7a57aa53448cc94a48bb448527141de222df3bbf88421a61",
+      "taskEvents": [
+        {
+          "onset": "9",
+          "duration": "1060.5"
+        }
+      ],
+      "releaseCropPrescription": {
+        "beginningVolumes": 3,
+        "endVolumes": 0,
+        "resultLength": 713,
+        "status": "prescribed-not-applied",
+        "zeroBasedIndexEquation": "stored_index = selected_index + beginningVolumes"
+      },
+      "scannerToMediaBinding": "unestablished",
+      "scannerToTranscriptBinding": "unestablished",
+      "appliedPreprocessingHistory": "unknown"
+    },
+    {
+      "task": "sherlockPart1",
+      "storedVolumes": 972,
+      "trSeconds": "3/2",
+      "header348Sha256": "d222e222a5c806296278656054572f40f0dbd158e88b1ad6c4afd74bc3e336a2",
+      "taskEvents": [
+        {
+          "onset": "0",
+          "duration": "1419"
+        }
+      ],
+      "releaseCropPrescription": {
+        "beginningVolumes": 20,
+        "endVolumes": 6,
+        "resultLength": 946,
+        "status": "prescribed-not-applied",
+        "zeroBasedIndexEquation": "stored_index = selected_index + beginningVolumes"
+      },
+      "scannerToMediaBinding": "unestablished",
+      "scannerToTranscriptBinding": "unestablished",
+      "appliedPreprocessingHistory": "unknown"
+    },
+    {
+      "task": "sherlockPart2",
+      "storedVolumes": 1057,
+      "trSeconds": "3/2",
+      "header348Sha256": "e3e58ba6ffb5a8b9ed7f722a4b2bd4b4b74d949e4c011917570ea4aa9a5ad1a2",
+      "taskEvents": [
+        {
+          "onset": "0",
+          "duration": "1545"
+        }
+      ],
+      "releaseCropPrescription": {
+        "beginningVolumes": 20,
+        "endVolumes": 7,
+        "resultLength": 1030,
+        "status": "prescribed-not-applied",
+        "zeroBasedIndexEquation": "stored_index = selected_index + beginningVolumes"
+      },
+      "scannerToMediaBinding": "unestablished",
+      "scannerToTranscriptBinding": "unestablished",
+      "appliedPreprocessingHistory": "unknown"
+    }
+  ],
+  "media": [
+    {
+      "partId": "media-part-a",
+      "sha256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+      "bytes": 285537456
+    },
+    {
+      "partId": "media-part-b",
+      "sha256": "f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907",
+      "bytes": 315565018
+    }
+  ],
+  "scope": "Selected development input byte/header recheck and release crop prescriptions only. No voxel decoding, applied crop, participant alias admission, physical timing join, semantic weight export, other participant payload or held-out analysis."
+}

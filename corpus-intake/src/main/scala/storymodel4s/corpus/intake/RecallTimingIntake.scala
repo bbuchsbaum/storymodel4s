@@ -11,6 +11,7 @@ import storymodel4s.recall.RecallTiming.*
 /** Byte-pinned, explicit-column intake. Exact text correspondence is not recording identity. */
 object RecallTimingIntake:
   val Recipe: String = "external-clock-exact-replay/v1"
+  val LexicalRecipe: String = "external-clock-single-lexical-word-replay/v1"
   val Parser: String = "strict-comma-quoted-utf8/v1"
 
   /** Column indices are zero based. All header cells, including duplicate labels, are explicit.
@@ -49,6 +50,28 @@ object RecallTimingIntake:
       graph: RecallGraph[Checked],
       inventory: RecallInventory
   ): Either[Refusal, Result] =
+    readWithRecipe(bytes, expected, columns, graph, inventory, lexical = false)
+
+  /** A punctuation-bearing CSV cell may name exactly one canonical lexical word. Multiple or absent
+    * lexical words in a nonblank cell refuse; no cell onset is divided among words.
+    */
+  def readLexical(
+      bytes: Array[Byte],
+      expected: Checksum,
+      columns: Columns,
+      graph: RecallGraph[Checked],
+      inventory: RecallInventory
+  ): Either[Refusal, Result] =
+    readWithRecipe(bytes, expected, columns, graph, inventory, lexical = true)
+
+  private def readWithRecipe(
+      bytes: Array[Byte],
+      expected: Checksum,
+      columns: Columns,
+      graph: RecallGraph[Checked],
+      inventory: RecallInventory,
+      lexical: Boolean
+  ): Either[Refusal, Result] =
     // Own the exact bytes being verified and parsed, even if the caller reuses its array.
     val snapshot = bytes.clone()
     for
@@ -84,7 +107,15 @@ object RecallTimingIntake:
       )
       _ <- Either.cond(replay == graph.transcript.canonicalText, (), Refusal.TranscriptMismatch)
       spans = replaySpans(words.filter(_.nonEmpty))
-      _ <- Either.cond(spans == inventory.words.map(_.span), (), Refusal.WordSpansMismatch)
+      actual = inventory.words.map(_.span)
+      sameWords =
+        if !lexical then spans == actual
+        else
+          actual == SurfaceSequence(graph.atlas).lexicalTokens.map(_.span) &&
+          spans.size == actual.size && spans.zip(actual).forall { (cell, word) =>
+            cell.start <= word.start && word.endExclusive <= cell.endExclusive
+          }
+      _ <- Either.cond(sameWords, (), Refusal.WordSpansMismatch)
       clock = Clock.declared(
         expected,
         columns.clock,
@@ -94,7 +125,13 @@ object RecallTimingIntake:
       )
       records = bind(words, values, inventory)
       correspondence = hash(
-        Vector(Recipe, Parser, expected.hex, columns.digest.hex, inventory.digest.hex) ++
+        Vector(
+          if lexical then LexicalRecipe else Recipe,
+          Parser,
+          expected.hex,
+          columns.digest.hex,
+          inventory.digest.hex
+        ) ++
           records.map(r =>
             r.binding match
               case RecordBinding.Matched(word)     => s"${r.number}:matched:${word.value}"

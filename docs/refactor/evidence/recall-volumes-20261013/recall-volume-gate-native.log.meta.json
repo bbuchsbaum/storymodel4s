@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T00:23:36.967021+00:00",
+  "finished_utc": "2026-10-14T00:44:40.133786+00:00",
+  "duration_seconds": 1263.153968,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "acquireNative/test; alignNative/test; amrInteropNative/test; codecNative/test; documentNative/test; fixturesNative/test; interviewNative/test; lawsNative/test; propositionNative/test; recallNative/test; storyNative/test; viewNative/test"
+  ],
+  "cwd": "/private/tmp/storymodel4s-recall-volume-20261013",
+  "log": "/private/tmp/recall-volume-gate-native.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 5400.0,
+  "log_bytes": 121445
+}

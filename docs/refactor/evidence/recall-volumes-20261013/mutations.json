@@ -1,0 +1,74 @@
+[
+  {
+    "mutant": "inclusive-end",
+    "source": "05d19ca5229b128d8f8937807883ac4ce89b2ed5",
+    "old": "n >= d * count",
+    "new": "n > d * count",
+    "exit": 1,
+    "witness": "half-open bins preserve negative and exact final boundary missingness",
+    "killed": false,
+    "log": "recall-volume-mutant-inclusive-end.log.gz",
+    "sha256": "57df21933cb240a88b3dcb37d6675d3dbd9049acd8e272a9f4cf4e7d61b2ede2",
+    "details": [
+      "==> X storymodel4s.pipeline.RecallVolumeExportSuite.half-open bins preserve negative and exact final boundary missingness 0.021s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/RecallVolumeExportSuite.scala:103",
+      "==> X storymodel4s.pipeline.RecallVolumeExportSuite.four word observations create two distinct non-additive unit attachments 0.07s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/RecallVolumeExportSuite.scala:123",
+      "[error] Failed: Total 8, Failed 2, Errors 0, Passed 6",
+      "[error] Failed tests:",
+      "[error] \tstorymodel4s.pipeline.RecallVolumeExportSuite",
+      "[error] (pipeline / Test / testOnly) sbt.TestsFailedException: Tests unsuccessful",
+      "[error] Total time: 11 s, completed Oct 13, 2026, 8:09:47 p.m."
+    ],
+    "qualification": "Compiled mutant killed by both named boundary witnesses; 6 unaffected tests passed. Initial harness expected exactly 1 failure and therefore reported killed=false."
+  },
+  {
+    "mutant": "drop-containment",
+    "source": "05d19ca5229b128d8f8937807883ac4ce89b2ed5",
+    "old": "cell.start <= word.start && word.endExclusive <= cell.endExclusive",
+    "new": "cell.start <= word.start",
+    "exit": 0,
+    "witness": "balanced global counts cannot hide multiword and punctuation-only cells",
+    "killed": false,
+    "log": "recall-volume-mutant-drop-containment.log.gz",
+    "sha256": "1b2ded3de8ef1dc2437421f7266540fe1a901f76449a06e744fd4edf3423ac87",
+    "details": [],
+    "qualification": "Survived original tests. Opposite-order fixture added; rerun kills this same mutation."
+  },
+  {
+    "mutant": "erase-recipe",
+    "source": "ada44911d7cd1f19192251878c267327e1b681aa",
+    "old": "if lexical then LexicalRecipe else Recipe",
+    "new": "if lexical then Recipe else Recipe",
+    "exit": 1,
+    "witness": "single lexical word recipe has a distinct correspondence even without punctuation",
+    "killed": true,
+    "log": "recall-volume-mutant-erase-recipe.log.gz",
+    "sha256": "cb2ecaa52f54705afb49fb83a5c1a42c28430ee02970bf2dd4a4548eee47b4af",
+    "details": [
+      "==> X storymodel4s.pipeline.RecallVolumeExportSuite.single lexical word recipe has a distinct correspondence even without punctuation 0.023s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/RecallVolumeExportSuite.scala:76 values are the same, expected 2 different values: 36d706e86a143f919ebd729386e0de80b0771999c5592e95391a622448718730 is equal to 36d706e86a143f919ebd729386e0de80b0771999c5592e95391a622448718730",
+      "[error] Failed: Total 8, Failed 1, Errors 0, Passed 7",
+      "[error] Failed tests:",
+      "[error] \tstorymodel4s.pipeline.RecallVolumeExportSuite",
+      "[error] (pipeline / Test / testOnly) sbt.TestsFailedException: Tests unsuccessful",
+      "[error] Total time: 9 s, completed Oct 13, 2026, 8:10:47 p.m."
+    ]
+  },
+  {
+    "mutant": "drop-containment",
+    "source": "5dced342139f4ae212bdcc8af6741700296bcfb6",
+    "old": "cell.start <= word.start && word.endExclusive <= cell.endExclusive",
+    "new": "cell.start <= word.start",
+    "exit": 1,
+    "witness": "balanced global counts cannot hide multiword and punctuation-only cells",
+    "killed": true,
+    "log": "recall-volume-mutant-drop-containment-02.log.gz",
+    "sha256": "56bcfa994264a6352dce8abf2d2711f7e297f9761a703377176cfebad86f1421",
+    "details": [
+      "==> X storymodel4s.pipeline.RecallVolumeExportSuite.balanced global counts cannot hide multiword and punctuation-only cells 0.027s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/RecallVolumeExportSuite.scala:86",
+      "[error] Failed: Total 8, Failed 1, Errors 0, Passed 7",
+      "[error] Failed tests:",
+      "[error] \tstorymodel4s.pipeline.RecallVolumeExportSuite",
+      "[error] (pipeline / Test / testOnly) sbt.TestsFailedException: Tests unsuccessful",
+      "[error] Total time: 11 s, completed Oct 13, 2026, 8:12:17 p.m."
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T00:10:17.944333+00:00",
+  "finished_utc": "2026-10-14T00:10:47.820742+00:00",
+  "duration_seconds": 29.876073,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-workflow-grakern-pin",
+    "set ThisBuild / tlFatalWarnings := true",
+    "pipeline/testOnly *RecallVolumeExportSuite"
+  ],
+  "cwd": "/private/tmp/storymodel4s-recall-volume-20261013",
+  "log": "/private/tmp/recall-volume-mutant-erase-recipe.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3302
+}
