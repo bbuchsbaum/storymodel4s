@@ -20,7 +20,7 @@ object StableApiAudit extends Inspector:
 
   def inspect(using Quotes)(tastys: List[Tasty[quotes.type]]): Unit =
     import quotes.reflect.*
-    val declaration = mutable.LinkedHashMap.empty[String, Symbol]
+    val declaration = mutable.LinkedHashMap.empty[String, Vector[Symbol]]
     val edges = mutable.LinkedHashSet.empty[Edge]
     val unresolved = mutable.LinkedHashSet.empty[String]
     val external = mutable.LinkedHashSet.empty[String]
@@ -28,35 +28,37 @@ object StableApiAudit extends Inspector:
       override def traverseTree(tree: Tree)(owner: Symbol): Unit =
         tree match
           case d: Definition if d.symbol != Symbol.noSymbol && id(d.symbol).startsWith("storymodel4s.") =>
-            declaration.getOrElseUpdate(id(d.symbol), d.symbol)
+            val name = id(d.symbol)
+            declaration.update(name, declaration.getOrElse(name, Vector.empty) :+ d.symbol)
           case _ => ()
         super.traverseTree(tree)(owner)
     tastys.foreach(t => collect.traverseTree(t.ast)(Symbol.spliceOwner))
-    def nested(parent: Symbol, name: String): Option[Symbol] =
+    def nested(parent: Symbol, name: String): Vector[Symbol] =
       val scopes = Vector(parent, parent.moduleClass, parent.companionModule, parent.companionClass)
       scopes.iterator
         .flatMap(s => s.declaredTypes ++ s.methodMembers)
-        .find(s => s.name == name || id(s).endsWith("." + name))
-    def resolve(r: String): Option[Symbol] =
-      declaration.get(r).orElse(declaration.collectFirst { case (n, s) if n == r + ".type" => s }).orElse {
+        .filter(s => s.name == name || id(s).endsWith("." + name))
+        .toVector
+    def resolve(r: String): Vector[Symbol] =
+      declaration.get(r).orElse(declaration.get(r + ".type")).getOrElse {
         declaration.keys.toVector.sortBy(-_.length).collectFirst {
           case prefix if r.startsWith(prefix + ".") =>
-            r.stripPrefix(prefix + ".").split("\\.").foldLeft(Option(declaration(prefix))) {
-              case (Some(owner), part) => nested(owner, part)
-              case (None, _)           => None
+            r.stripPrefix(prefix + ".").split("\\.").foldLeft(declaration(prefix)) {
+              case (owners, part) => owners.flatMap(owner => nested(owner, part))
             }
-        }.flatten
+        }.getOrElse(Vector.empty)
       }
-    val roots = requestedRoots.flatMap { r =>
-      resolve(r) match
-        case Some(s) => Some(s)
-        case None => unresolved += s"missing-root:$r"; None
+    val roots = requestedRoots.toVector.flatMap { r =>
+      val resolved = resolve(r)
+      if resolved.isEmpty then unresolved += s"missing-root:$r"
+      resolved
     }
     val seen = mutable.HashSet.empty[String]
+    def key(symbol: Symbol): String = id(symbol) + " :: " + symbol.info.show
     def public(symbol: Symbol): Boolean =
       !symbol.flags.is(Flags.Private) && !symbol.flags.is(Flags.PrivateLocal)
     def visit(symbol: Symbol): Unit =
-      val name = id(symbol)
+      val name = key(symbol)
       if seen.add(name) then
         typeEdge(symbol, symbol.info, "signature")
         symbol.tree match
@@ -67,20 +69,49 @@ object StableApiAudit extends Inspector:
           case d: ValDef => typeEdge(symbol, d.tpt.tpe, "accessor")
           case _ => ()
     def typeEdge(from: Symbol, t: TypeRepr, kind: String): Unit =
+      def symbolEdge(repr: TypeRepr, edgeKind: String): Unit =
+        val s = repr.typeSymbol
+        if s != Symbol.noSymbol then
+          val target = id(s)
+          if target.startsWith("storymodel4s.") then
+            edges += Edge(key(from), key(s), edgeKind, repr.show)
+            visit(s)
+          else if target.nonEmpty && !target.startsWith("scala.") && !target.startsWith("java.") then external += target
+      // Keep the nominal type before looking through an alias. In particular, `OpaqueId.T`
+      // must remain visible even though its transparent representation is String internally.
+      symbolEdge(t, kind + ":nominal")
       val normalized = t.dealias
-      val s = normalized.typeSymbol
-      if s != Symbol.noSymbol then
-        val target = id(s)
-        if target.startsWith("storymodel4s.") then
-          edges += Edge(id(from), target, kind, normalized.show)
-          visit(s)
-        else if target.nonEmpty && !target.startsWith("scala.") && !target.startsWith("java.") then external += target
-      normalized.typeArgs.foreach(typeEdge(from, _, kind + ":argument"))
+      if normalized != t then symbolEdge(normalized, kind + ":dealias")
+      normalized match
+        case mt: MethodType =>
+          mt.paramTypes.foreach(typeEdge(from, _, kind + ":parameter"))
+          typeEdge(from, mt.resType, kind + ":result")
+        case pt: PolyType =>
+          pt.paramBounds.foreach { bounds =>
+            typeEdge(from, bounds.low, kind + ":lower-bound")
+            typeEdge(from, bounds.hi, kind + ":upper-bound")
+          }
+          typeEdge(from, pt.resType, kind + ":poly-result")
+        case bounds: TypeBounds =>
+          typeEdge(from, bounds.low, kind + ":lower-bound")
+          typeEdge(from, bounds.hi, kind + ":upper-bound")
+        case applied: AppliedType =>
+          typeEdge(from, applied.tycon, kind + ":constructor")
+          applied.args.foreach(typeEdge(from, _, kind + ":argument"))
+        case refinement: Refinement =>
+          typeEdge(from, refinement.parent, kind + ":refinement-parent")
+          typeEdge(from, refinement.info, kind + ":refinement-info")
+        case andOr: AndOrType =>
+          typeEdge(from, andOr.left, kind + ":left")
+          typeEdge(from, andOr.right, kind + ":right")
+        case byName: ByNameType => typeEdge(from, byName.underlying, kind + ":by-name")
+        case annotated: AnnotatedType => typeEdge(from, annotated.underlying, kind + ":annotated")
+        case _ => normalized.typeArgs.foreach(typeEdge(from, _, kind + ":argument"))
     def memberEdges(owner: Symbol): Unit =
       val members = (owner.methodMembers ++ owner.fieldMembers).distinct
       members.filter(public).foreach { m =>
         typeEdge(owner, m.info, "member")
-        if m.flags.is(Flags.Protected) then edges += Edge(id(owner), id(m), "protected-member", m.name)
+        if m.flags.is(Flags.Protected) then edges += Edge(key(owner), key(m), "protected-member", m.name)
       }
     roots.foreach(visit)
     val out = sys.props("audit.output")

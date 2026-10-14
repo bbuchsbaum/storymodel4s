@@ -14,6 +14,8 @@ this small walker, so those are reported as a residual review item rather than t
 construction door; the included compiler negative control covers the named private constructor.
 
 This is a bounded audit aid, not a complete ABI extractor. Opaque aliases are recorded both as
-their nominal symbol and their `dealias` display when TASTy exposes it; JVM ABI representation,
-extension-method ownership, compiler-generated bridge methods, and Java/Scala binary
-compatibility still need dedicated review.
+their nominal symbol and their `dealias` display when TASTy exposes it. The fixture suite covers
+method parameters/results, polymorphic bounds, overloads, opaque aliases, inherited `OpaqueId.T`,
+case-class construction metadata, givens, and extensions. JVM ABI representation, bytecode
+bridges/default-getter compatibility, and Java/Scala binary compatibility still need dedicated
+review.

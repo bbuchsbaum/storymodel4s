@@ -1,0 +1,7 @@
+storymodel4s.stabilityfixture.FixtureFacade.overload
+storymodel4s.stabilityfixture.FixtureFacade.bounded
+storymodel4s.stabilityfixture.FixtureFacade.opaque
+storymodel4s.stabilityfixture.FixtureFacade.inheritedOpaque
+storymodel4s.stabilityfixture.FixtureFacade.extensionResult
+storymodel4s.stabilityfixture.FixtureFacade.given_Conversion_ParameterOnly_BoundOnly
+storymodel4s.stabilityfixture.Construction
