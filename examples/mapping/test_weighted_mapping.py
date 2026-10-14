@@ -5,8 +5,10 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import struct
 import unittest
 from read_weighted_mapping import fraction, read_sweep, selected
+from read_mapping import number
 from check_corruptions import repack
 
 
@@ -92,6 +94,26 @@ class WeightedReaderTests(unittest.TestCase):
                         row["raw_value"] = "0x0000000000000000"
         with self.assertRaisesRegex(ValueError, "invalid weighted mass"):
             selected(self.change_record(change))
+
+    def shifted_mass(self, difference):
+        def change(record):
+            for outcome in record["outcomes"]:
+                rows = [r for r in outcome["mapping_links"] if r["measure_kind"] == "ModelPosterior"]
+                if rows:
+                    row = max(rows, key=lambda r: number(r["raw_value"]))
+                    row["raw_value"] = "0x" + struct.pack(">d", number(row["raw_value"]) + difference).hex()
+        return self.change_record(change)
+
+    def test_contract_row_sum_roundoff_is_preserved_without_rescaling(self):
+        for difference in [-5e-10, 5e-10]:
+            files = self.shifted_mass(difference)
+            supplied = json.loads(files["record--mapping.json"])
+            self.assertEqual(selected(files)[1], supplied)
+
+    def test_mass_outside_contract_tolerance_still_refuses(self):
+        for difference in [-2e-9, 2e-9]:
+            with self.assertRaisesRegex(ValueError, "invalid weighted mass"):
+                selected(self.shifted_mass(difference))
 
     def test_removed_posterior_alternatives_refuse(self):
         def change(record):

@@ -15,6 +15,9 @@ import re
 import struct
 
 
+# MappingTolerance.RowSum: an admission shape tolerance, never a rescaling instruction.
+ROW_SUM_TOLERANCE = 1e-9
+
 def require(condition, message):
     if not condition:
         raise ValueError(message)
@@ -287,7 +290,7 @@ def read_pair(files):
         for unit in tables["units"]:
             values = [number(r["raw_value"]) for r in tables["alternatives"] if r["unit"] == unit["id"] and r["measure_kind"] == expected_kind]
             if values:
-                require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= 1e-12, "invalid paired mass")
+                require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= ROW_SUM_TOLERANCE, "invalid paired mass")
         loaded[name] = (record, tables)
     require(set(files) == expected_files, "unknown paired payload")
     reference, reconstruction = loaded["reference"][0], loaded["reconstruction"][0]

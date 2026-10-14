@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-from read_mapping import digest, envelope, number, parse, read, read_publication, require
+from read_mapping import ROW_SUM_TOLERANCE, digest, envelope, number, parse, read, read_publication, require
 
 COLUMNS = ["lambda", "profile_id", "record_profile_id", "selection_id", "execution_id",
            "shared_evidence_id", "measure_kind", "record_digest"]
@@ -52,7 +52,7 @@ def selected(files):
         require(all(outcome["measures"][other]["status"] == "absent"
                     for other in {"normalized", "posterior", "transport"} - {family}), "weighted measure family")
         if present:
-            require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= 1e-12, "invalid weighted mass")
+            require(all(v >= 0 for v in values) and abs(math.fsum(values) - 1) <= ROW_SUM_TOLERANCE, "invalid weighted mass")
         decision = outcome["decision"]
         if decision["status"] == "present":
             require(present and decision["value"]["basis"]["measure_kind"] == expected_kind, "weighted decision basis")
