@@ -31,8 +31,17 @@ final class Constructed(value: ConstructorParameterOnly)
 class ParentOnly(value: Int)
 final class ParentRoot extends ParentOnly(1)
 final class FactoryParameterOnly
+final class BuildParameterOnly
+final class WrappedFactoryParameterOnly
 final class Returned private ()
 object Returned:
   def create(value: FactoryParameterOnly): Returned = new Returned
+  def build(value: BuildParameterOnly): Returned = new Returned
+  def wrapped(value: WrappedFactoryParameterOnly): Option[Returned] = Some(new Returned)
 object ConstructorFacade:
   def returned: Returned = ???
+
+final class HiddenParameterOnly
+final class PrivateReturned private (value: HiddenParameterOnly)
+object PrivateConstructorFacade:
+  def returned: PrivateReturned = ???

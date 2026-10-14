@@ -5,7 +5,7 @@ This directory is generated from source SHA `2c4b74f9ef069e1bc1f6678f8dababe2421
 Scala signature closure separate from the command/wire inventory. It is evidence for promotion
 decisions, not a stability freeze or release certification.
 
-The verified run has 27 explicit roots, 679 reached symbols and 9,294 typed edges. It reaches
+The verified run has 27 explicit roots, 695 reached symbols and 10,089 typed edges. It reaches
 the required `MappingRun.Execution` result arms, `LocalEvidence` to `CandidateSet`,
 `StructuredReconstruction.Profile` to `HsmmConfig`, and the batch outcome/run route to
 `OnnxMappingRegistration.Registered`; it does not reach `GraphHsmm` or

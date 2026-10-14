@@ -51,10 +51,15 @@ jq -e '
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ConstructorParameterOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ParentOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.FactoryParameterOnly ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.BuildParameterOnly ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.WrappedFactoryParameterOnly ::"))) and
+  (all(.inventory[]; startswith("storymodel4s.stabilityfixture.HiddenParameterOnly ::") | not)) and
   (any(.edges[]; .kind | contains("parameter"))) and
   (any(.edges[]; .kind | contains("upper-bound"))) and
   (any(.edges[]; .kind | contains("lower-bound"))) and
   (any(.edges[]; .kind == "constructor:parameter:nominal")) and
   (any(.edges[]; .kind == "parent-term:nominal")) and
-  (any(.edges[]; .kind == "companion-factory:parameter:nominal"))
+  (any(.edges[]; .kind == "companion-factory:parameter:nominal")) and
+  ([.edges[] | select(.kind == "companion-factory" and .detail == "build")] | length == 1) and
+  ([.edges[] | select(.kind == "companion-factory" and .detail == "wrapped")] | length == 1)
 ' "$work/fixtures.json" >/dev/null

@@ -20,6 +20,7 @@ case-class construction metadata, givens, and extensions. JVM ABI representation
 bridges/default-getter compatibility, and Java/Scala binary compatibility still need dedicated
 review.
 
-For each reached class, the walker follows its constructor, both type- and term-shaped parents,
-and public companion methods named `apply`, `from`, `of`, `create`, `unsafe`, or `checked`. This
-is deliberately a bounded construction vocabulary: arbitrary companion behavior is not rooted.
+For each reached class, the walker follows an externally accessible constructor, both type- and
+term-shaped parents, and public companion methods whose result structurally contains that class
+(including wrappers). Arbitrary companion behavior whose result is unrelated remains outside the
+root-directed closure.

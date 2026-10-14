@@ -70,7 +70,8 @@ object StableApiAudit extends Inspector:
               case p: Term     => typeEdge(symbol, p.tpe, "parent-term")
               case _           => ()
             }
-            typeEdge(symbol, d.constructor.symbol.info, "constructor")
+            if public(d.constructor.symbol) then
+              typeEdge(symbol, d.constructor.symbol.info, "constructor")
             memberEdges(symbol)
             companionFactoryEdges(symbol)
           case d: DefDef => typeEdge(symbol, d.returnTpt.tpe, "return")
@@ -121,15 +122,29 @@ object StableApiAudit extends Inspector:
         typeEdge(owner, m.info, "member")
         if m.flags.is(Flags.Protected) then edges += Edge(key(owner), key(m), "protected-member", m.name)
       }
-    /** Constructor-shaped companion methods are caller construction doors when their result type
-      * is in the closure. Deliberately do not traverse arbitrary companion behavior.
+    /** Public companion methods are construction doors only when their result structurally
+      * contains this reached class. This admits `build` and wrappers such as `Option[A]` without
+      * turning unrelated companion behavior into a root.
       */
     def companionFactoryEdges(owner: Symbol): Unit =
-      val factoryNames = Set("apply", "from", "of", "create", "unsafe", "checked")
-      owner.companionModule.methodMembers.filter(m => public(m) && factoryNames(m.name)).foreach { m =>
+      owner.companionModule.methodMembers.filter(m => public(m) && resultMentions(m.info, owner)).foreach { m =>
         edges += Edge(key(owner), key(m), "companion-factory", m.name)
         typeEdge(owner, m.info, "companion-factory")
       }
+    def resultMentions(t: TypeRepr, target: Symbol): Boolean =
+      def loop(repr: TypeRepr): Boolean =
+        if repr.typeSymbol == target then true
+        else
+          repr.dealias match
+            case mt: MethodType => loop(mt.resType)
+            case pt: PolyType   => loop(pt.resType)
+            case applied: AppliedType => loop(applied.tycon) || applied.args.exists(loop)
+            case refinement: Refinement => loop(refinement.parent) || loop(refinement.info)
+            case andOr: AndOrType       => loop(andOr.left) || loop(andOr.right)
+            case byName: ByNameType     => loop(byName.underlying)
+            case annotated: AnnotatedType => loop(annotated.underlying)
+            case other => other.typeArgs.exists(loop)
+      loop(t)
     roots.foreach(visit)
     val out = sys.props("audit.output")
     val inventory = seen.toVector.sorted.map(q).mkString("[", ",", "]")
