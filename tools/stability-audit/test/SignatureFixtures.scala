@@ -34,10 +34,13 @@ final class FactoryParameterOnly
 final class BuildParameterOnly
 final class WrappedFactoryParameterOnly
 final class Returned private ()
+type ReturnedAlias = Returned
+final class AliasParameterOnly
 object Returned:
   def create(value: FactoryParameterOnly): Returned = new Returned
   def build(value: BuildParameterOnly): Returned = new Returned
   def wrapped(value: WrappedFactoryParameterOnly): Option[Returned] = Some(new Returned)
+  def aliased(value: AliasParameterOnly): ReturnedAlias = new Returned
 object ConstructorFacade:
   def returned: Returned = ???
 

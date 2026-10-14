@@ -133,9 +133,10 @@ object StableApiAudit extends Inspector:
       }
     def resultMentions(t: TypeRepr, target: Symbol): Boolean =
       def loop(repr: TypeRepr): Boolean =
-        if repr.typeSymbol == target then true
+        val normalized = repr.dealias
+        if repr.typeSymbol == target || normalized.typeSymbol == target then true
         else
-          repr.dealias match
+          normalized match
             case mt: MethodType => loop(mt.resType)
             case pt: PolyType   => loop(pt.resType)
             case applied: AppliedType => loop(applied.tycon) || applied.args.exists(loop)

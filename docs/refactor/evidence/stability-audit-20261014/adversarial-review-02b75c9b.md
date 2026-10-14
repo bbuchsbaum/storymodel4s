@@ -31,3 +31,8 @@ result structurally contains the reached class, including wrapper results, and r
 parameters only when the constructor is externally accessible. Fixture assertions cover both
 `build` and `wrapped(...): Option[Returned]`, while proving `HiddenParameterOnly` remains absent
 behind `PrivateReturned`'s private constructor.
+
+A final review of `2d4196f0` found that `type ReturnedAlias = Returned` still hid
+`Returned.aliased(AliasParameterOnly): ReturnedAlias`. The public-result predicate now compares
+both the nominal and dealiased type symbol before examining wrappers. The fixture asserts the
+aliased factory and its parameter dependency.
