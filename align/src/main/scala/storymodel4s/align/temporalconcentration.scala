@@ -53,91 +53,166 @@ object TemporalConcentration:
     override def hashCode(): Int = digest.hashCode
     override def toString: String = s"TemporalConcentration.Disconnected(${digest.hex})"
 
+  /** Imported concentration retains the exact supplied row and its inspection-only identity. */
+  final class InspectionWindow private[TemporalConcentration] (
+      val readout: TemporalQuery.InspectionReadout,
+      val width: BigInt,
+      val target: Option[Target],
+      val digest: Checksum
+  ):
+    private def fields = (readout, width, target, digest)
+    override def equals(other: Any): Boolean = other match
+      case that: InspectionWindow => fields == that.fields
+      case _                      => false
+    override def hashCode(): Int = fields.hashCode
+    override def toString: String =
+      s"TemporalConcentration.InspectionWindow(${digest.short()},$width)"
+
   /** Maximize on integer start ticks; equal numerical quantities choose the earliest start. */
   def bestWindow(prepared: TemporalQuery.Prepared, width: BigInt): Either[Refusal, Window] =
-    if prepared.ledger.supportWithoutAllocation > 0.0 then Left(Refusal.UnavailableAllocation)
+    bestReadout(
+      prepared.coordinate.axis,
+      prepared.domains.flatMap(_.availability.toOption),
+      prepared.ledger,
+      width,
+      r => prepared.query(r).left.map(Refusal.Query(_)),
+      (r: TemporalQuery.Readout) => r.allocatedRegionMass
+    ).map(window(_, width, None))
+
+  /** Same lattice calculation over imported claims, without constructing a live mapping result. */
+  def bestInspectionWindow(
+      prepared: TemporalQuery.Inspection,
+      width: BigInt
+  ): Either[Refusal, InspectionWindow] =
+    val geometry = prepared.components.flatMap(_.location match
+      case TemporalQuery.Location.Resolved(domain) => domain.availability.toOption
+      case _                                       => None)
+    bestReadout(
+      prepared.coordinate.axis,
+      geometry,
+      prepared.ledger,
+      width,
+      r => prepared.query(r).left.map(Refusal.Query(_)),
+      (r: TemporalQuery.InspectionReadout) => r.allocatedRegionMass
+    )
+      .map(inspectionWindow(_, width, None))
+
+  private def bestReadout[A](
+      axis: PresentationAxis,
+      geometry: Vector[PlaybackSupport],
+      ledger: TemporalQuery.Ledger,
+      width: BigInt,
+      query: TemporalQuery.Region => Either[Refusal, A],
+      mass: A => Double
+  ): Either[Refusal, A] =
+    if ledger.supportWithoutAllocation > 0.0 then Left(Refusal.UnavailableAllocation)
     else
-      prepared.coordinate.axis.extent match
+      axis.extent match
         case extent: AxisExtent.PlaybackTicks =>
           val lo = BigInt(extent.start)
           val hi = BigInt(extent.endExclusive)
           if width <= 0 || width > hi - lo then Left(Refusal.InvalidWidth)
           else
-            val edges = prepared.domains
-              .flatMap(_.availability.toOption)
-              .flatMap(g =>
-                g.intervals.flatMap(i => Vector(BigInt(i.start), BigInt(i.endExclusive))) ++
-                  g.points.flatMap(p => Vector(BigInt(p.at), BigInt(p.at) + 1))
-              )
+            val edges = geometry.flatMap(g =>
+              g.intervals.flatMap(i => Vector(BigInt(i.start), BigInt(i.endExclusive))) ++
+                g.points.flatMap(p => Vector(BigInt(p.at), BigInt(p.at) + 1))
+            )
             val starts = (Vector(lo, hi - width) ++ edges ++ edges.map(_ - width))
               .map(_.max(lo).min(hi - width))
               .distinct
               .sorted
             val windows = starts.map { start =>
               TemporalQuery.Region
-                .onTimeAxis(
-                  prepared.coordinate.axis,
-                  Vector(start.toLong -> (start + width).toLong),
-                  Vector.empty
-                )
-                .flatMap(prepared.query)
+                .onTimeAxis(axis, Vector(start.toLong -> (start + width).toLong), Vector.empty)
                 .left
                 .map(Refusal.Query(_))
+                .flatMap(query)
             }
             windows.collectFirst { case Left(error) => error } match
               case Some(error) => Left(error)
               case None        =>
                 val results = windows.flatMap(_.toOption)
-                val best = results.tail.foldLeft(results.head)((a, b) =>
-                  if b.allocatedRegionMass > a.allocatedRegionMass then b else a
+                Right(
+                  results.tail.foldLeft(results.head)((a, b) => if mass(b) > mass(a) then b else a)
                 )
-                Right(window(best, width, None))
         case _ => Left(Refusal.UnsupportedAxis)
 
   /** Shortest connected lattice interval attaining an explicitly conditioned quantity. */
   def shortestWindow(prepared: TemporalQuery.Prepared, target: Target): Either[Refusal, Window] =
-    for
-      needed <- quantity(prepared, target)
-      _ <- Either.cond(
-        prepared.ledger.supportWithoutAllocation == 0.0,
-        (),
-        Refusal.UnavailableAllocation
-      )
-      extent <- prepared.coordinate.axis.extent match
-        case e: AxisExtent.PlaybackTicks => Right(e)
-        case _                           => Left(Refusal.UnsupportedAxis)
-      _ <- Either.cond(
-        needed <= prepared.ledger.allocatedSource,
-        (),
-        Refusal.Unattainable(needed, prepared.ledger.allocatedSource)
-      )
-      result <-
-        if needed == 0.0 then
-          TemporalQuery.Region
-            .onTimeAxis(prepared.coordinate.axis, Vector.empty, Vector.empty)
-            .flatMap(prepared.query)
-            .left
-            .map(Refusal.Query(_))
-            .map(window(_, BigInt(0), Some(target)))
-        else
-          var lo = BigInt(1)
-          var hi = BigInt(extent.endExclusive) - BigInt(extent.start)
-          var error: Option[Refusal] = None
-          while lo < hi && error.isEmpty do
-            val mid = (lo + hi) / 2
-            bestWindow(prepared, mid) match
-              case Left(reason) => error = Some(reason)
-              case Right(value) =>
-                if value.readout.allocatedRegionMass >= needed then hi = mid else lo = mid + 1
-          error match
-            case Some(reason) => Left(reason)
-            case None => bestWindow(prepared, lo).map(v => window(v.readout, v.width, Some(target)))
-    yield result
+    shortestWidth(
+      prepared.coordinate.axis,
+      prepared.ledger,
+      target,
+      width => bestWindow(prepared, width).map(_.readout.allocatedRegionMass)
+    ).flatMap { width =>
+      if width == 0 then
+        TemporalQuery.Region
+          .onTimeAxis(prepared.coordinate.axis, Vector.empty, Vector.empty)
+          .flatMap(prepared.query)
+          .left
+          .map(Refusal.Query(_))
+          .map(window(_, width, Some(target)))
+      else bestWindow(prepared, width).map(v => window(v.readout, width, Some(target)))
+    }
+
+  /** Conditional precision over supplied claims; omitted and unallocated quantities survive. */
+  def shortestInspectionWindow(
+      prepared: TemporalQuery.Inspection,
+      target: Target
+  ): Either[Refusal, InspectionWindow] =
+    shortestWidth(
+      prepared.coordinate.axis,
+      prepared.ledger,
+      target,
+      width => bestInspectionWindow(prepared, width).map(_.readout.allocatedRegionMass)
+    ).flatMap { width =>
+      if width == 0 then
+        TemporalQuery.Region
+          .onTimeAxis(prepared.coordinate.axis, Vector.empty, Vector.empty)
+          .flatMap(prepared.query)
+          .left
+          .map(Refusal.Query(_))
+          .map(inspectionWindow(_, width, Some(target)))
+      else
+        bestInspectionWindow(prepared, width).map(v =>
+          inspectionWindow(v.readout, width, Some(target))
+        )
+    }
+
+  private def shortestWidth(
+      axis: PresentationAxis,
+      ledger: TemporalQuery.Ledger,
+      target: Target,
+      bestMass: BigInt => Either[Refusal, Double]
+  ): Either[Refusal, BigInt] = for
+    needed <- quantity(ledger, target)
+    _ <- Either.cond(ledger.supportWithoutAllocation == 0.0, (), Refusal.UnavailableAllocation)
+    extent <- axis.extent match
+      case e: AxisExtent.PlaybackTicks => Right(e)
+      case _                           => Left(Refusal.UnsupportedAxis)
+    _ <- Either.cond(
+      needed <= ledger.allocatedSource,
+      (),
+      Refusal.Unattainable(needed, ledger.allocatedSource)
+    )
+    result <-
+      if needed == 0 then Right(BigInt(0))
+      else
+        var lo = BigInt(1)
+        var hi = BigInt(extent.endExclusive) - BigInt(extent.start)
+        var error: Option[Refusal] = None
+        while lo < hi && error.isEmpty do
+          val mid = (lo + hi) / 2
+          bestMass(mid) match
+            case Left(reason) => error = Some(reason)
+            case Right(mass)  => if mass >= needed then hi = mid else lo = mid + 1
+        error.toLeft(lo)
+  yield result
 
   /** Highest-quantity grid cells first; ties keep original bin order and all omitted mass. */
   def disconnected(grid: TemporalGrid, target: Target): Either[Refusal, Disconnected] =
     for
-      needed <- quantity(grid.prepared, target)
+      needed <- quantity(grid.prepared.ledger, target)
       _ <- Either.cond(
         grid.prepared.ledger.supportWithoutAllocation == 0.0,
         (),
@@ -160,11 +235,11 @@ object TemporalConcentration:
       )
       new Disconnected(grid, selected, total, target, identity)
 
-  private def quantity(prepared: TemporalQuery.Prepared, target: Target): Either[Refusal, Double] =
+  private def quantity(ledger: TemporalQuery.Ledger, target: Target): Either[Refusal, Double] =
     val (value, scale, share) = target match
       case Target.AbsoluteQuantity(v)       => (v, 1.0, false)
-      case Target.ShareOfSupplied(v)        => (v, prepared.ledger.suppliedTotal, true)
-      case Target.ShareOfAllocatedSource(v) => (v, prepared.ledger.allocatedSource, true)
+      case Target.ShareOfSupplied(v)        => (v, ledger.suppliedTotal, true)
+      case Target.ShareOfAllocatedSource(v) => (v, ledger.allocatedSource, true)
     if !value.isFinite || value < 0.0 || (share && value > 1.0) || !(value * scale).isFinite then
       Left(Refusal.InvalidTarget)
     else if share && scale == 0.0 then Left(Refusal.UndefinedConditioning)
@@ -185,3 +260,14 @@ object TemporalConcentration:
       )
     )
     new Window(readout, width, target, digest)
+
+  private def inspectionWindow(
+      readout: TemporalQuery.InspectionReadout,
+      width: BigInt,
+      target: Option[Target]
+  ): InspectionWindow =
+    val digest = MappingRender.digest(
+      Vector(Version, "inspection-window", readout.digest.hex, width.toString) ++
+        target.toVector.map(targetKey)
+    )
+    new InspectionWindow(readout, width, target, digest)

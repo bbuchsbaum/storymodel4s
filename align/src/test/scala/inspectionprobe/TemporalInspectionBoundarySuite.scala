@@ -459,3 +459,73 @@ class TemporalInspectionBoundarySuite extends FunSuite:
       ).nonEmpty
     )
   }
+
+  test("TemporalConcentration.InspectionWindow refuses constructor outside its defining package") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; case class Control(v0: TemporalQuery.InspectionReadout, v1: BigInt, v2: Option[TemporalConcentration.Target], v3: Checksum); new Control(??? : TemporalQuery.InspectionReadout, ??? : BigInt, ??? : Option[TemporalConcentration.Target], ??? : Checksum)"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; new TemporalConcentration.InspectionWindow(??? : TemporalQuery.InspectionReadout, ??? : BigInt, ??? : Option[TemporalConcentration.Target], ??? : Checksum)"""
+      ).nonEmpty
+    )
+  }
+
+  test("TemporalConcentration.InspectionWindow refuses apply outside its defining package") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; case class Control(v0: TemporalQuery.InspectionReadout, v1: BigInt, v2: Option[TemporalConcentration.Target], v3: Checksum); Control(??? : TemporalQuery.InspectionReadout, ??? : BigInt, ??? : Option[TemporalConcentration.Target], ??? : Checksum)"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; TemporalConcentration.InspectionWindow(??? : TemporalQuery.InspectionReadout, ??? : BigInt, ??? : Option[TemporalConcentration.Target], ??? : Checksum)"""
+      ).nonEmpty
+    )
+  }
+
+  test("TemporalConcentration.InspectionWindow refuses copy outside its defining package") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; case class Control(v0: TemporalQuery.InspectionReadout, v1: BigInt, v2: Option[TemporalConcentration.Target], v3: Checksum); (??? : Control).copy()"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; (??? : TemporalConcentration.InspectionWindow).copy()"""
+      ).nonEmpty
+    )
+  }
+
+  test("TemporalConcentration.InspectionWindow refuses fromProduct outside its defining package") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; case class Control(v0: TemporalQuery.InspectionReadout, v1: BigInt, v2: Option[TemporalConcentration.Target], v3: Checksum); object Control { def fromProduct(p: Product): Control = summon[scala.deriving.Mirror.ProductOf[Control]].fromProduct(p) }; Control.fromProduct(??? : Product)"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; TemporalConcentration.InspectionWindow.fromProduct(??? : Product)"""
+      ).nonEmpty
+    )
+  }
+
+  test("TemporalConcentration.InspectionWindow refuses Mirror outside its defining package") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; case class Control(v0: TemporalQuery.InspectionReadout, v1: BigInt, v2: Option[TemporalConcentration.Target], v3: Checksum); summon[scala.deriving.Mirror.ProductOf[Control]]"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; import storymodel4s.core.*; summon[scala.deriving.Mirror.ProductOf[TemporalConcentration.InspectionWindow]]"""
+      ).nonEmpty
+    )
+  }

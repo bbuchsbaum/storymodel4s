@@ -304,3 +304,56 @@ class TemporalInspectionSuite extends FunSuite:
       Left(TemporalExposure.Refusal.ForeignProcessing)
     )
   }
+
+  test("imported concentration matches independent exhaustive lattice windows and live precision") {
+    val p = imported()
+    val live = prepared()
+    for width <- 1 to 10 do
+      val exact = (0 to (10 - width)).map(start =>
+        p.query(region(live, Vector(start.toLong -> (start + width).toLong))).toOption.get
+      )
+      val expected =
+        exact.reduceLeft((a, b) => if b.allocatedRegionMass > a.allocatedRegionMass then b else a)
+      val actual = TemporalConcentration.bestInspectionWindow(p, BigInt(width)).toOption.get
+      assertEquals(actual.readout.allocatedRegionMass, expected.allocatedRegionMass)
+      assertEquals(actual.readout.region.geometry, expected.region.geometry)
+      assertEquals(actual.width, BigInt(width))
+      assertEquals(
+        actual.readout.prepared.ledger.external,
+        Vector(ExternalState.Intrusion -> 0.125)
+      )
+    val target = TemporalConcentration.Target.ShareOfAllocatedSource(0.5)
+    val actual = TemporalConcentration.shortestInspectionWindow(p, target).toOption.get
+    val expected = TemporalConcentration.shortestWindow(live, target).toOption.get
+    assertEquals(actual.width, expected.width)
+    assertEquals(actual.readout.allocatedRegionMass, expected.readout.allocatedRegionMass)
+    assertNotEquals(actual.digest, expected.digest)
+    assertEquals(
+      TemporalConcentration
+        .shortestInspectionWindow(p, TemporalConcentration.Target.AbsoluteQuantity(0.9)),
+      Left(TemporalConcentration.Refusal.Unattainable(0.9, 0.75))
+    )
+    assertEquals(
+      TemporalConcentration.bestInspectionWindow(p, BigInt(0)),
+      Left(TemporalConcentration.Refusal.InvalidWidth)
+    )
+    assertEquals(
+      TemporalConcentration
+        .shortestInspectionWindow(p, TemporalConcentration.Target.ShareOfSupplied(Double.NaN)),
+      Left(TemporalConcentration.Refusal.InvalidTarget)
+    )
+    val unallocated = inspect(
+      source,
+      inventory,
+      unit,
+      p.measure,
+      p.components.map(c => c.alternative -> c.weight),
+      1.0,
+      selection,
+      declarations.map(_.copy(allocation = Allocation.SupportOnly))
+    ).toOption.get
+    assertEquals(
+      TemporalConcentration.bestInspectionWindow(unallocated, BigInt(1)),
+      Left(TemporalConcentration.Refusal.UnavailableAllocation)
+    )
+  }
