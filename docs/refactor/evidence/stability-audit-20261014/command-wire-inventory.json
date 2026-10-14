@@ -1,0 +1,15 @@
+{
+  "sourceSha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "scalaFacade": [
+    "MappingPipeline.analyze(Path, Config)",
+    "MappingPipeline.analyze(Path, Path)",
+    "MappingPipeline.inspect(Batch)",
+    "MappingPipeline.exportResults(Batch, Path)",
+    "MappingPipeline.inspectTemporal(Batch, TemporalProjection.Request)"
+  ],
+  "wire": [
+    "mapping-record/v0.1",
+    "hsmm/v4"
+  ],
+  "note": "Command and wire compatibility are inventoried separately from Scala signature reachability."
+}
