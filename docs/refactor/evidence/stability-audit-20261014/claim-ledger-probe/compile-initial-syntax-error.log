@@ -1,0 +1,5 @@
+[31m[31m-- [E040] Syntax Error: /tmp/constructor-family-crosswalk-2c4b74f9-20261014/claim-ledger-probe/ClaimLedgerProbe.scala:24:144 [0m[0m
+[31m24 |[0m    println([31m"copy_compile_errors="[0m + typeCheckErrors([31m"storymodel4s.core.ClaimLedger.empty.copy(order = Vector(storymodel4s.core.ClaimId.unsafe("ghost")))"[0m).size)
+[31m[31m   |[0m                                                                                                                                                ^^^^^[0m
+[31m   |[0m                      ',' or ')' expected, but string interpolator found
+1 error found

@@ -1,0 +1,29 @@
+{
+  "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "command": [
+    "npm",
+    "run",
+    "verify:examples"
+  ],
+  "exit": 0,
+  "durationSeconds": 536.549664,
+  "exampleCount": 14,
+  "verified": [
+    "verified inspect-source: 381 output bytes",
+    "verified model-a-story: 729 output bytes",
+    "verified represent-recall: 598 output bytes",
+    "verified align-and-interpret: 551 output bytes",
+    "verified summarize-recall: 756 output bytes",
+    "verified score-interview: 1074 output bytes",
+    "verified save-model: 330 output bytes",
+    "verified penman-to-chart: 840 output bytes",
+    "verified resolve-acquisition: 318 output bytes",
+    "verified compose-document: 340 output bytes",
+    "verified window-features: 634 output bytes",
+    "verified use-embeddings: 436 output bytes",
+    "verified structural-distance: 402 output bytes",
+    "verified mapping-facade: 168 output bytes"
+  ],
+  "parserTests": 5,
+  "scope": "Exact-candidate transcript replay; full site/navigation/layout verification remains bound to 2647d280, whose site inputs are unchanged."
+}

@@ -31,9 +31,14 @@
   "consumer": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
   "scope": "One admitted development participant, both actual conditions; participant artifacts remain private.",
   "qualified": "LocallyObserved",
-  "scriptSha256": "cb685e236b418473e46cfa72c9da3bba7d2c4b98e57ae077c3ac3ce970d63efc",
   "independentReaderSource": {
     "Readback.scala": "7c19f6d778b5a3131efe5f5653f96d04cfe05ccea1c09f3389932a9841e105f4",
     "Identity.scala": "eac6236cddd6834e150583d6e03b50e825ec8e9c7fa97886f33f1b5ee257438e"
+  },
+  "executedScriptSha256": "cb685e236b418473e46cfa72c9da3bba7d2c4b98e57ae077c3ac3ce970d63efc",
+  "reproductionScript": {
+    "path": "actual_temporal_browser.mjs",
+    "sha256": "cd00bb3336477ce3faf36d84f9d233decce4d14542b6af3d56de1f547bed71ab",
+    "changeFromExecuted": "Only explicit Atlas/input/output arguments replace the private local path defaults; check body unchanged."
   }
 }

@@ -1,0 +1,9 @@
+{
+  "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "reason": "CLI archive rebuilt after documentation replay; refreshed audits bind its final manifest bytes. Earlier inventory/provenance retained separately.",
+  "inventoryEquality": {
+    "semantic": true,
+    "inspection": true
+  },
+  "guardControls": "Full verify.sh passed before archive; unchanged audit runner/guards; final actual archive inputs independently reverified."
+}

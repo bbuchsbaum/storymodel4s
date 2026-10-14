@@ -1,0 +1,27 @@
+{
+  "scope": "Uncommitted A2-A6 documentation only",
+  "draftSha256": "4fff26df528ed56aa9cb9502e104169a3b2e64218c6ed70ceb0056e2908071ae",
+  "verdict": "FOLLOW-UP: one wording correction; other examined claims suitably bounded",
+  "finding": {
+    "section": "A2",
+    "text": "Abstract atlas interfaces are extension contracts.",
+    "reason": "NarrativeSourceAtlas is sealed; external extension is explicitly refused by D1aConstructionBoundarySuite. SourceView is the distinct open extension contract.",
+    "anchors": [
+      "core/src/main/scala/storymodel4s/core/atlas.scala:726",
+      "core/src/test/scala/storymodel4s/coreprobe/D1aConstructionBoundarySuite.scala:78"
+    ],
+    "replacement": "NarrativeSourceAtlas is a sealed text/anchored abstraction with checked alternatives."
+  },
+  "checked": [
+    "A2 atlas/factory guarantees against implementation",
+    "A3 descriptor vs checked sidecar distinctions and outcome counter",
+    "A4 contextual payloads vs restricted reader/writer results",
+    "A5 producer query geometry/projection/exposure scope distinct from imported inspection",
+    "A6 no blanket promotion or checked claim for 169 dependency entries",
+    "Named relevant suites exist"
+  ],
+  "limits": [
+    "This is draft prose review, not exact-commit acceptance.",
+    "Full gate totals are parent evidence; no gate launched or independently re-counted here."
+  ]
+}

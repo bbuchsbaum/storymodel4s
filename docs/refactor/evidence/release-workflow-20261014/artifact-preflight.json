@@ -1,0 +1,5270 @@
+{
+  "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "qualified": "LocallyObserved",
+  "poms": [
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-acquire_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "bbc292ab4560250d8403a8872f41fa4d5fe3c2988d57900cb682011d7b3fe2d2"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-acquire_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "b31531e79f3e513b0342bf9c2e0d178b72dc87725c76b17d32c2ba2f62e048ff"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-acquire_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "4491845572da75f71dfe45c15e3b99de47a79140546f7fb24005b46a18879a15"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-align_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "46467c838ec63d79e1b9c02e7b3ca855b29205e4fab4ec52474f30b2f8ecfe83"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-align_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "2f91246ee9851f5946de1a9a8ceee6f9d83b5d2bfce4b753d00a32ca411d42b4"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-align_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "a597a9735b759709306f2e4ebdc9ff615ef7fe62926a6e88417b622c4deeb2b4"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-amr-interop_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-parse_sjs1_3",
+          "version": "1.1.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "4d4e09d6dddd93ba261b12825875e07bc3230133a7e6109cd5b09db01090cd04"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-amr-interop_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-parse_3",
+          "version": "1.1.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "904cacd54f17ee6a3c026121013db4b5cb38e240f519f5758a2b579c5f8315db"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-amr-interop_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-parse_native0.5_3",
+          "version": "1.1.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "a810aa89366e6e93318d99176d5dd08f33cc97a9f642e7a3e1cd56cad525ca06"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-codec_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-laws_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_sjs1_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_sjs1_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "ab20624c583eba42538d5fb4d66bd5c64f93f1dd3f9d9eb5f9effe199260038b"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-codec_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-laws_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "d08f0878e70f8f98dfa547e350c4b58c99c639018a6f2d020782bdddd88ad1a6"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-codec_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-laws_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_native0.5_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_native0.5_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "0d7696579649693b9449437ec2f06a1ac58cfe73979118dc19eb58810957c15d"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-core_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-core_sjs1_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-collections-core_sjs1_3",
+          "version": "0.9.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "debbf3b258f28e84c8b7a1bf40104ebccec7ab4036af28f5471dc5f7cdae3d55"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-core_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-core_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-collections-core_3",
+          "version": "0.9.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "3628f95ff970c77e98aa611ec7c67edfb105ee60196ad9354e8870666a57203b"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-core_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-core_native0.5_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-collections-core_native0.5_3",
+          "version": "0.9.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "d4ff4d40bae9f6de4de4b6c9c8d694da37d2e2f3d52103e0dc9f00739b39fbf8"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-corpus_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_sjs1_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_sjs1_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "1173dd871d5c65bdac98668b0e1bd61e502b74bc8b858ca5a33a43aad8e5ad6c"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-corpus_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "9da43d16162785d3c86faf489877df740075eb634579dbb787672806e76769a8"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-corpus_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_native0.5_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_native0.5_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "be303d1abeb214ca1c836e51bc79cfa653519294047d3d2bd52832a17d30e97f"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-corpus-intake_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-corpus_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "e267aa6f2dd8e125d42ab128bb1bf414ba1da547f79a3f29189a83feb8034aa2"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-document_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "19401beec1e10d050f800f163d01c272996221d93b07e2380dea103f66352c47"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-document_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "8d423f2ace0caa2e4176fad76a98aa6d6be683f1b09a3d63070e8056a01caea1"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-document_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "4484d392160f3404b39e27ccbd764e7b16de8f0daa04a5ccfb14e98b7216998c"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-embed-bench_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-corpus-intake_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-onnx_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-grakern_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-codec_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-fixtures_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-laws_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "d3b1523ee4d08c493736345bcffb21ca06e54cf511dcc75c710fd46db2923f42"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-embed-core_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "c7b2c5b5002c38eba2934b7ac18ff055d448d125638b7a02f55d45814c9d9d24"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-embed-core_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "5a25212cb62cd1fc2da15448e2a6026b72fb62ee71e198ce7d9fdb7aa1d5db10"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-embed-core_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "9c6279aef512fd3c2eac26a2cb1346c64a49ce87e3c637a5f7a1cf9f016693d5"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-embed-grakern_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.canardlapin",
+          "artifact": "grakern-core_3",
+          "version": "0.1-0329c43-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.canardlapin",
+          "artifact": "grakern-standard_3",
+          "version": "0.1-0329c43-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.canardlapin",
+          "artifact": "grakern-graph4s_3",
+          "version": "0.1-0329c43-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.canardlapin",
+          "artifact": "grakern-engine-jvm_3",
+          "version": "0.1-0329c43-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "3e6e4c5f1d510b1d3fb9f19738cbf7af67b10eb113b2213f749d001a74fe539a"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-embed-onnx_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "com.microsoft.onnxruntime",
+          "artifact": "onnxruntime",
+          "version": "1.29.0",
+          "scope": "compile"
+        },
+        {
+          "group": "ai.djl.huggingface",
+          "artifact": "tokenizers",
+          "version": "0.36.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "70cfef280c8a5bca27ae34879d5bbe75a0b0dac2d671c1c347fee82db545f47a"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-features_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "c534c33038a6a74e50176d2d0fe40e3521fe585acfb9628ce914780062ff8f3b"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-features_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "8575bf9f9e2fc5cb7bf78e48f40c8239824a0a6366c8cd65899b5d9adaaf0883"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-features_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "1112eb1521e90bfdec7c94b65a0a76cc60570d09785a50d6d32533934494cbac"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-fixtures_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-codec_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "117e9e0ea8f2399c86e6951ff17d7f0f12558896339434f98eae34f12c1b5416"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-fixtures_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-codec_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "3d302f017b33a00d02734dddea684e8a2eeb8feebe5e02b739171823abe2bbff"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-fixtures_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-codec_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-view_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "3becd8543bf31077ba617b0b0a486379f336ae9cd27ddfae68b87e44d5d497c1"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-interview_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "7a64234fc74adf0f4b5c1fb6ff24c09b026a04dee0a0e739688f62b1350a1084"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-interview_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "51c10bcc27daab4dcf9bca27d368a898221d5950a1e4367c65acb0d4babf965d"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-interview_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "89938fa8175c356b5349e311156c4188ff891665ebccce4dd4daae0a2db0b022"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-laws_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "discipline-munit_sjs1_3",
+          "version": "2.0.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-laws_sjs1_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scalacheck",
+          "artifact": "scalacheck_sjs1_3",
+          "version": "1.19.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "c91acf593ae496b189d8306a3329b55e35b107d01afb5f1a82666830607368c7"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-laws_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "discipline-munit_3",
+          "version": "2.0.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-laws_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scalacheck",
+          "artifact": "scalacheck_3",
+          "version": "1.19.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "0a75c5727891921f771e5b411b897f1dadda1f25409874869283438be266d833"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-laws_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-interview_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "discipline-munit_native0.5_3",
+          "version": "2.0.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-laws_native0.5_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scalacheck",
+          "artifact": "scalacheck_native0.5_3",
+          "version": "1.19.0",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "3d06ebd76dd05faecab393b2e94d993031e06239f76f9c102b53f212d6208d60"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-media_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-corpus_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "0cef8f3386b28cffb11aff8f13f1ad1658632bcc3142a83972648dec9b69ead1"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-pipeline_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-provider-agent_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-provider-parser_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-codec_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-corpus-intake_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-embed-onnx_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-media_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-fixtures_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "f3e41abba030f95962be48edc8b7f829c6b91efb3653c9abf4b31528ff0736e2"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-proposition_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "72fad1cc0c37603974a5278ce4cd6a978bc97838296fc80c8ed41ab85c0d568c"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-proposition_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "ac24b629cf01180db8c16a8e9defda3cc51be90c6029d6b0b775d239a9d86def"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-proposition_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "61f8904851bbeecd77bd1aa19bf01efcc9a4a8a341e77012c2386f30e4003753"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-provider-agent_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-provider-parser_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "com.anthropic",
+          "artifact": "anthropic-java",
+          "version": "2.34.0",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "bb3925baa9caa0945deeac71bbe5362cc9abc1a19e50a57c003962762bb07bce"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-provider-parser_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-amr-interop_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "cats-core_3",
+          "version": "2.13.0",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-core_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        },
+        {
+          "group": "io.circe",
+          "artifact": "circe-parser_3",
+          "version": "0.14.10",
+          "scope": "compile"
+        }
+      ],
+      "pomSha256": "c0b917e4cef0eeadd5a6f383af51e982db7d2027fbf020e22a5d8b97daafc239"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-recall_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "1d55d70f9ef99cea80f06f280a6a708dd5563840d37d308faa8511bb1f28c326"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-recall_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "6ac0cdbe960eebea4819a3fcb5d216348a3c98dcb80f5174aa6aab7939aa5d6d"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-recall_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "cedd8f2422b2c199778599d38f09b301999cf2c1af80371bcc824eca302cc483"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-story_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "94bc9d7ca45cb99ba9f157d2bb0a4bf32c00de2bb3be4a632cb655893c3a5178"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-story_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "a7aac9a85be7c0b52731f850702f4ba253a6b822a446f0230f9e15d9adf48cdf"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-story_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "0e389a59cef35fedc96afd3d8b66b52a0d5b1f340e538cfb0309c3c1bef8ec38"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-view_sjs1_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_sjs1_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_sjs1_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-library_2.13",
+          "version": "1.22.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-js",
+          "artifact": "scalajs-test-bridge_2.13",
+          "version": "1.22.0",
+          "scope": "test"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_sjs1_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_sjs1_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "8a0ecbbed1e397c274353dd6dddb049424b1c85a6c45ac899c5d22ce1e0456b4"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-view_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "3e0dc45eb503ce83a4e6a399356f66367a3127be9a4fd495a26deac96d46c9f6"
+    },
+    {
+      "group": "io.github.bbuchsbaum",
+      "artifact": "storymodel4s-view_native0.5_3",
+      "version": "0.1-eb48a56-SNAPSHOT",
+      "packaging": "jar",
+      "url": "https://github.com/bbuchsbaum/storymodel4s",
+      "licenses": 1,
+      "developers": 1,
+      "scm": "https://github.com/bbuchsbaum/storymodel4s",
+      "dependencies": [
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-core_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-proposition_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-features_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-acquire_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-story_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-document_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-recall_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "io.github.bbuchsbaum",
+          "artifact": "storymodel4s-align_native0.5_3",
+          "version": "0.1-eb48a56-SNAPSHOT",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-lang",
+          "artifact": "scala3-library_3",
+          "version": "3.7.4",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "test-interface_native0.5_3",
+          "version": "0.5.12",
+          "scope": "test"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "scala3lib_native0.5_3",
+          "version": "3.7.4+0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "nativelib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "clib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "posixlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "windowslib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "javalib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.scala-native",
+          "artifact": "auxlib_native0.5_3",
+          "version": "0.5.12",
+          "scope": "compile"
+        },
+        {
+          "group": "org.typelevel",
+          "artifact": "scalac-compat-annotation_3",
+          "version": "0.1.4",
+          "scope": "provided"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit_native0.5_3",
+          "version": "1.3.4",
+          "scope": "test"
+        },
+        {
+          "group": "org.scalameta",
+          "artifact": "munit-scalacheck_native0.5_3",
+          "version": "1.3.0",
+          "scope": "test"
+        }
+      ],
+      "pomSha256": "28633ce77b708a773cd1fbc2963eaf17113b0c1f84ce1fb15df88cd19a7e664a"
+    }
+  ],
+  "portablePairs": 48,
+  "jvmOnly": 8,
+  "externalDirectPomChecks": [
+    {
+      "coordinate": "ai.djl.huggingface:tokenizers:0.36.0",
+      "url": "https://repo.maven.apache.org/maven2/ai/djl/huggingface/tokenizers/0.36.0/tokenizers-0.36.0.pom",
+      "status": 200,
+      "bytes": 1457,
+      "sha256": "9cdb34c0721d3130dd833b415976f5f64133d502c645e3b03713d0b1c14604be"
+    },
+    {
+      "coordinate": "com.anthropic:anthropic-java:2.34.0",
+      "url": "https://repo.maven.apache.org/maven2/com/anthropic/anthropic-java/2.34.0/anthropic-java-2.34.0.pom",
+      "status": 200,
+      "bytes": 1811,
+      "sha256": "284a9d5428389f51b0aa737986ef59d87a038a945d76e3ab46a98843ffb4bad1"
+    },
+    {
+      "coordinate": "com.microsoft.onnxruntime:onnxruntime:1.29.0",
+      "url": "https://repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.29.0/onnxruntime-1.29.0.pom",
+      "status": 200,
+      "bytes": 1684,
+      "sha256": "8745955f8de3bc0bdbfa99525b836ee285dd6ad22e70bfb5d96537a76b24be92"
+    },
+    {
+      "coordinate": "io.circe:circe-core_3:0.14.10",
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_3/0.14.10/circe-core_3-0.14.10.pom",
+      "status": 200,
+      "bytes": 3082,
+      "sha256": "7e8387bb2eefed50e1a480d544650c64c14105ffe26d8d845162f17dba9831d2"
+    },
+    {
+      "coordinate": "io.circe:circe-core_native0.5_3:0.14.10",
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_native0.5_3/0.14.10/circe-core_native0.5_3-0.14.10.pom",
+      "status": 200,
+      "bytes": 18319,
+      "sha256": "ca466fa48e15fdd11ca5f26b1215c0d530c93803a80ff2dacebcd453dead27a1"
+    },
+    {
+      "coordinate": "io.circe:circe-core_sjs1_3:0.14.10",
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_sjs1_3/0.14.10/circe-core_sjs1_3-0.14.10.pom",
+      "status": 200,
+      "bytes": 3509,
+      "sha256": "b0d66170bcfdc5a89b2744ab3110210be23fd18b4dcc7fec512be983da7b9743"
+    },
+    {
+      "coordinate": "io.circe:circe-parser_3:0.14.10",
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_3/0.14.10/circe-parser_3-0.14.10.pom",
+      "status": 200,
+      "bytes": 3084,
+      "sha256": "c7a38e9acaecf253d1664375f162a3e99ba366a697f8a22007ad5ecf5b072175"
+    },
+    {
+      "coordinate": "io.circe:circe-parser_native0.5_3:0.14.10",
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_native0.5_3/0.14.10/circe-parser_native0.5_3-0.14.10.pom",
+      "status": 200,
+      "bytes": 18321,
+      "sha256": "6f1fe44314ecb325077c21b3d76f71fd849b541b33e665dfb0aff8a5378deb41"
+    },
+    {
+      "coordinate": "io.circe:circe-parser_sjs1_3:0.14.10",
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_sjs1_3/0.14.10/circe-parser_sjs1_3-0.14.10.pom",
+      "status": 200,
+      "bytes": 3514,
+      "sha256": "6ff46d1596104a983715f2a25ac4267045d2448252839835c23dcad0a91cc5bd"
+    },
+    {
+      "coordinate": "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT",
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-core_3/0.1-0329c43-SNAPSHOT/grakern-core_3-0.1-0329c43-SNAPSHOT.pom",
+      "status": 404
+    },
+    {
+      "coordinate": "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT",
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-engine-jvm_3/0.1-0329c43-SNAPSHOT/grakern-engine-jvm_3-0.1-0329c43-SNAPSHOT.pom",
+      "status": 404
+    },
+    {
+      "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT",
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-graph4s_3/0.1-0329c43-SNAPSHOT/grakern-graph4s_3-0.1-0329c43-SNAPSHOT.pom",
+      "status": 404
+    },
+    {
+      "coordinate": "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT",
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-standard_3/0.1-0329c43-SNAPSHOT/grakern-standard_3-0.1-0329c43-SNAPSHOT.pom",
+      "status": 404
+    },
+    {
+      "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-js/scalajs-library_2.13/1.22.0/scalajs-library_2.13-1.22.0.pom",
+      "status": 200,
+      "bytes": 2704,
+      "sha256": "e589d89212992a56a515eb13c62f464bb39c020f06f5cbfd2db514cded8b862f"
+    },
+    {
+      "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-js/scalajs-test-bridge_2.13/1.22.0/scalajs-test-bridge_2.13-1.22.0.pom",
+      "status": 200,
+      "bytes": 2969,
+      "sha256": "b1c4a3c82a9bb20895b9ece0068164e68dc53870f194900607770c2af896a063"
+    },
+    {
+      "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.pom",
+      "status": 200,
+      "bytes": 4321,
+      "sha256": "d099f9ecd83bd357f9089cc7ff3e149dd7b84d4cf9f88a0ed639b8142b08ec90"
+    },
+    {
+      "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_sjs1_3/3.7.4/scala3-library_sjs1_3-3.7.4.pom",
+      "status": 200,
+      "bytes": 5144,
+      "sha256": "19284b233aff7b035d1585fe55e2e2b3adf1633521b9596cc8cb3967946184fc"
+    },
+    {
+      "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/auxlib_native0.5_3/0.5.12/auxlib_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 5811,
+      "sha256": "44ae1ff79cfd371dd1da47ab3b0ece44928fc50b9e18d23eff4564adc06057c8"
+    },
+    {
+      "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/clib_native0.5_3/0.5.12/clib_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 4483,
+      "sha256": "6da13301dabbb79537b5ffa1345e2f361cc111ba76397534a2881c63a136e068"
+    },
+    {
+      "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/javalib_native0.5_3/0.5.12/javalib_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 7141,
+      "sha256": "d981af5fe5481db3ddc252967e6b0a36e26e43ed3931bf9c2bb94d12735cb495"
+    },
+    {
+      "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/nativelib_native0.5_3/0.5.12/nativelib_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 4525,
+      "sha256": "775cf68d1f0bafba016c31fc4ecc2bfc0e1875b1f252ceb90dbf515db8fe93f5"
+    },
+    {
+      "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/posixlib_native0.5_3/0.5.12/posixlib_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 5817,
+      "sha256": "4a44351b0a444e73531cda3736a53cf6a793d3e32161c4a78729f12bddfa71ab"
+    },
+    {
+      "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/scala3lib_native0.5_3/3.7.4+0.5.12/scala3lib_native0.5_3-3.7.4+0.5.12.pom",
+      "status": 200,
+      "bytes": 5998,
+      "sha256": "2a46b8e4de47112d8743f2f632a39ff19d1b1535db64722493f5f416f5ccf1cf"
+    },
+    {
+      "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/test-interface_native0.5_3/0.5.12/test-interface_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 9910,
+      "sha256": "bbeb15b64a2b7467aedf3c9a2d2b9db47efea292f5e136444d84eea84b35fe79"
+    },
+    {
+      "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/windowslib_native0.5_3/0.5.12/windowslib_native0.5_3-0.5.12.pom",
+      "status": 200,
+      "bytes": 5823,
+      "sha256": "1b136e6dc755df6802dd68eadbfd19fdc12935f55a0f72bf847843dae2d94876"
+    },
+    {
+      "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.pom",
+      "status": 200,
+      "bytes": 2525,
+      "sha256": "02a5ea96bc1186113ad3f04d594c2ecfb289127c13e2a118babcc8cf77137727"
+    },
+    {
+      "coordinate": "org.scalacheck:scalacheck_native0.5_3:1.19.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_native0.5_3/1.19.0/scalacheck_native0.5_3-1.19.0.pom",
+      "status": 200,
+      "bytes": 15043,
+      "sha256": "aac62bf2591ddb3d18442743a3506fd61e9d51dab7b8781bddba2df1d868d603"
+    },
+    {
+      "coordinate": "org.scalacheck:scalacheck_sjs1_3:1.19.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_sjs1_3/1.19.0/scalacheck_sjs1_3-1.19.0.pom",
+      "status": 200,
+      "bytes": 2743,
+      "sha256": "fc401de07f6c0741456ff4f1cd5ef3fd01e3c24c1919f5513d72fe627b66d5a2"
+    },
+    {
+      "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.3.0/munit-scalacheck_3-1.3.0.pom",
+      "status": 200,
+      "bytes": 2179,
+      "sha256": "055518fb5462c17eef6f7db7f6a4d0741991f4ceffd3ae4c0d34c3d0547ed157"
+    },
+    {
+      "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_native0.5_3/1.3.0/munit-scalacheck_native0.5_3-1.3.0.pom",
+      "status": 200,
+      "bytes": 17424,
+      "sha256": "e5825f1c7bc485b9a4f8aace3903cf6c8f5577a4ecda908389eb7ac52e3cc86a"
+    },
+    {
+      "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_sjs1_3/1.3.0/munit-scalacheck_sjs1_3-1.3.0.pom",
+      "status": 200,
+      "bytes": 2606,
+      "sha256": "a5bda791398316291f1fe959f2576af131b2674eea754a0c1f20896beb818e4d"
+    },
+    {
+      "coordinate": "org.scalameta:munit_3:1.3.4",
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.pom",
+      "status": 200,
+      "bytes": 2517,
+      "sha256": "4326ffb4f944abdb6c11cc42939e0d84763d1ffaf12b9cab20381db470845ad9"
+    },
+    {
+      "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_native0.5_3/1.3.4/munit_native0.5_3-1.3.4.pom",
+      "status": 200,
+      "bytes": 18754,
+      "sha256": "c8fac11747e9920bf95b1c4ad75660abfd2995f9af653b69d1bd159bad4747fc"
+    },
+    {
+      "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_sjs1_3/1.3.4/munit_sjs1_3-1.3.4.pom",
+      "status": 200,
+      "bytes": 2984,
+      "sha256": "436906c7b64d079dfa205463b59b498e7d43dd7691b3a0054f2c8e5b6abfaff4"
+    },
+    {
+      "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.pom",
+      "status": 200,
+      "bytes": 2974,
+      "sha256": "976c996da4249c6e043adcd7e600d4dce2bb881dc98d0a01e15569a46e32659d"
+    },
+    {
+      "coordinate": "org.typelevel:cats-collections-core_native0.5_3:0.9.10",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_native0.5_3/0.9.10/cats-collections-core_native0.5_3-0.9.10.pom",
+      "status": 200,
+      "bytes": 18211,
+      "sha256": "11d79960a2ed2815c4e2f41eee274076cfaf73ca26f51a83ff8304591808155e"
+    },
+    {
+      "coordinate": "org.typelevel:cats-collections-core_sjs1_3:0.9.10",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_sjs1_3/0.9.10/cats-collections-core_sjs1_3-0.9.10.pom",
+      "status": 200,
+      "bytes": 3401,
+      "sha256": "826f91e2e021965531fe08dd305a949c4f5a6b46013875a4dd397c19eba1cfa1"
+    },
+    {
+      "coordinate": "org.typelevel:cats-core_3:2.13.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.pom",
+      "status": 200,
+      "bytes": 6535,
+      "sha256": "b2a0f180b36cd27136d5594e1468b31c4819324175487fed7b8464f4ee015ed4"
+    },
+    {
+      "coordinate": "org.typelevel:cats-core_native0.5_3:2.13.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_native0.5_3/2.13.0/cats-core_native0.5_3-2.13.0.pom",
+      "status": 200,
+      "bytes": 24060,
+      "sha256": "8408de19590845438632ac6a66248badbe3e4a18da261da3ebe9c27ced7daf96"
+    },
+    {
+      "coordinate": "org.typelevel:cats-core_sjs1_3:2.13.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_sjs1_3/2.13.0/cats-core_sjs1_3-2.13.0.pom",
+      "status": 200,
+      "bytes": 6967,
+      "sha256": "80d5dd1edcf6a3691b37003f02f725f4fae1b1a06a40cfdcbbfd45bcae4a012a"
+    },
+    {
+      "coordinate": "org.typelevel:cats-laws_3:2.13.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-laws_3/2.13.0/cats-laws_3-2.13.0.pom",
+      "status": 200,
+      "bytes": 6863,
+      "sha256": "b919f3ea0fecdf2e04219df00387505eb1737f4f0ba668252f7faca6bba13764"
+    },
+    {
+      "coordinate": "org.typelevel:cats-laws_native0.5_3:2.13.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-laws_native0.5_3/2.13.0/cats-laws_native0.5_3-2.13.0.pom",
+      "status": 200,
+      "bytes": 26686,
+      "sha256": "114089058f92c235b74513ac0acd6b412809909f0040a6413ecd9f27a2862a46"
+    },
+    {
+      "coordinate": "org.typelevel:cats-laws_sjs1_3:2.13.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-laws_sjs1_3/2.13.0/cats-laws_sjs1_3-2.13.0.pom",
+      "status": 200,
+      "bytes": 7305,
+      "sha256": "9f56e54e34c6e340537a563b84df4dd9c5130e9eba139458ec4605cd2b721da7"
+    },
+    {
+      "coordinate": "org.typelevel:cats-parse_3:1.1.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_3/1.1.0/cats-parse_3-1.1.0.pom",
+      "status": 200,
+      "bytes": 3182,
+      "sha256": "6b5b889bc78421e9ec32724a177c2dff8005ebfe90fd6d1f6f8c4d7de179beb9"
+    },
+    {
+      "coordinate": "org.typelevel:cats-parse_native0.5_3:1.1.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_native0.5_3/1.1.0/cats-parse_native0.5_3-1.1.0.pom",
+      "status": 200,
+      "bytes": 19363,
+      "sha256": "60975a8f095591a0f6a40eda455fc46f758dbf7b98a3385f20a949dba1aea58a"
+    },
+    {
+      "coordinate": "org.typelevel:cats-parse_sjs1_3:1.1.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_sjs1_3/1.1.0/cats-parse_sjs1_3-1.1.0.pom",
+      "status": 200,
+      "bytes": 3409,
+      "sha256": "eb0712cf47ae229e9ef29007f548857fc5fc43cffa343363a39b2859400b28cd"
+    },
+    {
+      "coordinate": "org.typelevel:discipline-munit_3:2.0.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.pom",
+      "status": 200,
+      "bytes": 2767,
+      "sha256": "2cf68c29b686c1ab0ae46d43574ba9119ca4ece2e73505bee7d2ebb81978e6f2"
+    },
+    {
+      "coordinate": "org.typelevel:discipline-munit_native0.5_3:2.0.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_native0.5_3/2.0.0/discipline-munit_native0.5_3-2.0.0.pom",
+      "status": 200,
+      "bytes": 19153,
+      "sha256": "6aac211dcc64168c4c500649109af0c16a5873ea2880b130ff0da4719a514a6e"
+    },
+    {
+      "coordinate": "org.typelevel:discipline-munit_sjs1_3:2.0.0",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_sjs1_3/2.0.0/discipline-munit_sjs1_3-2.0.0.pom",
+      "status": 200,
+      "bytes": 3199,
+      "sha256": "94cc9f52ba68bc0eb4abbabbf782b707240e9298ca7b18a0d383ebefe70fdcef"
+    },
+    {
+      "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/scalac-compat-annotation_3/0.1.4/scalac-compat-annotation_3-0.1.4.pom",
+      "status": 200,
+      "bytes": 2447,
+      "sha256": "527543e5b50054b8da70e596000e6c6ab68e81b1db21a04d8f1be6e3020e23e3"
+    }
+  ],
+  "directDependencyResolution": "blocked",
+  "scope": "Nonpublishing snapshot preparation. Direct POM availability is checked against Maven Central without a local repository; this does not establish complete transitive resolution or stable publication."
+}

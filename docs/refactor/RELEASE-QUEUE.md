@@ -34,13 +34,16 @@ published-index imaging walkthrough now have concrete independent receipts. Thei
 Motes remain open until the reviewed candidate lands and the remaining exact-pair checks
 complete; they no longer require new trigger records or another acquisition run.
 
-Current candidate priorities are: finish producer `eb48a562` platform/artifact/doc qualification;
-reconcile final acceptance; then request concrete main advancements and bind hosted results.
+Current candidate priorities are: finish exact-candidate receipt review; then request concrete
+main advancements and bind hosted results. Producer `eb48a562` passed all 56 platform test tasks
+(10,877 passed, zero failures/errors, five skips), extracted CLI checks and 14 guide transcripts.
 StoryAtlas `d6f800f3` has passed its exact-pin review, 510 tests, 30 synthetic browser checks,
 and both actual 173-row A/A+V readbacks. Source main remains published through `22cc7243`.
 The stable-construction audit records historical candidate abstention and token-truncation
 recipe findings on `bd-01M4XTRN36R6SYXQBP5YN7FSQP` and `bd-01M4XTS7JEY2ZQK2CFNZ429RFW`.
-Their pre-freeze acceptance and the final stable dependency boundary remain on the release
+The ClaimLedger construction opening has a reproduced lossy-serialization witness and a bounded
+repair on `bd-01M4XZ2H3XHGY8AQ80W07PR8M0`; its historical census ticket remains closed.
+These pre-freeze requirements and the final stable dependency boundary remain on the release
 lane; current study outputs do not demonstrate a strict-run authority or ONNX-output failure.
 Physical synchronization is not established by the published analysis crop convention. On
 14 October the owner confirmed that no finer trigger records are available and selected that

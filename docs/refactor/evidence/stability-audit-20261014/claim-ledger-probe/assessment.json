@@ -1,0 +1,88 @@
+{
+  "schema": "bounded-constructor-review/v1",
+  "sourceSha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "reviewedHeadWithSameImplementation": "bfbcb12190f9291babdc14b38b8a57109467b68d",
+  "sourceEquivalence": [
+    {
+      "path": "core/src/main/scala/storymodel4s/core/claim.scala",
+      "sameBytesAtReviewedHead": true,
+      "sha256": "42ef703dd95b168335390e7008ecf75ae6623017c99b3f90b20efbaef2e04f39"
+    },
+    {
+      "path": "core/src/main/scala/storymodel4s/core/ids.scala",
+      "sameBytesAtReviewedHead": true,
+      "sha256": "201ac773d31e923926728f5ac5a5e815c2b4f1cac90ae8a1d4c48cd8fb82c7c7"
+    },
+    {
+      "path": "core/src/main/scala/storymodel4s/core/provenance.scala",
+      "sameBytesAtReviewedHead": true,
+      "sha256": "1674a49bdc29dccd902b5c91ee046399f6be72d567323d7c3b00e89956a50f1d"
+    },
+    {
+      "path": "codec/src/main/scala/storymodel4s/codec/ledger.scala",
+      "sameBytesAtReviewedHead": true,
+      "sha256": "de7f74ace83dce251df86b169fa7073e5cc5040c6d08f919baf470c6bd2a8ae6"
+    }
+  ],
+  "verdicts": {
+    "stableCheckedLedgerIntegrity": "BLOCK: publicly constructible contradictory lookup/order views with demonstrated lossy export",
+    "currentlyQualifiedStudyPath": "FOLLOW-UP: no occurrence established; traced model and reader producers use empty.addAll"
+  },
+  "existingTracker": "bd-01M183VBPNEAPT5JNQMBMYMKQ9",
+  "evidence": {
+    "manifestVerifiedFiles": 73,
+    "orderedRuntimeJars": 69,
+    "compiler": "Scala 3.7.4",
+    "limits": [
+      "-Xmx2g",
+      "-XX:ActiveProcessorCount=2"
+    ],
+    "compileExit": 0,
+    "runExit": 0,
+    "directApplyNewCopy": "compile-time refusal, one error each",
+    "MirrorAndFromProduct": "compiled and executed",
+    "positiveControl": "empty.add; duplicate refusal; exact one-entry codec roundtrip",
+    "witnesses": [
+      "ghost order produces size 1 / all 0 / lookup absent",
+      "hidden map entry produces size 0 / all 0 / lookup present; zero-byte JSONL export loses it",
+      "duplicate order produces size 2 / repeated all; exported JSONL reader rejects duplicate",
+      "miskeyed entry lookup key differs from ClaimMeta.id; codec roundtrip changes lookup key"
+    ]
+  },
+  "callers": [
+    {
+      "path": "story/src/main/scala/storymodel4s/story/model.scala:64",
+      "meaning": "normal model derives normalized ledger through empty.addAll"
+    },
+    {
+      "path": "codec/src/main/scala/storymodel4s/codec/ledger.scala:42",
+      "meaning": "writer trusts all; measured silent omission on forged ledger"
+    },
+    {
+      "path": "codec/src/main/scala/storymodel4s/codec/ledger.scala:44",
+      "meaning": "reader reconstructs through empty.addAll, does not admit raw map/order pair"
+    },
+    {
+      "path": "view/src/main/scala/storymodel4s/view/visibility.scala:38",
+      "meaning": "source trace uses both lookup and all; no separate runtime view consequence measured"
+    },
+    {
+      "path": "view/src/main/scala/storymodel4s/view/atlas.scala:700",
+      "meaning": "normal Atlas compiler obtains model.ledger before private build"
+    }
+  ],
+  "judgments": {
+    "ClaimMeta": "checked narrow span-evidence/status relation; not truth or origin authentication",
+    "Credence": "checked finite raw score and measured-score prerequisite for Calibrated; supplied calibration model/probability not re-executed",
+    "ProviderCall": "honest declared provenance product with typed prompt-version lexical boundary and no untyped product bypass; not invocation-authenticated",
+    "Provenance": "honest declared calls/version/config-hash product; no actual-execution witness",
+    "ClaimLedger": "normal constructor path consistent, historical generated Mirror/fromProduct bypass retained; cannot claim universal checked integrity"
+  },
+  "minimumRepair": "final non-case class with private constructor; keep empty/add/addAll as construction, explicit read/equality methods as needed; replace historical open-door expectation with external positive-controlled refusal tests; retain duplicate/order and codec roundtrip controls",
+  "limits": [
+    "No restricted content used.",
+    "No sbt or full gate run.",
+    "Initial probe had a string-quoting syntax error, retained separately; corrected compile and runtime both exit 0.",
+    "No current study-data occurrence inferred from an external construction witness."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "qualification": "LocallyObserved",
+  "archiveName": "storymodel4s-0.1-eb48a56-SNAPSHOT.zip",
+  "archiveBytes": 143092859,
+  "archiveSha256": "b5f7b6a78026eb0886660351e4b822c4f4b86ee9e6beb2f0e253be2a79eca6e9",
+  "manifestSha256": "3970fa06e8d51588cda2a867f183639de3fb405648e719228dd42274dc93d798",
+  "filesVerified": 73,
+  "classpathEntries": 69,
+  "launcherTests": 5,
+  "actualJavaCommand": "mappingRun template",
+  "buildExit": 0,
+  "extractedReadbackExit": 0,
+  "scope": "Offline snapshot CLI rebuilt from exact clean source, extracted into a fresh directory and executed outside the checkout. Publication and cross-machine equivalence are not established."
+}

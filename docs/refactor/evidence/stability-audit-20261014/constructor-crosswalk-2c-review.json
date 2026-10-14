@@ -1,0 +1,25 @@
+{
+  "status": "PASS coverage consistency only",
+  "inventorySourceSha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "policyBasisSha": "bfbcb12190f9291babdc14b38b8a57109467b68d",
+  "assertions": [
+    "2058 exact entry identities retained once",
+    "945 ClassInfo entries separated into 840 class, 47 trait, 58 module class",
+    "887 nominal entries all assigned and source/root anchored",
+    "576 existing-family associations do not assert constructor acceptance",
+    "311 explicit pending assignments match six recommended addition groups",
+    "12 opaque and 76 transparent aliases separately retained",
+    "570 enum singleton terms retained separately",
+    "no build or constructor behavior experiment run"
+  ],
+  "artifacts": {
+    "summary.json": "f1ce4e1a6dda5e92f7af3c0c1d1e4476bc37f25f54aaa6f9118b0a1f4bcd3342",
+    "api-stability-basis.md": "5a73bf1ace2c6a09cddfede4b4227134cdd04904e0c5d8b11d845192564a0cef",
+    "recommended-additions.json": "694e98da4d7381832cb9773428a3eb99a1d2ebdc290a744671a55e3557ec3146",
+    "nominal-types.tsv": "be03d5798a04017c03c8fa0bb36c23c35af8e72f8c049e07e31e54c81823f7db",
+    "make_crosswalk.py": "78a90f8cee4fb810dbd1534e65571a2ac5286e4cfc40ecb1c2ff4ce433b86249",
+    "README.md": "8ffd567fd625a3a1da97651990e42fad55dc9d4585a5034268086bc19281feeb",
+    "rules.json": "fc681288eb6d01874ab4fee121c7446c89d09fb3d0de5d475dc0ec0999d6f442",
+    "constructor-family-crosswalk.json": "0a47ac676d3d9e1756173bb3c74029289cd25287719b6da6fa0c0fb4a08135a3"
+  }
+}

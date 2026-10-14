@@ -9,6 +9,47 @@ alternatives. The corrected reviewed population at the same distribution source 
 The supplemental TASTy hashes and admitted runtime JAR set are now part of the audit contract.
 Neither this repair nor the zero-unresolved count establishes a final stable API freeze.
 
+## Final distribution and complete coverage (14 October)
+
+The final `eb48a5622bf02d08c175d2956811fd35d4aaeb92` CLI archive has a
+[retained manifest](audited-distribution-manifest.json). Its refreshed
+[semantic inventory](semantic-inventory-final.json.gz) contains **2,060 symbols and 21,505
+edges**; the separate [inspection inventory](inspection-inventory-final.json.gz) contains
+**1,851 symbols and 19,093 edges**. Both have zero unresolved symbols. Their
+[semantic provenance](semantic-inventory-final.json.provenance.json) and
+[inspection provenance](inspection-inventory-final.json.provenance.json) bind the final archive
+manifest. The [refresh receipt](archive-audit-refresh.json) retains the earlier manifest-bound
+audit and confirms identical inventories after the archive rebuild.
+
+The [complete constructor-family crosswalk](constructor-family-crosswalk.json.gz) preserves
+every exact semantic inventory identity, including the distinction between class, companion,
+opaque alias and enum singleton. There are 945 ClassInfo entries: 840 class types, 47 traits and
+58 module classes. All 887 nominal class/trait entries have a root-path witness and source
+candidate; this conservative population includes types that are not publicly constructible.
+The [counts](constructor-crosswalk-summary.json) associate 718 nominal entries with scoped
+family judgments and leave 169 implementation dependencies explicitly pending. These are
+coverage counts, not accepted-constructor counts. The narrative dependency family also retains
+its experimental boundary even where a broad graph-family judgment is present.
+
+`constructor-judgment.md` adds explicit claim/provenance, text/atlas, source/sidecar, contextual
+codec and executed-temporal dispositions. The ledger probe reproduced a known generated-constructor
+opening and measured its lossy JSONL consequence; normal builder/readback controls pass. The
+candidate-abstention and token-truncation findings remain separately recorded. Final stable
+promotion/narrowing and repair acceptance remain required; this audit does not freeze the API.
+
+Reproduce the coverage assignment from the committed inventory and current judgment text:
+
+```sh
+python3 docs/refactor/evidence/stability-audit-20261014/constructor_crosswalk.py \
+  /absolute/path/to/output \
+  docs/refactor/evidence/stability-audit-20261014/semantic-inventory-final.json.gz
+```
+
+The classifier is a conservative evidence index, not a Scala visibility parser. Its source
+anchors are candidates; its exact root paths establish reachability. The independently prepared
+[earlier draft](constructor-crosswalk-2c-draft.json.gz) and
+[validation](constructor-crosswalk-2c-review.json) retain how the missing judgments were found.
+
 ## Historical pre-alternative inventory
 
 This directory is generated from source SHA `2c4b74f9ef069e1bc1f6678f8dababe2421ca929` by

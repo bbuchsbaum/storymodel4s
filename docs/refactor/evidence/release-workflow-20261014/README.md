@@ -114,9 +114,9 @@ retained explicitly; the new arrays have independently verified raw-volume prove
 ## Current action
 
 Actual planned video acquisition, controlled A/A+V execution, published-index imaging and
-StoryAtlas browser readback now have the receipts below. Complete the producer's final full
-platform gate, staged artifact/POM checks and exact-candidate example replay; then reconcile
-tracker acceptance and obtain approval for the reviewed main advancements. The 1.0 API freeze
+StoryAtlas browser readback now have the receipts below. The producer full gate, artifact/POM
+checks and exact-candidate example replay have completed. Reconcile final review and tracker
+acceptance, obtain approval for the reviewed main advancements, and bind their hosted checks. The 1.0 API freeze
 and public artifact/site publication retain their separate requirements. Local-only dashboard,
 private artifacts and resumable build state are under `.dashboard` and `.agent-work`.
 
@@ -257,3 +257,31 @@ contract and detects exactly the deliberately removed stable method, without exc
 Its empty-baseline controls are local policy checks; a post-1.0 published comparison has not
 been activated. [Release preparation](../../../release-preparation.md) records the artifact,
 dependency, namespace, signing, deployment and final authorization requirements.
+
+## Final local qualification
+
+Producer `eb48a5622bf02d08c175d2956811fd35d4aaeb92` passed the uninterrupted
+[full gate](producer-eb48a562-full-gate.json), with fatal warnings and formatting last:
+JVM 4,361 passed/five skipped, JavaScript 3,258 passed, Native 3,258 passed. All 56 test
+tasks completed with zero failures/errors. StoryAtlas `d6f800f3` retains the exact-pin
+510-test gate, 30 synthetic browser checks and both actual A/A+V readbacks described above.
+
+The [final offline ZIP](final-distribution-artifact.json) was rebuilt from that clean source,
+extracted into a fresh directory and executed from outside the checkout. All 73 manifest files,
+69 runtime classpath entries and five launcher tests passed. Its exact archive SHA-256 is
+`b5f7b6a78026eb0886660351e4b822c4f4b86ee9e6beb2f0e253be2a79eca6e9`.
+The [guide replay](final-documentation-replay.json) passed all 14 transcripts and five parser
+controls; site inputs are byte-identical to the earlier full site/layout qualification.
+[Command logs](final-command-log-index.json) retain these results.
+
+[Artifact preflight](artifact-preflight.json) generated all 56 POMs and checked 50 distinct
+direct external POM coordinates against Maven Central. Forty-six resolved; four grakern
+`0.1-0329c43-SNAPSHOT` coordinates returned 404. Public Maven dependency resolution therefore
+remains blocked. This does not prevent the offline bundle from carrying the verified dependency
+bytes; the preflight does not claim complete transitive resolution or authorize publication.
+
+The [final API audit](../stability-audit-20261014/README.md) is bound to this archive and has
+complete signature/constructor-family coverage. Its pending stable-boundary decisions and
+constructor debts remain explicit. [Review of the preceding evidence](review-bfbcb121.json)
+passed; its script-provenance label follow-up is corrected. New final receipts require their
+own exact-commit review before main advancement.

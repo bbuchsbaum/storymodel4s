@@ -1,0 +1,10 @@
+{
+  "sourceSha": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "distributionManifestSha256": "3970fa06e8d51588cda2a867f183639de3fb405648e719228dd42274dc93d798",
+  "rootsSha256": "a49c1e0b6d53cd7ed01308ae89ec53e24e5ebe5e48cd8a85ff48013207ee5e77",
+  "inventorySha256": "ed6f3250cf5da35111d18c8159d6d782b2cfb487ec8bf8b1a04f9b410b2a250a",
+  "toolSha256": "de74d9af46e018c837e7a46bf79e7e33a6ce057456271b0c7925d63e47c767be",
+  "runnerSha256": "cfeb3380617e3dcadc1a99ffc598a2e260f52c603fcafd097371463d7f298aeb",
+  "tool": "Scala 3.7.4 TASTy signature walker",
+  "supplementalTasty": []
+}

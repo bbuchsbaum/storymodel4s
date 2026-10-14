@@ -1,0 +1,62 @@
+{
+  "sha": "bfbcb12190f9291babdc14b38b8a57109467b68d",
+  "changedFiles": 140,
+  "parsedJsonFiles": 91,
+  "jsonErrors": [],
+  "localMarkdownLinks": 121,
+  "brokenLinks": [],
+  "hashBindings": 10,
+  "badHashes": [],
+  "privateLongTextFields": {
+    "canonicalText": 2,
+    "rawText": 2,
+    "text": 1185
+  },
+  "privatePhraseCount": 35143,
+  "publicPhraseMatches": [],
+  "verdict": "PASS with one provenance-label FOLLOW-UP",
+  "actualReadback": {
+    "conditions": [
+      "a",
+      "av"
+    ],
+    "eachRows": 173,
+    "eachUniqueCells": 5536,
+    "fullExpectedKeyCoverage": true,
+    "exactDoubles": true,
+    "unavailableBlank": true,
+    "exactViewAndReceiptReplay": true
+  },
+  "consumerGate": {
+    "sha": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+    "passed": 510,
+    "failed": 0,
+    "errors": 0,
+    "testTasks": 10
+  },
+  "syntheticBrowser": {
+    "checks": 30,
+    "allPassed": true,
+    "errors": 0,
+    "requests": 0
+  },
+  "adverseConsumerLogs": {
+    "8fe0ba20": "hash and byte length verified; compilation failure retained",
+    "a9470f84": "hash and byte length verified; save/replay failure retained"
+  },
+  "main": {
+    "producer": "22cc7243dd825198544569bc51f86bc21c8c0dbb",
+    "atlas": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d"
+  },
+  "followup": {
+    "file": "actual-temporal-browser.json",
+    "finding": "scriptSha256 hashes executed private runner; separately identify/hash committed portable reproduction script",
+    "executedScriptSha256": "cb685e236b418473e46cfa72c9da3bba7d2c4b98e57ae077c3ac3ce970d63efc",
+    "reproductionScriptSha256": "cd00bb3336477ce3faf36d84f9d233decce4d14542b6af3d56de1f547bed71ab"
+  },
+  "limitations": [
+    "No heavy gate or browser rerun",
+    "Producer full gate and artifact/docs replay remain pending",
+    "Privacy phrase scan is bounded to text fields and 12-word sequences; public screenshots were inspected separately"
+  ]
+}

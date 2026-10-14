@@ -32,9 +32,9 @@ missingness, permission and evidence checks.
 | `features`: `Estimate`, `ScoreEstimate`, `Coverage`, missingness/reason values and other values exposed by the stable source/mapping signatures | Stable after the missingness repair | `SourceView` already exposes these types; their constructor and pattern-match shapes must be settled before freezing it. |
 | `features`: `FeatureTrack`, planning/reducer APIs and feature derivation machinery not exposed by stable signatures | Experimental | Keep research feature construction extensible; artifact identity and declared reducer semantics remain exact. |
 | `align`: checked G1 mapping records, candidate/outcome/measure/decision vocabulary, support assessments, bindings and stage receipts | Stable | These are the inspectable, complete-accounting consumer result and preserve unknown provenance and unavailable calibration. |
-| Public mapping facade, named configuration/profile inputs and checked run envelope (implementation pending) | Stable target | Researchers need one supported invocation boundary; the existing facade/profile tickets must first implement and qualify it. No proposed spelling is frozen here. |
-| Registered shared-evidence and channel receipt values exposed by the public facade (completion pending) | Stable target | Reference and reconstruction must consume the same admitted evidence. The current engine identity alone does not establish a complete execution receipt. |
-| Declared candidate tie policy, budget and typed overflow/refusal receipt values exposed by that facade (implementation pending) | Stable target | Identifier-independent tie handling and explicit refusal belong to the public evidence contract; the final names and checked constructors still require implementation and audit. |
+| Public mapping facade, named configuration/profile inputs and checked run envelope | Stable target | `MappingPipeline` and `MappingRun.Execution` are implemented and qualified for the demonstrated study path. Final signature and construction acceptance remain required before freezing this boundary. |
+| Registered shared-evidence and channel receipt values exposed by the public facade | Stable target | The qualified reference/reconstruction pair binds the same admitted evidence, inventory, source and actual execution receipts. Required dependency types still need their final stable disposition. |
+| Declared candidate tie policy, budget and typed overflow/refusal receipt values exposed by that facade | Stable target | The implemented public path records candidate policy, budgets and typed refusals. Its stable boundary audit must distinguish checked strict candidates from the open historical `CandidateSet` contract. |
 | `align`: `HsmmResult` and the checked result values required by `DerivationContext`/G1 result binding | Stable structural result | The current contextual mapping decoder exposes this dependency. Checked structural consistency does not certify a custom cost invocation or calibration. |
 | `align`: `GraphHsmm`, current engine `LocalEvidence`/`LocalEvidenceId` construction, `CandidateGenerator`/`CandidateSet`, custom `LocalCostModel` and low-level inference/ablation configuration | Experimental | Research extension points remain available; promote exact public dependencies if the final stable facade exposes them. No universal invocation-authenticated or calibrated-HSMM claim follows. |
 | `align`: `RecallSignature`, `WeightedCoverage`, `MassRatio`, `StepMass` and the organization/readout helpers | Experimental | Organization measurement is 1.1 scope; residual denominator, grain and constructor work must not be implied complete by the 1.0 mapping release. |
@@ -43,11 +43,25 @@ missingness, permission and evidence checks.
 | `story`: `StoryModel`, narrative ontology and source adapters; `document`: `NarrativeCompiler` and proposal payloads including `CausalProposal` | Experimental | The owner chose an experimental narrative compiler for 1.0 and a film compiler for 1.1. Real-text validation and honest abstention remain required. |
 | `acquire`, `amr-interop`, `embed-core`, `embed-grakern`, parser/agent-provider implementation APIs | Experimental, except signature dependencies explicitly promoted by the audit | Provider runtimes and acquisition strategies can evolve; public mapping receipts must still name exact inputs, model/configuration and outcomes. |
 | `media` and `corpus-intake` Scala adapters and worker protocols | Experimental | Their 1.0 ingestion commands owe the checked source-package contract, exact media receipts and offline missing-capability behavior; this does not freeze adapter internals. |
-| `pipeline`: documented released commands and their versioned machine-readable receipts | Stable command target | The release-infrastructure ticket still owes installation without a source checkout and tested argument/exit/receipt behavior. |
+| `pipeline`: documented released commands and their versioned machine-readable receipts | Stable command target | The local offline CLI distribution has tested argument, exit and receipt behavior and runs without a source checkout. Public release and final stable command acceptance remain separate. |
 | `pipeline`: orchestration helpers and implementation classes | Internal | Only documented public entry points carry the command contract. |
 | `fixtures`, `laws` and `MappingMiniature` | Experimental test support | Published test support carries no scientific authority and is not the production source contract. |
 | `embed-bench`, workers, test harnesses and repository tools | Internal | Reproduction tools are version-pinned evidence producers, not the researcher-facing library API. |
 | Other public symbols not covered above | Experimental pending audit | Public visibility alone is not a stability declaration; the construction audit must resolve any symbol required by a stable contract. |
+
+### Implementation and audit checkpoint (14 October 2026)
+
+The [five-workstream evidence](refactor/evidence/release-workflow-20261014/README.md)
+now records the public facade, shared-evidence execution, actual A/A+V readback and
+installable CLI. The table above retains the owner-approved intended classifications;
+these implementation updates do not freeze their signatures.
+
+The corrected [signature inventory and construction judgment](refactor/evidence/stability-audit-20261014/README.md)
+include public enum/sealed alternatives and separately track the imported inspection
+surface. The audit identifies an open historical candidate-abstention contract and
+unchecked token-truncation limits, with bounded consequences and dedicated Motes.
+Exposed experimental dependencies must still be promoted and audited or removed from
+the final supported signature before the owner confirms the freeze.
 
 ### Signature closure before the freeze
 

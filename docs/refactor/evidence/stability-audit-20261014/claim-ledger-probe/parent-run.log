@@ -1,0 +1,9 @@
+positive_empty_add_duplicate_refusal_and_codec_roundtrip=true
+direct_apply_compile_errors=1
+direct_new_compile_errors=1
+copy_compile_errors=1
+mirror_ghost: size=1, all=0, lookup=false
+fromProduct_hidden: size=0, all=0, lookup=true, serializedBytes=0, reloadLookup=false, addSameRefuses=true
+mirror_duplicate_order: size=2, all=2, codecReadRefuses=true
+fromProduct_miskeyed: lookupKeyDiffersFromMetaId=true, codecRoundtripChangesKey=true
+claimmeta_span_law_and_credence_finite_score_basis_controls=true

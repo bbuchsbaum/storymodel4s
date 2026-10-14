@@ -1,5 +1,5 @@
 {
-  "sourceSha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "sourceSha": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
   "scalaFacade": [
     "MappingPipeline.analyze(Path, Config)",
     "MappingPipeline.analyze(Path, Path)",
@@ -9,7 +9,47 @@
   ],
   "wire": [
     "mapping-record/v0.1",
-    "hsmm/v4"
+    "mapping-exchange/v0.1",
+    "mapping-exchange-pair/v1",
+    "mapping-exchange-pair-temporal/v1",
+    "hsmm/v4",
+    "workspace-manifest/v0.1",
+    "workspace-manifest/v0.2",
+    "workspace-source-input/v1",
+    "recall-timing/v0.1",
+    "temporal-workspace/v1",
+    "temporal-inspection-view/v1",
+    "temporal-request/v1",
+    "temporal-projection/v1",
+    "weighted-mapping-exchange/v1"
   ],
-  "note": "Command and wire compatibility are inventoried separately from Scala signature reachability."
+  "note": "Command and wire compatibility are inventoried separately from Scala signature reachability.",
+  "consumerSha": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "launcherCommands": [
+    "textSourcePrepare",
+    "studyPrepare",
+    "mappingRun",
+    "mappingWeight",
+    "mappingExchangeExport",
+    "studyWorkspace",
+    "videoSource",
+    "recallTimingIntake",
+    "scannerSamples",
+    "recallVolumes",
+    "organizationMap",
+    "storyBuild",
+    "storyModelExport"
+  ],
+  "consumerWire": [
+    "surface-workspace-selection/v1",
+    "surface-workspace-selection/v2",
+    "storyatlas-temporal-workspace/v1"
+  ],
+  "boundaries": [
+    "Inventory only; exported commands and reached APIs are not all stable or scientifically validated.",
+    "HSMM v4 refuses noncanonical text/media support.",
+    "Optional timing absence is preserved; foreign timing refuses.",
+    "The v2 saved-view reader preserves the original temporal session; ordinary v1 remains readable."
+  ],
+  "scope": "Exported launcher names and selected mapping/workspace/temporal compatibility contracts; this is not a census of every intake job, manifest, or intermediate wire schema."
 }

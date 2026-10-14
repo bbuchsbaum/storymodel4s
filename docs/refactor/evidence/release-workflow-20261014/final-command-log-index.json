@@ -1,0 +1,100 @@
+[
+  {
+    "name": "final-docs-examples",
+    "log": "logs/final-docs-examples.log.gz",
+    "bytes": 1264,
+    "sha256": "c0aedc4951d72f9d730bb026835ba8360af53e20e3b7048fb6a1aceb7302e689",
+    "compressedSha256": "cfcfc7583821862146b7a014bc73b4775c75ec026597ca12ab111e23cb9d2300",
+    "command": [
+      "npm",
+      "run",
+      "verify:examples"
+    ],
+    "exit": 0,
+    "durationSeconds": 536.549664
+  },
+  {
+    "name": "final-cli-readback",
+    "log": "logs/final-cli-readback.log.gz",
+    "bytes": 879,
+    "sha256": "863c01dd1656e1186ba9639113cbb19faf94f327ba45ebfe90a0ad4122ce2029",
+    "compressedSha256": "cce47504e876cfa69614310611d59499cfb28940b366b6a5bbb58b916e03edfe"
+  },
+  {
+    "name": "final-archive-build",
+    "log": "logs/final-archive-build.log.gz",
+    "bytes": 1437,
+    "sha256": "b0854934fcf3439383480e7c6e9b66381bda955b33e305408ad67485451aacb5",
+    "compressedSha256": "648fd058444d9a8ec725a6382763933dbb7edb0135570983cb4e3e1dfc8a48b6",
+    "command": [
+      "sbt",
+      "-batch",
+      "pipeline/cliDistribution"
+    ],
+    "exit": 0,
+    "durationSeconds": 26.564085
+  },
+  {
+    "name": "final-archive-readback",
+    "log": "logs/final-archive-readback.log.gz",
+    "bytes": 879,
+    "sha256": "417e8ddbbd0b3c254f66908ff7734f878ae68bff2949920f8ecd7cd5f915adde",
+    "compressedSha256": "e726adeb10f1a088ef9f889087715c92eccc07a33dde9d3c4e0915937be8b18f"
+  },
+  {
+    "name": "stability-stable-final",
+    "log": "logs/stability-stable-final.log.gz",
+    "bytes": 11592,
+    "sha256": "5bfa6e7a75220b528cda0e374fb556f81f077b0e194221809de32ff56d715c9d",
+    "compressedSha256": "8a018236cef5ca16801789e6fa705b2a35845688016cd11e3052b08ed55e5868",
+    "command": [
+      "bash",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/tools/stability-audit/verify.sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/stability-audit-20261014/semantic-inventory-final.json"
+    ],
+    "exit": 0,
+    "durationSeconds": 65.818976
+  },
+  {
+    "name": "stability-inspection-final",
+    "log": "logs/stability-inspection-final.log.gz",
+    "bytes": 5733,
+    "sha256": "88025099ec0a91e56998ed19a85592bb64033c349163522da0c788571666d9a4",
+    "compressedSha256": "03b741364ab13d7f1ce20560b361efb157864d79129e27172b484fd4005ceb30",
+    "command": [
+      "bash",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/tools/stability-audit/run.sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/stability-audit-20261014/inspection-inventory-final.json"
+    ],
+    "exit": 0,
+    "durationSeconds": 25.089802
+  },
+  {
+    "name": "final-archive-audit-semantic",
+    "log": "logs/final-archive-audit-semantic.log.gz",
+    "bytes": 5733,
+    "sha256": "0009c1fe29ca9a65d831f7ef7ea31d970c3cc60e241e91457482c6e425715183",
+    "compressedSha256": "da2f039998ea8755f97ffb17db2783d5b0f95064dd6ac5aed966a1a5827a6126",
+    "command": [
+      "bash",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/tools/stability-audit/run.sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/stability-audit-20261014/semantic-inventory-final.json"
+    ],
+    "exit": 0,
+    "durationSeconds": 19.198226
+  },
+  {
+    "name": "final-archive-audit-inspection",
+    "log": "logs/final-archive-audit-inspection.log.gz",
+    "bytes": 5733,
+    "sha256": "0009c1fe29ca9a65d831f7ef7ea31d970c3cc60e241e91457482c6e425715183",
+    "compressedSha256": "da2f039998ea8755f97ffb17db2783d5b0f95064dd6ac5aed966a1a5827a6126",
+    "command": [
+      "bash",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/tools/stability-audit/run.sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/stability-audit-20261014/inspection-inventory-final.json"
+    ],
+    "exit": 0,
+    "durationSeconds": 18.190971
+  }
+]

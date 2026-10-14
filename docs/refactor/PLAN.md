@@ -32,7 +32,8 @@ The published-index imaging walkthrough and executable reader guide have passed 
 readback. The CLI distribution is installable and reproducible. Source `eb48a562` adds imported
 temporal inspection, lawful workspace row-sum tolerance, absent-clock round trips and immutable
 digest caches. Exact review passes through `874f1b08`, including the corrected signature-audit
-input boundary. The complete producer platform gate and final artifact/doc replay are running.
+input boundary. The complete producer platform gate passed all 56 tasks: 10,877 passed, zero failures/errors
+and five skips. Final CLI extraction/readback and all 14 guide transcripts also passed.
 
 StoryAtlas `d6f800f3` pins producer `eb48a562` and has passed independent review, all 510
 consumer tests, 30 synthetic browser checks and actual A/A+V browser readback. Each actual
@@ -43,13 +44,15 @@ browser has been closed and the ownership audit is clean. Main remains at the ap
 
 The stable-signature audit now includes public enum/sealed alternatives and verifies every
 runtime input. Its [construction judgment](evidence/stability-audit-20261014/constructor-judgment.md)
-records two concrete pre-freeze findings and the remaining promotion-versus-facade boundary
-decision. These are separate from qualification of the demonstrated pre-release study path.
+records candidate/truncation findings, the reproduced known ledger opening, and the remaining
+promotion-versus-facade boundary decision. These are separate from qualification of the demonstrated pre-release study path.
 The compatibility rehearsal passes unchanged and named-breaking controls; no stable baseline,
 Maven release or documentation deployment has been activated.
 
-Finish the producer gate and artifact/doc readback, reconcile final receipts and tracker,
-then obtain approval for the concrete reviewed main advancements and bind hosted checks.
+Reconcile the final reviewed receipts and tracker, then obtain approval for the concrete main
+advancements and bind hosted checks. The artifact preflight generated all 56 POMs; four direct
+grakern snapshot dependencies are absent from Maven Central, blocking Maven publication while
+the bundled CLI remains usable.
 The final 1.0 release gate remains open until its stability and publication requirements are met.
 
 ### Completed substrate to carry forward
