@@ -1,5 +1,46 @@
 # Current release queue
 
+## 14 October: owner-authorized completion queue
+
+The owner approved completing workstreams 1-5 in the current
+[execution plan](PLAN.md#current-execution-complete-the-five-workstreams-14-october-2026).
+This queue supersedes the October 7-9 next-action tables preserved below.
+
+At the read-only stocktake, Mote contained 345 closed and 91 open tickets:
+eight `release-1.0`, 21 `release-1.1`, and 62 `release-later`. There were no active
+claims or reservations. The 58 dependency-ready tickets are not a priority ordering.
+These counts are a dated observation; use live Mote when taking ownership.
+
+| Order | Ticket | Remaining acceptance |
+| --- | --- | --- |
+| 1 | `bd-01M2TA01EHVRF6MQ1N00XTVK1K` | Reconcile and qualify the current producer/consumer baseline, committed tracker state and canonical queue; synchronize reviewed revisions and bind hosted evidence. |
+| 2 | `bd-01M35P83TCNHBSDY6NSK13Q3K0` | Public ONNX command bridge, historical A-preset parity, actual Sherlock A/A+V with both mappings and weights, independent exchange and temporal/imaging walkthrough. |
+| 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | Complete encoding export and actual timing/array-history acceptance for the admitted development participant; reuse the qualified recall export and published scene-analysis convention. |
+| 4a | `bd-01M19FPY1EC5QNTW6SBG3QYT3R` | Execute the current reader journey and its visual qualification. |
+| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Audit the actual stable signature/constructor closure before freeze. |
+| 4c | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | Installable distribution, compatibility baseline and documented release process. |
+| Gate | `bd-01M2TAMJ95K9D7H248A8387YW4` | Aggregate the demonstrated journey, exact-head source/consumer/hosted checks and final stability acceptance. |
+| 5, StoryAtlas store | `bd-01M354JNKNKJ15N4T5MGQTRSET` | Consume the existing exact temporal producer handoff and qualify linked inspection and saved-state replay. |
+
+The eighth StoryModel 1.0 ticket, `bd-01M4EA3TVCGSVSA114DQX9588N`, adds populated
+StageTrace cost-retention witnesses. Its reviewed disposition is a nonblocking test-strength
+follow-up. Preserve that distinction from the release gate and the five substantive release
+obligations above. The epic and release gate are containers, not extra implementation slices.
+
+Carry forward the qualified G1/reference/reconstruction, preparation, exchange, weights,
+disclosure/header checks, facade, workspace, temporal producer and video software. Their
+closed Motes do not need to be reimplemented. The full Sherlock journey remains open because
+actual A+V, historical parity and imaging acceptance are broader than the synthetic controls.
+Physical synchronization is not established by the published analysis crop convention.
+
+Organization infrastructure and development experiments have advanced on the 1.1 lane.
+The public organization preview and scientific recovery remain separate acceptance; no
+automatic identity repair or temperature change is promoted. Film compilation and the
+62 later items retain their recorded scope. The active writer records exact results in
+[the workflow evidence](evidence/release-workflow-20261014/README.md) and live Mote.
+
+## Historical October 7-9 reconciliation
+
 7 October 2026 reconciliation. Read this first, then the selected Mote's current body and
 acceptance. [PLAN](PLAN.md#operative-10-scope-owner-decisions-22-september-2026) retains the
 owner's release scope; Mote owns status, claims and dependencies. The dated September backlog

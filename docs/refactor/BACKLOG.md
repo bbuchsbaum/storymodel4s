@@ -1,5 +1,14 @@
 # Delivery backlog
 
+**14 October 2026 execution:** the owner authorized completion of the five workstreams in
+[PLAN.md](PLAN.md#current-execution-complete-the-five-workstreams-14-october-2026).
+[RELEASE-QUEUE.md](RELEASE-QUEUE.md#14-october-owner-authorized-completion-queue) is the
+current small queue. The stocktake found 91 open Motes, only eight tagged for 1.0; the two
+release containers and nonblocking StageTrace follow-up are distinguished there. Public
+Sherlock/encoding completion and release preparation now lead. The Native, G1, exchange,
+weight and temporal-producer next-task lists below are historical, not instructions to
+repeat completed work. Live Mote owns current claims, status and remaining acceptance.
+
 **7 October 2026 current queue:** use [RELEASE-QUEUE.md](RELEASE-QUEUE.md) and live Mote.
 The complete before/after [ticket reconciliation](evidence/release-queue-20261007/README.md)
 supersedes this document's dated status tables and named-owner handoffs. All unfinished tickets

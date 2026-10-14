@@ -1,5 +1,66 @@
 # Delivery and measurement plan
 
+## Current execution: complete the five workstreams (14 October 2026)
+
+The owner authorized completion of the five workstreams below after the 14 October
+stocktake. This section and [RELEASE-QUEUE.md](RELEASE-QUEUE.md) supersede every dated
+next-task list below. The earlier sections remain decision and qualification history.
+Mote owns current acceptance and ownership; no historical status is a new prerequisite.
+
+The starting source is local main `76f6fad800176c27f756cf62a644cd68f9a694ca`.
+Live GitHub main was `908b935ca55fb6a4bc0f1e10b16a5b42c93adff4`: 128 commits behind,
+with no divergence. StoryAtlas local main is `ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d`,
+whose default producer pin is `34c0bc9a367c7c4e3cdad6743feb33cc4371f5ca`.
+These are starting observations, not a claim that the latest pair is remotely qualified.
+
+| Order | Existing work | Completion witness |
+| --- | --- | --- |
+| 1 | Delivery epic `bd-01M2TA01EHVRF6MQ1N00XTVK1K` | Reconcile current code, tracker authority and canonical queue; preserve exact bytes; qualify and synchronize the reviewed producer/consumer revisions with hosted evidence. |
+| 2 | Journey `bd-01M35P83TCNHBSDY6NSK13Q3K0` | Ordinary-file ONNX execution reaches the existing checked registration; historical A-preset parity is reproduced or differences explained; actual A and A+V retain equal inventories, both mappings, weights 0/0.5/1 and independent readback. |
+| 3 | Imaging `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | One admitted development participant has checked recall and encoding exports with exact recording/axis/array-history authority, independently recovered joins and explicit unavailable coverage. |
+| 4 | Docs `bd-01M19FPY1EC5QNTW6SBG3QYT3R`, construction `bd-01M19N0W937KVZCK78F6X57X1D`, infrastructure `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | The demonstrated journey has an executable reader guide, audited stable-signature closure, installable commands and compatibility/release checks; final acceptance stays on `bd-01M2TAMJ95K9D7H248A8387YW4`. |
+| 5 | StoryAtlas `bd-01M354JNKNKJ15N4T5MGQTRSET` in its own store | Adopt the exact temporal producer handoff; linked timeline/uncertainty inspection, saved-state replay and browser/reader agreement pass on the pinned pair. |
+
+The first runtime slice is the public ONNX command bridge under the existing journey.
+`MappingPipeline.registeredOnnx` already exists; the ordinary batch route currently accepts
+lexical and checked caption inputs. Reuse the registered implementation rather than a new
+scorer or a benchmark-only command. Historical preset reproduction is a separate witness
+from merely running the new paired profile.
+
+### Completed substrate to carry forward
+
+Shared evidence, strict reference/reconstruction, ordinary preparation, paired exchange,
+structural weights, disclosure/header checks, workspace production, facade hardening and
+video-source software have locally qualified implementations. Temporal projection producer
+acceptance is complete; its [handoff](TEMPORAL-HANDOFF-20261011.md) supplies the consumer seam.
+The [strict A+V qualification](evidence/strict-av-20261011/README.md) includes actual-worker
+synthetic controls, not actual Sherlock synchronization. These components are not another
+implementation queue.
+
+The [recall export](evidence/recall-volumes-20261013/README.md) preserves 2,495 records,
+including six outside raw coverage, and links original semantic units without inventing
+additive mass from word onsets. The [published scene-analysis clock](../data/sherlock/encoding-timing-20261014/README.md)
+resolves all 50 released scene intervals. Physical scanner/media synchronization and an
+existing derivative's applied processing history remain separately unverified. Do not fit
+an offset, silently add an HRF shift, or close the imaging parent from these narrower facts.
+If primary physical timing evidence cannot be recovered, record the exact remaining claim
+and obtain an explicit scope/authority decision while progressing independent work.
+
+Organization readouts now exist as additive experimental 1.1 capabilities. The
+[integration](evidence/integration-20261014/README.md) and
+[entity experiment](evidence/entity-hypotheses-20261014/README.md) retain local checks and
+adverse results. They establish neither general calibration nor production promotion of
+name repair. Film compilation, broader research, interview extensions and calibration retain
+their existing release lanes. This authorization completes the five workstreams; it does
+not turn every ready research ticket into release work or authorize a package release tag.
+
+Use one primary writer, one bounded reviewer and one heavy gate at a time. Review exact
+commits, gate standalone clones, preserve passed/failed/skipped counts and keep tracker
+operations committed. Current evidence and resumable state are indexed in
+[the workflow receipt](evidence/release-workflow-20261014/README.md).
+
+## Historical October restart and delivery sequence
+
 **7 October 2026 queue reconciliation:** start with [RELEASE-QUEUE.md](RELEASE-QUEUE.md)
 and the live Mote body, rather than the dated recovery list. Every previously unfinished
 ticket now has a release group and current remaining-work context. Recovery, workstation/data
