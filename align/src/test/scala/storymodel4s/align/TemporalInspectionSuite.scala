@@ -140,9 +140,16 @@ class TemporalInspectionSuite extends FunSuite:
 
   private def imported(m: MappingResult = mapping()): Inspection =
     val live = prepared(m)
-    inspect(m.source, m.inventory, unit, live.measure,
-      live.components.map(c => c.alternative -> c.weight), live.ledger.rowBudget,
-      selection, declarations).fold(e => fail(e.toString), identity)
+    inspect(
+      m.source,
+      m.inventory,
+      unit,
+      live.measure,
+      live.components.map(c => c.alternative -> c.weight),
+      live.ledger.rowBudget,
+      selection,
+      declarations
+    ).fold(e => fail(e.toString), identity)
 
   test("imported arithmetic agrees with live rows while authority identities remain distinct") {
     val live = prepared()
@@ -158,8 +165,13 @@ class TemporalInspectionSuite extends FunSuite:
     assertEquals(actual.prepared.ledger.unavailableLocation, 0.125)
     assertNotEquals(actual.digest, expected.digest)
     assertNotEquals(p.digest, live.digest)
-    val changed = imported(mapping(values = weights.updated(Destination.Target(e(1)), 0.25)
-      .updated(external, 0.375)))
+    val changed = imported(
+      mapping(values =
+        weights
+          .updated(Destination.Target(e(1)), 0.25)
+          .updated(external, 0.375)
+      )
+    )
     assertNotEquals(changed.digest, p.digest)
     assertEquals(changed.query(r).toOption.get.allocatedRegionMass, 0.0625)
   }
@@ -181,52 +193,105 @@ class TemporalInspectionSuite extends FunSuite:
     assertEquals(ranked.omittedWeight, 0.5)
     assertEquals(ranked.omittedAllocatedRegionMass, 0.0)
     assertEquals(p.query(first).toOption.get.topK(0).toOption.get.omittedAllocatedRegionMass, 0.125)
-    assertEquals(TemporalInspection.checked(p, Vector(first, first)), Left(TemporalInspection.Refusal.Overlap))
+    assertEquals(
+      TemporalInspection.checked(p, Vector(first, first)),
+      Left(TemporalInspection.Refusal.Overlap)
+    )
   }
 
   test("invalid imported quantities and foreign geometry refuse before querying") {
     val m = mapping()
     val values = imported().components.map(c => c.alternative -> c.weight)
     def attempt(v: Vector[(Alternative, Double)], u: RecallUnitId = unit) =
-      inspect(m.source, m.inventory, u, Measure.NormalizedScoreMass, v, 1.0, selection, declarations)
+      inspect(
+        m.source,
+        m.inventory,
+        u,
+        Measure.NormalizedScoreMass,
+        v,
+        1.0,
+        selection,
+        declarations
+      )
     assertEquals(attempt(values :+ values.head), Left(Refusal.InvalidClaims))
-    assertEquals(attempt(values.updated(0, values.head._1 -> Double.NaN)), Left(Refusal.InvalidClaims))
+    assertEquals(
+      attempt(values.updated(0, values.head._1 -> Double.NaN)),
+      Left(Refusal.InvalidClaims)
+    )
     assertEquals(attempt(values.updated(0, values.head._1 -> -0.5)), Left(Refusal.InvalidClaims))
     assertEquals(attempt(values.drop(1)), Left(Refusal.InvalidClaims))
     assertEquals(attempt(values, RecallUnitId.unsafe("foreign")), Left(Refusal.UnknownUnit))
-    assertEquals(imported().query(Region.on(SherlockShapedSource.b.primaryAxis,
-      Vector(0L -> 1L), Vector.empty).toOption.get), Left(Refusal.ForeignRegion))
+    assertEquals(
+      imported().query(
+        Region.on(SherlockShapedSource.b.primaryAxis, Vector(0L -> 1L), Vector.empty).toOption.get
+      ),
+      Left(Refusal.ForeignRegion)
+    )
   }
 
   test("transport inspection retains a nonunit budget and row discrepancy") {
     val m = mapping(transport = Some(3.0))
     val live = prepare(m, unit, Measure.TransportMass, selection, declarations).toOption.get
-    val p = inspect(m.source, m.inventory, unit, Measure.TransportMass,
-      live.components.map(c => c.alternative -> c.weight), 3.0, selection, declarations).toOption.get
+    val p = inspect(
+      m.source,
+      m.inventory,
+      unit,
+      Measure.TransportMass,
+      live.components.map(c => c.alternative -> c.weight),
+      3.0,
+      selection,
+      declarations
+    ).toOption.get
     assertEquals(p.ledger.suppliedTotal, 2.0)
     assertEquals(p.ledger.rowBudget, 3.0)
     assertEquals(p.ledger.rowSumDiscrepancy, -1.0)
-    assertEquals(p.query(region(prepared(), Vector(0L -> 1L))).toOption.get.allocatedRegionMass, 0.25)
+    assertEquals(
+      p.query(region(prepared(), Vector(0L -> 1L))).toOption.get.allocatedRegionMass,
+      0.25
+    )
   }
 
   test("imported exposure preserves onset-only missing and failed durations") {
     val m = mapping(failed = true)
-    val clock = RecallTiming.Clock.declared(Checksum.ofText("timing"), RecallTiming.ClockKey.unsafe("seconds"),
-      Checksum.ofText("descriptor"), RecallTiming.RecordingIdentity.Unestablished, RecallTiming.Origin.Unestablished)
+    val clock = RecallTiming.Clock.declared(
+      Checksum.ofText("timing"),
+      RecallTiming.ClockKey.unsafe("seconds"),
+      Checksum.ofText("descriptor"),
+      RecallTiming.RecordingIdentity.Unestablished,
+      RecallTiming.Origin.Unestablished
+    )
     val basis = RecallTiming.Basis.SourceReported(Checksum.ofText("source"))
     def sec(n: Long) = ExactRational.of(n, 1).toOption.get
     val words = inventory.units.head.words
-    val timing = RecallTiming.checked(inventory, clock, inventory.words.map { w =>
-      val observation = if w.id == words.head then RecallTiming.Observation.Interval(sec(0), sec(2), basis)
-        else if w.id == words.last then RecallTiming.Observation.OnsetOnly(sec(5), basis)
-        else RecallTiming.Observation.Missing(RecallTiming.MissingReason.NotProvided)
-      RecallTiming.Entry(w.id, clock, observation)
-    }, RecallTiming.Provenance(Checksum.ofText("correspondence"), RecallTiming.RecordingLink.NotEstablished)).toOption.get
+    val timing = RecallTiming
+      .checked(
+        inventory,
+        clock,
+        inventory.words.map { w =>
+          val observation =
+            if w.id == words.head then RecallTiming.Observation.Interval(sec(0), sec(2), basis)
+            else if w.id == words.last then RecallTiming.Observation.OnsetOnly(sec(5), basis)
+            else RecallTiming.Observation.Missing(RecallTiming.MissingReason.NotProvided)
+          RecallTiming.Entry(w.id, clock, observation)
+        },
+        RecallTiming
+          .Provenance(Checksum.ofText("correspondence"), RecallTiming.RecordingLink.NotEstablished)
+      )
+      .toOption
+      .get
     val statuses = m.outcomes.map(o => o.unit -> o.processing).toMap
-    val p = TemporalExposure.inspect(inventory, timing, statuses, TemporalExposure.Overlap.Refuse).toOption.get
+    val p = TemporalExposure
+      .inspect(inventory, timing, statuses, TemporalExposure.Overlap.Refuse)
+      .toOption
+      .get
     val result = p.query(clock, sec(0), sec(6)).toOption.get
-    val live = TemporalExposure.checked(m, timing, TemporalExposure.Overlap.Refuse).toOption.get
-      .query(clock, sec(0), sec(6)).toOption.get
+    val live = TemporalExposure
+      .checked(m, timing, TemporalExposure.Overlap.Refuse)
+      .toOption
+      .get
+      .query(clock, sec(0), sec(6))
+      .toOption
+      .get
     assertEquals(result.units, live.units)
     assertEquals(result.units.head.duration, BigInt(2) -> BigInt(1))
     assertEquals(result.units.head.onsetEvents, Vector(sec(5)))
@@ -234,6 +299,8 @@ class TemporalInspectionSuite extends FunSuite:
     assertEquals(result.uncovered, BigInt(4) -> BigInt(1))
     assertEquals(result.uncomputedDuration, BigInt(2) -> BigInt(1))
     assertNotEquals(result.digest, live.digest)
-    assertEquals(TemporalExposure.inspect(inventory, timing, statuses - unit, TemporalExposure.Overlap.Refuse),
-      Left(TemporalExposure.Refusal.ForeignProcessing))
+    assertEquals(
+      TemporalExposure.inspect(inventory, timing, statuses - unit, TemporalExposure.Overlap.Refuse),
+      Left(TemporalExposure.Refusal.ForeignProcessing)
+    )
   }

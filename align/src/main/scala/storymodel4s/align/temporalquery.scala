@@ -233,9 +233,11 @@ object TemporalQuery:
     def partition(regions: Vector[Region]): Either[Refusal, InspectionPartition] =
       if regions.exists(_.axis != coordinate.axis) then Left(Refusal.ForeignRegion)
       else if regions.indices.exists(i =>
-          regions.indices.drop(i + 1).exists(j =>
-            regions(i).geometry.exists(a => regions(j).geometry.exists(b => intersects(a, b)))
-          )
+          regions.indices
+            .drop(i + 1)
+            .exists(j =>
+              regions(i).geometry.exists(a => regions(j).geometry.exists(b => intersects(a, b)))
+            )
         )
       then Left(Refusal.OverlappingRegions)
       else
@@ -243,7 +245,9 @@ object TemporalQuery:
           bins <- regions.traverse(query)
           union <- Region.onTimeAxis(
             coordinate.axis,
-            regions.flatMap(_.geometry.toVector.flatMap(_.intervals).map(i => i.start -> i.endExclusive)),
+            regions.flatMap(
+              _.geometry.toVector.flatMap(_.intervals).map(i => i.start -> i.endExclusive)
+            ),
             regions.flatMap(_.geometry.toVector.flatMap(_.points).map(_.at))
           )
         yield new InspectionPartition(this, bins, outside(components, union))
@@ -267,8 +271,14 @@ object TemporalQuery:
       if k < 0 then Left(Refusal.InvalidTopK)
       else
         val ordered = contributions.sortBy(c => (-c.component.weight, c.component.alternative.key))
-        Right(new InspectionRanked(this, ordered.take(k),
-          ordered.drop(k).map(_.component.weight).sum, ordered.drop(k).flatMap(_.allocated).sum))
+        Right(
+          new InspectionRanked(
+            this,
+            ordered.take(k),
+            ordered.drop(k).map(_.component.weight).sum,
+            ordered.drop(k).flatMap(_.allocated).sum
+          )
+        )
     override def equals(other: Any): Boolean = other match
       case that: InspectionReadout => digest == that.digest
       case _                       => false
@@ -282,13 +292,18 @@ object TemporalQuery:
       val omittedWeight: Double,
       val omittedAllocatedRegionMass: Double
   ):
-    private def fields = (readout, retained.map(_.component.alternative.key), omittedWeight,
-      omittedAllocatedRegionMass)
+    private def fields = (
+      readout,
+      retained.map(_.component.alternative.key),
+      omittedWeight,
+      omittedAllocatedRegionMass
+    )
     override def equals(other: Any): Boolean = other match
       case that: InspectionRanked => fields == that.fields
       case _                      => false
     override def hashCode(): Int = fields.hashCode
-    override def toString: String = s"TemporalQuery.InspectionRanked(${readout.digest.short()},${retained.size})"
+    override def toString: String =
+      s"TemporalQuery.InspectionRanked(${readout.digest.short()},${retained.size})"
 
   /** Partition conservation is a diagnostic, never permission to rescale imported quantities. */
   final class InspectionPartition private[TemporalQuery] (
@@ -303,7 +318,8 @@ object TemporalQuery:
       case that: InspectionPartition => fields == that.fields
       case _                         => false
     override def hashCode(): Int = fields.hashCode
-    override def toString: String = s"TemporalQuery.InspectionPartition(${prepared.digest.short()},${bins.size})"
+    override def toString: String =
+      s"TemporalQuery.InspectionPartition(${prepared.digest.short()},${bins.size})"
 
   /** Validate supplied claims for arithmetic without constructing a checked mapping execution. */
   def inspect(
@@ -316,33 +332,53 @@ object TemporalQuery:
       selection: TemporalSupport.Selection,
       declarations: Vector[Declaration]
   ): Either[Refusal, Inspection] =
-    val family = entries.forall { (alternative, _) => (measure, alternative) match
-      case (Measure.NormalizedScoreMass, Alternative.Score(_)) => true
-      case (Measure.ModelPosterior, Alternative.Posterior(_))  => true
-      case (Measure.TransportMass, Alternative.Transport(_))  => true
-      case _                                                  => false
+    val family = entries.forall { (alternative, _) =>
+      (measure, alternative) match
+        case (Measure.NormalizedScoreMass, Alternative.Score(_)) => true
+        case (Measure.ModelPosterior, Alternative.Posterior(_))  => true
+        case (Measure.TransportMass, Alternative.Transport(_))   => true
+        case _                                                   => false
     }
     for
       _ <- Either.cond(inventory.units.exists(_.id == unit), (), Refusal.UnknownUnit)
       _ <- Either.cond(entries.nonEmpty, (), Refusal.MissingMeasure)
       _ <- Either.cond(
         family && entries.map(_._1.key).distinct.size == entries.size &&
-          entries.forall((a, w) => w.isFinite && w >= 0.0 && (a.destination match
-            case Destination.Target(ref) => source.target(ref).nonEmpty
-            case Destination.External(_) => true)) && rowBudget.isFinite && rowBudget >= 0.0 &&
+          entries.forall((a, w) =>
+            w.isFinite && w >= 0.0 && (a.destination match
+              case Destination.Target(ref) => source.target(ref).nonEmpty
+              case Destination.External(_) => true)
+          ) && rowBudget.isFinite && rowBudget >= 0.0 &&
           (measure == Measure.TransportMass ||
-            (rowBudget == 1.0 && math.abs(entries.sortBy(_._1.key).map(_._2).sum - 1.0) <= MappingTolerance.RowSum)),
+            (rowBudget == 1.0 && math
+              .abs(entries.sortBy(_._1.key).map(_._2).sum - 1.0) <= MappingTolerance.RowSum)),
         (),
         Refusal.InvalidClaims
       )
       context <- resolveComponents(source, entries, rowBudget, selection, declarations)
       (coordinate, domains, components, ledger) = context
       identity = MappingRender.digest(
-        Vector("imported-temporal-row/v1", source.digest.hex, inventory.digest.hex, unit.value,
-          measure.toString, CanonicalDouble.render(rowBudget), selectionKey(selection)) ++
-          components.map(c => MappingRender.sequence(Vector(c.alternative.key, CanonicalDouble.render(c.weight)))) ++
-          domains.map(d => MappingRender.sequence(Vector(d.declaration.target.key,
-            d.declaration.assumption.toString, allocationKey(d.declaration.allocation))))
+        Vector(
+          "imported-temporal-row/v1",
+          source.digest.hex,
+          inventory.digest.hex,
+          unit.value,
+          measure.toString,
+          CanonicalDouble.render(rowBudget),
+          selectionKey(selection)
+        ) ++
+          components.map(c =>
+            MappingRender.sequence(Vector(c.alternative.key, CanonicalDouble.render(c.weight)))
+          ) ++
+          domains.map(d =>
+            MappingRender.sequence(
+              Vector(
+                d.declaration.target.key,
+                d.declaration.assumption.toString,
+                allocationKey(d.declaration.allocation)
+              )
+            )
+          )
       )
     yield new Inspection(unit, measure, coordinate, components, ledger, identity)
 
@@ -415,7 +451,8 @@ object TemporalQuery:
       selection: TemporalSupport.Selection,
       declarations: Vector[Declaration]
   ): Either[Refusal, (TemporalSupport.Coordinate, Vector[Domain], Vector[Component], Ledger)] =
-    val targets = entries.map(_._1.destination).collect { case Destination.Target(ref) => ref }.toSet
+    val targets =
+      entries.map(_._1.destination).collect { case Destination.Target(ref) => ref }.toSet
     for
       _ <- Either.cond(
         declarations.map(_.target).distinct.size == declarations.size,
@@ -459,9 +496,8 @@ object TemporalQuery:
           val support = domain.availability.toOption.get
           val lower = if region.geometry.exists(_.contains(support)) then c.weight else 0.0
           val upper = if region.geometry.exists(intersects(support, _)) then c.weight else 0.0
-          val allocated = domain.allocation.toOption.map(a =>
-            c.weight * fraction(support, region.geometry, a)
-          )
+          val allocated =
+            domain.allocation.toOption.map(a => c.weight * fraction(support, region.geometry, a))
           new Contribution(c, Some(new Bounds(lower, upper)), allocated)
         case _ => new Contribution(c, None, None)
     }

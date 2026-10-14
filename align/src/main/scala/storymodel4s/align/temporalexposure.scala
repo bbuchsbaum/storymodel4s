@@ -43,12 +43,18 @@ final class TemporalExposure private (
       start: ExactRational,
       endExclusive: ExactRational
   ): Either[Refusal, Readout] =
-    evaluate(timing, mapping.outcomes.map(o => o.unit -> o.processing).toMap,
-      start, endExclusive).map { (rows, uncovered) =>
-      val identity = MappingRender.digest(Vector("recall-exposure-window/v1", digest.hex,
-        Rat.of(start).key, Rat.of(endExclusive).key))
-      new Readout(this, start, endExclusive, rows, uncovered, identity)
-    }
+    evaluate(timing, mapping.outcomes.map(o => o.unit -> o.processing).toMap, start, endExclusive)
+      .map { (rows, uncovered) =>
+        val identity = MappingRender.digest(
+          Vector(
+            "recall-exposure-window/v1",
+            digest.hex,
+            Rat.of(start).key,
+            Rat.of(endExclusive).key
+          )
+        )
+        new Readout(this, start, endExclusive, rows, uncovered, identity)
+      }
 
   override def equals(other: Any): Boolean = other match
     case that: TemporalExposure => digest == that.digest
@@ -143,15 +149,25 @@ object TemporalExposure:
       val overlap: Overlap,
       val digest: Checksum
   ):
-    def query(clock: RecallTiming.Clock, start: ExactRational,
-        endExclusive: ExactRational): Either[Refusal, InspectionReadout] =
+    def query(
+        clock: RecallTiming.Clock,
+        start: ExactRational,
+        endExclusive: ExactRational
+    ): Either[Refusal, InspectionReadout] =
       if clock != timing.clock then Left(Refusal.ForeignClock)
       else if !canonical(start) || !canonical(endExclusive) then Left(Refusal.InvalidWindow)
-      else evaluate(timing, processing, start, endExclusive).map { (rows, uncovered) =>
-        val identity = MappingRender.digest(Vector("imported-recall-exposure-window/v1",
-          digest.hex, Rat.of(start).key, Rat.of(endExclusive).key))
-        new InspectionReadout(this, start, endExclusive, rows, uncovered, identity)
-      }
+      else
+        evaluate(timing, processing, start, endExclusive).map { (rows, uncovered) =>
+          val identity = MappingRender.digest(
+            Vector(
+              "imported-recall-exposure-window/v1",
+              digest.hex,
+              Rat.of(start).key,
+              Rat.of(endExclusive).key
+            )
+          )
+          new InspectionReadout(this, start, endExclusive, rows, uncovered, identity)
+        }
     override def equals(other: Any): Boolean = other match
       case that: Inspection => digest == that.digest
       case _                => false
@@ -169,27 +185,37 @@ object TemporalExposure:
   ):
     def uncoveredSeconds: Double = (BigDecimal(uncovered._1) / BigDecimal(uncovered._2)).toDouble
     def unassignedWords: Vector[RecallWordId] = exposure.timing.inventory.words.collect {
-      case word if exposure.timing.inventory.membership(word.id)
-          .isInstanceOf[WordMembership.Unassigned] => word.id
+      case word
+          if exposure.timing.inventory
+            .membership(word.id)
+            .isInstanceOf[WordMembership.Unassigned] =>
+        word.id
     }
     def uncomputedDuration: (BigInt, BigInt) = units
       .filter(_.processing != ProcessingStatus.Complete)
-      .map(u => Rat(u.duration._1, u.duration._2)).foldLeft(Rat.zero)(_ + _).pair
+      .map(u => Rat(u.duration._1, u.duration._2))
+      .foldLeft(Rat.zero)(_ + _)
+      .pair
     override def equals(other: Any): Boolean = other match
       case that: InspectionReadout => digest == that.digest
       case _                       => false
     override def hashCode(): Int = digest.hashCode
     override def toString: String = s"TemporalExposure.InspectionReadout(${digest.short()})"
 
-  def inspect(inventory: RecallInventory, timing: RecallTiming,
-      processing: Map[RecallUnitId, ProcessingStatus], overlap: Overlap): Either[Refusal, Inspection] =
+  def inspect(
+      inventory: RecallInventory,
+      timing: RecallTiming,
+      processing: Map[RecallUnitId, ProcessingStatus],
+      overlap: Overlap
+  ): Either[Refusal, Inspection] =
     if inventory.digest != timing.inventory.digest then Left(Refusal.ForeignInventory)
-    else if processing.keySet != inventory.units.map(_.id).toSet then Left(Refusal.ForeignProcessing)
+    else if processing.keySet != inventory.units.map(_.id).toSet then
+      Left(Refusal.ForeignProcessing)
     else if overlap == Overlap.Refuse && overlapping(timing) then Left(Refusal.OverlappingUnits)
     else
       val rows = processing.toVector.sortBy(_._1.value).map { (unit, status) =>
         val fields = status match
-          case ProcessingStatus.Complete => Vector("complete")
+          case ProcessingStatus.Complete                      => Vector("complete")
           case ProcessingStatus.ExcludedByInputPolicy(reason) => Vector("excluded", reason)
           case ProcessingStatus.Failed(ProcessingFailure.ProviderFailure(detail)) =>
             Vector("failed", "provider", detail)
@@ -199,8 +225,14 @@ object TemporalExposure:
             Vector("failed", "refused", detail)
         MappingRender.sequence(Vector(unit.value) ++ fields)
       }
-      val identity = MappingRender.digest(Vector("imported-recall-exposure/v1",
-        inventory.digest.hex, timing.digest.hex, overlap.toString) ++ rows)
+      val identity = MappingRender.digest(
+        Vector(
+          "imported-recall-exposure/v1",
+          inventory.digest.hex,
+          timing.digest.hex,
+          overlap.toString
+        ) ++ rows
+      )
       Right(new Inspection(timing, processing, overlap, identity))
 
   private def overlapping(timing: RecallTiming): Boolean =
@@ -222,9 +254,12 @@ object TemporalExposure:
     }
     conflict
 
-  private def evaluate(timing: RecallTiming, processing: Map[RecallUnitId, ProcessingStatus],
-      start: ExactRational, endExclusive: ExactRational)
-      : Either[Refusal, (Vector[UnitReadout], (BigInt, BigInt))] =
+  private def evaluate(
+      timing: RecallTiming,
+      processing: Map[RecallUnitId, ProcessingStatus],
+      start: ExactRational,
+      endExclusive: ExactRational
+  ): Either[Refusal, (Vector[UnitReadout], (BigInt, BigInt))] =
     val lo = Rat.of(start)
     val hi = Rat.of(endExclusive)
     if !(lo < hi) then Left(Refusal.InvalidWindow)

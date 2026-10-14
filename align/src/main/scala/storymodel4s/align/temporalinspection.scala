@@ -19,7 +19,9 @@ final class TemporalInspection private (
     regions.lift(bin).map(_ => bounds.getOrElse(bin, 0.0 -> 0.0))
 
   /** Rebin from the original supplied measure, including alternatives omitted from this grid. */
-  def rebin(regions: Vector[TemporalQuery.Region]): Either[TemporalInspection.Refusal, TemporalInspection] =
+  def rebin(
+      regions: Vector[TemporalQuery.Region]
+  ): Either[TemporalInspection.Refusal, TemporalInspection] =
     TemporalInspection.checked(prepared, regions)
   def allocationDiscrepancy: Double =
     allocated.toVector
@@ -28,7 +30,7 @@ final class TemporalInspection private (
       .sum + allocatedOutside - prepared.ledger.allocatedSource
   override def equals(other: Any): Boolean = other match
     case that: TemporalInspection => digest == that.digest
-    case _                  => false
+    case _                        => false
   override def hashCode(): Int = digest.hashCode
   override def toString: String =
     s"TemporalInspection(${digest.hex},${regions.size} bins,${cells.values.map(_.size).sum} cells)"
