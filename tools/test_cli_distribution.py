@@ -31,6 +31,7 @@ class LauncherCourt(unittest.TestCase):
             f"#!{sys.executable}\n"
             "import json,os,sys\n"
             "print(json.dumps({'args':sys.argv[1:],'telemetry':os.environ.get('ORT_DISABLE_TELEMETRY')}))\n"
+            "sys.exit(int(os.environ.get('FIXTURE_JAVA_EXIT','0')))\n"
         )
         java.chmod(0o700)
         self.env = dict(os.environ, JAVA_HOME=str(home), ORT_DISABLE_TELEMETRY="0")
@@ -79,6 +80,20 @@ class LauncherCourt(unittest.TestCase):
                 self.assertEqual(result.returncode, 2)
                 self.assertEqual(result.stdout, "")
 
+    def test_child_failure_exit_is_preserved(self):
+        self.env["FIXTURE_JAVA_EXIT"] = "37"
+        self.assertEqual(self.run_cli("mappingRun", "template").returncode, 37)
+
+
+def compare_archives(left, right):
+    """Compare actual production artifacts made from the same revision in different timezones."""
+    def digest(path):
+        with path.open("rb") as stream:
+            return hashlib.file_digest(stream, "sha256").hexdigest()
+    first, second = digest(left), digest(right)
+    assert first == second, f"archive bytes differ: {first} != {second}"
+    print(json.dumps({"archive_bytes_equal": True, "sha256": first}))
+
 
 def verify_distribution(root):
     manifest = json.loads((root / "manifest.json").read_text())
@@ -107,7 +122,9 @@ if __name__ == "__main__":
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         raise SystemExit(1)
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 4 and sys.argv[1] == "--compare-archives":
+        compare_archives(Path(sys.argv[2]), Path(sys.argv[3]))
+    elif len(sys.argv) == 2:
         verify_distribution(Path(sys.argv[1]).resolve())
     elif len(sys.argv) != 1:
-        raise SystemExit("usage: test_cli_distribution.py [STAGED_DISTRIBUTION]")
+        raise SystemExit("usage: test_cli_distribution.py [STAGED_DISTRIBUTION | --compare-archives LEFT RIGHT]")

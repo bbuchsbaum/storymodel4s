@@ -49,7 +49,8 @@ object CliDistribution {
     try
       files.foreach { case (file, name) =>
         val entry = new ZipEntry(name)
-        entry.setTimeLocal(LocalDateTime.of(1980, 1, 1, 0, 0))
+        // January 1 is the DOS lower-bound sentinel and can add timezone-dependent extra bytes.
+        entry.setTimeLocal(LocalDateTime.of(1980, 1, 2, 0, 0))
         stream.putNextEntry(entry)
         Files.copy(file.toPath, stream)
         stream.closeEntry()
