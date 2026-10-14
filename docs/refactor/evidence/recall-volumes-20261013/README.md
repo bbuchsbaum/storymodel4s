@@ -69,3 +69,23 @@ duplicated links and invented temporal allocation. Independent review found the 
 Python replay omission; the same-length replacement was reproduced before repair. Scala's
 producer already refused it. Adverse runs and the surviving first containment mutant are
 retained alongside the repaired witnesses and final gates; see `checks.json`.
+
+## Final qualification
+
+Source revision `5dced342139f4ae212bdcc8af6741700296bcfb6` is independently reviewed.
+The final producer ran from evidence-only descendant
+`703dacbe99981b7ead94a4ef32681918247b959a`. All 30 output files, including the
+completion manifest, match the first production run byte for byte.
+
+| Gate | Passed | Failed | Skipped |
+| --- | ---: | ---: | ---: |
+| JVM reference scope, 18 modules | 3475 | 0 | 4 |
+| Scala.js reference scope, 12 modules | 2594 | 0 | 0 |
+| Native reference scope, 12 modules | 2594 | 0 | 0 |
+| Independent Python corruption tests | 11 | 0 | 0 |
+
+The four JVM skips are optional live media/remote-provider tests. Formatting checks
+pass. All results are locally observed; no hosted CI, push or main-branch landing is
+claimed. Logs, process exit metadata and decompressed-log SHA-256 values are retained
+in `checks.json` and `log-index.json`. The exact input/source pins and independent
+review scopes remain separate from the unresolved encoding scientific acceptance.

@@ -1,7 +1,7 @@
 {
   "schema": "recall-volume-qualification/v1",
-  "producerRevision": "7241af43",
-  "readerRevision": "ada44911",
+  "producerRevision": "703dacbe99981b7ead94a4ef32681918247b959a",
+  "readerRevision": "5dced342139f4ae212bdcc8af6741700296bcfb6",
   "manifestSha256": "1d9027e543c32dab89cd2bb8888cfa727c50261dd0c1ff65876f55867dc763f4",
   "jobSha256": "2e8204bf48382c181f90031b41342709a15e4f9d25a3b81c5b0d1f4aeea4e0bd",
   "summary": {
@@ -63,5 +63,29 @@
     2493,
     2494,
     2495
-  ]
+  ],
+  "preparedInputs": [
+    {
+      "file": "annotations.csv",
+      "sha256": "13e89fc08494dd0c47077f6077e7d250cdfaaeebdb6ec25c926157f9dfd58bc1",
+      "bytes": 161659
+    },
+    {
+      "file": "parts.json",
+      "sha256": "9f9a44dfe75571e922db696f8a874738420ba02aa13c2852945b9446874228ce",
+      "bytes": 194
+    },
+    {
+      "file": "recall-lineage.json",
+      "sha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e",
+      "bytes": 13755
+    }
+  ],
+  "sourceRevision": "5dced342139f4ae212bdcc8af6741700296bcfb6",
+  "repeat": {
+    "priorProducerRevision": "7241af43c69fa97e19187da440099dbac7ffbe57",
+    "allFilesByteIdentical": true,
+    "totalFiles": 30,
+    "manifestSha256": "1d9027e543c32dab89cd2bb8888cfa727c50261dd0c1ff65876f55867dc763f4"
+  }
 }

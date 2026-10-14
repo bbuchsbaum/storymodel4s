@@ -25,6 +25,31 @@
     "sha256": "92ccd2885f72a677904c7f6f29f2d6d0d69dd21531fc604d41e7b58f78eceb69"
   },
   {
+    "file": "recall-volume-gate-actual-final.log.gz",
+    "uncompressedBytes": 1879,
+    "sha256": "0b8e36d3aa1190099ac049b9f8f0169a3119afb2929e029c9d918b8b9459b704"
+  },
+  {
+    "file": "recall-volume-gate-format.log.gz",
+    "uncompressedBytes": 2036,
+    "sha256": "4e4c46fc4d36c6339af0f4cf33439265394c48a9687ba7c1a7ba4b60998b6689"
+  },
+  {
+    "file": "recall-volume-gate-js.log.gz",
+    "uncompressedBytes": 111989,
+    "sha256": "8324dd750f1c5ecc1deaaa5a476d12fcf551905ee1b295b996e47bb51aed141b"
+  },
+  {
+    "file": "recall-volume-gate-jvm.log.gz",
+    "uncompressedBytes": 2429184,
+    "sha256": "3e5088917ae39146cd595e0c198debcbce1483904908448643c3daf95a591474"
+  },
+  {
+    "file": "recall-volume-gate-native.log.gz",
+    "uncompressedBytes": 121445,
+    "sha256": "f268766188f9589293ce2c4cd7abc8827f7e21757a38c8f853678beabdf9291f"
+  },
+  {
     "file": "recall-volume-mutant-drop-containment-02.log.gz",
     "uncompressedBytes": 3539,
     "sha256": "56bcfa994264a6352dce8abf2d2711f7e297f9761a703377176cfebad86f1421"
