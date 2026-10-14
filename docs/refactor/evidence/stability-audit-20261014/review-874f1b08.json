@@ -1,0 +1,71 @@
+{
+  "reviewedSha": "874f1b087c8b69488e992532a8a6c4f5b6882727",
+  "cacheSha": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "verdict": "PASS",
+  "controls": {
+    "unlistedJar": {
+      "exit": 1,
+      "namedRefusal": true,
+      "receiptAbsent": true
+    },
+    "wrongSource": {
+      "exit": 1,
+      "receiptAbsent": true
+    },
+    "badChecksum": {
+      "exit": 1,
+      "receiptAbsent": true
+    },
+    "missingJar": {
+      "exit": 1,
+      "receiptAbsent": true
+    },
+    "supplemental": {
+      "exit": 0,
+      "exactPathHashes": 8,
+      "exactRunnerHash": true
+    },
+    "concurrency": {
+      "compileExit": 0,
+      "runExit": 0,
+      "simultaneousColdReaders": 8,
+      "matchingDigestPairs": 800
+    }
+  },
+  "readback": {
+    "aCells": 5536,
+    "avCells": 5536,
+    "bothExactSourceOnlyCacheBytes": true,
+    "originalAndCachedIdentityBytesEqual": true
+  },
+  "retainedFocusedTests": {
+    "passed": 106,
+    "failed": 0,
+    "skipped": 0
+  },
+  "publicJvmMethods": "unchanged; compiler adds OFFSET$0 field for private lazy initialization",
+  "limitations": [
+    "source full cross-platform gate pending separately",
+    "byte equality and bounded observations do not establish universal latency guarantee"
+  ],
+  "atlas": {
+    "sha": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+    "verdict": "PASS pin-only delta from reviewed 2887766",
+    "testTasks": 10,
+    "total": 510,
+    "failed": 0,
+    "errors": 0,
+    "passed": 510,
+    "gateExit": 0
+  },
+  "evidenceSha256": {
+    "unlisted.log": "52b375edd258f35b36f6888c5d96aeaa624708e08c917402c53c96a8b6a644cc",
+    "concurrent-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "concurrent.log": "505ecffe890d016b1dafd0cadd76e0b27c0a11d8e02d668a58956c860d694a7d",
+    "supplemental.json": "f3d4f6a33f4d0e4259f3500f073a89c6ea4367ebbbafd9c60255aa82d1f34a23",
+    "supplemental.json.provenance.json": "002fb91e90e4ecbbb7c5d2a0c90b8391c95c0e793878f9658e7f0619de305382",
+    "wrong-source.log": "0dac5064fe0358e570bd57afa13bedbcc4a9322750a56414225d6897932ead4a",
+    "bad-checksum.log": "af6607832a7470d4d7e0fb9569a327c45b2e602d310ee4bdd232122aca5170b9",
+    "missing-jar.log": "7917eefcd50d9235f20c37b816773d1b26da07da91cfb02706707b2fb7b19346"
+  }
+}

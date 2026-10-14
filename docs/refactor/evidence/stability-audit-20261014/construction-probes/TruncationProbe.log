@@ -1,0 +1,5 @@
+head:-1: admitted=true; retained=Some(head:-1)
+tail:-1: admitted=true; retained=Some(tail:-1)
+head:0: admitted=true; retained=Some(head:0)
+tail:0: admitted=true; retained=Some(tail:0)
+head:1: admitted=true; retained=Some(head:1)

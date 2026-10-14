@@ -1,0 +1,39 @@
+{
+  "reviewedSha": "b542f196d9a9bf365608b18fc60a7f6efbd022bb",
+  "verdict": "BLOCK",
+  "blockingFinding": "unmanifested lib JAR contributes TASTy while provenance binds only original manifest",
+  "witness": {
+    "runnerExit": 0,
+    "unmanifestedJar": "lib/zz-unlisted-control.jar",
+    "injectedProjectSymbols": 13,
+    "allSixAlternativesAndPayloadsPresent": true,
+    "unrelatedExcluded": true,
+    "unresolved": []
+  },
+  "verification": {
+    "source": "b542f196d9a9bf365608b18fc60a7f6efbd022bb",
+    "verify_exit": 0,
+    "elapsed_seconds": 88.01
+  },
+  "productionInventory": {
+    "sourceSha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "symbols": 2058,
+    "edges": 21499,
+    "unresolved": 0
+  },
+  "compatibility": {
+    "unchangedExit": 0,
+    "compiledMutantExit": 1,
+    "exactDiagnostic": "MissingTermMember rehearsal.StableApi.keep"
+  },
+  "diffCheck": "passed",
+  "evidenceSha256": {
+    "injected.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "injected-inventory.json": "f3d4f6a33f4d0e4259f3500f073a89c6ea4367ebbbafd9c60255aa82d1f34a23",
+    "injected-inventory.json.provenance.json": "a0dce943b33a2bc055a615a9bee230073f66c153a158e34d5a55812622c3d71b",
+    "inventory.json": "aff96acc4bae163e2c443b935a52b0ba04a8e89d59a874dbb592abf43790f20b",
+    "inventory.json.provenance.json": "bb8af8c9d9e525fbf76118f729a2b2628ec81da34da17fe5a00dbbfce43f45c6",
+    "verify.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compatibility/receipt.json": "e00eb9c000a3dabe06cd51f714ba995179b6f5f7bb1e9288c03ce967b791132a"
+  }
+}

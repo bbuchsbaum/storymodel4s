@@ -1,0 +1,39 @@
+{
+  "conditions": [
+    {
+      "condition": "a",
+      "openMs": 34949.044583,
+      "allocateMs": 12689.826417000004,
+      "cells": 5536,
+      "numericValues": 14496,
+      "unavailableValues": 2112,
+      "maxAbsoluteDifference": 0,
+      "pages": 8,
+      "exactReplay": true
+    },
+    {
+      "condition": "av",
+      "openMs": 48139.654209,
+      "allocateMs": 12656.991624999995,
+      "cells": 5536,
+      "numericValues": 15360,
+      "unavailableValues": 1248,
+      "maxAbsoluteDifference": 0,
+      "pages": 8,
+      "exactReplay": true
+    }
+  ],
+  "errors": [],
+  "networkRequests": 0,
+  "status": "passed",
+  "browser": "140.0.7339.186",
+  "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "consumer": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "scope": "One admitted development participant, both actual conditions; participant artifacts remain private.",
+  "qualified": "LocallyObserved",
+  "scriptSha256": "cb685e236b418473e46cfa72c9da3bba7d2c4b98e57ae077c3ac3ce970d63efc",
+  "independentReaderSource": {
+    "Readback.scala": "7c19f6d778b5a3131efe5f5653f96d04cfe05ccea1c09f3389932a9841e105f4",
+    "Identity.scala": "eac6236cddd6834e150583d6e03b50e825ec8e9c7fa97886f33f1b5ee257438e"
+  }
+}

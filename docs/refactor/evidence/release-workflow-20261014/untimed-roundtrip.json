@@ -1,0 +1,22 @@
+{
+  "source": "0726fcdc5c5562a66ed99bf272b51ac22a90a9a6",
+  "review": "independent PASS from evidence_review",
+  "positive": {
+    "passed": 95,
+    "failed": 0
+  },
+  "mutation": {
+    "compiled": true,
+    "passed": 94,
+    "failed": 1,
+    "named_failure": "an absent recall clock survives canonical packet roundtrip without inventing timing"
+  },
+  "independent_probes": [
+    "absent timing roundtrip",
+    "explicit null retains prior accepted shape",
+    "timed packet same session",
+    "unknown field refused",
+    "wrong-type timing refused"
+  ],
+  "qualification": "focused Scala JVM/direct compiler; full platform and final consumer gates are separate"
+}

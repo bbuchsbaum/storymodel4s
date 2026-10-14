@@ -1,0 +1,20 @@
+{
+  "oldCandidate": "b542f196d9a9bf365608b18fc60a7f6efbd022bb",
+  "parentReproduced": {
+    "exit": 0,
+    "injectedSymbols": 13,
+    "unresolved": []
+  },
+  "repair": {
+    "exit": 1,
+    "reason": "unlisted or missing runtime JAR"
+  },
+  "fullControls": {
+    "exit": 0,
+    "symbols": 2058,
+    "edges": 21499,
+    "unresolved": []
+  },
+  "productionDistribution": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "scope": "Wrapper admission and supplemental provenance; the independent compatibility rehearsal passed."
+}

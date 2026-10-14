@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "analyzer": "TASTy MiMa 1.4.0",
+  "scala": "3.7.4",
+  "baselineControls": [
+    "first-empty-allowed",
+    "later-1.0.0-accepted",
+    "1.0.1-empty-refused",
+    "1.1.0-empty-refused"
+  ],
+  "filters": [],
+  "scope": "local Scala 3 rehearsal; no published baseline or platform compatibility claim",
+  "commands": [
+    {
+      "name": "compile-runner",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compile-old",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "jar-old",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compile-same",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "jar-same",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compile-mutant",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "jar-mutant",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "unchanged",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "removed-stable-method",
+      "exit": 1,
+      "logSha256": "59449a97a4686b88a7089368b0b5103bd87ec3a46b0d94eb4994020361426604"
+    }
+  ],
+  "dependencies": {
+    "tasty-mima-interface-1.4.0.jar": "464b8973e0a8090037fd86d71a11a03614814517641501c6c2f35e64fbccac79",
+    "tasty-mima_3-1.4.0.jar": "14c717d7f35d9b41fba41d1192cbb0249d97bc56107306c0fa7ac88d991be3ca",
+    "tasty-query_3-1.6.1.jar": "91ef40433d2296761161dc5706a30f23c6125abfc434d6da8c81dfa2ba8542b5",
+    "jline-reader-3.29.0.jar": "a4cb0a5fde9289f2f1b614e04f94b202f6ff5c9c96476425837b1184c92ef81d",
+    "jline-terminal-jni-3.29.0.jar": "13fef8bcc0e4788c8e192dc76c33758683c6bfdbaef6f67b41445eb8986773ad",
+    "jline-terminal-3.29.0.jar": "fd68a98b32b1132035c62102e5df0b0fdc358e7c87a9f876ce7071450b4d10da",
+    "scala-asm-9.8.0-scala-1.jar": "86af037580bdf9ce9c05f8b2afd734daf1a8564c38cd10ca5d08bf81508ad2e4",
+    "scala-library-2.13.16.jar": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1",
+    "scala3-compiler_3-3.7.4.jar": "1a60682b898fb04753dec78f2904078d48670079b7ad5106d442a0f431d346e0",
+    "scala3-interfaces-3.7.4.jar": "c19ba8ea1a13c7fcdef675353c8ddd671156cf220879dcb28b27e986aae31ea9",
+    "scala3-library_3-3.7.4.jar": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639",
+    "tasty-core_3-3.7.4.jar": "24dfe7089232a42d28d5bee1209f462e4b4ca90622e0b13752399c12585e3069",
+    "compiler-interface-1.10.7.jar": "2bacc5761e03920a228e5c9d20b33d9c51d43aaf2f52e8f839ece630966eb880"
+  }
+}

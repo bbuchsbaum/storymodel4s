@@ -1,0 +1,32 @@
+{
+  "positive": {
+    "compiled": true,
+    "exit": 0,
+    "alternatives_and_payloads_present": {
+      "PublicEnum.Rich": true,
+      "PublicEnum.Plain": true,
+      "Good": true,
+      "Empty": true,
+      "EnumPayloadOnly": true,
+      "SealedPayloadOnly": true
+    },
+    "unrelated_excluded": true,
+    "unresolved": [],
+    "source_sha256": "de74d9af46e018c837e7a46bf79e7e33a6ce057456271b0c7925d63e47c767be"
+  },
+  "mutant": {
+    "compiled": true,
+    "exit": 0,
+    "alternatives_and_payloads_present": {
+      "PublicEnum.Rich": false,
+      "PublicEnum.Plain": false,
+      "Good": false,
+      "Empty": false,
+      "EnumPayloadOnly": false,
+      "SealedPayloadOnly": false
+    },
+    "unrelated_excluded": true,
+    "unresolved": [],
+    "source_sha256": "284c998bbe193c5fdfc809f79364a56d3b7c567722281da59ba319def1d67d60"
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "playwright": "1.55.1",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "cpu": "Apple M3 Max",
+  "checks": [
+    {
+      "name": "all synthetic recall rows visible",
+      "ok": true
+    },
+    {
+      "name": "at most32source bins rendered",
+      "ok": true
+    },
+    {
+      "name": "automatic viewport retains final supplied onset",
+      "ok": true
+    },
+    {
+      "name": "supplied interval represented separately",
+      "ok": true
+    },
+    {
+      "name": "unestablished physical clock remains explicit",
+      "ok": true
+    },
+    {
+      "name": "support-only table preserves absent allocation and ledger",
+      "ok": true
+    },
+    {
+      "name": "custom mixture retains its exact assumption label",
+      "ok": true
+    },
+    {
+      "name": "heterogeneous allocations are not relabeled as a uniform assumption",
+      "ok": true
+    },
+    {
+      "name": "keyboard selection restores its semantic control focus",
+      "ok": true
+    },
+    {
+      "name": "keyboard recall selection opens original evidence",
+      "ok": true
+    },
+    {
+      "name": "standalone exported temporal receipt reopens with exact clock policy and selections",
+      "ok": true
+    },
+    {
+      "name": "saved view retains admitted temporal descriptor",
+      "ok": true
+    },
+    {
+      "name": "top-k omission remains visible",
+      "ok": true
+    },
+    {
+      "name": "table exports every row and bin",
+      "ok": true
+    },
+    {
+      "name": "export table agrees with checked producer values without display rounding",
+      "ok": true
+    },
+    {
+      "name": "figure includes quantities and replay descriptor",
+      "ok": true
+    },
+    {
+      "name": "out-of-window observations are hidden rather than clamped to an edge",
+      "ok": true
+    },
+    {
+      "name": "save reopen is byte-identical",
+      "ok": true
+    },
+    {
+      "name": "foreign timing refusal retains current view",
+      "ok": true
+    },
+    {
+      "name": "source-axis switch retains original session clock",
+      "ok": true
+    },
+    {
+      "name": "mobile document has no horizontal overflow",
+      "ok": true
+    },
+    {
+      "name": "source column page survives recall selection",
+      "ok": true
+    },
+    {
+      "name": "failed rows remain visible",
+      "ok": true
+    },
+    {
+      "name": "failed processing status remains distinct from zero",
+      "ok": true
+    },
+    {
+      "name": "untimed temporal packet opens with no invented clock",
+      "ok": true
+    },
+    {
+      "name": "missing clock cannot acquire a recall-window estimate",
+      "ok": true
+    },
+    {
+      "name": "denied saving explains refusal",
+      "ok": true
+    },
+    {
+      "name": "denied packet grants no export",
+      "ok": true
+    },
+    {
+      "name": "no browser errors",
+      "ok": true
+    },
+    {
+      "name": "local artifacts remain offline",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "requests": [],
+  "latencyMs": {
+    "syntheticImport": 430.0269579999999,
+    "selectRecall": 52.19145900000012
+  },
+  "browser": "140.0.7339.186",
+  "status": "passed",
+  "files": [
+    {
+      "name": "after-refusal.json",
+      "bytes": 6060,
+      "sha256": "220be4f34e8d77b0627ffc7a3a2a1016e042c10cd3692a26277f56f306b1022b"
+    },
+    {
+      "name": "before-refusal.json",
+      "bytes": 6060,
+      "sha256": "220be4f34e8d77b0627ffc7a3a2a1016e042c10cd3692a26277f56f306b1022b"
+    },
+    {
+      "name": "browser-audit-before.log",
+      "bytes": 48,
+      "sha256": "9dc7f724c714f9fea49ba90ebf458169ba2ffdbf64334690895511d5075baecf"
+    },
+    {
+      "name": "command.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "desktop.png",
+      "bytes": 341124,
+      "sha256": "5c2f9405e67432a8266652d41ab98042e8ccf8af03a7c4267b5b4895bd300c6a"
+    },
+    {
+      "name": "figure.svg",
+      "bytes": 16064,
+      "sha256": "d3b1f40e784a3c78b7ea4101ee12c48c8ec708d537616a267c5b99cbbc714787"
+    },
+    {
+      "name": "mobile.png",
+      "bytes": 319117,
+      "sha256": "370cd25fefab85a18f150fff75ead6ffec434c47c6dfabd38bf4fa7909e36931"
+    },
+    {
+      "name": "other-axis.json",
+      "bytes": 3237,
+      "sha256": "2ee36b94864c46d7529c6d610406858baa7efa36bb15f5e02f5974b9ea8daafe"
+    },
+    {
+      "name": "replayed-receipt.json",
+      "bytes": 4221,
+      "sha256": "ec9af9d6fa78f4456647c08d11411a045152997f3322d82115a06c12ff99f567"
+    },
+    {
+      "name": "replayed-view.json",
+      "bytes": 6060,
+      "sha256": "220be4f34e8d77b0627ffc7a3a2a1016e042c10cd3692a26277f56f306b1022b"
+    },
+    {
+      "name": "support-only.csv",
+      "bytes": 19147,
+      "sha256": "8edf4ffb0ea13f4ee468b2d54cad8b1c2f9567595ddbe97748321ca73b60a63a"
+    },
+    {
+      "name": "table.csv",
+      "bytes": 19941,
+      "sha256": "ea6fd6368f86369ee122cc64b41382bd358de04cfbf0a85fd4f3e5e11eafedc4"
+    },
+    {
+      "name": "temporal-receipt.json",
+      "bytes": 4221,
+      "sha256": "ec9af9d6fa78f4456647c08d11411a045152997f3322d82115a06c12ff99f567"
+    },
+    {
+      "name": "view.json",
+      "bytes": 6060,
+      "sha256": "220be4f34e8d77b0627ffc7a3a2a1016e042c10cd3692a26277f56f306b1022b"
+    }
+  ]
+}

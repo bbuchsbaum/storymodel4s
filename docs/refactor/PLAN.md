@@ -29,19 +29,28 @@ verify every exported file. The planned video acquisition supplied 999 interval 
 one annotation has only an onset and is retained without an invented interval caption.
 
 The published-index imaging walkthrough and executable reader guide have passed independent
-readback. The CLI distribution is installable and reproducible; the stable-signature audit
-is independently reviewed as a bounded construction audit, not a completed API freeze.
-Producer `a2e023f1` adds imported temporal inspection and fixes workspace admission to use
-the established row-sum tolerance without renormalization. Its focused 93 tests and eight
-compiled guard mutations are qualified; the full platform gate is still being completed.
-StoryAtlas candidate `76046a2` pins that producer and implements temporal controls, independent
-source/recall clocks, partial-row inspection, and saved-view replay. Its full consumer gate,
-browser checks, independent review and publication remain active acceptance. No new source
-or consumer main advancement beyond the owner's approved `22cc7243` has occurred.
+readback. The CLI distribution is installable and reproducible. Source `eb48a562` adds imported
+temporal inspection, lawful workspace row-sum tolerance, absent-clock round trips and immutable
+digest caches. Exact review passes through `874f1b08`, including the corrected signature-audit
+input boundary. The complete producer platform gate and final artifact/doc replay are running.
 
-Finish the exact-pair gate and browser readback, reconcile the final receipts and tracker,
-then obtain approval for the concrete reviewed main advancements and synchronize hosted
-checks. These remaining steps, rather than another ONNX implementation, are the active queue.
+StoryAtlas `d6f800f3` pins producer `eb48a562` and has passed independent review, all 510
+consumer tests, 30 synthetic browser checks and actual A/A+V browser readback. Each actual
+condition retains 173 rows and 5,536 cells; numeric cells match the independent JVM reader
+exactly, unavailable quantities stay blank, and saved-state replay is byte-identical. The
+browser has been closed and the ownership audit is clean. Main remains at the approved
+`22cc7243`; Atlas main remains unchanged.
+
+The stable-signature audit now includes public enum/sealed alternatives and verifies every
+runtime input. Its [construction judgment](evidence/stability-audit-20261014/constructor-judgment.md)
+records two concrete pre-freeze findings and the remaining promotion-versus-facade boundary
+decision. These are separate from qualification of the demonstrated pre-release study path.
+The compatibility rehearsal passes unchanged and named-breaking controls; no stable baseline,
+Maven release or documentation deployment has been activated.
+
+Finish the producer gate and artifact/doc readback, reconcile final receipts and tracker,
+then obtain approval for the concrete reviewed main advancements and bind hosted checks.
+The final 1.0 release gate remains open until its stability and publication requirements are met.
 
 ### Completed substrate to carry forward
 

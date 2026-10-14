@@ -1,0 +1,12 @@
+{
+  "source": "0726fcdc5c5562a66ed99bf272b51ac22a90a9a6",
+  "units": 173,
+  "targets": 1050,
+  "input_sha256": "14cabb4218b3074839a6bcdd43cce328ad68742e947efa0e8ec5bcc44e6a1eb9",
+  "input_bytes": 29056910,
+  "status": "stopped-after-more-than-180-seconds",
+  "sample_elapsed_seconds": 113.67,
+  "sample_cpu_seconds": 91.90837,
+  "sample_hot_path": "MappingRender.digest -> SourceRepresentation.digest -> TemporalSupport.read -> TemporalQuery.domain",
+  "scope": "One thread sample and an unfinished opening; no exact total runtime or attribution percentage is claimed."
+}

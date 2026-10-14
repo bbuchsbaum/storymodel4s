@@ -1,0 +1,2 @@
+public apply/copy/Mirror accept nonempty nominations with abstained=true
+historical compute accepted=true retains contradictory flag=true provenanceUnattested=true

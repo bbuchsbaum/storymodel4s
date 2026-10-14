@@ -6,6 +6,13 @@ notice.**
 storymodel4s is a Scala 3 library for representing written stories, human
 recall of those stories, and the mapping between the two.
 
+For the demonstrated file-to-result workflow, start with the
+[mapping command guide](docs/guide/mapping-facade.md), then the
+[imaging readback](docs/guide/imaging.md). The [current delivery plan](docs/refactor/PLAN.md)
+records qualified capabilities and remaining release acceptance; the
+[release preparation guide](docs/release-preparation.md) covers the local CLI bundle and
+publication checks.
+
 A story says some things and reports others; a person recalling it may preserve
 an event but reverse who acted, or promote something a character merely said
 into something that happened. The library keeps those apart, and every claim it

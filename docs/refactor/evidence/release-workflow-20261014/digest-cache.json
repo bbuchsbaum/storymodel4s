@@ -1,0 +1,71 @@
+{
+  "base": "0726fcdc5c5562a66ed99bf272b51ac22a90a9a6",
+  "change": "Private lazy caches preserve the public digest methods and original hash expressions.",
+  "qualified": "LocallyObserved",
+  "readback": [
+    {
+      "condition": "a",
+      "seconds": 11.49928566699964,
+      "exit": 0,
+      "exactSourceCacheBytes": true,
+      "sha256": "ea1edd164c108cd67f0d94f3da5818092d376c324385f916dd8dcf453e986588",
+      "cells": 5536
+    },
+    {
+      "condition": "av",
+      "seconds": 15.701454207999632,
+      "exit": 0,
+      "exactSourceCacheBytes": true,
+      "sha256": "584c8ee8ea1c7156c04593f6a504f759578292be9495c628eec7bb7fa68a9150",
+      "cells": 5536
+    }
+  ],
+  "identity": {
+    "checks": [
+      "source digest exact",
+      "inventory digest exact",
+      "session digest exact",
+      "encoded packet digest exact"
+    ],
+    "results": [
+      {
+        "variant": "original",
+        "exit": 0,
+        "seconds": 14.226997958998254
+      },
+      {
+        "variant": "cached",
+        "exit": 0,
+        "seconds": 8.139772958998947
+      }
+    ]
+  },
+  "tests": {
+    "passed": 106,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline": "Original actual temporal projection was terminated after at least 180 seconds; source-only cache outputs were then captured before adding inventory cache. No exact original elapsed time or speedup ratio is claimed.",
+  "logs": [
+    {
+      "path": "logs/digest-cache-compile.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "logs/digest-cache-test-compile.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "logs/digest-cache-test.log.gz",
+      "sha256": "4e447e4c4cf1a94733595f106bfa5cc561a0b5d6bd8731bfbc7d3e0b684e7cc0"
+    },
+    {
+      "path": "logs/digest-cache-digest-cache-format.log.gz",
+      "sha256": "4cf139b21065d696c4978e5be30609d35a805b6be8233c1cb70e9b4c2d7cc4a2"
+    },
+    {
+      "path": "logs/digest-cache-cached-readback-thread-dump.log.gz",
+      "sha256": "0e9b1edd4ceeaf0e2803dd43fbf6af194b3f8541ccb0e29742f357067700bb84"
+    }
+  ]
+}

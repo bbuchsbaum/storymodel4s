@@ -113,10 +113,11 @@ retained explicitly; the new arrays have independently verified raw-volume prove
 
 ## Current action
 
-Complete actual planned video acquisition and the controlled lexical A/A+V comparison under
-`bd-01M35P83TCNHBSDY6NSK13Q3K0`. The plan contains 999 positive annotation intervals; point
-segment 13 retains unavailable video coverage. Continue installable-command preparation, stable
-boundary audit, reader documentation and temporal StoryAtlas adoption. Local-only dashboard,
+Actual planned video acquisition, controlled A/A+V execution, published-index imaging and
+StoryAtlas browser readback now have the receipts below. Complete the producer's final full
+platform gate, staged artifact/POM checks and exact-candidate example replay; then reconcile
+tracker acceptance and obtain approval for the reviewed main advancements. The 1.0 API freeze
+and public artifact/site publication retain their separate requirements. Local-only dashboard,
 private artifacts and resumable build state are under `.dashboard` and `.agent-work`.
 
 ## Reviewed ONNX milestone synchronized
@@ -153,8 +154,9 @@ control from `PublicMappingFacade.scala`. Eight commands complete analysis, pair
 weights 0/0.5/1, independent Python readers, identical resume and overwrite refusal. Model
 resources are supplied separately. A public binary release has not been published.
 
-The restored clean full source gate, actual Sherlock acquisition and subsequent consumer/docs
-checks are in progress. These focused witnesses do not close those remaining acceptance gates.
+At the `2c4b74f9` checkpoint, the full source gate and actual/consumer/docs checks remained open.
+Their subsequent receipts below supersede that checkpoint; the focused witnesses alone did not
+close those acceptance gates.
 
 
 ## Completed local caption and A/A+V execution
@@ -205,4 +207,53 @@ two-file repair. The earlier load-related failed Native attempt is also preserve
 Atlas candidate `76046a24ce1f5cea7b79e48ba0c055d7ac7618e0` is preserved on its own repository's
 `codex/temporal-adoption-20261014` branch; main is unchanged. Nine focused controller/import
 checks pass, direct Scala.js UI compilation passes, and formatting/workflow generation pass.
-Its full consumer gate, rendered browser checks and independent review are still pending.
+At that checkpoint its full consumer gate, rendered browser checks and independent review
+were pending. The later qualified candidate below supersedes it.
+
+
+## Reviewed temporal candidate and actual browser readback
+
+Producer `0726fcdc` repairs absent-clock packets without weakening exact-key validation.
+The [round-trip receipt](untimed-roundtrip.json) retains 95 passing focused tests and the
+compiled old-guard mutation (94 pass, one named failure). Untimed packets remain untimed.
+
+Actual data then exposed repeated full-source and full-inventory digest work. Producer
+`eb48a562` caches only those immutable digests, keeping their public methods and original
+serialization expressions. The [cache receipt](digest-cache.json) binds 106 passing tests,
+original/cached source, inventory, session and encoded-packet identity, and exact readback
+of all 5,536 cells per actual condition. The single measured JVM runs took 11.5 and 15.7
+seconds including decoding and two projections; these are local observations, not a benchmark
+population. Independent review through
+[`874f1b08`](../stability-audit-20261014/review-874f1b08.json) also compiled both changes and
+checked 800 matching digest pairs from eight simultaneous readers.
+
+StoryAtlas `d6f800f3` pins producer `eb48a562`. Its complete gate passed 510 tests with zero
+failures, errors or skips, application bundling and formatting. The independently reviewed
+consumer includes honest allocation labels, raw numeric CSV values, bounded bin counts,
+keyboard focus, paging, optional clocks and both ordinary/temporal saved-state replay.
+Earlier failed consumer gates are retained rather than counted as passes.
+
+The [synthetic browser report](atlas-browser-d6f800f/report.json) passes all 30 controls.
+Desktop/mobile rendering was inspected; the browser was closed and both ownership audits are
+retained. The [actual-data browser report](actual-temporal-browser.json) passes both A and A+V:
+173 units, eight row pages and 5,536 cells each, exact agreement with the independent JVM
+reader, explicit blank unavailable quantities, and byte-identical view/receipt replay.
+No HTTP requests or browser errors occurred. Measured import times were 34.9 and 48.1 seconds;
+allocation changes took about 12.7 seconds. Those latencies remain visible delivery limitations.
+Actual participant files, transcripts, tables and saved views remain in ignored local storage.
+
+## Stability and release preparation
+
+The corrected signature walker now includes public ADT alternatives and binds the admitted
+runtime JAR set and any supplemental TASTy files. Independent review first reproduced an
+unlisted-JAR provenance failure; the repaired runner refuses it before inspection. The
+[construction judgment](../stability-audit-20261014/constructor-judgment.md) records the
+checked receipt boundaries and two concrete pre-freeze findings. The expanded closure also
+exposes types previously described as experimental; the final stable-boundary decision remains
+promotion plus audit or a narrower facade. Enumeration is not a freeze certificate.
+
+The [compatibility rehearsal](compatibility-rehearsal/receipt.json) passes an unchanged compiled
+contract and detects exactly the deliberately removed stable method, without exclusions.
+Its empty-baseline controls are local policy checks; a post-1.0 published comparison has not
+been activated. [Release preparation](../../../release-preparation.md) records the artifact,
+dependency, namespace, signing, deployment and final authorization requirements.
