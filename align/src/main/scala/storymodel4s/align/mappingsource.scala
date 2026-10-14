@@ -91,7 +91,9 @@ final class SourceRepresentation private (
     val scopeDigest: Checksum
 ):
   def target(ref: SourceNodeRef): Option[MappingTarget] = targets.find(_.ref == ref)
-  def digest: Checksum = MappingRender.digest(
+  def digest: Checksum = cachedDigest
+
+  private lazy val cachedDigest: Checksum = MappingRender.digest(
     Vector(
       "source-representation/v1",
       viewFingerprint.checksum.hex,

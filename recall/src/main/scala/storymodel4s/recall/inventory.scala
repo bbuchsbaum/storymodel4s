@@ -68,7 +68,9 @@ final class RecallInventory private (
   def describes(graph: RecallGraph[Checked]): Boolean =
     transcript == graph.transcript.canonicalChecksum && segmentation == SegmentationId.of(graph)
 
-  def digest: Checksum = InventoryRender.digest(
+  def digest: Checksum = cachedDigest
+
+  private lazy val cachedDigest: Checksum = InventoryRender.digest(
     Vector(
       "recall-inventory/v1",
       transcript.hex,
