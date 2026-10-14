@@ -10,15 +10,24 @@ import storymodel4s.proposition.GraphOrder
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
-final case class OpenQuery(content: UnitContent[GraphOrder.Canonical], text: String)
-final case class OpenDocument(content: TargetContent[GraphOrder.Canonical], text: String)
+final case class OpenQuery(
+    content: UnitContent[GraphOrder.Canonical],
+    text: String,
+    policy: String
+)
+final case class OpenDocument(
+    content: TargetContent[GraphOrder.Canonical],
+    text: String,
+    policy: String
+)
 final case class OpenContext(
     recall: RecallGraph[Checked],
     source: SourceView,
     representation: SourceRepresentation,
-    sourceAtlas: SurfaceAtlas,
+    sourceIdentity: Either[SurfaceAtlas, storymodel4s.align.bridge.TimedSourceView],
     queries: Vector[(RecallUnitId, RenderedUnitInput)],
-    documents: Vector[(SourceNodeRef, RenderedTargetInput)]
+    documents: Vector[(SourceNodeRef, RenderedTargetInput)],
+    policy: String
 )
 final case class OpenData(
     querySpace: EmbeddingSpace,
@@ -53,13 +62,13 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
   test("query constructor is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new OpenQuery(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new OpenQuery(???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new SurfaceRendering.UnitInput(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new SurfaceRendering.UnitInput(???, ???, ???)"
       ),
       "constructor opened"
     )
@@ -68,13 +77,13 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
   test("query apply is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; OpenQuery(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; OpenQuery(???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; SurfaceRendering.UnitInput(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; SurfaceRendering.UnitInput(???, ???, ???)"
       ),
       "apply opened"
     )
@@ -128,13 +137,13 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
   test("document constructor is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new OpenDocument(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new OpenDocument(???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new SurfaceRendering.TargetInput(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new SurfaceRendering.TargetInput(???, ???, ???)"
       ),
       "constructor opened"
     )
@@ -143,13 +152,13 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
   test("document apply is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; OpenDocument(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; OpenDocument(???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; SurfaceRendering.TargetInput(???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; SurfaceRendering.TargetInput(???, ???, ???)"
       ),
       "apply opened"
     )
@@ -203,13 +212,13 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
   test("context constructor is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new OpenContext(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new OpenContext(???, ???, ???, ???, ???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new SurfaceRendering.Context(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; new SurfaceRendering.Context(???, ???, ???, ???, ???, ???, ???)"
       ),
       "constructor opened"
     )
@@ -218,13 +227,13 @@ class SurfaceEmbeddingBoundarySuite extends FunSuite:
   test("context apply is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; OpenContext(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; OpenContext(???, ???, ???, ???, ???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; SurfaceRendering.Context(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceembeddingconsumer.*; SurfaceRendering.Context(???, ???, ???, ???, ???, ???, ???)"
       ),
       "apply opened"
     )

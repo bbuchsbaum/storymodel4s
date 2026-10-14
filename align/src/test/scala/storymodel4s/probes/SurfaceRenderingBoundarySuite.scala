@@ -10,7 +10,8 @@ final case class OpenRenderedPair(
     target: TargetContent[GraphOrder.Canonical],
     grain: ContentGrain,
     unitText: String,
-    targetText: String
+    targetText: String,
+    policy: String
 )
 final case class OpenCosineValue(metric: EmbeddingMetric, value: Double)
 final case class OpenCoordinates(
@@ -29,13 +30,13 @@ class SurfaceRenderingBoundarySuite extends FunSuite:
   test("rendered pair constructor is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceprobe.*; new OpenRenderedPair(???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceprobe.*; new OpenRenderedPair(???, ???, ???, ???, ???, ???)"
       ),
       "same-shape positive control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceprobe.*; new SurfaceRendering.Pair(???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceprobe.*; new SurfaceRendering.Pair(???, ???, ???, ???, ???, ???)"
       ),
       "constructor opened"
     )
@@ -44,13 +45,13 @@ class SurfaceRenderingBoundarySuite extends FunSuite:
   test("rendered pair apply is closed") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import surfaceprobe.*; OpenRenderedPair(???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceprobe.*; OpenRenderedPair(???, ???, ???, ???, ???, ???)"
       ),
       "same-shape positive control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import surfaceprobe.*; SurfaceRendering.Pair(???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import surfaceprobe.*; SurfaceRendering.Pair(???, ???, ???, ???, ???, ???)"
       ),
       "apply opened"
     )
