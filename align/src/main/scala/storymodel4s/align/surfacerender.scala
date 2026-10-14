@@ -31,14 +31,18 @@ object SurfaceRendering:
   /** Versioned policies preserve recall hull text and avoid filling gaps in source support. */
   val Policy: String = "surface-render/recall-hull-source-union-newline/v1"
 
+  /** Timed descriptions render their checked encoder payloads without manufacturing text support.
+    */
+  val TimedPolicy: String = "surface-render/timed-source-encoder-payload/v1"
+
   /** Unforgeable query payloads keep exact text separate from coordinate-bearing originals. */
   final class UnitInput private[SurfaceRendering] (
       val content: UnitContent[GraphOrder.Canonical],
-      val text: String
+      val text: String,
+      val policy: String = Policy
   ):
-    val policy: String = Policy
     override def equals(other: Any): Boolean = other match
-      case p: UnitInput => content == p.content && text == p.text
+      case p: UnitInput => content == p.content && text == p.text && policy == p.policy
       case _            => false
     override def hashCode: Int = content.hashCode
     override def toString: String = s"RenderedUnitInput(chars=${text.length})"
@@ -46,11 +50,11 @@ object SurfaceRendering:
   /** Unforgeable document payloads keep exact text separate from source references. */
   final class TargetInput private[SurfaceRendering] (
       val content: TargetContent[GraphOrder.Canonical],
-      val text: String
+      val text: String,
+      val policy: String = Policy
   ):
-    val policy: String = Policy
     override def equals(other: Any): Boolean = other match
-      case p: TargetInput => content == p.content && text == p.text
+      case p: TargetInput => content == p.content && text == p.text && policy == p.policy
       case _              => false
     override def hashCode: Int = content.hashCode
     override def toString: String = s"RenderedTargetInput(chars=${text.length})"
@@ -61,11 +65,11 @@ object SurfaceRendering:
       val target: TargetContent[GraphOrder.Canonical],
       val grain: ContentGrain,
       val unitText: String,
-      val targetText: String
+      val targetText: String,
+      val policy: String = Policy
   ):
-    val policy: String = Policy
-    lazy val query: RenderedUnitInput = new UnitInput(unit, unitText)
-    lazy val document: RenderedTargetInput = new TargetInput(target, targetText)
+    lazy val query: RenderedUnitInput = new UnitInput(unit, unitText, policy)
+    lazy val document: RenderedTargetInput = new TargetInput(target, targetText, policy)
     private def parts = (unit, target, grain, unitText, targetText, policy)
     override def equals(other: Any): Boolean = other match
       case p: Pair => parts == p.parts
@@ -82,11 +86,11 @@ object SurfaceRendering:
       val recall: RecallGraph[Checked],
       val source: SourceView,
       val representation: SourceRepresentation,
-      private val sourceAtlas: SurfaceAtlas,
+      private val sourceIdentity: Either[SurfaceAtlas, bridge.TimedSourceView],
       val queries: Vector[(RecallUnitId, RenderedUnitInput)],
-      val documents: Vector[(SourceNodeRef, RenderedTargetInput)]
+      val documents: Vector[(SourceNodeRef, RenderedTargetInput)],
+      val policy: String = Policy
   ):
-    val policy: String = Policy
     val grain: ContentGrain = new ContentGrain(source.maxLevel)
     private val binding = StrictBinding.of(recall, source)
     private val queryIndex = queries.toMap
@@ -106,12 +110,13 @@ object SurfaceRendering:
       for
         q <- queryIndex.get(unit).toRight(SurfaceRenderingRefusal.UnknownUnit)
         d <- documentIndex.get(target).toRight(SurfaceRenderingRefusal.UnknownTarget)
-      yield new Pair(q.content, d.content, grain, q.text, d.text)
+      yield new Pair(q.content, d.content, grain, q.text, d.text, policy)
 
     override def equals(other: Any): Boolean = other match
       case c: Context =>
         binding == c.binding && representation.digest == c.representation.digest &&
-        sourceAtlas == c.sourceAtlas && queries == c.queries && documents == c.documents
+        sourceIdentity == c.sourceIdentity && queries == c.queries && documents == c.documents &&
+        policy == c.policy
       case _ => false
     // No new hash of private submitted strings or endpoint vectors.
     override def hashCode: Int = (queries.size, documents.size, grain, policy).hashCode
@@ -136,7 +141,33 @@ object SurfaceRendering:
       documents <- traverse(snapshot.nodes)(n =>
         targetInput(snapshot, representation, sourceAtlas, n).map(n.ref -> _)
       )
-    yield new Context(recall, snapshot, representation, sourceAtlas, queries, documents)
+    yield new Context(recall, snapshot, representation, Left(sourceAtlas), queries, documents)
+
+  /** Prepare every checked timed-source node with its declared encoder payload. */
+  def prepareTimed(
+      recall: RecallGraph[Checked],
+      source: bridge.TimedSourceView
+  ): Either[SurfaceRenderingRefusal, SurfaceScoringContext] =
+    val snapshot = MappingBindingRender.snapshot(source)
+    for
+      _ <- if recall.units.nonEmpty then Right(()) else Left(SurfaceRenderingRefusal.EmptyRecall)
+      _ <- if snapshot.nodes.nonEmpty then Right(()) else Left(SurfaceRenderingRefusal.EmptySource)
+      _ <- timedSourceCheck(snapshot, source.representation)
+      _ <- validUnicode(recall.atlas)
+      queries <- traverse(recall.ordered)(u => unitInput(recall, u, TimedPolicy).map(u.id -> _))
+      payloads <- timedPayloads(source, snapshot)
+      documents <- traverse(snapshot.nodes)(n =>
+        timedTargetInput(snapshot, n, payloads.get(n.ref), TimedPolicy).map(n.ref -> _)
+      )
+    yield new Context(
+      recall,
+      snapshot,
+      source.representation,
+      Right(source),
+      queries,
+      documents,
+      TimedPolicy
+    )
 
   /** A single checked pair retains its historical per-target validation behavior. */
   def pair(
@@ -184,20 +215,34 @@ object SurfaceRendering:
         else Left(SurfaceRenderingRefusal.InvalidHierarchy)
     yield ()
 
-  private def unitInput(recall: RecallGraph[Checked], unit: RecallUnit) =
+  private def timedSourceCheck(
+      snapshot: SourceView,
+      representation: SourceRepresentation
+  ): Either[SurfaceRenderingRefusal, Unit] =
+    for
+      _ <-
+        if representation.viewFingerprint == ViewFingerprint.of(snapshot) &&
+          representation.scopeDigest == MappingSourceRender.scope(snapshot.nodes)
+        then Right(())
+        else Left(SurfaceRenderingRefusal.SourceViewBinding)
+      _ <-
+        if acyclic(snapshot.nodes) then Right(())
+        else Left(SurfaceRenderingRefusal.InvalidHierarchy)
+    yield ()
+
+  private def unitInput(recall: RecallGraph[Checked], unit: RecallUnit, policy: String = Policy) =
     for
       _ <- validate(recall.atlas, unit.span)
       content <- ContentProjection
         .canonicalUnit(unit)
         .left
         .map(SurfaceRenderingRefusal.Projection.apply)
-    yield new UnitInput(
-      content,
-      recall.transcript.canonicalText.substring(
+      text = recall.transcript.canonicalText.substring(
         unit.span.minSpan.start,
         unit.span.minSpan.endExclusive
       )
-    )
+      _ <- validPayload(text)
+    yield new UnitInput(content, text, policy)
 
   private def targetInput(
       snapshot: SourceView,
@@ -217,12 +262,44 @@ object SurfaceRendering:
         .canonicalTarget(node, snapshot)
         .left
         .map(SurfaceRenderingRefusal.Projection.apply)
-    yield new TargetInput(
-      content,
-      union(spans)
+      text = union(spans)
         .map(s => atlas.source.canonicalText.substring(s.start, s.endExclusive))
         .mkString("\n")
-    )
+      _ <- validPayload(text)
+    yield new TargetInput(content, text)
+
+  private def timedPayloads(
+      source: bridge.TimedSourceView,
+      snapshot: SourceView
+  ): Either[SurfaceRenderingRefusal, Map[SourceNodeRef, String]] =
+    val leaves = snapshot.nodes.filter(_.level == 0).sortBy(_.discoursePosition)
+    val groups = snapshot.nodes.filter(_.level == 1).sortBy(_.discoursePosition)
+    val sourceGroups = source.segments.flatMap(_.group).distinct.sortBy(_.ordinal)
+    if leaves.size != source.segments.size || groups.size != sourceGroups.size then
+      Left(SurfaceRenderingRefusal.SourceViewBinding)
+    else
+      val leafPayloads = source.segments.zip(leaves).map { case (segment, node) =>
+        node.ref -> segment.embedText.getOrElse(segment.text)
+      }
+      val groupPayloads = sourceGroups.zip(groups).map { case (group, node) =>
+        node.ref -> group.embedText.getOrElse(group.label)
+      }
+      Right((leafPayloads ++ groupPayloads).toMap)
+
+  private def timedTargetInput(
+      snapshot: SourceView,
+      node: NodeSummary,
+      payload: Option[String],
+      policy: String
+  ) =
+    for
+      text <- payload.toRight(SurfaceRenderingRefusal.SourceViewBinding)
+      _ <- validPayload(text)
+      content <- ContentProjection
+        .canonicalTarget(node, snapshot)
+        .left
+        .map(SurfaceRenderingRefusal.Projection.apply)
+    yield new TargetInput(content, text, policy)
 
   private def acyclic(nodes: Vector[NodeSummary]): Boolean =
     val parents = nodes.map(n => n.ref -> n.parent).toMap
@@ -244,6 +321,9 @@ object SurfaceRendering:
   private def validUnicode(atlas: SurfaceAtlas): Either[SurfaceRenderingRefusal, Unit] =
     if unicode(atlas.source.canonicalText) then Right(())
     else Left(SurfaceRenderingRefusal.InvalidUnicode)
+
+  private def validPayload(text: String): Either[SurfaceRenderingRefusal, Unit] =
+    if unicode(text) then Right(()) else Left(SurfaceRenderingRefusal.InvalidUnicode)
 
   private def unicode(text: String): Boolean =
     var i = 0

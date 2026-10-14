@@ -142,11 +142,9 @@ object StudyWorkspaceCli:
       .toEither
       .left
       .map(_ => "invalid config path")
-    bytes <- StudyPreparation.read(path.getParent, path.getFileName.toString).left.map(_.toString)
-    text <- StudyPreparation.utf8(bytes).left.map(_.toString)
-    config <- MappingCli.config(text)
+    settings <- MappingSettings.load(path).left.map(_.diagnostic.noSpaces)
     prepared <- StudyCli.load(study).left.map(_.toString)
-    batch <- MappingPipeline.batch(prepared, config).left.map(_.toString)
+    batch <- settings.execute(prepared).left.map(_.diagnostic.noSpaces)
   yield batch
 
   def run(args: List[String], out: String => Unit, err: String => Unit): Int =

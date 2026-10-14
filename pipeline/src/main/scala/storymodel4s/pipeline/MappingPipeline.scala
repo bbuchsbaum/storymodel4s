@@ -5,7 +5,8 @@ import java.nio.file.Path
 import storymodel4s.align.*
 import storymodel4s.codec.{Canonical, MappingCodecs, MappingExchange, TemporalProjectionCodecs}
 import storymodel4s.core.*
-import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.embed.Sensitivity
+import storymodel4s.embed.onnx.{OnnxMappingRegistration, OnnxSentenceEmbedder}
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
@@ -390,7 +391,9 @@ object MappingPipeline:
         context.representation.digest.hex,
         registration.evidence.identity.checksum.hex,
         registration.basis.toString
-      ) ++ parameters ++ records
+      ) ++ parameters ++ c.selectedLevel.toVector.flatMap(level =>
+        Vector("selected-level/v1", level.toString)
+      ) ++ records
     )
     for
       _ <- validate(config)
@@ -479,7 +482,8 @@ object MappingPipeline:
   final class Batch private[MappingPipeline] (
       val prepared: StudyPreparation.Prepared,
       val config: Config,
-      val outcomes: Vector[Outcome]
+      val outcomes: Vector[Outcome],
+      private val providerBinding: Vector[String] = Vector.empty
   ):
     val identity: Checksum = ContentAddress.digest(
       Vector(
@@ -490,7 +494,7 @@ object MappingPipeline:
         configText(config)
       ) ++ prepared.source.captionContext.toVector.flatMap((pack, blend) =>
         Vector(pack.identity.hex, blend.toString)
-      ) ++ prepared.outcomes.map(_.attempt.hex)
+      ) ++ prepared.outcomes.map(_.attempt.hex) ++ providerBinding
     )
     override def equals(other: Any): Boolean = other match
       case b: Batch => identity == b.identity
@@ -575,6 +579,81 @@ object MappingPipeline:
         }
         new Batch(prepared, config, outcomes)
       }
+
+  /** Execute the checked local encoder against every attempted observation and retain both members.
+    * Source and recall payloads use keyed sensitive receipts even for admitted public examples.
+    */
+  def batchOnnx(
+      prepared: StudyPreparation.Prepared,
+      config: Config,
+      encoder: OnnxSentenceEmbedder
+  ): Either[Refusal, Batch] =
+    for
+      _ <- validate(config)
+      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(
+        prepared.source.captionContext.isEmpty,
+        (),
+        Refusal.MissingCapability("ONNX caption fusion is unavailable; use the caption profile")
+      )
+      candidates <- candidateConfig(config)
+      settings <- OnnxMappingRegistration.Config
+        .of(
+          candidates,
+          Sensitivity.Sensitive,
+          Sensitivity.Sensitive,
+          weights = CostWeights.semanticOnly,
+          functionPrior = FunctionPrior.none,
+          externalMismatch = 0.0,
+          distortionPenalty = 0.0,
+          selectedLevel = Some(0)
+        )
+        .left
+        .map(_ => Refusal.InvalidConfig)
+    yield
+      val outcomes = prepared.outcomes.map { input =>
+        input.result match
+          case Left(reason) =>
+            new Outcome(
+              input.input.participant,
+              input.input.session,
+              None,
+              Some(reason.toString),
+              None,
+              None
+            )
+          case Right(recall) =>
+            val result = for
+              context <- prepared.source
+                .scoringContext(recall.graph)
+                .left
+                .map(_ => Refusal.MissingCapability("checked source rendering unavailable"))
+              registration <- OnnxMappingRegistration
+                .record(encoder, context, settings)
+                .left
+                .map(_ => Refusal.ForeignRegistration)
+              run <- registeredOnnx(registration, recall.inventory, config)
+            yield run
+            new Outcome(
+              recall.participant,
+              recall.session,
+              Some(recall.observation),
+              result.left.toOption.map(_.toString),
+              result.toOption,
+              Some(recall)
+            )
+      }
+      val binding = Vector(
+        "onnx-batch/v1",
+        encoder.model.coordinate,
+        encoder.model.modelChecksum.hex,
+        encoder.model.tokenizerChecksum.hex,
+        encoder.info.provider.render,
+        encoder.runtimeIdentity
+      ) ++ outcomes.map { outcome =>
+        outcome.run.fold("failed:" + outcome.failure.getOrElse("unknown"))(_.identity.hex)
+      }
+      new Batch(prepared, config, outcomes, binding)
 
   /** Project both owned mapping members over one declared source selection and optional recall
     * clock.
@@ -725,6 +804,14 @@ object MappingPipeline:
         .left
         .map(FacadeFailure.Preparation(_))
       result <- batch(prepared, config).left.map(FacadeFailure.Mapping(_))
+    yield result
+
+  /** Resolve local artifacts from a settings file and close the encoder after execution. */
+  def analyze(study: Path, settings: Path): Either[FacadeFailure, Batch] =
+    for
+      resolved <- MappingSettings.load(settings)
+      prepared <- StudyCli.load(study.toString).left.map(FacadeFailure.Preparation(_))
+      result <- resolved.execute(prepared)
     yield result
 
   /** Inspect counts and requested capabilities without publishing participant or source content. */
@@ -882,6 +969,8 @@ object MappingPipeline:
 object MappingCli:
   val Template: String =
     """{"profile":"mapping-lexical-pair/v1","temperature":"1.0","perLevel":20,"tieBudget":200,"requested":["Mapping"],"networkRequests":0,"retries":0}"""
+  val OnnxTemplate: String =
+    """{"profile":"mapping-onnx-pair/v1","temperature":"1.0","perLevel":20,"tieBudget":200,"requested":["Mapping"],"networkRequests":0,"retries":0,"onnx":{"model":"model.onnx","tokenizer":"tokenizer.json","keyFile":"embedding.key","keyId":"local-embedding-v1"}}"""
   private val parser = new io.circe.jawn.JawnParser(maxValueSize = None, allowDuplicateKeys = false)
 
   def config(text: String): Either[String, MappingPipeline.Config] =
@@ -935,15 +1024,12 @@ object MappingCli:
           .toEither
           .left
           .map(_ => FacadeFailure.InvalidConfiguration)
-        bytes <- FacadeFailure.read(configPath)
-        text <- StudyPreparation.utf8(bytes).left.map(FacadeFailure.Preparation(_))
-        resolved <- config(text).left.map(_ => FacadeFailure.InvalidConfiguration)
         studyPath <- scala.util
           .Try(Path.of(study))
           .toEither
           .left
           .map(_ => FacadeFailure.InvalidConfiguration)
-        outcomes <- MappingPipeline.analyze(studyPath, resolved)
+        outcomes <- MappingPipeline.analyze(studyPath, configPath)
         destination <- scala.util
           .Try(Path.of(output))
           .toEither
@@ -988,10 +1074,8 @@ object MappingCli:
         .flatMap(bytes => StudyPreparation.utf8(bytes).left.map(FacadeFailure.Preparation(_)))
       val result = for
         settingsPath <- path(settings)
-        settingsText <- text(settingsPath)
-        resolved <- config(settingsText).left.map(_ => FacadeFailure.InvalidConfiguration)
         studyPath <- path(study)
-        batch <- MappingPipeline.analyze(studyPath, resolved)
+        batch <- MappingPipeline.analyze(studyPath, settingsPath)
         requestPath <- path(requestFile)
         requestText <- text(requestPath)
         request <- TemporalProjectionCodecs
@@ -1024,6 +1108,7 @@ object MappingCli:
       case List("temporal", study, config, request, output, "--resume") =>
         temporalExecute(study, config, request, output, true)
       case List("template")                   => out(Template); 0
+      case List("onnx-template")              => out(OnnxTemplate); 0
       case List("run", study, config, output) => execute(study, config, output, false, false)
       case List("run", study, config, output, "--resume") =>
         execute(study, config, output, true, false)
@@ -1032,7 +1117,7 @@ object MappingCli:
         execute(study, config, output, true, true)
       case _ =>
         refuse(
-          "mappingRun template | run|exchange STUDY.json CONFIG.json OUTPUT [--resume] | temporal STUDY.json CONFIG.json REQUEST.json OUTPUT [--resume]"
+          "mappingRun template|onnx-template | run|exchange STUDY.json CONFIG.json OUTPUT [--resume] | temporal STUDY.json CONFIG.json REQUEST.json OUTPUT [--resume]"
         )
 
 object mappingRun:

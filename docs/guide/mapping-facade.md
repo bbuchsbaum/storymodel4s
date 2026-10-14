@@ -46,8 +46,36 @@ publishing recall text or manufacture provider registration; those existing chec
 `mappingRun` exits 0 for a complete ready batch, 3 for a valid batch with failed observations,
 4 when observations succeeded but a requested capability is missing, and 2 for refusal before
 publication. A partial batch takes precedence over missing capabilities; inspect the outcomes
-and readiness separately. Requesting ONNX through the ordinary lexical path refuses until the
-caller supplies its checked registration to the typed ONNX entry point.
+and readiness separately.
+
+For local neural scoring, `mappingRun onnx-template` prints a configuration for the pinned
+`sentence-transformers/all-MiniLM-L6-v2` model. Place its `model.onnx` and `tokenizer.json` files
+beside the settings file, or use relative paths beneath that directory. The adapter checks the
+catalog's exact artifact hashes before loading native code. There is no automatic download or
+fallback. Create a local receipt key once and keep it for reproducible replay:
+
+```sh
+umask 077
+openssl rand -out embedding.key 32
+sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun onnx-template'
+```
+
+Save the printed JSON as `mapping-onnx.json`. Its `onnx` object names `model`, `tokenizer`,
+`keyFile`, and `keyId`; the key file contains exactly 32 raw bytes. Keep it in private local
+storage. Receipt hashes are keyed for both source and recall text. Paths and key bytes are
+excluded from published metadata; changing the key changes execution identity. The ordinary
+commands `mappingRun`, `mappingWeight`, `studyWorkspace`, and `recallVolumes` share this
+configuration. Scala callers can pass the settings path as the second argument to
+`MappingPipeline.analyze`. The sbt pipeline launcher disables ONNX telemetry before starting
+its child JVM; other launchers must set `ORT_DISABLE_TELEMETRY=1` before JVM startup.
+
+The ONNX profile supports checked text and timed annotation sources. Timed rendering uses each
+segment's embedding text when present, otherwise its description; groups use their embedding
+text or label. Receipts retain a distinct rendering policy and the complete checked source.
+It uses half-cosine semantic cost with independent reference and the declared Sherlock
+reconstruction profile. This is not an assertion of historical benchmark-preset equivalence.
+Joined video sources use the separate caption profile: ONNX caption fusion is unavailable and
+refuses explicitly. Annotation and video comparisons must name the actual scoring profiles.
 
 `FacadeFailure` retains I/O operation, exact local path and exception class for typed callers.
 Its `diagnostic` JSON hashes paths and omits exception messages, because filenames and parser

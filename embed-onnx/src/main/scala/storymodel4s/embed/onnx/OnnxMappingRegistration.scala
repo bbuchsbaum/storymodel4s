@@ -28,7 +28,8 @@ object OnnxMappingRegistration:
       val documentSensitivity: Sensitivity,
       val metric: EmbeddingMetric,
       val emptyPolicy: SurfaceEmptyPolicy,
-      val pricing: StrictCostModel
+      val pricing: StrictCostModel,
+      val selectedLevel: Option[Int]
   ):
     private def parts = (
       candidateSignature(candidates),
@@ -36,7 +37,8 @@ object OnnxMappingRegistration:
       documentSensitivity,
       metric,
       emptyPolicy,
-      pricingSignature(pricing)
+      pricingSignature(pricing),
+      selectedLevel
     )
     override def equals(other: Any): Boolean = other match
       case c: Config => parts == c.parts
@@ -56,9 +58,11 @@ object OnnxMappingRegistration:
         externalFloor: Double = 1.0,
         externalMismatch: Double = 0.5,
         missingSemantic: Double = 0.5,
-        distortionPenalty: Double = 0.3
+        distortionPenalty: Double = 0.3,
+        selectedLevel: Option[Int] = None
     ): Either[OnnxMappingRefusal, Config] =
       if metric != EmbeddingMetric.HalfCosineDistance then Left(OnnxMappingRefusal.StrictMetric)
+      else if selectedLevel.exists(_ < 0) then Left(OnnxMappingRefusal.Configuration)
       else
         StrictCostModel
           .of(
@@ -73,7 +77,15 @@ object OnnxMappingRegistration:
           .left
           .map(OnnxMappingRefusal.Pricing.apply)
           .map(p =>
-            new Config(candidates, querySensitivity, documentSensitivity, metric, emptyPolicy, p)
+            new Config(
+              candidates,
+              querySensitivity,
+              documentSensitivity,
+              metric,
+              emptyPolicy,
+              p,
+              selectedLevel
+            )
           )
 
   /** Only actual concrete recordings or their exact capability replay derive this envelope. It
@@ -140,6 +152,11 @@ object OnnxMappingRegistration:
       config: Config
   ): Either[OnnxMappingRefusal, Registered] =
     for
+      _ <- Either.cond(
+        config.selectedLevel.forall(context.source.byLevel.contains),
+        (),
+        OnnxMappingRefusal.Configuration
+      )
       spaces <- geometry(encoder.spaces)
       effective <- candidateConfig(config, spaces._1)
       query <- batch(
@@ -326,7 +343,7 @@ object OnnxMappingRegistration:
         .left
         .map(OnnxMappingRefusal.Surface.apply)
       candidates <- SurfaceCandidateGenerator
-        .generate(session, effective)
+        .generate(session, effective, config.selectedLevel)
         .left
         .map(OnnxMappingRefusal.Candidates.apply)
       pricing <-

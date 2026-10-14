@@ -164,7 +164,11 @@ object RecallVolumeExport:
       configPin <- field[Json](job, "config")
       configBytes <- load(base, configPin)
       configText <- StudyPreparation.utf8(configBytes).left.map(_ => "invalid-config")
-      config <- MappingCli.config(configText)
+      configName <- field[String](configPin, "path")
+      config <- MappingSettings
+        .decode(configText, base.resolve(configName).getParent)
+        .left
+        .map(_.diagnostic.noSpaces)
       participant <- field[String](job, "participant")
       session <- field[String](job, "session")
       _ <- Either.cond(
@@ -236,7 +240,7 @@ object RecallVolumeExport:
         .readLexical(csv, csvHash, columns, recall.graph, recall.inventory)
         .left
         .map(_.toString)
-      batch <- MappingPipeline.batch(prepared, config).left.map(_.toString)
+      batch <- config.execute(prepared).left.map(_.diagnostic.noSpaces)
       _ <- Either.cond(batch.outcomes.forall(_.run.nonEmpty), (), "mapping-failed")
       exchange <- MappingPipeline.exchangeArtifacts(batch)
       (exchangeFiles, exchangeManifest) = exchange

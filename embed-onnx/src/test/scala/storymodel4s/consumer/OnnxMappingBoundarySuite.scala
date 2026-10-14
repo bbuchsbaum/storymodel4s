@@ -12,7 +12,8 @@ final case class OpenConfig(
     documentSensitivity: Sensitivity,
     metric: EmbeddingMetric,
     emptyPolicy: SurfaceEmptyPolicy,
-    pricing: StrictCostModel
+    pricing: StrictCostModel,
+    selectedLevel: Option[Int]
 )
 final case class OpenRegistered(
     context: SurfaceScoringContext,
@@ -43,13 +44,13 @@ class OnnxMappingBoundarySuite extends FunSuite:
   test("config constructor is closed outside the defining package") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; new OpenConfig(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; new OpenConfig(???, ???, ???, ???, ???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; new OnnxMappingRegistration.Config(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; new OnnxMappingRegistration.Config(???, ???, ???, ???, ???, ???, ???)"
       ),
       "constructor opened"
     )
@@ -58,13 +59,13 @@ class OnnxMappingBoundarySuite extends FunSuite:
   test("config apply is closed outside the defining package") {
     assert(
       typeChecks(
-        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; OpenConfig(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; OpenConfig(???, ???, ???, ???, ???, ???, ???)"
       ),
       "same-shape control"
     )
     assert(
       !typeChecks(
-        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; OnnxMappingRegistration.Config(???, ???, ???, ???, ???, ???)"
+        "import storymodel4s.align.*; import storymodel4s.embed.*; import storymodel4s.embed.onnx.*; import onnxmappingconsumer.*; OnnxMappingRegistration.Config(???, ???, ???, ???, ???, ???, ???)"
       ),
       "apply opened"
     )

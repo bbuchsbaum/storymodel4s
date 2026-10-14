@@ -119,6 +119,18 @@ object StudyPreparation:
     /** Narrative targets are available only from a decoded and revalidated StoryModel. */
     def narrativeModel: Option[TextModel[ModelStatus.Validated]] = model
 
+    /** Render the retained checked source, without treating annotation positions as text support.
+      */
+    private[pipeline] def scoringContext(
+        recall: RecallGraph[Checked]
+    ): Either[SurfaceRenderingRefusal, SurfaceScoringContext] = underlying match
+      case timed: storymodel4s.align.bridge.TimedSourceView =>
+        SurfaceRendering.prepareTimed(recall, timed)
+      case _ =>
+        textPackage.map(_.atlas).orElse(model.map(_.atlas)) match
+          case Some(atlas) => SurfaceRendering.prepare(recall, this, representation, atlas)
+          case None        => Left(SurfaceRenderingRefusal.UnsupportedSupport)
+
     val edition: Checksum = Checksum.ofText(artifact)
     val nodes: Vector[NodeSummary] = underlying.nodes
     def node(ref: SourceNodeRef): Option[NodeSummary] = underlying.node(ref)

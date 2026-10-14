@@ -468,14 +468,17 @@ object StrictCandidateGenerator:
 /** A checked declared surface session shares its exact channel/context across generation/pricing.
   */
 object SurfaceCandidateGenerator:
+  /** Select the nomination level before scoring while retaining the complete surface context. */
   def generate(
       session: SurfaceScoringSession,
-      config: StrictCandidateConfig
+      config: StrictCandidateConfig,
+      selectedLevel: Option[Int] = None
   ): Either[CandidateRefusal, StrictCandidates] =
     StrictCandidates.canonical(
       session.channel,
       config,
       session.context.recall,
       session.context.source,
-      Some(session)
+      Some(session),
+      selectedLevel = selectedLevel
     )

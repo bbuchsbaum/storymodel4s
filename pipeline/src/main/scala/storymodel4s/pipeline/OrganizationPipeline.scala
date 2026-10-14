@@ -186,11 +186,9 @@ object OrganizationPipeline:
             .toEither
             .left
             .map(_ => "invalid config path")
-          bytes <- FacadeFailure.read(configPath).left.map(_.diagnostic.noSpaces)
-          text <- StudyPreparation.utf8(bytes).left.map(_.toString)
-          resolved <- MappingCli.config(text)
+          resolved <- MappingSettings.load(configPath).left.map(_.diagnostic.noSpaces)
           _ <- Either.cond(
-            resolved.requested == Vector(MappingPipeline.Capability.Mapping),
+            resolved.config.requested == Vector(MappingPipeline.Capability.Mapping),
             (),
             "the 1.1 organization command owns its explicit readout request; mapping config must request Mapping"
           )
@@ -200,7 +198,8 @@ object OrganizationPipeline:
             .toEither
             .left
             .map(_ => "invalid output path")
-          batch <- MappingPipeline.analyze(studyPath, resolved).left.map(_.diagnostic.noSpaces)
+          prepared <- StudyCli.load(studyPath.toString).left.map(_.toString)
+          batch <- resolved.execute(prepared).left.map(_.diagnostic.noSpaces)
           receipt <- publish(batch, axis, outputPath, tail.nonEmpty)
         yield batch -> receipt
         result match

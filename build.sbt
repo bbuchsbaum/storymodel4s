@@ -416,7 +416,9 @@ lazy val pipeline = project
     ),
     Test / unmanagedResourceDirectories += (media / Test / resourceDirectory).value,
     Test / fork := true,
-    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
+    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1",
+    run / fork := true,
+    run / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
   )
   .dependsOn(
     providerAgent,

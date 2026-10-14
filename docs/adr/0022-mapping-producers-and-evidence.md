@@ -297,3 +297,32 @@ Rejected alternatives: a universal refusal supertype across modules (no concrete
 echoing parser/exception messages (can disclose input text), and treating successful execution as
 validation or requested-capability readiness (different outcomes). Existing mapping status 3 for
 partial batches and 4 for missing capabilities remain distinct and documented.
+
+## Ordinary local ONNX registration (2026-10-14)
+
+The ordinary mapping settings file may supply an `onnx` resource object with local model,
+tokenizer and receipt-key paths. Scientific `MappingPipeline.Config` remains separate from
+machine paths. The catalog admits model bytes; the producer creates the actual registered
+attempts and consumes their originating evidence for both members. Keyed receipts cover source
+and recall payloads conservatively. Batch identity binds provider/model/runtime and actual run
+identities, including key-dependent registrations; relocating identical inputs does not rename
+the run. The encoder closes after the batch. Existing disclosure authority still governs export.
+
+`SurfaceRendering.prepareTimed` accepts a closed checked `TimedSourceView`, derives the complete
+declared population and uses a distinct versioned rendering policy. Segment embedding text (or
+description) and group embedding text (or label) are language payloads; physical support remains
+the original media/annotation support. The source identity retains all checked input fields.
+This adds no inferred clock, annotation-to-film synchronization or empirical accuracy claim.
+
+The ordinary ONNX preset nominates the complete level-0 cut before scoring or pricing. Its
+registration configuration and identity retain that choice, and replay refuses a changed cut.
+Rendering and execution still bind the complete source, including group documents. The existing
+typed registration default continues to nominate across levels. A missing requested level refuses
+before native recording. Rejected alternatives: filtering already-priced nominations, flattening
+the source hierarchy, and changing the default behavior of existing typed registrations.
+
+Rejected alternatives: a text atlas fabricated from annotation coordinates, caller-created
+execution receipts, checksums supplied as model authority, environmental configuration with
+silent lexical fallback, plaintext sensitive receipt hashes, and silently ignoring captions when
+ONNX is requested for a joined video source. The existing caption profile remains the separate
+checked video scoring route. Historical benchmark parity requires its own measured receipt.

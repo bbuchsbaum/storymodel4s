@@ -2,6 +2,8 @@ package onnxmappingconsumer
 
 import munit.FunSuite
 import storymodel4s.align.*
+import storymodel4s.align.bridge.*
+import storymodel4s.core.*
 import storymodel4s.embed.*
 import storymodel4s.embed.onnx.*
 import storymodel4s.features.Estimate
@@ -51,6 +53,109 @@ class OnnxMappingRegistrationSuite extends FunSuite:
     OnnxMappingRegistration.Config
       .of(value(StrictCandidateConfig.of(1, TieBudgetRequest.AtMost(8), false, None)), q, d)
   )
+
+  private def cut(level: Int) = value(
+    OnnxMappingRegistration.Config
+      .of(config.candidates, Sensitivity.Public, Sensitivity.Public, selectedLevel = Some(level))
+  )
+
+  private def timedContext =
+    val bundle = value(
+      SourceBundle.filmEdition(
+        EditionId.unsafe("onnx-timed-control"),
+        Checksum.ofText("synthetic video"),
+        0L,
+        100L,
+        RationalTimebase.Millisecond
+      )
+    )
+    val group = TimedSegment.Group(1, "hello")
+    val source = value(
+      TimedSourceView.of(
+        Vector(
+          TimedSegment(
+            1,
+            "hello",
+            Some(
+              MediaLocus.Extent("part", value(PlaybackInterval.on(bundle.primaryAxis, 0L, 10L)))
+            ),
+            Some(group)
+          ),
+          TimedSegment(
+            2,
+            "hello",
+            Some(
+              MediaLocus.Extent("part", value(PlaybackInterval.on(bundle.primaryAxis, 10L, 20L)))
+            ),
+            Some(group)
+          )
+        ),
+        Map("part" -> bundle),
+        Checksum.ofText("synthetic timed annotation")
+      )
+    )
+    value(SurfaceRendering.prepareTimed(OnnxMappingFixture.context().recall, source))
+
+  test("selected cut precedes nomination accounting and pricing while retaining every document") {
+    withEncoder { e =>
+      val ctx = timedContext
+      val original = value(OnnxMappingRegistration.record(e, ctx, cut(0)))
+      val unit = ctx.queries.head._1
+      val leaves = ctx.source.nodes.filter(_.level == 0).map(_.ref).toSet
+      assertEquals(original.documentRecord.result.outcomes.size, 3)
+      assertEquals(original.context.documents.size, 3)
+      val selected = original.candidates.get(unit).get
+      assertEquals(selected.set.nominations.map(_.ref).toSet, leaves)
+      assertEquals(selected.semanticOutcomes.map(s => s.level -> s.count), Vector(0 -> 2))
+      assertEquals(original.evidence.states.flatten.flatMap(_.anchor).toSet, leaves)
+      val replayed = value(original.replay(ctx, cut(0), e.model, e.info.provider))
+      assertEquals(replayed.evidence, original.evidence)
+      assertEquals(
+        original.replay(ctx, config, e.model, e.info.provider),
+        Left(OnnxMappingRefusal.Configuration)
+      )
+      val all = value(OnnxMappingRegistration.record(e, ctx, config))
+      assertEquals(
+        all.candidates.get(unit).get.set.nominations.map(_.ref).toSet,
+        ctx.source.nodes.map(_.ref).toSet
+      )
+      assertEquals(
+        all.candidates.get(unit).get.semanticOutcomes.map(s => s.level -> s.count),
+        Vector(0 -> 2, 1 -> 1)
+      )
+    }
+  }
+
+  test("selection remains replay configuration even when a flat source gives identical evidence") {
+    withEncoder { e =>
+      val ctx = OnnxMappingFixture.context()
+      val original = value(OnnxMappingRegistration.record(e, ctx, cut(0)))
+      val all = value(OnnxMappingRegistration.record(e, ctx, config))
+      assertEquals(original.evidence, all.evidence)
+      assertEquals(
+        original.replay(ctx, config, e.model, e.info.provider),
+        Left(OnnxMappingRefusal.Configuration)
+      )
+      assertEquals(
+        value(original.replay(ctx, cut(0), e.model, e.info.provider)).evidence,
+        original.evidence
+      )
+    }
+  }
+
+  test("invalid or absent requested levels refuse instead of yielding empty nominations") {
+    assertEquals(
+      OnnxMappingRegistration.Config
+        .of(config.candidates, Sensitivity.Public, Sensitivity.Public, selectedLevel = Some(-1)),
+      Left(OnnxMappingRefusal.Configuration)
+    )
+    withEncoder { e =>
+      assertEquals(
+        OnnxMappingRegistration.record(e, OnnxMappingFixture.context(), cut(1)),
+        Left(OnnxMappingRefusal.Configuration)
+      )
+    }
+  }
 
   test("exact replay after encoder closure preserves attempts and derived evidence") {
     val original = withEncoder(e =>

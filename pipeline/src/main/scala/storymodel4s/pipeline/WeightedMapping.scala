@@ -94,14 +94,9 @@ object MappingWeightCli:
           .toEither
           .left
           .map(_ => "invalid config path")
-        bytes <- StudyPreparation
-          .read(path.getParent, path.getFileName.toString)
-          .left
-          .map(_.toString)
-        text <- StudyPreparation.utf8(bytes).left.map(_.toString)
-        settings <- MappingCli.config(text)
+        settings <- MappingSettings.load(path).left.map(_.diagnostic.noSpaces)
         prepared <- StudyCli.load(study).left.map(_.toString)
-        batch <- MappingPipeline.batch(prepared, settings).left.map(_.toString)
+        batch <- settings.execute(prepared).left.map(_.diagnostic.noSpaces)
         output <- scala.util.Try(Path.of(destination)).toEither.left.map(_ => "invalid output path")
         receipt <- WeightedMapping.publish(batch, weights, output, resume)
       yield (batch, receipt)
