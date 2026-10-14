@@ -15,6 +15,7 @@ import storymodel4s.core.{Checksum, DomainError, EditionId}
   */
 object VideoAcquisition:
   val Schema: String = "video-source-job/v1"
+  private val PlannedSchema: String = "video-source-planned-job/v1"
   private final case class Runtime(
       ffmpeg: Path,
       ffprobe: Path,
@@ -82,6 +83,18 @@ object VideoAcquisition:
 
   /** Missing tools, runtime modules or pinned local models refuse before creating output. */
   def run(root: Path, config: String, output: Path): Either[DomainError, CaptionPackage] =
+    new JawnParser(maxValueSize = None, allowDuplicateKeys = false)
+      .parse(config)
+      .toOption
+      .flatMap(_.hcursor.get[String]("schemaVersion").toOption) match
+      case Some(PlannedSchema) => PlannedVideoAcquisition.run(root, config, output)
+      case _                   => runDetected(root, config, output)
+
+  private def runDetected(
+      root: Path,
+      config: String,
+      output: Path
+  ): Either[DomainError, CaptionPackage] =
     attempt {
       for
         json <- new JawnParser(maxValueSize = None, allowDuplicateKeys = false)

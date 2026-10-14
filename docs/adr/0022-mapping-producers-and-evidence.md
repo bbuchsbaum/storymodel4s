@@ -326,3 +326,27 @@ execution receipts, checksums supplied as model authority, environmental configu
 silent lexical fallback, plaintext sensitive receipt hashes, and silently ignoring captions when
 ONNX is requested for a joined video source. The existing caption profile remains the separate
 checked video scoring route. Historical benchmark parity requires its own measured receipt.
+
+## Planned annotation-interval video sampling (2026-10-14)
+
+The existing `videoSource build` entry point may accept a distinct versioned planned job.
+Each part declares native half-open tick intervals on a pinned media stream. Acquisition checks
+the plan against the actual frame index: boundaries must be exact frame starts and ends, with
+known durations. A multi-frame interval includes its first and last frames; intermediate frames
+are selected deterministically. Overlapping extents share a sorted, distinct sample set.
+The package retains the plan, selection rule and realized frame selections. Checked caption
+support must equal the planned interval before the unchanged package replay and strict join.
+
+This mode reuses sampled extraction and the existing caption worker; it executes no detector
+and creates no detector receipt. It avoids full raw-frame materialization, while ffmpeg may
+still decode the full stream. Sparse examined frames remain distinct from the interval covered
+by the caption proposal, and proposal authority remains Draft. Point annotations retain
+unavailable video coverage because they cannot equal a positive caption extent. The final
+annotation/media correspondence binds the actual resulting package identity.
+
+Rejected alternatives: disguising planned bounds as detected shots, rounding annotation bounds,
+stretching points to one frame, duplicating shared frames, assigning a placeholder package
+identity, and dropping uncovered annotations from the comparison population. The existing
+caption scorer blends lexical annotation and caption evidence; an ONNX-only profile is a
+separate condition. Caption blend and reference/reconstruction mixture weight remain separate
+parameters. This amendment adds no physical scanner synchronization or caption-accuracy claim.

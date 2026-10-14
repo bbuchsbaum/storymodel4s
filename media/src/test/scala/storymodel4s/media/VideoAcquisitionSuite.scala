@@ -155,6 +155,55 @@ class VideoAcquisitionSuite extends FunSuite:
         stream.iterator().asScala.toVector.reverse.foreach(p => { val _ = Files.deleteIfExists(p) })
       finally stream.close()
 
+  private def plannedJob(job: Json): Json =
+    val c = job.hcursor
+    val originalRuntime = c.downField("runtime")
+    val runtime = Json.obj(
+      Vector("ffmpeg", "ffprobe", "captionPython", "captionScript", "modelPath").map { name =>
+        name -> originalRuntime.downField(name).focus.get
+      }*
+    )
+    val inputSha = storymodel4s.core.Checksum.ofBytes(resource("f0-v1.mov")).hex
+    Json.obj(
+      "schemaVersion" -> Json.fromString("video-source-planned-job/v1"),
+      "edition" -> c.downField("edition").focus.get,
+      "runtime" -> runtime,
+      "parts" -> Json.arr(
+        Json.obj(
+          "occurrence" -> Json.fromString("part-a"),
+          "manifest" -> Json.fromString("fixture.json"),
+          "input" -> Json.fromString("input.mov"),
+          "inputSha256" -> Json.fromString(inputSha),
+          "streamIndex" -> Json.fromInt(0),
+          "timebase" -> Json.fromString("1/24000"),
+          "extents" -> Json.arr(
+            Json.obj(
+              "id" -> Json.fromString("a"),
+              "start" -> Json.fromString("0"),
+              "endExclusive" -> Json.fromString("7000"),
+              "samplesPerExtent" -> Json.fromInt(3)
+            ),
+            Json.obj(
+              "id" -> Json.fromString("b"),
+              "start" -> Json.fromString("4000"),
+              "endExclusive" -> Json.fromString("10000"),
+              "samplesPerExtent" -> Json.fromInt(3)
+            ),
+            Json.obj(
+              "id" -> Json.fromString("c"),
+              "start" -> Json.fromString("19000"),
+              "endExclusive" -> Json.fromString("21000"),
+              "samplesPerExtent" -> Json.fromInt(1)
+            )
+          )
+        )
+      ),
+      "model" -> c.downField("model").focus.get,
+      "captionRecipe" -> c.downField("captionRecipe").focus.get,
+      "maxDecodedBytes" -> c.downField("maxDecodedBytes").focus.get,
+      "timeoutSeconds" -> c.downField("timeoutSeconds").focus.get
+    )
+
   test("real extraction through synthetic worker processes publishes a replayable package"):
     withSyntheticWorkers { (root, job) =>
       val out = root.resolve("output")
@@ -176,6 +225,103 @@ class VideoAcquisitionSuite extends FunSuite:
       assertEquals(Files.readAllBytes(out.resolve("manifest.json")).toVector, manifest.toVector)
     }
 
+  test("planned intervals preserve exact support and share selected frames"):
+    withSyntheticWorkers { (root, job) =>
+      val out = root.resolve("planned-output")
+      val result = VideoAcquisition
+        .run(root, plannedJob(job).noSpaces, out)
+        .fold(e => fail(e.message), identity)
+      assertEquals(result.parts.size, 1)
+      assertEquals(result.parts.head.frames.selected, Vector(0, 2, 4, 5, 7, 17))
+      assertEquals(
+        result.parts.head.captions.proposals.map(p => (p.support.start, p.support.endExclusive)),
+        Vector((0L, 7000L), (4000L, 10000L), (19000L, 21000L))
+      )
+      assert(Files.exists(out.resolve("plan.json")))
+      assert(Files.exists(out.resolve("selection-rule.json")))
+      assert(Files.exists(out.resolve("part-0/realized-selections.json")))
+      assert(!Files.exists(out.resolve("part-0/detector-envelope.json")))
+      val manifest = Files.readAllBytes(out.resolve("manifest.json"))
+      val replay = storymodel4s.media.CaptionPackage.load(
+        out,
+        manifest,
+        result.manifestChecksum,
+        result.edition
+      )
+      assertEquals(replay.map(_.identity), Right(result.identity))
+    }
+
+  test("planned intervals refuse off-boundary, wrong pins and insufficient multi-frame samples"):
+    withSyntheticWorkers { (root, job) =>
+      val base = plannedJob(job)
+      def altered(f: Json => Json): Json =
+        base.mapObject(o => o.add("parts", f(o("parts").get)))
+      val offBoundary = altered(
+        _.mapArray(
+          _.map(
+            _.mapObject(
+              _.add(
+                "extents",
+                Json.arr(
+                  Json.obj(
+                    "id" -> Json.fromString("bad"),
+                    "start" -> Json.fromString("1"),
+                    "endExclusive" -> Json.fromString("7000"),
+                    "samplesPerExtent" -> Json.fromInt(2)
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+      assert(
+        VideoAcquisition
+          .run(root, offBoundary.noSpaces, root.resolve("off"))
+          .left
+          .toOption
+          .exists(_.message.contains("off a frame boundary"))
+      )
+      val wrongPin =
+        altered(_.mapArray(_.map(_.mapObject(_.add("inputSha256", Json.fromString("0" * 64))))))
+      assert(VideoAcquisition.run(root, wrongPin.noSpaces, root.resolve("pin")).isLeft)
+      val wrongTimebase =
+        altered(_.mapArray(_.map(_.mapObject(_.add("timebase", Json.fromString("1/2500"))))))
+      assert(
+        VideoAcquisition
+          .run(root, wrongTimebase.noSpaces, root.resolve("timebase"))
+          .left
+          .toOption
+          .exists(_.message.contains("timebase"))
+      )
+      val few = altered(
+        _.mapArray(
+          _.map(
+            _.mapObject(
+              _.add(
+                "extents",
+                Json.arr(
+                  Json.obj(
+                    "id" -> Json.fromString("few"),
+                    "start" -> Json.fromString("0"),
+                    "endExclusive" -> Json.fromString("7000"),
+                    "samplesPerExtent" -> Json.fromInt(1)
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+      assert(
+        VideoAcquisition
+          .run(root, few.noSpaces, root.resolve("few"))
+          .left
+          .toOption
+          .exists(_.message.contains("at least two"))
+      )
+    }
+
   test("wrong worker answer refuses the full process pipeline without publishing"):
     withSyntheticWorkers { (root, job) =>
       val script = root.resolve("caption.py")
@@ -192,6 +338,56 @@ class VideoAcquisitionSuite extends FunSuite:
       val paths = Files.list(root)
       try assert(!paths.anyMatch(_.getFileName.toString.startsWith(".video-source-")))
       finally paths.close()
+    }
+
+  test("planned input refusals leave no published or temporary package"):
+    withSyntheticWorkers { (root, job) =>
+      val base = plannedJob(job)
+      val part = base.hcursor.downField("parts").focus.get.asArray.get.head
+      val duplicate = base.mapObject(
+        _.add(
+          "parts",
+          Json.arr(
+            part,
+            part.mapObject(_.add("occurrence", Json.fromString("part-b")))
+          )
+        )
+      )
+      val point = base.mapObject(
+        _.add(
+          "parts",
+          Json.arr(
+            part.mapObject(
+              _.add(
+                "extents",
+                Json.arr(
+                  Json.obj(
+                    "id" -> Json.fromString("point"),
+                    "start" -> Json.fromString("0"),
+                    "endExclusive" -> Json.fromString("0"),
+                    "samplesPerExtent" -> Json.fromInt(1)
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+      val cases = Vector(
+        duplicate -> "extent ids must be unique",
+        point -> "positive interval",
+        base.mapObject(_.add("inventedAuthority", Json.True)) -> "unknown or missing fields",
+        base.mapObject(_.add("maxDecodedBytes", Json.fromLong(1))) -> "maxDecodedBytes"
+      )
+      cases.zipWithIndex.foreach { case ((config, reason), index) =>
+        val out = root.resolve(s"refused-$index")
+        val result = VideoAcquisition.run(root, config.noSpaces, out)
+        assert(result.left.toOption.exists(_.message.contains(reason)), result.toString)
+        assert(!Files.exists(out))
+        val files = Files.list(root)
+        try assert(!files.anyMatch(_.getFileName.toString.startsWith(".video-source-planned-")))
+        finally files.close()
+      }
     }
 
   test("pinned model bytes and decode budget are enforced before publishing"):
