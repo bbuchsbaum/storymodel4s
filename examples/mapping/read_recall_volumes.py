@@ -75,6 +75,10 @@ def read(files, csv_bytes):
     rows = list(csv.reader(io.StringIO(csv_bytes.decode('utf-8-sig'), newline=''), strict=True))
     require(rows[0] == columns['header'], 'CSV header')
     require(all(len(r) == len(rows[0]) for r in rows[1:]), 'CSV width')
+    prepared = parse(paired[outcome['observation'] + '-recall.json'])
+    replay = ' '.join(text for row in rows[1:]
+                      if (text := row[columns['word']].strip(''.join(map(chr, range(33))))))
+    require(replay == prepared['graph']['transcript']['canonicalText'], 'transcript replay')
     words = inventory['words']
     entries = timing['entries']
     require([e['word'] for e in entries] == [w['id'] for w in words], 'complete word timing')

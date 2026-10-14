@@ -59,6 +59,23 @@ class Reader(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'clock selection'):
             read(edited('recall-timing.json', lambda a: a['clock'].update(key='foreign')), CSV)
 
+    def test_repinned_same_length_foreign_text(self):
+        changed_csv = CSV.replace(b'Anna,0', b'Zzzz,0')
+        old_hash, new_hash = hashlib.sha256(CSV).hexdigest(), hashlib.sha256(changed_csv).hexdigest()
+        files = {name: text.replace(old_hash, new_hash) for name, text in FILES.items()}
+        manifest = json.loads(files['manifest.json'])
+        binding = json.loads(files['scanner-binding.json'])
+        declaration = manifest['metadata']['recording']
+        binding['evidence']['declaration'] = hashlib.sha256(json.dumps(
+            declaration, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
+        files['scanner-binding.json'] = json.dumps(binding)
+        for entry in manifest['files']:
+            raw = files[entry['path']].encode()
+            entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=str(len(raw)))
+        files['manifest.json'] = json.dumps(manifest)
+        with self.assertRaisesRegex(ValueError, 'transcript replay'):
+            read(files, changed_csv)
+
     def test_changed_csv(self):
         with self.assertRaisesRegex(ValueError, 'CSV identity'):
             read(FILES, CSV.replace(b'Anna,0', b'Anna,.1'))
