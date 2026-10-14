@@ -1,0 +1,49 @@
+{
+  "candidate": "19f98d9fc23e14143ac40731d13617b11a65e57b",
+  "reviewer": "independent package_contract_review agent",
+  "verdict": "PASS for local integration",
+  "blocks": [],
+  "followUps": [],
+  "verified": {
+    "jvm": {
+      "passed": 3475,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 4,
+      "moduleSummaries": 18
+    },
+    "js": {
+      "passed": 2594,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "moduleSummaries": 12
+    },
+    "native": {
+      "passed": 2594,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "moduleSummaries": 12
+    },
+    "archivedLogs": 16,
+    "identicalOutputFiles": 30,
+    "payloadPins": 29,
+    "preparedInputPins": 3,
+    "finalProducerExit": 0,
+    "formatExit": 0
+  },
+  "reviewScope": "Fresh reference scope, fatal warnings, log hashes/lengths, exact repeated outputs, source unchanged from5dced342, clean clone and diff check; prior mutation and Python verdicts retained",
+  "integration": {
+    "branch": "codex/passport-resume-20261013",
+    "head": "19f98d9fc23e14143ac40731d13617b11a65e57b",
+    "method": "fast-forward",
+    "touchedPathsMatchCandidate": true,
+    "mainUnchanged": "8860d064d2e9b9d5aa779d11c6c7caab7c4a3e36",
+    "pushed": false
+  },
+  "limits": [
+    "LocallyObserved, no hosted qualification",
+    "Encoding synchronization and full BIDS/Sherlock acceptance remain open"
+  ]
+}
