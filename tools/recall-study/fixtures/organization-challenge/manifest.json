@@ -1,0 +1,1717 @@
+{
+  "admission": {
+    "Source": "Codex original machine-authored fictional diagnostic clauses, 2026-10-14, Toronto, organization-content-challenge/v1; no transcribed edition",
+    "Basis": "Original synthetic project contribution under repository Apache-2.0; no translation or participant material",
+    "Narrator": "None; machine-authored fiction, not participant recall",
+    "Modifications": "Each four-target set crosses two fictional names and two actions. Exact copies, listed paraphrases, final-letter deletion, development second-letter substitution with z, held-out adjacent internal-letter transposition, shared two-letter name prefixes, unrelated weather events, and declared novel names test specific mechanisms. All transformations are diagnostic, not corrections to an original work.",
+    "Tradition": "None; no traditional, community, ethnographic or minoritized narrative material; no community protocol applies",
+    "Admitted by": "Codex independent reviewer /root/organization_review, 2026-10-14 UTC, checked against original organization-content-challenge/v1; approved pre-signoff SHA256 5af74f9a715fabb165f068585c453b044bf3b100992b0461990adbccf9d81be5"
+  },
+  "schema": "organization-content-challenge/v1",
+  "groups": [
+    {
+      "id": "dev-a",
+      "split": "development",
+      "source": [
+        "Anna arrived.",
+        "Anya left.",
+        "Anna left.",
+        "Anya arrived."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Anna arrived.",
+            "Anya left.",
+            "Anna left.",
+            "Anya arrived."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Anna came.",
+            "Anya departed.",
+            "Anna departed.",
+            "Anya came."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Ann arrived.",
+            "Any left.",
+            "Ann left.",
+            "Any arrived."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Azna arrived.",
+            "Azya left.",
+            "Azna left.",
+            "Azya arrived."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "An arrived.",
+            "An left.",
+            "An left.",
+            "An arrived."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Rain soaked the meadow.",
+            "Snow covered the mountain.",
+            "Thunder shook the valley.",
+            "Hail battered the roof."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Anne arrived.",
+            "Anye left.",
+            "Anne left.",
+            "Anye arrived."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dev-b",
+      "split": "development",
+      "source": [
+        "Clara opened the box.",
+        "Clive closed the box.",
+        "Clara closed the box.",
+        "Clive opened the box."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Clara opened the box.",
+            "Clive closed the box.",
+            "Clara closed the box.",
+            "Clive opened the box."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Clara unsealed the box.",
+            "Clive shut the box.",
+            "Clara shut the box.",
+            "Clive unsealed the box."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Clar opened the box.",
+            "Cliv closed the box.",
+            "Clar closed the box.",
+            "Cliv opened the box."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Czara opened the box.",
+            "Czive closed the box.",
+            "Czara closed the box.",
+            "Czive opened the box."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "Cl opened the box.",
+            "Cl closed the box.",
+            "Cl closed the box.",
+            "Cl opened the box."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Rain soaked the meadow.",
+            "Snow covered the mountain.",
+            "Thunder shook the valley.",
+            "Hail battered the roof."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Clare opened the box.",
+            "Cliva closed the box.",
+            "Clare closed the box.",
+            "Cliva opened the box."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dev-c",
+      "split": "development",
+      "source": [
+        "Marta lifted the crate.",
+        "Marco lowered the crate.",
+        "Marta lowered the crate.",
+        "Marco lifted the crate."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Marta lifted the crate.",
+            "Marco lowered the crate.",
+            "Marta lowered the crate.",
+            "Marco lifted the crate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Marta raised the crate.",
+            "Marco put the crate down.",
+            "Marta put the crate down.",
+            "Marco raised the crate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Mart lifted the crate.",
+            "Marc lowered the crate.",
+            "Mart lowered the crate.",
+            "Marc lifted the crate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Mzrta lifted the crate.",
+            "Mzrco lowered the crate.",
+            "Mzrta lowered the crate.",
+            "Mzrco lifted the crate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "Ma lifted the crate.",
+            "Ma lowered the crate.",
+            "Ma lowered the crate.",
+            "Ma lifted the crate."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Rain soaked the meadow.",
+            "Snow covered the mountain.",
+            "Thunder shook the valley.",
+            "Hail battered the roof."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Marte lifted the crate.",
+            "Marce lowered the crate.",
+            "Marte lowered the crate.",
+            "Marce lifted the crate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dev-d",
+      "split": "development",
+      "source": [
+        "Helen entered the hall.",
+        "Hector exited the hall.",
+        "Helen exited the hall.",
+        "Hector entered the hall."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Helen entered the hall.",
+            "Hector exited the hall.",
+            "Helen exited the hall.",
+            "Hector entered the hall."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Helen walked into the hall.",
+            "Hector walked out of the hall.",
+            "Helen walked out of the hall.",
+            "Hector walked into the hall."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Hele entered the hall.",
+            "Hecto exited the hall.",
+            "Hele exited the hall.",
+            "Hecto entered the hall."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Hzlen entered the hall.",
+            "Hzctor exited the hall.",
+            "Hzlen exited the hall.",
+            "Hzctor entered the hall."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "He entered the hall.",
+            "He exited the hall.",
+            "He exited the hall.",
+            "He entered the hall."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Rain soaked the meadow.",
+            "Snow covered the mountain.",
+            "Thunder shook the valley.",
+            "Hail battered the roof."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Helee entered the hall.",
+            "Hectoe exited the hall.",
+            "Helee exited the hall.",
+            "Hectoe entered the hall."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "test-a",
+      "split": "heldout",
+      "source": [
+        "Nora bought the book.",
+        "Noah sold the book.",
+        "Nora sold the book.",
+        "Noah bought the book."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Nora bought the book.",
+            "Noah sold the book.",
+            "Nora sold the book.",
+            "Noah bought the book."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Nora purchased the book.",
+            "Noah traded the book for money.",
+            "Nora traded the book for money.",
+            "Noah purchased the book."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Nor bought the book.",
+            "Noa sold the book.",
+            "Nor sold the book.",
+            "Noa bought the book."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Nroa bought the book.",
+            "Naoh sold the book.",
+            "Nroa sold the book.",
+            "Naoh bought the book."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "No bought the book.",
+            "No sold the book.",
+            "No sold the book.",
+            "No bought the book."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Fog obscured the harbor.",
+            "Frost coated the window.",
+            "Lightning struck the oak.",
+            "Wind scattered the leaves."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Nore bought the book.",
+            "Noae sold the book.",
+            "Nore sold the book.",
+            "Noae bought the book."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "test-b",
+      "split": "heldout",
+      "source": [
+        "Elena tied the rope.",
+        "Elise untied the rope.",
+        "Elena untied the rope.",
+        "Elise tied the rope."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Elena tied the rope.",
+            "Elise untied the rope.",
+            "Elena untied the rope.",
+            "Elise tied the rope."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Elena knotted the rope.",
+            "Elise undid the rope knot.",
+            "Elena undid the rope knot.",
+            "Elise knotted the rope."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Elen tied the rope.",
+            "Elis untied the rope.",
+            "Elen untied the rope.",
+            "Elis tied the rope."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Eelna tied the rope.",
+            "Eilse untied the rope.",
+            "Eelna untied the rope.",
+            "Eilse tied the rope."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "El tied the rope.",
+            "El untied the rope.",
+            "El untied the rope.",
+            "El tied the rope."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Fog obscured the harbor.",
+            "Frost coated the window.",
+            "Lightning struck the oak.",
+            "Wind scattered the leaves."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Elene tied the rope.",
+            "Elisa untied the rope.",
+            "Elene untied the rope.",
+            "Elisa tied the rope."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "test-c",
+      "split": "heldout",
+      "source": [
+        "Damon filled the cup.",
+        "Daria emptied the cup.",
+        "Damon emptied the cup.",
+        "Daria filled the cup."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Damon filled the cup.",
+            "Daria emptied the cup.",
+            "Damon emptied the cup.",
+            "Daria filled the cup."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Damon poured water into the cup.",
+            "Daria poured water out of the cup.",
+            "Damon poured water out of the cup.",
+            "Daria poured water into the cup."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Damo filled the cup.",
+            "Dari emptied the cup.",
+            "Damo emptied the cup.",
+            "Dari filled the cup."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Dmaon filled the cup.",
+            "Draia emptied the cup.",
+            "Dmaon emptied the cup.",
+            "Draia filled the cup."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "Da filled the cup.",
+            "Da emptied the cup.",
+            "Da emptied the cup.",
+            "Da filled the cup."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Fog obscured the harbor.",
+            "Frost coated the window.",
+            "Lightning struck the oak.",
+            "Wind scattered the leaves."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Damoe filled the cup.",
+            "Darie emptied the cup.",
+            "Damoe emptied the cup.",
+            "Darie filled the cup."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "test-d",
+      "split": "heldout",
+      "source": [
+        "Simon locked the gate.",
+        "Silas unlocked the gate.",
+        "Simon unlocked the gate.",
+        "Silas locked the gate."
+      ],
+      "cases": [
+        {
+          "condition": "exact",
+          "recall": [
+            "Simon locked the gate.",
+            "Silas unlocked the gate.",
+            "Simon unlocked the gate.",
+            "Silas locked the gate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "paraphrase",
+          "recall": [
+            "Simon secured the gate with a key.",
+            "Silas opened the gate lock.",
+            "Simon opened the gate lock.",
+            "Silas secured the gate with a key."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "truncation",
+          "recall": [
+            "Simo locked the gate.",
+            "Sila unlocked the gate.",
+            "Simo unlocked the gate.",
+            "Sila locked the gate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "typo",
+          "recall": [
+            "Smion locked the gate.",
+            "Slias unlocked the gate.",
+            "Smion unlocked the gate.",
+            "Slias locked the gate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": 0
+            },
+            {
+              "kind": "point",
+              "target": 1
+            },
+            {
+              "kind": "point",
+              "target": 2
+            },
+            {
+              "kind": "point",
+              "target": 3
+            }
+          ]
+        },
+        {
+          "condition": "collision",
+          "recall": [
+            "Si locked the gate.",
+            "Si unlocked the gate.",
+            "Si unlocked the gate.",
+            "Si locked the gate."
+          ],
+          "labels": [
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                1,
+                2
+              ]
+            },
+            {
+              "kind": "set",
+              "targets": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "condition": "external",
+          "recall": [
+            "Fog obscured the harbor.",
+            "Frost coated the window.",
+            "Lightning struck the oak.",
+            "Wind scattered the leaves."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        },
+        {
+          "condition": "novel-name",
+          "recall": [
+            "Simoe locked the gate.",
+            "Silae unlocked the gate.",
+            "Simoe unlocked the gate.",
+            "Silae locked the gate."
+          ],
+          "labels": [
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            },
+            {
+              "kind": "point",
+              "target": "external"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

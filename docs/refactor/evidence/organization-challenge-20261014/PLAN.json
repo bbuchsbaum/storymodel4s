@@ -1,0 +1,36 @@
+{
+  "schema": "organization-content-challenge-plan/v1",
+  "baseline_commit": "8860d064d2e9b9d5aa779d11c6c7caab7c4a3e36",
+  "manifest_sha256": "7bf4279a0678f14cf5c8ea21ef19df066c4d017a6c5cc2fe0294894d2c742e61",
+  "split": "Four development and four held-out source sets. Names and predicate families differ across splits. Sentence templates repeat; this is a performance holdout, not a blinded independent corpus.",
+  "channels": [
+    "lexical",
+    "minilm",
+    "repaired-minilm"
+  ],
+  "stock_temperature": 0.15,
+  "temperature_grid": [
+    0.01,
+    0.02,
+    0.05,
+    0.1,
+    0.15,
+    0.25,
+    0.5,
+    1.0,
+    2.0
+  ],
+  "selection": "Each channel independently minimizes mean development destination NLL over every point-labelled row, including external and declared novel-name controls; equal group, condition and row weights. Collision set labels excluded. Smallest temperature wins exact objective ties. All grid scores retained. No held-out scoring before fit is committed. No selection by organization counts or held-out metrics.",
+  "repair": "Diagnostic preprocessed-input arm only. Derive vocabulary from first ASCII capitalized token in each source sentence. Preserve exact known names. Consider only first ASCII capitalized token of each recall sentence, with minimum length 2. Repair only if exactly one vocabulary name has Levenshtein distance <=1 or starts with the token and token length is at least half the name length. Multiple matches or zero matches leave text unchanged. Case-sensitive; no truth, source order or split input. Preserve sentence index and remainder; record original/processed SHA and per-row token edit.",
+  "labels": "Source labels identify one of four discourse positions. Five substantive external states pool into External; Unranked is unavailable, never an external hit. Collision cases have admissible source sets and no point organization truth. Declared novel names are adversarial generative labels, not identifiable from spelling alone; their semantic interpretation competes with the corruption explanation.",
+  "metrics": "Point rows: proper destination NLL and multiclass Brier, unique top accuracy with ties separately, true mass, availability. Collision: set mass, outside-set mass, within-set maximum concentration. Report each group and condition, source and external separately, stock and fitted temperatures. Report genuine production organization counts only for four-row identifiable source paths; independently verify raw-cost normalization and all native count outputs. Do not infer general calibration or human efficacy.",
+  "failure_policy": "Retain every expected case/arm/temperature, failure and missing candidate. Missing truth has infinite NLL (JSON null plus explicit infinite count); unavailable rows count against coverage and do not silently disappear. Refuse fit if any development point row is unavailable. No label smoothing, clipping, post-hoc renormalization or gap bridging.",
+  "acceptance": "Complete frozen inventory; independently admitted input text; dev-only fit committed before held-out model scoring; leakage/tamper/ambiguity tests; native local model path and independent score/count readback; exact-revision independent review and pipeline scoped gate. Repair is an engineering probe, with no production promotion or default change based solely on these synthetic controls.",
+  "model": {
+    "id": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "model_sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+    "tokenizer_sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+  },
+  "tolerance": 1e-10
+}
