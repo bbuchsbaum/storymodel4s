@@ -48,3 +48,18 @@ final class HiddenParameterOnly
 final class PrivateReturned private (value: HiddenParameterOnly)
 object PrivateConstructorFacade:
   def returned: PrivateReturned = ???
+
+// These alternatives carry dependencies absent from the facade's base return types.
+final class EnumPayloadOnly
+final class SealedPayloadOnly
+final class UnrelatedAlternativePayload
+
+enum PublicEnum:
+  case Plain
+  case Rich(value: EnumPayloadOnly)
+sealed trait PublicOutcome
+final case class Good(value: SealedPayloadOnly) extends PublicOutcome
+case object Empty extends PublicOutcome
+object AlternativeFacade:
+  def enumeration: PublicEnum = ???
+  def outcome: PublicOutcome = ???

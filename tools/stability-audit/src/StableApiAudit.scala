@@ -74,6 +74,12 @@ object StableApiAudit extends Inspector:
               typeEdge(symbol, d.constructor.symbol.info, "constructor")
             memberEdges(symbol)
             companionFactoryEdges(symbol)
+            // Public alternatives are part of a sealed result contract even when their
+            // constructors return the narrower alternative type rather than the base.
+            symbol.children.filter(public).foreach { alternative =>
+              edges += Edge(key(symbol), key(alternative), "public-alternative", alternative.name)
+              visit(alternative)
+            }
           case d: DefDef => typeEdge(symbol, d.returnTpt.tpe, "return")
           case d: ValDef => typeEdge(symbol, d.tpt.tpe, "accessor")
           case _ => ()
@@ -152,7 +158,7 @@ object StableApiAudit extends Inspector:
     val renderedEdges = edges.toVector.filter(e => seen(e.from)).sortBy(e => (e.from, e.to, e.kind)).map { e =>
       s"{\"from\":${q(e.from)},\"to\":${q(e.to)},\"kind\":${q(e.kind)},\"detail\":${q(e.detail)}}"
     }
-    val content = s"{\"sourceSha\":\"2c4b74f9ef069e1bc1f6678f8dababe2421ca929\",\"roots\":${json(requestedRoots.toVector.sorted.map(q))},\"inventory\":$inventory,\"edges\":${json(renderedEdges)},\"unresolved\":${json(unresolved.toVector.sorted.map(q))},\"external\":${json(external.toVector.sorted.map(q))}}"
+    val content = s"{\"sourceSha\":${q(sys.props("audit.source"))},\"roots\":${json(requestedRoots.toVector.sorted.map(q))},\"inventory\":$inventory,\"edges\":${json(renderedEdges)},\"unresolved\":${json(unresolved.toVector.sorted.map(q))},\"external\":${json(external.toVector.sorted.map(q))}}"
     java.nio.file.Files.writeString(java.nio.file.Path.of(out), content + "\n")
 
   def main(args: Array[String]): Unit =

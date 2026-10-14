@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo=$(cd "$(dirname "$0")/../.." && pwd)
-evidence="$repo/docs/refactor/evidence/stability-audit-20261014/semantic-inventory.json"
+evidence=${1:-"$repo/docs/refactor/evidence/stability-audit-20261014/semantic-inventory.json"}
 bash "$repo/tools/stability-audit/run.sh" "$evidence"
 
 jq -e '
@@ -19,7 +19,7 @@ jq -e '
 
 # These source-level controls establish the public-copy and private-constructor boundaries that
 # TASTy signatures report. They use the same immutable installed classpath as the extractor.
-dist="$repo/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT"
+dist=${STABILITY_DIST:?Set STABILITY_DIST to the installed CLI distribution being audited}
 runtime=$(awk -v base="$dist/lib" '{print base "/" $0}' "$dist/classpath.txt" | paste -sd: -)
 cache="$HOME/Library/Caches/Coursier/v1"
 one() { find "$cache" -type f -name "$1" -print -quit; }
@@ -55,6 +55,14 @@ jq -e '
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.WrappedFactoryParameterOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.AliasParameterOnly ::"))) and
   (all(.inventory[]; startswith("storymodel4s.stabilityfixture.HiddenParameterOnly ::") | not)) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.PublicEnum.Rich ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.PublicEnum.Plain ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.Good ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.Empty ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.EnumPayloadOnly ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.SealedPayloadOnly ::"))) and
+  (all(.inventory[]; startswith("storymodel4s.stabilityfixture.UnrelatedAlternativePayload ::") | not)) and
+  (any(.edges[]; .kind == "public-alternative")) and
   (any(.edges[]; .kind | contains("parameter"))) and
   (any(.edges[]; .kind | contains("upper-bound"))) and
   (any(.edges[]; .kind | contains("lower-bound"))) and

@@ -1,11 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Runs against the immutable installed distribution named by the release workflow.
+# Runs against an explicitly selected, checksum-verified installed distribution.
 repo=$(cd "$(dirname "$0")/../.." && pwd)
-dist="$repo/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT"
+dist=${STABILITY_DIST:?Set STABILITY_DIST to the installed CLI distribution being audited}
+expected=${STABILITY_SOURCE:?Set STABILITY_SOURCE to its exact source commit}
 out=${1:-"$repo/docs/refactor/evidence/stability-audit-20261014/semantic-inventory.json"}
 roots=${STABILITY_ROOTS:-"$repo/tools/stability-audit/roots.txt"}
+python3 - "$dist" "$expected" <<'VERIFY'
+import hashlib, json, pathlib, re, sys
+root = pathlib.Path(sys.argv[1]).resolve()
+m = json.loads((root / 'manifest.json').read_text())
+assert m['schemaVersion'] == 'storymodel4s-cli-distribution/v1'
+assert re.fullmatch('[0-9a-f]{40}', sys.argv[2]) and m['source'] == sys.argv[2], 'source mismatch'
+assert m['scalaVersion'] == '3.7.4', 'compiler version mismatch'
+seen = set()
+for entry in m['files']:
+    rel = pathlib.PurePosixPath(entry['path'])
+    assert not rel.is_absolute() and '..' not in rel.parts and str(rel) not in seen
+    seen.add(str(rel))
+    path = root / rel
+    assert path.resolve().is_relative_to(root), 'file escapes distribution'
+    data = path.read_bytes()
+    assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], str(rel)
+assert (root / 'classpath.txt').read_text().splitlines() == m['classpath']
+assert m['classpath'] and all('lib/' + name in seen for name in m['classpath'])
+VERIFY
 work=$(mktemp -d "${TMPDIR:-/tmp}/storymodel4s-stability-audit.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$(dirname "$out")" "$work/tasty" "$work/classes"
@@ -29,4 +49,14 @@ if test -n "${STABILITY_EXTRA_TASTY:-}"; then
 fi
 test "${#tasty[@]}" -gt 0
 java "${java_opts[@]}" -cp "$compiler" dotty.tools.dotc.Main -experimental -classpath "$runtime:$compiler" -d "$work/classes" "$repo/tools/stability-audit/src/StableApiAudit.scala"
-java "${java_opts[@]}" -cp "$work/classes:$runtime:$compiler" storymodel4s.stabilityaudit.StableApiAudit "$roots" "$out" "${tasty[@]}"
+java "${java_opts[@]}" -Daudit.source="$expected" -cp "$work/classes:$runtime:$compiler" storymodel4s.stabilityaudit.StableApiAudit "$roots" "$out" "${tasty[@]}"
+python3 - "$dist" "$expected" "$roots" "$out" "$repo/tools/stability-audit/src/StableApiAudit.scala" <<'RECEIPT'
+import hashlib, json, pathlib, sys
+def sha(p): return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+dist, source, roots, out, tool = sys.argv[1:]
+inventory = json.loads(pathlib.Path(out).read_text())
+assert inventory['sourceSha'] == source and inventory['roots'] and not inventory['unresolved'], 'incomplete signature inventory'
+receipt = {'sourceSha': source, 'distributionManifestSha256': sha(pathlib.Path(dist) / 'manifest.json'),
+           'rootsSha256': sha(roots), 'inventorySha256': sha(out), 'toolSha256': sha(tool), 'tool': 'Scala 3.7.4 TASTy signature walker'}
+pathlib.Path(out + '.provenance.json').write_text(json.dumps(receipt, indent=2) + '\n')
+RECEIPT

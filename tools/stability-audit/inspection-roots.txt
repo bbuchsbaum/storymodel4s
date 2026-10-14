@@ -1,0 +1,5 @@
+# Imported artifact inspection is audited separately; these roots do not promote it to stable.
+storymodel4s.codec.TemporalInspectionCodecs
+storymodel4s.codec.SurfaceWorkspaceCodecs
+storymodel4s.codec.RecallTimingCodecs
+storymodel4s.codec.TemporalProjectionCodecs
