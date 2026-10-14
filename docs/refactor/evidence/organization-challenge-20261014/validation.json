@@ -18,7 +18,14 @@
     "skipped": 0,
     "exit": 0
   },
-  "review": "pending exact final evidence candidate",
+  "review": {
+    "verdict": "PASS",
+    "reviewer": "/root/organization_review",
+    "candidate": "84b95beea106025dd28cd11cb8a193480dddd5d4",
+    "block": 0,
+    "required_follow_up": 0,
+    "record": "REVIEW.md"
+  },
   "observed": "LocallyObserved",
   "hosted_ci": null,
   "source_tree_restored_after_mutation": true,
