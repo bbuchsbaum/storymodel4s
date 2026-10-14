@@ -1,0 +1,82 @@
+{
+  "producer": "2a34550acfc5d71dbe5b59b81581d8e287078fd0",
+  "plan_commit": "cb5fd11ba538c93c20f824b8f11d7218141e7857",
+  "authority": "LocallyObserved",
+  "pipeline": {
+    "passed": 354,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "fatal_warnings": true
+  },
+  "python": {
+    "passed": 228,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "focused_tests": 15
+  },
+  "native_mutant": {
+    "compiled": true,
+    "passed": 1,
+    "failed": 1,
+    "errors": 0,
+    "expected_failure": "exact names keep one identity while ambiguous prefixes keep both candidates",
+    "restored_control": "full pipeline gate"
+  },
+  "format_exit": 0,
+  "tamper_controls": {
+    "positive": 1,
+    "refusals": 3
+  },
+  "controller": {
+    "producer": "2a34550acfc5d71dbe5b59b81581d8e287078fd0",
+    "steps": [
+      {
+        "name": "native-mutant",
+        "exit": 1,
+        "expected_exit": 1,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/native-mutant.log"
+      },
+      {
+        "name": "pipeline-gate",
+        "exit": 0,
+        "expected_exit": 0,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/pipeline-gate.log"
+      },
+      {
+        "name": "native-produce",
+        "exit": 0,
+        "expected_exit": 0,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/native-produce.log"
+      },
+      {
+        "name": "evaluate",
+        "exit": 0,
+        "expected_exit": 0,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/evaluate.log"
+      },
+      {
+        "name": "python-tests",
+        "exit": 0,
+        "expected_exit": 0,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/python-tests.log"
+      },
+      {
+        "name": "python-mutations",
+        "exit": 0,
+        "expected_exit": 0,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/python-mutations.log"
+      },
+      {
+        "name": "format",
+        "exit": 0,
+        "expected_exit": 0,
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/format.log"
+      }
+    ]
+  },
+  "scope": "pipeline only; added test witness, no portable or sibling-consumed production changes",
+  "promotion": "rejected",
+  "scientific_scope": "Development-only controlled fixture assumptions; no heldout selection or generalization claim"
+}

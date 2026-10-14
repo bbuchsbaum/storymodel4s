@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T03:06:21.213276+00:00",
+  "finished_utc": "2026-10-14T03:06:22.566405+00:00",
+  "duration_seconds": 1.353013,
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "tools/recall-study/entity_hypotheses.py",
+    "evaluate",
+    "--results",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/native-2a34550a",
+    "--output",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/report.json"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/evaluate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 144
+}

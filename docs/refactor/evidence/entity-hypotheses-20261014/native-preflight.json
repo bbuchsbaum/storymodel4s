@@ -1,0 +1,8 @@
+{
+  "head": "2a34550acfc5d71dbe5b59b81581d8e287078fd0",
+  "plan_commit": "cb5fd11ba538c93c20f824b8f11d7218141e7857",
+  "plan_sha256": "2ac1c1fedb2326ce3a14cc0ee64351f252bbe861ea0fc62581e9092a2045cc03",
+  "manifest_sha256": "7bf4279a0678f14cf5c8ea21ef19df066c4d017a6c5cc2fe0294894d2c742e61",
+  "split": "development",
+  "expected_variants": 84
+}

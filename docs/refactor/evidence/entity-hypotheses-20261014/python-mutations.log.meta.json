@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T03:07:01.413413+00:00",
+  "finished_utc": "2026-10-14T03:07:02.152537+00:00",
+  "duration_seconds": 0.738923,
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "docs/refactor/evidence/entity-hypotheses-20261014/mutation_probe.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/mutations-final"
+  ],
+  "cwd": "/private/tmp/storymodel4s-organization-20261013",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/entity-hypotheses-20261014/python-mutations.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 1980
+}

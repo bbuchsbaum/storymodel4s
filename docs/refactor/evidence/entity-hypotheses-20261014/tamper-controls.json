@@ -1,0 +1,29 @@
+{
+  "positive_control": {
+    "native_variants": 84,
+    "failures": [],
+    "verified_rows": 336,
+    "maximum_mass_error": 1.1102230246251565e-16,
+    "unchanged_row_cost_parities": 168
+  },
+  "refusals": [
+    {
+      "case": "missing-entry",
+      "refused": true,
+      "reason": "native variant inventory mismatch",
+      "manifest_rehashed": true
+    },
+    {
+      "case": "false-clause",
+      "refused": true,
+      "reason": "native variant correspondence mismatch",
+      "manifest_rehashed": true
+    },
+    {
+      "case": "false-cost",
+      "refused": true,
+      "reason": "emitted costs do not reproduce destination masses",
+      "manifest_rehashed": true
+    }
+  ]
+}

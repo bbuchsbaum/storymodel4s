@@ -1,0 +1,62 @@
+[
+  {
+    "path": "compile-format.log.gz",
+    "raw_bytes": 1910,
+    "raw_sha256": "3f717dae197824f51646d0a95a4e2186957181c46ab6e1b0710031c505ec450f"
+  },
+  {
+    "path": "controller.log.gz",
+    "raw_bytes": 10608,
+    "raw_sha256": "321dc933bbe13e2c3dee6b6ab5d79699e3ef0240cf4149ff5648f4f8df57774f"
+  },
+  {
+    "path": "evaluate.log.gz",
+    "raw_bytes": 144,
+    "raw_sha256": "31f43bbbc2409cafa5ea9a2d8f953efb9e51b6daf11293660cf9bb02b53625d7"
+  },
+  {
+    "path": "format.log.gz",
+    "raw_bytes": 1808,
+    "raw_sha256": "dffa5ebcf36013e9d33be56404905f55e1a6afda3ff0a97a1cb562adaefdaeda"
+  },
+  {
+    "path": "native-mutant.log.gz",
+    "raw_bytes": 3417,
+    "raw_sha256": "579ad9276bdd2dbee38206216cf57d7c026d7721bb43f3b125aad7beb219eabf"
+  },
+  {
+    "path": "native-produce.log.gz",
+    "raw_bytes": 3369,
+    "raw_sha256": "52a6a1a3df9c4e6e2f27a227f780fd4d70c316ee8a1c2df966a48251a534a9db"
+  },
+  {
+    "path": "pipeline-gate.log.gz",
+    "raw_bytes": 2308017,
+    "raw_sha256": "45f87b0f64a97a431ccbe210129288a2209b3faee844a06b0f75f06aa489d983"
+  },
+  {
+    "path": "python-focused.log.gz",
+    "raw_bytes": 1995,
+    "raw_sha256": "4b24683d0e10f3c9a618cc22e4ff438b1afde1a920ba36ff34ca236e91350930"
+  },
+  {
+    "path": "python-mutations.log.gz",
+    "raw_bytes": 1980,
+    "raw_sha256": "7e57cd287e35eba9b5521d83fe8ee8053f81d4facd142916241c5a2dada691e9"
+  },
+  {
+    "path": "python-tests.log.gz",
+    "raw_bytes": 36967,
+    "raw_sha256": "e7c43e0266f62f8384066d8a32070b6ac36f9e5e49596a2d3b6e4f558f55cebd"
+  },
+  {
+    "path": "sandbox-controller.log.gz",
+    "raw_bytes": 1988,
+    "raw_sha256": "cd1a76700730dae3f3c606b52086a9cab9322d7c80a75db533d652a0a9e0e252"
+  },
+  {
+    "path": "sandbox-native-mutant.log.gz",
+    "raw_bytes": 1377,
+    "raw_sha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b"
+  }
+]

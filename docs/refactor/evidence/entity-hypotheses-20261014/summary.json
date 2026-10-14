@@ -1,0 +1,440 @@
+{
+  "scope": "Development-only diagnostics under declared fixture identity assumptions; no branch weights or selection",
+  "validation": {
+    "native_variants": 84,
+    "failures": [],
+    "verified_rows": 336,
+    "maximum_mass_error": 1.1102230246251565e-16,
+    "unchanged_row_cost_parities": 168
+  },
+  "summaries": [
+    {
+      "condition": "collision",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 0,
+      "set_label_rows": 16,
+      "baseline_unique_correct_point_rows": 0,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 2,
+      "no_robust_winner_rows": 14,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.7894667622150453,
+      "mean_organization_range_width": {
+        "Backward": 0.7831459114269432,
+        "Forward": 0.7831459114269431,
+        "SameTarget": 0.5603741325298535,
+        "External": 1.8686579854819763
+      },
+      "assignment_count_range": [
+        16,
+        256
+      ]
+    },
+    {
+      "condition": "exact",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 16,
+      "robust_correct_point_rows": 16,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 0,
+      "single_hypothesis_point_rows": 16,
+      "mean_external_mass_range_width": 0.0,
+      "mean_organization_range_width": {
+        "Backward": 0.0,
+        "Forward": 0.0,
+        "SameTarget": 0.0,
+        "External": 0.0
+      },
+      "assignment_count_range": [
+        1,
+        1
+      ],
+      "single_hypothesis_scores": {
+        "nll": {
+          "baseline_mean": 1.3475692954098886,
+          "conditional_mean": 0.9335170662027021
+        },
+        "brier": {
+          "baseline_mean": 0.6874081807280188,
+          "conditional_mean": 0.5552672356010939
+        }
+      },
+      "single_assignment_organization_L1": {
+        "cases": 4,
+        "definition": "Sum of absolute errors across four expected-count categories, then mean across cases; three actual adjacencies per case",
+        "baseline_mean": 4.377615918463788,
+        "conditional_mean": 4.0715800070562524
+      }
+    },
+    {
+      "condition": "external",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 16,
+      "robust_correct_point_rows": 16,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 0,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.7090851264302612,
+      "mean_organization_range_width": {
+        "Backward": 0.5665814449120343,
+        "Forward": 0.5649216559813381,
+        "SameTarget": 0.3775136319532673,
+        "External": 1.5090167328466402
+      },
+      "assignment_count_range": [
+        16,
+        16
+      ]
+    },
+    {
+      "condition": "novel-name",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 6,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.7900184929105757,
+      "mean_organization_range_width": {
+        "Backward": 0.7038115600089856,
+        "Forward": 0.9642099973074334,
+        "SameTarget": 0.4682191289968812,
+        "External": 1.874489049368115
+      },
+      "assignment_count_range": [
+        81,
+        81
+      ]
+    },
+    {
+      "condition": "paraphrase",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 15,
+      "robust_correct_point_rows": 15,
+      "robust_wrong_point_rows": 1,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 0,
+      "single_hypothesis_point_rows": 16,
+      "mean_external_mass_range_width": 0.0,
+      "mean_organization_range_width": {
+        "Backward": 0.0,
+        "Forward": 0.0,
+        "SameTarget": 0.0,
+        "External": 0.0
+      },
+      "assignment_count_range": [
+        1,
+        1
+      ],
+      "single_hypothesis_scores": {
+        "nll": {
+          "baseline_mean": 1.3932763225792404,
+          "conditional_mean": 0.9814799506649937
+        },
+        "brier": {
+          "baseline_mean": 0.7091709948994586,
+          "conditional_mean": 0.5889198781144711
+        }
+      },
+      "single_assignment_organization_L1": {
+        "cases": 4,
+        "definition": "Sum of absolute errors across four expected-count categories, then mean across cases; three actual adjacencies per case",
+        "baseline_mean": 4.420990734270117,
+        "conditional_mean": 4.154546497735904
+      }
+    },
+    {
+      "condition": "truncation",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 4,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.786982603887348,
+      "mean_organization_range_width": {
+        "Backward": 0.7035530471367484,
+        "Forward": 0.9642099963450128,
+        "SameTarget": 0.46504856397407823,
+        "External": 1.8599632714335481
+      },
+      "assignment_count_range": [
+        81,
+        81
+      ]
+    },
+    {
+      "condition": "typo",
+      "temperature": 0.5,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 5,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.784478746663726,
+      "mean_organization_range_width": {
+        "Backward": 0.7005229857998725,
+        "Forward": 0.9642099973074334,
+        "SameTarget": 0.4621204481418638,
+        "External": 1.8482385677051625
+      },
+      "assignment_count_range": [
+        81,
+        81
+      ]
+    },
+    {
+      "condition": "collision",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 0,
+      "set_label_rows": 16,
+      "baseline_unique_correct_point_rows": 0,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.9947811404583417,
+      "mean_organization_range_width": {
+        "Backward": 1.3423597637664977,
+        "Forward": 1.3423597637664977,
+        "SameTarget": 0.9106717314681513,
+        "External": 2.969123456537134
+      },
+      "assignment_count_range": [
+        16,
+        256
+      ]
+    },
+    {
+      "condition": "exact",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 16,
+      "robust_correct_point_rows": 16,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 0,
+      "single_hypothesis_point_rows": 16,
+      "mean_external_mass_range_width": 0.0,
+      "mean_organization_range_width": {
+        "Backward": 0.0,
+        "Forward": 0.0,
+        "SameTarget": 0.0,
+        "External": 0.0
+      },
+      "assignment_count_range": [
+        1,
+        1
+      ],
+      "single_hypothesis_scores": {
+        "nll": {
+          "baseline_mean": 0.7557334124257634,
+          "conditional_mean": 0.4899016529868333
+        },
+        "brier": {
+          "baseline_mean": 0.39891389351072404,
+          "conditional_mean": 0.29863981068840606
+        }
+      },
+      "single_assignment_organization_L1": {
+        "cases": 4,
+        "definition": "Sum of absolute errors across four expected-count categories, then mean across cases; three actual adjacencies per case",
+        "baseline_mean": 3.088646956537936,
+        "conditional_mean": 2.20456732204304
+      }
+    },
+    {
+      "condition": "external",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 0,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.9704159913980845,
+      "mean_organization_range_width": {
+        "Backward": 1.0624034695067985,
+        "Forward": 1.0514875221780084,
+        "SameTarget": 0.7116826488139592,
+        "External": 2.8255736404987664
+      },
+      "assignment_count_range": [
+        16,
+        16
+      ]
+    },
+    {
+      "condition": "novel-name",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 0,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.9960914302866324,
+      "mean_organization_range_width": {
+        "Backward": 1.2111349341089848,
+        "Forward": 1.897716339606629,
+        "SameTarget": 0.7573312074738379,
+        "External": 2.9765946185871393
+      },
+      "assignment_count_range": [
+        81,
+        81
+      ]
+    },
+    {
+      "condition": "paraphrase",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 15,
+      "robust_correct_point_rows": 15,
+      "robust_wrong_point_rows": 1,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 0,
+      "single_hypothesis_point_rows": 16,
+      "mean_external_mass_range_width": 0.0,
+      "mean_organization_range_width": {
+        "Backward": 0.0,
+        "Forward": 0.0,
+        "SameTarget": 0.0,
+        "External": 0.0
+      },
+      "assignment_count_range": [
+        1,
+        1
+      ],
+      "single_hypothesis_scores": {
+        "nll": {
+          "baseline_mean": 0.8564279725477624,
+          "conditional_mean": 0.5839748493908413
+        },
+        "brier": {
+          "baseline_mean": 0.4726328183686781,
+          "conditional_mean": 0.3877857454405765
+        }
+      },
+      "single_assignment_organization_L1": {
+        "cases": 4,
+        "definition": "Sum of absolute errors across four expected-count categories, then mean across cases; three actual adjacencies per case",
+        "baseline_mean": 3.2191968188583933,
+        "conditional_mean": 2.3938140935021215
+      }
+    },
+    {
+      "condition": "truncation",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 6,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.9960988330870781,
+      "mean_organization_range_width": {
+        "Backward": 1.2183807280580432,
+        "Forward": 1.8977163419171945,
+        "SameTarget": 0.7811065138049772,
+        "External": 2.9766536157181682
+      },
+      "assignment_count_range": [
+        81,
+        81
+      ]
+    },
+    {
+      "condition": "typo",
+      "temperature": 0.15,
+      "cases": 4,
+      "rows": 16,
+      "point_label_rows": 16,
+      "set_label_rows": 0,
+      "baseline_unique_correct_point_rows": 10,
+      "robust_correct_point_rows": 0,
+      "robust_wrong_point_rows": 0,
+      "robust_inside_label_set": 0,
+      "robust_outside_label_set": 0,
+      "no_robust_winner_rows": 16,
+      "single_hypothesis_point_rows": 0,
+      "mean_external_mass_range_width": 0.9960914302866324,
+      "mean_organization_range_width": {
+        "Backward": 1.2217508084377418,
+        "Forward": 1.897716339606629,
+        "SameTarget": 0.779246713024029,
+        "External": 2.9765946185871393
+      },
+      "assignment_count_range": [
+        81,
+        81
+      ]
+    }
+  ]
+}

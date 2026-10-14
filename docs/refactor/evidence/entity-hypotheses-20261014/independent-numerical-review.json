@@ -1,0 +1,19 @@
+{
+  "reviewer": "/root/organization_review",
+  "role": "independent lean_expert",
+  "verdict": "PASS source and numerical evidence; final candidate gate/evidence review pending",
+  "sha": "2a34550acfc5d71dbe5b59b81581d8e287078fd0",
+  "original_endpoint_parities": 28,
+  "conditional_rows": 496,
+  "independent_arithmetic_decimal_digits": 50,
+  "max_mass_error": 1.11e-16,
+  "max_score_error": 8.88e-16,
+  "complete_assignments": 2696,
+  "destination_paths_per_assignment": 625,
+  "max_count_extremum_error": 8.88e-16,
+  "adverse_findings": [
+    "One wrong paraphrase event remains",
+    "At T=.5 two collision rows unanimously choose External contrary to source label sets; unanimity only covers enumerated alternatives"
+  ],
+  "required_followups": []
+}

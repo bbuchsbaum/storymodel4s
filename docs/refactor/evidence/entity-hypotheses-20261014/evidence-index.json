@@ -1,0 +1,212 @@
+[
+  {
+    "path": "PLAN.json",
+    "bytes": 4763,
+    "sha256": "2ac1c1fedb2326ce3a14cc0ee64351f252bbe861ea0fc62581e9092a2045cc03"
+  },
+  {
+    "path": "README.md",
+    "bytes": 8395,
+    "sha256": "3b313f4856dc4b76d72a4a79d25ab3946147cb03f326295f22f908ab4147b78b"
+  },
+  {
+    "path": "checks.json",
+    "bytes": 2543,
+    "sha256": "01f5f5216fcd20ff38135fdd1e90152f412ebfe1883eae0a16360d020d0bd104"
+  },
+  {
+    "path": "compile-format.log.gz",
+    "bytes": 596,
+    "sha256": "e53a9a064ddc655a4fae3ccf679a6b7ab6de694299fc5c422139264e26b415b4"
+  },
+  {
+    "path": "compile-format.log.meta.json",
+    "bytes": 620,
+    "sha256": "289dac5a7aeb9c2d0b4c5ae36b82db313ebc6bb16db9ba35ddc2927f99abf6cf"
+  },
+  {
+    "path": "controller.log.gz",
+    "bytes": 3039,
+    "sha256": "1028721ac5f6b8f0c522e74f2ad64ef5012d4849d97283706130e1572715f7ba"
+  },
+  {
+    "path": "evaluate.log.gz",
+    "bytes": 140,
+    "sha256": "8837c71f3362f561f016349aead7f541db27558adf276e662d165408be0be28f"
+  },
+  {
+    "path": "evaluate.log.meta.json",
+    "bytes": 833,
+    "sha256": "88cdc6787819d1d17bdfdaea727aa82d2ad96c8af83662a30b49fd5876f7c46a"
+  },
+  {
+    "path": "format.log.gz",
+    "bytes": 548,
+    "sha256": "1f6ea1bc17ff89d332269fa36d62eda3092ddaad3e3fc34f952fc01fccd8c58c"
+  },
+  {
+    "path": "format.log.meta.json",
+    "bytes": 601,
+    "sha256": "355f43cc5254e9cd722036969df6377c0e60b2cd844368a87d97f30f2445360f"
+  },
+  {
+    "path": "independent-numerical-review.json",
+    "bytes": 756,
+    "sha256": "fd2a651523a9c185341881c1633f0a595189f105289b9be5efc0a9e2372f197c"
+  },
+  {
+    "path": "log-index.json",
+    "bytes": 1846,
+    "sha256": "ad3944e64e9aea81187bb3c0adc17e94db97b36076d47b5ec45bb34badba2cdb"
+  },
+  {
+    "path": "mutation_probe.py",
+    "bytes": 2990,
+    "sha256": "ee70eee275050e4aa47d49daf29cfa55798729d87234df363ff724a8add6ea73"
+  },
+  {
+    "path": "native-mutant.log.gz",
+    "bytes": 1214,
+    "sha256": "7e1b5821f077f4365d37a759dd820ff44b2bbc885f05c7d2b853c48faf2e3501"
+  },
+  {
+    "path": "native-mutant.log.meta.json",
+    "bytes": 636,
+    "sha256": "7641ea999f520de934841b2477ec150248414eb28fa34c547f9ec195cdf19eb3"
+  },
+  {
+    "path": "native-preflight.json",
+    "bytes": 345,
+    "sha256": "b72dad5dc1be383e78e3c2ccf68111ed8a5e03a525ff3cddbd75cccbeaf83551"
+  },
+  {
+    "path": "native-produce.log.gz",
+    "bytes": 1227,
+    "sha256": "2484234680a17f5e6654ea65bc962e66d71fe58ee1c7e4e1da522d5abce1bc2c"
+  },
+  {
+    "path": "native-produce.log.meta.json",
+    "bytes": 984,
+    "sha256": "08bbcb2782be287db1079a253e53f67f1026fdc3f1a5e63328a2ee802441acdc"
+  },
+  {
+    "path": "native-results.tar.gz",
+    "bytes": 100731,
+    "sha256": "14b5a0debc162938d60357c98bc51603b42eb1fe04836776d42ba8a58b8cafc0"
+  },
+  {
+    "path": "pipeline-gate.log.gz",
+    "bytes": 203097,
+    "sha256": "3b93ae1f070fd7c9738adf443ddf68dbafafca4c5c7687fafa9ecbc19a2a0d07"
+  },
+  {
+    "path": "pipeline-gate.log.meta.json",
+    "bytes": 584,
+    "sha256": "30a06f655353869d50a3971844586a3e7ffe0b88b9f3f643624b3f36ba078710"
+  },
+  {
+    "path": "python-focused.log.gz",
+    "bytes": 490,
+    "sha256": "933e8e961178e68371471db223608317d1cf1b96cb4c3d1fec337456a3c7a750"
+  },
+  {
+    "path": "python-focused.log.meta.json",
+    "bytes": 633,
+    "sha256": "b8dc9f57ad817782928068ad241ddffa6f46789fef6bdafa39930e3d7058ed92"
+  },
+  {
+    "path": "python-mutation-controls/bridge-gap.log.gz",
+    "bytes": 886,
+    "sha256": "a09332d4bebbf1db0c6d0bfa539c61046de58e35096f2575848d69bc0aaf0ffa"
+  },
+  {
+    "path": "python-mutation-controls/control.log.gz",
+    "bytes": 569,
+    "sha256": "e8402a5b795fcf02f958bbfc9435b63bf504f4a778fce39fe36c0acd0fca577a"
+  },
+  {
+    "path": "python-mutation-controls/identity-filter.log.gz",
+    "bytes": 822,
+    "sha256": "3f77841d21932ffe43ffad1352989a0199a86d94fc82e6ac00d4d0dd5f1cd6b8"
+  },
+  {
+    "path": "python-mutation-controls/invent-weights.log.gz",
+    "bytes": 793,
+    "sha256": "bf004538e1a464f38fe89f2a1272aa2c93f4750622d6b7f360f69ffb31a84035"
+  },
+  {
+    "path": "python-mutation-controls/no-value-to-zero.log.gz",
+    "bytes": 809,
+    "sha256": "38ef98373af5ad9ac3667063bfdba17b39c27c9f30e565d82f1f22f134386f4e"
+  },
+  {
+    "path": "python-mutation-controls/receipt.json",
+    "bytes": 2229,
+    "sha256": "61e24bca13e2f48e2cfb9027090683b88ae659451dc45eac9590ebae22f70460"
+  },
+  {
+    "path": "python-mutations.log.gz",
+    "bytes": 598,
+    "sha256": "2cf00f4970f9dbb931b2986e4b23f77b7368e936e4201d0e3ca03bad3953f927"
+  },
+  {
+    "path": "python-mutations.log.meta.json",
+    "bytes": 721,
+    "sha256": "d86663c59d8645a7fdd6c018b88927d6aaa0beba09f193486def9110d6e7004a"
+  },
+  {
+    "path": "python-tests.log.gz",
+    "bytes": 6802,
+    "sha256": "5614b2ebd5e599ac92c54384afed4642ae38ba8431f9c7c996087d2909736658"
+  },
+  {
+    "path": "python-tests.log.meta.json",
+    "bytes": 634,
+    "sha256": "d87c7e76367005d18f18963cc980fe0b1cf5edda51ee6b17e737fc36077f3061"
+  },
+  {
+    "path": "reference-scope.txt",
+    "bytes": 489,
+    "sha256": "8e7e116d4955fde2d34d743048376289e3fb65a00d19521704fbe794971468ca"
+  },
+  {
+    "path": "report.json.gz",
+    "bytes": 61888,
+    "sha256": "5794c1c106053fbe0f311e179570a787724e6c21c8fdb3b50fe6d779cb7190ce"
+  },
+  {
+    "path": "sandbox-controller.log.gz",
+    "bytes": 700,
+    "sha256": "78b79cda3d733dd974d224c55a79076acf489aa6adfe4f47b5a74d4e7c67a162"
+  },
+  {
+    "path": "sandbox-native-mutant.log.gz",
+    "bytes": 410,
+    "sha256": "c9633d987d63831ae67a28e866d27d4eb52e49b815f53f32de02e981d8182e5c"
+  },
+  {
+    "path": "sandbox-native-mutant.log.meta.json",
+    "bytes": 635,
+    "sha256": "f37ceddf20f255d9449f120d71ce5df01b32d4896a674179a686c74a314ebcfb"
+  },
+  {
+    "path": "summarize.py",
+    "bytes": 4153,
+    "sha256": "78642f68964982447b46fc96e83a0fcca63c85ce8ad7f668172a7ad58d581262"
+  },
+  {
+    "path": "summary.json",
+    "bytes": 13201,
+    "sha256": "43188638f3d4db878adb9e9d7a124e0e33b3d9c009992dca7a0ff8292b8065fc"
+  },
+  {
+    "path": "tamper-controls.json",
+    "bytes": 687,
+    "sha256": "6ca679dfc237691f73edfc1c005d974e9610d633878a54e17679194ceb97f37d"
+  },
+  {
+    "path": "tamper_probe.py",
+    "bytes": 2069,
+    "sha256": "299338a785ca224ceb8e5a4b9023e313a3135e00202a9321dd1ca1266f0e329b"
+  }
+]

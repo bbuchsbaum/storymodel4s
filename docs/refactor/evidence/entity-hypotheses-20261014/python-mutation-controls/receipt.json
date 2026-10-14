@@ -1,0 +1,78 @@
+{
+  "source_sha256": "fc4d60c1103e4b2b0d255f3e8bf9eab311b20ae0e1192fa64ec06775f594b332",
+  "runs": [
+    {
+      "name": "control",
+      "compiled": true,
+      "tests": 15,
+      "failed": [],
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15,
+      "expected_failures": [],
+      "sha256": "55d12c5294179e4a87321d53469d183bee3bb933d9c87dc99f82622bf1690e1d"
+    },
+    {
+      "name": "identity-filter",
+      "compiled": true,
+      "tests": 15,
+      "failed": [
+        "test_identity_condition_preserves_state_multiplicity_and_external_states"
+      ],
+      "errors": 0,
+      "skipped": 0,
+      "passed": 14,
+      "expected_failures": [
+        "test_identity_condition_preserves_state_multiplicity_and_external_states"
+      ],
+      "sha256": "679edf4e1a779ca54ca88053da7ffe3fc640f5246a9d4c2b2d88656137343a65"
+    },
+    {
+      "name": "invent-weights",
+      "compiled": true,
+      "tests": 15,
+      "failed": [
+        "test_unknown_weights_never_become_uniform_or_a_point_distribution"
+      ],
+      "errors": 0,
+      "skipped": 0,
+      "passed": 14,
+      "expected_failures": [
+        "test_unknown_weights_never_become_uniform_or_a_point_distribution"
+      ],
+      "sha256": "b7b586ce3f906616a2659dd1655addffd8eeb98d48285c6c4c8f2289effb1eb7"
+    },
+    {
+      "name": "bridge-gap",
+      "compiled": true,
+      "tests": 15,
+      "failed": [
+        "test_unavailable_interior_row_does_not_bridge_gap"
+      ],
+      "errors": 0,
+      "skipped": 0,
+      "passed": 14,
+      "expected_failures": [
+        "test_unavailable_interior_row_does_not_bridge_gap"
+      ],
+      "sha256": "5cd4d62cb228e77da490e3a67a361773f14d1f68d60d8e347e4eef3fd8ea87b2"
+    },
+    {
+      "name": "no-value-to-zero",
+      "compiled": true,
+      "tests": 15,
+      "failed": [
+        "test_all_failed_reader_has_no_measured_error",
+        "test_all_unavailable_reader_has_no_measured_error"
+      ],
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13,
+      "expected_failures": [
+        "test_all_failed_reader_has_no_measured_error",
+        "test_all_unavailable_reader_has_no_measured_error"
+      ],
+      "sha256": "ab31f0715971ece9e467b514fdbee19b8ee4422e018dc0e6724f38ab8a714091"
+    }
+  ]
+}
