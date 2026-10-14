@@ -125,3 +125,17 @@ object EntityHypothesisWitness:
       }))
     Files.writeString(output.resolve("manifest.json"), Canonical.print(receipt)): Unit
 
+/** Ensures the native producer preserves exact identity and every eligible alternative. */
+class EntityHypothesisWitnessSuite extends munit.FunSuite:
+  test("exact names keep one identity while ambiguous prefixes keep both candidates") {
+    val source = Vector("Anna", "Anya")
+    assertEquals(EntityHypothesisWitness.candidates(source, "Anna"), Vector("Anna"))
+    assertEquals(EntityHypothesisWitness.candidates(source, "An"), Vector("Anna", "Anya"))
+  }
+
+  test("candidate order is content derived and failed retrieval stays empty") {
+    val source = Vector("Anya", "Anna")
+    assertEquals(EntityHypothesisWitness.candidates(source, "An"), Vector("Anna", "Anya"))
+    assertEquals(EntityHypothesisWitness.candidates(Vector("Clara", "Clive"), "Cl"), Vector.empty)
+  }
+
