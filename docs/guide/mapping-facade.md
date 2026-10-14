@@ -1,18 +1,28 @@
 # Analyze, inspect and export local files
 
 Start with the [ordinary study input guide](study-inputs.md). Save the study template beside your
-source and recall files. The baseline runs offline and requires no model download:
+source and recall files. The baseline runs offline and requires no model download. With the
+extracted CLI bundle on your path, run:
 
 ```sh
-sbt 'pipeline/runMain storymodel4s.pipeline.studyPrepare template'
-sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun template'
-sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun run study.json mapping.json analysis'
-sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun exchange study.json mapping.json exchange'
+storymodel4s studyPrepare template > study.json
+storymodel4s mappingRun template > mapping.json
+storymodel4s mappingRun run study.json mapping.json analysis
+storymodel4s mappingRun exchange study.json mapping.json exchange
 ```
 
-The first two commands print JSON templates; save them as `study.json` and `mapping.json`.
+The first two commands save JSON templates; edit `study.json` to name your files.
 Use a new destination for each publication, or `--resume` to verify and reuse exactly matching
 bytes. An existing or corrupt destination refuses instead of being overwritten.
+
+The bundle needs Java 17 or newer on macOS or Linux. Extract it, run `chmod +x bin/storymodel4s`
+inside its directory, and add that `bin` directory to your path. A public binary release is
+pending; maintainers can build the ZIP with `sbt 'pipeline/cliDistribution'` from a clean
+checkout. Its manifest binds the source revision and packaged files. For a source invocation,
+replace `storymodel4s mappingRun ...` with
+`sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun ...'`. The
+[complete file walkthrough](../../docs-site/src/content/docs/method/map-files.mdx) includes an
+executable synthetic control, independent Python readback and weights `0/1,1/2,1/1`.
 
 The exchange includes recall text and therefore requires the existing text-bound disclosure
 admission. Ordinary local recalls can be analyzed but their text export refuses. For a runnable
@@ -57,17 +67,18 @@ fallback. Create a local receipt key once and keep it for reproducible replay:
 ```sh
 umask 077
 openssl rand -out embedding.key 32
-sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun onnx-template'
+storymodel4s mappingRun onnx-template > mapping-onnx.json
 ```
 
-Save the printed JSON as `mapping-onnx.json`. Its `onnx` object names `model`, `tokenizer`,
+The saved `mapping-onnx.json` has an `onnx` object naming `model`, `tokenizer`,
 `keyFile`, and `keyId`; the key file contains exactly 32 raw bytes. Keep it in private local
 storage. Receipt hashes are keyed for both source and recall text. Paths and key bytes are
 excluded from published metadata; changing the key changes execution identity. The ordinary
 commands `mappingRun`, `mappingWeight`, `studyWorkspace`, and `recallVolumes` share this
 configuration. Scala callers can pass the settings path as the second argument to
-`MappingPipeline.analyze`. The sbt pipeline launcher disables ONNX telemetry before starting
-its child JVM; other launchers must set `ORT_DISABLE_TELEMETRY=1` before JVM startup.
+`MappingPipeline.analyze`. Both the distributed command and sbt pipeline launcher disable ONNX
+telemetry before starting their child JVM; other launchers must set `ORT_DISABLE_TELEMETRY=1`
+before JVM startup.
 
 The ONNX profile supports checked text and timed annotation sources. Timed rendering uses each
 segment's embedding text when present, otherwise its description; groups use their embedding

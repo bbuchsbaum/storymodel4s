@@ -1,0 +1,26 @@
+{
+  "candidate": "22cc7243dd825198544569bc51f86bc21c8c0dbb",
+  "base": "0a3a97777c861f41c911ae1232a911590576fd2a",
+  "reviewer": "evidence_review",
+  "verdict": "PASS",
+  "block": [],
+  "follow_up": [],
+  "verification": [
+    "all 56 producer gate cells and raw log hashes",
+    "Atlas exact pair 488 passing tests, linking and formatting",
+    "six compiled mutations, named failure and passing siblings",
+    "both encoding verifiers rerun; committed receipts equal",
+    "ONNX independent readers, ten input hashes, three weights and identical base publications",
+    "historical profile comparison and pinned MATLAB source",
+    "Mote doctor clean 16677 committed operations",
+    "compressed patch exact-byte equality and git apply --check",
+    "git diff --check 0a3a9777..22cc7243"
+  ],
+  "limits": [
+    "physical scanner/media synchronization unestablished",
+    "new hosted qualification pending",
+    "StoryAtlas temporal adoption pending"
+  ],
+  "landing": "owner explicitly approved 2026-10-14; local main and GitHub main verified at exact candidate after non-force push",
+  "main": "22cc7243dd825198544569bc51f86bc21c8c0dbb"
+}

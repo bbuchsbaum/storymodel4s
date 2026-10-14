@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T15:06:57.402791+00:00",
+  "finished_utc": "2026-10-14T15:08:23.780440+00:00",
+  "duration_seconds": 86.377161,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Duser.timezone=UTC",
+    "pipeline/cliDistribution"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution-utc-negative.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 5272
+}

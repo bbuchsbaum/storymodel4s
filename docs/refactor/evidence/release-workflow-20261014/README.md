@@ -106,7 +106,10 @@ candidate and reconstruction choices; historical benchmark accuracy is not inher
 
 The [encoding selection receipt](../encoding-export-20261014/README.md) binds newly copied
 raw arrays, all 1,000 annotation outcomes and both actual scanner declaration exports. Physical
-scanner/media synchronization remains unestablished pending the owner's scope/evidence decision.
+scanner/media synchronization remains unestablished. The owner confirmed on 14 October that
+the OpenNeuro README crop prescriptions are the available timing authority and no finer
+trigger records exist. Item 3 will complete on published-index alignment with that limitation
+retained explicitly; the new arrays have independently verified raw-volume provenance.
 
 ## Current action
 
@@ -115,3 +118,40 @@ Complete actual planned video acquisition and the controlled lexical A/A+V compa
 segment 13 retains unavailable video coverage. Continue installable-command preparation, stable
 boundary audit, reader documentation and temporal StoryAtlas adoption. Local-only dashboard,
 private artifacts and resumable build state are under `.dashboard` and `.agent-work`.
+
+## Reviewed ONNX milestone synchronized
+
+After the owner explicitly approved exact commit `22cc7243dd825198544569bc51f86bc21c8c0dbb`,
+local main advanced from `7be3c0b1` and a non-force push made GitHub main identical. A fresh
+`ls-remote` confirmed the full SHA. The [evidence review](evidence-review.json) passed that
+exact candidate; newer working-branch changes were excluded. Hosted
+[CI 38589639065](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38589639065) and
+[documentation 38589639080](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38589639080)
+were running at this checkpoint. Their final results remain separate from local qualification.
+
+## Planned acquisition and installable commands
+
+Source `2c4b74f9ef069e1bc1f6678f8dababe2421ca929` adds explicitly planned frame selection and
+an offline CLI distribution. The independent [planned-video review](planned-video-review.json)
+passed the repaired provenance boundary: altered or missing plan, selection-rule and realized
+selection attachments refuse during replay. The original omitted replay check was reproduced
+as one failing test with eight passing siblings. The repaired focused suites passed 28 tests.
+All seven [compiled mutation checks](planned-mutations/mutations.json) fail their named test
+with eight passing siblings; the exact candidate was restored cleanly afterward.
+
+The [distribution review](distribution-review.json) passed the source and extracted artifact.
+The original ZIP timestamp produced different bytes under UTC and America/Toronto; the repaired
+timestamp gives identical 142,942,745-byte archives with SHA-256
+`8ddca4c7c732d20fe9bf888c8da397db9e152f33820add229ea66a4641d2d833`.
+All 73 manifest entries and 69 classpath entries were independently verified. This is the
+measured timezone comparison, not a claim of reproducibility across different build environments.
+The [artifact receipt](distribution-artifact.json) retains the failed collector step and its
+correction separately from the successful builds.
+
+The [installed ordinary-file journey](installed-journey.json) uses the existing exact synthetic
+control from `PublicMappingFacade.scala`. Eight commands complete analysis, paired exchange,
+weights 0/0.5/1, independent Python readers, identical resume and overwrite refusal. Model
+resources are supplied separately. A public binary release has not been published.
+
+The restored clean full source gate, actual Sherlock acquisition and subsequent consumer/docs
+checks are in progress. These focused witnesses do not close those remaining acceptance gates.

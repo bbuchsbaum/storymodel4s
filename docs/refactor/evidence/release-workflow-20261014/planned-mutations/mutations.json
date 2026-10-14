@@ -1,0 +1,233 @@
+[
+  {
+    "mutation": "planned-input-pin",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/PlannedVideoAcquisition.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned intervals refuse off-boundary, wrong pins and insufficient multi-frame samples",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned intervals refuse off-boundary, wrong pins and insufficient multi-frame samples 3.778s munit.FailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:335 assertion failed"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "4183ef027d7faec35fb5368c07864346df7803912a35c4a398808eea0e2b34b7",
+    "patch_file": "planned-input-pin.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "1f1467f2b5692ae44819379e0e750449be03de273e72da2b42e78626e1c04f10",
+    "log_sha256": "d60711187e06626933f82d7aeedb4df6388aa3c81ac905c0e6d221b0480e208f"
+  },
+  {
+    "mutation": "planned-timebase",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/PlannedVideoAcquisition.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned intervals refuse off-boundary, wrong pins and insufficient multi-frame samples",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned intervals refuse off-boundary, wrong pins and insufficient multi-frame samples 3.377s munit.FailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:344 assertion failed"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "bf528af8e53e7c46dd9f466e1c1ab48d4c4a18bb0ba24cf6c2988fddfcdc179f",
+    "patch_file": "planned-timebase.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "4caa52c1fbd4d6f39b6ee5df3839ea634f8dc7c37199e3fcddcfd21ecc5af067",
+    "log_sha256": "2fc205e5bfa0f5c790fe72e0b0a536d445912cf3941ff7e0196df3c1ede5a3d3"
+  },
+  {
+    "mutation": "planned-byte-budget",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/PlannedVideoAcquisition.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned input refusals leave no published or temporary package",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned input refusals leave no published or temporary package 2.286s munit.FailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:433 Right(CaptionPackage(synthetic-worker-f0, 1 parts, draft))"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "4903fc167af1cfc42053f32ba1ec33e11ad0c3b51dbe84508bf05d35b3540dfe",
+    "patch_file": "planned-byte-budget.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "07544f282c74ecc247e25f9edfc25f08cae68827c518d55187027d6eb672faca",
+    "log_sha256": "bcf4f1270f2ea709d2b6a345f4959eef26a2d1a2a0ce85fda63052854d023213"
+  },
+  {
+    "mutation": "planned-unknown-fields",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/PlannedVideoAcquisition.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned input refusals leave no published or temporary package",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned input refusals leave no published or temporary package 3.256s munit.FailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:433 Right(CaptionPackage(synthetic-worker-f0, 1 parts, draft))"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "e69ffec1d017efa9f0a8cdde3b6c1c28beb6d53864137d5c0012215b812ca6cd",
+    "patch_file": "planned-unknown-fields.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "ea5cf818d84dc281086d283dd1a264190d50e045e71c1e824c8f920824507ad8",
+    "log_sha256": "a5386ad15afb091b214278392b707188097878f2935eef985e91a993c2ca35f6"
+  },
+  {
+    "mutation": "planned-sample-spread",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/PlannedVideoAcquisition.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned intervals preserve exact support and share selected frames",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned intervals preserve exact support and share selected frames 3.028s munit.ComparisonFailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:235"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "89f6edea06904430e8ccc40e5132cfb70f9f5d046524b76665c52f57f28c8dc5",
+    "patch_file": "planned-sample-spread.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "af20354045b2650f5544695a27ca97cb805fd444718a0ce545a49b117f70b0ea",
+    "log_sha256": "0890a842455372384495c6e5c62e70ce413e8d9050d3f5a8f040f47d46c07548"
+  },
+  {
+    "mutation": "planned-attachment-bytes",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/captionpackage.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned provenance files remain required and pinned during replay",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned provenance files remain required and pinned during replay 2.097s munit.FailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:275 corrupted plan.json was accepted"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "49017304158c5eb014a39ea1c582b17caa7c9f52e6634f0e05f6374e15311f2c",
+    "patch_file": "planned-attachment-bytes.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "0e7717917903e9190110c351a2e1fb7778aa1442b4611f853e15a0798255c1c1",
+    "log_sha256": "cd3ef5fbe0347803b7d24ceb51808fd54cfcab32d3f3e43993bb7b857da83102"
+  },
+  {
+    "mutation": "planned-attachment-trio",
+    "candidate_sha": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "path": "media/src/main/scala/storymodel4s/media/captionpackage.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "media/testOnly storymodel4s.probe.VideoAcquisitionSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        9,
+        1,
+        0,
+        8
+      ]
+    ],
+    "named_failure": "planned provenance files remain required and pinned during replay",
+    "failures": [
+      "==> X storymodel4s.probe.VideoAcquisitionSuite.planned provenance files remain required and pinned during replay 2.732s munit.FailException: media/src/test/scala/storymodel4s/media/VideoAcquisitionSuite.scala:298 assertion failed"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "cd726bf04a93587eda5e0840521e86cd53dbe7040cf27bbc87a9345cdde66f18",
+    "patch_file": "planned-attachment-trio.patch.gz",
+    "patch_encoding": "gzip",
+    "patch_sha256": "f028f96716e498ae274a212e42892b440109e7cad079746b1af59a03cb5ae74c",
+    "log_sha256": "79d14dcf7f5e54bfc161e6510e39d4eb1987e3633a2d7050a0373e2a9175526a"
+  }
+]

@@ -1,0 +1,150 @@
+---
+title: Map ordinary story and recall files
+description: Run an offline comparison, keep reference and reconstruction separate, and read the result in Python.
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+Start with a text file containing the story and another containing a recall. The commands below
+produce two mappings for the same recall units: a **reference** based on local matches and a
+**reconstruction** that also uses a declared sequence model. Both keep outside-story alternatives
+and unavailable outcomes. The lexical baseline runs offline without a model download.
+
+## Install the command bundle
+
+The CLI bundle runs on macOS or Linux with Java 17 or newer. Extract its ZIP, make the launcher
+executable, and add its `bin` directory to your path:
+
+```sh
+unzip storymodel4s-VERSION.zip
+CLI_DIR=/absolute/path/to/extracted/storymodel4s-VERSION
+chmod +x "$CLI_DIR/bin/storymodel4s"
+export PATH="$CLI_DIR/bin:$PATH"
+storymodel4s --help
+```
+
+Replace `VERSION` and the example path with the supplied bundle's actual name. Keep its `lib`,
+`classpath.txt`, and `manifest.json` beside `bin`. The extracted bundle needs no sbt installation
+or source checkout. Model weights and video tools are separate inputs when those profiles are used.
+
+A public binary release has not yet been published. A maintainer can create the bundle from a
+clean source checkout with `sbt 'pipeline/cliDistribution'`; sbt prints the ZIP path. Its manifest
+records the source revision and a checksum for each packaged file.
+
+## Run the small public control
+
+Create a new working directory. This example reuses the project's admitted synthetic control;
+its text is deliberately fixed. These commands write files without a final newline:
+
+```sh
+mkdir mapping-example
+cd mapping-example
+printf '%s' 'Anna arrived. Bob left.' > source.txt
+printf '%s' 'Anna arrived.' > recall.txt
+```
+
+Save this as `study.json` in that directory:
+
+```json
+{
+  "schemaVersion": "storymodel-study/v1",
+  "source": {"format": "text", "path": "source.txt", "kind": "Sentence"},
+  "profile": "recall-baseline-lexical-words/v1",
+  "recalls": [{
+    "participant": "synthetic",
+    "session": "one",
+    "path": "recall.txt",
+    "timing": null,
+    "admission": {"kind": "project-synthetic-control"}
+  }]
+}
+```
+
+Then prepare the mapping settings and run the comparison:
+
+```sh
+storymodel4s mappingRun template > mapping.json
+storymodel4s mappingRun run study.json mapping.json analysis
+storymodel4s mappingRun exchange study.json mapping.json exchange
+```
+
+The printed summary reports one attempt, one completion and zero failures. `analysis` contains
+the prepared analysis; `exchange` contains the paired result for downstream readers. Each output
+directory has a completion manifest with its artifact hashes. Keep the whole directory together.
+
+The `project-synthetic-control` admission applies only to the exact recall above. When switching
+to your own local files, remove that field. Local analysis remains available; exporting recall
+text requires an admitted route matching that text. Public Sherlock preparation has its own
+checked lineage route. The [study input guide](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guide/study-inputs.md)
+describes ordinary text, timed annotations, and disclosure requirements.
+
+## Read the two measures
+
+| Output | What the values mean | What remains visible |
+| --- | --- | --- |
+| Reference | Normalized local score mass under the recorded candidate and scoring policy | Outside alternatives, exclusions and support |
+| Reconstruction | Posterior mass conditional on the declared sequence model | Its model policy, outside alternatives and support |
+
+These values have different meanings. Neither is a calibrated probability that the participant
+remembered an event correctly. Inspect the measure kind and policy in each member, and retain
+unavailable outcomes when summarizing a study.
+
+The Python readers in the matching source checkout provide an independent check. With Python 3,
+run these from the example directory, replacing `SOURCE_CHECKOUT` with that checkout's path:
+
+```sh
+python3 SOURCE_CHECKOUT/examples/mapping/read_mapping.py --directory exchange
+```
+
+For this control, it reports `status: pass`, one pair and one attempt. It checks package hashes,
+schema and projection consistency. Its success does not establish empirical accuracy or repeat
+the producer's contextual admission proof.
+
+## Compare structural weights
+
+Request exact rational weights, including the two endpoints:
+
+```sh
+storymodel4s mappingWeight study.json mapping.json 0/1,1/2,1/1 weighted
+python3 SOURCE_CHECKOUT/examples/mapping/read_weighted_mapping.py weighted
+```
+
+The reader reports one attempt and three weighted members. Weight zero reproduces the reference
+endpoint; weight one reproduces reconstruction. One half is the declared mixture of those
+members. This structural weight is separate from any annotation/caption scoring blend. A weight
+sweep compares modeling choices; it does not calibrate them or turn missing support into evidence.
+
+## Resume and diagnose
+
+To verify and reuse an existing output, request resume explicitly:
+
+```sh
+storymodel4s mappingRun exchange study.json mapping.json exchange --resume
+```
+
+Resume verifies identical expected bytes. A changed or corrupt output refuses; an existing
+destination without `--resume` also refuses. Use a new directory for changed settings.
+
+| `mappingRun` exit | Meaning |
+| --- | --- |
+| 0 | The batch completed and its requested capabilities are ready. |
+| 2 | The command refused before publishing a valid result. |
+| 3 | A valid batch retains failed observations or unavailable temporal results. |
+| 4 | Observations succeeded, but a requested capability is unavailable. |
+
+A partial batch takes precedence over missing capabilities. Read the outcomes and readiness
+fields together; the completion count alone is insufficient.
+
+<Evidence
+  status="Confirmed"
+  source="Installed CLI replay: paired exchange, three weights, independent readers, identical resume and overwrite refusal"
+  href={sourceLink('docs/refactor/evidence/release-workflow-20261014/installed-journey.json')}
+/>
+
+## Continue with your study
+
+- [Use the Scala facade](/scala/getting-started/) to analyze, inspect and export from code.
+- [Configure local ONNX scoring](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guide/mapping-facade.md)
+  with checksum-verified model files and a private receipt key.
+- [Inspect a structured story example](/method/align-and-interpret/) for graph inference and narrative summaries.

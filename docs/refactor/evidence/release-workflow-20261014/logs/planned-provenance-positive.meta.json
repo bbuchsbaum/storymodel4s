@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T15:04:02.008599+00:00",
+  "finished_utc": "2026-10-14T15:05:04.079090+00:00",
+  "duration_seconds": 62.070116,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "media/testOnly *VideoAcquisitionSuite *CaptionPackageSuite",
+    "scalafmtAll",
+    "scalafmtSbt",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/planned-provenance-positive.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 1800.0,
+  "log_bytes": 3988
+}

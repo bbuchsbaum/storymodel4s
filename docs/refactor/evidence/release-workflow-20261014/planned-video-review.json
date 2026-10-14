@@ -1,0 +1,27 @@
+{
+  "candidate": "c1670e91248912325c8516c32b4384301d60bf14",
+  "scope": "planned video f62d7005 plus provenance replay repair",
+  "reviewer": "evidence_review",
+  "verdict": "PASS",
+  "remaining_findings": [],
+  "checks": {
+    "negative": {
+      "total": 9,
+      "failed": 1,
+      "passed": 8,
+      "named": "planned provenance files remain required and pinned during replay"
+    },
+    "positive": {
+      "total": 28,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 28
+    }
+  },
+  "limits": [
+    "broader gate and mutations pending",
+    "actual Sherlock acquisition separate",
+    "Draft authority; physical scanner synchronization unavailable"
+  ]
+}

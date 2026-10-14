@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T15:30:28.095462+00:00",
+  "finished_utc": "2026-10-14T15:31:03.239581+00:00",
+  "duration_seconds": 35.143439,
+  "command": [
+    "python3",
+    "docs/refactor/evidence/release-workflow-20261014/verify_installed_journey.py",
+    ".agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT",
+    ".agent-work/release-workflow-20261014/installed-journey"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/installed-journey.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 764
+}

@@ -1,0 +1,105 @@
+[
+  {
+    "arguments": [
+      "sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT/bin/storymodel4s",
+      "mappingRun",
+      "template"
+    ],
+    "exit": 0,
+    "stdout": "{\"profile\":\"mapping-lexical-pair/v1\",\"temperature\":\"1.0\",\"perLevel\":20,\"tieBudget\":200,\"requested\":[\"Mapping\"],\"networkRequests\":0,\"retries\":0}\n",
+    "stderr": ""
+  },
+  {
+    "arguments": [
+      "sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT/bin/storymodel4s",
+      "mappingRun",
+      "run",
+      "study.json",
+      "mapping.json",
+      "analysis"
+    ],
+    "exit": 0,
+    "stdout": "{\"attempts\":1,\"completed\":1,\"failed\":0,\"manifest\":\"1cd1b4de66f2164d559cfe7e5c61629934c939eda199917ebdbb94a25b090d14\",\"missingCapabilities\":[],\"plan\":\"ce82bc0a7dbe7c42b734b0ffaea8231ffefdd68863d412dd4ee421daac1b9809\"}\n",
+    "stderr": ""
+  },
+  {
+    "arguments": [
+      "sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT/bin/storymodel4s",
+      "mappingRun",
+      "exchange",
+      "study.json",
+      "mapping.json",
+      "exchange"
+    ],
+    "exit": 0,
+    "stdout": "{\"attempts\":1,\"completed\":1,\"failed\":0,\"manifest\":\"0c4d46107e9d3d89a6d6c627b99932d38a8e7421eeb79795e268c1c4bce5912b\",\"missingCapabilities\":[],\"plan\":\"ce82bc0a7dbe7c42b734b0ffaea8231ffefdd68863d412dd4ee421daac1b9809\"}\n",
+    "stderr": ""
+  },
+  {
+    "arguments": [
+      "sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT/bin/storymodel4s",
+      "mappingRun",
+      "exchange",
+      "study.json",
+      "mapping.json",
+      "exchange",
+      "--resume"
+    ],
+    "exit": 0,
+    "stdout": "{\"attempts\":1,\"completed\":1,\"failed\":0,\"manifest\":\"0c4d46107e9d3d89a6d6c627b99932d38a8e7421eeb79795e268c1c4bce5912b\",\"missingCapabilities\":[],\"plan\":\"ce82bc0a7dbe7c42b734b0ffaea8231ffefdd68863d412dd4ee421daac1b9809\"}\n",
+    "stderr": ""
+  },
+  {
+    "arguments": [
+      "sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT/bin/storymodel4s",
+      "mappingRun",
+      "exchange",
+      "study.json",
+      "mapping.json",
+      "exchange"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "{\"status\":\"refused\",\"error\":\"Publication\",\"reason\":\"OutputExists\",\"path_sha256\":\"ab27b729d9cc4cb1c00960700446924159e9298d0f952aee3d55408b8e0b1b71\"}\n"
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/examples/mapping/read_mapping.py",
+      "--directory",
+      "exchange"
+    ],
+    "exit": 0,
+    "stdout": "{\"status\": \"pass\", \"schema\": \"mapping-exchange-batch/v1\", \"pairs\": 1, \"attempts\": 1, \"qualification\": \"package/schema/projection checks; not contextual derivation admission\"}\n",
+    "stderr": ""
+  },
+  {
+    "arguments": [
+      "sh",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/distribution/installed/storymodel4s-0.1-2c4b74f-SNAPSHOT/bin/storymodel4s",
+      "mappingWeight",
+      "study.json",
+      "mapping.json",
+      "0/1,1/2,1/1",
+      "weighted"
+    ],
+    "exit": 0,
+    "stdout": "{\"attempts\":1,\"completed\":1,\"manifest\":\"e23149b9775c81e09a5c70e3463b9908a93ea235e4e8d35fec5f3dea69d0a93e\",\"readouts\":[\"mapping\"]}\n",
+    "stderr": ""
+  },
+  {
+    "arguments": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/examples/mapping/read_weighted_mapping.py",
+      "weighted"
+    ],
+    "exit": 0,
+    "stdout": "pass: 1 attempts, 3 weighted members; wire checks, not execution admission\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,103 @@
+{
+  "logs": [
+    {
+      "log": "logs/planned-video-01.log.gz",
+      "raw_sha256": "33bfbfe7f0205a5f983ca365755529cf23552966a5e7a3908549034c60eb0d28",
+      "raw_bytes": 2418,
+      "metadata": "logs/planned-video-01.meta.json"
+    },
+    {
+      "log": "logs/planned-video-02.log.gz",
+      "raw_sha256": "e12412448542bbf88b34953d471fd07a21a2ec31951a04b61127f0deb74e3727",
+      "raw_bytes": 4015,
+      "metadata": "logs/planned-video-02.meta.json"
+    },
+    {
+      "log": "logs/planned-video-03.log.gz",
+      "raw_sha256": "5445652e0258dcfa46eb718abdc7c0bb2dd3cc3cf1d43209595d17e166633235",
+      "raw_bytes": 3840,
+      "metadata": "logs/planned-video-03.meta.json"
+    },
+    {
+      "log": "logs/planned-provenance-negative.log.gz",
+      "raw_sha256": "f14699bc67676caae5a4c5018d12914e477dfed5ed59a028f5946e91f990dc94",
+      "raw_bytes": 3725,
+      "metadata": "logs/planned-provenance-negative.meta.json"
+    },
+    {
+      "log": "logs/planned-provenance-positive.log.gz",
+      "raw_sha256": "2b7f2c0066c040e81262ee4b86b7a620fe7f9538d93d74e980ae08662ed2ea52",
+      "raw_bytes": 3988,
+      "metadata": "logs/planned-provenance-positive.meta.json"
+    },
+    {
+      "log": "logs/distribution-compile-01.log.gz",
+      "raw_sha256": "f31024a2b75bc0874feb208599c3be6ef8b9877431f28b9afbd3aed12c05f2cc",
+      "raw_bytes": 5954,
+      "metadata": "logs/distribution-compile-01.meta.json"
+    },
+    {
+      "log": "logs/distribution-compile-02.log.gz",
+      "raw_sha256": "12255975f70190242d9f08114e850da5be61ca4d34f0722bd50236ec6bd4b402",
+      "raw_bytes": 955,
+      "metadata": "logs/distribution-compile-02.meta.json"
+    },
+    {
+      "log": "logs/distribution-compile-03.log.gz",
+      "raw_sha256": "41386f93afc693721a66efe33e588213e2fcebcd20cd913ac0648d8ad3d5a741",
+      "raw_bytes": 2871,
+      "metadata": "logs/distribution-compile-03.meta.json"
+    },
+    {
+      "log": "logs/distribution-utc-negative.log.gz",
+      "raw_sha256": "2c1475edce7816d527663efaab3c6c6cb09698c08f8544f44d51303ff84eb836",
+      "raw_bytes": 5272,
+      "metadata": "logs/distribution-utc-negative.meta.json"
+    },
+    {
+      "log": "logs/distribution-toronto-negative.log.gz",
+      "raw_sha256": "00f3d96f4e72b03e5b15a5fb1b5a91b4528c12fd6880d548e4e0662cc761f541",
+      "raw_bytes": 1312,
+      "metadata": "logs/distribution-toronto-negative.meta.json"
+    },
+    {
+      "log": "logs/distribution-utc-positive.log.gz",
+      "raw_sha256": "86d033bc63798b2d91fc06f16e229e18f4a8365055e846b9d348e10aaf04ffc0",
+      "raw_bytes": 1509,
+      "metadata": "logs/distribution-utc-positive.meta.json"
+    },
+    {
+      "log": "logs/distribution-toronto-positive.log.gz",
+      "raw_sha256": "a1fc0c896b036f981529a6106179368f5a311e8a849d31cda0295c364a0169e6",
+      "raw_bytes": 1312,
+      "metadata": "logs/distribution-toronto-positive.meta.json"
+    },
+    {
+      "log": "logs/distribution-timezone-negative.log.gz",
+      "raw_sha256": "489ba1979509b1e5adf4c33123488d98e06d70cf529f81a104c79dfb8a11bbfc",
+      "raw_bytes": 1361
+    },
+    {
+      "log": "logs/distribution-timezone-positive.log.gz",
+      "raw_sha256": "0140d3adff0422b95fb8192650427bd38219359e766ad97044e3a9ef600c2d11",
+      "raw_bytes": 828
+    },
+    {
+      "log": "logs/distribution-artifact-readback.log.gz",
+      "raw_sha256": "4c5d64c15d02d80fd388fa48aa1e75ec761e36bc1ffc5c9c4439966419e06b2e",
+      "raw_bytes": 879
+    },
+    {
+      "log": "logs/distribution-installed-readback.log.gz",
+      "raw_sha256": "6c8391dd1c0cb3b074c238ae693892ea7944a7fe066310bdbb14cbbbbe2b228e",
+      "raw_bytes": 879
+    }
+  ],
+  "limits": {
+    "distribution-compile-01": "copy setup failed; compiled older source, not qualifying for the distribution change",
+    "planned-video-01": "syntax error before tests; corrected in later candidate",
+    "distribution-compile-02": "build-definition File separator compile failure; corrected later",
+    "planned-provenance-negative": "intentional pre-fix runtime reproduction",
+    "distribution-timezone-negative": "actual predecessor archive byte mismatch reproduced"
+  }
+}

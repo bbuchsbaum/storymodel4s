@@ -1,0 +1,31 @@
+{
+  "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "timezone_builds": [
+    {
+      "zone": "UTC",
+      "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+      "archive": "utc-positive.zip",
+      "sha256": "8ddca4c7c732d20fe9bf888c8da397db9e152f33820add229ea66a4641d2d833",
+      "bytes": 142942745,
+      "build_exit": 0
+    },
+    {
+      "zone": "America/Toronto",
+      "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+      "archive": "toronto-positive.zip",
+      "sha256": "8ddca4c7c732d20fe9bf888c8da397db9e152f33820add229ea66a4641d2d833",
+      "bytes": 142942745,
+      "build_exit": 0
+    }
+  ],
+  "byte_equal": true,
+  "readback": {
+    "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+    "files_verified": 73,
+    "classpath_entries": 69,
+    "actual_java_command": "mappingRun template",
+    "exit": 0
+  },
+  "launcher_tests": 5,
+  "collection_correction": "UTC build succeeded; initial collector mistakenly replaced dotted directory suffix. Corrected archive lookup; UTC build not repeated."
+}

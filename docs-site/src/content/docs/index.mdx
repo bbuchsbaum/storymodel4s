@@ -3,10 +3,10 @@ title: Compare a story with a person's recall
 description: storymodel4s records the text, the proposed story structure, the recall, and the uncertain mapping between them.
 template: splash
 hero:
-  tagline: Give storymodel4s a story model and a recall transcript. It returns an inspectable mapping from each recall unit to story events and named kinds of outside material.
+  tagline: Compare story and recall files, inspect local matches and structured reconstruction, and retain the evidence and uncertainty behind each result.
   actions:
-    - text: Follow the complete example
-      link: /method/align-and-interpret/
+    - text: Map ordinary files
+      link: /method/map-files/
       icon: right-arrow
       variant: primary
     - text: See how the model is built
@@ -23,9 +23,13 @@ import { sourceLink } from '../../lib/provenance';
 
 ## The job in sixty seconds
 
-A story model records people, events, states, contexts, order, and the words that support each
-claim. A recall graph records a person's retelling in its own sequence. The aligner compares the
-two and returns a probability row for every recall unit.
+A story and a recall can enter as ordinary text files. The mapping workflow keeps two results for
+the same recall units: local reference matches and reconstruction under a declared sequence model.
+Both retain named outside-story alternatives, support and unavailable outcomes. Their measure
+kinds remain distinct; a local score is not a calibrated probability of correct remembering.
+
+For richer analyses, a story model records people, events, states, contexts, order, and the words
+that support each claim. A recall graph records a person's retelling in its own sequence.
 
 Each row answers a concrete question: how much of this recall unit points to the story, where in the
 story does it point, and how much belongs to an association, commentary, or another named external
@@ -47,10 +51,10 @@ product records the segmentation policy or receipt and retains plausible alterna
 
 <div class="route-grid">
   <RouteCard
-    eyebrow="Complete example"
-    title="Compare a recall with a story"
-    description="Run the public alignment API, inspect its posterior rows, and read each estimate with its support."
-    href="/method/align-and-interpret/"
+    eyebrow="Start with files"
+    title="Run a paired mapping"
+    description="Use the installed command, compare three structural weights, and verify the exchange in Python."
+    href="/method/map-files/"
     accent="teal"
   />
   <RouteCard
@@ -109,18 +113,20 @@ proposal resolution, document identity, story and recall graphs, sparse alignmen
 summaries, interview scoring, feature tracks, deterministic embeddings, structural graph distance,
 and canonical JSON.
 
-The code is pre-release and runs from a source checkout. The complete *War of the Ghosts* model is a
+The code is pre-release. A maintainer-built CLI bundle runs with Java; Scala examples run from a
+source checkout. The complete *War of the Ghosts* model is a
 researcher-reviewed fixture. Automatic construction of an equally complete model from arbitrary
 prose remains programme work.
 
 <Evidence
   status="Confirmed"
-  source="README.md, build.sbt, and the 13-example replay manifest"
+  source="README.md, build.sbt, and the 14-example replay manifest"
   href={sourceLink('README.md')}
 />
 
 ## Continue the journey
 
+- [Map ordinary files](/method/map-files/) and independently read both mapping members.
 - [Model the story](/method/model-a-story/) and inspect its evidence, contexts, and relations.
 - [Represent the recall](/method/represent-recall/) and understand the baseline's scientific scope.
 - [Align and interpret](/method/align-and-interpret/) one recall against the reviewed story.

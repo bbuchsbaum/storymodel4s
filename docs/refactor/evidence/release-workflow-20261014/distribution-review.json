@@ -1,0 +1,25 @@
+{
+  "candidate": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "scope": "local command distribution ea635202 plus timestamp repair",
+  "reviewer": "evidence_review",
+  "verdict": "PASS",
+  "remaining_findings": [],
+  "archive_bytes": 142942745,
+  "archive_sha256": "8ddca4c7c732d20fe9bf888c8da397db9e152f33820add229ea66a4641d2d833",
+  "verified_files": 73,
+  "ordered_classpath_entries": 69,
+  "timezone_bytes_equal": [
+    "UTC",
+    "America/Toronto"
+  ],
+  "launcher_tests_passed": 5,
+  "real_java_command": {
+    "command": "mappingRun template",
+    "exit": 0
+  },
+  "limits": [
+    "local artifact only; no release tag/publication",
+    "not cross-environment reproducibility",
+    "broader gate pending"
+  ]
+}

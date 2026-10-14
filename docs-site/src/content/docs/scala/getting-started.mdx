@@ -33,15 +33,14 @@ export const _bindFiles = (() => {
   return true;
 })();
 
-storymodel4s compares a story with a later recall. A `StoryModel` records the people, events,
-claims, contexts, and order in the story. A `RecallGraph` divides the recall into units. `GraphHsmm`
-assigns each recall unit probability mass over story nodes and named external states such as an
-association or commentary.
+storymodel4s compares a story with a later recall. Start with `MappingPipeline` to analyze ordinary
+files and retain local reference matches alongside reconstruction under a declared sequence model.
+For an installed command and Python readback, follow [Map ordinary files](/method/map-files/).
 
-The program returns typed values that you can inspect. You can read every posterior row, the most
-likely route, the mass assigned inside and outside the story, and summaries such as coverage,
-specificity, and compression. Story and recall records cite exact text. Support-aware estimates
-keep their support, and unavailable estimates remain unavailable.
+The API returns typed values with their measure kinds, policies, failures and missing capabilities.
+The structured-story example below also exposes posterior rows, a most likely route and narrative
+summaries. Story and recall records cite exact text. Support-aware estimates keep their support,
+and unavailable estimates remain unavailable.
 
 ## Start with ordinary files
 
@@ -97,7 +96,7 @@ story nodes and explicit external states.
 
 ## Run it
 
-storymodel4s currently runs from a source checkout. You need JDK 17 or 21 and sbt 1.12.14.
+This Scala example runs from a source checkout. You need JDK 17 or 21 and sbt 1.12.14.
 The build fetches its pinned `grakern` source revision; a local checkout is an optional override.
 
 ```sh

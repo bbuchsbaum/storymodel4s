@@ -3,6 +3,7 @@ export const sidebar = [
     label: 'Start here',
     items: [
       { label: 'Orientation', slug: 'method/orientation' },
+      { label: 'Map ordinary files', slug: 'method/map-files' },
       { label: 'A concrete modeling test', slug: 'method/one-honest-success' },
       { label: 'How text becomes a story graph', slug: 'method/build-interpretation' },
     ],

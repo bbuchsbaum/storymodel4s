@@ -3,7 +3,11 @@
 This receipt establishes a new raw-array selection and the published annotation-index lookup.
 It uses the admitted `sub-03` recording from ds001132 revision
 `fc91edbbe1b8117f96b40bb4d1f5df43aa1afdce`. Physical scanner/media synchronization remains
-unestablished, and the processing history of older derivative arrays remains unknown.
+unestablished, and the processing history of older derivative arrays remains unknown. On
+14 October the owner confirmed that the OpenNeuro README's beginning/end crop prescriptions
+are the available timing authority and that no more specific trigger information exists.
+The approved imaging scope uses this published-index convention and retains physical
+synchronization as unavailable; recovery of nonexistent trigger records is not a release gate.
 
 `export_encoding.py` verifies the exact released image and 348-byte header hashes, dimensions,
 datatype, endianness, scaling, temporal units, voxel offset and complete payload length. It copies
@@ -61,5 +65,5 @@ python3 docs/refactor/evidence/encoding-export-20261014/verify_scanner_outputs.p
 
 The indexing and byte checks support reproducibility of these new arrays. They do not establish
 preprocessed analysis readiness, the historical predictor matrix, calibrated neural timing or
-the missing participant-specific trigger/presentation relation. The broader imaging acceptance
-remains open on that physical timing requirement.
+the missing participant-specific trigger/presentation relation. These are explicit limits of
+the owner-approved published-index scope, rather than outstanding requests for trigger records.

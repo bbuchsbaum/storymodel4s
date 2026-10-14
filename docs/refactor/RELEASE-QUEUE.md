@@ -15,7 +15,7 @@ These counts are a dated observation; use live Mote when taking ownership.
 | --- | --- | --- |
 | 1 | `bd-01M2TA01EHVRF6MQ1N00XTVK1K` | Reconcile and qualify the current producer/consumer baseline, committed tracker state and canonical queue; synchronize reviewed revisions and bind hosted evidence. |
 | 2 | `bd-01M35P83TCNHBSDY6NSK13Q3K0` | Public ONNX command bridge, historical A-preset parity, actual Sherlock A/A+V with both mappings and weights, independent exchange and temporal/imaging walkthrough. |
-| 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | Complete encoding export and actual timing/array-history acceptance for the admitted development participant; reuse the qualified recall export and published scene-analysis convention. |
+| 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | Complete the published-index imaging walkthrough for the admitted development participant; reuse qualified recall and newly verified encoding exports. The owner accepts README crop authority with physical trigger synchronization unavailable. |
 | 4a | `bd-01M19FPY1EC5QNTW6SBG3QYT3R` | Execute the current reader journey and its visual qualification. |
 | 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Audit the actual stable signature/constructor closure before freeze. |
 | 4c | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | Installable distribution, compatibility baseline and documented release process. |
@@ -31,7 +31,9 @@ Carry forward the qualified G1/reference/reconstruction, preparation, exchange, 
 disclosure/header checks, facade, workspace, temporal producer and video software. Their
 closed Motes do not need to be reimplemented. The full Sherlock journey remains open because
 actual A+V, historical parity and imaging acceptance are broader than the synthetic controls.
-Physical synchronization is not established by the published analysis crop convention.
+Physical synchronization is not established by the published analysis crop convention. On
+14 October the owner confirmed that no finer trigger records are available and selected that
+published-index scope for item 3. Preserve the unavailable status in every output and claim.
 
 Organization infrastructure and development experiments have advanced on the 1.1 lane.
 The public organization preview and scientific recovery remain separate acceptance; no
