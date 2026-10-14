@@ -1,0 +1,13 @@
+{
+  "name": "source-ci",
+  "run": 38634266780,
+  "sha": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38634266780",
+  "status": "completed",
+  "conclusion": "success",
+  "watchExit": 0,
+  "logExit": 0,
+  "logBytes": 1798252,
+  "logSha256": "1645cd7498c0a19e85b1a5e140fb2a998068fa355554922260bf776d1b95081b",
+  "finishedUtc": "2026-10-14T21:14:28.307939+00:00"
+}

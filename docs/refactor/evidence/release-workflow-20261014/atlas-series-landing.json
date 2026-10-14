@@ -1,0 +1,12 @@
+{
+  "from": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "to": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "remote": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "time": "2026-10-14T21:28:24.579130+00:00",
+  "method": "normal fast-forward and non-force push after byte-identical Mote preservation",
+  "preserved_dirty_paths": 1202,
+  "unrelated_nonMote_paths": 18,
+  "relocated_identical_untracked": 1179,
+  "mote_history_review": "9602b7aa0c7d1bd10d52e4d21c922ebd4ac92563",
+  "series_review": "atlas-series/review.json"
+}

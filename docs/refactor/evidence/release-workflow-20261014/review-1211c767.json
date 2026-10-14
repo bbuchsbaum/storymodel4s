@@ -1,0 +1,34 @@
+{
+  "schema": "exact-metadata-review/v1",
+  "verdict": "PASS",
+  "candidate": "1211c767cf1a17c25e7ec44b55007e8bc2af67c8",
+  "reviewedParent": "ad69af0119d21ba3469532422b67ac3e1455d8d7",
+  "scope": "17 added metadata paths: exact prior review receipt plus eight Mote operations and eight matching authority records",
+  "cleanTrackedAndUntrackedStatus": true,
+  "reviewReceiptByteIdentical": true,
+  "authorityOperationPairingVerified": 8,
+  "moteDoctor": {
+    "ok": true,
+    "fsckClean": true,
+    "operationsChecked": 16770,
+    "receipt": "/tmp/review-1211c767-doctor.json",
+    "warning": "Infrastructure bead remains doing with an expired claim; administrative warning only."
+  },
+  "moteOperations": {
+    "progressNotes": 5,
+    "reviewStatusTransitions": 3,
+    "actor": "codex-release-workflow-20261014",
+    "scope": "Journey, imaging and docs move to review; construction audit and infrastructure retain open acceptance."
+  },
+  "allPriorProductAndEvidenceBytesUnchanged": true,
+  "productionSource": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "atlasCandidate": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "sourceMain": "22cc7243dd825198544569bc51f86bc21c8c0dbb",
+  "diffCheckExit": 0,
+  "findings": [],
+  "limits": [
+    "Prior SHA-bound gate/artifact/crosswalk review carries forward through metadata-only delta.",
+    "No heavy gate run and no landing/publication performed.",
+    "Receipt remains outside repository to avoid a recursive receipt commit."
+  ]
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "name": "audit-before",
+    "argv": [
+      "node",
+      "/Users/bbuchsbaum/.local/share/agent-policy/browser-automation-guard.mjs",
+      "--audit"
+    ],
+    "exit": 0,
+    "seconds": 0.12653732299804688
+  },
+  {
+    "name": "series",
+    "argv": [
+      "node",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review/check.mjs",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-work",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review/browser-04"
+    ],
+    "exit": 0,
+    "seconds": 1.9990441799163818
+  },
+  {
+    "name": "existing",
+    "argv": [
+      "node",
+      "tools/temporal-browser-smoke.mjs",
+      "target/edition/index.html",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-series-final-gate.log",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-series-browser"
+    ],
+    "exit": 0,
+    "seconds": 3.607990026473999
+  },
+  {
+    "name": "actual",
+    "argv": [
+      "node",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/docs/refactor/evidence/release-workflow-20261014/actual_temporal_browser.mjs",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-work",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/actual-browser",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/actual-series-browser"
+    ],
+    "exit": 0,
+    "seconds": 246.87272667884827
+  }
+]

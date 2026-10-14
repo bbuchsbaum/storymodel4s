@@ -1,0 +1,100 @@
+{
+  "checks": [
+    {
+      "name": "support-only series has no invented numeric mass or concentration",
+      "ok": true
+    },
+    {
+      "name": "both timed rows agree with independently checked full-region quantities",
+      "ok": true
+    },
+    {
+      "name": "unequal recall observations retain exact positions and supplied interval extents",
+      "ok": true
+    },
+    {
+      "name": "estimated and source-reported timing remain distinct",
+      "ok": true
+    },
+    {
+      "name": "both numerical quantities are visible beside the timing marks",
+      "ok": true
+    },
+    {
+      "name": "ROI changes region mass while source-wide width stays unchanged",
+      "ok": true
+    },
+    {
+      "name": "a supported zero remains distinct from unavailable quantity",
+      "ok": true
+    },
+    {
+      "name": "series view reopens with byte-identical saved state",
+      "ok": true
+    },
+    {
+      "name": "series adds no mobile document overflow",
+      "ok": false
+    },
+    {
+      "name": "series keyboard selection updates the original semantic selection",
+      "ok": true
+    },
+    {
+      "name": "series keyboard selection retains its control focus",
+      "ok": false
+    },
+    {
+      "name": "series remains offline with no browser errors",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "networkRequests": 0,
+  "cpu": "Apple M3 Max",
+  "architecture": "arm64",
+  "status": "failed",
+  "browser": "140.0.7339.186",
+  "lastComparison": {
+    "key": "fullMass",
+    "actual": [
+      [
+        "[0/1, 2/1) seconds; source-reported; onset 3/1 seconds; duration unavailable; source-reported",
+        "0.41733",
+        "35 source ticks for 50% of allocated source quantity"
+      ],
+      [
+        "[5/1, 7/1) seconds; source-reported; onset 8/1 seconds; duration unavailable; estimated",
+        "0.35433",
+        "35 source ticks for 50% of allocated source quantity"
+      ]
+    ]
+  },
+  "mobileDimensions": {
+    "viewport": 390,
+    "width": 548,
+    "overflows": [
+      {
+        "class": "temporal-inspector temporal-series-panel",
+        "width": 336,
+        "scroll": 521
+      },
+      {
+        "class": "temporal-series-plot",
+        "width": 336,
+        "scroll": 336
+      },
+      {
+        "class": "temporal-series",
+        "width": 521.40625,
+        "scroll": 521
+      }
+    ]
+  },
+  "focusAfterSelection": {
+    "id": "",
+    "tag": "BODY",
+    "label": null
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'failed' !== 'passed'\n\n    at file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review/check.mjs:56:70"
+}

@@ -1,0 +1,26 @@
+{
+  "source": "1211c767cf1a17c25e7ec44b55007e8bc2af67c8",
+  "atlas": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "scope": "Read-only acceptance reconciliation; hosted PASS remains pending; no new heavy gates.",
+  "dispositions": {
+    "bd-01M4XAWCMQHJH604C3W7TV0H9Q": "Eligible after exact hosted PASS.",
+    "bd-01M354E83Z4Z7DR4KPP6Q45MAJ": "Eligible after exact hosted PASS within owner-approved published-index scope.",
+    "bd-01M35P83TCNHBSDY6NSK13Q3K0": "Execution requirements covered; close planned-video child and supply explicit reader-journey acceptance mapping before closing parent.",
+    "bd-01M19FPY1EC5QNTW6SBG3QYT3R": "Keep open until each MVP input is mapped to an authored reader walkthrough and its replayed transcript, especially annotated/video-derived inputs; 14-example receipt alone does not cover these.",
+    "bd-01M354JNKNKJ15N4T5MGQTRSET": "Keep open: selected-recall scalar region/precision readout is not requested time series; named-hardware metadata not found in actual browser receipt."
+  },
+  "wog": {
+    "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+    "wogBodyBytesExactAfterAdmissionHeader": true,
+    "inputConfigSha256Exact": true,
+    "outputFilesVerified": 99,
+    "pairedAttempts": 1,
+    "pairs": 1,
+    "weightedMembers": 3,
+    "independentReadersPassed": true,
+    "recallScope": "fixed admitted synthetic external recall; no mapping accuracy assertion"
+  },
+  "localOnly": "Code and named existing test establish preparation/analyze permitted and batch exchange refused as DisclosureRefused; private destination does not change admission predicate. Existing admitted synthetic WOG control satisfies ordinary-file acceptance.",
+  "atlasDiscriminator": "At least two recall observations produce provider-derived region mass and precision samples on a declared recall-time axis, with untimed/unavailable observations distinct, independently checked and rendered as a series. No smoothing or rescaling.",
+  "residual": "No fresh LocalOnly CLI execution; exact guard traced and existing test inspected. Docs walkthrough coverage is an acceptance evidence gap, not proof that underlying commands cannot work. No owner policy expansion needed."
+}

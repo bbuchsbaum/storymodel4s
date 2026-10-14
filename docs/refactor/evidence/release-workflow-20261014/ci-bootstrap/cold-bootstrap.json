@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/opt/homebrew/bin/sbt",
+    "-batch",
+    "-Dsbt.boot.directory=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/cold-bootstrap/bootstrap-v078j66r/boot",
+    "-Dsbt.global.base=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/cold-bootstrap/bootstrap-v078j66r/global",
+    "-Dsbt.ivy.home=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/cold-bootstrap/bootstrap-v078j66r/ivy",
+    "-Dcoursier.cache=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/cold-bootstrap/bootstrap-v078j66r/cache",
+    "show sbtVersion"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/cold-bootstrap/bootstrap-v078j66r",
+  "exit": 0,
+  "durationSeconds": 18.224854583000706,
+  "emptyBootAndCacheAtStart": true,
+  "repositoryConfig": "[repositories]\n  local\n  maven-central: https://repo.maven.apache.org/maven2/\n",
+  "bootJars": 87,
+  "logSha256": "05bcaec855a3786ef7c85d07db2bf6c948e356feda239cd95295ed4981f40d31",
+  "apacheCacheFiles": 935,
+  "repo1CacheFiles": 15
+}

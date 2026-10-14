@@ -1,0 +1,17 @@
+{
+  "sha": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "producer": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "status": "PASS",
+  "tasks": 10,
+  "totals": {
+    "total": 518,
+    "failed": 0,
+    "errors": 0,
+    "passed": 518,
+    "skipped": 0
+  },
+  "raw_log_sha256": "f0ea725c0d7f8d8a93e408343e6d69296a3f231b76e1cecb2934cdba6bba9abc",
+  "raw_log_bytes": 720628,
+  "metadata": "atlas-series-final-gate.log.meta.json",
+  "note": "Earlier helper full-gate attempt lacked complete retained log/exit and is INCONCLUSIVE. This uninterrupted parent-captured gate replaces it."
+}

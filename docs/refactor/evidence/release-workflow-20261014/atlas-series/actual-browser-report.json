@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "condition": "a",
+      "openMs": 25228.13525,
+      "allocateMs": 9194.301625,
+      "cells": 5536,
+      "numericValues": 14496,
+      "unavailableValues": 2112,
+      "maxAbsoluteDifference": 0,
+      "pages": 8,
+      "exactReplay": true
+    },
+    {
+      "condition": "av",
+      "openMs": 33561.58433299999,
+      "allocateMs": 9840.60500000001,
+      "cells": 5536,
+      "numericValues": 15360,
+      "unavailableValues": 1248,
+      "maxAbsoluteDifference": 0,
+      "pages": 8,
+      "exactReplay": true
+    }
+  ],
+  "errors": [],
+  "networkRequests": 0,
+  "status": "passed",
+  "browser": "140.0.7339.186"
+}

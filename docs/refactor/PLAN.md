@@ -31,16 +31,17 @@ one annotation has only an onset and is retained without an invented interval ca
 The published-index imaging walkthrough and executable reader guide have passed independent
 readback. The CLI distribution is installable and reproducible. Source `eb48a562` adds imported
 temporal inspection, lawful workspace row-sum tolerance, absent-clock round trips and immutable
-digest caches. Exact review passes through `874f1b08`, including the corrected signature-audit
-input boundary. The complete producer platform gate passed all 56 tasks: 10,877 passed, zero failures/errors
+digest caches. Exact review passes through `1211c767`, including the corrected signature-audit
+input boundary and final receipt/tracker metadata. The complete producer platform gate passed all 56 tasks: 10,877 passed, zero failures/errors
 and five skips. Final CLI extraction/readback and all 14 guide transcripts also passed.
 
 StoryAtlas `d6f800f3` pins producer `eb48a562` and has passed independent review, all 510
 consumer tests, 30 synthetic browser checks and actual A/A+V browser readback. Each actual
 condition retains 173 rows and 5,536 cells; numeric cells match the independent JVM reader
 exactly, unavailable quantities stay blank, and saved-state replay is byte-identical. The
-browser has been closed and the ownership audit is clean. Main remains at the approved
-`22cc7243`; Atlas main remains unchanged.
+browser has been closed and the ownership audit is clean. On owner approval, source main advanced
+to `1211c767` and Atlas main to `d6f800f3`; both exact revisions were pushed and independently
+read back from GitHub. All unrelated Atlas working files retained their hashes.
 
 The stable-signature audit now includes public enum/sealed alternatives and verifies every
 runtime input. Its [construction judgment](evidence/stability-audit-20261014/constructor-judgment.md)
@@ -49,11 +50,34 @@ promotion-versus-facade boundary decision. These are separate from qualification
 The compatibility rehearsal passes unchanged and named-breaking controls; no stable baseline,
 Maven release or documentation deployment has been activated.
 
-Reconcile the final reviewed receipts and tracker, then obtain approval for the concrete main
-advancements and bind hosted checks. The artifact preflight generated all 56 POMs; four direct
-grakern snapshot dependencies are absent from Maven Central, blocking Maven publication while
-the bundled CLI remains usable.
-The final 1.0 release gate remains open until its stability and publication requirements are met.
+The original [landing receipt](evidence/release-workflow-20261014/landing.json) records both
+fast-forwards. Source main subsequently advanced to `a56a74b8` with the reviewed sbt bootstrap
+repair and reader-route crosswalk. Full hosted qualification of the repaired runtime at `d1a82d5b`
+passed all 80 matrix tasks: each JVM passed 4,344 tests with 22 optional skips; JavaScript and
+Native each passed 3,258, with no failures/errors. The complete API log archive supplies the
+counts; the earlier CLI log download was truncated. All later source changes are docs or tracker
+metadata, so they do not invalidate that runtime gate.
+
+Atlas main advanced to independently reviewed `cda5210d`, retaining producer `eb48a562`.
+The added recall-clock series displays ROI mass and separate source-wide concentration width
+at supplied recall observations. Its complete gate passed 518 tests with no failures/errors/skips;
+12 new and 30 existing browser controls passed. Both actual conditions retain exact 5,536-cell
+readback and byte-identical saved-state replay. The final browser is closed. All 1,202 existing
+dirty-file hashes, including 18 unrelated paths, survived the fast-forward. See the
+[series review](evidence/release-workflow-20261014/atlas-series/review.json).
+
+The demonstrated journey, published-index imaging, planned acquisition, reader documentation
+and Atlas temporal inspection have completed their implementation and local acceptance.
+Hosted checks for the new main revisions and final tracker reconciliation are recorded in the
+workflow receipt. Final 1.0 freeze and publication remain separate, with this priority order:
+
+1. Repair the reproduced ClaimLedger construction/serialization opening, then the CandidateSet
+   and truncation recipe boundaries, on their existing pre-freeze tickets.
+2. Resolve the 169 pending stable dependency-boundary dispositions and finish constructor
+   judgment before declaring the API frozen.
+3. Resolve the four unavailable grakern snapshot dependencies, establish the stable compatibility
+   baseline and complete release infrastructure. The bundled CLI is usable; Maven publication,
+   a release tag and site deployment retain their acceptance and authorization requirements.
 
 ### Completed substrate to carry forward
 

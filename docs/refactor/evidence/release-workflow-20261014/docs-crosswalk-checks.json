@@ -1,0 +1,98 @@
+{
+  "source": "a56a74b8f0a682e907434728e51b5c9bfb62ec06",
+  "fullVerifyExit": 0,
+  "examples": 14,
+  "parserTests": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "sitePages": 22,
+  "guideWidths": [
+    390,
+    1440
+  ],
+  "guideLayout": "no document overflow, scrollable code, mobile menu open/close",
+  "examplesReplayed": [
+    {
+      "name": "inspect-source",
+      "bytes": 381
+    },
+    {
+      "name": "model-a-story",
+      "bytes": 729
+    },
+    {
+      "name": "represent-recall",
+      "bytes": 598
+    },
+    {
+      "name": "align-and-interpret",
+      "bytes": 551
+    },
+    {
+      "name": "summarize-recall",
+      "bytes": 756
+    },
+    {
+      "name": "score-interview",
+      "bytes": 1074
+    },
+    {
+      "name": "save-model",
+      "bytes": 330
+    },
+    {
+      "name": "penman-to-chart",
+      "bytes": 840
+    },
+    {
+      "name": "resolve-acquisition",
+      "bytes": 318
+    },
+    {
+      "name": "compose-document",
+      "bytes": 340
+    },
+    {
+      "name": "window-features",
+      "bytes": 634
+    },
+    {
+      "name": "use-embeddings",
+      "bytes": 436
+    },
+    {
+      "name": "structural-distance",
+      "bytes": 402
+    },
+    {
+      "name": "mapping-facade",
+      "bytes": 168
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs-crosswalk-verify.log.gz",
+      "rawSha256": "b4166afa8921bdcf8aedb977edcf3c2540d30d39c122bf3607d4f0ebc2b9a4ba"
+    },
+    {
+      "path": "docs-crosswalk-browser.log.gz",
+      "rawSha256": "1f621a92c55bd93a18f1428c374bd699421492e2edf488fef9ee30a1514035c2"
+    }
+  ],
+  "visualInspection": "Phone and desktop page screenshots inspected: headings, code blocks, route table and evidence links readable, with no clipping or document overflow.",
+  "screenshots": [
+    {
+      "path": "guide-crosswalk-desktop.png",
+      "bytes": 1153008,
+      "sha256": "b36292dafdb989e146102fbf0414c03db8ce772f02095cb904d6edb3664c7e54"
+    },
+    {
+      "path": "guide-crosswalk-mobile.png",
+      "bytes": 1054830,
+      "sha256": "e100d81defa6e4358f05201b75508f03bb44c653fb5a9ecdf99dd0aa1a2b4eb7"
+    }
+  ],
+  "executedBrowserScriptSha256": "374661860bbd980c3383bfcc1ceb3990ac1dcdc4b61c7a80913b2b4f5cb01309"
+}

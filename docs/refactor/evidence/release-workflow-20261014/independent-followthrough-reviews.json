@@ -1,0 +1,92 @@
+{
+  "ciBootstrap": {
+    "candidate": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+    "parent": "1211c767",
+    "scope": [".jvmopts", "project/bootstrap-repositories"],
+    "change": "-Dsbt.repository.config=project/bootstrap-repositories",
+    "commands": [
+      "git diff --name-status 1211c767 d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+      "git show d1a82d5b186c66bc50dd2fbbba818be0f6aab53e:.jvmopts",
+      "git show d1a82d5b186c66bc50dd2fbbba818be0f6aab53e:project/bootstrap-repositories",
+      "curl -I https://repo.maven.apache.org/maven2/"
+    ],
+    "verdict": "PASS",
+    "residual": "The repository override remains a bounded build-environment change; its cold bootstrap proof passed separately."
+  },
+  "motePreservation": {
+    "candidate": "9602b7aa0c7d1bd10d52e4d21c922ebd4ac92563",
+    "parent": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+    "scope": [".mote/**"],
+    "commands": [
+      "git diff --name-only d6f800f37e8290357b29c75c97d3350e9ff97c7e 9602b7aa0c7d1bd10d52e4d21c922ebd4ac92563",
+      "jq -r '.files[] | [.path, .sha256, (.bytes|tostring)] | @tsv' ../atlas-journal-preservation.json | while IFS=$'\\t' read -r entry_path sha bytes; do digest=$(git show \"9602b7aa0c7d1bd10d52e4d21c922ebd4ac92563:$entry_path\" | openssl dgst -sha256 -r); digest=${digest%% *}; size=$(git cat-file -s \"9602b7aa0c7d1bd10d52e4d21c922ebd4ac92563:$entry_path\"); if [ \"$digest\" != \"$sha\" ] || [ \"$size\" != \"$bytes\" ]; then printf 'mismatch %s\\n' \"$entry_path\"; fi; done",
+      "mote doctor"
+    ],
+    "evidence": {
+      "changedPaths": 1180,
+      "nonMotePaths": 0,
+      "manifestEntries": 1180,
+      "sha256AndByteMismatches": 0,
+      "doctor": "schema/layout valid; git-backed; fsck clean"
+    },
+    "verdict": "PASS",
+    "residual": "None within byte-preservation and local Mote-health scope."
+  },
+  "readerJourneyDocumentation": {
+    "candidate": "a56a74b8",
+    "scope": [
+      "docs-site/src/content/docs/method/map-files.mdx",
+      "docs/refactor/evidence/release-workflow-20261014/actual-browser-hardware.json",
+      "docs/refactor/evidence/release-workflow-20261014/reader-journey-crosswalk.json",
+      "docs/refactor/evidence/release-workflow-20261014/reader-story-source.json",
+      "docs/refactor/evidence/release-workflow-20261014/reader-wog-readback.json"
+    ],
+    "commands": [
+      "git show --stat --oneline a56a74b8",
+      "git diff --check a56a74b8^ a56a74b8",
+      "git diff --name-only a56a74b8^ a56a74b8",
+      "git diff --unified=4 a56a74b8^ a56a74b8 -- docs"
+    ],
+    "verdict": "PASS",
+    "residual": "Crosswalk reuses retained evidence and explicitly bounds its claims; docs-site verification was run independently by the parent."
+  },
+  "hostedCoverageCollection": {
+    "candidate": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+    "run": 38634266780,
+    "scope": "Corrected earlier truncated gh run-view coverage inference using the complete GitHub Actions logs archive.",
+    "commands": [
+      "unzip -l source-ci-raw.zip",
+      "unzip -p source-ci-raw.zip 'Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)/13_Test JVM serially.txt' | rg 'Passed: Total'",
+      "unzip -p source-ci-raw.zip 'Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)/13_Test JVM serially.txt' | rg 'Passed: Total'",
+      "shasum -a 256 source-ci-raw.zip",
+      "cat source-ci.json source-ci-jobs.json source-ci-receipt.json"
+    ],
+    "evidence": {
+      "archiveSha256": "b3cf01307aabc0c12927d3099dd8c047b93892a97377216a4f6fdf871a8906ab",
+      "jvmJobs": [116093289906, 116093290496],
+      "step13Files": {
+        "temurin17": {
+          "bytes": 2524557,
+          "sha256": "8ff2a9bc"
+        },
+        "temurin21": {
+          "bytes": 2526772,
+          "sha256": "d800af77"
+        }
+      },
+      "totalsPerJob": 24,
+      "tailTotals": [360, 159],
+      "hostedTotalsPerJob": {
+        "total": 4366,
+        "passed": 4344,
+        "skipped": 22,
+        "failed": 0,
+        "errors": 0
+      },
+      "media": "both hosted JVM jobs report Total 130, Passed 110, Skipped 20; local macOS separately observed Passed 127, Skipped 3",
+      "runConclusion": "success"
+    },
+    "verdict": "PASS",
+    "residual": "The earlier 22-total claim came from truncated gh run-view output; complete archive logs establish full testJVM coverage. No code or CI change is indicated."
+  }
+}

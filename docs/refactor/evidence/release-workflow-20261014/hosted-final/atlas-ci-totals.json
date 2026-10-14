@@ -1,0 +1,36 @@
+{
+  "sha": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "run": 38632251334,
+  "matrix": {
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)": {
+      "tasks": 5,
+      "totals": {
+        "total": 228,
+        "failed": 0,
+        "errors": 0,
+        "passed": 228,
+        "skipped": 0
+      }
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)": {
+      "tasks": 5,
+      "totals": {
+        "total": 282,
+        "failed": 0,
+        "errors": 0,
+        "passed": 282,
+        "skipped": 0
+      }
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)": {
+      "tasks": 5,
+      "totals": {
+        "total": 282,
+        "failed": 0,
+        "errors": 0,
+        "passed": 282,
+        "skipped": 0
+      }
+    }
+  }
+}

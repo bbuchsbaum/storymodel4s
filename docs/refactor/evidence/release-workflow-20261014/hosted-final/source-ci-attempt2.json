@@ -1,0 +1,730 @@
+{
+  "conclusion": "failure",
+  "createdAt": "2026-10-14T20:27:39Z",
+  "databaseId": 38632249175,
+  "event": "push",
+  "headBranch": "main",
+  "headSha": "1211c767cf1a17c25e7ec44b55007e8bc2af67c8",
+  "jobs": [
+    {
+      "completedAt": "2026-10-14T20:33:03Z",
+      "conclusion": "failure",
+      "databaseId": 116088867432,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "startedAt": "2026-10-14T20:32:32Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T20:32:38Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T20:32:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:42Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-14T20:32:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:46Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-14T20:32:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:46Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-14T20:32:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:46Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-14T20:32:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:48Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-14T20:32:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "failure",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-14T20:32:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@21)",
+          "number": 32,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:33:00Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-14T20:33:00Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249175/job/116088867432"
+    },
+    {
+      "completedAt": "2026-10-14T20:34:04Z",
+      "conclusion": "cancelled",
+      "databaseId": 116088867799,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "startedAt": "2026-10-14T20:32:32Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T20:32:36Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T20:32:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:41Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-14T20:32:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:45Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-14T20:32:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:47Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-14T20:32:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "cancelled",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-14T20:32:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 32,
+          "startedAt": "2026-10-14T20:34:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-14T20:34:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-14T20:34:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-14T20:34:01Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249175/job/116088867799"
+    },
+    {
+      "completedAt": "2026-10-14T20:34:10Z",
+      "conclusion": "cancelled",
+      "databaseId": 116088867884,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "startedAt": "2026-10-14T20:32:38Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T20:32:43Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T20:32:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:48Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-14T20:32:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:53Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-14T20:32:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:55Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-14T20:32:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "cancelled",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-14T20:32:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:06Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:07Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 32,
+          "startedAt": "2026-10-14T20:34:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:07Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-14T20:34:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:07Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-14T20:34:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:07Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-14T20:34:07Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249175/job/116088867884"
+    },
+    {
+      "completedAt": "2026-10-14T20:34:03Z",
+      "conclusion": "cancelled",
+      "databaseId": 116088867982,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "startedAt": "2026-10-14T20:32:32Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T20:32:36Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T20:32:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:40Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-14T20:32:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:42Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-14T20:32:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:32:44Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-14T20:32:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "cancelled",
+          "name": "sbt update",
+          "number": 5,
+          "startedAt": "2026-10-14T20:32:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Setup Java (temurin@21)",
+          "number": 6,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "sbt update",
+          "number": 7,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check that workflows are up to date",
+          "number": 8,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check formatting",
+          "number": 9,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "scalaJSLink",
+          "number": 10,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "nativeLink",
+          "number": 11,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Test",
+          "number": 12,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Test JVM serially",
+          "number": 13,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Test Native serially",
+          "number": 14,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check binary compatibility",
+          "number": 15,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Generate API documentation",
+          "number": 16,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "skipped",
+          "name": "Check source exports and scene frame planning",
+          "number": 17,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:00Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 32,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 33,
+          "startedAt": "2026-10-14T20:34:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 34,
+          "startedAt": "2026-10-14T20:34:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:34:01Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 35,
+          "startedAt": "2026-10-14T20:34:01Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249175/job/116088867982"
+    }
+  ],
+  "name": "Continuous Integration",
+  "status": "completed",
+  "updatedAt": "2026-10-14T20:34:11Z",
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249175"
+}

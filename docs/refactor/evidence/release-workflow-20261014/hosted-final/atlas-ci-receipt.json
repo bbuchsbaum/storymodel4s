@@ -1,0 +1,13 @@
+{
+  "name": "atlas-ci",
+  "run": 38632251334,
+  "sha": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+  "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/38632251334",
+  "status": "completed",
+  "conclusion": "success",
+  "watchExit": 0,
+  "logExit": 0,
+  "logBytes": 958176,
+  "logSha256": "4589c24fda770ff877e8ed43da33374eb5ba83f13324372dc14e29fe4b8dc3e5",
+  "finishedUtc": "2026-10-14T20:37:48.556012+00:00"
+}

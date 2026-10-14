@@ -1,0 +1,129 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-10-14T20:41:59Z",
+  "databaseId": 38634266710,
+  "event": "push",
+  "headBranch": "codex/bootstrap-recovery-20261014",
+  "headSha": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+  "jobs": [
+    {
+      "completedAt": "2026-10-14T20:50:40Z",
+      "conclusion": "success",
+      "databaseId": 116093289834,
+      "name": "Verify docs site",
+      "startedAt": "2026-10-14T20:42:06Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T20:42:09Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T20:42:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:42:13Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-14T20:42:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:42:20Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-14T20:42:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:42:24Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-14T20:42:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:42:28Z",
+          "conclusion": "success",
+          "name": "Setup Node",
+          "number": 5,
+          "startedAt": "2026-10-14T20:42:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:42:32Z",
+          "conclusion": "success",
+          "name": "Install site dependencies",
+          "number": 6,
+          "startedAt": "2026-10-14T20:42:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:42:53Z",
+          "conclusion": "success",
+          "name": "Install the pinned Playwright browser",
+          "number": 7,
+          "startedAt": "2026-10-14T20:42:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:50:36Z",
+          "conclusion": "success",
+          "name": "Verify",
+          "number": 8,
+          "startedAt": "2026-10-14T20:42:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:50:36Z",
+          "conclusion": "success",
+          "name": "Post Setup Node",
+          "number": 13,
+          "startedAt": "2026-10-14T20:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:50:36Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 14,
+          "startedAt": "2026-10-14T20:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:50:38Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 15,
+          "startedAt": "2026-10-14T20:50:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:50:38Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 16,
+          "startedAt": "2026-10-14T20:50:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T20:50:38Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-10-14T20:50:38Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38634266710/job/116093289834"
+    }
+  ],
+  "name": "Documentation",
+  "status": "completed",
+  "updatedAt": "2026-10-14T20:50:40Z",
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38634266710"
+}

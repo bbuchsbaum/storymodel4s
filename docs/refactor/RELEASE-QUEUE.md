@@ -11,16 +11,16 @@ eight `release-1.0`, 21 `release-1.1`, and 62 `release-later`. There were no act
 claims or reservations. The 58 dependency-ready tickets are not a priority ordering.
 These counts are a dated observation; use live Mote when taking ownership.
 
-| Order | Ticket | Remaining acceptance |
+| Order | Ticket | Current disposition |
 | --- | --- | --- |
-| 1 | `bd-01M2TA01EHVRF6MQ1N00XTVK1K` | Reconcile and qualify the current producer/consumer baseline, committed tracker state and canonical queue; synchronize reviewed revisions and bind hosted evidence. |
-| 2 | `bd-01M35P83TCNHBSDY6NSK13Q3K0` | Public ONNX command bridge, historical A-preset parity, actual Sherlock A/A+V with both mappings and weights, independent exchange and temporal/imaging walkthrough. |
-| 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | Complete the published-index imaging walkthrough for the admitted development participant; reuse qualified recall and newly verified encoding exports. The owner accepts README crop authority with physical trigger synchronization unavailable. |
-| 4a | `bd-01M19FPY1EC5QNTW6SBG3QYT3R` | Execute the current reader journey and its visual qualification. |
-| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Audit the actual stable signature/constructor closure before freeze. |
-| 4c | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | Installable distribution, compatibility baseline and documented release process. |
-| Gate | `bd-01M2TAMJ95K9D7H248A8387YW4` | Aggregate the demonstrated journey, exact-head source/consumer/hosted checks and final stability acceptance. |
-| 5, StoryAtlas store | `bd-01M354JNKNKJ15N4T5MGQTRSET` | Consume the existing exact temporal producer handoff and qualify linked inspection and saved-state replay. |
+| 1 | `bd-01M2TA01EHVRF6MQ1N00XTVK1K` | Reviewed producer/consumer mains synchronized; tracker history preserved. Parent remains open for the release obligations below. |
+| 2 | `bd-01M35P83TCNHBSDY6NSK13Q3K0` | **Complete:** public ONNX, historical differences, actual A/A+V, both mappings/weights, independent readback and walkthrough. |
+| 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | **Complete in owner-defined scope:** published crop/index alignment with independently verified new arrays; physical synchronization unavailable. |
+| 4a | `bd-01M19FPY1EC5QNTW6SBG3QYT3R` | **Complete:** executable reader routes, crosswalk and visual qualification. |
+| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Audit delivered. Constructor repairs and final stable dependency-boundary judgment remain before freeze. |
+| 4c | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | Installable CLI and compatibility/release preparation delivered. Public dependencies, stable baseline and publication remain. |
+| Gate | `bd-01M2TAMJ95K9D7H248A8387YW4` | Open for final stability and release-infrastructure acceptance. |
+| 5, StoryAtlas store | `bd-01M354JNKNKJ15N4T5MGQTRSET` | **Complete:** pinned temporal consumer, recall-clock series, linked inspection, saved replay and exact browser/reader agreement. |
 
 The eighth StoryModel 1.0 ticket, `bd-01M4EA3TVCGSVSA114DQX9588N`, adds populated
 StageTrace cost-retention witnesses. Its reviewed disposition is a nonblocking test-strength
@@ -28,17 +28,25 @@ follow-up. Preserve that distinction from the release gate and the five substant
 obligations above. The epic and release gate are containers, not extra implementation slices.
 
 Carry forward the qualified G1/reference/reconstruction, preparation, exchange, weights,
-disclosure/header checks, facade, workspace, temporal producer and video software. Their
-closed Motes do not need to be reimplemented. Actual A/A+V, historical comparison and the
-published-index imaging walkthrough now have concrete independent receipts. Their delivery
-Motes remain open until the reviewed candidate lands and the remaining exact-pair checks
-complete; they no longer require new trigger records or another acquisition run.
+disclosure/header checks, facade, workspace, temporal producer and video software. The actual
+A/A+V journey, historical comparison, published-index imaging, planned acquisition and reader
+crosswalk are now reviewed and landed; their delivery Motes are closed on the retained evidence.
+Physical trigger records and another acquisition run are not remaining acceptance work.
 
-Current candidate priorities are: finish exact-candidate receipt review; then request concrete
-main advancements and bind hosted results. Producer `eb48a562` passed all 56 platform test tasks
-(10,877 passed, zero failures/errors, five skips), extracted CLI checks and 14 guide transcripts.
-StoryAtlas `d6f800f3` has passed its exact-pin review, 510 tests, 30 synthetic browser checks,
-and both actual 173-row A/A+V readbacks. Source main remains published through `22cc7243`.
+Source main is `a56a74b8`, including the reviewed bootstrap repair and complete reader-route
+crosswalk. Exact runtime `d1a82d5b` passed the full hosted matrix: 4,344 passed/22 optional
+skips on each JVM, 3,258 passed on JavaScript and Native, zero failures/errors. All 80 task totals
+come from the complete log archive. The producer local gate retains 10,877 passed/five skipped,
+extracted CLI checks and 14 guide transcripts. The expanded guide passed full site verification
+and independent review.
+
+Atlas main is `cda5210d`, still pinning `eb48a562`. Its recall-clock series passed independent
+review, the 518-test full gate, 12 new and 30 existing browser checks, and actual A/A+V readback
+of every cell with exact saved-state replay. It preserves supplied timing basis and unavailable
+values. Hosted main checks and the final tracker readback are bound in the workflow receipt.
+
+The next release work is constructor repair and stable-boundary judgment, followed by
+publishable dependencies and release infrastructure; it is not another study execution.
 The stable-construction audit records historical candidate abstention and token-truncation
 recipe findings on `bd-01M4XTRN36R6SYXQBP5YN7FSQP` and `bd-01M4XTS7JEY2ZQK2CFNZ429RFW`.
 The ClaimLedger construction opening has a reproduced lossy-serialization witness and a bounded

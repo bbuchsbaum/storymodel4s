@@ -1,0 +1,1 @@
+{"actor":"codex-release-workflow-20261014","entity":"bd-01M4Y24YA7G2ZX8XQYHAE3YMJS","kind":"note","note_kind":"progress","op":"20261014T203834.008247Z-p74839-c0003-r78fc-hfa1681","text":"Repair repeated hosted sbt bootstrap failure with explicit Maven Central endpoint; retain version and tests.","ts":"2026-10-14T20:38:34.008247Z","v":1}

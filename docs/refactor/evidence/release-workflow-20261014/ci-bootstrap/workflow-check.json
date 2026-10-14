@@ -1,0 +1,14 @@
+{
+  "source": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+  "command": [
+    "sbt",
+    "-batch",
+    "githubWorkflowGenerate",
+    "githubWorkflowCheck",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exit": 0,
+  "durationSeconds": 15.672075667000172,
+  "generatedTreeUnchanged": true
+}

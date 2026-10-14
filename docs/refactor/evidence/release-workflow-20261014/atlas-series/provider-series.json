@@ -1,0 +1,82 @@
+[
+  {
+    "unit" : "u0",
+    "fullMass" : 0.41733105323216363,
+    "partialMass" : 0.08005489052604772,
+    "emptyMass" : 0.0,
+    "sourceAllocated" : 0.41733105323216363,
+    "width" : "35",
+    "components" : [
+      {
+        "weight" : 0.16010978105209545,
+        "allocation" : "Right(UniformIntervals)",
+        "intervals" : [
+          [
+            10,
+            20
+          ]
+        ]
+      },
+      {
+        "weight" : 0.09711149112797275,
+        "allocation" : "Right(UniformIntervals)",
+        "intervals" : [
+          [
+            30,
+            60
+          ]
+        ]
+      },
+      {
+        "weight" : 0.16010978105209545,
+        "allocation" : "Right(UniformIntervals)",
+        "intervals" : [
+          [
+            80,
+            90
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "unit" : "u1",
+    "fullMass" : 0.3543327633080409,
+    "partialMass" : 0.048555745563986376,
+    "emptyMass" : 0.0,
+    "sourceAllocated" : 0.3543327633080409,
+    "width" : "35",
+    "components" : [
+      {
+        "weight" : 0.09711149112797275,
+        "allocation" : "Right(UniformIntervals)",
+        "intervals" : [
+          [
+            10,
+            20
+          ]
+        ]
+      },
+      {
+        "weight" : 0.16010978105209545,
+        "allocation" : "Right(UniformIntervals)",
+        "intervals" : [
+          [
+            30,
+            60
+          ]
+        ]
+      },
+      {
+        "weight" : 0.09711149112797275,
+        "allocation" : "Right(UniformIntervals)",
+        "intervals" : [
+          [
+            80,
+            90
+          ]
+        ]
+      }
+    ]
+  }
+]

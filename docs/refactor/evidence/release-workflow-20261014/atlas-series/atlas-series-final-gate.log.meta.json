@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T21:19:42.447072+00:00",
+  "finished_utc": "2026-10-14T21:21:42.615812+00:00",
+  "duration_seconds": 120.168895,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "set Global / concurrentRestrictions := Seq(Tags.limitAll(1))",
+    "compileAll",
+    "testAll",
+    "app/editionBundle",
+    "shellJVM/Test/runMain storyatlas4s.shell.TemporalBrowserFixtures",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-work",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-series-final-gate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 7200.0,
+  "log_bytes": 720628
+}

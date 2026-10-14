@@ -1,0 +1,65 @@
+{
+  "sha": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+  "run": 38634266780,
+  "qualification": "PASS: complete API log archive, all 80 platform tasks completed; no failures/errors.",
+  "matrix": {
+    "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)": {
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)/13_Test JVM serially.txt",
+      "bytes": 2526772,
+      "sha256": "d800af77ef16a18665fa7451225d999fa54cf5daa0b05653d225900a63a01a34",
+      "tasks": 24,
+      "totals": {
+        "total": 4366,
+        "failed": 0,
+        "errors": 0,
+        "passed": 4344,
+        "skipped": 22
+      }
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)": {
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)/12_Test.txt",
+      "bytes": 164564,
+      "sha256": "c40738a1b7562270fbd508d5a395cb9f1e094fe48a90f1968f0755c02e3e3266",
+      "tasks": 16,
+      "totals": {
+        "total": 3258,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3258,
+        "skipped": 0
+      }
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)": {
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)/14_Test Native serially.txt",
+      "bytes": 173380,
+      "sha256": "7f14c11bf569c3758076ba0294a9cc997f250f4ac1711adc2e88ae771f178cd5",
+      "tasks": 16,
+      "totals": {
+        "total": 3258,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3258,
+        "skipped": 0
+      }
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)": {
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)/13_Test JVM serially.txt",
+      "bytes": 2524557,
+      "sha256": "8ff2a9bca12b9958ff4e7d4c1fe64d1be869b007bdbad5fb56dc5a29c10c5a11",
+      "tasks": 24,
+      "totals": {
+        "total": 4366,
+        "failed": 0,
+        "errors": 0,
+        "passed": 4344,
+        "skipped": 22
+      }
+    }
+  },
+  "collection_correction": "Initial gh run view --log output was truncated partway through pipeline in both JVM cells. Direct run/logs archive supplies all24 JVM totals. The partial log remains retained; it is not the source of these complete counts.",
+  "archive": {
+    "file": "source-ci-raw.zip",
+    "bytes": 1197546,
+    "sha256": "b3cf01307aabc0c12927d3099dd8c047b93892a97377216a4f6fdf871a8906ab"
+  }
+}

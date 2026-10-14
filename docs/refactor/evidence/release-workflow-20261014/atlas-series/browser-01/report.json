@@ -1,0 +1,15 @@
+{
+  "checks": [
+    {
+      "name": "support-only series has no invented numeric mass or concentration",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "networkRequests": 0,
+  "cpu": "Apple M3 Max",
+  "architecture": "arm64",
+  "status": "failed",
+  "browser": "140.0.7339.186",
+  "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(Math.abs(Number(r[1])-expected[i][key])<0.00001)\n\n    at file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review/check.mjs:23:114\n    at Array.forEach (<anonymous>)\n    at compare (file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review/check.mjs:23:91)\n    at async file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/series-review/check.mjs:28:13"
+}

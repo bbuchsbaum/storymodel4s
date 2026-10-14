@@ -1,0 +1,23 @@
+{
+  "checkedUtc": "2026-10-14T20:32:11.214642+00:00",
+  "responses": [
+    {
+      "url": "https://repo1.maven.org/maven2/org/scala-sbt/sbt/1.12.14/sbt-1.12.14.pom",
+      "status": 200,
+      "finalUrl": "https://repo1.maven.org/maven2/org/scala-sbt/sbt/1.12.14/sbt-1.12.14.pom",
+      "bytes": 4137,
+      "sha256": "42af2522d19068d50d910788dfc0795ac362840f256462fc5d401eb0c21b1057"
+    },
+    {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/sbt/1.12.14/sbt-1.12.14.pom",
+      "status": 200,
+      "finalUrl": "https://repo.maven.apache.org/maven2/org/scala-sbt/sbt/1.12.14/sbt-1.12.14.pom",
+      "bytes": 4137,
+      "sha256": "42af2522d19068d50d910788dfc0795ac362840f256462fc5d401eb0c21b1057"
+    },
+    {
+      "url": "https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt/1.12.14/sbt-1.12.14.pom",
+      "status": 403
+    }
+  ]
+}

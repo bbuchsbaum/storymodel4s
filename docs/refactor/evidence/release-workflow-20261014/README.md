@@ -115,8 +115,8 @@ retained explicitly; the new arrays have independently verified raw-volume prove
 
 Actual planned video acquisition, controlled A/A+V execution, published-index imaging and
 StoryAtlas browser readback now have the receipts below. The producer full gate, artifact/POM
-checks and exact-candidate example replay have completed. Reconcile final review and tracker
-acceptance, obtain approval for the reviewed main advancements, and bind their hosted checks. The 1.0 API freeze
+checks and exact-candidate example replay have completed. The owner-authorized main advancements
+are landed and pushed; final tracker and hosted receipts are being reconciled below. The 1.0 API freeze
 and public artifact/site publication retain their separate requirements. Local-only dashboard,
 private artifacts and resumable build state are under `.dashboard` and `.agent-work`.
 
@@ -248,7 +248,7 @@ The corrected signature walker now includes public ADT alternatives and binds th
 runtime JAR set and any supplemental TASTy files. Independent review first reproduced an
 unlisted-JAR provenance failure; the repaired runner refuses it before inspection. The
 [construction judgment](../stability-audit-20261014/constructor-judgment.md) records the
-checked receipt boundaries and two concrete pre-freeze findings. The expanded closure also
+checked receipt boundaries and the concrete pre-freeze findings. The expanded closure also
 exposes types previously described as experimental; the final stable-boundary decision remains
 promotion plus audit or a narrower facade. Enumeration is not a freeze certificate.
 
@@ -283,5 +283,89 @@ bytes; the preflight does not claim complete transitive resolution or authorize 
 The [final API audit](../stability-audit-20261014/README.md) is bound to this archive and has
 complete signature/constructor-family coverage. Its pending stable-boundary decisions and
 constructor debts remain explicit. [Review of the preceding evidence](review-bfbcb121.json)
-passed; its script-provenance label follow-up is corrected. New final receipts require their
-own exact-commit review before main advancement.
+passed; its script-provenance label follow-up is corrected. The [final receipt review](review-ad69af01.json)
+and [metadata-head review](review-1211c767.json) both passed.
+
+## Approved landing and hosted qualification
+
+The owner approved both main advancements. Source `1211c767cf1a17c25e7ec44b55007e8bc2af67c8`
+and StoryAtlas `d6f800f37e8290357b29c75c97d3350e9ff97c7e` were fast-forwarded and pushed
+without force. [Remote readback](landing.json) verifies both exact SHAs and confirms preservation
+of all 1,198 unrelated dirty Atlas paths.
+
+Hosted source [CI](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249175),
+[documentation](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38632249133), and
+[Atlas CI](https://github.com/bbuchsbaum/storyatlas4s/actions/runs/38632251334) are retained under
+`hosted-final/`. Documentation and Atlas CI passed. Atlas's three cells passed 282 tests on
+Java 17, 282 on Java 21 and 228 on JavaScript, with zero failures/errors/skips.
+Source CI failed twice before tests because different runners could not retrieve sbt 1.12.14
+from `repo1.maven.org`; the other matrix cells were cancelled. Both attempts remain retained.
+Both Central POM endpoints subsequently returned HTTP 200 with identical bytes.
+
+The independently reviewed repair `d1a82d5b` selects `repo.maven.apache.org` for sbt bootstrap
+through the launcher's repository configuration. It changes neither the sbt version nor build
+dependency resolution policy. An empty-cache bootstrap and workflow/format checks passed;
+their raw logs are in `ci-bootstrap/`. The exact repair's hosted
+[CI](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38634266780) and
+[documentation job](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38634266710) passed.
+The complete API log archive binds all 80 platform tasks: each JVM passed 4,344 tests with
+22 optional skips; JavaScript and Native each passed 3,258, with zero failures/errors.
+The initial `gh run view --log` collection was truncated inside the pipeline tests and showed
+only 22 JVM totals. The full archive establishes all 24, including pipeline and corpus intake;
+both forms are retained, and the independent review records the correction. Hosted media
+checks skipped 20 optional tests versus three on the local workstation; no missing totals are
+being counted as passes.
+
+## Reader-route acceptance follow-through
+
+The [reader crosswalk](reader-journey-crosswalk.json) connects each MVP input to its authored
+walkthrough and exact execution evidence: indexed/structured story, ordinary story and recall,
+annotations with and without video, video-derived source, and exchange/scanner readback.
+It preserves the original producer revision of each run. The older WOG control was independently
+rechecked against its exact admitted source/configuration and all 99 output files; it supplies
+one paired mapping and three weights with synthetic external recall, not an accuracy result.
+No private participant text was added to the documentation.
+
+The expanded guide at `a56a74b8` passed [full site verification](docs-crosswalk-checks.json):
+14 exact executable transcripts, five parser tests, 22 built pages, navigation, layout,
+figure-mutation, verbatim and provenance checks. The changed page passed 390/1440-pixel
+layout and menu checks, and both retained screenshots were inspected. The owned browser
+closed cleanly. A separate installed `textSourcePrepare` run and independent reader both
+exited zero; its five surface segments are not five inferred sentences or a semantic graph.
+
+[Hardware provenance](actual-browser-hardware.json) now names the local Apple M3 Max workstation
+for the previously retained actual-data browser timings. It distinguishes this later hardware
+observation from a new timing run; the existing measured latencies remain unchanged.
+
+
+## Final recall-clock series and authorized follow-through
+
+Source main advanced normally from `1211c767` to `a56a74b8`; the
+[source receipt](source-followthrough-landing.json) verifies the non-force push and remote SHA.
+Atlas main advanced from `d6f800f3` to `cda5210d`; its
+[receipt](atlas-series-landing.json) verifies all 1,202 original dirty-file hashes, including
+18 unrelated paths, after the fast-forward. The independently reviewed `9602b7aa` preserves
+its recovered Mote history; no private participant outputs were added.
+
+The independently authored [series review](atlas-series/review.json) passes exact `cda5210d`.
+The series displays producer ROI mass and separate source-wide concentration width at each
+supplied recall observation, retaining missing timing, source-reported/estimated basis and
+unavailable quantities. A direct overlap calculation and exhaustive finite-grid search agree
+with both unequal synthetic rows. The complete [gate](atlas-series/gate.json) passed 518 tests
+with zero failures/errors/skips, bundling and formatting. An earlier attempt without a complete
+log/exit remains inconclusive.
+
+Review first reproduced mobile page overflow and lost keyboard focus on `544499eb`; both
+BLOCKs were repaired. All 12 new browser controls and 30 existing controls now pass. Final
+390/desktop screenshots were inspected and owned browsers closed with clean lifecycle audits.
+The [actual replay](atlas-series/actual-browser-report.json) again matches all 5,536 cells in
+each A/A+V condition to the independent JVM reader, preserves unavailable values and reopens
+saved state byte-for-byte, with no network requests or browser errors. Single observed import
+times are 25.2/33.6 seconds and allocation changes 9.2/9.8 seconds on the previously recorded
+Apple M3 Max; these are local observations, not a population performance claim.
+
+The exact main runs are source [CI 38640089960](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640089960),
+[docs 38640090003](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640090003), and Atlas
+[CI 38640529077](https://github.com/bbuchsbaum/storyatlas4s/actions/runs/38640529077).
+Their final results are collected under `hosted-followthrough/`. These new run results remain
+separate from the already completed local gates and repaired-runtime hosted qualification.

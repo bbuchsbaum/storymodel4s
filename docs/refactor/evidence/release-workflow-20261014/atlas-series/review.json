@@ -1,0 +1,36 @@
+{
+  "reviewer": "root (independent of temporal_series author)",
+  "sha": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "verdict": "PASS",
+  "scope": [
+    "app/index.html",
+    "app/src/main/scala/storyatlas4s/app/TemporalWorkspaceView.scala",
+    "shell/src/main/scala/storyatlas4s/shell/TemporalSeries.scala",
+    "shell/src/test/scala/storyatlas4s/shell/TemporalSeriesSuite.scala"
+  ],
+  "evidence": [
+    "Complete implementations and consumers read; no new producer estimator or normalization.",
+    "Independent direct overlap arithmetic and exhaustive integer-window search agree on two unequal timed rows.",
+    "Full exact-SHA gate: 518 passed, zero failed/errors/skipped across JVM and JS; bundle and final formatting passed.",
+    "12 new browser controls and30 existing controls pass. Desktop/mobile final screenshots inspected.",
+    "ActualA/AV each5536cells across8pages equal independent JVM values; unavailable values remain explicit and saved state replays byte-identically.",
+    "Browser ownership audits clean; owned browsers closed; no network requests/browser errors."
+  ],
+  "adverse_evidence": [
+    {
+      "sha": "544499eb38c3ae847a7b0d418930ad9dead03997",
+      "result": "BLOCK: phone viewport390/document548; selection focus becameBODY. Both reproduced in browser-03/report.json, repaired and pass at exactcda in browser-04/report.json."
+    },
+    {
+      "result": "Earlier full-gate attempt without complete retained log/exit remains INCONCLUSIVE; replaced by gate.json."
+    },
+    {
+      "result": "browser-01 was a reviewer harness profile mismatch; corrected by explicitly selecting Reference. It is not a product finding."
+    }
+  ],
+  "limits": [
+    "Displays producer region mass and source-wide concentration width; ROI does not condition concentration.",
+    "Actual import times25.2/33.6seconds and allocation9.2/9.8seconds are single local runs on AppleM3Max, not a general benchmark.",
+    "No physical synchronization or calibrated probability claim."
+  ]
+}
