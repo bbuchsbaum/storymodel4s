@@ -1,0 +1,30 @@
+{
+  "failed_hosted_revision": "22cc7243dd825198544569bc51f86bc21c8c0dbb",
+  "failed_run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38589639080",
+  "cause": "pipeline run now forks; default sbt LoggedOutput decorates program stdout with info prefixes",
+  "fix": "set Compile / run / outputStrategy := Some(StdoutOutput) in example runner; preserve fork and envVars",
+  "local_reproduction": "one isolated PublicMappingFacade compilation against exact2c installed jars; default output differs, raw stdout matches original168 bytes",
+  "transcript_parser_tests": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scope": "focused evidence; complete docs verification pending",
+  "logs": [
+    {
+      "file": "logs/docs-fork-stdout.log.gz",
+      "raw_bytes": 916,
+      "raw_sha256": "8d8d64ad80e545696e09f2da304b324993db5b2414c01fd4d2d0660358cc0653"
+    },
+    {
+      "file": "logs/docs-fork-stderr.log.gz",
+      "raw_bytes": 445,
+      "raw_sha256": "499cb72839afbad38e16d7c27d831ceb0e19e78f7906c03ce4677d96aa2aa445"
+    },
+    {
+      "file": "logs/docs-fork-probe.json",
+      "raw_bytes": 270,
+      "raw_sha256": "d2f4db2d2a0ce429de7ee019f4a4de9aa2621435cd768bc25523784a0ae93b7b"
+    }
+  ]
+}

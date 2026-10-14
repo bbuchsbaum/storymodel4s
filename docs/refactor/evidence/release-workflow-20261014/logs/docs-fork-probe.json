@@ -1,0 +1,13 @@
+{
+  "exit": 0,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dsbt.supershell=false",
+    "-Dsbt.log.noformat=true",
+    "set Compile / run / outputStrategy := Some(StdoutOutput)",
+    "runMain docsprobe.mappingFacade"
+  ],
+  "stdout_bytes": 916,
+  "stderr_bytes": 445
+}

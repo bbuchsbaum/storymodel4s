@@ -66,6 +66,9 @@ for (const [project, entries] of byProject) {
     '-Dsbt.log.noformat=true',
     `project ${project}`,
     `set Compile / unmanagedSources ++= Seq(${sources})`,
+    // Forked launchers keep their environment boundary but write unadorned program bytes.
+    // The default LoggedOutput prefixes each line with [info], changing the transcript.
+    'set Compile / run / outputStrategy := Some(StdoutOutput)',
     ...entries.map((entry) => `runMain ${entry.main}`),
   ];
   const run = spawnSync('sbt', args, {

@@ -1,0 +1,98 @@
+{
+  "schema": "published-index-imaging-walkthrough/v1",
+  "recall_export_manifest_sha256": "1d9027e543c32dab89cd2bb8888cfa727c50261dd0c1ff65876f55867dc763f4",
+  "csv_sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+  "independent_recall_readback": {
+    "records": 2495,
+    "canonicalWords": 2495,
+    "originalUnits": 173,
+    "volumeUnitLinks": 686,
+    "attachedVolumes": 614,
+    "occupiedVolumes": 624,
+    "unassignedWords": 94,
+    "unitAttachments": {
+      "complete": 172,
+      "partial": 1
+    },
+    "timingDispositions": {
+      "assigned": 2489,
+      "outside-stored-coverage": 6
+    },
+    "mappingMembers": 2,
+    "semantics": "non-additive-original-unit-onset-attachments"
+  },
+  "original_unit_comparison": {
+    "reference": {
+      "measure_kind": "NormalizedScoreMass",
+      "original_units": 173,
+      "units_with_measure": 151,
+      "units_without_measure": 22,
+      "supplied_quantity": 151.0,
+      "top_k_destinations": {
+        "1": {
+          "retained_original_quantity": 6.16009310501381,
+          "omitted_original_quantity": 144.8399068949862,
+          "retained_share_of_supplied_quantity": 0.0407953185762504
+        },
+        "3": {
+          "retained_original_quantity": 17.959185820701475,
+          "omitted_original_quantity": 133.04081417929854,
+          "retained_share_of_supplied_quantity": 0.11893500543510911
+        }
+      },
+      "normalization": "original unit only; omitted quantity not redistributed",
+      "aggregation": "sum across measured original units; each unit occurs once"
+    },
+    "reconstruction": {
+      "measure_kind": "ModelPosterior",
+      "original_units": 173,
+      "units_with_measure": 173,
+      "units_without_measure": 0,
+      "supplied_quantity": 172.9999999999309,
+      "top_k_destinations": {
+        "1": {
+          "retained_original_quantity": 18.118155353164926,
+          "omitted_original_quantity": 154.88184464676598,
+          "retained_share_of_supplied_quantity": 0.10472922169463678
+        },
+        "3": {
+          "retained_original_quantity": 45.823809683669275,
+          "omitted_original_quantity": 127.17619031626164,
+          "retained_share_of_supplied_quantity": 0.2648775126224715
+        }
+      },
+      "normalization": "original unit only; omitted quantity not redistributed",
+      "aggregation": "sum across measured original units; each unit occurs once"
+    }
+  },
+  "clock_sensitivity": [
+    {
+      "assumed_shift_seconds": "-3/2",
+      "dispositions": {
+        "inside": 2491,
+        "outside": 4
+      },
+      "changed_volume_or_coverage": 2491
+    },
+    {
+      "assumed_shift_seconds": "0",
+      "dispositions": {
+        "inside": 2489,
+        "outside": 6
+      },
+      "changed_volume_or_coverage": 0
+    },
+    {
+      "assumed_shift_seconds": "3/2",
+      "dispositions": {
+        "inside": 2482,
+        "outside": 13
+      },
+      "changed_volume_or_coverage": 2489
+    }
+  ],
+  "sensitivity_basis": "illustrative minus/plus one TR; no fitted or applied shift",
+  "temporal_mass_allocation": "unavailable-onset-only",
+  "physical_synchronization": "unestablished",
+  "scientific_accuracy": "not estimated"
+}

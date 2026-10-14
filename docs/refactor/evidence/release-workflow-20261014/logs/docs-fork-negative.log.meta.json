@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T15:43:13.689950+00:00",
+  "finished_utc": "2026-10-14T15:44:04.018862+00:00",
+  "duration_seconds": 50.328586,
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dsbt.supershell=false",
+    "-Dsbt.log.noformat=true",
+    "runMain docsprobe.mappingFacade",
+    "set Compile / run / outputStrategy := Some(StdoutOutput)",
+    "runMain docsprobe.mappingFacade"
+  ],
+  "cwd": "/private/tmp/storymodel-docs-fork-20261014",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/docs-fork-negative.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 2300
+}

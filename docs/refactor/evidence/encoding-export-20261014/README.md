@@ -67,3 +67,18 @@ The indexing and byte checks support reproducibility of these new arrays. They d
 preprocessed analysis readiness, the historical predictor matrix, calibrated neural timing or
 the missing participant-specific trigger/presentation relation. These are explicit limits of
 the owner-approved published-index scope, rather than outstanding requests for trigger records.
+
+## Reader walkthrough and sensitivity
+
+The [imaging guide](../../../guide/imaging.md) joins this export with the qualified recall
+workflow, including read-only NumPy access. `imaging_walkthrough.py` independently rechecks the
+original recall package and compares its unmodified unit measures with destination top-k
+truncation. [The readback](walkthrough-readback.json) retains the different denominators:
+151 measured reference units and 22 without a measure, versus 173 measured reconstruction units.
+Top one retains supplied-quantity shares 0.0407953 and 0.1047292, respectively; omitted quantities remain
+explicit and are not redistributed. These are model-quantity summaries, not accuracy scores.
+
+Illustrative recall-clock shifts of −1.5, 0 and +1.5 seconds leave 4, 6 and 13 records outside
+raw coverage. All 2,495 records remain accounted for. No shift is fitted, applied, or selected
+using neural outcomes. Onset-only semantic mass allocation and physical synchronization remain
+unavailable. The documented NumPy shape/index assertions pass on the actual selected array.
