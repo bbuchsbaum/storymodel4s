@@ -27,6 +27,26 @@ compiler="$(one 'scala3-compiler_3-3.7.4.jar'):$(one 'scala3-interfaces-3.7.4.ja
 java_opts=(-Xmx2g -XX:ActiveProcessorCount=2)
 work=$(mktemp -d "${TMPDIR:-/tmp}/storymodel4s-stability-controls.XXXXXX")
 trap 'rm -rf "$work"' EXIT
+# An unlisted JAR must be refused before inspection, even if the listed files still match.
+python3 - "$dist" "$work/injected" <<'INJECT'
+import json, os, pathlib, shutil, sys
+source, target = map(pathlib.Path, sys.argv[1:])
+manifest = json.loads((source / 'manifest.json').read_text())
+for name in ['manifest.json'] + [entry['path'] for entry in manifest['files']]:
+    dest = target / name
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.link(source / name, dest)
+    except OSError:
+        shutil.copy2(source / name, dest)
+(target / 'lib/unlisted-control.jar').write_bytes(b'not an admitted runtime input')
+INJECT
+if STABILITY_DIST="$work/injected" bash "$repo/tools/stability-audit/run.sh" \
+  "$work/injected.json" >"$work/injected.log" 2>&1; then
+  echo "unlisted runtime JAR was accepted" >&2
+  exit 1
+fi
+grep -q 'unlisted or missing runtime JAR' "$work/injected.log"
 mkdir -p "$work/classes" "$work/private"
 printf '%s\n' 'import storymodel4s.pipeline.MappingPipeline; val c = MappingPipeline.Config("mapping-lexical-pair/v1", 1.0, 1, 1, Vector(MappingPipeline.Capability.Mapping)); val copied = c.copy(temperature = 2.0)' > "$work/PublicCopy.scala"
 java "${java_opts[@]}" -cp "$compiler" dotty.tools.dotc.Main -classpath "$runtime:$compiler" -d "$work/classes" "$work/PublicCopy.scala"
@@ -40,6 +60,7 @@ java "${java_opts[@]}" -cp "$compiler" dotty.tools.dotc.Main -classpath "$runtim
 STABILITY_EXTRA_TASTY="$work/fixtures" \
   STABILITY_ROOTS="$repo/tools/stability-audit/test/fixture-roots.txt" \
   bash "$repo/tools/stability-audit/run.sh" "$work/fixtures.json"
+jq -e '.supplementalTasty | length > 0' "$work/fixtures.json.provenance.json" >/dev/null
 jq -e '
   (.unresolved | length == 0) and
   ([.inventory[] | select(startswith("storymodel4s.stabilityfixture.FixtureFacade.overload ::"))] | length == 2) and

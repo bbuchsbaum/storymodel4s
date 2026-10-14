@@ -25,6 +25,9 @@ for entry in m['files']:
     assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], str(rel)
 assert (root / 'classpath.txt').read_text().splitlines() == m['classpath']
 assert m['classpath'] and all('lib/' + name in seen for name in m['classpath'])
+assert {str(p.relative_to(root)) for p in (root / 'lib').glob('*.jar')} == {
+    'lib/' + name for name in m['classpath']
+}, 'unlisted or missing runtime JAR'
 VERIFY
 work=$(mktemp -d "${TMPDIR:-/tmp}/storymodel4s-stability-audit.XXXXXX")
 trap 'rm -rf "$work"' EXIT
@@ -37,11 +40,12 @@ compiler="$(one 'scala3-compiler_3-3.7.4.jar'):$(one 'scala3-tasty-inspector_3-3
 java_opts=(-Xmx2g -XX:ActiveProcessorCount=2)
 # `jar` has no portable extraction-to option. Extract only project TASTy entries inside the
 # ignored temporary directory, avoiding the third-party runtime jars in the installed classpath.
-for jarfile in "$dist"/lib/*.jar; do
+while IFS= read -r jarname; do
+  jarfile="$dist/lib/$jarname"
   entries=()
   while IFS= read -r entry; do entries+=("$entry"); done < <(jar tf "$jarfile" | grep '^storymodel4s/.*\.tasty$' || true)
   if test "${#entries[@]}" -gt 0; then (cd "$work/tasty" && jar xf "$jarfile" "${entries[@]}"); fi
-done
+done < "$dist/classpath.txt"
 tasty=()
 while IFS= read -r entry; do tasty+=("$entry"); done < <(find "$work/tasty" -name '*.tasty' -print | sort)
 if test -n "${STABILITY_EXTRA_TASTY:-}"; then
@@ -50,13 +54,16 @@ fi
 test "${#tasty[@]}" -gt 0
 java "${java_opts[@]}" -cp "$compiler" dotty.tools.dotc.Main -experimental -classpath "$runtime:$compiler" -d "$work/classes" "$repo/tools/stability-audit/src/StableApiAudit.scala"
 java "${java_opts[@]}" -Daudit.source="$expected" -cp "$work/classes:$runtime:$compiler" storymodel4s.stabilityaudit.StableApiAudit "$roots" "$out" "${tasty[@]}"
-python3 - "$dist" "$expected" "$roots" "$out" "$repo/tools/stability-audit/src/StableApiAudit.scala" <<'RECEIPT'
+python3 - "$dist" "$expected" "$roots" "$out" "$repo/tools/stability-audit/src/StableApiAudit.scala" "$repo/tools/stability-audit/run.sh" "${STABILITY_EXTRA_TASTY:-}" <<'RECEIPT'
 import hashlib, json, pathlib, sys
 def sha(p): return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
-dist, source, roots, out, tool = sys.argv[1:]
+dist, source, roots, out, tool, runner, extra = sys.argv[1:]
 inventory = json.loads(pathlib.Path(out).read_text())
 assert inventory['sourceSha'] == source and inventory['roots'] and not inventory['unresolved'], 'incomplete signature inventory'
 receipt = {'sourceSha': source, 'distributionManifestSha256': sha(pathlib.Path(dist) / 'manifest.json'),
-           'rootsSha256': sha(roots), 'inventorySha256': sha(out), 'toolSha256': sha(tool), 'tool': 'Scala 3.7.4 TASTy signature walker'}
+           'rootsSha256': sha(roots), 'inventorySha256': sha(out), 'toolSha256': sha(tool),
+           'runnerSha256': sha(runner), 'tool': 'Scala 3.7.4 TASTy signature walker',
+           'supplementalTasty': [{'path': str(p.relative_to(extra)), 'sha256': sha(p)}
+                                for p in sorted(pathlib.Path(extra).rglob('*.tasty'))] if extra else []}
 pathlib.Path(out + '.provenance.json').write_text(json.dumps(receipt, indent=2) + '\n')
 RECEIPT
