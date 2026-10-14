@@ -143,6 +143,60 @@ fields together; the completion count alone is insufficient.
   href={sourceLink('docs/refactor/evidence/release-workflow-20261014/installed-journey.json')}
 />
 
+## Prepare a source before adding recall
+
+The same source file can be prepared on its own:
+
+```sh
+storymodel4s textSourcePrepare source.txt source-package
+python3 SOURCE_CHECKOUT/tools/check_text_source_exchange.py source-package
+```
+
+For the fixed control above, the command reports `status: complete`, profile
+`surface-semicolon/v1` and five segments; the reader reports `status: checked` and 23 UTF-16
+units. The five segments are surface units at several levels, not five sentences. This creates
+an indexed text source; it does not infer a semantic story graph. For a structured graph,
+follow [Model a story](/method/model-a-story/), which builds and checks the researcher-reviewed
+War of the Ghosts example through the Scala API.
+
+<Evidence
+  status="Confirmed"
+  source="Installed text-source command and independent package reader: both exited 0"
+  href={sourceLink('docs/refactor/evidence/release-workflow-20261014/reader-story-source.json')}
+/>
+
+## Choose the route for your inputs
+
+Each route below has an authored walkthrough and a retained execution record. The small public
+control is runnable without study data. Sherlock routes require the already admitted local
+inputs and explicit input checksums; the records publish counts and hashes without participant
+text. A completed command establishes an export that can be inspected, not mapping accuracy.
+
+| Your inputs | Walkthrough and result | Executed check |
+| --- | --- | --- |
+| Story alone | Prepare indexed text above, or [build a structured story](/method/model-a-story/). | Text-source transcript above; the structured example is included in the fourteen replayed Scala examples. |
+| Text story and recall | Run the paired exchange and three weights above. | Installed control plus an admitted War of the Ghosts source with synthetic external recall: one pair and three weighted members. |
+| Timed annotations and recall | [Prepare annotation rows and parts](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guide/study-inputs.md), then use the same mapping commands. | Sherlock annotation arm: 173 recall units, 1,050 source targets, both members and three weights. |
+| Annotations, video and recall | [Build or replay a caption package and join it to annotations](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guides/video-source.md#join-annotations-to-a-video-package); then select the checked A+V source. | Same recall inventory and target IDs as the annotation arm; 999 interval captions from 2,997 sampled frames. The onset-only annotation keeps an unavailable caption. |
+| Video-derived source and recall | [Configure the local video tools](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guides/video-source.md), build the package, replay it, and map its prepared source. | Actual workers on the public synthetic F0 video: three caption proposals, byte-identical source replay and one independently read mapping pair. |
+| Mapping tables and scanner samples | [Read recall and encoding exports](https://github.com/bbuchsbaum/storymodel4s/blob/main/docs/guide/imaging.md). | Independent Python readers check all 2,495 recall records and 1,976 selected encoding volumes, including unavailable timing and overlapping segment membership. |
+
+For annotations plus video, the join requires a declared correspondence between annotation and
+film coordinates. The Sherlock execution uses the published-part convention conditionally;
+it does not establish physical movie/scanner synchronization. The imaging walkthrough uses the
+published crop and TR indices, with no fitted offset or additional hemodynamic shift.
+
+For video-derived sources, install and verify the guide's local tools and model assets before
+running `videoSource build`. The command does not download them. Caption proposals retain Draft
+authority and explicit sampled/examined coverage. The F0 execution exercises the shipped route;
+it does not measure caption quality on natural video.
+
+<Evidence
+  status="Confirmed"
+  source="Route-by-route crosswalk: authored guides, exact producer revisions, command transcripts and independent readbacks"
+  href={sourceLink('docs/refactor/evidence/release-workflow-20261014/reader-journey-crosswalk.json')}
+/>
+
 ## Continue with your study
 
 - [Use the Scala facade](/scala/getting-started/) to analyze, inspect and export from code.

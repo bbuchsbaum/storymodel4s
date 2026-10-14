@@ -1,0 +1,11 @@
+{
+  "producer": "13bdc9aad68bba8493577f79f212fa07f3b57f44",
+  "wogBodyBytesExactAfterAdmissionHeader": true,
+  "inputConfigSha256Exact": true,
+  "outputFilesVerified": 99,
+  "pairedAttempts": 1,
+  "pairs": 1,
+  "weightedMembers": 3,
+  "independentReadersPassed": true,
+  "recallScope": "fixed admitted synthetic external recall; no mapping accuracy assertion"
+}

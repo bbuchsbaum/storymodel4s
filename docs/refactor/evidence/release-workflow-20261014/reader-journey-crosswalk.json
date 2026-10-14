@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "scope": "Reader-facing MVP input to authored walkthrough and executed transcript crosswalk; reuses retained exact-producer evidence rather than claiming all runs used the latest metadata HEAD.",
+  "routes": [
+    {
+      "input": "story-alone",
+      "walkthroughs": [
+        {
+          "path": "docs-site/src/content/docs/method/map-files.mdx",
+          "bytes": 11130,
+          "sha256": "f14e517f658efc7980efc9424459a8a8070d10fdee1ae1afa55372e2a583be6a"
+        },
+        {
+          "path": "docs-site/src/content/docs/method/model-a-story.mdx",
+          "bytes": 4242,
+          "sha256": "9684deebc9483dcb9df25e7824f18eff65876fb6be1425cb3cc54a86656266f0"
+        }
+      ],
+      "executionEvidence": [
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/reader-story-source.json",
+          "bytes": 1734,
+          "sha256": "519a77c9c81b03f2c782bbc8b529a159dfe7c04476b82029a08542f5ce20161f"
+        },
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/final-documentation-replay.json",
+          "bytes": 1087,
+          "sha256": "0c8273b9b240643a91852dda7211aa2ca6ef9960be226ed27dc2eaac47e5397b"
+        }
+      ],
+      "qualification": "Text preparation preserves surface coordinates; the separate structured story example is researcher-reviewed, not inferred from prose."
+    },
+    {
+      "input": "story-and-recall",
+      "walkthroughs": [
+        {
+          "path": "docs-site/src/content/docs/method/map-files.mdx",
+          "bytes": 11130,
+          "sha256": "f14e517f658efc7980efc9424459a8a8070d10fdee1ae1afa55372e2a583be6a"
+        }
+      ],
+      "executionEvidence": [
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/installed-journey.json",
+          "bytes": 15738,
+          "sha256": "7c6f6fd939ab8e7006b4933cdd589a85fbac87a5de9cb936681483d8a261f54c"
+        },
+        {
+          "path": "docs/refactor/evidence/video-imaging-20261011/journey/manifest.json",
+          "bytes": 1054,
+          "sha256": "9484f6e40737a30d9a36519927d79c96f10354a71ca9f45b91ee03b3047cd2cb"
+        },
+        {
+          "path": "docs/refactor/evidence/video-imaging-20261011/journey/journey-public-path.log.gz",
+          "bytes": 2328,
+          "sha256": "8e93a893370e738b0fb359bfdbc0f95d789ee079fe537d5f169f1cf62df708a1"
+        },
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/reader-wog-readback.json",
+          "bytes": 362,
+          "sha256": "947a164568b4e26a4567d4a065e433f6d4dc0d5031fb81c868d630471f44e0eb"
+        }
+      ],
+      "qualification": "Ordinary installed control and WOG with admitted synthetic external recall: paired export and three weights; no accuracy claim."
+    },
+    {
+      "input": "annotated-video-and-recall",
+      "walkthroughs": [
+        {
+          "path": "docs-site/src/content/docs/method/map-files.mdx",
+          "bytes": 11130,
+          "sha256": "f14e517f658efc7980efc9424459a8a8070d10fdee1ae1afa55372e2a583be6a"
+        },
+        {
+          "path": "docs/guide/study-inputs.md",
+          "bytes": 9131,
+          "sha256": "db3498ccb2195809e2dde1dc712a8d8d9633652d746174e6da9fc8daab3182aa"
+        },
+        {
+          "path": "docs/guides/video-source.md",
+          "bytes": 8274,
+          "sha256": "2fc791e23a408b05fe7e4e15a6050b087bd2b1325e2e5b96fc8298b71f25c60c"
+        }
+      ],
+      "executionEvidence": [
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/run_actual_av.py",
+          "bytes": 8238,
+          "sha256": "6e62d609e5dd6e8fbe21034152721d7902572b7b1839ed3aeb3fbae56ae3e3ef"
+        },
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/sherlock-actual-av-readback.json",
+          "bytes": 2257,
+          "sha256": "39e0baea34b60b42651c83b4b0ca063a6691d15bf540b0963f121994f7f96d5c"
+        },
+        {
+          "path": "docs/refactor/evidence/release-workflow-20261014/sherlock-planned-video-readback.json",
+          "bytes": 1381,
+          "sha256": "13a17825a084e8bdb4d999c38b9894057574a3dfc8084952af41a70e39cd01b8"
+        }
+      ],
+      "qualification": "Six successful public CLI commands for one admitted participant, same inventory and targets across A and A+V. Exact private command transcript is SHA-bound in readback; publication contains only counts and hashes. Published-part correspondence is conditional, not physical synchronization."
+    },
+    {
+      "input": "video-derived-source-and-recall",
+      "walkthroughs": [
+        {
+          "path": "docs/guides/video-source.md",
+          "bytes": 8274,
+          "sha256": "2fc791e23a408b05fe7e4e15a6050b087bd2b1325e2e5b96fc8298b71f25c60c"
+        },
+        {
+          "path": "docs-site/src/content/docs/method/map-files.mdx",
+          "bytes": 11130,
+          "sha256": "f14e517f658efc7980efc9424459a8a8070d10fdee1ae1afa55372e2a583be6a"
+        }
+      ],
+      "executionEvidence": [
+        {
+          "path": "docs/refactor/evidence/video-imaging-20261011/video/live-f0/manifest-evidence.json",
+          "bytes": 11954,
+          "sha256": "1d1e03824604e6bca0547f4d01e519c698076908d9aabdc435e631b0ed5d4ba5"
+        },
+        {
+          "path": "docs/refactor/evidence/video-imaging-20261011/video/live-f0/live-f0-build.log.gz",
+          "bytes": 740,
+          "sha256": "080cca7a908e63bb30bf304c3d6641fda0d425cbab8497733f498535257ef209"
+        },
+        {
+          "path": "docs/refactor/evidence/video-imaging-20261011/video/live-f0/live-f0-consume.log.gz",
+          "bytes": 926,
+          "sha256": "95776888e12cd9019fdfb60264af43f021957005106b51427b3756813cb4fa03"
+        },
+        {
+          "path": "docs/refactor/evidence/video-imaging-20261011/video/live-f0/live-f0-readback.json",
+          "bytes": 256,
+          "sha256": "6b6382ce8a1ad72c5daf3049780b20e5e177307b5a5ca7bb764c4a61f52f976e"
+        }
+      ],
+      "qualification": "Actual local workers on synthetic admitted F0, byte-identical source replay, one mapping pair. Runtime/model setup required; captions remain Draft."
+    },
+    {
+      "input": "exchange-and-scanner-crosswalk",
+      "walkthroughs": [
+        {
+          "path": "docs/guide/imaging.md",
+          "bytes": 7263,
+          "sha256": "2ccfc190e968be772aa4c69d935722c2afddae4279cf96a47328e731254e9cb3"
+        },
+        {
+          "path": "docs-site/src/content/docs/method/map-files.mdx",
+          "bytes": 11130,
+          "sha256": "f14e517f658efc7980efc9424459a8a8070d10fdee1ae1afa55372e2a583be6a"
+        }
+      ],
+      "executionEvidence": [
+        {
+          "path": "docs/refactor/evidence/recall-volumes-20261013/actual-readback.json",
+          "bytes": 2519,
+          "sha256": "09e887e25e5d0ee473c74e2ae609579ed72721a482b08278b2795d1e0ad4e271"
+        },
+        {
+          "path": "docs/refactor/evidence/recall-volumes-20261013/recall-volume-actual-01.log.gz",
+          "bytes": 636,
+          "sha256": "a44e5c27addb5cea4624c9d406680533ee128836545f4c0b485f9921f92867d8"
+        },
+        {
+          "path": "docs/refactor/evidence/encoding-export-20261014/encoding-scanner-commands.log.gz",
+          "bytes": 1294,
+          "sha256": "2c6b83de1b90a9a6205d46c785185b3a2b16dc64086bfbe8e911125e3051c20f"
+        },
+        {
+          "path": "docs/refactor/evidence/encoding-export-20261014/actual-readback.json",
+          "bytes": 926,
+          "sha256": "fca3d1ff7bfa0e92006f853b6e620396e0f4e1abd5020a1a8848c1729ea1f7a0"
+        },
+        {
+          "path": "docs/refactor/evidence/encoding-export-20261014/scanner-readback.json",
+          "bytes": 1612,
+          "sha256": "c967afdf894f609ff894d8375d91ab7fe9e8dde7aadbee4606ecc5201eb103e1"
+        },
+        {
+          "path": "docs/refactor/evidence/encoding-export-20261014/walkthrough-readback.json",
+          "bytes": 3195,
+          "sha256": "d7e515c37e2e46e0b18de746aebf5fa724cdc16975656182301575843a361cd1"
+        }
+      ],
+      "qualification": "Independent Python readers; published-index alignment only. Original indices, overlaps, outside records and unavailable duration allocation preserved."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "manifestSha256": "3970fa06e8d51588cda2a867f183639de3fb405648e719228dd42274dc93d798",
+  "input": "same admitted project-authored source control used in the reader guide",
+  "commands": [
+    [
+      "storymodel4s",
+      "textSourcePrepare",
+      "source.txt",
+      "source-package"
+    ],
+    [
+      "python3",
+      "SOURCE_CHECKOUT/tools/check_text_source_exchange.py",
+      "source-package"
+    ]
+  ],
+  "exits": [
+    0,
+    0
+  ],
+  "stdout": [
+    "{\"schemaVersion\":\"text-source-prepare-receipt/v1\",\"status\":\"complete\",\"raw_source_sha256\":\"4b8d9d501b96b4568c5a61b54afb37cab155afd8cd2bc7f180aeb28ec2e8709e\",\"canonical_source_sha256\":\"4b8d9d501b96b4568c5a61b54afb37cab155afd8cd2bc7f180aeb28ec2e8709e\",\"profile\":\"surface-semicolon/v1\",\"segments\":5,\"manifest_sha256\":\"def5666fd5df5b6f59b30971503b3d88223a7376b35c93ba225bedfb2a59a6a4\"}\n",
+    "{\"bom_retained\":false,\"canonical_utf16_units\":23,\"profile\":\"surface-semicolon/v1\",\"segmentation_recomputed\":false,\"segments\":5,\"status\":\"checked\"}\n"
+  ],
+  "stderrSha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "files": [
+    {
+      "name": "manifest.json",
+      "sha256": "def5666fd5df5b6f59b30971503b3d88223a7376b35c93ba225bedfb2a59a6a4",
+      "bytes": 840
+    },
+    {
+      "name": "segments.tsv",
+      "sha256": "3c0d9a7d5c363c12ce461960dfc477e176f1b06d788a78b6c2703103007eb48a",
+      "bytes": 1846
+    },
+    {
+      "name": "source.json",
+      "sha256": "8ff41fe2d2937b15745a56a3442978ff3e3794d3093d22f52db72bc1b4adc615",
+      "bytes": 3816
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "scope": "Hardware observation on the same local workstation after the retained actual-data browser run; timing itself was not rerun. No serial number, machine UUID or account identity collected.",
+  "observedUtc": "2026-10-14T20:49:55.588778+00:00",
+  "chip": "Apple M3 Max",
+  "architecture": "arm64",
+  "logicalCpus": 14,
+  "memoryBytes": 38654705664,
+  "os": "macOS 14.3 (23D56)",
+  "browser": "140.0.7339.186",
+  "timingReceipt": {
+    "path": "docs/refactor/evidence/release-workflow-20261014/actual-temporal-browser.json",
+    "bytes": 1518,
+    "sha256": "26e54a60a8e8a1fd12756f7087aef7de8e2e84c8b749348f3f34d76aa5d505ef"
+  },
+  "methods": [
+    "sysctl -n machdep.cpu.brand_string hw.memsize hw.ncpu",
+    "sw_vers"
+  ]
+}
