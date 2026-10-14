@@ -1,3 +1,4 @@
 -Xmx6g
 -Xss8m
 -XX:+UseG1GC
+-Dsbt.repository.config=project/bootstrap-repositories
