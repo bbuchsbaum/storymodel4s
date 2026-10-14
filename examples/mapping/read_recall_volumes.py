@@ -58,6 +58,11 @@ def read(files, csv_bytes):
     require(declaration['csv_sha256'] == csv_hash and declaration['clock'] == columns['clock'], 'recording clock')
     require(declaration['run_key'] == run['declaration']['key'], 'recording run')
     require((declaration['participant'], declaration['session']) == (meta['participant'], meta['session']), 'recording observation')
+    require(declaration['basis'] in {'published-release-definition', 'synthetic-control'} and declaration['evidence'], 'recording basis')
+    declaration_hash = hashlib.sha256(json.dumps(declaration, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
+    require(binding['evidence']['declaration'] == declaration_hash, 'declaration identity')
+    require(binding['evidence']['run'] == run['digest'] and binding['evidence']['reference'] == binding['reference_digest'], 'binding evidence')
+    require(binding['coordinate_units'] == 'seconds-to-seconds', 'binding units')
     require(binding['evidence']['supporting_artifacts'] == [v['sha256'] for v in declaration['evidence']], 'evidence pins')
     require(binding['reference_kind'] == 'RecallClock' and binding['reference_artifact'] == timing['clock']['digest'], 'binding reference')
     period = rational(actual['period'])
@@ -125,7 +130,10 @@ def read(files, csv_bytes):
     statuses = Counter(r['timing_status'] for r in records)
     return {'exchange': exchange, 'attachments': expected,
             'summary': {'records': len(records), 'canonicalWords': len(words), 'originalUnits': len(units),
-                        'volumeUnitLinks': len(links), 'occupiedVolumes': len({v for v, _ in links}),
+                        'volumeUnitLinks': len(links), 'attachedVolumes': len({v for v, _ in links}),
+                        'occupiedVolumes': len({r['volume'] for r in records if 'volume' in r}),
+                        'unassignedWords': sum('word' in r and 'unit' not in r for r in records),
+                        'unitAttachments': dict(Counter(u['attachment'] for u in units)),
                         'timingDispositions': dict(statuses), 'mappingMembers': 2,
                         'semantics': expected['semantics']}}
 

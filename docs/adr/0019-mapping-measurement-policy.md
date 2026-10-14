@@ -1093,3 +1093,20 @@ checksum as execution, interpreting scoring-space positions as chronology, summi
 bound extrema, promoting model posterior marginals to independent transition probabilities,
 and changing the legacy 1.0 mapping command's capability semantics. The 1.1 organization
 entry point is additive and requires its own axis declaration and public exchange checks.
+
+### 2026-10-13 — recall onset attachments to declared raw-volume bins
+
+The owner-authorized recall export uses the public paired mapping producer and a
+byte-pinned CSV clock. Exact transcript replay and exactly one canonical lexical word
+per nonblank CSV cell establish positional correspondence; an independent declaration
+binds that CSV, observation and raw run to cited release evidence. Scanner authority
+remains declared, with recording synchronization unverified. Raw bins have explicitly
+chosen half-open support and retain all outside-coverage and missing observations.
+
+A volume-to-unit link attaches an original inference unit to observed word onsets.
+It carries no additive mass. The paired exchange retains each original unit measure,
+normalization domain, external state and unavailable outcome once. Partial and absent
+attachments are counts, not estimated excluded semantic mass. Temporal mass allocation
+is unavailable with onset-only observations. Rejected: copying a unit's full mass into
+every touched volume, uniform per-word allocation, deriving durations from adjacent
+onsets, clamping outside records, and inferring movie origin, crop or HRF adjustments.

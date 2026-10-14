@@ -122,6 +122,36 @@ class RecallVolumeExportSuite extends FunSuite:
     assert(!Files.exists(root.resolve("wrong")))
   }
 
+  test("recording clock, CSV, run, evidence and sampling contradictions refuse before publication") {
+    val root = Files.createTempDirectory("recall-volume-refusals-")
+    val job = fixture(root)
+    val original = Canonical.parse(Files.readString(job)).toOption.get
+    def recording(key: String, value: Json): Json = original.mapObject(o =>
+      o.add("recording", o("recording").get.mapObject(_.add(key, value))))
+    val cases = Vector(
+      recording("clock", Json.fromString("wrong")) -> "recording-binding-mismatch",
+      recording("csv_sha256", Json.fromString(Checksum.ofText("wrong").hex)) -> "recording-binding-mismatch",
+      recording("run_key", Json.obj()) -> "recording-binding-mismatch",
+      recording("evidence", Json.arr()) -> "missing-recording-evidence",
+      recording("basis", Json.fromString("verified")) -> "invalid-basis",
+      original.mapObject(_.add("period", Json.obj("numerator" -> Json.fromString("2"),
+        "denominator" -> Json.fromString("1")))) -> "nonregular-or-foreign-origin"
+    )
+    // Use two samples so a wrong period changes the actual sample grid.
+    val two = ScannerCrosswalkJson.runDeclaration(run(2))
+    cases.zipWithIndex.foreach { case ((candidate, expected), i) =>
+      val adjusted = if i == cases.size - 1 then candidate.mapObject(_.add("run", two)) else candidate
+      Files.writeString(job, Canonical.print(adjusted)): Unit
+      val out = root.resolve(s"refused-$i")
+      assertEquals(RecallVolumeExport.run(job, out), Left(expected))
+      assert(!Files.exists(out))
+    }
+    Files.writeString(job, Canonical.print(original)): Unit
+    Files.writeString(root.resolve("source.txt"), "changed"): Unit
+    assertEquals(RecallVolumeExport.run(job, root.resolve("wrong-evidence")), Left("input-identity"))
+    assert(!Files.exists(root.resolve("wrong-evidence")))
+  }
+
 object RecallVolumeFixture:
   def main(args: Array[String]): Unit =
     val root = Path.of(args(0))
