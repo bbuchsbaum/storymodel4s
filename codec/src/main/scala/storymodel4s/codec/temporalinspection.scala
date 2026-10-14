@@ -185,8 +185,10 @@ object TemporalInspectionCodecs:
     digest <- field[String](json, "digest")
     _ <- Either.cond(digest == result.digest.hex, (), Error.ForeignView)
     _ <- check(
-      json.asObject.exists(
-        _.keys.toSet == Set("schemaVersion", "workspace", "recallTiming", "digest")
+      json.asObject.exists(obj =>
+        val keys = obj.keys.toSet
+        val required = Set("schemaVersion", "workspace", "digest")
+        keys == required || keys == required + "recallTiming"
       )
     )
   yield result

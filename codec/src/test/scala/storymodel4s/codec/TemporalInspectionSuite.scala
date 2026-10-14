@@ -152,6 +152,33 @@ package storymodel4s.codec {
       )
     }
 
+    test("an absent recall clock survives canonical packet roundtrip without inventing timing") {
+      val original = session()
+      val bytes = right(TemporalInspectionCodecs.encode(original))
+      assert(!right(Canonical.parse(bytes)).asObject.get.contains("recallTiming"))
+      val reopened = right(TemporalInspectionCodecs.decode(bytes))
+      assertEquals(reopened, original)
+      assertEquals(reopened.timing, None)
+      val explicitNull = right(Canonical.parse(bytes)).mapObject(_.add("recallTiming", Json.Null))
+      assertEquals(TemporalInspectionCodecs.decode(explicitNull.noSpaces), Right(original))
+      assertEquals(right(TemporalInspectionCodecs.encode(reopened)), bytes)
+      assertEquals(
+        right(reopened.compile(referenceId, measure, request)).timingState,
+        TemporalProjection.TimingState.NotRequested(false)
+      )
+    }
+
+    test("timed and untimed packets both refuse unknown envelope fields") {
+      Vector(session(), session(Some(timing()))).foreach { original =>
+        val json = right(Canonical.parse(right(TemporalInspectionCodecs.encode(original))))
+        val extra = json.mapObject(_.add("unexpected", Json.True))
+        assertEquals(
+          TemporalInspectionCodecs.decode(Canonical.print(extra)),
+          Left(TemporalInspectionCodecs.Error.Invalid)
+        )
+      }
+    }
+
     private val clock = RecallTiming.Clock.declared(
       Checksum.ofText("synthetic-clock"),
       RecallTiming.ClockKey.unsafe("seconds"),
