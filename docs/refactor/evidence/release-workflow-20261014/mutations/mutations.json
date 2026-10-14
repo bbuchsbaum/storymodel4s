@@ -59,7 +59,10 @@
     "test_selection": null,
     "source_sha256": "40a24cb169eb842cec068d810c4fa6350b80bca4653ff1a68451eca216cb4e81",
     "patch_sha256": "11913e5785ca14e8a2954d1624be0a226fb8d99a5fa2826a9b9145906f725070",
-    "log_sha256": "d91bb62e83ee68733f9a3f201fd0b82372d481256d7b49efb784d47569d5811b"
+    "log_sha256": "d91bb62e83ee68733f9a3f201fd0b82372d481256d7b49efb784d47569d5811b",
+    "patch_file": "timed-unicode.patch.gz",
+    "patch_encoding": "gzip",
+    "stored_patch_sha256": "8dc54e6828ae683d74eecd4f36070f5f8f6b399a2ceadc261a117eba92fcf4ef"
   },
   {
     "mutation": "nomination-cut",
