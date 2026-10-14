@@ -111,8 +111,9 @@ python3 SOURCE_CHECKOUT/examples/mapping/read_weighted_mapping.py weighted
 ```
 
 The reader reports one attempt and three weighted members. Weight zero reproduces the reference
-endpoint; weight one reproduces reconstruction. One half is the declared mixture of those
-members. This structural weight is separate from any annotation/caption scoring blend. A weight
+endpoint; weight one reproduces reconstruction. At one half, inference reuses the same local
+evidence and applies half the named reconstruction transition coefficients. This structural
+weight is separate from any annotation/caption scoring blend. A weight
 sweep compares modeling choices; it does not calibrate them or turn missing support into evidence.
 
 ## Resume and diagnose

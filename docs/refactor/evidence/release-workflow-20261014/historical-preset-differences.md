@@ -24,7 +24,9 @@ Equal source bytes and unit counts do not establish equal representations or est
 | Video condition | Historical embedding captions, with the limitations recorded by that protocol | Separate checked caption profile; planned actual-worker acquisition and strict package join require their own receipt |
 
 The current reference and reconstruction intentionally differ in their use of structure.
-Their mixture weights are explicit readouts, not new inference runs or calibration.
+Weights zero and one preserve those endpoint records exactly. Interior weights run inference
+on the same local evidence with the named reconstruction transition coefficients scaled by
+the requested weight. The resulting model posterior is not calibrated by the weight sweep.
 The actual A/A+V augmentation comparison uses the lexical A and checked caption profiles
 so the embedding-versus-lexical scorer change is not mistaken for a video effect. The
 ONNX pair remains a separately demonstrated supported route. These differences explain
