@@ -1,0 +1,41 @@
+#!/bin/sh
+set -eu
+
+usage() {
+  cat <<'USAGE'
+Usage: storymodel4s COMMAND [ARGUMENTS...]
+
+Commands: textSourcePrepare, studyPrepare, mappingRun, mappingWeight,
+          mappingExchangeExport, studyWorkspace, videoSource, recallTimingIntake,
+          scannerSamples, recallVolumes, organizationMap, storyBuild, storyModelExport
+
+Run a command without arguments for its usage. Requires Java 17 or newer.
+Model and media resources are supplied separately. ONNX telemetry is disabled.
+USAGE
+}
+
+if [ "$#" -eq 0 ]; then usage; exit 2; fi
+case "$1" in
+  --help|-h) usage; exit 0 ;;
+  videoSource) main=storymodel4s.pipeline.VideoSourceCli ;;
+  textSourcePrepare|studyPrepare|mappingRun|mappingWeight|mappingExchangeExport|studyWorkspace|recallTimingIntake|scannerSamples|recallVolumes|organizationMap|storyBuild|storyModelExport)
+    main=storymodel4s.pipeline.$1 ;;
+  *) printf '%s\n' 'Unknown command; use --help.' >&2; exit 2 ;;
+esac
+shift
+
+base=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+classpath=
+while IFS= read -r jar; do
+  case "$jar" in
+    [0-9][0-9][0-9][0-9].jar) ;;
+    *) printf '%s\n' 'Invalid distribution classpath.' >&2; exit 2 ;;
+  esac
+  [ -f "$base/lib/$jar" ] || { printf '%s\n' 'Incomplete distribution.' >&2; exit 2; }
+  classpath="${classpath:+$classpath:}$base/lib/$jar"
+done < "$base/classpath.txt"
+[ -n "$classpath" ] || { printf '%s\n' 'Empty distribution classpath.' >&2; exit 2; }
+
+export ORT_DISABLE_TELEMETRY=1
+if [ -n "${JAVA_HOME:-}" ]; then java="$JAVA_HOME/bin/java"; else java=java; fi
+exec "$java" -cp "$classpath" "$main" "$@"

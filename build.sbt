@@ -418,7 +418,17 @@ lazy val pipeline = project
     Test / fork := true,
     Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1",
     run / fork := true,
-    run / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
+    run / envVars += "ORT_DISABLE_TELEMETRY" -> "1",
+    CliDistribution.stageCliDistribution := CliDistribution.stage(
+      (LocalRootProject / baseDirectory).value,
+      target.value,
+      version.value,
+      scalaVersion.value,
+      (Runtime / fullClasspath).value.files
+    ),
+    CliDistribution.cliDistribution := CliDistribution.archive(
+      CliDistribution.stageCliDistribution.value
+    )
   )
   .dependsOn(
     providerAgent,

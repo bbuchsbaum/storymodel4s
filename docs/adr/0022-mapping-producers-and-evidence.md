@@ -350,3 +350,16 @@ identity, and dropping uncovered annotations from the comparison population. The
 caption scorer blends lexical annotation and caption evidence; an ONNX-only profile is a
 separate condition. Caption blend and reference/reconstruction mixture weight remain separate
 parameters. This amendment adds no physical scanner synchronization or caption-accuracy claim.
+
+## Local command distribution (2026-10-14)
+
+The existing JVM pipeline commands may be staged as an offline distribution containing their
+ordered runtime classpath and a small command-dispatch launcher. Build directories become
+deterministic jars; dependency jars retain their original bytes. A manifest records the exact
+clean source revision, version, classpath order and file hashes. Researchers need a compatible
+Java runtime, with model/media resources supplied separately, but no source checkout or sbt.
+ONNX telemetry remains disabled by the launcher. This prepares an installable artifact without
+enabling a publishing job, changing a release version or authorizing a release tag.
+
+Rejected alternatives: a new assembly dependency, silently resolving libraries at user runtime,
+flattening jars and merging unrelated resources, or using an unordered classpath wildcard.
