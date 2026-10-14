@@ -1,0 +1,12 @@
+{
+  "from": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "to": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "remote": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "utc": "2026-10-14T21:40:17.279428+00:00",
+  "scope": "Mote only",
+  "review": "PASS exact 50a160168 by independent temporal_series reviewer",
+  "hosted_code_sha": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "hosted_run": 38640529077,
+  "preserved_original_dirty_paths": 1202,
+  "preserved_uncommitted_mote_paths": 16
+}

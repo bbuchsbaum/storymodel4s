@@ -1,0 +1,53 @@
+{
+  "name": "atlas-ci",
+  "run": 38640529077,
+  "sha": "cda5210d107ba6e724ded387442f66e878e114c3",
+  "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/38640529077",
+  "status": "completed",
+  "conclusion": "success",
+  "watchExit": 0,
+  "archiveBytes": 126346,
+  "archiveSha256": "ed8af8134618e0a21345915a786a39fad16dd09ca452aa22fd0060262e1ea937",
+  "matrix": {
+    "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)": {
+      "tasks": 5,
+      "totals": {
+        "total": 286,
+        "failed": 0,
+        "errors": 0,
+        "passed": 286,
+        "skipped": 0
+      },
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)/11_Test.txt",
+      "bytes": 31470,
+      "sha256": "cca30c0fb2c0d7a2a9f6d47dc39cf525604d4f8f87e4e7f0510da900772b95d1"
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)": {
+      "tasks": 5,
+      "totals": {
+        "total": 232,
+        "failed": 0,
+        "errors": 0,
+        "passed": 232,
+        "skipped": 0
+      },
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)/11_Test.txt",
+      "bytes": 27215,
+      "sha256": "137e73c3d4b12f4ccc9536d5f0aa6d99da9f2dfd9cb4169d45035ef388971ab2"
+    },
+    "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)": {
+      "tasks": 5,
+      "totals": {
+        "total": 286,
+        "failed": 0,
+        "errors": 0,
+        "passed": 286,
+        "skipped": 0
+      },
+      "archive_entry": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)/11_Test.txt",
+      "bytes": 35974,
+      "sha256": "24a1dfe10272a4b57b5ccfd39986032e1eba11ddcd4122340b5d0ac36432a70b"
+    }
+  },
+  "finishedUtc": "2026-10-14T21:36:18.883209+00:00"
+}

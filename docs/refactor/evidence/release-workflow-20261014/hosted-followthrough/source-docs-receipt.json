@@ -1,0 +1,13 @@
+{
+  "name": "source-docs",
+  "run": 38640090003,
+  "sha": "a56a74b8f0a682e907434728e51b5c9bfb62ec06",
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640090003",
+  "status": "completed",
+  "conclusion": "success",
+  "watchExit": 0,
+  "archiveBytes": 39805,
+  "archiveSha256": "d5cfcf40c759b608442933c9b84be15f995f8751f8373c554f3b82a9ef821fc7",
+  "matrix": {},
+  "finishedUtc": "2026-10-14T21:37:47.365921+00:00"
+}

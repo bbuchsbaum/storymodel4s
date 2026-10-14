@@ -1,0 +1,67 @@
+{
+  "observed_utc": "2026-10-14T21:41:16.018624+00:00",
+  "source_runtime": {
+    "sha": "d1a82d5b186c66bc50dd2fbbba818be0f6aab53e",
+    "run": 38634266780,
+    "status": "PASS",
+    "matrix_receipt": "hosted-bootstrap-fix/source-ci-totals.json"
+  },
+  "source_docs": {
+    "sha": "a56a74b8f0a682e907434728e51b5c9bfb62ec06",
+    "run": 38640090003,
+    "status": "PASS"
+  },
+  "atlas_runtime": {
+    "sha": "cda5210d107ba6e724ded387442f66e878e114c3",
+    "run": 38640529077,
+    "status": "PASS",
+    "matrix_receipt": "hosted-followthrough/atlas-ci-receipt.json"
+  },
+  "source_followthrough_ci": {
+    "sha": "a56a74b8f0a682e907434728e51b5c9bfb62ec06",
+    "run": 38640089960,
+    "status": "in_progress at this observation; not counted as a completed run"
+  },
+  "metadata_gate": {
+    "rule": "AGENTS T2 and stale-base gate-inert rule: docs/Mote deltas do not invalidate unchanged runtime gates",
+    "source_checked_through": "d4b7ca0f7529feab3a6d668f4b9a82e7d34887a5",
+    "source_runtime_input_changes_after_d1": [],
+    "source_site_input_changes_after_a56": [],
+    "atlas_checked_through": "50a160168daa03c51fcab60a4eaaed66674da83a",
+    "atlas_changes_after_cda": [
+      ".mote/authority/00000000000000000010.json",
+      ".mote/authority/00000000000000000011.json",
+      ".mote/authority/00000000000000000012.json",
+      ".mote/authority/00000000000000000013.json",
+      ".mote/authority/00000000000000000014.json",
+      ".mote/authority/00000000000000000015.json",
+      ".mote/authority/00000000000000000016.json",
+      ".mote/authority/00000000000000000017.json",
+      ".mote/ops/20261014T205309.670808Z-p47948-c0000-re2d7-h4e6aac.json",
+      ".mote/ops/20261014T205309.892944Z-p47947-c0000-rb0e2-h9a4830.json",
+      ".mote/ops/20261014T212923.056450Z-p78806-c0000-re764-hb407f2.json",
+      ".mote/ops/20261014T212923.162582Z-p78806-c0001-r5ecd-hf052d6.json",
+      ".mote/ops/20261014T212923.296945Z-p78806-c0002-r2d68-he018fd.json",
+      ".mote/ops/20261014T212923.412820Z-p78806-c0003-r16d2-h739747.json",
+      ".mote/ops/20261014T212923.621339Z-p78806-c0004-rd85c-he45191.json",
+      ".mote/ops/20261014T213747.963325Z-p0147-c0000-r214c-h3ec12e.json"
+    ]
+  },
+  "completed_source_issues": [
+    "bd-01M35P83TCNHBSDY6NSK13Q3K0",
+    "bd-01M354E83Z4Z7DR4KPP6Q45MAJ",
+    "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+    "bd-01M4XAWCMQHJH604C3W7TV0H9Q",
+    "bd-01M4Y24YA7G2ZX8XQYHAE3YMJS",
+    "bd-01M4XK48BE4DA638YZTDR4TJ5D"
+  ],
+  "completed_atlas_issue": "bd-01M354JNKNKJ15N4T5MGQTRSET",
+  "remaining_release_issues": [
+    "bd-01M4XZ2H3XHGY8AQ80W07PR8M0",
+    "bd-01M4XTRN36R6SYXQBP5YN7FSQP",
+    "bd-01M4XTS7JEY2ZQK2CFNZ429RFW",
+    "bd-01M19N0W937KVZCK78F6X57X1D",
+    "bd-01M2TAKTB61XNXV4Y6A9J3CB0C",
+    "bd-01M2TAMJ95K9D7H248A8387YW4"
+  ]
+}

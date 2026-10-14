@@ -1,0 +1,129 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-10-14T21:25:01Z",
+  "databaseId": 38640090003,
+  "event": "push",
+  "headBranch": "main",
+  "headSha": "a56a74b8f0a682e907434728e51b5c9bfb62ec06",
+  "jobs": [
+    {
+      "completedAt": "2026-10-14T21:37:18Z",
+      "conclusion": "success",
+      "databaseId": 116113090176,
+      "name": "Verify docs site",
+      "startedAt": "2026-10-14T21:25:04Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T21:25:08Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T21:25:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:25:12Z",
+          "conclusion": "success",
+          "name": "Checkout current branch (full)",
+          "number": 2,
+          "startedAt": "2026-10-14T21:25:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:25:16Z",
+          "conclusion": "success",
+          "name": "Setup sbt",
+          "number": 3,
+          "startedAt": "2026-10-14T21:25:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:25:21Z",
+          "conclusion": "success",
+          "name": "Setup Java (temurin@17)",
+          "number": 4,
+          "startedAt": "2026-10-14T21:25:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:25:25Z",
+          "conclusion": "success",
+          "name": "Setup Node",
+          "number": 5,
+          "startedAt": "2026-10-14T21:25:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:25:32Z",
+          "conclusion": "success",
+          "name": "Install site dependencies",
+          "number": 6,
+          "startedAt": "2026-10-14T21:25:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:26:00Z",
+          "conclusion": "success",
+          "name": "Install the pinned Playwright browser",
+          "number": 7,
+          "startedAt": "2026-10-14T21:25:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:37:13Z",
+          "conclusion": "success",
+          "name": "Verify",
+          "number": 8,
+          "startedAt": "2026-10-14T21:26:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:37:13Z",
+          "conclusion": "success",
+          "name": "Post Setup Node",
+          "number": 13,
+          "startedAt": "2026-10-14T21:37:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:37:13Z",
+          "conclusion": "success",
+          "name": "Post Setup Java (temurin@17)",
+          "number": 14,
+          "startedAt": "2026-10-14T21:37:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:37:17Z",
+          "conclusion": "success",
+          "name": "Post Setup sbt",
+          "number": 15,
+          "startedAt": "2026-10-14T21:37:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:37:17Z",
+          "conclusion": "success",
+          "name": "Post Checkout current branch (full)",
+          "number": 16,
+          "startedAt": "2026-10-14T21:37:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T21:37:17Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-10-14T21:37:17Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640090003/job/116113090176"
+    }
+  ],
+  "name": "Documentation",
+  "status": "completed",
+  "updatedAt": "2026-10-14T21:37:19Z",
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640090003"
+}

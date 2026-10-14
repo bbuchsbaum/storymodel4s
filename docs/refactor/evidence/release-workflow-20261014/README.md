@@ -367,5 +367,18 @@ Apple M3 Max; these are local observations, not a population performance claim.
 The exact main runs are source [CI 38640089960](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640089960),
 [docs 38640090003](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38640090003), and Atlas
 [CI 38640529077](https://github.com/bbuchsbaum/storyatlas4s/actions/runs/38640529077).
-Their final results are collected under `hosted-followthrough/`. These new run results remain
-separate from the already completed local gates and repaired-runtime hosted qualification.
+The completed docs and Atlas results are retained under `hosted-followthrough/`. Atlas passed
+286 tests on each JVM and 232 on JavaScript, with no failures/errors/skips. Source main's
+repeated full matrix is still running at this receipt; it is not counted as a completed run.
+[Qualification closeout](qualification-closeout.json) binds the green runtime matrix at `d1a82d5b`,
+unchanged source runtime inputs, the green exact `a56a74b8` documentation run and the green Atlas
+code revision. Later docs/Mote-only commits preserve those gates under T2.
+
+The final [metadata review](closeout-review.json) passed source `d4b7ca0f` and Atlas `50a160168`.
+Atlas's [tracker closeout](atlas-closeout-landing.json) is pushed; its
+[final doctor](atlas-final-doctor.json) reports clean hashes and zero uncommitted operations.
+The inspection-only producer ticket was also reconciled against its original acceptance and
+closed: its exact review, compiled mutations, full platform gate and consumer/browser evidence
+were already complete. The six source delivery tickets and Atlas adoption ticket are closed.
+The broader delivery epic, construction judgment, infrastructure and final release gate remain
+open for their explicitly listed freeze/publication requirements.
