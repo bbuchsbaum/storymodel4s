@@ -1,0 +1,147 @@
+{
+  "schema": "exact-candidate-review/v1",
+  "verdict": "PASS",
+  "candidate": "ad69af0119d21ba3469532422b67ac3e1455d8d7",
+  "base": "bfbcb12190f9291babdc14b38b8a57109467b68d",
+  "scope": "76-path docs/evidence/Mote delta, final local gate and artifact provenance, constructor crosswalk and A1-A6 judgments; no fresh product-code review or release authorization",
+  "productionSource": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "auditRepairPreviouslyReviewed": "874f1b087c8b69488e992532a8a6c4f5b6882727",
+  "findings": [],
+  "checks": {
+    "source": "ad69af0119d21ba3469532422b67ac3e1455d8d7",
+    "base": "bfbcb12190f9291babdc14b38b8a57109467b68d",
+    "changedPaths": 76,
+    "parsedJsonFiles": 52,
+    "productionInputsUnchangedSince": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+    "siteInputsUnchangedSince": "2647d280",
+    "gate": {
+      "tasks": 56,
+      "passed": 10877,
+      "skipped": 5,
+      "failed": 0,
+      "errors": 0,
+      "platforms": {
+        "JVM": {
+          "total": 4366,
+          "passed": 4361,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 5
+        },
+        "JS": {
+          "total": 3258,
+          "passed": 3258,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "Native": {
+          "total": 3258,
+          "passed": 3258,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "source": "eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+      "logsExact": true,
+      "exit": 0,
+      "formattingLast": true
+    },
+    "finalLogsVerified": 8,
+    "archive": {
+      "sha256": "b5f7b6a78026eb0886660351e4b822c4f4b86ee9e6beb2f0e253be2a79eca6e9",
+      "manifestSha256": "3970fa06e8d51588cda2a867f183639de3fb405648e719228dd42274dc93d798",
+      "files": 73,
+      "classpathEntries": 69,
+      "allBytesVerified": true
+    },
+    "semanticInventory": {
+      "symbols": 2060,
+      "edges": 21505,
+      "unresolved": 0,
+      "provenanceVerified": true,
+      "preArchiveByteIdentity": true
+    },
+    "inspectionInventory": {
+      "symbols": 1851,
+      "edges": 19093,
+      "unresolved": 0,
+      "provenanceVerified": true,
+      "preArchiveByteIdentity": true
+    },
+    "crosswalk": {
+      "byteReproduced": true,
+      "identityCoverage": 2060,
+      "nominalTypes": 887,
+      "associated": 718,
+      "pending": 169,
+      "allReferencesAndPathsVerified": true
+    },
+    "inventoryDelta": {
+      "removed": 0,
+      "added": [
+        "storymodel4s.align.TemporalExposure.Refusal.ForeignProcessing :: storymodel4s.align.TemporalExposure.Refusal",
+        "storymodel4s.align.TemporalQuery.Refusal.InvalidClaims :: storymodel4s.align.TemporalQuery.Refusal"
+      ],
+      "nominalDelta": 0
+    },
+    "pomPreflight": {
+      "pomFilesVerified": 56,
+      "retainedCentralResponses": {
+        "200": 46,
+        "404": 4
+      },
+      "networkNotRepeated": true
+    },
+    "localMarkdownLinks": 132,
+    "browserProvenanceCorrectionVerified": true,
+    "whitespaceCheckExit": 0
+  },
+  "privacyScreen": {
+    "scope": "Bounded exact 12-word phrase overlap screen against private actual timed packets; no text retained",
+    "privateTextFields": {
+      "canonicalText": 2,
+      "rawText": 2,
+      "text": 1185
+    },
+    "privatePhraseCount": 35142,
+    "publicChangedFilesScanned": 76,
+    "matches": []
+  },
+  "additionalChecks": {
+    "guideTranscripts": 14,
+    "parserTestsPassed": 5,
+    "ledgerIndependentAndParentOutputByteEqual": true,
+    "A2SealedAtlasCorrectionPresent": true,
+    "A1ClaimAndLedgerJudgmentsSupported": true,
+    "A3A6JudgmentsConservative": true,
+    "liveLedgerMoteStatus": "open",
+    "ledgerRepair": "bd-01M4XZ2H3XHGY8AQ80W07PR8M0",
+    "ledgerRepairParent": "bd-01M19N0W937KVZCK78F6X57X1D",
+    "ledgerRepairBlocksConstructionAudit": true,
+    "historicalLedgerCensusRemainsClosed": true,
+    "sourceMain": "22cc7243dd825198544569bc51f86bc21c8c0dbb",
+    "atlasCandidate": "d6f800f37e8290357b29c75c97d3350e9ff97c7e",
+    "atlasMain": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d"
+  },
+  "remainingBoundaries": [
+    "No stable API freeze: candidate abstention, token-truncation recipe, ClaimLedger repair and exposed experimental/internal dependency dispositions remain open.",
+    "Maven publication blocked by four recorded direct grakern snapshot POM 404s; offline archive qualification is separate.",
+    "Main advancement, hosted checks and publication remain separate authorization/acceptance steps.",
+    "No physical scanner synchronization inferred from published-index mapping.",
+    "Privacy screen is bounded phrase matching, not an exhaustive confidentiality proof."
+  ],
+  "verificationLimits": [
+    "No sbt/npm/browser or heavy gate run by reviewer.",
+    "Gate tests and archive Java readback were checked through exact retained logs/metadata; archive contents and crosswalk were independently recomputed.",
+    "Maven HTTP checks were retained evidence, not repeated network requests.",
+    "Parent-owned untracked Mote authority/ops appeared during review; excluded from this exact-commit verdict and left untouched."
+  ],
+  "artifacts": {
+    "privacy.json": "5203a8d5f10c3a1402476ace67022314657afeda81f926371fe6c758df298b48",
+    "check.py": "c058152cd9394ed25bdeef5479037d8198dc9e7947d4fee46a4d81368e7f600b",
+    "checks.json": "538fbd2ab32d0ad6966e0ebfa205af9b7fa41f32e02175a0748258c8903b11b6",
+    "privacy.py": "3f263e01620ae0ae468c6d4cc923591b55d4374f85fa6babc7713918b0a116f0"
+  }
+}
