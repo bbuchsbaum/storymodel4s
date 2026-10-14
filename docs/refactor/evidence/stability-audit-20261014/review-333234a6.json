@@ -1,0 +1,21 @@
+{
+  "source": "333234a64ea76eddc4a5f25c0ec6998198a2660d",
+  "reviewer": "independent lean_expert evidence_review",
+  "verdict": "PASS bounded audit repair; not a stability freeze",
+  "checks": [
+    "independently compiled exact walker",
+    "constructor, term parent, create/build, wrapped and alias return dependencies present",
+    "private constructor dependency excluded",
+    "no unresolved roots",
+    "both analyze overloads and named engine/organization exclusions retained",
+    "git diff --check"
+  ],
+  "symbols": 781,
+  "edges": 10656,
+  "roots": 27,
+  "limitations": [
+    "package-scoped/generated visibility",
+    "JVM ABI and bridge/default-getter compatibility",
+    "wire compatibility"
+  ]
+}

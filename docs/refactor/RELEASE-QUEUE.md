@@ -29,8 +29,15 @@ obligations above. The epic and release gate are containers, not extra implement
 
 Carry forward the qualified G1/reference/reconstruction, preparation, exchange, weights,
 disclosure/header checks, facade, workspace, temporal producer and video software. Their
-closed Motes do not need to be reimplemented. The full Sherlock journey remains open because
-actual A+V, historical parity and imaging acceptance are broader than the synthetic controls.
+closed Motes do not need to be reimplemented. Actual A/A+V, historical comparison and the
+published-index imaging walkthrough now have concrete independent receipts. Their delivery
+Motes remain open until the reviewed candidate lands and the remaining exact-pair checks
+complete; they no longer require new trigger records or another acquisition run.
+
+Current candidate priorities are: finish producer platform qualification; qualify and review
+StoryAtlas temporal adoption at its exact producer pin; reconcile the final acceptance record;
+then request the concrete main advancements and bind hosted results. Source main is published
+through `22cc7243`. The newer producer `a2e023f1` and Atlas `76046a2` are preserved candidates.
 Physical synchronization is not established by the published analysis crop convention. On
 14 October the owner confirmed that no finer trigger records are available and selected that
 published-index scope for item 3. Preserve the unavailable status in every output and claim.

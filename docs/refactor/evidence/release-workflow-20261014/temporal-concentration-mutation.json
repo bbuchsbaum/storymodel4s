@@ -1,0 +1,11 @@
+{
+  "base": "5ac5d62421c66d605ea7bc72831f27c67d2d7fa4",
+  "source_sha256": "ab2933c49a5440f0bcff169d040717c5da9a29e28164409d07f86bf2b3617735",
+  "baseline_passed": 92,
+  "mutation": "remove supplied geometry from imported concentration candidates",
+  "mutant_compiled": true,
+  "passed": 91,
+  "failed": 1,
+  "named_failure": "imported concentration matches independent exhaustive lattice windows and live precision(storymodel4s.align.TemporalInspectionSuite)",
+  "raw_log_sha256": "754b946147a48ccd09eeca8de74236f577180f8dc3dff271a29ed3d2266e4088"
+}

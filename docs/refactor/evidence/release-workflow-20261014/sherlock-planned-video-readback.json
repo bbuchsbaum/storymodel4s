@@ -1,0 +1,33 @@
+{
+  "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "package_manifest_sha256": "be19c78a7fb0c3c367e3002e15643265c1d94e788266fa5703829a717898fc4d",
+  "plan_sha256": "3d79b27db42b108a3e9f8777e7094cd6d6e0c31b82bdfab6a029a9c4a8ed6a4c",
+  "files_verified": 24,
+  "parts": [
+    {
+      "occurrence": "media-part-a",
+      "input_sha256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+      "presentation_frames": 35655,
+      "selected_frames": 1443,
+      "requested_extents": 481,
+      "observed_extents": 481,
+      "point_annotations_without_interval_caption": [
+        13
+      ],
+      "caption_outcome_sha256": "e47eec82fde5b22c688219f640921861557870ace21e5d29d4d45624625250f1"
+    },
+    {
+      "occurrence": "media-part-b",
+      "input_sha256": "f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907",
+      "presentation_frames": 38870,
+      "selected_frames": 1554,
+      "requested_extents": 518,
+      "observed_extents": 518,
+      "point_annotations_without_interval_caption": [],
+      "caption_outcome_sha256": "14310618d2f6780c47f491c6370d595e0d8116bb4b960ddd9a562e2dd720a4d9"
+    }
+  ],
+  "selected_frames": 2997,
+  "worker_extents": 999,
+  "qualification": "Independent file hashes, frame inventory/ranks, exact annotation interval plan and worker coverage; no caption-accuracy or physical synchronization inference."
+}

@@ -1,0 +1,28 @@
+{
+  "candidate": "2647d28086868b34cac1a58b16c9a4cebbf221a1",
+  "reviewer": "evidence_review",
+  "verdict": "PASS",
+  "scope": "forked docs stdout; installed guide; published-index imaging walkthrough",
+  "checks": {
+    "parser_tests": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "fork_positive_golden_bytes": 168,
+    "fork_negative_discriminates": true,
+    "receipt_hashes_verified": 3,
+    "imaging_readback_equals_saved_receipt": true,
+    "whitespace": "pass"
+  },
+  "resolved_block": {
+    "property": "interior structural weights are inference with scaled transitions, not endpoint mixtures",
+    "max_half_weight_difference_from_endpoint_average": 0.34031552933764,
+    "corrected_in": "2647d28086868b34cac1a58b16c9a4cebbf221a1"
+  },
+  "limits": [
+    "Full documentation build and browser verification pending",
+    "Physical scanner/media synchronization unavailable under owner-approved published-index scope",
+    "Stability audit is separate and incomplete"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "source": "5ac5d62421c66d605ea7bc72831f27c67d2d7fa4",
+  "qualification": "LocallyObserved focused direct Scala3.7.4 compiler plus JUnit4/munit1.3.4; baseline86 passed; six compiled mutants",
+  "mutations": [
+    {
+      "mutation": "unknown-unit",
+      "mutant_compiled": true,
+      "failed": 1,
+      "passed": 85,
+      "total": 86,
+      "named_failure": "invalid imported quantities and foreign geometry refuse before querying(storymodel4s.align.TemporalInspectionSuite)",
+      "raw_log_sha256": "726f85458547c4b23b0293a2d773edc2980027d6d6885f6d2d5ba5d640d7bee4"
+    },
+    {
+      "mutation": "normalization",
+      "mutant_compiled": true,
+      "failed": 1,
+      "passed": 85,
+      "total": 86,
+      "named_failure": "invalid imported quantities and foreign geometry refuse before querying(storymodel4s.align.TemporalInspectionSuite)",
+      "raw_log_sha256": "847d024eeaac659f0cd8b4014cb0d3d9d07747d272fc3fd603ed289f9a581916"
+    },
+    {
+      "mutation": "timing-inventory",
+      "mutant_compiled": true,
+      "failed": 1,
+      "passed": 85,
+      "total": 86,
+      "named_failure": "original timing attachment and saved view replay bind exact inventory clock and request(storymodel4s.codec.TemporalInspectionSuite)",
+      "raw_log_sha256": "c8fb9be80bf380e09c366290b83e66949bbb167a024d438cd9746cd37d5c63f8"
+    },
+    {
+      "mutation": "save-permission",
+      "mutant_compiled": true,
+      "failed": 1,
+      "passed": 85,
+      "total": 86,
+      "named_failure": "timing attachment cannot widen a workspace export grant(storymodel4s.codec.TemporalInspectionSuite)",
+      "raw_log_sha256": "ff793922c2d2f40fd230ac4857599fb23b500e011cd20496944b7d7905b59511"
+    },
+    {
+      "mutation": "saved-view-digest",
+      "mutant_compiled": true,
+      "failed": 1,
+      "passed": 85,
+      "total": 86,
+      "named_failure": "original timing attachment and saved view replay bind exact inventory clock and request(storymodel4s.codec.TemporalInspectionSuite)",
+      "raw_log_sha256": "a0e5024e4b809e31a8ceaa0554697411768b849f2cedacca27ef6d4a555fcf8b"
+    },
+    {
+      "mutation": "selection-timing",
+      "mutant_compiled": true,
+      "failed": 1,
+      "passed": 85,
+      "total": 86,
+      "named_failure": "original timing attachment and saved view replay bind exact inventory clock and request(storymodel4s.codec.TemporalInspectionSuite)",
+      "raw_log_sha256": "d2258695d9c535b7fa9320f13cf2a095dd98759e017c9c069028f855d65a2ae0"
+    }
+  ]
+}

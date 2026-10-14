@@ -1,0 +1,62 @@
+{
+  "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "scope": "actual local captions and admitted source03; conditional published-part correspondence; no measured synchronization, caption accuracy or calibration",
+  "manifest": "be19c78a7fb0c3c367e3002e15643265c1d94e788266fa5703829a717898fc4d",
+  "correspondence_sha256": "6afe2c0e0a2cb64c45a46134bd2dfbf302c32e41beb6f6d71297b4257b246e9f",
+  "same_inventory_and_target_ids": true,
+  "separate_commands_base_equal": true,
+  "conditions": {
+    "a": {
+      "pairs": 1,
+      "weighted_members": 3,
+      "members": {
+        "reference": {
+          "record_sha256": "36ba6304a408942df28bebc771a69d8acbf3d938a8c5dd2c8d05d55ed0658704",
+          "inventory_digest": "a3581eabb9174fdfff338b790ef3ee88c66144c15ec3d044ef2025abaf4916e9",
+          "outcomes": 173,
+          "processing": {
+            "complete": 151,
+            "excluded": 22
+          },
+          "targets": 1050
+        },
+        "reconstruction": {
+          "record_sha256": "b3a8a1eafeccd8831581e92bc97eb7f23820fe5b748357eaa1d48d3e64c30151",
+          "inventory_digest": "a3581eabb9174fdfff338b790ef3ee88c66144c15ec3d044ef2025abaf4916e9",
+          "outcomes": 173,
+          "processing": {
+            "complete": 173
+          },
+          "targets": 1050
+        }
+      }
+    },
+    "av": {
+      "pairs": 1,
+      "weighted_members": 3,
+      "members": {
+        "reference": {
+          "record_sha256": "c97553ea10c2a8eec5f06f64370d820ae85bfcb2d30318f071965a46f70045ea",
+          "inventory_digest": "a3581eabb9174fdfff338b790ef3ee88c66144c15ec3d044ef2025abaf4916e9",
+          "outcomes": 173,
+          "processing": {
+            "complete": 160,
+            "excluded": 13
+          },
+          "targets": 1050
+        },
+        "reconstruction": {
+          "record_sha256": "522b8095f35cc5a8c9cfceb7751bf1e74b62d269bddc224a3b3682dabcfdb579",
+          "inventory_digest": "a3581eabb9174fdfff338b790ef3ee88c66144c15ec3d044ef2025abaf4916e9",
+          "outcomes": 173,
+          "processing": {
+            "complete": 173
+          },
+          "targets": 1050
+        }
+      }
+    }
+  },
+  "command_count": 6,
+  "command_receipt_sha256": "87fd272eebedf0a5e3591634016ab03d5bfbdfb790a48978300e09a1e92fbe6b"
+}

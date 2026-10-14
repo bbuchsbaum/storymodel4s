@@ -1,0 +1,15 @@
+{
+  "candidate": "a2e023f1e2f8333cc7be8209838d02129522c88d",
+  "fixed_focused_tests": {
+    "passed": 93,
+    "failed": 0
+  },
+  "old_guard": {
+    "compiled": true,
+    "passed": 92,
+    "failed": 1,
+    "named_failure": "workspace admission preserves both signs of lawful row roundoff through projection"
+  },
+  "raw_log_sha256": "16949d3b7ecd03390275140970fbd669afc8685921d1066eb9d60cffeeacfb75",
+  "raw_log_bytes": 1473
+}

@@ -1,0 +1,81 @@
+{
+  "source": "2c4b74f9ef069e1bc1f6678f8dababe2421ca929",
+  "status": "failed-and-incomplete",
+  "runner": {
+    "schema_version": 1,
+    "started_utc": "2026-10-14T15:34:50.962678+00:00",
+    "finished_utc": "2026-10-14T16:12:12.753302+00:00",
+    "duration_seconds": 2241.74462,
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "clean",
+      "compileAll",
+      "testAll",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/planned-cli-full-gate.log",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 10800.0,
+    "log_bytes": 44140
+  },
+  "test_tasks_with_totals": [
+    {
+      "total": 251,
+      "failed": 0,
+      "errors": 0,
+      "passed": 251,
+      "skipped": 0
+    },
+    {
+      "total": 251,
+      "failed": 0,
+      "errors": 0,
+      "passed": 251,
+      "skipped": 0
+    },
+    {
+      "total": 251,
+      "failed": 0,
+      "errors": 0,
+      "passed": 251,
+      "skipped": 0
+    },
+    {
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81,
+      "skipped": 0
+    },
+    {
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81,
+      "skipped": 0
+    },
+    {
+      "total": 42,
+      "failed": 3,
+      "errors": 10,
+      "passed": 29,
+      "skipped": 0
+    }
+  ],
+  "timeouts": [
+    "SemanticCompatibilitySuite.identity exactness flags an exhausted canonical budget",
+    "SemanticCompatibilitySuite.an exhausted canonical budget is refused, never ordered by id",
+    "IdentityHardSuite.WL-tied cycles: canonical form does not depend on which variable sits on which cycle"
+  ],
+  "intervention": "After three 30-second test timeouts under host load average114.12, terminated only owned Native runners21418/21423. Their interrupted siblings are errors, not passes. Other sessions and acquisition job were preserved.",
+  "causation": "not established; proposition source unchanged from hosted-qualified22cc7243; no green current full-gate claim",
+  "raw_log_sha256": "2360baeaa4b1940cc4f140e15ab6cc0b3603a69b80da7cffc7632c91ca7831d9",
+  "raw_log_bytes": 44140
+}

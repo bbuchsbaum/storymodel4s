@@ -21,11 +21,27 @@ These are starting observations, not a claim that the latest pair is remotely qu
 | 4 | Docs `bd-01M19FPY1EC5QNTW6SBG3QYT3R`, construction `bd-01M19N0W937KVZCK78F6X57X1D`, infrastructure `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | The demonstrated journey has an executable reader guide, audited stable-signature closure, installable commands and compatibility/release checks; final acceptance stays on `bd-01M2TAMJ95K9D7H248A8387YW4`. |
 | 5 | StoryAtlas `bd-01M354JNKNKJ15N4T5MGQTRSET` in its own store | Adopt the exact temporal producer handoff; linked timeline/uncertainty inspection, saved-state replay and browser/reader agreement pass on the pinned pair. |
 
-The first runtime slice is the public ONNX command bridge under the existing journey.
-`MappingPipeline.registeredOnnx` already exists; the ordinary batch route currently accepts
-lexical and checked caption inputs. Reuse the registered implementation rather than a new
-scorer or a benchmark-only command. Historical preset reproduction is a separate witness
-from merely running the new paired profile.
+The public ONNX command bridge is reviewed, locally and independently qualified, and published
+at `22cc7243`. The historical-preset comparison explains its differences from the new paired
+profile. Actual annotation-only and annotation-plus-video execution now preserves the same
+173-unit/2,495-word inventory, both mapping members, and weights 0/0.5/1; independent readers
+verify every exported file. The planned video acquisition supplied 999 interval captions;
+one annotation has only an onset and is retained without an invented interval caption.
+
+The published-index imaging walkthrough and executable reader guide have passed independent
+readback. The CLI distribution is installable and reproducible; the stable-signature audit
+is independently reviewed as a bounded construction audit, not a completed API freeze.
+Producer `a2e023f1` adds imported temporal inspection and fixes workspace admission to use
+the established row-sum tolerance without renormalization. Its focused 93 tests and eight
+compiled guard mutations are qualified; the full platform gate is still being completed.
+StoryAtlas candidate `76046a2` pins that producer and implements temporal controls, independent
+source/recall clocks, partial-row inspection, and saved-view replay. Its full consumer gate,
+browser checks, independent review and publication remain active acceptance. No new source
+or consumer main advancement beyond the owner's approved `22cc7243` has occurred.
+
+Finish the exact-pair gate and browser readback, reconcile the final receipts and tracker,
+then obtain approval for the concrete reviewed main advancements and synchronize hosted
+checks. These remaining steps, rather than another ONNX implementation, are the active queue.
 
 ### Completed substrate to carry forward
 

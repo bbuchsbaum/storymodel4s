@@ -155,3 +155,54 @@ resources are supplied separately. A public binary release has not been publishe
 
 The restored clean full source gate, actual Sherlock acquisition and subsequent consumer/docs
 checks are in progress. These focused witnesses do not close those remaining acceptance gates.
+
+
+## Completed local caption and A/A+V execution
+
+The installed `2c4b74f9` bundle completed both planned video parts. Independent readback verified
+all 24 manifest files, 2,997 selected frames and 999 interval captions against the original
+presentation packet inventory and admitted annotation CSV. Annotation 13 is onset-only and
+has no fabricated caption interval. See `sherlock-planned-video-readback.json` and its reader.
+
+The six public CLI commands then produced annotation-only and annotation-plus-video pairs and
+weight sweeps at 0, 0.5 and 1. Both use the identical 173-unit inventory and 1,050 target IDs.
+Reference completeness is 151 units for A and 160 for A+V; both reconstruction members retain
+173 complete units. Independent readers verify endpoint byte identity and separate-command
+base identity. These counts do not assess caption or mapping accuracy. Coordinate correspondence
+is the explicitly declared published-part convention, not measured physical synchronization.
+`run_actual_av.py` reproduces the command sequence; `sherlock-actual-av-readback.json` binds the
+private command receipt and result hashes without publishing study content.
+
+Readback exposed a Python-reader mismatch: the producer's documented row-sum shape tolerance is
+1e-9, while the readers used 1e-12. The largest actual discrepancy was 1.3736789483687062e-12.
+The readers now enforce the producer contract and retain every supplied value unchanged. All 12
+reader controls pass; restoring the old guard fails the named roundoff control with 11 siblings
+passing. Both signs beyond 2e-9 continue to refuse. The adverse observations are retained in
+`sherlock-weighted-roundoff-audit.json`, with checks in `weighted-reader-tolerance.json`.
+
+The full documentation verification passed on `2647d280`: 14 executable examples, five parser
+checks, the Astro build and navigation, provenance, figure-mutation and verbatim checks. The new
+ordinary-file guide also passed 390/1440-pixel layout and mobile-menu checks; both rendered pages
+were inspected, and browser ownership audits before/after were clean. See `docs-full-verify.json`.
+
+## Imported workspace tolerance and platform-gate continuation
+
+Independent review found that the ordinary workspace reader still required `1e-12` row-sum
+agreement while the established producer contract accepts `1e-9`. Exact `a2e023f1` uses the
+shared `MappingTolerance.RowSum`. Both signs of a `5e-10` discrepancy pass workspace admission,
+session creation and projection with their supplied values unchanged; both signs of `2e-9`
+refuse. Independent review passed, all 93 focused tests pass, and restoring the old guard
+compiles and fails only the new named test (92 pass, one fail). The
+[tolerance receipt](temporal-workspace-tolerance.json) retains the mutation log.
+
+The [full f4 gate attempt](producer-f4ecc807-full-gate-failed.json) compiled all platforms and
+passed 5,258 tests over 26 tasks before a 2 GiB JVM heap exhausted while compiling Native
+alignment tests. This is an incomplete gate, not a green result. The continuation runs exact
+`a2e023f1` with 6 GiB, covers every remaining task including the changed codec and downstream
+modules, and runs formatting last. The preceding passed modules have no source delta in the
+two-file repair. The earlier load-related failed Native attempt is also preserved.
+
+Atlas candidate `76046a24ce1f5cea7b79e48ba0c055d7ac7618e0` is preserved on its own repository's
+`codex/temporal-adoption-20261014` branch; main is unchanged. Nine focused controller/import
+checks pass, direct Scala.js UI compilation passes, and formatting/workflow generation pass.
+Its full consumer gate, rendered browser checks and independent review are still pending.

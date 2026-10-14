@@ -1,0 +1,60 @@
+{
+  "source": "22cc7243dd825198544569bc51f86bc21c8c0dbb",
+  "ci_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38589639065",
+  "docs_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38589639080",
+  "ci_conclusion": "success",
+  "docs_conclusion": "failure",
+  "docs_reason": "forked stdout prefixes changed the example transcript; local repair2647d280 under full verification",
+  "raw_ci_bytes": 1844853,
+  "raw_ci_sha256": "9e6fadd33c3b8f011ed5f1e3bd222232291a069a5444a3aec2c83c07f80624fe",
+  "cells": [
+    {
+      "id": 115940764988,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "status": "completed",
+      "conclusion": "success",
+      "tasks": 16,
+      "total": 3188,
+      "failed": 0,
+      "errors": 0,
+      "passed": 3188,
+      "skipped": 0
+    },
+    {
+      "id": 115940765138,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "status": "completed",
+      "conclusion": "success",
+      "tasks": 22,
+      "total": 3773,
+      "failed": 0,
+      "errors": 0,
+      "passed": 3755,
+      "skipped": 18
+    },
+    {
+      "id": 115940765278,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "status": "completed",
+      "conclusion": "success",
+      "tasks": 16,
+      "total": 3188,
+      "failed": 0,
+      "errors": 0,
+      "passed": 3188,
+      "skipped": 0
+    },
+    {
+      "id": 115940765319,
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "status": "completed",
+      "conclusion": "success",
+      "tasks": 22,
+      "total": 3773,
+      "failed": 0,
+      "errors": 0,
+      "passed": 3755,
+      "skipped": 18
+    }
+  ]
+}

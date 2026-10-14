@@ -1,0 +1,34 @@
+{
+  "source": "a2e023f1e2f8333cc7be8209838d02129522c88d",
+  "reviewer": "independent evidence_review agent",
+  "verdict": "PASS",
+  "scope": "Six temporal and workspace source files, imported-claim authority, binding, accounting, concentration, workspace admission, focused tests and mutation receipts. Excludes full platform and consumer gates.",
+  "previous_block": {
+    "source": "f4ecc807847f83bd11ef839ef5ceb487303fe463",
+    "finding": "Workspace admission used1e-12 against documented1e-9 tolerance",
+    "resolved_by": "a2e023f1e2f8333cc7be8209838d02129522c88d"
+  },
+  "focused": {
+    "passed": 93,
+    "failed": 0,
+    "skipped": 0
+  },
+  "compiled_mutations": 8,
+  "evidence": [
+    {
+      "path": "logs/review-a2e023f1-compile.log.gz",
+      "bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/review-a2e023f1-independent-probe.log.gz",
+      "bytes": 418,
+      "raw_sha256": "cbae12b280d645124dc4d8563bb2c211d933cf59353dbc46b61333194a5fb031"
+    },
+    {
+      "path": "logs/review-a2e023f1-focused-test.log.gz",
+      "bytes": 143,
+      "raw_sha256": "f3724146012e143a44868eea3403713932fb30955057601a055b83bea5be6084"
+    }
+  ]
+}

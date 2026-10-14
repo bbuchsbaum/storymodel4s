@@ -1,0 +1,23 @@
+{
+  "contract": "align.MappingTolerance.RowSum = 1e-9; shape check only; preserve original values",
+  "old_reader_tolerance": 1e-12,
+  "observed_maximum_absolute_discrepancy": 1.3736789483687062e-12,
+  "checks": [
+    {
+      "case": "fixed",
+      "exit": 0,
+      "tests": 12,
+      "passed": 12,
+      "named_error": null,
+      "raw_sha256": "c3454cccb96b2f459906d015501aa6b148f55b1c94b09c2e8e4da27e9921a65f"
+    },
+    {
+      "case": "old-guard",
+      "exit": 1,
+      "tests": 12,
+      "passed": 11,
+      "named_error": "test_contract_row_sum_roundoff_is_preserved_without_rescaling",
+      "raw_sha256": "e99e87174d7a58c1abe309abdbd999957c5fc92e227b1ce7ce42a37e2b13ed77"
+    }
+  ]
+}
