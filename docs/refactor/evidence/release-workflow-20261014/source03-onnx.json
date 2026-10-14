@@ -1,0 +1,86 @@
+{
+  "source": "0a3a97777c861f41c911ae1232a911590576fd2a",
+  "participant": "recall-source-03",
+  "pairs": 1,
+  "attempts": 1,
+  "members": {
+    "reference": {
+      "units": 173,
+      "words": 2495,
+      "targets": 1050,
+      "inventory_digest": "a3581eabb9174fdfff338b790ef3ee88c66144c15ec3d044ef2025abaf4916e9",
+      "outcomes": {
+        "complete": 173
+      }
+    },
+    "reconstruction": {
+      "units": 173,
+      "words": 2495,
+      "targets": 1050,
+      "inventory_digest": "a3581eabb9174fdfff338b790ef3ee88c66144c15ec3d044ef2025abaf4916e9",
+      "outcomes": {
+        "complete": 173
+      }
+    }
+  },
+  "weighted_members": 3,
+  "separate_commands_base_equal": true,
+  "readback": "independent wire/hash/schema/projection checks; not a new contextual admission or accuracy claim",
+  "inputs": [
+    {
+      "file": "study.json",
+      "bytes": 376,
+      "sha256": "bce1b2bd64443f41d64285a9edc8e0bfa349e20a2fa5fcf0f04e17286d6b0060"
+    },
+    {
+      "file": "parts.json",
+      "bytes": 194,
+      "sha256": "9f9a44dfe75571e922db696f8a874738420ba02aa13c2852945b9446874228ce"
+    },
+    {
+      "file": "annotations.csv",
+      "bytes": 161659,
+      "sha256": "13e89fc08494dd0c47077f6077e7d250cdfaaeebdb6ec25c926157f9dfd58bc1"
+    },
+    {
+      "file": "recall-source-03.csv",
+      "bytes": 91928,
+      "sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e"
+    },
+    {
+      "file": "recall-lineage.json",
+      "bytes": 13755,
+      "sha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e"
+    },
+    {
+      "file": "verification.json",
+      "bytes": 4778,
+      "sha256": "9695f5461a5ca11c5762e4f2c9673a957933e1b986f66d98b69b8ab368e064b4"
+    },
+    {
+      "file": "recall-coverage.json",
+      "bytes": 3289,
+      "sha256": "06932182d9f0c3a5e3f2911e6184429abeb70c1ef491dbffecf4cd91af8210e7"
+    },
+    {
+      "file": "mapping.json",
+      "bytes": 331,
+      "sha256": "a202a7cb1468cc5e704f62817e0502bc193b95f8b415c2a60651a38d63143f9e"
+    },
+    {
+      "file": "model.onnx",
+      "bytes": 90405214,
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    },
+    {
+      "file": "tokenizer.json",
+      "bytes": 466247,
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+    }
+  ],
+  "commands": [
+    "mappingRun exchange STUDY MAPPING OUTPUT",
+    "mappingWeight STUDY MAPPING 0/1,1/2,1/1 OUTPUT"
+  ],
+  "key": "32 random local bytes retained privately; no key bytes or unkeyed key digest published"
+}

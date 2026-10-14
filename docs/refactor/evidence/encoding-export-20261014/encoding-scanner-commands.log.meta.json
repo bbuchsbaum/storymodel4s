@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-14T14:01:52.177467+00:00",
+  "finished_utc": "2026-10-14T14:02:35.257829+00:00",
+  "duration_seconds": 43.079941,
+  "command": [
+    "sbt",
+    "-batch",
+    "pipeline/runMain storymodel4s.pipeline.scannerSamples /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/encoding-selected/sherlockPart1-scanner-job.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/encoding-selected/part1-scanner.json",
+    "pipeline/runMain storymodel4s.pipeline.scannerSamples /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/encoding-selected/sherlockPart2-scanner-job.json /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/encoding-selected/part2-scanner.json"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/encoding-scanner-commands.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 7546
+}

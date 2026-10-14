@@ -1,0 +1,13 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingSettings.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingSettings.scala
+@@ -60,9 +60,7 @@
+       val relative = Path.of(name)
+       val path = base.resolve(relative).normalize()
+       Either.cond(
+-        !relative.isAbsolute && path.startsWith(base) &&
+-          Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) &&
+-          path.toRealPath().startsWith(base),
++        Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS),
+         path,
+         FacadeFailure.InvalidConfiguration
+       )

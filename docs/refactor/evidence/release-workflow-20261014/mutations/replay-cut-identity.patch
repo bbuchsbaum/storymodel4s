@@ -1,0 +1,11 @@
+--- a/embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala
++++ b/embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala
+@@ -38,7 +38,7 @@
+       metric,
+       emptyPolicy,
+       pricingSignature(pricing),
+-      selectedLevel
++      None
+     )
+     override def equals(other: Any): Boolean = other match
+       case c: Config => parts == c.parts

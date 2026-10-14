@@ -1,0 +1,51 @@
+[
+  {
+    "name": "compile-01",
+    "raw_bytes": 4335,
+    "raw_sha256": "2d6cdc75fa9844b3c46e5e33fff89b4e2c7b11b99f9becff3fc2feff1202b949",
+    "gzip_sha256": "e2744b2962148c9316aa45925e902e601f905e8298e833ad41344d400e4915ce",
+    "exit": 1
+  },
+  {
+    "name": "compile-02",
+    "raw_bytes": 25024,
+    "raw_sha256": "1e13c80390098075452bce988a8f5acee9b9c514cc39ec48de10b2212265b17d",
+    "gzip_sha256": "e03e0abd118d253531ea1c3cff08f3258d09c254d2b0f51f2c2e97feb7b0a4e5",
+    "exit": 0
+  },
+  {
+    "name": "compile-03",
+    "raw_bytes": 3376,
+    "raw_sha256": "304e57162779549b3a9cb8b244d894871c877997047ffdaf8308e755e390416e",
+    "gzip_sha256": "5a0ff1b8db73f369c57659635ba26e9de39385113bcf2fd73fe4124e810c2b56",
+    "exit": 1
+  },
+  {
+    "name": "compile-04",
+    "raw_bytes": 5132,
+    "raw_sha256": "f41a1712c6903dbda84bff7cd09304f6633a9429df6a5aecbfbe93898d034abb",
+    "gzip_sha256": "099bd8941eeeb3e74b36bc4b16e1dbc18e8b0beb3deaf406b5d7af290245414f",
+    "exit": 1
+  },
+  {
+    "name": "compile-05",
+    "raw_bytes": 8666,
+    "raw_sha256": "1210960a82304fb0b56e826a2dd3ab5ddb53c76766dbd686bce94b03a8b79a72",
+    "gzip_sha256": "6619a243740c2ae40fb8abdbe203946629563ab15a3436603526a5b46f159c4c",
+    "exit": 0
+  },
+  {
+    "name": "boundaries-01",
+    "raw_bytes": 4281,
+    "raw_sha256": "bbacefd07d979eb4c28c07d7ded12ac3f90a8137b84538f57b8a0d1577d04816",
+    "gzip_sha256": "9a1bccb6f4b0001f61402cc7c5b1ef031d206533afca6b8078c30753b02d2b96",
+    "exit": 0
+  },
+  {
+    "name": "source03-onnx-commands",
+    "raw_bytes": 5716,
+    "raw_sha256": "4b10484ec00e91a0b33a49f3e16bcd9402f2f1b9ba7d0206781ee5f255ddb741",
+    "gzip_sha256": "76390e7915d5995864a793ab777d7ecf8f3b4fe1bc5aa8a465f25035d2e27188",
+    "exit": 0
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "arrays": [
+    {
+      "part": 1,
+      "stored_range_half_open": [
+        20,
+        966
+      ],
+      "volumes": 946,
+      "bytes": 209240064,
+      "sha256": "2cd6a9aeaf4b8442576ac49794a11c6dbd19b49b1dfb45f799f01e8035589870",
+      "every_voxel_byte_equal": true
+    },
+    {
+      "part": 2,
+      "stored_range_half_open": [
+        20,
+        1050
+      ],
+      "volumes": 1030,
+      "bytes": 227819520,
+      "sha256": "a8c1d787babbe60da8320c5247bde42ca9566556e5a2fa917e65915d2bff5f53",
+      "every_voxel_byte_equal": true
+    }
+  ],
+  "original_segment_outcomes": 1000,
+  "unassigned_segments": [
+    481,
+    482
+  ],
+  "membership_pairs": 2065,
+  "selected_trs": 1976,
+  "overlapping_trs": 89,
+  "max_memberships_per_tr": 2,
+  "corruptions_rejected": 9,
+  "physical_synchronization": "unestablished",
+  "prior_derivative_history": "unknown",
+  "predictor_averaging_or_normalization": "not performed"
+}

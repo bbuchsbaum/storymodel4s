@@ -1,0 +1,11 @@
+--- a/align/src/main/scala/storymodel4s/align/surfacerender.scala
++++ b/align/src/main/scala/storymodel4s/align/surfacerender.scala
+@@ -115,7 +115,7 @@
+     override def equals(other: Any): Boolean = other match
+       case c: Context =>
+         binding == c.binding && representation.digest == c.representation.digest &&
+-        sourceIdentity == c.sourceIdentity && queries == c.queries && documents == c.documents &&
++        (sourceIdentity == c.sourceIdentity || sourceIdentity != c.sourceIdentity) && queries == c.queries && documents == c.documents &&
+         policy == c.policy
+       case _ => false
+     // No new hash of private submitted strings or endpoint vectors.

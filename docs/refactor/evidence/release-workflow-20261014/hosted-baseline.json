@@ -1,0 +1,681 @@
+{
+  "schema": "exact-revision-review/v1",
+  "base": "76f6fad800176c27f756cf62a644cd68f9a694ca",
+  "candidate": "7be3c0b10fd006a1c0b7679203e4cebdab5da3aa",
+  "reviewer": "baseline_review",
+  "verdict": "PASS",
+  "block": [],
+  "follow_up": [],
+  "facts": [
+    "Complete whitespace check passed",
+    "594 sequential authority records admit all 16643 committed operations exactly",
+    "22 indexed gate logs match hashes and byte lengths",
+    "Existing local scoped gates cover runtime inputs; hosted qualification separate"
+  ],
+  "parent_observed_clone": {
+    "doctor": "clean",
+    "tracked_ops": 16643,
+    "uncommitted_ops": 0,
+    "warnings": [],
+    "authority_version": 2,
+    "genesis": "3234e04da3ca6b6276e4e717b18fa193192631d34db50238afd54e2c1f47b102"
+  },
+  "synchronization": {
+    "remote_before": "908b935ca55fb6a4bc0f1e10b16a5b42c93adff4",
+    "remote_after": "7be3c0b10fd006a1c0b7679203e4cebdab5da3aa",
+    "force": false,
+    "ci_run": 38568151167,
+    "docs_run": 38568151276,
+    "integrity_run": 38568151452,
+    "integrity": "success"
+  },
+  "hosted_ci": {
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38568151167",
+    "head": "7be3c0b10fd006a1c0b7679203e4cebdab5da3aa",
+    "conclusion": "success",
+    "totals": [
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 251,
+        "failed": 0,
+        "errors": 0,
+        "passed": 251,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 81,
+        "failed": 0,
+        "errors": 0,
+        "passed": 81,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 189,
+        "failed": 0,
+        "errors": 0,
+        "passed": 189,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 983,
+        "failed": 0,
+        "errors": 0,
+        "passed": 983,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 145,
+        "failed": 0,
+        "errors": 0,
+        "passed": 145,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 377,
+        "failed": 0,
+        "errors": 0,
+        "passed": 377,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 165,
+        "failed": 0,
+        "errors": 0,
+        "passed": 165,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 117,
+        "failed": 0,
+        "errors": 0,
+        "passed": 117,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 98,
+        "failed": 0,
+        "errors": 0,
+        "passed": 98,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 76,
+        "skipped": 1
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 28,
+        "failed": 0,
+        "errors": 0,
+        "passed": 28,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 48,
+        "failed": 0,
+        "errors": 0,
+        "passed": 48,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 176,
+        "failed": 0,
+        "errors": 0,
+        "passed": 175,
+        "skipped": 1
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+        "total": 126,
+        "failed": 0,
+        "errors": 0,
+        "passed": 110,
+        "skipped": 16
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 251,
+        "failed": 0,
+        "errors": 0,
+        "passed": 251,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 81,
+        "failed": 0,
+        "errors": 0,
+        "passed": 81,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 186,
+        "failed": 0,
+        "errors": 0,
+        "passed": 186,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 963,
+        "failed": 0,
+        "errors": 0,
+        "passed": 963,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 145,
+        "failed": 0,
+        "errors": 0,
+        "passed": 145,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 376,
+        "failed": 0,
+        "errors": 0,
+        "passed": 376,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 160,
+        "failed": 0,
+        "errors": 0,
+        "passed": 160,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+        "total": 117,
+        "failed": 0,
+        "errors": 0,
+        "passed": 117,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 251,
+        "failed": 0,
+        "errors": 0,
+        "passed": 251,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 81,
+        "failed": 0,
+        "errors": 0,
+        "passed": 81,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 189,
+        "failed": 0,
+        "errors": 0,
+        "passed": 189,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 983,
+        "failed": 0,
+        "errors": 0,
+        "passed": 983,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 145,
+        "failed": 0,
+        "errors": 0,
+        "passed": 145,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 377,
+        "failed": 0,
+        "errors": 0,
+        "passed": 377,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 165,
+        "failed": 0,
+        "errors": 0,
+        "passed": 165,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 117,
+        "failed": 0,
+        "errors": 0,
+        "passed": 117,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 98,
+        "failed": 0,
+        "errors": 0,
+        "passed": 98,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 76,
+        "skipped": 1
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 28,
+        "failed": 0,
+        "errors": 0,
+        "passed": 28,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 48,
+        "failed": 0,
+        "errors": 0,
+        "passed": 48,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 176,
+        "failed": 0,
+        "errors": 0,
+        "passed": 175,
+        "skipped": 1
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+        "total": 126,
+        "failed": 0,
+        "errors": 0,
+        "passed": 110,
+        "skipped": 16
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 116,
+        "failed": 0,
+        "errors": 0,
+        "passed": 116,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 251,
+        "failed": 0,
+        "errors": 0,
+        "passed": 251,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 138,
+        "failed": 0,
+        "errors": 0,
+        "passed": 138,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 167,
+        "failed": 0,
+        "errors": 0,
+        "passed": 167,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 77,
+        "failed": 0,
+        "errors": 0,
+        "passed": 77,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 145,
+        "failed": 0,
+        "errors": 0,
+        "passed": 145,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 186,
+        "failed": 0,
+        "errors": 0,
+        "passed": 186,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 104,
+        "failed": 0,
+        "errors": 0,
+        "passed": 104,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 133,
+        "failed": 0,
+        "errors": 0,
+        "passed": 133,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 92,
+        "failed": 0,
+        "errors": 0,
+        "passed": 92,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 963,
+        "failed": 0,
+        "errors": 0,
+        "passed": 963,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 81,
+        "failed": 0,
+        "errors": 0,
+        "passed": 81,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 376,
+        "failed": 0,
+        "errors": 0,
+        "passed": 376,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 160,
+        "failed": 0,
+        "errors": 0,
+        "passed": 160,
+        "skipped": 0
+      },
+      {
+        "job": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+        "total": 117,
+        "failed": 0,
+        "errors": 0,
+        "passed": 117,
+        "skipped": 0
+      }
+    ],
+    "log_sha256": "9d8c8c1b9f9b0ad6c6b0cbc65f8edb1849a9e1b20c55ed0beb41c22f8e8d4f9b",
+    "log_bytes": 2225410,
+    "by_job": {
+      "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)": {
+        "cells": 22,
+        "passed": 3747,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 18
+      },
+      "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)": {
+        "cells": 16,
+        "passed": 3183,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)": {
+        "cells": 22,
+        "passed": 3747,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 18
+      },
+      "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)": {
+        "cells": 16,
+        "passed": 3183,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "compressed_log": "hosted-baseline-ci.log.gz",
+    "compressed_sha256": "5db650d70dae80c10b83b907d1e4010df8b5d0e15c781ed0d5e68f6eea4f1969"
+  }
+}

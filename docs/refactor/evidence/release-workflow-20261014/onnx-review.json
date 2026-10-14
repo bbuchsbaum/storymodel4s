@@ -1,0 +1,21 @@
+{
+  "base": "7be3c0b10fd006a1c0b7679203e4cebdab5da3aa",
+  "candidate": "0a3a97777c861f41c911ae1232a911590576fd2a",
+  "reviewer": "baseline_review",
+  "verdict": "PASS",
+  "block": [],
+  "follow_up": [],
+  "scope": [
+    "resource and key isolation",
+    "timed source payload and complete identity binding",
+    "pre-nomination hierarchy cut and exact replay",
+    "all ordinary public callers",
+    "shape-correct external boundary probes",
+    "sbt runMain delegates to run / runner"
+  ],
+  "acceptance_remaining": [
+    "restored reference scope across platforms",
+    "sibling source compatibility",
+    "receipt review"
+  ]
+}

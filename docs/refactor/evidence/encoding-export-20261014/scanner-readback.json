@@ -1,0 +1,43 @@
+{
+  "source": "0a3a97777c861f41c911ae1232a911590576fd2a",
+  "parts": [
+    {
+      "part": 1,
+      "output_sha256": "fcb43e28f921184ff56cccbf9edb474c6542fe181bb359e62feb7c24b5d7722a",
+      "job_sha256": "57c4d297883638438fdec1b158484f374093461eade65bb11e140e1c33a432cc",
+      "raw_samples": 972,
+      "selected_samples": 946,
+      "run_digest": "3deb51a47afcc2bcc33ef7622fbf3c11a4cfb9d0606d7472bdd2e47803680ab0",
+      "layout_digest": "f1624256bffd66d26df0eef5376f43113df2baa3689659f2f0f5f452de9fcb27",
+      "array_sha256": "2cd6a9aeaf4b8442576ac49794a11c6dbd19b49b1dfb45f799f01e8035589870",
+      "corruptions_rejected": [
+        "time",
+        "drop",
+        "array",
+        "binding",
+        "censor"
+      ]
+    },
+    {
+      "part": 2,
+      "output_sha256": "97a2d28ccfe94927dd2280cdd9adf78dbadbe1a54f79a2531c80278b9a3856be",
+      "job_sha256": "2cc2f725515c75bd2ce6d914976450ca962797265241ac11843681868bb74988",
+      "raw_samples": 1057,
+      "selected_samples": 1030,
+      "run_digest": "debe8a36a647995dc1b5abbcb07d5aafe944ba57ef5f86bbc13b4bf9a0557eeb",
+      "layout_digest": "ed415c61fa17a323020a9ca203ad524c44fe33c680fe4bb7b82cb02c9c66cb85",
+      "array_sha256": "a8c1d787babbe60da8320c5247bde42ca9566556e5a2fa917e65915d2bff5f53",
+      "corruptions_rejected": [
+        "time",
+        "drop",
+        "array",
+        "binding",
+        "censor"
+      ]
+    }
+  ],
+  "corruptions_rejected": 10,
+  "first_selected_raw_time_seconds": "30",
+  "physical_synchronization": "unestablished",
+  "scope": "emitted index/time declarations; voxel-byte evidence is in actual-readback.json"
+}

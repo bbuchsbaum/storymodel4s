@@ -46,9 +46,72 @@ and documentation run
 were successful. They do not qualify the newer local code. Subsequent synchronization and
 hosted receipts must name their exact revisions here before that workstream is called complete.
 
-## Next action
+## Source baseline synchronized and hosted-qualified
 
-Review and commit the baseline/queue/authority snapshot, prove fresh-clone tracker readback,
-then integrate and synchronize the reviewed source baseline. Continue the public ONNX
-command bridge under `bd-01M35P83TCNHBSDY6NSK13Q3K0`; keep original acceptance and real-data
-restrictions intact. Local-only dashboard/runtime state is under `.dashboard` and `.agent-work`.
+Independent review passed exact revision `7be3c0b10fd006a1c0b7679203e4cebdab5da3aa`.
+A fresh standalone clone validates all 16,643 committed Mote operations with zero uncommitted
+operations or doctor warnings. Main advanced by a normal fast-forward, and a non-force push
+made GitHub main identical. [The receipt](hosted-baseline.json) retains the review scope,
+fresh-clone readback, remote observations and all 76 hosted result cells.
+
+[CI 38568151167](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38568151167)
+passed at that exact revision:
+
+| Matrix cell | Passed | Failed/errors | Skipped |
+| --- | ---: | ---: | ---: |
+| JVM, Java 17 | 3747 | 0 | 18 |
+| JVM, Java 21 | 3747 | 0 | 18 |
+| Scala.js | 3183 | 0 | 0 |
+| Native | 3183 | 0 | 0 |
+
+The compressed raw log is retained and hash-bound. Documentation run
+[38568151276](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38568151276)
+and integrity run [38568151452](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38568151452)
+also passed. These hosted results qualify the synchronized source baseline; they do not
+qualify subsequent branch changes or update StoryAtlas's source pin.
+
+## Owner-supplied timing workbook
+
+The supplied `Sherlock_Segments_1000_NN_2017.xlsx` has SHA-256
+`5271b7704ccebfc7cae2228c78faf472c0ba5530c1a45e4c784757057bf476df`, identical to the
+already pinned authors' tutorial workbook. [Read-only comparison](workbook-comparison.json)
+finds all 1,000 segment rows and numeric seconds/TR boundaries equal to the imported TSV.
+The workbook retains the part-2 seconds reset, concatenated TR numbering and two rows without
+TR assignment. It supplies annotation coordinates; it does not add a participant-specific
+video-presentation/scanner-trigger record or an existing derivative array's processing history.
+
+## Ordinary ONNX execution qualified locally
+
+The [independent code review](onnx-review.json) passed exact source
+`0a3a97777c861f41c911ae1232a911590576fd2a`. Its restored
+[full gate](onnx-full-gate.json) ran all 56 test tasks, with fatal warnings enabled and
+formatting last: JVM 4,287 passed and five skipped; Scala.js 3,188 passed; Native 3,188
+passed. There were zero failures/errors. The six [compiled mutations](mutations/mutations.json)
+each failed its named assertion while all selected siblings passed. Shape-correct external
+construction probes were separately recompiled cleanly. [Logs](onnx-log-index.json) retain
+the earlier failed controls as well as successful checks.
+
+StoryAtlas `ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d` passed its
+[exact-pair compatibility gate](onnx-atlas-gate.json): 488 tests, zero failures/errors/skips,
+application linking and formatting. That override check does not change its default source pin
+or establish the pending temporal browser adoption.
+
+The ordinary `mappingRun exchange` and `mappingWeight` commands executed the pinned local
+ONNX model for admitted source03. [Independent readback](source03-onnx.json) retains one
+successful attempt, both complete 173-unit/2,495-word members, the same inventory digest and
+weights 0, 0.5 and 1. Separately executed base publications agree exactly. Participant-derived
+outputs and the receipt key stay in ignored local storage. The
+[historical-preset comparison](historical-preset-differences.md) records changed scoring,
+candidate and reconstruction choices; historical benchmark accuracy is not inherited.
+
+The [encoding selection receipt](../encoding-export-20261014/README.md) binds newly copied
+raw arrays, all 1,000 annotation outcomes and both actual scanner declaration exports. Physical
+scanner/media synchronization remains unestablished pending the owner's scope/evidence decision.
+
+## Current action
+
+Complete actual planned video acquisition and the controlled lexical A/A+V comparison under
+`bd-01M35P83TCNHBSDY6NSK13Q3K0`. The plan contains 999 positive annotation intervals; point
+segment 13 retains unavailable video coverage. Continue installable-command preparation, stable
+boundary audit, reader documentation and temporal StoryAtlas adoption. Local-only dashboard,
+private artifacts and resumable build state are under `.dashboard` and `.agent-work`.

@@ -1,0 +1,111 @@
+{
+  "producer": "0a3a97777c861f41c911ae1232a911590576fd2a",
+  "consumer": "ac2ca6cb85fdb8a959390e0e3d16e7af87c3e16d",
+  "qualification": "LocallyObserved",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+    "set ThisBuild / tlFatalWarnings := true",
+    "compileAll",
+    "testAll",
+    "app/fastLinkJS",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exit": 0,
+  "cells_in_command_order": [
+    {
+      "total": 22,
+      "failed": 0,
+      "errors": 0,
+      "passed": 22,
+      "skipped": 0,
+      "task": "layoutJVM/test"
+    },
+    {
+      "total": 26,
+      "failed": 0,
+      "errors": 0,
+      "passed": 26,
+      "skipped": 0,
+      "task": "layoutJS/test"
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100,
+      "skipped": 0,
+      "task": "intaglioJVM/test"
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100,
+      "skipped": 0,
+      "task": "intaglioJS/test"
+    },
+    {
+      "total": 13,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13,
+      "skipped": 0,
+      "task": "editionJVM/test"
+    },
+    {
+      "total": 13,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13,
+      "skipped": 0,
+      "task": "editionJS/test"
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0,
+      "task": "shellJVM/test"
+    },
+    {
+      "total": 74,
+      "failed": 0,
+      "errors": 0,
+      "passed": 74,
+      "skipped": 0,
+      "task": "shellJS/test"
+    },
+    {
+      "total": 59,
+      "failed": 0,
+      "errors": 0,
+      "passed": 59,
+      "skipped": 0,
+      "task": "cli/test"
+    },
+    {
+      "total": 4,
+      "failed": 0,
+      "errors": 0,
+      "passed": 4,
+      "skipped": 0,
+      "task": "app/test"
+    }
+  ],
+  "totals": {
+    "total": 488,
+    "failed": 0,
+    "errors": 0,
+    "passed": 488,
+    "skipped": 0
+  },
+  "raw_log_bytes": 32080,
+  "raw_log_sha256": "6822fc547ea3b5ea64e5dc399790bb40894c639f979d437fc7200c8db7e6dd3a",
+  "compressed_log_sha256": "561ecf9458e3eda3be712f7b5738ecf4bd6db23ca2bf8cc7a16468e9488fbbc1",
+  "pin_update": false,
+  "browser_temporal_adoption": "not established by this compatibility gate"
+}

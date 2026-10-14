@@ -1,0 +1,11 @@
+--- a/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
++++ b/pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala
+@@ -494,7 +494,7 @@
+         configText(config)
+       ) ++ prepared.source.captionContext.toVector.flatMap((pack, blend) =>
+         Vector(pack.identity.hex, blend.toString)
+-      ) ++ prepared.outcomes.map(_.attempt.hex) ++ providerBinding
++      ) ++ prepared.outcomes.map(_.attempt.hex) ++ providerBinding.take(0)
+     )
+     override def equals(other: Any): Boolean = other match
+       case b: Batch => identity == b.identity

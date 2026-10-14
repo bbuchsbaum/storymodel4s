@@ -1,0 +1,11 @@
+--- a/embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala
++++ b/embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala
+@@ -343,7 +343,7 @@
+         .left
+         .map(OnnxMappingRefusal.Surface.apply)
+       candidates <- SurfaceCandidateGenerator
+-        .generate(session, effective, config.selectedLevel)
++        .generate(session, effective, None)
+         .left
+         .map(OnnxMappingRefusal.Candidates.apply)
+       pricing <-

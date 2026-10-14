@@ -1,0 +1,188 @@
+[
+  {
+    "mutation": "timed-full-identity",
+    "candidate_sha": "0a3a97777c861f41c911ae1232a911590576fd2a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.probes.TimedSurfaceRenderingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4
+      ]
+    ],
+    "named_failure": "non-rendered timed declarations remain context identity even with the same view and payload",
+    "failures": [
+      "==> X storymodel4s.probes.TimedSurfaceRenderingSuite.non-rendered timed declarations remain context identity even with the same view and payload 0.025s munit.ComparisonFailException: align/src/test/scala/storymodel4s/probes/TimedSurfaceRenderingSuite.scala:125 values are the same, expected 2 different values: SurfaceScoringContext(queries=1, documents=3) is equal to SurfaceScoringContext(queries=1, documents=3)"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "be4f91e1f744444e3f0f37750df8840e6a2ab18dd9be3e7c4689f34bb642c02c",
+    "patch_sha256": "5932ac5c64fe7413679c5cc29530f924102a4fe79fbceb5ee8b2deeebdf030fd",
+    "log_sha256": "48cfc9c6651eb5cde5192da15655c2f858699c4456fdaea6a88cd09cf72f9dd1"
+  },
+  {
+    "mutation": "timed-unicode",
+    "candidate_sha": "0a3a97777c861f41c911ae1232a911590576fd2a",
+    "path": "align/src/main/scala/storymodel4s/align/surfacerender.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "alignJVM/testOnly storymodel4s.probes.TimedSurfaceRenderingSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        5,
+        1,
+        0,
+        4
+      ]
+    ],
+    "named_failure": "unpaired Unicode in a timed rendering payload is refused",
+    "failures": [
+      "==> X storymodel4s.probes.TimedSurfaceRenderingSuite.unpaired Unicode in a timed rendering payload is refused 0.024s munit.ComparisonFailException: align/src/test/scala/storymodel4s/probes/TimedSurfaceRenderingSuite.scala:133"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "40a24cb169eb842cec068d810c4fa6350b80bca4653ff1a68451eca216cb4e81",
+    "patch_sha256": "11913e5785ca14e8a2954d1624be0a226fb8d99a5fa2826a9b9145906f725070",
+    "log_sha256": "d91bb62e83ee68733f9a3f201fd0b82372d481256d7b49efb784d47569d5811b"
+  },
+  {
+    "mutation": "nomination-cut",
+    "candidate_sha": "0a3a97777c861f41c911ae1232a911590576fd2a",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingRegistrationSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        18,
+        1,
+        0,
+        17
+      ]
+    ],
+    "named_failure": "selected cut precedes nomination accounting and pricing while retaining every document",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingRegistrationSuite.selected cut precedes nomination accounting and pricing while retaining every document 0.083s munit.ComparisonFailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala:108"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "3e64dd12dba4dc88c40576aac234cbe76f50708bfaac867ff44de978f5717980",
+    "patch_sha256": "737a8d17bd5f6f6b0579edf828e16709952bc62e744db9fcae2b08bc6989c82b",
+    "log_sha256": "c4fbf5740e18e501f7591314487800dfb48026e8cc863390cc59508db582412f"
+  },
+  {
+    "mutation": "replay-cut-identity",
+    "candidate_sha": "0a3a97777c861f41c911ae1232a911590576fd2a",
+    "path": "embed-onnx/src/main/scala/storymodel4s/embed/onnx/OnnxMappingRegistration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "embedOnnx/testOnly onnxmappingconsumer.OnnxMappingRegistrationSuite -- \"--tests=^(selection remains replay configuration|exact replay after encoder closure).*\""
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        2,
+        1,
+        0,
+        1
+      ]
+    ],
+    "named_failure": "selection remains replay configuration even when a flat source gives identical evidence",
+    "failures": [
+      "==> X onnxmappingconsumer.OnnxMappingRegistrationSuite.selection remains replay configuration even when a flat source gives identical evidence 1.13s munit.ComparisonFailException: embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala:138"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": "^(selection remains replay configuration|exact replay after encoder closure).*",
+    "source_sha256": "93e8f60488645e92edc08fcef53174f2157d902b1f013a5025a729a4efd8800b",
+    "patch_sha256": "42cea036aa4bf6489cdba58ab90f6ffcec82fa5a86fc04daf628f6047de06597",
+    "log_sha256": "8d6d4a10a022784b84c60f18ff19371cdd087c1b3489df852df57dfa47178a5f"
+  },
+  {
+    "mutation": "batch-provider-identity",
+    "candidate_sha": "0a3a97777c861f41c911ae1232a911590576fd2a",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.MappingSettingsSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        6,
+        1,
+        0,
+        5
+      ]
+    ],
+    "named_failure": "key rotation changes execution and batch identity while relocation preserves them",
+    "failures": [
+      "==> X storymodel4s.pipeline.MappingSettingsSuite.key rotation changes execution and batch identity while relocation preserves them 0.084s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingSettingsSuite.scala:85 values are the same, expected 2 different values: d55d33ea5cdb7b598c42e46d62cfe2961fdb915f360db60154ad742279309a29 is equal to d55d33ea5cdb7b598c42e46d62cfe2961fdb915f360db60154ad742279309a29"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "f818cddaa0c02da149fbc875fcdcad03fd43e98a7ef9e7f19f1b8acb8e5c824f",
+    "patch_sha256": "9cfdc6c079aa04f10169b0038162cad6a852c92352912d20757d2237ae7f94fd",
+    "log_sha256": "6c3519b9f63ec33ecc881a196ca47b4eb32b4c18d01379550af2103241e13e91"
+  },
+  {
+    "mutation": "local-file-boundary",
+    "candidate_sha": "0a3a97777c861f41c911ae1232a911590576fd2a",
+    "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingSettings.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/testOnly storymodel4s.pipeline.MappingSettingsSuite"
+    ],
+    "exit": 1,
+    "compiled": true,
+    "qualified_single_failure": true,
+    "totals": [
+      [
+        6,
+        1,
+        0,
+        5
+      ]
+    ],
+    "named_failure": "missing short and external keys refuse and diagnostics never echo secret text",
+    "failures": [
+      "==> X storymodel4s.pipeline.MappingSettingsSuite.missing short and external keys refuse and diagnostics never echo secret text 0.019s munit.ComparisonFailException: pipeline/src/test/scala/storymodel4s/pipeline/MappingSettingsSuite.scala:162"
+    ],
+    "clean_test_recompile": false,
+    "test_selection": null,
+    "source_sha256": "ece65d20f15d424efbe9306a75aee088d7dfa3e7d43f1c9f22f34a23d438f994",
+    "patch_sha256": "2408f7ffc15ffd4f0f700b56f25d823645f8b30b41bff5d88cb22311305bf9d3",
+    "log_sha256": "ef890ad05dd52e987c6a331c9c3d0dc60a2c39af945d330abaafc86db5b3ad7f"
+  }
+]

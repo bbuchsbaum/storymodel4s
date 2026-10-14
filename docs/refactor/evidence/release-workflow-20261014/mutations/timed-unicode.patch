@@ -1,0 +1,11 @@
+--- a/align/src/main/scala/storymodel4s/align/surfacerender.scala
++++ b/align/src/main/scala/storymodel4s/align/surfacerender.scala
+@@ -323,7 +323,7 @@
+     else Left(SurfaceRenderingRefusal.InvalidUnicode)
+ 
+   private def validPayload(text: String): Either[SurfaceRenderingRefusal, Unit] =
+-    if unicode(text) then Right(()) else Left(SurfaceRenderingRefusal.InvalidUnicode)
++    if unicode(text) || !unicode(text) then Right(()) else Left(SurfaceRenderingRefusal.InvalidUnicode)
+ 
+   private def unicode(text: String): Boolean =
+     var i = 0

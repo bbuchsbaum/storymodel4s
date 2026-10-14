@@ -1,0 +1,547 @@
+{
+  "source": "0a3a97777c861f41c911ae1232a911590576fd2a",
+  "qualification": "LocallyObserved",
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "embedOnnx/Test/clean",
+    "checkAll"
+  ],
+  "exit": 0,
+  "duration_seconds": 1592.478549,
+  "cells": [
+    {
+      "task": "coreJVM/test",
+      "platform": "JVM",
+      "total": 251,
+      "failed": 0,
+      "errors": 0,
+      "passed": 251,
+      "skipped": 0
+    },
+    {
+      "task": "coreJS/test",
+      "platform": "JS",
+      "total": 251,
+      "failed": 0,
+      "errors": 0,
+      "passed": 251,
+      "skipped": 0
+    },
+    {
+      "task": "coreNative/test",
+      "platform": "Native",
+      "total": 251,
+      "failed": 0,
+      "errors": 0,
+      "passed": 251,
+      "skipped": 0
+    },
+    {
+      "task": "propositionJVM/test",
+      "platform": "JVM",
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81,
+      "skipped": 0
+    },
+    {
+      "task": "propositionJS/test",
+      "platform": "JS",
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81,
+      "skipped": 0
+    },
+    {
+      "task": "propositionNative/test",
+      "platform": "Native",
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81,
+      "skipped": 0
+    },
+    {
+      "task": "amrInteropJVM/test",
+      "platform": "JVM",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "task": "amrInteropJS/test",
+      "platform": "JS",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "task": "amrInteropNative/test",
+      "platform": "Native",
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "task": "featuresJVM/test",
+      "platform": "JVM",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "featuresJS/test",
+      "platform": "JS",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "featuresNative/test",
+      "platform": "Native",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "acquireJVM/test",
+      "platform": "JVM",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "task": "acquireJS/test",
+      "platform": "JS",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "task": "acquireNative/test",
+      "platform": "Native",
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138,
+      "skipped": 0
+    },
+    {
+      "task": "storyJVM/test",
+      "platform": "JVM",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "task": "storyJS/test",
+      "platform": "JS",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "task": "storyNative/test",
+      "platform": "Native",
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167,
+      "skipped": 0
+    },
+    {
+      "task": "documentJVM/test",
+      "platform": "JVM",
+      "total": 189,
+      "failed": 0,
+      "errors": 0,
+      "passed": 189,
+      "skipped": 0
+    },
+    {
+      "task": "documentJS/test",
+      "platform": "JS",
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "task": "documentNative/test",
+      "platform": "Native",
+      "total": 186,
+      "failed": 0,
+      "errors": 0,
+      "passed": 186,
+      "skipped": 0
+    },
+    {
+      "task": "recallJVM/test",
+      "platform": "JVM",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "recallJS/test",
+      "platform": "JS",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "recallNative/test",
+      "platform": "Native",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    {
+      "task": "alignJVM/test",
+      "platform": "JVM",
+      "total": 988,
+      "failed": 0,
+      "errors": 0,
+      "passed": 988,
+      "skipped": 0
+    },
+    {
+      "task": "alignJS/test",
+      "platform": "JS",
+      "total": 968,
+      "failed": 0,
+      "errors": 0,
+      "passed": 968,
+      "skipped": 0
+    },
+    {
+      "task": "alignNative/test",
+      "platform": "Native",
+      "total": 968,
+      "failed": 0,
+      "errors": 0,
+      "passed": 968,
+      "skipped": 0
+    },
+    {
+      "task": "interviewJVM/test",
+      "platform": "JVM",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "task": "interviewJS/test",
+      "platform": "JS",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "task": "interviewNative/test",
+      "platform": "Native",
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "task": "embedCoreJVM/test",
+      "platform": "JVM",
+      "total": 145,
+      "failed": 0,
+      "errors": 0,
+      "passed": 145,
+      "skipped": 0
+    },
+    {
+      "task": "embedCoreJS/test",
+      "platform": "JS",
+      "total": 145,
+      "failed": 0,
+      "errors": 0,
+      "passed": 145,
+      "skipped": 0
+    },
+    {
+      "task": "embedCoreNative/test",
+      "platform": "Native",
+      "total": 145,
+      "failed": 0,
+      "errors": 0,
+      "passed": 145,
+      "skipped": 0
+    },
+    {
+      "task": "viewJVM/test",
+      "platform": "JVM",
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "task": "viewJS/test",
+      "platform": "JS",
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "task": "viewNative/test",
+      "platform": "Native",
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133,
+      "skipped": 0
+    },
+    {
+      "task": "codecJVM/test",
+      "platform": "JVM",
+      "total": 377,
+      "failed": 0,
+      "errors": 0,
+      "passed": 377,
+      "skipped": 0
+    },
+    {
+      "task": "codecJS/test",
+      "platform": "JS",
+      "total": 376,
+      "failed": 0,
+      "errors": 0,
+      "passed": 376,
+      "skipped": 0
+    },
+    {
+      "task": "codecNative/test",
+      "platform": "Native",
+      "total": 376,
+      "failed": 0,
+      "errors": 0,
+      "passed": 376,
+      "skipped": 0
+    },
+    {
+      "task": "corpusJVM/test",
+      "platform": "JVM",
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "task": "corpusJS/test",
+      "platform": "JS",
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "task": "corpusNative/test",
+      "platform": "Native",
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116,
+      "skipped": 0
+    },
+    {
+      "task": "fixturesJVM/test",
+      "platform": "JVM",
+      "total": 165,
+      "failed": 0,
+      "errors": 0,
+      "passed": 165,
+      "skipped": 0
+    },
+    {
+      "task": "fixturesJS/test",
+      "platform": "JS",
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    {
+      "task": "fixturesNative/test",
+      "platform": "Native",
+      "total": 160,
+      "failed": 0,
+      "errors": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    {
+      "task": "lawsJVM/test",
+      "platform": "JVM",
+      "total": 117,
+      "failed": 0,
+      "errors": 0,
+      "passed": 117,
+      "skipped": 0
+    },
+    {
+      "task": "lawsJS/test",
+      "platform": "JS",
+      "total": 117,
+      "failed": 0,
+      "errors": 0,
+      "passed": 117,
+      "skipped": 0
+    },
+    {
+      "task": "lawsNative/test",
+      "platform": "Native",
+      "total": 117,
+      "failed": 0,
+      "errors": 0,
+      "passed": 117,
+      "skipped": 0
+    },
+    {
+      "task": "providerParser/test",
+      "platform": "JVM",
+      "total": 98,
+      "failed": 0,
+      "errors": 0,
+      "passed": 98,
+      "skipped": 0
+    },
+    {
+      "task": "providerAgent/test",
+      "platform": "JVM",
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 76,
+      "skipped": 1
+    },
+    {
+      "task": "embedGrakern/test",
+      "platform": "JVM",
+      "total": 28,
+      "failed": 0,
+      "errors": 0,
+      "passed": 28,
+      "skipped": 0
+    },
+    {
+      "task": "embedOnnx/test",
+      "platform": "JVM",
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "task": "embedBench/test",
+      "platform": "JVM",
+      "total": 176,
+      "failed": 0,
+      "errors": 0,
+      "passed": 175,
+      "skipped": 1
+    },
+    {
+      "task": "media/test",
+      "platform": "JVM",
+      "total": 126,
+      "failed": 0,
+      "errors": 0,
+      "passed": 123,
+      "skipped": 3
+    },
+    {
+      "task": "pipeline/test",
+      "platform": "JVM",
+      "total": 360,
+      "failed": 0,
+      "errors": 0,
+      "passed": 360,
+      "skipped": 0
+    },
+    {
+      "task": "corpusIntake/test",
+      "platform": "JVM",
+      "total": 159,
+      "failed": 0,
+      "errors": 0,
+      "passed": 159,
+      "skipped": 0
+    }
+  ],
+  "by_platform": {
+    "JVM": {
+      "total": 4292,
+      "passed": 4287,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 5
+    },
+    "JS": {
+      "total": 3188,
+      "passed": 3188,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "Native": {
+      "total": 3188,
+      "passed": 3188,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "raw_log_bytes": 2717654,
+  "raw_log_sha256": "915b0935ed02309a599a82033c016c494d7d8e8760bc11deb8d4c4f8ab5c87e2",
+  "compressed_log_sha256": "9ac8ec968f5aa638622f66f932d8ba560594bb3a4326e5086756db67f7cac3b3",
+  "formatting": "scalafmtCheckAll and scalafmtSbtCheck passed last"
+}

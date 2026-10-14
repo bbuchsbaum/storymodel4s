@@ -1,0 +1,1 @@
+{"actor":"codex-timed-render-20261014","entity":"bd-01M4X803DW0D0Q63GQZCQZSMHM","kind":"note","note_kind":"progress","op":"20261014T131202.562843Z-p46146-c0000-r74c3-h68a903","text":"Fixed parent compile-only probe mismatch by converting RecallGraph.validated to Either. Awaiting parent narrow rerun; no commit or local build.","ts":"2026-10-14T13:12:02.562843Z","v":1}
