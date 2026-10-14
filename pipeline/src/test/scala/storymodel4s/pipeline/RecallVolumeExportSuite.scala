@@ -16,7 +16,7 @@ class RecallVolumeExportSuite extends FunSuite:
   private def intake(csv: String, text: String, unitEnd: Option[Int] = None) =
     val source = StorySource.fromText(text).toOption.get
     val unit = RecallUnit(RecallUnitId.unsafe("u"), 0,
-      SpanSet.one(TextSpan.unsafe(0, unitEnd.getOrElse(text.length))), "synthetic",
+      SpanSet.one(TextSpan.unsafe(0, unitEnd.getOrElse(text.length))), text.substring(0, unitEnd.getOrElse(text.length)),
       DiscourseFunction.EpisodicAssertion, ExpressedUncertainty.Unmarked, PropositionSketch.empty, None)
     val graph = RecallGraph.validated(source, SurfaceAnalyzer.analyze(source), Vector(unit), RecallRelations.empty).toOption.get
     val inventory = RecallInventory.of(graph, SurfaceSequence(graph.atlas).lexicalTokens.map(_.span),
