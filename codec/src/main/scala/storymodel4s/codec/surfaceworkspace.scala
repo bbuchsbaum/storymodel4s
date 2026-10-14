@@ -356,7 +356,7 @@ object SurfaceWorkspaceCodecs:
       _ <- check(
         (main._1 == "present") == mass.nonEmpty && (mass.isEmpty || math.abs(
           mass.sum - 1.0
-        ) <= 1e-12)
+        ) <= MappingTolerance.RowSum)
       )
       _ <- main._2.traverse(row => stage(row, "stage", Stage.Inference, ledger))
       _ <- (Set("normalized", "posterior", "transport") - family).toVector.traverse_(name =>

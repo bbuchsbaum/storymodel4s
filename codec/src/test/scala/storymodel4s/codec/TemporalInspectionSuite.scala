@@ -348,7 +348,7 @@ package storymodel4s.codec {
         )
       )
 
-    test("changed supplied weights with the same claimed record digest cannot reuse a saved view") {
+    private def changedPolicy(adjust: (Double, Int) => Double): String =
       val policy = workspace.policy(referenceId).get
       val outcomes = policy.outcomes.map { outcome =>
         val links = outcome.hcursor.get[Vector[Json]]("mapping_links").toOption.get
@@ -357,7 +357,7 @@ package storymodel4s.codec {
           val old = CanonicalPrimitives
             .parseHexDouble(link.hcursor.get[String]("raw_value").toOption.get)
             .get
-          key -> ((old + 1.0 / links.size) / 2.0)
+          key -> adjust(old, links.size)
         }.toMap
         val changedLinks = links.map(link =>
           link.mapObject(
@@ -414,8 +414,45 @@ package storymodel4s.codec {
             )
         )
       }
-      val changedBytes =
-        Canonical.print(policy.document.mapObject(_.add("outcomes", Json.fromValues(outcomes))))
+      Canonical.print(policy.document.mapObject(_.add("outcomes", Json.fromValues(outcomes))))
+
+    test("workspace admission preserves both signs of lawful row roundoff through projection") {
+      Vector(-5e-10, 5e-10).foreach { delta =>
+        val bytes = changedPolicy((old, count) => old + delta / count)
+        val admitted = right(
+          SurfaceWorkspaceCodecs.decode(repack(Map(WorkspaceRole.Mapping(referenceId) -> bytes)))
+        )
+        assertEquals(admitted.policy(referenceId).get.bytes, bytes)
+        val imported = right(TemporalInspectionCodecs.checked(admitted, None))
+        val projection =
+          right(imported.compile(referenceId, measure, request.copy(bins = Vector(0L -> 100L))))
+        val supplied = admitted.policy(referenceId).get.outcomes.map { outcome =>
+          outcome.hcursor.get[Vector[Json]]("mapping_links").toOption.get.map { link =>
+            CanonicalPrimitives
+              .parseHexDouble(link.hcursor.get[String]("raw_value").toOption.get)
+              .get
+          }
+        }
+        projection.rows.zip(supplied).foreach { (row, weights) =>
+          val grid = right(row.grid)
+          assertEquals(grid.prepared.components.map(_.weight).sorted, weights.sorted)
+          assertEquals(grid.prepared.components.map(_.weight).sum, weights.sum)
+          assert(math.abs(weights.sum - 1.0) > 1e-12)
+          assert(math.abs(weights.sum - 1.0) <= MappingTolerance.RowSum)
+        }
+      }
+      Vector(-2e-9, 2e-9).foreach { delta =>
+        val bytes = changedPolicy((old, count) => old + delta / count)
+        assertEquals(
+          SurfaceWorkspaceCodecs.decode(repack(Map(WorkspaceRole.Mapping(referenceId) -> bytes))),
+          Left(WorkspaceRefusal.SemanticJoinMismatch)
+        )
+      }
+    }
+
+    test("changed supplied weights with the same claimed record digest cannot reuse a saved view") {
+      val policy = workspace.policy(referenceId).get
+      val changedBytes = changedPolicy((old, count) => (old + 1.0 / count) / 2.0)
       assertNotEquals(changedBytes, policy.bytes)
       val changedWorkspace = right(
         SurfaceWorkspaceCodecs.decode(
