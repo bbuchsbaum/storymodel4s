@@ -1,0 +1,32 @@
+[
+  {
+    "mutant": "fit-commit-guard",
+    "compiled": true,
+    "run": 12,
+    "failures": [
+      "test_preflight_rejects_substituted_fit_before_native_launch (mutation_courts.OrganizationChallengeTests.test_preflight_rejects_substituted_fit_before_native_launch)"
+    ],
+    "errors": [],
+    "passed": 11
+  },
+  {
+    "mutant": "development-split-guard",
+    "compiled": true,
+    "run": 12,
+    "failures": [
+      "test_fit_rejects_heldout_injection (mutation_courts.OrganizationChallengeTests.test_fit_rejects_heldout_injection)"
+    ],
+    "errors": [],
+    "passed": 11
+  },
+  {
+    "mutant": "partial-row-verification",
+    "compiled": true,
+    "run": 12,
+    "failures": [
+      "test_partial_result_still_checks_available_native_mass (mutation_courts.OrganizationChallengeTests.test_partial_result_still_checks_available_native_mass)"
+    ],
+    "errors": [],
+    "passed": 11
+  }
+]

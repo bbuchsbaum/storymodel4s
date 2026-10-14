@@ -1,0 +1,8 @@
+{
+  "archive": "numerical-artifacts.tar.gz",
+  "sha256": "991208e5764467ead83d4e38a7c578fde98d3a4ee76cb37b0b6c97f9c85347e7",
+  "bytes": 215748,
+  "json_files": 226,
+  "native_conditions": 224,
+  "input_directories_included": false
+}

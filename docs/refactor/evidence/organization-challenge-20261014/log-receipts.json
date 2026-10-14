@@ -1,0 +1,346 @@
+[
+  {
+    "name": "compile.log",
+    "raw_sha256": "391ed08926e0003ebfe4c9b6a2b819be988160c5d08911519e79120a2747f8ef",
+    "raw_bytes": 1908,
+    "retained": "compile.log.gz",
+    "retention": "full log",
+    "retained_sha256": "dab12940b5aec028b3276a0134d9eabe08a6b4b9659a1a51ff3170ca78687723",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T00:53:49.211278+00:00",
+      "finished_utc": "2026-10-14T00:54:12.561870+00:00",
+      "duration_seconds": 23.350427,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/compile",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/compile.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 1908
+    }
+  },
+  {
+    "name": "courts.log",
+    "raw_sha256": "248ed5c14b32eaf50e145042a42b4f6dfd8a489e4a9b364c1fac17a594ac968c",
+    "raw_bytes": 2699,
+    "retained": "courts.log.gz",
+    "retention": "full log",
+    "retained_sha256": "eab09a429536af48654bd74c50b0e2f6fc15f55ea088208410c3ab8ac29585b4",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T00:55:15.677695+00:00",
+      "finished_utc": "2026-10-14T00:55:53.421018+00:00",
+      "duration_seconds": 37.743025,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *OrganizationChallengeWitnessSuite",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/courts.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 2699
+    }
+  },
+  {
+    "name": "development.log",
+    "raw_sha256": "0e96b98d883282adf2a309c8ff6b866b661dbeeed36d1967c0660eb43606eced",
+    "raw_bytes": 4190,
+    "retained": "development.log.gz",
+    "retention": "full log",
+    "retained_sha256": "c02b2209e71f94841525b8af952e7c8a960fd56f2b65dd9bfb81ffcd73e51ec6",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T00:59:59.299082+00:00",
+      "finished_utc": "2026-10-14T01:00:37.132011+00:00",
+      "duration_seconds": 37.832694,
+      "command": [
+        "python3",
+        "tools/recall-study/organization_challenge.py",
+        "produce",
+        "--split",
+        "development",
+        "--model",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx",
+        "--tokenizer",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json",
+        "--plan-commit",
+        "0389f93c4a4f47e8457edc2c3e6093cb71383587",
+        "--output",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/development-7a58aab6"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/development.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1200.0,
+      "log_bytes": 4190
+    }
+  },
+  {
+    "name": "evaluate.log",
+    "raw_sha256": "37a3b9ecddff3deaefa26b42308706c076ce8974b40c6464cabfbb1fa7142b27",
+    "raw_bytes": 161,
+    "retained": "evaluate.log.gz",
+    "retention": "full log",
+    "retained_sha256": "774d69d2030499ac124a4a94cdbdcea5e3123123e52f80201108f0bfc3d6c8a3",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T01:02:18.514460+00:00",
+      "finished_utc": "2026-10-14T01:02:19.992242+00:00",
+      "duration_seconds": 1.477717,
+      "command": [
+        "python3",
+        "tools/recall-study/organization_challenge.py",
+        "evaluate",
+        "--results",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/heldout-7a58aab6",
+        "--fit",
+        "docs/refactor/evidence/organization-challenge-20261014/FIT.json",
+        "--output",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/heldout-report.json"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/evaluate.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 161
+    }
+  },
+  {
+    "name": "final-producer-check.log",
+    "raw_sha256": "f61a53aad75dd5c5c7473cfa598c3dce825960d40c47930589feb5d9f1d89978",
+    "raw_bytes": 1908,
+    "retained": "final-producer-check.log.gz",
+    "retention": "full log",
+    "retained_sha256": "d9840b34d10ad19610347a4ca94f02aaf6f9be204d9e8aebcd69addbd692f07f",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T00:58:41.879334+00:00",
+      "finished_utc": "2026-10-14T00:59:13.479195+00:00",
+      "duration_seconds": 31.599605,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/compile",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/final-producer-check.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 1908
+    }
+  },
+  {
+    "name": "fit.log",
+    "raw_sha256": "8b09108a7e8a9564e62c489f23995e27b38d6de443ef0cf8473425a220ade1d2",
+    "raw_bytes": 113,
+    "retained": "fit.log.gz",
+    "retention": "full log",
+    "retained_sha256": "8152b92df388c1abbf8b36b8f01272e23feb21750ce1c4e199bd3c4a6dbfcab0",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T01:00:46.615249+00:00",
+      "finished_utc": "2026-10-14T01:00:48.040548+00:00",
+      "duration_seconds": 1.425215,
+      "command": [
+        "python3",
+        "tools/recall-study/organization_challenge.py",
+        "fit",
+        "--results",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/development-7a58aab6",
+        "--output",
+        "docs/refactor/evidence/organization-challenge-20261014/FIT.json"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/fit.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 113
+    }
+  },
+  {
+    "name": "heldout.log",
+    "raw_sha256": "3420a37c742a11d83f4c54805c55de640555ce74840d2cf7506c1afaed22dfad",
+    "raw_bytes": 4271,
+    "retained": "heldout.log.gz",
+    "retention": "full log",
+    "retained_sha256": "fafe2048d662659143b1d985c4a88f79865f9e0bf95823edbd5fd6361252f057",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T01:01:20.123234+00:00",
+      "finished_utc": "2026-10-14T01:01:57.233003+00:00",
+      "duration_seconds": 37.109529,
+      "command": [
+        "python3",
+        "tools/recall-study/organization_challenge.py",
+        "produce",
+        "--split",
+        "heldout",
+        "--model",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx",
+        "--tokenizer",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json",
+        "--plan-commit",
+        "0389f93c4a4f47e8457edc2c3e6093cb71383587",
+        "--fit",
+        "docs/refactor/evidence/organization-challenge-20261014/FIT.json",
+        "--output",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/heldout-7a58aab6"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/heldout.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1200.0,
+      "log_bytes": 4271
+    }
+  },
+  {
+    "name": "pipeline-gate.log",
+    "raw_sha256": "5f67f4e242058ab38b46c2a645c83f104c05d1df5d1111cdd5d20b1480457388",
+    "raw_bytes": 2307876,
+    "retained": "pipeline-gate.log.gz",
+    "retention": "status-only; full raw log retained privately and bound by hash",
+    "retained_sha256": "9a9673d49c538a86785699c1d2869a8d9810c9a9ff3b2522832ba7d1f60edd86",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T01:04:06.405309+00:00",
+      "finished_utc": "2026-10-14T01:04:50.194138+00:00",
+      "duration_seconds": 43.788584,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/test",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/pipeline-gate.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 2307876
+    }
+  },
+  {
+    "name": "producer-check.log",
+    "raw_sha256": "d7959365fe1e3a500eb6abcf20b518f962559ffe8dc7a0a8b4d70457deef0ff7",
+    "raw_bytes": 1908,
+    "retained": "producer-check.log.gz",
+    "retention": "full log",
+    "retained_sha256": "54c62bcf69b7163771fc581cfa83ed1b233f53e76a87fc8c5c0e8a0a86252251",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T00:56:13.289030+00:00",
+      "finished_utc": "2026-10-14T00:56:50.365099+00:00",
+      "duration_seconds": 37.075799,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/compile",
+        "scalafmtAll"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/producer-check.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 1908
+    }
+  },
+  {
+    "name": "python-gate.log",
+    "raw_sha256": "89eb6b41939c147a3f79d23c6a683138955727cf22a7ea799c47a15ada543662",
+    "raw_bytes": 1921,
+    "retained": "python-gate.log.gz",
+    "retention": "full log",
+    "retained_sha256": "9d018bdce5640eb10c6c838851e5efe56566f45c636559b72847d43eea244a63",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T01:04:07.367498+00:00",
+      "finished_utc": "2026-10-14T01:04:41.320726+00:00",
+      "duration_seconds": 33.953088,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/recall-study/tests"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/python-gate.log",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 300.0,
+      "log_bytes": 1921
+    }
+  },
+  {
+    "name": "scala-mutation.log",
+    "raw_sha256": "16a3a6267bc4a2288896db177f600a97a322909654eee3f1b48cbe44799353ed",
+    "raw_bytes": 3554,
+    "retained": "scala-mutation.log.gz",
+    "retention": "full log",
+    "retained_sha256": "b486d6f518ea458ad682c34deb9c55efb204a482e0d282a3597ccb69a902867d",
+    "receipt": {
+      "schema_version": 1,
+      "started_utc": "2026-10-14T01:02:53.863701+00:00",
+      "finished_utc": "2026-10-14T01:03:15.093227+00:00",
+      "duration_seconds": 21.229332,
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *OrganizationChallengeWitnessSuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-organization-20261013",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/organization-challenge-20261014/scala-mutation.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 3554
+    }
+  }
+]

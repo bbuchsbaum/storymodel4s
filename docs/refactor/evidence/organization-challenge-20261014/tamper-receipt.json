@@ -1,0 +1,27 @@
+[
+  {
+    "control": "unchanged-native-development",
+    "accepted": true,
+    "conditions": 84,
+    "verified_rows": 336
+  },
+  {
+    "mutation": "correspondence",
+    "rehashed_manifest": true,
+    "refused": "native clause correspondence mismatch"
+  },
+  {
+    "mutation": "cost",
+    "rehashed_manifest": true,
+    "refused": "emitted costs do not reproduce destination masses"
+  },
+  {
+    "mutation": "drop",
+    "rehashed_manifest": true,
+    "refused": "challenge inventory mismatch"
+  },
+  {
+    "mutation": "uncommitted-fit-bytes",
+    "refused": "fit must already be committed before heldout launch"
+  }
+]

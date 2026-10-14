@@ -1,0 +1,10 @@
+{
+  "heldout_pairs": 40,
+  "comparison": [
+    "result",
+    "costs",
+    "certificate",
+    "registration"
+  ],
+  "equal": true
+}

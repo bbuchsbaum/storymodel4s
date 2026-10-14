@@ -1,0 +1,11 @@
+{
+  "mutant": "choose first candidate when multiple names match",
+  "compiled": true,
+  "exit": 1,
+  "passed": 3,
+  "failed": 1,
+  "errors": 0,
+  "named_test": "exact names survive, a unique typo repairs, and ambiguous candidates remain unchanged",
+  "restored_exact_bytes": true,
+  "receipt_note": "Initial receipt parser expected Passed prefix on intentionally failed gate. Corrected to actual Failed prefix by reading retained log; no test rerun."
+}

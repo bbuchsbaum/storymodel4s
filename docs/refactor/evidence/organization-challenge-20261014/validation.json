@@ -1,0 +1,29 @@
+{
+  "scope_base": "8860d064d2e9b9d5aa779d11c6c7caab7c4a3e36",
+  "gated_head": "c9cd7fe278661488c5e9b914ba45f3a24793466b",
+  "source_producer": "7a58aab66e3d793c5ad582aac48c896c51415ef4",
+  "pipeline": {
+    "passed": 344,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "fatal_warnings": true,
+    "format_last": true,
+    "exit": 0
+  },
+  "python": {
+    "passed": 213,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit": 0
+  },
+  "review": "pending exact final evidence candidate",
+  "observed": "LocallyObserved",
+  "hosted_ci": null,
+  "source_tree_restored_after_mutation": true,
+  "limitations": [
+    "Existing Python extract_scene_frames ResourceWarnings for unclosed files appeared; tests passed.",
+    "Existing Java Unsafe/JNA native-access and SLF4J warnings appeared in native model runs; exit0."
+  ]
+}
