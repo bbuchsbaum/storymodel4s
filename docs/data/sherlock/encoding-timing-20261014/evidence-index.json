@@ -1,0 +1,110 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "daa41396c41e43910f1094cae0af5f54483547d1f1e1eacf9373a70b22034242",
+      "bytes": 3310
+    },
+    {
+      "path": "controls.json",
+      "sha256": "bbfb5d7eb9743cf8acfacba569e3e13fb9d15efbe54774aa5deb0795abd19e73",
+      "bytes": 342
+    },
+    {
+      "path": "crosswalk.json",
+      "sha256": "3dc54333e8a331ff6989d280ca8c104ce2cf15e3e3d0b252fdc90146bead4328",
+      "bytes": 21696
+    },
+    {
+      "path": "crosswalk.log.gz",
+      "sha256": "3706e46dd62e5b610e8e3934d0ffaab078648665aa52567901f82d999d8c95df",
+      "bytes": 124
+    },
+    {
+      "path": "crosswalk.log.meta.json",
+      "sha256": "72c957537478c2afe364daeae311c2247591cd633de834560a0b321d4263b925",
+      "bytes": 790
+    },
+    {
+      "path": "landmark-part1-1308.log.gz",
+      "sha256": "35ce47fdbfc9233f554437e4046da8d444ae529cc778251bedaf97794b72eafe",
+      "bytes": 1144
+    },
+    {
+      "path": "landmark-part1-349.log.gz",
+      "sha256": "93f84e8949910f660dc49f45b3780ed2c93d94ad21e6da4b6f839b8ba4b8871d",
+      "bytes": 1216
+    },
+    {
+      "path": "landmark-part1-39.log.gz",
+      "sha256": "82b6849616c3f0deac77e1ee08e8bc3fef09341b1279ea1d3fb6911ed8e33533",
+      "bytes": 1506
+    },
+    {
+      "path": "landmark-part1-752.log.gz",
+      "sha256": "7afe4b10671a978b4f83836840c7dc3dc34934579f39f410fe4fdaac3fee329a",
+      "bytes": 1137
+    },
+    {
+      "path": "landmark-part2-118.log.gz",
+      "sha256": "18e4ea777627661bc8509dc18cfc6a0e387980c83a624773426ed49ad76431e0",
+      "bytes": 1139
+    },
+    {
+      "path": "landmark-part2-1500.log.gz",
+      "sha256": "36b50e0f88f1b58a6770e4ac32457cabfae8d2a8a873d4427520d052c6953297",
+      "bytes": 1107
+    },
+    {
+      "path": "landmark-part2-39.log.gz",
+      "sha256": "cbfb32230dfaf019adde6cdaa2851b7dccec86ef6fc08bc8e8d0bb7a1025c0f1",
+      "bytes": 1094
+    },
+    {
+      "path": "landmark-part2-475.log.gz",
+      "sha256": "085bf275e2c17a2d14fafaed41a89f9bf009ea1b4312ed97cdeaf16bd41da67e",
+      "bytes": 1108
+    },
+    {
+      "path": "landmark-part2-995.log.gz",
+      "sha256": "a9c1a8fe94f770046c94ccfaee250d9de79f3c34537a4ec7fa566894c2d64314",
+      "bytes": 1136
+    },
+    {
+      "path": "landmark-plan.json",
+      "sha256": "3fbb3455065a1fa47de2c5c579603ad1c09bf4d694dacb14c3c73bc51f05ad4a",
+      "bytes": 1301
+    },
+    {
+      "path": "landmark_probe.py",
+      "sha256": "85e28e81bbbc78eab0caaecca823d21fa828a497eb813ef2d8b8273e468568db",
+      "bytes": 1679
+    },
+    {
+      "path": "landmarks.json",
+      "sha256": "8b683f260299d86728bd27984cff90f1f44c01414980f8d9869c7c5d8c9cd182",
+      "bytes": 2825
+    },
+    {
+      "path": "manual-followup.json",
+      "sha256": "91748ab0f490d9e5f50da81b0f70e30db85ecbfadda5a22e7421082bdecc855e",
+      "bytes": 1085
+    },
+    {
+      "path": "qualify_timing.py",
+      "sha256": "cf76d2b50c52bbae6033048fa03dbf7bed08cec2acd48b14d58233436f0525a0",
+      "bytes": 5881
+    },
+    {
+      "path": "search-scope.json",
+      "sha256": "85775a2ea95d41e9a126c1e029217683f3496229da4263fd7df170b63a9cde2d",
+      "bytes": 1368
+    },
+    {
+      "path": "sources.json",
+      "sha256": "979e3590de8c73f5e23fd74b078db4afcf6e6288cf550cfecdc337b220c1c661",
+      "bytes": 2339
+    }
+  ],
+  "source_payloads": "Primary xlsx/MAT and film frames remain ignored locally. URLs and exact hashes permit source recovery."
+}

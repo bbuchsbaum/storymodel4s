@@ -1,0 +1,916 @@
+{
+  "schema": "sherlock-released-scene-crosswalk/v1",
+  "authority": "published-release-analysis-convention",
+  "dataset": "ds001132",
+  "revision": "fc91edbbe1b8117f96b40bb4d1f5df43aa1afdce",
+  "participant": "sub-03",
+  "verification_sha256": "9695f5461a5ca11c5762e4f2c9673a957933e1b986f66d98b69b8ab368e064b4",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/README.txt",
+      "path": "README.txt",
+      "sha256": "5d00475bf3b820efea77a6cf1fa92faca6b50ffa1ea6fab931f147f1d3fdccfc",
+      "bytes": 2810
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/sherlock_nifti_crop.m",
+      "path": "sherlock_nifti_crop.m",
+      "sha256": "57c76cf6c7b7e2a46b6cefd89c88d476d9d286daf7f9796ded2ca3425b2eb3b2",
+      "bytes": 985
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/sherlock_get_subj_info.m",
+      "path": "sherlock_get_subj_info.m",
+      "sha256": "6aa75b553c57d718825292fa5432a187ca1322ed06c44e14fbb18c96032dc1e3",
+      "bytes": 1422
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/sherlock_load_avgscenes_50M_50R.m",
+      "path": "sherlock_load_avgscenes_50M_50R.m",
+      "sha256": "fcf53355d2e961e8b94fde3a8ba5121c37dc51f55ef627ecaa91f558b0e2b2ea",
+      "bytes": 3693
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/get_predictors_1000segs.m",
+      "path": "get_predictors_1000segs.m",
+      "sha256": "9df52687df786f3df0f337f4c3e6c6ed459b4f26e0983cd45a3d820252936765",
+      "bytes": 5941
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/subjects/Sherlock_Segments_1000_NN_2017.xlsx",
+      "path": "Sherlock_Segments_1000_NN_2017.xlsx",
+      "sha256": "5271b7704ccebfc7cae2228c78faf472c0ba5530c1a45e4c784757057bf476df",
+      "bytes": 161074
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/subjects/sherlock_allsubs_events.mat",
+      "path": "sherlock_allsubs_events.mat",
+      "sha256": "a61ae5defefebcb31523702c461dcf19e8e6a605564579e37cd8749d8d551d78",
+      "bytes": 16223
+    }
+  ],
+  "controls": {
+    "positive": 7,
+    "refused": 6
+  },
+  "runs": [
+    {
+      "part": 1,
+      "task": "sherlockPart1",
+      "stored_volumes": 972,
+      "retained_volumes": 946,
+      "crop": {
+        "beginningVolumes": 20,
+        "endVolumes": 6,
+        "resultLength": 946,
+        "status": "prescribed-not-applied",
+        "zeroBasedIndexEquation": "stored_index = selected_index + beginningVolumes"
+      },
+      "concatenated_prefix_volumes": 0,
+      "unlabelled_selected_indices": [
+        86,
+        130,
+        143,
+        172,
+        192,
+        203,
+        204,
+        225,
+        313,
+        361,
+        362,
+        503,
+        504,
+        505,
+        506,
+        525,
+        534,
+        633,
+        641,
+        697,
+        698,
+        747,
+        868,
+        869,
+        870,
+        871,
+        945
+      ],
+      "scenes": [
+        {
+          "scene_in_part": 1,
+          "released_scene_tr_inclusive": [
+            1,
+            26
+          ],
+          "published_media_annotation_seconds": [
+            0.0,
+            39.0
+          ],
+          "raw_zero_based_half_open": [
+            20,
+            46
+          ]
+        },
+        {
+          "scene_in_part": 2,
+          "released_scene_tr_inclusive": [
+            27,
+            35
+          ],
+          "published_media_annotation_seconds": [
+            39.0,
+            53.0
+          ],
+          "raw_zero_based_half_open": [
+            46,
+            55
+          ]
+        },
+        {
+          "scene_in_part": 3,
+          "released_scene_tr_inclusive": [
+            36,
+            55
+          ],
+          "published_media_annotation_seconds": [
+            53.0,
+            83.0
+          ],
+          "raw_zero_based_half_open": [
+            55,
+            75
+          ]
+        },
+        {
+          "scene_in_part": 4,
+          "released_scene_tr_inclusive": [
+            56,
+            86
+          ],
+          "published_media_annotation_seconds": [
+            83.0,
+            129.0
+          ],
+          "raw_zero_based_half_open": [
+            75,
+            106
+          ]
+        },
+        {
+          "scene_in_part": 5,
+          "released_scene_tr_inclusive": [
+            88,
+            109
+          ],
+          "published_media_annotation_seconds": [
+            130.0,
+            164.0
+          ],
+          "raw_zero_based_half_open": [
+            107,
+            129
+          ]
+        },
+        {
+          "scene_in_part": 6,
+          "released_scene_tr_inclusive": [
+            110,
+            130
+          ],
+          "published_media_annotation_seconds": [
+            164.0,
+            195.0
+          ],
+          "raw_zero_based_half_open": [
+            129,
+            150
+          ]
+        },
+        {
+          "scene_in_part": 7,
+          "released_scene_tr_inclusive": [
+            132,
+            143
+          ],
+          "published_media_annotation_seconds": [
+            196.0,
+            214.0
+          ],
+          "raw_zero_based_half_open": [
+            151,
+            163
+          ]
+        },
+        {
+          "scene_in_part": 8,
+          "released_scene_tr_inclusive": [
+            145,
+            157
+          ],
+          "published_media_annotation_seconds": [
+            215.99999999999997,
+            236.0
+          ],
+          "raw_zero_based_half_open": [
+            164,
+            177
+          ]
+        },
+        {
+          "scene_in_part": 9,
+          "released_scene_tr_inclusive": [
+            158,
+            172
+          ],
+          "published_media_annotation_seconds": [
+            236.0,
+            258.0
+          ],
+          "raw_zero_based_half_open": [
+            177,
+            192
+          ]
+        },
+        {
+          "scene_in_part": 10,
+          "released_scene_tr_inclusive": [
+            174,
+            192
+          ],
+          "published_media_annotation_seconds": [
+            259.0,
+            288.0
+          ],
+          "raw_zero_based_half_open": [
+            193,
+            212
+          ]
+        },
+        {
+          "scene_in_part": 11,
+          "released_scene_tr_inclusive": [
+            194,
+            203
+          ],
+          "published_media_annotation_seconds": [
+            289.0,
+            305.0
+          ],
+          "raw_zero_based_half_open": [
+            213,
+            223
+          ]
+        },
+        {
+          "scene_in_part": 12,
+          "released_scene_tr_inclusive": [
+            206,
+            225
+          ],
+          "published_media_annotation_seconds": [
+            307.0,
+            338.0
+          ],
+          "raw_zero_based_half_open": [
+            225,
+            245
+          ]
+        },
+        {
+          "scene_in_part": 13,
+          "released_scene_tr_inclusive": [
+            227,
+            313
+          ],
+          "published_media_annotation_seconds": [
+            339.0,
+            470.00000000000006
+          ],
+          "raw_zero_based_half_open": [
+            246,
+            333
+          ]
+        },
+        {
+          "scene_in_part": 14,
+          "released_scene_tr_inclusive": [
+            315,
+            361
+          ],
+          "published_media_annotation_seconds": [
+            471.0,
+            542.0
+          ],
+          "raw_zero_based_half_open": [
+            334,
+            381
+          ]
+        },
+        {
+          "scene_in_part": 15,
+          "released_scene_tr_inclusive": [
+            364,
+            399
+          ],
+          "published_media_annotation_seconds": [
+            544.0,
+            598.0
+          ],
+          "raw_zero_based_half_open": [
+            383,
+            419
+          ]
+        },
+        {
+          "scene_in_part": 16,
+          "released_scene_tr_inclusive": [
+            400,
+            503
+          ],
+          "published_media_annotation_seconds": [
+            599.0,
+            755.0
+          ],
+          "raw_zero_based_half_open": [
+            419,
+            523
+          ]
+        },
+        {
+          "scene_in_part": 17,
+          "released_scene_tr_inclusive": [
+            508,
+            525
+          ],
+          "published_media_annotation_seconds": [
+            760.0000000000001,
+            788.0
+          ],
+          "raw_zero_based_half_open": [
+            527,
+            545
+          ]
+        },
+        {
+          "scene_in_part": 18,
+          "released_scene_tr_inclusive": [
+            527,
+            534
+          ],
+          "published_media_annotation_seconds": [
+            789.0000000000001,
+            801.0000000000001
+          ],
+          "raw_zero_based_half_open": [
+            546,
+            554
+          ]
+        },
+        {
+          "scene_in_part": 19,
+          "released_scene_tr_inclusive": [
+            536,
+            615
+          ],
+          "published_media_annotation_seconds": [
+            802.0,
+            922.0
+          ],
+          "raw_zero_based_half_open": [
+            555,
+            635
+          ]
+        },
+        {
+          "scene_in_part": 20,
+          "released_scene_tr_inclusive": [
+            616,
+            633
+          ],
+          "published_media_annotation_seconds": [
+            923.0,
+            949.9999999999999
+          ],
+          "raw_zero_based_half_open": [
+            635,
+            653
+          ]
+        },
+        {
+          "scene_in_part": 21,
+          "released_scene_tr_inclusive": [
+            635,
+            641
+          ],
+          "published_media_annotation_seconds": [
+            951.0,
+            962.0000000000001
+          ],
+          "raw_zero_based_half_open": [
+            654,
+            661
+          ]
+        },
+        {
+          "scene_in_part": 22,
+          "released_scene_tr_inclusive": [
+            643,
+            679
+          ],
+          "published_media_annotation_seconds": [
+            963.0,
+            1017.9999999999999
+          ],
+          "raw_zero_based_half_open": [
+            662,
+            699
+          ]
+        },
+        {
+          "scene_in_part": 23,
+          "released_scene_tr_inclusive": [
+            680,
+            697
+          ],
+          "published_media_annotation_seconds": [
+            1019.0,
+            1046.0
+          ],
+          "raw_zero_based_half_open": [
+            699,
+            717
+          ]
+        },
+        {
+          "scene_in_part": 24,
+          "released_scene_tr_inclusive": [
+            700,
+            747
+          ],
+          "published_media_annotation_seconds": [
+            1048.0,
+            1121.0
+          ],
+          "raw_zero_based_half_open": [
+            719,
+            767
+          ]
+        },
+        {
+          "scene_in_part": 25,
+          "released_scene_tr_inclusive": [
+            749,
+            868
+          ],
+          "published_media_annotation_seconds": [
+            1122.0,
+            1302.0
+          ],
+          "raw_zero_based_half_open": [
+            768,
+            888
+          ]
+        },
+        {
+          "scene_in_part": 26,
+          "released_scene_tr_inclusive": [
+            873,
+            891
+          ],
+          "published_media_annotation_seconds": [
+            1308.0,
+            1336.0
+          ],
+          "raw_zero_based_half_open": [
+            892,
+            911
+          ]
+        },
+        {
+          "scene_in_part": 27,
+          "released_scene_tr_inclusive": [
+            892,
+            945
+          ],
+          "published_media_annotation_seconds": [
+            1337.0,
+            1418.0
+          ],
+          "raw_zero_based_half_open": [
+            911,
+            965
+          ]
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "task": "sherlockPart2",
+      "stored_volumes": 1057,
+      "retained_volumes": 1030,
+      "crop": {
+        "beginningVolumes": 20,
+        "endVolumes": 7,
+        "resultLength": 1030,
+        "status": "prescribed-not-applied",
+        "zeroBasedIndexEquation": "stored_index = selected_index + beginningVolumes"
+      },
+      "concatenated_prefix_volumes": 946,
+      "unlabelled_selected_indices": [
+        25,
+        69,
+        129,
+        193,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        331,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        342,
+        412,
+        489,
+        523,
+        728,
+        756,
+        813,
+        875,
+        912,
+        960
+      ],
+      "scenes": [
+        {
+          "scene_in_part": 1,
+          "released_scene_tr_inclusive": [
+            1,
+            25
+          ],
+          "published_media_annotation_seconds": [
+            0.0,
+            38.0
+          ],
+          "raw_zero_based_half_open": [
+            20,
+            45
+          ]
+        },
+        {
+          "scene_in_part": 2,
+          "released_scene_tr_inclusive": [
+            27,
+            69
+          ],
+          "published_media_annotation_seconds": [
+            39.0,
+            104.0
+          ],
+          "raw_zero_based_half_open": [
+            46,
+            89
+          ]
+        },
+        {
+          "scene_in_part": 3,
+          "released_scene_tr_inclusive": [
+            71,
+            129
+          ],
+          "published_media_annotation_seconds": [
+            105.0,
+            194.0
+          ],
+          "raw_zero_based_half_open": [
+            90,
+            149
+          ]
+        },
+        {
+          "scene_in_part": 4,
+          "released_scene_tr_inclusive": [
+            131,
+            145
+          ],
+          "published_media_annotation_seconds": [
+            195.0,
+            216.99999999999997
+          ],
+          "raw_zero_based_half_open": [
+            150,
+            165
+          ]
+        },
+        {
+          "scene_in_part": 5,
+          "released_scene_tr_inclusive": [
+            146,
+            193
+          ],
+          "published_media_annotation_seconds": [
+            217.99999999999997,
+            290.0
+          ],
+          "raw_zero_based_half_open": [
+            165,
+            213
+          ]
+        },
+        {
+          "scene_in_part": 6,
+          "released_scene_tr_inclusive": [
+            195,
+            275
+          ],
+          "published_media_annotation_seconds": [
+            291.0,
+            412.0
+          ],
+          "raw_zero_based_half_open": [
+            214,
+            295
+          ]
+        },
+        {
+          "scene_in_part": 7,
+          "released_scene_tr_inclusive": [
+            276,
+            325
+          ],
+          "published_media_annotation_seconds": [
+            413.0,
+            488.0
+          ],
+          "raw_zero_based_half_open": [
+            295,
+            345
+          ]
+        },
+        {
+          "scene_in_part": 8,
+          "released_scene_tr_inclusive": [
+            344,
+            412
+          ],
+          "published_media_annotation_seconds": [
+            515.0,
+            618.0
+          ],
+          "raw_zero_based_half_open": [
+            363,
+            432
+          ]
+        },
+        {
+          "scene_in_part": 9,
+          "released_scene_tr_inclusive": [
+            414,
+            489
+          ],
+          "published_media_annotation_seconds": [
+            619.0,
+            734.0
+          ],
+          "raw_zero_based_half_open": [
+            433,
+            509
+          ]
+        },
+        {
+          "scene_in_part": 10,
+          "released_scene_tr_inclusive": [
+            491,
+            523
+          ],
+          "published_media_annotation_seconds": [
+            735.0,
+            785.0000000000001
+          ],
+          "raw_zero_based_half_open": [
+            510,
+            543
+          ]
+        },
+        {
+          "scene_in_part": 11,
+          "released_scene_tr_inclusive": [
+            525,
+            635
+          ],
+          "published_media_annotation_seconds": [
+            785.9999999999999,
+            952.0
+          ],
+          "raw_zero_based_half_open": [
+            544,
+            655
+          ]
+        },
+        {
+          "scene_in_part": 12,
+          "released_scene_tr_inclusive": [
+            636,
+            671
+          ],
+          "published_media_annotation_seconds": [
+            952.0,
+            1006.0
+          ],
+          "raw_zero_based_half_open": [
+            655,
+            691
+          ]
+        },
+        {
+          "scene_in_part": 13,
+          "released_scene_tr_inclusive": [
+            672,
+            728
+          ],
+          "published_media_annotation_seconds": [
+            1007.0000000000001,
+            1092.0
+          ],
+          "raw_zero_based_half_open": [
+            691,
+            748
+          ]
+        },
+        {
+          "scene_in_part": 14,
+          "released_scene_tr_inclusive": [
+            730,
+            747
+          ],
+          "published_media_annotation_seconds": [
+            1093.0,
+            1120.0
+          ],
+          "raw_zero_based_half_open": [
+            749,
+            767
+          ]
+        },
+        {
+          "scene_in_part": 15,
+          "released_scene_tr_inclusive": [
+            748,
+            756
+          ],
+          "published_media_annotation_seconds": [
+            1121.0,
+            1134.0
+          ],
+          "raw_zero_based_half_open": [
+            767,
+            776
+          ]
+        },
+        {
+          "scene_in_part": 16,
+          "released_scene_tr_inclusive": [
+            758,
+            790
+          ],
+          "published_media_annotation_seconds": [
+            1135.0,
+            1185.0
+          ],
+          "raw_zero_based_half_open": [
+            777,
+            810
+          ]
+        },
+        {
+          "scene_in_part": 17,
+          "released_scene_tr_inclusive": [
+            791,
+            813
+          ],
+          "published_media_annotation_seconds": [
+            1185.0,
+            1220.0
+          ],
+          "raw_zero_based_half_open": [
+            810,
+            833
+          ]
+        },
+        {
+          "scene_in_part": 18,
+          "released_scene_tr_inclusive": [
+            815,
+            859
+          ],
+          "published_media_annotation_seconds": [
+            1221.0,
+            1288.0
+          ],
+          "raw_zero_based_half_open": [
+            834,
+            879
+          ]
+        },
+        {
+          "scene_in_part": 19,
+          "released_scene_tr_inclusive": [
+            860,
+            875
+          ],
+          "published_media_annotation_seconds": [
+            1289.0,
+            1313.0
+          ],
+          "raw_zero_based_half_open": [
+            879,
+            895
+          ]
+        },
+        {
+          "scene_in_part": 20,
+          "released_scene_tr_inclusive": [
+            877,
+            912
+          ],
+          "published_media_annotation_seconds": [
+            1314.0,
+            1368.0
+          ],
+          "raw_zero_based_half_open": [
+            896,
+            932
+          ]
+        },
+        {
+          "scene_in_part": 21,
+          "released_scene_tr_inclusive": [
+            914,
+            960
+          ],
+          "published_media_annotation_seconds": [
+            1369.0000000000002,
+            1440.0
+          ],
+          "raw_zero_based_half_open": [
+            933,
+            980
+          ]
+        },
+        {
+          "scene_in_part": 22,
+          "released_scene_tr_inclusive": [
+            962,
+            1000
+          ],
+          "published_media_annotation_seconds": [
+            1441.0,
+            1500.0
+          ],
+          "raw_zero_based_half_open": [
+            981,
+            1020
+          ]
+        },
+        {
+          "scene_in_part": 23,
+          "released_scene_tr_inclusive": [
+            1001,
+            1030
+          ],
+          "published_media_annotation_seconds": [
+            1500.0,
+            1545.0
+          ],
+          "raw_zero_based_half_open": [
+            1020,
+            1050
+          ]
+        }
+      ]
+    }
+  ],
+  "raw_index_equation": "raw_zero_based = scene_one_based - 1 + 20 (part local)",
+  "hrf": "20-volume prescription already includes reported 3-volume lag; do not add it again",
+  "physical_media_origin": {
+    "status": "conditional-inference-not-observed",
+    "candidate_seconds": 25.5,
+    "equation": "20*1.5 - 3*1.5",
+    "assumptions": [
+      "crop consists of 17 calibration volumes plus 3 HRF volumes",
+      "exact full-media zero equals the scene annotation zero"
+    ],
+    "trigger_record": "unavailable"
+  },
+  "existing_derivative_history": "unknown; no array was cropped or lag shifted",
+  "recall_word_clock": "unchanged; published raw scan-relative columns do not inherit this movie adjustment"
+}

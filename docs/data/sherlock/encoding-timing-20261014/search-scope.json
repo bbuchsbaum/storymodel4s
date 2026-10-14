@@ -1,0 +1,26 @@
+{
+  "checked_sources": [
+    {
+      "url": "https://jchenlab.johnshopkins.edu/",
+      "result": "Author site links raw release, DataSpace and tutorial."
+    },
+    {
+      "url": "https://dataspace.princeton.edu/handle/88435/dsp01nz8062179",
+      "result": "Web fetch returned401; no authenticated retrieval attempted."
+    },
+    {
+      "url": "https://github.com/Summer-MIND/mind_2018/tree/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata",
+      "result": "Pinned full tree; seven primary files fetched. Crop function and already-cropped scene-loader convention inspected. No participant presentation/trigger log identified in this tutorial subtree."
+    },
+    {
+      "url": "https://github.com/OpenNeuroDatasets/ds001132/tree/fc91edbbe1b8117f96b40bb4d1f5df43aa1afdce",
+      "result": "Mounted pinned release README and previous full-tree verification; raw crop/scenes documented, events onset alone does not distinguish physical presentation from analysis lag."
+    }
+  ],
+  "supplementary_queries": [
+    "Sherlock fMRI presentation trigger Chen code",
+    "Sherlock eyetracking HRF 20",
+    "Sherlock Psychtoolbox github"
+  ],
+  "conclusion": "Published scene-analysis transformation recovered. Participant-specific physical trigger record not found in these checked sources; no claim that it does not exist elsewhere."
+}

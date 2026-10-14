@@ -1,0 +1,38 @@
+{
+  "status": "post-hoc visual followup, excluded from fixed-cut detection count",
+  "parts": [
+    {
+      "part": 2,
+      "annotation_seconds": 39,
+      "sample_seconds": [
+        38,
+        39,
+        40
+      ],
+      "observation": "Introduction-to-episode transition visible between the last two sampled frames; fixed detector miss retained."
+    },
+    {
+      "part": 2,
+      "annotation_seconds": 475,
+      "sample_seconds": [
+        474,
+        475,
+        476
+      ],
+      "observation": "Continuous changing shot across sampled frames; no independent hard-cut anchor established."
+    },
+    {
+      "part": 2,
+      "annotation_seconds": 1500,
+      "sample_seconds": [
+        1499,
+        1500,
+        1501
+      ],
+      "observation": "Shot change visible between last two samples; fixed detector miss retained."
+    }
+  ],
+  "contact_sheet_sha256": "78861c190f8d4d429617bc3a370a481a3a07897f8e00c72145ad94d270cbe717",
+  "image_policy": "Private source frames remain ignored locally, not copied to public evidence",
+  "physical_trigger": "not measured"
+}

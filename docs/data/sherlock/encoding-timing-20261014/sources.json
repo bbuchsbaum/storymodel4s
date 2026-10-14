@@ -1,0 +1,44 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/README.txt",
+    "path": "README.txt",
+    "sha256": "5d00475bf3b820efea77a6cf1fa92faca6b50ffa1ea6fab931f147f1d3fdccfc",
+    "bytes": 2810
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/sherlock_nifti_crop.m",
+    "path": "sherlock_nifti_crop.m",
+    "sha256": "57c76cf6c7b7e2a46b6cefd89c88d476d9d286daf7f9796ded2ca3425b2eb3b2",
+    "bytes": 985
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/sherlock_get_subj_info.m",
+    "path": "sherlock_get_subj_info.m",
+    "sha256": "6aa75b553c57d718825292fa5432a187ca1322ed06c44e14fbb18c96032dc1e3",
+    "bytes": 1422
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/sherlock_load_avgscenes_50M_50R.m",
+    "path": "sherlock_load_avgscenes_50M_50R.m",
+    "sha256": "fcf53355d2e961e8b94fde3a8ba5121c37dc51f55ef627ecaa91f558b0e2b2ea",
+    "bytes": 3693
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/code/get_predictors_1000segs.m",
+    "path": "get_predictors_1000segs.m",
+    "sha256": "9df52687df786f3df0f337f4c3e6c6ed459b4f26e0983cd45a3d820252936765",
+    "bytes": 5941
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/subjects/Sherlock_Segments_1000_NN_2017.xlsx",
+    "path": "Sherlock_Segments_1000_NN_2017.xlsx",
+    "sha256": "5271b7704ccebfc7cae2228c78faf472c0ba5530c1a45e4c784757057bf476df",
+    "bytes": 161074
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Summer-MIND/mind_2018/77e8ee9102837b921883e033b72e246fc5e3c535/tutorials/sherlock_nifti_kit_v2_withdata/subjects/sherlock_allsubs_events.mat",
+    "path": "sherlock_allsubs_events.mat",
+    "sha256": "a61ae5defefebcb31523702c461dcf19e8e6a605564579e37cd8749d8d551d78",
+    "bytes": 16223
+  }
+]
