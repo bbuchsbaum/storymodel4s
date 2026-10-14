@@ -24,7 +24,7 @@
   },
   "metadata_gate": {
     "rule": "AGENTS T2 and stale-base gate-inert rule: docs/Mote deltas do not invalidate unchanged runtime gates",
-    "source_checked_through": "d4b7ca0f7529feab3a6d668f4b9a82e7d34887a5",
+    "source_checked_through": "7d7f543282be6666829abc8fdbcebcc60f58b027",
     "source_runtime_input_changes_after_d1": [],
     "source_site_input_changes_after_a56": [],
     "atlas_checked_through": "50a160168daa03c51fcab60a4eaaed66674da83a",

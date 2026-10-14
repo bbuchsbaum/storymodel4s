@@ -1,0 +1,122 @@
+{
+  "source_snapshot": "7d7f543282be6666829abc8fdbcebcc60f58b027",
+  "source_counts": {
+    "closed": 352,
+    "open": 91
+  },
+  "open_release_groups": {
+    "release-1.0": 8,
+    "release-1.1": 21,
+    "release-later": 62
+  },
+  "open_1_0": [
+    {
+      "assignee": null,
+      "id": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+      "priority": 1,
+      "status": "open",
+      "tags": [
+        "delivery-20260919",
+        "epic",
+        "mapper-plan",
+        "milestone-delivery",
+        "queue-container",
+        "release-1.0"
+      ],
+      "title": "DELIVERY: usable recall mapping and defensible organization measurement"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M2TAMJ95K9D7H248A8387YW4",
+      "priority": 1,
+      "status": "open",
+      "tags": [
+        "delivery-20260919",
+        "gate",
+        "mapper-plan",
+        "milestone-release",
+        "phase4",
+        "queue-container",
+        "release",
+        "release-1.0"
+      ],
+      "title": "[release] Phase 4: 1.0 release gate and stability table"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M19N0W937KVZCK78F6X57X1D",
+      "priority": 2,
+      "status": "open",
+      "tags": [
+        "align",
+        "milestone-release",
+        "release-1.0"
+      ],
+      "title": "[maintenance] sweep: enumerate CONSTRUCTIBLE PRODUCT TYPES WITH INVARIANTS, not case classes -- 422 parameterised enum cases were never in any population"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C",
+      "priority": 2,
+      "status": "open",
+      "tags": [
+        "delivery-20260919",
+        "mapper-plan",
+        "milestone-release",
+        "phase4",
+        "release",
+        "release-1.0"
+      ],
+      "title": "[release] Phase 4: release infrastructure -- publishing, MiMa baseline, deployed docs"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M4EA3TVCGSVSA114DQX9588N",
+      "priority": 2,
+      "status": "open",
+      "tags": [
+        "g1",
+        "milestone-evidence",
+        "release-1.0"
+      ],
+      "title": "[G1] Populate StageTrace cost-receipt retention witnesses"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M4XTRN36R6SYXQBP5YN7FSQP",
+      "priority": 2,
+      "status": "open",
+      "tags": [
+        "release-1.0",
+        "stability-audit"
+      ],
+      "title": "Settle historical CandidateSet abstention semantics before stable API freeze"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M4XTS7JEY2ZQK2CFNZ429RFW",
+      "priority": 2,
+      "status": "open",
+      "tags": [
+        "release-1.0",
+        "stability-audit"
+      ],
+      "title": "Validate or explicitly delimit token truncation recipe declarations before API freeze"
+    },
+    {
+      "assignee": null,
+      "id": "bd-01M4XZ2H3XHGY8AQ80W07PR8M0",
+      "priority": 2,
+      "status": "open",
+      "tags": [
+        "milestone-release",
+        "release-1.0"
+      ],
+      "title": "Close ClaimLedger product-construction bypass before stable API freeze"
+    }
+  ],
+  "source_doctor": "source-final-doctor.json",
+  "atlas_snapshot": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "atlas_doctor": "atlas-final-doctor.json",
+  "note": "Counts are a dated tracker snapshot, not a priority ordering. PLAN and RELEASE-QUEUE order the remaining release work. Historical closed children do not close the broader final release gate."
+}

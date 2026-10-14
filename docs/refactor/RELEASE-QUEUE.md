@@ -33,14 +33,15 @@ A/A+V journey, historical comparison, published-index imaging, planned acquisiti
 crosswalk are now reviewed and landed; their delivery Motes are closed on the retained evidence.
 Physical trigger records and another acquisition run are not remaining acceptance work.
 
-Source main is `a56a74b8`, including the reviewed bootstrap repair and complete reader-route
+Source delivery revision `a56a74b8` includes the reviewed bootstrap repair and complete reader-route
 crosswalk. Exact runtime `d1a82d5b` passed the full hosted matrix: 4,344 passed/22 optional
 skips on each JVM, 3,258 passed on JavaScript and Native, zero failures/errors. All 80 task totals
 come from the complete log archive. The producer local gate retains 10,877 passed/five skipped,
 extracted CLI checks and 14 guide transcripts. The expanded guide passed full site verification
 and independent review.
 
-Atlas main is `cda5210d`, still pinning `eb48a562`. Its recall-clock series passed independent
+Atlas code revision `cda5210d` pins `eb48a562`; tracker-only main `50a160168` preserves that code.
+Its recall-clock series passed independent
 review, the 518-test full gate, 12 new and 30 existing browser checks, and actual A/A+V readback
 of every cell with exact saved-state replay. It preserves supplied timing basis and unavailable
 values. Hosted main checks and the final tracker readback are bound in the workflow receipt.
