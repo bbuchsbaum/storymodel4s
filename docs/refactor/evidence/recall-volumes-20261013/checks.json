@@ -1,0 +1,26 @@
+{
+  "sourceRevision": "5dced342139f4ae212bdcc8af6741700296bcfb6",
+  "authority": "LocallyObserved",
+  "focusedScala": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0
+  },
+  "python": {
+    "passed": 11,
+    "failed": 0
+  },
+  "mutations": "See mutations.json; inclusive-end kills2 boundary witnesses, erasedrecipe and cell containment kill1 each. Initial containment survived before added fixture.",
+  "gateStatus": "in-progress",
+  "JVMLog": "/private/tmp/recall-volume-gate-jvm.log",
+  "controller": "/private/tmp/recall-volume-gate-rest.py",
+  "remaining": [
+    "JVM reference scope",
+    "Scala.js reference scope",
+    "Native reference scope",
+    "final production rerun",
+    "format check",
+    "evidence review"
+  ],
+  "consumerScope": "StoryAtlas consumes view/codec/fixtures. No dependency or call to RecallTimingIntake or new RecallVolumeExport; legacy paired exchange unchanged."
+}

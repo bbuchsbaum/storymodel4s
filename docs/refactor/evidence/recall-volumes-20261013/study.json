@@ -1,0 +1,1 @@
+{"profile":"recall-baseline-lexical-words/v1","recalls":[{"admission":{"kind":"sherlock","lineage":"recall-lineage.json","sourceId":"recall-source-03"},"participant":"recall-source-03","path":"recall-source-03.csv","session":"released","timing":null}],"schemaVersion":"storymodel-study/v1","source":{"format":"timed-annotations","parts":"parts.json","path":"annotations.csv"}}
