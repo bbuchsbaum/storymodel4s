@@ -1,0 +1,211 @@
+{
+  "schema": "organization-content-challenge-fit/v1",
+  "producer_commit": "7a58aab66e3d793c5ad582aac48c896c51415ef4",
+  "plan_sha256": "274a3c8235e75fe98de0ce989affacdb12a001d3bf1e4f5278371d6cd82c6dab",
+  "manifest_sha256": "7bf4279a0678f14cf5c8ea21ef19df066c4d017a6c5cc2fe0294894d2c742e61",
+  "development_manifest_sha256": "7d384d40c095ab581ceb5951aeed373d0a64e5bb2551c805a33051d73cfdd094",
+  "temperatures": {
+    "lexical": 0.15,
+    "minilm": 0.5,
+    "repaired-minilm": 0.5
+  },
+  "grid": {
+    "lexical": [
+      {
+        "temperature": 0.01,
+        "nll": 7.930711801340237,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.02,
+        "nll": 4.111267543571244,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.05,
+        "nll": 1.8216473607592354,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.1,
+        "nll": 1.1094342229781924,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.15,
+        "nll": 0.9671420127236133,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.25,
+        "nll": 1.0051167837405401,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.5,
+        "nll": 1.2233651666161587,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 1.0,
+        "nll": 1.415996518932065,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 2.0,
+        "nll": 1.5324577049290882,
+        "infinite_rows": 0,
+        "rows": 96
+      }
+    ],
+    "minilm": [
+      {
+        "temperature": 0.01,
+        "nll": 23.396805562076455,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.02,
+        "nll": 11.688802393288084,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.05,
+        "nll": 4.870966390274777,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.1,
+        "nll": 2.743576791736153,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.15,
+        "nll": 2.085912090878756,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.25,
+        "nll": 1.6282508642491027,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.5,
+        "nll": 1.443673888048196,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 1.0,
+        "nll": 1.4832345344953428,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 2.0,
+        "nll": 1.55333470661203,
+        "infinite_rows": 0,
+        "rows": 96
+      }
+    ],
+    "repaired-minilm": [
+      {
+        "temperature": 0.01,
+        "nll": 25.830553990742363,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.02,
+        "nll": 12.795814310884069,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.05,
+        "nll": 5.146820530138212,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.1,
+        "nll": 2.784219805545865,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.15,
+        "nll": 2.077127675919329,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.25,
+        "nll": 1.594097453716845,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 0.5,
+        "nll": 1.4015183530657416,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 1.0,
+        "nll": 1.4515602806637542,
+        "infinite_rows": 0,
+        "rows": 96
+      },
+      {
+        "temperature": 2.0,
+        "nll": 1.5344776419666275,
+        "infinite_rows": 0,
+        "rows": 96
+      }
+    ]
+  },
+  "stock": {
+    "lexical": {
+      "expected_rows": 96,
+      "available_rows": 96,
+      "infinite_nll_rows": 0,
+      "nll": 0.9671420127236133,
+      "brier": 0.5006108766769665,
+      "unique_correct": 32,
+      "tied_best": 48
+    },
+    "minilm": {
+      "expected_rows": 96,
+      "available_rows": 96,
+      "infinite_nll_rows": 0,
+      "nll": 2.085912090878756,
+      "brier": 0.7677625527800399,
+      "unique_correct": 47,
+      "tied_best": 0
+    },
+    "repaired-minilm": {
+      "expected_rows": 96,
+      "available_rows": 96,
+      "infinite_nll_rows": 0,
+      "nll": 2.077127675919329,
+      "brier": 0.697251093941385,
+      "unique_correct": 63,
+      "tied_best": 0
+    }
+  }
+}
