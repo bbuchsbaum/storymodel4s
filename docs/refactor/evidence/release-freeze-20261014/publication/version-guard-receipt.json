@@ -1,0 +1,126 @@
+{
+  "sourceSha256": "d9309029294ce19413bd7850dc084e22f70608d219ff45c27414c3f6a6f1959f",
+  "baseline": {
+    "fixed-release": {
+      "admitted": true,
+      "expected": true,
+      "passed": true
+    },
+    "fixed-candidate": {
+      "admitted": true,
+      "expected": true,
+      "passed": true
+    },
+    "fixed-native-composite": {
+      "admitted": true,
+      "expected": true,
+      "passed": true
+    },
+    "snapshot": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "latest": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "interval": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "star": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "minor-wildcard-plus": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "prefix-plus": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "release-plus": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "empty-metadata-component": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    }
+  },
+  "mutation": "delete plus-selector guard",
+  "mutantCompiled": true,
+  "mutant": {
+    "fixed-release": {
+      "admitted": true,
+      "expected": true,
+      "passed": true
+    },
+    "fixed-candidate": {
+      "admitted": true,
+      "expected": true,
+      "passed": true
+    },
+    "fixed-native-composite": {
+      "admitted": true,
+      "expected": true,
+      "passed": true
+    },
+    "snapshot": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "latest": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "interval": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "star": {
+      "admitted": false,
+      "expected": false,
+      "passed": true
+    },
+    "minor-wildcard-plus": {
+      "admitted": true,
+      "expected": false,
+      "passed": false
+    },
+    "prefix-plus": {
+      "admitted": true,
+      "expected": false,
+      "passed": false
+    },
+    "release-plus": {
+      "admitted": true,
+      "expected": false,
+      "passed": false
+    },
+    "empty-metadata-component": {
+      "admitted": true,
+      "expected": false,
+      "passed": false
+    }
+  },
+  "namedKills": [
+    "minor-wildcard-plus",
+    "prefix-plus",
+    "release-plus",
+    "empty-metadata-component"
+  ],
+  "passingSiblings": 7
+}

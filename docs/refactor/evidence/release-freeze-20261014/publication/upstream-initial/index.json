@@ -1,0 +1,82 @@
+{
+  "status": "failed-metadata-validation",
+  "error": "missing required POM field url",
+  "sourceTests": "1006 passed, zero failures/errors/skips over11tasks",
+  "files": [
+    {
+      "path": "receipt.json.gz",
+      "sha256": "a7294584cd452b8dfe48a02dd9b142a7d20269bb5773ffa9a017bd622a934d09",
+      "uncompressedSha256": "90ab726d9b6027ce548d0d1f8c03ec05ddb0b5597c53e825d5c5d8b7e15ffe03"
+    },
+    {
+      "path": "matrix.json.gz",
+      "sha256": "35ae620fe29bd814b2dfaf4c0bcda4e190ce911da0b8c1b0fbbc8fc813a5ff4d",
+      "uncompressedSha256": "319ce565b3da304c5b63f4172f881450207a75a14fe96f7f06e1f94ee3f9a100"
+    },
+    {
+      "path": "command-000.log.gz",
+      "sha256": "995aa5dcd08c77836641336a379ab644837489e70d457cf8af4eaee995b34f19",
+      "uncompressedSha256": "dd9e6f408430bcd8d81d48c69a5036ad28869a5b36ff7d153bc622b10ab487fd"
+    },
+    {
+      "path": "command-001.log.gz",
+      "sha256": "52560b2f11fd52ee4a62f404e1729bac5510b97b56e4796d544c56684151795e",
+      "uncompressedSha256": "d9c966a01be2b60bab675bfcd83889c007cb3e909e7f591a950e743f5d0b49a0"
+    },
+    {
+      "path": "command-002.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-003.log.gz",
+      "sha256": "4d4a8eacf8e85723bbeb7eb0b5616e98e8cfc1220bd643d9340ec687ff6ee32e",
+      "uncompressedSha256": "7ef0462e1f7ee557ca3317005a5911ea444b8f0154b1d4211ee27e6597b77964"
+    },
+    {
+      "path": "command-004.log.gz",
+      "sha256": "6e80291e26fae535b7a434c4b27e0af3f0e10b73ff5100250a95ee5b17516901",
+      "uncompressedSha256": "a1ced53377eac864ed7480a1d2e66e3da80ecff9a976867698e28e7681dd1a9f"
+    },
+    {
+      "path": "command-005.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-006.log.gz",
+      "sha256": "6ccfa9f3ad4a063240fffcd61856e6fc851743bd0754bcbbd5aa3f3b7d794035",
+      "uncompressedSha256": "50585626e661d572a13223500e6acca46015057811851f75115e64f8de2b3f6f"
+    },
+    {
+      "path": "command-007.log.gz",
+      "sha256": "3fec3acd8d2380e8079d34fff8496542ff7f72a2f507bbc1a142e98897560332",
+      "uncompressedSha256": "778a1fa87966d0cc2db99cb78de7798c3894fc4272199c79195bc828e31efcb7"
+    },
+    {
+      "path": "command-008.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-009.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-010.log.gz",
+      "sha256": "bfbe2cd78dad557a619ce8d6aba30bc0296501b0a428cde5fcf6adc404a891f9",
+      "uncompressedSha256": "35d589577df960171fca789709d0cd86017f18f440aa10fc363fbba92db5225d"
+    },
+    {
+      "path": "command-011.log.gz",
+      "sha256": "55e6e2564bb665884b57f140a25f1b8bfdf1696e6eb9dd05007c5467cd0d098f",
+      "uncompressedSha256": "7c63bb38093bcfa6511ea5ed10a83bfa6a468295f6a1abfddf0dd942fd95b983"
+    },
+    {
+      "path": "command-012.log.gz",
+      "sha256": "c129917a13b6ff0a3d9f41b158f372283098846fd54c4667dff18e5a8aca2ee1",
+      "uncompressedSha256": "6af6c6089c78c4520223f8378326614e4034c7d684a30baacbd2babf797f7874"
+    }
+  ]
+}

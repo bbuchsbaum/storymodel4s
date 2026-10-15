@@ -55,7 +55,10 @@ The [family review](promotion-family-review.md) covers the 29 supplied source pa
 declaration/admission and inspection/execution distinctions. [Compiled mutations](promotion-mutations/receipt.json)
 kill each repaired guard or construction opening; the [identity rerun](promotion-mutations/identity-d7bc/receipt.json)
 rechecks the length-delimited encoding after the Native fixture adjustment. The final member boundary and construction judgments have [independent GO](stable-api/independent-review.json).
-Pinned consumer qualification and integration evidence remain required before landing.
+The [pinned StoryAtlas consumer](promotion-atlas-receipt.json), consumer `dc14d52d` against producer
+`63a952f9`, passed all 518 tests over ten tasks with fatal warnings and clean source trees.
+The local upstream artifact qualification below completes the remaining rehearsal acceptance;
+final exact-SHA review and local/remote landing are recorded separately.
 
 Member-aware audit controls distinguish supported accessors from experimental factories,
 require classification of every exposed member and traverse enum alternatives. The retained
@@ -115,3 +118,22 @@ and separate clean-cache public resolution from local staging. Upstream release 
 proposals; no Maven artifact, tag or documentation deployment is authorized by this record.
 Namespace/signing qualification, publicly available upstream dependencies and the final
 release gate remain distinct acceptance.
+
+
+The [completed local publication rehearsal](publication/summary.json) records 1,006 upstream
+source-test passes across 11 tasks, nine staged artifacts with complete metadata/closure, and
+six assertions from a fresh binary consumer. All nine fetched root JAR hashes match the staging
+manifest; the owned loopback server closed. The actual 56-POM StoryModel matrix passed metadata
+and internal closure validation. Fresh Maven Central resolution passed for 46 of 50 external
+coordinates. These four proposed roots remain unavailable, all under `io.github.canardlapin`
+at `0.1.0-RC1`: `grakern-core_3`, `grakern-engine-jvm_3`, `grakern-graph4s_3`, and
+`grakern-standard_3`. The [public-resolution archive](publication/public-preflight/index.json)
+retains all 50 attempts, including every failure.
+
+The rehearsal exposed and repaired two tooling defects: missing homepage/SCM fields in the
+upstream release overlays, and an overly broad plus-sign rejection of fixed Native versions.
+Both initial failures remain archived. The final controls include real resolution of
+`3.7.4+0.5.12`, eleven version cases and a compiling mutation killed by four named cases while
+seven siblings pass. The tool deltas have independent exact-SHA GO. Public availability,
+namespace/signing, the Native literal-hash prerequisite, release authorization and documentation
+deployment remain open; local staging is not a public release.

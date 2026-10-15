@@ -1,0 +1,177 @@
+{
+  "toolSource": "c3add00ed7cc9400f918fd9651d64ca3d6310804",
+  "status": "locally-staged-pending-preflight",
+  "publication": "not-published",
+  "pomValidation": {
+    "matrix": "passed",
+    "internalClosure": "passed",
+    "count": 9
+  },
+  "tasks": [
+    [
+      16,
+      0,
+      0,
+      16,
+      0
+    ],
+    [
+      6,
+      0,
+      0,
+      6,
+      0
+    ],
+    [
+      4,
+      0,
+      0,
+      4,
+      0
+    ],
+    [
+      592,
+      0,
+      0,
+      592,
+      0
+    ],
+    [
+      45,
+      0,
+      0,
+      45,
+      0
+    ],
+    [
+      44,
+      0,
+      0,
+      44,
+      0
+    ],
+    [
+      8,
+      0,
+      0,
+      8,
+      0
+    ],
+    [
+      35,
+      0,
+      0,
+      35,
+      0
+    ],
+    [
+      116,
+      0,
+      0,
+      116,
+      0
+    ],
+    [
+      133,
+      0,
+      0,
+      133,
+      0
+    ],
+    [
+      7,
+      0,
+      0,
+      7,
+      0
+    ]
+  ],
+  "sums": {
+    "total": 1006,
+    "failed": 0,
+    "errors": 0,
+    "passed": 1006,
+    "skipped": 0
+  },
+  "files": [
+    {
+      "path": "receipt.json.gz",
+      "sha256": "2d556c304756ee79bf3ce3d00415e49feb418a4506b3977ce99c3dee76e797e2",
+      "uncompressedSha256": "8e7b5f537b823f186cbcefe8364223e1545d967e6607b242700961d571a98ab7"
+    },
+    {
+      "path": "matrix.json.gz",
+      "sha256": "35ae620fe29bd814b2dfaf4c0bcda4e190ce911da0b8c1b0fbbc8fc813a5ff4d",
+      "uncompressedSha256": "319ce565b3da304c5b63f4172f881450207a75a14fe96f7f06e1f94ee3f9a100"
+    },
+    {
+      "path": "command-000.log.gz",
+      "sha256": "92fcd08bc7ae38994875e65b729ddebbcdf7b5ea660671ae3dc705e9a8130392",
+      "uncompressedSha256": "493d973a99f8ee027e032de86ec334efd41437316ce88d011fbef44bd7edc4dd"
+    },
+    {
+      "path": "command-001.log.gz",
+      "sha256": "52560b2f11fd52ee4a62f404e1729bac5510b97b56e4796d544c56684151795e",
+      "uncompressedSha256": "d9c966a01be2b60bab675bfcd83889c007cb3e909e7f591a950e743f5d0b49a0"
+    },
+    {
+      "path": "command-002.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-003.log.gz",
+      "sha256": "f5ff065e361a3eaae9565c691277ecf6d66d0253b5b8f5f6ea639d3fb106736d",
+      "uncompressedSha256": "1ab60c2d7b7faac058c346a76ec5a1f1d586ad0eb26435e18edb23756e5856d4"
+    },
+    {
+      "path": "command-004.log.gz",
+      "sha256": "6e80291e26fae535b7a434c4b27e0af3f0e10b73ff5100250a95ee5b17516901",
+      "uncompressedSha256": "a1ced53377eac864ed7480a1d2e66e3da80ecff9a976867698e28e7681dd1a9f"
+    },
+    {
+      "path": "command-005.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-006.log.gz",
+      "sha256": "2841981b2b5c5fdee06543ea216d5fbdc9d9825ec060bb589fa6bafacaac9c3a",
+      "uncompressedSha256": "9f2e36b4ddc09658a8885b8edfc9b60855ac4ed031b87c0f75782f354a37967b"
+    },
+    {
+      "path": "command-007.log.gz",
+      "sha256": "3fec3acd8d2380e8079d34fff8496542ff7f72a2f507bbc1a142e98897560332",
+      "uncompressedSha256": "778a1fa87966d0cc2db99cb78de7798c3894fc4272199c79195bc828e31efcb7"
+    },
+    {
+      "path": "command-008.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-009.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-010.log.gz",
+      "sha256": "3073b43ff6f4a50e7768db011d02d2f6922c05c255f61cb266a961f95b3d5c27",
+      "uncompressedSha256": "8dad075a13768fe54822c33f192648fbbee87b09a814ba32cdd7913a54d02e8e"
+    },
+    {
+      "path": "command-011.log.gz",
+      "sha256": "b8bbd1e58ff3f035e702966c1869bcd258c111f98e49950b0c3eac2262dcc965",
+      "uncompressedSha256": "e31f2a9641233d06713b8254e2ffa147e57e0ab653829f12dae39f311aaeb6c2"
+    },
+    {
+      "path": "command-012.log.gz",
+      "sha256": "8587acb475ea61a76dc5ab167ce1da8435fa9020e92f79f921981a4f55415571",
+      "uncompressedSha256": "9cfe8813d28320bc001a314005b62957367bb7c3939234877ffcaeaf04fa945f"
+    }
+  ],
+  "overlayReview": {
+    "reviewer": "constructor_exact_review",
+    "verdict": "GO-code exactc3add00e; source pins/local routing and overlay-hash verification preserved"
+  }
+}

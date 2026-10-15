@@ -1,0 +1,5 @@
+ThisBuild / version := "0.1.0-RC1"
+ThisBuild / homepage := Some(url("https://github.com/canardlapin/graph4s"))
+ThisBuild / scmInfo := Some(ScmInfo(url("https://github.com/canardlapin/graph4s"), "scm:git:https://github.com/canardlapin/graph4s.git"))
+ThisBuild / publishTo := Some(Resolver.file("local-release-rehearsal", file("/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/upstream-staged-02/maven"))(Resolver.mavenStylePatterns))
+ThisBuild / publishMavenStyle := true

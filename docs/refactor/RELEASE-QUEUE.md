@@ -17,7 +17,7 @@ These counts are a dated observation; use live Mote when taking ownership.
 | 2 | `bd-01M35P83TCNHBSDY6NSK13Q3K0` | **Complete:** public ONNX, historical differences, actual A/A+V, both mappings/weights, independent readback and walkthrough. |
 | 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | **Complete in owner-defined scope:** published crop/index alignment with independently verified new arrays; physical synchronization unavailable. |
 | 4a | `bd-01M19FPY1EC5QNTW6SBG3QYT3R` | **Complete:** executable reader routes, crosswalk and visual qualification. |
-| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Constructor repairs landed; the member-level stable boundary is independently reviewed. Promotion repairs await final consumer/integration evidence. |
+| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | **Complete in this slice:** constructor/promotion repairs, member-level stable boundary, full producer and pinned consumer qualification. |
 | 4c | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | Installable CLI and compatibility/release preparation delivered. Public dependencies, stable baseline and publication remain. |
 | Gate | `bd-01M2TAMJ95K9D7H248A8387YW4` | Open for final stability and release-infrastructure acceptance. |
 | 5, StoryAtlas store | `bd-01M354JNKNKJ15N4T5MGQTRSET` | **Complete:** pinned temporal consumer, recall-clock series, linked inspection, saved replay and exact browser/reader agreement. |
@@ -50,7 +50,7 @@ The three constructor repairs and the related finite-refinement guard are now la
 and GitHub main at `8ea96d6a`. [Release-prerequisite evidence](evidence/release-freeze-20261014/README.md)
 records independent exact-SHA review, 10,964 producer passes/five optional skips with documented
 unchanged-input reuse, and 518 pinned StoryAtlas consumer passes. The stable boundary is now
-independently reviewed at compiled source `63a952f9`: 1,184 supported nominals and 9,455 supported members. Publishable dependencies and final integration evidence
+independently reviewed at compiled source `63a952f9`: 1,184 supported nominals and 9,455 supported members. Publishable dependencies and final release qualification
 remain; no new study execution is required.
 
 The member-level promotion review identified four further bounded repair groups: media value
@@ -60,8 +60,8 @@ and custom semantic-view identity (`bd-01M4YJ91P5FE7E55RJQ371VXK9`). Their compi
 and repairs are prerequisites to the final member manifest; no study occurrence is inferred.
 Runtime `d7bc9c06` has a complete producer receipt: 11,067 passed, zero failed/errors and five
 optional skips over 56 tasks, with unchanged-input reuse identified. The final manifest has
-independent GO; pinned consumer qualification remains in progress. Main's repeated Linux Native crash is the P0
-(`bd-01M4YFK6VVZ71EB2SGS25DM0ED`); its qualified disposition awaits landing. The retained LLVM 18
+independent GO, and the pinned `dc14d52d` Atlas consumer passed all 518 tests against `63a952f9`. Main's repeated Linux Native crash
+(`bd-01M4YFK6VVZ71EB2SGS25DM0ED`) has a qualified LLVM 18 disposition in this slice. The retained LLVM 18
 diagnostic holds application source fixed and passed all 1,030 alignment tests, with captured
 executable integrity unchanged. Candidate `63a952f9` selects that configuration and passed the
 full hosted matrix:
@@ -71,12 +71,20 @@ These results qualify the tested configuration without attributing the earlier c
 Native qualification also exposed a standard-library literal NUL hash crash, independently of
 StoryModel types (`bd-01M4YP83C7925M22V0K5AQ88BX`). An equal-content fixture construction retains
 all identity assertions; the underlying runtime remains a separate stable-publication prerequisite.
+Local publication preparation now includes nine staged upstream artifacts, 1,006 upstream
+passes, a fresh binary consumer with six assertions, and 56 validated StoryModel POMs. Public
+resolution passed for 46/50 external coordinates; four proposed grakern `0.1.0-RC1` roots remain
+unpublished. The [rehearsal receipt](evidence/release-freeze-20261014/publication/summary.json)
+records the exact missing coordinates and repaired metadata/version-validation failures.
+Namespace/signing verification, dependency publication, the Native runtime prerequisite and
+final release/site authorization remain on the infrastructure lane.
 The stable-construction audit records historical candidate abstention and token-truncation
 recipe findings on `bd-01M4XTRN36R6SYXQBP5YN7FSQP` and `bd-01M4XTS7JEY2ZQK2CFNZ429RFW`.
 The ClaimLedger construction opening has a reproduced lossy-serialization witness and a bounded
 repair on `bd-01M4XZ2H3XHGY8AQ80W07PR8M0`; its historical census ticket remains closed.
-These pre-freeze requirements and the final stable dependency boundary remain on the release
-lane; current study outputs do not demonstrate a strict-run authority or ONNX-output failure.
+These constructor requirements and the final stable dependency-boundary judgment are complete
+in the qualified slice. Publication prerequisites remain on the release lane; current study
+outputs do not demonstrate a strict-run authority or ONNX-output failure.
 Physical synchronization is not established by the published analysis crop convention. On
 14 October the owner confirmed that no finer trigger records are available and selected that
 published-index scope for item 3. Preserve the unavailable status in every output and claim.

@@ -1,0 +1,487 @@
+[
+  {
+    "path": "receipt.json.gz",
+    "sha256": "34f4756cbfb360d2db8294921b26c720a1f6977ed53bd64599aafd4801e5310d",
+    "uncompressedSha256": "4949023867dcd953bfbbd563d5f1189ae8d3bcf9cf4fc4b119c0be2ae0bca547"
+  },
+  {
+    "path": "coursier-maven-central-0000.log.gz",
+    "sha256": "8fb3527365547ff09f5693971dbd2412a8af78ff910bc7e3215574b2598a2b76",
+    "uncompressedSha256": "f73c6b7f4f98bcf0505c1a38da791a7d33913bebd08d972f7f9931490ffce6ae"
+  },
+  {
+    "path": "coursier-maven-central-0001.log.gz",
+    "sha256": "7b357ee83f81c3a0d5456b98221783582ea13dc23e4876448b95a340677eff0f",
+    "uncompressedSha256": "316c105dac5a0da7410f27e34f2314c58d932cce3c2e875803d9bf0e604b3cba"
+  },
+  {
+    "path": "coursier-maven-central-0002.log.gz",
+    "sha256": "eb81386c0f3ade291c06f86d5b773513d6baf9d2b8ea40776dd0fb4a9a62a132",
+    "uncompressedSha256": "e40fcae823bbdafe40a082e580760ee0b7c061470792b7663dd410c7e2d90608"
+  },
+  {
+    "path": "coursier-maven-central-0003.log.gz",
+    "sha256": "c8e8b470a23ee0eebe9218f8d7a4ca7687078615f1c4fb8f2786f70d79dba3b9",
+    "uncompressedSha256": "498ca1dc4ab9cb4e4ae63ae543f61fc1bf125d75614e07ea83b72f7854a21ab9"
+  },
+  {
+    "path": "coursier-maven-central-0004.log.gz",
+    "sha256": "f75e22b5423310121a75f1d02d3db516eb9abc57314271082dacd139d4bdcefd",
+    "uncompressedSha256": "b9f0fc31ce829bb7ca2184ec20a6566257c5555b2f26425f72e33a829355e8f4"
+  },
+  {
+    "path": "coursier-maven-central-0005.log.gz",
+    "sha256": "59a07bfe6f084ce544f9eee26438b989119fe1d8a0a3cd608acae4f165897822",
+    "uncompressedSha256": "2554aee08af8cf32ae2800156a381fa9db7349ac989c93a6079d6bcc0d7836fd"
+  },
+  {
+    "path": "coursier-maven-central-0006.log.gz",
+    "sha256": "0fe417a9b6180ca362bd89db5e65a6b244df820cefd1c7d7065e257e06f31f52",
+    "uncompressedSha256": "fec135ab2518af2a830645dbaadc2c184867fce8062854ea0b28e85cb50b1f8c"
+  },
+  {
+    "path": "coursier-maven-central-0007.log.gz",
+    "sha256": "470ba2980877243e1f52fbf99291dfb3d27b7e3bb6fd8190a38b11f2b3f5b791",
+    "uncompressedSha256": "650a3d878c0f8cd2dbdaa315c5654ebe796bff775087b70c355549942a04832e"
+  },
+  {
+    "path": "coursier-maven-central-0008.log.gz",
+    "sha256": "dabb416ab71c82ceeb0dea40c74cd99ec7495b7bc405730c274b8bd767a92cae",
+    "uncompressedSha256": "cf3e646c5f70141e5746cde2d37facf04bdb2e0e0a5bcd812c00d647c7954ff9"
+  },
+  {
+    "path": "coursier-maven-central-0009.log.gz",
+    "sha256": "90d2a565769062d1d2191cf688e5baa7105a8943f5573a058046875f4bf1b141",
+    "uncompressedSha256": "d2df53d4bda1de32d47aded6e82d7481d9faa4ff774ae39461999f35282cfff0"
+  },
+  {
+    "path": "coursier-maven-central-0010.log.gz",
+    "sha256": "eaf02e71a654a054a7d649ff00d4dd85dff98122039133ecac85084cc77af717",
+    "uncompressedSha256": "6b112412c71f40ea0f8ab233cfb67f215e62b83af651698a2601773d2eaf0b0e"
+  },
+  {
+    "path": "coursier-maven-central-0011.log.gz",
+    "sha256": "b14c9a0ce842bfb0923f74f45d22fee31d3d8d1c3addec8ea621afb1393ef873",
+    "uncompressedSha256": "6620e348cd8c812d605287c389bc6980f3848406bccf4869118f49b676bed689"
+  },
+  {
+    "path": "coursier-maven-central-0012.log.gz",
+    "sha256": "09f6ed990bcd4fb7be364cc044ad9c8aa7747f2c4f4e7d343726b33b5af4f37c",
+    "uncompressedSha256": "6fcef5d4130fa7d356128111de9d1800e042addb27aa83259780decee6eac48a"
+  },
+  {
+    "path": "coursier-maven-central-0013.log.gz",
+    "sha256": "dc46eae4cfcb7f8ff4e3b875c1e31f12807d78cb9f78e166ce9bdc1e674f5190",
+    "uncompressedSha256": "bcbc591da1f69ed78fe425ea3f31fe7a5be505f0dad604353cd08252fcf4fc50"
+  },
+  {
+    "path": "coursier-maven-central-0014.log.gz",
+    "sha256": "bc2d7cea59e7ce20be92c6907c35a66d1391f6b9da6bd1397488952df13d12ff",
+    "uncompressedSha256": "e2dbacce193bf95b76d33b6ef1da3c911fa5ea460106dac8ce0a9d527c62af41"
+  },
+  {
+    "path": "coursier-maven-central-0015.log.gz",
+    "sha256": "7d8863fd3c67e4af41dd1a679108d4c1ad1d931044d164083c8b4f20613ee624",
+    "uncompressedSha256": "d600dec7c677ca4621f657af615f7b08c3d8be49be8951f854b3011f39c3ac5d"
+  },
+  {
+    "path": "coursier-maven-central-0016.log.gz",
+    "sha256": "e31b33d33792423cd2c4d0b355621c95093163d59cfb18e1b1bd94306ab762d7",
+    "uncompressedSha256": "399b08a3a0b9072d3d00dcec6cab1ae1b419fbaa7710f2cb4b6ed95738c9ce54"
+  },
+  {
+    "path": "coursier-maven-central-0017.log.gz",
+    "sha256": "007341a76ed675040408c37b80fa4cb7b0a413bed1d3be2ee49315401706a618",
+    "uncompressedSha256": "743aad7dfa88c3c3462177683911008759bbbe7dd6fcaccdd6ca9b079d59303a"
+  },
+  {
+    "path": "coursier-maven-central-0018.log.gz",
+    "sha256": "41f592f748006e33c0060b117d26014d5c7343ea877992345ff17bf016fda3d2",
+    "uncompressedSha256": "1b905a10f16ce84605ea6212e026fb26248f3f82deac009318267adbd5eb21f4"
+  },
+  {
+    "path": "coursier-maven-central-0019.log.gz",
+    "sha256": "82a170aec54010ff5dc347720ae9e59caa495c65f2963d07b53bb816ab0922bf",
+    "uncompressedSha256": "3d946efad04d4bc487956865e5a144cc6f36aa489d4060e8fcf0ea5562abdceb"
+  },
+  {
+    "path": "coursier-maven-central-0020.log.gz",
+    "sha256": "015f0d3553f8a9834ad94bb6a39dd179a39a787783c9ce4a7d79a7b548465202",
+    "uncompressedSha256": "fa93c8307baccbf6a7b01cc4dd6d0ccaff957dba0bc1c07503a04b0aa4f26431"
+  },
+  {
+    "path": "coursier-maven-central-0021.log.gz",
+    "sha256": "2434dbc267870d70d25f7b93c8ce8bab186f886e41b1925e373c83d7a2c21345",
+    "uncompressedSha256": "f23259e100ef574b8f4d2125d17af7c5860caec135d27d5ee0a352d06aca8339"
+  },
+  {
+    "path": "coursier-maven-central-0022.log.gz",
+    "sha256": "c5325920a97594c3099c53090c62ac45b486b5da768d728c54ee6615f1d11d1e",
+    "uncompressedSha256": "acaa1c25d057cedefd0fd4bcd6ba98c5902c3b2f1ce9412cd990bc2b8a296bd4"
+  },
+  {
+    "path": "coursier-maven-central-0023.log.gz",
+    "sha256": "417b2d46c27b99f060c6db7fcef681bf21b7298ffcdb4883b9a7a0959a64eb5f",
+    "uncompressedSha256": "3c999343e09d7042690c1da6d2b25d3522d8d06cb2f9639fc3935812fca8049b"
+  },
+  {
+    "path": "coursier-maven-central-0024.log.gz",
+    "sha256": "7ec40020a16073477e566c72a4cc77e829574222fe3e84818c28080b24e37ad5",
+    "uncompressedSha256": "35a0fcaaeccd531563b301931f89fa13390a8fae6042f5161046c864c311db61"
+  },
+  {
+    "path": "coursier-maven-central-0025.log.gz",
+    "sha256": "52b37b7fd00645dadd949357df1bac73f3bec95272349480175156a6b25b772e",
+    "uncompressedSha256": "ec38bd9c60824c3139c455fea5ccc590220c91a3a1c5087eced885729329f501"
+  },
+  {
+    "path": "coursier-maven-central-0026.log.gz",
+    "sha256": "aa38946281f8b10876f4aa005060d574d5559a8173b92f263c22d5820f8cc734",
+    "uncompressedSha256": "3310d99d39559f235fd99c69d1a789bf0826795d4f42d0511a6a818797060153"
+  },
+  {
+    "path": "coursier-maven-central-0027.log.gz",
+    "sha256": "1d31a6d87926547bacd10651379963de2cf18d3adaa76068ce40d06950077ab0",
+    "uncompressedSha256": "303b12f96aa83a3ec03e09ed8dd7dcc72219bc580d874c8c3600e0b01d37b3c8"
+  },
+  {
+    "path": "coursier-maven-central-0028.log.gz",
+    "sha256": "f8e6cededc31fa416413b3dcbf0daa2008344f023267e995087d1721e55fbdad",
+    "uncompressedSha256": "07c71b8926e550abd3b2b235e381651a8b6b096252a8b966866ed01dbe6115fe"
+  },
+  {
+    "path": "coursier-maven-central-0029.log.gz",
+    "sha256": "af10c15c71de94d56288d45c34ab14ad8233a07399692d725a55532017e048e3",
+    "uncompressedSha256": "7456c3afbf56a4d67c5849f3785d060226c013efaae7b6ad7c6c8d3dcf51a48c"
+  },
+  {
+    "path": "coursier-maven-central-0030.log.gz",
+    "sha256": "7c78b6af0d202fd9cac82c1da93fb519ff97fb7c6996398cdafa6874cccff552",
+    "uncompressedSha256": "60ecd78b1598152f7c6f6b6ed51237ba0c8e0143fe748ca73f75259249d54186"
+  },
+  {
+    "path": "coursier-maven-central-0031.log.gz",
+    "sha256": "912cd3d1c00ae8e3f3c126944e2b7525667f5c2a15a64958de98c431617755fe",
+    "uncompressedSha256": "769c739b03533f4d94dd0c07f97a59aab04066170811480dfb23259053dec4fe"
+  },
+  {
+    "path": "coursier-maven-central-0032.log.gz",
+    "sha256": "3db9e6c0e8162178902ac4af34ca25779843a8cf112bb2311a2c25f6f8014e87",
+    "uncompressedSha256": "cfea261fe8dc9e71bcfaa61835f3b556bd9f38a3ed7bf5d9d1b515068953ba12"
+  },
+  {
+    "path": "coursier-maven-central-0033.log.gz",
+    "sha256": "6e40d24143c21401e9bcc4de9a26073057c92376fb6fe744d545677f8e23c464",
+    "uncompressedSha256": "5abb8f372e6aa28008fd91918bb8ae39b09fff74cb76967eb50c800529da3211"
+  },
+  {
+    "path": "coursier-maven-central-0034.log.gz",
+    "sha256": "f812aa42950c397c8abb5f34a5815d255e5d0c41962947d899d6d3d46e0e0a3a",
+    "uncompressedSha256": "ad46e65b1489ee1e5f184b7e5dea352426b8e67297608b6f678d4ff9482785c3"
+  },
+  {
+    "path": "coursier-maven-central-0035.log.gz",
+    "sha256": "f6555113e5f69f04a60247cd119c75fa7418f7027edb1c0d2a6cffd1b3078515",
+    "uncompressedSha256": "a902bedd8a72074721b5ce7fbbd1b00f6867531b46c182d7820b103494d24fbe"
+  },
+  {
+    "path": "coursier-maven-central-0036.log.gz",
+    "sha256": "aeecf802c27f0ee0f30eb6b2782845f7b97d2f50458f6551577520fecc6915ab",
+    "uncompressedSha256": "9bfed0044747a89b19a5bd5990f9fcc6422d7ef48db90ee2d7933c0c4cefe522"
+  },
+  {
+    "path": "coursier-maven-central-0037.log.gz",
+    "sha256": "c4f5b5940f34a471349a400ed18cb1e94af6630c41dd88a8eddabb9fc92673a7",
+    "uncompressedSha256": "f3a8475447c575c006a28d3f81ba1d2c4d9127cc7810bcdd032be0cd2ada77b7"
+  },
+  {
+    "path": "coursier-maven-central-0038.log.gz",
+    "sha256": "8353b3c4948de08ce74d4d1a934be15d0710f52f75a0ff4873338f883b85eebb",
+    "uncompressedSha256": "c8aa20da03ed69d1a3dc5102798a8136efb24be79af7bd6c8c64e5c8441c5e2e"
+  },
+  {
+    "path": "coursier-maven-central-0039.log.gz",
+    "sha256": "abeba77d4ac96f8361cff9e586c9f52f001bba979a468f4602afd0d99421ce69",
+    "uncompressedSha256": "fb3b2d9b83e558cd95995054cf05ee5fbeae5051518c9d7a8e65b732c9380cec"
+  },
+  {
+    "path": "coursier-maven-central-0040.log.gz",
+    "sha256": "eaa17d455cc054fb6d46bfcf2c7af0d1961b27b443e7c37a801fc4ab282e8015",
+    "uncompressedSha256": "a715b9da57b413f5c0172130e31292eeacde4c9464a9a8633e9d304264f08304"
+  },
+  {
+    "path": "coursier-maven-central-0041.log.gz",
+    "sha256": "24e4885b35b979d0f67d8ecad9ac6c2b14c23071fac6d278c847cbe3c5aa23ae",
+    "uncompressedSha256": "0f017e0e7bc6aecf30936731ee421af1e7e56196c116963d98d07e536667f05e"
+  },
+  {
+    "path": "coursier-maven-central-0042.log.gz",
+    "sha256": "65e0e23018da2a732d36f99b25693b624ce7018023c07fa474ecba31e505488a",
+    "uncompressedSha256": "1c44b6e93781630a2cfee3d3b19e2827c57a0c3e72d2e8a4015a45da16a4c217"
+  },
+  {
+    "path": "coursier-maven-central-0043.log.gz",
+    "sha256": "18e0d6c2df78e9ca51b3cb1afa33f34b0c88bc622e02f7d2a80eb910d3805d16",
+    "uncompressedSha256": "0e8770154aa07e44f0c0862381385511a1cc861f5599d95a49aec3293bcd1aa4"
+  },
+  {
+    "path": "coursier-maven-central-0044.log.gz",
+    "sha256": "ef751be3cabc047765f56f0f40d4d22d76259456fc4e6805f79595707bf0ba71",
+    "uncompressedSha256": "0d4da563d5e63f19d09ae36cc332fe609ac883700ce20295ee2cd6e032b01e2a"
+  },
+  {
+    "path": "coursier-maven-central-0045.log.gz",
+    "sha256": "b3c97d6c494baee65fa39b92b9412d42412bde18919fdf7631a09bb38e92009f",
+    "uncompressedSha256": "a60f745ee2b2b5ee5e26d40f8919ed4463aa551f24bff11f6c3f9b6baa809b61"
+  },
+  {
+    "path": "coursier-maven-central-0046.log.gz",
+    "sha256": "baf3e9fd27f0099cec17a70912ec9508f3e69db56f6e9e91befefc302129cdc3",
+    "uncompressedSha256": "1c833b7c89e06c70a429705094ba0ee86a4909e61f49eefcd3c86ab33441a3d5"
+  },
+  {
+    "path": "coursier-maven-central-0047.log.gz",
+    "sha256": "5c3dd594f15562e232c37142a338523d7b98cea811c4d3aeb2110a14f984b53f",
+    "uncompressedSha256": "774595b2b17fb898bd146413adfdd0af6cf49e78360fbf62d028231f34ad17a6"
+  },
+  {
+    "path": "coursier-maven-central-0048.log.gz",
+    "sha256": "d1c6517cc3f21118d06f978613fcd881ad10d13fd0ff858ebb95f2829973907c",
+    "uncompressedSha256": "77eff4971719942a30ea65cd2acf13fa10e45b10e91aefbd66f0ead12b1a65dd"
+  },
+  {
+    "path": "coursier-maven-central-0049.log.gz",
+    "sha256": "9dc9f2c96b978a5c009538ca41b8040abaac326e66b41de1e2c97f2b9e18b8cc",
+    "uncompressedSha256": "ee4323cf3166309c91afaa2036c97d8988b81ba7f9a6979b5d3416fda50378aa"
+  },
+  {
+    "path": "coursier-maven-central-0000.json.gz",
+    "sha256": "d91a71f88123498b72f776c3eef2545ff080d73d57a67feb2757919b011152b5",
+    "uncompressedSha256": "ffa7aa9fd6e3f2f5504cfff98676cfdd250a891865f61d999457a5122e0e94df"
+  },
+  {
+    "path": "coursier-maven-central-0001.json.gz",
+    "sha256": "a5a2efb7b7f172989341937217cf87ce10be985076ea81b3d98380b6d8969ebd",
+    "uncompressedSha256": "83dace57506f495f014e3cc430e9b09a8f3d6669ed4c7bbef9eeb290a4f18654"
+  },
+  {
+    "path": "coursier-maven-central-0002.json.gz",
+    "sha256": "a4404e1cc0b2bdfae5be666e314843d1fff15c05479bf8e2d4bee364f6762b2e",
+    "uncompressedSha256": "5da68de48f68127ac6ac91f0f3b07fc9ec9c6a08cfd81347409033fe308f7228"
+  },
+  {
+    "path": "coursier-maven-central-0003.json.gz",
+    "sha256": "263fea29c74231db680d184edce2c4a383174a87d64235203fa3066c53c7be25",
+    "uncompressedSha256": "bdadb720e52077a0d11d111383d6c437f3c60e5a3c539891ce9f7994270cd07d"
+  },
+  {
+    "path": "coursier-maven-central-0004.json.gz",
+    "sha256": "64c546f66bb8293ee8ba9a451c785f15deea9b53bc02d5ad77c7c8ef5b1848db",
+    "uncompressedSha256": "d6fab45b49a56bf66e5a056197afee1b859520132ad1e3d005b1b48b197a14e6"
+  },
+  {
+    "path": "coursier-maven-central-0005.json.gz",
+    "sha256": "d179aa9a7f785100163b52af8444adb7aa998d94b683e990fe08edcf2d3a3f7b",
+    "uncompressedSha256": "440b37ee5a4900dfe3f65f2f32e100d8ec666abd799e9760654a595c318720e8"
+  },
+  {
+    "path": "coursier-maven-central-0006.json.gz",
+    "sha256": "97083b13c17ab009471e25b705b369db1470f40821a64728b6983231ac5591d6",
+    "uncompressedSha256": "d7df426ae1fbf090d8ffee87185ad33c820cee0dfb5c458ec4637278e645f98d"
+  },
+  {
+    "path": "coursier-maven-central-0007.json.gz",
+    "sha256": "0f3e92eb77fed5d908c7337cb4609a75e8b1918cd0f510705128738861157a17",
+    "uncompressedSha256": "dab8c6736ab7aaea1dbc6fd124c94534b90e64c491aa22fdfca6a976ed0102ab"
+  },
+  {
+    "path": "coursier-maven-central-0008.json.gz",
+    "sha256": "d6aa541ed21414460f200f81838fdc7600eb720c3dc460869e80f23d275b59a8",
+    "uncompressedSha256": "5e92bbfe93ff84da932050ed2e8f615abc213299545ffdb50af167e5d3d74885"
+  },
+  {
+    "path": "coursier-maven-central-0013.json.gz",
+    "sha256": "32a608a8cdce7e851126cd96b90e72013ff531de475bf1b58b6b728ffb44000b",
+    "uncompressedSha256": "0d6fd4276ba9878b8d239f39e3addff18dac0c75819dfe3440fb47df97c82aa7"
+  },
+  {
+    "path": "coursier-maven-central-0014.json.gz",
+    "sha256": "31ba1480755a33afd1d9a6f9548b83ed60ff4fd3c52a3b7300b59d9b7920a2bf",
+    "uncompressedSha256": "6c2ebc7f59321af937324920a366c67b8e1f6ec3666b2fe9ff4a29f4a844fbbf"
+  },
+  {
+    "path": "coursier-maven-central-0015.json.gz",
+    "sha256": "b70bc1508b2581e15c18bb32d674d4ad493494503701df56b0f666c7ed96d686",
+    "uncompressedSha256": "0537437d44e0253591fb20409fbfba38505312cd9a1ec7e0778b457ff368ad80"
+  },
+  {
+    "path": "coursier-maven-central-0016.json.gz",
+    "sha256": "c5e9ecdc983265afb4ad9edde2f227f0df87b725551e086124df04a90a283fac",
+    "uncompressedSha256": "5bbd9d7bb555c250c56ec8693c3b3c00ad6e844e13740bbdd18a6025ce5f8356"
+  },
+  {
+    "path": "coursier-maven-central-0017.json.gz",
+    "sha256": "de5eb0658f71ebb5bcde769f96d42861f9b0bc7a68f659c1bd7f3f51bd86942d",
+    "uncompressedSha256": "46099c2656ea5bdf69d53c5d1c75ce231fae0c46253cfbc3e63f1daaf4fc81de"
+  },
+  {
+    "path": "coursier-maven-central-0018.json.gz",
+    "sha256": "7f61cf7607ff89d6d16d3bd7d1005d1c2994d7dc0d3b5f7ae5563d0615bd0636",
+    "uncompressedSha256": "a9b9911120d185dfb2c5cc96707c3212d713470cae828634da39ca1b200397bf"
+  },
+  {
+    "path": "coursier-maven-central-0019.json.gz",
+    "sha256": "c9135e78fce2a1de349bc0849b720123bc2a7534435a984bd1f44c1633e8d9aa",
+    "uncompressedSha256": "7f28e7955add91c23b858e3c2e28c567bca4177b2172bb2c2bb687ee1b610521"
+  },
+  {
+    "path": "coursier-maven-central-0020.json.gz",
+    "sha256": "c48b5ba86717e3c1b187673cbbda56d0260dc10f84c8572008988be29a946a31",
+    "uncompressedSha256": "4f0a7d982f6ce1832de02eb03d9f4ff1dc50e239e4b83a2183f6186c6e8b3e7b"
+  },
+  {
+    "path": "coursier-maven-central-0021.json.gz",
+    "sha256": "4710de28f5161a43121c8aecf017dea3326ba76a7b09597f8c3999feca3e78f5",
+    "uncompressedSha256": "ee5e5c77333e889a63c651c0ac2e7aa94033cdf2cc1e96f3b05fabc72c83bf08"
+  },
+  {
+    "path": "coursier-maven-central-0022.json.gz",
+    "sha256": "112eee78a93164290b92395f1d673896f863968d83096ea7686c8bd36139f2e6",
+    "uncompressedSha256": "cd47b0913b3358b938eb848af9cf40ae5f791159389e7e672f41f335e0d640b6"
+  },
+  {
+    "path": "coursier-maven-central-0023.json.gz",
+    "sha256": "1cc36e15b551f473cfc59e339fc4062614c93ee9b4cb7fd0491d456f2428f1b3",
+    "uncompressedSha256": "80689e500472751d6b048e011b6c47da51c004a999f5a3913173cc868e203261"
+  },
+  {
+    "path": "coursier-maven-central-0024.json.gz",
+    "sha256": "dd283e45d8cbe711fb74490f85bd889cf1d259284681c1bc3bac86e80d01db27",
+    "uncompressedSha256": "22b0e44d37fd2c12439c300ec8356414e9556c10c1ab50710d7dcb1a3cbecfa7"
+  },
+  {
+    "path": "coursier-maven-central-0025.json.gz",
+    "sha256": "2c8b1c31f2a15f65617f421680373094d68d7239f08351dd9b46d502b45f2276",
+    "uncompressedSha256": "1854efdee90a68e66819883f6661a1821610c765eb9ae30119548484300a6148"
+  },
+  {
+    "path": "coursier-maven-central-0026.json.gz",
+    "sha256": "85f5cb1f2ce22f3b22d78c7155e08fadef98c38ac71c5a3bb8a148f06863206d",
+    "uncompressedSha256": "01fcce8bc6f008ed6613246a133316f55b3a28a8f3d6abbe259a28e93671ec79"
+  },
+  {
+    "path": "coursier-maven-central-0027.json.gz",
+    "sha256": "2426bfb8834f1ea6325462edb084663bf1fda5a3cd8e2cde4f4e29ec3e5897a1",
+    "uncompressedSha256": "ec548c096d4f772a27f42f6035984bc4165a6930ca7d2f45d769628aec1019e0"
+  },
+  {
+    "path": "coursier-maven-central-0028.json.gz",
+    "sha256": "9f3f2eef1d1653a5d3370365c00047b5142327122e7f3bb1758d85d3720a2ca9",
+    "uncompressedSha256": "eb698ce3dd640dc595f5b56be393a886657a11d87bcaa2faed01ce46815b073c"
+  },
+  {
+    "path": "coursier-maven-central-0029.json.gz",
+    "sha256": "79a73700726fb7a7ba4b21409c04ab1b06c2b4657ca9cbb5dd3ab8e87c7f5ad3",
+    "uncompressedSha256": "2696f32faefd1a68b534df3b39cee3966d90c2baaa1404ee7d1fea1acccc1ea7"
+  },
+  {
+    "path": "coursier-maven-central-0030.json.gz",
+    "sha256": "0104ff5b14b69d47efd4e0d94835e91a87443a61f57225ad0e862defe77d6106",
+    "uncompressedSha256": "221349a6de8cdebea8d316993ace9480db9ab2daef207bc1fcd45678f443430c"
+  },
+  {
+    "path": "coursier-maven-central-0031.json.gz",
+    "sha256": "f49da60fa6ace20c16f2bb505e67b297212b64aa6da078404ca441238989f08b",
+    "uncompressedSha256": "431c9e0729ce7a2db71df7c65878999c99182057998c8b8339437745b526af5f"
+  },
+  {
+    "path": "coursier-maven-central-0032.json.gz",
+    "sha256": "8e30467d0071467e0e4532cb70e644df97afa628041b28e7523059e7cb45873e",
+    "uncompressedSha256": "f357521833f013fa0ea0b185671eabd5e99989edc09448ea53f8c5b698bb4e02"
+  },
+  {
+    "path": "coursier-maven-central-0033.json.gz",
+    "sha256": "27691c52feac058b0f7979f559532edf202b7573095d8c97d10b7d421220fcad",
+    "uncompressedSha256": "f7603564860a33563db1f6266b716b7df2e4032746af1789367278b9dccd75c5"
+  },
+  {
+    "path": "coursier-maven-central-0034.json.gz",
+    "sha256": "0ff4bad6618d3f5e5ce2fa07168ddcd6bb3d15abca2c4fd26b53ce109e8cfdb6",
+    "uncompressedSha256": "dea31afbd0281122fe8e18091fe8f9ea223645f68ca4614a7cd3229f0b6f8093"
+  },
+  {
+    "path": "coursier-maven-central-0035.json.gz",
+    "sha256": "9bde99faf1d632d35d9d603c1a5077ac6c6c639b5ed6db9b3b9442e1ae129a1e",
+    "uncompressedSha256": "8b142bd0a918a787dafa66f1bebee835dfa4eedaf2e4e0acc374c893b34d6ca9"
+  },
+  {
+    "path": "coursier-maven-central-0036.json.gz",
+    "sha256": "afa280bf51f954bbb56c5d34b2804f539e8439858ce2a2b2a28af9e74ea19542",
+    "uncompressedSha256": "6e3e2f07d5fbf2adcbbd98674d95f4b7e0117d148d4edc9fb7a314e9ed5b5c14"
+  },
+  {
+    "path": "coursier-maven-central-0037.json.gz",
+    "sha256": "e9e61954dd6aae8f2c5e0717b86b2816fdf9c5abec4229e1edccd70fc29e223f",
+    "uncompressedSha256": "54ebd451f786852983ad2a5f725aa4f2c8b4eecfde7d209973b7ea22dda7f666"
+  },
+  {
+    "path": "coursier-maven-central-0038.json.gz",
+    "sha256": "fd603acb6c8e05b3c88ab478207f87bb859bc0340e1b2ce50b99bc802106d34d",
+    "uncompressedSha256": "103a1cce5b4141f2bf632110442a6daa0e5fed9121d643c53bb819ccc4a0e9cd"
+  },
+  {
+    "path": "coursier-maven-central-0039.json.gz",
+    "sha256": "c053ee66f1cbcd9088296b24ec29374ec8e091884e7dd99f634bd850d2c6590f",
+    "uncompressedSha256": "5961670ad9b30b287a8948b51002d5767c48f9dc6fbe986b99e3157f8a66d9e9"
+  },
+  {
+    "path": "coursier-maven-central-0040.json.gz",
+    "sha256": "60c47d8b97eab84daee8d584b1015841db224d82723cffb91d555b2fa231a91a",
+    "uncompressedSha256": "b21997d2e6e4bda2a110eef947a67646fc2a5ebc6716bbb5a4ef218b14b47da5"
+  },
+  {
+    "path": "coursier-maven-central-0041.json.gz",
+    "sha256": "eec8e697ad0a1f831c38e071d688cdfe61399390a0245de76edf2b4bae8f8d4b",
+    "uncompressedSha256": "336df29ff7222cb55d74f6b25d17137497c572f9a8aae1dd029a03b6ca4b1f46"
+  },
+  {
+    "path": "coursier-maven-central-0042.json.gz",
+    "sha256": "241cce402c0fd4c7ea98a3c36e3fa4e597391aa187b0547942fb6a597c4a0aee",
+    "uncompressedSha256": "11a5e008b9409afc44bde83fc6be3b7dbb7476155cf2790a0c5fd57dc4dd9a69"
+  },
+  {
+    "path": "coursier-maven-central-0043.json.gz",
+    "sha256": "c818a6ddf0fffa1e66b0cb5e3bf2a6f4c5069fbc37e1d047480a1528ff6f49c6",
+    "uncompressedSha256": "aa399444f8ff6594fe46921170bf437f18dd7d152ac46660a56d4d070a4c590f"
+  },
+  {
+    "path": "coursier-maven-central-0044.json.gz",
+    "sha256": "eca4378935421912ec0015096ba1b11a88921a9aac0d65b4d16d858a57769f9b",
+    "uncompressedSha256": "84d7169fb8aca9992f893e31ec5790049e5cf446d8a91a1716e4e31c676b0592"
+  },
+  {
+    "path": "coursier-maven-central-0045.json.gz",
+    "sha256": "0dc67baf487b499bab13f2d65bdc02f183fa7c848c5013b7d53b4fbebe147dbd",
+    "uncompressedSha256": "119c3ea549f39826528a37cc6f4140981d6293d916a5a0c32d6b42fe964e9b0f"
+  },
+  {
+    "path": "coursier-maven-central-0046.json.gz",
+    "sha256": "ce8b9884e04db25347faa8d87f804eb389fad2338ff03a16b052a3b279fa6511",
+    "uncompressedSha256": "22936f2b3d85c2c284adee8c99ebfb70e5209af68722d86f155f46ff457440ee"
+  },
+  {
+    "path": "coursier-maven-central-0047.json.gz",
+    "sha256": "f00f65e01e8baca2238eb962a59d7a6e7884ad32184d2b4d1200a1b6b5bf6b6b",
+    "uncompressedSha256": "3c74dfa487e2147a782f9d1f940b4dd64a0a68ccf0b23112ec7199ad19a3f28c"
+  },
+  {
+    "path": "coursier-maven-central-0048.json.gz",
+    "sha256": "6cd2d1104d468d818f0231d2e470048e95ee29c9dcbd59a7361850df68319727",
+    "uncompressedSha256": "7f3f7fd5d7c08e0ce33ef7cb824f1aaf0f09e7158d148a5c9237da520e9590f4"
+  },
+  {
+    "path": "coursier-maven-central-0049.json.gz",
+    "sha256": "69558b9870f9cf3bb069359ad670a1e377f398cd64b8392934cf8c4103ca8ad4",
+    "uncompressedSha256": "836f068e6ad879a5614f4c887f97f2dfe2aa8f4b7828f5759773be72a5ff81f0"
+  }
+]

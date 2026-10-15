@@ -86,6 +86,23 @@ factory rename and a refused supported-accessor removal. Neither local control e
 whole-library JavaScript/Native, wire or scientific compatibility. After the first stable
 artifacts are published, the configured comparisons must resolve those actual artifact bytes.
 
+## Current local rehearsal
+
+The [14 October evidence](refactor/evidence/release-freeze-20261014/README.md) records the exact
+`63a952f9` compiled candidate and its full hosted matrix, documentation and pinned Atlas checks.
+The proposed upstream chain passed 1,006 source tests and staged nine JVM artifacts. Its recorded
+release overlays supply fixed versions, local publication routing and homepage/SCM metadata from
+the pinned repository URLs. A fresh binary consumer resolved those exact staged JARs and passed
+six graph/kernel/query assertions. All 56 actual StoryModel POMs passed metadata and internal
+closure checks. Fresh Maven Central resolution passed for 46 of 50 external coordinates. The four missing
+`io.github.canardlapin` roots at `0.1.0-RC1` are `grakern-core_3`, `grakern-engine-jvm_3`,
+`grakern-graph4s_3` and `grakern-standard_3`; their publication remains required.
+[Complete receipt](refactor/evidence/release-freeze-20261014/publication/summary.json).
+
+The preflight admits fixed Scala Native versions such as `3.7.4+0.5.12`; it still refuses
+snapshots, ranges and wildcard-plus selectors before resolution. Eleven version controls and
+a compiling guard mutation distinguish those cases, alongside actual Coursier resolution.
+
 ## Publication decision
 
 The organization is already `io.github.bbuchsbaum`. Before publication, verify ownership of

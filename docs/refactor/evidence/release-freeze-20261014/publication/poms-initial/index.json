@@ -1,0 +1,12 @@
+[
+  {
+    "path": "make-poms.log.gz",
+    "sha256": "b4559f1995b3d2bbd70fd11b29982e5e97dec4edc885760015c6fefdd911d48b",
+    "uncompressedSha256": "280002e713276ac842789981809a753426334d521892ded6625589308d010528"
+  },
+  {
+    "path": "receipt.json.gz",
+    "sha256": "d7befb2bb7c2fcb5a7b718f3c55cbae14fad8f10cdecc8f7ac2f32aad48a39ba",
+    "uncompressedSha256": "378d094e7f60a83c444a74763d9ce68a0a8f9830e414c755bee9a7f5fc28bbf7"
+  }
+]

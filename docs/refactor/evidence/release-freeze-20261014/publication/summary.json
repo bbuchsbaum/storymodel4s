@@ -1,0 +1,42 @@
+{
+  "librarySource": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "toolSource": "f1ec18dcebca50a4d2c912ae3afdbb8f2f225956",
+  "publication": "not-published",
+  "upstream": {
+    "tests": 1006,
+    "tasks": 11,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "artifacts": 9,
+    "pomMatrix": "passed",
+    "localBinaryConsumerAssertions": 6,
+    "rootHashesVerified": 9,
+    "serverClosed": true
+  },
+  "storymodel": {
+    "candidatePoms": 56,
+    "metadataAndInternalClosure": "passed",
+    "externalCoordinates": 50,
+    "publicResolved": 46,
+    "missingPublicCoordinates": [
+      "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+      "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1",
+      "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+      "io.github.canardlapin:grakern-standard_3:0.1.0-RC1"
+    ]
+  },
+  "baseline": "six actual MiMa task controls passed; first1.0.0 exempt, later1.x require exact own1.0.0 module; no stable artifacts published",
+  "remaining": [
+    "qualify Native literal-NUL runtime behavior",
+    "approve upstream coordinates and publish dependency chain after namespace/signing verification",
+    "verify StoryModel namespace/signing route and authorize final release/tag",
+    "approve docs hosting destination and deployment"
+  ],
+  "toolReview": {
+    "reviewer": "constructor_exact_review",
+    "overlaySource": "c3add00ed7cc9400f918fd9651d64ca3d6310804",
+    "versionSource": "f1ec18dcebca50a4d2c912ae3afdbb8f2f225956",
+    "verdict": "GO-code on both actual-rehearsal repairs; no scoped BLOCK"
+  }
+}
