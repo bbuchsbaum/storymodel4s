@@ -1,0 +1,70 @@
+diff --git a/javalib/src/main/scala/java/lang/String.scala b/javalib/src/main/scala/java/lang/String.scala
+index 3c7279b..3a9cb30 100644
+--- a/javalib/src/main/scala/java/lang/String.scala
++++ b/javalib/src/main/scala/java/lang/String.scala
+@@ -400,7 +400,10 @@ final class _String()
+           hash = data(i) + ((hash << 5) - hash)
+           i += 1
+         }
+-        cachedHashCode = hash
++        // String literals reside in read-only memory and already contain their
++        // computed hash. A zero hash is also the uncached sentinel; writing it
++        // back is redundant for heap strings and invalid for literals.
++        if (hash != 0) cachedHashCode = hash
+         hash
+       }
+     } else {
+diff --git a/unit-tests/shared/src/test/scala/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala b/unit-tests/shared/src/test/scala/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala
+new file mode 100644
+index 0000000..6f61f37
+--- /dev/null
++++ b/unit-tests/shared/src/test/scala/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala
+@@ -0,0 +1,48 @@
++package org.scalanative.testsuite.javalib.lang
++
++import org.junit.Assert._
++import org.junit.Test
++
++class StringHashCodeTest {
++  @Test def literalNulHash(): Unit = checkHash("\u0000", 0)
++
++  @Test def literalTwoNulsHash(): Unit = checkHash("\u0000\u0000", 0)
++
++  @Test def literalAsciiZeroHash(): Unit = checkHash("f5a5a608", 0)
++
++  @Test def dynamicNulHash(): Unit = checkHash(new String(Array(0.toChar)), 0)
++
++  @Test def dynamicAsciiZeroHash(): Unit =
++    checkHash(new String(Array('f', '5', 'a', '5', 'a', '6', '0', '8')), 0)
++
++  @Test def emptyHash(): Unit = checkHash("", 0)
++
++  @Test def ordinaryHash(): Unit = checkHash("abc", 96354)
++
++  @Test def negativeHash(): Unit = checkHash("polygenelubricants", Int.MinValue)
++
++  @Test def zeroHashCollectionKeys(): Unit = {
++    val map = new java.util.HashMap[String, String]()
++    val set = new java.util.HashSet[String]()
++    val keys = Array("", "\u0000", "\u0000\u0000", "f5a5a608")
++    keys.foreach { key =>
++      map.put(key, key)
++      assertTrue(set.add(key))
++    }
++    assertEquals(keys.length, map.size())
++    assertEquals(keys.length, set.size())
++    keys.foreach { key =>
++      val copy = new String(key.toCharArray)
++      assertEquals(key, map.get(copy))
++      assertFalse(set.add(copy))
++    }
++  }
++
++  private def checkHash(value: String, expected: Int): Unit = {
++    var iteration = 0
++    while (iteration < 10) {
++      assertEquals(expected, value.hashCode())
++      iteration += 1
++    }
++  }
++}

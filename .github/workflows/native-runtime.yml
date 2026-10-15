@@ -1,0 +1,47 @@
+name: Native runtime repair
+
+on:
+  push:
+    paths:
+      - 'tools/native-runtime/**'
+      - '.github/workflows/native-runtime.yml'
+  pull_request:
+    paths:
+      - 'tools/native-runtime/**'
+      - '.github/workflows/native-runtime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        mode: [debug, release-fast]
+    env:
+      LLVM_BIN: /usr/lib/llvm-18/bin
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+      - name: Install LLVM 18
+        run: sudo apt-get update && sudo apt-get install -y clang-18 llvm-18 lld-18
+      - name: Qualify original and repaired runtime
+        run: python3 tools/native-runtime/qualify.py --output "$RUNNER_TEMP/native-runtime" --mode '${{ matrix.mode }}'
+      - name: Retain qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-runtime-${{ matrix.mode }}
+          path: |
+            ${{ runner.temp }}/native-runtime/*.log
+            ${{ runner.temp }}/native-runtime/receipt.json
