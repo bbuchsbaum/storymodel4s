@@ -1,0 +1,1 @@
+{"actor":"codex-release-freeze-20261014","entity":"bd-01M4YFK6VVZ71EB2SGS25DM0ED","kind":"reserve_open","mode":"exclusive","op":"20261015T030121.643245Z-p16161-c0000-re9ab-hf5579a","paths":[".github/workflows/ci.yml","tools/ci/"],"reservation_id":"rv-01M4YR3NKB2CNB20Y9G7HYHRD8","ts":"2026-10-15T03:01:21.643245Z","ttl_s":14400,"v":2}
