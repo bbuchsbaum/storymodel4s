@@ -37,14 +37,8 @@ class ConstructionProbeSuite extends FunSuite:
     classOf[storymodel4s.embed.RemotePolicy]
   )
 
-  /** Sweep 3 slice: the Mirror.ProductOf door across embed-core's private-constructor case classes.
-    *
-    * `case class X private (...)` still derives `Mirror.ProductOf` in Scala 3, so the private
-    * constructor is defeated from outside the package. Pins the measured state; closing any of
-    * these makes this FAIL and asks for the name to be removed. Tracked on
-    * bd-01M183VBPNEAPT5JNQMBMYMKQ9.
-    */
-  test("sweep 3: Mirror.ProductOf door across embed-core private-constructor case classes") {
+  /** Receipt alternatives must preserve the restricted factory route from outside the package. */
+  test("receipt alternatives have no Mirror.ProductOf reconstruction door") {
     assert(dependsOn.forall(_ != null))
     assertEquals(
       typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceUnit]]"),
@@ -74,9 +68,8 @@ class ConstructionProbeSuite extends FunSuite:
     val forgeable = results.collect { case (n, errs) if errs.isEmpty => n }.toSet
     assertEquals(
       forgeable,
-      results.map(_._1).toSet,
-      "sweep 3 expects the Mirror door OPEN here; a difference means one was closed (update this " +
-        "list) or a new private-constructor case class was added unmeasured"
+      Set.empty[String],
+      "receipt alternatives must not derive product construction"
     )
   }
 

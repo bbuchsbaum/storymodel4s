@@ -112,12 +112,12 @@ object ReceiptRendering:
 /** The identity of some receipt surface (cache key, provider-call input/output, capability payload,
   * attempt receipt).
   *
-  * Sealed with `private[embed]` constructors: outside this package a `Plain` identity of sensitive
-  * material cannot be constructed at all — the only constructors are [[ReceiptDigest.of]] (Plain
-  * iff `Sensitivity.Public`), [[ReceiptDigest.keyed]] / [[ReceiptDigest.keyedUnder]] (HMAC or a
-  * typed `NoKey`), and the `private[embed]` [[ReceiptDigest.withheld]] used only by
-  * [[AttemptReceipt]] for a material-free rendering. Rendered forms never contain material or key
-  * bytes.
+  * Sealed with non-product alternatives and restricted factories: outside this package construction
+  * follows [[ReceiptDigest.of]] (Plain iff the supplied sensitivity is `Sensitivity.Public`),
+  * [[ReceiptDigest.keyed]] / [[ReceiptDigest.keyedUnder]] (HMAC or a typed `NoKey`), and the
+  * `private[embed]` [[ReceiptDigest.withheld]] used only by [[AttemptReceipt]] for a material-free
+  * rendering. Rendered forms never contain material or key bytes. The caller's sensitivity
+  * declaration is an input, not a content-classification proof.
   */
 sealed trait ReceiptDigest:
   def kind: DigestKind
@@ -129,26 +129,54 @@ sealed trait ReceiptDigest:
   def render: String
 
 object ReceiptDigest:
-  final case class Plain private[embed] (checksum: Checksum) extends ReceiptDigest:
+  final class Plain private (val checksum: Checksum) extends ReceiptDigest:
     def kind: DigestKind = DigestKind.Plain
     def keyIdOption: Option[KeyId] = None
     def render: String = s"plain:${checksum.hex}"
+    override def equals(other: Any): Boolean = other match
+      case that: Plain => checksum == that.checksum
+      case _           => false
+    override def hashCode(): Int = checksum.hashCode
+    override def toString: String = render
 
-  final case class Keyed private[embed] (digest: SensitiveDigest) extends ReceiptDigest:
+  object Plain:
+    private[embed] def apply(checksum: Checksum): Plain = new Plain(checksum)
+    def unapply(value: Plain): Some[Checksum] = Some(value.checksum)
+
+  final class Keyed private (val digest: SensitiveDigest) extends ReceiptDigest:
     def kind: DigestKind = DigestKind.Keyed
     def keyId: KeyId = digest.keyId
     def keyIdOption: Option[KeyId] = Some(digest.keyId)
     def render: String = digest.render
+    override def equals(other: Any): Boolean = other match
+      case that: Keyed => digest == that.digest
+      case _           => false
+    override def hashCode(): Int = digest.hashCode
+    override def toString: String = s"ReceiptDigest.Keyed(keyId=${keyId.value}, digest=<redacted>)"
+
+  object Keyed:
+    private[embed] def apply(digest: SensitiveDigest): Keyed = new Keyed(digest)
+    def unapply(value: Keyed): Some[SensitiveDigest] = Some(value.digest)
 
   /** A material-free identity recorded when a required key was absent; only [[AttemptReceipt]]
     * mints it, and only when every non-public item of the batch carries a
     * `PolicyDecision.KeyUnavailable`.
     */
-  final case class Withheld private[embed] (missingKey: KeyId, checksum: Checksum)
+  final class Withheld private (val missingKey: KeyId, val checksum: Checksum)
       extends ReceiptDigest:
     def kind: DigestKind = DigestKind.Withheld
     def keyIdOption: Option[KeyId] = Some(missingKey)
     def render: String = s"withheld:${missingKey.value}:${checksum.hex}"
+    override def equals(other: Any): Boolean = other match
+      case that: Withheld => missingKey == that.missingKey && checksum == that.checksum
+      case _              => false
+    override def hashCode(): Int = (missingKey, checksum).hashCode
+    override def toString: String = render
+
+  object Withheld:
+    private[embed] def apply(missingKey: KeyId, checksum: Checksum): Withheld =
+      new Withheld(missingKey, checksum)
+    def unapply(value: Withheld): Some[(KeyId, Checksum)] = Some((value.missingKey, value.checksum))
 
   /** Sensitivities whose receipt identity may be a plain content hash. Exactly `Public`. */
   val plainAdmissible: Set[Sensitivity] = Set(Sensitivity.Public)
@@ -238,7 +266,7 @@ final class EmbeddingReceipt private (
   /** True iff no rendered identity in this receipt is a plain hash of non-public material. */
   def isKeyConsistent: Boolean =
     items.forall(i =>
-      (i.digest.kind == DigestKind.Plain) == ReceiptDigest.plainAdmissible.contains(i.sensitivity)
+      i.digest.kind != DigestKind.Plain || ReceiptDigest.plainAdmissible.contains(i.sensitivity)
     ) &&
       (kind match
         case DigestKind.Plain    => outputs.kind == DigestKind.Plain

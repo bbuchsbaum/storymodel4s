@@ -189,6 +189,55 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       cached = false
     )
 
+  test(
+    "keyed public items satisfy receipt consistency while all-public attempt policy stays strict"
+  ) {
+    val keyed = ReceiptDigest.keyed("public material", k1).toOption.get
+    val item =
+      ItemDigest.of(RequestId.unsafe("public-keyed"), Sensitivity.Public, keyed).toOption.get
+    val receipt = EmbeddingReceipt.of(baseCall("public-keyed"), Vector(item), keyed).toOption.get
+    assertEquals(receipt.kind, DigestKind.Keyed)
+    assert(receipt.isKeyConsistent)
+    val attempt = AttemptReceipt.of(
+      Vector(receipt.call),
+      Vector(receipt),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(item.id -> item.sensitivity),
+      k1
+    )
+    assertEquals(
+      attempt,
+      Left(EmbedError.InvalidResult("public batch cannot contain keyed receipt evidence"))
+    )
+  }
+
+  test("every admitted item/output sensitivity combination yields a consistent embedding receipt") {
+    val plain = ReceiptDigest.of(Sensitivity.Public, "public", k1).toOption.get
+    val keyed = ReceiptDigest.keyed("material", k1).toOption.get
+    val withheld = ReceiptDigest.withheld(k1.currentKeyId, "material-free")
+    val admitted = for
+      sensitivity <- Sensitivity.values
+      input <- Vector(plain, keyed, withheld)
+      output <- Vector(plain, keyed, withheld)
+      item <- ItemDigest.of(RequestId.unsafe("r"), sensitivity, input).toOption
+      receipt <- EmbeddingReceipt.of(baseCall("admission"), Vector(item), output).toOption
+    yield
+      assert(receipt.isKeyConsistent, s"$sensitivity/${input.kind}/${output.kind}")
+      (sensitivity, input.kind, output.kind)
+    assertEquals(
+      admitted.toSet,
+      Set(
+        (Sensitivity.Public, DigestKind.Plain, DigestKind.Plain),
+        (Sensitivity.Public, DigestKind.Plain, DigestKind.Keyed),
+        (Sensitivity.Public, DigestKind.Keyed, DigestKind.Keyed),
+        (Sensitivity.Internal, DigestKind.Keyed, DigestKind.Keyed),
+        (Sensitivity.Sensitive, DigestKind.Keyed, DigestKind.Keyed)
+      )
+    )
+  }
+
   private def embeddingReceipt(
       call: ProviderCall,
       item: ItemDigest,
