@@ -87,6 +87,7 @@ def main() -> int:
         receipt["original"] = {"controlPasses": original_passes, "crashCase": "literal-nul"}
         run("apply", ["git", "apply", str(HERE / "zero-hash.patch")], checkout)
         source_suffixes = [
+            "/sbt-buildinfo/ScalaNativeBuildInfo.scala",
             "/org/scalanative/testsuite/javalib/lang/StringTest.scala",
             "/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala",
             "/utils/AssertThrows.scala", "/org/scalanative/testsuite/utils/Platform.scala"]
