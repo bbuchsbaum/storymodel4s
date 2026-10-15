@@ -71,6 +71,7 @@ These results qualify the tested configuration without attributing the earlier c
 Native qualification also exposed a standard-library literal NUL hash crash, independently of
 StoryModel types (`bd-01M4YP83C7925M22V0K5AQ88BX`). An equal-content fixture construction retains
 all identity assertions; the underlying runtime remains a separate stable-publication prerequisite.
+The complete reviewed prerequisite slice landed on local and GitHub main at `94ffd993`.
 Local publication preparation now includes nine staged upstream artifacts, 1,006 upstream
 passes, a fresh binary consumer with six assertions, and 56 validated StoryModel POMs. Public
 resolution passed for 46/50 external coordinates; four proposed grakern `0.1.0-RC1` roots remain

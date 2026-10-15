@@ -1,0 +1,48 @@
+{
+  "reviewedCandidate": "94ffd993404e7e2d7c5d8c0665d09523a61742f2",
+  "base": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO for authorized main integration and push; no remaining integration BLOCK",
+  "compiledSource": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "hosted": {
+    "passed": 15474,
+    "skipped": 44,
+    "failed": 0,
+    "errors": 0,
+    "tasks": 80
+  },
+  "atlas": {
+    "source": "dc14d52d59b6ded38a959f88f87f448fba6fb1e0",
+    "passed": 518,
+    "skipped": 0,
+    "failed": 0
+  },
+  "upstream": {
+    "passed": 1006,
+    "tasks": 11,
+    "artifacts": 9,
+    "consumerAssertions": 6
+  },
+  "candidatePoms": 56,
+  "publicDependencies": {
+    "passed": 46,
+    "missing": 4
+  },
+  "versionCourt": {
+    "baselinePassed": 11,
+    "namedMutationKills": 4,
+    "passingSiblings": 7
+  },
+  "landing": {
+    "localMain": "94ffd993404e7e2d7c5d8c0665d09523a61742f2",
+    "remoteMain": "94ffd993404e7e2d7c5d8c0665d09523a61742f2",
+    "method": "fast-forward; ordinary push"
+  },
+  "limits": [
+    "LLVM18 operational qualification does not establish cause of earlier crashes",
+    "Native literal-NUL P1 remains open",
+    "four proposed grakern roots unavailable publicly",
+    "namespace/signing, dependency publication, final release/tag authorization and site deployment remain outstanding"
+  ],
+  "publication": "not-published"
+}

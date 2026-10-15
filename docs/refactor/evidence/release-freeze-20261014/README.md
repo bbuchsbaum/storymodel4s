@@ -1,7 +1,8 @@
 # Release prerequisite evidence
 
 This record binds the constructor repairs, member-level stability decisions and local
-publication preparation requested on 14 October. It is not a release certificate.
+publication preparation requested on 14 October. [Final independent review and landing](final-review-and-landing.json)
+approved candidate `94ffd993`, fast-forwarded and pushed to main. It is not a release certificate.
 
 ## Constructor slice
 
