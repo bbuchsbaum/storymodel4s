@@ -71,9 +71,12 @@ def main() -> int:
                 raise RuntimeError(f"wrong checkout for {name}: {actual}")
             run(["git", "remote", "set-url", "origin", entry["url"]], dest)
             overlay = dest / "zz-release-preparation.sbt"
+            homepage = entry["url"].removesuffix(".git")
             # JSON string quoting also produces valid Scala literals for these fixed paths/URLs.
             overlay.write_text(
                 f'ThisBuild / version := {json.dumps(entry["version"])}\n'
+                f'ThisBuild / homepage := Some(url({json.dumps(homepage)}))\n'
+                f'ThisBuild / scmInfo := Some(ScmInfo(url({json.dumps(homepage)}), {json.dumps("scm:git:" + entry["url"])}))\n'
                 f'ThisBuild / publishTo := Some(Resolver.file("local-release-rehearsal", file({json.dumps(str(repository))}))(Resolver.mavenStylePatterns))\n'
                 'ThisBuild / publishMavenStyle := true\n'
             )

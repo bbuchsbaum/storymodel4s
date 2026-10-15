@@ -56,7 +56,8 @@ python3 tools/release/stage-dependencies.py --output /absolute/new/directory
 Add `--run` to execute the recorded JVM tests and publish the selected artifacts into that
 directory's file Maven repository. `--source graph4s=/local/git/checkout` (and the corresponding
 gale/grakern options) can supply the pinned Git objects without changing those source checkouts.
-Every target receives an explicit local publication destination. The command refuses an existing
+The recorded build overlay supplies proposed versions and homepage/SCM metadata derived from
+the pinned repository URLs. Every target receives an explicit local publication destination. The command refuses an existing
 output directory and retains source revisions, build overlays, commands, log hashes and artifact
 hashes. It checks the actual POM matrix, metadata, fixed dependency versions and internal closure.
 
