@@ -1,0 +1,47 @@
+{
+  "status": "passed",
+  "controls": [
+    {
+      "repository": "graph4s",
+      "command": [
+        "sbt",
+        "-batch",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"signing-refusal-control\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/graph4s-refused-staging\"))(Resolver.mavenStylePatterns))",
+        "coreJVM/publish"
+      ],
+      "exit": 1,
+      "namedFailure": "signing failed: No secret key",
+      "publishedArtifacts": 0,
+      "log": "graph4s-signing-refusal.log",
+      "sha256": "8c8efa780155102cc0c96446adf938d5541b2db56bebdc03f98221f60113bf91"
+    },
+    {
+      "repository": "gale",
+      "command": [
+        "sbt",
+        "-batch",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"signing-refusal-control\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/gale-refused-staging\"))(Resolver.mavenStylePatterns))",
+        "coreJVM/publish"
+      ],
+      "exit": 1,
+      "namedFailure": "signing failed: No secret key",
+      "publishedArtifacts": 0,
+      "log": "gale-signing-refusal.log",
+      "sha256": "c05078eb33ab2cb32d2ce56b85774ad3d2e4653a1833d85443312497edd4ff96"
+    },
+    {
+      "repository": "grakern",
+      "command": [
+        "sbt",
+        "-batch",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"signing-refusal-control\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/grakern-refused-staging\"))(Resolver.mavenStylePatterns))",
+        "coreJVM/publish"
+      ],
+      "exit": 1,
+      "namedFailure": "signing failed: No secret key",
+      "publishedArtifacts": 0,
+      "log": "grakern-signing-refusal.log",
+      "sha256": "6414759755c5077505710c2f94868431972bd9c588f63da0226423c9ecbc889f"
+    }
+  ]
+}

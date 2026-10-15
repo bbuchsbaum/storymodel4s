@@ -1,0 +1,33 @@
+{
+  "reviewer": "/root/constructor_exact_review",
+  "kind": "independent-exact-commit-review",
+  "candidates": [
+    {
+      "repository": "graph4s",
+      "commit": "10e29e2a496b9ac00e299b560faa1462d122ccaa",
+      "branch": "codex/publication-20261015"
+    },
+    {
+      "repository": "gale",
+      "commit": "9e7d1e7d0325d8e8b7989b4acd8c6c7328c1dbd8",
+      "branch": "codex/publication-20261015"
+    },
+    {
+      "repository": "grakern",
+      "commit": "539a9e16d5ef36ede721fb43fe4a89e95dacd52d",
+      "branch": "codex/publication-20261015"
+    }
+  ],
+  "verdict": "GO-code",
+  "verified": [
+    "nine POMs have complete internal closure and fixed versions",
+    "1006 passes in11 tasks;zero failures/errors",
+    "local staging;releaseversions;signing refusaldefault;no automaticrelease"
+  ],
+  "remaining": "Central account verification, actual signatures and signed bundle validation, public resolution",
+  "pages": {
+    "commit": "5958d3d1627d69ef7f0827a49e60604b7ee34654",
+    "verdict": "GO",
+    "controls": "33 localURL checks and two independently corrupted base-path controls"
+  }
+}

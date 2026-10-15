@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-15T14:49:08.656695+00:00",
+  "github": [
+    {
+      "repository": "canardlapin/graph4s",
+      "secretNames": []
+    },
+    {
+      "repository": "canardlapin/gale",
+      "secretNames": []
+    },
+    {
+      "repository": "canardlapin/grakern",
+      "secretNames": []
+    },
+    {
+      "repository": "bbuchsbaum/storymodel4s",
+      "secretNames": []
+    }
+  ],
+  "centralNamespaceVerified": false,
+  "centralCredentialsAvailable": false,
+  "localSigningSecretKeyCount": 0,
+  "pendingInput": "publisher account setup and credential/key location; no secret values in chat"
+}

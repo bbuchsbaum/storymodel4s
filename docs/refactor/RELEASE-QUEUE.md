@@ -1,5 +1,23 @@
 # Current release queue
 
+## 15 October: publication workstreams
+
+The owner authorized completing the four infrastructure actions below. This table supersedes
+the earlier statements that site authorization was missing. The final release gate stays open
+until the remaining public artifacts and corrected-runtime delivery are evidenced.
+
+| Workstream | Current result | Remaining action |
+| --- | --- | --- |
+| 1. Dependency publication | Three exact-commit reviews; 1,006 source passes; nine staged JVM JARs; six fresh binary-consumer assertions. Release branches are pushed. | Verify the publisher account and signatures, publish graph4s/Gale then grakern, and rerun public resolution. |
+| 2. Native zero-hash defect | Reviewed upstream runtime patch and original/fixed comparison with the complete String suite. [Runtime evidence](evidence/native-runtime-20261015/README.md) records each platform/mode result. | Deliver a corrected runtime and qualify StoryModel against the selected release. The library still selects 0.5.12. |
+| 3. Namespace and signing | Fixed release metadata/local staging and signing configuration; three missing-key controls refuse publication. | Central namespaces, publisher tokens and signing key remain unavailable/unverified. The owner setup question is pending. |
+| 4. Documentation deployment | **Complete:** reviewed `5958d3d1` is live at <https://bbuchsbaum.github.io/storymodel4s/>; verification, deployment and live checks passed. | Normal verified main deployments. |
+
+[Publication evidence](evidence/publication-20261015/README.md) retains candidate SHAs, raw logs,
+artifact hashes, review and deployment receipts. [The release instructions](../../tools/release/PUBLICATION.md)
+give the precise account setup and remaining publication sequence. No Maven artifact or release
+tag was published in this checkpoint. The infrastructure and Native tickets remain open.
+
 ## 14 October: owner-authorized completion queue
 
 The owner approved completing workstreams 1-5 in the current

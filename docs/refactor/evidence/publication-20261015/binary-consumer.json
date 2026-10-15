@@ -1,0 +1,1706 @@
+{
+  "status": "local-binary-consumer-qualified",
+  "publication": "not-published",
+  "commands": [
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0000.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.scala-lang:scala3-library_3:3.3.8"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0000.log",
+      "exit": 0,
+      "logSha256": "b6b4d62d41f950c032cd1ffe0bba5f3e690f5c6cb9eab1254c164f7564237870",
+      "mode": "maven-central",
+      "coordinate": "org.scala-lang:scala3-library_3:3.3.8",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0000.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.18",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "sha256": "4e85d96ff7bc7dc627985523c3541b9917aaa08e956391380c42db21a2c4e5a0"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.8",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "sha256": "2c6eace9158df8ee4485a06128a479d968c1ebfc83ae9b1a394b58429f0d1492"
+        }
+      ],
+      "reportSha256": "28960b6cad8d43c35ef914fb9bfe7af80570f956a8cde29633357eb487608778",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0001.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.scala-lang:scala3-library_3:3.7.4"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0001.log",
+      "exit": 0,
+      "logSha256": "a83740cfdab28595209d5b11d3a1cd1b849f8a095dfe0efc2c38bb116ab2456c",
+      "mode": "maven-central",
+      "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0001.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        }
+      ],
+      "reportSha256": "396ef3527eeb25599683572bba8708bf2341d9a0af483bb4fd52d672796c2f39",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0002.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.scalacheck:scalacheck_3:1.19.0"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0002.log",
+      "exit": 0,
+      "logSha256": "eddf96e13cd3b7841578627cc22b3efb152bc5332e4f8274b72bec5ab43ff4dd",
+      "mode": "maven-central",
+      "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0002.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.6",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.6/scala3-library_3-3.3.6.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.6/scala3-library_3-3.3.6.jar",
+          "sha256": "cf4ddaf76c0ce71cf68ca5d2dc7bad46c5a921aaf18909317ddc9ba6e67fb12b"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "sha256": "18a47bcadcb392d3bc4f56ba871887da97066e9c6748745f2d08a32efd44cce1"
+        }
+      ],
+      "reportSha256": "0d6bb95eb04ff5ee0d528d9bd56b1a2acd437fd5e6420990b081483e310bb26d",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0003.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.scalameta:munit-scalacheck_3:1.3.0"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0003.log",
+      "exit": 0,
+      "logSha256": "be90c072e00c0ae61ae63a76b57ee9d298e7afc26cb82a070cd2063990e81301",
+      "mode": "maven-central",
+      "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0003.json",
+      "jars": [
+        {
+          "coordinate": "junit:junit:4.13.2",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "url": "https://repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+        },
+        {
+          "coordinate": "org.hamcrest:hamcrest-core:1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.7",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.7/scala3-library_3-3.3.7.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.7/scala3-library_3-3.3.7.jar",
+          "sha256": "a16e046f4a9df9e0d0e0bc54bf6298c94d7d867457f7b3b68291a88c568b92d0"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "sha256": "18a47bcadcb392d3bc4f56ba871887da97066e9c6748745f2d08a32efd44cce1"
+        },
+        {
+          "coordinate": "org.scalameta:junit-interface:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.0/junit-interface-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.0/junit-interface-1.3.0.jar",
+          "sha256": "0ec5545c6175e747b4ed94d3390219f6f32806f060eadb90e6e0f7e80420210d"
+        },
+        {
+          "coordinate": "org.scalameta:munit-diff_3:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.0/munit-diff_3-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.0/munit-diff_3-1.3.0.jar",
+          "sha256": "d1d5cd1bc1ff64a8b6eaad68543abdd702740b158648c8b35cf15962962f2ecb"
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.3.0/munit-scalacheck_3-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.3.0/munit-scalacheck_3-1.3.0.jar",
+          "sha256": "e56bc9b8c13d45702f582863578525d64c35ef9ee945d21c2a9280e2cdbad2b3"
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.0/munit_3-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.0/munit_3-1.3.0.jar",
+          "sha256": "115789a92c114c55ded2dd03ab4950649039edf53718a8746722f9613074b29c"
+        }
+      ],
+      "reportSha256": "47406fbe24b46660c71e3f8377ee653cef0e3fe237402c7e0a7a288c9aa3cd97",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0004.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.scalameta:munit_3:1.3.0"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0004.log",
+      "exit": 0,
+      "logSha256": "fc64d04ed44bd1c7f55385592bc00b9e3aad1c70c564ab6c7070629a993def7f",
+      "mode": "maven-central",
+      "coordinate": "org.scalameta:munit_3:1.3.0",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0004.json",
+      "jars": [
+        {
+          "coordinate": "junit:junit:4.13.2",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "url": "https://repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+        },
+        {
+          "coordinate": "org.hamcrest:hamcrest-core:1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.7",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.7/scala3-library_3-3.3.7.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.7/scala3-library_3-3.3.7.jar",
+          "sha256": "a16e046f4a9df9e0d0e0bc54bf6298c94d7d867457f7b3b68291a88c568b92d0"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalameta:junit-interface:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.0/junit-interface-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.0/junit-interface-1.3.0.jar",
+          "sha256": "0ec5545c6175e747b4ed94d3390219f6f32806f060eadb90e6e0f7e80420210d"
+        },
+        {
+          "coordinate": "org.scalameta:munit-diff_3:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.0/munit-diff_3-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.0/munit-diff_3-1.3.0.jar",
+          "sha256": "d1d5cd1bc1ff64a8b6eaad68543abdd702740b158648c8b35cf15962962f2ecb"
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.0/munit_3-1.3.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.0/munit_3-1.3.0.jar",
+          "sha256": "115789a92c114c55ded2dd03ab4950649039edf53718a8746722f9613074b29c"
+        }
+      ],
+      "reportSha256": "84d3a85bf1f631581f5f9946b0320ab94d61c6c252887e301296733ff9ea9555",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0005.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.scalameta:munit_3:1.3.4"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0005.log",
+      "exit": 0,
+      "logSha256": "e264a9c546faeeab295d0e041bb51b8cbe0723270c49a7cd210bd99dda71932e",
+      "mode": "maven-central",
+      "coordinate": "org.scalameta:munit_3:1.3.4",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0005.json",
+      "jars": [
+        {
+          "coordinate": "junit:junit:4.13.2",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "url": "https://repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+        },
+        {
+          "coordinate": "org.hamcrest:hamcrest-core:1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "coordinate": "org.portable-scala:portable-scala-reflect_2.13:1.1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar",
+          "sha256": "920f62979293069cf721865f931e42f9f7b0b2720ee9f6a9ddff76a19ecf8d4e"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.18",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "sha256": "4e85d96ff7bc7dc627985523c3541b9917aaa08e956391380c42db21a2c4e5a0"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.8",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "sha256": "2c6eace9158df8ee4485a06128a479d968c1ebfc83ae9b1a394b58429f0d1492"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalameta:junit-interface:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar",
+          "sha256": "24ddcd5a54ac36521c7c69dce2aad2642f282cc4a2fb04ab0de39d2d193b0dfe"
+        },
+        {
+          "coordinate": "org.scalameta:munit-diff_3:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar",
+          "sha256": "c13b3f3382bb16ad675627b711d40898a72f7fd81af70aec77888a15b0cfe223"
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar",
+          "sha256": "9c5c29f28dd00e6570dd0ffad3f57f9906f195cf3cf95899c552a6dd14236cda"
+        }
+      ],
+      "reportSha256": "c4dde7e019f7bc8c74ff5fa68f441cabd70529724955bf155ccff78039376cd3",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0006.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.typelevel:cats-collections-core_3:0.9.10"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0006.log",
+      "exit": 0,
+      "logSha256": "39bb9e9143215fc708f83e41f34f9daea82481ddca5bf5b09976874a4c646147",
+      "mode": "maven-central",
+      "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0006.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.6",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.6/scala3-library_3-3.3.6.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.6/scala3-library_3-3.3.6.jar",
+          "sha256": "cf4ddaf76c0ce71cf68ca5d2dc7bad46c5a921aaf18909317ddc9ba6e67fb12b"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "0057c1aff84c79d56fee8f9c80ebced9b01f92f9b347a88f1e295818fdb407cf",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0007.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.typelevel:cats-core_3:2.13.0"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0007.log",
+      "exit": 0,
+      "logSha256": "6fc0828044c0be21a09498228850bf75ccf4a9091bc377a3f5403620bbb97832",
+      "mode": "maven-central",
+      "coordinate": "org.typelevel:cats-core_3:2.13.0",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0007.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.14",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+          "sha256": "43e0ca1583df1966eaf02f0fbddcfb3784b995dd06bfc907209347758ce4b7e3"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.4/scala3-library_3-3.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.4/scala3-library_3-3.3.4.jar",
+          "sha256": "d95184acfcd814da2e051378e4962c653f4b468f4086452ab427af030482bd3c"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "66f4c732fa08d791214351e06e4f0b51bb6a45aa4a2db0c15b5c05d569e2dd5d",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0008.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.typelevel:cats-kernel_3:2.13.0"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0008.log",
+      "exit": 0,
+      "logSha256": "cfd8eb06c6c45adb3636e6ac3665dd521f9e2a9c89c22493f145e0d89f443e59",
+      "mode": "maven-central",
+      "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0008.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.14",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+          "sha256": "43e0ca1583df1966eaf02f0fbddcfb3784b995dd06bfc907209347758ce4b7e3"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.4/scala3-library_3-3.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.4/scala3-library_3-3.3.4.jar",
+          "sha256": "d95184acfcd814da2e051378e4962c653f4b468f4086452ab427af030482bd3c"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "f5f6ee066b40a70dab8c7088d029fd9b89b7f0ae4712b33b7fc775122b54395c",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0009.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.typelevel:discipline-munit_3:2.0.0"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0009.log",
+      "exit": 0,
+      "logSha256": "be30b566c8f79e811b969f7d6fe9af0a31c89867d44e4e7a67d16a34b9f39a6e",
+      "mode": "maven-central",
+      "coordinate": "org.typelevel:discipline-munit_3:2.0.0",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0009.json",
+      "jars": [
+        {
+          "coordinate": "junit:junit:4.13.2",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "url": "https://repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+        },
+        {
+          "coordinate": "org.hamcrest:hamcrest-core:1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.12",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.12/scala-library-2.13.12.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.12/scala-library-2.13.12.jar",
+          "sha256": "c6a879e4973a60f6162668542a33eaccc2bb565d1c934fb061c5844259131dd1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.3/scala3-library_3-3.3.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.3/scala3-library_3-3.3.3.jar",
+          "sha256": "16fe064f1373ed6f098d3d9f812a398ed5075db4bf2721c04e630502cb352816"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_3:1.18.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.18.0/scalacheck_3-1.18.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.18.0/scalacheck_3-1.18.0.jar",
+          "sha256": "f25d957a660d975e51a2f90d633603f59bd632c7a9fcb81d9ffad5ffd8d5f5e6"
+        },
+        {
+          "coordinate": "org.scalameta:junit-interface:1.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.0.0/junit-interface-1.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.0.0/junit-interface-1.0.0.jar",
+          "sha256": "a8878dcc43dd31562cb1935407548d8b54c6b54a28ce6167ca7fb0051349bf48"
+        },
+        {
+          "coordinate": "org.scalameta:munit-diff_3:1.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.0.0/munit-diff_3-1.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.0.0/munit-diff_3-1.0.0.jar",
+          "sha256": "daa06ab8146413247db957a65a8e4e6ed4d8558a3638a8f904b7dd2b927cd13b"
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar",
+          "sha256": "931adf7212a5f5d05102925ce11de465340b12c6f368436cc55a39d654eb21c9"
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.0.0/munit_3-1.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.0.0/munit_3-1.0.0.jar",
+          "sha256": "a512032d7279add2574ed5283912dbde16665068a26777ccb23242eab026ba93"
+        },
+        {
+          "coordinate": "org.typelevel:discipline-core_3:1.7.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar",
+          "sha256": "010159161a9136e2bff671ffb93d15c83518201a7d3c63f036334897a6ae392a"
+        },
+        {
+          "coordinate": "org.typelevel:discipline-munit_3:2.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+          "sha256": "2abe2cc6d334c7d51f9496c1806b6ca9f1fb936c97294018c22d2cb120d2f169"
+        }
+      ],
+      "reportSha256": "e53bd2e6839f5fb4dea392c7ac8ec0ef4ec0811ed3216d9a3eeb103f4667b325",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0010.json",
+        "--json-report-add-urls",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "org.typelevel:scalac-compat-annotation_3:0.1.4"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0010.log",
+      "exit": 0,
+      "logSha256": "e5c32f23f9a26a179dab4babc60f4e4d1f264a47ed9172f77e04d138a9b210bd",
+      "mode": "maven-central",
+      "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0010.json",
+      "jars": [
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar",
+          "sha256": "e6ca607c3fce03e8fa38af3374ce1f8bb098e316e8bf6f6d27331360feddb1c1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.1/scala3-library_3-3.3.1.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.1/scala3-library_3-3.3.1.jar",
+          "sha256": "b64c13c1f3d1ac2323457ec6cc09e9b38d7a9ef6889a1a0063601bf25d545508"
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-maven-central/https/repo.maven.apache.org/maven2/org/typelevel/scalac-compat-annotation_3/0.1.4/scalac-compat-annotation_3-0.1.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/scalac-compat-annotation_3/0.1.4/scalac-compat-annotation_3-0.1.4.jar",
+          "sha256": "49102870d9bf89d68c96ae7fd4a41250ecdf1b33ee1221c73ff24e92d9531df9"
+        }
+      ],
+      "reportSha256": "023f5d00cd97a52bc5f07fc2ebffe73d57e8fcdceb2d7f285b9916873c53fe5a",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0000.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:gale-core_3:1.0.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0000.log",
+      "exit": 0,
+      "logSha256": "789d8a84a0dc7e5706e507660f10f8c99a3b708b6f45627447a7e2408f936368",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:gale-core_3:1.0.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0000.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:gale-core_3:1.0.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+          "sha256": "15a09250bcd58c1f236b1cbf3a92c33985e537cdcf98e670dbe25534019fb3c4"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        }
+      ],
+      "reportSha256": "6f2c69dfc92663d22e4206a763e8c71bb7bda1544596bf7dd12aa4454440d7f8",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0001.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:grakern-core_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0001.log",
+      "exit": 0,
+      "logSha256": "b5048b36fade51df9e21c4837bfc794448d488efc3a0165f59637e879b12ed4c",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0001.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "7680b2274c37f9c3dc3b8409c65b981fecf613a1af077e7b684a8c5a8e9efa2c",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0002.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0002.log",
+      "exit": 0,
+      "logSha256": "f9d59383347da33a635798f064a79a5f0400d3521f1297c39aa293add97b4964",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0002.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:gale-core_3:1.0.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+          "sha256": "15a09250bcd58c1f236b1cbf3a92c33985e537cdcf98e670dbe25534019fb3c4"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar",
+          "sha256": "e988a5e393649d69986a8bf24bc11146a8b90d4c7b77d0c6181a4b0d5c0f363b"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "sha256": "8bb7ad6edacbf559c65389758b698ca5ebce2d289706c518fcf57885a26412e8"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-standard_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "sha256": "beadfeccf0585b84005e1c5ebcf50d76c61766d5ac1563589d7dadcb671809a3"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "sha256": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "sha256": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "db2f7e75a6ddba911724f4979359e67160efde85e9a9785ecec11a0f52495fb3",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0003.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0003.log",
+      "exit": 0,
+      "logSha256": "55ba5ffb3984add117ed13caf5c699e4aa51489422d5f992d31069e5cbb8621a",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0003.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "sha256": "8bb7ad6edacbf559c65389758b698ca5ebce2d289706c518fcf57885a26412e8"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "sha256": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "sha256": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "ca6e7bd91ffe01b4fafc7446c66d39d9d13c66c473abab0b46cfefdfb1175eb2",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0004.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:grakern-laws_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0004.log",
+      "exit": 0,
+      "logSha256": "a310409c24e3e4e9b57b4d228ed5700b6864a73946d8dd2d752c5c194352dada",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:grakern-laws_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0004.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "sha256": "8bb7ad6edacbf559c65389758b698ca5ebce2d289706c518fcf57885a26412e8"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-laws_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar",
+          "sha256": "1fcc766d8b364b61b60a5329a58584c167622119fba0de47716ec5ef62f6cd51"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-standard_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "sha256": "beadfeccf0585b84005e1c5ebcf50d76c61766d5ac1563589d7dadcb671809a3"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "sha256": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "sha256": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+        },
+        {
+          "coordinate": "junit:junit:4.13.2",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "url": "https://repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+        },
+        {
+          "coordinate": "org.hamcrest:hamcrest-core:1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "coordinate": "org.portable-scala:portable-scala-reflect_2.13:1.1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar",
+          "sha256": "920f62979293069cf721865f931e42f9f7b0b2720ee9f6a9ddff76a19ecf8d4e"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "sha256": "18a47bcadcb392d3bc4f56ba871887da97066e9c6748745f2d08a32efd44cce1"
+        },
+        {
+          "coordinate": "org.scalameta:junit-interface:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar",
+          "sha256": "24ddcd5a54ac36521c7c69dce2aad2642f282cc4a2fb04ab0de39d2d193b0dfe"
+        },
+        {
+          "coordinate": "org.scalameta:munit-diff_3:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar",
+          "sha256": "c13b3f3382bb16ad675627b711d40898a72f7fd81af70aec77888a15b0cfe223"
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar",
+          "sha256": "931adf7212a5f5d05102925ce11de465340b12c6f368436cc55a39d654eb21c9"
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar",
+          "sha256": "9c5c29f28dd00e6570dd0ffad3f57f9906f195cf3cf95899c552a6dd14236cda"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        },
+        {
+          "coordinate": "org.typelevel:discipline-core_3:1.7.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar",
+          "sha256": "010159161a9136e2bff671ffb93d15c83518201a7d3c63f036334897a6ae392a"
+        },
+        {
+          "coordinate": "org.typelevel:discipline-munit_3:2.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+          "sha256": "2abe2cc6d334c7d51f9496c1806b6ca9f1fb936c97294018c22d2cb120d2f169"
+        }
+      ],
+      "reportSha256": "8461114e6f44208359bf539176b34fcee336f50cc52768753c9605cfebf9778a",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0005.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:grakern-standard_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0005.log",
+      "exit": 0,
+      "logSha256": "3257c4f72d6615143073407565af171eef77258ddc49244380c9d7ceb7207906",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:grakern-standard_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0005.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-standard_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "sha256": "beadfeccf0585b84005e1c5ebcf50d76c61766d5ac1563589d7dadcb671809a3"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "b83e6436a9c3cf1b926adbcf51f4fc0837da211eaa4af1480d44ccbc42207209",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0006.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:graph4s-core_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0006.log",
+      "exit": 0,
+      "logSha256": "f9d20ac592d524b82d0ec347ee29b992de52ecacbe9807210284e707e7b8796f",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0006.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.18",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "sha256": "4e85d96ff7bc7dc627985523c3541b9917aaa08e956391380c42db21a2c4e5a0"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.8",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "sha256": "2c6eace9158df8ee4485a06128a479d968c1ebfc83ae9b1a394b58429f0d1492"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "b09bcc4880cd7256edaac858e3a334f74976108030fcfdb9e92cfe1ef5ebe9cb",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0007.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:graph4s-data_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0007.log",
+      "exit": 0,
+      "logSha256": "efbb4db5619b9efee27b4c3f99add62a0e5a915cc13ff8f5c28fe8611f900900",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0007.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "sha256": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.18",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "sha256": "4e85d96ff7bc7dc627985523c3541b9917aaa08e956391380c42db21a2c4e5a0"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.8",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "sha256": "2c6eace9158df8ee4485a06128a479d968c1ebfc83ae9b1a394b58429f0d1492"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "bfc8b0f430d9fa59585a2e8bdaedf2037efda8563cf842c049b9afd46bec8184",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0008.json",
+        "--json-report-add-urls",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0008.log",
+      "exit": 0,
+      "logSha256": "e9d64ab515ba65de22a11f69a984210645ab0b2afe434dba2ed79815150b9634",
+      "mode": "staging-rehearsal",
+      "coordinate": "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1",
+      "report": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0008.json",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "sha256": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.18",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.jar",
+          "sha256": "4e85d96ff7bc7dc627985523c3541b9917aaa08e956391380c42db21a2c4e5a0"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.3.8",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.3.8/scala3-library_3-3.3.8.jar",
+          "sha256": "2c6eace9158df8ee4485a06128a479d968c1ebfc83ae9b1a394b58429f0d1492"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/coursier-cache-staging-rehearsal/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        }
+      ],
+      "reportSha256": "71ef4bd029648937729ffb232ce3d34cf001b27e7db27b03406df777619e4b71",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--repository",
+        "http://127.0.0.1:62262",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer.json",
+        "--json-report-add-urls",
+        "io.github.canardlapin:gale-core_3:1.0.0-RC1",
+        "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+        "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1",
+        "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+        "io.github.canardlapin:grakern-laws_3:0.1.0-RC1",
+        "io.github.canardlapin:grakern-standard_3:0.1.0-RC1",
+        "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+        "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+        "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-fetch.log",
+      "exit": 0,
+      "logSha256": "3d722b3f41d49b529de36d0d727165718ed4bbbea9e6a3c3abe3e656636ad94b",
+      "jars": [
+        {
+          "coordinate": "io.github.canardlapin:gale-core_3:1.0.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+          "sha256": "15a09250bcd58c1f236b1cbf3a92c33985e537cdcf98e670dbe25534019fb3c4"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+          "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar",
+          "sha256": "e988a5e393649d69986a8bf24bc11146a8b90d4c7b77d0c6181a4b0d5c0f363b"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+          "sha256": "8bb7ad6edacbf559c65389758b698ca5ebce2d289706c518fcf57885a26412e8"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-laws_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar",
+          "sha256": "1fcc766d8b364b61b60a5329a58584c167622119fba0de47716ec5ef62f6cd51"
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-standard_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+          "sha256": "beadfeccf0585b84005e1c5ebcf50d76c61766d5ac1563589d7dadcb671809a3"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-core_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+          "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-data_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+          "sha256": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe"
+        },
+        {
+          "coordinate": "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "url": "http://127.0.0.1:62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+          "sha256": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+        },
+        {
+          "coordinate": "junit:junit:4.13.2",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "url": "https://repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar",
+          "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+        },
+        {
+          "coordinate": "org.hamcrest:hamcrest-core:1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar",
+          "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+        },
+        {
+          "coordinate": "org.portable-scala:portable-scala-reflect_2.13:1.1.3",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar",
+          "sha256": "920f62979293069cf721865f931e42f9f7b0b2720ee9f6a9ddff76a19ecf8d4e"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.scala-sbt:test-interface:1.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar",
+          "sha256": "15f70b38bb95f3002fec9aea54030f19bb4ecfbad64c67424b5e5fea09cd749e"
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar",
+          "sha256": "18a47bcadcb392d3bc4f56ba871887da97066e9c6748745f2d08a32efd44cce1"
+        },
+        {
+          "coordinate": "org.scalameta:junit-interface:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar",
+          "sha256": "24ddcd5a54ac36521c7c69dce2aad2642f282cc4a2fb04ab0de39d2d193b0dfe"
+        },
+        {
+          "coordinate": "org.scalameta:munit-diff_3:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar",
+          "sha256": "c13b3f3382bb16ad675627b711d40898a72f7fd81af70aec77888a15b0cfe223"
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar",
+          "sha256": "931adf7212a5f5d05102925ce11de465340b12c6f368436cc55a39d654eb21c9"
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar",
+          "sha256": "9c5c29f28dd00e6570dd0ffad3f57f9906f195cf3cf95899c552a6dd14236cda"
+        },
+        {
+          "coordinate": "org.typelevel:algebra_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+          "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41"
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+          "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed"
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+          "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6"
+        },
+        {
+          "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+          "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040"
+        },
+        {
+          "coordinate": "org.typelevel:discipline-core_3:1.7.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar",
+          "sha256": "010159161a9136e2bff671ffb93d15c83518201a7d3c63f036334897a6ae392a"
+        },
+        {
+          "coordinate": "org.typelevel:discipline-munit_3:2.0.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+          "sha256": "2abe2cc6d334c7d51f9496c1806b6ca9f1fb936c97294018c22d2cb120d2f169"
+        }
+      ],
+      "reportSha256": "643b397137c0407f56a8590f282dbada90374064346ca05fe82f59d7a5c8fa76"
+    },
+    {
+      "command": [
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/cs",
+        "fetch",
+        "--no-default",
+        "--repository",
+        "https://repo.maven.apache.org/maven2",
+        "--json-output-file",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler.json",
+        "--json-report-add-urls",
+        "org.scala-lang:scala3-compiler_3:3.7.4"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-fetch.log",
+      "exit": 0,
+      "logSha256": "0bc5550b82ca818ef53f58aacdf6d8376503567dc2efcead42694e7acae87051",
+      "jars": [
+        {
+          "coordinate": "org.jline:jline-native:3.29.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-native/3.29.0/jline-native-3.29.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/jline/jline-native/3.29.0/jline-native-3.29.0.jar",
+          "sha256": "19cfcc9d3c78a1c6cfe4c6c9599f16a657e4bf8da43940fc4b875373236dc258"
+        },
+        {
+          "coordinate": "org.jline:jline-reader:3.29.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-reader/3.29.0/jline-reader-3.29.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/jline/jline-reader/3.29.0/jline-reader-3.29.0.jar",
+          "sha256": "a4cb0a5fde9289f2f1b614e04f94b202f6ff5c9c96476425837b1184c92ef81d"
+        },
+        {
+          "coordinate": "org.jline:jline-terminal-jni:3.29.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-terminal-jni/3.29.0/jline-terminal-jni-3.29.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/jline/jline-terminal-jni/3.29.0/jline-terminal-jni-3.29.0.jar",
+          "sha256": "13fef8bcc0e4788c8e192dc76c33758683c6bfdbaef6f67b41445eb8986773ad"
+        },
+        {
+          "coordinate": "org.jline:jline-terminal:3.29.0",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-terminal/3.29.0/jline-terminal-3.29.0.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/jline/jline-terminal/3.29.0/jline-terminal-3.29.0.jar",
+          "sha256": "fd68a98b32b1132035c62102e5df0b0fdc358e7c87a9f876ce7071450b4d10da"
+        },
+        {
+          "coordinate": "org.scala-lang.modules:scala-asm:9.8.0-scala-1",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/modules/scala-asm/9.8.0-scala-1/scala-asm-9.8.0-scala-1.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/modules/scala-asm/9.8.0-scala-1/scala-asm-9.8.0-scala-1.jar",
+          "sha256": "86af037580bdf9ce9c05f8b2afd734daf1a8564c38cd10ca5d08bf81508ad2e4"
+        },
+        {
+          "coordinate": "org.scala-lang:scala-library:2.13.16",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+          "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-compiler_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-compiler_3/3.7.4/scala3-compiler_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-compiler_3/3.7.4/scala3-compiler_3-3.7.4.jar",
+          "sha256": "1a60682b898fb04753dec78f2904078d48670079b7ad5106d442a0f431d346e0"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-interfaces:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-interfaces/3.7.4/scala3-interfaces-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-interfaces/3.7.4/scala3-interfaces-3.7.4.jar",
+          "sha256": "c19ba8ea1a13c7fcdef675353c8ddd671156cf220879dcb28b27e986aae31ea9"
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+          "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639"
+        },
+        {
+          "coordinate": "org.scala-lang:tasty-core_3:3.7.4",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/tasty-core_3/3.7.4/tasty-core_3-3.7.4.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-lang/tasty-core_3/3.7.4/tasty-core_3-3.7.4.jar",
+          "sha256": "24dfe7089232a42d28d5bee1209f462e4b4ca90622e0b13752399c12585e3069"
+        },
+        {
+          "coordinate": "org.scala-sbt:compiler-interface:1.10.7",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/compiler-interface/1.10.7/compiler-interface-1.10.7.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/compiler-interface/1.10.7/compiler-interface-1.10.7.jar",
+          "sha256": "2bacc5761e03920a228e5c9d20b33d9c51d43aaf2f52e8f839ece630966eb880"
+        },
+        {
+          "coordinate": "org.scala-sbt:util-interface:1.10.7",
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/util-interface/1.10.7/util-interface-1.10.7.jar",
+          "url": "https://repo.maven.apache.org/maven2/org/scala-sbt/util-interface/1.10.7/util-interface-1.10.7.jar",
+          "sha256": "1d6b91efa42b70fc064caed6d62962374e13b27737f885a87c84c667b30be625"
+        }
+      ],
+      "reportSha256": "ac8e201c55844528aca8afd928d3a0184a7f2e1c71506905ebf392ef46cc589a"
+    },
+    {
+      "command": [
+        "java",
+        "-version"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/java-version.log",
+      "exit": 0,
+      "logSha256": "852095cab44f83f526a130175f3bc152581bb2d201848eac9af0a95668e1db0a"
+    },
+    {
+      "command": [
+        "java",
+        "-cp",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-native/3.29.0/jline-native-3.29.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-reader/3.29.0/jline-reader-3.29.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-terminal-jni/3.29.0/jline-terminal-jni-3.29.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/jline/jline-terminal/3.29.0/jline-terminal-3.29.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/modules/scala-asm/9.8.0-scala-1/scala-asm-9.8.0-scala-1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-compiler_3/3.7.4/scala3-compiler_3-3.7.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-interfaces/3.7.4/scala3-interfaces-3.7.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-lang/tasty-core_3/3.7.4/tasty-core_3-3.7.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/compiler-interface/1.10.7/compiler-interface-1.10.7.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compiler-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/util-interface/1.10.7/util-interface-1.10.7.jar",
+        "dotty.tools.dotc.Main",
+        "-classpath",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+        "-d",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/classes",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/tools/release/UpstreamBinaryConsumer.scala"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/compile.log",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "java",
+        "-cp",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/classes:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/http/127.0.0.1%3A62262/io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.0.0/munit-scalacheck_3-1.0.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/discipline-core_3/1.7.0/discipline-core_3-1.7.0.jar:/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/consumer-cache/https/repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.jar",
+        "UpstreamBinaryConsumer"
+      ],
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/binary-consumer-final/run.log",
+      "exit": 0,
+      "logSha256": "371cfdcbf0c92d417af146976236eb639b3c5a3d7159eb7be72a90f22d9b5305"
+    }
+  ],
+  "upstreamReceiptSha256": "e4795ac9f9cd6498853260b7cf952abfee7b9ff98c5f7f4eab203173b6d918f8",
+  "coursierSha256": "5dbb39c01ef3195cbe9469122535856707a85532866cc2a6bb1ec9038be52be5",
+  "fixtureSha256": "7ef8025561b5e30bc8c5072f3a80654e29c3ae7e45a7b0eed470b45ae21ade2e",
+  "verifiedStagedRootHashes": {
+    "io.github.canardlapin:gale-core_3:1.0.0-RC1": "15a09250bcd58c1f236b1cbf3a92c33985e537cdcf98e670dbe25534019fb3c4",
+    "io.github.canardlapin:grakern-core_3:0.1.0-RC1": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed",
+    "io.github.canardlapin:grakern-engine-jvm_3:0.1.0-RC1": "e988a5e393649d69986a8bf24bc11146a8b90d4c7b77d0c6181a4b0d5c0f363b",
+    "io.github.canardlapin:grakern-graph4s_3:0.1.0-RC1": "8bb7ad6edacbf559c65389758b698ca5ebce2d289706c518fcf57885a26412e8",
+    "io.github.canardlapin:grakern-laws_3:0.1.0-RC1": "1fcc766d8b364b61b60a5329a58584c167622119fba0de47716ec5ef62f6cd51",
+    "io.github.canardlapin:grakern-standard_3:0.1.0-RC1": "beadfeccf0585b84005e1c5ebcf50d76c61766d5ac1563589d7dadcb671809a3",
+    "io.github.canardlapin:graph4s-core_3:0.1.0-RC1": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a",
+    "io.github.canardlapin:graph4s-data_3:0.1.0-RC1": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe",
+    "io.github.canardlapin:graph4s-indexed_3:0.1.0-RC1": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+  },
+  "assertions": 6,
+  "serverClosed": true
+}

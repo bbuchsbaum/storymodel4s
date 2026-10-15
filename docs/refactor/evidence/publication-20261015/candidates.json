@@ -1,0 +1,17 @@
+[
+  {
+    "repository": "graph4s",
+    "commit": "10e29e2a496b9ac00e299b560faa1462d122ccaa",
+    "branch": "codex/publication-20261015"
+  },
+  {
+    "repository": "gale",
+    "commit": "9e7d1e7d0325d8e8b7989b4acd8c6c7328c1dbd8",
+    "branch": "codex/publication-20261015"
+  },
+  {
+    "repository": "grakern",
+    "commit": "539a9e16d5ef36ede721fb43fe4a89e95dacd52d",
+    "branch": "codex/publication-20261015"
+  }
+]

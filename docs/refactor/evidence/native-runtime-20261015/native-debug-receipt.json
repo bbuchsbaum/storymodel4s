@@ -1,0 +1,92 @@
+{
+  "schema": "storymodel4s-native-runtime-qualification/v1",
+  "base": "65dd513df188300d0180514ad828308facc5ca61",
+  "mode": "debug",
+  "status": "failed",
+  "commands": [
+    {
+      "label": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--no-checkout",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/scala-native",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/native-debug/scala-native"
+      ],
+      "exit": 0,
+      "seconds": 0.311,
+      "log": "clone.log",
+      "sha256": "6f5ab0d5a62aa3254a2418a147c15653e7058b8f6037a9ff220ccd2be04b021d"
+    },
+    {
+      "label": "checkout",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "65dd513df188300d0180514ad828308facc5ca61"
+      ],
+      "exit": 0,
+      "seconds": 0.416,
+      "log": "checkout.log",
+      "sha256": "5f453fbadf51a8530aa18c346c99cc81763de996587f5afe478595a0c9b06b37"
+    },
+    {
+      "label": "original",
+      "command": [
+        "sbt",
+        "-batch",
+        "++3.7.4",
+        "set LocalProject(\"sandbox3\") / Compile / mainClass := Some(\"ZeroHashProbe\")",
+        "sandbox3/run"
+      ],
+      "exit": 1,
+      "seconds": 117.806,
+      "log": "original.log",
+      "sha256": "c34537d44a03ff31dca0173c76633d5992a9d11eded6912fb4f96f87d37bf99b"
+    },
+    {
+      "label": "apply",
+      "command": [
+        "git",
+        "apply",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/tools/native-runtime/zero-hash.patch"
+      ],
+      "exit": 0,
+      "seconds": 0.047,
+      "log": "apply.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "fixed",
+      "command": [
+        "sbt",
+        "-batch",
+        "++3.7.4",
+        "set LocalProject(\"sandbox3\") / Compile / mainClass := Some(\"ZeroHashProbe\")",
+        "sandbox3/run",
+        "set LocalProject(\"tests3\") / Test / sources ~= (_.filter(p => p.getPath.contains(\"/src_managed/\") || Seq(\"/org/scalanative/testsuite/javalib/lang/StringTest.scala\", \"/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala\", \"/utils/AssertThrows.scala\", \"/org/scalanative/testsuite/utils/Platform.scala\").exists(p.getPath.endsWith)))",
+        "tests3/testOnly org.scalanative.testsuite.javalib.lang.StringHashCodeTest org.scalanative.testsuite.javalib.lang.StringTest"
+      ],
+      "exit": 1,
+      "seconds": 93.148,
+      "log": "fixed.log",
+      "sha256": "8c6148ff560443c0cf57f6b34a895e69c859f6debc07866f96275c042741d2c0"
+    }
+  ],
+  "inputs": {
+    "ZeroHashProbe.scala": "91e9390a1d7542d93803c79963f6f54f4ec2839177e6845d312849a3aa70adca",
+    "zero-hash.patch": "d223b4691ff0002f60c7165b178a5e3e166af19a7965ecb80252dd982c1a8467"
+  },
+  "original": {
+    "controlPasses": [
+      "empty",
+      "dynamic-nul",
+      "dynamic-zero-ascii",
+      "ordinary",
+      "negative"
+    ],
+    "crashCase": "literal-nul"
+  },
+  "error": "fixed exited 1; inspect /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/native-debug/fixed.log"
+}

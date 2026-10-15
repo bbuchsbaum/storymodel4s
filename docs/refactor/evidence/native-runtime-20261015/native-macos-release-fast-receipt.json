@@ -1,0 +1,49 @@
+{
+  "schema": "storymodel4s-native-runtime-qualification/v1",
+  "base": "65dd513df188300d0180514ad828308facc5ca61",
+  "mode": "release-fast",
+  "status": "failed",
+  "commands": [
+    {
+      "label": "java-version",
+      "command": [
+        "/Users/bbuchsbaum/Library/Caches/Coursier/arc/https/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%252B1/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.12.1_1.tar.gz/jdk-21.0.12.1+1/Contents/Home/bin/java",
+        "-version"
+      ],
+      "exit": 0,
+      "log": "java-version.log",
+      "seconds": 0.187,
+      "sha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+    },
+    {
+      "label": "clang-version",
+      "command": [
+        "/opt/homebrew/opt/llvm/bin/clang",
+        "--version"
+      ],
+      "exit": 0,
+      "log": "clang-version.log",
+      "seconds": 0.185,
+      "sha256": "9e338a03d149419911f1097aa7b66518a804612356d83cf2d3a66e8e8edadd8f"
+    },
+    {
+      "label": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--no-checkout",
+        ".agent-work/publication-20261015/scala-native",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/native-macos-release-fast/scala-native"
+      ],
+      "exit": 128,
+      "log": "clone.log",
+      "seconds": 0.02,
+      "sha256": "9f87ca1c97f876108b4faad36370316e9f7fd9f19031e4e5ecdee0a07596f90e"
+    }
+  ],
+  "inputs": {
+    "ZeroHashProbe.scala": "91e9390a1d7542d93803c79963f6f54f4ec2839177e6845d312849a3aa70adca",
+    "zero-hash.patch": "d223b4691ff0002f60c7165b178a5e3e166af19a7965ecb80252dd982c1a8467"
+  },
+  "error": "clone exited 128; inspect /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/native-macos-release-fast/clone.log"
+}

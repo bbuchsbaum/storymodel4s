@@ -1,0 +1,136 @@
+{
+  "schema": "storymodel4s-native-runtime-qualification/v1",
+  "base": "65dd513df188300d0180514ad828308facc5ca61",
+  "mode": "release-fast",
+  "status": "passed",
+  "commands": [
+    {
+      "label": "java-version",
+      "command": [
+        "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64/bin/java",
+        "-version"
+      ],
+      "exit": 0,
+      "log": "java-version.log",
+      "seconds": 0.032,
+      "sha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+    },
+    {
+      "label": "clang-version",
+      "command": [
+        "/usr/lib/llvm-18/bin/clang",
+        "--version"
+      ],
+      "exit": 0,
+      "log": "clang-version.log",
+      "seconds": 0.365,
+      "sha256": "d5488a2e583e2cbd3f61386073b6c38a24a2bf4d45f3b6b6ac048b541121d804"
+    },
+    {
+      "label": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--no-checkout",
+        "https://github.com/scala-native/scala-native.git",
+        "/home/runner/work/_temp/native-runtime/scala-native"
+      ],
+      "exit": 0,
+      "log": "clone.log",
+      "seconds": 2.018,
+      "sha256": "2e6db413ac1ee7fc7ffb9a4040091b8a0df0c2ac7b41c8241ce7d5c5396f8578"
+    },
+    {
+      "label": "checkout",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "65dd513df188300d0180514ad828308facc5ca61"
+      ],
+      "exit": 0,
+      "log": "checkout.log",
+      "seconds": 0.265,
+      "sha256": "0a12293d71e0d1af49c93fa99e6e489a34be8152789811c0cb742b7a49066b2f"
+    },
+    {
+      "label": "original",
+      "command": [
+        "sbt",
+        "-batch",
+        "++3.7.4",
+        "set LocalProject(\"sandbox3\") / Compile / mainClass := Some(\"ZeroHashProbe\")",
+        "show sandbox3/nativeConfig",
+        "show tests3/nativeConfig",
+        "sandbox3/run"
+      ],
+      "exit": 1,
+      "log": "original.log",
+      "seconds": 377.35,
+      "sha256": "36499323ec18c0cf27eefcab0f384c6b1900fcccca42198c1fc63322cff4000a"
+    },
+    {
+      "label": "apply",
+      "command": [
+        "git",
+        "apply",
+        "/home/runner/work/storymodel4s/storymodel4s/tools/native-runtime/zero-hash.patch"
+      ],
+      "exit": 0,
+      "log": "apply.log",
+      "seconds": 0.006,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "fixed",
+      "command": [
+        "sbt",
+        "-batch",
+        "++3.7.4",
+        "set LocalProject(\"sandbox3\") / Compile / mainClass := Some(\"ZeroHashProbe\")",
+        "show sandbox3/nativeConfig",
+        "show tests3/nativeConfig",
+        "sandbox3/run",
+        "set LocalProject(\"tests3\") / Test / sources ~= (_.filter(p => Seq(\"/sbt-buildinfo/ScalaNativeBuildInfo.scala\", \"/org/scalanative/testsuite/javalib/lang/StringTest.scala\", \"/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala\", \"/utils/AssertThrows.scala\", \"/org/scalanative/testsuite/utils/Platform.scala\").exists(p.getPath.endsWith)))",
+        "tests3/testOnly org.scalanative.testsuite.javalib.lang.StringHashCodeTest org.scalanative.testsuite.javalib.lang.StringTest"
+      ],
+      "exit": 0,
+      "log": "fixed.log",
+      "seconds": 147.287,
+      "sha256": "d6bf6d6c0463f4615c8f45c2a73e03930b8787b691d11a986e18ff05ca63c1f6"
+    }
+  ],
+  "inputs": {
+    "ZeroHashProbe.scala": "91e9390a1d7542d93803c79963f6f54f4ec2839177e6845d312849a3aa70adca",
+    "zero-hash.patch": "d223b4691ff0002f60c7165b178a5e3e166af19a7965ecb80252dd982c1a8467"
+  },
+  "original": {
+    "controlPasses": [
+      "empty",
+      "dynamic-nul",
+      "dynamic-zero-ascii",
+      "ordinary",
+      "negative"
+    ],
+    "crashCase": "literal-nul"
+  },
+  "fixed": {
+    "probePassed": 8,
+    "suites": {
+      "StringHashCodeTest": {
+        "failed": 0,
+        "ignored": 0,
+        "executed": 9,
+        "total": 9,
+        "passed": 9
+      },
+      "StringTest": {
+        "failed": 0,
+        "ignored": 1,
+        "executed": 55,
+        "total": 56,
+        "passed": 55
+      }
+    }
+  }
+}

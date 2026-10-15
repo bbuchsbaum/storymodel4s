@@ -1,0 +1,302 @@
+[
+  {
+    "source": ".agent-work/publication-20261015/native-original.log",
+    "retained": "native-original.log.gz",
+    "rawBytes": 1377,
+    "rawSha256": "9dd8ea77df4f8e2a4e1958a2cb2a27b4b541e79495822974c311c629bf334a9b"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-original-02.log",
+    "retained": "native-original-02.log.gz",
+    "rawBytes": 1324,
+    "rawSha256": "51288f45cae8fe17f1d65caf5c3a87a821dd22c69c77f09bfbca9310e822a367"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-original-03.log",
+    "retained": "native-original-03.log.gz",
+    "rawBytes": 1138,
+    "rawSha256": "1d274564bad7f38a758c59bddca7082193fad51ec3b37c05875271332e06d0b8"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-original-04.log",
+    "retained": "native-original-04.log.gz",
+    "rawBytes": 10121,
+    "rawSha256": "7a121fc8b10feccbcf6d15431845cdba315d00215c5c887e0a46eba2017e2b46"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-fixed-01.log",
+    "retained": "native-fixed-01.log.gz",
+    "rawBytes": 11465,
+    "rawSha256": "c420df05979511d919c069b97fd2bc7e3c5e0156662e6d4b19e920424410c6dd"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-string-suite-02.log",
+    "retained": "native-string-suite-02.log.gz",
+    "rawBytes": 4679,
+    "rawSha256": "0c9ebe159f3266e5eddb0e289d95291a64a059d6f7cd8c758ecadc5bcbac4b54"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-string-suite-03.log",
+    "retained": "native-string-suite-03.log.gz",
+    "rawBytes": 7211,
+    "rawSha256": "9093f7640dbd3d60539b600f84cc91a5ee296a52deb70ecd112fcdf5eb78d386"
+  },
+  {
+    "source": ".agent-work/publication-20261015/ansi-parser-mutation.log",
+    "retained": "ansi-parser-mutation.log.gz",
+    "rawBytes": 1805,
+    "rawSha256": "7f15d8be4a136cd44586a0068cbfb2b3d7781f97d2ef00924c6cc1bf7bba978a"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/apply.log",
+    "retained": "linux-native-debug-121-apply.log.gz",
+    "rawBytes": 0,
+    "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/checkout.log",
+    "retained": "linux-native-debug-121-checkout.log.gz",
+    "rawBytes": 53,
+    "rawSha256": "0a12293d71e0d1af49c93fa99e6e489a34be8152789811c0cb742b7a49066b2f"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/clang-version.log",
+    "retained": "linux-native-debug-121-clang-version.log.gz",
+    "rawBytes": 122,
+    "rawSha256": "d5488a2e583e2cbd3f61386073b6c38a24a2bf4d45f3b6b6ac048b541121d804"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/clone.log",
+    "retained": "linux-native-debug-121-clone.log.gz",
+    "rawBytes": 70,
+    "rawSha256": "2e6db413ac1ee7fc7ffb9a4040091b8a0df0c2ac7b41c8241ce7d5c5396f8578"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/fixed.log",
+    "retained": "linux-native-debug-121-fixed.log.gz",
+    "rawBytes": 23309,
+    "rawSha256": "802826b9e422a16c727ec6bd27e1f8e6673c5695e623e132e4fbd8f4f14fd833"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/java-version.log",
+    "retained": "linux-native-debug-121-java-version.log.gz",
+    "rawBytes": 205,
+    "rawSha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-121/original.log",
+    "retained": "linux-native-debug-121-original.log.gz",
+    "rawBytes": 19754,
+    "rawSha256": "2c560a69813e9479c0270d664f0baccccb756b3f5a995eb68cc9740e9a0f8204"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/apply.log",
+    "retained": "linux-native-debug-final-apply.log.gz",
+    "rawBytes": 0,
+    "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/checkout.log",
+    "retained": "linux-native-debug-final-checkout.log.gz",
+    "rawBytes": 53,
+    "rawSha256": "0a12293d71e0d1af49c93fa99e6e489a34be8152789811c0cb742b7a49066b2f"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/clang-version.log",
+    "retained": "linux-native-debug-final-clang-version.log.gz",
+    "rawBytes": 122,
+    "rawSha256": "d5488a2e583e2cbd3f61386073b6c38a24a2bf4d45f3b6b6ac048b541121d804"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/clone.log",
+    "retained": "linux-native-debug-final-clone.log.gz",
+    "rawBytes": 70,
+    "rawSha256": "2e6db413ac1ee7fc7ffb9a4040091b8a0df0c2ac7b41c8241ce7d5c5396f8578"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/fixed.log",
+    "retained": "linux-native-debug-final-fixed.log.gz",
+    "rawBytes": 23326,
+    "rawSha256": "7ac53d6a3e77b2ca1ad2d10c2915939ed64a31f731fbb414d522692840f674c6"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/java-version.log",
+    "retained": "linux-native-debug-final-java-version.log.gz",
+    "rawBytes": 205,
+    "rawSha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-debug-final/original.log",
+    "retained": "linux-native-debug-final-original.log.gz",
+    "rawBytes": 19755,
+    "rawSha256": "5d72ee617e3f4cde9915f513b422bf09ef0656322f3f9ece8076cd8a74145953"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-debug/apply.log",
+    "retained": "native-debug-apply.log.gz",
+    "rawBytes": 0,
+    "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-debug/checkout.log",
+    "retained": "native-debug-checkout.log.gz",
+    "rawBytes": 51,
+    "rawSha256": "5f453fbadf51a8530aa18c346c99cc81763de996587f5afe478595a0c9b06b37"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-debug/clone.log",
+    "retained": "native-debug-clone.log.gz",
+    "rawBytes": 119,
+    "rawSha256": "6f5ab0d5a62aa3254a2418a147c15653e7058b8f6037a9ff220ccd2be04b021d"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-debug/fixed.log",
+    "retained": "native-debug-fixed.log.gz",
+    "rawBytes": 16344,
+    "rawSha256": "8c6148ff560443c0cf57f6b34a895e69c859f6debc07866f96275c042741d2c0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-debug/original.log",
+    "retained": "native-debug-original.log.gz",
+    "rawBytes": 9772,
+    "rawSha256": "c34537d44a03ff31dca0173c76633d5992a9d11eded6912fb4f96f87d37bf99b"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast/clang-version.log",
+    "retained": "native-macos-release-fast-clang-version.log.gz",
+    "rawBytes": 203,
+    "rawSha256": "9e338a03d149419911f1097aa7b66518a804612356d83cf2d3a66e8e8edadd8f"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast/clone.log",
+    "retained": "native-macos-release-fast-clone.log.gz",
+    "rawBytes": 81,
+    "rawSha256": "9f87ca1c97f876108b4faad36370316e9f7fd9f19031e4e5ecdee0a07596f90e"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast/java-version.log",
+    "retained": "native-macos-release-fast-java-version.log.gz",
+    "rawBytes": 205,
+    "rawSha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast-02/checkout.log",
+    "retained": "native-macos-release-fast-02-checkout.log.gz",
+    "rawBytes": 51,
+    "rawSha256": "5f453fbadf51a8530aa18c346c99cc81763de996587f5afe478595a0c9b06b37"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast-02/clang-version.log",
+    "retained": "native-macos-release-fast-02-clang-version.log.gz",
+    "rawBytes": 203,
+    "rawSha256": "9e338a03d149419911f1097aa7b66518a804612356d83cf2d3a66e8e8edadd8f"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast-02/clone.log",
+    "retained": "native-macos-release-fast-02-clone.log.gz",
+    "rawBytes": 135,
+    "rawSha256": "4149121d9685fac3ade904c6f1a11c19441208004df73054d5961a4e06d62f68"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast-02/java-version.log",
+    "retained": "native-macos-release-fast-02-java-version.log.gz",
+    "rawBytes": 205,
+    "rawSha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-release-fast-02/original.log",
+    "retained": "native-macos-release-fast-02-original.log.gz",
+    "rawBytes": 13046,
+    "rawSha256": "a057b8a5ebc307aabb786401651c08d82841d34cb3ef338dde8b8901294d3465"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-plugin-diagnostic.log",
+    "retained": "native-macos-plugin-diagnostic.log.gz",
+    "rawBytes": 3641,
+    "rawSha256": "dd1526bceb656b400ead7c10bc024904f65b8e7bcb1f4a8b9e5d87c60e6a407c"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/apply.log",
+    "retained": "macos-release-fast-apply.log.gz",
+    "rawBytes": 0,
+    "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/checkout.log",
+    "retained": "macos-release-fast-checkout.log.gz",
+    "rawBytes": 51,
+    "rawSha256": "5f453fbadf51a8530aa18c346c99cc81763de996587f5afe478595a0c9b06b37"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/clang-version.log",
+    "retained": "macos-release-fast-clang-version.log.gz",
+    "rawBytes": 203,
+    "rawSha256": "9e338a03d149419911f1097aa7b66518a804612356d83cf2d3a66e8e8edadd8f"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/clone.log",
+    "retained": "macos-release-fast-clone.log.gz",
+    "rawBytes": 125,
+    "rawSha256": "9e3e663d89f3bb8eff6e527d029106ff162c405bfdc57e74f9843ee82649e41e"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/fixed.log",
+    "retained": "macos-release-fast-fixed.log.gz",
+    "rawBytes": 16715,
+    "rawSha256": "6989f46500ee0a2fdfaf569e916831c60556bf69c59a350583cb6161ee5e953d"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/java-version.log",
+    "retained": "macos-release-fast-java-version.log.gz",
+    "rawBytes": 205,
+    "rawSha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/native-macos-rf-03/original.log",
+    "retained": "macos-release-fast-original.log.gz",
+    "rawBytes": 13964,
+    "rawSha256": "47487cf1716ad7d42461d585cb437eaef21bb876115e455dd4f08d9eda4dad5c"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/apply.log",
+    "retained": "linux-native-rf-final-apply.log.gz",
+    "rawBytes": 0,
+    "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/checkout.log",
+    "retained": "linux-native-rf-final-checkout.log.gz",
+    "rawBytes": 53,
+    "rawSha256": "0a12293d71e0d1af49c93fa99e6e489a34be8152789811c0cb742b7a49066b2f"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/clang-version.log",
+    "retained": "linux-native-rf-final-clang-version.log.gz",
+    "rawBytes": 122,
+    "rawSha256": "d5488a2e583e2cbd3f61386073b6c38a24a2bf4d45f3b6b6ac048b541121d804"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/clone.log",
+    "retained": "linux-native-rf-final-clone.log.gz",
+    "rawBytes": 70,
+    "rawSha256": "2e6db413ac1ee7fc7ffb9a4040091b8a0df0c2ac7b41c8241ce7d5c5396f8578"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/fixed.log",
+    "retained": "linux-native-rf-final-fixed.log.gz",
+    "rawBytes": 23353,
+    "rawSha256": "d6bf6d6c0463f4615c8f45c2a73e03930b8787b691d11a986e18ff05ca63c1f6"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/java-version.log",
+    "retained": "linux-native-rf-final-java-version.log.gz",
+    "rawBytes": 205,
+    "rawSha256": "5b4412738541184e84f6b2d7520d4f4a7c2a455f60650491464c61adcbbbdeb0"
+  },
+  {
+    "source": ".agent-work/publication-20261015/linux-native-rf-final/original.log",
+    "retained": "linux-native-rf-final-original.log.gz",
+    "rawBytes": 19259,
+    "rawSha256": "36499323ec18c0cf27eefcab0f384c6b1900fcccca42198c1fc63322cff4000a"
+  }
+]

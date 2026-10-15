@@ -3,7 +3,8 @@
 The installed CLI and executable guide are qualified local delivery artifacts. The current
 publication gate is `bd-01M2TAMJ95K9D7H248A8387YW4`; the infrastructure ticket is
 `bd-01M2TAKTB61XNXV4Y6A9J3CB0C`. This checklist records preparation for that gate. No stable
-artifact, tag or deployed documentation site follows from a local build.
+artifact or tag follows from a local build. The documentation site has its own completed
+deployment receipt below.
 
 The current Native platform prerequisite is `bd-01M4YP83C7925M22V0K5AQ88BX`. Native 0.5.12
 on macOS arm64 reproducibly crashes when hashing a literal NUL string, including without any
@@ -11,7 +12,11 @@ StoryModel type. Both Clang 15 and 20 reproduce it. Constructing the identical c
 preserves the full identity-test coverage and passes, but does not repair that compiler/runtime
 defect. [Retained controls](refactor/evidence/release-freeze-20261014/native-diagnostic/receipt.json)
 keep this separate from the application repairs. Qualify the underlying behavior before
-unrestricted stable Native publication.
+unrestricted stable Native publication. A reviewed zero-hash runtime patch now has
+[separate qualification evidence](refactor/evidence/native-runtime-20261015/README.md).
+It skips the redundant write to constant literal storage without changing the hash algorithm.
+The patch does not change StoryModel's selected runtime; delivery of a corrected runtime
+remains required.
 
 ## Reproducible checks
 
@@ -103,15 +108,27 @@ The preflight admits fixed Scala Native versions such as `3.7.4+0.5.12`; it stil
 snapshots, ranges and wildcard-plus selectors before resolution. Eleven version controls and
 a compiling guard mutation distinguish those cases, alongside actual Coursier resolution.
 
-## Publication decision
+## Authorized publication and remaining access
 
-The organization is already `io.github.bbuchsbaum`. Before publication, verify ownership of
-that Sonatype namespace and the configured credential/signing route without exposing secrets.
-The build currently disables release branches and tags. Activate publishing only after the
-artifact matrix, dependency availability, final stability acceptance and exact revision gates
-are complete and the owner authorizes publication. Record the resulting coordinates and bytes;
-then activate the baseline for subsequent releases.
+On 15 October the owner authorized the four infrastructure workstreams: dependency publication,
+Native repair, namespace/signing setup and site deployment. The new
+[dependency candidates](../tools/release/publication-candidates.json) have exact-commit independent
+review, 1,006 passing source tests, nine staged JVM artifacts and a fresh binary consumer with
+six passing assertions. Grakern now builds its JVM dependency chain from fixed graph4s/Gale
+binaries. [Evidence](refactor/evidence/publication-20261015/README.md) records the pushed release
+branches and three missing-key refusal controls. Upstream mains and tags have not moved.
 
-The documentation workflow currently verifies the site. Record and approve its hosting
-destination before adding deployment, then verify the published URL against the approved
-revision. Main synchronization, a Maven release, and site deployment are separate operations.
+Central access remains unavailable: verify `io.github.canardlapin` for the dependency chain and
+`io.github.bbuchsbaum` for StoryModel, and supply the credential location/setup method and
+signing key through the secret-handling route. No token or private key belongs in chat or git.
+The retained artifacts are unsigned local rehearsals. No Central publication has occurred.
+[The publication sequence](../tools/release/PUBLICATION.md) starts with graph4s/Gale, then grakern,
+and ends with fresh public resolution and StoryModel POM preflight. Final stable-release
+acceptance still includes the selected corrected Native runtime and the artifact matrix.
+
+The documentation site is deployed at <https://bbuchsbaum.github.io/storymodel4s/> from reviewed
+commit `5958d3d1627d69ef7f0827a49e60604b7ee34654`.
+[Run 38749988902](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38749988902)
+passed site verification, artifact build and deployment; live page and embedded-artifact checks
+returned nonempty HTTP 200 responses. Subsequent successful main documentation workflows deploy
+the verified site. Site deployment and Maven publication retain separate receipts.

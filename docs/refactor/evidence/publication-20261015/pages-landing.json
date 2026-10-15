@@ -1,0 +1,13 @@
+{
+  "sha": "5958d3d1627d69ef7f0827a49e60604b7ee34654",
+  "previousMain": "1fbca6f862323e2bae455b4c676f72b31c33d634",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO",
+  "localMain": true,
+  "remoteMain": true,
+  "pagesBuildType": "workflow",
+  "url": "https://bbuchsbaum.github.io/storymodel4s/",
+  "gate": "docs-repaired-01.log",
+  "unchangedExamplesGate": "docs-verify-02.log",
+  "deployment": "pending"
+}

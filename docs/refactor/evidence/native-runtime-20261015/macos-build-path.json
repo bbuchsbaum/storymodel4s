@@ -1,0 +1,9 @@
+{
+  "upstreamBase": "65dd513df188300d0180514ad828308facc5ca61",
+  "source": "project/Settings.scala",
+  "sha256": "45967df886d87dc97a0fbb0011ba4cae3f6b4fd56593b3aebc9248aa98ab4217",
+  "reviewer": "/root/constructor_exact_review",
+  "finding": "commonJavalibSettings filters every compiler option containing -release; a checkout directory with -release causes its -Xplugin option to be removed",
+  "evidence": "failed compile stream has plugin parameters but no -Xplugin; same JAR works from native-debug; packaging-first retry also fails",
+  "disposition": "rerun unchanged code in directory without the filtered substrings; retain prior failure as build-path evidence"
+}

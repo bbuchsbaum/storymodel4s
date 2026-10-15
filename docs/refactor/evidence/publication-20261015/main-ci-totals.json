@@ -1,0 +1,40 @@
+{
+  "run": 38749988858,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38749988858",
+  "sourceCommit": "5958d3d1627d69ef7f0827a49e60604b7ee34654",
+  "jobs": [
+    {
+      "job": "0_Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM).txt",
+      "tasks": 24,
+      "passed": 4424,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 22
+    },
+    {
+      "job": "1_Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM).txt",
+      "tasks": 24,
+      "passed": 4424,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 22
+    },
+    {
+      "job": "2_Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS).txt",
+      "tasks": 16,
+      "passed": 3313,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "job": "3_Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative).txt",
+      "tasks": 16,
+      "passed": 3313,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "rawZipSha256": "53c8252a9364e2933573531ea879cf0babe473e4d9999b40b67d53391c5d18e2"
+}

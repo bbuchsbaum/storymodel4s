@@ -1,0 +1,230 @@
+[
+  {
+    "sourceLog": "graph4s-qualification-final.log",
+    "retained": "graph4s-qualification-final.log.gz",
+    "rawSha256": "24db19a6f0beefa8e8038b835e28e4e7b2aaf70ed4256527f7a14c74d080fd94",
+    "rawBytes": 10057
+  },
+  {
+    "sourceLog": "gale-qualification-final.log",
+    "retained": "gale-qualification-final.log.gz",
+    "rawSha256": "bea3271be84e0721bc81b8ea8a381bb248b6f5650b40ced5cf84586b5363cd1e",
+    "rawBytes": 21423
+  },
+  {
+    "sourceLog": "grakern-qualification-final.log",
+    "retained": "grakern-qualification-final.log.gz",
+    "rawSha256": "704ad760c84a55238747d152cc3b4132cd417382343dd9ccbf77429c8d79462f",
+    "rawBytes": 28920
+  },
+  {
+    "sourceLog": "graph4s-signing-refusal.log",
+    "retained": "graph4s-signing-refusal.log.gz",
+    "rawSha256": "8c8efa780155102cc0c96446adf938d5541b2db56bebdc03f98221f60113bf91",
+    "rawBytes": 4369
+  },
+  {
+    "sourceLog": "gale-signing-refusal.log",
+    "retained": "gale-signing-refusal.log.gz",
+    "rawSha256": "c05078eb33ab2cb32d2ce56b85774ad3d2e4653a1833d85443312497edd4ff96",
+    "rawBytes": 3727
+  },
+  {
+    "sourceLog": "grakern-signing-refusal.log",
+    "retained": "grakern-signing-refusal.log.gz",
+    "rawSha256": "6414759755c5077505710c2f94868431972bd9c588f63da0226423c9ecbc889f",
+    "rawBytes": 4479
+  },
+  {
+    "sourceLog": "gale-qualification.log",
+    "retained": "gale-qualification.log.gz",
+    "rawSha256": "8afd02fa1ab895df44171ebd60a756f30c1d4847e46b8a7782760c39a7efa1fa",
+    "rawBytes": 21714
+  },
+  {
+    "sourceLog": "grakern-qualification.log",
+    "retained": "grakern-qualification.log.gz",
+    "rawSha256": "ef74f8b4f6a0da2f0f377b57ab515b73f852c064a64ab3cdf53bf3d0b2da76b0",
+    "rawBytes": 12008
+  },
+  {
+    "sourceLog": "grakern-qualification-02.log",
+    "retained": "grakern-qualification-02.log.gz",
+    "rawSha256": "2593230baca4630a5c91d4b5cd3d5e226448e2728a81415a42351808bd95409d",
+    "rawBytes": 1377
+  },
+  {
+    "sourceLog": "grakern-qualification-03.log",
+    "retained": "grakern-qualification-03.log.gz",
+    "rawSha256": "af74f5cef10af4b86400fba704e204b4a926dd310fba5b5f057e46d93cd76054",
+    "rawBytes": 13175
+  },
+  {
+    "sourceLog": "docs-verify-01.log",
+    "retained": "docs-verify-01.log.gz",
+    "rawSha256": "ad585f9ff2533bf35917c47621ecf3eee8701e440455119bbd30c50fa1e41def",
+    "rawBytes": 11178
+  },
+  {
+    "sourceLog": "docs-verify-02.log",
+    "retained": "docs-verify-02.log.gz",
+    "rawSha256": "d2fda87ed64ae72929dc8061f354d76b8bdbe3b89ecb2a40871f10a05d7f76b7",
+    "rawBytes": 8095
+  },
+  {
+    "sourceLog": "docs-repaired-01.log",
+    "retained": "docs-repaired-01.log.gz",
+    "rawSha256": "817bd25a0d6597f2ac03d13613d873658fad591e83cf05d5fafdff12fe22fa0e",
+    "rawBytes": 6746
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/compile.log",
+    "retained": "binary-compile.log.gz",
+    "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawBytes": 0
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/compiler-fetch.log",
+    "retained": "binary-compiler-fetch.log.gz",
+    "rawSha256": "0bc5550b82ca818ef53f58aacdf6d8376503567dc2efcead42694e7acae87051",
+    "rawBytes": 8515
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/consumer-fetch.log",
+    "retained": "binary-consumer-fetch.log.gz",
+    "rawSha256": "3d722b3f41d49b529de36d0d727165718ed4bbbea9e6a3c3abe3e656636ad94b",
+    "rawBytes": 29218
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0000.log",
+    "retained": "binary-coursier-maven-central-0000.log.gz",
+    "rawSha256": "b6b4d62d41f950c032cd1ffe0bba5f3e690f5c6cb9eab1254c164f7564237870",
+    "rawBytes": 1778
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0001.log",
+    "retained": "binary-coursier-maven-central-0001.log.gz",
+    "rawSha256": "a83740cfdab28595209d5b11d3a1cd1b849f8a095dfe0efc2c38bb116ab2456c",
+    "rawBytes": 1778
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0002.log",
+    "retained": "binary-coursier-maven-central-0002.log.gz",
+    "rawSha256": "eddf96e13cd3b7841578627cc22b3efb152bc5332e4f8274b72bec5ab43ff4dd",
+    "rawBytes": 2617
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0003.log",
+    "retained": "binary-coursier-maven-central-0003.log.gz",
+    "rawSha256": "be90c072e00c0ae61ae63a76b57ee9d298e7afc26cb82a070cd2063990e81301",
+    "rawBytes": 5715
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0004.log",
+    "retained": "binary-coursier-maven-central-0004.log.gz",
+    "rawSha256": "fc64d04ed44bd1c7f55385592bc00b9e3aad1c70c564ab6c7070629a993def7f",
+    "rawBytes": 2153
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0005.log",
+    "retained": "binary-coursier-maven-central-0005.log.gz",
+    "rawSha256": "e264a9c546faeeab295d0e041bb51b8cbe0723270c49a7cd210bd99dda71932e",
+    "rawBytes": 4201
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0006.log",
+    "retained": "binary-coursier-maven-central-0006.log.gz",
+    "rawSha256": "39bb9e9143215fc708f83e41f34f9daea82481ddca5bf5b09976874a4c646147",
+    "rawBytes": 3538
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0007.log",
+    "retained": "binary-coursier-maven-central-0007.log.gz",
+    "rawSha256": "6fc0828044c0be21a09498228850bf75ccf4a9091bc377a3f5403620bbb97832",
+    "rawBytes": 2216
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0008.log",
+    "retained": "binary-coursier-maven-central-0008.log.gz",
+    "rawSha256": "cfd8eb06c6c45adb3636e6ac3665dd521f9e2a9c89c22493f145e0d89f443e59",
+    "rawBytes": 1099
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0009.log",
+    "retained": "binary-coursier-maven-central-0009.log.gz",
+    "rawSha256": "be30b566c8f79e811b969f7d6fe9af0a31c89867d44e4e7a67d16a34b9f39a6e",
+    "rawBytes": 7016
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-maven-central-0010.log",
+    "retained": "binary-coursier-maven-central-0010.log.gz",
+    "rawSha256": "e5c32f23f9a26a179dab4babc60f4e4d1f264a47ed9172f77e04d138a9b210bd",
+    "rawBytes": 2553
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0000.log",
+    "retained": "binary-coursier-staging-rehearsal-0000.log.gz",
+    "rawSha256": "789d8a84a0dc7e5706e507660f10f8c99a3b708b6f45627447a7e2408f936368",
+    "rawBytes": 3705
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0001.log",
+    "retained": "binary-coursier-staging-rehearsal-0001.log.gz",
+    "rawSha256": "b5048b36fade51df9e21c4837bfc794448d488efc3a0165f59637e879b12ed4c",
+    "rawBytes": 4109
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0002.log",
+    "retained": "binary-coursier-staging-rehearsal-0002.log.gz",
+    "rawSha256": "f9d59383347da33a635798f064a79a5f0400d3521f1297c39aa293add97b4964",
+    "rawBytes": 11104
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0003.log",
+    "retained": "binary-coursier-staging-rehearsal-0003.log.gz",
+    "rawSha256": "55ba5ffb3984add117ed13caf5c699e4aa51489422d5f992d31069e5cbb8621a",
+    "rawBytes": 2951
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0004.log",
+    "retained": "binary-coursier-staging-rehearsal-0004.log.gz",
+    "rawSha256": "a310409c24e3e4e9b57b4d228ed5700b6864a73946d8dd2d752c5c194352dada",
+    "rawBytes": 16626
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0005.log",
+    "retained": "binary-coursier-staging-rehearsal-0005.log.gz",
+    "rawSha256": "3257c4f72d6615143073407565af171eef77258ddc49244380c9d7ceb7207906",
+    "rawBytes": 1798
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0006.log",
+    "retained": "binary-coursier-staging-rehearsal-0006.log.gz",
+    "rawSha256": "f9d20ac592d524b82d0ec347ee29b992de52ecacbe9807210284e707e7b8796f",
+    "rawBytes": 3763
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0007.log",
+    "retained": "binary-coursier-staging-rehearsal-0007.log.gz",
+    "rawSha256": "efbb4db5619b9efee27b4c3f99add62a0e5a915cc13ff8f5c28fe8611f900900",
+    "rawBytes": 2252
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/coursier-staging-rehearsal-0008.log",
+    "retained": "binary-coursier-staging-rehearsal-0008.log.gz",
+    "rawSha256": "e9d64ab515ba65de22a11f69a984210645ab0b2afe434dba2ed79815150b9634",
+    "rawBytes": 2258
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/java-version.log",
+    "retained": "binary-java-version.log.gz",
+    "rawSha256": "852095cab44f83f526a130175f3bc152581bb2d201848eac9af0a95668e1db0a",
+    "rawBytes": 144
+  },
+  {
+    "sourceLog": ".agent-work/publication-20261015/binary-consumer-final/run.log",
+    "retained": "binary-run.log.gz",
+    "rawSha256": "371cfdcbf0c92d417af146976236eb639b3c5a3d7159eb7be72a90f22d9b5305",
+    "rawBytes": 70
+  }
+]

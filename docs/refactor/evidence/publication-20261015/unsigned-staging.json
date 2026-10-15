@@ -1,0 +1,580 @@
+{
+  "status": "locally-staged-pending-preflight",
+  "publication": "unsigned-local-only",
+  "sources": [
+    {
+      "repository": "graph4s",
+      "commit": "10e29e2a496b9ac00e299b560faa1462d122ccaa",
+      "branch": "codex/publication-20261015",
+      "passed": 26,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "repository": "gale",
+      "commit": "9e7d1e7d0325d8e8b7989b4acd8c6c7328c1dbd8",
+      "branch": "codex/publication-20261015",
+      "passed": 637,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "repository": "grakern",
+      "commit": "539a9e16d5ef36ede721fb43fe4a89e95dacd52d",
+      "branch": "codex/publication-20261015",
+      "passed": 343,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1-javadoc.jar",
+      "size": 4537653,
+      "sha256": "031a07e9c2d2f6b227733680aed7e6d13f5aeff3d59a52cb2c15bfa8d9469b64"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "b32e3f0ee1e331139d45ea290c9f0b5b3c03b16c2a9d5170b55b4c0bd428bc8c"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "0a8e111d40102e1beaee18afa353c5c4b28ddaa3e9afc1add399fcede6896fd6"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1-sources.jar",
+      "size": 197550,
+      "sha256": "c443a892e85877595014fccd31579c1195426ee86fe94e56a14853e6c2e50a5c"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "1ff6f60a543617acc77d9751159cdb879069a08866259dc512a678f7ffa5f705"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "b3ed7808c4839d36501df3fb8a3a11c412793df725d3bca25cb03bde893e4073"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar",
+      "size": 1891847,
+      "sha256": "15a09250bcd58c1f236b1cbf3a92c33985e537cdcf98e670dbe25534019fb3c4"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "46d79d0b2ece81d9e420e5f41d58726a27597292a5c030d5fb920d174720d0be"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "01be78f6edaa39ce529bdefcb015ec58e0cf48512e4378b1832d7b637cb40200"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.pom",
+      "size": 2100,
+      "sha256": "3b605a9b62137ffd9c8e3ac4106d426b9b60b70867af25e117060b68f3c3cb93"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "7d25fddd79948864cab4065ed13fd77467ebdc9e7a0439b850bf4d65c837969d"
+    },
+    {
+      "path": "io/github/canardlapin/gale-core_3/1.0.0-RC1/gale-core_3-1.0.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "da563427c59cb8ef014b79d83064846513bbcc3a8a16de120254c170dadc94a6"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1-javadoc.jar",
+      "size": 3190726,
+      "sha256": "8e185565b5237016025942e46ef98195d3c43c9ad01cc801da640f3649d91e06"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "5b66521e35ee9a3a56577f4ed9f4c78467b95d292d8f57be017c63c9a3da6e75"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "06e2f56399d213eb5afd22f79db048e3ae6348dae92e8318ebab3ac7a63b9179"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1-sources.jar",
+      "size": 18054,
+      "sha256": "a8f0bff44cfcc3f4c8fef79f39b30fe695e5b1fcc7c2d64157ff82165ecf4ae0"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "52cebc9c6c2f800d52f8bb8ebf49e041dd925edb15c08eddb39923dd4c649aff"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "80765786f6e19330fad4c3c50e55dbb96a5075979579cb9e3904e3b25f135241"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar",
+      "size": 516711,
+      "sha256": "ea1124fc6d34aa0603e92a20096b029400a50f5ef5e5f02692b8918ae5a65bed"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "c5da1fc599cc1adaff27c3af672a85f8788520aacfe47e8ab7f92d2d789c6b09"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "a4c50993b537d35695bd2f4d1a7f2233d6ce04e4f45cfd67ba9d72f55a235a51"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.pom",
+      "size": 2736,
+      "sha256": "0fb8419e540e007dc8de62d82379c8493a1b39b288b0d1f81d2363d4a547c700"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "5f030f642cc4ba9bb668525cce2d5380ca94a4a23f409e28b61bd3f150173bb7"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-core_3/0.1.0-RC1/grakern-core_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "c0962ad86b0e54984270971c1f756c16f5b6711c7b912ff3919da321b2caf21c"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1-javadoc.jar",
+      "size": 3570561,
+      "sha256": "fd9a3a8f16d3db20ce95dc149192e1d44bea84c53ea3b00c2d9fc5509ab1facc"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "5b75a8fe5a1797af34707567abc58925c871417c1f2e64788009fc21436e8e51"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "86304572eff1de53f506e42140122c4dffedc5bcecf2bb3a9f2ddacce9d3709d"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1-sources.jar",
+      "size": 48428,
+      "sha256": "403337b8e1e566dfedba19598bbd37ca64e522bff2dfcafdbd52a499faff99a2"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "32c4de32f402783ab9d410a9f79f985f6eeb79edf93c19f3d4dde529f51a2674"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "5c413f7857e226c389b9893297c0dcd20ef2f7b7b235d13098f47f62dd025478"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar",
+      "size": 1052990,
+      "sha256": "e988a5e393649d69986a8bf24bc11146a8b90d4c7b77d0c6181a4b0d5c0f363b"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "b51afdec36be2be3d949863c3aaaa03070e971c8e9afa8d0b97f772e987053d7"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "85ac623a3806f9eac239487d3f2bc40c98789910b9f05c72d48f4082347154d7"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.pom",
+      "size": 3389,
+      "sha256": "a615a1e721a8b6a223a17b1ba3ac8d1ea1295f707405911f4aee1de365bd3c2f"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "5e2e4b5248ccd389b5623e7e1f11375849fc4809d564397eca826a192e6133ad"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-engine-jvm_3/0.1.0-RC1/grakern-engine-jvm_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "5d3eb6dd94485976072270aecdc2902884c96fada8f7134bad1e8d1e25d13710"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1-javadoc.jar",
+      "size": 2748188,
+      "sha256": "4cadf6086c558dc42899b565c239db31b8612fdd93eb97737713c4408d9a4b35"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "b0ae604fc590f54bc8a1e09cb070e3e34033dbeb29e7dd66b3dbed7ab63a89b3"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "51576554ced5d2aca43e355f8ba00de51243220555db0dac9e05072f56b90dc2"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1-sources.jar",
+      "size": 1668,
+      "sha256": "76cba6fe7bb9d72ddd76775344bdee2c80ee76c8bb1b1235a8373dc10c3f31d3"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "a060a827eb3c07fc772f5e2c1dfb462a9b43fd2fa84f2c0796205532b50ae877"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "c2e88a7da85c614ba1a6b97da20cba7bc247d6ae1919d4b04c96d63438ffee67"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar",
+      "size": 21151,
+      "sha256": "8bb7ad6edacbf559c65389758b698ca5ebce2d289706c518fcf57885a26412e8"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "644ecea3ac95636b1f218ae196d94c1d84950c9d0811a143f6fdf116c9986bf0"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "906a6d7d10f62f956de69a0646525e1dd14d093621d59f649cd5a29cbee58a5d"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.pom",
+      "size": 3155,
+      "sha256": "55a110f1ea0d9a667c2309b308325d3b6724b016eaf6f2d5331fd3ca08069e8c"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "107a2820866763da6b5c53e331bfe79edebd332259b899e33efbb3e397e58143"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-graph4s_3/0.1.0-RC1/grakern-graph4s_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "c5da4a0545a3e195199453ced142bf586e01685b013533df3e4bda60ddcab6ba"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1-javadoc.jar",
+      "size": 2803986,
+      "sha256": "aad9b418f8b1e611208ed7cb51dad311cc1cb3f47e56ef5142fa98945a49480d"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "7d8a7f6ae34c38608e6dce91f60cf0f0d1d015c3af11c7ea43a28ce8b44e77b9"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "c95a9909acbab595c4c0eb8a107172d17eaf91679104ad6763c5bdc56a7b31e6"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1-sources.jar",
+      "size": 11830,
+      "sha256": "d76f544876b1e38e5b3cbef7d06482885ed8ef605085268e3a4944a45c4a8654"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "50bb98bf84be053be8bf0904f97437a9e1400a1f386ed6e9216998b5edaa02c9"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "ea2a1c700f3c9061ad6d586f784f2b52cb7177956ae14e31a6a86b13227a7c1f"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar",
+      "size": 139522,
+      "sha256": "1fcc766d8b364b61b60a5329a58584c167622119fba0de47716ec5ef62f6cd51"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "e9673b5d977b36e2c3fc45909702153d3b7f645c23222c6f93e9b1c33639cbed"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "4ab7611c231b47dbb516245516461bb968a4e98cf23253dfb06f125b022a3060"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.pom",
+      "size": 3284,
+      "sha256": "6d1292788a329b30fba641fb48539a90c43a738a404169ee7962c1d6cfdfafdd"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "b4545389acefa08598c10a2fb9bb14009f9746effbee387f18bf74d39f3b3d5c"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-laws_3/0.1.0-RC1/grakern-laws_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "5fbdf833b9dddc24ad62a421c380c386f21af29f8d194eef6d758846c7e06cbf"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1-javadoc.jar",
+      "size": 2964635,
+      "sha256": "b82c38b12a91352c3add15f8d3f5e20f6a741df8b43f8158fd6b6af95c714e49"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "346556e9ebd7910e021de2c8692d7afdef88f1680c03487f23abc78b2d3f234b"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "2daecd1c4335198085080b83273e2207510100f293c4890695a996351c76578a"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1-sources.jar",
+      "size": 17348,
+      "sha256": "0cb6f0dc4eacb00b32ad306ce3524d6b7481b1179907f88fce4fdbd575ff4551"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "9c3f57f3baaf45037a37437c6d4fcf415508645e23bcf4b634d8c91c64027ea5"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "59104c98c3971124b9beb2f5789ee0ab8504743f789e05744f7820f7809aca06"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar",
+      "size": 318355,
+      "sha256": "beadfeccf0585b84005e1c5ebcf50d76c61766d5ac1563589d7dadcb671809a3"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "6002ee1ed5c1939f3537f395c7b7ad992c7505bab1fe5e0f54b1469eb492fc83"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "830eb8a8ec90187cdb02de2528587ad1662a7dbc175826be8b1ed7e487b014c8"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.pom",
+      "size": 2813,
+      "sha256": "95f0da5be2cdf0032ef159f707db67adce4b6838df133c9ca1d917f9ff92db8e"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "2cecf3a3aa427cbf832e06bd4ac7b9a3644669dc0cfc5fd2f48bdd7935be1b10"
+    },
+    {
+      "path": "io/github/canardlapin/grakern-standard_3/0.1.0-RC1/grakern-standard_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "8bed34ae2439d91ee0604053d1cb0c092746a1a9398ca2059548a47f2934d40a"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1-javadoc.jar",
+      "size": 2827605,
+      "sha256": "01d6e8f08f8ae7af39d654c1df25ab166770663eb3d0852bf8cdfd3aaaa88e23"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "06130fa11a54f37e5034f6cb23c6ac69e67228b750db777f7a79597958afbd88"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "ce01da54de91cd173c326ea742d209bccbbe9263d29e75f10e3ac5c34d10679e"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1-sources.jar",
+      "size": 10833,
+      "sha256": "69f741d0a8e5db7d70214cb3689421ae96eeb63c5a431b239520b3ca5ecd1123"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "57f40770f86356fedc6d31d73b613e086988d79b518c27a5589865a3b3e927af"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "08895db9ebf257c8de3fb77c4f28c57742d54d982b6ee40449f3c85ffab3b391"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar",
+      "size": 204622,
+      "sha256": "8229a61bbddc734d35b5d3c2f90a09f368ff93eb0843baa5ac15a66d3a8c4a5a"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "9064cbd30ba0800b266d10621d62ef9ac4cdd808aa6074b0757508bc3924299a"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "6bfbb58f4b043e195f3d37e215b00ade8568ccd683539f2ad4c0c1c8ecf50000"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.pom",
+      "size": 2746,
+      "sha256": "41cae425c642ff799e51bd55ca530b9808703512e8e46fca5d0a5bdb0915b803"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "7c473a645df1c84e82adef80c037125d91460451a1f743531a1b13debdf98cfb"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-core_3/0.1.0-RC1/graph4s-core_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "ad165aea54a22b0fddc9188d5a3dec6a8b180d72ace334b4b41992d20884beed"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1-javadoc.jar",
+      "size": 2778905,
+      "sha256": "5b03e481db460294b71adff17a97ad2b2811eda1d3774bda9d78a98411c387da"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "79cd90b9385cafe6d5ef0387f302eaf98a107f19c195da421b7d55715fc9afe7"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "3eacfe8052051ebb152b29d88be23738f122919a7967a624c2e58657d6bcfa9d"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1-sources.jar",
+      "size": 3494,
+      "sha256": "128651d27388334c564ba22b6c787fd3469f6146b2765cd9bf9e8c38ff76201e"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "b9cabf5f4b1fd96fcd72b7d66cf76e1c57f5ec10c00fffff8e763db0c93eac6c"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "dbe4e341c5263846e21783e668de692547c948a2ec1d0eec4046892cccc0f8fc"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar",
+      "size": 60759,
+      "sha256": "634a6c6234f62903e1b5c2d3a45caf829c3bb244b152dabe01891986d2f17abe"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "0e90b2b28c1010eaaa907d9a58d9ff66aae312c2b9fa988e1d890d881285823b"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "812e16e63e9157a6fc4706b04b22cc0ac9755901d1d5a9ca6e65fc1cc4ea9cb8"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.pom",
+      "size": 2573,
+      "sha256": "dfa3fbcaccce69789c05341991b193d6689fe9d9834c5dbea6470ead025d887f"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "3935655266c89cc0d30b5d9ae08e220a8f003d15cfca6e59d9f3dcc42445a12a"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-data_3/0.1.0-RC1/graph4s-data_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "d4eddba5e2eece7d799233ec871a6208b88eb0b11e88adb8eb752e35a4f5fe56"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1-javadoc.jar",
+      "size": 2777745,
+      "sha256": "53a95d132ca2c1c931882ace668700507ce82e7d6e03bd56865f078e87506542"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1-javadoc.jar.md5",
+      "size": 32,
+      "sha256": "b67e772a576d87516c266e2c6c7137eff67cd307b19177b952d210bf86835ed8"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1-javadoc.jar.sha1",
+      "size": 40,
+      "sha256": "ceb28aeb45d6433e663b655a05ddf0e9df0337915c2979050b8ee490df16b27b"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1-sources.jar",
+      "size": 5661,
+      "sha256": "a4670d268c403c092a632df4083d27d36cc4f7250bd60ad96cdf2f2ba33f82f3"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1-sources.jar.md5",
+      "size": 32,
+      "sha256": "adfbb3df930c118215983d3d9a16b231487d6437b42532bfc2ab7dbd6da6a75f"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1-sources.jar.sha1",
+      "size": 40,
+      "sha256": "4749a1b1f8368b2598a910e79529a241d5377250f6e9cca139d1a45d05da70d1"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar",
+      "size": 77129,
+      "sha256": "6442aca52b17c87a99f119167a5bb54e89ea24276b134f2b0f47c0ecb2578ea7"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar.md5",
+      "size": 32,
+      "sha256": "5bcf26950c52947e759ad6287cf8a3d40925f83c1b89f23ef8d4e97f7738af85"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.jar.sha1",
+      "size": 40,
+      "sha256": "3beb09b5cac71fbd689724fcc5eb06b7ee36b2f0f660ab73117991fa6be8a062"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.pom",
+      "size": 2585,
+      "sha256": "0f8c558111d8ffe8cdebb875a205ce24a5a7b0adface80985b500f1ff3602293"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.pom.md5",
+      "size": 32,
+      "sha256": "4850c9ddfcca2c4936fecd88581cc9b3c366f3096d3cb711ce9d8192a1a1601e"
+    },
+    {
+      "path": "io/github/canardlapin/graph4s-indexed_3/0.1.0-RC1/graph4s-indexed_3-0.1.0-RC1.pom.sha1",
+      "size": 40,
+      "sha256": "9f4140c4ecc601fa6f063ebe1f07c5e24d69ac5050fa077d308f063f5bf050c5"
+    }
+  ],
+  "pomValidation": {
+    "count": 9,
+    "matrix": "passed",
+    "internalClosure": "passed"
+  }
+}

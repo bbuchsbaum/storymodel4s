@@ -27,6 +27,11 @@ executes the upstream `StringTest` suite. Raw logs, exit codes, source hashes an
 passed/failed/ignored totals are retained in the output directory. The hosted
 workflow repeats the comparison on Linux with LLVM 18.
 
+Use an absolute local `--source` path. The output checkout's absolute path must
+avoid `-release`, `-target` and `-Xtarget`: this upstream revision filters compiler
+options containing those substrings and can accidentally remove the `-Xplugin`
+argument. Use a directory such as `native-rf` with `--mode release-fast`.
+
 This is a locally prepared upstream patch. It does not alter StoryModel's Native
 dependency, publish a fork, or establish that an official corrected runtime is
 available. Unrestricted Native publication still requires that delivery decision

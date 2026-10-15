@@ -1,0 +1,84 @@
+{
+  "schema": "storymodel4s-upstream-release-qualification/v1",
+  "publication": "unsigned-local-only",
+  "commands": [
+    {
+      "repository": "graph4s",
+      "commands": [
+        "sbt",
+        "-batch",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"indexedJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"dataJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "show coreJVM/isSnapshot",
+        "show coreJVM/gpgWarnOnFailure",
+        "set LocalProject(\"coreJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"indexedJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"dataJVM\") / gpgWarnOnFailure := true",
+        "coreJVM/test",
+        "indexedJVM/test",
+        "dataJVM/test",
+        "stageDependencyRelease",
+        "scalafmtSbtCheck"
+      ],
+      "exit": 0,
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/graph4s-qualification-final.log",
+      "sha256": "24db19a6f0beefa8e8038b835e28e4e7b2aaf70ed4256527f7a14c74d080fd94"
+    },
+    {
+      "repository": "gale",
+      "commands": [
+        "sbt",
+        "-batch",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "show coreJVM/isSnapshot",
+        "show coreJVM/gpgWarnOnFailure",
+        "set LocalProject(\"coreJVM\") / gpgWarnOnFailure := true",
+        "coreJVM/test",
+        "parity/test",
+        "stageDependencyRelease"
+      ],
+      "exit": 0,
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/gale-qualification-final.log",
+      "sha256": "bea3271be84e0721bc81b8ea8a381bb248b6f5650b40ced5cf84586b5363cd1e"
+    },
+    {
+      "repository": "grakern",
+      "commands": [
+        "sbt",
+        "-batch",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"graph4sAdapterJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"standardJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"lawsJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"engineJVM\") / publishTo := Some(Resolver.file(\"unsigned-local-qualification\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"))(Resolver.mavenStylePatterns))",
+        "show coreJVM/isSnapshot",
+        "show coreJVM/gpgWarnOnFailure",
+        "set LocalProject(\"coreJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"graph4sAdapterJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"standardJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"lawsJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"engineJVM\") / gpgWarnOnFailure := true",
+        "set LocalProject(\"coreJVM\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "set LocalProject(\"graph4sAdapterJVM\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "set LocalProject(\"standardJVM\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "set LocalProject(\"lawsJVM\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "set LocalProject(\"engineJVM\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "set LocalProject(\"architectureProbes\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "set LocalProject(\"benchmarkWorker\") / resolvers += \"qualified-upstream\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/upstream-maven-final\"",
+        "coreJVM/test",
+        "graph4sAdapterJVM/test",
+        "standardJVM/test",
+        "lawsJVM/test",
+        "engineJVM/test",
+        "architectureProbes/test",
+        "stageDependencyRelease",
+        "scalafmtSbtCheck"
+      ],
+      "exit": 0,
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/publication-20261015/grakern-qualification-final.log",
+      "sha256": "704ad760c84a55238747d152cc3b4132cd417382343dd9ccbf77429c8d79462f"
+    }
+  ],
+  "status": "source-checks-and-unsigned-staging-passed"
+}

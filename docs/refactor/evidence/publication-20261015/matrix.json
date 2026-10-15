@@ -1,0 +1,59 @@
+{
+  "schema": "storymodel4s-release-candidate-matrix/v1",
+  "coordinates": [
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "graph4s-core_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "graph4s-indexed_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "graph4s-data_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "gale-core_3",
+      "version": "1.0.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "grakern-core_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "grakern-graph4s_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "grakern-standard_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "grakern-laws_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    },
+    {
+      "groupId": "io.github.canardlapin",
+      "artifactId": "grakern-engine-jvm_3",
+      "version": "0.1.0-RC1",
+      "packaging": "jar"
+    }
+  ]
+}

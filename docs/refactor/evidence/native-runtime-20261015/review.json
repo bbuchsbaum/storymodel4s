@@ -1,0 +1,17 @@
+{
+  "reviewer": "/root/constructor_exact_review",
+  "verdict": "GO-code",
+  "commits": [
+    "121ec8e4e8f484ed956f1442f76aa431f976ddb6",
+    "3506dc6281de009f2e7941f7bbac29255a2344b5"
+  ],
+  "scope": [
+    "runtime guard and nine upstream JUnit regressions",
+    "eight-case probe",
+    "exact suite selection and JUnit executed/ignored normalization",
+    "ANSI stripping leaves saved logs unchanged"
+  ],
+  "runtimeDelivery": "not established",
+  "upstreamPatchCommit": "c3d9136408a18515e51a36561c24feeb595fc44f",
+  "upstreamBase": "65dd513df188300d0180514ad828308facc5ca61"
+}

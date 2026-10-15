@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "5958d3d1627d69ef7f0827a49e60604b7ee34654",
+  "deploymentRun": 38749988902,
+  "checks": [
+    {
+      "url": "https://bbuchsbaum.github.io/storymodel4s/",
+      "status": 200,
+      "bytes": 24807,
+      "sha256": "9481e390e1bc56273ea7195479089d8e50e6e0412caf37ec53fcbfd6ccadc990"
+    },
+    {
+      "url": "https://bbuchsbaum.github.io/storymodel4s/method/evidence/",
+      "status": 200,
+      "bytes": 36770,
+      "sha256": "1ef74579487b511d99a99b2f4cc49966e1429a12f21e0be77eb318d87625f67a"
+    },
+    {
+      "url": "https://bbuchsbaum.github.io/storymodel4s/artifacts/verbatim-proof.html",
+      "status": 200,
+      "bytes": 1726,
+      "sha256": "62f03a03ed09c4fe4beeeb3ec5b0b4d8fe34bac0c411983a41e7101621582ba1"
+    }
+  ]
+}

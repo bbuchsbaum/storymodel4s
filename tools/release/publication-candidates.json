@@ -1,0 +1,62 @@
+{
+  "schema": "storymodel4s-publication-candidates/v1",
+  "purpose": "Owner-authorized bounded JVM dependency releases. Reviewed code; Central publication requires account, signing and public-resolution receipts.",
+  "repositories": [
+    {
+      "name": "graph4s",
+      "url": "https://github.com/canardlapin/graph4s.git",
+      "commit": "10e29e2a496b9ac00e299b560faa1462d122ccaa",
+      "version": "0.1.0-RC1",
+      "projects": {
+        "coreJVM": "graph4s-core_3",
+        "indexedJVM": "graph4s-indexed_3",
+        "dataJVM": "graph4s-data_3"
+      },
+      "tests": [
+        "coreJVM/test",
+        "indexedJVM/test",
+        "dataJVM/test"
+      ],
+      "sourceBase": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "branch": "codex/publication-20261015"
+    },
+    {
+      "name": "gale",
+      "url": "https://github.com/canardlapin/gale.git",
+      "commit": "9e7d1e7d0325d8e8b7989b4acd8c6c7328c1dbd8",
+      "version": "1.0.0-RC1",
+      "projects": {
+        "coreJVM": "gale-core_3"
+      },
+      "tests": [
+        "coreJVM/test",
+        "parity/test"
+      ],
+      "sourceBase": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "branch": "codex/publication-20261015"
+    },
+    {
+      "name": "grakern",
+      "url": "https://github.com/canardlapin/grakern.git",
+      "commit": "539a9e16d5ef36ede721fb43fe4a89e95dacd52d",
+      "version": "0.1.0-RC1",
+      "projects": {
+        "coreJVM": "grakern-core_3",
+        "graph4sAdapterJVM": "grakern-graph4s_3",
+        "standardJVM": "grakern-standard_3",
+        "lawsJVM": "grakern-laws_3",
+        "engineJVM": "grakern-engine-jvm_3"
+      },
+      "tests": [
+        "coreJVM/test",
+        "graph4sAdapterJVM/test",
+        "standardJVM/test",
+        "lawsJVM/test",
+        "engineJVM/test",
+        "architectureProbes/test"
+      ],
+      "sourceBase": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "branch": "codex/publication-20261015"
+    }
+  ]
+}
