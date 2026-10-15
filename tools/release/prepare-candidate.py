@@ -36,7 +36,7 @@ def main() -> int:
         actual = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=tree, text=True).strip()
         if actual != source['commit'] or sha(tree / 'zz-release-preparation.sbt') != source['overlaySha256']:
             raise SystemExit('upstream source or version overlay changed after staging')
-        tracked = subprocess.check_output(['git', 'diff', '--name-only'], cwd=tree, text=True).splitlines()
+        tracked = subprocess.check_output(['git', 'diff', 'HEAD', '--name-only'], cwd=tree, text=True).splitlines()
         untracked = subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard'], cwd=tree, text=True).splitlines()
         if tracked != (['build.sbt'] if source['name'] == 'grakern' else []) or untracked != ['zz-release-preparation.sbt']:
             raise SystemExit('unexpected upstream source changes after staging')
