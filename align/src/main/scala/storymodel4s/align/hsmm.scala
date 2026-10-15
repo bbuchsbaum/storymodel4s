@@ -201,8 +201,8 @@ object HsmmConfigFingerprint:
     }
     b.digest
 
-/** Inference knobs. Not a case class: `fromProduct` would mint a non-positive temperature or
-  * negative refinement weight that [[HsmmConfig.of]] refuses.
+/** Inference knobs. Not a case class: `fromProduct` would mint a non-positive temperature or a
+  * non-finite or negative refinement weight that [[HsmmConfig.of]] refuses.
   */
 final class HsmmConfig private (
     val temperature: Double,
@@ -240,8 +240,10 @@ object HsmmConfig:
       Left(AlignError.InvalidConfig("HsmmConfig.temperature", "must be positive and finite"))
     else if refinementPasses < 0 then
       Left(AlignError.InvalidConfig("HsmmConfig.refinementPasses", "must be nonnegative"))
-    else if refinementWeight < 0.0 || refinementWeight.isNaN then
-      Left(AlignError.InvalidConfig("HsmmConfig.refinementWeight", "must be nonnegative"))
+    else if refinementWeight < 0.0 || refinementWeight.isNaN || refinementWeight.isInfinite then
+      Left(
+        AlignError.InvalidConfig("HsmmConfig.refinementWeight", "must be nonnegative and finite")
+      )
     else if transitions.theta.values.exists(v => v.isNaN || v.isInfinite) then
       Left(AlignError.InvalidConfig("HsmmConfig.transitions", "weights must be finite"))
     else
