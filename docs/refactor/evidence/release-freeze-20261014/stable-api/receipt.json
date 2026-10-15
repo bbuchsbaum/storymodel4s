@@ -1,7 +1,7 @@
 {
   "source": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
   "schema": "storymodel4s-stable-boundary-receipt/v1",
-  "status": "independent-final-review-pending",
+  "status": "independently-reviewed-boundary",
   "counts": {
     "allNominals": 1544,
     "allMembers": 12833,
@@ -47,5 +47,6 @@
     "log": "final-member-audit-63a952f9.log.gz",
     "output": "semantic-inventory.json.gz",
     "note": "Fresh extraction from checksum-verified 63a952f9 distribution; quiet command output is not used as success evidence. Inventory/provenance and content hashes establish the artifact."
-  }
+  },
+  "independentReview": "independent-review.json"
 }

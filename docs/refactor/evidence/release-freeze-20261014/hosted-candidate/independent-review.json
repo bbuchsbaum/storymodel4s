@@ -1,0 +1,19 @@
+{
+  "source": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO on hosted evidence and LLVM18 operational disposition; no BLOCK or FOLLOW-UP",
+  "verified": [
+    "80 raw task totals:15474passed,44skipped,0failed/errors",
+    "all4matrixjobs and docs exactSHA success",
+    "Clang and Clang++18.1.8,debug,immix,noLTO",
+    "MappingRunSuite6passes;identity3passes",
+    "compressed and uncompressed hashes",
+    "all16231 archived files independently hashed;16231 successful hosted post-test integrity checks",
+    "clean captured source"
+  ],
+  "limits": [
+    "does not establish cause of earlier Clang14 crashes",
+    "literal-NUL Native publication blocker remains",
+    "Atlas and upstream runtime acceptance pending"
+  ]
+}

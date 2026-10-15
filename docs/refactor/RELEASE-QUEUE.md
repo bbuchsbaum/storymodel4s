@@ -17,7 +17,7 @@ These counts are a dated observation; use live Mote when taking ownership.
 | 2 | `bd-01M35P83TCNHBSDY6NSK13Q3K0` | **Complete:** public ONNX, historical differences, actual A/A+V, both mappings/weights, independent readback and walkthrough. |
 | 3 | `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` | **Complete in owner-defined scope:** published crop/index alignment with independently verified new arrays; physical synchronization unavailable. |
 | 4a | `bd-01M19FPY1EC5QNTW6SBG3QYT3R` | **Complete:** executable reader routes, crosswalk and visual qualification. |
-| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Audit delivered. Constructor repairs and final stable dependency-boundary judgment remain before freeze. |
+| 4b | `bd-01M19N0W937KVZCK78F6X57X1D` | Constructor repairs landed; the member-level stable boundary is independently reviewed. Promotion repairs await final consumer/integration evidence. |
 | 4c | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` | Installable CLI and compatibility/release preparation delivered. Public dependencies, stable baseline and publication remain. |
 | Gate | `bd-01M2TAMJ95K9D7H248A8387YW4` | Open for final stability and release-infrastructure acceptance. |
 | 5, StoryAtlas store | `bd-01M354JNKNKJ15N4T5MGQTRSET` | **Complete:** pinned temporal consumer, recall-clock series, linked inspection, saved replay and exact browser/reader agreement. |
@@ -49,8 +49,9 @@ values. Hosted main checks and the final tracker readback are bound in the workf
 The three constructor repairs and the related finite-refinement guard are now landed on local
 and GitHub main at `8ea96d6a`. [Release-prerequisite evidence](evidence/release-freeze-20261014/README.md)
 records independent exact-SHA review, 10,964 producer passes/five optional skips with documented
-unchanged-input reuse, and 518 pinned StoryAtlas consumer passes. Stable-boundary judgment and
-publishable dependencies/release infrastructure remain; no new study execution is required.
+unchanged-input reuse, and 518 pinned StoryAtlas consumer passes. The stable boundary is now
+independently reviewed at compiled source `63a952f9`: 1,184 supported nominals and 9,455 supported members. Publishable dependencies and final integration evidence
+remain; no new study execution is required.
 
 The member-level promotion review identified four further bounded repair groups: media value
 construction/arithmetic (`bd-01M4YJ6SNNV1MDQGZQKHPE9EC2`), receipt construction/consistency
@@ -58,10 +59,15 @@ construction/arithmetic (`bd-01M4YJ6SNNV1MDQGZQKHPE9EC2`), receipt construction/
 and custom semantic-view identity (`bd-01M4YJ91P5FE7E55RJQ371VXK9`). Their compiled counterexamples
 and repairs are prerequisites to the final member manifest; no study occurrence is inferred.
 Runtime `d7bc9c06` has a complete producer receipt: 11,067 passed, zero failed/errors and five
-optional skips over 56 tasks, with unchanged-input reuse identified. Final manifest and pinned
-consumer qualification remain in progress. Main's repeated Linux Native crash is now the P0
-(`bd-01M4YFK6VVZ71EB2SGS25DM0ED`); integration waits for its disposition. The retained LLVM 18
-diagnostic holds application source fixed and captures the executable before running tests.
+optional skips over 56 tasks, with unchanged-input reuse identified. The final manifest has
+independent GO; pinned consumer qualification remains in progress. Main's repeated Linux Native crash is the P0
+(`bd-01M4YFK6VVZ71EB2SGS25DM0ED`); its qualified disposition awaits landing. The retained LLVM 18
+diagnostic holds application source fixed and passed all 1,030 alignment tests, with captured
+executable integrity unchanged. Candidate `63a952f9` selects that configuration and passed the
+full hosted matrix:
+15,474 passed, zero failed/errors and 44 optional skips across 80 task totals. Full documentation
+verification passed 14 examples, 21 pages and its browser provenance court.
+These results qualify the tested configuration without attributing the earlier crash to LLVM 14.
 Native qualification also exposed a standard-library literal NUL hash crash, independently of
 StoryModel types (`bd-01M4YP83C7925M22V0K5AQ88BX`). An equal-content fixture construction retains
 all identity assertions; the underlying runtime remains a separate stable-publication prerequisite.

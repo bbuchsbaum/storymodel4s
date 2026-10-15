@@ -54,9 +54,8 @@ described as passing. Formatting completed last in the successful tail.
 The [family review](promotion-family-review.md) covers the 29 supplied source paths and retains
 declaration/admission and inspection/execution distinctions. [Compiled mutations](promotion-mutations/receipt.json)
 kill each repaired guard or construction opening; the [identity rerun](promotion-mutations/identity-d7bc/receipt.json)
-rechecks the length-delimited encoding after the Native fixture adjustment. The API freeze
-remains pending until the repaired compiled distribution, exact member manifest, construction
-judgments, pinned consumer evidence and independent review agree.
+rechecks the length-delimited encoding after the Native fixture adjustment. The final member boundary and construction judgments have [independent GO](stable-api/independent-review.json).
+Pinned consumer qualification and integration evidence remain required before landing.
 
 Member-aware audit controls distinguish supported accessors from experimental factories,
 require classification of every exposed member and traverse enum alternatives. The retained
@@ -88,14 +87,17 @@ python3 tools/stability-audit/validate-supported-closure.py /tmp/storymodel4s-in
 
 Two findings remain distinct. Main `8ea96d6a` failed Linux Native CI twice in `MappingRunSuite`,
 with a process crash and, on retry, glibc heap-corruption diagnostics. The original failed
-executables were not uploaded. JVM and JavaScript cells passed. Main integration is held while
-a source-pinned Ubuntu 22.04/LLVM 18 comparison retains its executable and generated LLVM before
+executables were not uploaded. JVM and JavaScript cells passed. A source-pinned Ubuntu 22.04/LLVM 18 comparison retained its executable and generated LLVM before
 testing. That [Linux comparison](native-diagnostic/llvm18-linux/receipt.json) passed 1,030
 alignment tests, including all six `MappingRunSuite` tests, with every retained artifact hash
 unchanged. Actual Native configuration selected Clang 18.1.8. This qualifies that configuration
 without establishing the cause of the earlier failures. The generated CI candidate `63a952f9`
-adopts the same toolchain and retains alignment artifacts before testing; its full hosted
-matrix is the next gate. [Workflow review](native-diagnostic/workflow-review.json) and
+adopts the same toolchain and retains alignment artifacts before testing. Its [full hosted
+matrix](hosted-candidate/receipt.json) passed 15,474 tests with zero failures/errors and 44 optional
+skips over 80 task totals: 4,424 passes/22 skips on each JVM and 3,313 passes on both JavaScript
+and Native. The exact Native executable passed post-test integrity; all 16,231 retained files
+were independently read and verified against their before-test manifest. Full documentation
+verification passed 14 executable examples, 21 pages and the browser provenance court. [Workflow review](native-diagnostic/workflow-review.json) and
 [shell controls](native-diagnostic/workflow-shell-controls.json) bind that diagnostic mechanism;
 the runtime result is bound separately in the Linux comparison receipt.
 

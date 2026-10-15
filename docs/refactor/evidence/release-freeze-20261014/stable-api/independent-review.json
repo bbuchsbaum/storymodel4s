@@ -1,0 +1,24 @@
+{
+  "source": "f6f7a46c69a8e5702649733337d41b6f9cb1d9a5",
+  "compiledSource": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO on stable-boundary decision and documentation; no scoped BLOCK",
+  "verified": [
+    "artifact and provenance hashes",
+    "exact recipe replay and closure: 1184 supported nominals and 9455 members",
+    "six contextual readers retained",
+    "no story or document promotion; four acquire aliases",
+    "five construction helpers experimental and retained in the full graph",
+    "repaired signatures and closed product construction doors",
+    "fresh candidate inventory equality; prior inventory differs only in sourceSha",
+    "all documentation links",
+    "13 named mutation receipts and identity rerun",
+    "producer: 6665 reused plus 4402 rerun equals 11067 passes, with five skips"
+  ],
+  "remainingLandingAcceptance": [
+    "exact hosted matrix",
+    "pinned Atlas consumer",
+    "upstream staging and binary consumer"
+  ],
+  "publicationLimit": "separate Native literal-hash prerequisite remains open"
+}

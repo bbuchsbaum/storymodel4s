@@ -1,0 +1,13 @@
+{
+  "source": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "run": 38674741254,
+  "job": 116225660605,
+  "archiveSha256": "4fcc49462f9db4e1686c0ae29065d39eca61abe2fc982993113c09a8aa9e3087",
+  "validatedEntries": 16231,
+  "uniqueEntries": 16231,
+  "llvmFiles": 119,
+  "executable": "align/.native/target/scala-3.7.4/storymodel4s-align-test",
+  "executableSha256": "206f21199b49f6ad45ddf00a3b34ec6f2eaa42fea8da30c2c5dca7eefa18f27d",
+  "sourceStatus": "",
+  "integrity": "all archived bytes match before-test manifest"
+}
