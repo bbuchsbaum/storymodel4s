@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -40,19 +41,33 @@ def main() -> int:
         log = output / (label + ".log")
         start = time.monotonic()
         environment = dict(os.environ, SCALANATIVE_MODE=args.mode)
-        with log.open("w") as stream:
-            result = subprocess.run(command, cwd=cwd, env=environment, stdout=stream,
-                                    stderr=subprocess.STDOUT, timeout=1800)
-        record = {"label": label, "command": command, "exit": result.returncode,
-                  "seconds": round(time.monotonic() - start, 3), "log": log.name,
-                  "sha256": hashlib.sha256(log.read_bytes()).hexdigest()}
+        record = {"label": label, "command": command, "exit": None, "log": log.name}
         receipt["commands"].append(record)
         save()
-        if must_pass and result.returncode:
-            raise RuntimeError(f"{label} exited {result.returncode}; inspect {log}")
-        return result.returncode, log.read_text(errors="replace")
+        try:
+            with log.open("w") as stream:
+                result = subprocess.run(command, cwd=cwd, env=environment, stdout=stream,
+                                        stderr=subprocess.STDOUT, timeout=1800)
+            record["exit"] = result.returncode
+        except subprocess.TimeoutExpired:
+            record["timeoutSeconds"] = 1800
+            raise RuntimeError(f"{label} timed out; inspect {log}")
+        finally:
+            record["seconds"] = round(time.monotonic() - start, 3)
+            if log.exists():
+                record["sha256"] = hashlib.sha256(log.read_bytes()).hexdigest()
+            save()
+        if must_pass and record["exit"]:
+            raise RuntimeError(f"{label} exited {record['exit']}; inspect {log}")
+        return record["exit"], log.read_text(errors="replace")
 
     try:
+        java = str(Path(os.environ["JAVA_HOME"]) / "bin/java") if os.environ.get("JAVA_HOME") else "java"
+        clang = str(Path(os.environ["LLVM_BIN"]) / "clang") if os.environ.get("LLVM_BIN") else shutil.which("clang")
+        if not clang:
+            raise RuntimeError("clang is unavailable")
+        run("java-version", [java, "-version"], output)
+        run("clang-version", [clang, "--version"], output)
         run("clone", ["git", "clone", "--no-checkout", args.source, str(checkout)], output)
         run("checkout", ["git", "checkout", "--detach", BASE], checkout)
         actual = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=checkout, text=True).strip()
@@ -61,7 +76,8 @@ def main() -> int:
         (checkout / "sandbox/src/main/scala/ZeroHashProbe.scala").write_bytes(
             (HERE / "ZeroHashProbe.scala").read_bytes())
         settings = ["sbt", "-batch", "++3.7.4",
-                    'set LocalProject("sandbox3") / Compile / mainClass := Some("ZeroHashProbe")']
+                    'set LocalProject("sandbox3") / Compile / mainClass := Some("ZeroHashProbe")',
+                    "show sandbox3/nativeConfig", "show tests3/nativeConfig"]
         code, original = run("original", settings + ["sandbox3/run"], checkout, False)
         original_passes = re.findall(r"^PASS (.+)$", original, re.M)
         if (code == 0 or original_passes != PROBE_CASES[:5]
@@ -74,8 +90,7 @@ def main() -> int:
             "/org/scalanative/testsuite/javalib/lang/StringTest.scala",
             "/org/scalanative/testsuite/javalib/lang/StringHashCodeTest.scala",
             "/utils/AssertThrows.scala", "/org/scalanative/testsuite/utils/Platform.scala"]
-        select = ('set LocalProject("tests3") / Test / sources ~= (_.filter(p => '
-                  'p.getPath.contains("/src_managed/") || Seq('
+        select = ('set LocalProject("tests3") / Test / sources ~= (_.filter(p => Seq('
                   + ", ".join(json.dumps(s) for s in source_suffixes)
                   + ').exists(p.getPath.endsWith)))')
         code, fixed = run("fixed", settings + ["sandbox3/run", select,
