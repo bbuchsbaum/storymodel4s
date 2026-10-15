@@ -140,11 +140,19 @@ object Resolved:
   given Functor[Resolved] with
     def map[A, B](fa: Resolved[A])(f: A => B): Resolved[B] = fa.map(f)
 
-/** Append-only registry of claims keyed by identifier. */
-final case class ClaimLedger private (claims: Map[ClaimId, ClaimMeta], order: Vector[ClaimId]):
+/** Append-only registry whose lookup keys and insertion order describe exactly the same claims.
+  *
+  * Construction starts at [[ClaimLedger.empty]] and proceeds through [[add]] or [[addAll]]. A
+  * non-case class prevents generated product constructors from hiding, duplicating or miskeying
+  * claims that the ordered JSONL writer would otherwise lose or misrepresent.
+  */
+final class ClaimLedger private (
+    val claims: Map[ClaimId, ClaimMeta],
+    val order: Vector[ClaimId]
+):
   def add(meta: ClaimMeta): Either[DomainError, ClaimLedger] =
     if claims.contains(meta.id) then Left(DomainError.DuplicateId("ClaimId", meta.id.value))
-    else ClaimMeta.validated(meta).map(m => ClaimLedger(claims.updated(m.id, m), order :+ m.id))
+    else ClaimMeta.validated(meta).map(m => new ClaimLedger(claims.updated(m.id, m), order :+ m.id))
 
   def addAll(metas: Iterable[ClaimMeta]): Either[DomainError, ClaimLedger] =
     metas.foldLeft[Either[DomainError, ClaimLedger]](Right(this))((acc, m) => acc.flatMap(_.add(m)))
@@ -156,5 +164,13 @@ final case class ClaimLedger private (claims: Map[ClaimId, ClaimMeta], order: Ve
   def size: Int = order.size
   def all: Vector[ClaimMeta] = order.flatMap(claims.get)
 
+  override def equals(other: Any): Boolean = other match
+    case that: ClaimLedger => claims == that.claims && order == that.order
+    case _                 => false
+
+  override def hashCode(): Int = (claims, order).hashCode()
+
+  override def toString: String = s"ClaimLedger($size claims)"
+
 object ClaimLedger:
-  val empty: ClaimLedger = ClaimLedger(Map.empty, Vector.empty)
+  val empty: ClaimLedger = new ClaimLedger(Map.empty, Vector.empty)
