@@ -20,6 +20,11 @@ PROBE_CASES = ["empty", "dynamic-nul", "dynamic-zero-ascii", "ordinary", "negati
                "literal-nul", "literal-two-nuls", "literal-zero-ascii"]
 
 
+def plain_log(text: str) -> str:
+    """Remove terminal CSI styling for parsing; the saved log remains byte-for-byte raw."""
+    return re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", text)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path, help="new output directory")
@@ -59,7 +64,7 @@ def main() -> int:
             save()
         if must_pass and record["exit"]:
             raise RuntimeError(f"{label} exited {record['exit']}; inspect {log}")
-        return record["exit"], log.read_text(errors="replace")
+        return record["exit"], plain_log(log.read_text(errors="replace"))
 
     try:
         java = str(Path(os.environ["JAVA_HOME"]) / "bin/java") if os.environ.get("JAVA_HOME") else "java"

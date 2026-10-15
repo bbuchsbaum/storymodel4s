@@ -37,6 +37,8 @@ jobs:
           java-version: 21
           cache: sbt
       - uses: sbt/setup-sbt@v1
+      - name: Check qualification log parser
+        run: python3 -m unittest discover -s tools/native-runtime -p 'test_*.py'
       - name: Install LLVM 18
         run: sudo apt-get update && sudo apt-get install -y clang-18 llvm-18 lld-18
       - name: Qualify original and repaired runtime
