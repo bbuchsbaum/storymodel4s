@@ -1,0 +1,453 @@
+{
+  "schema": "storymodel4s-release-candidate-matrix/v1",
+  "coordinates": [
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-acquire_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "acquireJVM",
+      "moduleDirectory": "acquire/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-acquire_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "acquireNative",
+      "moduleDirectory": "acquire/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-acquire_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "acquireJS",
+      "moduleDirectory": "acquire/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-align_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "alignJVM",
+      "moduleDirectory": "align/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-align_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "alignNative",
+      "moduleDirectory": "align/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-align_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "alignJS",
+      "moduleDirectory": "align/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-amr-interop_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "amrInteropJVM",
+      "moduleDirectory": "amr-interop/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-amr-interop_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "amrInteropNative",
+      "moduleDirectory": "amr-interop/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-amr-interop_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "amrInteropJS",
+      "moduleDirectory": "amr-interop/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-codec_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "codecJVM",
+      "moduleDirectory": "codec/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-codec_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "codecNative",
+      "moduleDirectory": "codec/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-codec_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "codecJS",
+      "moduleDirectory": "codec/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-core_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "coreJVM",
+      "moduleDirectory": "core/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-core_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "coreNative",
+      "moduleDirectory": "core/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-core_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "coreJS",
+      "moduleDirectory": "core/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-corpus-intake_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "corpusIntake",
+      "moduleDirectory": "corpus-intake"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-corpus_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "corpusJVM",
+      "moduleDirectory": "corpus/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-corpus_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "corpusNative",
+      "moduleDirectory": "corpus/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-corpus_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "corpusJS",
+      "moduleDirectory": "corpus/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-document_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "documentJVM",
+      "moduleDirectory": "document/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-document_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "documentNative",
+      "moduleDirectory": "document/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-document_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "documentJS",
+      "moduleDirectory": "document/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-embed-bench_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "embedBench",
+      "moduleDirectory": "embed-bench"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-embed-core_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "embedCoreJVM",
+      "moduleDirectory": "embed-core/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-embed-core_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "embedCoreNative",
+      "moduleDirectory": "embed-core/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-embed-core_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "embedCoreJS",
+      "moduleDirectory": "embed-core/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-embed-grakern_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "embedGrakern",
+      "moduleDirectory": "embed-grakern"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-embed-onnx_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "embedOnnx",
+      "moduleDirectory": "embed-onnx"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-features_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "featuresJVM",
+      "moduleDirectory": "features/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-features_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "featuresNative",
+      "moduleDirectory": "features/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-features_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "featuresJS",
+      "moduleDirectory": "features/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-fixtures_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "fixturesJVM",
+      "moduleDirectory": "fixtures/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-fixtures_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "fixturesNative",
+      "moduleDirectory": "fixtures/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-fixtures_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "fixturesJS",
+      "moduleDirectory": "fixtures/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-interview_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "interviewJVM",
+      "moduleDirectory": "interview/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-interview_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "interviewNative",
+      "moduleDirectory": "interview/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-interview_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "interviewJS",
+      "moduleDirectory": "interview/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-laws_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "lawsJVM",
+      "moduleDirectory": "laws/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-laws_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "lawsNative",
+      "moduleDirectory": "laws/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-laws_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "lawsJS",
+      "moduleDirectory": "laws/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-media_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "media",
+      "moduleDirectory": "media"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-pipeline_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "pipeline",
+      "moduleDirectory": "pipeline"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-proposition_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "propositionJVM",
+      "moduleDirectory": "proposition/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-proposition_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "propositionNative",
+      "moduleDirectory": "proposition/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-proposition_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "propositionJS",
+      "moduleDirectory": "proposition/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-provider-agent_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "providerAgent",
+      "moduleDirectory": "provider-agent"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-provider-parser_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "providerParser",
+      "moduleDirectory": "provider-parser"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-recall_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "recallJVM",
+      "moduleDirectory": "recall/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-recall_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "recallNative",
+      "moduleDirectory": "recall/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-recall_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "recallJS",
+      "moduleDirectory": "recall/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-story_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "storyJVM",
+      "moduleDirectory": "story/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-story_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "storyNative",
+      "moduleDirectory": "story/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-story_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "storyJS",
+      "moduleDirectory": "story/.js"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-view_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "viewJVM",
+      "moduleDirectory": "view/.jvm"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-view_native0.5_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "viewNative",
+      "moduleDirectory": "view/.native"
+    },
+    {
+      "groupId": "io.github.bbuchsbaum",
+      "artifactId": "storymodel4s-view_sjs1_3",
+      "version": "1.0.0",
+      "packaging": "jar",
+      "project": "viewJS",
+      "moduleDirectory": "view/.js"
+    }
+  ]
+}

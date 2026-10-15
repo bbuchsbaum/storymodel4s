@@ -1,0 +1,30 @@
+{
+  "schema": "storymodel4s-dependency-candidates/v1",
+  "purpose": "Local release rehearsal. Coordinates are proposals until owner-authorized publication.",
+  "repositories": [
+    {
+      "name": "graph4s",
+      "url": "https://github.com/canardlapin/graph4s.git",
+      "commit": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "version": "0.1.0-RC1",
+      "projects": {"coreJVM": "graph4s-core_3", "indexedJVM": "graph4s-indexed_3", "dataJVM": "graph4s-data_3"},
+      "tests": ["coreJVM/test", "indexedJVM/test", "dataJVM/test"]
+    },
+    {
+      "name": "gale",
+      "url": "https://github.com/canardlapin/gale.git",
+      "commit": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "version": "1.0.0-RC1",
+      "projects": {"coreJVM": "gale-core_3"},
+      "tests": ["coreJVM/test", "parity/test"]
+    },
+    {
+      "name": "grakern",
+      "url": "https://github.com/canardlapin/grakern.git",
+      "commit": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "version": "0.1.0-RC1",
+      "projects": {"coreJVM": "grakern-core_3", "graph4sAdapterJVM": "grakern-graph4s_3", "standardJVM": "grakern-standard_3", "lawsJVM": "grakern-laws_3", "engineJVM": "grakern-engine-jvm_3"},
+      "tests": ["coreJVM/test", "graph4sAdapterJVM/test", "standardJVM/test", "lawsJVM/test", "engineJVM/test", "architectureProbes/test"]
+    }
+  ]
+}
