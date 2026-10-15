@@ -282,7 +282,7 @@ object StrictCandidateSet:
     val nominations = perLevel.flatMap(_._1)
     val set =
       if nominations.isEmpty && !anyRanked && lexicalRefs.isEmpty then CandidateSet.unranked
-      else CandidateSet(nominations, abstained = false)
+      else CandidateSet.nominated(nominations)
     new StrictCandidateSet(set, perLevel.flatMap(_._2), perLevel.flatMap(_._3), outcomes)
 
   private[align] def canonicalGenerated(

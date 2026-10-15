@@ -297,8 +297,11 @@ object ModeGateLaws extends Laws:
         forAll { (f: AlignGens.FoilCase) =>
           val base = f.candidates
           val set = base.set(f.unit.id)
+          val reversedSet = CandidateSet
+            .of(set.nominations.reverse, set.abstained)
+            .fold(e => throw new IllegalStateException(e.message), identity)
           val reversed =
-            Candidates(Map(f.unit.id -> set.copy(nominations = set.nominations.reverse)))
+            Candidates(Map(f.unit.id -> reversedSet))
           val fused =
             Candidates(
               Map(f.unit.id -> CandidateSet.fuse(Vector(set, set.without(Channels.lexical))))

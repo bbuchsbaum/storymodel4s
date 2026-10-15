@@ -124,12 +124,15 @@ class StageTraceOriginSuite extends FunSuite:
   test("equal results retain different originating nomination receipts") {
     val r = recall("hello"); val b = built; val c = candidates(r, b)
     val changed = Candidates(c.byUnit.map { (id, set) =>
-      id -> CandidateSet(
-        set.nominations.map(
-          _.copy(space = Some("declared-space"), receipt = Some("distinct-receipt"))
-        ),
-        set.abstained
-      )
+      id -> CandidateSet
+        .of(
+          set.nominations.map(
+            _.copy(space = Some("declared-space"), receipt = Some("distinct-receipt"))
+          ),
+          set.abstained
+        )
+        .toOption
+        .get
     })
     def run(cs: Candidates) =
       value(StageTrace.historical(r, b, cs, DefaultLocalCostModel(), HsmmConfig.default))

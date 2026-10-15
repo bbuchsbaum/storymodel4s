@@ -34,7 +34,7 @@ class LocalEvidenceSuite extends FunSuite:
 
   test("identity ignores nomination storage order, which carries no information") {
     val reversed = Candidates(candidates.byUnit.view.mapValues { s =>
-      CandidateSet(s.nominations.reverse, s.abstained)
+      CandidateSet.of(s.nominations.reverse, s.abstained).toOption.get
     }.toMap)
     assert(
       candidates.byUnit.values.exists(_.nominations.size > 1),
@@ -59,7 +59,10 @@ class LocalEvidenceSuite extends FunSuite:
     val relabeled = set.nominations.head.copy(receipt = Some("another-provider-receipt"))
     val changed = Candidates(
       candidates.byUnit
-        .updated(unit, CandidateSet(relabeled +: set.nominations.tail, set.abstained))
+        .updated(
+          unit,
+          CandidateSet.of(relabeled +: set.nominations.tail, set.abstained).toOption.get
+        )
     )
     assertEquals(
       evidence(changed).breakdowns,

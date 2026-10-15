@@ -17,7 +17,9 @@ class LocalEvidenceConsumerSuite extends FunSuite:
     )
   }
   private def candidates(ns: Vector[Nomination]): Candidates = Candidates(
-    fixture.recall.ordered.map(u => u.id -> CandidateSet(ns, abstained = false)).toMap
+    fixture.recall.ordered
+      .map(u => u.id -> CandidateSet.of(ns, abstained = false).toOption.get)
+      .toMap
   )
   private def evidence(
       ns: Vector[Nomination] = nominations,

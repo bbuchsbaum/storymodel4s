@@ -16,14 +16,21 @@ final case class Nomination(
     receipt: Option[String]
 )
 
-/** The candidate set of one unit. `abstained` records that no ranking evidence existed at all:
-  * every semantic provider abstained on every node and no lexical/entity hit fired. Such a unit
-  * goes to `ExternalState.Unranked`, never to `Intrusion` (review #2).
+/** The candidate set of one unit. `abstained` declares no effective ranking evidence under the
+  * retained channels, and therefore requires empty nominations. Empty nominations alone do not
+  * imply abstention: a ranking may have retained no candidates. An abstained unit goes to
+  * `ExternalState.Unranked`, never to `Intrusion` (review #2).
+  *
+  * Historical declarations remain unattested. Checked construction proves this local relation; only
+  * a strict generation receipt establishes the provider outcomes that led to it.
   *
   * `ranked` is the deduplicated, deterministically ordered anchor list the aligner consumes; the
   * order carries no information into inference (states are a set), only `nominations` do.
   */
-final case class CandidateSet(nominations: Vector[Nomination], abstained: Boolean):
+final class CandidateSet private (
+    val nominations: Vector[Nomination],
+    val abstained: Boolean
+):
   lazy val ranked: Vector[SourceNodeRef] = nominations.map(_.ref).distinct.sorted
   def isEmpty: Boolean = ranked.isEmpty
   def size: Int = ranked.size
@@ -34,21 +41,41 @@ final case class CandidateSet(nominations: Vector[Nomination], abstained: Boolea
 
   def channels: Set[String] = nominations.map(_.channel).toSet
 
-  /** Drop every nomination from `channel` (ablation); abstention is recomputed. */
+  /** Drop a channel. Removing the last nomination declares effective abstention after ablation; it
+    * does not assert that the original providers never ranked a node.
+    */
   def without(channel: String): CandidateSet =
     val kept = nominations.filterNot(_.channel == channel)
-    CandidateSet(kept, abstained = abstained || (kept.isEmpty && nominations.nonEmpty))
+    new CandidateSet(kept, abstained = abstained || (kept.isEmpty && nominations.nonEmpty))
+
+  override def equals(other: Any): Boolean = other match
+    case that: CandidateSet => nominations == that.nominations && abstained == that.abstained
+    case _                  => false
+  override def hashCode(): Int = (nominations, abstained).hashCode()
+  override def toString: String = s"CandidateSet($size anchors, abstained=$abstained)"
 
 object CandidateSet:
-  val unranked: CandidateSet = CandidateSet(Vector.empty, abstained = true)
+  val unranked: CandidateSet = new CandidateSet(Vector.empty, abstained = true)
+
+  /** Admit a historical declaration without allowing nominations to contradict abstention. */
+  def of(
+      nominations: Vector[Nomination],
+      abstained: Boolean
+  ): Either[AlignError, CandidateSet] =
+    if abstained && nominations.nonEmpty then
+      Left(AlignError.InvalidConfig("candidates", "abstained candidates must have no nominations"))
+    else Right(new CandidateSet(nominations, abstained))
+
+  /** Internal producers have ranking evidence even if their retention budget removes every hit. */
+  private[align] def nominated(nominations: Vector[Nomination]): CandidateSet =
+    new CandidateSet(nominations, abstained = false)
 
   /** Plain anchors with no provenance (channel `unspecified`). */
   def of(refs: Vector[SourceNodeRef]): CandidateSet =
-    CandidateSet(
+    nominated(
       refs.distinct.sorted.zipWithIndex.map { (r, i) =>
         Nomination(r, Channels.unspecified, i, None, None, None)
-      },
-      abstained = false
+      }
     )
 
   /** Rank-only fusion of several channels' candidate sets (reciprocal-rank fusion). The fused rank
@@ -58,7 +85,7 @@ object CandidateSet:
     */
   def fuse(sets: Vector[CandidateSet], k: Int = 60): CandidateSet =
     val all = sets.flatMap(_.nominations)
-    if all.isEmpty then CandidateSet(Vector.empty, abstained = sets.forall(_.abstained))
+    if all.isEmpty then new CandidateSet(Vector.empty, abstained = sets.forall(_.abstained))
     else
       val rrf: Map[SourceNodeRef, Double] = all
         .groupBy(_.ref)
@@ -66,7 +93,7 @@ object CandidateSet:
         .mapValues(ns => ns.map(n => 1.0 / (k + 1 + n.rank)).sum)
         .toMap
       val ordered = all.sortBy(n => (-rrf(n.ref), n.ref.key, n.channel, n.rank))
-      CandidateSet(ordered, abstained = false)
+      nominated(ordered)
 
 object Channels:
   val unspecified = "unspecified"
@@ -140,7 +167,7 @@ final case class CandidateGenerator(
           .map { (r, i) => Nomination(r, Channels.lexical, i, None, None, None) }
     val all = dense ++ lexical
     if all.isEmpty && !anyRanked then CandidateSet.unranked
-    else CandidateSet(all, abstained = false)
+    else CandidateSet.nominated(all)
 
 object CandidateGenerator:
 

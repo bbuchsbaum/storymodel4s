@@ -436,10 +436,13 @@ class GateProofSuite extends FunSuite:
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
     val withAlien = Candidates(
       AnnaFixture.candidates.byUnit.map((u, set) =>
-        u -> CandidateSet(
-          set.nominations :+ Nomination(alien, Channels.unspecified, set.size, None, None, None),
-          set.abstained
-        )
+        u -> CandidateSet
+          .of(
+            set.nominations :+ Nomination(alien, Channels.unspecified, set.size, None, None, None),
+            set.abstained
+          )
+          .toOption
+          .get
       )
     )
     val res = GraphHsmm
