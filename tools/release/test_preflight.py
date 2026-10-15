@@ -82,6 +82,10 @@ with tempfile.TemporaryDirectory() as temporary:
         result, receipt = run(work, work / "real.json", real, real_cs, "--timeout-seconds", "120")
         assert result.returncode == 0, result.stderr
         assert receipt["commands"][0]["reportSha256"] and len(receipt["commands"][0]["jars"]) >= 2
+        (real / "real.pom").write_text(pom("example", "real", "1.0.0", [("org.scala-native", "scala3lib_native0.5_3", "3.7.4+0.5.12")]))
+        result, receipt = run(work, work / "real.json", real, real_cs, "--timeout-seconds", "120")
+        assert result.returncode == 0, result.stderr
+        assert "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12" in receipt["commands"][0]["command"]
 
     # Duplicate coordinates cannot pass merely because their set matches the matrix.
     (candidate / "duplicate.pom").write_text((candidate / "b.pom").read_text())
@@ -118,9 +122,15 @@ with tempfile.TemporaryDirectory() as temporary:
     assert result.returncode != 0 and "missing internal" in receipt["error"]
 
     # Dynamic and snapshot transitives fail before resolver invocation.
-    (candidate / "a.pom").write_text(pom("example", "a", "1.0.0", [("external", "dep", "2.0-SNAPSHOT")]))
+    for version in ["2.0-SNAPSHOT", "1.+", "1.2+", "1.2.3+", "[1.0,2.0)", "latest.release", "1.2.3+4..5"]:
+        (candidate / "a.pom").write_text(pom("example", "a", "1.0.0", [("external", "dep", version)]))
+        result, receipt = run(work, work / "only-a.json", candidate, good_cs)
+        assert result.returncode != 0 and "non-fixed version" in receipt["error"], version
+        assert not receipt["commands"], version
+
+    (candidate / "a.pom").write_text(pom("example", "a", "1.0.0", [("external", "dep", "3.7.4+0.5.12")]))
     result, receipt = run(work, work / "only-a.json", candidate, good_cs)
-    assert result.returncode != 0 and "non-fixed version" in receipt["error"]
+    assert result.returncode == 0 and receipt["publicDependencyQualification"] == "passed"
 
     # Fixed external closure preserves the resolver's nonzero exit and fails closed.
     (candidate / "a.pom").write_text(pom("example", "a", "1.0.0", [("external", "dep", "2.0.0")]))

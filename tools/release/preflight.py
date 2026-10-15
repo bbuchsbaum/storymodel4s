@@ -20,7 +20,8 @@ from typing import Any
 MATRIX_SCHEMA = "storymodel4s-release-candidate-matrix/v1"
 RECEIPT_SCHEMA = "storymodel4s-release-preflight/v1"
 CENTRAL = "https://repo.maven.apache.org/maven2"
-DYNAMIC = re.compile(r"(?i)(snapshot|latest|release|[\[\](){}*+])")
+DYNAMIC = re.compile(r"(?i)(snapshot|latest|release|[\[\](){}*])")
+FIXED_BUILD_METADATA = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*")
 
 
 class PreflightError(RuntimeError):
@@ -82,7 +83,9 @@ class Pom:
 
 
 def reject_dynamic(value: str, context: str) -> None:
-    if not value or DYNAMIC.search(value):
+    # Scala Native publishes exact versions such as 3.7.4+0.5.12. A trailing '+'
+    # selector (1.2.+ or 1.2.3+) remains dynamic and must never reach the resolver.
+    if not value or DYNAMIC.search(value) or ("+" in value and not FIXED_BUILD_METADATA.fullmatch(value)):
         raise PreflightError(f"non-fixed version in {context}: {value!r}")
 
 
