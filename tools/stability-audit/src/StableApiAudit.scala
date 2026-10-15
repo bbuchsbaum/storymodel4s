@@ -11,6 +11,7 @@ import scala.tasty.inspector.*
   */
 object StableApiAudit extends Inspector:
   private final case class Edge(from: String, to: String, kind: String, detail: String)
+  private final case class Member(id: String, exposedBy: String, origin: String)
   private var requestedRoots = Set.empty[String]
 
   private def q(s: String): String = "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
@@ -24,6 +25,8 @@ object StableApiAudit extends Inspector:
     val edges = mutable.LinkedHashSet.empty[Edge]
     val unresolved = mutable.LinkedHashSet.empty[String]
     val external = mutable.LinkedHashSet.empty[String]
+    val nominal = mutable.LinkedHashSet.empty[String]
+    val members = mutable.LinkedHashSet.empty[Member]
     object collect extends TreeTraverser:
       override def traverseTree(tree: Tree)(owner: Symbol): Unit =
         tree match
@@ -57,12 +60,20 @@ object StableApiAudit extends Inspector:
     def key(symbol: Symbol): String = id(symbol) + " :: " + symbol.info.show
     def public(symbol: Symbol): Boolean =
       !symbol.flags.is(Flags.Private) && !symbol.flags.is(Flags.PrivateLocal)
+    def recordMember(member: Symbol, exposedBy: Symbol, origin: String): Unit =
+      if public(member) then
+        members += Member(key(member), key(exposedBy), origin)
+        // Qualified privacy is represented separately from bare Private in TASTy. Retain these
+        // construction doors, but do not silently classify them as a caller-supported API.
+        if member.privateWithin.nonEmpty then
+          members += Member(key(member), key(exposedBy), "qualified-private")
     def visit(symbol: Symbol): Unit =
       val name = key(symbol)
       if seen.add(name) then
         typeEdge(symbol, symbol.info, "signature")
         symbol.tree match
           case d: ClassDef =>
+            nominal += name
             // `parents` can be a TypeTree or an applied Term (`extends Parent(1)`).  The latter
             // carries both the parent type and its constructor MethodType only as a Term.
             d.parents.foreach {
@@ -70,9 +81,7 @@ object StableApiAudit extends Inspector:
               case p: Term     => typeEdge(symbol, p.tpe, "parent-term")
               case _           => ()
             }
-            if public(d.constructor.symbol) then
-              typeEdge(symbol, d.constructor.symbol.info, "constructor")
-            memberEdges(symbol)
+            memberEdges(symbol, d.constructor.symbol)
             companionFactoryEdges(symbol)
             // Public alternatives are part of a sealed result contract even when their
             // constructors return the narrower alternative type rather than the base.
@@ -80,8 +89,13 @@ object StableApiAudit extends Inspector:
               edges += Edge(key(symbol), key(alternative), "public-alternative", alternative.name)
               visit(alternative)
             }
-          case d: DefDef => typeEdge(symbol, d.returnTpt.tpe, "return")
-          case d: ValDef => typeEdge(symbol, d.tpt.tpe, "accessor")
+          case d: DefDef =>
+            recordMember(symbol, symbol.owner, "declaration")
+            typeEdge(symbol, d.returnTpt.tpe, "return")
+          case d: ValDef =>
+            recordMember(symbol, symbol.owner, "declaration")
+            typeEdge(symbol, d.tpt.tpe, "accessor")
+          case _: TypeDef => nominal += name
           case _ => ()
     def typeEdge(from: Symbol, t: TypeRepr, kind: String): Unit =
       def symbolEdge(repr: TypeRepr, edgeKind: String): Unit =
@@ -122,11 +136,25 @@ object StableApiAudit extends Inspector:
         case byName: ByNameType => typeEdge(from, byName.underlying, kind + ":by-name")
         case annotated: AnnotatedType => typeEdge(from, annotated.underlying, kind + ":annotated")
         case _ => normalized.typeArgs.foreach(typeEdge(from, _, kind + ":argument"))
-    def memberEdges(owner: Symbol): Unit =
-      val members = (owner.methodMembers ++ owner.fieldMembers).distinct
-      members.filter(public).foreach { m =>
-        typeEdge(owner, m.info, "member")
-        if m.flags.is(Flags.Protected) then edges += Edge(key(owner), key(m), "protected-member", m.name)
+    /** Each member is an inventory vertex because a stable nominal can expose only selected
+      * members.  In particular, attribute every dependency to the member that carries the
+      * signature rather than to its receiver class.
+      */
+    def memberEdges(owner: Symbol, constructor: Symbol): Unit =
+      val exposed = (owner.methodMembers ++ owner.fieldMembers :+ constructor).distinct
+      exposed.filter(public).foreach { member =>
+        val origin =
+          if member == constructor then "constructor"
+          else if member.flags.is(Flags.ParamAccessor) then "parameter-accessor"
+          else if member.flags.is(Flags.CaseAccessor) then "case-accessor"
+          else if member.flags.is(Flags.Synthetic) then "generated"
+          else if member.flags.is(Flags.Protected) then "protected"
+          else if member.owner != owner then "inherited"
+          else "member"
+        recordMember(member, owner, origin)
+        edges += Edge(key(owner), key(member), "member-exposure", origin)
+        typeEdge(member, member.info, if origin == "constructor" then "constructor" else "member")
+        visit(member)
       }
     /** Public companion methods are construction doors only when their result structurally
       * contains this reached class. This admits `build` and wrappers such as `Option[A]` without
@@ -134,8 +162,11 @@ object StableApiAudit extends Inspector:
       */
     def companionFactoryEdges(owner: Symbol): Unit =
       owner.companionModule.methodMembers.filter(m => public(m) && resultMentions(m.info, owner)).foreach { m =>
+        recordMember(m, owner, "companion-factory")
+        edges += Edge(key(owner), key(m), "member-exposure", "companion-factory")
         edges += Edge(key(owner), key(m), "companion-factory", m.name)
-        typeEdge(owner, m.info, "companion-factory")
+        typeEdge(m, m.info, "companion-factory")
+        visit(m)
       }
     def resultMentions(t: TypeRepr, target: Symbol): Boolean =
       def loop(repr: TypeRepr): Boolean =
@@ -155,10 +186,16 @@ object StableApiAudit extends Inspector:
     roots.foreach(visit)
     val out = sys.props("audit.output")
     val inventory = seen.toVector.sorted.map(q).mkString("[", ",", "]")
+    val nominals = nominal.toVector.sorted.map(q).mkString("[", ",", "]")
+    val memberInventory = members.toVector.groupBy(_.id).toVector.sortBy(_._1).map { case (id, records) =>
+      val exposedBy = records.map(_.exposedBy).distinct.sorted.map(q).mkString("[", ",", "]")
+      val origins = records.map(_.origin).distinct.sorted.map(q).mkString("[", ",", "]")
+      s"{\"id\":${q(id)},\"exposedBy\":$exposedBy,\"origins\":$origins}"
+    }
     val renderedEdges = edges.toVector.filter(e => seen(e.from)).sortBy(e => (e.from, e.to, e.kind)).map { e =>
       s"{\"from\":${q(e.from)},\"to\":${q(e.to)},\"kind\":${q(e.kind)},\"detail\":${q(e.detail)}}"
     }
-    val content = s"{\"sourceSha\":${q(sys.props("audit.source"))},\"roots\":${json(requestedRoots.toVector.sorted.map(q))},\"inventory\":$inventory,\"edges\":${json(renderedEdges)},\"unresolved\":${json(unresolved.toVector.sorted.map(q))},\"external\":${json(external.toVector.sorted.map(q))}}"
+    val content = s"{\"sourceSha\":${q(sys.props("audit.source"))},\"roots\":${json(requestedRoots.toVector.sorted.map(q))},\"inventory\":$inventory,\"nominals\":$nominals,\"members\":${json(memberInventory)},\"edges\":${json(renderedEdges)},\"unresolved\":${json(unresolved.toVector.sorted.map(q))},\"external\":${json(external.toVector.sorted.map(q))}}"
     java.nio.file.Files.writeString(java.nio.file.Path.of(out), content + "\n")
 
   def main(args: Array[String]): Unit =

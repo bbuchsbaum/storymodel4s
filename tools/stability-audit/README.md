@@ -6,7 +6,12 @@ requested JSON path (the default is the dated evidence directory).
 
 The root list is intentionally explicit. The walker follows public signature types, type
 arguments, parent types, public inherited methods/fields, accessible accessors, and protected
-members. It follows public alternatives of reached enums and sealed traits, including each
+members. Each reached member has its own exact `fullName :: info.show` identity in `members`,
+with `exposedBy` receiver nominal identities and `origins` (`constructor`, accessor, generated,
+protected, inherited, ordinary member, or companion factory). Member signature dependencies are
+emitted from that member identity, rather than from the receiver class. This retains overloaded
+signatures independently and makes default/getter/constructor association explicit when TASTy
+flags expose it. It follows public alternatives of reached enums and sealed traits, including each
 alternative's payload types; unrelated alternatives outside this closure remain excluded. It does
 not read method bodies, traverse reverse references, or turn an enclosing object into a root
 because one nested result was reached. Directly private symbols are excluded. Scala 3 TASTy
@@ -25,6 +30,44 @@ For each reached class, the walker follows an externally accessible constructor,
 term-shaped parents, and public companion methods whose result structurally contains that class
 (including wrappers). Arbitrary companion behavior whose result is unrelated remains outside the
 root-directed closure.
+
+`nominals` is the exact set of class and type declaration identities reached by the graph.
+`validate-supported-closure.py INVENTORY.json DISPOSITIONS.json` separately checks an intended
+supported surface; it does not change the full inventory. Its manifest uses
+`storymodel4s-stable-api-disposition/v1` and two maps from **exact inventory identities** to
+`stable` or `experimental`:
+
+```json
+{
+  "schema": "storymodel4s-stable-api-disposition/v1",
+  "nominals": { "<inventory.nominals entry>": "stable" },
+  "members": { "<inventory.members[].id entry>": "stable" }
+}
+```
+
+Use [dispositions.example.json](dispositions.example.json) as a schema-only starting point.
+Every public/protected member exposed by a stable nominal needs an explicit member disposition;
+an omitted member fails closed. Every internal dependency of a stable member, and every nominal
+edge from a stable nominal except the member/classification links, must resolve to an explicitly
+stable nominal. That includes parent and public-alternative edges. Experimental members are not
+supported closure roots, but remain present in the full graph. In particular, class constructors
+are independent member exposures, so classifying a companion factory as experimental never removes
+a constructor obligation. The walker preserves
+Scala/JDK/Cats/Circe references as terminal `external` records; the supported-closure validator
+does not require dispositions for those external implementation APIs.
+
+After copying exact identities into a reviewed manifest, run:
+
+```sh
+python3 tools/stability-audit/validate-supported-closure.py INVENTORY.json DISPOSITIONS.json
+jq '[.members[].id] | unique | length' INVENTORY.json
+jq '[.members[].origins[]] | group_by(.) | map({origin: .[0], count: length})' INVENTORY.json
+```
+
+The full `inventory` count and edge count will grow because public members are now distinct graph
+vertices and their typed edges preserve their origin. The nominal signature closure, explicit roots
+and external stopping rule are otherwise unchanged; this is an inventory omission correction, not
+automatic stable promotion.
 
 Set `STABILITY_DIST` to an installed CLI distribution and `STABILITY_SOURCE` to its full source
 commit. Before inspection, the runner verifies the manifest's source, Scala version, file sizes,

@@ -44,6 +44,17 @@ object Returned:
 object ConstructorFacade:
   def returned: Returned = ???
 
+// The factory-only parameter must remain experimental without hiding the independently exposed
+// accessor type.  The supported-closure fixture classifies these member identities separately.
+final class FactoryOnlyParameter
+final class StableAccessorType
+final class FactoryExposure(val stableAccessor: StableAccessorType)
+object FactoryExposure:
+  def experimentalFactory(value: FactoryOnlyParameter): FactoryExposure =
+    new FactoryExposure(new StableAccessorType)
+object FactoryExposureFacade:
+  def exposed: FactoryExposure = ???
+
 final class HiddenParameterOnly
 final class PrivateReturned private (value: HiddenParameterOnly)
 object PrivateConstructorFacade:

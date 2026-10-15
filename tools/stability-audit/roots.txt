@@ -26,3 +26,15 @@ storymodel4s.pipeline.MappingPipeline.analyze
 storymodel4s.pipeline.MappingPipeline.inspect
 storymodel4s.pipeline.MappingPipeline.exportResults
 storymodel4s.pipeline.MappingPipeline.inspectTemporal
+# Contextual imported-artifact readers; producers and helpers have separate member decisions.
+storymodel4s.codec.SurfaceWorkspaceCodecs.decode
+storymodel4s.codec.TemporalInspectionCodecs.decode
+storymodel4s.codec.TemporalInspectionCodecs.restoreView
+storymodel4s.codec.TemporalInspectionCodecs.SchemaVersion
+storymodel4s.codec.TemporalInspectionCodecs.ViewVersion
+storymodel4s.codec.RecallTimingCodecs.decode
+storymodel4s.codec.RecallTimingCodecs.SchemaVersion
+storymodel4s.codec.TemporalProjectionCodecs.decodeRequest
+storymodel4s.codec.TemporalProjectionCodecs.decode
+storymodel4s.codec.TemporalProjectionCodecs.SchemaVersion
+storymodel4s.codec.TemporalProjectionCodecs.RequestSchemaVersion

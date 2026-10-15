@@ -8,6 +8,7 @@ storymodel4s.stabilityfixture.Construction
 storymodel4s.stabilityfixture.Constructed
 storymodel4s.stabilityfixture.ParentRoot
 storymodel4s.stabilityfixture.ConstructorFacade.returned
+storymodel4s.stabilityfixture.FactoryExposureFacade.exposed
 storymodel4s.stabilityfixture.PrivateConstructorFacade.returned
 storymodel4s.stabilityfixture.AlternativeFacade.enumeration
 storymodel4s.stabilityfixture.AlternativeFacade.outcome

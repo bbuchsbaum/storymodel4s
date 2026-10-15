@@ -1,0 +1,10 @@
+{
+  "schema": "storymodel4s-stable-api-disposition/v1",
+  "nominals": {
+    "<exact nominal identity copied from inventory.nominals>": "stable"
+  },
+  "members": {
+    "<exact member identity copied from inventory.members[].id>": "stable",
+    "<another exact member identity>": "experimental"
+  }
+}

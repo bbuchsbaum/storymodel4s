@@ -1,4 +1,5 @@
-# Imported artifact inspection is audited separately; these roots do not promote it to stable.
+# Complete-object inspection retained from the historical audit. Selected reader entry points
+# now appear in roots.txt; this list does not promote every producer or helper.
 storymodel4s.codec.TemporalInspectionCodecs
 storymodel4s.codec.SurfaceWorkspaceCodecs
 storymodel4s.codec.RecallTimingCodecs

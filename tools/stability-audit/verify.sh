@@ -64,6 +64,7 @@ jq -e '.supplementalTasty | length > 0' "$work/fixtures.json.provenance.json" >/
 jq -e '
   (.unresolved | length == 0) and
   ([.inventory[] | select(startswith("storymodel4s.stabilityfixture.FixtureFacade.overload ::"))] | length == 2) and
+  ([.members[] | select(.id | startswith("storymodel4s.stabilityfixture.FixtureFacade.overload ::")) | .id] | length == 2) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ParameterOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.Lower ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.Upper ::"))) and
@@ -72,6 +73,8 @@ jq -e '
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ConstructorParameterOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.ParentOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.FactoryParameterOnly ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.FactoryOnlyParameter ::"))) and
+  (any(.inventory[]; startswith("storymodel4s.stabilityfixture.StableAccessorType ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.BuildParameterOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.WrappedFactoryParameterOnly ::"))) and
   (any(.inventory[]; startswith("storymodel4s.stabilityfixture.AliasParameterOnly ::"))) and
@@ -94,3 +97,36 @@ jq -e '
   ([.edges[] | select(.kind == "companion-factory" and .detail == "wrapped")] | length == 1) and
   ([.edges[] | select(.kind == "companion-factory" and .detail == "aliased")] | length == 1)
 ' "$work/fixtures.json" >/dev/null
+python3 "$repo/tools/stability-audit/test/validate_supported_closure_test.py" \
+  "$work/fixtures.json" "$repo/tools/stability-audit/validate-supported-closure.py" \
+  "$work/supported.json"
+
+# Compile changed artifacts, not edited inventory JSON. An experimental factory may change while
+# its neighboring supported accessor remains compatible; removing that accessor must fail.
+compatibility="$repo/tools/stability-audit/check-supported-compatibility.py"
+python3 "$compatibility" "$work/fixtures.json" "$work/supported.json" "$work/fixtures.json"
+for variant in experimental stable; do
+  mkdir -p "$work/$variant/classes"
+  python3 - "$repo/tools/stability-audit/test/SignatureFixtures.scala" "$work/$variant/Changed.scala" "$variant" <<'CHANGE'
+from pathlib import Path
+import sys
+source, output = map(Path, sys.argv[1:3])
+before, after = ("experimentalFactory", "experimentalFactoryV2") if sys.argv[3] == "experimental" else ("stableAccessor", "removedAccessor")
+text = source.read_text()
+assert text.count(before) == 1
+output.write_text(text.replace(before, after))
+CHANGE
+  java "${java_opts[@]}" -cp "$compiler" dotty.tools.dotc.Main -classpath "$runtime:$compiler" \
+    -d "$work/$variant/classes" "$work/$variant/Changed.scala"
+  STABILITY_EXTRA_TASTY="$work/$variant/classes" \
+    STABILITY_ROOTS="$repo/tools/stability-audit/test/fixture-roots.txt" \
+    bash "$repo/tools/stability-audit/run.sh" "$work/$variant.json"
+done
+python3 "$compatibility" "$work/fixtures.json" "$work/supported.json" "$work/experimental.json"
+if python3 "$compatibility" "$work/fixtures.json" "$work/supported.json" "$work/stable.json" \
+  >"$work/stable-break.log" 2>&1; then
+  echo "removed supported accessor was accepted" >&2
+  exit 1
+fi
+grep -q 'FactoryExposure.stableAccessor' "$work/stable-break.log"
+echo 'compiled supported-signature compatibility controls: 3 passed'
