@@ -1,6 +1,56 @@
 # Delivery and measurement plan
 
-## Current execution: complete the five workstreams (14 October 2026)
+## Current follow-through: reality check (15 October 2026)
+
+The owner approved the four actions below and directed that **grakern remain pinned to
+GitHub for now**. This section supersedes the next-action prose in the historical sections
+below. Mote owns the complete plan and each slice's acceptance: the decision note on delivery
+epic `bd-01M2TA01EHVRF6MQ1N00XTVK1K`, under the tag **`reality-check-20261015`**.
+
+```sh
+mote ls --tag reality-check-20261015
+mote ls --tag reality-check-20261015 --ready
+mote show bd-01M2TA01EHVRF6MQ1N00XTVK1K
+```
+
+The assessed baseline is `13aec7cc874ed1c2695c6dd281852523cc43ef90`, with clean local/GitHub
+parity. Its [hosted gate](https://github.com/bbuchsbaum/storymodel4s/actions/runs/38757201426)
+contains 15,474 passes, zero failures/errors and 44 skips across 80 task totals. Documentation
+is deployed. The constructor repairs and stable-boundary judgment are complete; the earlier
+169 pending dispositions are historical, not an active queue.
+
+| Workstream | Mote slices | Acceptance that changes the decision |
+| --- | --- | --- |
+| 1. Source build and CLI | S1 `bd-01M50K8E8KMRGY0MYXJRT0SZ8G` | A fresh no-override build fetches exact Git source pins; the extracted CLI verifies every packaged file and passes offline paired/weighted export and independent readback. Explicitly inventory the Maven artifacts still blocked by unpublished dependencies. |
+| 2. Corrected Native runtime | N1 `bd-01M4YP83C7925M22V0K5AQ88BX` | Deliver an accepted, independently fetchable corrected runtime, select it in StoryModel, and qualify the exact producer/consumer with the named zero-hash regressions. The retained patch alone does not close this gate. |
+| 3. Researcher's own study | U1 `bd-01M50K95JAQB34R876FWMV85J0` -> U2 `bd-01M50K9WYM4TQSX106M7Q2YAF4` -> U3 `bd-01M50KAP8CB5MMBQE3BX4RQ2PF` | Review the local-export admission contract, implement it without widening authority, then have an independent reviewer run unfamiliar authorized files through paired/weighted exports, readers and the pinned Atlas workspace without undocumented intervention. |
+| 4. Prospective efficacy | E1 `bd-01M50KBFT26DRB77VFHPRHYNA2` -> E2 `bd-01M50KC744836VNJ8F8A4AHNWH` -> E3 `bd-01M50KD0NHVPCEHGZND9H18M6E` | Freeze estimands, eligibility/exposure, comparisons, numerical thresholds and guards before new reads; obtain approved blinded coding; independently reproduce the frozen evaluation and a positive, negative or inconclusive claim verdict. |
+
+**Execute S1 first.** U1 and E1 design can proceed independently while external runtime or
+study resources are unavailable. U3 also depends on S1. E2 needs the existing coder/resource
+decision; E3 needs the existing emitted-decision instrument repair. Scientific work has no
+blocking edge into the software release gate. Use one primary writer, at most one helper and
+one heavy gate; take ownership of a bounded child rather than the whole delivery epic.
+
+The immediate distribution route is the immutable GitHub source build and offline JVM CLI.
+Retain grakern `0329c43c88a0b71e9aa4456723bb16bac2fa3841` and its transitive source pins
+unless a reviewed change is needed. The later grakern publication branch expects unpublished
+fixed binaries and is not a substitute for this route. Full dependent Maven publication,
+namespace/signing setup and a real published compatibility baseline remain deferred obligations;
+source/CLI qualification does not establish them. The final release gate
+`bd-01M2TAMJ95K9D7H248A8387YW4` stays open for its unsatisfied acceptance, including corrected
+Native delivery. No platform promise is
+reduced, and a Native fork requires its own owner decision.
+
+Keep existing scientific boundaries: previously opened holdouts cannot become fresh test sets;
+participant material, coder recruitment and hosted spend retain their specific permissions;
+negative or inconclusive findings are valid study outcomes but do not establish efficacy.
+The film compiler and organization product preview retain their existing release lanes.
+The [release queue](RELEASE-QUEUE.md) lists the execution order and preserved obligations.
+
+<a id="current-execution-complete-the-five-workstreams-14-october-2026"></a>
+
+## Historical: complete the five workstreams (14 October 2026)
 
 The owner authorized completion of the five workstreams below after the 14 October
 stocktake. This section and [RELEASE-QUEUE.md](RELEASE-QUEUE.md) supersede every dated
