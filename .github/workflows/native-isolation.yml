@@ -50,9 +50,9 @@ jobs:
       - name: Build and retain the exact test executable
         shell: bash
         run: |
-          set -uo pipefail
-          sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'show alignNative / nativeConfig' 'alignNative/Test/nativeLink' > evidence/link.log 2>&1
-          status=$?
+          set -euo pipefail
+          status=0
+          sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'show alignNative / nativeConfig' 'alignNative/Test/nativeLink' > evidence/link.log 2>&1 || status=$?
           echo "$status" > evidence/link.exit
           if test "$status" -eq 0; then
             find align/.native/target -type f \( -name '*.ll' -o -name '*.nir' -o -name '*-test' -o -name '*.out' \) -print0 > evidence/native-files.list
@@ -72,14 +72,17 @@ jobs:
       - name: Run the full alignment module
         shell: bash
         run: |
-          set -uo pipefail
+          set -euo pipefail
           ulimit -c unlimited
           cat /proc/sys/kernel/core_pattern > evidence/core-pattern.txt
-          sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'alignNative/test' > evidence/test.log 2>&1
-          status=$?
+          status=0
+          sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'alignNative/test' > evidence/test.log 2>&1 || status=$?
           echo "$status" > evidence/test.exit
-          sha256sum --check evidence/native-files.sha256 > evidence/native-after-test.txt 2>&1
-          git diff --exit-code HEAD > evidence/source-after-test.txt 2>&1
+          integrity=0
+          sha256sum --check evidence/native-files.sha256 > evidence/native-after-test.txt 2>&1 || integrity=$?
+          git diff --exit-code HEAD > evidence/source-after-test.txt 2>&1 || integrity=$?
+          echo "$integrity" > evidence/integrity.exit
+          if test "$status" -eq 0 && test "$integrity" -ne 0; then status=$integrity; fi
           exit "$status"
       - name: Upload full diagnostic evidence
         if: always()
