@@ -1,4 +1,4 @@
-import org.typelevel.sbt.gha.{JavaSpec, WorkflowStep}
+import org.typelevel.sbt.gha.{JavaSpec, UseRef, WorkflowStep}
 
 val Scala3 = "3.7.4"
 val catsV = "2.13.0"
@@ -54,6 +54,14 @@ ThisBuild / githubWorkflowIncludeClean := false
 ThisBuild / tlCiHeaderCheck := false
 ThisBuild / tlCiDependencyGraphJob := false
 
+// Main's Linux Native configuration is qualified with LLVM 18. Retain its executable before
+// testing so a future process crash has inspectable evidence rather than only a stack trace.
+ThisBuild / githubWorkflowBuildPreamble += WorkflowStep.Run(
+  List("bash tools/ci/setup-native-llvm.sh"),
+  name = Some("Select qualified Native LLVM toolchain"),
+  cond = Some("matrix.project == 'rootNative'")
+)
+
 // Activate the exact first stable coordinate automatically for subsequent 1.x builds. The task
 // guard checks the effective per-module artifacts, so an empty override cannot silently skip MiMa.
 ThisBuild / tlMimaPreviousVersions ++= ReleasePolicy.requiredVersions(version.value)
@@ -67,7 +75,29 @@ ThisBuild / githubWorkflowBuild ~= { steps =>
     case _                   => false
   }
   require(steps.count(isTest) == 1, "Expected exactly one generated Test step")
+  require(
+    steps.count(_.name.contains("nativeLink")) == 1,
+    "Expected exactly one generated nativeLink step"
+  )
   steps.flatMap {
+    case s: WorkflowStep.Sbt if s.name.contains("nativeLink") =>
+      List(
+        s.withCommands("show alignNative / nativeConfig" :: s.commands),
+        WorkflowStep.Run(
+          List("bash tools/ci/capture-native.sh"),
+          name = Some("Retain Native alignment executable"),
+          cond = Some("matrix.project == 'rootNative'")
+        ),
+        WorkflowStep.Use(
+          UseRef.Public("actions", "upload-artifact", "v4"),
+          params = Map(
+            "name" -> "native-alignment-before-test",
+            "path" -> "target/native-ci-evidence/",
+            "retention-days" -> "14"
+          ),
+          cond = Some("always() && matrix.project == 'rootNative'")
+        )
+      )
     case s: WorkflowStep.Sbt if isTest(s) =>
       require(s.cond.isEmpty, "Generated Test condition changed")
       List(
@@ -82,6 +112,16 @@ ThisBuild / githubWorkflowBuild ~= { steps =>
     case other => List(other)
   }
 }
+
+ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
+  List(
+    """if test -f target/native-ci-evidence/native-files.sha256; then
+      |  sha256sum --check target/native-ci-evidence/native-files.sha256
+      |fi""".stripMargin
+  ),
+  name = Some("Verify retained Native executable integrity"),
+  cond = Some("always() && matrix.project == 'rootNative'")
+)
 
 // Run the independent exchange readers and synthetic media planner courts in generated CI.
 ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
