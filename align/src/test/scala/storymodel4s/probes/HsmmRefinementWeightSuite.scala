@@ -23,7 +23,7 @@ class HsmmRefinementWeightSuite extends munit.FunSuite:
       val config = HsmmConfig.of(refinementPasses = 1, refinementWeight = weight).toOption.get
       assertEquals(config.refinementPasses, 1)
       assertEquals(config.refinementWeight, weight)
-      assertEquals(config.layerUse, LayerUse.of(config.transitions))
+      assertEquals(LayerUse.of(config.transitions), Right(config.layerUse))
     }
   }
 

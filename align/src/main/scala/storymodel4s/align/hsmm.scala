@@ -128,9 +128,8 @@ object TransitionFeatures:
   * σ(−1.5) ≈ 0.18 — so the ledger carries them as the probabilities they set, never as "withheld".
   * Refinement (`refinementPasses > 0`) reads layers through `view.reachable` and is outside this
   * ledger, which is a statement about the transition model only. A ledger is the only way to say
-  * what an alignment was computed under, and it exists exactly when an [[HsmmConfig]] does: the
-  * constructor is private and the value is derived, so a ledger that disagrees with its model
-  * cannot be built.
+  * what an alignment was computed under. The checked factory derives it only from finite transition
+  * weights; an [[HsmmConfig]] binds the ledger derived from its own transitions.
   */
 final class LayerUse private (
     val weighted: Set[TransitionKind],
@@ -162,7 +161,14 @@ final class LayerUse private (
   override def toString: String = s"LayerUse($render)"
 
 object LayerUse:
-  def of(model: TransitionModel): LayerUse =
+  /** Refuse non-finite declarations before deriving probabilities and their provenance rendering.
+    */
+  def of(model: TransitionModel): Either[AlignError, LayerUse] =
+    if model.theta.values.exists(v => v.isNaN || v.isInfinite) then
+      Left(AlignError.InvalidConfig("LayerUse.transitions", "weights must be finite"))
+    else Right(derive(model))
+
+  private def derive(model: TransitionModel): LayerUse =
     import TransitionKind.*
     val all = TransitionKind.features.toSet
     val weighted = all.filter(k => model(k) != 0.0)
@@ -208,11 +214,10 @@ final class HsmmConfig private (
     val temperature: Double,
     val transitions: TransitionModel,
     val refinementPasses: Int,
-    val refinementWeight: Double
+    val refinementWeight: Double,
+    /** The ledger derived from these checked transitions by the factory. */
+    val layerUse: LayerUse
 ):
-  /** The ledger of what this configuration reads and withholds; derived, never supplied. */
-  val layerUse: LayerUse = LayerUse.of(transitions)
-
   /** Content address of this configuration, θ included. */
   def fingerprint: Checksum = HsmmConfigFingerprint.of(this)
 
@@ -251,7 +256,9 @@ object HsmmConfig:
       // is normalized here rather than left to make two addresses for one configuration.
       def plain(v: Double): Double = if v == 0.0 then 0.0 else v
       val theta = TransitionModel(transitions.theta.map((k, v) => k -> plain(v)))
-      Right(new HsmmConfig(temperature, theta, refinementPasses, plain(refinementWeight)))
+      LayerUse.of(theta).map { use =>
+        new HsmmConfig(temperature, theta, refinementPasses, plain(refinementWeight), use)
+      }
 
   val default: HsmmConfig = of().fold(e => throw new IllegalStateException(e.message), identity)
 

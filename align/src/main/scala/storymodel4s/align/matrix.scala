@@ -216,8 +216,12 @@ final class AlignmentRow private[align] (
     val z = total
     if z <= 0.0 then this else AlignmentRow(unit, mass.view.mapValues(_ / z).toMap)
 
-  /** Whether every mass is nonnegative and finite. */
-  def isWellFormed: Boolean = mass.values.forall(m => m >= 0.0 && !m.isNaN && !m.isInfinite)
+  /** Whether every mass and their deterministic total are nonnegative and finite. */
+  def isWellFormed: Boolean =
+    mass.values.forall(m => m >= 0.0 && !m.isNaN && !m.isInfinite) && {
+      val sum = total
+      sum >= 0.0 && !sum.isInfinite
+    }
 
   override def equals(other: Any): Boolean = other match
     case that: AlignmentRow => unit == that.unit && mass == that.mass
@@ -231,11 +235,11 @@ object AlignmentRow:
   private[align] def apply(unit: RecallUnitId, mass: Map[AlignState, Double]): AlignmentRow =
     new AlignmentRow(unit, mass)
 
-  /** Smart constructor rejecting negative or non-finite mass. */
+  /** Smart constructor rejecting negative/non-finite mass and an unrepresentable total. */
   def of(unit: RecallUnitId, mass: Map[AlignState, Double]): Either[AlignError, AlignmentRow] =
     val row = AlignmentRow(unit, mass)
     if row.isWellFormed then Right(row)
-    else Left(AlignError.MalformedRow(unit, "mass must be nonnegative and finite"))
+    else Left(AlignError.MalformedRow(unit, "mass and total must be nonnegative and finite"))
 
 /** The alignment `P`: one row per recall unit in recall order. Construction is `private[align]`
   * (aligners) or via [[AlignmentMatrix.of]], which rejects malformed rows and repeated units. Not a

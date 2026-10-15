@@ -13,8 +13,11 @@ class LayerUseSuite extends munit.ScalaCheckSuite:
   private def model(overrides: (TransitionKind, Double)*): TransitionModel =
     TransitionModel(TransitionModel.default.theta ++ overrides.toMap)
 
+  private def checkedUse(model: TransitionModel): LayerUse =
+    LayerUse.of(model).fold(error => fail(error.message), identity)
+
   test("the shipped model reads five layers by name, hierarchy through parents, and positions") {
-    val use = LayerUse.of(TransitionModel.default)
+    val use = checkedUse(TransitionModel.default)
     assertEquals(
       use.layersRead,
       Set(
@@ -36,7 +39,7 @@ class LayerUseSuite extends munit.ScalaCheckSuite:
   }
 
   test("a zero external logit is the prior one half, never a withheld feature") {
-    val use = LayerUse.of(model(ExternalIn -> 0.0, ExternalStay -> 0.0))
+    val use = checkedUse(model(ExternalIn -> 0.0, ExternalStay -> 0.0))
     assertEquals(use.externalIn, 0.5)
     assertEquals(use.externalStay, 0.5)
     assertEquals(use.withheld, Set(CauseToEffect, EffectToCause))
@@ -61,24 +64,24 @@ class LayerUseSuite extends munit.ScalaCheckSuite:
   }
 
   test("zeroing a kind withdraws its layer, and only its layer") {
-    val noDiscourse = LayerUse.of(model(DiscourseSuccessor -> 0.0))
+    val noDiscourse = checkedUse(model(DiscourseSuccessor -> 0.0))
     assert(!noDiscourse.layersRead.contains(RelationLayer.DiscourseSuccession))
     assert(noDiscourse.layersRead.contains(RelationLayer.WorldTime))
     assert(noDiscourse.withheld.contains(DiscourseSuccessor))
 
-    val noCausal = LayerUse.of(model(CausalNeighbor -> 0.0))
+    val noCausal = checkedUse(model(CausalNeighbor -> 0.0))
     assert(!noCausal.layersRead.contains(RelationLayer.Causal))
-    val directedOnly = LayerUse.of(model(CausalNeighbor -> 0.0, CauseToEffect -> 0.8))
+    val directedOnly = checkedUse(model(CausalNeighbor -> 0.0, CauseToEffect -> 0.8))
     assert(directedOnly.layersRead.contains(RelationLayer.Causal))
 
     // hierarchy is reached through parents by the hierarchy kinds and by Backward
-    val noHierarchyKinds = LayerUse.of(model(HierarchyUp -> 0.0, HierarchyDown -> 0.0))
+    val noHierarchyKinds = checkedUse(model(HierarchyUp -> 0.0, HierarchyDown -> 0.0))
     assert(noHierarchyKinds.layersRead.contains(RelationLayer.Hierarchy), "Backward still reads it")
-    val noHierarchy = LayerUse.of(model(HierarchyUp -> 0.0, HierarchyDown -> 0.0, Backward -> 0.0))
+    val noHierarchy = checkedUse(model(HierarchyUp -> 0.0, HierarchyDown -> 0.0, Backward -> 0.0))
     assert(!noHierarchy.layersRead.contains(RelationLayer.Hierarchy))
     assert(noHierarchy.positionsRead, "LongJump still reads positions")
 
-    val nothing = LayerUse.of(TransitionModel(Map.empty))
+    val nothing = checkedUse(TransitionModel(Map.empty))
     assertEquals(nothing.layersRead, Set.empty[RelationLayer])
     assert(!nothing.positionsRead)
     assertEquals(nothing.withheld, TransitionKind.features.toSet)
@@ -89,8 +92,8 @@ class LayerUseSuite extends munit.ScalaCheckSuite:
     val genTheta: Gen[Map[TransitionKind, Double]] =
       Gen.mapOf(Gen.zip(Gen.oneOf(TransitionKind.values.toSeq), Gen.choose(-2.0, 2.0)))
     forAll(genTheta) { theta =>
-      val use = LayerUse.of(TransitionModel(theta))
-      val explicit = LayerUse.of(
+      val use = checkedUse(TransitionModel(theta))
+      val explicit = checkedUse(
         TransitionModel(
           TransitionKind.values.map(k => k -> theta.getOrElse(k, 0.0)).toMap
         )
@@ -114,10 +117,10 @@ class LayerUseSuite extends munit.ScalaCheckSuite:
   }
 
   test("a configuration's ledger is derived from its own transitions") {
-    assertEquals(HsmmConfig.default.layerUse, LayerUse.of(TransitionModel.default))
+    assertEquals(HsmmConfig.default.layerUse, checkedUse(TransitionModel.default))
     val custom =
       HsmmConfig.unsafe(transitions = model(CausalNeighbor -> 0.0, SemanticNeighbor -> 0.0))
-    assertEquals(custom.layerUse, LayerUse.of(custom.transitions))
+    assertEquals(custom.layerUse, checkedUse(custom.transitions))
     assertEquals(
       custom.layerUse.withheld,
       Set(CausalNeighbor, SemanticNeighbor, CauseToEffect, EffectToCause)

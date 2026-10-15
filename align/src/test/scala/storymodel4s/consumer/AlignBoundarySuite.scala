@@ -45,6 +45,12 @@ class AlignBoundarySuite extends FunSuite:
   }
 
   test("HsmmConfig has no Mirror.ProductOf or fromProduct bypass") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; final class Control(val temperature: Double, val transitions: TransitionModel, val refinementPasses: Int, val refinementWeight: Double, val layerUse: LayerUse); new Control(0.0, TransitionModel.default, -1, -1.0, HsmmConfig.default.layerUse)"""
+      ),
+      Nil
+    )
     val mirror = typeCheckErrors(
       "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.HsmmConfig]]"
     )
@@ -56,7 +62,8 @@ class AlignBoundarySuite extends FunSuite:
            0.0,
            storymodel4s.align.TransitionModel.default,
            -1,
-           -1.0
+           -1.0,
+           storymodel4s.align.HsmmConfig.default.layerUse
          )"""
     )
     assert(mirror.nonEmpty, "Mirror.ProductOf reconstructed an unchecked HsmmConfig")

@@ -127,11 +127,11 @@ class ReconstructionPolicySuite extends FunSuite:
   }
 
   test("finite individual masses with overflowing sum refuse") {
-    val row = right(
-      AlignmentRow.of(
-        unit.id,
-        Map(AlignState.Source(a) -> Double.MaxValue, AlignState.Source(b) -> Double.MaxValue)
-      )
+    // Public admission now rejects this row. Exercise the consumer's independent defense using
+    // the package-only constructor available to inference implementations.
+    val row = AlignmentRow(
+      unit.id,
+      Map(AlignState.Source(a) -> Double.MaxValue, AlignState.Source(b) -> Double.MaxValue)
     )
     val result = StructuredReconstruction.decide(Vector(row), grouping, hard)
     assert(result.isLeft)
