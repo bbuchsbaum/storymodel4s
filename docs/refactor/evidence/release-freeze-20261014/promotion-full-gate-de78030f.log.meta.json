@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T02:09:19.410038+00:00",
+  "finished_utc": "2026-10-15T02:21:33.580143+00:00",
+  "duration_seconds": 734.19142,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/Test/clean",
+    "alignJS/Test/clean",
+    "alignNative/Test/clean",
+    "embedCoreJVM/Test/clean",
+    "embedCoreJS/Test/clean",
+    "embedCoreNative/Test/clean",
+    "media/Test/clean",
+    "githubWorkflowGenerate",
+    "pipeline/cliDistribution",
+    "checkAll"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/promotion-full-gate-de78030f.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 5400.0,
+  "log_bytes": 218759
+}

@@ -140,6 +140,19 @@ the transitive SHA set (grakern, graph4s, gale) is recorded in the build receipt
 the release path proves a clean clone builds without sibling checkouts. Pins
 become published artifacts when grakern 0.1 / graph4s releases exist.
 
+Release preparation (14 October 2026) uses the exact upstream revisions in
+`tools/release/dependency-candidates.json`. `stage-dependencies.py` makes independent clones and
+records the version/routing overlay, test commands and local Maven artifact bytes. Its proposed
+RC coordinates are rehearsal inputs, not approved releases. The graph4s and gale references are
+routed only to those verified local clones; production sources remain at the recorded commits.
+Include grakern's published law dependency when closing the generated POM graph, not just the
+eight direct/runtime artifacts. Public qualification still requires fresh-cache resolution from
+Maven Central and a binary consumer; local staging cannot supply that proof.
+
+Rejected: shipping snapshot coordinates in release POMs, treating source checkout resolution as
+Maven availability, or silently substituting newer upstream source for the tested pins. Publication
+of the exact dependency candidates remains a separate owner-authorized action.
+
 ### D4b. Three structural/semantic estimands (P0-4)
 
 | Distance | Input | Availability | Space family |

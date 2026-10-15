@@ -40,12 +40,18 @@ derived, unforgeable value belongs.
 final class LayerUse private (weighted, withheld: Set[TransitionKind],
                               layersRead: Set[RelationLayer], positionsRead: Boolean,
                               externalIn: Double, externalStay: Double)
-object LayerUse: def of(model: TransitionModel): LayerUse
+object LayerUse: def of(model: TransitionModel): Either[AlignError, LayerUse]
 
-final class HsmmConfig private (...):
-  val layerUse: LayerUse = LayerUse.of(transitions)
+final class HsmmConfig private (..., val layerUse: LayerUse):
   def fingerprint: Checksum = HsmmConfigFingerprint.of(this)
 ```
+
+The 14 October pre-freeze repair makes standalone `LayerUse.of` refuse every nonfinite
+transition weight. `HsmmConfig.of` derives the ledger from its own normalized transition model
+and supplies it only through the private constructor. Callers cannot attach an unrelated ledger.
+Rejected: relying on an enclosing configuration check while leaving the public ledger factory
+able to admit an invalid model. The named controls are `PromotedNumericBoundarySuite` and
+`AlignBoundarySuite`; the ledger remains a statement of model use, not execution authority.
 
 "Read" means *carries weight*: `TransitionFeatures.between` computes every feature on every move,
 and a zero weight makes a feature inert in the score. The map from kinds to layers is the one

@@ -1,0 +1,201 @@
+{
+  "source": "2f48ee0be083e568d85fd4b9d4365512c06d2d4c",
+  "sourcesRestored": true,
+  "cases": [
+    {
+      "case": "layer-finite",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "5",
+          "1",
+          "0",
+          "4",
+          ""
+        ]
+      ],
+      "rawSha256": "5e5cb76014677d44e49b0d5967a71c28908b58a759381db0c8a1e1c0d28130e7",
+      "compressedSha256": "3fd4810f81073145c6ae592aff3f23d518b97d8437797bf0be2b52a9a2592dd4"
+    },
+    {
+      "case": "row-total",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "5",
+          "1",
+          "0",
+          "4",
+          ""
+        ]
+      ],
+      "rawSha256": "88fe082cc7577c34042acd90491b8545f7a912b4cf61eae2267e3a5b38e5c65e",
+      "compressedSha256": "ad205d18e965e4cdbcb81fa04264cbd1a324b0852c9e1eb126fdce1286552b01"
+    },
+    {
+      "case": "custom-identity",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "3",
+          "2",
+          "0",
+          "1",
+          ""
+        ]
+      ],
+      "rawSha256": "22102ee7418ad902df1a422229bfe2b3af678dc7360ba399b3b6bb99d7eec092",
+      "compressedSha256": "db7151a3548977f50ad1c93644200ae0a894cd53a2febbc483683771e7a4e794"
+    },
+    {
+      "case": "receipt-consistency",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "28",
+          "2",
+          "0",
+          "26",
+          ""
+        ]
+      ],
+      "rawSha256": "6ceb2927d2ef002faad96d3e2a043987bbd6281f7d3e1f17b04e0e09c1d1ca7c",
+      "compressedSha256": "a3c9da755c335f61875b63046f97161b62c535eb36bd43cfd518c5777dcc2389"
+    },
+    {
+      "case": "receipt-construction",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "16",
+          "3",
+          "0",
+          "13",
+          ""
+        ]
+      ],
+      "rawSha256": "eca6803c2006a559a7a08b1b2c3179cedbc858415f949791c42c2d35adb0e02e",
+      "compressedSha256": "a6f9797e0140e6c2b551f40703182de421959a20a9b7c70ea144eccf85b6ab8f"
+    },
+    {
+      "case": "media-caption-construction",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "4",
+          "0",
+          "21",
+          ""
+        ]
+      ],
+      "rawSha256": "8dcdc3cd86c09ebe47f088047328c5ccb7dec94f69921eee352f7833e25c5a96",
+      "compressedSha256": "e522b20d709113f4545d847784d268712381b5e2fa1da5b2c74561e38d4ac181"
+    },
+    {
+      "case": "geometry-construction",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "2",
+          "0",
+          "23",
+          ""
+        ]
+      ],
+      "rawSha256": "b32b00459a5bd2170ce7012e1f467d2c9d77d8eabd71cd3d28433bcad5134a3f",
+      "compressedSha256": "5fa315e4964b502b6218485aeff6a99b411d9ee308391789a7943a433a75fd8c"
+    },
+    {
+      "case": "recipe-prompt",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "1",
+          "0",
+          "24",
+          ""
+        ]
+      ],
+      "rawSha256": "e7d82e86b7d1ea79a1dcac776f9bb89061956207db675c5516f85483d4416ecf",
+      "compressedSha256": "79e244188f68e59d9f73db8e0c8d6112f2915058f674149410b2b96c704907a4"
+    },
+    {
+      "case": "recipe-minimum",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "1",
+          "0",
+          "24",
+          ""
+        ]
+      ],
+      "rawSha256": "4017561946a6a1900a7507c012f1e134536eba7d28a58db040c01aab3140bcb9",
+      "compressedSha256": "a645986bb3e80d01f98ca677d38bfac4b383cc8628007537e0e56cf94bb60ef4"
+    },
+    {
+      "case": "recipe-order",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "1",
+          "0",
+          "24",
+          ""
+        ]
+      ],
+      "rawSha256": "d816ece3e1cb198d86262be7c1e11e3ad5db74978d5565aa3ce8d4578a0ecada",
+      "compressedSha256": "347bc0cfd30487a4908286cbebebff34a65970a5671a581523d1283ffd6dc548"
+    },
+    {
+      "case": "recipe-token-limit",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "1",
+          "0",
+          "24",
+          ""
+        ]
+      ],
+      "rawSha256": "6ad0f3ee8a0370714e7253953dacb6e632982990ea31733bc7ca5f69dccebd82",
+      "compressedSha256": "c9440fde9c59cd59623f36d11303dfc923b61625570f80c646b8bf9894fa6f51"
+    },
+    {
+      "case": "geometry-overflow",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "1",
+          "0",
+          "24",
+          ""
+        ]
+      ],
+      "rawSha256": "f16e785261667b01079dbf025a6ec64bb2afa3caa76059f3e0d0a42e3e9989b4",
+      "compressedSha256": "33c0992eb80bd1c07ff8aec175752502e502850848aad7ed184f274dfe21f5a8"
+    },
+    {
+      "case": "pts-overflow",
+      "status": "killed-by-named-assertions",
+      "totals": [
+        [
+          "25",
+          "1",
+          "0",
+          "24",
+          ""
+        ]
+      ],
+      "rawSha256": "242871e475b5ae1b14664a6f443947e40d8ffa45d3ecd59b02cd4269298a97e2",
+      "compressedSha256": "cce18213c407027e97370ab0d4a289ce5e3b37608605e79215d94f37294a20b7"
+    }
+  ]
+}

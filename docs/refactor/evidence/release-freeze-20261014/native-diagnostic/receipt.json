@@ -1,0 +1,34 @@
+{
+  "source": "de78030f0c7c6622314686dbe4097629a3a808b8",
+  "fixtureRepair": "d7bc9c06dfe8c441e020c826b895616f914b157f",
+  "runtimeIssue": "bd-01M4YP83C7925M22V0K5AQ88BX",
+  "finding": "Plain literal NUL-string.hashCode crashes with signal10 on Native0.5.12/macOSarm64; no StoryModel type required",
+  "compilerControls": [
+    "AppleClang15",
+    "HomebrewClang20.1.8"
+  ],
+  "runtimeEqualStringControl": "new String(Array(0.toChar)) has length1,char0,hash0; all121inputpair assertions retained",
+  "passed": {
+    "isolatedTests": 3,
+    "fullEmbedCoreNative": 170
+  },
+  "remaining": "Qualify corrected runtime before unrestricted stable Native publication; fixture change does not repair the compiler/runtime",
+  "logs": [
+    {
+      "path": "promotion-native-clang20-control.log.gz",
+      "rawSha256": "d723bce0b6ae9c5b86f4c1787563b91d0c70bcc805bac8a2f283f57305660ec8"
+    },
+    {
+      "path": "promotion-native-hash-diagnostic.log.gz",
+      "rawSha256": "c41ccc0ac6d459c365436230cf6bf6c54d50b18b5f94a8617a2e20a481b25407"
+    },
+    {
+      "path": "promotion-native-string-hash-control.log.gz",
+      "rawSha256": "3238ef8d5beda71e530016d7b3553cc57a3291322dfe25f6dd5260557ad6aa2d"
+    },
+    {
+      "path": "promotion-native-runtime-nul-control.log.gz",
+      "rawSha256": "c61a7745a829afaa253a8fa823bd3dd77736819c0f1bc6259e9fbfabe784afd5"
+    }
+  ]
+}

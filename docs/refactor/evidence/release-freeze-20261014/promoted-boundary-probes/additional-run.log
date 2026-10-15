@@ -1,0 +1,7 @@
+CUSTOM_VIEW: distinct namespace/name pairs have same render and same GeometryId
+DECLARED_FRAMES: checked positive fields produce expectedPts=[0,9223372036854775807,-2]
+PICTURE_GEOMETRY: positive Int dimensions produce negative frameBytes=-4611686031312289789
+ALIGNMENT_ROW: admitted finite masses overflow total; normalized silently becomes all-zero
+PROBES_PASSED=4
+
+EXIT_STATUS=0

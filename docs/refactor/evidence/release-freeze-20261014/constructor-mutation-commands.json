@@ -1,0 +1,14 @@
+[
+  {
+    "label": "candidate-abstention-guard-mutant",
+    "exit": 1
+  },
+  {
+    "label": "truncation-positive-guard-mutant",
+    "exit": 1
+  },
+  {
+    "label": "constructor-restored-jvm",
+    "exit": 0
+  }
+]

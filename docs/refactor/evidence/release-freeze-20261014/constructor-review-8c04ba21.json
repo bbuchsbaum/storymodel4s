@@ -1,0 +1,42 @@
+{
+  "candidate": "8c04ba21293d29383c245bfb23d60d20f9f5929b",
+  "base": "b78177f5190bcb77f9fce3156b1a9137df37feba",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO-code-pending-gates",
+  "blocks": [],
+  "evidence": {
+    "oldLedger": {
+      "failed": 2,
+      "passed": 4
+    },
+    "oldCandidate": {
+      "failed": 5,
+      "passed": 1
+    },
+    "oldTruncation": {
+      "failed": 2,
+      "passed": 2
+    },
+    "oldHsmm": {
+      "failed": 1,
+      "passed": 3
+    },
+    "candidateMutation": {
+      "failed": 1,
+      "passed": 5
+    },
+    "truncationMutation": {
+      "failed": 2,
+      "passed": 2
+    }
+  },
+  "required": [
+    "complete exact candidate cross-platform gate with cold compile-time courts",
+    "StoryAtlas source consumer gate"
+  ],
+  "limitations": [
+    "EmbeddingSpace.of admission is covered; pre-existing private[embed] construction remains package-open.",
+    "Review ran git diff --check and inspected code/evidence; no independent build was run.",
+    "constructor-jvm-02 retained stale compile-time failures; constructor-jvm-cold is inconclusive because it later failed at the then-unmigrated laws caller."
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "producer": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+  "consumer": "bfaac8d",
+  "tasks": [
+    [
+      22,
+      0,
+      0,
+      22,
+      0
+    ],
+    [
+      26,
+      0,
+      0,
+      26,
+      0
+    ],
+    [
+      100,
+      0,
+      0,
+      100,
+      0
+    ],
+    [
+      100,
+      0,
+      0,
+      100,
+      0
+    ],
+    [
+      15,
+      0,
+      0,
+      15,
+      0
+    ],
+    [
+      15,
+      0,
+      0,
+      15,
+      0
+    ],
+    [
+      90,
+      0,
+      0,
+      90,
+      0
+    ],
+    [
+      87,
+      0,
+      0,
+      87,
+      0
+    ],
+    [
+      59,
+      0,
+      0,
+      59,
+      0
+    ],
+    [
+      4,
+      0,
+      0,
+      4,
+      0
+    ]
+  ],
+  "sums": {
+    "total": 518,
+    "failed": 0,
+    "errors": 0,
+    "passed": 518,
+    "skipped": 0
+  },
+  "logSha256": "7c4915472c92b52b5e492f9be11450a3e28efc7fb8eb0bc4a395bf5c822df912",
+  "meta": {
+    "schema_version": 1,
+    "started_utc": "2026-10-15T01:38:08.641036+00:00",
+    "finished_utc": "2026-10-15T01:40:56.114475+00:00",
+    "duration_seconds": 167.471618,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstoryatlas4s.storymodel4s.build=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+      "set ThisBuild / tlFatalWarnings := true",
+      "githubWorkflowGenerate",
+      "checkAll"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/atlas-work",
+    "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/constructor-8ea96-atlas-gate.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 3600.0,
+    "log_bytes": 26861
+  },
+  "consumerStatus": "",
+  "producerStatus": ""
+}

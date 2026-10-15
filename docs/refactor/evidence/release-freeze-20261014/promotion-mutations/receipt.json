@@ -1,0 +1,597 @@
+[
+  {
+    "label": "layer-finite",
+    "module": "alignJVM",
+    "source": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+    "tests": [
+      "align/src/test/scala/storymodel4s/probes/PromotedNumericBoundarySuite.scala"
+    ],
+    "required": [
+      "standalone layer use refuses every nonfinite transition weight"
+    ],
+    "allowed": [
+      "standalone layer use refuses every nonfinite transition weight"
+    ],
+    "sourceSha256": "a26ae87f9bb3be979049571806c8ce73b7e08a4ad689a57c0118329a1717197d",
+    "mutation": [
+      [
+        "if model.theta.values.exists(v => v.isNaN || v.isInfinite) then",
+        "if false then"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"alignJVM\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/align/src/test/scala/storymodel4s/probes/PromotedNumericBoundarySuite.scala\")))",
+      "alignJVM/Test/clean",
+      "alignJVM/test"
+    ],
+    "exit": 1,
+    "logSha256": "5e5cb76014677d44e49b0d5967a71c28908b58a759381db0c8a1e1c0d28130e7",
+    "failures": [
+      "standalone layer use refuses every nonfinite transition weight"
+    ],
+    "totals": [
+      [
+        "5",
+        "1",
+        "0",
+        "4",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "row-total",
+    "module": "alignJVM",
+    "source": "align/src/main/scala/storymodel4s/align/matrix.scala",
+    "tests": [
+      "align/src/test/scala/storymodel4s/probes/PromotedNumericBoundarySuite.scala"
+    ],
+    "required": [
+      "finite masses whose aggregate overflows are refused"
+    ],
+    "allowed": [
+      "finite masses whose aggregate overflows are refused"
+    ],
+    "sourceSha256": "c94f93eb1a3e99fa8c62e4cc5759763f21de8852b344da9f791445d6a6df92b8",
+    "mutation": [
+      [
+        "&& {\n      val sum = total\n      sum >= 0.0 && !sum.isInfinite\n    }",
+        "&& true"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"alignJVM\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/align/src/test/scala/storymodel4s/probes/PromotedNumericBoundarySuite.scala\")))",
+      "alignJVM/Test/clean",
+      "alignJVM/test"
+    ],
+    "exit": 1,
+    "logSha256": "88fe082cc7577c34042acd90491b8545f7a912b4cf61eae2267e3a5b38e5c65e",
+    "failures": [
+      "finite masses whose aggregate overflows are refused"
+    ],
+    "totals": [
+      [
+        "5",
+        "1",
+        "0",
+        "4",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "custom-identity",
+    "module": "embedCoreJVM",
+    "source": "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+    "tests": [
+      "embed-core/src/test/scala/storymodel4s/embed/SemanticViewIdentitySuite.scala"
+    ],
+    "required": [
+      "the old namespace/name collision has distinct versioned renderings and geometry ids",
+      "empty, Unicode and separator-bearing component pairs retain separate identities"
+    ],
+    "allowed": [
+      "the old namespace/name collision has distinct versioned renderings and geometry ids",
+      "empty, Unicode and separator-bearing component pairs retain separate identities"
+    ],
+    "sourceSha256": "4ce53816c10bb6d859ffabdf916e7daf59e25af4e50792190ad3f763cb2c3255",
+    "mutation": [
+      [
+        "s\"custom/v2:${ns.length}:$ns:${n.length}:$n\"",
+        "s\"custom:$ns:$n\""
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"embedCoreJVM\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/embed-core/src/test/scala/storymodel4s/embed/SemanticViewIdentitySuite.scala\")))",
+      "embedCoreJVM/Test/clean",
+      "embedCoreJVM/test"
+    ],
+    "exit": 1,
+    "logSha256": "22102ee7418ad902df1a422229bfe2b3af678dc7360ba399b3b6bb99d7eec092",
+    "failures": [
+      "the old namespace/name collision has distinct versioned renderings and geometry ids",
+      "empty, Unicode and separator-bearing component pairs retain separate identities"
+    ],
+    "totals": [
+      [
+        "3",
+        "2",
+        "0",
+        "1",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "receipt-consistency",
+    "module": "embedCoreJVM",
+    "source": "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+    "tests": [
+      "embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala"
+    ],
+    "required": [
+      "keyed public items satisfy receipt consistency while all-public attempt policy stays strict",
+      "every admitted item/output sensitivity combination yields a consistent embedding receipt"
+    ],
+    "allowed": [
+      "keyed public items satisfy receipt consistency while all-public attempt policy stays strict",
+      "every admitted item/output sensitivity combination yields a consistent embedding receipt"
+    ],
+    "sourceSha256": "48b52ed78c33fd08956c2adc8c7fa084d70215d9646362c2dc770cc61f9ddaa9",
+    "mutation": [
+      [
+        "i.digest.kind != DigestKind.Plain || ReceiptDigest.plainAdmissible.contains(i.sensitivity)",
+        "(i.digest.kind == DigestKind.Plain) == ReceiptDigest.plainAdmissible.contains(i.sensitivity)"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"embedCoreJVM\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala\")))",
+      "embedCoreJVM/Test/clean",
+      "embedCoreJVM/test"
+    ],
+    "exit": 1,
+    "logSha256": "6ceb2927d2ef002faad96d3e2a043987bbd6281f7d3e1f17b04e0e09c1d1ca7c",
+    "failures": [
+      "keyed public items satisfy receipt consistency while all-public attempt policy stays strict",
+      "every admitted item/output sensitivity combination yields a consistent embedding receipt"
+    ],
+    "totals": [
+      [
+        "28",
+        "2",
+        "0",
+        "26",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "receipt-construction",
+    "module": "embedCoreJVM",
+    "source": "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+    "tests": [
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ReceiptDigestBoundarySuite.scala"
+    ],
+    "required": [
+      "Plain refuses external new with a same-shape positive control",
+      "Keyed refuses external new with a same-shape positive control",
+      "Withheld refuses external new with a same-shape positive control"
+    ],
+    "allowed": [
+      "Plain refuses external new with a same-shape positive control",
+      "Plain refuses external apply with a same-shape positive control",
+      "Keyed refuses external new with a same-shape positive control",
+      "Keyed refuses external apply with a same-shape positive control",
+      "Withheld refuses external new with a same-shape positive control",
+      "Withheld refuses external apply with a same-shape positive control"
+    ],
+    "sourceSha256": "48b52ed78c33fd08956c2adc8c7fa084d70215d9646362c2dc770cc61f9ddaa9",
+    "mutation": [
+      [
+        "final class Plain private (",
+        "final class Plain ("
+      ],
+      [
+        "final class Keyed private (",
+        "final class Keyed ("
+      ],
+      [
+        "final class Withheld private (",
+        "final class Withheld ("
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"embedCoreJVM\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/embed-core/src/test/scala/storymodel4s/embedprobe/ReceiptDigestBoundarySuite.scala\")))",
+      "embedCoreJVM/Test/clean",
+      "embedCoreJVM/test"
+    ],
+    "exit": 1,
+    "logSha256": "eca6803c2006a559a7a08b1b2c3179cedbc858415f949791c42c2d35adb0e02e",
+    "failures": [
+      "Plain refuses external new with a same-shape positive control",
+      "Keyed refuses external new with a same-shape positive control",
+      "Withheld refuses external new with a same-shape positive control"
+    ],
+    "totals": [
+      [
+        "16",
+        "3",
+        "0",
+        "13",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "media-caption-construction",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/caption.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "ModelPin direct constructor is inaccessible",
+      "CaptionRecipe direct constructor is inaccessible"
+    ],
+    "allowed": [
+      "ModelPin direct constructor is inaccessible",
+      "ModelPin apply is absent",
+      "CaptionRecipe direct constructor is inaccessible",
+      "CaptionRecipe apply is absent"
+    ],
+    "sourceSha256": "1b906ff621e7ee9fed1f53e0071787ac5ce6c25214973676ea364d088df62aa4",
+    "mutation": [
+      [
+        "final class ModelPin private (",
+        "final class ModelPin ("
+      ],
+      [
+        "final class CaptionRecipe private (",
+        "final class CaptionRecipe ("
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "8dcdc3cd86c09ebe47f088047328c5ccb7dec94f69921eee352f7833e25c5a96",
+    "failures": [
+      "ModelPin direct constructor is inaccessible",
+      "ModelPin apply is absent",
+      "CaptionRecipe direct constructor is inaccessible",
+      "CaptionRecipe apply is absent"
+    ],
+    "totals": [
+      [
+        "25",
+        "4",
+        "0",
+        "21",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "geometry-construction",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/frames.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "PictureGeometry direct constructor is inaccessible"
+    ],
+    "allowed": [
+      "PictureGeometry direct constructor is inaccessible",
+      "PictureGeometry apply is absent"
+    ],
+    "sourceSha256": "76bd068c110aaa773b2199986be6be7ffe87ac879c5b2ece89324247c0537093",
+    "mutation": [
+      [
+        "final class PictureGeometry private (",
+        "final class PictureGeometry ("
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "b32b00459a5bd2170ce7012e1f467d2c9d77d8eabd71cd3d28433bcad5134a3f",
+    "failures": [
+      "PictureGeometry direct constructor is inaccessible",
+      "PictureGeometry apply is absent"
+    ],
+    "totals": [
+      [
+        "25",
+        "2",
+        "0",
+        "23",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "recipe-prompt",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/caption.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "CaptionRecipe rejects a blank prompt"
+    ],
+    "allowed": [
+      "CaptionRecipe rejects a blank prompt"
+    ],
+    "sourceSha256": "1b906ff621e7ee9fed1f53e0071787ac5ce6c25214973676ea364d088df62aa4",
+    "mutation": [
+      [
+        "prompt.trim.nonEmpty && minPixels > 0",
+        "minPixels > 0"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "e7d82e86b7d1ea79a1dcac776f9bb89061956207db675c5516f85483d4416ecf",
+    "failures": [
+      "CaptionRecipe rejects a blank prompt"
+    ],
+    "totals": [
+      [
+        "25",
+        "1",
+        "0",
+        "24",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "recipe-minimum",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/caption.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "CaptionRecipe rejects non-positive minimum pixels"
+    ],
+    "allowed": [
+      "CaptionRecipe rejects non-positive minimum pixels"
+    ],
+    "sourceSha256": "1b906ff621e7ee9fed1f53e0071787ac5ce6c25214973676ea364d088df62aa4",
+    "mutation": [
+      [
+        " && minPixels > 0 &&",
+        " &&"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "4017561946a6a1900a7507c012f1e134536eba7d28a58db040c01aab3140bcb9",
+    "failures": [
+      "CaptionRecipe rejects non-positive minimum pixels"
+    ],
+    "totals": [
+      [
+        "25",
+        "1",
+        "0",
+        "24",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "recipe-order",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/caption.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "CaptionRecipe rejects maximum pixels below the minimum"
+    ],
+    "allowed": [
+      "CaptionRecipe rejects maximum pixels below the minimum"
+    ],
+    "sourceSha256": "1b906ff621e7ee9fed1f53e0071787ac5ce6c25214973676ea364d088df62aa4",
+    "mutation": [
+      [
+        " && maxPixels >= minPixels &&",
+        " &&"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "d816ece3e1cb198d86262be7c1e11e3ad5db74978d5565aa3ce8d4578a0ecada",
+    "failures": [
+      "CaptionRecipe rejects maximum pixels below the minimum"
+    ],
+    "totals": [
+      [
+        "25",
+        "1",
+        "0",
+        "24",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "recipe-token-limit",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/caption.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "CaptionRecipe rejects non-positive token limit"
+    ],
+    "allowed": [
+      "CaptionRecipe rejects non-positive token limit"
+    ],
+    "sourceSha256": "1b906ff621e7ee9fed1f53e0071787ac5ce6c25214973676ea364d088df62aa4",
+    "mutation": [
+      [
+        " && maxNewTokens > 0 then",
+        " then"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "6ad0f3ee8a0370714e7253953dacb6e632982990ea31733bc7ca5f69dccebd82",
+    "failures": [
+      "CaptionRecipe rejects non-positive token limit"
+    ],
+    "totals": [
+      [
+        "25",
+        "1",
+        "0",
+        "24",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "geometry-overflow",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/frames.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "PictureGeometry rejects a frame byte count above Long maximum"
+    ],
+    "allowed": [
+      "PictureGeometry rejects a frame byte count above Long maximum"
+    ],
+    "sourceSha256": "76bd068c110aaa773b2199986be6be7ffe87ac879c5b2ece89324247c0537093",
+    "mutation": [
+      [
+        "bytes > BigInt(Long.MaxValue)",
+        "bytes > BigInt(Long.MaxValue) * 4"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "f16e785261667b01079dbf025a6ec64bb2afa3caa76059f3e0d0a42e3e9989b4",
+    "failures": [
+      "PictureGeometry rejects a frame byte count above Long maximum"
+    ],
+    "totals": [
+      [
+        "25",
+        "1",
+        "0",
+        "24",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  },
+  {
+    "label": "pts-overflow",
+    "module": "media",
+    "source": "media/src/main/scala/storymodel4s/media/manifest.scala",
+    "tests": [
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ],
+    "required": [
+      "DeclaredFrames rejects an unrepresentable last generated PTS"
+    ],
+    "allowed": [
+      "DeclaredFrames rejects an unrepresentable last generated PTS"
+    ],
+    "sourceSha256": "81e409acb8ee0b61370c95a8abd3accc0c9457d6e5085b6a5cd91a9d2d2d8e15",
+    "mutation": [
+      [
+        "BigInt(nominalTicksPerFrame) > BigInt(Long.MaxValue)",
+        "BigInt(nominalTicksPerFrame) > BigInt(Long.MaxValue) * 2"
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"media\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala\")))",
+      "media/Test/clean",
+      "media/test"
+    ],
+    "exit": 1,
+    "logSha256": "242871e475b5ae1b14664a6f443947e40d8ffa45d3ecd59b02cd4269298a97e2",
+    "failures": [
+      "DeclaredFrames rejects an unrepresentable last generated PTS"
+    ],
+    "totals": [
+      [
+        "25",
+        "1",
+        "0",
+        "24",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  }
+]

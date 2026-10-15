@@ -1,0 +1,32 @@
+[
+  {
+    "repo": "grakern",
+    "query": "releases?per_page=5",
+    "items": []
+  },
+  {
+    "repo": "grakern",
+    "query": "tags?per_page=5",
+    "items": []
+  },
+  {
+    "repo": "graph4s",
+    "query": "releases?per_page=5",
+    "items": []
+  },
+  {
+    "repo": "graph4s",
+    "query": "tags?per_page=5",
+    "items": []
+  },
+  {
+    "repo": "gale",
+    "query": "releases?per_page=5",
+    "items": []
+  },
+  {
+    "repo": "gale",
+    "query": "tags?per_page=5",
+    "items": []
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "source": "8689168c31c6fcfbcb7cf06e6eecf9bf19c6f8fb",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO",
+  "finding": "staged upstream source edits escaped unstaged-only diff",
+  "repair": "git diff HEAD includes index and worktree; permitted routing hash still required",
+  "controls": "unchanged sources reach sbt sentinel; staged and unstaged unexpected edits refuse before output or sbt",
+  "mutant": "previous implementation passes first two controls and fails staged-rejection assertion",
+  "productionGateInputsUnchanged": true
+}

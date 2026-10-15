@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T01:33:12.849020+00:00",
+  "finished_utc": "2026-10-15T01:34:40.277574+00:00",
+  "duration_seconds": 87.427547,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "embedBench/test",
+    "media/test",
+    "pipeline/test",
+    "corpusIntake/test",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck",
+    "pipeline/cliDistribution"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/constructor-8ea96-tail-gate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 3600.0,
+  "log_bytes": 2321894
+}

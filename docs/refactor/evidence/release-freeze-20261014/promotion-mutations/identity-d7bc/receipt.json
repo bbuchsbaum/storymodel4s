@@ -1,0 +1,48 @@
+[
+  {
+    "label": "custom-identity",
+    "module": "embedCoreJVM",
+    "source": "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+    "tests": [
+      "embed-core/src/test/scala/storymodel4s/embed/SemanticViewIdentitySuite.scala"
+    ],
+    "required": [
+      "the old namespace/name collision has distinct versioned renderings and geometry ids",
+      "empty, Unicode and separator-bearing component pairs retain separate identities"
+    ],
+    "allowed": [
+      "the old namespace/name collision has distinct versioned renderings and geometry ids",
+      "empty, Unicode and separator-bearing component pairs retain separate identities"
+    ],
+    "sourceSha256": "4ce53816c10bb6d859ffabdf916e7daf59e25af4e50792190ad3f763cb2c3255",
+    "mutation": [
+      [
+        "s\"custom/v2:${ns.length}:$ns:${n.length}:$n\"",
+        "s\"custom:$ns:$n\""
+      ]
+    ],
+    "command": [
+      "sbt",
+      "-batch",
+      "set Seq(ThisBuild / tlFatalWarnings := true, LocalProject(\"embedCoreJVM\") / Test / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/embed-core/src/test/scala/storymodel4s/embed/SemanticViewIdentitySuite.scala\")))",
+      "embedCoreJVM/Test/clean",
+      "embedCoreJVM/test"
+    ],
+    "exit": 1,
+    "logSha256": "3fbc1d9f2017c3fbefe9950c5e0548ecadb29073cecdbe12928795d53593abcf",
+    "failures": [
+      "the old namespace/name collision has distinct versioned renderings and geometry ids",
+      "empty, Unicode and separator-bearing component pairs retain separate identities"
+    ],
+    "totals": [
+      [
+        "3",
+        "2",
+        "0",
+        "1",
+        ""
+      ]
+    ],
+    "status": "killed-by-named-assertions"
+  }
+]

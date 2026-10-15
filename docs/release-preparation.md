@@ -5,6 +5,14 @@ publication gate is `bd-01M2TAMJ95K9D7H248A8387YW4`; the infrastructure ticket i
 `bd-01M2TAKTB61XNXV4Y6A9J3CB0C`. This checklist records preparation for that gate. No stable
 artifact, tag or deployed documentation site follows from a local build.
 
+The current Native platform prerequisite is `bd-01M4YP83C7925M22V0K5AQ88BX`. Native 0.5.12
+on macOS arm64 reproducibly crashes when hashing a literal NUL string, including without any
+StoryModel type. Both Clang 15 and 20 reproduce it. Constructing the identical character at runtime
+preserves the full identity-test coverage and passes, but does not repair that compiler/runtime
+defect. [Retained controls](refactor/evidence/release-freeze-20261014/native-diagnostic/receipt.json)
+keep this separate from the application repairs. Qualify the underlying behavior before
+unrestricted stable Native publication.
+
 ## Reproducible checks
 
 Run the full producer and pinned StoryAtlas consumer gates in clean standalone checkouts,
@@ -52,13 +60,31 @@ comparison. No exclusion filter is installed. Raw command logs and dependency ha
 Explicit Scala libraries and the JDK base module are analyzer inputs as well as runner dependencies;
 missing them caused the retained initial analyzer failure.
 
-The rehearsal's baseline policy permits an empty baseline for the first `1.0.0`, accepts `1.0.0`
-for later versions, and refuses an empty baseline for `1.0.1` and `1.1.0`. This tests the policy
-helper; it is not yet an activated published-artifact comparison in CI. After the first stable
-artifact exists, bind `tlMimaPreviousVersions` to its exact coordinates, integrate the nonempty
-baseline guard, and run a named stable-symbol break through the actual release workflow.
-Experimental exclusions must be explicit and reviewed. This local Scala 3 control does not
-establish JVM bytecode, source, JavaScript/Native, or wire compatibility for the whole library.
+The release candidate now adds `1.0.0` to `tlMimaPreviousVersions` for subsequent 1.x versions.
+`releaseBaselineCheck` runs before each published module's actual `mimaReportBinaryIssues`
+task and requires that same module's exact `1.0.0` coordinate. An empty override or another
+module's artifact cannot silently replace the comparison. The first `1.0.0` remains exempt.
+
+The actual-task rehearsal is:
+
+```sh
+python3 tools/release/rehearse-baseline.py \
+  --checkout /absolute/path/to/clean-standalone-candidate \
+  --output /absolute/path/to/new-evidence-directory
+```
+
+It uses the real `coreJVM` build/release tasks with a synthetic class selected by sbt session
+settings. A local file repository holds the synthetic baseline. The unchanged binary passes;
+removing `releasebaselineprobe.StableApi.keep` fails MiMa; empty baselines for `1.0.1` and
+`1.1.0`, and a wrong-module baseline, fail the guard. These six controls passed in the release
+prerequisite candidate. No synthetic artifact is a released library baseline. Rebuild ordinary
+source outputs after this rehearsal before generating a library distribution.
+
+Experimental exclusions must be explicit and reviewed; no MiMa exclusion filter is installed.
+The exact-member source-signature comparison separately demonstrates an allowed experimental
+factory rename and a refused supported-accessor removal. Neither local control establishes
+whole-library JavaScript/Native, wire or scientific compatibility. After the first stable
+artifacts are published, the configured comparisons must resolve those actual artifact bytes.
 
 ## Publication decision
 

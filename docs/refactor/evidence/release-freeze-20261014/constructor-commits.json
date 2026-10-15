@@ -1,0 +1,35 @@
+[
+  {
+    "subject": "Close ClaimLedger product construction and preserve serialization",
+    "sha": "aa09a5c6991fc0517cf5285cdba6d5b1156dca4d",
+    "paths": [
+      "core/src/main/scala/storymodel4s/core/claim.scala",
+      "core/src/test/scala/coreprobe/ClaimLedgerBoundarySuite.scala",
+      "core/src/test/scala/storymodel4s/coreprobe/ConstructionProbeSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/ClaimLedgerIntegritySuite.scala"
+    ]
+  },
+  {
+    "subject": "Validate candidate abstention while preserving ranked empty sets",
+    "sha": "b0ff8da755b87f8ad1f5fb3a82fe815c3db9eed4",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/candidates.scala",
+      "align/src/main/scala/storymodel4s/align/candidatepolicy.scala",
+      "align/src/test/scala/storymodel4s/align/CandidateSetSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/CandidateSetBoundarySuite.scala",
+      "align/src/test/scala/storymodel4s/align/GateProofSuite.scala",
+      "align/src/test/scala/storymodel4s/align/LocalEvidenceSuite.scala",
+      "codec/src/test/scala/storymodel4s/codec/LocalEvidenceConsumerSuite.scala",
+      "embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala",
+      "laws/src/main/scala/storymodel4s/laws/Laws.scala"
+    ]
+  },
+  {
+    "subject": "Reject nonpositive embedding truncation limits",
+    "sha": "8ebd513bdf8884cc3d6122a31d739d696ebdb646",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/TruncationPolicySuite.scala"
+    ]
+  }
+]

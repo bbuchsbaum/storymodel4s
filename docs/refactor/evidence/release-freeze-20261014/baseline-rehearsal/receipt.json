@@ -1,0 +1,107 @@
+{
+  "source": "646cf42908901b592855e5948012d14d028cadd8",
+  "scope": "synthetic binary contract through actual coreJVM release tasks; not a published baseline",
+  "status": "passed",
+  "commands": [
+    {
+      "label": "first-baseline",
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / version := \"1.0.0\"",
+        "set LocalProject(\"coreJVM\") / Compile / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/old.scala\"))",
+        "set LocalProject(\"coreJVM\") / Compile / managedSources := Nil",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"baseline-fixture\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"coreJVM\") / resolvers += \"baseline-fixture\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"",
+        "coreJVM/releaseBaselineCheck",
+        "coreJVM/publish"
+      ],
+      "expectedFailure": null,
+      "exit": 0,
+      "logSha256": "0f63992410d2e03e78c9d1417bdae737dc75c917381144e0e802f69b1d04e931"
+    },
+    {
+      "label": "unchanged",
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / version := \"1.0.1\"",
+        "set LocalProject(\"coreJVM\") / Compile / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/same.scala\"))",
+        "set LocalProject(\"coreJVM\") / Compile / managedSources := Nil",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"baseline-fixture\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"coreJVM\") / resolvers += \"baseline-fixture\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"",
+        "coreJVM/mimaReportBinaryIssues"
+      ],
+      "expectedFailure": null,
+      "exit": 0,
+      "logSha256": "cb5bf83095d924e2616569833eb5474b0e7c5d38fdf1eba77551da781b5df52a"
+    },
+    {
+      "label": "removed-stable-method",
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / version := \"1.0.1\"",
+        "set LocalProject(\"coreJVM\") / Compile / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/removed.scala\"))",
+        "set LocalProject(\"coreJVM\") / Compile / managedSources := Nil",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"baseline-fixture\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"coreJVM\") / resolvers += \"baseline-fixture\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"",
+        "coreJVM/mimaReportBinaryIssues"
+      ],
+      "expectedFailure": "releasebaselineprobe.StableApi.keep",
+      "exit": 1,
+      "logSha256": "a0d59fccbf075da0437bdbd806397aefde759ae81445453bc0c094a4d454f3bd"
+    },
+    {
+      "label": "empty-1.0.1",
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / version := \"1.0.1\"",
+        "set LocalProject(\"coreJVM\") / Compile / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/same.scala\"))",
+        "set LocalProject(\"coreJVM\") / Compile / managedSources := Nil",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"baseline-fixture\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"coreJVM\") / resolvers += \"baseline-fixture\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"",
+        "set LocalProject(\"coreJVM\") / mimaPreviousArtifacts := Set.empty",
+        "coreJVM/mimaReportBinaryIssues"
+      ],
+      "expectedFailure": "must compare with this module's exact 1.0.0 binary baseline",
+      "exit": 1,
+      "logSha256": "cf9d472feb6206f03e8ae458b0f7cf7c4a2a106556650e6409e2dbc81238598e"
+    },
+    {
+      "label": "empty-1.1.0",
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / version := \"1.1.0\"",
+        "set LocalProject(\"coreJVM\") / Compile / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/same.scala\"))",
+        "set LocalProject(\"coreJVM\") / Compile / managedSources := Nil",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"baseline-fixture\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"coreJVM\") / resolvers += \"baseline-fixture\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"",
+        "set LocalProject(\"coreJVM\") / mimaPreviousArtifacts := Set.empty",
+        "coreJVM/mimaReportBinaryIssues"
+      ],
+      "expectedFailure": "must compare with this module's exact 1.0.0 binary baseline",
+      "exit": 1,
+      "logSha256": "d97c527d08b89ec13912560d0ecf765a6821abbbc945f4e6dbb7c40bf38ec7ea"
+    },
+    {
+      "label": "wrong-module",
+      "command": [
+        "sbt",
+        "-batch",
+        "set ThisBuild / version := \"1.0.1\"",
+        "set LocalProject(\"coreJVM\") / Compile / unmanagedSources := Seq(file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/same.scala\"))",
+        "set LocalProject(\"coreJVM\") / Compile / managedSources := Nil",
+        "set LocalProject(\"coreJVM\") / publishTo := Some(Resolver.file(\"baseline-fixture\", file(\"/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"))(Resolver.mavenStylePatterns))",
+        "set LocalProject(\"coreJVM\") / resolvers += \"baseline-fixture\" at \"file:///Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/actual-baseline-rehearsal-02/maven\"",
+        "set LocalProject(\"coreJVM\") / mimaPreviousArtifacts := Set(\"example\" % \"wrong\" % \"1.0.0\")",
+        "coreJVM/mimaReportBinaryIssues"
+      ],
+      "expectedFailure": "must compare with this module's exact 1.0.0 binary baseline",
+      "exit": 1,
+      "logSha256": "541d0a4a2d585d87cf7e490bab43c9c2b36c68ff9e433f6258f5b90adc789756"
+    }
+  ]
+}

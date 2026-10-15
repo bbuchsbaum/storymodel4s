@@ -1,0 +1,9 @@
+{
+  "reviewer": "constructor_exact_review",
+  "sha": "268473e776aa0e4f447816043d208fb265e3dab3",
+  "verdict": "GO for diagnostic branch push",
+  "scope": ".github/workflows/native-isolation.yml",
+  "priorBlock": "GitHub bash inherited errexit skipped status capture",
+  "resolution": "Explicit sbt failure capture; independent binary/source integrity statuses; five shell controls pass",
+  "qualification": "Actual hosted artifacts and results pending"
+}

@@ -1,0 +1,18 @@
+{
+  "source": "b78177f5190bcb77f9fce3156b1a9137df37feba",
+  "run": 38643088718,
+  "attempt": 2,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38643088718/attempts/2",
+  "archiveSha256": "a7356ab6bb2f1e8a155d94c019855b581e86e1360f629ae6945912be945b739f",
+  "cells": [
+    {
+      "log": "0_Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative).txt",
+      "tasks": 16,
+      "passed": 3258,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "limitation": "Unchanged failed-cell retry passed. Cause of original Native MatchError remains unestablished; original attempt retained."
+}

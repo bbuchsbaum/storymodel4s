@@ -1,0 +1,19 @@
+{
+  "source": "d7bc9c06dfe8c441e020c826b895616f914b157f",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO-code pending final receipts",
+  "testCoverage": "identical one-character NUL; added length, character and hash assertions; all 121 pairs and three distinctness assertions retained",
+  "runtimeMechanism": "Native lowers literals to constant objects with precomputed hash; String.hashCode writes a zero cache for a nonempty string even when the result is zero; source and generated LLVM agree with controls, faulting instruction not captured",
+  "references": [
+    "https://github.com/scala-native/scala-native/blob/v0.5.12/tools/src/main/scala/scala/scalanative/codegen/Lower.scala#L1836-L1871",
+    "https://github.com/scala-native/scala-native/blob/v0.5.12/javalib/src/main/scala/java/lang/String.scala#L365-L385"
+  ],
+  "gateReuse": "first 30 de780 tasks and 6665 passes unchanged; rerun all three embedCore platforms plus remaining 23 tasks",
+  "remaining": [
+    "identitymutationrecheck",
+    "26tasktailandformat",
+    "freshdistribution",
+    "pinnedconsumer"
+  ],
+  "runtimeIssueRemainsOpen": "bd-01M4YP83C7925M22V0K5AQ88BX"
+}

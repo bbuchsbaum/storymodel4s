@@ -1,0 +1,7 @@
+MODEL_PIN: checked factory rejects missing config; public copy admits it; configSha256 throws java.util.NoSuchElementException
+LAYER_USE: config refuses NaN; public LayerUse.of admits NaN externalIn; render throws java.lang.NumberFormatException
+RECEIPT_DIGEST: all three external Mirror constructors compile and run; Withheld minted without AttemptReceipt
+EMBEDDING_RECEIPT: checked factories admit Public+Keyed item and return isKeyConsistent=false; enclosing AttemptReceipt refuses
+PROBES_PASSED=4 POSITIVE_CONTROLS_PASSED=4
+
+EXIT_STATUS=0

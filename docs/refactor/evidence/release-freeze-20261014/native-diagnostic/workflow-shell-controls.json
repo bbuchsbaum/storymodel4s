@@ -1,0 +1,50 @@
+{
+  "platformCommands": "ulimit and Linux proc read mocked on macOS",
+  "cases": [
+    {
+      "case": "pass",
+      "exit": 0,
+      "recorded": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "test-fails",
+      "exit": 139,
+      "recorded": [
+        139,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "binary-fails",
+      "exit": 1,
+      "recorded": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "case": "source-fails",
+      "exit": 1,
+      "recorded": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case": "all-fail",
+      "exit": 139,
+      "recorded": [
+        139,
+        1,
+        1
+      ]
+    }
+  ]
+}

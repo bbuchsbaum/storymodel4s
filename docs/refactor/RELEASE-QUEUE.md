@@ -46,8 +46,25 @@ review, the 518-test full gate, 12 new and 30 existing browser checks, and actua
 of every cell with exact saved-state replay. It preserves supplied timing basis and unavailable
 values. Hosted main checks and the final tracker readback are bound in the workflow receipt.
 
-The next release work is constructor repair and stable-boundary judgment, followed by
-publishable dependencies and release infrastructure; it is not another study execution.
+The three constructor repairs and the related finite-refinement guard are now landed on local
+and GitHub main at `8ea96d6a`. [Release-prerequisite evidence](evidence/release-freeze-20261014/README.md)
+records independent exact-SHA review, 10,964 producer passes/five optional skips with documented
+unchanged-input reuse, and 518 pinned StoryAtlas consumer passes. Stable-boundary judgment and
+publishable dependencies/release infrastructure remain; no new study execution is required.
+
+The member-level promotion review identified four further bounded repair groups: media value
+construction/arithmetic (`bd-01M4YJ6SNNV1MDQGZQKHPE9EC2`), receipt construction/consistency
+(`bd-01M4YJ816QHR3FR5VKGGNP3WQS`), numeric value admission (`bd-01M4YJ8HMAGM91AKQZ7FM8CB1M`),
+and custom semantic-view identity (`bd-01M4YJ91P5FE7E55RJQ371VXK9`). Their compiled counterexamples
+and repairs are prerequisites to the final member manifest; no study occurrence is inferred.
+Runtime `d7bc9c06` has a complete producer receipt: 11,067 passed, zero failed/errors and five
+optional skips over 56 tasks, with unchanged-input reuse identified. Final manifest and pinned
+consumer qualification remain in progress. Main's repeated Linux Native crash is now the P0
+(`bd-01M4YFK6VVZ71EB2SGS25DM0ED`); integration waits for its disposition. The retained LLVM 18
+diagnostic holds application source fixed and captures the executable before running tests.
+Native qualification also exposed a standard-library literal NUL hash crash, independently of
+StoryModel types (`bd-01M4YP83C7925M22V0K5AQ88BX`). An equal-content fixture construction retains
+all identity assertions; the underlying runtime remains a separate stable-publication prerequisite.
 The stable-construction audit records historical candidate abstention and token-truncation
 recipe findings on `bd-01M4XTRN36R6SYXQBP5YN7FSQP` and `bd-01M4XTS7JEY2ZQK2CFNZ429RFW`.
 The ClaimLedger construction opening has a reproduced lossy-serialization witness and a bounded

@@ -1,0 +1,27 @@
+{
+  "candidate": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO",
+  "blocks": [],
+  "producer": {
+    "kind": "combined verification with unchanged-input reuse",
+    "tasks": 56,
+    "passed": 10964,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "consumer": {
+    "commit": "bfaac8d044aab8937cafee662585f0e1ff84a913",
+    "tasks": 10,
+    "passed": 518,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "landing": {
+    "localMain": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+    "remoteMain": "8ea96d6a91e88144eff132c185cb3663047d20b9"
+  },
+  "scope": "Original constructor slice only. Separate promotion defects remain open."
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T02:03:55.871271+00:00",
+  "finished_utc": "2026-10-15T02:03:59.510403+00:00",
+  "duration_seconds": 3.63901,
+  "command": [
+    "python3",
+    "tools/release/test_preflight.py"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/release-preflight-final-controls-02.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 300.0,
+  "log_bytes": 78
+}

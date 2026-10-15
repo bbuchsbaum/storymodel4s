@@ -1,0 +1,18 @@
+{
+  "sha": "7d43a6139dfdda3b9ff6d744af3c6cd1dae50717",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO-code, actual staging and binary execution pending",
+  "scope": [
+    "tools/release/rehearse-upstream-binaries.py",
+    "tools/release/UpstreamBinaryConsumer.scala",
+    "tools/release/README.md"
+  ],
+  "checks": [
+    "fresh cache and explicit repositories",
+    "combined dependency graph",
+    "all fetched roots match staging hashes",
+    "six kernel and query assertions",
+    "owned loopback server closes",
+    "runtime version retained"
+  ]
+}

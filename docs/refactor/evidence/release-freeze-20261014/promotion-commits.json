@@ -1,0 +1,50 @@
+[
+  {
+    "commit": "5dcbf75237569310a594d0397131aad1ad1db1ff",
+    "message": "Refuse nonfinite layer ledgers and overflowing alignment rows",
+    "paths": [
+      "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "align/src/main/scala/storymodel4s/align/matrix.scala",
+      "align/src/test/scala/storymodel4s/align/LayerUseSuite.scala",
+      "align/src/test/scala/storymodel4s/align/ReconstructionPolicySuite.scala",
+      "align/src/test/scala/storymodel4s/consumer/AlignBoundarySuite.scala",
+      "align/src/test/scala/storymodel4s/probes/HsmmRefinementWeightSuite.scala",
+      "align/src/test/scala/storymodel4s/probes/PromotedNumericBoundarySuite.scala"
+    ]
+  },
+  {
+    "commit": "604cadf8af911f24813b84e1667ba59f0576e87d",
+    "message": "Close receipt product construction and correct keyed consistency",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/receipt.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/ReceiptDigestSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala",
+      "embed-core/src/test/scala/storymodel4s/embedprobe/ReceiptDigestBoundarySuite.scala"
+    ]
+  },
+  {
+    "commit": "8a46027f520cc125f98f00c4f77d8c7c6087362a",
+    "message": "Version custom semantic identities with unambiguous component lengths",
+    "paths": [
+      "embed-core/src/main/scala/storymodel4s/embed/identity.scala",
+      "embed-core/src/test/scala/storymodel4s/embed/SemanticViewIdentitySuite.scala"
+    ]
+  },
+  {
+    "commit": "e8ac2b0b306d6a5cfbb16812cecfb6e93cb650bc",
+    "message": "Check caption value construction and bounded media arithmetic",
+    "paths": [
+      "media/src/main/scala/storymodel4s/media/boundary.scala",
+      "media/src/main/scala/storymodel4s/media/caption.scala",
+      "media/src/main/scala/storymodel4s/media/frames.scala",
+      "media/src/main/scala/storymodel4s/media/manifest.scala",
+      "media/src/main/scala/storymodel4s/media/sampledextraction.scala",
+      "media/src/test/scala/storymodel4s/media/BoundarySearchSuite.scala",
+      "media/src/test/scala/storymodel4s/media/CaptionSearchSuite.scala",
+      "media/src/test/scala/storymodel4s/media/F1ExcerptSuite.scala",
+      "media/src/test/scala/storymodel4s/media/MediaProbeSuite.scala",
+      "media/src/test/scala/storymodel4s/media/SampledExtractionSuite.scala",
+      "media/src/test/scala/storymodel4s/probe/PromotedMediaBoundarySuite.scala"
+    ]
+  }
+]

@@ -1,0 +1,479 @@
+{
+  "source": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+  "priorSource": "8c04ba21293d29383c245bfb23d60d20f9f5929b",
+  "delta": "embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala only; failed task rerun and three previously unrun JVM tasks plus formatting and distribution",
+  "runs": [
+    {
+      "log": "constructor-8c04-full-gate.log",
+      "sha256": "0818046f0d4c07c2086b9a57f0b921bdad05ad519c8c66ea02273f214026e5ee",
+      "totals": [
+        [
+          257,
+          0,
+          0,
+          257,
+          0
+        ],
+        [
+          257,
+          0,
+          0,
+          257,
+          0
+        ],
+        [
+          257,
+          0,
+          0,
+          257,
+          0
+        ],
+        [
+          81,
+          0,
+          0,
+          81,
+          0
+        ],
+        [
+          81,
+          0,
+          0,
+          81,
+          0
+        ],
+        [
+          81,
+          0,
+          0,
+          81,
+          0
+        ],
+        [
+          92,
+          0,
+          0,
+          92,
+          0
+        ],
+        [
+          92,
+          0,
+          0,
+          92,
+          0
+        ],
+        [
+          92,
+          0,
+          0,
+          92,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          77,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          77,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          77,
+          0
+        ],
+        [
+          138,
+          0,
+          0,
+          138,
+          0
+        ],
+        [
+          138,
+          0,
+          0,
+          138,
+          0
+        ],
+        [
+          138,
+          0,
+          0,
+          138,
+          0
+        ],
+        [
+          167,
+          0,
+          0,
+          167,
+          0
+        ],
+        [
+          167,
+          0,
+          0,
+          167,
+          0
+        ],
+        [
+          167,
+          0,
+          0,
+          167,
+          0
+        ],
+        [
+          189,
+          0,
+          0,
+          189,
+          0
+        ],
+        [
+          186,
+          0,
+          0,
+          186,
+          0
+        ],
+        [
+          186,
+          0,
+          0,
+          186,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          77,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          77,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          77,
+          0
+        ],
+        [
+          1050,
+          0,
+          0,
+          1050,
+          0
+        ],
+        [
+          1030,
+          0,
+          0,
+          1030,
+          0
+        ],
+        [
+          1030,
+          0,
+          0,
+          1030,
+          0
+        ],
+        [
+          104,
+          0,
+          0,
+          104,
+          0
+        ],
+        [
+          104,
+          0,
+          0,
+          104,
+          0
+        ],
+        [
+          104,
+          0,
+          0,
+          104,
+          0
+        ],
+        [
+          149,
+          0,
+          0,
+          149,
+          0
+        ],
+        [
+          149,
+          0,
+          0,
+          149,
+          0
+        ],
+        [
+          149,
+          0,
+          0,
+          149,
+          0
+        ],
+        [
+          133,
+          0,
+          0,
+          133,
+          0
+        ],
+        [
+          133,
+          0,
+          0,
+          133,
+          0
+        ],
+        [
+          133,
+          0,
+          0,
+          133,
+          0
+        ],
+        [
+          404,
+          0,
+          0,
+          404,
+          0
+        ],
+        [
+          403,
+          0,
+          0,
+          403,
+          0
+        ],
+        [
+          403,
+          0,
+          0,
+          403,
+          0
+        ],
+        [
+          116,
+          0,
+          0,
+          116,
+          0
+        ],
+        [
+          116,
+          0,
+          0,
+          116,
+          0
+        ],
+        [
+          116,
+          0,
+          0,
+          116,
+          0
+        ],
+        [
+          165,
+          0,
+          0,
+          165,
+          0
+        ],
+        [
+          160,
+          0,
+          0,
+          160,
+          0
+        ],
+        [
+          160,
+          0,
+          0,
+          160,
+          0
+        ],
+        [
+          117,
+          0,
+          0,
+          117,
+          0
+        ],
+        [
+          117,
+          0,
+          0,
+          117,
+          0
+        ],
+        [
+          117,
+          0,
+          0,
+          117,
+          0
+        ],
+        [
+          98,
+          0,
+          0,
+          98,
+          0
+        ],
+        [
+          77,
+          0,
+          0,
+          76,
+          1
+        ],
+        [
+          28,
+          0,
+          0,
+          28,
+          0
+        ],
+        [
+          51,
+          0,
+          0,
+          51,
+          0
+        ],
+        [
+          176,
+          1,
+          0,
+          174,
+          1
+        ]
+      ],
+      "meta": {
+        "schema_version": 1,
+        "started_utc": "2026-10-15T00:59:45.341618+00:00",
+        "finished_utc": "2026-10-15T01:30:45.725108+00:00",
+        "duration_seconds": 1860.350516,
+        "command": [
+          "sbt",
+          "-batch",
+          "set ThisBuild / tlFatalWarnings := true",
+          "coreJVM/Test/clean",
+          "alignJVM/Test/clean",
+          "coreJS/Test/clean",
+          "alignJS/Test/clean",
+          "coreNative/Test/clean",
+          "alignNative/Test/clean",
+          "checkAll",
+          "pipeline/cliDistribution"
+        ],
+        "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/constructor-8c04-full-gate.log",
+        "exit_code": 1,
+        "child_returncode": 1,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 7200.0,
+        "log_bytes": 409035
+      }
+    },
+    {
+      "log": "constructor-8ea96-tail-gate.log",
+      "sha256": "e59bd3442a2f7b0c1d1986bbd8db6ce3a51d3c36e7a4b02daa7fd930ded7cd4a",
+      "totals": [
+        [
+          176,
+          0,
+          0,
+          175,
+          1
+        ],
+        [
+          130,
+          0,
+          0,
+          127,
+          3
+        ],
+        [
+          360,
+          0,
+          0,
+          360,
+          0
+        ],
+        [
+          159,
+          0,
+          0,
+          159,
+          0
+        ]
+      ],
+      "meta": {
+        "schema_version": 1,
+        "started_utc": "2026-10-15T01:33:12.849020+00:00",
+        "finished_utc": "2026-10-15T01:34:40.277574+00:00",
+        "duration_seconds": 87.427547,
+        "command": [
+          "sbt",
+          "-batch",
+          "set ThisBuild / tlFatalWarnings := true",
+          "embedBench/test",
+          "media/test",
+          "pipeline/test",
+          "corpusIntake/test",
+          "scalafmtCheckAll",
+          "scalafmtSbtCheck",
+          "pipeline/cliDistribution"
+        ],
+        "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+        "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/constructor-8ea96-tail-gate.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 3600.0,
+        "log_bytes": 2321894
+      }
+    }
+  ],
+  "reusedAndRerunTotals": {
+    "total": 10969,
+    "failed": 0,
+    "errors": 0,
+    "passed": 10964,
+    "skipped": 5
+  },
+  "taskCount": 56
+}

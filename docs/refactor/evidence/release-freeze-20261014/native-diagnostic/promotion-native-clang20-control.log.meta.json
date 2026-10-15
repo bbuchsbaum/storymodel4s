@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T02:24:01.830065+00:00",
+  "finished_utc": "2026-10-15T02:24:38.798985+00:00",
+  "duration_seconds": 36.968686,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "show embedCoreNative/nativeConfig",
+    "embedCoreNative/testOnly semanticviewprobe.SemanticViewIdentitySuite",
+    "embedCoreNative/test"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/promotion-native-clang20-control.log",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 5910
+}

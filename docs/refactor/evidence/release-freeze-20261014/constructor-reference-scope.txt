@@ -1,0 +1,108 @@
+types defined by this candidate:
+  AblationResult
+  Adm
+  AlignmentLaws
+  AtMost
+  CandidateGenerator
+  CandidateRefusal
+  CandidateSet
+  CandidateSetBoundarySuite
+  CandidateSetSuite
+  CandidateTiePolicy
+  Candidates
+  Channels
+  ChartLaws
+  ClaimLedger
+  ClaimLedgerBoundarySuite
+  ClaimLedgerIntegritySuite
+  ClaimMeta
+  CompatibilityKey
+  ConstructionProbeSuite
+  Costs
+  Dimension
+  EmbeddingSpace
+  EpistemicStatus
+  EstimateLaws
+  Evidence
+  GateProofLaws
+  GateProofSuite
+  GeometryId
+  GeometryPair
+  GeometryPairRule
+  GraphHsmm
+  HistoricalKeyOrder
+  HsmmConfig
+  HsmmConfigFingerprint
+  HsmmRefinementWeightSuite
+  HsmmResult
+  InstructionDigest
+  LatePoolingCompatibilityKey
+  LatePoolingRecipe
+  LayerPreservation
+  LayerUse
+  LocalEvidenceConsumerSuite
+  LocalEvidenceSuite
+  ModeGateLaws
+  Nomination
+  Normalization
+  PolicyModelIdentity
+  PoolingRule
+  PopulationLaws
+  ProviderFingerprint
+  RelationPreservation
+  Resolved
+  Role
+  SemanticView
+  SourceViewLaws
+  StageTraceOriginSuite
+  StoryLaws
+  StrictBinding
+  StrictCandidateConfig
+  StrictCandidateGenerator
+  StrictCandidateSet
+  StrictCandidates
+  SurfaceCandidateGenerator
+  TemporalLaws
+  TieBudget
+  TieBudgetRequest
+  TieComplete
+  TieOverflow
+  TransitionFeatures
+  TransitionKind
+  TransitionModel
+  TruncationPolicy
+  TruncationPolicySuite
+  Unbounded
+  UncoveredPolicy
+  UniformSemanticScores
+  WireLaws
+
+modules that reference them (the gate must cover all of these):
+  acquire
+  align
+  amr-interop
+  codec
+  core
+  corpus
+  corpus-intake
+  document
+  embed-bench
+  embed-core
+  embed-grakern
+  embed-onnx
+  fixtures
+  interview
+  laws
+  media
+  pipeline
+  proposition
+  provider-agent
+  story
+  view
+
+gate command (JVM; paste it, do not retype the module names):
+  sbt -batch "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedCoreJVM/test; embedGrakern/test; embedOnnx/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; storyJVM/test; viewJVM/test"
+
+  Run it in a CLONE, never a linked worktree. Capture the exit status. Run
+  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --
+  a red gate with no totals measured your infrastructure, not the candidate.

@@ -1,0 +1,12 @@
+{
+  "source": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+  "run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38667061008",
+  "attempt": 1,
+  "independentReviewer": "constructor_exact_review",
+  "observed": "Native process signal11 through Array.copy, String.getChars, StringBuilder.append, MappingRender.sequence/digest during MappingRunSuite",
+  "attribution": "No attributable source defect established; named rendering source, suite and build unchanged fromb781 baseline",
+  "diagnosticLead": "Hosted log warns clang14 is below16 and has known runtime issues; no causality demonstrated",
+  "nextAction": "qualify exact source in supported Linux toolchain with isolated suite, retained executable and full align module",
+  "status": "reproduced-on-attempt2",
+  "retry": "same MappingRunSuite, signal11 then glibc malloc assertion and abort134; 687passes and27errors, JSandJVMcells passed"
+}

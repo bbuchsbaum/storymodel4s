@@ -36,7 +36,7 @@ missingness, permission and evidence checks.
 | Registered shared-evidence and channel receipt values exposed by the public facade | Stable target | The qualified reference/reconstruction pair binds the same admitted evidence, inventory, source and actual execution receipts. Required dependency types still need their final stable disposition. |
 | Declared candidate tie policy, budget and typed overflow/refusal receipt values exposed by that facade | Stable target | The implemented public path records candidate policy, budgets and typed refusals. Its stable boundary audit must distinguish checked strict candidates from the open historical `CandidateSet` contract. |
 | `align`: `HsmmResult` and the checked result values required by `DerivationContext`/G1 result binding | Stable structural result | The current contextual mapping decoder exposes this dependency. Checked structural consistency does not certify a custom cost invocation or calibration. |
-| `align`: `GraphHsmm`, current engine `LocalEvidence`/`LocalEvidenceId` construction, `CandidateGenerator`/`CandidateSet`, custom `LocalCostModel` and low-level inference/ablation configuration | Experimental | Research extension points remain available; promote exact public dependencies if the final stable facade exposes them. No universal invocation-authenticated or calibrated-HSMM claim follows. |
+| `align`: `GraphHsmm`, engine `LocalEvidence.compute`, `CandidateGenerator`, custom `LocalCostModel` and low-level inference operations | Experimental | Research extension points remain available. The facade's exact `LocalEvidence` identity/read values, historical `CandidateSet` inspection and validated `HsmmConfig` vocabulary are supported dependencies after their pre-freeze repairs and exact-member review. No universal invocation-authenticated or calibrated-HSMM claim follows. |
 | `align`: `RecallSignature`, `WeightedCoverage`, `MassRatio`, `StepMass` and the organization/readout helpers | Experimental | Organization measurement is 1.1 scope; residual denominator, grain and constructor work must not be implied complete by the 1.0 mapping release. |
 | `codec`: contextual mapping/workspace readers, checked exchange writer and their public error/context/result values | Stable | An independent consumer must be able to validate exact joins and refusals. Wire/schema compatibility is separately versioned below. |
 | G2 mapping exchange tables and manifests; new source/StoryModel export formats | Stable versioned format target | Retain exact accounting, declared loss and input identities. Each format still needs its own schema, independent reader and acceptance evidence before release. |
@@ -58,12 +58,83 @@ these implementation updates do not freeze their signatures.
 
 The corrected [signature inventory and construction judgment](refactor/evidence/stability-audit-20261014/README.md)
 include public enum/sealed alternatives and separately track the imported inspection
-surface. The audit identifies an open historical candidate-abstention contract and
-unchecked token-truncation limits, with bounded consequences and dedicated Motes.
-Exposed experimental dependencies must still be promoted and audited or removed from
-the final supported signature before the owner confirms the freeze.
+surface. The historical candidate-abstention, token-truncation and ClaimLedger construction
+repairs landed at `8ea96d6a`, with their producer and consumer evidence in the
+[release-prerequisite record](refactor/evidence/release-freeze-20261014/README.md).
+The subsequent member-level promotion review adds the bounded repairs and exact reader
+boundary below. The final supported signature must have a closed, reviewed dependency manifest
+before the owner confirms the freeze.
 
 ### Signature closure before the freeze
+
+The 14 October release-prerequisite work uses an explicit nominal-type and member boundary.
+A supported type may have experimental factories or operational members, but these exclusions
+must name exact signatures, including overloads, rather than whole packages. The supported
+member manifest must classify every exposed member of a partially stable type. An unclassified
+member is an audit failure. Every argument, result, parent and alternative payload required by
+a supported member must itself have a supported nominal disposition.
+
+An experimental factory may produce a supported value. This separates compatibility of the
+factory from the validity of every value it can produce: the complete construction-exposure
+graph and its generated construction doors remain audited even when the factory is excluded
+from the supported signature closure. Compatibility exclusions must not suppress neighboring
+supported accessors, constructors or alternatives. This policy is preparation for the final
+freeze; adoption alone does not satisfy its inventory, construction or compatibility checks.
+
+The intended cuts preserve the public mapping facade, run/accounting results, source and recall
+inspection, and provider receipt inspection. Historical `LocalEvidence.compute`, detector-based
+`PseudonymizedText` factories, preparation configuration and `Source.narrativeModel` remain
+experimental members. Supported profile accessors that return `HsmmConfig` require its exact
+configuration value/read vocabulary to be promoted and judged; the inference engine and
+arbitrary invocation builders remain experimental. Registered embedding/caption inspection
+likewise requires exact receipt, identity, recipe and outcome values, without freezing runtime
+acquisition, registration or replay operations. The final manifest must make each of these
+choices explicit against the actual compiled signatures.
+
+Rejected: blanket promotion of the entire reachable implementation graph, package-wide
+compatibility filters, and replacing inspectable receipts with digests merely to conceal their
+dependencies. The unchanged complete graph remains evidence of what callers can construct.
+
+The member decision distinguishes declaration envelopes from checked results. `BatchResult`,
+`EmbedOutcome`, `StudyPreparation.Outcome`, raw media declarations and `TransitionModel` are
+untrusted declarations where publicly constructible. Supporting their inspection and categorical
+shape does not certify their payloads: the named batch, preparation, media and configuration
+admission boundaries remain required before consumption. Checked receipt/value factories must
+uphold their own advertised invariants independently of an enclosing validation step.
+
+Research operations are separate member decisions. `AlignmentRow` entropy/localizability and
+normalization, matrix visitation/readout helpers, and `ValidatedVector` arithmetic remain
+experimental. This does not waive overflow or invalid-state defects in their checked inputs.
+Stable inspection includes the declared masses, exact input identity and unavailable statuses;
+it does not promote an arbitrary numerical operation merely because its receiver is supported.
+
+The independent promotion review reproduced eight bounded counterexamples: caption-model
+construction, standalone layer-use admission, receipt product construction, receipt consistency,
+custom-view identity collisions, frame-clock overflow, geometry-size overflow and row-total
+overflow. Caption-recipe admission also needs its generated construction doors closed. These
+are pre-freeze repair obligations on the release queue, not evidence of occurrence in the
+qualified study. The final manifest and constructor judgment must bind the repaired revision.
+
+The custom semantic-view repair changes its canonical rendering to
+`custom/v2:<namespace UTF-16 length>:<namespace>:<name UTF-16 length>:<name>`.
+Every `SemanticView.Custom` geometry identity therefore changes, including components without
+colons. Recompute those identities and their dependent caches; do not relabel old evidence.
+Built-in semantic-view renderings and geometry identities retain their previous encoding.
+
+The contextual-reader promise has these concrete entry points: `SurfaceWorkspaceCodecs.decode`,
+`TemporalInspectionCodecs.decode` and `restoreView`, `RecallTimingCodecs.decode`, and
+`TemporalProjectionCodecs.decodeRequest` and contextual `decode`. Their schema constants, typed
+errors and required decoded-value inspection are supported. Imported `Investigation`/`Policy`,
+`Session` and projection/row values remain checked joins of declared data; importing them does
+not reconstruct execution authority. The existing construction judgments and independent
+StoryAtlas reader courts apply to this boundary.
+
+`SurfaceWorkspaceCodecs.create` and `Investigation.narrativeModel`/`exportBytes`,
+`TemporalInspectionCodecs.checked`/`encode`/`saveView`, `Session.compile`, `Projection.query`,
+`Row.durationWeighted`/`durationWeightedBounds`, and the leaf timing/projection encoders remain
+experimental Scala members. Their wire meanings and permission checks remain binding. The
+historically separate inspection inventory prevented accidental promotion; the final combined
+inventory names the selected reader members explicitly instead of freezing whole codec objects.
 
 The pre-freeze audit `bd-01M19N0W937KVZCK78F6X57X1D` must enumerate the actual stable
 symbols and their public argument, return, parent and constructor types. A type

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T00:57:34.763295+00:00",
+  "finished_utc": "2026-10-15T00:58:04.944624+00:00",
+  "duration_seconds": 30.116689,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "alignJVM/testOnly hsmmconfigprobe.HsmmRefinementWeightSuite storymodel4s.align.LayerUseSuite storymodel4s.align.CandidateSetSuite",
+    "embedCoreJVM/testOnly storymodel4s.embed.TruncationPolicySuite",
+    "scalafmtAll"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/constructor-restored-jvm.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 4827
+}
