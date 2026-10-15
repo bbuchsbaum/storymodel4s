@@ -73,6 +73,10 @@ jobs:
         if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
         run: sbt +update
 
+      - name: Select qualified Native LLVM toolchain
+        if: matrix.project == 'rootNative'
+        run: bash tools/ci/setup-native-llvm.sh
+
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
@@ -86,7 +90,18 @@ jobs:
 
       - name: nativeLink
         if: matrix.project == 'rootNative'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/nativeLink
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'show alignNative / nativeConfig' Test/nativeLink
+
+      - name: Retain Native alignment executable
+        if: matrix.project == 'rootNative'
+        run: bash tools/ci/capture-native.sh
+
+      - if: always() && matrix.project == 'rootNative'
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-alignment-before-test
+          path: target/native-ci-evidence/
+          retention-days: 14
 
       - name: Test
         if: matrix.project != 'rootNative' && matrix.project != 'rootJVM'
@@ -107,6 +122,13 @@ jobs:
       - name: Generate API documentation
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
+
+      - name: Verify retained Native executable integrity
+        if: always() && matrix.project == 'rootNative'
+        run: |
+          if test -f target/native-ci-evidence/native-files.sha256; then
+            sha256sum --check target/native-ci-evidence/native-files.sha256
+          fi
 
       - name: Check source exports and scene frame planning
         if: matrix.project == 'rootJVM' && matrix.java == 'temurin@17'
