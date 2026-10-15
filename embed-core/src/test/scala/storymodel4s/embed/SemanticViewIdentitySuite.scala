@@ -31,7 +31,13 @@ class SemanticViewIdentitySuite extends FunSuite:
   }
 
   test("empty, Unicode and separator-bearing component pairs retain separate identities") {
-    val components = Vector("", ":", "a", "a:b", "b:c", "\\", "λ", "\u0000", "\n", "12:a", "😀")
+    // Native 0.5.12 crashes hashing a nonempty zero-hash string literal. Preserve the same
+    // character coverage with runtime storage; the independent runtime defect stays recorded.
+    val nul = new String(Array(0.toChar))
+    assertEquals(nul.length, 1)
+    assertEquals(nul.charAt(0).toInt, 0)
+    assertEquals(nul.hashCode, 0)
+    val components = Vector("", ":", "a", "a:b", "b:c", "\\", "λ", nul, "\n", "12:a", "😀")
     val views = for namespace <- components; name <- components
     yield SemanticView.Custom(namespace, name)
     assertEquals(views.distinct.size, components.size * components.size)
