@@ -62,10 +62,19 @@ def main():
             raise RuntimeError('combined binary dependency resolution failed')
         combined['jars'] = report_jars(runtime_report, runtime_cache, [url, CENTRAL], False)
         combined['reportSha256'] = sha256(runtime_report)
+        staged_hashes = {artifact['path']: artifact['sha256'] for artifact in upstream['artifacts']}
+        root_hashes = {}
+        for pom in poms:
+            c = pom.coordinate
+            path = f"{c.group_id.replace('.', '/')}/{c.artifact_id}/{c.version}/{c.artifact_id}-{c.version}.jar"
+            root_hashes[c.gav] = staged_hashes[path]
         for coordinate in coordinates:
             roots = [jar for jar in combined['jars'] if jar['coordinate'] == coordinate]
             if not roots or any(not jar['url'].startswith(url + '/') for jar in roots):
                 raise RuntimeError(f'combined graph omits staged root {coordinate}')
+            if any(jar['sha256'] != root_hashes[coordinate] for jar in roots):
+                raise RuntimeError(f'fetched root differs from staging receipt: {coordinate}')
+        receipt['verifiedStagedRootHashes'] = root_hashes
         runtime = [jar['path'] for jar in combined['jars']]
         cache, config = output / 'compiler-cache', output / 'compiler-config'
         report = output / 'compiler.json'
@@ -83,6 +92,7 @@ def main():
         classes = output / 'classes'
         classes.mkdir()
         for label, command in [
+            ('java-version', ['java', '-version']),
             ('compile', ['java', '-cp', compiler_cp, 'dotty.tools.dotc.Main', '-classpath', runtime_cp,
                          '-d', str(classes), str(fixture)]),
             ('run', ['java', '-cp', str(classes) + ':' + runtime_cp, 'UpstreamBinaryConsumer'])]:

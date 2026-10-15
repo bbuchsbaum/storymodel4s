@@ -73,7 +73,8 @@ python3 tools/release/rehearse-upstream-binaries.py \
 
 This serves the verified staged repository on an owned loopback server, resolves all nine
 coordinates in fresh caches, and compiles and runs an external Scala consumer. The consumer
-checks six exact normalized-kernel and query results across graph4s, grakern and Gale. External
+checks six normalized-kernel and query results across graph4s, grakern and Gale, with exact
+zeros and a `1e-12` tolerance for ones. Fetched root hashes must match the staging receipt. External
 dependencies and the compiler resolve from Maven Central. The server closes before the receipt
 is written. This qualifies the local binary chain, not public availability of the proposed roots.
 
