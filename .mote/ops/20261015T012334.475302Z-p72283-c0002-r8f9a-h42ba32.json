@@ -1,0 +1,1 @@
+{"actor":"codex-release-freeze-20261014","entity":"bd-01M4YJ8HMAGM91AKQZ7FM8CB1M","kind":"note","note_kind":"progress","op":"20261015T012334.475302Z-p72283-c0002-r8f9a-h42ba32","text":"Reuse existing same-actor hsmm reservation for the separate post8c04 repair; add finite standalone admission and row aggregate checks.","ts":"2026-10-15T01:23:34.475302Z","v":1}

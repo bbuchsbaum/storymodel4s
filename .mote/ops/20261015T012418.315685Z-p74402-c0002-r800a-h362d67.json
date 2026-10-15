@@ -1,0 +1,1 @@
+{"actor":"codex-release-freeze-20261014","entity":"bd-01M4YJ91P5FE7E55RJQ371VXK9","kind":"note","note_kind":"progress","op":"20261015T012418.315685Z-p74402-c0002-r800a-h362d67","text":"Reuse same-actor identity.scala reservation for separate custom-identity repair; versioned framing preserves built-ins.","ts":"2026-10-15T01:24:18.315685Z","v":1}

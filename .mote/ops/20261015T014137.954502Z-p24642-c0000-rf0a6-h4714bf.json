@@ -1,0 +1,1 @@
+{"actor":"codex-release-freeze-20261014","entity":"bd-01M4YJ8HMAGM91AKQZ7FM8CB1M","kind":"reserve_open","mode":"exclusive","op":"20261015T014137.954502Z-p24642-c0000-rf0a6-h4714bf","paths":["align/src/test/scala/storymodel4s/consumer/AlignBoundarySuite.scala"],"reservation_id":"rv-01M4YKHP10X643MMR8YWFRHGAM","ts":"2026-10-15T01:41:37.954502Z","ttl_s":3600,"v":2}
