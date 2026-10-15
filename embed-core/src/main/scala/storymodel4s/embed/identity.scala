@@ -149,7 +149,8 @@ enum SemanticView:
     case ContextualTemplate   => "contextual.template"
     case ContextualLatePooled => "contextual.latepooled"
     case Segment              => "segment"
-    case Custom(ns, n)        => s"custom:$ns:$n"
+    // Versioned UTF-16 lengths distinguish a separator inside either component from its boundary.
+    case Custom(ns, n) => s"custom/v2:${ns.length}:$ns:${n.length}:$n"
 
 object SemanticView:
   given Order[SemanticView] = Order.by(_.render)
