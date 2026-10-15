@@ -17,7 +17,8 @@
     "auditControls": {
       "closure": 8,
       "compiledCompatibilityComparisons": 3,
-      "source": "d7bc9c06dfe8c441e020c826b895616f914b157f"
+      "source": "d7bc9c06dfe8c441e020c826b895616f914b157f",
+      "commandReceipt": "audit-controls-d7bc.log.meta.json"
     },
     "inventoryChangeFromD7bc": "sourceSha only; all signature/edge/member data equal"
   },
@@ -40,5 +41,11 @@
       "uncompressedSha256": "1887698b6f31e696d5c1e5dd1e890c21bbb2a1947c298ec64c2a46caafaf41d1",
       "uncompressedBytes": 5764984
     }
-  ]
+  ],
+  "exactExtraction": {
+    "commandReceipt": "final-member-audit-63a952f9.log.meta.json",
+    "log": "final-member-audit-63a952f9.log.gz",
+    "output": "semantic-inventory.json.gz",
+    "note": "Fresh extraction from checksum-verified 63a952f9 distribution; quiet command output is not used as success evidence. Inventory/provenance and content hashes establish the artifact."
+  }
 }
