@@ -54,6 +54,11 @@ ThisBuild / githubWorkflowIncludeClean := false
 ThisBuild / tlCiHeaderCheck := false
 ThisBuild / tlCiDependencyGraphJob := false
 
+// Activate the exact first stable coordinate automatically for subsequent 1.x builds. The task
+// guard checks the effective per-module artifacts, so an empty override cannot silently skip MiMa.
+ThisBuild / tlMimaPreviousVersions ++= ReleasePolicy.requiredVersions(version.value)
+lazy val releaseBaselineCheck = taskKey[Unit]("Refuse an empty post-1.0.0 compatibility baseline")
+
 // Per-project parallelExecution does not serialize aggregate JVM or Native module tests on CI.
 // Keep every court and its timeout; run each platform's existing module alias one at a time.
 ThisBuild / githubWorkflowBuild ~= { steps =>
@@ -95,6 +100,11 @@ ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
 )
 
 lazy val commonSettings = Seq(
+  releaseBaselineCheck := {
+    if (publishArtifact.value)
+      ReleasePolicy.check(version.value, projectID.value, mimaPreviousArtifacts.value)
+  },
+  mimaReportBinaryIssues := (mimaReportBinaryIssues dependsOn releaseBaselineCheck).value,
   scalacOptions ++= Seq(
     "-Wunused:all",
     "-Wconf:msg=package scala contains object and package with same name.*caps:silent"
