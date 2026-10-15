@@ -100,8 +100,11 @@ def main() -> int:
         if re.findall(r"^PASS (.+)$", fixed, re.M) != PROBE_CASES:
             raise RuntimeError("fixed probe did not pass all eight named cases")
         suites = re.findall(r"Test run ([\w.]+) finished: (\d+) failed, (\d+) ignored, (\d+) total", fixed)
+        # Scala Native's JUnitTask increments `total` only for non-ignored methods.
+        # Retain that executed count and normalize the inventory total separately.
         by_name = {name.rsplit(".", 1)[-1]: {"failed": int(failed), "ignored": int(ignored),
-                   "total": int(total), "passed": int(total) - int(failed) - int(ignored)}
+                   "executed": int(total), "total": int(total) + int(ignored),
+                   "passed": int(total) - int(failed)}
                    for name, failed, ignored, total in suites}
         expected_string_tests = len(re.findall(r"@Test\b", (checkout /
             "unit-tests/shared/src/test/scala/org/scalanative/testsuite/javalib/lang/StringTest.scala").read_text()))
