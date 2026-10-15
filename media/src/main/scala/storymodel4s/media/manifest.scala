@@ -53,6 +53,8 @@ object DeclaredFrames:
       )
     else if droppedFrames.distinct.size != droppedFrames.size then
       Left(DomainError.InvariantViolation("fixture/declared", "dropped frame listed twice"))
+    else if BigInt(generatedFrames - 1) * BigInt(nominalTicksPerFrame) > BigInt(Long.MaxValue) then
+      Left(DomainError.InvariantViolation("fixture/declared", "last generated PTS overflows Long"))
     else Right(new DeclaredFrames(generatedFrames, nominalTicksPerFrame, droppedFrames.sorted))
 
 /** Declared picture parameters the tool must confirm. */
@@ -190,10 +192,8 @@ object FixtureManifest:
           pixFmt <- MediaJson.string(c.downField("pixFmt"), "streams[].pixFmt")
           width <- MediaJson.int(c.downField("width"), "streams[].width")
           height <- MediaJson.int(c.downField("height"), "streams[].height")
-          _ <-
-            if width > 0 && height > 0 then Right(())
-            else Left(DomainError.InvariantViolation("fixture/picture", "non-positive geometry"))
-        yield Some(DeclaredPicture(pixFmt, PictureGeometry(width, height)))
+          geometry <- PictureGeometry.of(width, height)
+        yield Some(DeclaredPicture(pixFmt, geometry))
       case _ => Right(None)
 
   private def parseAudio(c: ACursor, kind: StreamKind): Either[DomainError, Option[DeclaredAudio]] =

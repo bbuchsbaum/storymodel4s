@@ -368,7 +368,7 @@ class BoundarySearchSuite extends FunSuite:
       FrameSet.join(
         probe,
         0,
-        PictureGeometry(64, 36),
+        PictureGeometry.of(64, 36).toOption.get,
         framesEnvelope.tool,
         framesEnvelope.args,
         64L * 36L * 3L * 45L,

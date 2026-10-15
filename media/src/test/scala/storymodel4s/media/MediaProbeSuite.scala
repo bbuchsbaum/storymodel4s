@@ -277,6 +277,13 @@ class MediaProbeSuite extends FunSuite:
     assert(DeclaredFrames.of(0, 1000L, Vector.empty).isLeft)
     assert(DeclaredFrames.of(48, 1000L, Vector(48)).isLeft)
     assert(DeclaredFrames.of(48, 1000L, Vector(5, 5)).isLeft)
+    assert(DeclaredFrames.of(3, Long.MaxValue, Vector.empty).isLeft)
+    assertEquals(
+      right(DeclaredFrames.of(2, Long.MaxValue, Vector.empty)).expectedPts.last,
+      Long.MaxValue
+    )
+    assert(PictureGeometry.of(0, 1).isLeft)
+    assert(PictureGeometry.of(Int.MaxValue, Int.MaxValue).isLeft)
     assertEquals(right(DeclaredFrames.of(48, 1000L, Vector(20, 5, 6))).expectedPts.size, 45)
     assert(ToolRealization.of("", "v", Checksum.ofText("x")).isLeft)
     assert(ToolRealization.of("ffprobe", "line one\nline two", Checksum.ofText("x")).isLeft)

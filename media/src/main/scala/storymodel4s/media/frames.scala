@@ -68,9 +68,28 @@ object Ffmpeg:
         )
     }
 
-/** Picture geometry in pixels. */
-final case class PictureGeometry(width: Int, height: Int):
+/** Picture geometry in pixels.
+  *
+  * Why: its dimensions determine a raw frame byte count, which must be positive and representable
+  * before a worker can allocate or validate frame bytes.
+  */
+final class PictureGeometry private (val width: Int, val height: Int):
   def frameBytes: Long = width.toLong * height.toLong * Ffmpeg.BytesPerPixel.toLong
+  override def equals(other: Any): Boolean = other match
+    case that: PictureGeometry => width == that.width && height == that.height
+    case _                     => false
+  override def hashCode(): Int = 31 * width + height
+  override def toString: String = s"PictureGeometry($width,$height)"
+object PictureGeometry:
+  def of(width: Int, height: Int): Either[DomainError, PictureGeometry] =
+    val bytes = BigInt(width) * BigInt(height) * BigInt(Ffmpeg.BytesPerPixel)
+    if width <= 0 || height <= 0 then
+      Left(DomainError.InvariantViolation("picture/geometry", "non-positive dimensions"))
+    else if bytes > BigInt(Long.MaxValue) then
+      Left(
+        DomainError.InvariantViolation("picture/geometry", "frame byte length overflows Long")
+      )
+    else Right(new PictureGeometry(width, height))
 
 /** Recorded frame extraction over an admitted fixture: the tool that ran, the exact arguments, the
   * stream, the geometry, and the digest of the decoded bytes. Ordinary CI replays this instead of
@@ -115,13 +134,14 @@ object FramesEnvelope:
           )
       byteLength <- MediaJson.long(f.downField("byteLength"), "frames.byteLength")
       sha <- MediaJson.string(f.downField("sha256"), "frames.sha256").flatMap(Checksum.from)
+      geometry <- PictureGeometry.of(width, height)
     yield FramesEnvelope(
       fixtureId,
       input,
       streamIndex,
       tool,
       args,
-      PictureGeometry(width, height),
+      geometry,
       count,
       byteLength,
       sha

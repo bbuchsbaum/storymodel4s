@@ -17,7 +17,7 @@ class SampledExtractionSuite extends FunSuite:
     try in.readAllBytes()
     finally in.close()
   private def text(name: String): String = new String(resource(name), UTF_8)
-  private val geometry = PictureGeometry(32, 18)
+  private val geometry = PictureGeometry.of(32, 18).toOption.get
   private val selected = Vector(0, 4, 5, 14, 29, 44)
   private def probe(shift: Long = 0L): MediaProbe =
     val manifest = right(FixtureManifest.parse(text("f0-v1.manifest.json")))
@@ -291,7 +291,15 @@ class SampledExtractionSuite extends FunSuite:
       val wrong =
         right(MediaProbe.join(manifest, manifest.sha256, envelope.tool, envelope.args, declared))
       val result =
-        SampledExtraction.run(tool, input, output, wrong, 0, PictureGeometry(18, 32), selected)
+        SampledExtraction.run(
+          tool,
+          input,
+          output,
+          wrong,
+          0,
+          PictureGeometry.of(18, 32).toOption.get,
+          selected
+        )
       assert(result.left.toOption.exists(_.message.contains("dimensions differ")))
       assert(!Files.exists(output))
     }

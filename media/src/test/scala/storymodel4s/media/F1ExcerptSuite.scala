@@ -147,7 +147,7 @@ class F1ExcerptSuite extends FunSuite:
     "one decoded frame per packet; the recorded detector run yields eight draft proposals whose instants come from the index"
   ):
     assertEquals(f1.frames.count, 720)
-    assertEquals(f1.frames.geometry, PictureGeometry(320, 180))
+    assertEquals(f1.frames.geometry, PictureGeometry.of(320, 180).toOption.get)
     assertEquals(f1.result.authority, ObservationAuthority.Draft)
     assertEquals(f1.result.proposals.size, 8)
     assertEquals(f1.outcome.cuts, Vector(125, 199, 300, 346, 413, 461, 532, 569))

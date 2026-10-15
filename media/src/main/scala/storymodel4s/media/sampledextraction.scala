@@ -215,7 +215,13 @@ object SampledExtraction:
       _ <- requireThat(clock == frames.index.timebase, "clock", "decoder and probe clocks differ")
       ordinals = samples.map(_.group(1).toInt)
       pts = samples.map(_.group(2).toLong)
-      shapes = samples.map(m => PictureGeometry(m.group(3).toInt, m.group(4).toInt))
+      shapes <- samples.foldLeft[Either[DomainError, Vector[PictureGeometry]]](
+        Right(Vector.empty)
+      ) { (acc, sample) =>
+        acc.flatMap(values =>
+          PictureGeometry.of(sample.group(3).toInt, sample.group(4).toInt).map(values :+ _)
+        )
+      }
       _ <- requireThat(
         shapes.forall(_ == frames.geometry),
         "geometry",

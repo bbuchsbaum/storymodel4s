@@ -134,10 +134,21 @@ class CaptionSearchSuite extends FunSuite:
     )
     assertNotEquals(right(joinWith(worker = otherWorker)).identity, result.identity)
     assertNotEquals(
-      request.recipe.copy(prompt = request.recipe.prompt + " ").identity,
+      right(
+        CaptionRecipe.of(
+          request.recipe.prompt + " ",
+          request.recipe.minPixels,
+          request.recipe.maxPixels,
+          request.recipe.maxNewTokens,
+          request.recipe.seed
+        )
+      ).identity,
       request.recipe.identity
     )
-    assertNotEquals(request.model.copy(revision = "0c351dd01ed8").identity, request.model.identity)
+    assertNotEquals(
+      right(ModelPin.of(request.model.repo, "0c351dd01ed8", request.model.files)).identity,
+      request.model.identity
+    )
 
   test(
     "an outcome for another request, other frames, another recipe, another model, or another runtime is refused"
@@ -148,8 +159,17 @@ class CaptionSearchSuite extends FunSuite:
       "caption/frames"
     )
     refusedAt(joinWith(out = outcome.copy(framesCount = 44)), "caption/frames")
+    val changedRecipe = right(
+      CaptionRecipe.of(
+        request.recipe.prompt,
+        request.recipe.minPixels,
+        request.recipe.maxPixels,
+        8,
+        request.recipe.seed
+      )
+    )
     refusedAt(
-      joinWith(req = request.copy(recipe = request.recipe.copy(maxNewTokens = 8))),
+      joinWith(req = request.copy(recipe = changedRecipe)),
       "caption/recipe"
     )
     refusedAt(
@@ -266,6 +286,7 @@ class CaptionSearchSuite extends FunSuite:
       .get
       .hcursor
     assert(CaptionRecipe.parse(sampled).isLeft)
+    assert(CaptionRecipe.of("", 1, 1, 1, 0).isLeft)
 
   test("a caption proposal is not a timed segment and offers no promotion"):
     // Type-level: CaptionProposal has no conversion to TimedSegment or to any accepted claim; the

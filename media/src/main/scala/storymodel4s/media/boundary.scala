@@ -212,8 +212,9 @@ object DetectorRequest:
           Left(
             DomainError.InvalidFormat("frames.pixelFormat", pix, s"expected ${Ffmpeg.PixelFormat}")
           )
+      geometry <- PictureGeometry.of(width, height)
       recipe <- ContentDetectorRecipe.parse(c.downField("detector"))
-    yield DetectorRequest(requestId, sha, count, PictureGeometry(width, height), recipe)
+    yield DetectorRequest(requestId, sha, count, geometry, recipe)
 
 /** Recorded worker run: the worker realization (script digest and runtime versions), the request it
   * answered, and the digest of the outcome it wrote.
@@ -326,12 +327,13 @@ object DetectorOutcome:
       cov = c.downField("coverage")
       requested <- MediaJson.int(cov.downField("requested"), "coverage.requested")
       observed <- MediaJson.int(cov.downField("observed"), "coverage.observed")
+      geometry <- PictureGeometry.of(width, height)
     yield DetectorOutcome(
       requestId,
       runtime,
       sha,
       count,
-      PictureGeometry(width, height),
+      geometry,
       pix,
       recipe,
       applied,

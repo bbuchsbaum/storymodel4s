@@ -17,9 +17,14 @@ import storymodel4s.core.{
   * every file the worker will read (weight shards, the weight index, config, tokenizer, chat
   * template, preprocessor and generation configs). The worker verifies each file, refuses an
   * unlisted weight file or an index naming one, and echoes the config digest; the join compares
-  * that echo with the pin.
+  * that echo with the pin. Why: these fields jointly identify verified model bytes, so creation is
+  * restricted to `of` rather than permitting an unchecked pin.
   */
-final case class ModelPin(repo: String, revision: String, files: Map[String, Checksum]):
+final class ModelPin private (
+    val repo: String,
+    val revision: String,
+    val files: Map[String, Checksum]
+):
   def configSha256: Checksum = files(ModelPin.ConfigFile)
   def identity: Checksum =
     ContentAddress.digest(
@@ -35,6 +40,12 @@ final case class ModelPin(repo: String, revision: String, files: Map[String, Che
         n -> Json.fromString(c.hex)
       }*)
     )
+  override def equals(other: Any): Boolean = other match
+    case that: ModelPin => repo == that.repo && revision == that.revision && files == that.files
+    case _              => false
+  override def hashCode(): Int = (repo, revision, files).hashCode()
+  override def toString: String =
+    s"ModelPin($repo,$revision,${files.keys.toVector.sorted.mkString(",")})"
 
 object ModelPin:
   val ConfigFile: String = "config.json"
@@ -52,7 +63,7 @@ object ModelPin:
       Left(
         DomainError.InvariantViolation("model/pin", "a model pin names at least one weight shard")
       )
-    else Right(ModelPin(repo, revision, files))
+    else Right(new ModelPin(repo, revision, files))
 
   def parse(c: ACursor): Either[DomainError, ModelPin] =
     for
@@ -75,13 +86,15 @@ object ModelPin:
 
 /** Every captioning parameter, declared. Frames are always supplied explicitly as an image
   * sequence; decoding is greedy; the prompt is one fixed text whose digest enters every receipt.
+  * Why: pixel and token limits bound the admitted worker request, so their relation is checked at
+  * construction.
   */
-final case class CaptionRecipe(
-    prompt: String,
-    minPixels: Int,
-    maxPixels: Int,
-    maxNewTokens: Int,
-    seed: Int
+final class CaptionRecipe private (
+    val prompt: String,
+    val minPixels: Int,
+    val maxPixels: Int,
+    val maxNewTokens: Int,
+    val seed: Int
 ):
   val presentation: String = "image-sequence"
   def promptSha256: Checksum = Checksum.ofText(prompt)
@@ -108,8 +121,26 @@ final case class CaptionRecipe(
       "presentation" -> Json.fromString(presentation),
       "greedy" -> Json.fromBoolean(true)
     )
+  override def equals(other: Any): Boolean = other match
+    case that: CaptionRecipe =>
+      prompt == that.prompt && minPixels == that.minPixels && maxPixels == that.maxPixels &&
+      maxNewTokens == that.maxNewTokens && seed == that.seed
+    case _ => false
+  override def hashCode(): Int = (prompt, minPixels, maxPixels, maxNewTokens, seed).hashCode()
+  override def toString: String =
+    s"CaptionRecipe(promptSha256=${promptSha256.short()},$minPixels,$maxPixels,$maxNewTokens,$seed)"
 
 object CaptionRecipe:
+  def of(
+      prompt: String,
+      minPixels: Int,
+      maxPixels: Int,
+      maxNewTokens: Int,
+      seed: Int
+  ): Either[DomainError, CaptionRecipe] =
+    if prompt.trim.nonEmpty && minPixels > 0 && maxPixels >= minPixels && maxNewTokens > 0 then
+      Right(new CaptionRecipe(prompt, minPixels, maxPixels, maxNewTokens, seed))
+    else Left(DomainError.InvariantViolation("recipe", "empty prompt or non-positive limits"))
   def parse(c: ACursor): Either[DomainError, CaptionRecipe] =
     for
       prompt <- MediaJson.string(c.downField("prompt"), "recipe.prompt")
@@ -129,11 +160,8 @@ object CaptionRecipe:
               "only the greedy image-sequence recipe is admitted"
             )
           )
-      _ <-
-        if prompt.trim.nonEmpty && minPixels > 0 && maxPixels >= minPixels && maxNewTokens > 0 then
-          Right(())
-        else Left(DomainError.InvariantViolation("recipe", "empty prompt or non-positive limits"))
-    yield CaptionRecipe(prompt, minPixels, maxPixels, maxNewTokens, seed)
+      recipe <- of(prompt, minPixels, maxPixels, maxNewTokens, seed)
+    yield recipe
 
 /** One extent to describe: a nonempty, strictly increasing list of frame ordinals.
   *
@@ -277,12 +305,13 @@ object CaptionRequest:
       extents <- MediaJson.traverse(extentsJson)(CaptionExtent.parse)
       model <- ModelPin.parse(c.downField("model"))
       recipe <- CaptionRecipe.parse(c.downField("recipe"))
+      geometry <- PictureGeometry.of(width, height)
     yield CaptionRequest(
       requestId,
       sha,
       frameIdentity,
       count,
-      PictureGeometry(width, height),
+      geometry,
       extents,
       model,
       recipe
@@ -429,6 +458,7 @@ object CaptionOutcome:
       pix <- MediaJson.string(f.downField("pixelFormat"), "frames.pixelFormat")
       recipe <- CaptionRecipe.parse(c.downField("recipe"))
       applied <- AppliedCaptionRecipe.parse(c.downField("applied"))
+      geometry <- PictureGeometry.of(width, height)
       extentsJson <- MediaJson.array(c.downField("extents"), "extents")
       extents <- MediaJson.traverse(extentsJson)(parseResult)
       cov = c.downField("coverage")
@@ -441,7 +471,7 @@ object CaptionOutcome:
       ModelEcho(repo, revision, configSha, verified),
       sha,
       count,
-      PictureGeometry(width, height),
+      geometry,
       pix,
       recipe,
       applied,
