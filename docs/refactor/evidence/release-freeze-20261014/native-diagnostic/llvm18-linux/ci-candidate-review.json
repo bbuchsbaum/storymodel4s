@@ -1,0 +1,12 @@
+{
+  "source": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "reviewer": "constructor_exact_review",
+  "verdict": "GO-code for candidate push and full hosted matrix",
+  "scope": [
+    "build.sbt",
+    ".github/workflows/ci.yml",
+    "tools/ci/setup-native-llvm.sh",
+    "tools/ci/capture-native.sh"
+  ],
+  "qualification": "full candidate matrix pending; no causal attribution to LLVM14; separate macOS NUL limitation open"
+}

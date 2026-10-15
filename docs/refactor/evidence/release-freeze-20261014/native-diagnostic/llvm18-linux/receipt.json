@@ -1,0 +1,67 @@
+{
+  "applicationSource": "8ea96d6a91e88144eff132c185cb3663047d20b9",
+  "workflowSource": "268473e776aa0e4f447816043d208fb265e3dab3",
+  "run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/38673035685",
+  "linkExit": 0,
+  "compiler": "Ubuntu clang version 18.1.8 (++20240731024944+3b5b5c1ec4a3-1~exp1~20240731145000.144)\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-18/bin",
+  "actualNativeConfigClang": "/usr/lib/llvm-18/bin/clang",
+  "archiveSha256": "cd8893544eec048e33d5d310cf837dfbeca090c6059737773b8cbf17daabf28d",
+  "verifiedArchiveEntries": 16193,
+  "llvmFiles": 119,
+  "executables": {
+    "align/.native/target/scala-3.7.4/storymodel4s-align-test": "6498db701c936c8347b59cd0ea8aaf14a2d0a1f822a6497469120637f416f964"
+  },
+  "testOutcome": "passed",
+  "passed": 1030,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "mappingRunSuitePassed": 6,
+  "testExit": 0,
+  "binaryIntegrityExit": 0,
+  "sourceIntegrityExit": 0,
+  "claim": "Qualified same-source alignment module under LLVM18; does not establish cause of prior LLVM14 crash or complete Native platform qualification",
+  "remoteArtifacts": [
+    {
+      "digest": "sha256:a59e8139e0a79f7645859eed6f4baebc2ed11d4d0198461fdb4144fcc034810d",
+      "expired": false,
+      "id": 11945347429,
+      "name": "native-main-llvm18-result",
+      "size_in_bytes": 45013110
+    },
+    {
+      "digest": "sha256:4d4a54957b05a8e505b229f870653c3ec79be3445f774167b58798140e0b4da6",
+      "expired": false,
+      "id": 11944877287,
+      "name": "native-main-llvm18-before-test",
+      "size_in_bytes": 44831131
+    }
+  ],
+  "retainedFiles": [
+    {
+      "path": "link.log.gz",
+      "sha256": "ccd24408028c4068a61bf07a2f698b3ac1283b49eef53c7cfd2a2fbc5459e1a5",
+      "uncompressedSha256": "0c41f1ff8eb50bf07fe5cb4ffcebf2311360e99d9e07677606b93c7b7fa6c0ff"
+    },
+    {
+      "path": "test.log.gz",
+      "sha256": "cd68b81d5cb29a00fd578f15dc2ea905e9f2edddd3496dbc23ccbf00a1d861a2",
+      "uncompressedSha256": "54a6ed82fabf2a7951db60a9427255055246b0a5adba00266fa353645b09479b"
+    },
+    {
+      "path": "native-files.sha256.gz",
+      "sha256": "12dae02f4ce8d78ba92f6dcbf41f994a3f6baba7168b73cb981c8768aa003a83",
+      "uncompressedSha256": "a4d9a472a4b167e3b7ec9b2bfd44bf7d102ccd1c9182f9ed1e86eb7ee929f34e"
+    },
+    {
+      "path": "source-files.sha256.gz",
+      "sha256": "96c69168b6f9b945c5f04b517908ca2f0291cc8535f93ecf5020a9a4d810eb03",
+      "uncompressedSha256": "40bced6926ebc90ae86f6d0b152beda64c81c30bc9df6faaeb469bd9a391fa0a"
+    },
+    {
+      "path": "native-after-test.txt.gz",
+      "sha256": "bbb3f6022be14366bc9c0cd2c6642e68e492c0677afe2829f892e4f097ca265e",
+      "uncompressedSha256": "7a2af84ba1ffcd902adfcdd6ac0f0f673ce90d1378c02357f3c11e18d96ffed9"
+    }
+  ]
+}

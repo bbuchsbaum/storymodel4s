@@ -1,0 +1,44 @@
+{
+  "source": "63a952f9d27ca7e135d1462dc6ede75ab27ff5f0",
+  "schema": "storymodel4s-stable-boundary-receipt/v1",
+  "status": "independent-final-review-pending",
+  "counts": {
+    "allNominals": 1544,
+    "allMembers": 12833,
+    "supportedNominals": 1184,
+    "supportedMembers": 9455
+  },
+  "checks": {
+    "unresolved": 0,
+    "supportedClosure": "passed",
+    "contextualReaderEntryPoints": 6,
+    "narrativeGraphPromotion": 0,
+    "acquireOutputAliases": 4,
+    "auditControls": {
+      "closure": 8,
+      "compiledCompatibilityComparisons": 3,
+      "source": "d7bc9c06dfe8c441e020c826b895616f914b157f"
+    },
+    "inventoryChangeFromD7bc": "sourceSha only; all signature/edge/member data equal"
+  },
+  "files": [
+    {
+      "path": "semantic-inventory.json.gz",
+      "sha256": "30e6509f65fcd4179b01c28f40e9d84bb0404cb0ffbf322f073a46e355b0067c",
+      "uncompressedSha256": "b215fdde20970dbd8663f51ef75778a197d6dae77cc92ce896731d34b73cb1b6",
+      "uncompressedBytes": 68914076
+    },
+    {
+      "path": "supported-api.json.gz",
+      "sha256": "6a028bcce58fd26c2ff9dbab9e39568ae45baaa56e39ae589aee8ff88918ac15",
+      "uncompressedSha256": "36677409af2ab892619fc8fa90f7a8357a681a87aecdc48219ad47eda95dab6c",
+      "uncompressedBytes": 2274153
+    },
+    {
+      "path": "disposition-reasons.json.gz",
+      "sha256": "ba01deb9e3f2f0a8330838621ad154f6b17bc8dcdd969e7c111c614825443b39",
+      "uncompressedSha256": "1887698b6f31e696d5c1e5dd1e890c21bbb2a1947c298ec64c2a46caafaf41d1",
+      "uncompressedBytes": 5764984
+    }
+  ]
+}

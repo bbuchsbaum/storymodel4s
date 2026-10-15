@@ -1,8 +1,8 @@
 # Source and alignment API stability
 
-This records the D1A/D1B source migration for library callers. The design decisions
-are in [ADR 0007](adr/0007-film-source-representation.md). D1B qualification is
-pending; this page describes the candidate API, not a release certification.
+This records the intended 1.0 source, mapping and inspection contract for library callers.
+The source design decisions are in [ADR 0007](adr/0007-film-source-representation.md).
+The compiled member decisions below describe the release candidate, not a release certification.
 
 ## Owner-approved 1.0 stability boundary (2026-09-23)
 
@@ -29,12 +29,12 @@ missingness, permission and evidence checks.
 | `recall`: `RecallUnit`, roles/modalities, `RecallInventory` and checked observation identity | Stable | One fixed inventory and explicit unit outcomes are the public accounting contract. |
 | `recall`: automatic segmenter heuristics and tuning configuration | Experimental | A named/versioned segmentation profile identifies output; its implementation can evolve without changing old artifact identities. |
 | `align`: `SourceView`, `NodeSummary`, source references, typed physical support, scoring positions and the value types in their public signatures | Stable | D1B's text/media distinction and exact support are part of the preserved public source commitment. |
-| `features`: `Estimate`, `ScoreEstimate`, `Coverage`, missingness/reason values and other values exposed by the stable source/mapping signatures | Stable after the missingness repair | `SourceView` already exposes these types; their constructor and pattern-match shapes must be settled before freezing it. |
+| `features`: `Estimate`, `ScoreEstimate`, `Coverage`, missingness/reason values and other values exposed by the stable source/mapping signatures | Stable | The typed eligibility repair preserves the difference between missing and ineligible values exposed by `SourceView`. |
 | `features`: `FeatureTrack`, planning/reducer APIs and feature derivation machinery not exposed by stable signatures | Experimental | Keep research feature construction extensible; artifact identity and declared reducer semantics remain exact. |
 | `align`: checked G1 mapping records, candidate/outcome/measure/decision vocabulary, support assessments, bindings and stage receipts | Stable | These are the inspectable, complete-accounting consumer result and preserve unknown provenance and unavailable calibration. |
-| Public mapping facade, named configuration/profile inputs and checked run envelope | Stable target | `MappingPipeline` and `MappingRun.Execution` are implemented and qualified for the demonstrated study path. Final signature and construction acceptance remain required before freezing this boundary. |
-| Registered shared-evidence and channel receipt values exposed by the public facade | Stable target | The qualified reference/reconstruction pair binds the same admitted evidence, inventory, source and actual execution receipts. Required dependency types still need their final stable disposition. |
-| Declared candidate tie policy, budget and typed overflow/refusal receipt values exposed by that facade | Stable target | The implemented public path records candidate policy, budgets and typed refusals. Its stable boundary audit must distinguish checked strict candidates from the open historical `CandidateSet` contract. |
+| Public mapping facade, named configuration/profile inputs and checked run envelope | Stable | `MappingPipeline` and `MappingRun.Execution` are implemented and qualified for the demonstrated study path; the member manifest records their required dependencies. |
+| Registered shared-evidence and channel receipt values exposed by the public facade | Stable | The qualified reference/reconstruction pair binds the same admitted evidence, inventory, source and actual execution receipts. Exact inspection members and their dependency values are included. |
+| Declared candidate tie policy, budget and typed overflow/refusal receipt values exposed by that facade | Stable | The public path records candidate policy, budgets and typed refusals. Checked strict candidates and the historical `CandidateSet` declaration contract remain distinct. |
 | `align`: `HsmmResult` and the checked result values required by `DerivationContext`/G1 result binding | Stable structural result | The current contextual mapping decoder exposes this dependency. Checked structural consistency does not certify a custom cost invocation or calibration. |
 | `align`: `GraphHsmm`, engine `LocalEvidence.compute`, `CandidateGenerator`, custom `LocalCostModel` and low-level inference operations | Experimental | Research extension points remain available. The facade's exact `LocalEvidence` identity/read values, historical `CandidateSet` inspection and validated `HsmmConfig` vocabulary are supported dependencies after their pre-freeze repairs and exact-member review. No universal invocation-authenticated or calibrated-HSMM claim follows. |
 | `align`: `RecallSignature`, `WeightedCoverage`, `MassRatio`, `StepMass` and the organization/readout helpers | Experimental | Organization measurement is 1.1 scope; residual denominator, grain and constructor work must not be implied complete by the 1.0 mapping release. |
@@ -47,7 +47,7 @@ missingness, permission and evidence checks.
 | `pipeline`: orchestration helpers and implementation classes | Internal | Only documented public entry points carry the command contract. |
 | `fixtures`, `laws` and `MappingMiniature` | Experimental test support | Published test support carries no scientific authority and is not the production source contract. |
 | `embed-bench`, workers, test harnesses and repository tools | Internal | Reproduction tools are version-pinned evidence producers, not the researcher-facing library API. |
-| Other public symbols not covered above | Experimental pending audit | Public visibility alone is not a stability declaration; the construction audit must resolve any symbol required by a stable contract. |
+| Other public symbols outside the supported member manifest | Experimental | Public visibility alone is not a stability declaration. Required signature dependencies are classified explicitly in the manifest. |
 
 ### Implementation and audit checkpoint (14 October 2026)
 
@@ -64,6 +64,15 @@ repairs landed at `8ea96d6a`, with their producer and consumer evidence in the
 The subsequent member-level promotion review adds the bounded repairs and exact reader
 boundary below. The final supported signature must have a closed, reviewed dependency manifest
 before the owner confirms the freeze.
+
+The [compiled boundary receipt](refactor/evidence/release-freeze-20261014/stable-api/receipt.json)
+binds source `63a952f9`: **1,184 supported nominal types and 9,455 supported members** from
+1,544 reachable nominals and 12,833 exposed members. The
+[member manifest](refactor/evidence/release-freeze-20261014/stable-api/supported-api.json.gz)
+classifies every entry; the complete graph and reproducible decision recipe remain in the
+[release evidence](refactor/evidence/release-freeze-20261014/README.md). Signature closure passes,
+including the six selected contextual-reader entry points and their required output aliases.
+These are compatibility decisions, not 1,184 independent construction-invariant certificates.
 
 ### Signature closure before the freeze
 
@@ -111,9 +120,9 @@ it does not promote an arbitrary numerical operation merely because its receiver
 The independent promotion review reproduced eight bounded counterexamples: caption-model
 construction, standalone layer-use admission, receipt product construction, receipt consistency,
 custom-view identity collisions, frame-clock overflow, geometry-size overflow and row-total
-overflow. Caption-recipe admission also needs its generated construction doors closed. These
-are pre-freeze repair obligations on the release queue, not evidence of occurrence in the
-qualified study. The final manifest and constructor judgment must bind the repaired revision.
+overflow. The repaired candidate also closes caption-recipe construction doors. Compiled
+mutation controls and producer gates bind these repairs; the findings do not establish
+occurrence in the qualified study. The manifest uses the repaired compiled signatures.
 
 The custom semantic-view repair changes its canonical rendering to
 `custom/v2:<namespace UTF-16 length>:<namespace>:<name UTF-16 length>:<name>`.
@@ -135,6 +144,16 @@ StoryAtlas reader courts apply to this boundary.
 experimental Scala members. Their wire meanings and permission checks remain binding. The
 historically separate inspection inventory prevented accidental promotion; the final combined
 inventory names the selected reader members explicitly instead of freezing whole codec objects.
+
+The construction helpers `Investigation.apply`, `Policy.apply`, `Session.apply`,
+`Projection.apply` and `Row.apply` are also experimental members. They remain in the complete
+construction graph. In particular, supporting `SurfaceWorkspaceCodecs.decode` and investigation
+inspection does not freeze the narrative model accepted by its construction helper.
+
+Four aliases from `acquire` are supported signature dependencies of workspace inspection:
+`MediaTypeId`, `OutputSchemaId`, `OutputNamespace` and `OutputLabel`. `ArtifactRef` and
+`ArtifactRole.Custom` expose them through public accessors. This supports the bounded output
+vocabulary, while acquisition strategies and research graphs retain their experimental status.
 
 The pre-freeze audit `bd-01M19N0W937KVZCK78F6X57X1D` must enumerate the actual stable
 symbols and their public argument, return, parent and constructor types. A type

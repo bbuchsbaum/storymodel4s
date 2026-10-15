@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T03:06:53.647163+00:00",
+  "finished_utc": "2026-10-15T03:07:28.498620+00:00",
+  "duration_seconds": 34.852351,
+  "command": [
+    "sbt",
+    "-batch",
+    "set ThisBuild / tlFatalWarnings := true",
+    "githubWorkflowCheck",
+    "pipeline/cliDistribution",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/final-distribution-63a952f9-02.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 2080
+}

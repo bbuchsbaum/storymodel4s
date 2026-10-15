@@ -22,6 +22,7 @@ exact_cuts.update({'storymodel4s.codec.SurfaceWorkspaceCodecs.' + x for x in ['c
 exact_cuts.update({'storymodel4s.codec.TemporalInspectionCodecs.' + x for x in ['checked', 'encode', 'saveView', 'Session.compile', 'Projection.query', 'Row.durationWeighted', 'Row.durationWeightedBounds']})
 exact_cuts.update({'storymodel4s.codec.RecallTimingCodecs.' + x for x in ['encode', 'toJson']})
 exact_cuts.update({'storymodel4s.codec.TemporalProjectionCodecs.' + x for x in ['encodeRequest', 'encode', 'toJson']})
+exact_cuts.update({'storymodel4s.codec.' + x for x in ['SurfaceWorkspaceCodecs.Investigation.apply', 'SurfaceWorkspaceCodecs.Policy.apply', 'TemporalInspectionCodecs.Session.apply', 'TemporalInspectionCodecs.Projection.apply', 'TemporalInspectionCodecs.Row.apply']})
 def cut(m):
  n=name(m); origins=members[m]['origins']
  if n in exact_cuts or any(n.startswith(c+'$default$') for c in exact_cuts):return 'experimental construction or preparation extension'

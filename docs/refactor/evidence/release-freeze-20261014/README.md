@@ -64,15 +64,40 @@ controls include eight closure tests and three compiled compatibility comparison
 an experimental-factory rename, and a supported-accessor removal. These do not substitute
 for the final library manifest or for binary compatibility checks.
 
+The [compiled boundary receipt](stable-api/receipt.json) and
+[supported-member manifest](stable-api/supported-api.json.gz) bind source `63a952f9`.
+The complete [semantic inventory](stable-api/semantic-inventory.json.gz) has 1,544 reachable
+nominals and 12,833 exposed members; the selected boundary supports 1,184 nominals and 9,455
+members. [Provenance](stable-api/inventory-provenance.json) binds the verified
+[distribution manifest](stable-api/distribution-manifest.json). The exact data equal the
+previous repaired inventory except for the source SHA.
+
+The [decision recipe](decide-boundary.py) excludes five imported-value construction helpers
+explicitly. This closes the incidental narrative-graph path while preserving the selected
+readers and public inspection. Four `acquire` output-ID aliases remain required by public
+workspace accessors; acquisition strategies remain experimental. The complete graph still
+contains excluded construction edges. To check the saved boundary:
+
+```sh
+gzip -dc docs/refactor/evidence/release-freeze-20261014/stable-api/semantic-inventory.json.gz > /tmp/storymodel4s-inventory.json
+gzip -dc docs/refactor/evidence/release-freeze-20261014/stable-api/supported-api.json.gz > /tmp/storymodel4s-supported.json
+python3 tools/stability-audit/validate-supported-closure.py /tmp/storymodel4s-inventory.json /tmp/storymodel4s-supported.json
+```
+
 ## Native qualification
 
 Two findings remain distinct. Main `8ea96d6a` failed Linux Native CI twice in `MappingRunSuite`,
 with a process crash and, on retry, glibc heap-corruption diagnostics. The original failed
 executables were not uploaded. JVM and JavaScript cells passed. Main integration is held while
 a source-pinned Ubuntu 22.04/LLVM 18 comparison retains its executable and generated LLVM before
-testing. [Workflow review](native-diagnostic/workflow-review.json) and
+testing. That [Linux comparison](native-diagnostic/llvm18-linux/receipt.json) passed 1,030
+alignment tests, including all six `MappingRunSuite` tests, with every retained artifact hash
+unchanged. Actual Native configuration selected Clang 18.1.8. This qualifies that configuration
+without establishing the cause of the earlier failures. The generated CI candidate `63a952f9`
+adopts the same toolchain and retains alignment artifacts before testing; its full hosted
+matrix is the next gate. [Workflow review](native-diagnostic/workflow-review.json) and
 [shell controls](native-diagnostic/workflow-shell-controls.json) bind that diagnostic mechanism;
-they do not establish a successful runtime result.
+the runtime result is bound separately in the Linux comparison receipt.
 
 Separately, macOS Native 0.5.12 crashes hashing a literal NUL string with both Clang 15 and 20,
 including outside all StoryModel types. [Diagnostic controls](native-diagnostic/receipt.json)

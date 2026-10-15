@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T03:04:08.360107+00:00",
+  "finished_utc": "2026-10-15T03:04:36.949146+00:00",
+  "duration_seconds": 28.589703,
+  "command": [
+    "sbt",
+    "-batch",
+    "githubWorkflowGenerate",
+    "scalafmtSbt",
+    "scalafmtSbtCheck"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/ci-llvm18-candidate-20261014",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/ci-llvm18-generate.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 600.0,
+  "log_bytes": 2142
+}

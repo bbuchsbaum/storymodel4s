@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-15T02:58:38.914810+00:00",
+  "finished_utc": "2026-10-15T03:00:01.804017+00:00",
+  "duration_seconds": 82.891531,
+  "command": [
+    "env",
+    "STABILITY_DIST=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-workflow-20261014/producer-check/pipeline/target/cli-distribution/storymodel4s-0.1-d7bc9c0-SNAPSHOT",
+    "STABILITY_SOURCE=d7bc9c06dfe8c441e020c826b895616f914b157f",
+    "bash",
+    "tools/stability-audit/verify.sh",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/final-member-inventory.json"
+  ],
+  "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s",
+  "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/release-freeze-20261014/final-member-audit.log",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "reason": "exited",
+  "detail": null,
+  "timeout_seconds": 900.0,
+  "log_bytes": 221
+}
