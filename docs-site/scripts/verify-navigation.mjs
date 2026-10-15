@@ -40,19 +40,42 @@ for (const slug of sourceSlugs) {
   if (!existsSync(pageFor(slug))) throw new Error(`built page missing for /${slug}`);
 }
 
+const rootBypassingLinks = [];
+for (const slug of sourceSlugs) {
+  const page = pageFor(slug);
+  const rendered = readFileSync(page, 'utf8');
+  for (const match of rendered.matchAll(/(?:href|src)="\/(?:method|scala|reference|artifacts)\//g)) {
+    rootBypassingLinks.push(`${relative(root, page)}: ${match[0]}`);
+  }
+}
+
+if (rootBypassingLinks.length) {
+  throw new Error(
+    `site-relative link bypasses the configured GitHub Pages base path:\n${rootBypassingLinks.join('\n')}`,
+  );
+}
+
+const siteOrigin = 'https://bbuchsbaum.github.io';
+const siteBase = '/storymodel4s/';
 const internalLinks = new Set();
-for (const path of sourcePages) {
-  const source = readFileSync(path, 'utf8');
-  for (const match of source.matchAll(/(?:href=|link:\s*|\]\()(["']?)(\/[a-z0-9][^"')\s#]*\/?)\1/g)) {
-    internalLinks.add(match[2]);
+for (const slug of sourceSlugs) {
+  const page = pageFor(slug);
+  const pageUrl = new URL(`${siteBase}${slug ? `${slug}/` : ''}`, siteOrigin);
+  const rendered = readFileSync(page, 'utf8');
+  for (const match of rendered.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
+    const target = new URL(match[1], pageUrl);
+    if (target.origin === siteOrigin && target.pathname.startsWith(siteBase)) {
+      internalLinks.add(target.pathname);
+    }
   }
 }
 
 for (const link of internalLinks) {
-  const slug = link.replace(/^\//, '').replace(/\/$/, '');
+  const slug = link.slice(siteBase.length).replace(/\/$/, '');
   if (!existsSync(pageFor(slug))) throw new Error(`internal link has no built page: ${link}`);
 }
 
 console.log(`verified ${sourceSlugs.length} built pages`);
 console.log(`verified ${sidebarSlugs.length} unique sidebar entries`);
 console.log(`verified ${internalLinks.size} internal links`);
+console.log('verified rendered links retain the configured GitHub Pages base path');

@@ -6,6 +6,7 @@ import { chromium } from '@playwright/test';
 
 const root = resolve(import.meta.dirname, '..');
 const dist = resolve(root, 'dist');
+const siteBase = '/storymodel4s';
 const playwrightPackage = JSON.parse(
   await readFile(resolve(root, 'node_modules/@playwright/test/package.json'), 'utf8'),
 );
@@ -28,7 +29,8 @@ const contentTypes = new Map([
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1');
-    const relative = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+    assert(url.pathname === siteBase || url.pathname.startsWith(`${siteBase}/`));
+    const relative = decodeURIComponent(url.pathname.slice(siteBase.length)).replace(/^\/+/, '');
     const requested = resolve(dist, relative || 'index.html');
     assert(requested === dist || requested.startsWith(`${dist}/`));
     const path = url.pathname.endsWith('/') ? resolve(requested, 'index.html') : requested;
@@ -95,7 +97,7 @@ const assertMobileMenu = async (page, path) => {
 await listen();
 const address = server.address();
 assert(address && typeof address !== 'string');
-const base = `http://127.0.0.1:${address.port}`;
+const base = `http://127.0.0.1:${address.port}${siteBase}`;
 
 let browser;
 try {
