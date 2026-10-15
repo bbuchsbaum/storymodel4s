@@ -1,0 +1,93 @@
+name: Native main isolation
+
+on:
+  push:
+    branches: [pr/native-main-diagnostic-20261014]
+
+permissions:
+  contents: read
+
+jobs:
+  llvm18:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      LLVM_BIN: /usr/lib/llvm-18/bin
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 8ea96d6a91e88144eff132c185cb3663047d20b9
+          fetch-depth: 0
+      - uses: sbt/setup-sbt@v1
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Install LLVM 18 on the original runner OS
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          curl --fail --silent --show-error --location https://apt.llvm.org/llvm-snapshot.gpg.key --output evidence/llvm.key
+          gpg --show-keys --with-colons evidence/llvm.key > evidence/key-details.txt
+          test "$(awk -F: '$1 == "fpr" {print $10; exit}' evidence/key-details.txt)" = 6084F3CF814B57C1CF12EFD515CF4D18AF4F7421
+          gpg --dearmor --output evidence/llvm.gpg evidence/llvm.key
+          sudo install -m 644 evidence/llvm.gpg /usr/share/keyrings/llvm-diagnostic.gpg
+          echo 'deb [signed-by=/usr/share/keyrings/llvm-diagnostic.gpg] https://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main' > evidence/llvm.list
+          sudo install -m 644 evidence/llvm.list /etc/apt/sources.list.d/llvm-diagnostic.list
+          sudo apt-get update > evidence/apt-update.log 2>&1
+          sudo apt-get install -y clang-18 lld-18 > evidence/apt-install.log 2>&1
+          "$LLVM_BIN/clang" --version > evidence/clang-version.txt
+          "$LLVM_BIN/clang++" --version > evidence/clangpp-version.txt
+          dpkg-query -W 'clang-18' 'llvm-18*' 'libllvm18*' 'lld-18' > evidence/packages.txt
+          java -version > evidence/java-version.txt 2>&1
+          uname -a > evidence/uname.txt
+          git rev-parse HEAD > evidence/source-sha.txt
+          test "$(cat evidence/source-sha.txt)" = 8ea96d6a91e88144eff132c185cb3663047d20b9
+          git diff --exit-code HEAD
+          git ls-files -z | xargs -0 sha256sum > evidence/source-files.sha256
+          git status --short > evidence/source-status.txt
+      - name: Build and retain the exact test executable
+        shell: bash
+        run: |
+          set -uo pipefail
+          sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'show alignNative / nativeConfig' 'alignNative/Test/nativeLink' > evidence/link.log 2>&1
+          status=$?
+          echo "$status" > evidence/link.exit
+          if test "$status" -eq 0; then
+            find align/.native/target -type f \( -name '*.ll' -o -name '*.nir' -o -name '*-test' -o -name '*.out' \) -print0 > evidence/native-files.list
+            find align/.native/target -type f -perm /111 -print0 >> evidence/native-files.list
+            sort -zu evidence/native-files.list -o evidence/native-files.list
+            xargs -0 sha256sum < evidence/native-files.list > evidence/native-files.sha256
+            tar --null -T evidence/native-files.list -czf evidence/align-before-test.tar.gz
+          fi
+          exit "$status"
+      - name: Upload executable before running tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-main-llvm18-before-test
+          path: evidence/
+          retention-days: 14
+      - name: Run the full alignment module
+        shell: bash
+        run: |
+          set -uo pipefail
+          ulimit -c unlimited
+          cat /proc/sys/kernel/core_pattern > evidence/core-pattern.txt
+          sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'alignNative/test' > evidence/test.log 2>&1
+          status=$?
+          echo "$status" > evidence/test.exit
+          sha256sum --check evidence/native-files.sha256 > evidence/native-after-test.txt 2>&1
+          git diff --exit-code HEAD > evidence/source-after-test.txt 2>&1
+          exit "$status"
+      - name: Upload full diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-main-llvm18-result
+          path: |
+            evidence/
+            core
+            core.*
+          retention-days: 14
