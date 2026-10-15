@@ -78,11 +78,14 @@ jobs:
           status=0
           sbt -batch 'set ThisBuild / tlFatalWarnings := true' 'alignNative/test' > evidence/test.log 2>&1 || status=$?
           echo "$status" > evidence/test.exit
-          integrity=0
-          sha256sum --check evidence/native-files.sha256 > evidence/native-after-test.txt 2>&1 || integrity=$?
-          git diff --exit-code HEAD > evidence/source-after-test.txt 2>&1 || integrity=$?
-          echo "$integrity" > evidence/integrity.exit
-          if test "$status" -eq 0 && test "$integrity" -ne 0; then status=$integrity; fi
+          binary_status=0
+          source_status=0
+          sha256sum --check evidence/native-files.sha256 > evidence/native-after-test.txt 2>&1 || binary_status=$?
+          git diff --exit-code HEAD > evidence/source-after-test.txt 2>&1 || source_status=$?
+          echo "$binary_status" > evidence/binary-integrity.exit
+          echo "$source_status" > evidence/source-integrity.exit
+          if test "$status" -eq 0 && test "$binary_status" -ne 0; then status=$binary_status; fi
+          if test "$status" -eq 0 && test "$source_status" -ne 0; then status=$source_status; fi
           exit "$status"
       - name: Upload full diagnostic evidence
         if: always()
