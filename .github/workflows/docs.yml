@@ -18,6 +18,9 @@ on:
     branches: ['**', '!update/**', '!pr/**']
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }} @ ${{ github.ref }}
   cancel-in-progress: true
@@ -70,8 +73,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
-      pages: write
-      id-token: write
+      pages: read
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v6

@@ -52,7 +52,7 @@ them. Astro's `public/` path is accepted only because the build verifies byte id
 
 <iframe
   class="artifact-frame"
-  src={`${import.meta.env.BASE_URL}artifacts/verbatim-proof.html`}
+  src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/artifacts/verbatim-proof.html`}
   title="Self-contained HTML artifact used by the byte-identity build test"
 ></iframe>
 
