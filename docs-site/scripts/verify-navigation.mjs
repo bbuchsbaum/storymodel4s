@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { sidebar } from '../src/lib/navigation.mjs';
 
@@ -40,19 +40,36 @@ for (const slug of sourceSlugs) {
   if (!existsSync(pageFor(slug))) throw new Error(`built page missing for /${slug}`);
 }
 
+const siteOrigin = 'https://bbuchsbaum.github.io';
+const siteBase = '/storymodel4s/';
+const dist = resolve(root, 'dist');
 const internalLinks = new Set();
-for (const path of sourcePages) {
-  const source = readFileSync(path, 'utf8');
-  for (const match of source.matchAll(/(?:href=|link:\s*|\]\()(["']?)(\/[a-z0-9][^"')\s#]*\/?)\1/g)) {
-    internalLinks.add(match[2]);
+for (const slug of sourceSlugs) {
+  const page = pageFor(slug);
+  const pageUrl = new URL(`${siteBase}${slug ? `${slug}/` : ''}`, siteOrigin);
+  const rendered = readFileSync(page, 'utf8');
+  for (const match of rendered.matchAll(/\b(?:href|src)="([^"]+)"/g)) {
+    const target = new URL(match[1], pageUrl);
+    if (target.origin !== siteOrigin) continue;
+    if (target.pathname !== siteBase.slice(0, -1) && !target.pathname.startsWith(siteBase)) {
+      throw new Error(`local URL escapes Pages base: ${target.pathname} in ${relative(root, page)}`);
+    }
+    const localPath = decodeURIComponent(target.pathname.slice(siteBase.length));
+    const artifact = resolve(dist, localPath);
+    if (artifact !== dist && !artifact.startsWith(`${dist}/`)) {
+      throw new Error(`local URL escapes built directory: ${target.pathname}`);
+    }
+    const file = existsSync(artifact) && statSync(artifact).isFile()
+      ? artifact
+      : resolve(artifact, 'index.html');
+    if (!existsSync(file) || !statSync(file).isFile()) {
+      throw new Error(`local URL has no built artifact: ${target.pathname} in ${relative(root, page)}`);
+    }
+    internalLinks.add(target.pathname);
   }
-}
-
-for (const link of internalLinks) {
-  const slug = link.replace(/^\//, '').replace(/\/$/, '');
-  if (!existsSync(pageFor(slug))) throw new Error(`internal link has no built page: ${link}`);
 }
 
 console.log(`verified ${sourceSlugs.length} built pages`);
 console.log(`verified ${sidebarSlugs.length} unique sidebar entries`);
-console.log(`verified ${internalLinks.size} internal links`);
+console.log(`verified ${internalLinks.size} local page and resource URLs`);
+console.log('verified rendered links retain the configured GitHub Pages base path');

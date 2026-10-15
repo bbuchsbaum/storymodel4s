@@ -35,5 +35,5 @@ const generatedDate = new Intl.DateTimeFormat('en-CA', {
       )}
     </p>
   </div>
-  <a class="receipt-action" href="/method/evidence/">How claims are graded →</a>
+  <a class="receipt-action" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/method/evidence/`}>How claims are graded →</a>
 </aside>

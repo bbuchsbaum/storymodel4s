@@ -3,6 +3,8 @@ import starlight from '@astrojs/starlight';
 import { sidebar } from './src/lib/navigation.mjs';
 
 export default defineConfig({
+  site: 'https://bbuchsbaum.github.io',
+  base: '/storymodel4s',
   integrations: [
     starlight({
       title: 'storymodel4s',
