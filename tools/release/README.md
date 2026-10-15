@@ -63,3 +63,39 @@ hashes. It checks the actual POM matrix, metadata, fixed dependency versions and
 The release-candidate versions remain proposals. Local staging proves neither public resolution
 nor namespace ownership/signing. Complete a fresh binary-consumer rehearsal, qualify external
 dependencies against Maven Central, and obtain publication authorization before publishing them.
+
+```sh
+python3 tools/release/rehearse-upstream-binaries.py \
+  --staging /absolute/path/to/completed-upstream-staging \
+  --coursier /absolute/path/to/cs \
+  --output /absolute/new/binary-consumer-directory
+```
+
+This serves the verified staged repository on an owned loopback server, resolves all nine
+coordinates in fresh caches, and compiles and runs an external Scala consumer. The consumer
+checks six exact normalized-kernel and query results across graph4s, grakern and Gale. External
+dependencies and the compiler resolve from Maven Central. The server closes before the receipt
+is written. This qualifies the local binary chain, not public availability of the proposed roots.
+
+## Candidate metadata and baseline controls
+
+After upstream staging succeeds, generate the complete storymodel4s POM matrix from a clean
+standalone checkout:
+
+```sh
+python3 tools/release/prepare-candidate.py \
+  --checkout /absolute/path/to/clean-storymodel4s \
+  --upstream-staging /absolute/path/to/completed-upstream-staging \
+  --output /absolute/new/metadata-directory
+```
+
+The command verifies upstream revisions, version-overlay bytes, the allowed grakern source
+routing patch, and staged as well as unstaged source changes before invoking sbt. It then
+generates and validates all 56 actual POMs against `candidate-matrix.json`. This prepares
+metadata; run the public-dependency preflight separately.
+
+`python3 tools/release/test_prepare_candidate.py` checks that unchanged prepared sources reach
+an sbt sentinel and both staged and unstaged unexpected edits refuse before the build starts.
+`rehearse-baseline.py --checkout CLEAN_CHECKOUT --output NEW_DIRECTORY` exercises the actual
+sbt release-baseline guard and MiMa tasks with a synthetic local artifact. Its baseline is a
+fixture, not a published storymodel4s release. Rebuild ordinary outputs after running it.
