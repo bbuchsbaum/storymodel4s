@@ -108,7 +108,8 @@ enum Normalization:
     case L2           => "l2"
 
 /** What the provider does with inputs longer than its context. Part of recipe identity because it
-  * changes which text the vector represents.
+  * changes which text the vector represents. Head/tail limits are declarations;
+  * [[EmbeddingSpace.of]] admits them only when the token bound is positive.
   */
 enum TruncationPolicy:
   case Reject
@@ -501,13 +502,35 @@ object EmbeddingSpace:
       truncation: TruncationPolicy,
       latePooling: Option[LatePoolingRecipe] = None
   ): Either[EmbedError, EmbeddingSpace] =
-    (view, latePooling) match
-      case (SemanticView.ContextualLatePooled, None) =>
-        Left(EmbedError.InvalidRecipe("late-pooled view requires a LatePoolingRecipe"))
-      case (SemanticView.ContextualLatePooled, Some(r)) =>
-        LatePoolingRecipe
-          .validated(r)
-          .map(v =>
+    val validTruncation = truncation match
+      case TruncationPolicy.Reject      => true
+      case TruncationPolicy.KeepHead(n) => n > 0
+      case TruncationPolicy.KeepTail(n) => n > 0
+    if !validTruncation then Left(EmbedError.InvalidRecipe("truncation maxTokens must be positive"))
+    else
+      (view, latePooling) match
+        case (SemanticView.ContextualLatePooled, None) =>
+          Left(EmbedError.InvalidRecipe("late-pooled view requires a LatePoolingRecipe"))
+        case (SemanticView.ContextualLatePooled, Some(r)) =>
+          LatePoolingRecipe
+            .validated(r)
+            .map(v =>
+              build(
+                provider,
+                role,
+                view,
+                instruction,
+                dimension,
+                normalization,
+                truncation,
+                Some(v),
+                None
+              )
+            )
+        case (_, Some(_)) =>
+          Left(EmbedError.InvalidRecipe("only the late-pooled view may carry a LatePoolingRecipe"))
+        case (_, None) =>
+          Right(
             build(
               provider,
               role,
@@ -516,16 +539,10 @@ object EmbeddingSpace:
               dimension,
               normalization,
               truncation,
-              Some(v),
+              None,
               None
             )
           )
-      case (_, Some(_)) =>
-        Left(EmbedError.InvalidRecipe("only the late-pooled view may carry a LatePoolingRecipe"))
-      case (_, None) =>
-        Right(
-          build(provider, role, view, instruction, dimension, normalization, truncation, None, None)
-        )
 
   given Show[EmbeddingSpace] = Show.show(s => s"EmbeddingSpace(${s.id.value})")
 
