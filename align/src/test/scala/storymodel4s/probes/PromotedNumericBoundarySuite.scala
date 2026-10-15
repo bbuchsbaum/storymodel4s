@@ -15,8 +15,11 @@ class PromotedNumericBoundarySuite extends FunSuite:
       kind <- TransitionKind.values;
       value <- Vector(Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity)
     do
+      val result = LayerUse.of(TransitionModel(Map(kind -> value)))
+      // Check refusal before rendering a hypothetical invalid ledger in an assertion diagnostic.
+      assert(result.isLeft, s"accepted nonfinite weight for $kind: $value")
       assertEquals(
-        LayerUse.of(TransitionModel(Map(kind -> value))),
+        result,
         Left(AlignError.InvalidConfig("LayerUse.transitions", "weights must be finite"))
       )
   }
