@@ -1,10 +1,10 @@
 from pathlib import Path
 import importlib.util,json,os,re,shutil,subprocess,tempfile,time
 parent=Path('/Volumes/My Passport for Mac/agent-work/storymodel4s')
-producer_root=parent/'reality-check-20261015-s1-candidate-65811d01'
-root=parent/'reality-check-20261015-s1-timezones-65811d01'
+producer_root=parent/'reality-check-20261015-s1-candidate-c69a5d75'
+root=parent/'reality-check-20261015-s1-timezones-c69a5d75'
 checkout=producer_root/'checkout'
-expected='65811d0137ab49dde114dce5450e3998fa7b96c6'
+expected='c69a5d754a21fa455c64901334d9509278401091'
 qualification=json.loads((producer_root/'receipt.json').read_text())
 assert qualification['status']=='source-cli-qualified', 'Producer qualification incomplete; do not run concurrent gates'
 assert qualification['source']==expected

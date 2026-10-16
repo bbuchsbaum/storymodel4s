@@ -5,8 +5,8 @@
     "docs/refactor/evidence/source-cli-20261015/qualification-drivers/driver-courts.py"
   ],
   "exit": 0,
-  "logSha256": "105e907fc0b823eafcb24999971205ff2a7caeac375236d09c130038c2ead82a",
-  "review": "source_cli_review: corrected driver logic PASS; execution acceptance remains pending",
-  "producer": "65811d0137ab49dde114dce5450e3998fa7b96c6",
+  "logSha256": "414facb58fb6411206813be3e87a7f11fd3737b6c962846a3b36d124f1658c6e",
+  "review": "Logic independently reviewed at2f00483c; expected producer revision updated after whitespace-only correctionc69a5d75. Execution acceptance remains pending.",
+  "producer": "c69a5d754a21fa455c64901334d9509278401091",
   "consumer": "50a160168daa03c51fcab60a4eaaed66674da83a"
 }

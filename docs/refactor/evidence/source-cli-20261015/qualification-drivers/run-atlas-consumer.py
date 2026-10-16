@@ -8,9 +8,9 @@ def validate_inputs(qualification, expected, environment):
         raise ValueError('Ambient Atlas source overrides: '+', '.join(present))
 
 root=Path('/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234')
-producer_root=root.parent/'reality-check-20261015-s1-candidate-65811d01'
+producer_root=root.parent/'reality-check-20261015-s1-candidate-c69a5d75'
 producer=producer_root/'checkout';checkout=root/'checkout'
-expected_producer='65811d0137ab49dde114dce5450e3998fa7b96c6'
+expected_producer='c69a5d754a21fa455c64901334d9509278401091'
 expected_consumer='50a160168daa03c51fcab60a4eaaed66674da83a'
 qualification=json.loads((producer_root/'receipt.json').read_text())
 validate_inputs(qualification,expected_producer,os.environ)

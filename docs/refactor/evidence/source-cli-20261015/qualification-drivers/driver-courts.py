@@ -8,7 +8,7 @@ function=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and
 namespace={}
 exec(compile(ast.Module(body=[function],type_ignores=[]),str(path),'exec'),namespace)
 validate=namespace['validate_inputs']
-expected='65811d0137ab49dde114dce5450e3998fa7b96c6'
+expected='c69a5d754a21fa455c64901334d9509278401091'
 good={'status':'source-cli-qualified','source':expected}
 validate(good,expected,{})
 for value,environment in [({**good,'source':'0'*40},{}),({**good,'status':'running'},{}),(good,{'STORYATLAS4S_INTAGLIO_BUILD':'/tmp/foreign'}),(good,{'STORYATLAS4S_STORYMODEL4S_BUILD':'/tmp/foreign'})]:
