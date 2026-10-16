@@ -58,6 +58,13 @@ The proposed checked admission associates a declaration/grant with:
 - the declaration/issuer-policy version, authorization identifier and revocation/lifetime
   semantics appropriate to the selected trust model.
 
+Current study configuration has no study identifier. Supply that identity in a separate
+explicit authorization context so ordinary input files can remain unchanged. Authorize the
+complete requested participant/session inventory, including failure metadata. If preparation
+fails before a recall digest exists, only the explicitly covered attempt metadata may be
+exported; it must not inherit permission to emit unknown text. Such rows stay in the batch
+manifest with their failure and unavailable digest, rather than disappearing from the study.
+
 No implicit permission propagates to a sibling study, new recall, new destination, upload,
 remote embedding/parser call, repository admission, or public-corpus classification. Source
 content exported to the workspace/cache must also be covered by the declaration; recall
@@ -113,7 +120,9 @@ distinction instead of assuming every standalone run export has the batch's disc
 | Missing/wrong issuer or altered grant under issuer mode | Refuse against independently provisioned policy. Under declaration mode, require the actual explicit operator action instead of pretending to authenticate an issuer. |
 | Import a genuine receipt, edit its scope, or place it in study JSON | No authority is reconstructed; attempts to gain hosted/public/certified scope refuse. |
 | Resume valid output after authority removal/revocation/change | Refuse even if existing output bytes and manifest match. |
+| Resume with the same still-valid authority and exact bytes | Succeed without rewriting; retain the same observations and receipt. |
 | Request an extra operation/cache destination | Refuse; permission for paired export does not grant workspace/cache writes. |
+| Mixed successful and failed preparation attempts | Preserve every authorized attempt, including metadata-only failures without a text digest; refuse unauthorized attempt metadata and never emit unavailable text. |
 | Genuine detector-certified payload, admitted Sherlock replay, existing project control | Preserve their exact existing lineage and allowed local routes; retain their refusal controls. |
 
 Use admitted synthetic fixtures for all courts. No participant text enters Git. Compile-refusal
