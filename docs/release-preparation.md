@@ -37,7 +37,7 @@ directories, refuses ambient source/JVM overrides, and runs the JVM tests with f
 before packaging `pipeline/cliDistribution`. Add `--full-gate` for workflow generation and
 the complete JVM/JavaScript/Native gate; this also needs Node and the Native C/C++ toolchain.
 The default maximum heap is 6 GiB, matching the project's `.jvmopts`; choose an explicit
-`--heap-gib` within the build host's memory budget. The full-gate retry on the 36 GiB host uses
+`--heap-gib` within the build host's memory budget. The qualified full run on the 36 GiB host used
 `--full-gate --heap-gib 8`. A prior 4 GiB attempt was stopped during sustained garbage
 collection after 9,457 passing tests; its
 [inconclusive receipt](refactor/evidence/source-cli-20261015/heap4g-stopped-candidate-286b5234/receipt.json)
@@ -71,7 +71,21 @@ and keeps HTTP failures. This records the source-pinned publication gap; the sep
 transitive-resolution and signing preflight remains required for Maven publication.
 
 The [S1 evidence](refactor/evidence/source-cli-20261015/README.md) distinguishes the fresh
-baseline, runtime control and final candidate qualification. S1 belongs to
+baseline, adverse attempts and final candidate qualification. Exact `c69a5d75` passed the full
+56-task gate with 11,067 passes, zero failures/errors and five skips, then packaging, provenance
+and notice verification, independent readers and measured network-denied replay. Its original,
+Toronto and Honolulu archives are byte-identical. Independent artifact review passes. Pinned
+Atlas `50a16016`, explicitly using this producer, passed 518 tests, application linking and final
+format checks; its default producer pin is unchanged. Final consumer evidence review and
+authorized landing remain separate S1 acceptance.
+
+The actual source-pinned POMs still reference four missing grakern coordinates at
+`0.1-0329c43-SNAPSHOT`. Their nonoptional compile/runtime paths reach `embed-grakern` and
+`embed-bench`; the retained 404s and graph do not establish publication readiness of the other
+artifacts. These observations differ from the later dependency-publication rehearsal below,
+which used prepared release branches and staged binaries.
+
+S1 belongs to
 `bd-01M50K8E8KMRGY0MYXJRT0SZ8G`, tagged `reality-check-20261015`. Source/CLI qualification
 does not close the Maven or corrected-Native release obligations below. Central/signing setup
 and dependent Maven publication are deferred from this immediate route.

@@ -5,8 +5,12 @@ The [exact candidate qualification](qualified-candidate-c69a5d75/receipt.json) p
 `c69a5d754a21fa455c64901334d9509278401091`: 56 task totals, **11,067 passed, zero failures/errors
 and five skips**, followed by passing format checks, actual packaging and extracted-CLI readback.
 This is locally observed evidence. The [timezone witness](timezones-c69a5d75/receipt.json) also
-passes: the original archive and actual Toronto/Honolulu rebuilds are byte-identical. S1 remains
-open for the pinned Atlas consumer gate, independent artifact review and authorized landing.
+passes: the original archive and actual Toronto/Honolulu rebuilds are byte-identical. Independent
+source/CLI artifact review passes. The [Atlas gate](atlas-compatible-c69a5d75/receipt.json) passes
+at consumer `50a160168daa03c51fcab60a4eaaed66674da83a`: ten task totals, **518 passed, zero
+failures/errors/skips**, application linking and final formatting checks. It explicitly overrides
+the producer to the qualified revision; the consumer's default pin is unchanged. S1 remains open
+for final consumer evidence review and authorized landing.
 
 The fresh checkout fetched all three declared Git pins without source overrides, using configured
 SSH transport. Its 143,475,273-byte archive has SHA256
@@ -57,6 +61,9 @@ Their seven admission controls pass; execution receipts remain separate from dri
   the verified official JFrog download endpoint with its Ivy layout, retaining fresh isolation
   and unchanged producer, consumer and dependency pins. Consumer compatibility requires the
   retry's actual compile/test/link results; repository availability alone does not establish it.
+  The fresh retry above passed. Its actual cached descriptor and plugin JAR match the independent
+  official-repository observations; the exact resolver configuration is retained. This is a
+  metabuild-plugin dependency, not adoption of a different StoryModel Native runtime.
 
 Full logs are retained as deterministic gzip files beside their receipts. Each receipt's log
 hash covers the original uncompressed bytes. Build workspaces and the installed baseline remain

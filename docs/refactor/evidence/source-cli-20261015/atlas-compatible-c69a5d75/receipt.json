@@ -1,0 +1,97 @@
+{
+  "schema": "storyatlas4s-producer-compatibility/v1",
+  "status": "qualified-compatibility",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792122240.454994,
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home/bin/java",
+        "-version"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "42a7cc673edfb4df1649add8bb6469e37e0b05fa2875c5b0402da69b93273835"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx6G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/repositories",
+        "-Dsbt.override.build.repos=true",
+        "-Dstoryatlas4s.storymodel4s.build=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+        "set ThisBuild / tlFatalWarnings := true",
+        "compileAll",
+        "testAll",
+        "app/fastLinkJS",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/checkout",
+      "log": "command-001.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "6cfa834b7a650d903cab50bb4b6575f2fe7050e5eac2e3c07a67396d9ca23191"
+    }
+  ],
+  "producer": "c69a5d754a21fa455c64901334d9509278401091",
+  "consumer": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "producerReceiptSha256": "4f8131c0a52e48e5592b7c4a665f2e063fef0ac26850a7055ce3485343697caa",
+  "heapGiB": 6,
+  "producerRoute": "explicit isolated source override; consumer default pin remains eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "intaglioPin": "2fa5c682f4a95b8e73daad78dd9302d7aff46e11",
+  "uiQualification": "not performed; unchanged consumer compile/tests/bundle only",
+  "isolation": {
+    "boot": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/boot",
+    "global": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/global",
+    "staging": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/staging",
+    "ivy": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/ivy",
+    "coursier": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/coursier",
+    "config": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/config",
+    "tmp": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/tmp"
+  },
+  "repositories": {
+    "sha256": "8fbb291979c937775da3b725b4673432a6f6491863d30a17c5bb9a57989da9cb",
+    "contents": "[repositories]\n  maven-central: https://repo.maven.apache.org/maven2\n  sbt-plugin-releases: https://scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]\n"
+  },
+  "tests": {
+    "tasks": 10,
+    "passed": 518,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "fetchedSources": [
+    {
+      "url": "https://github.com/canardlapin/intaglio.git",
+      "revision": "2fa5c682f4a95b8e73daad78dd9302d7aff46e11",
+      "clean": true
+    },
+    {
+      "url": "https://github.com/canardlapin/grakern.git",
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "clean": true
+    },
+    {
+      "url": "https://github.com/canardlapin/gale.git",
+      "revision": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "clean": true
+    },
+    {
+      "url": "https://github.com/canardlapin/graph4s.git",
+      "revision": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "clean": true
+    }
+  ],
+  "finishedUnix": 1792122558.4019141
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "storyatlas4s-official-plugin-cache-readback/v1",
+  "producer": "c69a5d754a21fa455c64901334d9509278401091",
+  "consumer": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "compatibilityReceiptSha256": "e526a669e48f07d8af0e12af1a350f97f274adcce2e861256606deb00cd0ab74",
+  "repositoriesSha256": "8fbb291979c937775da3b725b4673432a6f6491863d30a17c5bb9a57989da9cb",
+  "plugin": {
+    "cachePath": "coursier/https/scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/jars/sbt-scala-native.jar",
+    "bytes": 244880,
+    "sha256": "d7354ae840deafc39de103e7693a2bff245f928d9af4b0af65c5e7510848603f"
+  },
+  "descriptor": {
+    "cachePath": "coursier/https/scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/ivys/ivy.xml",
+    "bytes": 1850,
+    "sha256": "736f71705b107d43e56f8108369d95eeab2522428a34215ae2a4a17ed29c7558"
+  },
+  "matchesIndependentOfficialRepositoryProbe": true,
+  "runtimeAdoption": "No StoryModel Native runtime change; this is the consumer metabuild plugin dependency."
+}
