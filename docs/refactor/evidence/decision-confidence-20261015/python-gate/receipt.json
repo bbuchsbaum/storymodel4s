@@ -1,0 +1,278 @@
+{
+  "source": "65811d0137ab49dde114dce5450e3998fa7b96c6",
+  "qualification": "LocallyObserved, isolated checkout, synthetic Python courts only",
+  "status": "passed",
+  "startedUnix": 1792117242.4792168,
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_corpus_descriptor.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "faf0853c54484d7d8234ef6d5ef2a72b872b4877d921d1d468aafa0bf62f6222",
+      "log": "00-test_corpus_descriptor.log",
+      "logSha256": "85a7f3dd0ffeed1eed4183943242f5729fb2c0bdf812edfd66d74126ef14d959",
+      "reportedUnittestCases": null
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_entity_hypotheses.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "66fa78b7717b3b4559e2a940bf652d03ceb7d9530d45145a454219558f2c212b",
+      "log": "01-test_entity_hypotheses.log",
+      "logSha256": "e28ab8ee96a71b23a64ca640d702ed2c29f50b291130ee18e0aecf897f5c016b",
+      "reportedUnittestCases": 15
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_extract_scene_frames.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "a85bb3737ef29f616e73277840b4c4968edb871a7b4860a2c87cfbd6ca2aa4c3",
+      "log": "02-test_extract_scene_frames.log",
+      "logSha256": "85f3d8a5f56760d6f94ec51c1f91bfccc4894b4b7c2fade5d84c402e3646a263",
+      "reportedUnittestCases": 15
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_filmfest_diagnostics.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "fc4df5c65897a3ea43ae8d6ce71816d9112682d6883db276877fe8db2cddd8be",
+      "log": "03-test_filmfest_diagnostics.log",
+      "logSha256": "ca18cc8e8cf94f56e58232f50620b1e8cacd8cccd6a6b7690d4968cc5d62d3ac",
+      "reportedUnittestCases": 12
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_filmfest_protocols.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "5bbe2937557f636fa218b9b7cffcb8befc7afe2058d1cb42b91f98668fe5a769",
+      "log": "04-test_filmfest_protocols.log",
+      "logSha256": "8aed598952aeef4e742c2d551da0fd3d722cfc8a7f83f6389c2d60f7c9030dc7",
+      "reportedUnittestCases": 9
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_filmfest_replay.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "2fb5459c10b12ffc9f661b899677d1b71b5c653d837eb570858387ff6e3f1eff",
+      "log": "05-test_filmfest_replay.log",
+      "logSha256": "0eee84248d053b40e768e694ede58feb5b3605aa34a44b72f92bcfa8b09a77cf",
+      "reportedUnittestCases": 4
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_filmfestival.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "c82c539e2cab784d248a51f5ef676f544bc0e5d95724e4dee225116f3069597f",
+      "log": "06-test_filmfestival.log",
+      "logSha256": "874caacf9a14a9c1cd2709923d803051ee976db42c9cb2266cc7b29183550551",
+      "reportedUnittestCases": 16
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_friends_guard.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "36de05866d351f1ece58fa6bd98be18cc13e6a89afe67c2b55b3a9cb8d6afd39",
+      "log": "07-test_friends_guard.log",
+      "logSha256": "24a1d1c7ab2bc1441248f34cfcece82d85cf5b8b9abb39cbb301c9b08802fe03",
+      "reportedUnittestCases": 7
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_gold_rule_single.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "941c54dbab8a33b60e907488ea4fb07ecff8094c2cd6010e3b3eb007003df906",
+      "log": "08-test_gold_rule_single.log",
+      "logSha256": "3d8a9c1b3d6dadaf754af09d4c824c6dda7b9c5dafcbc63cdc3ebccd6bda7f5c",
+      "reportedUnittestCases": null
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_gold_scene.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "a4df1332577ecd40765bb034bddb7d0ae6dcc0660bd6eb7e6380cf110858c9ff",
+      "log": "09-test_gold_scene.log",
+      "logSha256": "bc5a0557e9150c83143f1830fcf7bf19b96b2956450065131d1d813b415aa1da",
+      "reportedUnittestCases": 19
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_memento_guard.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "5477908a045ca60403673568eae08b571e4a1c344a36b98de2cb9582ca0bcdf8",
+      "log": "10-test_memento_guard.log",
+      "logSha256": "64e4ceda9240a9f0c8e60cde63ed8ba483da322b3305cbc66fb9a724386a22ce",
+      "reportedUnittestCases": 10
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_memento_task.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "d11ea672bd4165ccf6a4554bc72981c2b80fae56414cba95e9c9f9eef8e0b46f",
+      "log": "11-test_memento_task.log",
+      "logSha256": "8df53778929f28104f13d79ae72ed603525e0092ba9c9fb306b3faaf7cdbbe2b",
+      "reportedUnittestCases": 17
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_offset_kinds.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "d35083a76a2bdbf7c2ff69a37b3d76d1c889a1b8bc4030a025054e3b29d8ecf3",
+      "log": "12-test_offset_kinds.log",
+      "logSha256": "ae30e03181b0ed5d3307427f4e86b2b02628a94e7226fd4935172c0c4a0208ec",
+      "reportedUnittestCases": null
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_organization_challenge.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "5240c38ed727f23203cb0dd724911016f29ad50eb939c77fd54b54d9799653d0",
+      "log": "13-test_organization_challenge.log",
+      "logSha256": "22e69128faed2c5b9f76178176222e7a4635dbd31155df18e4fad6455f8ab9ea",
+      "reportedUnittestCases": 12
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_organization_diagnosis.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "415e436d9362d407fcc0dc8cbd0f39c0459a6cf75421217d3d88a677bb9f623d",
+      "log": "14-test_organization_diagnosis.log",
+      "logSha256": "243d9f12aca1e6da8aa0f7b3bcf5ccd1e5fc47e87caff6bc6b68009466b67934",
+      "reportedUnittestCases": 11
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_organization_recovery.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "c3bec28e0509fb5357775fc6382db905a400a5d7d3b2e8278d193c1e43b80871",
+      "log": "15-test_organization_recovery.log",
+      "logSha256": "85bdb3d23316195a7aad16b696a688d839cd6f3a8ddf856daed46f675b993098",
+      "reportedUnittestCases": 10
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_recall_clock.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "83455a80e182e55f88840e2d20fba27cb429a26bfc9ba543d81857bec4117175",
+      "log": "16-test_recall_clock.log",
+      "logSha256": "94b8f4610597ddceba6e4aa55ebb65f8120aba77a1d238c79fbccd8d9e645336",
+      "reportedUnittestCases": 23
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_recall_word_clock.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "d0624f9a28cb3d22934159261711b6611c31e6983da3c000839b5d610125f405",
+      "log": "17-test_recall_word_clock.log",
+      "logSha256": "d7256c086a3de055ab5e1082e833d61b1936a2ce6c1e488aba4c07ec35a954e9",
+      "reportedUnittestCases": 25
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_risk_coverage.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "49a0f85cdd2433fd5a4729a0df155b38557c78237da0bdb03253325e6aa87cdc",
+      "log": "18-test_risk_coverage.log",
+      "logSha256": "fe008aab760eb03ccac7578e2b84665b1b50b0d7f855b17a0c7a8d039435b658",
+      "reportedUnittestCases": 2
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout/tools/recall-study/tests/test_sealed_split.py"
+      ],
+      "exit": 0,
+      "sourceSha256": "1059d236a9a18f735777325ffd4defeabe605273f37e8a6c0cb6eb86c705a815",
+      "log": "19-test_sealed_split.log",
+      "logSha256": "12e76d47bda0b634457bde7cde4f6f712dc42bdac0bb6d64e5cefca9a44b2c94",
+      "reportedUnittestCases": 23
+    }
+  ],
+  "finishedUnix": 1792117282.443139,
+  "scriptCount": 20,
+  "reportedUnittestCases": 230,
+  "standaloneScriptsWithoutUnittestTotals": 3,
+  "reportedUnittestSkipped": 0,
+  "unscopedFormatCheck": {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "13aec7cc874ed1c2695c6dd281852523cc43ef90",
+      "HEAD"
+    ],
+    "exit": 2,
+    "log": "format-check.log",
+    "assessment": "Nonzero only for exact copied license bytes (anthropic, cats-collections, slf4j) and legitimate unified-diff context spaces in the retained mutation patch; no source change or license-byte normalization made."
+  },
+  "instrumentFormatCheck": {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "3f9a3e1255eea72008646c40b9c255a37e1f663b",
+      "6005fd8260feecd1ba15c8211903a2f23fdd8f63",
+      "--",
+      ".mote/authority/00000000000000001058.json",
+      ".mote/authority/00000000000000001059.json",
+      ".mote/authority/00000000000000001060.json",
+      ".mote/authority/00000000000000001061.json",
+      ".mote/authority/00000000000000001062.json",
+      ".mote/ops/20261016T020800.315050Z-p21663-c0000-r1e6d-hcf34b8.json",
+      ".mote/ops/20261016T020814.325330Z-p21663-c0001-r29ff-h136b79.json",
+      ".mote/ops/20261016T020821.609259Z-p21663-c0002-r8863-h9f6773.json",
+      ".mote/ops/20261016T020829.101371Z-p21663-c0003-r161d-h30a7a0.json",
+      ".mote/ops/20261016T021100.311464Z-p32831-c0000-re5df-h074129.json",
+      "docs/plans/2026-09-04-risk-coverage-results.md",
+      "docs/refactor/evidence/decision-confidence-20261015/observed.json",
+      "docs/refactor/evidence/decision-confidence-20261015/probe-receipt.json",
+      "docs/refactor/evidence/decision-confidence-20261015/probe_risk_coverage.py",
+      "docs/refactor/evidence/decision-confidence-20261015/repair-plan.md",
+      "docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.json",
+      "tools/recall-study/SCORING.md",
+      "tools/recall-study/risk_coverage.py",
+      "tools/recall-study/tests/test_risk_coverage.py"
+    ],
+    "exit": 0,
+    "log": "authored-format-check.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope": "All authored .py/.md/.json files in exact retirement slice; raw mutation patch and compressed/raw evidence logs preserve bytes."
+  }
+}
