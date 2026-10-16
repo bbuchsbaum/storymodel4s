@@ -1,0 +1,94 @@
+{
+  "schema": "storymodel4s-source-cli-qualification/v1",
+  "status": "failed",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792117169.337087,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--no-checkout",
+        "/Users/bbuchsbaum/code/scala/storymodel4s",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "c04edb98c34bc2a09403d4e6cdee051b05c98c08f0c464721ceec05a64814689"
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "65811d0137ab49dde114dce5450e3998fa7b96c6"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout",
+      "log": "command-001.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "57e4ebf6c3285e671bcbe04937b6104634cb254cf7535c261a7ecf9275ac19bf"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home/bin/java",
+        "-version"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01",
+      "log": "command-002.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "42a7cc673edfb4df1649add8bb6469e37e0b05fa2875c5b0402da69b93273835"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx8G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/repositories",
+        "-Dsbt.override.build.repos=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "githubWorkflowGenerate",
+        "checkAll",
+        "pipeline/cliDistribution"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout",
+      "log": "command-003.log",
+      "expectedExit": 0,
+      "exit": 1,
+      "logSha256": "abc34e4eac9405c88c4d8d129947bdab960ea2d88b8d4018fbe9f56ab8fdcd68"
+    }
+  ],
+  "source": "65811d0137ab49dde114dce5450e3998fa7b96c6",
+  "ipcDirectory": "/private/tmp/sm4s-ipc-oirgg66j",
+  "isolation": {
+    "boot": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/boot",
+    "global": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/global",
+    "staging": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/staging",
+    "ivy": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/ivy",
+    "coursier": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/coursier",
+    "config": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/config",
+    "tmp": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/tmp"
+  },
+  "heapGiB": 8,
+  "error": "command exit differs; inspect /Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/command-003.log",
+  "finishedUnix": 1792119515.638261,
+  "observedTestsBeforeFailure": {
+    "tasks": 56,
+    "passed": 11067,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "failureScope": "Full checkAll failed scalafmtSbtCheck on project/CliDistribution.scala after all test tasks. Package/runtime/POM tasks did not execute. Not a passing gate."
+}

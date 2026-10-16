@@ -1,0 +1,34 @@
+{
+  "schema": "storymodel4s-format-correction/v1",
+  "status": "formatted-only-not-qualified",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792119578.3266199,
+  "commands": [
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx8G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/repositories",
+        "-Dsbt.override.build.repos=true",
+        "scalafmtSbt",
+        "scalafmtSbtCheck"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-65811d01/checkout",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "4bc225e76ce7c01af1309b21f1017d41dd5ab226a2f11dec0c358341792b8b70"
+    }
+  ],
+  "source": "65811d0137ab49dde114dce5450e3998fa7b96c6",
+  "patchSha256": "c93f104fc2b70d2cd252f7fae04e1257f02fdc397ed939674ef6318e3be33475",
+  "finishedUnix": 1792119602.271863
+}
