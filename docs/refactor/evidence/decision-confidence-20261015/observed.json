@@ -1,0 +1,27 @@
+{
+  "assessedCommit": "3f9a3e1255eea72008646c40b9c255a37e1f663b",
+  "sourceSha256": "cb1e9b4d2b159a37262dc293eb15c1ede98c94002e3a70dccbb36f44bca40661",
+  "readScope": "Only synthetic temporary TSVs and in-repository Python code; no gold, corpus or saved model outputs opened.",
+  "rankReversal": {
+    "rawArgmaxAccuracyAtTwoThirds": 50.0,
+    "emittedOwnMassAccuracyAtTwoThirds": 100.0
+  },
+  "shrinkingPopulation": {
+    "stipulatedEligible": 3,
+    "retained": 1,
+    "reportedDropped": 1,
+    "reportedFullCoverage": 1.0,
+    "reportedAccuracy": 100.0,
+    "stipulatedPopulationAccuracyPercent": 33.333333333333336
+  },
+  "nonfinite": {
+    "accepted": 2,
+    "reportedDropped": 0
+  },
+  "ties": {
+    "nominalGridPoints": 20,
+    "distinctActualCoverages": [
+      1.0
+    ]
+  }
+}

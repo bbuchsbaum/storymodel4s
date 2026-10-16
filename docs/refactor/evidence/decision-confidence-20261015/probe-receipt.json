@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "python3",
+    "docs/refactor/evidence/decision-confidence-20261015/probe_risk_coverage.py",
+    "/Users/bbuchsbaum/code/scala/storymodel4s"
+  ],
+  "exit": 0,
+  "scriptSha256": "6245fb303b63116330d6d19ccfca082737e3d08a59611bb8c5e78dc79cfff8b6",
+  "stdoutSha256": "12124e0f34b5662d6ddbe063594af632eade5cb9594368434695a63076375a3b",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "purpose": "Independent parent reproduction of peer instrument findings with synthetic rows only; not a scientific efficacy result."
+}
