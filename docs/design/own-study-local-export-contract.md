@@ -63,6 +63,13 @@ remote embedding/parser call, repository admission, or public-corpus classificat
 content exported to the workspace/cache must also be covered by the declaration; recall
 authority alone does not establish source redistribution rights.
 
+Operation names describe complete payloads: weighted and temporal exports include their base
+paired artifacts, so their explicit grants must cover that composition. A paired grant alone
+cannot authorize weighted or temporal export. Workspace publication always includes its source
+cache write and therefore requires both named destination roots; it refuses before either write
+when either authorization is missing. Do not grant unlisted operations by invoking an internal
+base helper.
+
 A live checked value is created only after these relations are verified against the actual
 prepared batch and publication request. Stable relational validity uses a final non-case
 class with a private checked factory, per rule 8. The identity is derived from the bound
@@ -81,6 +88,8 @@ and destination before checking existing files; a matching old manifest alone is
 | `MappingPipeline.exportTemporalResults` | Apply the same admission to the temporal exchange path. |
 | `OrganizationPipeline.publish` | Check the same operation and observations before reference/reconstruction text can be emitted. |
 | `StudyWorkspace.artifacts` / `publish` | Check packets and source-cache destinations before either can be created; bind both roots explicitly. |
+| Standalone `MappingPipeline.publishExchange(run)` and `OrganizationPipeline.publish(value)` | These values have no retained study/disclosure context. Classify the actual payload explicitly as ordinary analysis or admitted exchange and test that classification. Any text-bearing export must require checked context or refuse. |
+| `StudyArtifacts.publish` and workspace cache writes | Enforce the verified root at actual file creation/reuse, including intermediate directories and completion markers. A higher-level pathname check alone cannot establish the binding if paths can change before use. |
 | CLI configuration/preparation and cache decode | Treat stored admission/receipt fields as requests/data; require fresh authority from the selected trust boundary. |
 
 The existing `StudyCli` prepared working artifacts and ordinary mapping analysis keep their
@@ -88,6 +97,10 @@ current local-analysis semantics. U2 must trace and document those writes so the
 admission is not misrepresented as a filesystem sandbox. Direct API exports of a checked run
 must be reviewed for text-bearing contents as well as the batch path; an unreviewed overload
 cannot become an authorization bypass.
+Current standalone mapping exchange serializes coordinates, identities and numeric evidence,
+including transcript digests/spans; this review has not demonstrated a raw-transcript leak there.
+Batch exchange additionally serializes prepared recall JSON containing graph text. Preserve that
+distinction instead of assuming every standalone run export has the batch's disclosure behavior.
 
 ## Acceptance examples fixed before implementation
 
