@@ -317,6 +317,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True, help="new directory on a volume with >=15 GiB free")
     parser.add_argument("--java-home", type=Path, required=True)
     parser.add_argument("--sbt", default="sbt")
+    parser.add_argument("--heap-gib", type=int, choices=range(1, 33), default=6, metavar="GiB",
+                        help="maximum sbt heap in GiB (default: 6, matching project .jvmopts)")
     parser.add_argument("--full-gate", action="store_true", help="run workflow generation and checkAll instead of testJVM")
     args = parser.parse_args()
     validate_environment(os.environ)
@@ -352,7 +354,8 @@ def main():
                    COURSIER_CREDENTIALS="", GIT_TERMINAL_PROMPT="0", ORT_DISABLE_TELEMETRY="1")
         witness.receipt["isolation"] = {key: str(value) for key, value in directories.items()}
         witness.run([str(args.java_home / "bin/java"), "-version"], output, env)
-        base = [args.sbt, "-batch", "-J-Xmx4G", "-J-XX:ActiveProcessorCount=4",
+        witness.receipt["heapGiB"] = args.heap_gib
+        base = [args.sbt, "-batch", "-J-Xmx" + str(args.heap_gib) + "G", "-J-XX:ActiveProcessorCount=4",
                 "-J-Djava.io.tmpdir=" + str(directories["tmp"]),
                 "-Dsbt.boot.directory=" + str(directories["boot"]),
                 "-Dsbt.global.base=" + str(directories["global"]),

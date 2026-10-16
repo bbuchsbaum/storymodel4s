@@ -36,6 +36,12 @@ The qualifier clones that exact commit, uses fresh sbt boot/global/staging/Ivy/C
 directories, refuses ambient source/JVM overrides, and runs the JVM tests with fatal warnings
 before packaging `pipeline/cliDistribution`. Add `--full-gate` for workflow generation and
 the complete JVM/JavaScript/Native gate; this also needs Node and the Native C/C++ toolchain.
+The default maximum heap is 6 GiB, matching the project's `.jvmopts`; choose an explicit
+`--heap-gib` within the build host's memory budget. The full-gate retry on the 36 GiB host uses
+`--full-gate --heap-gib 8`. A prior 4 GiB attempt was stopped during sustained garbage
+collection after 9,457 passing tests; its
+[inconclusive receipt](refactor/evidence/source-cli-20261015/heap4g-stopped-candidate-286b5234/receipt.json)
+is retained and does not qualify the candidate.
 The task uses a short private IPC directory for sbt while heavy temporary files stay on the
 build volume. Reusing the same output path refuses so a failed receipt cannot be overwritten.
 
