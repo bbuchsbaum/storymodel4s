@@ -276,3 +276,22 @@ never `Reported(empty, empty)`.
 - Phase 1.4's compiler extension will move the pinned gap and error counts; the suite is the
   place that change must be recorded.
 - Phase 2.2 wraps the trio in `result.json` and `manifest.json` through `StoryOutputResult`.
+
+## Amendment: source-pinned CLI provenance (15 October 2026)
+
+Within the owner's approved reality-check S1 scope (`reality-check-20261015`), the JVM
+distribution gains `dependency-provenance.json` (`storymodel4s-cli-dependencies/v1`) and
+dependency notice files, all covered by its existing file manifest. Each ordered classpath
+entry must resolve to exactly one actual sbt project product or external resolution identity.
+Source products retain the project, SCM URL, exact clean Git revision and Scala version;
+external products retain module/artifact identity, declared licenses and artifact hash.
+Embedded legal notices are preserved byte for byte. Supplemental license text is bound to
+exact coordinates, declared license names, source URLs, artifact hashes and text hashes in the catalog.
+Unknown origins and unresolved evidence refuse before replacing staged output. The qualifier
+separately records the actual GitHub fetches and network-denied runtime control.
+
+Rejected: deriving a dependency identity from its filename or directory; treating a file named
+`License.class` as license text; assigning generic copyright text to a dependency; treating
+locally built bytes as public Maven availability. The existing classpath ordering, launcher and
+deterministic ZIP construction remain the packaging contract. This amendment adds no runtime
+dependency or semantic authority.

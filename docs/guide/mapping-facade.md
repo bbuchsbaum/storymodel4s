@@ -17,8 +17,8 @@ bytes. An existing or corrupt destination refuses instead of being overwritten.
 
 The bundle needs Java 17 or newer on macOS or Linux. Extract it, run `chmod +x bin/storymodel4s`
 inside its directory, and add that `bin` directory to your path. A public binary release is
-pending; maintainers can build the ZIP with `sbt 'pipeline/cliDistribution'` from a clean
-checkout. Its manifest binds the source revision and packaged files. For a source invocation,
+pending; maintainers use the [source-build qualification recipe](../release-preparation.md#source-build-and-offline-cli).
+Its manifest binds the source revision, packaged files and dependency notices. For a source invocation,
 replace `storymodel4s mappingRun ...` with
 `sbt 'pipeline/runMain storymodel4s.pipeline.mappingRun ...'`. The
 [complete file walkthrough](../../docs-site/src/content/docs/method/map-files.mdx) includes an

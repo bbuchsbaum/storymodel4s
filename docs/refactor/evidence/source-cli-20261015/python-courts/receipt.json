@@ -1,0 +1,26 @@
+[
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "tools/test_cli_distribution.py"
+    ],
+    "exit": 0,
+    "sourceSha256": "4dc82c03c3fd7bc38ff5f444d34ddc76cc2574bcc6bac3f1f375293509ce18c4",
+    "logSha256": "c0c17b3936f6ab25300acc382c3f3a7f6a6753813e335827cea453a8b26264fd",
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "tools/release/test_qualify_source_cli.py"
+    ],
+    "exit": 0,
+    "sourceSha256": "2dc5f912d16042f1efe1540053a393e0c4d293c9b365eeac9d5ecec634082bf8",
+    "logSha256": "f5d9e9fb25ff29281d0e5404aff4935e2f250850cb0d1e5b641a6c78021853af",
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "source": "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c",
+  "qualification": "LocallyObserved",
+  "toolchain": "OpenJDK 22; sbt 1.12.14; Scala 3.7.4",
+  "buildExit": 0,
+  "tests": {
+    "tasks": 2,
+    "passed": 388,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "fetchedSources": [
+    {
+      "url": "https://github.com/canardlapin/grakern.git",
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "clean": true
+    },
+    {
+      "url": "https://github.com/canardlapin/gale.git",
+      "revision": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "clean": true
+    },
+    {
+      "url": "https://github.com/canardlapin/graph4s.git",
+      "revision": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "clean": true
+    }
+  ],
+  "archive": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/checkout/pipeline/target/cli-distribution/storymodel4s-0.1-e5bd6ae-SNAPSHOT.zip",
+  "archiveSha256": "f3a49a4125e4aa639b90504a2b8ef75654aa61ff831226f363ffd9eb197e0808",
+  "archiveBytes": 143091141,
+  "scope": "Fresh default Git source build, adapter and pipeline JVM tests, existing CLI packaging. Third-party provenance/notice supplement and full candidate gate remain pending."
+}

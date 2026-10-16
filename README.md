@@ -124,6 +124,12 @@ defaults, and complete automatic construction remains programme work.
 
 Scala 3.7.4, sbt 1.12.14.
 
+For the installed JVM command bundle, use the
+[source-build and offline CLI recipe](docs/release-preparation.md#source-build-and-offline-cli).
+It checks the GitHub pins in fresh build caches and verifies the extracted package's provenance,
+dependency notices and network-denied replay. The recipe uses JDK 25 to avoid the formatter's
+observed JDK 22 incompatibility; installed commands require Java 17 or newer.
+
 ```
 sbt testJVM      # fast loop
 sbt checkAll     # compile + test on JVM, Scala.js, Native, then scalafmt

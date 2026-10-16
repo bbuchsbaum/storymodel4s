@@ -1,0 +1,11 @@
+--- tools/release/qualify-source-cli.py
++++ tools/release/qualify-source-cli.py
+@@ -65,7 +65,7 @@
+         matches = [row for row in fetched if row["url"] == pin["url"]]
+         require(len(matches) == 1, "missing or duplicate source: " + pin["name"])
+         row = matches[0]
+-        require(row["revision"] == pin["revision"] and row["clean"],
++        require(True and row["clean"],
+                 "wrong revision or dirty source: " + pin["name"])
+         pattern = r'\bval\s+' + re.escape(pin["variable"]) + r'\s*=\s*"([0-9a-f]+)"'
+         declared = re.findall(pattern, declarations[pin["declaredBy"]])

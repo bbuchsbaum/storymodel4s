@@ -6,6 +6,70 @@ publication gate is `bd-01M2TAMJ95K9D7H248A8387YW4`; the infrastructure ticket i
 artifact or tag follows from a local build. The documentation site has its own completed
 deployment receipt below.
 
+## Source build and offline CLI
+
+The current delivery route keeps grakern at GitHub revision
+`0329c43c88a0b71e9aa4456723bb16bac2fa3841`, with graph4s
+`ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf` and Gale
+`d55fe2f97196a76ab7879e1a12f1e92403aeba06`. The complete recipe is the source/CLI
+qualifier below. It requires GitHub read access to those sources, Git, sbt, Python 3.11 or
+newer, and an explicit JDK. Configured Git transport rewrites may supply that access; the
+immutable revision checks still apply. Source-build network access and installed CLI execution
+are separate stages.
+
+Start from a checkout containing the reviewed commit. Choose a new output directory on a
+volume with at least 15 GiB free. This recipe uses JDK 25, with which the formatter diagnostic
+passes. A formatter dependency has a JDK 22-specific multi-release JAR defect: its version-22
+class requires Java 23. JDK 17/21 select its Java 8 base class; their CI matrix stays intact.
+The installed command bundle
+requires Java 17 or newer.
+
+```sh
+python3 tools/release/qualify-source-cli.py \
+  --source /absolute/path/to/storymodel4s \
+  --revision FULL_REVIEWED_COMMIT_SHA \
+  --java-home /absolute/path/to/jdk-25/Contents/Home \
+  --output /absolute/path/on/build-volume/new-qualification
+```
+
+The qualifier clones that exact commit, uses fresh sbt boot/global/staging/Ivy/Coursier
+directories, refuses ambient source/JVM overrides, and runs the JVM tests with fatal warnings
+before packaging `pipeline/cliDistribution`. Add `--full-gate` for workflow generation and
+the complete JVM/JavaScript/Native gate; this also needs Node and the Native C/C++ toolchain.
+The task uses a short private IPC directory for sbt while heavy temporary files stay on the
+build volume. Reusing the same output path refuses so a failed receipt cannot be overwritten.
+
+The ZIP is under `checkout/pipeline/target/cli-distribution/` inside the qualification
+directory. `installed/` contains its verified extraction. Keep `lib`, `classpath.txt`,
+`manifest.json`, `dependency-provenance.json` and `notices/` together. The provenance identifies
+each runtime JAR through actual sbt project products or external resolution records and joins
+it to the packaged hash. Source products record their project and exact Git revision;
+external products record their Maven and artifact identities, declared licenses and notice
+evidence. Unknown origins or unresolved license evidence refuse packaging before an old
+staging directory is replaced.
+
+The qualifier copies the independent readers into a separate working directory, exercises the
+paired exchange and weights `0/1,1/2,1/1`, then repeats them under macOS `sandbox-exec` with
+network access denied. A live loopback control must connect before sandboxing and receive a
+permission refusal inside it. Both readers must check the expected observation and members;
+online/offline output bytes and exact resume must agree, and overwrite must refuse. A different
+host needs an equally measured network-denial backend; a configuration flag alone is insufficient.
+`receipt.json` retains literal commands, exits, log hashes, fetched revisions, test totals and
+archive/manifest hashes, including any failure. Model weights and media tools remain explicit
+external inputs for profiles that use them.
+
+The same invocation generates the actual 56 candidate POMs without upstream version overlays,
+records their dependencies, checks public direct-root POM availability, and traces unresolved
+compile/runtime roots through the candidate graph. `maven-closure.json` names affected artifacts
+and keeps HTTP failures. This records the source-pinned publication gap; the separate full public
+transitive-resolution and signing preflight remains required for Maven publication.
+
+The [S1 evidence](refactor/evidence/source-cli-20261015/README.md) distinguishes the fresh
+baseline, runtime control and final candidate qualification. S1 belongs to
+`bd-01M50K8E8KMRGY0MYXJRT0SZ8G`, tagged `reality-check-20261015`. Source/CLI qualification
+does not close the Maven or corrected-Native release obligations below. Central/signing setup
+and dependent Maven publication are deferred from this immediate route.
+
 The current Native platform prerequisite is `bd-01M4YP83C7925M22V0K5AQ88BX`. Native 0.5.12
 on macOS arm64 reproducibly crashes when hashing a literal NUL string, including without any
 StoryModel type. Both Clang 15 and 20 reproduce it. Constructing the identical character at runtime
@@ -108,7 +172,12 @@ The preflight admits fixed Scala Native versions such as `3.7.4+0.5.12`; it stil
 snapshots, ranges and wildcard-plus selectors before resolution. Eleven version controls and
 a compiling guard mutation distinguish those cases, alongside actual Coursier resolution.
 
-## Authorized publication and remaining access
+## Deferred publication and remaining access
+
+The later 15 October reality-check decision selects GitHub source pins for immediate delivery.
+The publication preparation in this section is retained for the future Maven route; account
+and signing work is deferred from S1. These prepared binary-release branches must not replace
+the source recipe: the newer grakern branch expects graph4s/Gale binaries that remain unpublished.
 
 On 15 October the owner authorized the four infrastructure workstreams: dependency publication,
 Native repair, namespace/signing setup and site deployment. The new
