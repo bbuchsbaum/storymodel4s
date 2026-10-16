@@ -1,0 +1,3 @@
+no types defined in changed files
+
+exit=0
