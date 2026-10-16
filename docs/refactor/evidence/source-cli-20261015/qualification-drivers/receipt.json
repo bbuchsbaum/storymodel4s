@@ -1,0 +1,12 @@
+{
+  "status": "prepared-drivers-only",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "docs/refactor/evidence/source-cli-20261015/qualification-drivers/driver-courts.py"
+  ],
+  "exit": 0,
+  "logSha256": "105e907fc0b823eafcb24999971205ff2a7caeac375236d09c130038c2ead82a",
+  "review": "source_cli_review: corrected driver logic PASS; execution acceptance remains pending",
+  "producer": "65811d0137ab49dde114dce5450e3998fa7b96c6",
+  "consumer": "50a160168daa03c51fcab60a4eaaed66674da83a"
+}
