@@ -57,6 +57,10 @@ only. The preregistration must bind code, model/tokenizer bytes, encoder fingerp
 configuration, segmentation, candidate policy, reconstruction settings and development exposure.
 Retain failure and input receipts for every arm. Frozen settings must be executable, not prose
 such as "best current model".
+Qualify any output-affecting emitted-decision instrumentation repair before freezing these
+executable hashes and before opening evaluation material. A repair that changes scored outputs
+after freeze requires a reviewed new registration before any opening; after opening it cannot
+be presented as the original confirmatory run.
 
 The proposed single primary empirical contrast is reconstruction minus the local neural
 reference in **participant-average correct event assignments over all eligible gold-bearing
@@ -119,13 +123,14 @@ contract. Read ledgers remain durable after failure; evaluation does not reset t
 
 Courts use synthetic manifests and must refuse changed hashes, duplicate/overlapping identities
 across splits, reused or exposed evaluation families, an added comparison, missing failures,
+changed instrument/scorer hashes on launch or reuse,
 premature opening, and unregistered stopping/threshold changes. A mutation deleting each named
 guard must compile and fail its corresponding court while unrelated controls pass. The checker
 must be independently reviewed on the exact frozen revision before E2 receives a launch token.
 
 E1 acceptance is the **complete frozen registration, working refusal checker and independent
-scientific review**, not this draft. E2 prepares and obtains approved blinded coding. E3 repairs
-the emitted-decision instrument, independently reproduces the frozen analysis and records one
+scientific review**, not this draft. E2 prepares and obtains approved blinded coding. E3 uses
+the already qualified instrument, independently reproduces the frozen analysis and records one
 of positive, negative or inconclusive. Negative and inconclusive outcomes are valid completions
 of the study, but do not establish efficacy or change product defaults. Any new comparison after
 opening needs a new preregistration and newly eligible data.
