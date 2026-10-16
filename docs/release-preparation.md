@@ -76,8 +76,9 @@ baseline, adverse attempts and final candidate qualification. Exact `c69a5d75` p
 and notice verification, independent readers and measured network-denied replay. Its original,
 Toronto and Honolulu archives are byte-identical. Independent artifact review passes. Pinned
 Atlas `50a16016`, explicitly using this producer, passed 518 tests, application linking and final
-format checks; its default producer pin is unchanged. Final consumer evidence review and
-authorized landing remain separate S1 acceptance.
+format checks; its default producer pin is unchanged. Independent consumer evidence review
+passes at `de1dce18dcdb5497b9ffaa1c01268fec9d8155f8`. Authorized landing remains open S1
+acceptance.
 
 The actual source-pinned POMs still reference four missing grakern coordinates at
 `0.1-0329c43-SNAPSHOT`. Their nonoptional compile/runtime paths reach `embed-grakern` and

@@ -9,8 +9,8 @@ passes: the original archive and actual Toronto/Honolulu rebuilds are byte-ident
 source/CLI artifact review passes. The [Atlas gate](atlas-compatible-c69a5d75/receipt.json) passes
 at consumer `50a160168daa03c51fcab60a4eaaed66674da83a`: ten task totals, **518 passed, zero
 failures/errors/skips**, application linking and final formatting checks. It explicitly overrides
-the producer to the qualified revision; the consumer's default pin is unchanged. S1 remains open
-for final consumer evidence review and authorized landing.
+the producer to the qualified revision; the consumer's default pin is unchanged. Independent consumer evidence review also passes at evidence commit
+`de1dce18dcdb5497b9ffaa1c01268fec9d8155f8`. S1 remains open for authorized landing.
 
 The fresh checkout fetched all three declared Git pins without source overrides, using configured
 SSH transport. Its 143,475,273-byte archive has SHA256
