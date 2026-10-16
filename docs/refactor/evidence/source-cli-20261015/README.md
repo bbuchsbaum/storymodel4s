@@ -50,6 +50,13 @@ Their seven admission controls pass; execution receipts remain separate from dri
   56 test totals passed, then `scalafmtSbtCheck` failed before packaging. The formatter's exact
   whitespace-only correction and passing format check are retained beside that adverse receipt.
   The corrected candidate above was qualified afresh; this failed run was not relabelled green.
+- [Atlas Central-only attempt](atlas-central-only-failed/receipt.json): resolution failed before
+  compilation. Typelevel's Native-crossproject plugin requests `sbt-scala-native` 0.3.7, which
+  is absent from Central but available from the official sbt plugin Ivy repository. The retained
+  descriptor and observed 244,880-byte JAR identify that exact version. The revised witness adds
+  the verified official JFrog download endpoint with its Ivy layout, retaining fresh isolation
+  and unchanged producer, consumer and dependency pins. Consumer compatibility requires the
+  retry's actual compile/test/link results; repository availability alone does not establish it.
 
 Full logs are retained as deterministic gzip files beside their receipts. Each receipt's log
 hash covers the original uncompressed bytes. Build workspaces and the installed baseline remain

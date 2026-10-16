@@ -7,7 +7,7 @@ def validate_inputs(qualification, expected, environment):
     if present:
         raise ValueError('Ambient Atlas source overrides: '+', '.join(present))
 
-root=Path('/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234')
+root=Path('/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy')
 producer_root=root.parent/'reality-check-20261015-s1-candidate-c69a5d75'
 producer=producer_root/'checkout';checkout=root/'checkout'
 expected_producer='c69a5d754a21fa455c64901334d9509278401091'
@@ -25,10 +25,10 @@ ipc=tempfile.TemporaryDirectory(prefix='sm4s-atlas-ipc-',dir='/private/tmp')
 try:
     directories={name:root/name for name in ['boot','global','staging','ivy','coursier','config','tmp']}
     for directory in directories.values():directory.mkdir()
-    repositories=root/'repositories';repositories.write_text('[repositories]\n  maven-central: https://repo.maven.apache.org/maven2\n')
+    repositories=root/'repositories';repositories.write_text('[repositories]\n  maven-central: https://repo.maven.apache.org/maven2\n  sbt-plugin-releases: https://scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]\n')
     java='/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home'
     env=dict(os.environ,JAVA_HOME=java,TMPDIR=str(directories['tmp']),XDG_RUNTIME_DIR=ipc.name,COURSIER_CACHE=str(directories['coursier']),COURSIER_CONFIG_DIR=str(directories['config']),COURSIER_CREDENTIALS='',GIT_TERMINAL_PROMPT='0',ORT_DISABLE_TELEMETRY='1')
-    witness.receipt['isolation']={key:str(value) for key,value in directories.items()};witness.save()
+    witness.receipt['isolation']={key:str(value) for key,value in directories.items()};witness.receipt['repositories']={'sha256':module.sha(repositories),'contents':repositories.read_text()};witness.save()
     witness.run([java+'/bin/java','-version'],root,env)
     base=['sbt','-batch','-J-Xmx6G','-J-XX:ActiveProcessorCount=4','-J-Djava.io.tmpdir='+str(directories['tmp']),'-Dsbt.boot.directory='+str(directories['boot']),'-Dsbt.global.base='+str(directories['global']),'-Dsbt.global.staging='+str(directories['staging']),'-Dsbt.ivy.home='+str(directories['ivy']),'-Dsbt.repository.config='+str(repositories),'-Dsbt.override.build.repos=true','-Dstoryatlas4s.storymodel4s.build='+str(producer)]
     log=witness.run(base+['set ThisBuild / tlFatalWarnings := true','compileAll','testAll','app/fastLinkJS','scalafmtCheckAll','scalafmtSbtCheck'],checkout,env)

@@ -1,0 +1,31 @@
+[
+  {
+    "url": "https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/ivys/ivy.xml",
+    "error": "<HTTPError 403: 'Forbidden'>"
+  },
+  {
+    "url": "https://scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/ivys/ivy.xml",
+    "status": 200,
+    "finalUrl": "https://scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/ivys/ivy.xml",
+    "contentType": "application/xml",
+    "bytes": 1850,
+    "sha256": "736f71705b107d43e56f8108369d95eeab2522428a34215ae2a4a17ed29c7558"
+  },
+  {
+    "url": "https://scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/jars/sbt-scala-native.jar",
+    "status": 200,
+    "bytes": 244880,
+    "sha256": "d7354ae840deafc39de103e7693a2bff245f928d9af4b0af65c5e7510848603f",
+    "entries": 141,
+    "manifest": "Manifest-Version: 1.0\r\nImplementation-Title: Scala Native sbt-scala-native\r\nImplementation-Version: 0.3.7\r\nSpecification-Vendor: org.scala-native\r\nSpecification-Title: Scala Native sbt-scala-native\r\nImplementation-Vendor-Id: org.scala-native\r\nSpecification-Version: 0.3.7\r\nImplementation-URL: http://www.scala-native.org\r\nImplementation-Vendor: org.scala-native\r\n\r\n",
+    "pluginClasses": [
+      "scala/scalanative/sbtplugin/ScalaNativePluginInternal.class",
+      "scala/scalanative/sbtplugin/ScalaNativePlugin$autoImport$.class",
+      "scala/scalanative/sbtplugin/ScalaNativePlugin.class",
+      "scala/scalanative/sbtplugin/ScalaNativePluginInternal$.class",
+      "scala/scalanative/sbtplugin/ScalaNativePlugin$.class"
+    ],
+    "finalUrl": "https://scala.jfrog.io/artifactory/api/download/sbt-plugin-releases/org.scala-native/sbt-scala-native/scala_2.12/sbt_1.0/0.3.7/jars/sbt-scala-native.jar",
+    "contentType": "application/java-archive"
+  }
+]
