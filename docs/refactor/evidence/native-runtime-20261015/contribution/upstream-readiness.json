@@ -1,0 +1,24 @@
+{
+  "latestRelease": {
+    "tag_name": "v0.5.12",
+    "published_at": "2026-05-22T09:11:45Z",
+    "html_url": "https://github.com/scala-native/scala-native/releases/tag/v0.5.12"
+  },
+  "main": "c3918a9fe52a4217842b60935378a4da054a9380",
+  "stringSourceSha256": "8766a12c22d3433bd3a2b75d34fa66fec8148c39e5291b4e440a56d9b95ad05e",
+  "hashCode": "override def hashCode(): Int = {\n    val currentHashCode = cachedHashCode\n    if (currentHashCode == 0) {\n      if (count == 0) {\n        0\n      } else {\n        val data = value.at(offset)\n        var hash = 0\n        var i = 0\n        while (i < count) {\n          hash = data(i) + ((hash << 5) - hash)\n          i += 1\n        }\n        cachedHashCode = hash\n        hash\n      }\n    } else {\n      currentHashCode\n    }\n  }",
+  "checkedAtUtc": "2026-10-16T01:55:38.750719+00:00",
+  "patchSha256": "d223b4691ff0002f60c7165b178a5e3e166af19a7965ecb80252dd982c1a8467",
+  "applyCheck": {
+    "argv": [
+      "git",
+      "apply",
+      "--check",
+      "--whitespace=error-all",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/tools/native-runtime/zero-hash.patch"
+    ],
+    "exit": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "assessment": "Patch applies to live upstream main; no main-based build/test performed. Qualified runtime evidence remains bound to release0.5.12/base65dd513, not currentmain. No external contribution or fork published."
+}
