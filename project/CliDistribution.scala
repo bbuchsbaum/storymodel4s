@@ -166,7 +166,7 @@ object CliDistribution {
     }.toVector
   }
 
-  private def sourceOrigin(input: ProjectInput): Origin = {
+  private def sourceOrigin(input: ProjectInput, source: File): Origin = {
     val root = file(Process(Seq("git", "rev-parse", "--show-toplevel"), input.base).!!.trim)
     require(
       Process(Seq("git", "status", "--porcelain"), root).!!.trim.isEmpty,
@@ -195,7 +195,7 @@ object CliDistribution {
         "scalaVersion" -> quoted(input.scalaVersion)
       ),
       input.licenses.map { case (name, url) => name -> Some(url.toString) },
-      legal.map { file =>
+      embeddedNotices(source) ++ legal.map { file =>
         Notice(
           "source/" + file.getName,
           IO.readBytes(file),
@@ -230,7 +230,7 @@ object CliDistribution {
       projects.size + (if (external.nonEmpty) 1 else 0) == 1,
       "unknown or ambiguous classpath origin: " + source.getName
     )
-    if (projects.nonEmpty) sourceOrigin(projects.head)
+    if (projects.nonEmpty) sourceOrigin(projects.head, source)
     else {
       require(source.isFile, "external dependency is not a JAR")
       val identities = external.map { case (report, artifact) =>

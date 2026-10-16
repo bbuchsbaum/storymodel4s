@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise launcher argument/environment boundaries; optionally read back a staged distribution."""
 import hashlib
+from collections import Counter
 import json
 import os
 from pathlib import Path
@@ -153,6 +154,7 @@ def verify_provenance(root, manifest):
         assert licenses and all(licenses), "missing declared licenses"
         assert row["notices"], "missing dependency notices"
         covered = set()
+        embedded = []
         for notice in row["notices"]:
             name = notice["path"]
             assert name.startswith(f"notices/{ordinal:04d}/") and name in files, "notice reference differs"
@@ -162,6 +164,7 @@ def verify_provenance(root, manifest):
             proof = notice["origin"]
             if proof["kind"] == "jar-entry":
                 assert legal_name(proof["entry"]), "non-text file offered as a legal notice"
+                embedded.append(proof["entry"])
                 with zipfile.ZipFile(root / row["path"]) as jar:
                     assert jar.namelist().count(proof["entry"]) == 1, "missing or duplicate embedded notice"
                     assert jar.read(proof["entry"]) == payload, "embedded notice bytes differ"
@@ -177,6 +180,11 @@ def verify_provenance(root, manifest):
                     covered.update(licenses)
             else:
                 raise AssertionError("unknown notice origin")
+        with zipfile.ZipFile(root / row["path"]) as jar:
+            legal = [entry.filename for entry in jar.infolist()
+                     if not entry.is_dir() and legal_name(entry.filename)]
+        assert len(legal) == len(set(legal)), "duplicate embedded legal member"
+        assert Counter(embedded) == Counter(legal), "embedded notice inventory differs"
         assert licenses <= covered, "declared license lacks evidence"
 
 
@@ -240,6 +248,25 @@ class DependencyCourt(unittest.TestCase):
 
     def test_complete_origin_and_notice_control_passes(self):
         self.check()
+
+    def test_omitted_embedded_notice_refuses_for_every_origin(self):
+        for row in self.provenance["classpath"]:
+            with self.subTest(kind=row["origin"]["kind"]):
+                notice = row["notices"].pop()
+                (self.root / notice["path"]).unlink()
+                with self.assertRaisesRegex(AssertionError, "embedded notice inventory differs"):
+                    self.check()
+                path = self.root / notice["path"]
+                path.write_bytes(b"synthetic embedded notice")
+                row["notices"].append(notice)
+
+    def test_duplicate_embedded_association_refuses_for_every_origin(self):
+        for row in self.provenance["classpath"]:
+            with self.subTest(kind=row["origin"]["kind"]):
+                row["notices"].append(row["notices"][-1])
+                with self.assertRaisesRegex(AssertionError, "embedded notice inventory differs"):
+                    self.check()
+                row["notices"].pop()
 
     def test_vendored_component_notice_names_are_retained(self):
         for name in ("META-INF/FastDoubleParser-LICENSE", "META-INF/thirdparty-LICENSE",
