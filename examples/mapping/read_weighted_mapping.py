@@ -77,7 +77,9 @@ def selected(files):
 
 
 def read_sweep(files):
-    meta = envelope(files, "weighted-mapping-batch/v1")
+    schema = parse(files.get("manifest.json", "{}")).get("schemaVersion")
+    require(schema in {"weighted-mapping-batch/v1", "weighted-mapping-batch/v2"}, "unsupported weighted batch schema")
+    meta = envelope(files, schema)
     require(set(meta) == {"baseManifest", "weights", "members"}, "weighted batch metadata")
     weights = meta["weights"]
     require(weights and len(weights) == len(set(weights)), "duplicate or empty sweep")
@@ -86,7 +88,7 @@ def read_sweep(files):
     base_files = {k[len("base--"):]: v for k, v in files.items() if k.startswith("base--")}
     require(hashlib.sha256(base_files["manifest.json"].encode()).hexdigest() == meta["baseManifest"], "weighted base digest")
     base = read_publication(base_files)
-    require(base["schema"] == "mapping-exchange-batch/v1", "weighted base schema")
+    require(base["schema"] in {"mapping-exchange-batch/v1", "mapping-exchange-batch/v2"}, "weighted base schema")
     complete = [o for o in base["outcomes"] if o["execution"] == "complete"]
     expected = [(o["run"], weight) for o in complete for weight in weights]
     require([(m["run"], m["lambda"]) for m in meta["members"]] == expected, "weighted attempt denominator")
@@ -94,7 +96,8 @@ def read_sweep(files):
     names = {"manifest.json"} | {"base--" + k for k in base_files}
     loaded = []
     for entry in meta["members"]:
-        require(set(entry) == {"run", "lambda", "prefix", "manifest"}, "weighted member descriptor")
+        v2_fields = {"run", "lambda", "kind", "dispatchedMember", "temperature", "decisionPolicy", "endpointContinuity", "model", "prefix", "manifest"}
+        require(set(entry) == (v2_fields if schema.endswith("/v2") else {"run", "lambda", "prefix", "manifest"}), "weighted member descriptor")
         n, d = fraction(entry["lambda"])
         prefix = entry["run"] + f"--{n}-{d}--"
         require(entry["prefix"] == prefix, "weighted prefix")
@@ -112,6 +115,16 @@ def read_sweep(files):
             endpoint_prefix = entry["run"] + "--" + endpoint + "--"
             original = {k[len(endpoint_prefix):]: v for k, v in base_files.items() if k.startswith(endpoint_prefix)}
             require(payloads == original, "endpoint bytes differ")
+        if schema.endswith("/v2"):
+            expected_dispatch = "Reference" if n == 0 else "Reconstruction" if n == d else "Weighted"
+            expected_kind = "NormalizedScoreMass" if n == 0 else "ModelPosterior"
+            require(entry["kind"] == expected_kind and entry["dispatchedMember"] == expected_dispatch, "weighted dispatch")
+            require(entry["model"] == run["model"], "weighted executed model")
+            expected_temperature = entry["model"]["reference"]["temperature"] if n == 0 else entry["model"]["reconstruction"]["temperature"]
+            require(entry["temperature"] == expected_temperature, "weighted temperature")
+            expected_policy = entry["model"]["reconstruction"]["decisionPolicy"] if n == d else "RawArgmax"
+            require(entry["decisionPolicy"] == expected_policy, "weighted decision policy")
+            require(entry["endpointContinuity"] == "Not promised by weighted v1", "weighted endpoint continuity")
         names |= {prefix + k for k in member_files}
         loaded.append((m, record, tables))
     require(set(files) == names, "unaccounted weighted payload")

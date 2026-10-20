@@ -128,7 +128,9 @@ Add `--resume` to the mapping command only to reuse an identical completed publi
 interrupted or corrupted output refuses. Existing files are never overwritten.
 
 `MappingPipeline.publishExchange` accepts either an actual registered `Run` or a prepared
-`Batch`. Its completion envelope is `mapping-exchange-run/v1` or `mapping-exchange-batch/v1`.
+`Batch`. Its current completion envelope is `mapping-exchange-run/v2` or
+`mapping-exchange-batch/v2`; readers retain explicit support for the corresponding v1 wrappers
+around unchanged pair payloads.
 Each run contains a `mapping-exchange-pair/v1` manifest and the unchanged single-record files,
 with flat deterministic filename prefixes. Every checksum binds the exact UTF-8 bytes.
 The pair names the original execution, shared evidence, source, inventory and both profiles.
@@ -136,8 +138,18 @@ The outer run retains provider registration and explicit capability readiness. A
 every attempted participant/session, including failed attempts, and the prepared recall joins.
 
 The Python `read_publication(files)` API checks the complete envelopes, member/stage joins,
-measure kinds, unit/participant denominators and exact coordinates. Reference normalized score
-mass and reconstruction model posterior remain distinct; neither is calibrated correctness.
+measure kinds, unit/participant denominators and exact coordinates. For v2 batch wrappers it also
+recomputes summary coverage from retained prepared observations and actual exported record measures,
+including every diagnostic count. It binds each summary model to its executed member profile, and
+binds the reference temperature and single-level universe to exported normalized-measure metadata.
+The reconstruction temperature is retained as a finite declared policy value: v2 does not export an
+independent reconstruction inference-config artifact from which a reader could recover it. Reference
+normalized score mass and reconstruction model posterior remain distinct; neither is calibrated
+correctness.
+
+`WeightedMapping.publish` currently emits `weighted-mapping-batch/v2`; its reader also accepts
+v1 envelopes. V2 member descriptors bind the exact lambda, dispatched member, measure kind,
+decision policy, model profile and temperature. Endpoint continuity remains explicitly unpromised.
 The reader verifies package consistency, not the truth of an untrusted producer's execution
 claim. `MappingExchange.decodePair(files, execution)` additionally requires the actual owning
 execution and matches the complete canonical pair.

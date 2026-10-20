@@ -299,8 +299,10 @@ def read_pair(files):
     return metadata, loaded
 
 
-def check_run(metadata, files):
+def check_run(metadata, files, v2):
     required = {"run", "registration", "execution", "sharedEvidence", "config", "readiness", "members"}
+    if v2:
+        required.add("model")
     require(set(metadata) == required, "run metadata")
     prefix = digest(metadata["run"]) + "--"
     pair_files = {p[len(prefix):]: text for p, text in files.items() if p.startswith(prefix)}
@@ -311,7 +313,74 @@ def check_run(metadata, files):
         {"member": name.capitalize(), "kind": "NormalizedScoreMass" if name == "reference" else "ModelPosterior",
          "profile": member["profile"], "record": member["record"]}
         for name, member in zip(("reference", "reconstruction"), pair["members"])], "run member join")
+    if v2:
+        model = metadata["model"]
+        require(set(model) == {"run", "reference", "reconstruction", "interpretation"} and model["run"] == metadata["run"], "run model")
+        require(model["reference"]["profile"] == metadata["members"][0]["profile"] and model["reconstruction"]["profile"] == metadata["members"][1]["profile"], "run model profiles")
+        for member in ("reference", "reconstruction"):
+            require(isinstance(model[member]["temperature"], (int, float)) and math.isfinite(model[member]["temperature"]) and model[member]["temperature"] > 0, "run model temperatures")
+        reference, tables = loaded["reference"]
+        normalized = [row["measures"]["normalized"] for row in tables["measure-metadata"]]
+        supplied = [number(value["value"]["temperature"]) for value in normalized if value["status"] == "present"]
+        require(all(value == model["reference"]["temperature"] for value in supplied), "reference normalized temperature")
+        universe = reference["policies"]["target_universe_id"]
+        require(model["reference"]["universe"] == universe["id"] and universe["grain"] == {"status": "single-level", "level": model["reference"]["level"]}, "reference universe")
+        # Reconstruction's inference temperature has no independent exported config in v2; its
+        # finite declared value is checked above, but is not presented as a recovered measurement.
     return loaded, {prefix + p for p in pair_files}
+
+
+def check_v2_coverage(metadata, outcomes, pairs):
+    """Recompute the v2 summary from retained outcomes and exported record measures."""
+    summary = metadata["summary"]
+    require(set(summary) == {"schema", "plan", "attempts", "completed", "failed", "coverage", "models", "missingCapabilities"}, "summary fields")
+    require(summary["schema"] == "mapping-summary/v2" and summary["plan"] == metadata["plan"], "foreign summary plan")
+    require(summary["attempts"] == len(outcomes), "summary attempt denominator")
+    complete = [outcome for outcome in outcomes if outcome["execution"] == "complete"]
+    require(summary["completed"] == len(complete) and summary["failed"] == len(outcomes) - len(complete), "summary execution totals")
+    require(summary["missingCapabilities"] == [cap for cap in metadata["config"]["requested"] if cap != "Mapping"], "summary capabilities")
+    models = {model["run"]: model for model in summary["models"]}
+    require(len(models) == len(complete) and set(models) == {outcome["run"] for outcome in complete}, "summary models")
+    pairs_by_run = {outcome["run"]: pair for outcome, pair in zip(complete, pairs)}
+    coverage = summary["coverage"]
+    require(set(coverage) == {"prepared", "runProduced", "unknownUnitObservations", "aggregation", "diagnosticCounts", "reference", "reconstruction", "observations"}, "coverage fields")
+    require(coverage["prepared"] == sum(outcome.get("observation") is not None for outcome in outcomes), "coverage prepared")
+    require(coverage["runProduced"] == len(complete), "coverage runs")
+    require(coverage["unknownUnitObservations"] == len(outcomes) - coverage["prepared"], "coverage unknown observations")
+    require(coverage["aggregation"] == "pooled-known-units; unknown unit counts excluded from denominator", "coverage aggregation")
+    require(coverage["diagnosticCounts"] == "nonexclusive; uniform costs do not mean unavailable", "coverage diagnostics")
+    observations = coverage["observations"]
+    require(len(observations) == len(outcomes), "coverage observation denominator")
+    units = []
+    for outcome, observation in zip(outcomes, observations):
+        require((observation["participant"], observation["session"], observation.get("observation"), observation.get("failure")) == (outcome["participant"], outcome["session"], outcome.get("observation"), outcome.get("failure")), "coverage observation identity")
+        if outcome.get("observation") is None:
+            require("declaredUnits" not in observation and observation["units"] == [], "coverage unknown inventory")
+        else:
+            require(observation["declaredUnits"] == len(outcome["units"]) and [unit["unit"] for unit in observation["units"]] == [unit["unit"] for unit in outcome["units"]], "coverage retained inventory")
+        if outcome["execution"] == "complete":
+            pair = pairs_by_run[outcome["run"]]
+            require(models[outcome["run"]] == outcome["mapping"]["model"], "summary executed model")
+            for member, family in (("reference", "normalized"), ("reconstruction", "posterior")):
+                measure = {row["unit"]: row["measures"][family]["status"] == "present" for row in pair[member][1]["measure-metadata"]}
+                decisions = {row["unit"]: row["processing_status"]["status"].capitalize() for row in pair[member][1]["decisions"]}
+                for unit in observation["units"]:
+                    value = unit[member]
+                    require(value["processing"] == decisions[unit["unit"]] and value["measureAvailable"] == measure[unit["unit"]], "coverage record measure")
+        else:
+            for unit in observation["units"]:
+                for member in ("reference", "reconstruction"):
+                    require(unit[member]["processing"] == "NotProduced" and not unit[member]["measureAvailable"], "coverage failed measure")
+        units.extend(observation["units"])
+    for member in ("reference", "reconstruction"):
+        totals = coverage[member]
+        required_totals = {"declaredUnits", "measuredUnits", "unavailableUnits", "overflowUnits", "uniformSemanticUnits", "uniformCostUnits"}
+        require(set(totals) == required_totals | ({"measuredFractionOfKnownUnits"} if units else set()), "coverage member fields")
+        measured = sum(unit[member]["measureAvailable"] for unit in units)
+        require(totals["declaredUnits"] == len(units) and totals["measuredUnits"] == measured and totals["unavailableUnits"] == len(units) - measured, "coverage member totals")
+        if units:
+            require(totals["measuredFractionOfKnownUnits"] == measured / len(units), "coverage member fraction")
+        require(totals["overflowUnits"] == sum(unit[member].get("overflow", False) for unit in units) and totals["uniformSemanticUnits"] == sum(unit[member].get("uniformSemantic", False) for unit in units) and totals["uniformCostUnits"] == sum(unit[member].get("uniformCosts", False) for unit in units), "coverage diagnostic totals")
 
 
 def read_publication(files):
@@ -319,13 +388,15 @@ def read_publication(files):
     if schema == "mapping-exchange-pair/v1":
         metadata, loaded = read_pair(files)
         return {"schema": schema, "pairs": [loaded], "outcomes": [], "metadata": metadata}
-    require(schema in {"mapping-exchange-run/v1", "mapping-exchange-batch/v1"}, "unsupported publication schema")
+    require(schema in {"mapping-exchange-run/v1", "mapping-exchange-run/v2", "mapping-exchange-batch/v1", "mapping-exchange-batch/v2"}, "unsupported publication schema")
     metadata = envelope(files, schema)
-    if schema == "mapping-exchange-run/v1":
-        loaded, names = check_run(metadata, files)
+    if schema in {"mapping-exchange-run/v1", "mapping-exchange-run/v2"}:
+        loaded, names = check_run(metadata, files, schema.endswith("/v2"))
         require(set(files) == names | {"manifest.json"}, "unexpected run payload")
         return {"schema": schema, "pairs": [loaded], "outcomes": [], "metadata": metadata}
-    require(set(metadata) == {"plan", "sourceEdition", "config", "attempts", "outcomes"}, "batch metadata")
+    v2 = schema == "mapping-exchange-batch/v2"
+    required_metadata = {"plan", "sourceEdition", "config", "attempts", "outcomes"} | ({"summary"} if v2 else set())
+    require(set(metadata) == required_metadata, "batch metadata")
     digest(metadata["plan"])
     digest(metadata["sourceEdition"])
     require(len(metadata["attempts"]) == len(metadata["outcomes"]), "attempt denominator")
@@ -369,7 +440,7 @@ def read_publication(files):
         run = outcome["mapping"]
         require(run["config"] == metadata["config"] and run["run"] == outcome["run"]
                 and run["registration"] == outcome["registration"] and run["readiness"] == outcome["readiness"], "foreign batch run")
-        pair, payloads = check_run(run, files)
+        pair, payloads = check_run(run, files, v2)
         names |= payloads
         require(pair["reference"][0]["inventory"]["digest"] == prepared["inventory"], "foreign prepared inventory")
         require([u["unit"] for u in outcome["units"]] == [u["id"] for u in pair["reference"][1]["units"]], "unit outcome denominator")
@@ -378,6 +449,8 @@ def read_publication(files):
                 require(summary[name] == decision["processing_status"]["status"].capitalize(), "unit outcome status")
         loaded_pairs.append(pair)
     require(set(files) == names, "unaccounted batch payload")
+    if v2:
+        check_v2_coverage(metadata, metadata["outcomes"], loaded_pairs)
     return {"schema": schema, "pairs": loaded_pairs, "outcomes": metadata["outcomes"], "metadata": metadata}
 
 

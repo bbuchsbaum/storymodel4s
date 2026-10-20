@@ -10,6 +10,10 @@ import json
 import struct
 import sys
 from fractions import Fraction
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples" / "mapping"))
+from read_weighted_mapping import read_sweep
 
 
 def rows(text):
@@ -75,6 +79,8 @@ def check(files):
             assert member["decisionPolicy"] == member["model"]["reconstruction"]["decisionPolicy"]
         else:
             assert member["decisionPolicy"] == "RawArgmax"
+    # The established reader also verifies byte integrity and all original scientific joins.
+    read_sweep(files)
 
 
 def main(log):

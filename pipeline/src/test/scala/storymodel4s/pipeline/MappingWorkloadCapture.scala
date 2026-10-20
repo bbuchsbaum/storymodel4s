@@ -60,7 +60,7 @@ object MappingWorkloadCapture:
         case bean: ThreadMXBean if bean.isThreadAllocatedMemorySupported =>
           if !bean.isThreadAllocatedMemoryEnabled then bean.setThreadAllocatedMemoryEnabled(true)
           Option.when(bean.isThreadAllocatedMemoryEnabled)(
-          bean.getThreadAllocatedBytes(Thread.currentThread().getId)
+            bean.getThreadAllocatedBytes(Thread.currentThread().getId)
           )
         case _ => None
     catch case NonFatal(_) => None
@@ -72,15 +72,23 @@ object MappingWorkloadCapture:
     val value = body
     val elapsed = System.nanoTime() - started
     val afterAllocated = allocatedBytes
-    Measurement(value, elapsed, beforeHeap, heapUsed, for
-      before <- beforeAllocated
-      after <- afterAllocated
-    yield after - before)
+    Measurement(
+      value,
+      elapsed,
+      beforeHeap,
+      heapUsed,
+      for
+        before <- beforeAllocated
+        after <- afterAllocated
+      yield after - before
+    )
 
   private def text(size: Int): String =
-    Vector.tabulate(size) { index =>
-      if index % 2 == 0 then "Anna arrived." else "Bob left."
-    }.mkString(" ")
+    Vector
+      .tabulate(size) { index =>
+        if index % 2 == 0 then "Anna arrived." else "Bob left."
+      }
+      .mkString(" ")
 
   private def write(root: Path, name: String, value: String): Unit =
     Files.writeString(root.resolve(name), value): Unit
@@ -107,18 +115,33 @@ object MappingWorkloadCapture:
     val rendered = text(size)
     val key = KeyId.unsafe("synthetic-workload-key")
     val keys = SensitiveKeyProvider.static(key, Array[Byte](3, 5, 7, 11))
-    val detector = right(PseudonymizationDetector.wholeWordTable(
-      Vector(PseudonymizationTableEntry("Jane", "Anna"))
-    ))
+    val detector = right(
+      PseudonymizationDetector.wholeWordTable(
+        Vector(PseudonymizationTableEntry("Jane", "Anna"))
+      )
+    )
     val detected = right(detector.detect(original, key, keys))
-    val spans = "Jane".r.findAllMatchIn(original).map { matched =>
-      val span = storymodel4s.core.TextSpan.unsafe(matched.start, matched.end)
-      span -> span
-    }.toVector
-    RecallDisclosure.certified(right(PseudonymizedText.checked(
-      PrivacyPolicyId.unsafe("synthetic-workload-policy"), key, original, rendered,
-      spans, detected, detector, keys
-    )))
+    val spans = "Jane".r
+      .findAllMatchIn(original)
+      .map { matched =>
+        val span = storymodel4s.core.TextSpan.unsafe(matched.start, matched.end)
+        span -> span
+      }
+      .toVector
+    RecallDisclosure.certified(
+      right(
+        PseudonymizedText.checked(
+          PrivacyPolicyId.unsafe("synthetic-workload-policy"),
+          key,
+          original,
+          rendered,
+          spans,
+          detected,
+          detector,
+          keys
+        )
+      )
+    )
 
   private def prepare(root: Path, recallSize: Int): StudyPreparation.Prepared =
     right(
@@ -214,7 +237,9 @@ object MappingWorkloadCapture:
     )
     val label = s"s$sourceSize-r$recallSize-t$tieBudget-w${selectedWeights.size}-$index"
     val pairedOutput = root.resolve(s"paired-$label")
-    val pairedExport = measure(right(MappingPipeline.publishExchange(batch, pairedOutput, resume = false)))
+    val pairedExport = measure(
+      right(MappingPipeline.publishExchange(batch, pairedOutput, resume = false))
+    )
     val weightedOutput = root.resolve(s"weighted-$label")
     val weightedExport = measure(
       right(WeightedMapping.publish(batch, selectedWeights, weightedOutput, resume = false))
@@ -251,16 +276,22 @@ object MappingWorkloadCapture:
             .sum
         ),
         "sourceLevelObservedScores" -> Json.fromLong(
-          candidates.value.byUnit.valuesIterator.flatMap(_.semanticOutcomes.iterator)
-            .map(_.observed.toLong).sum
+          candidates.value.byUnit.valuesIterator
+            .flatMap(_.semanticOutcomes.iterator)
+            .map(_.observed.toLong)
+            .sum
         ),
         "sourceLevelIneligibleCandidates" -> Json.fromLong(
-          candidates.value.byUnit.valuesIterator.flatMap(_.semanticOutcomes.iterator)
-            .map(_.ineligible.toLong).sum
+          candidates.value.byUnit.valuesIterator
+            .flatMap(_.semanticOutcomes.iterator)
+            .map(_.ineligible.toLong)
+            .sum
         ),
         "sourceLevelMissingScores" -> Json.fromLong(
-          candidates.value.byUnit.valuesIterator.flatMap(_.semanticOutcomes.iterator)
-            .map(_.missing.values.sum.toLong).sum
+          candidates.value.byUnit.valuesIterator
+            .flatMap(_.semanticOutcomes.iterator)
+            .map(_.missing.values.sum.toLong)
+            .sum
         ),
         "sourceLevelNominatedAnchors" -> Json.fromLong(
           localEvidence.value.nominated.map(_.size.toLong).sum

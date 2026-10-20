@@ -180,9 +180,21 @@ class TemporalPipelineSuite extends FunSuite:
       assert(MappingPipeline.exportTemporalResults(batch, requests, output).isLeft)
       val manifestPath = output.resolve("manifest.json")
       val manifest = right(Canonical.parse(Files.readString(manifestPath)))
-      assertEquals(manifest.hcursor.get[String]("schemaVersion"), Right("mapping-temporal-batch/v2"))
-      assertEquals(manifest.hcursor.downField("metadata").downField("summary").get[String]("schema"), Right("mapping-summary/v2"))
-      write(output, "manifest.json", Canonical.print(manifest.mapObject(_.add("schemaVersion", Json.fromString("mapping-temporal-batch/v1")))))
+      assertEquals(
+        manifest.hcursor.get[String]("schemaVersion"),
+        Right("mapping-temporal-batch/v2")
+      )
+      assertEquals(
+        manifest.hcursor.downField("metadata").downField("summary").get[String]("schema"),
+        Right("mapping-summary/v2")
+      )
+      write(
+        output,
+        "manifest.json",
+        Canonical.print(
+          manifest.mapObject(_.add("schemaVersion", Json.fromString("mapping-temporal-batch/v1")))
+        )
+      )
       assert(MappingPipeline.exportTemporalResults(batch, requests, output, true).isLeft)
       write(output, "manifest.json", Canonical.print(manifest))
       val name = batch.outcomes.head.run.get.identity.hex + "--reference--temporal-projection.json"
