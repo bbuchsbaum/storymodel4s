@@ -172,3 +172,8 @@ unavailable when absent. No presentation schedule is inferred from text length.
 The independent `examples/mapping/test_offline_source.py` court reads an actual
 public preparation output, checks both manifests and exact Unicode slices, and
 checks the absent capabilities. It is a synthetic interoperability control.
+
+The owner-approved selectable-policy and reference-only journey is documented in
+[Reference-only mapping](refactor/reference-only-mapping-20261020.md). Its new record,
+exchange and publication versions require explicit contextual reference decoding;
+legacy paired readers refuse them. Ordinary settings use `"mode":"reference-only"`.

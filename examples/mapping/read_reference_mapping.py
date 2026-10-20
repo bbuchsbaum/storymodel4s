@@ -2,6 +2,7 @@
 """Read a reference-only publication. Integrity joins do not confer Scala execution authority."""
 import argparse
 import json
+import hashlib
 from pathlib import Path
 from read_mapping import read, envelope, parse, require, digest, number
 
@@ -29,7 +30,14 @@ def read_reference(files):
             name = digest(outcome["observation"]) + "-recall.json"
             names.add(name)
             prepared = parse(files[name])
-            # The record below provides the authoritative inventory; failed preparations remain unknown.
+            require((prepared["participant"], prepared["session"]) == key and prepared["sourceEdition"] == metadata["sourceEdition"], "prepared input join")
+            require(prepared["observation"] == outcome["observation"], "prepared observation")
+            require([u["id"] for u in prepared["graph"]["units"]] == [u["unit"] for u in observation["units"]], "prepared unit denominator")
+            require(observation["declaredUnits"] == len(prepared["graph"]["units"]), "prepared unit count")
+            if prepared["schemaVersion"] == "prepared-recall/v2":
+                disclosure = prepared["disclosure"]
+                require(disclosure["scope"] == "local-workspace" and disclosure["schemaVersion"] == "recall-disclosure-receipt/v1", "disclosure description")
+                require(disclosure["textDigest"] == hashlib.sha256(prepared["graph"]["transcript"]["rawText"].encode()).hexdigest(), "disclosure text")
             require(prepared["schemaVersion"] in {"prepared-recall/v1", "prepared-recall/v2"}, "prepared recall schema")
         else:
             unknown += 1
@@ -75,6 +83,13 @@ def read_reference(files):
     require(unknown == coverage["unknownUnitObservations"], "unknown denominator")
     totals = coverage["reference"]
     require(totals["declaredUnits"] == known and totals["measuredUnits"] == measured and totals["unavailableUnits"] == known - measured, "coverage totals")
+    require(summary["failed"] == len(outcomes) - completed, "failed denominator")
+    require(coverage["prepared"] == len(outcomes) - unknown, "prepared denominator")
+    fraction = totals.get("measuredFractionOfKnownUnits")
+    require(fraction == (measured / known if known else None), "coverage fraction")
+    all_units = [row["reference"] for observation in observations for row in observation["units"]]
+    for field, total in (("overflow", "overflowUnits"), ("uniformSemantic", "uniformSemanticUnits"), ("uniformCosts", "uniformCostUnits")):
+        require(totals[total] == sum(bool(row.get(field)) for row in all_units), "diagnostic totals")
     require(len(models) == completed, "model count")
     return records
 

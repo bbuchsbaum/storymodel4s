@@ -10,7 +10,7 @@ import storymodel4s.embed.onnx.{OnnxMappingRegistration, OnnxSentenceEmbedder}
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
-/** One offline execution boundary owns profiles, registrations and both published estimands. */
+/** One offline boundary owns registrations and the explicitly selected mapping estimands. */
 object MappingPipeline:
   private enum OrganizationOrigin:
     case Lexical, Captions, Onnx
@@ -400,15 +400,10 @@ object MappingPipeline:
       .left
       .map(e => Refusal.Alignment(AlignError.InvalidConfig("candidates", e.message)))
 
-  /** Local annotation scoring is executed here; supplied score tables cannot acquire its identity.
-    */
-  def lexical(
-      recall: RecallGraph[Checked],
-      view: SourceView,
-      inventory: RecallInventory,
-      source: SourceRepresentation,
-      config: Config
-  ): Either[Refusal, Run] =
+  private def lexicalEvidence(
+      recall: RecallGraph[Checked], view: SourceView, inventory: RecallInventory,
+      source: SourceRepresentation, config: Config
+  ): Either[Refusal, (LocalEvidence, Checksum)] =
     for
       _ <- validate(config)
       _ <- Either.cond(config.profile == LexicalProfile, (), Refusal.InvalidConfig)
@@ -440,8 +435,14 @@ object MappingPipeline:
           configText(config)
         )
       )
-      run <- execute(recall, view, inventory, source, evidence, config, registration, None, None)
-    yield run
+    yield evidence -> registration
+
+  /** Local annotation scoring is executed here; caller score tables grant no origin. */
+  def lexical(recall: RecallGraph[Checked], view: SourceView, inventory: RecallInventory,
+      source: SourceRepresentation, config: Config): Either[Refusal, Run] =
+    lexicalEvidence(recall, view, inventory, source, config).flatMap { (evidence, registration) =>
+      execute(recall, view, inventory, source, evidence, config, registration, None, None)
+    }
 
   /** Consuming the registration itself prevents an unrelated genuine envelope being attached. */
   def captions(registration: CaptionMapping.Registered, config: Config): Either[Refusal, Run] =
@@ -622,48 +623,12 @@ object MappingPipeline:
       structured <- execution.reconstructionRecord.left.map(Refusal.Projection(_))
     yield new Run(execution, local, structured, config, registration, caption, onnx, captionPackage)
 
-  /** Local annotation scoring is executed here; supplied score tables cannot acquire its identity.
-    */
-  def referenceLexical(
-      recall: RecallGraph[Checked],
-      view: SourceView,
-      inventory: RecallInventory,
-      source: SourceRepresentation,
-      config: Config
-  ): Either[Refusal, ReferenceRun] =
-    for
-      _ <- validate(config)
-      _ <- Either.cond(config.profile == LexicalProfile, (), Refusal.InvalidConfig)
-      candidatesConfig <- candidateConfig(config)
-      candidates <- StrictCandidateGenerator
-        .canonicalLevel(StrictSemanticChannel.Lexical, candidatesConfig, recall, view, config.selectedLevel)
-        .left
-        .map(e => Refusal.Alignment(AlignError.InvalidConfig("candidates", e.message)))
-      model <- StrictCostModel
-        .of(
-          StrictSemanticChannel.Lexical,
-          weights = CostWeights.semanticOnly,
-          functionPrior = FunctionPrior.none,
-          externalMismatch = 0.0,
-          distortionPenalty = 0.0
-        )
-        .left
-        .map(Refusal.Alignment(_))
-      evidence <- LocalEvidence
-        .compute(recall, view, candidates, model)
-        .left
-        .map(Refusal.Alignment(_))
-      registration = ContentAddress.digest(
-        Vector(
-          "executed-canonical-lexical/v1",
-          evidence.identity.checksum.hex,
-          source.digest.hex,
-          inventory.digest.hex,
-          configText(config)
-        )
-      )
-      run <- referenceExecute(recall, view, inventory, source, evidence, config, registration, None, None)
-    yield run
+  /** The same genuine lexical evidence enters the independent producer without a grouping. */
+  def referenceLexical(recall: RecallGraph[Checked], view: SourceView, inventory: RecallInventory,
+      source: SourceRepresentation, config: Config): Either[Refusal, ReferenceRun] =
+    lexicalEvidence(recall, view, inventory, source, config).flatMap { (evidence, registration) =>
+      referenceExecute(recall, view, inventory, source, evidence, config, registration, None, None)
+    }
 
   /** Consuming the registration itself prevents an unrelated genuine envelope being attached. */
   def referenceCaptions(registration: CaptionMapping.Registered, config: Config): Either[Refusal, ReferenceRun] =
@@ -803,8 +768,8 @@ object MappingPipeline:
   private def referenceExecute(
       recall: RecallGraph[Checked], view: SourceView, inventory: RecallInventory,
       source: SourceRepresentation, evidence: LocalEvidence, config: Config,
-      registration: Checksum, caption: Option[CaptionMapping.Registered] = None,
-      onnx: Option[OnnxMappingRegistration.Registered] = None,
+      registration: Checksum, caption: Option[CaptionMapping.Registered],
+      onnx: Option[OnnxMappingRegistration.Registered],
       captionPackage: Option[CaptionMapping.PackageRegistered] = None
   ): Either[Refusal, ReferenceRun] =
     for
@@ -1056,8 +1021,9 @@ object MappingPipeline:
     validate(config)
       .flatMap(_ =>
         Either.cond(
-          config.profile == LexicalProfile || (config.profile == CaptionProfile &&
-            prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty),
+          config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty &&
+            (config.profile == LexicalProfile || (config.profile == CaptionProfile &&
+            prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty)),
           (),
           Refusal.MissingCapability(
             "registered evidence required: use the typed ONNX or caption registration entry"
@@ -1487,11 +1453,6 @@ object MappingPipeline:
         .map(v => Json.fromString(v.toString))
     )
   )
-
-  private def processingLabel(status: ProcessingStatus): String = status match
-    case ProcessingStatus.Complete                 => "Complete"
-    case ProcessingStatus.ExcludedByInputPolicy(_) => "Excluded"
-    case ProcessingStatus.Failed(_)                => "Failed"
 
   private def unitCoverage(o: ReferenceOutcome, unit: RecallUnitId, reference: Boolean): Json =
     val record = o.run.map(_.reference)

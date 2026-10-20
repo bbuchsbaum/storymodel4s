@@ -284,7 +284,11 @@ class MappingPipelineSuite extends FunSuite:
       )
     )
     val resolved = config.copy(profile = MappingPipeline.OnnxProfile, perLevel = 2, tieBudget = 2)
+    assert(MappingPipeline.registeredOnnx(registration, inventory, resolved.copy(selectedLevel = 1)).isLeft)
+    assert(MappingPipeline.referenceOnnx(registration, inventory, resolved.copy(selectedLevel = 1)).isLeft)
+    val referenceOnly = right(MappingPipeline.referenceOnnx(registration, inventory, resolved))
     val run = right(MappingPipeline.registeredOnnx(registration, inventory, resolved))
+    assertEquals(referenceOnly.execution.reference.outcomes, run.execution.reference.outcomes)
     assert(run.execution.reference.evidence eq registration.evidence)
     assert(run.execution.reconstruction.evidence eq registration.evidence)
     val replay = right(
@@ -605,13 +609,51 @@ class MappingPipelineSuite extends FunSuite:
       assert(!run.execution.reference.evidence.breakdowns.flatMap(_.keys).exists(_.anchor.contains(parent.ref)))
       val local = right(MappingPipeline.referenceLexical(recall.graph, view, recall.inventory, source, selected))
       assertEquals(local.execution.reference.outcomes, run.execution.reference.outcomes)
-      val cyclic = view.copy(nodes = view.nodes.map(n => n.copy(parent = Some(n.ref))))
-      val cyclicSource = right(SourceRepresentation.of(cyclic, source.bundles, None,
-        cyclic.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap))
-      assert(MappingPipeline.lexical(recall.graph, cyclic, recall.inventory, cyclicSource, selected).isLeft)
-      val independent = right(MappingPipeline.referenceLexical(recall.graph, cyclic, recall.inventory, cyclicSource, selected))
-      assertEquals(independent.execution.reference.profile.level, 1)
-      val context = ExpectedMappingContext(recall.inventory, cyclicSource, referenceExecution = Some(independent.execution))
-      assertEquals(right(MappingCodecs.decodeReference(MappingCodecs.encode(independent.reference), context)).digest, independent.reference.digest)
+      val invalidGrouping = selected.copy(groupingRoots = Some(Vector(parent.ref -> 0, parent.ref -> 1)))
+      assert(MappingPipeline.lexical(recall.graph, view, recall.inventory, source, invalidGrouping).isLeft)
+      val context = ExpectedMappingContext(recall.inventory, source, referenceExecution = Some(local.execution))
+      assertEquals(right(MappingCodecs.decodeReference(MappingCodecs.encode(local.reference), context)).digest, local.reference.digest)
+    }
+  }
+
+  test("executed grouping ranks and order policy produce distinct reconstruction decisions") {
+    inTemp { root =>
+      val first = prepared(root)
+      write(root, "recall.txt", "Bob left. Anna arrived.")
+      val input = right(StudyPreparation.prepare(root, first.config))
+      val inference = StructuredReconstruction.Profile.sherlock().inference
+      def settings(order: StructuredReconstruction.OrderPolicy) = config.copy(reconstructionProfile = Some(
+        right(StructuredReconstruction.Profile.of(inference, right(StructuredReconstruction.DecisionPolicy.of(order))))))
+      val free = right(MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Unconstrained))).outcomes.head.run.get
+      val ordered = right(MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Nondecreasing))).outcomes.head.run.get
+      assertEquals(free.execution.reference, ordered.execution.reference)
+      assertNotEquals(free.execution.reconstruction.decisions.map(_.anchor), ordered.execution.reconstruction.decisions.map(_.anchor))
+      val roots = input.source.nodes.filter(_.parent.isEmpty).sortBy(_.discoursePosition).reverse.zipWithIndex.map((n, i) => n.ref -> i)
+      val reversed = right(MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Nondecreasing).copy(groupingRoots = Some(roots)))).outcomes.head.run.get
+      assertEquals(reversed.execution.reconstruction.grouping.roots, roots)
+      assertEquals(reversed.execution.reference, ordered.execution.reference)
+      assertNotEquals(reversed.execution.reconstruction.decisions.map(_.anchor), ordered.execution.reconstruction.decisions.map(_.anchor))
+    }
+  }
+
+  test("reference-only empty all-failed and partial publications preserve every attempted denominator") {
+    inTemp { root =>
+      val base = prepared(root)
+      Vector(Vector.empty, Vector(StudyPreparation.RecallInput("p1", "s1", "missing.txt"))).zipWithIndex.foreach { (recalls, index) =>
+        val input = right(StudyPreparation.prepare(root, base.config.copy(recalls = recalls)))
+        val batch = right(MappingPipeline.referenceBatch(input, config))
+        val summary = MappingPipeline.inspect(batch)
+        assertEquals(right(summary.hcursor.get[Int]("attempts")), recalls.size)
+        assertEquals(right(summary.hcursor.get[Int]("completed")), 0)
+        assertEquals(right(summary.hcursor.downField("coverage").get[Int]("unknownUnitObservations")), recalls.size)
+        val output = root.resolve(s"empty-$index")
+        val receipt = right(MappingPipeline.publishReference(batch, output, false, exchange = true))
+        assertEquals(right(MappingPipeline.publishReference(batch, output, true, exchange = true)), receipt)
+        write(output, "manifest.json", "interrupted")
+        assertEquals(MappingPipeline.publishReference(batch, output, true, exchange = true), Left("Corrupt"))
+      }
+      val mixed = right(MappingPipeline.referenceBatch(prepared(root, true), config))
+      assertEquals(mixed.outcomes.count(_.run.nonEmpty), 1)
+      assertEquals(mixed.outcomes.count(_.failure.nonEmpty), 1)
     }
   }

@@ -241,6 +241,8 @@ class MappingRunSuite extends FunSuite:
       record.roles, record.ledger, record.outcomes)).digest, record.digest)
     val foreign = graph(Vector(unit.copy(function = storymodel4s.recall.DiscourseFunction.Association)))
     assert(MappingRun.computeReference(foreign, view, inventory(), source(), paired.reference.evidence, profile()).isLeft)
+    assert(MappingRun.computeReference(recall, view, inventory(graph(Vector.empty)), source(), paired.reference.evidence, profile()).isLeft)
+    assert(MappingRun.computeReference(recall, view, inventory(), source(view.copy(scoringLength = view.scoringLength + 1)), paired.reference.evidence, profile()).isLeft)
     assert(MappingRun.computeReference(recall, view.copy(scoringLength = view.scoringLength + 1), inventory(), source(), paired.reference.evidence, profile()).isLeft)
     assert(MappingRun.computeReference(foreign, view, inventory(foreign), source(), paired.reference.evidence, profile()).isLeft)
   }
