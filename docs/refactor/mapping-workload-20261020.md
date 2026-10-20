@@ -11,7 +11,8 @@ Compiled capture revision: `3d0ed5f4c52b826e4c434a1309b9287933ae5c5c`. Source SH
 hashes, output/manifest identities, allocations, heap observations, operation timings and bytes.
 
 Hardware: Apple M3 Max, 14 available processors, 36 GiB installed RAM. Runtime: OpenJDK
-25.0.1, Mac OS X 14.3, aarch64. One warmup and three measured repetitions per cell;
+25.0.1, Mac OS X 14.3, aarch64. The later export-only profiling clone ran on Java 22;
+its measurements are isolated from this initial Java 25 public baseline. One warmup and three measured repetitions per cell;
 all three output witnesses agree in every cell. No randomization or parallel worker is used.
 
 The exact command is retained with exit 0 in
@@ -136,7 +137,8 @@ simultaneous maximum heap value and interval in the capture runtime receipt. It 
 disabled for the timing run and is not a JVM pool-peak sum. The separate run observed
 385,161,896 bytes over 18,450 samples at 10 ms. It has canonical parity with both timing runs.
 No `time -l` OS RSS was collected for that sampler run. The ordinary and instrumented timing
-runs reported 443,600,640 and 688,214,080 bytes respectively; those are distinct whole-process
+runs reported maximum RSS of 518,062,080 and 639,811,584 bytes, and separate peak-memory-footprint
+figures of 443,600,640 and 688,214,080 bytes respectively. These are distinct whole-process
 command observations, not simultaneous heap measurements or a recorder-overhead estimate.
 
 ## Memory and qualification limits
