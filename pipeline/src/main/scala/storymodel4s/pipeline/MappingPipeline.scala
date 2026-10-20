@@ -816,10 +816,13 @@ object MappingPipeline:
 
   /** Inspect counts and requested capabilities without publishing participant or source content. */
   def inspect(batch: Batch): Json = Json.obj(
+    "schema" -> Json.fromString("mapping-summary/v2"),
     "plan" -> Json.fromString(batch.identity.hex),
     "attempts" -> Json.fromInt(batch.outcomes.size),
     "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
     "failed" -> Json.fromInt(batch.outcomes.count(_.failure.nonEmpty)),
+    "coverage" -> coverage(batch),
+    "models" -> Json.fromValues(batch.outcomes.flatMap(_.run).map(modelMetadata)),
     "missingCapabilities" -> Json.fromValues(
       batch.config.requested
         .filterNot(_ == Capability.Mapping)
@@ -827,6 +830,86 @@ object MappingPipeline:
         .map(v => Json.fromString(v.toString))
     )
   )
+
+  private def processingLabel(status: ProcessingStatus): String = status match
+    case ProcessingStatus.Complete                 => "Complete"
+    case ProcessingStatus.ExcludedByInputPolicy(_) => "Excluded"
+    case ProcessingStatus.Failed(_)                => "Failed"
+
+  private def unitCoverage(o: Outcome, unit: RecallUnitId, reference: Boolean): Json =
+    val record = o.run.map(r => if reference then r.reference else r.reconstruction)
+    val row = record.flatMap(_.outcome(unit))
+    val local = o.run.flatMap(_.execution.reference.outcome(unit))
+    val available = row.exists(r =>
+      if reference then r.measures.normalized.nonEmpty else r.measures.posterior.nonEmpty
+    )
+    val reason = row match
+      case None    => Some("RunNotProduced")
+      case Some(r) =>
+        r.processing match
+          case ProcessingStatus.ExcludedByInputPolicy(reason) => Some(reason)
+          case ProcessingStatus.Failed(failure)               => Some(failure.toString)
+          case ProcessingStatus.Complete => Option.unless(available)("MeasureNotProduced")
+    Json.obj(
+      "processing" -> row.fold(Json.fromString("NotProduced"))(r =>
+        Json.fromString(processingLabel(r.processing))
+      ),
+      "measureAvailable" -> Json.fromBoolean(available),
+      "unavailableReason" -> reason.fold(Json.Null)(Json.fromString),
+      "overflow" -> local.fold(Json.Null)(r => Json.fromBoolean(r.overflow.nonEmpty)),
+      "uniformSemantic" -> local.fold(Json.Null)(r => Json.fromBoolean(r.uniformSemantic.nonEmpty)),
+      "uniformCosts" -> (local match
+        case Some(c: LocalReference.Computed) if reference =>
+          Json.fromBoolean(c.information == LocalReference.Information.UniformCosts)
+        case _ => Json.Null)
+    )
+
+  private def observationCoverage(o: Outcome): Json = Json.obj(
+    "participant" -> Json.fromString(o.participant),
+    "session" -> Json.fromString(o.session),
+    "observation" -> o.observation.fold(Json.Null)(v => Json.fromString(v.hex)),
+    "failure" -> o.failure.fold(Json.Null)(Json.fromString),
+    "declaredUnits" -> o.prepared.fold(Json.Null)(p => Json.fromInt(p.inventory.units.size)),
+    "units" -> Json.fromValues(o.prepared.toVector.flatMap(_.inventory.units).map { u =>
+      Json.obj(
+        "unit" -> Json.fromString(u.id.value),
+        "reference" -> unitCoverage(o, u.id, true),
+        "reconstruction" -> unitCoverage(o, u.id, false)
+      )
+    })
+  )
+
+  private def coverage(batch: Batch): Json =
+    val units =
+      batch.outcomes.flatMap(o => o.prepared.toVector.flatMap(_.inventory.units).map(o -> _))
+    def member(reference: Boolean): Json =
+      val rows = units.map((o, u) => unitCoverage(o, u.id, reference).hcursor)
+      val measured = rows.count(_.get[Boolean]("measureAvailable").contains(true))
+      def count(field: String): Json =
+        Json.fromInt(rows.count(_.get[Boolean](field).contains(true)))
+      Json.obj(
+        "declaredUnits" -> Json.fromInt(rows.size),
+        "measuredUnits" -> Json.fromInt(measured),
+        "unavailableUnits" -> Json.fromInt(rows.size - measured),
+        "measuredFractionOfKnownUnits" ->
+          (if rows.isEmpty then Json.Null
+           else Json.fromDoubleOrNull(measured.toDouble / rows.size)),
+        "overflowUnits" -> count("overflow"),
+        "uniformSemanticUnits" -> count("uniformSemantic"),
+        "uniformCostUnits" -> count("uniformCosts")
+      )
+    Json.obj(
+      "prepared" -> Json.fromInt(batch.outcomes.count(_.prepared.nonEmpty)),
+      "runProduced" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+      "unknownUnitObservations" -> Json.fromInt(batch.outcomes.count(_.prepared.isEmpty)),
+      "aggregation" -> Json.fromString(
+        "pooled-known-units; unknown unit counts excluded from denominator"
+      ),
+      "diagnosticCounts" -> Json.fromString("nonexclusive; uniform costs do not mean unavailable"),
+      "reference" -> member(true),
+      "reconstruction" -> member(false),
+      "observations" -> Json.fromValues(batch.outcomes.map(observationCoverage))
+    )
 
   /** Export the same checked paired results, preserving publication and resume guards. */
   def exportResults(
@@ -837,6 +920,7 @@ object MappingPipeline:
     publishExchange(batch, output, resume).left.map(FacadeFailure.Publication(_, output))
 
   private def runMetadata(run: Run): Json = Json.obj(
+    "model" -> modelMetadata(run),
     "run" -> Json.fromString(run.identity.hex),
     "registration" -> Json.fromString(run.registration.hex),
     "execution" -> Json.fromString(run.execution.identity.hex),
@@ -859,6 +943,62 @@ object MappingPipeline:
     )
   )
 
+  private[pipeline] def modelMetadata(run: Run): Json =
+    val reference = run.execution.reference.profile
+    val reconstruction = run.execution.reconstruction
+    val profile = reconstruction.profile
+    Json.obj(
+      "run" -> Json.fromString(run.identity.hex),
+      "reference" -> Json.obj(
+        "kind" -> Json.fromString(MeasureKind.NormalizedScoreMass.toString),
+        "profile" -> Json.fromString(reference.fingerprint.hex),
+        "level" -> Json.fromInt(reference.level),
+        "universe" -> Json.fromString(reference.universe.id.digest.hex),
+        "targets" -> Json.fromInt(reference.universe.targets.size),
+        "temperature" -> Json.fromDoubleOrNull(reference.temperature),
+        "prior" -> Json.fromString(reference.prior.toString),
+        "normalization" -> Json.fromString(reference.normalization.toString)
+      ),
+      "reconstruction" -> Json.obj(
+        "kind" -> Json.fromString(MeasureKind.ModelPosterior.toString),
+        "profile" -> Json.fromString(profile.fingerprint.hex),
+        "historicalSherlock" -> Json.fromBoolean(profile.historicalSherlock),
+        "temperature" -> Json.fromDoubleOrNull(profile.inference.temperature),
+        "decisionPolicy" -> Json.fromString(profile.decision.fingerprint.hex),
+        "order" -> Json.fromString(profile.decision.order.toString),
+        "backwardPenalty" -> Json.fromDoubleOrNull(profile.decision.backwardPenalty),
+        "forwardPenalty" -> Json.fromDoubleOrNull(profile.decision.forwardPenalty),
+        "fill" -> Json.fromString(profile.decision.fill.toString),
+        "grouping" -> Json.fromString(reconstruction.grouping.fingerprint.hex),
+        "groupingOrderBasis" -> Json.fromString("source-root discourse position, then source key"),
+        "decisions" -> Json.fromValues(reconstruction.decisions.map { d =>
+          Json.obj(
+            "unit" -> Json.fromString(d.unit.value),
+            "rawArgmax" -> d.rawArgmax.fold(Json.Null)(s => Json.fromString(s.toString)),
+            "rawArgmaxMass" -> d.rawArgmaxMass.fold(Json.Null)(Json.fromDoubleOrNull),
+            "chosenTarget" -> d.anchor.fold(Json.Null)(s => Json.fromString(s.key)),
+            "chosenMass" -> d.chosenMass.fold(Json.Null)(Json.fromDoubleOrNull),
+            "origin" -> Json.fromString(d.origin.toString)
+          )
+        })
+      ),
+      "interpretation" -> Json.obj(
+        "reference" -> Json.fromString(
+          "Normalized local cost mass over admitted states; not calibrated correctness."
+        ),
+        "reconstruction" -> Json.fromString(
+          "Model-conditional posterior and declared trajectory decisions; not observed human retrieval."
+        ),
+        "fidelity" -> Json.fromString(
+          "Checked gate consequences; factual-distortion detection has not been empirically validated."
+        ),
+        "calibration" -> Json.fromString("Unavailable: no correctness calibration artifact."),
+        "efficacy" -> Json.fromString(
+          "Not established by structural admission or policy compatibility."
+        )
+      )
+    )
+
   private def runFiles(run: Run): Vector[(String, String)] = Vector(
     s"${run.identity.hex}-reference.json" -> MappingCodecs.encode(run.reference),
     s"${run.identity.hex}-reconstruction.json" -> MappingCodecs.encode(run.reconstruction)
@@ -868,20 +1008,17 @@ object MappingPipeline:
     */
   def publish(run: Run, output: Path, resume: Boolean): Either[String, Checksum] =
     val files = runFiles(run)
-    val manifest = StudyArtifacts.manifest("mapping-run/v1", files, runMetadata(run))
+    val manifest = StudyArtifacts.manifest("mapping-run/v2", files, runMetadata(run))
     StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
 
   private[pipeline] def artifacts(batch: Batch): (Vector[(String, String)], String) =
-    def processingLabel(status: ProcessingStatus): String = status match
-      case ProcessingStatus.Complete                 => "Complete"
-      case ProcessingStatus.ExcludedByInputPolicy(_) => "Excluded"
-      case ProcessingStatus.Failed(_)                => "Failed"
     val outcomes = batch.outcomes
     val inputs = outcomes
       .flatMap(_.prepared)
       .map(r => s"${r.observation.hex}-recall.json" -> StudyPreparation.encode(r))
     val files = inputs ++ outcomes.flatMap(_.run).flatMap(runFiles)
     val metadata = Json.obj(
+      "summary" -> inspect(batch),
       "plan" -> Json.fromString(batch.identity.hex),
       "sourceEdition" -> Json.fromString(batch.prepared.source.edition.hex),
       "config" -> Canonical.parse(configText(batch.config)).toOption.get,
@@ -924,7 +1061,7 @@ object MappingPipeline:
         )
       })
     )
-    files -> StudyArtifacts.manifest("mapping-batch/v1", files, metadata)
+    files -> StudyArtifacts.manifest("mapping-batch/v2", files, metadata)
 
   def publish(batch: Batch, output: Path, resume: Boolean): Either[String, Checksum] =
     val (files, manifest) = artifacts(batch)
@@ -938,7 +1075,7 @@ object MappingPipeline:
   /** Export the original pair and lossless tables, retaining the facade's provider registration. */
   def publishExchange(run: Run, output: Path, resume: Boolean): Either[String, Checksum] =
     exchangeFiles(run).flatMap { files =>
-      val manifest = StudyArtifacts.manifest("mapping-exchange-run/v1", files, runMetadata(run))
+      val manifest = StudyArtifacts.manifest("mapping-exchange-run/v2", files, runMetadata(run))
       StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
     }
 
@@ -957,7 +1094,7 @@ object MappingPipeline:
       val inputs = original.filter(_._1.endsWith("-recall.json"))
       val files = inputs ++ pairs.flatten
       val metadata = Canonical.parse(manifest).toOption.get.hcursor.downField("metadata").focus.get
-      files -> StudyArtifacts.manifest("mapping-exchange-batch/v1", files, metadata)
+      files -> StudyArtifacts.manifest("mapping-exchange-batch/v2", files, metadata)
 
   /** Complete paired exchange through the same source, outcomes and publication boundary. */
   def publishExchange(batch: Batch, output: Path, resume: Boolean): Either[String, Checksum] =

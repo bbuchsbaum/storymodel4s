@@ -123,6 +123,122 @@ class MappingPipelineSuite extends FunSuite:
     assert(MappingCli.config(MappingCli.Template.dropRight(1) + ",\"profile\":\"custom\"}").isLeft)
   }
 
+  test("coverage reconciles retained mixed outcomes without inventing failed observation units") {
+    inTemp { root =>
+      val batch = right(MappingPipeline.batch(prepared(root, true), config))
+      val summary = MappingPipeline.inspect(batch)
+      val coverage = summary.hcursor.downField("coverage")
+      val count = batch.outcomes.head.prepared.get.inventory.units.size
+      assert(count > 0)
+      assertEquals(right(coverage.get[Int]("prepared")), 1)
+      assertEquals(right(coverage.get[Int]("runProduced")), 1)
+      assertEquals(right(coverage.get[Int]("unknownUnitObservations")), 1)
+      val observations = right(coverage.get[Vector[io.circe.Json]]("observations"))
+      assertEquals(observations.size, 2)
+      assertEquals(right(observations(1).hcursor.get[Option[Int]]("declaredUnits")), None)
+      assertEquals(right(observations(1).hcursor.get[Vector[io.circe.Json]]("units")), Vector.empty)
+      Vector("reference", "reconstruction").foreach { member =>
+        val retained =
+          observations.flatMap(o => right(o.hcursor.get[Vector[io.circe.Json]]("units")))
+        val measured = retained.count(
+          _.hcursor.downField(member).get[Boolean]("measureAvailable").contains(true)
+        )
+        val totals = coverage.downField(member)
+        assertEquals(right(totals.get[Int]("declaredUnits")), count)
+        assertEquals(right(totals.get[Int]("measuredUnits")), measured)
+        assertEquals(right(totals.get[Int]("unavailableUnits")), count - measured)
+      }
+      val (_, manifest) = MappingPipeline.artifacts(batch)
+      val decoded = right(io.circe.parser.parse(manifest))
+      assertEquals(
+        decoded.hcursor.downField("metadata").downField("summary").focus,
+        Some(right(io.circe.parser.parse(storymodel4s.codec.Canonical.print(summary))))
+      )
+      val before = batch.outcomes.head.run.get.reference.digest
+      val output = root.resolve("coverage")
+      assert(MappingPipeline.publish(batch, output, false).isRight)
+      assertEquals(batch.outcomes.head.run.get.reference.digest, before)
+    }
+  }
+
+  test("empty and all-failed summaries keep unknown and zero denominators distinct") {
+    inTemp { root =>
+      val base = prepared(root)
+      Vector(Vector.empty, Vector(StudyPreparation.RecallInput("p1", "s1", "missing.txt")))
+        .foreach { recalls =>
+          val input = right(StudyPreparation.prepare(root, base.config.copy(recalls = recalls)))
+          val batch = right(MappingPipeline.batch(input, config))
+          val coverage = MappingPipeline.inspect(batch).hcursor.downField("coverage")
+          assertEquals(right(coverage.get[Int]("unknownUnitObservations")), recalls.size)
+          assertEquals(right(coverage.downField("reference").get[Int]("declaredUnits")), 0)
+          assertEquals(
+            right(
+              coverage.downField("reference").get[Option[Double]]("measuredFractionOfKnownUnits")
+            ),
+            None
+          )
+        }
+    }
+  }
+
+  test("tie overflow remains unavailable while measured uniform nomination remains visible") {
+    inTemp { root =>
+      val base = prepared(root)
+      write(root, "source.txt", "Anna arrived. Anna arrived.")
+      val input = right(StudyPreparation.prepare(root, base.config))
+      val overflow = right(MappingPipeline.batch(input, config.copy(perLevel = 1, tieBudget = 1)))
+      val summary = MappingPipeline.inspect(overflow).hcursor.downField("coverage")
+      val count = overflow.outcomes.head.prepared.get.inventory.units.size
+      assert(count > 0)
+      assertEquals(right(summary.downField("reference").get[Int]("overflowUnits")), count)
+      assertEquals(right(summary.downField("reference").get[Int]("unavailableUnits")), count)
+      val retained = right(summary.get[Vector[io.circe.Json]]("observations")).head
+      right(retained.hcursor.get[Vector[io.circe.Json]]("units")).foreach { u =>
+        assertEquals(
+          right(u.hcursor.downField("reference").get[String]("unavailableReason")),
+          "local-reference:TieOverflow"
+        )
+      }
+      val measured = right(MappingPipeline.batch(input, config))
+      val coverage =
+        MappingPipeline.inspect(measured).hcursor.downField("coverage").downField("reference")
+      assertEquals(right(coverage.get[Int]("unavailableUnits")), 0)
+      assertEquals(right(coverage.get[Int]("uniformSemanticUnits")), count)
+    }
+  }
+
+  test(
+    "ordinary model metadata is derived from executed profiles and keeps scientific limits visible"
+  ) {
+    inTemp { root =>
+      val batch = right(MappingPipeline.batch(prepared(root), config.copy(temperature = 0.7)))
+      val run = batch.outcomes.head.run.get
+      val models =
+        right(MappingPipeline.inspect(batch).hcursor.get[Vector[io.circe.Json]]("models"))
+      val model = models.head.hcursor
+      assertEquals(right(model.downField("reference").get[Double]("temperature")), 0.7)
+      assertEquals(
+        right(model.downField("reference").get[Int]("level")),
+        run.execution.reference.profile.level
+      )
+      assertEquals(
+        right(model.downField("reference").get[String]("universe")),
+        run.execution.reference.profile.universe.id.digest.hex
+      )
+      assertEquals(right(model.downField("reconstruction").get[Double]("temperature")), 0.15)
+      assertEquals(right(model.downField("reconstruction").get[String]("order")), "Nondecreasing")
+      assertEquals(right(model.downField("reconstruction").get[String]("fill")), "Disabled")
+      assert(
+        right(model.downField("interpretation").get[String]("calibration"))
+          .startsWith("Unavailable")
+      )
+      assertEquals(
+        right(model.downField("reconstruction").get[Vector[io.circe.Json]]("decisions")).size,
+        run.reconstruction.outcomes.size
+      )
+    }
+  }
+
   test("public offline CLI preserves partial publication and verifies replay") {
     inTemp { root =>
       val _ = prepared(root)

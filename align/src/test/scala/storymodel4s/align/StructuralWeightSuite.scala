@@ -158,9 +158,77 @@ class StructuralWeightSuite extends FunSuite:
       case Destination.External(_) => true
       case _                       => false
     }))
+    assert(
+      e.reconstruction.decisions.forall(d =>
+        d.rawArgmax.exists(_.isExternal) && d.anchor.nonEmpty &&
+          d.origin == StructuredReconstruction.Origin.GroupConstrained
+      )
+    )
     val foreign = execution()
     assertEquals(
       foreign.record(MappingRun.Member.Weighted(selected)),
       Left(MappingRefusal.BindingMismatch("weighted execution"))
     )
+  }
+
+  test(
+    "equal-cost 343-path witness separates exact reference from the zero-coefficient interior limit"
+  ) {
+    import ReferenceFixture.{a, b}
+    val e = execution(external = 1.0, uniformSources = true)
+    assertEquals(e.reference.profile.temperature, 1.0)
+    val states = Vector(AlignState.Source(a), AlignState.Source(b)) ++ AlignState.externals
+    assertEquals(states.size, 7)
+    assertEquals(e.reference.evidence.states.map(_.toSet), Vector.fill(3)(states.toSet))
+    e.reference.outcomes.foreach {
+      case c: LocalReference.Computed =>
+        assertEquals(c.costs.values.map(_.total).toSet, Set(1.0))
+        assertEquals(c.information, LocalReference.Information.UniformCosts)
+        assertEqualsDouble(c.mass.filter(_._1.anchor.nonEmpty).values.sum, 2.0 / 7.0, 1e-12)
+      case other => fail(s"equal measured costs must be available: $other")
+    }
+    val paths = for s <- states; t <- states; u <- states yield Vector(s, t, u)
+    assertEquals(paths.size, 343)
+    Vector(1000L, 1000000L, 1000000000L, 2L).foreach { denominator =>
+      val selected = right(e.weighted(right(StructuralWeight.of(1L, denominator))))
+      val actual = selected.inference.get
+      val lambda = 1.0 / denominator.toDouble
+      // Independent enumeration: equal emissions cancel, but sigmoid(0) is 1/2.
+      // Scaling logits to zero does not remove the source/external class prior.
+      val enter = 1.0 / (1.0 + math.exp(1.5 * lambda))
+      val persist = 1.0 / (1.0 + math.exp(0.85 * lambda))
+      val stay = math.exp(0.5 * lambda)
+      def transition(s: AlignState, t: AlignState): Double =
+        if s.isExternal then if t.isExternal then persist / 5.0 else (1.0 - persist) / 2.0
+        else if t.isExternal then enter / 5.0
+        else (1.0 - enter) * (if s == t then stay else 1.0) / (stay + 1.0)
+      val weights = paths.map(p => p -> (transition(p(0), p(1)) * transition(p(1), p(2)) / 7.0))
+      val z = weights.map(_._2).sum
+      assertEqualsDouble(z, 1.0, 1e-12)
+      for i <- 0 until 3; s <- states do
+        assertEqualsDouble(
+          actual.posterior.rows(i).mass(s),
+          weights.collect {
+            case (p, w) if p(i) == s => w
+          }.sum / z,
+          1e-12
+        )
+      for i <- 0 until 2; s <- states; t <- states do
+        assertEqualsDouble(
+          actual.flow.steps(i)(s, t),
+          weights.collect {
+            case (p, w) if p(i) == s && p(i + 1) == t => w
+          }.sum / z,
+          1e-12
+        )
+      def sourceMass(i: Int): Double =
+        actual.posterior.rows(i).mass.filter(_._1.anchor.nonEmpty).values.sum
+      assertEqualsDouble(sourceMass(0), 2.0 / 7.0, 1e-12)
+      if denominator == 1000000000L then
+        // First-order logit perturbations are bounded well below 1e-9 here.
+        assertEqualsDouble(sourceMass(1), 0.5, 1e-9)
+        assertEqualsDouble(sourceMass(2), 0.5, 1e-9)
+      assertEquals(selected.profile.inference.temperature, 0.15)
+    }
+    assert(right(right(e.weighted(StructuralWeight.Reference)).record) eq right(e.referenceRecord))
   }
