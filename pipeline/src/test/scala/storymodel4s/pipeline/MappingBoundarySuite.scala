@@ -1178,7 +1178,6 @@ import storymodel4s.align.bridge.*
 summon[scala.deriving.Mirror.ProductOf[MappingPipeline.ReferenceRun]]""").nonEmpty)
   }
 
-
   test("MappingPipeline.ReferenceOutcome constructor refuses with matching positive control") {
     assertEquals(
       typeCheckErrors(
@@ -1316,7 +1315,6 @@ import storymodel4s.embed.onnx.OnnxMappingRegistration
 import storymodel4s.align.bridge.*
 summon[scala.deriving.Mirror.ProductOf[MappingPipeline.ReferenceOutcome]]""").nonEmpty)
   }
-
 
   test("MappingPipeline.ReferenceBatch constructor refuses with matching positive control") {
     assertEquals(

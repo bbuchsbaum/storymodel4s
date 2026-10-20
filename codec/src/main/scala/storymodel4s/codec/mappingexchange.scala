@@ -28,14 +28,19 @@ object MappingExchange:
 
   /** Rebuild every file using original checked context; hashes alone confer no authority. */
   def decodeReference(
-      files: Vector[(String, String)], expected: ExpectedMappingContext
+      files: Vector[(String, String)],
+      expected: ExpectedMappingContext
   ): Either[Error, MappingResult] =
     for
       _ <- Either.cond(files.map(_._1).distinct.size == files.size, (), Error.InvalidManifest)
       mapping <- files.toMap.get("mapping.json").toRight(Error.MissingFile("mapping.json"))
       record <- MappingCodecs.decodeReference(mapping, expected).left.map(Error.Mapping(_))
       rebuilt <- encode(record)
-      _ <- Either.cond(files.toMap == rebuilt.files.toMap, (), Error.ContentMismatch("reference files"))
+      _ <- Either.cond(
+        files.toMap == rebuilt.files.toMap,
+        (),
+        Error.ContentMismatch("reference files")
+      )
     yield record
 
   /** An execution owns both members; callers cannot assemble an apparently shared pair. */
@@ -381,7 +386,8 @@ object MappingExchange:
             "sha256" -> Json.fromString(Checksum.ofText(text).hex),
             "bytes" -> Json.fromString(text.getBytes("UTF-8").length.toString),
             "format" -> Json.fromString(
-              if name == "mapping.json" then field(json, "schemaVersion").asString.get else "quoted-tsv/v1"
+              if name == "mapping.json" then field(json, "schemaVersion").asString.get
+              else "quoted-tsv/v1"
             ),
             "table" -> tables.find(_.name == name).fold(MappingJson.tagged("not-applicable")) { t =>
               MappingJson.tagged(
@@ -394,7 +400,12 @@ object MappingExchange:
         }
         val manifest = MappingJson.print(
           Json.obj(
-            "schemaVersion" -> Json.fromString(if field(json, "schemaVersion").asString.contains(MappingCodecs.ReferenceSchemaVersion) then ReferenceSchemaVersion else SchemaVersion),
+            "schemaVersion" -> Json.fromString(
+              if field(json, "schemaVersion").asString
+                  .contains(MappingCodecs.ReferenceSchemaVersion)
+              then ReferenceSchemaVersion
+              else SchemaVersion
+            ),
             "mapping_digest" -> Json.fromString(digest),
             "inventory_digest" -> field(inventory, "digest"),
             "source_digest" -> field(source, "digest"),

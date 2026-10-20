@@ -78,8 +78,9 @@ private[codec] object MappingRecordWire:
           "reason" -> str(v.reason.toString),
           "asserted" -> optional(v.asserted)(receipt)
         )
-      case v: StageProvenance.Derived => tagged("derived", "receipt" -> receipt(v.receipt))
-      case v: StageProvenance.ReferenceDerived => tagged("reference-derived", "receipt" -> receipt(v.receipt)))
+      case v: StageProvenance.Derived          => tagged("derived", "receipt" -> receipt(v.receipt))
+      case v: StageProvenance.ReferenceDerived =>
+        tagged("reference-derived", "receipt" -> receipt(v.receipt)))
   )
   def stages(value: UnitStageRefs): Json = obj(
     "inference" -> str(value.inference.digest.hex),
@@ -272,8 +273,11 @@ private[codec] object MappingRecordWire:
   )
   def encode(value: MappingResult): Json = obj(
     "schema" -> str("storymodel4s.mapping-record"),
-    "schemaVersion" -> str(if value.ledger.entries.exists(_.provenance.isInstanceOf[StageProvenance.ReferenceDerived])
-      then "mapping-record/reference/v1" else "mapping-record/v0.1"),
+    "schemaVersion" -> str(
+      if value.ledger.entries.exists(_.provenance.isInstanceOf[StageProvenance.ReferenceDerived])
+      then "mapping-record/reference/v1"
+      else "mapping-record/v0.1"
+    ),
     "record_digest" -> str(value.digest.hex),
     "inventory" -> MappingSourceWire.inventory(value.inventory),
     "source" -> MappingSourceWire.source(value.source),

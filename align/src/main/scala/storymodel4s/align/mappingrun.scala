@@ -109,32 +109,47 @@ object MappingRun:
       val source: SourceRepresentation,
       val reference: LocalReference.Result
   ):
-    val identity: Checksum = MappingRender.digest(Vector(
-      "mapping-reference-execution/v1", inventory.digest.hex, source.digest.hex,
-      reference.evidence.identity.checksum.hex, reference.profile.fingerprint.hex
-    ))
+    val identity: Checksum = MappingRender.digest(
+      Vector(
+        "mapping-reference-execution/v1",
+        inventory.digest.hex,
+        source.digest.hex,
+        reference.evidence.identity.checksum.hex,
+        reference.profile.fingerprint.hex
+      )
+    )
     lazy val record: Either[MappingRefusal, MappingResult] = MappingResult.referenceExecuted(this)
-    private[align] def receipt(stage: Stage): StageReceipt = StageReceipt.of(
-      stage, s"mapping-reference-run/v1/$stage", identity,
-      Vector(reference.evidence.identity.checksum, inventory.digest, source.digest),
-      ProviderStatus.NotApplicable("portable deterministic local execution")
-    ).toOption.get
+    private[align] def receipt(stage: Stage): StageReceipt = StageReceipt
+      .of(
+        stage,
+        s"mapping-reference-run/v1/$stage",
+        identity,
+        Vector(reference.evidence.identity.checksum, inventory.digest, source.digest),
+        ProviderStatus.NotApplicable("portable deterministic local execution")
+      )
+      .toOption
+      .get
     override def equals(other: Any): Boolean = other match
       case e: ReferenceExecution => identity == e.identity
-      case _ => false
+      case _                     => false
     override def hashCode: Int = identity.hashCode
     override def toString: String = s"ReferenceExecution(${identity.short()})"
 
   /** Bind immutable inputs before running only the independent local estimator. */
   def computeReference(
-      recall: RecallGraph[Checked], view: SourceView, inventory: RecallInventory,
-      source: SourceRepresentation, evidence: LocalEvidence, profile: LocalReference.Profile
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      inventory: RecallInventory,
+      source: SourceRepresentation,
+      evidence: LocalEvidence,
+      profile: LocalReference.Profile
   ): Either[AlignError, ReferenceExecution] =
     val captured = MappingBindingRender.snapshot(view)
     for
       _ <- Either.cond(
         inventory.describes(recall) && source.viewFingerprint == ViewFingerprint.of(captured) &&
-          source.scopeDigest == MappingSourceRender.scope(captured.nodes), (),
+          source.scopeDigest == MappingSourceRender.scope(captured.nodes),
+        (),
         AlignError.InvalidConfig("reference mapping run", "foreign inventory or source")
       )
       local <- LocalReference.compute(recall, captured, evidence, profile)
@@ -385,22 +400,34 @@ object MappingRun:
     val universe = e.reference.profile.universe
     val decisionId = DecisionPolicyId.unsafe("mapping-run:" + e.reference.profile.fingerprint.hex)
     for
-      ledger <- Stage.values.toVector.traverse { stage =>
-        val provenance =
-          if stage == Stage.Inference || stage == Stage.Decision then
-            StageProvenance.referenceExecuted(e, stage)
-          else StageProvenance.unknown(UnknownProvenanceReason.NominationProvenanceUnproven, None)
-        StageEntry.of(stage, provenance)
-      }.flatMap(StageLedger.of)
-      stages <- UnitStageRefs.of(ledger, ledger.at(Stage.Inference).head.id,
-        ledger.at(Stage.Candidates).head.id, ledger.at(Stage.Decision).head.id)
+      ledger <- Stage.values.toVector
+        .traverse { stage =>
+          val provenance =
+            if stage == Stage.Inference || stage == Stage.Decision then
+              StageProvenance.referenceExecuted(e, stage)
+            else StageProvenance.unknown(UnknownProvenanceReason.NominationProvenanceUnproven, None)
+          StageEntry.of(stage, provenance)
+        }
+        .flatMap(StageLedger.of)
+      stages <- UnitStageRefs.of(
+        ledger,
+        ledger.at(Stage.Inference).head.id,
+        ledger.at(Stage.Candidates).head.id,
+        ledger.at(Stage.Decision).head.id
+      )
       policies <- MappingPolicies.of(
         InferencePolicy.Unspecified("local-reference/shifted-exponential-cost/v1"),
         ContextPolicy.Unspecified("exact originating evidence retained by execution"),
         CandidatePolicy.Unknown("upstream registration belongs to enclosing run"),
-        ReferencePrior.Declared(prior), DecisionPolicy.Declared(decisionId), universe)
-      roles <- UnitRoles.of(AnalysisGrain.InferenceUnit(e.inventory.segmentation),
-        AnalysisGrain.InferenceUnit(e.inventory.segmentation), AnalysisGrain.Targets(universe.grain))
+        ReferencePrior.Declared(prior),
+        DecisionPolicy.Declared(decisionId),
+        universe
+      )
+      roles <- UnitRoles.of(
+        AnalysisGrain.InferenceUnit(e.inventory.segmentation),
+        AnalysisGrain.InferenceUnit(e.inventory.segmentation),
+        AnalysisGrain.Targets(universe.grain)
+      )
       outcomes <-
         val computed = e.reference.outcomes.collect { case c: LocalReference.Computed => c }
         val requests = computed.flatMap { c =>

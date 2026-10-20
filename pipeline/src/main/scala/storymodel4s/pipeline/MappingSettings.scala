@@ -25,70 +25,79 @@ private[pipeline] object MappingSettings:
     def execute(
         prepared: StudyPreparation.Prepared,
         model: OnnxSentenceModel = OnnxSentenceModel.AllMiniLmL6V2
-    ): Either[FacadeFailure, MappingPipeline.Batch] = if referenceOnly then Left(FacadeFailure.InvalidConfiguration) else local match
-      case None        => MappingPipeline.batch(prepared, config).left.map(FacadeFailure.Mapping(_))
-      case Some(files) =>
-        FacadeFailure.read(files.key).flatMap { secretBytes =>
-          try
-            if secretBytes.length != 32 then Left(FacadeFailure.InvalidConfiguration)
-            else
-              val keys = new SensitiveKeyProvider:
-                def currentKeyId: KeyId = files.keyId
-                def key(id: KeyId): Option[Array[Byte]] =
-                  Option.when(id == files.keyId)(secretBytes.clone())
-              OnnxSentenceEmbedder
-                .open(model, OnnxSentenceArtifacts(files.model, files.tokenizer), keys)
-                .left
-                .map(error =>
-                  FacadeFailure.Mapping(
-                    MappingPipeline.Refusal.MissingCapability("onnx-startup:" + error.productPrefix)
+    ): Either[FacadeFailure, MappingPipeline.Batch] = if referenceOnly then
+      Left(FacadeFailure.InvalidConfiguration)
+    else
+      local match
+        case None => MappingPipeline.batch(prepared, config).left.map(FacadeFailure.Mapping(_))
+        case Some(files) =>
+          FacadeFailure.read(files.key).flatMap { secretBytes =>
+            try
+              if secretBytes.length != 32 then Left(FacadeFailure.InvalidConfiguration)
+              else
+                val keys = new SensitiveKeyProvider:
+                  def currentKeyId: KeyId = files.keyId
+                  def key(id: KeyId): Option[Array[Byte]] =
+                    Option.when(id == files.keyId)(secretBytes.clone())
+                OnnxSentenceEmbedder
+                  .open(model, OnnxSentenceArtifacts(files.model, files.tokenizer), keys)
+                  .left
+                  .map(error =>
+                    FacadeFailure.Mapping(
+                      MappingPipeline.Refusal
+                        .MissingCapability("onnx-startup:" + error.productPrefix)
+                    )
                   )
-                )
-                .flatMap { encoder =>
-                  try
-                    MappingPipeline
-                      .batchOnnx(prepared, config, encoder)
-                      .left
-                      .map(FacadeFailure.Mapping(_))
-                  finally encoder.close()
-                }
-          finally java.util.Arrays.fill(secretBytes, 0.toByte)
-        }
+                  .flatMap { encoder =>
+                    try
+                      MappingPipeline
+                        .batchOnnx(prepared, config, encoder)
+                        .left
+                        .map(FacadeFailure.Mapping(_))
+                    finally encoder.close()
+                  }
+            finally java.util.Arrays.fill(secretBytes, 0.toByte)
+          }
 
     /** Checked catalog models own artifact admission; the file never supplies hashes or topology.
       */
     def executeReference(
         prepared: StudyPreparation.Prepared,
         model: OnnxSentenceModel = OnnxSentenceModel.AllMiniLmL6V2
-    ): Either[FacadeFailure, MappingPipeline.ReferenceBatch] = if !referenceOnly then Left(FacadeFailure.InvalidConfiguration) else local match
-      case None        => MappingPipeline.referenceBatch(prepared, config).left.map(FacadeFailure.Mapping(_))
-      case Some(files) =>
-        FacadeFailure.read(files.key).flatMap { secretBytes =>
-          try
-            if secretBytes.length != 32 then Left(FacadeFailure.InvalidConfiguration)
-            else
-              val keys = new SensitiveKeyProvider:
-                def currentKeyId: KeyId = files.keyId
-                def key(id: KeyId): Option[Array[Byte]] =
-                  Option.when(id == files.keyId)(secretBytes.clone())
-              OnnxSentenceEmbedder
-                .open(model, OnnxSentenceArtifacts(files.model, files.tokenizer), keys)
-                .left
-                .map(error =>
-                  FacadeFailure.Mapping(
-                    MappingPipeline.Refusal.MissingCapability("onnx-startup:" + error.productPrefix)
+    ): Either[FacadeFailure, MappingPipeline.ReferenceBatch] = if !referenceOnly then
+      Left(FacadeFailure.InvalidConfiguration)
+    else
+      local match
+        case None =>
+          MappingPipeline.referenceBatch(prepared, config).left.map(FacadeFailure.Mapping(_))
+        case Some(files) =>
+          FacadeFailure.read(files.key).flatMap { secretBytes =>
+            try
+              if secretBytes.length != 32 then Left(FacadeFailure.InvalidConfiguration)
+              else
+                val keys = new SensitiveKeyProvider:
+                  def currentKeyId: KeyId = files.keyId
+                  def key(id: KeyId): Option[Array[Byte]] =
+                    Option.when(id == files.keyId)(secretBytes.clone())
+                OnnxSentenceEmbedder
+                  .open(model, OnnxSentenceArtifacts(files.model, files.tokenizer), keys)
+                  .left
+                  .map(error =>
+                    FacadeFailure.Mapping(
+                      MappingPipeline.Refusal
+                        .MissingCapability("onnx-startup:" + error.productPrefix)
+                    )
                   )
-                )
-                .flatMap { encoder =>
-                  try
-                    MappingPipeline
-                      .referenceBatchOnnx(prepared, config, encoder)
-                      .left
-                      .map(FacadeFailure.Mapping(_))
-                  finally encoder.close()
-                }
-          finally java.util.Arrays.fill(secretBytes, 0.toByte)
-        }
+                  .flatMap { encoder =>
+                    try
+                      MappingPipeline
+                        .referenceBatchOnnx(prepared, config, encoder)
+                        .left
+                        .map(FacadeFailure.Mapping(_))
+                    finally encoder.close()
+                  }
+            finally java.util.Arrays.fill(secretBytes, 0.toByte)
+          }
 
   private def file(root: Path, name: String): Either[FacadeFailure, Path] =
     try
@@ -110,14 +119,21 @@ private[pipeline] object MappingSettings:
     for
       json <- invalid(parser.parse(text))
       obj <- json.asObject.toRight(FacadeFailure.InvalidConfiguration)
-      config <- invalid(MappingCli.config(Json.fromJsonObject(obj.remove("onnx").remove("mode")).noSpaces))
+      config <- invalid(
+        MappingCli.config(Json.fromJsonObject(obj.remove("onnx").remove("mode")).noSpaces)
+      )
       referenceOnly <- obj("mode") match
-        case None => Right(false)
-        case Some(value) => value.asString match
-          case Some("paired") => Right(false)
-          case Some("reference-only") => Right(true)
-          case _ => Left(FacadeFailure.InvalidConfiguration)
-      _ <- Either.cond(!referenceOnly || (config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty), (), FacadeFailure.InvalidConfiguration)
+        case None        => Right(false)
+        case Some(value) =>
+          value.asString match
+            case Some("paired")         => Right(false)
+            case Some("reference-only") => Right(true)
+            case _                      => Left(FacadeFailure.InvalidConfiguration)
+      _ <- Either.cond(
+        !referenceOnly || (config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty),
+        (),
+        FacadeFailure.InvalidConfiguration
+      )
       local <- obj("onnx") match
         case None =>
           Either.cond(

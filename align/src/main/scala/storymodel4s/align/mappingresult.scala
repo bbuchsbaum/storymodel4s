@@ -57,10 +57,14 @@ object MappingResult:
       if referenceOwners.nonEmpty then
         if owners.nonEmpty || referenceOwners.size != 1 then
           Left(MappingRefusal.BindingMismatch("execution"))
-        else referenceOwners.head.record.flatMap { expected =>
-          Either.cond(result.digest == expected.digest, result,
-            MappingRefusal.BindingMismatch("executed reference projection"))
-        }
+        else
+          referenceOwners.head.record.flatMap { expected =>
+            Either.cond(
+              result.digest == expected.digest,
+              result,
+              MappingRefusal.BindingMismatch("executed reference projection")
+            )
+          }
       else if owners.isEmpty && unboundLocalLinks then
         Left(MappingRefusal.BindingMismatch("local evidence execution required"))
       else if owners.isEmpty then Right(result)
@@ -89,8 +93,11 @@ object MappingResult:
   private[align] def referenceExecuted(
       execution: MappingRun.ReferenceExecution
   ): Either[MappingRefusal, MappingResult] =
-    MappingRun.referenceParts(execution).flatMap(p =>
-      validate(execution.inventory, execution.source, p.policies, p.roles, p.ledger, p.outcomes))
+    MappingRun
+      .referenceParts(execution)
+      .flatMap(p =>
+        validate(execution.inventory, execution.source, p.policies, p.roles, p.ledger, p.outcomes)
+      )
 
   private def validate(
       inventory: RecallInventory,

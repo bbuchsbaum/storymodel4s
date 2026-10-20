@@ -90,7 +90,10 @@ object CaptionMapping:
         .map(Refusal.Media(_))
       scoring <- CaptionScoring.of(blend, declared).left.map(Refusal.Media(_))
       session <- scoring.session(recall, view, source).left.map(Refusal.Media(_))
-      produced <- CaptionScoring.produce(session, inventory, config, selectedLevel).left.map(Refusal.Scoring(_))
+      produced <- CaptionScoring
+        .produce(session, inventory, config, selectedLevel)
+        .left
+        .map(Refusal.Scoring(_))
     yield new Registered(media, produced, expected)
 
   /** A complete checked package and the declared correspondence own one global evidence run. */
@@ -134,5 +137,8 @@ object CaptionMapping:
       .session(recall, joined.view, joined.view.representation)
       .left
       .map(Refusal.Media(_))
-    produced <- CaptionScoring.produce(session, inventory, config, selectedLevel).left.map(Refusal.Scoring(_))
+    produced <- CaptionScoring
+      .produce(session, inventory, config, selectedLevel)
+      .left
+      .map(Refusal.Scoring(_))
   yield new PackageRegistered(media, joined, produced)

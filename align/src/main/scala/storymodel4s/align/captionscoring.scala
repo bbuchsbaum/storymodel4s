@@ -174,7 +174,8 @@ object CaptionScoring:
         config.lexicalOverlap.toString,
         MappingRender.optional(config.space),
         evidence.identity.checksum.hex
-      ) ++ (if selectedLevel == 0 then Vector.empty else Vector("selected-level/v1", selectedLevel.toString))
+      ) ++ (if selectedLevel == 0 then Vector.empty
+            else Vector("selected-level/v1", selectedLevel.toString))
     )
     override def equals(other: Any): Boolean = other match
       case p: Produced => identity == p.identity

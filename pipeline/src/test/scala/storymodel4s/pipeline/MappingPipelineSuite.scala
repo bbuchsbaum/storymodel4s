@@ -284,8 +284,16 @@ class MappingPipelineSuite extends FunSuite:
       )
     )
     val resolved = config.copy(profile = MappingPipeline.OnnxProfile, perLevel = 2, tieBudget = 2)
-    assert(MappingPipeline.registeredOnnx(registration, inventory, resolved.copy(selectedLevel = 1)).isLeft)
-    assert(MappingPipeline.referenceOnnx(registration, inventory, resolved.copy(selectedLevel = 1)).isLeft)
+    assert(
+      MappingPipeline
+        .registeredOnnx(registration, inventory, resolved.copy(selectedLevel = 1))
+        .isLeft
+    )
+    assert(
+      MappingPipeline
+        .referenceOnnx(registration, inventory, resolved.copy(selectedLevel = 1))
+        .isLeft
+    )
     val referenceOnly = right(MappingPipeline.referenceOnnx(registration, inventory, resolved))
     val run = right(MappingPipeline.registeredOnnx(registration, inventory, resolved))
     assertEquals(referenceOnly.execution.reference.outcomes, run.execution.reference.outcomes)
@@ -511,7 +519,9 @@ class MappingPipelineSuite extends FunSuite:
     }
   }
 
-  test("registered reference-only context round-trips with distinct authority and no paired substitute") {
+  test(
+    "registered reference-only context round-trips with distinct authority and no paired substitute"
+  ) {
     inTemp { root =>
       val input = prepared(root, true)
       val paired = right(MappingPipeline.batch(input, config)).outcomes.head.run.get
@@ -520,28 +530,52 @@ class MappingPipelineSuite extends FunSuite:
       assertEquals(run.execution.reference.outcomes, paired.execution.reference.outcomes)
       assertEquals(run.execution.reference.profile, paired.execution.reference.profile)
       assertNotEquals(run.identity, paired.identity)
-      val context = ExpectedMappingContext(run.reference.inventory, run.reference.source,
-        referenceExecution = Some(run.execution))
+      val context = ExpectedMappingContext(
+        run.reference.inventory,
+        run.reference.source,
+        referenceExecution = Some(run.execution)
+      )
       val wire = MappingCodecs.encode(run.reference)
       assertEquals(right(MappingCodecs.decodeReference(wire, context)).digest, run.reference.digest)
       assert(MappingCodecs.decode(wire, context).isLeft)
       assert(MappingCodecs.decode(wire, context.copy(referenceExecution = None)).isLeft)
       assert(MappingCodecs.decodeReference(wire, context.copy(referenceExecution = None)).isLeft)
-      assert(MappingCodecs.decodeReference(wire, context.copy(execution = Some(paired.execution -> MappingRun.Member.Reference))).isLeft)
-      assert(MappingCodecs.decodeReference(wire.replace(run.reference.digest.hex, "0" * 64), context).isLeft)
+      assert(
+        MappingCodecs
+          .decodeReference(
+            wire,
+            context.copy(execution = Some(paired.execution -> MappingRun.Member.Reference))
+          )
+          .isLeft
+      )
+      assert(
+        MappingCodecs
+          .decodeReference(wire.replace(run.reference.digest.hex, "0" * 64), context)
+          .isLeft
+      )
       val exchange = right(storymodel4s.codec.MappingExchange.encode(run.execution))
-      assertEquals(right(storymodel4s.codec.MappingExchange.decodeReference(exchange.files, context)).digest, run.reference.digest)
+      assertEquals(
+        right(storymodel4s.codec.MappingExchange.decodeReference(exchange.files, context)).digest,
+        run.reference.digest
+      )
       assert(storymodel4s.codec.MappingExchange.decode(exchange.files, context).isLeft)
       assert(exchange.files.forall(!_._1.contains("reconstruction")))
       val coverage = MappingPipeline.inspect(batch).hcursor.downField("coverage")
       assertEquals(right(coverage.get[Int]("unknownUnitObservations")), 1)
       assertEquals(right(coverage.get[Vector[io.circe.Json]]("observations")).size, 2)
       assert(coverage.downField("reconstruction").focus.isEmpty)
-      val request = right(OrganizationPipeline.request(paired, MeasurementCompatibility.Axis.Discourse))
+      val request =
+        right(OrganizationPipeline.request(paired, MeasurementCompatibility.Axis.Discourse))
       val organization = right(MappingPipeline.referenceOrganization(run, request))
-      assertEquals(organization.result.rows, right(MappingPipeline.organization(paired, request)).result.rows)
+      assertEquals(
+        organization.result.rows,
+        right(MappingPipeline.organization(paired, request)).result.rows
+      )
       assertEquals(organization.result.transitions.size, run.execution.inventory.units.size - 1)
-      assertEquals(MeasurementCompatibility.inspect(run.reference, request).verdict, MeasurementCompatibility.Verdict.UnknownProvenance)
+      assertEquals(
+        MeasurementCompatibility.inspect(run.reference, request).verdict,
+        MeasurementCompatibility.Verdict.UnknownProvenance
+      )
     }
   }
 
@@ -549,15 +583,29 @@ class MappingPipelineSuite extends FunSuite:
     inTemp { root =>
       val input = prepared(root)
       val base = right(MappingPipeline.batch(input, config)).outcomes.head.run.get
-      val decision = right(StructuredReconstruction.DecisionPolicy.of(StructuredReconstruction.OrderPolicy.Unconstrained))
-      val profile = right(StructuredReconstruction.Profile.of(right(HsmmConfig.of(temperature = 0.9)), decision))
-      val chosen = right(MappingPipeline.batch(input, config.copy(reconstructionProfile = Some(profile)))).outcomes.head.run.get
+      val decision = right(
+        StructuredReconstruction.DecisionPolicy.of(
+          StructuredReconstruction.OrderPolicy.Unconstrained
+        )
+      )
+      val profile = right(
+        StructuredReconstruction.Profile.of(right(HsmmConfig.of(temperature = 0.9)), decision)
+      )
+      val chosen = right(
+        MappingPipeline.batch(input, config.copy(reconstructionProfile = Some(profile)))
+      ).outcomes.head.run.get
       assertEquals(chosen.execution.reconstruction.profile, profile)
       assertEquals(chosen.execution.reference, base.execution.reference)
       assertNotEquals(chosen.identity, base.identity)
       assert(chosen.execution.weighted(right(StructuralWeight.of(1, 2))).isLeft)
-      assert(MappingPipeline.referenceBatch(input, config.copy(reconstructionProfile = Some(profile))).isLeft)
-      val invalid = config.copy(groupingRoots = Some(Vector(SourceNodeRef.Situation(SituationId.unsafe("foreign")) -> 1)))
+      assert(
+        MappingPipeline
+          .referenceBatch(input, config.copy(reconstructionProfile = Some(profile)))
+          .isLeft
+      )
+      val invalid = config.copy(groupingRoots =
+        Some(Vector(SourceNodeRef.Situation(SituationId.unsafe("foreign")) -> 1))
+      )
       assert(right(MappingPipeline.batch(input, invalid)).outcomes.head.run.isEmpty)
       val local = right(MappingPipeline.referenceBatch(input, config)).outcomes.head.run.get
       assert(local.reference.outcomes.nonEmpty)
@@ -567,20 +615,51 @@ class MappingPipelineSuite extends FunSuite:
   test("reference settings and ordinary CLI publish only one member with safe resume") {
     inTemp { root =>
       val _ = prepared(root)
-      write(root, "study.json", StudyCli.Template.replace("\"timing\":null", "\"timing\":null,\"admission\":{\"kind\":\"project-synthetic-control\"}"))
-      write(root, "mapping.json", MappingCli.Template.dropRight(1) + ",\"mode\":\"reference-only\"}")
-      val batch = right(MappingPipeline.analyzeReference(root.resolve("study.json"), root.resolve("mapping.json")))
-      assert(MappingPipeline.analyze(root.resolve("study.json"), root.resolve("mapping.json")).isLeft)
+      write(
+        root,
+        "study.json",
+        StudyCli.Template.replace(
+          "\"timing\":null",
+          "\"timing\":null,\"admission\":{\"kind\":\"project-synthetic-control\"}"
+        )
+      )
+      write(
+        root,
+        "mapping.json",
+        MappingCli.Template.dropRight(1) + ",\"mode\":\"reference-only\"}"
+      )
+      val batch = right(
+        MappingPipeline.analyzeReference(root.resolve("study.json"), root.resolve("mapping.json"))
+      )
+      assert(
+        MappingPipeline.analyze(root.resolve("study.json"), root.resolve("mapping.json")).isLeft
+      )
       val output = root.resolve("reference-export")
-      val args = List("exchange", root.resolve("study.json").toString, root.resolve("mapping.json").toString, output.toString)
+      val args = List(
+        "exchange",
+        root.resolve("study.json").toString,
+        root.resolve("mapping.json").toString,
+        output.toString
+      )
       val errors = scala.collection.mutable.ArrayBuffer.empty[String]
-      assertEquals(MappingCli.run(args, _ => (), e => { val _ = errors += e; () }), 0, errors.mkString)
-      assertEquals(MappingCli.run(args :+ "--resume", _ => (), e => { val _ = errors += e; () }), 0, errors.mkString)
+      assertEquals(
+        MappingCli.run(args, _ => (), e => { val _ = errors += e; () }),
+        0,
+        errors.mkString
+      )
+      assertEquals(
+        MappingCli.run(args :+ "--resume", _ => (), e => { val _ = errors += e; () }),
+        0,
+        errors.mkString
+      )
       val members = Files.list(output)
-      val names = try members.iterator().asScala.toVector.map(_.getFileName.toString) finally members.close()
+      val names =
+        try members.iterator().asScala.toVector.map(_.getFileName.toString)
+        finally members.close()
       assert(names.exists(_.contains("mapping.json")))
       assert(!names.exists(_.contains("reconstruction")))
-      val emitted = names.map(name => name -> io.circe.Json.fromString(Files.readString(output.resolve(name))))
+      val emitted =
+        names.map(name => name -> io.circe.Json.fromString(Files.readString(output.resolve(name))))
       println("REFERENCE_MAPPING_FIXTURE\t" + io.circe.Json.obj(emitted*).noSpaces)
       val run = batch.outcomes.head.run.get
       write(output, s"${run.identity.hex}--mapping.json", "corrupt")
@@ -594,25 +673,54 @@ class MappingPipelineSuite extends FunSuite:
       val recall = input.outcomes.head.result.toOption.get
       val nodes = input.source.nodes
       val parent = nodes.head.copy(level = 0, parent = None)
-      val children = nodes.zipWithIndex.map((n, i) => n.copy(
-        ref = SourceNodeRef.Situation(SituationId.unsafe(s"selected-child-$i")), level = 1, parent = Some(parent.ref)))
+      val children = nodes.zipWithIndex.map((n, i) =>
+        n.copy(
+          ref = SourceNodeRef.Situation(SituationId.unsafe(s"selected-child-$i")),
+          level = 1,
+          parent = Some(parent.ref)
+        )
+      )
       val view = InMemorySourceView(parent +: children, Map.empty, None, input.source.scoringLength)
-      val source = right(SourceRepresentation.of(view,
-        cats.data.NonEmptyVector.fromVector(input.source.representation.bundles.toVector).get, None,
-        view.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap))
+      val source = right(
+        SourceRepresentation.of(
+          view,
+          cats.data.NonEmptyVector.fromVector(input.source.representation.bundles.toVector).get,
+          None,
+          view.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap
+        )
+      )
       val selected = config.copy(selectedLevel = 1)
-      val run = right(MappingPipeline.lexical(recall.graph, view, recall.inventory, source, selected))
-      assertEquals(run.execution.reference.profile.universe.targets.toSet, children.map(_.ref).toSet)
+      val run =
+        right(MappingPipeline.lexical(recall.graph, view, recall.inventory, source, selected))
+      assertEquals(
+        run.execution.reference.profile.universe.targets.toSet,
+        children.map(_.ref).toSet
+      )
       assertEquals(run.execution.reference.profile.level, 1)
       assert(run.execution.reference.evidence.nominated.flatten.nonEmpty)
       assert(run.execution.reference.evidence.nominated.flatten.forall(children.map(_.ref).toSet))
-      assert(!run.execution.reference.evidence.breakdowns.flatMap(_.keys).exists(_.anchor.contains(parent.ref)))
-      val local = right(MappingPipeline.referenceLexical(recall.graph, view, recall.inventory, source, selected))
+      assert(
+        !run.execution.reference.evidence.breakdowns
+          .flatMap(_.keys)
+          .exists(_.anchor.contains(parent.ref))
+      )
+      val local = right(
+        MappingPipeline.referenceLexical(recall.graph, view, recall.inventory, source, selected)
+      )
       assertEquals(local.execution.reference.outcomes, run.execution.reference.outcomes)
-      val invalidGrouping = selected.copy(groupingRoots = Some(Vector(parent.ref -> 0, parent.ref -> 1)))
-      assert(MappingPipeline.lexical(recall.graph, view, recall.inventory, source, invalidGrouping).isLeft)
-      val context = ExpectedMappingContext(recall.inventory, source, referenceExecution = Some(local.execution))
-      assertEquals(right(MappingCodecs.decodeReference(MappingCodecs.encode(local.reference), context)).digest, local.reference.digest)
+      val invalidGrouping =
+        selected.copy(groupingRoots = Some(Vector(parent.ref -> 0, parent.ref -> 1)))
+      assert(
+        MappingPipeline
+          .lexical(recall.graph, view, recall.inventory, source, invalidGrouping)
+          .isLeft
+      )
+      val context =
+        ExpectedMappingContext(recall.inventory, source, referenceExecution = Some(local.execution))
+      assertEquals(
+        right(MappingCodecs.decodeReference(MappingCodecs.encode(local.reference), context)).digest,
+        local.reference.digest
+      )
     }
   }
 
@@ -622,35 +730,78 @@ class MappingPipelineSuite extends FunSuite:
       write(root, "recall.txt", "Bob left. Anna arrived.")
       val input = right(StudyPreparation.prepare(root, first.config))
       val inference = StructuredReconstruction.Profile.sherlock().inference
-      def settings(order: StructuredReconstruction.OrderPolicy) = config.copy(reconstructionProfile = Some(
-        right(StructuredReconstruction.Profile.of(inference, right(StructuredReconstruction.DecisionPolicy.of(order))))))
-      val free = right(MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Unconstrained))).outcomes.head.run.get
-      val ordered = right(MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Nondecreasing))).outcomes.head.run.get
+      def settings(order: StructuredReconstruction.OrderPolicy) =
+        config.copy(reconstructionProfile =
+          Some(
+            right(
+              StructuredReconstruction.Profile
+                .of(inference, right(StructuredReconstruction.DecisionPolicy.of(order)))
+            )
+          )
+        )
+      val free = right(
+        MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Unconstrained))
+      ).outcomes.head.run.get
+      val ordered = right(
+        MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Nondecreasing))
+      ).outcomes.head.run.get
       assertEquals(free.execution.reference, ordered.execution.reference)
-      assertNotEquals(free.execution.reconstruction.decisions.map(_.anchor), ordered.execution.reconstruction.decisions.map(_.anchor))
-      val roots = input.source.nodes.filter(_.parent.isEmpty).sortBy(_.discoursePosition).reverse.zipWithIndex.map((n, i) => n.ref -> i)
-      val reversed = right(MappingPipeline.batch(input, settings(StructuredReconstruction.OrderPolicy.Nondecreasing).copy(groupingRoots = Some(roots)))).outcomes.head.run.get
+      assertNotEquals(
+        free.execution.reconstruction.decisions.map(_.anchor),
+        ordered.execution.reconstruction.decisions.map(_.anchor)
+      )
+      val roots = input.source.nodes
+        .filter(_.parent.isEmpty)
+        .sortBy(_.discoursePosition)
+        .reverse
+        .zipWithIndex
+        .map((n, i) => n.ref -> i)
+      val reversed = right(
+        MappingPipeline.batch(
+          input,
+          settings(StructuredReconstruction.OrderPolicy.Nondecreasing).copy(groupingRoots =
+            Some(roots)
+          )
+        )
+      ).outcomes.head.run.get
       assertEquals(reversed.execution.reconstruction.grouping.roots, roots)
       assertEquals(reversed.execution.reference, ordered.execution.reference)
-      assertNotEquals(reversed.execution.reconstruction.decisions.map(_.anchor), ordered.execution.reconstruction.decisions.map(_.anchor))
+      assertNotEquals(
+        reversed.execution.reconstruction.decisions.map(_.anchor),
+        ordered.execution.reconstruction.decisions.map(_.anchor)
+      )
     }
   }
 
-  test("reference-only empty all-failed and partial publications preserve every attempted denominator") {
+  test(
+    "reference-only empty all-failed and partial publications preserve every attempted denominator"
+  ) {
     inTemp { root =>
       val base = prepared(root)
-      Vector(Vector.empty, Vector(StudyPreparation.RecallInput("p1", "s1", "missing.txt"))).zipWithIndex.foreach { (recalls, index) =>
+      Vector(
+        Vector.empty,
+        Vector(StudyPreparation.RecallInput("p1", "s1", "missing.txt"))
+      ).zipWithIndex.foreach { (recalls, index) =>
         val input = right(StudyPreparation.prepare(root, base.config.copy(recalls = recalls)))
         val batch = right(MappingPipeline.referenceBatch(input, config))
         val summary = MappingPipeline.inspect(batch)
         assertEquals(right(summary.hcursor.get[Int]("attempts")), recalls.size)
         assertEquals(right(summary.hcursor.get[Int]("completed")), 0)
-        assertEquals(right(summary.hcursor.downField("coverage").get[Int]("unknownUnitObservations")), recalls.size)
+        assertEquals(
+          right(summary.hcursor.downField("coverage").get[Int]("unknownUnitObservations")),
+          recalls.size
+        )
         val output = root.resolve(s"empty-$index")
         val receipt = right(MappingPipeline.publishReference(batch, output, false, exchange = true))
-        assertEquals(right(MappingPipeline.publishReference(batch, output, true, exchange = true)), receipt)
+        assertEquals(
+          right(MappingPipeline.publishReference(batch, output, true, exchange = true)),
+          receipt
+        )
         write(output, "manifest.json", "interrupted")
-        assertEquals(MappingPipeline.publishReference(batch, output, true, exchange = true), Left("Corrupt"))
+        assertEquals(
+          MappingPipeline.publishReference(batch, output, true, exchange = true),
+          Left("Corrupt")
+        )
       }
       val mixed = right(MappingPipeline.referenceBatch(prepared(root, true), config))
       assertEquals(mixed.outcomes.count(_.run.nonEmpty), 1)

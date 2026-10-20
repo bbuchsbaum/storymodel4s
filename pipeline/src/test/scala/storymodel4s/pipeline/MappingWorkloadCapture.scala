@@ -232,12 +232,20 @@ object MappingWorkloadCapture:
       )
     )
     val referenceOnly = measure(
-      right(MappingPipeline.referenceLexical(
-        recall.graph, prepared.value.source, recall.inventory,
-        prepared.value.source.representation, config(tieBudget)))
+      right(
+        MappingPipeline.referenceLexical(
+          recall.graph,
+          prepared.value.source,
+          recall.inventory,
+          prepared.value.source.representation,
+          config(tieBudget)
+        )
+      )
     )
-    require(referenceOnly.value.execution.reference == paired.value.execution.reference,
-      "reference-only scientific outcomes differ from matched paired execution")
+    require(
+      referenceOnly.value.execution.reference == paired.value.execution.reference,
+      "reference-only scientific outcomes differ from matched paired execution"
+    )
     val batch = right(MappingPipeline.batch(prepared.value, config(tieBudget)))
     val weighted = measure(
       selectedWeights.map(weight => right(paired.value.execution.weighted(weight)).identity.hex)
@@ -276,7 +284,9 @@ object MappingWorkloadCapture:
         measurementJson("weightedReexecutionAndExport", weightedExport)
       ),
       "referenceOnlyComparison" -> Json.obj(
-        "scientificParity" -> Json.fromBoolean(referenceOnly.value.execution.reference == paired.value.execution.reference),
+        "scientificParity" -> Json.fromBoolean(
+          referenceOnly.value.execution.reference == paired.value.execution.reference
+        ),
         "execution" -> Json.fromString(referenceOnly.value.execution.identity.hex),
         "record" -> Json.fromString(referenceOnly.value.reference.digest.hex),
         "pairedExecution" -> Json.fromString(paired.value.execution.identity.hex)
