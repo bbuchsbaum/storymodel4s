@@ -34,14 +34,14 @@ def verify_target(root: Path) -> None:
     primary = Path(__file__).resolve().parents[1]
     if root == primary or primary in root.parents:
         fail("target is this primary repository or one of its descendants")
+    if not (root / ".git").is_dir():
+        fail("target must be a standalone clone with a .git directory")
     inside = git(root, "rev-parse", "--is-inside-work-tree")
-    if inside.returncode:
-        return  # A hash-verified archive has no git metadata to inspect.
+    if inside.returncode or inside.stdout.strip() != "true":
+        fail("git discovery failed")
     top = git(root, "rev-parse", "--show-toplevel")
     if top.returncode or Path(top.stdout.strip()).resolve() != root:
         fail("target is not a repository top-level")
-    if (root / ".git").is_file():
-        fail("linked worktrees are not accepted")
     dirty = git(root, "status", "--porcelain", "--untracked-files=all")
     if dirty.returncode or dirty.stdout:
         fail("git target is dirty (tracked or untracked files)")
@@ -66,8 +66,8 @@ def main() -> None:
         if MARKER in path.read_text() or digest(path) != expected:
             fail(f"{relative} is not the exact uninstrumented {BASELINE} input")
     head = git(root, "rev-parse", "HEAD")
-    if head.returncode == 0 and head.stdout.strip() != BASELINE:
-        fail(f"clone HEAD {head.stdout.strip()} is not pinned baseline {BASELINE}")
+    if head.returncode or head.stdout.strip() != BASELINE:
+        fail(f"clone HEAD is not pinned baseline {BASELINE}")
     check = git(root, "apply", "--check", str(patch))
     if check.returncode:
         fail(check.stderr.strip() or "patch does not apply")

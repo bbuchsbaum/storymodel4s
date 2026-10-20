@@ -86,6 +86,36 @@ per-cell distributions below or the complete JSON, rather than treating this as 
 | 16 | 16 | 16 | 2 | 174.26 [172.90,177.45] | 623.07 [615.87,626.01] | 2535 |
 | 16 | 16 | 16 | 3 | 175.95 [175.13,214.29] | 895.49 [868.88,913.30] | 2535 |
 
+## Export-only HSMM stage receipt
+
+An export-only JVM patch was applied to a clean standalone clone pinned at
+`90ebaa8f48dd45f70db13bcccc67dda1c0020234`; it does not alter the library checkout. The
+patch SHA-256 is `4b45740293b93519799c7cec730b9d61ea978171d7617a21dd761ffad478dd24` and the
+application script SHA-256 is `994c49ffe734e74f7dcd75b082e57443fef773d57104ed1d1d603e5d3d669d69`.
+The script refuses the primary checkout, descendants, linked or subdirectory worktrees, dirty
+clones, HEAD/discovery failures, input hash mismatches, and reapplication. Dry apply and apply
+were both observed before compiling the isolated patched clone.
+
+The ordinary direct 1 GiB JVM capture took 140.99 s; the instrumented timing capture took
+153.43 s. They have 36 cells and 108 measured repetitions, and every canonical member/export
+parity witness is identical between the two captures. The stage receipt contains 3,564 rows for
+324 inference invocations. For every invocation there is exactly one transition-matrix and one
+Viterbi row; forward/backward phases have equal pass counts, retained-flow rows carry a
+nonnegative logical count, and every child interval is enclosed by its full-run interval.
+The largest reported retained-flow count is 2,535, matching the largest adjacent state-product
+coordinate in this matrix.
+
+The patch writes into fixed primitive arrays (capacity 4,096) during inference and constructs
+rows only while draining after the timed work. It records timestamps and optional per-thread
+allocated bytes. It does not time validation separately, inspect result values in a pair loop, or
+make the capture a performance comparison: the observed 12.44 s command-level difference also
+includes recorder overhead and host variation. The existing workload uses zero refinement passes,
+so its refinement row is correctly absent rather than inferred from a synthetic extra case.
+
+`-Dhsmm.audit.heapSampleMillis=10` enables a separate daemon sampler that reports a sampled
+simultaneous maximum heap value and interval in the capture runtime receipt. It is deliberately
+disabled for the timing run and is not a JVM pool-peak sum.
+
 ## Memory and qualification limits
 
 The capture reports 682,664,832 bytes as the sum of cumulative JVM heap-pool peaks. Pool
