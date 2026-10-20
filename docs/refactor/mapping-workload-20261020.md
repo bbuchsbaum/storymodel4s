@@ -105,6 +105,25 @@ nonnegative logical count, and every child interval is enclosed by its full-run 
 The largest reported retained-flow count is 2,535, matching the largest adjacent state-product
 coordinate in this matrix.
 
+The machine-readable aggregate is
+[mapping-hsmm-profile-20261020.json](mapping-hsmm-profile-20261020.json). It summarizes the
+raw timing and separate sampler logs while retaining the qualification boundary below.
+
+| Recorded phase | Rows | Median ms | Total ms | Thread allocation MiB |
+|---|---:|---:|---:|---:|
+| full run | 324 | 0.332 | 225.668 | 298.0 |
+| transition matrix | 324 | 0.049 | 96.583 | 164.5 |
+| emissions | 324 | 0.013 | 4.751 | 4.4 |
+| forward alpha | 324 | 0.038 | 17.644 | 16.2 |
+| backward beta | 324 | 0.035 | 18.747 | 16.3 |
+| posterior rows | 324 | 0.015 | 5.384 | 3.9 |
+| transition flow | 324 | 0.067 | 33.426 | 37.8 |
+| Viterbi | 324 | 0.056 | 24.156 | 36.6 |
+
+These are recorder stage totals, so they overlap through the full-run enclosing interval and must
+not be summed as wall-clock time. The all-zero refinement row is retained in the JSON: this
+workload configured zero refinement passes.
+
 The patch writes into fixed primitive arrays (capacity 4,096) during inference and constructs
 rows only while draining after the timed work. It records timestamps and optional per-thread
 allocated bytes. It does not time validation separately, inspect result values in a pair loop, or
@@ -114,11 +133,15 @@ so its refinement row is correctly absent rather than inferred from a synthetic 
 
 `-Dhsmm.audit.heapSampleMillis=10` enables a separate daemon sampler that reports a sampled
 simultaneous maximum heap value and interval in the capture runtime receipt. It is deliberately
-disabled for the timing run and is not a JVM pool-peak sum.
+disabled for the timing run and is not a JVM pool-peak sum. The separate run observed
+385,161,896 bytes over 18,450 samples at 10 ms. It has canonical parity with both timing runs.
+No `time -l` OS RSS was collected for that sampler run. The ordinary and instrumented timing
+runs reported 443,600,640 and 688,214,080 bytes respectively; those are distinct whole-process
+command observations, not simultaneous heap measurements or a recorder-overhead estimate.
 
 ## Memory and qualification limits
 
-The capture reports 682,664,832 bytes as the sum of cumulative JVM heap-pool peaks. Pool
+The original public-only capture reports 682,664,832 bytes as the sum of cumulative JVM heap-pool peaks. Pool
 peaks need not coincide: this is not a simultaneous heap peak or stage-local allocation.
 Per-thread allocated-byte counters are available and retained for every operation; heap deltas
 may include GC and are not allocations. OS `time -l` reports 2,444,132,352 bytes maximum RSS
@@ -126,11 +149,12 @@ for the whole command tree, including sbt/compiler/tests; it is not isolated cap
 No portable per-stage/process-RSS measurement was available. A live owned-process snapshot
 during the capture was about 801 MiB RSS; a snapshot is not a peak.
 
-Transition construction, forward/backward, Viterbi, refinement and retained-flow storage do not
-have separately measured public boundaries in this harness. They remain explicitly unmeasured;
-the adjacent-state product is a workload coordinate, not measured time or memory complexity.
-Reference-only comparison awaits G. These limits mean H has a reproducible baseline but does
-not yet satisfy every requested instrumentation/operating-envelope acceptance item.
+The public harness alone has no separately measured transition, forward/backward, Viterbi,
+refinement or retained-flow boundary. The export-only recorder above supplies those timing cuts
+for the pinned clone only; validation and encoding remain outside its cuts, and the adjacent-state
+product remains a workload coordinate rather than a complexity proof. No portable process-RSS or
+per-stage heap API exists. Reference-only comparison awaits G. These limits mean H has a
+reproducible baseline and an isolated internal receipt, not a general operating-envelope claim.
 
 The failed first compile (Java release compatibility) and first admission attempt are retained
 in the adjacent raw logs. Repeated strings correctly refused the fixed `ProjectSyntheticControl`
