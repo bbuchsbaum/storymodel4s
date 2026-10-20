@@ -155,7 +155,7 @@ The public harness alone has no separately measured transition, forward/backward
 refinement or retained-flow boundary. The export-only recorder above supplies those timing cuts
 for the pinned clone only; validation and encoding remain outside its cuts, and the adjacent-state
 product remains a workload coordinate rather than a complexity proof. No portable process-RSS or
-per-stage heap API exists. Reference-only comparison awaits G. These limits mean H has a
+per-stage heap API exists. Reference-only comparison is recorded below under child G. These limits mean H has a
 reproducible baseline and an isolated internal receipt, not a general operating-envelope claim.
 
 The failed first compile (Java release compatibility) and first admission attempt are retained
@@ -172,5 +172,32 @@ predeclared; do not reinterpret these maxima as a universal safe capacity.
 
 Recommended next action: retain existing budgets and no optimization on this evidence alone.
 If the owner wants a performance acceptance target, choose workload/latency/memory targets
-explicitly before using this baseline as a regression gate. Separate internal instrumentation
-and reference-only comparison remain acceptance work on existing H/G, not a new project.
+explicitly before using this baseline as a regression gate. The export-only internal instrumentation and matched reference comparison are recorded on existing H/G; no separate project or optimization is introduced.
+
+## Matched reference-only comparison (G)
+
+Final functional candidate: `a11c79726ea817a23c5e4096ee0b7848aa47b71b`.
+[Full matched receipt](mapping-reference-workload-20261020.json) retains all 36 cells and
+108 measured repetitions, source/raw-log hashes, operation allocations/times and identities.
+The direct Java25.0.1 JVM had a 1 GiB heap cap; the captured command exited 0. The same process
+runs paired lexical execution followed by reference-only lexical execution on identical checked
+inputs. Every `LocalReference.Result` is equal, including evidence, profile, costs, masses,
+information and missing/overflow diagnostics. Published scientific rows are compared separately
+by `MappingPipelineSuite`, retaining policy/measure/gate/fidelity/support/choice values while
+excluding execution-derived stage/candidate identifiers. Execution and record identities differ
+as intended. All 36 paired/weighted legacy publication witnesses match the earlier baseline
+cryptographically; these are not literal byte-by-byte comparisons.
+
+| Public operation | Median ms across 108 repetitions | Observed range ms | Median current-thread allocated bytes |
+|---|---:|---:|---:|
+| Paired lexical evidence and both estimands | 56.530 | 11.682–492.944 | 117,586,504 |
+| Reference-only lexical evidence and local estimand | 15.009 | 4.443–271.710 | 29,318,252 |
+
+These pooled medians describe this matrix. Reference always runs second, caches are warm, and
+unrelated host builds contribute contention; no randomized speedup estimate or capacity threshold
+was predeclared. Compare the two operations within this Java25 capture, not against the separate
+Java22 profiler timings. Whole-command elapsed time was 127.23 s, maximum RSS 602,947,584 bytes,
+and peak memory footprint 470,323,072 bytes. Those include preparation, repeated execution,
+publication, receipt construction and cleanup; neither is reference-only stage RSS or a sampled
+heap peak. The per-operation heap deltas can include GC and current-thread allocations exclude
+other threads. Retain existing candidate budgets and backend choices on this bounded evidence.
