@@ -10,6 +10,27 @@ import storymodel4s.core.*
 /** Reuses the admitted Anna/Bob synthetic parser control; no participant inputs. */
 class MappingPipelineSuite extends FunSuite:
   private def right[E, A](v: Either[E, A]): A = v.fold(e => fail(e.toString), identity)
+  private def scientificProjection(record: MappingResult): io.circe.Json =
+    def strip(value: io.circe.Json): io.circe.Json = value.arrayOrObject(
+      value,
+      rows => io.circe.Json.fromValues(rows.map(strip)),
+      obj =>
+        io.circe.Json.fromJsonObject(
+          io.circe.JsonObject.fromIterable(
+            obj.toVector
+              .filterNot((key, _) =>
+                Set("stages", "stage", "inference_stage_id", "candidate_set_id")(key)
+              )
+              .map((key, child) => key -> strip(child))
+          )
+        )
+    )
+    val json = MappingCodecs.toJson(record)
+    io.circe.Json.obj(
+      "policies" -> json.hcursor.downField("policies").focus.get,
+      "outcomes" -> strip(json.hcursor.downField("outcomes").focus.get)
+    )
+
   private val config = MappingPipeline.Config(
     MappingPipeline.LexicalProfile,
     1.0,
@@ -294,7 +315,23 @@ class MappingPipelineSuite extends FunSuite:
         .referenceOnnx(registration, inventory, resolved.copy(selectedLevel = 1))
         .isLeft
     )
-    val referenceOnly = right(MappingPipeline.referenceOnnx(registration, inventory, resolved))
+    assert(MappingPipeline.referenceOnnx(registration, inventory, resolved).isLeft)
+    val referenceSettings = right(
+      OnnxMappingRegistration.Config.of(
+        settings.candidates,
+        settings.querySensitivity,
+        settings.documentSensitivity,
+        weights = CostWeights.semanticOnly,
+        functionPrior = FunctionPrior.none,
+        selectedLevel = Some(0)
+      )
+    )
+    val referenceEncoder = OnnxMappingFixture.open()
+    val referenceRegistration =
+      try right(OnnxMappingRegistration.record(referenceEncoder, context, referenceSettings))
+      finally referenceEncoder.close()
+    val referenceOnly =
+      right(MappingPipeline.referenceOnnx(referenceRegistration, inventory, resolved))
     val run = right(MappingPipeline.registeredOnnx(registration, inventory, resolved))
     assertEquals(referenceOnly.execution.reference.outcomes, run.execution.reference.outcomes)
     assert(run.execution.reference.evidence eq registration.evidence)
@@ -529,6 +566,7 @@ class MappingPipelineSuite extends FunSuite:
       val run = batch.outcomes.head.run.get
       assertEquals(run.execution.reference.outcomes, paired.execution.reference.outcomes)
       assertEquals(run.execution.reference.profile, paired.execution.reference.profile)
+      assertEquals(scientificProjection(run.reference), scientificProjection(paired.reference))
       assertNotEquals(run.identity, paired.identity)
       val context = ExpectedMappingContext(
         run.reference.inventory,
@@ -708,6 +746,27 @@ class MappingPipelineSuite extends FunSuite:
         MappingPipeline.referenceLexical(recall.graph, view, recall.inventory, source, selected)
       )
       assertEquals(local.execution.reference.outcomes, run.execution.reference.outcomes)
+      assertEquals(scientificProjection(local.reference), scientificProjection(run.reference))
+      val admitted = right(
+        StudyPreparation.prepare(
+          root,
+          input.config.copy(recalls =
+            input.config.recalls.map(
+              _.copy(admission = StudyPreparation.Admission.ProjectSyntheticControl)
+            )
+          )
+        )
+      )
+      val refBatch = right(MappingPipeline.referenceBatch(admitted, config.copy(selectedLevel = 1)))
+      val (_, refManifest) = right(MappingPipeline.referenceArtifacts(refBatch, exchange = true))
+      val declared = right(io.circe.parser.parse(refManifest)).hcursor
+        .downField("metadata")
+        .downField("config")
+        .focus
+        .get
+      assert(!declared.noSpaces.contains("reconstruction"))
+      assert(!declared.noSpaces.contains("grouping"))
+      assertEquals(right(declared.hcursor.get[Int]("selectedLevel")), 1)
       val invalidGrouping =
         selected.copy(groupingRoots = Some(Vector(parent.ref -> 0, parent.ref -> 1)))
       assert(
@@ -806,5 +865,30 @@ class MappingPipelineSuite extends FunSuite:
       val mixed = right(MappingPipeline.referenceBatch(prepared(root, true), config))
       assertEquals(mixed.outcomes.count(_.run.nonEmpty), 1)
       assertEquals(mixed.outcomes.count(_.failure.nonEmpty), 1)
+    }
+  }
+
+  test("reference-only temporal projection consumes the checked local record and original clock") {
+    inTemp { root =>
+      val paired = TemporalPipelineFixture.setup(root, timed = true)
+      val reference =
+        right(MappingPipeline.referenceBatch(paired.prepared, paired.config)).outcomes.head.run.get
+      val original = paired.outcomes.head.run.get
+      val timing = paired.outcomes.head.prepared.flatMap(_.timing)
+      val request = TemporalPipelineFixture.request(paired, window = true)
+      val localProjection = right(MappingPipeline.temporal(reference, request, timing))
+      val pairedProjection = right(MappingPipeline.temporal(original, request, timing))._1
+      assertEquals(localProjection.mapping.digest, reference.reference.digest)
+      assertNotEquals(localProjection.mapping.digest, pairedProjection.mapping.digest)
+      assertEquals(localProjection.measure, TemporalQuery.Measure.NormalizedScoreMass)
+      assertEquals(localProjection.rows.map(_.unit), pairedProjection.rows.map(_.unit))
+      assertEquals(
+        localProjection.rows.map(_.grid.map(_.allocated)),
+        pairedProjection.rows.map(_.grid.map(_.allocated))
+      )
+      assertEquals(
+        localProjection.rows.map(_.durationWeighted),
+        pairedProjection.rows.map(_.durationWeighted)
+      )
     }
   }

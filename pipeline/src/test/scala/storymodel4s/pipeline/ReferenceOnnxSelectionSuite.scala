@@ -24,7 +24,8 @@ class ReferenceOnnxSelectionSuite extends FunSuite:
       parent = Some(parent.ref),
       discoursePosition = parent.discoursePosition + 1
     )
-    val view = InMemorySourceView(base.source.nodes :+ nested, Map.empty, None, text.canonicalText.length)
+    val view =
+      InMemorySourceView(base.source.nodes :+ nested, Map.empty, None, text.canonicalText.length)
     val support = view.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap
     val representation = right(
       SourceRepresentation.of(
@@ -55,7 +56,7 @@ class ReferenceOnnxSelectionSuite extends FunSuite:
         candidates,
         Sensitivity.Public,
         Sensitivity.Public,
-        emptyPolicy = SurfaceEmptyPolicy.Unavailable,
+        emptyPolicy = SurfaceEmptyPolicy.EmptyIsIneligible,
         weights = CostWeights.semanticOnly,
         functionPrior = FunctionPrior.none,
         selectedLevel = selectedLevel
@@ -65,7 +66,7 @@ class ReferenceOnnxSelectionSuite extends FunSuite:
     try right(OnnxMappingRegistration.record(encoder, context, settings))
     finally encoder.close()
 
-  private def config(selectedLevel: Option[Int]): MappingPipeline.Config =
+  private def config(selectedLevel: Int): MappingPipeline.Config =
     MappingPipeline.Config(
       MappingPipeline.OnnxProfile,
       temperature = 1.0,
@@ -78,14 +79,27 @@ class ReferenceOnnxSelectionSuite extends FunSuite:
   test("reference ONNX refuses absent selection before local-reference nomination") {
     val context = hierarchicalContext()
     val registered = registration(context, None)
-    val paired = right(MappingPipeline.registeredOnnx(registered, inventory(context), config(None)))
-    assert(paired.execution.reference.outcomes.forall(_.measures.normalized.isEmpty))
-    assert(MappingPipeline.referenceOnnx(registered, inventory(context), config(None)).isLeft)
+    assert(
+      registered.evidence.nominated.forall(_.isEmpty),
+      "fixture must not nominate out-of-cut targets"
+    )
+    assert(MappingPipeline.registeredOnnx(registered, inventory(context), config(0)).isLeft)
+    assert(MappingPipeline.referenceOnnx(registered, inventory(context), config(0)).isLeft)
+  }
+
+  test(
+    "legacy paired all-level registration remains valid when checked source is only level zero"
+  ) {
+    val context = OnnxMappingFixture.context(query = "")
+    val registered = registration(context, None)
+    val paired = right(MappingPipeline.registeredOnnx(registered, inventory(context), config(0)))
+    assert(paired.reference.outcomes.forall(_.measures.normalized.isEmpty))
+    assertEquals(paired.onnx, Some(registered))
   }
 
   test("explicit level zero reference preserves all-unavailable accounting") {
     val context = hierarchicalContext()
     val registered = registration(context, Some(0))
-    val reference = right(MappingPipeline.referenceOnnx(registered, inventory(context), config(Some(0))))
-    assert(reference.execution.reference.outcomes.forall(_.measures.normalized.isEmpty))
+    val reference = right(MappingPipeline.referenceOnnx(registered, inventory(context), config(0)))
+    assert(reference.reference.outcomes.forall(_.measures.normalized.isEmpty))
   }

@@ -54,7 +54,10 @@ Selection changes bind versioned config identities. Existing default config text
 paired execution/record identities and exact endpoint object dispatch retain their original
 representation. A selected cut is never a subset filtered from already-priced evidence.
 Caption production and ONNX registration retain their selected level, including unavailable
-comparisons. Missing content stays unavailable; changing resolution does not grant a scoring
+comparisons. The existing paired ONNX entry additionally accepts its historical all-level
+registration only when the checked source contains level zero exclusively and new selection
+settings are absent. That source proves the cuts identical; hierarchical and reference-only
+entries require explicit matching registration. Missing content stays unavailable; changing resolution does not grant a scoring
 capability.
 
 Reference records use `mapping-record/reference/v1` and one-member exchanges use

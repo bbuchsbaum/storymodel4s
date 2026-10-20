@@ -234,7 +234,7 @@ object MappingPipeline:
         registration.hex,
         execution.identity.hex,
         reference.digest.hex,
-        configText(config)
+        referenceConfigText(config)
       )
     )
     override def equals(other: Any): Boolean = other match
@@ -373,16 +373,27 @@ object MappingPipeline:
             .map(stages => new ReferenceOrganization(run, request, computed, stages))
         }
 
-  private def configText(c: Config): String =
-    val legacy = Json.obj(
-      "profile" -> Json.fromString(c.profile),
-      "temperature" -> Json.fromString(c.temperature.toString),
-      "perLevel" -> Json.fromInt(c.perLevel),
-      "tieBudget" -> Json.fromInt(c.tieBudget),
-      "requested" -> Json.fromValues(c.requested.map(v => Json.fromString(v.toString))),
-      "networkRequests" -> Json.fromInt(c.networkRequests),
-      "retries" -> Json.fromInt(c.retries)
+  private def baseConfig(c: Config): Json = Json.obj(
+    "profile" -> Json.fromString(c.profile),
+    "temperature" -> Json.fromString(c.temperature.toString),
+    "perLevel" -> Json.fromInt(c.perLevel),
+    "tieBudget" -> Json.fromInt(c.tieBudget),
+    "requested" -> Json.fromValues(c.requested.map(v => Json.fromString(v.toString))),
+    "networkRequests" -> Json.fromInt(c.networkRequests),
+    "retries" -> Json.fromInt(c.retries)
+  )
+  private def referenceConfigText(c: Config): String = Canonical.print(
+    baseConfig(c).deepMerge(
+      Json.obj(
+        "mode" -> Json.fromString("reference-only"),
+        "selectionVersion" -> Json.fromString("mapping-reference-selection/v1"),
+        "selectedLevel" -> Json.fromInt(c.selectedLevel)
+      )
     )
+  )
+
+  private def configText(c: Config): String =
+    val legacy = baseConfig(c)
     Canonical.print(
       if c.selectedLevel == 0 && c.reconstructionProfile.isEmpty && c.groupingRoots.isEmpty then
         legacy
@@ -431,7 +442,8 @@ object MappingPipeline:
       view: SourceView,
       inventory: RecallInventory,
       source: SourceRepresentation,
-      config: Config
+      config: Config,
+      referenceOnly: Boolean
   ): Either[Refusal, (LocalEvidence, Checksum)] =
     for
       _ <- validate(config)
@@ -463,11 +475,12 @@ object MappingPipeline:
         .map(Refusal.Alignment(_))
       registration = ContentAddress.digest(
         Vector(
-          "executed-canonical-lexical/v1",
+          if referenceOnly then "executed-canonical-lexical/reference/v1"
+          else "executed-canonical-lexical/v1",
           evidence.identity.checksum.hex,
           source.digest.hex,
           inventory.digest.hex,
-          configText(config)
+          if referenceOnly then referenceConfigText(config) else configText(config)
         )
       )
     yield evidence -> registration
@@ -480,8 +493,9 @@ object MappingPipeline:
       source: SourceRepresentation,
       config: Config
   ): Either[Refusal, Run] =
-    lexicalEvidence(recall, view, inventory, source, config).flatMap { (evidence, registration) =>
-      execute(recall, view, inventory, source, evidence, config, registration, None, None)
+    lexicalEvidence(recall, view, inventory, source, config, referenceOnly = false).flatMap {
+      (evidence, registration) =>
+        execute(recall, view, inventory, source, evidence, config, registration, None, None)
     }
 
   /** Consuming the registration itself prevents an unrelated genuine envelope being attached. */
@@ -601,9 +615,11 @@ object MappingPipeline:
       _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        c.selectedLevel.getOrElse(
-          0
-        ) == config.selectedLevel && c.candidates.perLevel == expected.perLevel &&
+        (c.selectedLevel.contains(config.selectedLevel) ||
+          (c.selectedLevel.isEmpty && config.selectedLevel == 0 &&
+            config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty &&
+            context.source.nodes
+              .forall(_.level == 0))) && c.candidates.perLevel == expected.perLevel &&
           c.candidates.policy == expected.policy,
         (),
         Refusal.ForeignRegistration
@@ -676,8 +692,19 @@ object MappingPipeline:
       source: SourceRepresentation,
       config: Config
   ): Either[Refusal, ReferenceRun] =
-    lexicalEvidence(recall, view, inventory, source, config).flatMap { (evidence, registration) =>
-      referenceExecute(recall, view, inventory, source, evidence, config, registration, None, None)
+    lexicalEvidence(recall, view, inventory, source, config, referenceOnly = true).flatMap {
+      (evidence, registration) =>
+        referenceExecute(
+          recall,
+          view,
+          inventory,
+          source,
+          evidence,
+          config,
+          registration,
+          None,
+          None
+        )
     }
 
   /** Consuming the registration itself prevents an unrelated genuine envelope being attached. */
@@ -800,9 +827,9 @@ object MappingPipeline:
       _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        c.selectedLevel.getOrElse(
-          0
-        ) == config.selectedLevel && c.candidates.perLevel == expected.perLevel &&
+        c.selectedLevel.contains(
+          config.selectedLevel
+        ) && c.candidates.perLevel == expected.perLevel &&
           c.candidates.policy == expected.policy,
         (),
         Refusal.ForeignRegistration
@@ -1081,7 +1108,7 @@ object MappingPipeline:
         prepared.source.edition.hex,
         prepared.source.representation.digest.hex,
         prepared.config.profile,
-        configText(config)
+        referenceConfigText(config)
       ) ++ prepared.source.captionContext.toVector.flatMap((pack, blend) =>
         Vector(pack.identity.hex, blend.toString)
       ) ++ prepared.outcomes.map(_.attempt.hex) ++ providerBinding
@@ -1865,7 +1892,7 @@ object MappingPipeline:
         "summary" -> inspect(batch),
         "sourceEdition" -> Json.fromString(batch.prepared.source.edition.hex),
         "sourceRepresentation" -> Json.fromString(batch.prepared.source.representation.digest.hex),
-        "config" -> Canonical.parse(configText(batch.config)).toOption.get,
+        "config" -> Canonical.parse(referenceConfigText(batch.config)).toOption.get,
         "outcomes" -> Json.fromValues(
           batch.outcomes.map(o =>
             Json.obj(

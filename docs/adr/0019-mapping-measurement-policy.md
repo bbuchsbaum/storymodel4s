@@ -78,7 +78,12 @@ StoryAtlas compilation/tests qualify consumed surfaces before landing.
 `CaptionScoring.produce`, `CaptionMapping.replay/fromPackage` and
 `OnnxMappingRegistration.Config` must retain selected-level binding explicitly, including
 when distinct selections yield identical unavailable evidence. Candidate targets alone do
-not certify which cut was selected.
+not certify which cut was selected. For the existing paired ONNX entry only, a legacy
+all-level registration remains admissible when the new selection fields are absent and the
+checked source contains exclusively level-zero nodes: the complete source itself proves that
+all-level nomination equals the complete level-zero cut. Hierarchical sources and the new
+reference-only entry require explicit matching selected-level registration. This derived legacy
+case preserves existing paired identities without assigning a selection label to unknown evidence.
 
 Rejected: optional fake reconstruction fields, a generalized execution framework, filtering
 already-priced evidence, treating an imported self-consistent record as live origin, changing
