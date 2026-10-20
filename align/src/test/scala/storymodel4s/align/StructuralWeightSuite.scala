@@ -37,6 +37,11 @@ class StructuralWeightSuite extends FunSuite:
     )
     assert(right(StructuralWeight.parse("0/1")).isReference)
     assert(right(StructuralWeight.parse("1/1")).isReconstruction)
+    val selected = right(execution().weighted(near))
+    assert(selected.inference.nonEmpty)
+    assert(
+      right(selected.record).outcomes.forall(_.decision.exists(_.request == DecisionRequest.RawArgmax))
+    )
   }
 
   test("interior scales every named transition including external coefficients") {
