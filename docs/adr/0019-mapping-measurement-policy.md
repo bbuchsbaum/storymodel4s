@@ -1,5 +1,91 @@
 # ADR 0019: mapping evidence, inference policy and scientific use
 
+### 2026-10-20 — proposed selectable-policy and reference-only contract
+
+Status: **proposed, awaiting owner decision** on mapping-audit child D
+(`bd-01M5DAH6B093N2WZCNZ160JMJ6`). The request to implement the epic authorizes
+preparation and qualification; this paragraph does not assert approval of this contract.
+
+Extend the existing modules with a bounded reference producer, `MappingRun.ReferenceExecution`,
+and an additive facade entry. Its checked factory consumes the exact checked recall, immutable
+source snapshot, inventory, source representation, canonical local evidence and single-level
+reference profile. It runs `LocalReference.compute` alone. It owns its record and stage receipts;
+no reconstruction profile, grouping, fill request or inference result is stored or manufactured.
+Construction remains final, non-case and private to the checked producer. Foreign inventory,
+source and evidence refuse before publication. A live record proves the computation; only the
+facade's genuine lexical/caption/ONNX registration grants downstream organization origin.
+
+Add a distinct reference-derived provenance branch and an optional, mutually exclusive
+reference execution in `ExpectedMappingContext`. Decode rebuilds the expected producer record
+and requires canonical full-record equality. `MappingResult.checked` must replay this authority
+just as it does paired authority. No caller receipt or checksum grants execution. Preserve
+existing paired constructors, provenance and decoding unchanged. Reference-only records use a
+new explicit wire version; the legacy v0.1 decoder accepts existing paired records and refuses
+the new wire version even when given context. The new decoder requires the contextual
+reference producer and rejects simultaneous paired/reference contexts. Reference-only exchange
+carries one member and original inventory/source/evidence identities. Replay is explicitly
+contextual: the consumer supplies the original checked recall, source and local evidence to
+rebuild the producer. A self-contained `LocalEvidence` import format is outside this amendment.
+Decoding never grants facade registration. Readers never substitute a paired execution.
+Temporal projection consumes the resulting checked record. Organization
+uses an additive registered-reference entry that retains its original-unit adjacency denominator.
+
+Selection uses existing `LocalReference.Profile`, `StructuredReconstruction.Profile`,
+`DecisionPolicy` and source-bound `Grouping`. A selected level denotes the **complete** source
+cut at that level, never a user-selected subset. All lexical/caption/ONNX nomination receives
+the selected cut before pricing; stale or differently selected registrations refuse. Explicit
+grouping roots/ranks are checked against that same source. Paired and reference-only modes are
+distinct facade entries and settings modes. A reference-only request never constructs or
+validates a reconstruction grouping. Unsupported policy/mode combinations refuse explicitly.
+
+Preserve the legacy config text, lexical registration, paired run identities, record bytes and
+endpoint object identity when callers use the existing default configuration. New selections
+use versioned config/settings identities binding actual level, reconstruction fingerprint,
+decision/fill policy and grouping fingerprint. Historical Sherlock remains the default;
+reference temperature remains configurable and independent of reconstruction temperature.
+Weighted v1 continues to require the exact no-fill Sherlock preset. Other reconstruction
+profiles refuse weighted execution; no new solver, calibration or endpoint interpolation is
+introduced. Exact reduced fractions select endpoints even when a floating coefficient rounds
+to 1.0. Interior records retain raw argmax; the reconstruction endpoint retains its constrained
+decision. Reference-only runs have distinct execution/receipt digests while scientific reference
+rows must equal the matched paired reference `LocalReference.Outcome` values (costs, masses,
+information and diagnostics). Record outcomes also contain execution-specific stage IDs;
+their full bytes are deliberately different and are not the equality witness.
+The published scientific projection compares unit ID, processing/localization, normalized
+mass, temperature/prior/universe, gate/fidelity/support and choice, excluding only stage IDs.
+
+Summary v2 is descriptive metadata, derived from executed objects and original outcomes.
+It retains attempted/prepared/run-produced counts, unknown unit denominators, per-member
+processing and availability/reasons, overflow and measured uniform information separately.
+Pooled known-unit fractions identify their weighting and exclude unknown inventories explicitly;
+no condition aggregation or eligibility filtering is inferred. Record and numeric bytes remain
+unchanged. Publication manifests containing this summary get a new version; legacy manifest
+readers must refuse unsupported versions, and existing mapping-record decoders remain valid.
+Policy descriptions expose target cut, temperatures, grouping order basis, decision and fill,
+measure kind and actual endpoint dispatch. Structural checking is not validated factual-error
+detection, empirical correctness calibration or scientific efficacy. Weighted v1 promises no
+continuity at endpoints.
+
+Consumer crosswalk: `MappingPipeline.execute`, lexical/caption/ONNX nomination and
+`MappingSettings` own selection/origin; `MappingRun`, `MappingResult` and `StageProvenance`
+own checked execution; `ExpectedMappingContext`, `MappingCodecs` and `MappingExchange` own
+contextual replay; `TemporalProjection` and the facade organization producer consume checked
+records and registration. Outside-package probes must refuse construction/copy/product mirrors;
+foreign evidence and inventory mutations must compile and fail named tests. A lawful local
+fixture with invalid reconstruction grouping must execute and round-trip reference-only while
+the paired control refuses. A nonzero-level consumer must prove nomination preceded pricing.
+StoryAtlas compilation/tests qualify consumed surfaces before landing.
+`CaptionScoring.produce`, `CaptionMapping.replay/fromPackage` and
+`OnnxMappingRegistration.Config` must retain selected-level binding explicitly, including
+when distinct selections yield identical unavailable evidence. Candidate targets alone do
+not certify which cut was selected.
+
+Rejected: optional fake reconstruction fields, a generalized execution framework, filtering
+already-priced evidence, treating an imported self-consistent record as live origin, changing
+legacy default identities, renaming scientific labels library-wide, and continuity repair.
+Owner decision: **pending**. Independent design review and executable consumer witnesses are
+still required; this proposal alone does not complete child D.
+
 Accepted direction, 2026-09-19, single-developer mode (SD5), in response to the owner's external
 review and backlog-reorganization request. These are design decisions; the APIs are not yet
 implemented. Detailed contracts and acceptance gates: [delivery plan](../refactor/PLAN.md).
