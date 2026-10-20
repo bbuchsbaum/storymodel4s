@@ -785,7 +785,7 @@ object MappingPipeline:
             })
           )
         )
-      manifest = StudyArtifacts.manifest("mapping-temporal-batch/v1", files, metadata)
+      manifest = StudyArtifacts.manifest("mapping-temporal-batch/v2", files, metadata)
       receipt <- StudyArtifacts
         .publish(output, files, manifest, resume)
         .left
