@@ -40,7 +40,8 @@ class StructuralWeightSuite extends FunSuite:
     val selected = right(execution().weighted(near))
     assert(selected.inference.nonEmpty)
     assert(
-      right(selected.record).outcomes.forall(_.decision.exists(_.request == DecisionRequest.RawArgmax))
+      right(selected.record).outcomes
+        .forall(_.decision.exists(_.request == DecisionRequest.RawArgmax))
     )
   }
 

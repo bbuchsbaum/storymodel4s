@@ -1,10 +1,10 @@
 # ADR 0019: mapping evidence, inference policy and scientific use
 
-### 2026-10-20 — proposed selectable-policy and reference-only contract
+### 2026-10-20 — accepted selectable-policy and reference-only contract
 
-Status: **proposed, awaiting owner decision** on mapping-audit child D
-(`bd-01M5DAH6B093N2WZCNZ160JMJ6`). The request to implement the epic authorizes
-preparation and qualification; this paragraph does not assert approval of this contract.
+Status: **accepted by owner, 2026-10-20** on mapping-audit child D
+(`bd-01M5DAH6B093N2WZCNZ160JMJ6`). The owner explicitly approved the concrete
+amendment reviewed at `f9823aecc`: “Approve and implement E–G”.
 
 Extend the existing modules with a bounded reference producer, `MappingRun.ReferenceExecution`,
 and an additive facade entry. Its checked factory consumes the exact checked recall, immutable
@@ -83,8 +83,8 @@ not certify which cut was selected.
 Rejected: optional fake reconstruction fields, a generalized execution framework, filtering
 already-priced evidence, treating an imported self-consistent record as live origin, changing
 legacy default identities, renaming scientific labels library-wide, and continuity repair.
-Owner decision: **pending**. Independent design review and executable consumer witnesses are
-still required; this proposal alone does not complete child D.
+Owner decision: **approved**. Independent design review passed at `f9823aecc`.
+Executable consumer witnesses remain required for implementation acceptance.
 
 Accepted direction, 2026-09-19, single-developer mode (SD5), in response to the owner's external
 review and backlog-reorganization request. These are design decisions; the APIs are not yet

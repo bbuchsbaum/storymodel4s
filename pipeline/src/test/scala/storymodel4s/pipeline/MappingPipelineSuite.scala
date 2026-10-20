@@ -506,3 +506,112 @@ class MappingPipelineSuite extends FunSuite:
       )
     }
   }
+
+  test("registered reference-only context round-trips with distinct authority and no paired substitute") {
+    inTemp { root =>
+      val input = prepared(root, true)
+      val paired = right(MappingPipeline.batch(input, config)).outcomes.head.run.get
+      val batch = right(MappingPipeline.referenceBatch(input, config))
+      val run = batch.outcomes.head.run.get
+      assertEquals(run.execution.reference.outcomes, paired.execution.reference.outcomes)
+      assertEquals(run.execution.reference.profile, paired.execution.reference.profile)
+      assertNotEquals(run.identity, paired.identity)
+      val context = ExpectedMappingContext(run.reference.inventory, run.reference.source,
+        referenceExecution = Some(run.execution))
+      val wire = MappingCodecs.encode(run.reference)
+      assertEquals(right(MappingCodecs.decodeReference(wire, context)).digest, run.reference.digest)
+      assert(MappingCodecs.decode(wire, context).isLeft)
+      assert(MappingCodecs.decode(wire, context.copy(referenceExecution = None)).isLeft)
+      assert(MappingCodecs.decodeReference(wire, context.copy(referenceExecution = None)).isLeft)
+      assert(MappingCodecs.decodeReference(wire, context.copy(execution = Some(paired.execution -> MappingRun.Member.Reference))).isLeft)
+      assert(MappingCodecs.decodeReference(wire.replace(run.reference.digest.hex, "0" * 64), context).isLeft)
+      val exchange = right(storymodel4s.codec.MappingExchange.encode(run.execution))
+      assertEquals(right(storymodel4s.codec.MappingExchange.decodeReference(exchange.files, context)).digest, run.reference.digest)
+      assert(storymodel4s.codec.MappingExchange.decode(exchange.files, context).isLeft)
+      assert(exchange.files.forall(!_._1.contains("reconstruction")))
+      val coverage = MappingPipeline.inspect(batch).hcursor.downField("coverage")
+      assertEquals(right(coverage.get[Int]("unknownUnitObservations")), 1)
+      assertEquals(right(coverage.get[Vector[io.circe.Json]]("observations")).size, 2)
+      assert(coverage.downField("reconstruction").focus.isEmpty)
+      val request = right(OrganizationPipeline.request(paired, MeasurementCompatibility.Axis.Discourse))
+      val organization = right(MappingPipeline.referenceOrganization(run, request))
+      assertEquals(organization.result.rows, right(MappingPipeline.organization(paired, request)).result.rows)
+      assertEquals(organization.result.transitions.size, run.execution.inventory.units.size - 1)
+      assertEquals(MeasurementCompatibility.inspect(run.reference, request).verdict, MeasurementCompatibility.Verdict.UnknownProvenance)
+    }
+  }
+
+  test("explicit reconstruction policies leave local evidence and reference outcomes unchanged") {
+    inTemp { root =>
+      val input = prepared(root)
+      val base = right(MappingPipeline.batch(input, config)).outcomes.head.run.get
+      val decision = right(StructuredReconstruction.DecisionPolicy.of(StructuredReconstruction.OrderPolicy.Unconstrained))
+      val profile = right(StructuredReconstruction.Profile.of(right(HsmmConfig.of(temperature = 0.9)), decision))
+      val chosen = right(MappingPipeline.batch(input, config.copy(reconstructionProfile = Some(profile)))).outcomes.head.run.get
+      assertEquals(chosen.execution.reconstruction.profile, profile)
+      assertEquals(chosen.execution.reference, base.execution.reference)
+      assertNotEquals(chosen.identity, base.identity)
+      assert(chosen.execution.weighted(right(StructuralWeight.of(1, 2))).isLeft)
+      assert(MappingPipeline.referenceBatch(input, config.copy(reconstructionProfile = Some(profile))).isLeft)
+      val invalid = config.copy(groupingRoots = Some(Vector(SourceNodeRef.Situation(SituationId.unsafe("foreign")) -> 1)))
+      assert(right(MappingPipeline.batch(input, invalid)).outcomes.head.run.isEmpty)
+      val local = right(MappingPipeline.referenceBatch(input, config)).outcomes.head.run.get
+      assert(local.reference.outcomes.nonEmpty)
+    }
+  }
+
+  test("reference settings and ordinary CLI publish only one member with safe resume") {
+    inTemp { root =>
+      val _ = prepared(root)
+      write(root, "study.json", StudyCli.Template.replace("\"timing\":null", "\"timing\":null,\"admission\":{\"kind\":\"project-synthetic-control\"}"))
+      write(root, "mapping.json", MappingCli.Template.dropRight(1) + ",\"mode\":\"reference-only\"}")
+      val batch = right(MappingPipeline.analyzeReference(root.resolve("study.json"), root.resolve("mapping.json")))
+      assert(MappingPipeline.analyze(root.resolve("study.json"), root.resolve("mapping.json")).isLeft)
+      val output = root.resolve("reference-export")
+      val args = List("exchange", root.resolve("study.json").toString, root.resolve("mapping.json").toString, output.toString)
+      val errors = scala.collection.mutable.ArrayBuffer.empty[String]
+      assertEquals(MappingCli.run(args, _ => (), e => { val _ = errors += e; () }), 0, errors.mkString)
+      assertEquals(MappingCli.run(args :+ "--resume", _ => (), e => { val _ = errors += e; () }), 0, errors.mkString)
+      val members = Files.list(output)
+      val names = try members.iterator().asScala.toVector.map(_.getFileName.toString) finally members.close()
+      assert(names.exists(_.contains("mapping.json")))
+      assert(!names.exists(_.contains("reconstruction")))
+      val emitted = names.map(name => name -> io.circe.Json.fromString(Files.readString(output.resolve(name))))
+      println("REFERENCE_MAPPING_FIXTURE\t" + io.circe.Json.obj(emitted*).noSpaces)
+      val run = batch.outcomes.head.run.get
+      write(output, s"${run.identity.hex}--mapping.json", "corrupt")
+      assertEquals(MappingCli.run(args :+ "--resume", _ => (), e => { val _ = errors += e; () }), 2)
+    }
+  }
+
+  test("nonzero complete cut is nominated before lexical pricing and reference needs no grouping") {
+    inTemp { root =>
+      val input = prepared(root)
+      val recall = input.outcomes.head.result.toOption.get
+      val nodes = input.source.nodes
+      val parent = nodes.head.copy(level = 0, parent = None)
+      val children = nodes.zipWithIndex.map((n, i) => n.copy(
+        ref = SourceNodeRef.Situation(SituationId.unsafe(s"selected-child-$i")), level = 1, parent = Some(parent.ref)))
+      val view = InMemorySourceView(parent +: children, Map.empty, None, input.source.scoringLength)
+      val source = right(SourceRepresentation.of(view,
+        cats.data.NonEmptyVector.fromVector(input.source.representation.bundles.toVector).get, None,
+        view.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap))
+      val selected = config.copy(selectedLevel = 1)
+      val run = right(MappingPipeline.lexical(recall.graph, view, recall.inventory, source, selected))
+      assertEquals(run.execution.reference.profile.universe.targets.toSet, children.map(_.ref).toSet)
+      assertEquals(run.execution.reference.profile.level, 1)
+      assert(run.execution.reference.evidence.nominated.flatten.nonEmpty)
+      assert(run.execution.reference.evidence.nominated.flatten.forall(children.map(_.ref).toSet))
+      assert(!run.execution.reference.evidence.breakdowns.flatMap(_.keys).exists(_.anchor.contains(parent.ref)))
+      val local = right(MappingPipeline.referenceLexical(recall.graph, view, recall.inventory, source, selected))
+      assertEquals(local.execution.reference.outcomes, run.execution.reference.outcomes)
+      val cyclic = view.copy(nodes = view.nodes.map(n => n.copy(parent = Some(n.ref))))
+      val cyclicSource = right(SourceRepresentation.of(cyclic, source.bundles, None,
+        cyclic.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap))
+      assert(MappingPipeline.lexical(recall.graph, cyclic, recall.inventory, cyclicSource, selected).isLeft)
+      val independent = right(MappingPipeline.referenceLexical(recall.graph, cyclic, recall.inventory, cyclicSource, selected))
+      assertEquals(independent.execution.reference.profile.level, 1)
+      val context = ExpectedMappingContext(recall.inventory, cyclicSource, referenceExecution = Some(independent.execution))
+      assertEquals(right(MappingCodecs.decodeReference(MappingCodecs.encode(independent.reference), context)).digest, independent.reference.digest)
+    }
+  }

@@ -130,3 +130,122 @@ class MappingRunBoundarySuite extends FunSuite:
       ).nonEmpty
     )
   }
+
+  private val referenceControls = typeCheckErrors("""
+    import storymodel4s.align.*
+    import storymodel4s.recall.*
+    import storymodel4s.recall.RecallGraphStatus.Checked
+    case class ReferenceExecutionControl(
+      recall: RecallGraph[Checked], view: SourceView, inventory: RecallInventory,
+      source: SourceRepresentation, reference: LocalReference.Result
+    )
+    object ReferenceExecutionControl:
+      def fromProduct(p: Product): ReferenceExecutionControl =
+        summon[scala.deriving.Mirror.ProductOf[ReferenceExecutionControl]].fromProduct(p)
+    case class ReferenceDerivedControl(
+      execution: MappingRun.ReferenceExecution, receipt: StageReceipt
+    )
+    object ReferenceDerivedControl:
+      def fromProduct(p: Product): ReferenceDerivedControl =
+        summon[scala.deriving.Mirror.ProductOf[ReferenceDerivedControl]].fromProduct(p)
+    new ReferenceExecutionControl(???, ???, ???, ???, ???)
+    ReferenceExecutionControl(???, ???, ???, ???, ???)
+    (??? : ReferenceExecutionControl).copy()
+    ReferenceExecutionControl.fromProduct(Tuple5(
+      ??? : RecallGraph[Checked], ??? : SourceView, ??? : RecallInventory,
+      ??? : SourceRepresentation, ??? : LocalReference.Result
+    ))
+    summon[scala.deriving.Mirror.ProductOf[ReferenceExecutionControl]]
+    new ReferenceDerivedControl(???, ???)
+    ReferenceDerivedControl(???, ???)
+    (??? : ReferenceDerivedControl).copy()
+    ReferenceDerivedControl.fromProduct(Tuple2(
+      ??? : MappingRun.ReferenceExecution, ??? : StageReceipt
+    ))
+    summon[scala.deriving.Mirror.ProductOf[ReferenceDerivedControl]]
+  """)
+
+  test("reference same-shape controls compile") { assertEquals(referenceControls, Nil) }
+
+  test("ReferenceExecution doors are closed") {
+    assert(
+      typeCheckErrors("""
+        import storymodel4s.align.*
+        import storymodel4s.recall.*
+        import storymodel4s.recall.RecallGraphStatus.Checked
+        new MappingRun.ReferenceExecution(
+          ??? : RecallGraph[Checked], ??? : SourceView, ??? : RecallInventory,
+          ??? : SourceRepresentation, ??? : LocalReference.Result
+        )
+      """).nonEmpty
+    )
+    assert(
+      typeCheckErrors("""
+        import storymodel4s.align.*
+        import storymodel4s.recall.*
+        import storymodel4s.recall.RecallGraphStatus.Checked
+        MappingRun.ReferenceExecution(
+          ??? : RecallGraph[Checked], ??? : SourceView, ??? : RecallInventory,
+          ??? : SourceRepresentation, ??? : LocalReference.Result
+        )
+      """).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; (??? : MappingRun.ReferenceExecution).copy()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors("""
+        import storymodel4s.align.*
+        import storymodel4s.recall.*
+        import storymodel4s.recall.RecallGraphStatus.Checked
+        MappingRun.ReferenceExecution.fromProduct(Tuple5(
+          ??? : RecallGraph[Checked], ??? : SourceView, ??? : RecallInventory,
+          ??? : SourceRepresentation, ??? : LocalReference.Result
+        ))
+      """).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[MappingRun.ReferenceExecution]]"""
+      ).nonEmpty
+    )
+  }
+
+  test("ReferenceDerived doors are closed") {
+    assert(
+      typeCheckErrors("""
+        import storymodel4s.align.*
+        new StageProvenance.ReferenceDerived(
+          ??? : MappingRun.ReferenceExecution, ??? : StageReceipt
+        )
+      """).nonEmpty
+    )
+    assert(
+      typeCheckErrors("""
+        import storymodel4s.align.*
+        StageProvenance.ReferenceDerived(
+          ??? : MappingRun.ReferenceExecution, ??? : StageReceipt
+        )
+      """).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; (??? : StageProvenance.ReferenceDerived).copy()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors("""
+        import storymodel4s.align.*
+        StageProvenance.ReferenceDerived.fromProduct(Tuple2(
+          ??? : MappingRun.ReferenceExecution, ??? : StageReceipt
+        ))
+      """).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StageProvenance.ReferenceDerived]]"""
+      ).nonEmpty
+    )
+  }

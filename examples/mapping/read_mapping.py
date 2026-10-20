@@ -89,12 +89,14 @@ def read_tsv(content):
         csv.field_size_limit(previous)
 
 
-def read(files):
+def read(files, *, reference_only=False):
     manifest = parse(files["manifest.json"])
     require(set(manifest) == {"schemaVersion", "mapping_digest", "inventory_digest", "source_digest", "transcript_checksum", "segmentation_id", "policies", "roles", "capabilities", "files"}, "manifest fields")
-    require(manifest["schemaVersion"] == "mapping-exchange/v0.1", "unsupported exchange schema")
+    exchange_version = "mapping-exchange/reference/v1" if reference_only else "mapping-exchange/v0.1"
+    record_version = "mapping-record/reference/v1" if reference_only else "mapping-record/v0.1"
+    require(manifest["schemaVersion"] == exchange_version, "unsupported exchange schema")
     record = parse(files["mapping.json"])
-    require(record["schemaVersion"] == "mapping-record/v0.1" and record["schema"] == "storymodel4s.mapping-record", "unsupported mapping schema")
+    require(record["schemaVersion"] == record_version and record["schema"] == "storymodel4s.mapping-record", "unsupported mapping schema")
     inventory, source = record["inventory"], record["source"]
     for key, value in {"mapping_digest": record["record_digest"], "inventory_digest": inventory["digest"], "source_digest": source["digest"], "transcript_checksum": inventory["transcript_checksum"], "segmentation_id": inventory["segmentation_id"], "policies": record["policies"], "roles": record["roles"]}.items():
         require(manifest[key] == value, f"foreign identity: {key}")
@@ -112,7 +114,7 @@ def read(files):
         require(str(len(raw)) == entry["bytes"], f"size mismatch: {name}")
         require(hashlib.sha256(raw).hexdigest() == entry["sha256"], f"hash mismatch: {name}")
         if name == "mapping.json":
-            require(entry["format"] == "mapping-record/v0.1" and entry["table"] == {"status": "not-applicable"}, "record descriptor")
+            require(entry["format"] == record_version and entry["table"] == {"status": "not-applicable"}, "record descriptor")
             continue
         require(entry["format"] == "quoted-tsv/v1", "table format")
         path, columns = TABLES[name[:-4]]

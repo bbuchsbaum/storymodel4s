@@ -226,3 +226,37 @@ class MappingRunSuite extends FunSuite:
       0.0
     )
   }
+
+  test("reference-only executes independently and matches the paired scientific outcomes") {
+    val paired = execution()
+    val local = right(MappingRun.computeReference(recall, view, inventory(), source(),
+      paired.reference.evidence, profile()))
+    assertEquals(local.reference.outcomes, paired.reference.outcomes)
+    assertEquals(local.reference.profile, paired.reference.profile)
+    val record = right(local.record)
+    assertNotEquals(record.digest, right(paired.referenceRecord).digest)
+    assert(record.outcomes.forall(_.measures.posterior.isEmpty))
+    assert(record.ledger.at(Stage.Inference).head.provenance.isInstanceOf[StageProvenance.ReferenceDerived])
+    assertEquals(right(MappingResult.checked(record.inventory, record.source, record.policies,
+      record.roles, record.ledger, record.outcomes)).digest, record.digest)
+    val foreign = graph(Vector(unit.copy(function = storymodel4s.recall.DiscourseFunction.Association)))
+    assert(MappingRun.computeReference(foreign, view, inventory(), source(), paired.reference.evidence, profile()).isLeft)
+    assert(MappingRun.computeReference(recall, view.copy(scoringLength = view.scoringLength + 1), inventory(), source(), paired.reference.evidence, profile()).isLeft)
+    assert(MappingRun.computeReference(foreign, view, inventory(foreign), source(), paired.reference.evidence, profile()).isLeft)
+  }
+
+  test("reference authority refuses a changed normalized row") {
+    val paired = execution()
+    val local = right(MappingRun.computeReference(recall, view, inventory(), source(), paired.reference.evidence, profile()))
+    val record = right(local.record)
+    val row = record.outcomes.head
+    val mass = row.measures.normalized.get
+    val keys = mass.mass.keys.toVector.sorted
+    val changed = keys.map(k => k -> (if k == keys.last then 1.0 else 0.0)).toMap
+    val normalized = right(NormalizedScoreMass.of(mass.universe, mass.prior, mass.temperature, changed, mass.stage))
+    val measures = right(UnitMeasures.of(Vector.empty, Some(normalized), None, None))
+    val altered = right(UnitOutcome.computed(row.unit, measures, row.links, row.decision.get.basis,
+      DecisionRequest.RawArgmax, row.stages.get))
+    assertEquals(MappingResult.checked(record.inventory, record.source, record.policies, record.roles,
+      record.ledger, altered +: record.outcomes.tail), Left(MappingRefusal.BindingMismatch("executed reference projection")))
+  }

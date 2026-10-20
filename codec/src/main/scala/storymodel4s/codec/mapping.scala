@@ -17,7 +17,9 @@ object MappingCodecs:
       text: String,
       context: ExpectedMappingContext
   ): Either[MappingCodecError, MappingResult] =
-    context.execution match
+    if context.referenceExecution.nonEmpty then
+      Left(MappingCodecError.ValueMismatch("legacy decoder refuses reference execution"))
+    else context.execution match
       case None                      => decodeSupplied(text, context)
       case Some((execution, member)) =>
         for
@@ -33,6 +35,25 @@ object MappingCodecs:
           )
           _ <- exact(json, toJson(expected), "executed record")
         yield expected
+
+  val ReferenceSchemaVersion: String = "mapping-record/reference/v1"
+
+  /** Reference authority is replayed only from its original checked producer context. */
+  def decodeReference(
+      text: String, context: ExpectedMappingContext
+  ): Either[MappingCodecError, MappingResult] =
+    for
+      _ <- Either.cond(context.execution.isEmpty && context.derivation.isEmpty, (),
+        MappingCodecError.ValueMismatch("simultaneous execution contexts"))
+      execution <- context.referenceExecution.toRight(MappingCodecError.ContextRequired("reference execution"))
+      json <- Canonical.parse(text).left.map(MappingCodecError.Wire(_))
+      _ <- uniqueObjectKeys(text)
+      _ <- reserved(json)
+      expected <- checked(execution.record)
+      _ <- Either.cond(expected.inventory.digest == context.inventory.digest &&
+        expected.source.digest == context.source.digest, (), MappingCodecError.ValueMismatch("reference context"))
+      _ <- exact(json, toJson(expected), "executed reference record")
+    yield expected
 
   private def decodeSupplied(
       text: String,

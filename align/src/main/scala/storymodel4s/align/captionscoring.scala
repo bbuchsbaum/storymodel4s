@@ -161,7 +161,8 @@ object CaptionScoring:
       val session: Session,
       val config: StrictCandidateConfig,
       val inventory: RecallInventory,
-      val evidence: LocalEvidence
+      val evidence: LocalEvidence,
+      val selectedLevel: Int
   ):
     val identity: Checksum = MappingRender.digest(
       Vector(
@@ -173,7 +174,7 @@ object CaptionScoring:
         config.lexicalOverlap.toString,
         MappingRender.optional(config.space),
         evidence.identity.checksum.hex
-      )
+      ) ++ (if selectedLevel == 0 then Vector.empty else Vector("selected-level/v1", selectedLevel.toString))
     )
     override def equals(other: Any): Boolean = other match
       case p: Produced => identity == p.identity
@@ -184,7 +185,8 @@ object CaptionScoring:
   def produce(
       session: Session,
       inventory: RecallInventory,
-      config: StrictCandidateConfig
+      config: StrictCandidateConfig,
+      selectedLevel: Int = 0
   ): Either[AlignError, Produced] =
     for
       _ <- Either.cond(
@@ -199,7 +201,7 @@ object CaptionScoring:
           session.recall,
           session.view,
           captionSession = Some(session),
-          selectedLevel = Some(0)
+          selectedLevel = Some(selectedLevel)
         )
         .left
         .map(e => AlignError.InvalidConfig("caption", e.message))
@@ -212,4 +214,4 @@ object CaptionScoring:
         captionSession = Some(session)
       )
       evidence <- LocalEvidence.compute(session.recall, session.view, candidates, model)
-    yield new Produced(session, config, inventory, evidence)
+    yield new Produced(session, config, inventory, evidence, selectedLevel)

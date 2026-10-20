@@ -90,17 +90,34 @@ object StageProvenance:
       stage: Stage
   ): Derived = new Derived(execution, member, execution.receipt(member, stage))
 
+  /** Only the local producer owns this authority; paired provenance cannot be substituted. */
+  final class ReferenceDerived private[StageProvenance] (
+      val execution: MappingRun.ReferenceExecution,
+      val receipt: StageReceipt
+  ) extends StageProvenance:
+    override def equals(other: Any): Boolean = other match
+      case p: ReferenceDerived => execution == p.execution && receipt.render == p.receipt.render
+      case _ => false
+    override def hashCode: Int = (execution, receipt.render).hashCode
+    override def toString: String = s"ReferenceDerived(${execution.identity.short()}, ${receipt.stage})"
+
+  private[align] def referenceExecuted(
+      execution: MappingRun.ReferenceExecution, stage: Stage
+  ): ReferenceDerived = new ReferenceDerived(execution, execution.receipt(stage))
+
   def unknown(reason: UnknownProvenanceReason, asserted: Option[StageReceipt]): Unknown =
     Unknown.of(reason, asserted)
   private[align] def receipt(value: StageProvenance): Option[StageReceipt] = value match
     case p: Unknown => p.asserted
     case p: Derived => Some(p.receipt)
+    case p: ReferenceDerived => Some(p.receipt)
   private[align] def render(value: StageProvenance): String = value match
     case p: Unknown =>
       MappingRender.sequence(
         Vector("unknown", p.reason.toString, MappingRender.optional(p.asserted.map(_.render)))
       )
     case p: Derived => MappingRender.sequence(Vector("derived", p.receipt.render))
+    case p: ReferenceDerived => MappingRender.sequence(Vector("reference-derived", p.receipt.render))
 
 final class StageEntryId private (val digest: Checksum):
   override def equals(other: Any): Boolean = other match
