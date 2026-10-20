@@ -3,6 +3,11 @@
 Epic `bd-01M5DAE8KHF6VX3RE2V5RJG64T`, tag `mapping-audit-20261020`.
 The implementation branch is `codex/mapping-audit-20261020`. No merge or push was performed.
 This page records local engineering evidence, not hosted CI, release or scientific acceptance.
+The task started from pre-existing branch revision `6702a28ec9bde57729eb9ec09a7180fa92aa73b3`,
+which has 22 commits above local main `13aec7cc874ed1c2695c6dd281852523cc43ef90`.
+Those ancestors have not been integrated here. Before landing, resolve that ancestry within
+owner authorization and gate the exact integration result; this branch is a reviewed local
+implementation candidate, not a landing receipt.
 
 | Child | Implemented outcome | Evidence |
 |---|---|---|
@@ -52,7 +57,9 @@ retain their own gates and ownership.
 
 The Native gate UTC endpoints span about 62 minutes, while the runner records
 1,620.612 seconds (about 27 minutes). These clocks disagree; both are retained, and no
-performance conclusion uses this gate. Observed suite durations included PopulationSuite
+performance conclusion uses this gate. StoryAtlas likewise spans 1,267.083445 seconds in
+UTC endpoints versus 207.540353 runner seconds. Its raw clocks are retained with the same
+qualification. Observed Native suite durations included PopulationSuite
 1,470.168 seconds, MappingHistoricalSuite 343.934 seconds and LawsSuite 554.096 seconds.
 A two-second sample of the owned laws process captured `ObjectMeta_ClearBlockAt` in the
 Native runtime and a 3 GiB process footprint. These uncontrolled observations are retained in
