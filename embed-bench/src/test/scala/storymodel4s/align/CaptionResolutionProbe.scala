@@ -172,10 +172,13 @@ object CaptionResolutionProbe:
       .get[RecallGraph[RecallGraphStatus.Checked]]("graph")
       .fold(throw _, identity)
     val nodes = source.view.nodes.filter(_.level == 0).sortBy(_.ref.key)
-    val rowPattern = ".*:row:([0-9]+)".r
-    def rowOf(node: NodeSummary): Int = node.ref.key match
-      case rowPattern(number) => number.toInt
-      case _                  => throw new IllegalArgumentException("target has no row coordinate")
+    // TimedSourceView derives IDs from its artifact and declared segment ordinals. Bind that
+    // complete table rather than guessing a narrative-fixture ':row:' suffix.
+    val rowByKey = source.view.segments
+      .map(s => s"sit:timed:${source.view.artifact.hex}:${s.ordinal}" -> s.ordinal)
+      .toMap
+    require(nodes.map(_.ref.key).toSet == rowByKey.keySet, "source target/segment table differs")
+    def rowOf(node: NodeSummary): Int = rowByKey(node.ref.key)
     val intervention = json(interventionPath)
     val expectedRows = expected(intervention)
     require(
