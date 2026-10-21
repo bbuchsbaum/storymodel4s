@@ -197,11 +197,17 @@ def open_paths(paths):
     return {line[1:] for line in result.stdout.splitlines() if line.startswith('n')}
 
 
+def contained_volume_root(root, mount):
+    require(not root.is_symlink() and root.resolve().is_relative_to(mount.resolve()),
+            'Cache root escapes the external volume or is a symlink')
+
+
 def volume_identity(root, expected):
     require(root.parts[:2] == ('/', 'Volumes') and len(root.parts) > 2,
             'Migration requires an explicit mounted external volume')
     mount = Path(*root.parts[:3])
     require(mount.is_mount(), 'External volume is not mounted')
+    contained_volume_root(root, mount)
     result = subprocess.run(['diskutil', 'info', '-plist', str(mount)], capture_output=True, check=True)
     info = plistlib.loads(result.stdout)
     require(info.get('VolumeUUID') == expected and info.get('Internal') is False and
@@ -275,13 +281,23 @@ def migrate(models, root, repo, receipt_path, expected_uuid, copy_only=False):
     return receipt
 
 
+def select_models(manifest, requested, command):
+    if command == 'migrate':
+        require(requested and 'all' not in requested,
+                'Migration requires explicit model IDs; exclude every active experiment bundle')
+    ids = {model['id'] for model in manifest['models']}
+    selected = ids if not requested or requested == ['all'] else set(requested)
+    require(selected <= ids, 'Unknown model IDs: ' + ', '.join(sorted(selected - ids)))
+    return [model for model in manifest['models'] if model['id'] in selected]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', help='Cache outside checkout; default STORYMODEL4S_MODEL_ROOT or Passport')
     sub = parser.add_subparsers(dest='command', required=True)
     for command in ('list', 'verify', 'fetch', 'link', 'migrate'):
         child = sub.add_parser(command)
-        child.add_argument('models', nargs='*', help='Manifest IDs; omitted or all selects all six')
+        child.add_argument('models', nargs='*', help='Manifest IDs; migrate requires explicit IDs, other commands accept all/omitted')
         if command in ('fetch', 'link'):
             child.add_argument('--relink', action='store_true', help='Replace only existing symlinks with verified new targets')
         if command == 'fetch':
@@ -296,10 +312,7 @@ def main():
     manifest = read_manifest(MANIFEST)
     repo = checkout()
     root = prepare_root(args.root or os.environ.get('STORYMODEL4S_MODEL_ROOT') or manifest['default_cache_root'], repo)
-    ids = {m['id'] for m in manifest['models']}
-    selected = ids if not args.models or args.models == ['all'] else set(args.models)
-    require(selected <= ids, 'Unknown model IDs: ' + ', '.join(sorted(selected - ids)))
-    models = [m for m in manifest['models'] if m['id'] in selected]
+    models = select_models(manifest, args.models, args.command)
     if args.command == 'list':
         for model in models:
             print(model['id'], sum(r['bytes'] for r in model['files'].values()),

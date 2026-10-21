@@ -149,6 +149,28 @@ class ModelAssetsTests(unittest.TestCase):
         m.replace_with_link(source, target, self.record, relink=True)
         self.assertEqual(source.read_bytes(), self.payload)
 
+    def test_migration_selection_requires_explicit_allowlist(self):
+        manifest = m.read_manifest(m.MANIFEST)
+        for requested in ([], ['all'], ['whisper-cpu', 'all']):
+            with self.assertRaisesRegex(ValueError, 'explicit model IDs'):
+                m.select_models(manifest, requested, 'migrate')
+        selected = m.select_models(manifest, ['whisper-cpu', 'minilm-onnx'], 'migrate')
+        self.assertEqual({model['id'] for model in selected}, {'whisper-cpu', 'minilm-onnx'})
+        self.assertNotIn('qwen3-vl-4b', {model['id'] for model in selected})
+
+    def test_external_root_rejects_direct_and_parent_symlink_escape(self):
+        mount = self.base/'volume'
+        mount.mkdir()
+        direct = mount/'models'
+        direct.symlink_to(self.repo)
+        with self.assertRaisesRegex(ValueError, 'escapes the external volume'):
+            m.contained_volume_root(direct, mount)
+        parent = mount/'data'
+        parent.symlink_to(self.repo)
+        with self.assertRaisesRegex(ValueError, 'escapes the external volume'):
+            m.contained_volume_root(parent/'models', mount)
+        m.contained_volume_root(mount/'safe'/'models', mount)
+
     def test_late_open_guard_mutation_is_killed(self):
         source = Path(m.__file__).read_text()
         guard = "require(not open_paths([path]), 'Weight became open before replacement: ' + str(path))"
@@ -163,7 +185,7 @@ class ModelAssetsTests(unittest.TestCase):
         result = unittest.TestResult()
         with patch(__name__ + '.m', mutant):
             suite.run(result)
-        self.assertEqual(result.testsRun, 11)
+        self.assertEqual(result.testsRun, len(names))
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 1)
         self.assertEqual(result.failures[0][0]._testMethodName,

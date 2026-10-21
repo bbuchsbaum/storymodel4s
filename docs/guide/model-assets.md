@@ -50,7 +50,7 @@ installed environments; they are not independent bulk model downloads.
 Migration is an explicit operation with a durable receipt and expected external volume UUID:
 
 ```sh
-python3 tools/model-assets.py migrate all --copy-only \
+python3 tools/model-assets.py migrate whisper-cpu whisper-mlx parakeet-mlx minilm-onnx --copy-only \
   --expected-volume-uuid YOUR_VOLUME_UUID --receipt /path/to/copy-receipt.json
 python3 tools/model-assets.py migrate whisper-cpu whisper-mlx parakeet-mlx minilm-onnx \
   --expected-volume-uuid YOUR_VOLUME_UUID --receipt /path/to/relocation-receipt.json
@@ -63,10 +63,15 @@ Additional ONNX copies in `tmp/` and the recorded source03 input directory point
 same verified external artifact. Receipts count logical bytes replaced, not guaranteed
 physical free-space changes on filesystems with clones/hardlinks.
 
+Migration requires an explicit model-ID allowlist; omitted IDs and `all` are refused.
+Exclude every model used by a running experiment, including from copy-only operations,
+until that entire experiment has terminated. A momentary gap in open handles between
+model loads is insufficient clearance.
+
 Before replacement, all selected weight aliases must have their expected bytes and no
 open-file handles. The manager rechecks the volume, source identity and open handles
-at each actual replacement. An active model job is left running; `--copy-only` can safely
-establish custody first, then relocation waits until the files close. macOS migration uses
+at each actual replacement. An active model job is left running. Use `--copy-only` to establish custody for inactive
+bundles first, then perform relocation with a new receipt. macOS migration uses
 `diskutil` and `lsof`; ordinary downloads and verification use Python's standard library.
 
 Conflicting existing cache files, changed source files, unsafe paths, wrong volumes,
