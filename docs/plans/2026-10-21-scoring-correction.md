@@ -120,11 +120,13 @@ It does exercise the corrected measured basis and conditional export on the real
 These coverage counts are not accuracy scores. Row 575 is dialogue about the same dead woman,
 so it is not an established wrong-event match; it also does not localize the depicted reveal.
 In V, row 507 is absent from u92 exported normalized support, while rows 508 and 591
-rank 17 and 12 among the exported normalized source targets. The
-top V interval, row 526, has an annotation about inspecting an umbrella. The initial reveal's
-caption omitted the body. Preserve these adverse observations: normalization does not repair
-caption omissions or weak semantic matches, and symmetric lexical similarity does not establish
-event support. A reliable depicted-content match remains unqualified.
+rank 17 and 12 among the exported normalized source targets. The top V interval, row 526,
+has an annotation about inspecting an umbrella, but subsequent inspection of its recorded
+frames establishes that it also depicts the body. It must not be classified as a wrong
+depicted-content match from the manual annotation alone. The initial reveal's caption does
+not describe a full body; its three recorded samples do not show a full body either.
+These development observations do not qualify overall accuracy. Symmetric lexical similarity
+does not establish event support, and normalization does not repair acquisition or matching.
 
 The separate retained-score counterfactual reproduced the original local masses for all 173
 units with maximum absolute error below `5.6e-16`. On its retained detail candidates, u92
@@ -144,3 +146,46 @@ The next scientific acceptance step is the independent evaluation above, includi
 labels for event support and depicted-interval support. Caption acquisition and semantic
 retrieval need their own measured improvements; a blanket visual boost is not supported by
 these results. The parent issue remains open for that acceptance.
+
+## Recorded-frame audit and next accuracy intervention
+
+Subsequent agent inspection decoded the actual `bgr24` samples supplied to the existing caption
+worker, rather than inferring frame content from annotations. The raw-frame SHA-256 was checked
+against `frames-envelope.json`: `a434a84c01276f33a4d637142eb3471ba8a0e76a1b0d776fc47073b7c1d39373`.
+The local receipt is `.agent-work/scoring-20261021/frame-audit/inspection.json`; extracted images
+remain outside Git. This is a three-interval development audit, not blinded independent labels
+or inspection of every frame in each interval.
+
+| Source row | Selected sample ordinals | Observed evidence and consequence |
+|---|---|---|
+| 503 | 60, 61, 62 | Doorway/people, wall/hanging object, and a hand close-up. No full body in these samples. A description omission cannot be assigned to the model without checking its supplied images. |
+| 507 | 72, 73, 74 | Observer in a dark jacket, then a different person face-down in a pink coat. The caption captures posture but incorrectly identifies them as the same person across the cut. |
+| 526 | 129, 130, 131 | Sample 130 includes the pink-coated person lying on the floor alongside the examiner and umbrella. The top V result is a plausible valid depiction; the umbrella-focused annotation is not a negative label. |
+
+The governing matching rule is to credit supported recalled actions or states at any interval
+that depicts them, with separate labels for dialogue or other contextual support. Initial
+appearance and any valid depiction are different localization questions. A visible prone person
+alone does not establish death; death can be supported by additional source context with its
+provenance retained. Missing descriptions are unknown evidence, not contradictions.
+
+The next bounded experiment is the existing `AllMiniLmL6V2` ONNX annotation channel against
+the lexical baseline, with the corrected profile and fixed 1,000-detail source cut. Score the
+complete cut for the same units, retaining raw distances and candidate provenance, before
+applying a retrieval budget. This isolates semantic ordering from candidate truncation. The
+fresh A/V/AV diagnostics above used lexical Jaccard, so they did not test this alternative.
+Current ONNX registration does not fuse captions: semantic V/AV comparisons require an explicit,
+versioned rendering/join extension and must not be claimed by merely changing a profile name.
+
+If semantic retrieval finds supported intervals but ranks them poorly, test a pairwise support
+reranker against the same frozen candidate pool. Distinguishing action, state, participant and
+context must be checked; generic scene similarity is insufficient. Supported, contradicted and
+unknown claims remain separate, and a relevance score is not a calibrated correctness
+probability. If evidence is absent from the sampled images, test recall-blind shot coverage;
+if present but misdescribed, test per-shot descriptions and identity continuity separately.
+The row 507 error specifically motivates a cross-cut identity check, not a death-word rule.
+
+Evaluate these interventions separately against blinded, multi-positive reference judgments,
+with candidate recall, supported top-1/top-5, ranking, depiction localization, coverage and
+paired regressions reported under the frozen protocol above. Existing Sherlock cases are
+development diagnostics. Neither the frame correction nor a successful example establishes
+general improvement; the next model comparison and independent acceptance remain unexecuted.
