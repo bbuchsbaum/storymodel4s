@@ -47,7 +47,7 @@ class RemoteClaimBoundary(unittest.TestCase):
             self.assertEqual(remote.interpret(self.request, response)['processing'], 'invalid_proposal')
 
     def test_malformed_response_is_retained_and_sibling_still_succeeds(self):
-        request = dict(self.request, identity='synthetic-request')
+        request = dict(self.request, identity='synthetic-request', arm='visual')
         record = dict(condition='synthetic', request=request)
         for malformed in [[], dict(choices=[None]), dict(choices=[dict(message=[])])]:
             responses = [io.StringIO(json.dumps(x)) for x in [malformed, self.response]]
