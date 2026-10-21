@@ -687,3 +687,116 @@ missing extraction and source evidence visible. Measure false support, false con
 resolved coverage separately, then test cross-shot event/reference binding. Only after that
 comparison succeeds should a candidate face held-out participants and movies. The parent accuracy
 issue remains open; this milestone does not change the production scorer or captioner.
+
+### Second milestone: automatic proposals over retained audiovisual evidence
+
+Child `bd-01M5FKA73X997XYKW332666MVS` adds an offline question-conditioned critic experiment
+and a test-only consumer of its proposals through the real `ClaimAssessmentReceipt`. The source
+revision is `1d98aff7aaae29ff2b3fec83a543812b7ef8fe4d`. The experiment supplies focal claims and
+fixed candidate events; original recall and media coordinates remain provenance. It does not
+extract free-form recall, run production localization, change captions or admit root-world truth.
+
+The primary population has 48 questions: one independently supplied focal claim for each of the
+24 earlier recall units, and 24 authored supported/opposite/added-detail variants over all eight
+earlier AV-supported pairs. Natural targets were selected from each existing pool by the minimum
+SHA-256 of the fixed seed, ordinal and row, without consulting prior support labels. The eight
+controlled anchors belong to five recall units; observations are dependent and same-film
+exploration, not held-out participant or movie evidence. Eight known body questions are a separate
+diagnostic. Audio, caption text and their exact union produce 144 primary and 24 diagnostic
+executions. Human annotation is not an input arm in this milestone.
+
+The independent reviewer froze two reference layers before inference: sampled original frames
+plus time-qualified ASR assertions, and the exact text available to each arm. ASR assertions are
+not a listened verification of the audio or independent world truth. All 34 selected image hashes
+were verified. Common-source primary labels are 9 supported, 8 contradicted and 31 unresolved.
+The input-layer references resolve only 2/48 audio, 2/48 caption and 4/48 combined questions, with
+equal support/contradiction counts in each arm. Thus this set mainly tests abstention and
+unsupported inference; the small resolved subset cannot establish broad positive accuracy.
+
+The pinned local Qwen3-VL-4B model runs text-only with deterministic seed/temperature and explicit
+input/output limits. Complete ASR segments retain decoder suspicion and central word timings;
+timings appear only in audio arms. Exact quotations must belong to each question's allowed items.
+Missing evidence, uncertain reference/context and processing failure stay distinct. Every question
+remains in the denominator. The Scala consumer independently verifies input ownership, raw-to-
+normalized quotation agreement and UTF-16 spans, then exports attributed proposals with unchanged
+mapping and question-population digests across arms. Passing these checks proves provenance and
+accounting, not entailment.
+
+Pre-inference review repaired omitted word timings and an experiment-folder file-binding gap.
+A later parent check found control labels embedded in model-facing case IDs. That partial run
+was stopped at 105/168 and is inadmissible; only processing counters had been inspected before
+repair. All attempts remain in the local audit trail. The corrected experiment uses full SHA-256
+claim IDs and a four-field model-input whitelist, independently inspected across all 168 inputs.
+Claims, evidence, prompt and reference judgments were unchanged. Only `experiment-04` supplies
+admissible critic results; earlier attempts must not be pooled with it.
+
+The pinned MiniLM control uses identical claim and evidence-item texts, without critic timing
+metadata or any fitted threshold. Its byte-identical input allowed reuse after the ID repair.
+Of 168 comparisons, 167 have observed vectors and one has no document text. In 5/24 controlled
+polarity comparisons, the opposite wording has higher cosine than the supported wording. This
+characterizes cosine ordering; it is not a numerical accuracy comparison with a semantic classifier.
+
+The admissible run completed all 168 executions in 893.11 seconds. The native consumer built
+three receipts with all 56 questions and identical mapping/population digests. Primary results
+against the input-layer references are:
+
+| Arm | Questions | Correct resolved | Unsupported support | Unsupported contradiction | Unresolved | Processing failure |
+|---|---:|---:|---:|---:|---:|---:|
+| Audio | 48 | 1 | 0 | 0 | 38 | 9 |
+| Caption | 48 | 2 | 2 | 2 | 30 | 12 |
+| Audio + caption | 48 | 2 | 0 | 0 | 12 | 34 |
+
+Unsupported resolution means deciding a claim whose input reference is unresolved; it does not
+mean that the inferred fact is false in the movie. There are no opposite resolved-reference
+verdicts in this run. The four unsupported primary caption decisions concern supported/opposite
+variants at rows 67 and 313: generic object becomes pill, and generic vehicle/emergency lights
+become police vehicle. They agree with the original-frame reference while exceeding the caption
+text. Exact quote ownership did not guarantee entailment. No natural claim received a resolved
+verdict, and no accepted unresolved proposal retained a support or counterevidence quotation.
+Thus the model did not demonstrate useful partial-evidence retention.
+
+Across primary and diagnostic populations, 65/168 outputs are processing failures, all rejected
+proposals. The first validation failure is unresolved-reason shape in 63 and claim identity in 2;
+64 outputs use reason objects rather than the required strings, including one identity failure.
+These failures remain in denominators. Combined primary input fails protocol in 34/48 cases, so
+this run cannot establish that adding audio helps semantic assessment. The five correct primary
+input resolutions recover five of the eight resolvable arm/question comparisons; all nine accepted
+primary resolutions agree with the common-source reference. Neither count establishes general
+accuracy, given missing text evidence, failures and dependent authored controls.
+
+In the separate eight-question body diagnostic, audio yields five unresolved and three failed
+proposals; caption yields two supported, four unresolved and two failed; AV yields three unresolved
+and five failed. Caption supports `d507-lying` and `d507-floor`, agreeing with sampled frames while
+exceeding the caption's participant identification. At part-2 row 507 (110–111 s), the caption does
+retain posture/clothing/floor, but its person linkage is not established. Row 526 (152–155 s)
+retains a generic person on the ground while losing distinguishing detail. Row 503 (84–94 s)
+remains a sampling limitation rather than a demonstrated caption omission. The scoped utterance-
+content claim at row 575 (249–251 s; ASR segment 31 at 250.02–250.96 s) is recoverable in A/AV
+reference input, but the critic leaves it unresolved in A and fails protocol in AV. Cross-shot
+identity never resolves. This is not a repaired, evidence-bound direct hit for the complete event.
+
+Decision: do not promote this critic into the production scorer. The next bounded intervention is
+a separately tested serialization repair or constrained output protocol, preserving identity and
+quotation checks and this run's original failure counts. Then compare original-frame assessment
+with caption text on fixed claims/intervals/ASR to test recovery of omitted details. Any reprocessing
+of these exposed outputs is a new post-hoc development condition, not a replacement for this
+frozen result. Event correspondence, partial factual support and veridicality must remain separate.
+Held-out participants and movies remain necessary for a claim of overall improvement. The parent
+accuracy issue stays OPEN.
+
+Verification: the fatal-warning scoped `embedBench/test` gate passed 195, failed zero, errors zero,
+skipped one (196 total). The skipped existing neural-channel integration test is named in the gate
+log. Python passes 14 tests. A compiled Python blinding mutant fails its one named regression with
+13 siblings passing; a compiled Scala request-identity mutant fails its named assertion with eight
+siblings passing, followed by exact source restoration and the green gate. All executed results are
+local observations. No production API or behavior changed in this milestone, no sibling consumes
+the test-only adapter, no corpus text/media entered Git, and no merge or push was performed.
+
+Evidence is under `.agent-work/automatic-claims-20261021/`: `experiment-04/report.md` and
+`summary.json`, frozen inputs/references, full raw model outputs, native `claim-receipts.json`,
+embedding reuse proof, interrupted-attempt receipts, mutations and build logs. `analyze.py` checks
+exact unique populations, request/input hashes and every valid Python/Scala status match; its hash
+is bound into the summary. Independent review recomputed all arm counts and assessed resolved
+errors against both reference layers. Final formatting, exact-revision review and Git state are
+bound in `verification.json`. Nonblocking strict-JSON consumer hardening is tracked separately as
+`bd-01M5FMPM0F5Y22EKGYZF05DRSD`.
