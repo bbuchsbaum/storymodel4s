@@ -1,7 +1,9 @@
 """Synthetic wire probes; no network calls or narrative fixtures."""
 import copy
 import json
+import io
 import unittest
+from unittest.mock import patch
 import openrouter_claim_probe as remote
 import claim_assessment_probe as v1
 
@@ -43,6 +45,19 @@ class RemoteClaimBoundary(unittest.TestCase):
             response = copy.deepcopy(self.response)
             response['choices'][0]['message']['content'] = json.dumps(dict(json.loads(self.raw), **mutation))
             self.assertEqual(remote.interpret(self.request, response)['processing'], 'invalid_proposal')
+
+    def test_malformed_response_is_retained_and_sibling_still_succeeds(self):
+        request = dict(self.request, identity='synthetic-request')
+        record = dict(condition='synthetic', request=request)
+        for malformed in [[], dict(choices=[None]), dict(choices=[dict(message=[])])]:
+            responses = [io.StringIO(json.dumps(x)) for x in [malformed, self.response]]
+            with self.subTest(malformed=malformed), patch.object(remote.urllib.request, 'urlopen', side_effect=responses):
+                failed = remote.execute(record, 'synthetic-secret')
+                passed = remote.execute(record, 'synthetic-secret')
+                self.assertEqual(failed['processing'], 'invalid_response')
+                self.assertIsNone(failed['proposal'])
+                self.assertEqual(passed['processing'], 'valid')
+                self.assertNotIn('synthetic-secret', json.dumps([failed, passed]))
 
 
 if __name__ == '__main__':

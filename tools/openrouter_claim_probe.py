@@ -41,11 +41,16 @@ def cost_bound(payload):
 
 
 def interpret(request, response):
+    invalid = dict(processing="invalid_response", raw=None, proposal=None)
+    if not isinstance(response, dict):
+        return invalid
+    choices = response.get("choices")
+    if (not isinstance(choices, list) or len(choices) != 1 or
+            not isinstance(choices[0], dict) or
+            not isinstance(choices[0].get("message"), dict)):
+        return invalid
     if response.get("model") != MODEL or response.get("provider") != "Fireworks":
         return dict(processing="foreign_provider_or_model", raw=None, proposal=None)
-    choices = response.get("choices", [])
-    if len(choices) != 1:
-        return dict(processing="invalid_response", raw=None, proposal=None)
     choice = choices[0]; message = choice.get("message", {})
     raw = message.get("content")
     if choice.get("finish_reason") != "stop" or message.get("tool_calls") or not isinstance(raw, str):
@@ -73,9 +78,12 @@ def execute(record, key):
         with urllib.request.urlopen(call, timeout=90) as stream:
             response = json.load(stream)
         result.update(interpret(request, response))
-        result.update(generationId=response.get("id"), provider=response.get("provider"),
-                      model=response.get("model"), usage=response.get("usage"),
-                      finishReason=(response.get("choices") or [{}])[0].get("finish_reason"))
+        if isinstance(response, dict):
+            result.update(generationId=response.get("id"), provider=response.get("provider"),
+                          model=response.get("model"), usage=response.get("usage"))
+            choices = response.get("choices")
+            if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+                result["finishReason"] = choices[0].get("finish_reason")
     except urllib.error.HTTPError as error:
         # Error bodies can echo caller inputs. Keep only the HTTP code, never credentials.
         result.update(processing="http_failure", httpStatus=error.code)
