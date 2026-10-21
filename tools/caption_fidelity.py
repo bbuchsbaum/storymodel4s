@@ -88,6 +88,22 @@ def requests(source, cases, frames):
     return result
 
 
+def stratified_selection(extents, excluded, seed, strata=16):
+    """Choose within temporal strata without inspecting caption content or recall matches."""
+    result = []
+    for i in range(strata):
+        lo, hi = i * len(extents) // strata, (i + 1) * len(extents) // strata
+        eligible = [e for e in extents[lo:hi] if e["id"] not in excluded]
+        if not eligible:
+            raise ValueError("temporal stratum has no uninspected interval")
+        chosen = min(
+            eligible,
+            key=lambda e: hashlib.sha256(f"{seed}:{i}:{e['id']}".encode()).hexdigest(),
+        )
+        result.append(chosen)
+    return result
+
+
 def validate_outcome(request, outcome):
     """Refuse cross-arm substitutions or incomplete outputs before any quality assessment."""
     if outcome["schema"] != "storymodel4s.media.caption-outcome":

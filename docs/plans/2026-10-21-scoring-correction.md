@@ -302,3 +302,44 @@ Initial experiment producer: `c57311efa0ef5fb76962328e96fb79e9d999452c`; later c
 assessment counting and tests without altering those recorded worker calls. Eleven synthetic
 tests pass. Removing the request-identity guard yields one named failure with seven siblings
 passing in the then-eight-test suite. No captions, video or participant text entered Git.
+
+## Fresh interval and actual-recall confirmation (frozen before inference)
+
+The owner authorized testing the higher-resolution candidate on fresh intervals and downstream
+recall retrieval. Select 16 temporal strata in each part and choose the minimum SHA-256 of
+the fixed seed, stratum and extent identifier, excluding the 15 previously inspected frame
+intervals. Independently choose 24 of the 173 recall units by a different seed coordinate,
+excluding the known development units 92 and 93. Do not choose queries by matching, baseline
+success or anticipated benefit. All selected units remain in the denominator, including
+uninformative and unsupported queries. New frame inspections may share familiar scenes;
+row 591's old caption had been discussed previously. This is not a participant or film holdout.
+
+The local protocol, exact interval/query selection and input hashes are frozen in
+`.agent-work/caption-confirm-20261021/protocol-freeze.json`. An independent agent records
+image-only facts and qualifications before either new arm runs. Both arms use the original
+prompt, the same pinned model, exact samples and 96-token output limit; only `maxPixels`
+differs (65,536 versus 262,144). Judge paired captions with anonymous condition labels.
+
+For downstream retrieval, the intervention replaces only the selected 32 captions in the
+otherwise fixed full gallery. It is explicitly a hybrid diagnostic, not a homogeneous new
+caption package. `CaptionResolutionProbe` calls the production `CaptionScoring` function on
+the checked retained recall graph and bound source view. It retains all 1,000 detail targets,
+missing caption values, and all 173 units. It checks each fresh low-resolution caption against
+the retained baseline prices. This full-cut pricing diagnostic does not execute nomination,
+normalization or final chronological decoding; their outputs must not be inferred from it.
+
+The primary retrieval comparison is caption-only lexical distance. Stable source-key order
+breaks exact ties, and tie sizes remain visible. A wholly flat price vector is non-discriminating,
+not missing evidence; it produces an abstention for this diagnostic and remains in the sample
+denominator. The fixed 0.5 annotation/caption blend is a separate descriptive rank comparison.
+For the prespecified 24-unit sample, pool both primary arms' top three distinct intervals,
+randomize presentation and judge recall/source pairs without captions, ranks or arm labels.
+Credit all supported intervals, including repeated depictions. Separate sampled-frame depiction,
+contextual support from the original annotation, contradiction and unknown full-interval support.
+Three samples without a recalled event do not establish its absence throughout the interval.
+
+Report supported top-1/top-3 counts, unknowns, abstentions, unchanged rankings and paired
+regressions. Pool judgments do not establish exhaustive relevant-interval recall or full-gallery
+MRR. Report caption facts, false identities, other unsupported claims and costs separately.
+Sparse replacement may have little effect: retain that result without selecting more favorable
+queries afterward. The experiment cannot establish the effect of regenerating all captions.

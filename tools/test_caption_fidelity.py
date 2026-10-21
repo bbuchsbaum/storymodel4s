@@ -4,7 +4,12 @@ import copy
 import hashlib
 import unittest
 
-from caption_fidelity import assessment_summary, requests, validate_outcome
+from caption_fidelity import (
+    assessment_summary,
+    requests,
+    stratified_selection,
+    validate_outcome,
+)
 
 
 class CaptionFidelityTest(unittest.TestCase):
@@ -140,6 +145,27 @@ class AssessmentSummaryTest(unittest.TestCase):
         self.rows[0]["facts"] = "C"
         with self.assertRaises(ValueError):
             assessment_summary(self.rows, self.references, self.key)
+
+
+class StratifiedSelectionTest(unittest.TestCase):
+    def test_each_temporal_stratum_is_represented_without_known_cases(self):
+        extents = [{"id": str(n)} for n in range(24)]
+        chosen = stratified_selection(
+            extents, {str(n) for n in range(0, 24, 4)}, "fixed", 6
+        )
+        self.assertEqual(len(chosen), 6)
+        self.assertEqual([int(e["id"]) // 4 for e in chosen], list(range(6)))
+        self.assertTrue(all(int(e["id"]) % 4 != 0 for e in chosen))
+        self.assertEqual(
+            chosen,
+            stratified_selection(
+                extents, {str(n) for n in range(0, 24, 4)}, "fixed", 6
+            ),
+        )
+
+    def test_exhausted_stratum_refuses_instead_of_sampling_another_period(self):
+        with self.assertRaises(ValueError):
+            stratified_selection([{"id": "0"}, {"id": "1"}], {"0"}, "fixed", 2)
 
 
 if __name__ == "__main__":
