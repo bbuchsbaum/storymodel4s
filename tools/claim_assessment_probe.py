@@ -77,12 +77,22 @@ def unique_object(pairs):
     return result
 
 
+def model_claim_id(request):
+    return hashlib.sha256(request["question"].encode()).hexdigest()
+
+
+def model_input(request):
+    """Only task content and source coordinates cross the model boundary; IDs conceal labels."""
+    return dict(claim_id=model_claim_id(request), claim=request["claim"],
+                intervals=request["intervals"], items=request["items"])
+
+
 def validate_proposal(request, raw):
     """Bind exact quotations to the requested items; do not adjudicate semantic correctness."""
     value = json.loads(raw, object_pairs_hook=unique_object)
     if not isinstance(value, dict) or set(value) != {"claim_id", "support", "counter", "unresolved"}:
         raise ValueError("wrong proposal shape")
-    if value["claim_id"] != request["question"]:
+    if value["claim_id"] != model_claim_id(request):
         raise ValueError("foreign claim")
     reasons = value["unresolved"]
     if not isinstance(reasons, list) or any(not isinstance(x, str) for x in reasons):
@@ -241,8 +251,7 @@ def run(args):
     with output.open("x") as stream:
         for index, request in enumerate(requests):
             mx.random.seed(recipe["seed"])
-            body = json.dumps({"claim_id": request["question"], **{k:v for k,v in request.items()
-                              if k not in ("identity", "arm", "question")}}, ensure_ascii=False)
+            body = json.dumps(model_input(request), ensure_ascii=False)
             prompt = apply_chat_template(processor, config, PROMPT + "\nINPUT:\n" + body, num_images=0)
             prompt_tokens = len(tokenizer.encode(prompt))
             result = dict(question=request["question"], arm=request["arm"], requestIdentity=request["identity"],

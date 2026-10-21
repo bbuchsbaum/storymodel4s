@@ -86,7 +86,7 @@ object AutomaticClaimAssessmentProbe:
       val raw = parse(field[String](output, "raw")).fold(throw _, identity)
       require(
         field[String](p, "question") == key(request)._1 &&
-          field[String](raw, "claim_id") == key(request)._1,
+          field[String](raw, "claim_id") == Checksum.ofText(key(request)._1).hex,
         "foreign claim"
       )
       val rs = field[Vector[String]](p, "unresolved")

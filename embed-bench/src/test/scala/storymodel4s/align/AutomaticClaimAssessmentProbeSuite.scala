@@ -28,7 +28,7 @@ class AutomaticClaimAssessmentProbeSuite extends FunSuite:
     "unresolved" -> Json.arr()
   )
   private val raw = Json.obj(
-    "claim_id" -> "q".asJson,
+    "claim_id" -> Checksum.ofText("q").hex.asJson,
     "support" -> Json.arr(rawLink),
     "counter" -> Json.arr(),
     "unresolved" -> Json.arr()
@@ -79,6 +79,15 @@ class AutomaticClaimAssessmentProbeSuite extends FunSuite:
     }
     intercept[IllegalArgumentException] {
       AutomaticClaimAssessmentProbe.checkedQuote("🔔 x=1", "x=1", 2, 5)
+    }
+  }
+
+  test("raw proposal must echo the opaque model claim identity") {
+    intercept[IllegalArgumentException] {
+      AutomaticClaimAssessmentProbe.checkedProposal(
+        request,
+        output.mapObject(_.add("raw", raw.mapObject(_.add("claim_id", "q".asJson)).noSpaces.asJson))
+      )
     }
   }
 

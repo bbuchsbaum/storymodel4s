@@ -12,7 +12,7 @@ class ClaimAssessmentProbeTests(unittest.TestCase):
         self.request = {"question": "q", "items": [{"id": "e", "text": "signal=on; mode=stable"}]}
 
     def raw(self, **changes):
-        value = dict(claim_id="q", support=[], counter=[], unresolved=["comparison_unavailable"])
+        value = dict(claim_id=probe.model_claim_id(self.request), support=[], counter=[], unresolved=["comparison_unavailable"])
         value.update(changes)
         return json.dumps(value)
 
@@ -31,6 +31,26 @@ class ClaimAssessmentProbeTests(unittest.TestCase):
         for quote in ["", " ", "x"]:
             with self.assertRaises(ValueError):
                 validate_proposal(request, self.raw(support=[dict(evidence_id="e", quote=quote)]))
+
+    def test_model_body_conceals_reference_metadata_and_label_bearing_ids(self):
+        request = dict(question="control-case-supported", claim="signal=on", intervals=[],
+                       items=[dict(id="opaque", text="signal=on")], kind="controlled",
+                       variant="supported", commonLabel="Supported", commonBasis="hidden-basis",
+                       recallQuote="hidden-recall", cluster="hidden-cluster", identity="hidden-id")
+        body = probe.model_input(request)
+        self.assertEqual(set(body), {"claim_id", "claim", "intervals", "items"})
+        self.assertEqual(body['claim_id'], probe.hashlib.sha256(request['question'].encode()).hexdigest())
+        self.assertEqual(body['claim'], request['claim'])
+        self.assertEqual(body['items'], request['items'])
+        serialized = json.dumps(body)
+        for hidden in ('control-case-supported', 'kind', 'variant', 'commonLabel', 'commonBasis',
+                       'recallQuote', 'cluster', 'hidden-basis', 'hidden-recall', 'hidden-cluster'):
+            self.assertNotIn(hidden, serialized)
+        valid = dict(claim_id=body['claim_id'], support=[], counter=[], unresolved=['comparison_unavailable'])
+        self.assertEqual(validate_proposal(request, json.dumps(valid))['question'], request['question'])
+        valid['claim_id'] = request['question']
+        with self.assertRaisesRegex(ValueError, 'foreign claim'):
+            validate_proposal(request, json.dumps(valid))
 
     def test_foreign_claim_is_refused(self):
         with self.assertRaises(ValueError):
