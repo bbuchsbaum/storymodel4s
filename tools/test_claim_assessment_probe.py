@@ -73,6 +73,16 @@ class ClaimAssessmentProbeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             payload(dict(id="q", claim="signal=on", sourceRows=[1, 2]), "visual", targets)
 
+    def test_audio_word_timing_is_preserved_without_leaking_into_visual_arm(self):
+        word = dict(word="signal", start=1.2, end=1.5, segment_index=3)
+        item = dict(id="e", text="signal=on", kind="asr-segment")
+        targets = {1: dict(row=1, part="part-1", start=1, end=2, centralWords=[word],
+                           arms={"audio": [item], "audio_visual": [item], "visual": []})}
+        question = dict(id="q", claim="signal=on", sourceRows=[1])
+        for arm in ("audio", "audio_visual"):
+            self.assertEqual(payload(question, arm, targets)['intervals'][0]['centralWords'], [word])
+        self.assertNotIn('centralWords', payload(question, 'visual', targets)['intervals'][0])
+
     def test_duplicate_citations_and_item_ids_are_refused(self):
         link = dict(evidence_id="e", quote="signal=on")
         with self.assertRaises(ValueError):

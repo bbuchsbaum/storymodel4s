@@ -140,7 +140,8 @@ def payload(question, arm, targets):
                 raise ValueError("same item identity has different content")
             items[item["id"]] = item
     request = dict(question=question["id"], arm=arm, claim=question["claim"],
-                   intervals=[{k: targets[row][k] for k in ("row", "part", "start", "end")}
+                   intervals=[{**{k: targets[row][k] for k in ("row", "part", "start", "end")},
+                               **({"centralWords": targets[row]["centralWords"]} if arm != "visual" else {})}
                               for row in question["sourceRows"]],
                    items=[items[k] for k in sorted(items)])
     request["identity"] = identity(request)
