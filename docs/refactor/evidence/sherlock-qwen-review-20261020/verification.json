@@ -1,0 +1,57 @@
+{
+  "model": "mlx-community/Qwen3-ASR-1.7B-8bit",
+  "modelRevision": "a8379a2e2f9e313c9292cdf1af4055ab56d50d55",
+  "methodIdentity": "a13ba56c34be0a17f6376bda23e9249c160ed2ae267559694dc88c08488a041c",
+  "reviewedArtifactSHA256": {
+    "comparison.json": "11bc2a19e06f3c3c199da4b7b23b2f2f5fe3ba0b9161dc666782800c02fdf54b",
+    "method.json": "3660c1e0d31c0b271175f0f16ec79744861abf080bae32dd747cbcc8d2b5dbf8",
+    "manifest.json": "1fc1c14ca32ae2aacddc4dfa99e7db4e58a6416708684444754d73175005624f",
+    "comparison.html": "28b3f6dc6d1700e2b9f32d3801d9421fc9ad41d1806aefef4c78719391704690"
+  },
+  "baselineSHA256": "2db0b7cd4276dd514dbe60790dda4b723db1762a05a992692bfb2525b95d842d",
+  "verified": [
+    {
+      "key": "sherlock1_boundary",
+      "sourcePart": "Sherlock_part1_imovie",
+      "sourceStartSeconds": 20,
+      "durationSeconds": 145,
+      "sourceSHA256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+      "excerptSHA256": "f1764db88479d12296fa31877e952c2a9200ae90669d351d6de916c13f188e67",
+      "completionSHA256": "f65e70bd9c68843347921f4c5d5b3ee1bb60fc1577ecf1284d5f8a8c6f8d12a9",
+      "completedExit": 0,
+      "generatedTokens": 124,
+      "wordTiming": null,
+      "exactSourceAudioSlice": true
+    },
+    {
+      "key": "sherlock2_boundary",
+      "sourcePart": "Sherlock_part2_imovie",
+      "sourceStartSeconds": 20,
+      "durationSeconds": 120,
+      "sourceSHA256": "f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907",
+      "excerptSHA256": "78cd0a60054ba8bbe960c8261496879e9bd853c0323aff4d93773fd47f761c5b",
+      "completionSHA256": "7662574907b6a662a757b1fd9dbd5d3898551f2408ea0659a194b0a45c6b7122",
+      "completedExit": 0,
+      "generatedTokens": 110,
+      "wordTiming": null,
+      "exactSourceAudioSlice": true
+    },
+    {
+      "key": "sherlock1_dialogue",
+      "sourcePart": "Sherlock_part1_imovie",
+      "sourceStartSeconds": 860,
+      "durationSeconds": 60,
+      "sourceSHA256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+      "excerptSHA256": "6ccec2bf56ef3775c0ed7a27669686f57eb6b41e7bab80e15a1f3f4cc2dcfa42",
+      "completionSHA256": "0cae79f09e66bf4af2670fd29f3a186c121199e08fe3261e56a5e006540cc0aa",
+      "completedExit": 0,
+      "generatedTokens": 135,
+      "wordTiming": null,
+      "exactSourceAudioSlice": true
+    }
+  ],
+  "selectedSeconds": 325,
+  "newInferenceExecuted": false,
+  "humanAudioAdjudication": false,
+  "claim": "Retained source/excerpt/output integrity and exact excerpt clock verified; text differences are not accuracy or mapping efficacy."
+}
