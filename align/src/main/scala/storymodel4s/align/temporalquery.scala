@@ -34,6 +34,7 @@ object TemporalQuery:
     case SupportOnly, IncompatibleGeometry
 
   enum Refusal:
+    case ConditionalMeasureUnsupported
     case UnknownUnit, MissingMeasure, DuplicateDeclaration, UnmeasuredTarget, InvalidMixture,
       NonFiniteAggregate
     case Processing(status: ProcessingStatus)
@@ -398,8 +399,10 @@ object TemporalQuery:
       )
       row <- measure match
         case Measure.NormalizedScoreMass =>
-          outcome.measures.normalized.toRight(Refusal.MissingMeasure).map { m =>
-            (m.stage, m.mass.toVector.map((d, w) => (Alternative.Score(d), w)), 1.0)
+          outcome.measures.normalized.toRight(Refusal.MissingMeasure).flatMap { m =>
+            if m.population != NormalizationPopulation.SuppliedDestinations then
+              Left(Refusal.ConditionalMeasureUnsupported)
+            else Right((m.stage, m.mass.toVector.map((d, w) => (Alternative.Score(d), w)), 1.0))
           }
         case Measure.ModelPosterior =>
           outcome.measures.posterior.toRight(Refusal.MissingMeasure).map { m =>

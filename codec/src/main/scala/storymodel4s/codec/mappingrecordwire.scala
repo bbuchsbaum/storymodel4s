@@ -191,6 +191,9 @@ private[codec] object MappingRecordWire:
         "prior" -> str(r.prior.value),
         "temperature" -> number(r.temperature),
         "stage" -> str(r.stage.digest.hex)
+      ).deepMerge(
+        if r.population == NormalizationPopulation.SuppliedDestinations then obj()
+        else obj("population" -> str(r.population.toString))
       )
     ),
     "transport" -> optional(value.transport)(r =>
@@ -205,6 +208,8 @@ private[codec] object MappingRecordWire:
     )
   )
   def values(value: UnitMeasures): Json =
+    val normalizedScope =
+      value.normalized.fold(NormalizationPopulation.SuppliedDestinations.scope)(_.population.scope)
     def row(
         kind: MeasureKind,
         channel: Option[String],
@@ -219,7 +224,7 @@ private[codec] object MappingRecordWire:
         "raw_value" -> number(value),
         "normalization_scope" -> str(kind match
           case MeasureKind.RawScore              => "not-normalized"
-          case MeasureKind.NormalizedScoreMass   => "unit/supplied-destinations"
+          case MeasureKind.NormalizedScoreMass   => normalizedScope
           case MeasureKind.TransportMass         => "not-row-normalized"
           case MeasureKind.ModelPosterior        => "unit/supplied-model-states"
           case MeasureKind.CalibratedProbability => "calibrated-event"),

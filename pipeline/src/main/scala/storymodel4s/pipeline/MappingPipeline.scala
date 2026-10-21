@@ -42,6 +42,28 @@ object MappingPipeline:
   val LexicalProfile: String = "mapping-lexical-pair/v1"
   val OnnxProfile: String = "mapping-onnx-pair/v1"
   val CaptionProfile: String = "mapping-caption-pair/v1"
+  val LexicalSourceProfile: String = "mapping-lexical-source-reference/v1"
+  val OnnxSourceProfile: String = "mapping-onnx-source-reference/v1"
+  val CaptionSourceProfile: String = "mapping-caption-source-reference/v1"
+
+  private def sourceConditional(config: Config): Boolean =
+    Set(LexicalSourceProfile, OnnxSourceProfile, CaptionSourceProfile)(config.profile)
+  private def matchesProfile(actual: String, historical: String): Boolean =
+    actual == historical || (historical match
+      case LexicalProfile => actual == LexicalSourceProfile
+      case OnnxProfile    => actual == OnnxSourceProfile
+      case CaptionProfile => actual == CaptionSourceProfile
+      case _              => false)
+  private def contentPolicy(config: Config): ContentCostPolicy =
+    if sourceConditional(config) then ContentCostPolicy.MeasuredSemanticV1
+    else ContentCostPolicy.HistoricalV1
+  private def referenceProfile(
+      universe: DeclaredUniverse,
+      config: Config
+  ): Either[AlignError, LocalReference.Profile] =
+    if sourceConditional(config) then
+      LocalReference.Profile.sourceTargets(universe, config.temperature)
+    else LocalReference.Profile.of(universe, config.temperature)
 
   /** The facade mints this value by consuming its registration's actual originating evidence. */
   final class Run private[MappingPipeline] (
@@ -126,15 +148,15 @@ object MappingPipeline:
     else if request.level != run.execution.reference.profile.level then Left(Reason.WrongResolution)
     else
       val originMatches = run.organizationOrigin match
-        case OrganizationOrigin.Lexical  => run.config.profile == LexicalProfile
+        case OrganizationOrigin.Lexical  => matchesProfile(run.config.profile, LexicalProfile)
         case OrganizationOrigin.Captions =>
-          run.config.profile == CaptionProfile &&
+          matchesProfile(run.config.profile, CaptionProfile) &&
           run.caption
             .map(_.evidence)
             .orElse(run.captionPackage.map(_.produced.evidence))
             .contains(run.execution.reference.evidence)
         case OrganizationOrigin.Onnx =>
-          run.config.profile == OnnxProfile &&
+          matchesProfile(run.config.profile, OnnxProfile) &&
           run.onnx.exists(_.evidence == run.execution.reference.evidence)
       if !originMatches then Left(Reason.UnsupportedOrigin)
       else
@@ -285,15 +307,15 @@ object MappingPipeline:
     else if request.level != run.execution.reference.profile.level then Left(Reason.WrongResolution)
     else
       val originMatches = run.organizationOrigin match
-        case OrganizationOrigin.Lexical  => run.config.profile == LexicalProfile
+        case OrganizationOrigin.Lexical  => matchesProfile(run.config.profile, LexicalProfile)
         case OrganizationOrigin.Captions =>
-          run.config.profile == CaptionProfile &&
+          matchesProfile(run.config.profile, CaptionProfile) &&
           run.caption
             .map(_.evidence)
             .orElse(run.captionPackage.map(_.produced.evidence))
             .contains(run.execution.reference.evidence)
         case OrganizationOrigin.Onnx =>
-          run.config.profile == OnnxProfile &&
+          matchesProfile(run.config.profile, OnnxProfile) &&
           run.onnx.exists(_.evidence == run.execution.reference.evidence)
       if !originMatches then Left(Reason.UnsupportedOrigin)
       else
@@ -418,7 +440,14 @@ object MappingPipeline:
     )
 
   def validate(config: Config): Either[Refusal, Unit] = Either.cond(
-    Set(LexicalProfile, CaptionProfile, OnnxProfile)(
+    Set(
+      LexicalProfile,
+      CaptionProfile,
+      OnnxProfile,
+      LexicalSourceProfile,
+      CaptionSourceProfile,
+      OnnxSourceProfile
+    )(
       config.profile
     ) && config.temperature.isFinite &&
       config.temperature > 0 && config.selectedLevel >= 0 &&
@@ -447,7 +476,7 @@ object MappingPipeline:
   ): Either[Refusal, (LocalEvidence, Checksum)] =
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == LexicalProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, LexicalProfile), (), Refusal.InvalidConfig)
       candidatesConfig <- candidateConfig(config)
       candidates <- StrictCandidateGenerator
         .canonicalLevel(
@@ -465,7 +494,8 @@ object MappingPipeline:
           weights = CostWeights.semanticOnly,
           functionPrior = FunctionPrior.none,
           externalMismatch = 0.0,
-          distortionPenalty = 0.0
+          distortionPenalty = 0.0,
+          contentPolicy = contentPolicy(config)
         )
         .left
         .map(Refusal.Alignment(_))
@@ -504,10 +534,12 @@ object MappingPipeline:
     val session = produced.session
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel &&
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel &&
           produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap &&
           produced.config.space == expected.space,
         (),
@@ -536,10 +568,12 @@ object MappingPipeline:
     val session = produced.session
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
         (),
         Refusal.ForeignRegistration
       )
@@ -606,16 +640,17 @@ object MappingPipeline:
         context.representation.digest.hex,
         registration.evidence.identity.checksum.hex,
         registration.basis.toString
-      ) ++ parameters ++ c.selectedLevel.toVector.flatMap(level =>
-        Vector("selected-level/v1", level.toString)
-      ) ++ records
+      ) ++ parameters ++ (if p.contentPolicy == ContentCostPolicy.HistoricalV1 then Vector.empty
+                          else Vector(p.contentPolicy.toString)) ++ c.selectedLevel.toVector
+        .flatMap(level => Vector("selected-level/v1", level.toString)) ++ records
     )
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        (c.selectedLevel.contains(config.selectedLevel) ||
+        p.contentPolicy == contentPolicy(config) && (c.selectedLevel
+          .contains(config.selectedLevel) ||
           (c.selectedLevel.isEmpty && config.selectedLevel == 0 &&
             config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty &&
             context.source.nodes
@@ -650,6 +685,11 @@ object MappingPipeline:
       captionPackage: Option[CaptionMapping.PackageRegistered] = None
   ): Either[Refusal, Run] =
     for
+      _ <- Either.cond(
+        !sourceConditional(config),
+        (),
+        Refusal.MissingCapability("source-conditional profiles require reference-only execution")
+      )
       universe <- DeclaredUniverse
         .of(
           view.nodes.filter(_.level == config.selectedLevel).map(_.ref),
@@ -657,9 +697,7 @@ object MappingPipeline:
         )
         .left
         .map(Refusal.Projection(_))
-      reference <- LocalReference.Profile
-        .of(universe, config.temperature)
-        .left
+      reference <- referenceProfile(universe, config).left
         .map(Refusal.Alignment(_))
       // Presentation order is an explicit reconstruction assumption in this named preset.
       roots = view.nodes.filter(_.parent.isEmpty).sortBy(n => (n.discoursePosition, n.ref.key))
@@ -716,10 +754,12 @@ object MappingPipeline:
     val session = produced.session
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel &&
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel &&
           produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap &&
           produced.config.space == expected.space,
         (),
@@ -748,10 +788,12 @@ object MappingPipeline:
     val session = produced.session
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
         (),
         Refusal.ForeignRegistration
       )
@@ -818,16 +860,16 @@ object MappingPipeline:
         context.representation.digest.hex,
         registration.evidence.identity.checksum.hex,
         registration.basis.toString
-      ) ++ parameters ++ c.selectedLevel.toVector.flatMap(level =>
-        Vector("selected-level/v1", level.toString)
-      ) ++ records
+      ) ++ parameters ++ (if p.contentPolicy == ContentCostPolicy.HistoricalV1 then Vector.empty
+                          else Vector(p.contentPolicy.toString)) ++ c.selectedLevel.toVector
+        .flatMap(level => Vector("selected-level/v1", level.toString)) ++ records
     )
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        c.selectedLevel.contains(
+        p.contentPolicy == contentPolicy(config) && c.selectedLevel.contains(
           config.selectedLevel
         ) && c.candidates.perLevel == expected.perLevel &&
           c.candidates.policy == expected.policy,
@@ -873,9 +915,7 @@ object MappingPipeline:
         )
         .left
         .map(Refusal.Projection(_))
-      profile <- LocalReference.Profile
-        .of(universe, config.temperature)
-        .left
+      profile <- referenceProfile(universe, config).left
         .map(Refusal.Alignment(_))
       execution <- MappingRun
         .computeReference(recall, view, inventory, source, evidence, profile)
@@ -928,7 +968,10 @@ object MappingPipeline:
     validate(config)
       .flatMap(_ =>
         Either.cond(
-          config.profile == LexicalProfile || (config.profile == CaptionProfile &&
+          matchesProfile(config.profile, LexicalProfile) || (matchesProfile(
+            config.profile,
+            CaptionProfile
+          ) &&
             prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty),
           (),
           Refusal.MissingCapability(
@@ -949,7 +992,7 @@ object MappingPipeline:
                 None
               )
             case Right(recall) =>
-              (if config.profile == LexicalProfile then
+              (if matchesProfile(config.profile, LexicalProfile) then
                  lexical(
                    recall.graph,
                    prepared.source,
@@ -974,7 +1017,8 @@ object MappingPipeline:
                        recall.inventory,
                        candidates,
                        context._2,
-                       selectedLevel = config.selectedLevel
+                       selectedLevel = config.selectedLevel,
+                       contentPolicy = contentPolicy(config)
                      )
                      .left
                      .map(_ => Refusal.ForeignRegistration)
@@ -1013,7 +1057,7 @@ object MappingPipeline:
   ): Either[Refusal, Batch] =
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
       _ <- Either.cond(
         prepared.source.captionContext.isEmpty,
         (),
@@ -1029,7 +1073,8 @@ object MappingPipeline:
           functionPrior = FunctionPrior.none,
           externalMismatch = 0.0,
           distortionPenalty = 0.0,
-          selectedLevel = Some(config.selectedLevel)
+          selectedLevel = Some(config.selectedLevel),
+          contentPolicy = contentPolicy(config)
         )
         .left
         .map(_ => Refusal.InvalidConfig)
@@ -1128,7 +1173,10 @@ object MappingPipeline:
       .flatMap(_ =>
         Either.cond(
           config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty &&
-            (config.profile == LexicalProfile || (config.profile == CaptionProfile &&
+            (matchesProfile(config.profile, LexicalProfile) || (matchesProfile(
+              config.profile,
+              CaptionProfile
+            ) &&
               prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty)),
           (),
           Refusal.MissingCapability(
@@ -1149,7 +1197,7 @@ object MappingPipeline:
                 None
               )
             case Right(recall) =>
-              (if config.profile == LexicalProfile then
+              (if matchesProfile(config.profile, LexicalProfile) then
                  referenceLexical(
                    recall.graph,
                    prepared.source,
@@ -1174,7 +1222,8 @@ object MappingPipeline:
                        recall.inventory,
                        candidates,
                        context._2,
-                       selectedLevel = config.selectedLevel
+                       selectedLevel = config.selectedLevel,
+                       contentPolicy = contentPolicy(config)
                      )
                      .left
                      .map(_ => Refusal.ForeignRegistration)
@@ -1218,7 +1267,7 @@ object MappingPipeline:
         (),
         Refusal.InvalidConfig
       )
-      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
       _ <- Either.cond(
         prepared.source.captionContext.isEmpty,
         (),
@@ -1234,7 +1283,8 @@ object MappingPipeline:
           functionPrior = FunctionPrior.none,
           externalMismatch = 0.0,
           distortionPenalty = 0.0,
-          selectedLevel = Some(config.selectedLevel)
+          selectedLevel = Some(config.selectedLevel),
+          contentPolicy = contentPolicy(config)
         )
         .left
         .map(_ => Refusal.InvalidConfig)
@@ -1835,16 +1885,25 @@ object MappingPipeline:
     val profile = run.execution.reference.profile
     Json.obj(
       "run" -> Json.fromString(run.identity.hex),
-      "reference" -> Json.obj(
-        "kind" -> Json.fromString(MeasureKind.NormalizedScoreMass.toString),
-        "profile" -> Json.fromString(profile.fingerprint.hex),
-        "level" -> Json.fromInt(profile.level),
-        "universe" -> Json.fromString(profile.universe.id.digest.hex),
-        "targets" -> Json.fromInt(profile.universe.targets.size),
-        "temperature" -> Json.fromDoubleOrNull(profile.temperature),
-        "prior" -> Json.fromString(profile.prior.toString),
-        "normalization" -> Json.fromString(profile.normalization.toString)
-      ),
+      "reference" -> Json
+        .obj(
+          "kind" -> Json.fromString(MeasureKind.NormalizedScoreMass.toString),
+          "profile" -> Json.fromString(profile.fingerprint.hex),
+          "level" -> Json.fromInt(profile.level),
+          "universe" -> Json.fromString(profile.universe.id.digest.hex),
+          "targets" -> Json.fromInt(profile.universe.targets.size),
+          "temperature" -> Json.fromDoubleOrNull(profile.temperature),
+          "prior" -> Json.fromString(profile.prior.toString),
+          "normalization" -> Json.fromString(profile.normalization.toString)
+        )
+        .deepMerge(
+          if profile.population == NormalizationPopulation.SuppliedDestinations then Json.obj()
+          else
+            Json.obj(
+              "population" -> Json.fromString(profile.population.scope),
+              "sourceMembership" -> Json.fromString("unestablished")
+            )
+        ),
       "interpretation" -> Json.fromString(
         "Local cost mass; not calibrated correctness. Structural checks do not establish empirical fidelity detection or scientific efficacy."
       )

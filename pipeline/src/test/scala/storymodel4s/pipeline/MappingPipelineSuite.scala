@@ -892,3 +892,52 @@ class MappingPipelineSuite extends FunSuite:
       )
     }
   }
+
+  test("source reference retains conditioning through exchange and refuses paired reconstruction") {
+    inTemp { root =>
+      val input = prepared(root)
+      val conditional = config.copy(profile = MappingPipeline.LexicalSourceProfile)
+      val batch = right(MappingPipeline.referenceBatch(input, conditional))
+      val run = batch.outcomes.head.run.getOrElse(fail(batch.outcomes.head.failure.toString))
+      val record = run.reference
+      val context = ExpectedMappingContext(
+        record.inventory,
+        record.source,
+        referenceExecution = Some(run.execution)
+      )
+      val encoded = MappingCodecs.encode(record)
+      assert(encoded.contains("unit/nominated-admitted-source-targets"))
+      assert(encoded.contains("AdmittedSourceTargets"))
+      val decoded = right(MappingCodecs.decodeReference(encoded, context))
+      assertEquals(decoded.digest, record.digest)
+      assertEquals(MappingCodecs.encode(decoded), encoded)
+      decoded.outcomes.flatMap(_.measures.normalized).foreach { m =>
+        assertEquals(m.population, NormalizationPopulation.AdmittedSourceTargets)
+        assert(m.mass.keys.forall { case Destination.Target(_) => true; case _ => false })
+      }
+      val exchange = right(storymodel4s.codec.MappingExchange.encode(run.execution))
+      assertEquals(
+        right(storymodel4s.codec.MappingExchange.decodeReference(exchange.files, context)).digest,
+        record.digest
+      )
+      assert(exchange.files.exists(_._2.contains("unit/nominated-admitted-source-targets")))
+      assertEquals(
+        TemporalQuery.prepare(
+          record,
+          record.outcomes.head.unit,
+          TemporalQuery.Measure.NormalizedScoreMass,
+          TemporalSupport.Selection.Part(Checksum.ofText("unneeded")),
+          Vector.empty
+        ),
+        Left(TemporalQuery.Refusal.ConditionalMeasureUnsupported)
+      )
+      val stripped =
+        encoded.replace("unit/nominated-admitted-source-targets", "unit/supplied-destinations")
+      assert(MappingCodecs.decodeReference(stripped, context).isLeft)
+      val wrong = encoded.replace("AdmittedSourceTargets", "SuppliedDestinations")
+      assert(MappingCodecs.decodeReference(wrong, context).isLeft)
+      val paired = right(MappingPipeline.batch(input, conditional))
+      assert(paired.outcomes.head.run.isEmpty)
+      assert(paired.outcomes.head.failure.nonEmpty)
+    }
+  }

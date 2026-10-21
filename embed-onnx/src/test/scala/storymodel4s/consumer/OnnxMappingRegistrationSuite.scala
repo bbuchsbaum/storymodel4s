@@ -498,3 +498,37 @@ class OnnxMappingRegistrationSuite extends FunSuite:
       )
     }
   }
+
+  test("record and replay preserve the checked measured semantic policy") {
+    withEncoder { encoder =>
+      val settings = value(
+        OnnxMappingRegistration.Config.of(
+          config.candidates,
+          Sensitivity.Public,
+          Sensitivity.Public,
+          weights = CostWeights.semanticOnly,
+          functionPrior = FunctionPrior.none,
+          distortionPenalty = 0.0,
+          selectedLevel = Some(0),
+          contentPolicy = ContentCostPolicy.MeasuredSemanticV1
+        )
+      )
+      val context = OnnxMappingFixture.context()
+      val registered = value(OnnxMappingRegistration.record(encoder, context, settings))
+      assertEquals(registered.pricing.contentPolicy, ContentCostPolicy.MeasuredSemanticV1)
+      val prices =
+        registered.evidence.breakdowns.flatMap(_.toVector.filter(_._1.isSource).map(_._2))
+      assert(prices.nonEmpty)
+      prices.foreach(price => assertEquals(price.terms.keySet, Set(CostTerm.Semantic)))
+      val replayed = value(
+        registered.replay(
+          context,
+          settings,
+          registered.queryRecord.model,
+          registered.queryRecord.provider
+        )
+      )
+      assertEquals(replayed.pricing.contentPolicy, ContentCostPolicy.MeasuredSemanticV1)
+      assertEquals(replayed.evidence, registered.evidence)
+    }
+  }

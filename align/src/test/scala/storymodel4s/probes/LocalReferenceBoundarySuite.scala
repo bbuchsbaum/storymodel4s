@@ -9,7 +9,8 @@ import storymodel4s.recall.RecallUnitId
 final case class ReferenceProfileControl(
     universe: DeclaredUniverse,
     temperature: Double,
-    level: Int
+    level: Int,
+    population: NormalizationPopulation
 )
 
 /** Public same-shape control proves each external construction probe can compile. */
@@ -46,7 +47,8 @@ object ReferenceProfileControl:
     ReferenceProfileControl(
       p.productElement(0).asInstanceOf[DeclaredUniverse],
       p.productElement(1).asInstanceOf[Double],
-      p.productElement(2).asInstanceOf[Int]
+      p.productElement(2).asInstanceOf[Int],
+      p.productElement(3).asInstanceOf[NormalizationPopulation]
     )
 
 /** An explicit public product factory is the direct-door positive control. */
@@ -92,10 +94,28 @@ class LocalReferenceBoundarySuite extends FunSuite:
   """
 
   test("Profile has no unchecked constructor or apply door") {
-    assert(typeCheckErrors(imports + "new LocalReference.Profile(null, 1.0, 0)").nonEmpty)
-    assertEquals(typeCheckErrors(imports + "new ReferenceProfileControl(null, 1.0, 0)"), Nil)
-    assert(typeCheckErrors(imports + "LocalReference.Profile(null, 1.0, 0)").nonEmpty)
-    assertEquals(typeCheckErrors(imports + "ReferenceProfileControl(null, 1.0, 0)"), Nil)
+    assert(
+      typeCheckErrors(
+        imports + "new LocalReference.Profile(null, 1.0, 0, NormalizationPopulation.SuppliedDestinations)"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        imports + "new ReferenceProfileControl(null, 1.0, 0, NormalizationPopulation.SuppliedDestinations)"
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        imports + "LocalReference.Profile(null, 1.0, 0, NormalizationPopulation.SuppliedDestinations)"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        imports + "ReferenceProfileControl(null, 1.0, 0, NormalizationPopulation.SuppliedDestinations)"
+      ),
+      Nil
+    )
   }
 
   test("Profile has no replacement copy door") {
@@ -115,12 +135,12 @@ class LocalReferenceBoundarySuite extends FunSuite:
   test("Profile has no product construction door") {
     assert(
       typeCheckErrors(
-        imports + "summon[Mirror.ProductOf[LocalReference.Profile]].fromProduct((null, 1.0, 0))"
+        imports + "summon[Mirror.ProductOf[LocalReference.Profile]].fromProduct((null, 1.0, 0, NormalizationPopulation.SuppliedDestinations))"
       ).nonEmpty
     )
     assertEquals(
       typeCheckErrors(
-        imports + "summon[Mirror.ProductOf[ReferenceProfileControl]].fromProduct((null, 1.0, 0))"
+        imports + "summon[Mirror.ProductOf[ReferenceProfileControl]].fromProduct((null, 1.0, 0, NormalizationPopulation.SuppliedDestinations))"
       ),
       Nil
     )
@@ -312,9 +332,15 @@ class LocalReferenceBoundarySuite extends FunSuite:
   }
 
   test("Profile has no direct companion fromProduct door") {
-    assert(typeCheckErrors(imports + "LocalReference.Profile.fromProduct((null, 1.0, 0))").nonEmpty)
+    assert(
+      typeCheckErrors(
+        imports + "LocalReference.Profile.fromProduct((null, 1.0, 0, NormalizationPopulation.SuppliedDestinations))"
+      ).nonEmpty
+    )
     assertEquals(
-      typeCheckErrors(imports + "ReferenceProfileControl.fromProduct((null, 1.0, 0))"),
+      typeCheckErrors(
+        imports + "ReferenceProfileControl.fromProduct((null, 1.0, 0, NormalizationPopulation.SuppliedDestinations))"
+      ),
       Nil
     )
   }

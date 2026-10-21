@@ -170,7 +170,7 @@ object MappingRun:
       case Member.Reconstruction      => e.reconstruction.profile.fingerprint
       case Member.Weighted(selection) => selection.profile.fingerprint
     val decisionId = DecisionPolicyId.unsafe("mapping-run:" + profile.hex)
-    val prior = ReferencePriorId.unsafe("uniform-admitted-states/v1")
+    val prior = e.reference.profile.priorId
     for
       ledger <- Stage.values.toVector
         .traverse { stage =>
@@ -243,7 +243,8 @@ object MappingRun:
               case c: LocalReference.Computed =>
                 val mass = c.mass.toVector.groupMapReduce((s, _) => Destination.of(s))(_._2)(_ + _)
                 for
-                  normalized <- NormalizedScoreMass.of(
+                  normalized <- normalizedMass(
+                    e.reference.profile,
                     universe.id,
                     prior,
                     e.reference.profile.temperature,
@@ -396,7 +397,7 @@ object MappingRun:
     yield Parts(policies, roles, ledger, outcomes)
 
   private[align] def referenceParts(e: ReferenceExecution): Either[MappingRefusal, Parts] =
-    val prior = ReferencePriorId.unsafe("uniform-admitted-states/v1")
+    val prior = e.reference.profile.priorId
     val universe = e.reference.profile.universe
     val decisionId = DecisionPolicyId.unsafe("mapping-run:" + e.reference.profile.fingerprint.hex)
     for
@@ -453,7 +454,8 @@ object MappingRun:
             case c: LocalReference.Computed =>
               val mass = c.mass.toVector.groupMapReduce((s, _) => Destination.of(s))(_._2)(_ + _)
               for
-                normalized <- NormalizedScoreMass.of(
+                normalized <- normalizedMass(
+                  e.reference.profile,
                   universe.id,
                   prior,
                   e.reference.profile.temperature,
@@ -479,3 +481,16 @@ object MappingRun:
           }
         yield rows
     yield Parts(policies, roles, ledger, outcomes)
+
+  private def normalizedMass(
+      profile: LocalReference.Profile,
+      universe: TargetUniverseId,
+      prior: ReferencePriorId,
+      temperature: Double,
+      mass: Map[Destination, Double],
+      stage: StageEntryId
+  ): Either[MappingRefusal, NormalizedScoreMass] = profile.population match
+    case NormalizationPopulation.SuppliedDestinations =>
+      NormalizedScoreMass.of(universe, prior, temperature, mass, stage)
+    case NormalizationPopulation.AdmittedSourceTargets =>
+      NormalizedScoreMass.sourceTargets(universe, prior, temperature, mass, stage)

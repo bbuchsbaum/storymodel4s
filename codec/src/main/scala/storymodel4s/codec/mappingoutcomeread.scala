@@ -104,9 +104,23 @@ private[codec] object MappingOutcomeRead:
                 .map(v => v.destination -> v.value),
               "normalized.values"
             )
-            result <- checked(
-              NormalizedScoreMass.of(policies.universe.id, prior, temperature, entries, stage)
-            )
+            population <- field[Option[String]](row, "population")
+            result <- population match
+              case None =>
+                checked(
+                  NormalizedScoreMass.of(policies.universe.id, prior, temperature, entries, stage)
+                )
+              case Some("AdmittedSourceTargets") =>
+                checked(
+                  NormalizedScoreMass.sourceTargets(
+                    policies.universe.id,
+                    prior,
+                    temperature,
+                    entries,
+                    stage
+                  )
+                )
+              case _ => invalid("normalized.population", "unknown normalization population")
           yield result
         }
       )

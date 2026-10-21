@@ -363,3 +363,19 @@ enabling a publishing job, changing a release version or authorizing a release t
 
 Rejected alternatives: a new assembly dependency, silently resolving libraries at user runtime,
 flattening jars and merging unrelated resources, or using an unordered classpath wildcard.
+
+## 2026-10-21: fixed-basis source-conditional localization
+
+Owner authorized implementation of the general scoring correction in
+`bd-01M5EA1JDF877X4RZPJY6EFJDJ`. Add a versioned measured-semantic policy requiring a single
+positive semantic basis and no auxiliary priors. Disabled terms do not count as measurements;
+unavailable semantic values are not imputed. Normalize equally over nominated admitted source
+targets, not fidelity states or external floors. Attach typed conditioning to the exported
+measure and its identity. This establishes a conditional location, not source membership.
+Preserve historical policy factories and rendering. Consumers unable to retain conditioning
+must refuse it. The evaluation and falsifiers are frozen in the
+[scoring protocol](../plans/2026-10-21-scoring-correction.md).
+
+Rejected alternative: a heterogeneous observed-term sum without rescaling makes sparsely
+described targets artificially cheaper. A general entailment score is also outside this slice:
+symmetric chart compatibility does not establish directional event support.

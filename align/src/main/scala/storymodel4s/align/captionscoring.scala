@@ -162,7 +162,8 @@ object CaptionScoring:
       val config: StrictCandidateConfig,
       val inventory: RecallInventory,
       val evidence: LocalEvidence,
-      val selectedLevel: Int
+      val selectedLevel: Int,
+      val contentPolicy: ContentCostPolicy
   ):
     val identity: Checksum = MappingRender.digest(
       Vector(
@@ -175,7 +176,9 @@ object CaptionScoring:
         MappingRender.optional(config.space),
         evidence.identity.checksum.hex
       ) ++ (if selectedLevel == 0 then Vector.empty
-            else Vector("selected-level/v1", selectedLevel.toString))
+            else Vector("selected-level/v1", selectedLevel.toString)) ++
+        (if contentPolicy == ContentCostPolicy.HistoricalV1 then Vector.empty
+         else Vector(contentPolicy.toString))
     )
     override def equals(other: Any): Boolean = other match
       case p: Produced => identity == p.identity
@@ -187,7 +190,8 @@ object CaptionScoring:
       session: Session,
       inventory: RecallInventory,
       config: StrictCandidateConfig,
-      selectedLevel: Int = 0
+      selectedLevel: Int = 0,
+      contentPolicy: ContentCostPolicy = ContentCostPolicy.HistoricalV1
   ): Either[AlignError, Produced] =
     for
       _ <- Either.cond(
@@ -212,7 +216,8 @@ object CaptionScoring:
         functionPrior = FunctionPrior.none,
         externalMismatch = 0.0,
         distortionPenalty = 0.0,
-        captionSession = Some(session)
+        captionSession = Some(session),
+        contentPolicy = contentPolicy
       )
       evidence <- LocalEvidence.compute(session.recall, session.view, candidates, model)
-    yield new Produced(session, config, inventory, evidence, selectedLevel)
+    yield new Produced(session, config, inventory, evidence, selectedLevel, contentPolicy)

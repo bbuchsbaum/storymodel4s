@@ -290,7 +290,8 @@ private[align] object MappingResultRender:
               number(m.temperature),
               weighted(m.mass),
               m.stage.digest.hex
-            )
+            ) ++ (if m.population == NormalizationPopulation.SuppliedDestinations then Vector.empty
+                  else Vector(m.population.scope))
           )
         )
       ),

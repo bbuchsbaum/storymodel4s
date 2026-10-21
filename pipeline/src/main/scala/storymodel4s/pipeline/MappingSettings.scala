@@ -137,14 +137,14 @@ private[pipeline] object MappingSettings:
       local <- obj("onnx") match
         case None =>
           Either.cond(
-            config.profile != MappingPipeline.OnnxProfile,
+            !Set(MappingPipeline.OnnxProfile, MappingPipeline.OnnxSourceProfile)(config.profile),
             None,
             FacadeFailure.InvalidConfiguration
           )
         case Some(settings) =>
           for
             _ <- Either.cond(
-              config.profile == MappingPipeline.OnnxProfile &&
+              Set(MappingPipeline.OnnxProfile, MappingPipeline.OnnxSourceProfile)(config.profile) &&
                 settings.asObject.exists(
                   _.keys.toSet == Set("model", "tokenizer", "keyFile", "keyId")
                 ),
