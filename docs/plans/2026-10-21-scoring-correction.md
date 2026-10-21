@@ -447,3 +447,51 @@ earlier death, hypothetical future bodies, wrong-person matches, repeated valid 
 ASR alternatives and timestamp offsets across cuts. Preserve missing evidence separately from
 contradiction. This is the next scoped implementation/evaluation proposal, not an executed
 fusion result; the parent accuracy acceptance remains open.
+
+
+### Authorized native-interval audio/caption retrieval experiment
+
+Outcome: determine whether retained ASR adds supported candidates beyond caption-only lexical
+and semantic retrieval. The independent formulation review selected native-interval channel-union
+retrieval v1; no blocking finding. Scope is a test-only diagnostic using the pinned MiniLM ONNX
+adapter and existing local data. Production scoring, public types and dependencies stay unchanged.
+
+Freeze the original 1,000 detail intervals and original captions. For each interval use complete
+ASR decoder segments with positive overlap, in time order, without padding. Preserve central word
+and complete segment times separately: words outside the interval provide context, not direct
+interval ownership. The instantaneous interval remains in the gallery without invented duration.
+Audio and visual media hashes must agree. No concatenation across channels is used for embeddings.
+
+Embed the three channels separately with the existing 256-token limit. Refusals, missing channels
+and flat score vectors abstain. Each channel uses cosine competition ranks; exact similarity ties
+share rank and use a frozen query/target hash for presentation. Audio-plus-visual and all-channel
+arms use the minimum available within-channel rank, breaking ties with the same frozen hash.
+Duplicating agreement adds no vote. This is an explicit retrieval baseline, not entailment,
+calibrated fusion or a probability of source membership.
+
+Use the existing fixed 24 recall units as development evidence; retain units 92/93 as separate known
+case diagnostics. Pool the three single-channel top-three lists plus the original lexical caption
+control. The fused top-three candidates must be contained in this pool. An independent agent judges
+original images and retained ASR without seeing ranks, scores, generated captions or human text,
+then freezes those judgments before reading human annotations. Keep visual depiction, machine
+transcript assertion, interval versus context support, identity uncertainty and temporal reference
+separate. Machine ASR support does not establish recognition accuracy without listening. Facts from
+human text cannot establish that the no-human-text inputs supplied them. Original source samples
+can reveal caption omissions, which must be distinguished from support actually in model inputs.
+
+Report paired supported top-one/top-three gains and losses, unknown/partial/contradicted outcomes,
+abstention coverage and channel availability with all 24 units in denominators. These pooled labels
+cannot establish exhaustive relevant-target recall or full-gallery MRR. The no-human-text arms still
+use human-derived segmentation and are not end-to-end annotation-free. Invented cyclist contrasts
+characterize paraphrase retrieval, wrong-person, sleeping, negated, earlier-reference, hypothetical
+and unrelated statements. Embedding similarities on these contrasts must not be reported as
+successful entailment decisions. A local text-support critic is deferred until candidate findings
+show whether audio adds useful support; it is not silently assumed in this retrieval baseline.
+
+Local freeze: `.agent-work/audiovisual-20261021/experiment/freeze.json`, binding source, transcript,
+recall, sample, lexical control, script and 3,060 submitted requests. Primary implementation paths
+are `tools/event_fusion_probe.py`, its synthetic tests, and test-only `OnnxTextProbe.scala`.
+Acceptance checks: Python tests, scoped fatal-warning `embedBench/test`, final formatting, a
+compiled guard mutation with named failure, exact-revision independent review and blind support
+judgments. The next action after those observations is to retain, reject or extend this baseline
+on evidence; scientific acceptance of the parent accuracy issue remains separate.
