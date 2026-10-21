@@ -9,7 +9,9 @@ import argparse
 import copy
 import csv
 import hashlib
+import itertools
 import json
+import math
 from pathlib import Path
 import subprocess
 import time
@@ -327,6 +329,140 @@ def summarize(args):
     print(f"Summarized {len(rows)} judgments across {len(result)} arms")
 
 
+def ranked_prices(rows, column):
+    available = []
+    for row in rows:
+        if row[column] == "missing":
+            continue
+        value = float(row[column])
+        if not math.isfinite(value) or not 0 <= value <= 1:
+            raise ValueError("invalid observed retrieval price")
+        available.append(
+            {"row": int(row["row"]), "target": row["target"], "cost": value}
+        )
+    available.sort(key=lambda r: (r["cost"], r["target"]))
+    if not available:
+        return {
+            "status": "unavailable",
+            "availableTargets": 0,
+            "bestTieCount": 0,
+            "top": [],
+        }
+    flat = available[0]["cost"] == available[-1]["cost"]
+    return {
+        "status": "flat" if flat else "ranked",
+        "availableTargets": len(available),
+        "bestTieCount": sum(r["cost"] == available[0]["cost"] for r in available),
+        "top": [] if flat else available[:3],
+    }
+
+
+def changed_top(low, high, count):
+    return [r["target"] for r in low["top"][:count]] != [
+        r["target"] for r in high["top"][:count]
+    ]
+
+
+def pool(args):
+    sample = read(args.sample)
+    graph = read(args.recall)["graph"]["units"]
+    by_ordinal = {u["ordinal"]: u for u in graph}
+    selected = {u["ordinal"]: u for u in sample["units"]}
+    output = Path(args.output)
+    output.mkdir(exist_ok=False)
+    rankings, queries = [], []
+    gallery = None
+    seen = set()
+    with Path(args.scores).open(encoding="utf-8") as stream:
+        groups = itertools.groupby(
+            csv.DictReader(stream, delimiter="\t"), key=lambda r: int(r["unit"])
+        )
+        for ordinal, group in groups:
+            if ordinal in seen:
+                raise ValueError("price matrix repeats a noncontiguous query")
+            seen.add(ordinal)
+            rows = list(group)
+            current = {(int(r["row"]), r["target"]) for r in rows}
+            if len(current) != len(rows) or len(current) != 1000:
+                raise ValueError("incomplete or duplicate gallery")
+            if gallery is None:
+                gallery = current
+            if current != gallery:
+                raise ValueError("query galleries differ")
+            arms = {
+                k: ranked_prices(rows, k)
+                for k in ("low_v", "high_v", "low_av", "high_av")
+            }
+            rankings.append(
+                {
+                    "unit": ordinal,
+                    "arms": arms,
+                    "changedPrices": sum(r["low_v"] != r["high_v"] for r in rows),
+                }
+            )
+            if ordinal not in selected:
+                continue
+            unit = selected[ordinal]
+            if (
+                unit["id"] != by_ordinal[ordinal]["id"]
+                or unit["text"] != by_ordinal[ordinal]["text"]
+            ):
+                raise ValueError("sample differs from checked recall export")
+            candidates = {r["row"] for a in ("low_v", "high_v") for r in arms[a]["top"]}
+            order = sorted(
+                candidates,
+                key=lambda row: hashlib.sha256(
+                    f"caption-confirm-pool-v1:{ordinal}:{row}".encode()
+                ).hexdigest(),
+            )
+            context = [
+                {"ordinal": n, "text": by_ordinal[n]["text"]}
+                for n in range(max(0, ordinal - 2), min(len(graph), ordinal + 3))
+            ]
+            queries.append(
+                {
+                    "unit": ordinal,
+                    "id": unit["id"],
+                    "text": unit["text"],
+                    "contextForInterpretationOnly": context,
+                    "candidates": [
+                        {"pair": f"u{ordinal}-r{row}", "row": row} for row in order
+                    ],
+                }
+            )
+    if len(seen) != 173 or not set(selected).issubset(seen) or len(queries) != 24:
+        raise ValueError("comparison does not cover the frozen query populations")
+    write_new(
+        output / "rankings.json",
+        {
+            "scope": "Full-cut prices, not normalized mapping weights.",
+            "units": rankings,
+        },
+    )
+    write_new(
+        output / "pooled-queries.json",
+        {
+            "scope": "Candidate order hides ranks and arms. Context is not scored.",
+            "queries": queries,
+        },
+    )
+    summary = {
+        "units": len(seen),
+        "targets": len(gallery),
+        "sampledQueries": len(queries),
+        "pooledPairs": sum(len(q["candidates"]) for q in queries),
+        "changedPriceQueries": sum(r["changedPrices"] > 0 for r in rankings),
+        "changedTop1": sum(
+            changed_top(r["arms"]["low_v"], r["arms"]["high_v"], 1) for r in rankings
+        ),
+        "changedTop3": sum(
+            changed_top(r["arms"]["low_v"], r["arms"]["high_v"], 3) for r in rankings
+        ),
+    }
+    write_new(output / "summary.json", summary)
+    print(json.dumps(summary, sort_keys=True))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -345,6 +481,10 @@ def main():
     for field in ("assessment", "references", "key", "output"):
         report.add_argument(f"--{field}", required=True)
     report.set_defaults(function=summarize)
+    pooling = commands.add_parser("pool")
+    for name in ("scores", "sample", "recall", "output"):
+        pooling.add_argument(f"--{name}", required=True)
+    pooling.set_defaults(function=pool)
     args = parser.parse_args()
     args.function(args)
 

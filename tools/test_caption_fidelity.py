@@ -6,6 +6,8 @@ import unittest
 
 from caption_fidelity import (
     assessment_summary,
+    changed_top,
+    ranked_prices,
     requests,
     stratified_selection,
     validate_outcome,
@@ -166,6 +168,34 @@ class StratifiedSelectionTest(unittest.TestCase):
     def test_exhausted_stratum_refuses_instead_of_sampling_another_period(self):
         with self.assertRaises(ValueError):
             stratified_selection([{"id": "0"}, {"id": "1"}], {"0"}, "fixed", 2)
+
+
+class RetrievalRankingTest(unittest.TestCase):
+    def test_missing_and_flat_prices_remain_different_statuses(self):
+        missing = [{"row": "1", "target": "a", "price": "missing"}]
+        flat = [{"row": str(n), "target": str(n), "price": "1"} for n in [1, 2]]
+        self.assertEqual(ranked_prices(missing, "price")["status"], "unavailable")
+        self.assertEqual(ranked_prices(flat, "price")["status"], "flat")
+        self.assertEqual(ranked_prices(flat, "price")["top"], [])
+
+    def test_ties_use_stable_source_key_and_report_their_size(self):
+        rows = [
+            {"row": str(n), "target": key, "price": str(value)}
+            for n, key, value in [(1, "z", 0.2), (2, "a", 0.2), (3, "c", 0.8)]
+        ]
+        result = ranked_prices(rows, "price")
+        self.assertEqual([r["target"] for r in result["top"]], ["a", "z", "c"])
+        self.assertEqual(result["bestTieCount"], 2)
+
+    def test_price_change_is_not_misreported_as_target_rank_change(self):
+        low = {"top": [{"target": "a", "cost": 0.1}]}
+        high = {"top": [{"target": "a", "cost": 0.2}]}
+        self.assertFalse(changed_top(low, high, 1))
+        self.assertTrue(changed_top(low, {"top": [{"target": "b", "cost": 0.1}]}, 1))
+
+    def test_nonfinite_observation_is_not_a_rankable_value(self):
+        with self.assertRaises(ValueError):
+            ranked_prices([{"row": "1", "target": "a", "price": "nan"}], "price")
 
 
 if __name__ == "__main__":
