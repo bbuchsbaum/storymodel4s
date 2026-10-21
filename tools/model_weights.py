@@ -39,10 +39,10 @@ def fetch(path, entry):
     if path.exists() or path.is_symlink():
         verify(path, entry)
         return
-    path.parent.mkdir(parents=True, exist_ok=True)
     # Refuse writes through symlinked parents; verified existing files remain readable.
     if path.parent.resolve() != path.parent.absolute():
         raise ValueError(f"Download parent contains a symlink: {path.parent}")
+    path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix="." + path.name + "-", suffix=".part", dir=path.parent)
     temporary = Path(name)
     try:

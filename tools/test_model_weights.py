@@ -52,7 +52,7 @@ class Downloads(unittest.TestCase):
         real.mkdir()
         self.dest.parent.symlink_to(real, target_is_directory=True)
         with self.assertRaises(ValueError):
-            w.fetch(self.dest, self.entry)
+            w.fetch(self.dest.parent / "new-directory" / "model", self.entry)
         self.assertEqual(list(real.iterdir()), [])
 
     def test_path_traversal_refused(self):
