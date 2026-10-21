@@ -1,0 +1,142 @@
+{
+  "source_commit": "76339f0c98e817a7f0649272b387eeec43dd896d",
+  "manifest_sha256": "43e6507b767c1da84db86f042277300d90da122524a9300036e0044c70f714d8",
+  "migration": {
+    "schema_version": 1,
+    "manifest_sha256": "43e6507b767c1da84db86f042277300d90da122524a9300036e0044c70f714d8",
+    "script_sha256": "bbc5daf58ce30e7df593a16e0a7021d5f6bc064558cb4d8f40506107963b2566",
+    "volume": {
+      "VolumeUUID": "51B72C66-64BB-3C5F-8853-2219CA2FFA9F",
+      "MountPoint": "/Volumes/My Passport for Mac",
+      "VolumeName": "My Passport for Mac",
+      "Internal": false
+    },
+    "cache_root": "/Volumes/My Passport for Mac/data/models",
+    "selected": [
+      "whisper-cpu",
+      "whisper-mlx",
+      "parakeet-mlx",
+      "qwen3-asr-8bit",
+      "minilm-onnx"
+    ],
+    "phase": "complete",
+    "copies": [],
+    "aliases": [
+      {
+        "path": "data/media-tools/asr/apple-gpu/model/49e6aa286ad60c14352c404340ded53710378a11/weights.npz",
+        "target": "/Volumes/My Passport for Mac/data/models/mlx-community/whisper-large-v3-mlx/49e6aa286ad60c14352c404340ded53710378a11/weights.npz",
+        "bytes": 3083520416,
+        "sha256": "05ff791ce3630fae47e7c51004e9666204d786246ec07cac6110af768099b40d",
+        "previous_stat": [
+          16777232,
+          822907335,
+          3083520416,
+          1792531381370214296
+        ],
+        "outcome": "relocated"
+      },
+      {
+        "path": "tmp/onnx/model.onnx",
+        "target": "/Volumes/My Passport for Mac/data/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model.onnx",
+        "bytes": 90405214,
+        "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+        "previous_stat": [
+          16777232,
+          590103266,
+          90405214,
+          1788286091238689385
+        ],
+        "outcome": "relocated"
+      },
+      {
+        "path": ".agent-work/release-workflow-20261014/sherlock-source03/input/model.onnx",
+        "target": "/Volumes/My Passport for Mac/data/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model.onnx",
+        "bytes": 90405214,
+        "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",
+        "previous_stat": [
+          16777232,
+          777699964,
+          90405214,
+          1791984652234670880
+        ],
+        "outcome": "relocated"
+      }
+    ],
+    "relocated_bytes": 3264330844
+  },
+  "weight_paths": [
+    {
+      "model": "whisper-cpu",
+      "path": "data/models/faster-whisper-large-v3/edaa852ec7e145841d8ffdb056a99866b5f0a478/model.bin",
+      "target": "/Volumes/My Passport for Mac/data/models/Systran/faster-whisper-large-v3/edaa852ec7e145841d8ffdb056a99866b5f0a478/model.bin",
+      "bytes": 3087284237,
+      "sha256": "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1"
+    },
+    {
+      "model": "whisper-mlx",
+      "path": "data/media-tools/asr/apple-gpu/model/49e6aa286ad60c14352c404340ded53710378a11/weights.npz",
+      "target": "/Volumes/My Passport for Mac/data/models/mlx-community/whisper-large-v3-mlx/49e6aa286ad60c14352c404340ded53710378a11/weights.npz",
+      "bytes": 3083520416,
+      "sha256": "05ff791ce3630fae47e7c51004e9666204d786246ec07cac6110af768099b40d"
+    },
+    {
+      "model": "parakeet-mlx",
+      "path": "data/media-tools/asr/comparison-20261020/model/ed2b7e8c15f9aaa0b5772e2efb986255eaef7e15/model.safetensors",
+      "target": "/Volumes/My Passport for Mac/data/models/mlx-community/parakeet-tdt-0.6b-v3/ed2b7e8c15f9aaa0b5772e2efb986255eaef7e15/model.safetensors",
+      "bytes": 2508288736,
+      "sha256": "05e01c7f396c298cf7d23f61da7b504adeab698f0aaeafd9c82d198625464592"
+    },
+    {
+      "model": "minilm-onnx",
+      "path": "data/models/onnx/model.onnx",
+      "target": "/Volumes/My Passport for Mac/data/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/model.onnx",
+      "bytes": 90405214,
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    },
+    {
+      "model": "minilm-onnx",
+      "path": "tmp/onnx/model.onnx",
+      "target": "/Volumes/My Passport for Mac/data/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model.onnx",
+      "bytes": 90405214,
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    },
+    {
+      "model": "minilm-onnx",
+      "path": ".agent-work/release-workflow-20261014/sherlock-source03/input/model.onnx",
+      "target": "/Volumes/My Passport for Mac/data/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/onnx/model.onnx",
+      "bytes": 90405214,
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    }
+  ],
+  "all_weight_paths_logical_bytes": 8950309031,
+  "pin_hashes_unchanged": {
+    "data/media-tools/asr/model-pin.json": "f0086121ed8e617c4d7af4d228b0a8ea44d3b13ac1919944dee2237c8128d004",
+    "data/media-tools/asr/apple-gpu/model-pin.json": "1f18ae0b2da60a4d4ee166063b72339d5f3e3fcc00ca089a787eccd2237dfcfc",
+    "data/media-tools/asr/comparison-20261020/model-pin.json": "694f8cc3f421ec72c23bf2f3e22dd69ca844095a5d3780e6261f75fdcdca19f3",
+    "data/models/Qwen3-ASR-1.7B-8bit.external.json": "f1dd79e5251b4a96b56a782c8b0d2d42a06cdf053bd75972539c36e5573573bd",
+    "media/src/test/resources/f0/f0-v1.caption-request.json": "d18bcb63bc6e293f5a3da3172585218d5f3c6fbe567b43a42298b28ae7b0ade4"
+  },
+  "checks": {
+    "unit_passed": 15,
+    "unit_failed": 0,
+    "public_small_downloads_verified": 6,
+    "full_cache_readback": "all five selected bundles during migration",
+    "legacy_weight_readback": "new links during replacement; existing shared targets verified in cache phase; alternate MiniLM target separately hashed",
+    "legacy_small_assets_verified": true
+  },
+  "deferred": {
+    "model": "qwen3-vl-4b",
+    "reason": "Excluded from every copy/relocation invocation to preserve the experiment; entire workflow clearance required before migration",
+    "local_weight_bytes": 8875719344
+  },
+  "independent_review": {
+    "verdict": "PASS",
+    "commit": "76339f0c98e817a7f0649272b387eeec43dd896d",
+    "scope": "explicit five-ID non-VL migration; 14 safety courts independently rerun in isolated export"
+  },
+  "prior_migration": {
+    "receipt": "data/models/weights-passport-20261021.json",
+    "sha256": "6ae3df9c7309c054c098a0c4d7db190cd3195492d89b76ad44cd4004e38015e8",
+    "logical_bytes": 5685978187
+  }
+}

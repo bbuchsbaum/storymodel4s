@@ -3,7 +3,10 @@
 Model weights live outside the checkout. The tracked
 [manifest](../../tools/model-assets/manifest.json) pins the repository, full immutable
 revision, download URL, byte count and SHA-256 of every required asset. The stdlib-only
-[manager](../../tools/model-assets.py) downloads or verifies them without running inference.
+[manager](../../tools/model-assets.py) requires Python 3.11+ and downloads or verifies them
+without running inference. It extends the earlier [four-model download utility](../model-weights.md)
+with MLX Whisper, Qwen3-VL, compatibility links and explicit migration. Tests check that
+shared model pins agree; existing utility files and paths are preserved.
 
 ```sh
 python3 tools/model-assets.py list
@@ -82,3 +85,10 @@ verified cached files. No model weights, participant data or large generated out
 ```sh
 python3 -m unittest discover -s tools -p 'test_model_assets.py' -v
 ```
+
+The [2026-10-21 storage receipt](../../tools/model-assets/storage-receipt-20261021.json)
+records six external weight aliases (8.95 GB logical), including 3.26 GB relocated by this
+pass after earlier work moved 5.69 GB. Qwen3-VL's 8.88 GB remains local and is excluded
+from migration pending whole-experiment clearance. The
+[download witness](../../tools/model-assets/download-witness-20261021.json) records one
+actual checksum-verified public download per model; it does not qualify inference quality.

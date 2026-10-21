@@ -171,6 +171,18 @@ class ModelAssetsTests(unittest.TestCase):
             m.contained_volume_root(parent/'models', mount)
         m.contained_volume_root(mount/'safe'/'models', mount)
 
+    def test_existing_download_utility_pins_remain_consistent(self):
+        older = json.loads(Path(m.__file__).with_name('model-weights.json').read_text())
+        current = {(model['repo'], model['revision']): model
+                   for model in m.read_manifest(m.MANIFEST)['models']}
+        for model in older['models'].values():
+            by_url = {record['url']: record for record in
+                      current[(model['repo'], model['revision'])]['files'].values()}
+            for record in model['files'].values():
+                shared = by_url[record['url']]
+                self.assertEqual((shared['bytes'], shared['sha256']),
+                                 (record['bytes'], record['sha256']))
+
     def test_late_open_guard_mutation_is_killed(self):
         source = Path(m.__file__).read_text()
         guard = "require(not open_paths([path]), 'Weight became open before replacement: ' + str(path))"

@@ -1,0 +1,59 @@
+{
+  "source": "actual pinned HTTPS downloads through fetch_asset; no inference",
+  "assets": [
+    {
+      "model": "whisper-cpu",
+      "file": "config.json",
+      "url": "https://huggingface.co/Systran/faster-whisper-large-v3/resolve/edaa852ec7e145841d8ffdb056a99866b5f0a478/config.json",
+      "bytes": 2394,
+      "sha256": "a9306624f5ec14270a014b647e5c316b6e03a662c369758d1b90697a7b0655b9",
+      "upstream_git_blob": "75336feae814999bae6ccccdecf177639ffc6f9d",
+      "verified": true
+    },
+    {
+      "model": "whisper-mlx",
+      "file": "config.json",
+      "url": "https://huggingface.co/mlx-community/whisper-large-v3-mlx/resolve/49e6aa286ad60c14352c404340ded53710378a11/config.json",
+      "bytes": 269,
+      "sha256": "34982ce6ae286095000f82ae9583b3431639e8b092bf60c961f203745e6500e3",
+      "upstream_git_blob": "2c626df3c540bdc0287b11725441d10e1af73680",
+      "verified": true
+    },
+    {
+      "model": "parakeet-mlx",
+      "file": "config.json",
+      "url": "https://huggingface.co/mlx-community/parakeet-tdt-0.6b-v3/resolve/ed2b7e8c15f9aaa0b5772e2efb986255eaef7e15/config.json",
+      "bytes": 244093,
+      "sha256": "f320f1292511f34ec47f513755fe20fd01dbfc09a925d42730e66059a6e1ef4c",
+      "upstream_git_blob": "4f469c2e92c981861f7ce6bcd940e608401d931e",
+      "verified": true
+    },
+    {
+      "model": "qwen3-asr-8bit",
+      "file": "config.json",
+      "url": "https://huggingface.co/mlx-community/Qwen3-ASR-1.7B-8bit/resolve/a8379a2e2f9e313c9292cdf1af4055ab56d50d55/config.json",
+      "bytes": 7188,
+      "sha256": "1b76b3b6c655fc54595da025f7a96474ad9fa86363303fbdd61a7d8483ccfaf7",
+      "upstream_git_blob": "888cc7fae19ea9ede543b1ae82e9c78aa06104ca",
+      "verified": true
+    },
+    {
+      "model": "qwen3-vl-4b",
+      "file": "config.json",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct/resolve/ebb281ec70b05090aa6165b016eac8ec08e71b17/config.json",
+      "bytes": 1505,
+      "sha256": "edac7703329133edfc53e46ac0081835144c99d7eebf28b71c732694d435224d",
+      "upstream_git_blob": "22be8bb79043d39840ca5e70d7a2dab80311602c",
+      "verified": true
+    },
+    {
+      "model": "minilm-onnx",
+      "file": "tokenizer.json",
+      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer.json",
+      "bytes": 466247,
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+      "upstream_git_blob": "cb202bfe2e3c98645018a6d12f182a434c9d3e02",
+      "verified": true
+    }
+  ]
+}
