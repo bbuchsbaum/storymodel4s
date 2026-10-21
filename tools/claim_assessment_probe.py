@@ -200,6 +200,10 @@ def verify_freeze(root):
         raise ValueError("harness changed after freeze")
     if freeze["prompt"] != PROMPT or freeze["promptSha256"] != hashlib.sha256(PROMPT.encode()).hexdigest():
         raise ValueError("prompt changed")
+    for name in ("requests.json", "questions.json"):
+        path = (root / name).absolute()
+        if freeze["inputs"].get(str(path)) != sha(path):
+            raise ValueError("consumed input is not bound to this frozen experiment")
     for path, digest in freeze["inputs"].items():
         if sha(path) != digest:
             raise ValueError("frozen input changed")

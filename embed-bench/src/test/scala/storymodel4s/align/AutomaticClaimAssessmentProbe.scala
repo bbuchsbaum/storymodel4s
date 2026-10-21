@@ -19,6 +19,16 @@ object AutomaticClaimAssessmentProbe:
     j.hcursor.get[A](name).fold(throw _, identity)
   private def json(path: Path): Json = parse(Files.readString(path, UTF_8)).fold(throw _, identity)
   private def hash(path: Path): String = Checksum.ofBytes(Files.readAllBytes(path)).hex
+
+  /** Bind the actual consumed file to this frozen experiment, including its absolute path. */
+  private[align] def checkedInput(path: Path, freeze: Json): Json =
+    val absolute = path.toAbsolutePath.normalize()
+    require(
+      field[Map[String, String]](freeze, "inputs").get(absolute.toString).contains(hash(absolute)),
+      "consumed input is not bound to this frozen experiment"
+    )
+    json(absolute)
+
   private val arms = Vector("audio", "visual", "audio_visual")
   private val reasons = Map(
     "source_unavailable" -> ClaimAssessmentUnknown.SourceUnavailable,
@@ -128,8 +138,9 @@ object AutomaticClaimAssessmentProbe:
         field[String](execution, "outputsSha256") == hash(root.resolve("outputs.jsonl")),
       "execution content differs"
     )
-    val requestRows = field[Vector[Json]](json(root.resolve("requests.json")), "requests")
-    val qs = field[Vector[Json]](json(root.resolve("questions.json")), "questions")
+    val requestRows =
+      field[Vector[Json]](checkedInput(root.resolve("requests.json"), freeze), "requests")
+    val qs = field[Vector[Json]](checkedInput(root.resolve("questions.json"), freeze), "questions")
     require(
       qs.map(questionId).distinct.size == qs.size && qs.nonEmpty,
       "duplicate or empty questions"

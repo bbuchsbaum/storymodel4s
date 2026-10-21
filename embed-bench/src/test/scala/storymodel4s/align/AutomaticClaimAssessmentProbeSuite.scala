@@ -3,6 +3,8 @@ package storymodel4s.align
 import io.circe.Json
 import io.circe.syntax.*
 import munit.FunSuite
+import java.nio.file.Files
+import storymodel4s.core.Checksum
 
 /** Original synthetic protocol tokens; no narrative, media or participant material. */
 class AutomaticClaimAssessmentProbeSuite extends FunSuite:
@@ -39,6 +41,32 @@ class AutomaticClaimAssessmentProbeSuite extends FunSuite:
     "proposal" -> proposal,
     "raw" -> raw.noSpaces.asJson
   )
+
+  test("consumed input must have the frozen path and content") {
+    val owned = Files.createTempFile("claim-owned-", ".json")
+    val copied = Files.createTempFile("claim-copy-", ".json")
+    try
+      val _ = Files.writeString(owned, "{}")
+      val _ = Files.writeString(copied, "{}")
+      val freeze = Json.obj(
+        "inputs" -> Json.obj(
+          owned.toAbsolutePath
+            .normalize()
+            .toString -> Checksum.ofBytes(Files.readAllBytes(owned)).hex.asJson
+        )
+      )
+      assertEquals(AutomaticClaimAssessmentProbe.checkedInput(owned, freeze), Json.obj())
+      intercept[IllegalArgumentException] {
+        AutomaticClaimAssessmentProbe.checkedInput(copied, freeze)
+      }
+      val _ = Files.writeString(owned, "[]")
+      intercept[IllegalArgumentException] {
+        AutomaticClaimAssessmentProbe.checkedInput(owned, freeze)
+      }
+    finally
+      Files.delete(owned)
+      Files.delete(copied)
+  }
 
   test("matching raw proposal and owned quote are accepted") {
     assertEquals(AutomaticClaimAssessmentProbe.checkedProposal(request, output), Some(proposal))

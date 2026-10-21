@@ -1,6 +1,9 @@
 """Original synthetic protocol strings only; no narrative, media or participant material."""
 import json
 import unittest
+import tempfile
+from pathlib import Path
+import claim_assessment_probe as probe
 from claim_assessment_probe import payload, status, validate_proposal
 
 
@@ -82,6 +85,28 @@ class ClaimAssessmentProbeTests(unittest.TestCase):
         for arm in ("audio", "audio_visual"):
             self.assertEqual(payload(question, arm, targets)['intervals'][0]['centralWords'], [word])
         self.assertNotIn('centralWords', payload(question, 'visual', targets)['intervals'][0])
+
+    def test_consumed_files_must_belong_to_the_exact_frozen_experiment(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td).absolute()
+            originals = root / 'original'; originals.mkdir()
+            copy = root / 'copy'; copy.mkdir()
+            for name in ('requests.json', 'questions.json'):
+                (originals / name).write_text('{}')
+                (copy / name).write_text('{}')
+            freeze = dict(harness=dict(sha256=probe.sha(probe.__file__)), prompt=probe.PROMPT,
+                          promptSha256=probe.hashlib.sha256(probe.PROMPT.encode()).hexdigest(),
+                          inputs={str(originals / name): probe.sha(originals / name)
+                                  for name in ('requests.json', 'questions.json')},
+                          worker=dict(path=probe.__file__, sha256=probe.sha(probe.__file__)))
+            for path in (originals, copy):
+                (path / 'freeze.json').write_text(json.dumps(freeze))
+            self.assertEqual(probe.verify_freeze(originals), freeze)
+            with self.assertRaisesRegex(ValueError, 'consumed input'):
+                probe.verify_freeze(copy)
+            (originals / 'requests.json').write_text('{"changed":true}')
+            with self.assertRaisesRegex(ValueError, 'consumed input'):
+                probe.verify_freeze(originals)
 
     def test_duplicate_citations_and_item_ids_are_refused(self):
         link = dict(evidence_id="e", quote="signal=on")
