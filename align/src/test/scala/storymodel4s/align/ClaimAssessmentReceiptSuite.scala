@@ -391,4 +391,29 @@ class ClaimAssessmentReceiptSuite extends FunSuite:
     assert(receipt(cs = Vector(citation.copy(chart = Some(reference)))).isRight)
     val wrong = reference.copy(owner = event.support.identity)
     assert(receipt(cs = Vector(citation.copy(chart = Some(wrong)))).isLeft)
+    val otherSource = SourceRepresentation
+      .of(
+        view,
+        cats.data.NonEmptyVector.one(BundleEntry.text(Checksum.ofText("another source edition"))),
+        None,
+        view.nodes.map(n => n.ref -> SourceSupportStatus.located(n.support)).toMap
+      )
+      .toOption
+      .get
+    val otherMapping = HistoricalMapping
+      .of(result, recall, view, inventory(recall), otherSource, HistoricalDecode.ArgmaxOnly)
+      .toOption
+      .get
+    val otherOwner =
+      ClaimAssessmentReceipt.sourceChartOwner(otherMapping, event.ref, event.support)
+    assertNotEquals(otherSource.digest, mapping.source.digest)
+    assertNotEquals(otherOwner, owner)
+    def onOther(ref: ClaimChartReference) = ClaimAssessmentReceipt.checked(
+      otherMapping,
+      Vector(question),
+      Vector(citation.copy(chart = Some(ref))),
+      Vector(submission())
+    )
+    assert(onOther(reference.copy(owner = otherOwner)).isRight)
+    assert(onOther(reference).isLeft)
   }

@@ -640,3 +640,50 @@ evidence quotations, but proposals and matching quotations are not a semantic gu
 claim extraction, evidence ownership, contextual reasoning and verdicts independently before
 allowing those outputs to affect veridicality. This is the next design constraint, not an executed
 claim-level implementation or an accuracy result from the current embedding experiment.
+
+### Executed first milestone: attributed claim assessment
+
+Child `bd-01M5FGET6020C9B1BC2YCBKY52` implements an additive `ClaimAssessmentReceipt` in
+`align`, under the owner-authorized amendment to ADR 0022. A receipt preserves the original
+`MappingResult` and separately records a fixed question population, reviewed recall spans,
+claim spans, source citations, chart references, assessor/procedure attribution, support,
+counterevidence and unresolved reasons. Its checked constructor verifies ownership and complete
+accounting. It does not certify semantic truth, successful extraction or assessor identity.
+
+Each question has one derived status. Evidence supporting and contradicting a claim remains
+separately inspectable; conflicts cannot cancel into a resolved verdict. Incomplete context can
+retain supporting evidence while remaining unresolved. An unresolved participant can retain an
+expressed action and its evidence. Reviewed nonexpression, failed extraction and unavailable
+source evidence are different states. All declared questions stay in the population, including
+unresolved cases. Repeating a citation does not multiply question credit. Counts are descriptive
+accounting, not calibrated veridicality or participant accuracy.
+
+The independently reviewed synthetic diagnostic in `ClaimAssessmentContrast` uses a deliberately
+narrow, test-only comparison rule: exact canonical proposition, supplied event/entity identity,
+one atomic root assertion and explicit polarity. Identical assertions support; opposite explicit
+polarity on the same proposition supplies counterevidence. Other predicate/participant mismatch,
+unknown identity, different event, embedded content and unmodeled alternatives abstain. Paraphrase
+equivalence and correspondence are supplied, not extracted. The disjunction control checks
+abstention on unmodeled content; the perhaps control deliberately withholds chart polarity and
+does not qualify modality interpretation.
+
+All 17 frozen expected outcomes match: three supported, two contradicted, eight unresolved, and
+one each conflicted, reviewed-not-expressed, extraction-unresolved and reference-unresolved.
+There are 15 expressed questions and five resolved questions. One compound recollection has a
+supported clause and a contradicted clause assigned to the same recall unit and source event,
+with distinct claim spans and unchanged event mapping. These results establish controlled
+mechanism behavior, not an improvement on Sherlock or another corpus.
+
+The local artifact `.agent-work/claim-assessment-20261021/controlled-report.json` contains the
+complete synthetic mapping, question rows, citation support, chart owners/elements/provenance,
+recall scopes, supplied correspondence and procedure attribution. `controlled-report.md` provides
+a readable table. The checked-in diagnostic regenerates the JSON; this local report format is
+not a new production interchange contract. No source-media or participant transcript entered Git.
+
+The next acceptance boundary is automatic evidence construction. Freeze a source/recall pool and
+independent claim judgments before comparing extraction/caption candidates. Compare audio-only,
+visual-only, their combination, and optional human annotations against the same questions; keep
+missing extraction and source evidence visible. Measure false support, false contradiction and
+resolved coverage separately, then test cross-shot event/reference binding. Only after that
+comparison succeeds should a candidate face held-out participants and movies. The parent accuracy
+issue remains open; this milestone does not change the production scorer or captioner.
