@@ -9,6 +9,13 @@ One copy serves every worktree. `tools/data-root.sh` resolves the location as `$
 when set, otherwise `<main checkout>/data` through the git common dir, so a worktree under
 `.worktrees/` reads and writes the same files as the main checkout without symlinks.
 
+Large model weights are kept on WD Passport, with compatibility file symlinks at their
+existing paths. The tracked [model manifest](../tools/model-assets/manifest.json) and
+[download guide](../docs/guide/model-assets.md) provide pinned, checksum-verified downloads:
+`python3 tools/model-assets.py fetch minilm-onnx --link`. The default cache is
+`/Volumes/My Passport for Mac/data/models`; `STORYMODEL4S_MODEL_ROOT` selects another
+cache outside the checkout. Dataset/study storage and model-weight storage remain separate.
+
 ## Layout
 
 ```text
