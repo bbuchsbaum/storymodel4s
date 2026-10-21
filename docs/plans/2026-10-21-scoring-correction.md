@@ -602,3 +602,41 @@ input checks, synthetic results and `support-summary.json`. The executable local
 `.agent-work/audiovisual-20261021/summarize_support.py`; its hash and all label/rank/pool hashes are
 bound in the summary. `verification-before-judgments.json`, both mutation receipts, native/gate
 logs and the final review receipt remain at the parent artifact root.
+
+
+### Owner clarification: mixed true/false recollections require claim-level assessment
+
+The owner emphasized that false and partially false memories are central, not edge cases. The
+full-unit supported/not-supported retrieval diagnostic above is deliberately strict but is not a
+veridicality measure. It cannot answer how much of a compound recollection is correct, and its
+partial/unknown labels must not be renamed false memory.
+
+The required general separation is event correspondence versus claim-level veridicality. A recall
+can refer to the right source event while misstating a participant, object, state or causal detail.
+Preserve that event correspondence and separately assess each expressed claim, including polarity,
+modality, alternatives and temporal/reference context. Contradicting one facet must not erase
+supported facets or force the whole unit to a non-source destination. A contradictory facet can
+still help distinguish the intended event from unrelated events; localization is not certification.
+
+For each recall claim and candidate event, retain support, positive counterevidence and unresolved
+status with actual source provenance and interval/reference scope. Lack of depiction, absent
+captions, uncertain ASR, unresolved pronouns or a truncated sample is unresolved source evidence,
+not contradiction. A character's report, suspicion or later retraction retains its context; it does
+not silently establish a root-world fact. Disjunctions and uncertainty must not be strengthened into
+assertions during claim extraction. Several compatible source intervals may jointly support an
+event, while repeated descriptions of one utterance remain shared evidence.
+
+Evaluate event retrieval and claim assessment separately. The next reference set needs correct,
+partly contradictory, wholly contradictory and unresolvable recall variants about the SAME events,
+plus plausible but unrelated events and legitimate reordered recall. Freeze researcher judgments
+at the claim level without showing ranks, allow alternate event references, and retain unresolved
+claims in denominators/coverage. Measure false contradiction and false support separately from
+event correspondence, alongside partial factual coverage and the causes of unresolved assessment.
+A lower complete-unit hit count is not itself evidence of worse memory or more intrusions.
+
+No measured support/contradiction score becomes a calibrated probability, clinical inference or
+participant trait without its own qualification. A learned local critic can propose claim links and
+evidence quotations, but proposals and matching quotations are not a semantic guarantee. Test its
+claim extraction, evidence ownership, contextual reasoning and verdicts independently before
+allowing those outputs to affect veridicality. This is the next design constraint, not an executed
+claim-level implementation or an accuracy result from the current embedding experiment.
