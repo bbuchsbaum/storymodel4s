@@ -2,6 +2,7 @@
 
 import copy
 import math
+import random
 import unittest
 
 import event_fusion_probe as probe
@@ -49,6 +50,16 @@ class IntervalEvidenceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             probe.select_audio(0, 1, {"outcome": "failed"})
 
+    def test_clock_scale_must_be_verified_before_joining(self):
+        self.assertEqual(
+            probe.declared_scale({"numerator": "1", "denominator": "2500"}), 2500
+        )
+        for numerator, denominator in [(1, 1000), (2, 2500), (1, 0)]:
+            with self.assertRaises(ValueError):
+                probe.declared_scale(
+                    {"numerator": numerator, "denominator": denominator}
+                )
+
 
 class RankingTest(unittest.TestCase):
     def test_complementary_channels_retain_each_first_choice(self):
@@ -89,6 +100,23 @@ class RankingTest(unittest.TestCase):
         for b in [[0.0, 0.0], [1.0], [math.nan, 0.0]]:
             with self.assertRaises(ValueError):
                 probe.cosine([3.0, 0.0], b)
+
+    def test_combined_pool_inclusion_with_many_ties_and_missing_channels(self):
+        rng = random.Random(42031)
+        for unit in range(100):
+            channels = [
+                probe.rank_channel(
+                    unit,
+                    {
+                        row: rng.choice([None, 0.1, 0.1, 0.5, 0.9])
+                        for row in range(1, 61)
+                    },
+                )
+                for _ in range(3)
+            ]
+            pool = set().union(*(set(channel["top"]) for channel in channels))
+            for subset in [channels[:2], channels]:
+                self.assertTrue(set(probe.combine(unit, subset)["top"]).issubset(pool))
 
     def test_negative_contrasts_are_characterization_not_assumed_success(self):
         self.assertEqual(

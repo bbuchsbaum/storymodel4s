@@ -141,6 +141,13 @@ def controls():
     }
 
 
+def declared_scale(part):
+    numerator, denominator = int(part["numerator"]), int(part["denominator"])
+    if numerator != 1 or denominator != 2500:
+        raise ValueError("diagnostic requires the frozen 2500Hz media clock")
+    return denominator
+
+
 def prepare(args):
     config = read(args.config)
     source = pinned(config["source"])
@@ -171,6 +178,7 @@ def prepare(args):
         start = float(row["onset"])
         end = float(row["end"]) if row["end"].strip() else start
         view = by_annotation[part]
+        scale = declared_scale(view)
         hits = [
             p
             for p in view["proposals"]
@@ -179,7 +187,7 @@ def prepare(args):
         if len(hits) > 1:
             raise ValueError("ambiguous visual ownership")
         if hits and (
-            int(hits[0]["start"]) / 2500 != start or int(hits[0]["end"]) / 2500 != end
+            int(hits[0]["start"]) / scale != start or int(hits[0]["end"]) / scale != end
         ):
             raise ValueError("declared annotation/visual clocks differ")
         audio = select_audio(start, end, transcripts[part])
