@@ -495,3 +495,110 @@ Acceptance checks: Python tests, scoped fatal-warning `embedBench/test`, final f
 compiled guard mutation with named failure, exact-revision independent review and blind support
 judgments. The next action after those observations is to retain, reject or extend this baseline
 on evidence; scientific acceptance of the parent accuracy issue remains separate.
+
+
+### Native-interval experiment results: reject minimum-rank fusion as a replacement
+
+Native producer `be4a2c97e6415a04d79aa3e970c56fb171000cc8` completed all 3,060 requests in
+96 local provider calls, with no failed, missing or TooLong outcomes. Inputs comprise 880 audio,
+999 visual-caption and 1,000 human-text targets, 173 queries and eight invented contrasts. Audio
+absence is missing channel material, not evidence of silence or absent story content. The frozen
+1,000-target universe and all 24 development queries remain in every metric denominator.
+
+An independent agent inspected 197 source-image strips and rehashed every strip without a mismatch.
+The 250 pooled recall/target pairs were fixed as visual depiction, machine-transcript assertion and
+combined interval support before reading human annotations or generated captions. Combined AV
+source labels are eight supported, 100 partial, 141 unknown and one contradicted. Partial and
+unknown outcomes are not counted as erroneous recollections. The contradiction concerns a positive
+ASR statement with a conflicting classification, not missing depiction. Human-text contextual
+judgments were then fixed separately, adding one fully supported pair and six partial pairs.
+Aggregate arm counts were disclosed after the primary AV freeze; no target ranks were shown during
+either judgment stage. The reviewer had prior scene exposure from the earlier experiment.
+
+The primary table uses the SAME frozen AV-source reference for every ranking arm. This avoids
+crediting human-text arms with a richer reference than the no-human-text arms receive.
+
+| Retrieval input/policy | Supported first choice / 24 | Supported top-three / 24 |
+|---|---:|---:|
+| Original lexical caption control | 2 | 2 |
+| Audio embeddings | 0 | 1 |
+| Original-caption embeddings | 1 | 2 |
+| Human-annotation embeddings | 3 | 5 |
+| Audio + captions, minimum rank | 0 | 2 |
+| All three, minimum rank | 0 | 3 |
+
+Audio-plus-caption minimum rank loses both supported lexical first choices. Its top-three lists
+have one supported gain (unit 42) and one loss (26), hence no net gain. Against caption embeddings,
+it adds no supported top-three query and loses the supported first choice at unit 42. All-channel
+minimum rank gains top-three queries 42 and 168 versus lexical captions but loses 26; it also loses
+both supported first choices. Audio alone retrieves a valid target for unit 168 in its top three,
+which the audio-plus-caption policy drops. Human embeddings recover supported top-three targets
+for units 3, 26, 42, 74 and 168. None of these within-film observations is an independent accuracy
+qualification, and no policy is tuned on the observed outcomes.
+
+The lexical control has 12 unknown, eight partial, two supported first choices and two flat-vector
+abstentions. Audio has 11 unknown, 12 partial and one contradicted first choice. Caption embeddings
+have 11 unknown, 12 partial and one supported first choice. Human embeddings have eight unknown,
+13 partial and three supported first choices. Both combined policies have 11 unknown and 13 partial
+first choices. Each combined arm's top-three pool contains a contradicted candidate for one query.
+The other 23 are not thereby declared correct. No inference about intrusion, source membership,
+normalized mapping weights, temporal accuracy or population performance follows from these counts.
+
+Using the richer all-source contextual reference SECONDARILY raises human-only supported top-three
+from five to six; all other table entries remain unchanged. That extra case comes solely from an
+annotation about an empty room. It cannot establish that audio/caption inputs supplied that fact.
+
+After all source judgments were fixed, the reviewer checked generated caption plus ASR input
+coverage for the eight AV-supported source pairs. Seven are only partially expressed by the actual
+model inputs: sparse furnishing, pill identity/speckling, passing a seated bench man, or the relevant
+observer/seeing relation is omitted. Some captions also invent a camera or liquid. Only the phone-
+absent-from-case pair has complete model-input support, supplied by central ASR alone. Thus source
+retrieval validity and encoded factual coverage are separate: a returned interval can be supported
+by original frames even when its caption omitted the decisive fact. These eight are a selected
+positive subset, not an overall caption-error estimate.
+
+Known development unit 92 is outside the 24-unit denominator. Audio ranks the explicit dead-woman
+statement at row 575 first; the audio-plus-caption and all-channel policies also retain it first.
+That locates the relevant statement but does not prove the complete recalled floor/body event is
+represented in one interval. Visual posture/location and spoken death state still require a
+justified link across shots. Do not call this an independently validated direct-hit repair.
+
+The seven invented contrast documents expose an embedding limitation. True paraphrase cosine is
+0.559; wrong-person, sleeping, negated, earlier-reference and hypothetical descriptions score
+0.762, 0.737, 0.823, 0.839 and 0.833 respectively. Unrelated text scores 0.050. These are one
+synthetic characterization, not a benchmark accuracy estimate: cosine alone is not an entailment,
+identity, state, tense or modality decision. No local support critic was executed or assumed.
+
+An additional descriptive audit finds 654 distinct audio payloads among 880 audio targets, with
+290 targets sharing some payload and a maximum group of 39. Identical repeated payloads have
+byte-identical exported vectors; every sampled query's best audio score has one exact winner.
+Therefore duplication does not explain these observed top-score ties (there are none). Shared
+utterances remain one evidence source rather than multiple independent confirmations. No dedup
+reranking or tolerance adjustment was performed after outcomes were read.
+
+Decision: retain the existing production scorer and reject minimum-rank combination as its
+replacement. The useful next mechanism is support-aware event construction and ranking: preserve
+atomic facets with evidence, distinguish the same participant from nearby people, bind statements
+to the event they refer to, and compose compatible cross-shot facts while retaining uncertainty.
+A richer caption/fact extractor and any learned support critic need their own frozen candidate
+comparison; neither is established by this experiment. Human text remains optional, and the
+no-human-text route still needs annotation-independent segmentation before end-to-end qualification.
+The parent accuracy issue remains OPEN.
+
+Verification: Python 13 passed, zero failed/skipped. The fatal-warning scoped `embedBench/test`
+gate on the native producer passed 181, failed zero and skipped one (182 total), followed by
+`scalafmtCheckAll`. Later Python-only clock validation and tied/missing-channel pool checks pass;
+regenerated embedding input and source evidence are byte-identical to the original frozen files.
+Two compiled Python mutants each produce one named failure: inclusive/touching overlap (10
+siblings pass in the then-11-test suite) and removed clock-scale guard (12 siblings pass in 13).
+Both scripts were restored byte-for-byte. Independent tooling review PASS covers exact revision
+`8a57524092fd4068bf430f8bd0dd5e7aa121e0ad`; final documentation/result-transcription review is
+recorded in the local receipt. No public API or production behavior changed, no sibling consumes
+this test-only object, and no source/participant text or media entered Git. No merge or push.
+
+Reproduction/evidence: `.agent-work/audiovisual-20261021/experiment/` contains original input,
+native outputs, all scores/ranks, frozen blind pool and AV labels, secondary human labels, caption
+input checks, synthetic results and `support-summary.json`. The executable local analysis is
+`.agent-work/audiovisual-20261021/summarize_support.py`; its hash and all label/rank/pool hashes are
+bound in the summary. `verification-before-judgments.json`, both mutation receipts, native/gate
+logs and the final review receipt remain at the parent artifact root.
