@@ -800,3 +800,145 @@ is bound into the summary. Independent review recomputed all arm counts and asse
 errors against both reference layers. Final formatting, exact-revision review and Git state are
 bound in `verification.json`. Nonblocking strict-JSON consumer hardening is tracked separately as
 `bd-01M5FMPM0F5Y22EKGYZF05DRSD`.
+
+### Third milestone: separate protocol, source information and assessor capability
+
+Child `bd-01M5FQFMG4JSDVWZV6J6XN2WXS` retains the preceding experiment and adds explicitly
+attributed development conditions. The same 56 questions, authored candidate assignments and
+three input arms remain fixed. Here A means timestamped ASR, V means generated caption text,
+and AV means their union. These conditions do not include human annotations, original frames
+as assessor input, or a search of the complete film. Independent agent judgments of the original
+frames and exact supplied text remain evaluation references, not information given to the critic.
+
+The protocol replay accepts only exact singleton `{"reason": "known_enum"}` objects as wire
+equivalents of the required reason strings. Original raw outputs and processing failures remain
+recorded. Unknown reasons, extra keys, wrong claim identities and invalid quotations still fail.
+This recovers 63 original responses, all unresolved: 166/168 become valid and two remain rejected.
+It repairs serialization, with no added semantic resolutions. The explicit post-hoc condition is
+not a replacement for the original 65-failure result.
+
+The source intervention uses a question-independent frame-local description prompt over the
+same 34 intervals and three sampled frames per interval, with the same Qwen3-VL-4B model and
+image resolution. Its 512-token output budget is larger than the earlier caption recipe; this is
+not a compute-matched comparison. All 34 descriptions complete without truncation or empty output.
+The first attempt refused an incompatible frame-bank name before inference; that receipt is retained.
+The final input references were independently reviewed and frozen before the new critic run.
+
+The new descriptions remove the false cross-image person linkage at row 507, but retain only a
+generic prone person at rows 507/526. They add a tentative small-object interpretation at row 67,
+lose speckles at row 82, and incorrectly add a wheelchair at row 139. These are mixed caption
+changes, not a demonstrated fidelity improvement. The exact-input reference labels gain no fully
+resolvable questions. The retained samples and ASR do not independently establish the cross-shot
+person link needed to join the body depiction to the later death assertion. This is a limit of
+these supplied inputs, not a claim that wider footage cannot establish the link.
+
+The new Qwen critic executes 112 V/AV requests; unchanged A responses are reused. The real Scala
+consumer produces three receipts of 56 questions each. After the same protocol replay, 163/168
+responses are valid and five fail: two wrong claim identities and three invalid quotations.
+The latter are absent from, or not uniquely locatable in, the cited input. Across the 48 primary
+questions per arm, exact-input references permit two A, two V and four AV resolutions:
+
+| Qwen input condition | Correct resolutions A / V / AV | Unsupported resolutions A / V / AV | Processing failures A / V / AV |
+|---|---|---|---|
+| Original captions, protocol replay | 1 / 2 / 2 | 0 / 4 / 0 | 0 / 1 / 1 |
+| Frame-local captions, protocol replay | 1 / 2 / 0 | 0 / 0 / 0 | 0 / 2 / 3 |
+
+Reduced unsupported resolutions coexist with lost correct AV contradictions. One becomes a
+quotation failure; the other abstains despite unchanged decisive audio. All natural claims remain
+unresolved, and no accepted unresolved response retains partial supporting or counterevidence
+links. All eight body diagnostics remain unresolved in the new condition, including the directly
+available death-assertion content. Therefore richer descriptions alone have not repaired assessment.
+
+The encoder control compares pinned MiniLM and `BAAI/bge-small-en-v1.5` on the exact same claim
+and evidence texts, with their respective masked-mean/CLS pooling and token limits. No query
+instruction or threshold is fitted. MiniLM Python vectors reproduce the existing Scala output
+over all 154 records, with maximum component difference `2.43e-7` against a frozen `1e-5` tolerance.
+The alternative encoder shows no benefit on the four controlled polarity comparisons resolvable
+from input text: both encoders have zero inverted orderings with the original captions and one
+with the longer captions. Both lose the same AV ordering despite unchanged decisive ASR. The full
+24-comparison inversion counts are 5/10 for original MiniLM/BGE and 7/12 for new MiniLM/BGE, but
+most of those facts are absent from the supplied text; those counts are descriptive cosine
+ordering, not entailment error rates. New-caption MiniLM also refuses five oversized inputs;
+coverage is 162/168 versus 167/168 for the other conditions, with one empty document in all four.
+No retrieval stage is changed or evaluated by this fixed-pair experiment.
+
+Local evidence is under `.agent-work/scoring-factorial-20261021/`: `plan-freeze.json`,
+`baseline-v2/`, `atomic-02/`, `atomic-critic/`, `atomic-v2/`, the independently reviewed
+`reference-atomic-input-02.json` and `caption-fidelity-02.json`, four encoder freezes/results,
+`comparison-summary.json`, and execution logs. Earlier provisional caption references are retained
+but superseded and unused by the critic. The analysis verifies exact text-to-vector bindings and
+fixed questions/candidate assignments; source changes legitimately change mapping/population
+digests. A compiled negative witness swaps two valid document IDs without changing populations
+and fails the named text-binding assertion, while the real inputs pass all 96 encoder contrasts.
+
+#### Stronger-assessor comparison: DeepSeek V4.1 Flash
+
+At the owner's request, the same semantic prompt and exact evidence inputs were sent to
+OpenRouter model `deepseek/deepseek-v4.1-flash-1017` (canonical dated slug
+`deepseek/deepseek-v4.1-flash-20261017`). The frozen route permits only Fireworks, with zero-data
+retention, data collection denied and no fallback. The recipe uses low reasoning, temperature
+zero, a 4,096-token completion budget, four concurrent requests and one attempt per input.
+This is an assessor-package comparison: model, provider, reasoning and token budgets differ
+from Qwen. It does not isolate parameter count or establish repeat-run stability.
+
+All 280 unique requests completed: 168 original-text requests and 112 new-caption V/AV requests;
+the 56 original A results are reused in the second condition. Reported cost for every request
+totals USD 0.354744252, below the frozen conservative USD 1.7146338 bound and USD 3 budget.
+Two successful synthetic endpoint checks separately report USD 0.0003828. Neither reference
+labels nor original frames, manual annotations, complete recall transcripts or participant
+identifiers are model inputs. Exact request/body hashes and provider/model identity are retained.
+
+Both derived conditions use the same narrow protocol replay as Qwen and the unchanged real Scala
+consumer. Original-caption responses are 155/168 valid before replay and 168/168 after it.
+New-caption responses, including reused audio, are 154/168 before replay and 165/168 after;
+the three remaining failures have invalid quotations. All failures stay in the denominator.
+Primary exact-input results, with the same 2/2/4 resolvable questions per A/V/AV arm, are:
+
+| DeepSeek input condition | Correct resolutions A / V / AV | Unsupported resolutions A / V / AV | Processing failures A / V / AV |
+|---|---|---|---|
+| Original captions, protocol replay | 2 / 1 / 3 | 0 / 1 / 0 | 0 / 0 / 0 |
+| Frame-local captions, protocol replay | 2 / 1 / 3 | 0 / 0 / 0 | 0 / 1 / 2 |
+
+No model gives an opposite verdict on an input-resolved reference, and no Conflicted verdict is
+produced. DeepSeek's remaining unsupported original-V contradiction concerns a police-car claim
+when the caption supplies only an unspecified vehicle with emergency lights. Missing participant
+or object identity still prevents a definite contradiction. No natural claim becomes fully resolved.
+The primary results favor DeepSeek's audio handling while retaining a visual over-abstention:
+Qwen resolves both available V questions, whereas DeepSeek resolves only one in each condition.
+
+In the separate body diagnostic, DeepSeek recovers the death-assertion question in A and AV for
+both source conditions, citing the time-qualified ASR segment within the selected interval.
+Qwen leaves it unresolved even after protocol replay. This is recovery of an assertion in ASR,
+not listened audio verification or proof of death. DeepSeek retains posture/floor evidence and,
+in one new-caption AV proposal, separately cites depiction and assertion while leaving their
+cross-shot identity unresolved. It therefore improves evidence use without completing the
+evidence-bound match for the entire recalled event.
+
+DeepSeek retains links in 21 original-caption and 17 new-caption unresolved proposals, compared
+with Qwen's one and zero respectively. These counts include diagnostic cases across V/AV arms;
+they are not independent cases or counts of verified partial claims. Independent inspection finds
+useful posture/floor and tentative-object evidence, but also generic overlap, unresolved people,
+the original caption's false cross-image linkage, and a reported inference that cannot establish
+a person's present state. Literal quote ownership is necessary and insufficient for semantic support.
+
+Decision: use the stronger assessor for the next development comparison; do not promote either
+caption rewrite or assessor directly into production. The next evidence condition should combine
+captions and timestamped ASR with optional manual annotations and relevant surrounding event
+context, retaining source identity, temporal scope and disagreement. Manual annotations are an
+additional fallible source, not a prerequisite or automatic truth override. Compare automatic-only
+and annotation-augmented conditions separately. Explicitly test cross-shot person/event links,
+partial false memories, wrong-event neighbors and unsupported contradiction. Any full-event
+acceptance still requires those links and independent held-out evaluation; the parent accuracy
+issue remains open. The current experiments establish neither improved retrieval nor overall
+accuracy across participants or films.
+
+Additional evidence under the same local root: `deepseek-01/` (freeze, exact model metadata,
+raw responses and costs), `deepseek-old-v2/`, `deepseek-atomic-v2/`, `assessor-comparison.json`,
+`prepare_remote.py`, `analyze_assessors.py` and consumer logs. The independent reviewer reproduced
+the counts and inspected resolved and linked unresolved proposals against both reference layers.
+Python checks pass 26 tests, fail zero and skip zero; two earlier compiled mutants each fail their
+named regression with siblings passing. A malformed-response regression retains a failed request
+and a successful sibling. The unchanged Scala consumer builds all four three-arm conditions with
+56 questions per arm; its focused suite passes nine, fails zero and skips zero. These are local
+observations. Final revision, format checks, evidence hashes and independent review are recorded
+in the local `verification.json`. Production behavior, `main` and remote publication are unchanged.
