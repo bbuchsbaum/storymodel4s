@@ -1,0 +1,249 @@
+#!/usr/bin/env python3
+"""Freeze and run an offline caption comparison; outputs remain unaccepted worker proposals.
+
+No media, captions, or reference judgments belong in this script or in Git. This harness
+compares supplied frames, not automatic shot detection or downstream alignment accuracy.
+"""
+
+import argparse
+import copy
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import time
+
+
+IDENTITY_INSTRUCTION = (
+    " These images may show different shots and different people. Describe distinct people "
+    "separately. Link a person across images only when visible appearance supports that match. "
+    "A change of shot does not establish identity. If identity is uncertain, describe the "
+    "observations separately without asserting sameness or difference. Preserve visible "
+    "actions, posture, clothing, and objects; do not infer unseen actions or events."
+)
+SINGLE_IMAGE_PROMPT = (
+    "Describe only what is visibly present in this image in one short sentence. State the "
+    "visible people, their posture or action, and distinctive objects. Do not name characters, "
+    "infer unseen events, or refer to any other image."
+)
+ARMS = ("joint", "identity-aware", "separate-images")
+
+
+def digest(path):
+    h = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1 << 24), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def write_new(path, value):
+    with Path(path).open("x", encoding="utf-8") as stream:
+        json.dump(value, stream, indent=2, sort_keys=True, ensure_ascii=False)
+        stream.write("\n")
+
+
+def request_id(request):
+    body = {k: v for k, v in request.items() if k != "requestId"}
+    return hashlib.sha256(
+        json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def requests(source, cases, frames):
+    """Keep model, images, preprocessing and per-call token limit fixed across arms."""
+    ids = [c["id"] for c in cases]
+    if len(set(ids)) != len(ids) or not ids:
+        raise ValueError("cases must have unique nonempty identities")
+    extents = {e["id"]: e for e in source["extents"]}
+    result = {}
+    for arm in ARMS:
+        request = copy.deepcopy(source)
+        request["frames"]["file"] = str(Path(frames).resolve())
+        request["extents"] = []
+        for case in cases:
+            original = extents[case["extentId"]]
+            if case["ordinals"] != original["ordinals"]:
+                raise ValueError("case ordinals disagree with the recorded request")
+            if arm == "separate-images":
+                request["extents"].extend(
+                    {"id": f"{case['id']}:image-{i + 1}", "ordinals": [ordinal]}
+                    for i, ordinal in enumerate(original["ordinals"])
+                )
+            else:
+                request["extents"].append(
+                    {"id": case["id"], "ordinals": list(original["ordinals"])}
+                )
+        if arm == "identity-aware":
+            request["recipe"]["prompt"] += IDENTITY_INSTRUCTION
+        elif arm == "separate-images":
+            request["recipe"]["prompt"] = SINGLE_IMAGE_PROMPT
+        request["requestId"] = request_id(request)
+        result[arm] = request
+    return result
+
+
+def validate_outcome(request, outcome):
+    """Refuse cross-arm substitutions or incomplete outputs before any quality assessment."""
+    if outcome["schema"] != "storymodel4s.media.caption-outcome":
+        raise ValueError("wrong outcome schema")
+    if outcome["schemaVersion"] != 1 or outcome["requestId"] != request["requestId"]:
+        raise ValueError("wrong outcome request identity")
+    if outcome["recipe"] != request["recipe"]:
+        raise ValueError("outcome recipe differs")
+    for key in ("sha256", "width", "height", "count", "pixelFormat"):
+        if outcome["frames"][key] != request["frames"][key]:
+            raise ValueError("outcome frame binding differs")
+    for key in ("repo", "revision"):
+        if outcome["model"][key] != request["model"][key]:
+            raise ValueError("outcome model binding differs")
+    prompt_hash = hashlib.sha256(
+        request["recipe"]["prompt"].encode("utf-8")
+    ).hexdigest()
+    if outcome["applied"]["promptSha256"] != prompt_hash:
+        raise ValueError("applied prompt differs")
+    for key in ("minPixels", "maxPixels", "maxNewTokens", "greedy", "presentation"):
+        if outcome["applied"][key] != request["recipe"][key]:
+            raise ValueError("applied recipe differs")
+    if outcome["offline"] != {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}:
+        raise ValueError("offline execution not reported")
+    expected = [(e["id"], e["ordinals"]) for e in request["extents"]]
+    actual = [(e["id"], e["ordinals"]) for e in outcome["extents"]]
+    if actual != expected:
+        raise ValueError("outcome extent coverage or order differs")
+    if outcome["coverage"] != {"requested": len(expected), "observed": len(expected)}:
+        raise ValueError("outcome coverage count differs")
+    for extent in outcome["extents"]:
+        if not isinstance(extent["text"], str) or not extent["text"].strip():
+            raise ValueError("empty caption")
+
+
+def prepare(args):
+    source = read(args.request)
+    cases = read(args.cases)
+    if digest(args.frames) != source["frames"]["sha256"]:
+        raise ValueError("recorded frames hash mismatch")
+    output = Path(args.output)
+    output.mkdir(parents=True, exist_ok=False)
+    manifest = {
+        "schema": "storymodel4s.caption-fidelity-experiment/v1",
+        "scope": "Raw worker proposals; not a joined or admitted caption package.",
+        "selection": cases["selection"],
+        "cases": cases["cases"],
+        "inputs": {
+            str(Path(p).resolve()): digest(p) for p in (args.request, args.cases)
+        },
+        "worker": {
+            "path": str(Path(args.worker).resolve()),
+            "sha256": digest(args.worker),
+        },
+        "harnessSha256": digest(__file__),
+        "arms": {},
+        "controls": {
+            "sameModelAndFrames": True,
+            "samePerCallTokenLimit": True,
+            "separateImagesHasMoreCallsAndOutputBudget": True,
+            "noRecallInput": True,
+            "noAutomaticShotDetection": True,
+            "noProductionDefaultChange": True,
+        },
+    }
+    for arm, request in requests(source, cases["cases"], args.frames).items():
+        path = output / f"{arm}.request.json"
+        write_new(path, request)
+        manifest["arms"][arm] = {"request": path.name, "sha256": digest(path)}
+    write_new(output / "freeze.json", manifest)
+    print(f"Frozen {len(cases['cases'])} cases and {len(ARMS)} arms in {output}")
+
+
+def run(args):
+    root = Path(args.experiment)
+    manifest = read(root / "freeze.json")
+    worker = manifest["worker"]
+    if (
+        digest(worker["path"]) != worker["sha256"]
+        or digest(__file__) != manifest["harnessSha256"]
+    ):
+        raise ValueError("worker or harness changed after freeze")
+    for arm, spec in manifest["arms"].items():
+        path = root / spec["request"]
+        if digest(path) != spec["sha256"]:
+            raise ValueError("request changed after freeze")
+        request = read(path)
+        output = root / f"{arm}.outcome.json"
+        log = root / f"{arm}.log"
+        if output.exists() or log.exists():
+            raise ValueError(f"refusing to overwrite attempted arm {arm}")
+        # Preserve a virtualenv entry point: resolving its symlink selects the base environment.
+        argv = [
+            str(Path(args.python).absolute()),
+            worker["path"],
+            str(path),
+            str(output),
+        ]
+        start = time.monotonic()
+        print(f"Starting {arm}: {len(request['extents'])} calls", flush=True)
+        with log.open("x") as stream:
+            try:
+                status = subprocess.run(
+                    argv,
+                    stdout=stream,
+                    stderr=subprocess.STDOUT,
+                    timeout=args.timeout,
+                    check=False,
+                ).returncode
+            except subprocess.TimeoutExpired:
+                status = 124
+        receipt = {
+            "argv": argv,
+            "exitCode": status,
+            "seconds": time.monotonic() - start,
+            "logSha256": digest(log),
+        }
+        write_new(root / f"{arm}.execution.json", receipt)
+        if status != 0:
+            raise RuntimeError(f"{arm} failed with exit {status}; see {log}")
+        outcome = read(output)
+        validate_outcome(request, outcome)
+        write_new(
+            root / f"{arm}.verified.json",
+            {
+                "outcomeSha256": digest(output),
+                "extents": len(outcome["extents"]),
+                "generatedTokens": sum(
+                    e["generatedTokens"] for e in outcome["extents"]
+                ),
+                "atTokenLimit": [
+                    e["id"]
+                    for e in outcome["extents"]
+                    if e["generatedTokens"] >= request["recipe"]["maxNewTokens"]
+                ],
+            },
+        )
+        print(f"Verified {arm}: {len(outcome['extents'])} extents", flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest="command", required=True)
+    prep = commands.add_parser("prepare")
+    for field in ("request", "frames", "cases", "worker", "output"):
+        prep.add_argument(f"--{field}", required=True)
+    prep.set_defaults(function=prepare)
+    execute = commands.add_parser("run")
+    execute.add_argument("--experiment", required=True)
+    execute.add_argument("--python", required=True)
+    execute.add_argument(
+        "--timeout", type=int, default=900, help="maximum seconds per arm"
+    )
+    execute.set_defaults(function=run)
+    args = parser.parse_args()
+    args.function(args)
+
+
+if __name__ == "__main__":
+    main()

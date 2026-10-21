@@ -189,3 +189,37 @@ with candidate recall, supported top-1/top-5, ranking, depiction localization, c
 paired regressions reported under the frozen protocol above. Existing Sherlock cases are
 development diagnostics. Neither the frame correction nor a successful example establishes
 general improvement; the next model comparison and independent acceptance remain unexecuted.
+
+## Item 4: caption fidelity across cuts (frozen comparison)
+
+Owner authorized proceeding with the fourth work item: improve caption accuracy across shot
+changes while preserving genuine continuity and visible actions/states. The bounded first
+experiment changes the description recipe only. It does not change the model, frame samples,
+resolution, greedy decoding or the 96-token per-call limit. It does not use recall text.
+
+Three arms are frozen in `tools/caption_fidelity.py`: the existing joint prompt, that prompt
+with explicit evidence requirements for identity continuity, and one independent description
+per sampled image. The last arm has three calls and up to three times the output budget per
+interval; measure tokens and time rather than claiming a cost-matched comparison. Separate
+sampled images are not detected shots, and separate descriptions alone do not recover identity
+continuity or actions between images. Outputs remain raw worker proposals, not admitted source
+claims or a replacement production caption package.
+
+Selection before new outputs: the three previously inspected development rows 503, 507 and
+526, plus every 42nd row from 493 through 955 (12 additional intervals). All use the existing
+Part B samples. An independent agent records image-only reference observations before viewing
+captions, then judges anonymous arm outputs against those fixed observations. This is a bounded
+within-film diagnostic with agent judgments, not independent human or cross-film validation.
+The receipt must distinguish the three known development cases from the additional cases.
+
+Acceptance questions: does false cross-image identity decrease, does genuine continuity remain
+described when visibly supported, and are salient visible actions/states/objects preserved?
+Record factual additions unsupported by the frames, omissions, uncertainty, and token-limit
+hits. Report per-case wins and regressions; do not pick an arm solely on row 507. Do not change
+the production default merely because a prompt requests better behavior.
+
+Local inputs, frame strips, frozen requests, outcomes, reference judgments and execution logs
+live in `.agent-work/caption-fidelity-20261021/`; no media or derived captions are committed.
+The harness refuses changed frozen inputs, cross-arm outcomes and incomplete extent coverage.
+Run its synthetic binding checks with
+`python3 -m unittest discover -s tools -p test_caption_fidelity.py`.
