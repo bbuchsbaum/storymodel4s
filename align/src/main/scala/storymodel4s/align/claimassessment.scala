@@ -38,9 +38,9 @@ final case class ClaimChartReference(
     element: AlignmentTarget
 )
 
-/** Unchecked source citation; its origin interval and assessed event need not be the same shot.
-  * The assessor owns the semantic link between them; checked receipt construction proves only
-  * physical ownership and complete accounting, never that the link is correct.
+/** Unchecked source citation; its origin interval and assessed event need not be the same shot. The
+  * assessor owns the semantic link between them; checked receipt construction proves only physical
+  * ownership and complete accounting, never that the link is correct.
   */
 final case class ClaimSourceCitation(
     id: EvidenceId,
@@ -69,8 +69,8 @@ final case class ClaimAssessmentSubmission(
   *
   * This certifies ownership, inventory accounting and provenance consistency, not factual truth,
   * assessor identity, successful execution or extraction completeness. No legacy alignment,
-  * fidelity mode, score or signature is changed. Counts weight declared questions equally; they
-  * are not participant accuracy or calibrated probabilities. See ADR 0022.
+  * fidelity mode, score or signature is changed. Counts weight declared questions equally; they are
+  * not participant accuracy or calibrated probabilities. See ADR 0022.
   */
 final class ClaimAssessmentReceipt private (
     val mapping: MappingResult,
@@ -93,17 +93,19 @@ final class ClaimAssessmentReceipt private (
       case RecallClaimState.ReviewedNotExpressed => ClaimAssessmentStatus.NotExpressed
       case RecallClaimState.ExtractionUnresolved => ClaimAssessmentStatus.ExtractionUnresolved
       case RecallClaimState.ReferenceUnresolved  => ClaimAssessmentStatus.ReferenceUnresolved
-      case RecallClaimState.Expressed =>
+      case RecallClaimState.Expressed            =>
         (s.supporting.nonEmpty, s.counterevidence.nonEmpty) match
-          case (true, true)   => ClaimAssessmentStatus.Conflicted
+          case (true, true)                          => ClaimAssessmentStatus.Conflicted
           case (true, false) if s.unresolved.isEmpty => ClaimAssessmentStatus.Supported
           case (false, true) if s.unresolved.isEmpty => ClaimAssessmentStatus.Contradicted
-          case _             => ClaimAssessmentStatus.Unresolved
+          case _                                     => ClaimAssessmentStatus.Unresolved
   }
 
   /** Full fixed-population accounting, including every unresolved and unexpressed question. */
   def counts: Map[ClaimAssessmentStatus, Int] =
-    ClaimAssessmentStatus.values.toVector.map(s => s -> questions.count(q => status(q.id).contains(s))).toMap
+    ClaimAssessmentStatus.values.toVector
+      .map(s => s -> questions.count(q => status(q.id).contains(s)))
+      .toMap
 
   def totalQuestions: Int = questions.size
 
@@ -115,25 +117,31 @@ final class ClaimAssessmentReceipt private (
   )
 
   /** Conflicting evidence is not a resolved assessment. No correctness fraction is manufactured. */
-  def resolvedQuestions: Int = counts(ClaimAssessmentStatus.Supported) + counts(ClaimAssessmentStatus.Contradicted)
+  def resolvedQuestions: Int =
+    counts(ClaimAssessmentStatus.Supported) + counts(ClaimAssessmentStatus.Contradicted)
 
   override def equals(other: Any): Boolean = other match
     case that: ClaimAssessmentReceipt =>
       mappingDigest == that.mappingDigest && questions == that.questions &&
-        citations == that.citations && submissions == that.submissions
+      citations == that.citations && submissions == that.submissions
     case _ => false
   override def hashCode: Int = (mappingDigest, questions, citations, submissions).hashCode
-  override def toString: String = s"ClaimAssessmentReceipt($version, $populationDigest, $totalQuestions)"
+  override def toString: String =
+    s"ClaimAssessmentReceipt($version, $populationDigest, $totalQuestions)"
 
 object ClaimAssessmentReceipt:
   private def invalid(detail: String): Left[MappingRefusal, Nothing] =
     Left(MappingRefusal.InvalidValue("claimAssessment", detail))
 
   private def contains(outer: SpanSet, inner: SpanSet): Boolean =
-    inner.spans.forall(s => outer.spans.exists(_.contains(s)))
+    inner.refs.forall(s =>
+      outer.refs.exists(p => p.span.contains(s.span) && (s.unit.isEmpty || p.unit == s.unit))
+    )
 
   private def checkChart(
-      ref: ClaimChartReference, owner: Checksum, scope: SpanSet
+      ref: ClaimChartReference,
+      owner: Checksum,
+      scope: SpanSet
   ): Either[MappingRefusal, Unit] =
     val chart = ref.evidence.chart
     val member = ref.element match
@@ -144,29 +152,57 @@ object ClaimAssessmentReceipt:
     else if !member then invalid("foreign chart element")
     else if selected.isEmpty || selected.exists(a => !contains(scope, a.spans))
     then invalid("chart element lacks alignment within its cited text scope")
-    else if ref.evidence.provenance != chart.provenance then invalid("chart provenance disagrees with its owner")
+    else if ref.evidence.provenance != chart.provenance then
+      invalid("chart provenance disagrees with its owner")
     else Right(())
 
-  private def checkCitation(mapping: MappingResult, c: ClaimSourceCitation): Either[MappingRefusal, Unit] =
-    mapping.source.target(c.origin).toRight(MappingRefusal.UnknownTarget(c.origin)).flatMap { target =>
-      val owned = target.sourceSupport match
-        case located: SourceSupportStatus.Located =>
-          (located.support, c.support) match
-            case (TypedSupport.Text(parent), TypedSupport.Text(child)) => contains(parent, child)
-            case (TypedSupport.Anchored(parent), TypedSupport.Anchored(child)) =>
-              parent.bundleIdentity == child.bundleIdentity &&
+  private def checkCitation(
+      mapping: MappingResult,
+      c: ClaimSourceCitation
+  ): Either[MappingRefusal, Unit] =
+    mapping.source.target(c.origin).toRight(MappingRefusal.UnknownTarget(c.origin)).flatMap {
+      target =>
+        val owned = target.sourceSupport match
+          case located: SourceSupportStatus.Located =>
+            (located.support, c.support) match
+              case (TypedSupport.Text(parent), TypedSupport.Text(child)) => contains(parent, child)
+              case (TypedSupport.Anchored(parent), TypedSupport.Anchored(child)) =>
+                parent.bundleIdentity == child.bundleIdentity &&
                 child.anchors.forall(parent.anchors.toVector.contains) &&
-                mapping.source.bundles.toVector.collect { case b: BundleEntry.Media => b.bundle }
+                (mapping.source.bundles.toVector.collect { case b: BundleEntry.Media =>
+                  b.bundle
+                } ++
+                  mapping.source.composition.toVector.map(_.composed))
                   .exists(b => child.checkedOn(b).isRight)
-            case _ => false
-        case _ => false
-      if !owned then invalid("citation is outside its source target or bundle")
-      else c.chart.traverse_ { ref =>
-        c.support match
-          case TypedSupport.Text(spans) => checkChart(ref, c.support.identity, spans)
-          case TypedSupport.Anchored(_) => invalid("a chart requires separately represented text support")
-      }
+              case _ => false
+          case _ => false
+        if !owned then invalid("citation is outside its source target or bundle")
+        else
+          c.chart.traverse_ { ref =>
+            c.support match
+              case TypedSupport.Text(spans) =>
+                checkChart(ref, sourceChartOwner(mapping, c.origin, c.support), spans)
+              case TypedSupport.Anchored(_) =>
+                invalid("a chart requires separately represented text support")
+          }
     }
+
+  /** Expected declared owner for a chart attached to a citation, including the complete source
+    * identity, origin target and selected support. Matching this value does not prove extraction.
+    */
+  def sourceChartOwner(
+      mapping: MappingResult,
+      origin: SourceNodeRef,
+      support: TypedSupport
+  ): Checksum =
+    MappingRender.digest(
+      Vector(
+        "claim-source-chart-owner/v1",
+        mapping.source.digest.hex,
+        origin.key,
+        support.identity.hex
+      )
+    )
 
   /** Validate an attributed submission against the exact mapping and a separately frozen question
     * population. Source citations may be reused; repeated citations never multiply question counts.
@@ -194,30 +230,47 @@ object ClaimAssessmentReceipt:
       for
         _ <- questions.traverse_ { q =>
           if !units.contains(q.unit) then Left(MappingRefusal.UnknownUnit(q.unit))
-          else if mapping.source.target(q.event).isEmpty then Left(MappingRefusal.UnknownTarget(q.event))
+          else if mapping.source.target(q.event).isEmpty then
+            Left(MappingRefusal.UnknownTarget(q.event))
           else Right(())
         }
         _ <- citations.traverse_(checkCitation(mapping, _))
         _ <- submissions.traverse_ { s =>
           val q = byQuestion(s.question)
           val unit = units(q.unit)
-          val expressed = s.recallState == RecallClaimState.Expressed || s.recallState == RecallClaimState.ReferenceUnresolved
+          val expressed =
+            s.recallState == RecallClaimState.Expressed || s.recallState == RecallClaimState.ReferenceUnresolved
           val links = s.supporting ++ s.counterevidence
-          if !contains(unit.span, s.reviewedSpans) || s.claimSpans.exists(p => !contains(s.reviewedSpans, p))
+          if !contains(unit.span, s.reviewedSpans) || s.claimSpans.exists(p =>
+              !contains(s.reviewedSpans, p)
+            )
           then invalid("recall spans are outside their unit or review scope")
-          else if expressed != s.claimSpans.nonEmpty then invalid("expressed claims require spans; unavailable or unexpressed claims cannot assert spans")
+          else if expressed != s.claimSpans.nonEmpty then
+            invalid(
+              "expressed claims require spans; unavailable or unexpressed claims cannot assert spans"
+            )
           else if !expressed && (links.nonEmpty || s.recallChart.nonEmpty)
-          then invalid("unavailable or unexpressed claims cannot carry decided evidence or a resolved chart")
+          then
+            invalid(
+              "unavailable or unexpressed claims cannot carry decided evidence or a resolved chart"
+            )
           else if !links.subsetOf(evidence) then invalid("foreign evidence link")
           else if s.recallState == RecallClaimState.Expressed && links.isEmpty && s.unresolved.isEmpty
           then invalid("an unanswered expressed claim requires an unresolved reason")
-          else if s.recallState == RecallClaimState.ExtractionUnresolved && !s.unresolved.contains(ClaimAssessmentUnknown.RecallExtractionUnavailable)
+          else if s.recallState == RecallClaimState.ExtractionUnresolved && !s.unresolved.contains(
+              ClaimAssessmentUnknown.RecallExtractionUnavailable
+            )
           then invalid("extraction failure requires its own reason")
-          else if s.recallState == RecallClaimState.ReferenceUnresolved && !s.unresolved.contains(ClaimAssessmentUnknown.ReferenceUnresolved)
+          else if s.recallState == RecallClaimState.ReferenceUnresolved && !s.unresolved.contains(
+              ClaimAssessmentUnknown.ReferenceUnresolved
+            )
           then invalid("unresolved reference requires its own reason")
           else if s.recallState == RecallClaimState.ReviewedNotExpressed && s.unresolved.nonEmpty
           then invalid("reviewed nonexpression cannot also mean failed assessment")
-          else s.recallChart.traverse_(ref => checkChart(ref, mapping.inventory.transcript, s.claimSpans.get))
+          else
+            s.recallChart.traverse_(ref =>
+              checkChart(ref, mapping.inventory.transcript, s.claimSpans.get)
+            )
         }
       yield new ClaimAssessmentReceipt(
         mapping,
