@@ -92,7 +92,7 @@ def summary(name):
         cases.append(
             {
                 "unit": ordinal,
-                "nominated_source_targets": len(items),
+                "normalized_source_targets": len(items),
                 "top_target_rows": [int(t.rsplit(":", 1)[1]) for t in row["top"]],
                 "known_target_ranks": {
                     str(i): next(
@@ -101,7 +101,7 @@ def summary(name):
                     )
                     for i in (503, 507, 508, 509, 575, 591, 592, 596)
                 },
-                "all_nominated": [
+                "all_normalized_source_targets": [
                     {
                         "target": t,
                         "row": int(t.rsplit(":", 1)[1]),
@@ -133,8 +133,8 @@ result = {
     "limitations": [
         "No independent accuracy judgments",
         "Fresh lexical channels, not a replay of historical ONNX/BM25 baseline",
-        "Different representation arms may nominate different targets",
-        "Ranks use 1e-12 tie tolerance; null target rank means absent from nominations",
+        "Representation arms may have different exported normalized source support",
+        "Ranks use 1e-12 tie tolerance; null target rank means absent from exported normalized support",
         "Conditional producer does not assess intrusion",
     ],
     "arms": {},
@@ -149,17 +149,25 @@ for arm in ["a", "v", "av"]:
         or old["inventory_digest"] != new["inventory_digest"]
     ):
         raise ValueError("policy arms have different units")
+    matched = {k: o for k, o in oldrows.items() if o["source"] and newrows[k]["source"]}
     result["matched_policy_comparison"][arm] = {
+        "matched_available_units": len(matched),
+        "both_unavailable_units": sum(
+            not o["source"] and not newrows[k]["source"] for k, o in oldrows.items()
+        ),
+        "availability_disagreements": sum(
+            bool(o["source"]) != bool(newrows[k]["source"]) for k, o in oldrows.items()
+        ),
         "units": len(oldrows),
-        "same_source_nominations": sum(
+        "same_exported_source_support": sum(
             o["source"].keys() == newrows[k]["source"].keys()
             for k, o in oldrows.items()
         ),
-        "same_top_source_set": sum(
-            set(o["top"]) == set(newrows[k]["top"]) for k, o in oldrows.items()
+        "same_top_source_set_among_matched_available": sum(
+            set(o["top"]) == set(newrows[k]["top"]) for k, o in matched.items()
         ),
-        "same_all_source_ranks": sum(
-            o["ranks"] == newrows[k]["ranks"] for k, o in oldrows.items()
+        "same_exported_source_ranks_among_matched_available": sum(
+            o["ranks"] == newrows[k]["ranks"] for k, o in matched.items()
         ),
     }
 print(json.dumps(result, indent=2, sort_keys=True))

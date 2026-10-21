@@ -103,23 +103,27 @@ completed successfully, with 173 units and a declared cut of 1,000 detail target
 the existing lexical channels; they are not a replay of the original ONNX/BM25 producer.
 No captions were regenerated. The existing package still uses manually supplied intervals.
 
-Within each representation arm, both policies produced identical source nominations and
-identical source ranks for all 173 units, including identical empty results. Thus this experiment
-does **not** demonstrate a source-ranking improvement from the new policy. It does exercise
-the corrected measured basis and conditional export on the real inputs.
+Within each representation arm, both policies exported identical normalized source-support
+sets. Exported source ranks were identical for the matched available units: 151 in A, 120
+in V, and 160 in AV. Another 22, 53, and 13 units respectively had no normalized source
+support under either policy; these are unavailable comparisons, not ranking agreements.
+Ranks use a `1e-12` tie tolerance. The complete nomination sets were not inspected. Thus
+this experiment does **not** demonstrate a source-ranking improvement from the new policy.
+It does exercise the corrected measured basis and conditional export on the real inputs.
 
-| Representation | Units with normalized source candidates | u92 top source row | u92 row 503 rank | u93 top source row |
+| Representation | Units with normalized source weights | u92 top source row | u92 row 503 rank | u93 top source row |
 |---|---:|---:|---:|---:|
 | A | 151 / 173 | 575 | 4 | 596 |
-| V | 120 / 173 | 526 | absent from nominations | 804 |
+| V | 120 / 173 | 526 | absent from normalized support | 804 |
 | AV | 160 / 173 | 575 | 4 | 594 |
 
 These coverage counts are not accuracy scores. Row 575 is dialogue about the same dead woman,
 so it is not an established wrong-event match; it also does not localize the depicted reveal.
-In V, row 507 is absent from u92 nominations, while rows 508 and 591 rank 17 and 12. The
+In V, row 507 is absent from u92 exported normalized support, while rows 508 and 591
+rank 17 and 12 among the exported normalized source targets. The
 top V interval, row 526, has an annotation about inspecting an umbrella. The initial reveal's
 caption omitted the body. Preserve these adverse observations: normalization does not repair
-caption omissions or weak retrieval, and symmetric lexical similarity does not establish
+caption omissions or weak semantic matches, and symmetric lexical similarity does not establish
 event support. A reliable depicted-content match remains unqualified.
 
 The separate retained-score counterfactual reproduced the original local masses for all 173
@@ -133,8 +137,8 @@ Local receipts are under `.agent-work/scoring-20261021/`: `fresh-diagnostic-free
 `fresh-diagnostic-audit.json`. The first two diagnostic attempts failed at invocation and
 output-directory setup respectively; their logs are retained. Reproduce the scalar audit with
 `python3 tools/audit-source-reference-diagnostic.py PATH/TO/runs`. It verifies publication
-hashes and mass sums, retains every nominated target for u92/u93, and reports source-rank
-agreement across all units. Participant text stays in the existing local artifacts.
+hashes and mass sums, retains every exported normalized source target for u92/u93, and
+reports source-rank agreement among matched available units separately from unavailable pairs. Participant text stays in the existing local artifacts.
 
 The next scientific acceptance step is the independent evaluation above, including separate
 labels for event support and depicted-interval support. Caption acquisition and semantic
