@@ -1,0 +1,24 @@
+{
+  "files": {
+    "build.sbt": "a7f6996cdab2c6b79f7584ebecdc2b7dd520c806b1f79614c2a1d2108be238bc",
+    "project/plugins.sbt": "12e82f4a3117eb9a5409d5839460f11e79e5067333e0adae40f4600e759dfa7c",
+    "align/src/main/scala/storymodel4s/align/source.scala": "f759ee5e96b30aaf3147774440b886909ea6fd99f2b4f5b5673d54a8a3684440",
+    "align/src/main/scala/storymodel4s/align/signature.scala": "2cb02d07596ed03b0cca51a7da0385ca2427a3a143c678d4419064cff08aa91f",
+    "embed-bench/src/test/scala/storymodel4s/bench/video/StageTraceOriginSuite.scala": "13a84e20d1e937057299f1943d6c632b9ec27439fc47173140fb4a65a781fb2a",
+    "corpus-intake/src/test/scala/storymodel4s/corpus/intake/CorpusReaderSuite.scala": "e15c986aa43ecd15bdaada06ed9588cc43348129f895112a5695b1cd8eaf5419",
+    "docs/refactor/mapping-audit-20261020.md": "33e0427505867bed46f6314b457447aa05efc5f048e6ad7936164e8cfd027d0d",
+    "docs/refactor/mapping-audit-gates-20261020.json": "dcfe43b3cde051029814f875464b9d43338f6d1c8db970736d56fb98f7ac28ff",
+    "docs/refactor/evidence/source-cli-20261015/README.md": "0a53a373f32e61685240e1287822ebf6631c7f0406b5fc69909912fd19738ca3",
+    "docs/design/own-study-local-export-contract.md": "12a177d75d7ab62e41be88a4b668b47c0fe5e4cee4432e8805869a7f31231f11",
+    "docs/refactor/prospective-evaluation-20261015.md": "5e910e823163e7805766ebd6980693238c7fc01fe7079727daa0fbfa786286ea",
+    "data/transcription/unified-v1/manifest.json": "ed9ce76bba2c7eae5acbf593f2f65c6044993f79b0acaeb9a11878f51c17fc0a",
+    "data/filmfestival/media/provenance/ingest-20261020/staging-receipt.json": "3e3920a805a67a6bbe3e759c50d441da042086a477caca134e501bcb3ca7625c"
+  },
+  "git": {
+    "source": "37f659277199d9d1922b772f13b0b260b1e028d9",
+    "main": "13aec7cc874ed1c2695c6dd281852523cc43ef90",
+    "recorded_origin_main": "13aec7cc874ed1c2695c6dd281852523cc43ef90",
+    "range_commits": "40"
+  },
+  "limits": "Local metadata/source hashes only. No payload contents exported, network refresh, build or inference."
+}

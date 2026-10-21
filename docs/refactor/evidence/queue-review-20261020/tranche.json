@@ -1,0 +1,63 @@
+{
+  "tag": "queue-next-20261020",
+  "selected": [
+    {
+      "order": 1,
+      "id": "bd-01M5E3J13V6CVABAMCRC69AG07",
+      "role": "Prepare single exact S1+mapping integration candidate; no main movement.",
+      "depends_on": []
+    },
+    {
+      "order": 2,
+      "id": "bd-01M50K95JAQB34R876FWMV85J0",
+      "role": "Choose and accept own-study trust model/ADR; owner decision pending.",
+      "depends_on": []
+    },
+    {
+      "order": 3,
+      "id": "bd-01M50K9WYM4TQSX106M7Q2YAF4",
+      "role": "Implement accepted local admission, reuse existing pipeline.",
+      "depends_on": [
+        "bd-01M50K95JAQB34R876FWMV85J0"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "bd-01M50KAP8CB5MMBQE3BX4RQ2PF",
+      "role": "Independent unfamiliar-file end-to-end acceptance.",
+      "depends_on": [
+        "bd-01M50K8E8KMRGY0MYXJRT0SZ8G",
+        "bd-01M50K9WYM4TQSX106M7Q2YAF4"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "bd-01M4EA3TVCGSVSA114DQX9588N",
+      "role": "Small ready fallback: populated StageTrace cost/exclusion witness; release nonblocking.",
+      "depends_on": []
+    }
+  ],
+  "companions": [
+    "bd-01M50K8E8KMRGY0MYXJRT0SZ8G",
+    "bd-01M5DAE8KHF6VX3RE2V5RJG64T",
+    "bd-01M5DAFJ2M42RNRC6T1TWFBFNE",
+    "bd-01M5DAG1ZBER090DC52PB19CPH",
+    "bd-01M5DAGPJTNF8FFNPPWF7P3XDC",
+    "bd-01M5DAH6B093N2WZCNZ160JMJ6",
+    "bd-01M5DAHPNBZ45HNB19F36HFSPQ",
+    "bd-01M5DAJ6DE0MH29XWP38AR6QP1",
+    "bd-01M5DAJMAJ5QWGGD8X9919THPY",
+    "bd-01M5DAK5ED2W3HW3XDS3MZV5PS"
+  ],
+  "follow_after": [
+    "Separate reviewed historical instrument integration",
+    "Existing organization real-file preview"
+  ],
+  "held_separate": [
+    "Corrected Native route/adoption",
+    "Prospective E1-E3 resources/freeze",
+    "Hosted research/LLM campaigns",
+    "Film compiler and advanced view expansion",
+    "Maven publication/release"
+  ]
+}

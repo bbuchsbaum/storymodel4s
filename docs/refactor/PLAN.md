@@ -1,6 +1,19 @@
 # Delivery and measurement plan
 
-## Current follow-through: reality check (15 October 2026)
+## Current queue review (20 October 2026)
+
+The [complete Mote review](evidence/queue-review-20261020/README.md) assesses all 108
+unfinished baseline tickets and records priority/status corrections. Select work with
+`mote ls --tag queue-next-20261020`: prepare the exact reviewed S1/mapping integration
+candidate, resolve U1's trust model, then U2 implementation and U3 independent acceptance.
+The populated StageTrace fixture is a small nonblocking fallback. S1/mapping qualifications
+are local and unmerged; Native delivery and scientific resources retain their separate
+blockers. Do not restart completed implementation or infer scientific permission from
+this planning review. The [release queue](RELEASE-QUEUE.md) gives the current ordering.
+
+<a id="current-follow-through-reality-check-15-october-2026"></a>
+
+## Retained owner decisions: reality check (15 October 2026)
 
 The owner approved the four actions below and directed that **grakern remain pinned to
 GitHub for now**. This section supersedes the next-action prose in the historical sections

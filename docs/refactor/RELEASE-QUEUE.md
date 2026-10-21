@@ -1,6 +1,32 @@
 # Current release queue
 
-## Current execution: `reality-check-20261015` (15 October 2026)
+## Current execution: `queue-next-20261020` (20 October 2026)
+
+The [all-open review](evidence/queue-review-20261020/README.md) covers every one of the
+108 unfinished baseline Motes. Its [per-ticket dispositions](evidence/queue-review-20261020/dispositions.md)
+and live Mote supersede the dated next-action prose below; accepted owner scope is preserved.
+
+| Order | Work record | Remaining acceptance |
+| --- | --- | --- |
+| 1 | Integration `bd-01M5E3J13V6CVABAMCRC69AG07` | Prepare the exact S1/mapping integration candidate, including all 22 pre-existing ancestors and declared Git-pin qualification; review the actual tree/bundle/consumer and concrete final integration action. |
+| 2 | U1 `bd-01M50K95JAQB34R876FWMV85J0` | Resolve and accept the own-study trust/ADR decision; reviewed proposal alone is insufficient. |
+| 3 | U2 `bd-01M50K9WYM4TQSX106M7Q2YAF4` | Implement the accepted authority contract through existing exports/cache/resume; waits for U1. |
+| 4 | U3 `bd-01M50KAP8CB5MMBQE3BX4RQ2PF` | Independent unfamiliar-file acceptance through CLI/readers/Atlas; waits for S1/U2. |
+| Fallback | StageTrace `bd-01M4EA3TVCGSVSA114DQX9588N` | Populate the concrete cost/exclusion fixture; P2, release nonblocking. |
+
+S1 and mapping A–H remain review until actual authorized landing. Their existing exact
+local gates are not fresh integration/default-pin or hosted evidence. Keep the historical
+instrument branch's separate integration and real organization preview as subsequent work.
+Native remains P1 but blocked on runtime route/delivery; E1–E3 remain independent of software
+release and wait for actual resources, eligibility and scientific freeze. No merge, push,
+study opening or package publication is performed by this queue update.
+
+```sh
+mote ls --tag queue-next-20261020
+mote ls --tag queue-next-20261020 --ready
+```
+
+## Retained owner decisions: `reality-check-20261015` (15 October 2026)
 
 Owner instruction: proceed with the four reality-check actions, keeping grakern pinned to
 GitHub for now. The complete dependency-ordered packet is the decision note on
