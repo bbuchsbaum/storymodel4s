@@ -212,3 +212,14 @@ class MappingSettingsSuite extends FunSuite:
       storymodel4s.align.NormalizationPopulation.AdmittedSourceTargets
     )
   }
+
+  test("source-reference profiles refuse paired or omitted mode before provider execution") {
+    val root = inputs()
+    val omitted =
+      changed(_.mapObject(_.add("profile", Json.fromString(MappingPipeline.OnnxSourceProfile))))
+    val paired = right(io.circe.parser.parse(omitted))
+      .mapObject(_.add("mode", Json.fromString("paired")))
+      .noSpaces
+    assert(MappingSettings.decode(omitted, root).isLeft)
+    assert(MappingSettings.decode(paired, root).isLeft)
+  }

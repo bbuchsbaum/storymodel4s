@@ -90,5 +90,6 @@ caption-package input appropriate to that channel. Example lexical settings:
 The new profiles require reference-only execution. Existing `mapping-*-pair/v1` settings retain
 their historical behavior. Normalized values declare `unit/nominated-admitted-source-targets`;
 source membership is unestablished, even when one candidate receives all the score mass.
-Temporal allocation currently refuses this new measure because its result type does not retain
-conditioning. Existing historical temporal results remain supported.
+Temporal allocation and organization summaries currently refuse this new measure because their result
+types do not retain conditioning. Existing historical readouts remain supported. Incompatible paired
+settings are rejected before provider execution.

@@ -46,7 +46,7 @@ object MappingPipeline:
   val OnnxSourceProfile: String = "mapping-onnx-source-reference/v1"
   val CaptionSourceProfile: String = "mapping-caption-source-reference/v1"
 
-  private def sourceConditional(config: Config): Boolean =
+  private[pipeline] def sourceConditional(config: Config): Boolean =
     Set(LexicalSourceProfile, OnnxSourceProfile, CaptionSourceProfile)(config.profile)
   private def matchesProfile(actual: String, historical: String): Boolean =
     actual == historical || (historical match
@@ -300,7 +300,9 @@ object MappingPipeline:
     import cats.syntax.all.*
     import MeasurementCompatibility.{Axis, Reason}
     import OrganizationReadout.{Dependence, Order, Row}
-    if request.organization != AnalysisGrain.InferenceUnit(
+    if run.execution.reference.profile.population == NormalizationPopulation.AdmittedSourceTargets
+    then Left(Reason.ConditionalMeasureUnsupported)
+    else if request.organization != AnalysisGrain.InferenceUnit(
         run.execution.inventory.segmentation
       )
     then Left(Reason.ForeignSegmentation)

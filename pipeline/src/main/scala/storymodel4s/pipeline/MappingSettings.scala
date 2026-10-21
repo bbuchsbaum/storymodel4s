@@ -130,7 +130,8 @@ private[pipeline] object MappingSettings:
             case Some("reference-only") => Right(true)
             case _                      => Left(FacadeFailure.InvalidConfiguration)
       _ <- Either.cond(
-        !referenceOnly || (config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty),
+        (!MappingPipeline.sourceConditional(config) || referenceOnly) &&
+          (!referenceOnly || (config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty)),
         (),
         FacadeFailure.InvalidConfiguration
       )

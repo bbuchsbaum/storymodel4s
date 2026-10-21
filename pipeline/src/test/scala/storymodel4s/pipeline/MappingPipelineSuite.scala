@@ -941,3 +941,32 @@ class MappingPipelineSuite extends FunSuite:
       assert(paired.outcomes.head.failure.nonEmpty)
     }
   }
+
+  test("organization refuses source conditioning while historical reference remains supported") {
+    inTemp { root =>
+      val input = prepared(root)
+      val conditional = right(
+        MappingPipeline.referenceBatch(
+          input,
+          config.copy(profile = MappingPipeline.LexicalSourceProfile)
+        )
+      ).outcomes.head.run.get
+      val historical = right(MappingPipeline.referenceBatch(input, config)).outcomes.head.run.get
+      val request = right(
+        MeasurementCompatibility.Request.of(
+          MeasurementCompatibility.Axis.Discourse,
+          conditional.reference.inventory.segmentation,
+          0
+        )
+      )
+      assertEquals(
+        MappingPipeline.referenceOrganization(conditional, request),
+        Left(MeasurementCompatibility.Reason.ConditionalMeasureUnsupported)
+      )
+      assert(MappingPipeline.referenceOrganization(historical, request).isRight)
+      assertEquals(
+        MeasurementCompatibility.inspect(conditional.reference, request).verdict,
+        MeasurementCompatibility.Verdict.Incompatible
+      )
+    }
+  }
