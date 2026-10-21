@@ -39,6 +39,15 @@ def run(root):
     rows = freeze["targets"]
     if not rows or len({r["row"] for r in rows}) != len(rows):
         raise ValueError("duplicate or empty frame population")
+    for row in rows:
+        if row["part"] not in freeze["frames"]:
+            raise ValueError("unknown source frame bank")
+        frame = freeze["frames"][row["part"]]
+        if (freeze["inputs"].get(frame["file"]) != frame["sha256"] or
+                len(row["sampleOrdinals"]) != 3 or
+                any(not isinstance(n, int) or not 0 <= n < frame["count"]
+                    for n in row["sampleOrdinals"])):
+            raise ValueError("unbound frame bank or invalid sampling")
     output = root / "outputs.jsonl"
     if output.exists():
         raise ValueError("execution already attempted")
