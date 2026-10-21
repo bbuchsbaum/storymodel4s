@@ -343,3 +343,107 @@ regressions. Pool judgments do not establish exhaustive relevant-interval recall
 MRR. Report caption facts, false identities, other unsupported claims and costs separately.
 Sparse replacement may have little effect: retain that result without selecting more favorable
 queries afterward. The experiment cannot establish the effect of regenerating all captions.
+
+
+### Fresh confirmation results and decision
+
+The four worker runs completed successfully on the frozen 32 intervals. Every fresh low-resolution
+caption exactly reproduced its retained baseline. Anonymous paired judgments against 88 fixed
+reference facts gave:
+
+| Quantity | Original resolution | Higher resolution |
+|---|---:|---:|
+| Complete / partial / absent facts | 7 / 66 / 15 | 7 / 67 / 14 |
+| False merges / false splits | 0 / 0 | 0 / 0 |
+| Intervals with unsupported identity | 1 / 32 | 0 / 32 |
+| Intervals with other unsupported claims | 14 / 32 | 15 / 32 |
+| Recurring subject retained | 27 / 29 | 28 / 29 |
+
+The probe priced all 173 units against all 1,000 detail targets, preserving the one missing
+caption. It measured 172,827 available baseline pairs and verified 5,536 fresh-baseline prices.
+Replacing only 32 captions changed some prices for 122 units, the first-ranked interval for four,
+and the top-three list for 15. These are rank changes, not accuracy improvements.
+
+The independent judge inspected all 63 distinct original source-image strips and original
+annotation contexts for the 73 pooled recall/source pairs. Across pairs, combined support was
+supported for four, partial for 24, and unknown for 45; none was judged contradicted. Insufficient
+samples or annotation context do not establish an incorrect recollection. Both flat queries
+remain in the fixed 24-unit denominator.
+
+| Primary caption-only diagnostic | Original resolution | Higher resolution |
+|---|---:|---:|
+| Supported first choice | 2 / 24 | 2 / 24 |
+| At least one supported top-three interval | 2 / 24 | 3 / 24 |
+| First choice: partial / unknown | 8 / 12 | 8 / 12 |
+| Flat-vector abstentions | 2 / 24 | 2 / 24 |
+
+The single supported top-three gain is unit 3; there are no paired supported-top-one gains or
+losses and no supported-top-three losses. This sparse intervention gives no persuasive evidence
+for making higher resolution the default. The broader caption improvement from the exploratory
+pilot did not repeat. Keep the original production recipe while testing complementary source
+channels. Neither this small sample nor its sparse intervention estimates the effect of a fully
+regenerated film, a new participant or a new film. Agent judgments are not researcher gold.
+
+Local evidence is under `.agent-work/caption-confirm-20261021/`: `caption-summary.json`,
+`caption-paired.json`, `retrieval/support-judgments.tsv`, `retrieval/analyze_support.py`, and
+`retrieval/support-summary.json`. The original anonymous pool and source evidence remain intact.
+The support summary binds the judgment, pool, ranking and analysis script hashes. No source or
+participant text entered Git.
+
+The production-function probe is a test-only diagnostic, not an admitted mixed-recipe package.
+Its ownership guard checks frozen case identities, exact requests, outcome and verification
+receipts, recipe differences, source ordinals and exact low/high texts. Swapping high captions
+between lawful rows must fail. Removing that guard compiles, then fails the named swapped-caption
+test with five siblings passing. The source was restored byte-for-byte.
+
+On exact producer `38d70609b7b5bb58c07332ddaa553864ac88f82c`, the fatal-warning scoped
+`embedBench/test` gate passed 181 tests, failed zero and skipped one (182 total). The final
+`CaptionResolutionProbe` replay produced a byte-identical score table, and `scalafmtCheckAll`
+passed last. The Python harness has 17 passing tests. These are local observations; they do not
+qualify caption accuracy, normalized mapping weights or the original accuracy issue as resolved.
+
+### Audio evidence and the next general scoring comparison
+
+Live inspection found complete Whisper transcripts for both Sherlock media parts in
+`data/transcription/unified-v1/full/whisper_mlx/sherlock/`, with native-media word and decoder
+segment times. The deterministic export check reconstructed all 441 exported files across 110
+records (95 complete, 15 failed) byte-for-byte. This checks artifact integrity, not recognition
+or timestamp accuracy. Full-film Qwen/Parakeet alternatives must not be inferred from excerpt
+trials. The retained Qwen review records meaning-changing disagreements and lacks word timing.
+
+The second-part Whisper decoder segment at 250.02--250.96 seconds explicitly supplies the
+woman's death and lying state. It overlaps annotation row 575 at 249--251 seconds, under the
+existing declared part-clock correspondence. The body is independently described by visual
+captions at nearby intervals. Thus available audio provides a concrete complementary fact,
+without requiring the captioner to infer medical state from posture. We have read the machine
+transcript and annotation, not independently listened to and adjudicated that audio interval.
+
+The current caption profile uses stem-set Jaccard distances over annotations and captions.
+Its A/V comparison means annotation/visual-caption, not audio/visual. `MappingPipeline.batchOnnx`
+explicitly refuses caption fusion; the existing full ASR exports are not a registered scoring
+channel in this route. Consequently the current experiment does not test audio-transcript
+embeddings or three-source fusion.
+
+The next comparison should retrieve candidates from each available channel and score evidence
+about the same event, preserving part, interval, source identity and provenance. Embeddings can
+find paraphrases; participant roles, action/state, negation and reported-world context must then
+constrain support. A useful fact from one channel must not require redundant agreement from all
+channels. Human annotations are optional. Annotation dialogue and ASR derived from the same
+utterance must not count as independent confirmations. A later discussion of an earlier event
+must retain its reference to that event, rather than becoming a present visual depiction.
+
+Compare annotation-only where available, audio-only, visual-only, audio-plus-visual, and all
+available channels, including an explicit no-human-annotation arm. Keep target universe, query
+sample and source timings fixed; preselect any window sizes and avoid tuning on the known body
+case. Reuse the current 24 units as development evidence only. Reserve fresh participants and
+films for acceptance, judge pooled candidates blind, and report supported top-one/top-three,
+wrong-person or wrong-event matches, unknowns, abstention coverage and paired regressions.
+Calibrate any channel combination on separate judgments; arbitrary averaging of embedding
+distances does not establish a better scorer.
+
+Required controls include paraphrased posture/death matches, a standing observer beside a prone
+person, a sleeping rather than deceased person, negated death statements, later reference to an
+earlier death, hypothetical future bodies, wrong-person matches, repeated valid depictions,
+ASR alternatives and timestamp offsets across cuts. Preserve missing evidence separately from
+contradiction. This is the next scoped implementation/evaluation proposal, not an executed
+fusion result; the parent accuracy acceptance remains open.
