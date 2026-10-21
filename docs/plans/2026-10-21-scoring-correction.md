@@ -208,8 +208,10 @@ claims or a replacement production caption package.
 Selection before new outputs: the three previously inspected development rows 503, 507 and
 526, plus every 42nd row from 493 through 955 (12 additional intervals). All use the existing
 Part B samples. An independent agent records image-only reference observations before viewing
-captions, then judges anonymous arm outputs against those fixed observations. This is a bounded
-within-film diagnostic with agent judgments, not independent human or cross-film validation.
+new caption variants, then judges anonymous arm outputs against those fixed observations. The
+reviewer had previously seen the development error in row 507. Separate-image output structure
+can reveal that arm even with anonymous labels, so this is not complete recipe blinding. This is
+a bounded within-film diagnostic with agent judgments, not independent human or cross-film validation.
 The receipt must distinguish the three known development cases from the additional cases.
 
 Acceptance questions: does false cross-image identity decrease, does genuine continuity remain
@@ -223,3 +225,80 @@ live in `.agent-work/caption-fidelity-20261021/`; no media or derived captions a
 The harness refuses changed frozen inputs, cross-arm outcomes and incomplete extent coverage.
 Run its synthetic binding checks with
 `python3 -m unittest discover -s tools -p test_caption_fidelity.py`.
+
+
+### Exploratory resolution control
+
+After inspecting the frozen recipe comparison, a further control tests the same original joint
+prompt with `maxPixels` raised from 65,536 to 262,144; all other recipe fields and the 15 input
+intervals remain fixed. The original image grids are 12 by 20 patches (320 by 192 pixels),
+although the decoded frames are 640 by 360. The small budget originated in the adapter's
+preprocessing court and is not a validated film-quality choice. More visual detail is a general
+alternative to increasingly restrictive identity instructions. Its effect remains empirical.
+
+This is an exploratory follow-up on already inspected cases, not an additional independent
+validation set. Its request, reference hash and acceptance questions were frozen before
+inference in `.agent-work/caption-fidelity-20261021/resolution-control/freeze.json`. Compare
+all 15 cases, preserve regressions and token costs, and judge against the same fixed references.
+
+### Observed caption-fidelity results
+
+All worker calls completed successfully. The initial three arms used identical effective grids
+for all 45 sampled images and identical runtimes (Python 3.13.11, MLX 0.32.2, mlx-vlm 0.6.17).
+The fresh baseline reproduced every one of the 15 retained captions byte-for-byte. The
+resolution control used 640 by 352 inputs, with the same runtime and original prompt.
+
+An independent agent judged 60 interval-level variants against 44 image-first reference facts.
+Initial 45 judgments were fixed before the resolution follow-up was read; that follow-up was
+condition-aware. Reference qualifications retain image indices, additional people within
+recurring-subject cases, and uncertainty about hand ownership, small objects and medical state.
+Concrete unsupported claims are counted separately from interpretive adjectives. Counts below
+are intervals with an error, not numbers of erroneous claims. Complete coverage requires all
+parts of a preselected compound fact; it is not an overall caption-accuracy score.
+
+| Recipe | False merges | False splits | Complete / partial / absent facts | Other unsupported claims: intervals | Recurring subject retained |
+|---|---:|---:|---:|---:|---:|
+| Original joint, 320x192 | 3 | 0 | 5 / 31 / 8 | 6 / 15 | 13 / 14 |
+| Identity-aware joint, 320x192 | 0 | 4 | 13 / 26 / 5 | 7 / 15 | 7 / 14 |
+| Separate sampled images, 320x192 | 0 | 0 | 13 / 28 / 3 | 9 / 15 | 0 / 14 |
+| Original joint, 640x352 | 1 | 0 | 9 / 26 / 9 | 6 / 15 | 14 / 14 |
+
+The original body-case merge disappears under all alternatives. The identity-aware prompt
+also repairs rows 787 and 829 but introduces false splits in rows 526, 871, 913 and 955.
+Separate-image descriptions leave identity continuity unestablished rather than solving it;
+their zero merge/split count must not be reported as perfect identity recognition.
+
+Higher resolution repairs the merges in rows 507 and 787 without adding a judged merge or
+split; row 829 still merges two people. In the 12 additional systematically selected intervals,
+identity-error counts are 2 for the baseline, 3 for the identity-aware prompt, and 1 for higher
+resolution. Those same intervals were already inspected before choosing the resolution control,
+so this is exploratory replication across cases, not a held-out result. Higher resolution
+increases complete fact coverage in five intervals and reduces it in two (829 and 913).
+Its other unsupported-claim flags improve in rows 577 and 871 and regress in 503 and 526;
+aggregate unsupported-claim incidence is unchanged. The new omissions and remaining false
+descriptions stay in the assessment, not hidden by the identity improvement.
+
+Measured single-run times: original joint 53.96 seconds, identity-aware 64.92 seconds,
+separate images 82.72 seconds, higher resolution 54.28 seconds. Generated token totals are
+767, 1,242, 1,589 and 841 respectively. Only the identity-aware arm hits the 96-token cap:
+three intervals (493, 619, 955). These timings are observations, not a repeated performance
+benchmark. Per-image calls have a larger aggregate output budget.
+
+The supported next recipe candidate keeps the original prompt and changes only
+`captionRecipe.maxPixels` from `65536` to `262144`, with `minPixels=16384` and
+`maxNewTokens=96` retained. A complete local recipe is
+`.agent-work/caption-fidelity-20261021/resolution-control/recipe.json`. Existing acquisition
+configuration already accepts this field and derives a new recipe identity; no production
+API change is needed. This is a candidate for a fresh independent comparison, not a qualified
+default replacement or a regenerated full-movie caption package. More detailed input improved
+identity fidelity in this pilot, while residual factual errors prevent an overall accuracy claim.
+
+Reproduce the judgment counts with `tools/caption_fidelity.py summarize`, supplying
+`--assessment assessment.tsv --references reference-observations.json
+--key combined-arm-key.json --output NEW_OUTPUT.json`, resolved under the local artifact root.
+`verified-assessment-summary.json` binds the three inputs by SHA-256. Per-case adverse
+judgments are in `assessment.tsv`; `assessment-summary.json` also retains paired wins/losses.
+Initial experiment producer: `c57311efa0ef5fb76962328e96fb79e9d999452c`; later changes add
+assessment counting and tests without altering those recorded worker calls. Eleven synthetic
+tests pass. Removing the request-identity guard yields one named failure with seven siblings
+passing in the then-eight-test suite. No captions, video or participant text entered Git.

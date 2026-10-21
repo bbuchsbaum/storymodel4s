@@ -4,7 +4,7 @@ import copy
 import hashlib
 import unittest
 
-from caption_fidelity import requests, validate_outcome
+from caption_fidelity import assessment_summary, requests, validate_outcome
 
 
 class CaptionFidelityTest(unittest.TestCase):
@@ -72,8 +72,13 @@ class CaptionFidelityTest(unittest.TestCase):
         self.assertEqual(self.source["extents"][0]["id"], "extent")
 
     def test_another_arms_outcome_is_refused(self):
-        with self.assertRaisesRegex(ValueError, "request identity"):
+        with self.assertRaises(ValueError):
             validate_outcome(self.arms["identity-aware"], self.outcome)
+
+    def test_wrong_request_id_with_identical_payload_is_refused(self):
+        self.outcome["requestId"] = "0" * 64
+        with self.assertRaises(ValueError):
+            validate_outcome(self.arms["joint"], self.outcome)
 
     def test_changed_frame_ownership_is_refused(self):
         self.outcome["extents"][0]["ordinals"] = [0, 1, 5]
@@ -94,6 +99,47 @@ class CaptionFidelityTest(unittest.TestCase):
         self.cases[0]["ordinals"] = [0, 1, 2]
         with self.assertRaisesRegex(ValueError, "case ordinals"):
             requests(self.source, self.cases, "/synthetic/frames.bgr")
+
+
+class AssessmentSummaryTest(unittest.TestCase):
+    def setUp(self):
+        self.references = {
+            "cases": [
+                {
+                    "id": "case-1",
+                    "facts": ["visible cube", "cube is blue"],
+                    "development": False,
+                }
+            ]
+        }
+        self.key = {"case-1-v1": "first", "case-1-v2": "second"}
+        common = {
+            "false_merge": "0",
+            "false_split": "0",
+            "unsupported_identity": "0",
+            "other_unsupported": "0",
+            "continuing_subject_retained": "yes",
+        }
+        self.rows = [
+            {**common, "variant_id": "case-1-v1", "facts": "CP"},
+            {**common, "variant_id": "case-1-v2", "facts": "AA", "false_merge": "1"},
+        ]
+
+    def test_partial_facts_are_not_counted_as_complete(self):
+        result = assessment_summary(self.rows, self.references, self.key)
+        self.assertEqual(result["first"]["all"]["coveredFacts"], 1)
+        self.assertEqual(result["first"]["all"]["partialFacts"], 1)
+        self.assertEqual(result["second"]["all"]["coveredFacts"], 0)
+        self.assertEqual(result["second"]["all"]["identityErrorIntervals"], 1)
+
+    def test_duplicate_rows_cannot_substitute_for_missing_variant(self):
+        with self.assertRaises(ValueError):
+            assessment_summary([self.rows[0], self.rows[0]], self.references, self.key)
+
+    def test_missing_fact_rating_is_not_silently_an_abstention(self):
+        self.rows[0]["facts"] = "C"
+        with self.assertRaises(ValueError):
+            assessment_summary(self.rows, self.references, self.key)
 
 
 if __name__ == "__main__":

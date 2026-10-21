@@ -7,6 +7,7 @@ compares supplied frames, not automatic shot detection or downstream alignment a
 
 import argparse
 import copy
+import csv
 import hashlib
 import json
 from pathlib import Path
@@ -227,6 +228,89 @@ def run(args):
         print(f"Verified {arm}: {len(outcome['extents'])} extents", flush=True)
 
 
+def assessment_summary(rows, references, key):
+    """Count complete reference facts separately from partial coverage and identity errors."""
+    cases = {case["id"]: case for case in references["cases"]}
+    if len(rows) != len(key) or {r["variant_id"] for r in rows} != set(key):
+        raise ValueError("assessment must cover every variant exactly once")
+    grouped = {}
+    for row in rows:
+        case = row["variant_id"].rsplit("-v", 1)[0]
+        if case not in cases or len(row["facts"]) != len(cases[case]["facts"]):
+            raise ValueError("reference fact count differs")
+        if not set(row["facts"]) <= set("CPA"):
+            raise ValueError("unknown fact rating")
+        if row["continuing_subject_retained"] not in ("yes", "no", "na"):
+            raise ValueError("unknown continuity rating")
+        flags = [
+            row[k]
+            for k in (
+                "false_merge",
+                "false_split",
+                "unsupported_identity",
+                "other_unsupported",
+            )
+        ]
+        if any(flag not in ("0", "1") for flag in flags):
+            raise ValueError("error flags must be binary")
+        grouped.setdefault(key[row["variant_id"]], []).append((case, row))
+
+    def count(entries):
+        return {
+            "intervals": len(entries),
+            "falseMerge": sum(int(r["false_merge"]) for _, r in entries),
+            "falseSplit": sum(int(r["false_split"]) for _, r in entries),
+            "identityErrorIntervals": sum(
+                any(
+                    r[k] == "1"
+                    for k in ("false_merge", "false_split", "unsupported_identity")
+                )
+                for _, r in entries
+            ),
+            "otherUnsupportedIntervals": sum(
+                int(r["other_unsupported"]) for _, r in entries
+            ),
+            "coveredFacts": sum(r["facts"].count("C") for _, r in entries),
+            "partialFacts": sum(r["facts"].count("P") for _, r in entries),
+            "absentFacts": sum(r["facts"].count("A") for _, r in entries),
+            "retainedContinuity": sum(
+                r["continuing_subject_retained"] == "yes" for _, r in entries
+            ),
+            "continuityEligible": sum(
+                r["continuing_subject_retained"] != "na" for _, r in entries
+            ),
+        }
+
+    result = {}
+    for arm, entries in grouped.items():
+        if len(entries) != len(cases) or {case for case, _ in entries} != set(cases):
+            raise ValueError("each arm must cover the same reference cases")
+        result[arm] = {
+            "all": count(entries),
+            "known": count([e for e in entries if cases[e[0]]["development"]]),
+            "additional": count([e for e in entries if not cases[e[0]]["development"]]),
+        }
+    return result
+
+
+def summarize(args):
+    with Path(args.assessment).open(encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream, delimiter="\t"))
+    result = assessment_summary(rows, read(args.references), read(args.key))
+    write_new(
+        args.output,
+        {
+            "scope": "Counts of supplied judgments, not automatic or general accuracy validation.",
+            "inputs": {
+                str(Path(p).resolve()): digest(p)
+                for p in (args.assessment, args.references, args.key)
+            },
+            "arms": result,
+        },
+    )
+    print(f"Summarized {len(rows)} judgments across {len(result)} arms")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -241,6 +325,10 @@ def main():
         "--timeout", type=int, default=900, help="maximum seconds per arm"
     )
     execute.set_defaults(function=run)
+    report = commands.add_parser("summarize")
+    for field in ("assessment", "references", "key", "output"):
+        report.add_argument(f"--{field}", required=True)
+    report.set_defaults(function=summarize)
     args = parser.parse_args()
     args.function(args)
 
