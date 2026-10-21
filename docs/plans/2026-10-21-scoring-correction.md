@@ -93,3 +93,50 @@ source membership is unestablished, even when one candidate receives all the sco
 Temporal allocation and organization summaries currently refuse this new measure because their result
 types do not retain conditioning. Existing historical readouts remain supported. Incompatible paired
 settings are rejected before provider execution.
+
+## Executed development diagnostics
+
+Producer `c323c4976c670ce3167f6dd890cfdba12da91aa3` ran six fresh local publications: the
+historical and corrected policies for annotations (A), captions (V, blend 1.0), and their
+fixed blend (AV, 0.5). Configuration and input hashes were frozen before execution. All six
+completed successfully, with 173 units and a declared cut of 1,000 detail targets. These use
+the existing lexical channels; they are not a replay of the original ONNX/BM25 producer.
+No captions were regenerated. The existing package still uses manually supplied intervals.
+
+Within each representation arm, both policies produced identical source nominations and
+identical source ranks for all 173 units, including identical empty results. Thus this experiment
+does **not** demonstrate a source-ranking improvement from the new policy. It does exercise
+the corrected measured basis and conditional export on the real inputs.
+
+| Representation | Units with normalized source candidates | u92 top source row | u92 row 503 rank | u93 top source row |
+|---|---:|---:|---:|---:|
+| A | 151 / 173 | 575 | 4 | 596 |
+| V | 120 / 173 | 526 | absent from nominations | 804 |
+| AV | 160 / 173 | 575 | 4 | 594 |
+
+These coverage counts are not accuracy scores. Row 575 is dialogue about the same dead woman,
+so it is not an established wrong-event match; it also does not localize the depicted reveal.
+In V, row 507 is absent from u92 nominations, while rows 508 and 591 rank 17 and 12. The
+top V interval, row 526, has an annotation about inspecting an umbrella. The initial reveal's
+caption omitted the body. Preserve these adverse observations: normalization does not repair
+caption omissions or weak retrieval, and symmetric lexical similarity does not establish
+event support. A reliable depicted-content match remains unqualified.
+
+The separate retained-score counterfactual reproduced the original local masses for all 173
+units with maximum absolute error below `5.6e-16`. On its retained detail candidates, u92
+orders row 575 first and row 503 second after removing the incompatible penalties. Its
+distances already contain the historical mixed-grain reranker's effects; this is not a fresh
+producer result and must not be substituted for the table above.
+
+Local receipts are under `.agent-work/scoring-20261021/`: `fresh-diagnostic-freeze.json`,
+`fresh-diagnostic-controls-freeze.json`, `fresh-diagnostic-03.log`, `runs/`, and
+`fresh-diagnostic-audit.json`. The first two diagnostic attempts failed at invocation and
+output-directory setup respectively; their logs are retained. Reproduce the scalar audit with
+`python3 tools/audit-source-reference-diagnostic.py PATH/TO/runs`. It verifies publication
+hashes and mass sums, retains every nominated target for u92/u93, and reports source-rank
+agreement across all units. Participant text stays in the existing local artifacts.
+
+The next scientific acceptance step is the independent evaluation above, including separate
+labels for event support and depicted-interval support. Caption acquisition and semantic
+retrieval need their own measured improvements; a blanket visual boost is not supported by
+these results. The parent issue remains open for that acceptance.
