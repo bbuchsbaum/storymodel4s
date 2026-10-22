@@ -21,7 +21,7 @@ def fixture():
         basis=dict(kind='direct',explanation='Explicitly described.') if side=='support' else dict(
             kind='exclusive_value',axis='life_state',claim_value='dead',source_value='alive',explanation='Same time.')
         return dict(citations=[citation],bindings=bindings,basis=basis)
-    v=dict(claim_id=model_claim_id(r),joins=[dict(role='r1',disposition='matched',basis='direct_description',anchors=[dict(evidence_id='s1',quote=r['items'][0]['text'])],explanation='Same source woman.')],components=[dict(component_id='c1',support=[link()],counter=[],unresolved=[]),
+    v=dict(claim_id=model_claim_id(r),joins=[dict(role=role,disposition='matched',basis='direct_description',anchors=[dict(evidence_id='s1',quote=r['items'][0]['text'])],explanation='Same source participant/event/context.') for role in ('r1','event_scope','context_scope')],components=[dict(component_id='c1',support=[link()],counter=[],unresolved=[]),
              dict(component_id='c2',support=[],counter=[],unresolved=['partial_evidence'])])
     return r,v,link
 
@@ -34,7 +34,7 @@ class ComponentTests(unittest.TestCase):
 
     def test_false_detail_is_not_conflict(self):
         r,v,link=fixture();v['components'][1].update(counter=[link('s2','counter')],unresolved=[])
-        v['joins'][0]['anchors'].append(dict(evidence_id='s2',quote=r['items'][1]['text']))
+        for j in v['joins']:j['anchors'].append(dict(evidence_id='s2',quote=r['items'][1]['text']))
         o=p.validate_proposal(r,json.dumps(v))
         self.assertEqual(o['summary']['componentCounts'],dict(Supported=1,Contradicted=1,Conflicted=0,Unresolved=0))
         self.assertFalse(o['summary']['withinComponentConflict'])
@@ -43,6 +43,7 @@ class ComponentTests(unittest.TestCase):
         r,v,link=fixture();r['items'][1]['text']='The same woman is not on the floor.'
         counter=link('s2','counter');counter['basis']=dict(kind='explicit_negation',explanation='The source explicitly denies floor contact for the same woman.')
         v['components'][0]['counter']=[counter]
+        for j in v['joins']:j['anchors'].append(dict(evidence_id='s2',quote=r['items'][1]['text']))
         self.assertEqual(p.validate_proposal(r,json.dumps(v))['components'][0]['status'],'Conflicted')
 
     def test_unresolved_join_retains_only_proposal(self):
@@ -71,6 +72,24 @@ class ComponentTests(unittest.TestCase):
         self.assertEqual([c['status'] for c in o['components']],['Unresolved','Unresolved'])
         self.assertFalse(o['summary']['allSupported'])
         self.assertTrue(o['summary']['parentBindingUnresolved'])
+
+    def test_same_record_multiple_people_still_need_join(self):
+        r,v,link=fixture();r['items'][0]['text']='Ana is on the floor. Beth is dead.'
+        v['components'][0]['support']=[link()]
+        v['components'][1].update(support=[link()],unresolved=[])
+        for j in v['joins']:j.update(disposition='unresolved',basis='unresolved',anchors=[dict(evidence_id='s1',quote=r['items'][0]['text'])])
+        o=p.validate_proposal(r,json.dumps(v))
+        self.assertEqual([c['localStatus'] for c in o['components']],['Supported','Supported'])
+        self.assertEqual([c['status'] for c in o['components']],['Unresolved','Unresolved'])
+
+    def test_atomic_opposing_links_need_entity_event_context_joins(self):
+        r,v,link=fixture();r['inventory']['logic']='atomic'
+        r['inventory']['components']=r['inventory']['components'][:1];v['components']=v['components'][:1]
+        r['items'][1]['text']='Another woman is not on the floor.'
+        counter=link('s2','counter');counter['basis']=dict(kind='explicit_negation',explanation='Negative floor assertion about another woman.')
+        v['components'][0]['counter']=[counter]
+        c=p.validate_proposal(r,json.dumps(v))['components'][0]
+        self.assertEqual(c['localStatus'],'Conflicted');self.assertEqual(c['status'],'Unresolved')
 
     def test_partial_population_rejected(self):
         r,v,_=fixture();v['components'].pop()

@@ -41,7 +41,9 @@ colors, textures, objects, or participants are NOT counter evidence. Counter bas
 {kind: exclusive_value, axis: life_state|presence, claim_value: ..., source_value: ...,
  explanation: ...}. life_state allows alive/dead; presence allows present/absent. Opposite
 values require identical scope. Medical state cannot be inferred from posture.
-Also return joins: one binding for each role id shared across two or more components.
+Also return joins: one binding for EVERY distinct role id in the inventory PLUS event_scope and
+context_scope, even for one-component claims. These joins connect all evidence links,
+including support versus counter evidence within one component.
 These parent-level joins must bridge ALL source records cited for that role across components;
 otherwise different people/events could satisfy different parts of one recalled individual.
 Each join has the same fields as a binding. An unresolved join retains component findings but
@@ -194,7 +196,7 @@ def validate_proposal(request, raw):
                 raise ValueError('shared role definition differs')
             role_anchors[rid] = role
             role_counts[rid] = role_counts.get(rid,0)+1
-    shared = {r for r,n in role_counts.items() if n>1}
+    shared = set(role_counts) | {'event_scope','context_scope'}
     joins = value['joins']
     if len(joins)!=len(shared) or {j['role'] for j in joins}!=shared:
         raise ValueError('parent join population differs')
@@ -209,7 +211,7 @@ def validate_proposal(request, raw):
         anchors=[citation(items,a) for a in j['anchors']]
         used=set()
         for c in result:
-            if j['role'] in {r['id'] for r in expected[c['component']]['roles']}:
+            if j['role'] in {r['id'] for r in expected[c['component']]['roles']} | {'event_scope','context_scope'}:
                 for side in ('support','counter','proposed_support','proposed_counter'):
                     used.update(a['evidence'] for link in c[side] for a in link['citations'])
         if j['basis']=='continuous_visual_track' and not any(items[a['evidence']].get('kind')=='visual_track' for a in anchors):
@@ -217,8 +219,8 @@ def validate_proposal(request, raw):
         resolved=bool(used) and used<={a['evidence'] for a in anchors} and j['disposition']=='matched' and j['basis']!='unresolved'
         checked_joins.append(dict(j,anchors=anchors,bindingResolved=resolved))
     # Local proposition support is distinct from attribution to one recalled referent.
-    # An absent fact introduces no competing entity. Two differently anchored local
-    # facts do require a resolved join; without a supplied anchor neither wins by order.
+    # An absent fact introduces no competing entity. Two evidence-bearing local
+    # facts do require a resolved join (even one quote can name two people); without a supplied anchor neither wins by order.
     for c in result:
         c['localStatus']=c['status']
         c['attributionUnresolved']=False
@@ -226,20 +228,20 @@ def validate_proposal(request, raw):
         if join['bindingResolved']:
             continue
         dependent=[]
-        signatures=set()
+        assignments=0
         for c in result:
-            if join['role'] not in {r['id'] for r in expected[c['component']]['roles']}:
+            if join['role'] not in {r['id'] for r in expected[c['component']]['roles']} | {'event_scope','context_scope'}:
                 continue
             anchors=set()
             for side in ('support','counter'):
                 for link in c[side]:
                     for binding in link['bindings']:
                         if binding['role']==join['role']:
+                            assignments+=1
                             anchors.update((a['evidence'],a['quote']) for a in binding['anchors'])
             if anchors:
                 dependent.append(c)
-                signatures.add(tuple(sorted(anchors)))
-        if len(dependent)>1 and len(signatures)>1:
+        if assignments>1:
             for c in dependent:
                 c['attributionUnresolved']=True
                 c['unresolved']=sorted(set(c['unresolved'])|{'reference_unresolved'})
@@ -266,6 +268,7 @@ def summarize(components, logic):
               for s in ('Supported','Contradicted','Conflicted','Unresolved')}
     # A conjunction can have one true and one false conjunct without conflicting evidence.
     return dict(componentCounts=counts, allSupported=logic!='unresolved' and counts['Supported']==len(components),
-                counterPresent=any(c['counter'] for c in components),
+                localCounterPresent=any(c['counter'] for c in components),
+                attributedCounterPresent=any(c['counter'] and not c.get('attributionUnresolved',False) for c in components),
                 unresolvedPresent=logic=='unresolved' or counts['Unresolved']>0,
                 withinComponentConflict=counts['Conflicted']>0)
