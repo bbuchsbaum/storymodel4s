@@ -13,19 +13,25 @@ import component_assessment_probe as protocol
 import openrouter_claim_probe as remote
 
 
-def body(request):
-    return dict(model=remote.MODEL, temperature=0, max_tokens=8192,
+ROUTES={'fireworks':'Fireworks','together':'Together'}
+
+def body(request,route='fireworks',protocol_name='components'):
+    if route not in ROUTES or protocol_name not in {'components','whole'}:
+        raise ValueError('unknown route or protocol')
+    prompt=protocol.PROMPT if protocol_name=='components' else base.PROMPT
+    model_input=protocol.model_input(request) if protocol_name=='components' else base.model_input(request)
+    return dict(model=remote.MODEL, temperature=0, max_tokens=8192 if protocol_name=='components' else 4096,
                 reasoning=dict(effort='low', exclude=True), stream=False,
-                provider=dict(remote.PROVIDER,max_price=dict(prompt=.30,completion=1.20,request=0)),
-                messages=[dict(role='user',content=protocol.PROMPT+'\nINPUT:\n'+
-                               json.dumps(protocol.model_input(request),ensure_ascii=False))])
+                provider=dict(remote.PROVIDER,only=[route],max_price=dict(prompt=.30,completion=1.20,request=0)),
+                messages=[dict(role='user',content=prompt+'\nINPUT:\n'+
+                               json.dumps(model_input,ensure_ascii=False))])
 
 
-def interpret(request,response):
+def interpret(request,response,route='fireworks',protocol_name='components'):
     invalid = dict(processing='invalid_response',raw=None,proposal=None)
     if not isinstance(response,dict):
         return invalid
-    if response.get('model') != remote.MODEL or response.get('provider') != 'Fireworks':
+    if response.get('model') != remote.MODEL or response.get('provider') != ROUTES[route]:
         return dict(invalid,processing='foreign_provider_or_model')
     choices = response.get('choices')
     if not isinstance(choices,list) or len(choices)!=1 or not isinstance(choices[0],dict):
@@ -37,7 +43,7 @@ def interpret(request,response):
     if choice.get('finish_reason')!='stop' or message.get('tool_calls') or not isinstance(raw,str):
         return dict(invalid,processing='unfinished_or_nontext_response',raw=raw if isinstance(raw,str) else None)
     try:
-        return dict(processing='valid',raw=raw,proposal=protocol.validate_proposal(request,raw))
+        return dict(processing='valid',raw=raw,proposal=(protocol.validate_proposal(request,raw) if protocol_name=='components' else base.validate_proposal(request,raw)))
     except (ValueError,KeyError,TypeError,AttributeError) as error:
         return dict(processing='invalid_proposal',raw=raw,proposal=None,errorClass=type(error).__name__)
 
@@ -64,10 +70,10 @@ def error_metadata(error):
     return out
 
 
-def execute(record,key):
-    request=record['request']; payload=body(request)
+def execute(record,key,route='fireworks'):
+    request=record['request']; protocol_name=record.get('protocol','components');payload=body(request,route,protocol_name)
     encoded=json.dumps(payload,ensure_ascii=False).encode()
-    out=dict(condition=record['condition'],question=request['question'],requestIdentity=request['identity'],
+    out=dict(condition=record['condition'],question=request['question'],requestIdentity=request['identity'],protocol=protocol_name,route=route,
              bodySha256=base.hashlib.sha256(encoded).hexdigest(),attempts=1,raw=None,proposal=None)
     start=time.monotonic()
     call=urllib.request.Request(remote.ENDPOINT,data=encoded,method='POST',headers={
@@ -75,7 +81,7 @@ def execute(record,key):
     try:
         with urllib.request.urlopen(call,timeout=120) as stream:
             response=json.load(stream)
-        out.update(interpret(request,response))
+        out.update(interpret(request,response,route,protocol_name))
         if isinstance(response,dict):
             out.update(usage=response.get('usage'),generationId=response.get('id'),model=response.get('model'),
                        provider=response.get('provider'))
@@ -99,6 +105,8 @@ def run(root):
     for path in (Path(__file__),Path(protocol.__file__),Path(base.__file__),Path(remote.__file__),root/'requests.json'):
         if freeze['files'].get(str(path.absolute()))!=base.sha(path):
             raise ValueError('consumed code/input not frozen')
+    route=freeze.get('route','fireworks')
+    if route not in ROUTES:raise ValueError('unknown frozen route')
     records=base.read(root/'requests.json')['executions']
     keys=[(r['condition'],r['request']['question']) for r in records]
     if not records or len(keys)!=len(set(keys)):
@@ -107,7 +115,7 @@ def run(root):
         req=r['request']
         if req['identity']!=base.identity({k:v for k,v in req.items() if k!='identity'}):
             raise ValueError('request identity mismatch')
-    bound=sum(remote.cost_bound(body(r['request'])) for r in records)
+    bound=sum(remote.cost_bound(body(r['request'],route,r.get('protocol','components'))) for r in records)
     budget=freeze['budgetUsd']; prior=freeze['priorCostBoundUsd']
     if not all(isinstance(n,(int,float)) and not isinstance(n,bool) and math.isfinite(n) for n in (budget,prior)):
         raise ValueError('invalid budget')
@@ -126,13 +134,13 @@ def run(root):
             else:
                 if i:
                     time.sleep(5)
-                out=execute(r,key)
+                out=execute(r,key,route)
                 stopped=out.get('httpStatus')==429
             results.append(out); stream.write(json.dumps(out,ensure_ascii=False)+'\n'); stream.flush()
             print(f"Completed {i+1}/{len(records)}: {out['processing']}",flush=True)
     costs=[r['usage']['cost'] for r in results if isinstance(r.get('usage'),dict)
            and isinstance(r['usage'].get('cost'),(int,float))]
-    attempted_bound=sum(remote.cost_bound(body(r['request'])) for r,o in zip(records,results) if o['attempts'])
+    attempted_bound=sum(remote.cost_bound(body(r['request'],route,r.get('protocol','components'))) for r,o in zip(records,results) if o['attempts'])
     base.write(root/'execution.json',dict(freezeSha256=base.sha(root/'freeze.json'),
         outputsSha256=base.sha(output),requested=len(records),attempted=sum(o['attempts'] for o in results),
         valid=sum(o['processing']=='valid' for o in results),conservativeCostBoundUsd=bound,

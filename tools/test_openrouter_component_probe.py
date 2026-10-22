@@ -14,6 +14,15 @@ class RemoteTests(unittest.TestCase):
         self.assertEqual(b['max_tokens'],8192)
         self.assertFalse(b['provider']['allow_fallbacks'])
         self.assertEqual(b['provider']['max_price']['request'],0)
+    def test_pinned_alternate_route_keeps_privacy_and_baseline_prompt(self):
+        r,_,_=fixture();b=p.body(r,'together','whole')
+        self.assertEqual(b['provider']['only'],['together'])
+        self.assertTrue(b['provider']['zdr']);self.assertEqual(b['provider']['data_collection'],'deny')
+        self.assertEqual(b['max_tokens'],4096)
+        self.assertTrue(b['messages'][0]['content'].startswith(base.PROMPT))
+        self.assertNotIn('components',b['messages'][0]['content'].split('INPUT:',1)[1])
+        with self.assertRaises(ValueError):p.body(r,'unknown')
+
     def test_foreign_model_rejected(self):
         r,v,_=fixture()
         self.assertEqual(p.interpret(r,dict(model='other',provider='Fireworks'))['processing'],'foreign_provider_or_model')
