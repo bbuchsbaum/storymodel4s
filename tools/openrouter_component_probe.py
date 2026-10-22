@@ -42,6 +42,28 @@ def interpret(request,response):
         return dict(processing='invalid_proposal',raw=raw,proposal=None,errorClass=type(error).__name__)
 
 
+def error_metadata(error):
+    """Classify provider errors without retaining a body that could echo private inputs."""
+    out={}
+    try:
+        value=json.loads(error.read(65536)); e=value.get('error',{})
+        meta=e.get('metadata',{}) if isinstance(e,dict) else {}
+        if isinstance(meta,dict) and meta.get('provider_name') in {'Fireworks','DeepSeek','Together','OpenRouter'}:
+            out['errorProvider']=meta['provider_name']
+        # Emit only fixed categories, never the provider's free-text error message.
+        body_text=json.dumps(value).lower()
+        patterns={'rate_limit':('rate limit','rate_limit','too many requests'),
+                  'upstream_capacity':('capacity','overloaded','temporarily'),
+                  'token_limit':('token limit','tokens per','tpm'),
+                  'credit_limit':('insufficient credit','credit limit','insufficient_quota'),
+                  'context_length':('context length','context_length','too long'),
+                  'provider_returned_error':('provider returned error',)}
+        out['errorCategories']=[name for name,terms in patterns.items() if any(t in body_text for t in terms)]
+    except (ValueError,TypeError,AttributeError,OSError):
+        out['errorCategories']=['unclassified']
+    return out
+
+
 def execute(record,key):
     request=record['request']; payload=body(request)
     encoded=json.dumps(payload,ensure_ascii=False).encode()
@@ -58,7 +80,7 @@ def execute(record,key):
             out.update(usage=response.get('usage'),generationId=response.get('id'),model=response.get('model'),
                        provider=response.get('provider'))
     except urllib.error.HTTPError as error:
-        out.update(processing='http_failure',httpStatus=error.code)
+        out.update(processing='http_failure',httpStatus=error.code,**error_metadata(error))
         # Numeric retry delay only; neither headers nor potentially echoed request bodies are logged.
         retry=error.headers.get('Retry-After','')
         if retry.isdigit():
@@ -102,6 +124,8 @@ def run(root):
                          requestIdentity=r['request']['identity'],attempts=0,processing='unattempted_after_rate_limit',
                          raw=None,proposal=None)
             else:
+                if i:
+                    time.sleep(5)
                 out=execute(r,key)
                 stopped=out.get('httpStatus')==429
             results.append(out); stream.write(json.dumps(out,ensure_ascii=False)+'\n'); stream.flush()

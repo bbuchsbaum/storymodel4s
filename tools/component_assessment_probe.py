@@ -269,6 +269,6 @@ def summarize(components, logic):
     # A conjunction can have one true and one false conjunct without conflicting evidence.
     return dict(componentCounts=counts, allSupported=logic!='unresolved' and counts['Supported']==len(components),
                 localCounterPresent=any(c['counter'] for c in components),
-                attributedCounterPresent=any(c['counter'] and not c.get('attributionUnresolved',False) for c in components),
+                attributedCounterPresent=any(c['status'] in {'Contradicted','Conflicted'} for c in components),
                 unresolvedPresent=logic=='unresolved' or counts['Unresolved']>0,
                 withinComponentConflict=counts['Conflicted']>0)
