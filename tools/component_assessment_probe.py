@@ -18,9 +18,14 @@ participants, time, and reported/believed/hypothetical scope. Assess asserted de
 unasserted embellishments. Unknown death must not erase supported posture or location.
 Captions are machine proposals, not ground truth. ASR supplies what was asserted, not proof
 that the assertion is true. Different records are not independent votes. Use no film knowledge.
+Role quote anchors point to a claimed referent; they do not establish every noun or modifier
+in that description. Bind the referent while separately assessing its disputed properties.
 For each component return support/counter links and unresolved reasons. Each link contains
 citations, bindings, and basis. citations are exact unique quotes from supplied evidence ids.
-Bindings must cover EVERY required role plus event_scope and context_scope. Each binding has
+Bindings must cover EVERY required role plus event_scope and context_scope.
+The binding basis MUST be one string from: explicit_reference, direct_description,
+continuous_visual_track, unresolved. Do not put explanations or "direct" in binding basis.
+Unresolved MUST be an array of reason STRINGS, for example ["partial_evidence"], never objects. Each binding has
 role, disposition (matched or unresolved), basis, anchors (exact source citations), explanation.
 A binding joins the recall role to ALL the linked source records; explain any cross-record
 entity/event continuity. Explicit reference chains and distinctive descriptions can support
@@ -36,7 +41,12 @@ colors, textures, objects, or participants are NOT counter evidence. Counter bas
 {kind: exclusive_value, axis: life_state|presence, claim_value: ..., source_value: ...,
  explanation: ...}. life_state allows alive/dead; presence allows present/absent. Opposite
 values require identical scope. Medical state cannot be inferred from posture.
-Return JSON only: {claim_id, components:[{component_id,support:[],counter:[],unresolved:[]}]}
+Also return joins: one binding for each role id shared across two or more components.
+These parent-level joins must bridge ALL source records cited for that role across components;
+otherwise different people/events could satisfy different parts of one recalled individual.
+Each join has the same fields as a binding. An unresolved join retains component findings but
+prevents declaring the whole conjunction supported.
+Return JSON only: {claim_id, joins:[], components:[{component_id,support:[],counter:[],unresolved:[]}]}
 Each link: {citations:[{evidence_id,quote}],bindings:[{role,disposition,basis,anchors:
 [{evidence_id,quote}],explanation}],basis:{...}}. Reasons: source_unavailable, partial_evidence,
 reference_unresolved, context_unresolved, comparison_unavailable, extraction_unresolved.
@@ -145,7 +155,7 @@ def validate_link(items, component, side, link):
 def validate_proposal(request, raw):
     inv = validate_inventory(request['claim'],request['inventory'])
     value = json.loads(raw,object_pairs_hook=unique_object)
-    if set(value) != {'claim_id','components'} or value['claim_id'] != model_claim_id(request):
+    if set(value) != {'claim_id','components','joins'} or value['claim_id'] != model_claim_id(request):
         raise ValueError('foreign claim or wrong proposal shape')
     expected = {c['id']:c for c in inv['components']}
     components = value['components']
@@ -174,7 +184,42 @@ def validate_proposal(request, raw):
             raise ValueError('unanswered component lacks reason')
         out['status'] = component_status(out)
         result.append(out)
-    return dict(question=request['question'],components=result,summary=summarize(result,inv['logic']))
+    role_counts = {}
+    role_anchors = {}
+    for c in inv['components']:
+        for role in c['roles']:
+            rid = role['id']
+            if rid in role_anchors and role_anchors[rid] != role:
+                raise ValueError('shared role definition differs')
+            role_anchors[rid] = role
+            role_counts[rid] = role_counts.get(rid,0)+1
+    shared = {r for r,n in role_counts.items() if n>1}
+    joins = value['joins']
+    if len(joins)!=len(shared) or {j['role'] for j in joins}!=shared:
+        raise ValueError('parent join population differs')
+    checked_joins = []
+    for j in joins:
+        if set(j)!={'role','disposition','basis','anchors','explanation'}:
+            raise ValueError('wrong parent join shape')
+        if j['disposition'] not in {'matched','unresolved'} or j['basis'] not in BASES:
+            raise ValueError('invalid parent join')
+        if not isinstance(j['explanation'],str) or not j['explanation'].strip():
+            raise ValueError('missing parent join explanation')
+        anchors=[citation(items,a) for a in j['anchors']]
+        used=set()
+        for c in result:
+            if j['role'] in {r['id'] for r in expected[c['component']]['roles']}:
+                for side in ('support','counter','proposed_support','proposed_counter'):
+                    used.update(a['evidence'] for link in c[side] for a in link['citations'])
+        if j['basis']=='continuous_visual_track' and not any(items[a['evidence']].get('kind')=='visual_track' for a in anchors):
+            raise ValueError('invented parent visual track')
+        resolved=bool(used) and used<={a['evidence'] for a in anchors} and j['disposition']=='matched' and j['basis']!='unresolved'
+        checked_joins.append(dict(j,anchors=anchors,bindingResolved=resolved))
+    summary=summarize(result,inv['logic'])
+    summary['parentBindingUnresolved']=any(not j['bindingResolved'] for j in checked_joins)
+    summary['allSupported'] &= not summary['parentBindingUnresolved']
+    summary['unresolvedPresent'] |= summary['parentBindingUnresolved']
+    return dict(question=request['question'],components=result,joins=checked_joins,summary=summary)
 
 
 def component_status(c):

@@ -21,7 +21,7 @@ def fixture():
         basis=dict(kind='direct',explanation='Explicitly described.') if side=='support' else dict(
             kind='exclusive_value',axis='life_state',claim_value='dead',source_value='alive',explanation='Same time.')
         return dict(citations=[citation],bindings=bindings,basis=basis)
-    v=dict(claim_id=model_claim_id(r),components=[dict(component_id='c1',support=[link()],counter=[],unresolved=[]),
+    v=dict(claim_id=model_claim_id(r),joins=[dict(role='r1',disposition='matched',basis='direct_description',anchors=[dict(evidence_id='s1',quote=r['items'][0]['text'])],explanation='Same source woman.')],components=[dict(component_id='c1',support=[link()],counter=[],unresolved=[]),
              dict(component_id='c2',support=[],counter=[],unresolved=['partial_evidence'])])
     return r,v,link
 
@@ -60,6 +60,13 @@ class ComponentTests(unittest.TestCase):
         r,v,link=fixture(); c=link('s2','counter');c['basis'].update(axis='color',claim_value='red',source_value='speckled')
         v['components'][0]['counter']=[c]
         with self.assertRaisesRegex(ValueError,'incompatibility'):p.validate_proposal(r,json.dumps(v))
+
+    def test_parent_join_cannot_stitch_different_sources(self):
+        r,v,link=fixture();v['components'][1].update(support=[link('s2')],unresolved=[])
+        o=p.validate_proposal(r,json.dumps(v))
+        self.assertEqual(o['summary']['componentCounts']['Supported'],2)
+        self.assertFalse(o['summary']['allSupported'])
+        self.assertTrue(o['summary']['parentBindingUnresolved'])
 
     def test_partial_population_rejected(self):
         r,v,_=fixture();v['components'].pop()

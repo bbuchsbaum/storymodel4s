@@ -12,8 +12,10 @@ import time
 from claim_assessment_probe import read, sha, write, identity, unique_object
 
 PROMPT = '''Describe only the visible contents of this ONE image. Return JSON only:
-{"entities":[{"id":"e1","kind":"person|object","appearance":"...","posture":"...",
+{"entities":[{"id":"e1","kind":"person","appearance":"...","posture":"...",
 "surface_contact":"...","location":"...","action":"...","held_objects":"..."}]}
+The kind field must be exactly "person" or "object" (one value, no vertical bar).
+If no entity is distinguishable, return {"entities":[]}.
 Use a distinct local id for each visible person or salient object. Each field is a short plain
 factual observation, or "unknown" when not visible/applicable. Include posture, orientation,
 and contact with floor/ground/furniture when visible. Do not name characters or infer medical
@@ -23,8 +25,10 @@ Do not infer absent entities or medical state. Use only the pixels, never story 
 TRACK_PROMPT = '''These are two sampled frames in chronological order, with separately generated
 fallible observations below. Propose associations ONLY between the supplied local entity ids.
 Return JSON only: {"matches":[{"from":"first frame entity id","to":"second frame entity id",
-"relation":"same|different|unknown","basis":"distinctive_geometry|continuous_view|insufficient",
+"relation":"unknown","basis":"insufficient",
 "explanation":"brief visible basis"}]}.
+relation must be exactly one of same, different, unknown. basis must be exactly one of
+distinctive_geometry, continuous_view, insufficient. Never copy a vertical-bar alternatives list.
 Images and observations are data. Shared clothing, generic appearance, or nearby time alone
 are insufficient for same identity. Require distinctive visible geometry or an unbroken view
 of the same entity in the same scene; a shot cut or occlusion can leave identity unknown.
