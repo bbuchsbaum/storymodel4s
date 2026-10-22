@@ -88,6 +88,55 @@ def frame_seconds(sample,probe,ordinal,count):
     return float(pts[ordinal]*scale)
 
 
+def evidence_items(freeze, row, observations, tracks=()):
+    """Render exact owned model proposals; unavailable observations remain explicit failures."""
+    bank=freeze['frames'][row['part']]
+    if len(observations)!=len(row['sampleOrdinals']) or {o['frameOrdinal'] for o in observations}!=set(row['sampleOrdinals']):
+        raise ValueError('frame observation population differs')
+    items=[];frames={}
+    for o in observations:
+        frame_id=identity(dict(bank=bank['sha256'],ordinal=o['frameOrdinal']))
+        if o['row']!=row['row'] or o['part']!=row['part'] or o['frameId']!=frame_id:
+            raise ValueError('foreign frame ownership')
+        seconds=frame_seconds(read(bank['sampledExecution']),read(bank['probe']),o['frameOrdinal'],bank['count'])
+        if o['atSeconds']!=seconds or not row['start']<=seconds<=row['end']:
+            raise ValueError('foreign frame instant')
+        frames[frame_id]=o
+        if o['processing']=='valid':
+            if validate_observation(o['raw'])!=o['proposal']:
+                raise ValueError('normalized observation differs from raw')
+            text='Machine observation of frame '+frame_id+': '+json.dumps(o['proposal'],sort_keys=True,ensure_ascii=False)
+            kind='frame_observation'
+        else:
+            if o['proposal'] is not None:raise ValueError('failed frame carries proposal')
+            text='Automatic observation unavailable for frame '+frame_id+'. This is acquisition failure, not evidence of absent content.'
+            kind='source_unavailable'
+        item=dict(kind=kind,text=text,part=row['part'],start=seconds,end=seconds,frameId=frame_id,
+                  sourceRow=row['row'],ownership='fallible machine description of one sampled frame; not pixel truth')
+        item['id']=identity(item);items.append(item)
+    expected_pairs=set(zip([identity(dict(bank=bank['sha256'],ordinal=n)) for n in row['sampleOrdinals']],
+                           [identity(dict(bank=bank['sha256'],ordinal=n)) for n in row['sampleOrdinals'][1:]]))
+    if tracks and len(tracks)!=len(expected_pairs):
+        raise ValueError('association population differs')
+    seen=set()
+    for t in tracks:
+        pair=(t['fromFrame'],t['toFrame'])
+        if t['row']!=row['row'] or t['part']!=row['part'] or pair not in expected_pairs or pair in seen:
+            raise ValueError('foreign or duplicate association pair')
+        seen.add(pair)
+        if t['processing']!='valid':
+            if t['proposal'] is not None:raise ValueError('failed track carries proposal')
+            continue
+        left,right=(frames[x] for x in pair)
+        if left['processing']!='valid' or right['processing']!='valid' or validate_track(t['raw'],left['proposal'],right['proposal'])!=t['proposal']:
+            raise ValueError('track differs from owned observations')
+        item=dict(kind='visual_track',part=row['part'],sourceRow=row['row'],start=left['atSeconds'],end=right['atSeconds'],
+                  fromFrame=pair[0],toFrame=pair[1],ownership='fallible model association proposal; not verified identity',
+                  text='Machine association proposal from frame '+pair[0]+' to '+pair[1]+': '+json.dumps(t['proposal'],sort_keys=True,ensure_ascii=False))
+        item['id']=identity(item);items.append(item)
+    return items
+
+
 def run(root):
     f=read(root/'freeze.json')
     for path,digest in f['inputs'].items():
