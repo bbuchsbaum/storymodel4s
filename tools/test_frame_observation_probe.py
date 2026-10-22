@@ -59,7 +59,9 @@ class FrameTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'endpoint'):p.validate_track(json.dumps(v),self.observation(),self.observation())
     def test_unlicensed_same_identity(self):
         v=dict(matches=[dict(**{'from':'e1','to':'e1'},relation='same',basis='insufficient',explanation='same coat')])
-        with self.assertRaisesRegex(ValueError,'unlicensed'):p.validate_track(json.dumps(v),self.observation(),self.observation())
+        for relation in ('same','different'):
+            v['matches'][0]['relation']=relation
+            with self.assertRaisesRegex(ValueError,'unlicensed'):p.validate_track(json.dumps(v),self.observation(),self.observation())
     def test_ambiguous_association_preserved(self):
         v=dict(matches=[dict(**{'from':'e1','to':'e1'},relation='unknown',basis='insufficient',explanation='occluded')])
         self.assertEqual(p.validate_track(json.dumps(v),self.observation(),self.observation()),v)

@@ -67,8 +67,8 @@ def validate_track(raw,left,right):
             raise ValueError('unsupported association basis')
         if not isinstance(m['explanation'],str) or not m['explanation'].strip():
             raise ValueError('missing association basis')
-        if m['relation']=='same' and m['basis']=='insufficient':
-            raise ValueError('unlicensed same identity')
+        if m['relation'] in {'same','different'} and m['basis']=='insufficient':
+            raise ValueError('unlicensed definite identity decision')
     same=[m for m in v['matches'] if m['relation']=='same']
     if len({m['from'] for m in same})!=len(same) or len({m['to'] for m in same})!=len(same):
         raise ValueError('non-injective identity association')
@@ -132,7 +132,7 @@ def evidence_items(freeze, row, observations, tracks=()):
             raise ValueError('track differs from owned observations')
         item=dict(kind='visual_track',part=row['part'],sourceRow=row['row'],start=left['atSeconds'],end=right['atSeconds'],
                   fromFrame=pair[0],toFrame=pair[1],ownership='fallible model association proposal; not verified identity',
-                  text='Machine association proposal from frame '+pair[0]+' to '+pair[1]+': '+json.dumps(t['proposal'],sort_keys=True,ensure_ascii=False))
+                  text='Only sampled stills were inspected; no intervening video continuity was verified. Machine association proposal from frame '+pair[0]+' to '+pair[1]+': '+json.dumps(t['proposal'],sort_keys=True,ensure_ascii=False))
         item['id']=identity(item);items.append(item)
     return items
 
