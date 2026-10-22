@@ -942,3 +942,82 @@ and a successful sibling. The unchanged Scala consumer builds all four three-arm
 56 questions per arm; its focused suite passes nine, fails zero and skips zero. These are local
 observations. Final revision, format checks, evidence hashes and independent review are recorded
 in the local `verification.json`. Production behavior, `main` and remote publication are unchanged.
+
+#### Context and optional-annotation comparison
+
+The next fixed-candidate experiment preserves the original 56 questions (48 primary plus eight
+body diagnostics) and every focal interval and word coordinate. Three new AV conditions add
+focal manual annotations, automatic evidence within same-part ±90-second windows, or both
+context and annotations. The original automatic AV condition is reused. Context records retain
+their own timestamps and source identities; they never enlarge the focal target. Selection uses
+positive temporal overlap, not claim wording or reference labels. Complete records are retained,
+with optional manual annotations explicitly treated as fallible assertions. One zero-duration
+source description is refused without removing a focal row or unique ASR segment. The retained
+1,000-row source cut and its segmentation are still human-derived.
+
+An independent agent read the selected evidence and froze all 168 condition-specific judgments
+before inference. These assess support in supplied source assertions, not verified footage truth.
+The context-plus-annotation references contain an explicit body/examination/death-statement
+identity chain; the automatic-only records do not establish that chain. One other contextual
+statement becomes supportable outside its focal interval; it cannot count as recovered focal
+localization. The previous common-reference layer has narrower coverage and is not complete
+negative gold for these expanded inputs.
+
+The model, Fireworks-only route, prompt, temperature, low reasoning setting and 4,096-token
+completion budget remain unchanged. Primary results are:
+
+| AV evidence | Input-resolvable / 48 | Correct resolutions / 48 | Unsupported or opposite resolutions | Processing failures / 48 |
+|---|---|---|---|---|
+| Focal automatic, reused | 4 | 3 | 0 | 0 |
+| Focal plus annotations | 9 | 5 | 0 | 0 |
+| Broader automatic context | 4 | 3 | 0 | 2 |
+
+The two additional correct resolutions concern opposite formulations of one police-car event,
+not two independent events. No natural primary claim is fully resolved. The frozen police-car
+positive reference is sensitive to an unexplicit marked-vehicle adjective; its unresolved result
+is not an unambiguous semantic error. Agent references and dependent controls cannot establish
+held-out accuracy.
+
+In the separate body diagnostics, focal annotations let the assessor resolve the prone woman's
+posture. It still leaves the floor-specific claim unresolved despite its joined caption/annotation
+support. The death assertion remains correctly resolved, as in the automatic baseline; cross-shot
+identity remains unresolved. Broader automatic context adds no diagnostic resolution and incurs
+one completion-length failure. The full context-plus-annotation outcome is **inconclusive**:
+49 of 56 requests received HTTP 429, one exhausted the completion budget, and six valid results
+were unresolved. Every body diagnostic failed at transport, so this condition says nothing about
+whether the assessor can use the available annotation identity chain.
+
+A separately frozen full-population recovery preserved the original results and exact input
+order, used serial execution with at least five seconds between starts, and stopped on its first
+429. It attempted three requests: one valid unresolved result, one length failure and one 429;
+the other 53 are explicitly unattempted. No outcomes are stitched across runs. Operational losses
+are reported separately from semantic regressions. The recovery also leaves all body diagnostics
+unmeasured. Further remote execution requires renewed route availability or a separately qualified
+route; this experiment is not grounds to promote the assessor into production.
+
+Eight wholly invented controls all pass: explicit versus absent identity links, distinct people,
+focal versus outside-focal depiction, conflicting sources, a partly supported compound memory,
+and explicit negation. The compound case retains partial support while remaining unresolved.
+Nevertheless, independent inspection finds incorrect partial evidence polarity: compatible color
+and speckling descriptions are treated as opposing evidence. Other partial links confuse an
+ambiguous transition with flashing lights, lack participant binding, or cite later posture for a
+focal claim. Exact quotation ownership and an unresolved final status do not make these links
+semantically sound. The next semantic change should assess each claim component and require
+actual incompatibility about the same entity/event before assigning counterevidence; supported
+components, missing bindings and false additions must remain distinguishable.
+
+There were 179 actual calls, with 129 priced responses reporting USD 0.754598976. Assigning all
+50 unpriced HTTP failures their full request bounds gives a post-run accounted upper bound of
+USD 2.705561976; unattempted records cost zero. The recovery's prospective cumulative bound was
+USD 4.821619908, within the authorized USD 5 cap. These are different quantities, not alternative
+estimates of one measured bill. Both original and recovery failures remain in their populations.
+
+Evidence lives under `.agent-work/context-evidence-20261021/`: frozen inputs and references,
+original and recovery remote artifacts, separately normalized conditions, native receipts,
+`comparison.json`, `comparison-recovery.json`, `report.md`, and `verification.json`. Python checks
+pass 31, fail zero and skip zero. A compiled same-part-guard mutant fails the named scope test
+with four siblings passing. The unchanged Scala consumer accepts all four new condition artifacts,
+each with three receipts and 56 questions per arm; unchanged A/V controls are explicitly reused.
+Independent review verified reference ownership, outcomes, costs and partial-link limitations.
+This is local experiment evidence; the parent accuracy issue remains open and no production
+scorer or remote publication is changed by this slice.
