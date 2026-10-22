@@ -89,8 +89,9 @@ def model_input(request):
     inv = validate_inventory(request['claim'], request['inventory'])
     # Exclude parent labels, adjudications, condition and question identifiers.
     return dict(claim_id=model_claim_id(request), claim=request['claim'],
-                logic=inv['logic'], components=[{k:c[k] for k in ('id','text','quote','roles')}
-                                               for c in inv['components']],
+                logic=inv['logic'], components=[dict(id=c['id'],text=c['text'],quote=c['quote'],
+                    roles=[{k:r[k] for k in ('id','kind','quote')} for r in c['roles']])
+                    for c in inv['components']],
                 intervals=request['intervals'], items=request['items'])
 
 
@@ -215,6 +216,34 @@ def validate_proposal(request, raw):
             raise ValueError('invented parent visual track')
         resolved=bool(used) and used<={a['evidence'] for a in anchors} and j['disposition']=='matched' and j['basis']!='unresolved'
         checked_joins.append(dict(j,anchors=anchors,bindingResolved=resolved))
+    # Local proposition support is distinct from attribution to one recalled referent.
+    # An absent fact introduces no competing entity. Two differently anchored local
+    # facts do require a resolved join; without a supplied anchor neither wins by order.
+    for c in result:
+        c['localStatus']=c['status']
+        c['attributionUnresolved']=False
+    for join in checked_joins:
+        if join['bindingResolved']:
+            continue
+        dependent=[]
+        signatures=set()
+        for c in result:
+            if join['role'] not in {r['id'] for r in expected[c['component']]['roles']}:
+                continue
+            anchors=set()
+            for side in ('support','counter'):
+                for link in c[side]:
+                    for binding in link['bindings']:
+                        if binding['role']==join['role']:
+                            anchors.update((a['evidence'],a['quote']) for a in binding['anchors'])
+            if anchors:
+                dependent.append(c)
+                signatures.add(tuple(sorted(anchors)))
+        if len(dependent)>1 and len(signatures)>1:
+            for c in dependent:
+                c['attributionUnresolved']=True
+                c['unresolved']=sorted(set(c['unresolved'])|{'reference_unresolved'})
+                c['status']='Unresolved'
     summary=summarize(result,inv['logic'])
     summary['parentBindingUnresolved']=any(not j['bindingResolved'] for j in checked_joins)
     summary['allSupported'] &= not summary['parentBindingUnresolved']
@@ -223,6 +252,8 @@ def validate_proposal(request, raw):
 
 
 def component_status(c):
+    if c.get('attributionUnresolved'):
+        return 'Unresolved'
     if c['support'] and c['counter']:
         return 'Conflicted'
     if c['unresolved']:

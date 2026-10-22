@@ -34,12 +34,15 @@ class ComponentTests(unittest.TestCase):
 
     def test_false_detail_is_not_conflict(self):
         r,v,link=fixture();v['components'][1].update(counter=[link('s2','counter')],unresolved=[])
+        v['joins'][0]['anchors'].append(dict(evidence_id='s2',quote=r['items'][1]['text']))
         o=p.validate_proposal(r,json.dumps(v))
         self.assertEqual(o['summary']['componentCounts'],dict(Supported=1,Contradicted=1,Conflicted=0,Unresolved=0))
         self.assertFalse(o['summary']['withinComponentConflict'])
 
     def test_same_component_conflict(self):
-        r,v,link=fixture();v['components'][0]['counter']=[link('s2','counter')]
+        r,v,link=fixture();r['items'][1]['text']='The same woman is not on the floor.'
+        counter=link('s2','counter');counter['basis']=dict(kind='explicit_negation',explanation='The source explicitly denies floor contact for the same woman.')
+        v['components'][0]['counter']=[counter]
         self.assertEqual(p.validate_proposal(r,json.dumps(v))['components'][0]['status'],'Conflicted')
 
     def test_unresolved_join_retains_only_proposal(self):
@@ -64,7 +67,8 @@ class ComponentTests(unittest.TestCase):
     def test_parent_join_cannot_stitch_different_sources(self):
         r,v,link=fixture();v['components'][1].update(support=[link('s2')],unresolved=[])
         o=p.validate_proposal(r,json.dumps(v))
-        self.assertEqual(o['summary']['componentCounts']['Supported'],2)
+        self.assertEqual([c['localStatus'] for c in o['components']],['Supported','Supported'])
+        self.assertEqual([c['status'] for c in o['components']],['Unresolved','Unresolved'])
         self.assertFalse(o['summary']['allSupported'])
         self.assertTrue(o['summary']['parentBindingUnresolved'])
 
@@ -88,6 +92,7 @@ class ComponentTests(unittest.TestCase):
 
     def test_no_labels_cross_model_boundary(self):
         r,_,_=fixture();r['reference']='Supported';r['inventory']['secretLabel']='Supported'
+        r['inventory']['components'][0]['roles'][0]['secretLabel']='Supported'
         text=json.dumps(p.model_input(r))
         self.assertNotIn('secretLabel',text);self.assertNotIn('private-label',text);self.assertNotIn('Supported',text)
 
