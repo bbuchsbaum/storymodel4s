@@ -1,3 +1,4 @@
+"""Original synthetic protocol strings only; no narrative, media or participant material."""
 import json
 import unittest
 import tempfile

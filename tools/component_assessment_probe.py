@@ -32,8 +32,10 @@ entity/event continuity. Explicit reference chains and distinctive descriptions 
 joins. Mere adjacency, shared clothing, or two generic people cannot. If a join is uncertain,
 retain the link as a proposal with an unresolved binding. Different event/time/context cannot
 supply focal evidence. Bind event_scope to the focal event and context_scope to the asserted
-world or speech act. 'continuous_visual_track' requires an attributed track in the supplied
-items; never invent one. Direct evidence can be a single source record with direct_description.
+world or speech act. No input in this probe establishes continuous visual tracking, so the
+continuous_visual_track basis is unavailable. Sampled image-pair associations are fallible
+textual proposals, even when they assert same identity. Direct evidence can be a single source
+record with direct_description.
 Support basis is {kind: direct, explanation: ...}. Counter evidence must be positively
 incompatible for the SAME entity/event/time/context. Missing detail and different/compatible
 colors, textures, objects, or participants are NOT counter evidence. Counter basis is either
@@ -132,8 +134,7 @@ def validate_link(items, component, side, link):
         # Each required role must bridge every source record used by this link.
         covered = {a['evidence'] for a in anchors} == evidence_ids
         if b['basis'] == 'continuous_visual_track':
-            if not any(items[a['evidence']].get('kind') == 'visual_track' for a in anchors):
-                raise ValueError('invented visual track')
+            raise ValueError('continuous visual track unavailable in this probe')
         resolved &= b['disposition'] == 'matched' and b['basis'] != 'unresolved' and covered
         checked.append(dict(b, anchors=anchors, covered=covered))
     basis = link['basis']
@@ -214,8 +215,8 @@ def validate_proposal(request, raw):
             if j['role'] in {r['id'] for r in expected[c['component']]['roles']} | {'event_scope','context_scope'}:
                 for side in ('support','counter','proposed_support','proposed_counter'):
                     used.update(a['evidence'] for link in c[side] for a in link['citations'])
-        if j['basis']=='continuous_visual_track' and not any(items[a['evidence']].get('kind')=='visual_track' for a in anchors):
-            raise ValueError('invented parent visual track')
+        if j['basis']=='continuous_visual_track':
+            raise ValueError('continuous parent visual track unavailable in this probe')
         resolved=bool(used) and used<={a['evidence'] for a in anchors} and j['disposition']=='matched' and j['basis']!='unresolved'
         checked_joins.append(dict(j,anchors=anchors,bindingResolved=resolved))
     # Local proposition support is distinct from attribution to one recalled referent.

@@ -1,3 +1,4 @@
+"""Original synthetic protocol strings only; no narrative, media or participant material."""
 import copy
 import json
 import unittest
@@ -98,6 +99,22 @@ class ComponentTests(unittest.TestCase):
     def test_invented_track_rejected(self):
         r,v,_=fixture();v['components'][0]['support'][0]['bindings'][0]['basis']='continuous_visual_track'
         with self.assertRaisesRegex(ValueError,'track'):p.validate_proposal(r,json.dumps(v))
+
+    def test_sampled_association_cannot_license_continuous_identity(self):
+        for relation in ('empty','unknown','different','same'):
+            for scope in ('link','parent'):
+                with self.subTest(relation=relation,scope=scope):
+                    r,v,link=fixture()
+                    r['items'][0].update(kind='visual_track',text='Sampled pair association: '+relation,
+                        ownership='fallible association; intervening video not inspected')
+                    v['components'][0]['support']=[link()]
+                    for j in v['joins']:j['anchors']=[dict(evidence_id='s1',quote=r['items'][0]['text'])]
+                    binding=v['components'][0]['support'][0]['bindings'][0] if scope=='link' else v['joins'][0]
+                    binding['basis']='continuous_visual_track'
+                    with self.assertRaisesRegex(ValueError,'track unavailable'):
+                        p.validate_proposal(r,json.dumps(v))
+                    binding['basis']='direct_description'
+                    self.assertEqual(p.validate_proposal(r,json.dumps(v))['components'][0]['status'],'Supported')
 
     def test_unknown_logic_cannot_become_supported(self):
         r,v,_=fixture();r['inventory']['logic']='unresolved'
