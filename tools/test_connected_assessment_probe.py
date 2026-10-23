@@ -310,6 +310,11 @@ class TargetBindingTests(unittest.TestCase):
         v['components'][0]['denies']=[proof]
         connect(v,'different_entity','ap','bp',basis='explicit_reference')
         self.assertEqual(statuses(assess(r,v)),['Contradicted'])
+        # Mirror: only the depicted argument's record lies in the target.
+        r['items'][0]=timed('e1','Ana is on the floor.');r['items'][1]=timed('e2','Beth is dead.',110.0,114.0)
+        self.assertEqual(statuses(assess(r,v)),['Contradicted'])
+        r['items'][0]=timed('e1','Ana is on the floor.',110.0,114.0)
+        self.assertEqual(statuses(assess(r,v)),['Unresolved'])
 
     def test_any_target_interval_anchors(self):
         r,v=fixture();r['intervals']=[dict(part='q',start=0.0,end=1.0),dict(part='p',start=10.0,end=13.0)]
