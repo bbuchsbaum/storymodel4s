@@ -4,6 +4,7 @@ Each pair holds a case the assessor must credit beside a same-shape case it must
 are hand-written stand-ins for a model. Fixtures are authored; they contain no story text, recall
 transcript or excerpt. A case the current validator cannot yet decide is an expectedFailure naming
 the slice that owns it, so landing that slice turns it into an unexpected success to remove.
+CurrentGaps pins what each such case returns today, so a fixture error cannot pass as the gap.
 """
 import unittest
 
@@ -70,6 +71,48 @@ def depicted_and_described(dialogue, scope="assertion"):
     return r, v
 
 
+def appearance_only_identity():
+    r, v = two_people("A woman in a green hat lies on the floor.", "A woman in a green hat is dead.")
+    connect(v, "same_entity", "ap", "bp")
+    v["connections"][-1]["explanation"] = "Both wear a green hat."
+    return r, v
+
+
+def identity_claim_about_someone_elsewhere():
+    r, v = depicted_and_described("Carl, on the telephone, says his aunt is dead.")
+    connect(v, "same_entity", "ap", "bp", basis="explicit_reference")
+    return r, v
+
+
+def persistence(with_state_change):
+    r, v = fixture()
+    r["intervals"] = [dict(part="p", start=152.0, end=155.0)]
+    r["items"] = [timed("e1", "Ana is on the floor.", 110.0, 114.0),
+                  timed("e3", "Two men stand in the room.", 152.0, 155.0)]
+    if with_state_change:
+        r["items"].insert(1, timed("e2", "Ana stands up.", 130.0, 132.0))
+    add_source(r, v, "e3", "c", roles=False)
+    return r, v
+
+
+def continuity_across_state_change():
+    r, v = persistence(with_state_change=True)
+    connect(v, "same_situation", "as", "cs")
+    v["connections"][-1]["explanation"] = "Same room, later shot."
+    return r, v
+
+
+def asserted_death(contested):
+    """A world-state death core whose only support is speech about the depicted person."""
+    r, v = depicted_and_described("Carl, looking at the woman on the floor, says she is dead.")
+    connect(v, "same_entity", "ap", "bp", basis="explicit_reference")
+    connect(v, "same_situation", "as", "bs")
+    r["inventory"]["components"][0]["assessment"] = world("The depicted person is dead.")
+    if contested:
+        r["items"].append(timed("e3", "Carl later admits she is alive and he lied."))
+    return r, v
+
+
 class IdentityAcrossShots(unittest.TestCase):
     def test_succeeds_with_explicit_reference(self):
         r, v = two_people("Ana lies on the floor.", "Ana is dead.")
@@ -78,18 +121,14 @@ class IdentityAcrossShots(unittest.TestCase):
 
     def test_resists_missing_identity_edge(self):
         r, v = two_people(
-            "A woman in pink lies on the floor.", "A woman in pink is dead."
+            "A woman in a green hat lies on the floor.", "A woman in a green hat is dead."
         )
         self.assertEqual(statuses(assess(r, v)), ["Unresolved", "Unresolved"])
 
     @unittest.expectedFailure
     def test_resists_appearance_only_identity(self):
-        # S2: the basis vocabulary cannot say "appearance", so a matching coat passes as identity.
-        r, v = two_people(
-            "A woman in pink lies on the floor.", "A woman in pink is dead."
-        )
-        connect(v, "same_entity", "ap", "bp")
-        v["connections"][-1]["explanation"] = "Both wear a pink coat."
+        # S2: the basis vocabulary cannot say "appearance", so a matching hat passes as identity.
+        r, v = appearance_only_identity()
         self.assertEqual(statuses(assess(r, v)), ["Unresolved", "Unresolved"])
 
 
@@ -108,35 +147,25 @@ class DialogueReference(unittest.TestCase):
     @unittest.expectedFailure
     def test_resists_per_question_identity_claim_about_someone_elsewhere(self):
         # S5: identity must come from the recall-blind source graph, not this proposal's edge.
-        r, v = depicted_and_described("Carl, on the telephone, says his aunt is dead.")
-        connect(v, "same_entity", "ap", "bp", basis="explicit_reference")
+        r, v = identity_claim_about_someone_elsewhere()
         self.assertEqual(statuses(assess(r, v)), ["Unresolved"])
 
 
 class StateAcrossTime(unittest.TestCase):
-    def setUp(self):
-        self.r, self.v = fixture()
-        self.r["intervals"] = [dict(part="p", start=152.0, end=155.0)]
-        self.r["items"] = [
-            timed("e1", "Ana is on the floor.", 110.0, 114.0),
-            timed("e2", "Ana stands up.", 130.0, 132.0),
-            timed("e3", "Two men stand in the room.", 152.0, 155.0),
-        ]
-        add_source(self.r, self.v, "e3", "c", roles=False)
-
     def test_succeeds_with_cited_persistence(self):
-        connect(self.v, "same_situation", "as", "cs")
-        self.assertEqual(statuses(assess(self.r, self.v)), ["Supported", "Unresolved"])
+        r, v = persistence(with_state_change=False)
+        connect(v, "same_situation", "as", "cs")
+        self.assertEqual(statuses(assess(r, v)), ["Supported", "Unresolved"])
 
     def test_resists_earlier_state_without_continuity(self):
-        self.assertEqual(statuses(assess(self.r, self.v)), ["Unresolved", "Unresolved"])
+        r, v = persistence(with_state_change=True)
+        self.assertEqual(statuses(assess(r, v)), ["Unresolved", "Unresolved"])
 
     @unittest.expectedFailure
     def test_resists_continuity_across_a_state_change(self):
         # S3: continuity is a per-question proposal; nothing stops it at the stand-up record.
-        connect(self.v, "same_situation", "as", "cs")
-        self.v["connections"][-1]["explanation"] = "Same room, later shot."
-        self.assertEqual(statuses(assess(self.r, self.v)), ["Unresolved", "Unresolved"])
+        r, v = continuity_across_state_change()
+        self.assertEqual(statuses(assess(r, v)), ["Unresolved", "Unresolved"])
 
 
 class ModifierVersusIdentity(unittest.TestCase):
@@ -161,27 +190,15 @@ class ContextualInference(unittest.TestCase):
         v["handles"][2]["scope"] = "belief"
         self.assertEqual(statuses(assess(r, v)), ["Unresolved", "Unresolved"])
 
-    def test_resists_promoting_assertion_to_world(self):
-        r, v = depicted_and_described(
-            "Carl, looking at the woman on the floor, says she is dead."
-        )
-        connect(v, "same_entity", "ap", "bp", basis="explicit_reference")
-        r["inventory"]["components"][0]["assessment"] = world(
-            "The depicted person is dead."
-        )
-        self.assertEqual(statuses(assess(r, v)), ["Unresolved"])
+    def test_resists_contested_assertion_as_world_fact(self):
+        out = assess(*asserted_death(contested=True))
+        self.assertEqual(statuses(out), ["Unresolved"])
+        self.assertEqual(len(out["components"][0]["proposed_affirms"]), 1)
 
     @unittest.expectedFailure
     def test_succeeds_on_uncontested_assertion_as_inference(self):
         # S4: no rule yet carries an uncontested assertion into the narrated world.
-        r, v = depicted_and_described(
-            "Carl, looking at the woman on the floor, says she is dead."
-        )
-        connect(v, "same_entity", "ap", "bp", basis="explicit_reference")
-        r["inventory"]["components"][0]["assessment"] = world(
-            "The depicted person is dead."
-        )
-        self.assertEqual(statuses(assess(r, v)), ["Supported"])
+        self.assertEqual(statuses(assess(*asserted_death(contested=False))), ["Supported"])
 
 
 class ComplementarySources(unittest.TestCase):
@@ -237,7 +254,9 @@ class Polarity(unittest.TestCase):
         v["components"][0]["denies"] = [proof]
         self.assertEqual(statuses(assess(r, v)), ["Supported", "Unresolved"])
 
-    def test_resists_compatible_detail_as_negation(self):
+    def test_resists_direct_basis_as_negation(self):
+        # Shape only: a model that labels a compatible detail explicit_negation is beyond a
+        # deterministic check.
         r, v = fixture()
         r["inventory"]["components"][0]["assessment"].update(
             core="The object is speckled.", polarity="negative"
@@ -248,6 +267,18 @@ class Polarity(unittest.TestCase):
             ValueError, "denial needs positive incompatibility"
         ):
             assess(r, v)
+
+
+class CurrentGaps(unittest.TestCase):
+    """Today's outcomes for the expected failures; update these when the owning slice lands."""
+
+    def test_current_outcomes(self):
+        cases = [(appearance_only_identity, ["Supported", "Supported"]),
+                 (identity_claim_about_someone_elsewhere, ["Supported"]),
+                 (continuity_across_state_change, ["Supported", "Unresolved"]),
+                 (lambda: asserted_death(contested=False), ["Unresolved"])]
+        for build, current in cases:
+            self.assertEqual(statuses(assess(*build())), current)
 
 
 if __name__ == "__main__":
