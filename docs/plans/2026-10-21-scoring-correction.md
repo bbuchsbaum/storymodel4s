@@ -1021,3 +1021,80 @@ each with three receipts and 56 questions per arm; unchanged A/V controls are ex
 Independent review verified reference ownership, outcomes, costs and partial-link limitations.
 This is local experiment evidence; the parent accuracy issue remains open and no production
 scorer or remote publication is changed by this slice.
+
+#### Component and frame-observation experiment (2026-10-22)
+
+The four authorized changes are implemented as experimental Python tools: fixed component
+assessment, explicit entity/event/context joins, positive incompatibility requirements, and
+question-independent per-frame observations with separately attributed sampled associations.
+An independently checked inventory retains all56 original parents and108 components. It does
+not establish automatic recall decomposition. Local proposition evidence and attribution to the
+recalled referent are distinct fields. Correct details can remain inspectable when another
+detail is unknown; incompatible attributes are not automatically same-component conflict.
+
+After Fireworks capacity failures, a separately frozen Together route used the same dated
+DeepSeek model with no fallback and the existing privacy/price restrictions. A same-route old
+whole-claim control was included. Component requests allow8192 output tokens versus4096 for
+the old protocol, so this is a protocol/compute comparison. All176 executions were attempted:
+166 valid,7 unfinished/nontext responses and3 invalid proposals. Failed requests remain in
+their original populations; no successes are stitched across attempts.
+
+| Component condition | Parents | Components | Input-resolvable | Correct resolutions | Wrong resolutions | Failed parents |
+|---|---:|---:|---:|---:|---:|---:|
+| Automatic focal, primary |48|87|20|13|0|1|
+| Focal plus annotations, primary |48|87|37|7|1|4|
+| Automatic focal, body diagnostics |8|21|8|6|0|0|
+| Focal plus annotations, body diagnostics |8|21|14|11|0|0|
+| Context plus annotations, body diagnostics |8|21|21|8|0|4|
+
+None of the24 natural primary claims gains a correctly resolved component; the primary gains
+come from authored controls. Counts above measure components against independently reviewed
+input assertions, not fully correct memories or verified footage. Separate joint whole-claim
+judgments were frozen before semantic outcomes were inspected. On the48 primary parents,
+component all-supported has0 correct and1 unsupported positive resolution; the same-route old
+whole protocol has2 correct and0 unsupported positives. The protocol does not qualify for
+production promotion or a claimed improvement over the earlier five whole-claim resolutions.
+
+The focal annotation condition does resolve the floor-specific body claim that the old whole
+protocol leaves unresolved. However, independent review identifies three general failures:
+negative claims can bypass the incompatibility guard by entering on the support side; unknown
+modifiers contaminate referent assignment and suppress correct local details; and requiring
+every role to be quoted in every source record rejects complementary annotation/ASR evidence.
+The next bounded revision should test polarity-equivalent evidence requirements, separate
+referent assignment from modifiers, and use explicit connected assignments across complementary
+records. Different-people and wrong-event falsifiers must remain. Larger output budgets alone
+do not repair these semantic problems.
+
+Automatic acquisition used the pinned local Qwen visual model without recall, ASR or manual
+annotation in its prompts. The full34-row run yielded95/102 valid observations and43/68 original
+valid sampled associations. Four associations are subsequently refused for definite-different
+decisions with an insufficient basis. Continuous visual tracking is unavailable in this probe:
+sampled-pair same/different/unknown/empty proposals cannot establish intervening continuity.
+Raw outputs and refusals are preserved separately.
+
+Independent pixel review covers only12 body frames. It finds the floor/body detail, but also
+orientation errors and an incorrect different-person association for the same body. A separate
+adaptive higher-pixel run restores some usable observations but moves an orientation error and
+retains the bad association; it establishes no consistent visual improvement. Those adaptive
+outputs are never substituted into the complete low-pixel condition.
+
+The final automatic-only assessor comparison preserves ASR and has no manual annotations:
+observations alone credit2/7 input-resolvable components with2/8 parent processing failures;
+observations plus sampled associations credit6/7 with1/8 failure. Each retains21 components
+and has zero hard reference-status errors. No valid evidence link cites an association item,
+so this difference is not evidence of successful tracking. One reference-status success has a
+weak chosen quote despite support elsewhere in its complete source record. The new inputs
+permit lying/floor credit, but gender, death attribution and cross-shot identity remain unresolved.
+
+Targeted Python checks pass32, fail0, skip0 (component16, frame11, remote5). Compiled mutations
+exercise quote ownership, source coverage, compatible-property rejection, join attribution and
+both continuous-track refusal paths, with named failing witnesses and sibling controls. Exact
+independent code/outcome review and final-reader replay are retained. There are no Scala/API
+changes or new native consumer receipts; this is a tools-only local gate, not hosted CI.
+
+This round attempted223 remote calls. The221 priced responses report USD0.986319396; assigning
+the2 unpriced HTTP failures their full bounds gives USD1.009014996 accounted upper cost. The
+conservative attempted-request bound is USD2.6004756, within the authorized USD5. Unattempted
+records cost zero. Raw data remain ignored under `.agent-work/facet-assessment-20261022/`, with
+frozen inputs, references, original outputs, comparison scripts, cost accounting, `report.md`
+and `verification.json`. The branch remains local and the parent accuracy issue stays open.
