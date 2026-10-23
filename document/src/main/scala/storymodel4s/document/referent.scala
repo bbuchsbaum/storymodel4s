@@ -57,6 +57,7 @@ enum ReferentError:
   case ForeignLink(left: ReferentMentionId, right: ReferentMentionId)
   case DuplicateCoverage(track: TrackId)
   case Unlicensed(basis: String, reason: String)
+  case InvalidPresence(reason: String)
 
   def message: String = this match
     case BlankName                 => "a proper name must not be blank"
@@ -67,6 +68,7 @@ enum ReferentError:
     case ForeignLink(l, r)         => s"link ${l.value}-${r.value} was licensed in another context"
     case DuplicateCoverage(t)      => s"track ${t.value} has more than one coverage on one stream"
     case Unlicensed(basis, reason) => s"$basis does not license this link: $reason"
+    case InvalidPresence(reason)   => s"invalid presence claim: $reason"
 
 /** One mention of a person or thing, in any modality. A mention is not an entity: two mentions are
   * one referent only through a licensed [[IdentityLink]], never because their descriptions match.
@@ -186,6 +188,56 @@ private[document] object ReferentExtents:
         .groupMapReduce(_._1)(_._2)(_ ++ _)
     case TypedSupport.Text(_) => Map.empty
 
+/** Why a presence claim may be believed (ADR 0024 amendment 5). */
+enum PresenceBasis:
+  /** A person reviewed the interval and recorded that every person present is a mention. */
+  case HumanReviewed(receipt: SourceDerivationReceipt)
+
+  /** A detector whose per-interval recall was measured at `recall`, at least `threshold`. */
+  case MeasuredDetector(
+      recall: ExactRational,
+      threshold: ExactRational,
+      receipt: SourceDerivationReceipt
+  )
+
+/** A claim that every person present in `coverage` is among the context's visual mentions. Why:
+  * deixis ("she", said while exactly one person is on screen) is sound only if nobody else was
+  * there, and a detector that misses the second person would license a confident wrong identity.
+  */
+final class PresenceClaim private (
+    val coverage: EvidenceAnchor.MediaTime,
+    val basis: PresenceBasis
+):
+  /** Whether this claim covers one playback extent: same bundle and axis, inside one interval. */
+  private[document] def covers(e: ReferentExtents.ReferentExtent): Boolean =
+    coverage.bundle == e.bundle && coverage.axis == e.axis &&
+      coverage.intervals.intervals.toVector.exists(i =>
+        i.start <= e.start && e.end <= i.endExclusive
+      )
+
+  override def equals(other: Any): Boolean = other match
+    case that: PresenceClaim => coverage == that.coverage && basis == that.basis
+    case _                   => false
+  override def hashCode(): Int = (coverage, basis).##
+  override def toString: String = s"PresenceClaim(${coverage.bundle.value}, $basis)"
+
+object PresenceClaim:
+  private def within01(r: ExactRational): Boolean =
+    r.numerator >= 0 && BigInt(r.numerator) <= BigInt(r.denominator)
+  private def atLeast(a: ExactRational, b: ExactRational): Boolean =
+    BigInt(a.numerator) * BigInt(b.denominator) >= BigInt(b.numerator) * BigInt(a.denominator)
+
+  def of(
+      coverage: EvidenceAnchor.MediaTime,
+      basis: PresenceBasis
+  ): Either[ReferentError, PresenceClaim] = basis match
+    case PresenceBasis.MeasuredDetector(recall, threshold, _)
+        if !within01(recall) || !within01(threshold) =>
+      Left(ReferentError.InvalidPresence("recall and threshold must lie in [0, 1]"))
+    case PresenceBasis.MeasuredDetector(recall, threshold, _) if !atLeast(recall, threshold) =>
+      Left(ReferentError.InvalidPresence("measured recall is below the declared threshold"))
+    case _ => Right(new PresenceClaim(coverage, basis))
+
 /** The mentions and observed track coverage that identity links are checked against.
   *
   * Why a context: a deictic basis needs the set of people present, and a track basis needs the
@@ -194,7 +246,8 @@ private[document] object ReferentExtents:
   */
 final class ReferentContext private (
     val mentions: SortedMap[ReferentMentionId, ReferentMention],
-    val trackCoverage: Vector[EvidenceAnchor.Track]
+    val trackCoverage: Vector[EvidenceAnchor.Track],
+    val presence: Vector[PresenceClaim]
 ):
   def mention(id: ReferentMentionId): Either[ReferentError, ReferentMention] =
     mentions.get(id).toRight(ReferentError.UnknownMention(id))
@@ -228,8 +281,22 @@ final class ReferentContext private (
           Vector(i.axis.value, i.start.toString, i.endExclusive.toString)
         )
     }
-    val fields = Vector("referent-context/v1", mentions.size.toString) ++ ms ++
-      Vector(trackCoverage.size.toString) ++ cs
+    val ps = presence.flatMap { p =>
+      val basis = p.basis match
+        case PresenceBasis.HumanReviewed(r) => Vector("human-reviewed", r.bindingIdentity.hex)
+        case PresenceBasis.MeasuredDetector(recall, threshold, r) =>
+          Vector("measured-detector", recall.toString, threshold.toString, r.bindingIdentity.hex)
+      Vector(
+        p.coverage.bundle.value,
+        p.coverage.stream.value,
+        p.coverage.axis.value,
+        p.coverage.intervals.intervals.length.toString
+      ) ++ p.coverage.intervals.intervals.toVector.flatMap(i =>
+        Vector(i.start.toString, i.endExclusive.toString)
+      ) ++ Vector(basis.length.toString) ++ basis
+    }
+    val fields = Vector("referent-context/v2", mentions.size.toString) ++ ms ++
+      Vector(trackCoverage.size.toString) ++ cs ++ Vector(presence.size.toString) ++ ps
     ContentAddress.digest(fields.map(f => Checksum.ofText(f).hex))
 
   override def equals(other: Any): Boolean = other match
@@ -241,11 +308,13 @@ final class ReferentContext private (
 
 object ReferentContext:
   /** `trackCoverage` gives, per track and stream, the intervals in which it was actually observed;
-    * one entry per bundle, stream and track.
+    * one entry per bundle, stream and track. `presence` certifies the intervals in which every
+    * person present is among `mentions`; deixis is licensed only there.
     */
   def of(
       mentions: Vector[ReferentMention],
-      trackCoverage: Vector[EvidenceAnchor.Track]
+      trackCoverage: Vector[EvidenceAnchor.Track],
+      presence: Vector[PresenceClaim] = Vector.empty
   ): Either[ReferentError, ReferentContext] =
     val duplicateCoverage = trackCoverage
       .groupBy(c => (c.bundle, c.stream, c.track))
@@ -258,7 +327,9 @@ object ReferentContext:
       case (_, Some(t))   => Left(ReferentError.DuplicateCoverage(t))
       case _              =>
         val sorted = trackCoverage.sortBy(c => (c.bundle.value, c.stream.value, c.track.value))
-        Right(new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), sorted))
+        Right(
+          new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), sorted, presence)
+        )
 
 /** A basis that is sufficient by itself to make two mentions one referent (ADR 0024 §2). Why a
   * closed enum: the licence class is fixed by the basis, so a caller cannot promote a weak basis.
@@ -267,7 +338,9 @@ enum IdentityBasis:
   /** Both mentions lie in one observed track, inside one stretch of its coverage. */
   case ContinuousTrack(track: TrackId)
 
-  /** An utterance refers to someone present, and exactly one visual mention is present. */
+  /** An utterance refers to someone present, exactly one visual mention is present, and a presence
+    * claim certifies that nobody else was there (ADR 0024 amendment 5).
+    */
   case DeicticReference
 
   /** The same proper name is attached directly to both mentions. */
@@ -283,14 +356,16 @@ enum DistinctnessBasis:
     */
   case SimultaneousTracks
 
-  /** Different proper names are attached directly to the two mentions. Known limit: aliases. */
-  case DifferentNames
-
 /** Evidence that can rank candidates but never decides identity or distinctness by itself. Why its
   * own type: no value of it can be passed where a sufficient basis is required.
   */
 enum ContributoryBasis:
   case AppearanceMatch, TemporalProximity, CompatibleDescription
+
+  /** Different names attached to two mentions (ADR 0024 amendment 4). Contributory only: aliases,
+    * partial names and encodings make a name mismatch weak evidence of two people.
+    */
+  case DifferentNames
 
 /** A licensed identity between two mentions. Construction checks the basis against the context;
   * there is no other way to obtain one. The link keeps that context, because its licence (who was
@@ -362,9 +437,18 @@ object IdentityLink:
       m.origin == MentionOrigin.Visual &&
       ReferentExtents.of(m.support).exists(e => spoken.exists(_.overlaps(e)))
     }
+    // ADR 0024 amendment 5: "only one person present" holds only where presence is certified.
+    val certified = spoken.nonEmpty && spoken.forall(e => context.presence.exists(_.covers(e)))
     present.map(_.id) match
-      case Vector(only) if only == depicted.id =>
+      case Vector(only) if only == depicted.id && certified =>
         Right(new IdentityLink(context, utterance, depicted, IdentityBasis.DeicticReference))
+      case Vector(only) if only == depicted.id =>
+        Left(
+          ReferentError.Unlicensed(
+            "DeicticReference",
+            "presence is not certified complete while it is said"
+          )
+        )
       case Vector() =>
         Left(ReferentError.Unlicensed("DeicticReference", "nobody depicted while it is said"))
       case Vector(_) =>
@@ -413,11 +497,6 @@ object DistinctLink:
           else if ta.keySet.intersect(tb.keySet).nonEmpty then refuse("the mentions share a track")
           else if !together.exists(identity) then refuse("the tracks do not overlap on one stream")
           else Right(new DistinctLink(context, a, b, basis))
-        case DistinctnessBasis.DifferentNames =>
-          (a.name, b.name) match
-            case (Some(x), Some(y)) if x != y => Right(new DistinctLink(context, a, b, basis))
-            case (Some(_), Some(_))           => refuse("the names are the same")
-            case _                            => refuse("both mentions need a name")
     yield link
 
 /** Which way a contributory hint points. Why: a hint against identity is recorded beside a class

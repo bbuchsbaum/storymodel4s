@@ -45,14 +45,30 @@ class ReferentIdentitySuite extends FunSuite:
   ): Either[ReferentError, ReferentMention] = support match
     case TypedSupport.Anchored(s) => ReferentMention.anchored(at, origin, film, s, named)
     case TypedSupport.Text(spans) => ReferentMention.text(at, origin, spans, named)
-  // Coverage per track on the film's picture stream.
+  // Coverage per track on the film's picture stream. Presence defaults to a reviewed claim over
+  // the whole film, so deixis tests read as before; certification tests pass their own claims.
+  private val reviewed =
+    PresenceBasis.HumanReviewed(
+      SourceDerivationReceipt.of("presence-review/v1", "film", Vector.empty).toOption.get
+    )
+  private def presenceOver(start: Long, end: Long, basis: PresenceBasis = reviewed) =
+    PresenceClaim
+      .of(
+        new EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, ivs(start -> end)),
+        basis
+      )
+      .toOption
+      .get
+  private lazy val wholeFilm = Vector(presenceOver(0L, 1000L))
   private def contextOf(
       mentions: Vector[ReferentMention],
-      coverage: Map[TrackId, PlaybackIntervalSet]
+      coverage: Map[TrackId, PlaybackIntervalSet],
+      presence: Vector[PresenceClaim] = wholeFilm
   ): Either[ReferentError, ReferentContext] =
     ReferentContext.of(
       mentions,
-      coverage.toVector.map((t, set) => new EvidenceAnchor.Track(film.id, stream, t, set))
+      coverage.toVector.map((t, set) => new EvidenceAnchor.Track(film.id, stream, t, set)),
+      presence
     )
 
   private val speech = MentionOrigin.Dialogue(ContextId.unsafe("speech-1"))
@@ -134,6 +150,58 @@ class ReferentIdentitySuite extends FunSuite:
     assert(same("d2", "v2", IdentityBasis.DeicticReference).isRight)
     assert(same("v2", "d2", IdentityBasis.DeicticReference).isRight)
 
+  test("deixis without a presence claim is refused"):
+    val uncertified = contextOf(all, Map.empty, Vector.empty).toOption.get
+    refusedWith(same("d2", "v2", IdentityBasis.DeicticReference, uncertified), "not certified")
+
+  test("deixis needs the claim to cover the whole utterance"):
+    val partial = contextOf(all, Map.empty, Vector(presenceOver(360L, 400L))).toOption.get
+    refusedWith(same("d2", "v2", IdentityBasis.DeicticReference, partial), "not certified")
+    val covering = contextOf(all, Map.empty, Vector(presenceOver(340L, 390L))).toOption.get
+    assert(same("d2", "v2", IdentityBasis.DeicticReference, covering).isRight)
+
+  test("a presence claim on another bundle does not certify this one"):
+    val elsewhere = PresenceClaim
+      .of(
+        new EvidenceAnchor.MediaTime(borrowed.id, stream, film.primaryAxis.id, ivs(0L -> 1000L)),
+        reviewed
+      )
+      .toOption
+      .get
+    val in = contextOf(all, Map.empty, Vector(elsewhere)).toOption.get
+    refusedWith(same("d2", "v2", IdentityBasis.DeicticReference, in), "not certified")
+
+  test("a measured detector certifies only at or above its declared threshold"):
+    val receipt = SourceDerivationReceipt.of("detector/v1", "measured", Vector.empty).toOption.get
+    def r(n: Long, d: Long) = ExactRational.of(n, d).toOption.get
+    val cover = new EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, ivs(0L -> 1000L))
+    assert(
+      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(95, 100), r(9, 10), receipt)).isRight
+    )
+    assert(
+      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(9, 10), r(9, 10), receipt)).isRight
+    )
+    refusedWith(
+      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(8, 10), r(9, 10), receipt)),
+      "below the declared threshold"
+    )
+    refusedWith(
+      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(11, 10), r(9, 10), receipt)),
+      "[0, 1]"
+    )
+    refusedWith(
+      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(-1, 10), r(-2, 10), receipt)),
+      "[0, 1]"
+    )
+
+  test("presence claims enter the context digest"):
+    val without = contextOf(all, Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)), Vector.empty)
+    assertNotEquals(without.map(_.digest), Right(ctx.digest))
+    // Same number of claims, different coverage: the claims themselves must enter the digest.
+    val half =
+      contextOf(all, Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)), Vector(presenceOver(0L, 500L)))
+    assertNotEquals(half.map(_.digest), Right(ctx.digest))
+
   test("deixis refuses when more than one person is present"):
     refusedWith(same("d1", "v1", IdentityBasis.DeicticReference), "more than one")
 
@@ -195,20 +263,17 @@ class ReferentIdentitySuite extends FunSuite:
   test("simultaneity separates only visual mentions"):
     refusedWith(apart("v1", "d1", DistinctnessBasis.SimultaneousTracks), "only visual")
 
-  test("different names separate; the same name or a missing one does not"):
+  test("different names are a contributory hint and never separate mentions"):
     val named = Vector(
       mention("n1", MentionOrigin.Narration, recalled.support, Some("Ana")),
-      mention("n2", MentionOrigin.Narration, recalled.support, Some("Beth")),
-      mention("n3", MentionOrigin.Narration, recalled.support, Some("ANA")),
-      mention("n4", MentionOrigin.Narration, recalled.support, None)
+      mention("n2", MentionOrigin.Narration, recalled.support, Some("Ana Smith"))
     )
     val in = contextOf(named, Map.empty).toOption.get
-    assert(DistinctLink.of(in, id("n1"), id("n2"), DistinctnessBasis.DifferentNames).isRight)
-    refusedWith(DistinctLink.of(in, id("n1"), id("n3"), DistinctnessBasis.DifferentNames), "same")
-    refusedWith(
-      DistinctLink.of(in, id("n1"), id("n4"), DistinctnessBasis.DifferentNames),
-      "need a name"
-    )
+    val hint =
+      IdentityHint(id("n1"), id("n2"), ContributoryBasis.DifferentNames, HintDirection.Against)
+    val r = ReferentIdentity.resolve(in, Vector.empty, Vector.empty, Vector(hint)).toOption.get
+    assertEquals(r.relation(id("n1"), id("n2")), Right(ReferentRelation.Unknown))
+    assertEquals(r.hintsBetween(id("n1"), id("n2")), Vector(hint))
 
   private def resolve(
       identities: Vector[IdentityLink],
@@ -236,14 +301,12 @@ class ReferentIdentitySuite extends FunSuite:
     assertEquals(r.relation(id("v2"), id("v3")), Right(ReferentRelation.Distinct))
 
   test("a licensed distinctness inside a class reopens it with its candidates"):
-    // One track joins the two mentions while different names attached to them separate them.
+    // A shared name joins the two mentions while overlapping tracks separate them.
     val ana = mention("a1", MentionOrigin.Visual, onTrack("t1", 100L, 200L), Some("Ana"))
-    val beth = mention("b1", MentionOrigin.Visual, onTrack("t1", 300L, 400L), Some("Beth"))
-    val in =
-      contextOf(Vector(ana, beth), Map(TrackId.unsafe("t1") -> ivs(100L -> 400L))).toOption.get
-    val joined =
-      IdentityLink.of(in, id("a1"), id("b1"), IdentityBasis.ContinuousTrack(TrackId.unsafe("t1")))
-    val split = DistinctLink.of(in, id("a1"), id("b1"), DistinctnessBasis.DifferentNames)
+    val other = mention("b1", MentionOrigin.Visual, onTrack("t2", 150L, 250L), Some("Ana"))
+    val in = contextOf(Vector(ana, other), Map.empty).toOption.get
+    val joined = IdentityLink.of(in, id("a1"), id("b1"), IdentityBasis.NamedReference(name("Ana")))
+    val split = DistinctLink.of(in, id("a1"), id("b1"), DistinctnessBasis.SimultaneousTracks)
     val r = ReferentIdentity
       .resolve(in, Vector(joined.toOption.get), Vector(split.toOption.get), Vector.empty)
       .toOption
@@ -257,19 +320,20 @@ class ReferentIdentitySuite extends FunSuite:
     assertEquals(settled.map(_.relation(id("a1"), id("b1"))), Right(Right(ReferentRelation.Same)))
 
   test("distinctness is not lifted through an open class"):
-    // a1, a2, a3 share a track; a2 and a3 carry different names, so the class is open. A
-    // simultaneous outsider b is licensed apart from a1 only.
+    // a1 and a2 share a track; a2 and a3 share a name but overlap on different tracks, so the
+    // class {a1, a2, a3} is open. A simultaneous outsider b is licensed apart from a1 only.
     val a1 = mention("a1", MentionOrigin.Visual, onTrack("t1", 100L, 200L))
     val a2 = mention("a2", MentionOrigin.Visual, onTrack("t1", 300L, 400L), Some("Ana"))
-    val a3 = mention("a3", MentionOrigin.Visual, onTrack("t1", 500L, 600L), Some("Beth"))
+    val a3 = mention("a3", MentionOrigin.Visual, onTrack("t3", 350L, 450L), Some("Ana"))
     val b = mention("b", MentionOrigin.Visual, onTrack("t9", 100L, 200L))
     val in =
-      contextOf(Vector(a1, a2, a3, b), Map(TrackId.unsafe("t1") -> ivs(100L -> 600L))).toOption.get
-    val t1 = IdentityBasis.ContinuousTrack(TrackId.unsafe("t1"))
-    val joins =
-      Vector(("a1", "a2"), ("a2", "a3")).map((x, y) => IdentityLink.of(in, id(x), id(y), t1))
+      contextOf(Vector(a1, a2, a3, b), Map(TrackId.unsafe("t1") -> ivs(100L -> 400L))).toOption.get
+    val joins = Vector(
+      IdentityLink.of(in, id("a1"), id("a2"), IdentityBasis.ContinuousTrack(TrackId.unsafe("t1"))),
+      IdentityLink.of(in, id("a2"), id("a3"), IdentityBasis.NamedReference(name("Ana")))
+    )
     val splits = Vector(
-      DistinctLink.of(in, id("a2"), id("a3"), DistinctnessBasis.DifferentNames),
+      DistinctLink.of(in, id("a2"), id("a3"), DistinctnessBasis.SimultaneousTracks),
       DistinctLink.of(in, id("a1"), id("b"), DistinctnessBasis.SimultaneousTracks)
     )
     val r = ReferentIdentity
@@ -498,11 +562,11 @@ class ReferentIdentitySuite extends FunSuite:
     assertNotEquals(a.digest, b.digest)
 
   test("distinctness carries through settled identity, not through an open class"):
-    // {x, y} is settled by one track; {p, q} shares a track but is opened by different names.
+    // {x, y} is settled by one track; {p, q} shares a name but overlaps on two tracks, so open.
     val x = mention("x", MentionOrigin.Visual, onTrack("t1", 100L, 200L))
     val y = mention("y", MentionOrigin.Visual, onTrack("t1", 300L, 400L))
     val p = mention("p", MentionOrigin.Visual, onTrack("t5", 150L, 250L), Some("Ana"))
-    val q = mention("q", MentionOrigin.Visual, onTrack("t5", 300L, 400L), Some("Beth"))
+    val q = mention("q", MentionOrigin.Visual, onTrack("t6", 200L, 300L), Some("Ana"))
     val in = contextOf(
       Vector(x, y, p, q),
       Map(TrackId.unsafe("t1") -> ivs(100L -> 400L), TrackId.unsafe("t5") -> ivs(150L -> 400L))
@@ -510,10 +574,10 @@ class ReferentIdentitySuite extends FunSuite:
     def track(t: String) = IdentityBasis.ContinuousTrack(TrackId.unsafe(t))
     val joins = Vector(
       IdentityLink.of(in, id("x"), id("y"), track("t1")),
-      IdentityLink.of(in, id("p"), id("q"), track("t5"))
+      IdentityLink.of(in, id("p"), id("q"), IdentityBasis.NamedReference(name("Ana")))
     )
     val splits = Vector(
-      DistinctLink.of(in, id("p"), id("q"), DistinctnessBasis.DifferentNames),
+      DistinctLink.of(in, id("p"), id("q"), DistinctnessBasis.SimultaneousTracks),
       DistinctLink.of(in, id("x"), id("p"), DistinctnessBasis.SimultaneousTracks)
     )
     val r = ReferentIdentity

@@ -74,7 +74,7 @@ Each basis has a fixed **licence class**:
 | Basis | Licence | Factory must check |
 |---|---|---|
 | `ContinuousTrack(trackId)` | Sufficient alone | Both mentions lie inside one `EvidenceAnchor.Track` with no gap in observed coverage |
-| `DeicticReference(utterance)` | Sufficient alone | Exactly one candidate referent is present in the interval, cited by speech and visual support |
+| `DeicticReference(utterance)` | Sufficient alone (amendment 5) | Exactly one candidate referent is present in the interval, and a presence-completeness claim covers it |
 | `NamedReference(name)` | Sufficient alone | The name is attached to each mention directly, not through another identity link |
 | `TextCoreference(rule)` | Sufficient alone | The ADR 0012 rule, unchanged |
 | `AppearanceMatch` | Contributory only | Nothing: it can never resolve identity by itself |
@@ -85,11 +85,11 @@ Contributory bases can rank candidates or prompt further acquisition, but no com
 yields `Resolved`. Ambiguity stays `Open` with its candidates, as in ADR 0012.
 
 Distinctness is licensed the same way. A `DistinctLink` opens the whole equivalence class only
-with a sufficient basis: two simultaneous detections in one frame, different names attached
-directly, or dialogue that explicitly contrasts the referent with someone present. A distinctness
-proposal with only a contributory basis (different clothing, a long gap) is recorded beside the
-class and does not open it. This differs from the S0 validator, where any `different_*` edge
-opens the class. S5 brings that validator into line with this rule.
+with a sufficient basis: two simultaneous detections in one frame on different tracks (amendment 4
+removed different names). A distinctness proposal with only a contributory basis (different
+clothing, a long gap, different names) is recorded beside the class and does not open it. This
+differs from the S0 validator, where any `different_*` edge opens the class. S5 brings that
+validator into line with this rule.
 
 ### 3. Build source identity before the recall, once per film
 
@@ -183,3 +183,24 @@ remain, but the recall gets no credit and the participant is not penalized.
   declare another bundle's axis as its native axis.
 - Deferred: `TextCoreference` and explicit-contrast distinctness (text identity stays with ADR
   0012's `EntityIdentity`), Unicode name normalization, and a completeness statement for deixis.
+
+## Amendment 2026-10-23: names and deixis (owner decisions 4 and 5)
+
+4. **Different names no longer prove different people.** `DifferentNames` moves from the
+   sufficient distinctness bases to the contributory ones: it may be recorded as a hint against
+   identity but never opens a class. The reason is the failure direction. A shared name that fails
+   to match (an accent encoded two ways, a nickname) yields no link, which is safe. Different names
+   that are really one person (an alias, "Ana" and "Ana Smith") would reopen a settled identity,
+   which is the rule 7 failure. No Unicode normalization is added to `core`: `java.text.Normalizer`
+   is not reliably available on Scala.js and Native. Any alias or normalization table belongs in a
+   producer that records receipts. Sufficient distinctness is now `SimultaneousTracks` only.
+5. **Deixis is sufficient only where presence is certified complete.** "She", said while exactly
+   one person is on screen, licenses identity only if a typed presence-completeness claim covers
+   the utterance's interval on that bundle and stream. A claim's basis is either `HumanReviewed`
+   (for example a reviewed scene annotation) or `MeasuredDetector` (a detector whose per-interval
+   recall was measured above a declared threshold, with its receipt). Without a covering claim,
+   deixis is contributory only. The reason: deixis is sound only if nobody else was there, and the
+   S3b measurement showed sampled-frame visual evidence is weak. A detector that misses the second
+   person would turn "the one person present" into a confident wrong identity. Rejected: demoting
+   deixis outright, which would close the main route to the motivating case (the depicted woman is
+   the "she" being discussed), where a reviewed annotation can certify the few intervals involved.

@@ -18,7 +18,8 @@ class ReferentBoundarySuite extends FunSuite:
     classOf[storymodel4s.document.IdentityLink],
     classOf[storymodel4s.document.DistinctLink],
     classOf[storymodel4s.document.ReferentResolution],
-    classOf[storymodel4s.document.IdentityHint]
+    classOf[storymodel4s.document.IdentityHint],
+    classOf[storymodel4s.document.PresenceClaim]
   )
 
   test("controls: the case-class hint exposes every door the guarded types must close") {
@@ -56,6 +57,9 @@ class ReferentBoundarySuite extends FunSuite:
       "ProperName" -> typeCheckErrors(
         "summon[scala.deriving.Mirror.ProductOf[storymodel4s.document.ProperName]]"
       ),
+      "PresenceClaim" -> typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.document.PresenceClaim]]"
+      ),
       "ReferentMention" -> typeCheckErrors(
         "summon[scala.deriving.Mirror.ProductOf[storymodel4s.document.ReferentMention]]"
       ),
@@ -78,6 +82,9 @@ class ReferentBoundarySuite extends FunSuite:
   test("no fromProduct, apply or new from outside the package") {
     val open = List(
       "ProperName" -> typeCheckErrors("storymodel4s.document.ProperName.fromProduct(EmptyTuple)"),
+      "PresenceClaim" -> typeCheckErrors(
+        "storymodel4s.document.PresenceClaim.fromProduct(EmptyTuple)"
+      ),
       "ReferentMention" -> typeCheckErrors(
         "storymodel4s.document.ReferentMention.fromProduct(EmptyTuple)"
       ),
@@ -100,6 +107,11 @@ class ReferentBoundarySuite extends FunSuite:
       errors.nonEmpty && errors.forall(_.message.contains("cannot be accessed"))
     val newDoors = List(
       "ProperName" -> typeCheckErrors("""new storymodel4s.document.ProperName("x")"""),
+      "PresenceClaim" -> typeCheckErrors(
+        """new storymodel4s.document.PresenceClaim(
+             null: storymodel4s.core.EvidenceAnchor.MediaTime,
+             null: storymodel4s.document.PresenceBasis)"""
+      ),
       "IdentityLink" -> typeCheckErrors(
         """new storymodel4s.document.IdentityLink(
              null: storymodel4s.document.ReferentContext,
@@ -112,7 +124,7 @@ class ReferentBoundarySuite extends FunSuite:
              null: storymodel4s.document.ReferentContext,
              null: storymodel4s.document.ReferentMention,
              null: storymodel4s.document.ReferentMention,
-             storymodel4s.document.DistinctnessBasis.DifferentNames)"""
+             storymodel4s.document.DistinctnessBasis.SimultaneousTracks)"""
       ),
       "ReferentResolution" -> typeCheckErrors(
         """new storymodel4s.document.ReferentResolution(
@@ -153,7 +165,7 @@ class ReferentBoundarySuite extends FunSuite:
     assert(
       typeCheckErrors(
         """(null: storymodel4s.document.DistinctLink).copy(
-             basis = storymodel4s.document.DistinctnessBasis.DifferentNames)"""
+             basis = storymodel4s.document.DistinctnessBasis.SimultaneousTracks)"""
       ).nonEmpty
     )
   }
