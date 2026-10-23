@@ -70,6 +70,14 @@ and the axis. A court must kill removal of the check from outside `core`, with a
 `streamNative(F1.id, …)` stream as the refused case and a lawful stream-native secondary clock as
 its positive control (design rule 8).
 
+The guarantee holds up to the content address: ids keep 12 hex characters (48 bits), so a
+deliberate second preimage against another bundle's axis id costs about 2^48 hashes, the same bound
+bundle ids already have. `streamNative` uses its own fingerprint tag, `stream-native-axis/v1`, so it
+never shares a layout with edition or text axes. Two bundles with the same short id (same edition,
+kinds, authority tracks and stream id, kind and checksum, but different native axes or mappings) can
+lawfully reproduce each other's stream-native axes; consumers that must tell such bundles apart
+compare full `identity`, never `id`.
+
 Producers need the prospective bundle id before minting. `computeId` is `private[core]`, so a public
 `SourceBundle.prospectiveId(edition, sourceKind, streams, axisKind, authorityTracks)` is part of
 this decision, next to the existing `editionPlaybackAxis`, which already derives one for film
