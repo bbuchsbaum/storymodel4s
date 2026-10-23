@@ -799,8 +799,7 @@ object PlaybackCoordinate:
   def onTimeAxis(axis: PresentationAxis, tick: Long): Either[DomainError, PlaybackCoordinate] =
     if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline &&
       axis.kind != AxisKind.StreamClock
-    then
-      Left(SourceCanon.inv("coordinate/time", "axis is not a declared time axis"))
+    then Left(SourceCanon.inv("coordinate/time", "axis is not a declared time axis"))
     else
       axis.extent match
         case pt: AxisExtent.PlaybackTicks if tick < pt.start || tick >= pt.endExclusive =>
@@ -1085,13 +1084,16 @@ object SourceBundle:
   ): Either[DomainError, SourceBundleId] =
     computeId(edition, sourceKind, streams, axisKind, authorityTracks)
 
-  /** ADR 0025: a stream's native axis is the primary axis, the stream clock re-minted here from
-    * this bundle's own id and the stream's own fields, or a foreign axis named as the source of one
-    * of this bundle's `TrackComposition` mappings. Anything else would let two bundles appear to
-    * share footage time.
+  /** ADR 0025: a stream's native axis is the primary axis, an edition axis of this same bundle
+    * re-minted from its own id and edition with the stream's own extent and timebase (so one bundle
+    * identity may carry two edition axes and be rebound between them), the stream clock re-minted
+    * from this bundle's own id and the stream's own fields, or a foreign axis named as the source
+    * of one of this bundle's `TrackComposition` mappings. Anything else would let two bundles
+    * appear to share footage time.
     */
   private def nativeAxesOwned(
       id: SourceBundleId,
+      edition: Option[EditionId],
       sourceKind: SourceKind,
       streams: Vector[SourceStream],
       primaryAxis: PresentationAxis,
@@ -1103,7 +1105,13 @@ object SourceBundle:
         PresentationAxis
           .streamClock(id, sourceKind, s.id, s.kind, s.extent, s.timebase)
           .flatMap { clock =>
-            if s.nativeAxis == primaryAxis.id || s.nativeAxis == clock.id ||
+            val ownEdition = (edition, s.extent, s.timebase) match
+              case (Some(e), pt: AxisExtent.PlaybackTicks, Some(tb)) =>
+                PresentationAxis
+                  .editionPlayback(id, e, pt.start, pt.endExclusive, tb)
+                  .exists(_.id == s.nativeAxis)
+              case _ => false
+            if s.nativeAxis == primaryAxis.id || ownEdition || s.nativeAxis == clock.id ||
               composedFrom.contains(s.nativeAxis)
             then Right(())
             else
@@ -1179,7 +1187,7 @@ object SourceBundle:
             )
           )
         else
-          nativeAxesOwned(id, sourceKind, streams, primaryAxis, mappings).map { _ =>
+          nativeAxesOwned(id, edition, sourceKind, streams, primaryAxis, mappings).map { _ =>
             new SourceBundle(
               id,
               edition,

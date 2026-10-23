@@ -132,3 +132,79 @@ class StreamAxisOwnershipSuite extends FunSuite:
       result.left.exists(_.message.contains("never a bundle's primary axis")),
       result
     )
+
+  // A longer audio stream: extents do not enter the bundle id, so b2's id is unchanged.
+  private val longExtent = AxisExtent.playbackTicks(0L, 200L, ms).toOption.get
+  private def withLongAudio(axis: PresentationAxisId): Either[DomainError, SourceBundle] =
+    val long = SourceStream
+      .of(audio.id, audio.kind, audio.checksum, axis, longExtent, Some(ms), Vector.empty)
+      .toOption
+      .get
+    SourceBundle.of(
+      Some(edition),
+      SourceKind.FilmEdition,
+      Vector(bound(picture, primary.id), long),
+      primary,
+      authority,
+      Vector.empty
+    )
+
+  test("control: a second edition axis of the same bundle with the stream's extent is admitted"):
+    val second = PresentationAxis.editionPlayback(b2, edition, 0L, 200L, ms).toOption.get
+    assert(withLongAudio(second.id).isRight)
+
+  test("an edition axis of the same bundle with another extent is refused"):
+    val other = PresentationAxis.editionPlayback(b2, edition, 0L, 150L, ms).toOption.get
+    refusedForAxis(withLongAudio(other.id))
+
+  test("an edition axis of another bundle with the stream's extent is refused"):
+    val foreign = PresentationAxis.editionPlayback(f1.id, edition, 0L, 200L, ms).toOption.get
+    refusedForAxis(withLongAudio(foreign.id))
+
+  test("two streams of one kind cannot share one stream clock"):
+    val twin = draft("b2-audio-twin", StreamKind.Audio)
+    val drafts = Vector(picture, audio, twin)
+    val ax = SourceBundle.editionPlaybackAxis(edition, drafts, authority, 0L, 100L, ms).toOption.get
+    val id = SourceBundle
+      .prospectiveId(
+        Some(edition),
+        SourceKind.FilmEdition,
+        drafts,
+        AxisKind.EditionPlayback,
+        authority
+      )
+      .toOption
+      .get
+    def clockFor(s: SourceStream) = PresentationAxis
+      .streamClock(id, SourceKind.FilmEdition, s.id, s.kind, s.extent, s.timebase)
+      .toOption
+      .get
+    def of(twinAxis: PresentationAxisId) = SourceBundle.of(
+      Some(edition),
+      SourceKind.FilmEdition,
+      Vector(bound(picture, ax.id), bound(audio, clockFor(audio).id), bound(twin, twinAxis)),
+      ax,
+      authority,
+      Vector.empty
+    )
+    refusedForAxis(of(clockFor(audio).id))
+    assert(of(clockFor(twin).id).isRight)
+
+  test("a composition into a foreign axis does not license that axis"):
+    // Only a composition's source axis is licensed: primary -> f1 names f1 as a target.
+    val segment = CompositionSegment
+      .of(
+        PlaybackInterval.on(primary, 0L, 100L).toOption.get,
+        PlaybackInterval.on(f1.primaryAxis, 0L, 100L).toOption.get,
+        OccurrenceId.unsafe("into-f1")
+      )
+      .toOption
+      .get
+    val into =
+      TrackComposition.of(primary.id, f1.primaryAxis.id, Vector(segment), receipt).toOption.get
+    refusedForAxis(build(f1.primaryAxis.id, Vector(into)))
+
+  test("edition-only builders refuse a stream clock"):
+    assert(PlaybackInterval.on(clock(b2), 0L, 10L).isLeft)
+    assert(PlaybackCoordinate.on(clock(b2), 5L).isLeft)
+    assert(PlaybackInterval.onTimeAxis(clock(b2), 0L, 10L).isRight)

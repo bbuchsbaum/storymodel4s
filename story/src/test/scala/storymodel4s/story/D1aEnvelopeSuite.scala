@@ -367,12 +367,25 @@ class D1aEnvelopeSuite extends FunSuite:
     val accepted =
       right(StoryModel.draft(atlas(a), g, NarrativeHierarchy.empty, DiscourseTrajectory.empty))
     val other = a.streams(1)
+    // ADR 0025: a same-bundle edition axis must carry the stream's own extent, so the narrowed
+    // stream moves to its own 0..40 axis. The support at 50..52 on the old axis then no longer
+    // belongs to the changed bundle: the model is still refused, now because that anchor's axis is
+    // not the stream's, where it used to escape the stream's extent. core's D1a extent test keeps
+    // the extent refusal witnessed on a licensed wider axis.
     val narrowed = right(
       SourceStream.of(
         other.id,
         other.kind,
         other.checksum,
-        other.nativeAxis,
+        right(
+          PresentationAxis.editionPlayback(
+            a.id,
+            a.edition.get,
+            0L,
+            40L,
+            RationalTimebase.Millisecond
+          )
+        ).id,
         right(AxisExtent.playbackTicks(0L, 40L, RationalTimebase.Millisecond)),
         other.timebase,
         other.derivedFrom
@@ -400,12 +413,16 @@ class D1aEnvelopeSuite extends FunSuite:
   test("non-primary coordinate metadata and mapping payload reach both model identity fields"):
     val (base, otherPrimary) = twoAxes()
     val secondary = base.streams(1)
+    // ADR 0025: the changed extent comes with the edition axis that carries it.
     val changedStream = right(
       SourceStream.of(
         secondary.id,
         secondary.kind,
         secondary.checksum,
-        secondary.nativeAxis,
+        right(
+          PresentationAxis
+            .editionPlayback(base.id, base.edition.get, 0L, 150L, RationalTimebase.Millisecond)
+        ).id,
         right(AxisExtent.playbackTicks(0L, 150L, RationalTimebase.Millisecond)),
         secondary.timebase,
         secondary.derivedFrom

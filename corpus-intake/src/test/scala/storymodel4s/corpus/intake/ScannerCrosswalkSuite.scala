@@ -444,12 +444,11 @@ class ScannerCrosswalkSuite extends FunSuite:
       )
       .toOption
       .get
+    // ADR 0025 moved this refusal earlier. b's streams sit on b's axis, which is only the
+    // composition's target, never its source, so the bundle itself is refused and no
+    // native-only occurrence can be admitted. Before the ADR the bundle was built and
+    // Reference.mediaOccurrence refused the occurrence (UnknownOccurrence).
     val bundle = SourceBundle
       .of(axis.edition, SourceKind.FilmEdition, streams, axis, streams.map(_.id), Vector(transform))
-      .toOption
-      .get
-    assertEquals(
-      Reference.mediaOccurrence(bundle, transform.identity, occurrence),
-      Left(Refusal.UnknownOccurrence)
-    )
+    assert(bundle.left.exists(_.message.contains("bundle/stream-axis")), clues(bundle))
   }

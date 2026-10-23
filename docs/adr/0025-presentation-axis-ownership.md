@@ -45,9 +45,13 @@ Every consumer that treats an equal axis as the same footage has to remember the
 
 ## Decision
 
-### 1. A stream's native axis comes from one of three sources
+### 1. A stream's native axis comes from one of four sources
 
 1. **The bundle's primary axis.**
+1a. **An edition axis of this same bundle** (owner decision 4), re-minted by `SourceBundle.of` from
+   the bundle's own id and edition with the stream's own extent and timebase. One bundle identity
+   may carry two edition axes and be rebound between them (the D1a rebind fixture). Its id
+   fingerprints the bundle, so another bundle cannot reproduce it.
 2. **A stream-native axis.** It is minted for one stream of one bundle by a new constructor,
    `PresentationAxis.streamNative(bundle: SourceBundleId, stream: StreamId, kind: StreamKind,
    extent, timebase)`. Every input is public, so the constructor alone proves nothing: another
@@ -135,3 +139,23 @@ core rule removes the unmapped case. The consumer guards cover the mapped-but-un
    stays with `DeclaredComposition.of` and the consumer guards, because `SourceBundle.of` has no
    part bundles at construction time.
 3. **Implement before S3c**, so S3c builds media bundles under the final rule.
+4. **A same-bundle edition axis is a fourth lawful source** (rule 1a), decided during
+   implementation when the D1a rebind test showed one bundle identity legitimately carrying two
+   edition axes. Rejected: synthetic compositions in the fixture, which would declare compositions
+   that do not exist; and moving the second stream to a stream clock, which would change what the
+   rebind test asserts.
+
+## Implementation notes (2026-10-23)
+
+- The constructor ships as `PresentationAxis.streamClock(bundle, sourceKind, stream, kind, extent,
+  timebase)`. The source kind joins the fingerprint because `SourceBundle.of` knows it from the
+  bundle being built, so recomputation still needs only the bundle and the stream.
+- A stream clock has its own kind, `AxisKind.StreamClock`: never a bundle's primary axis, accepted
+  by the explicit time-axis builders (`onTimeAxis`) and refused by the edition-only ones. Rejected:
+  minting stream clocks as `EditionPlayback`, which would contradict `AxisKind`'s own contract
+  that edition playback is never an elementary stream clock.
+- Follow-up, not decided: rule 3 accepts the source axis of any `TrackComposition`, whatever its
+  target, so two foreign axes can name each other without reaching the primary axis. Requiring
+  the target to be the primary axis would tighten it; it needs an owner decision because it
+  narrows the accepted rule.
+
