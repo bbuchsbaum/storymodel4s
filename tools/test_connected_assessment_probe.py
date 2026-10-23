@@ -204,6 +204,19 @@ class ConnectedTests(unittest.TestCase):
         r,v=fixture();r['inventory']['components'][0]['assessment']['mode']='unresolved'
         self.assertEqual(statuses(assess(r,v)),['Unresolved','Unresolved'])
 
+    def test_unknown_normalization_with_both_sides_is_not_conflicted(self):
+        for level in ('component','parent'):
+            r,v=fixture()
+            if level=='component':r['inventory']['components'][0]['assessment']['mode']='unresolved'
+            else:r['inventory']['logic']='unresolved'
+            negative=copy.deepcopy(v['components'][0]['affirms'][0])
+            negative['basis']=dict(kind='explicit_negation',explanation='Opposing proposal retained under unresolved normalization.')
+            v['components'][0]['denies']=[negative]
+            out=assess(r,v)
+            self.assertEqual(statuses(out),['Unresolved','Unresolved'])
+            self.assertEqual(len(out['components'][0]['proposed_affirms']),1)
+            self.assertEqual(len(out['components'][0]['proposed_denies']),1)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -302,7 +302,8 @@ def validate_proof(proof, relation, component, inv, citations, handles, graph):
             if handles[handle]['kind'] != required[role]:
                 raise ValueError('wrong role handle kind')
             assigned[role].append(handle)
-    licensed = all(graph.same(hs) for hs in assigned.values())
+    licensed = (all(graph.same(hs) for hs in assigned.values()) and
+                meta['mode'] != 'unresolved' and inv['logic'] != 'unresolved')
     if meta['mode'] == 'cross_scope_identity':
         licensed &= all(handles[h]['scope'] in {'world', 'assertion'} for h in contexts)
         a, b = [hs[0] if hs else None for hs in assigned.values()]
