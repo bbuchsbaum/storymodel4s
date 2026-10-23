@@ -256,9 +256,9 @@ object SourceRepresentation:
     // A part's axis is that part's footage only through the part's own streams: the owner is the
     // part, or its anchors on that axis use streams identical to the part's (a composition that
     // carries them). A stream that merely declares the axis, even under a self-declared mapping, is
-    // different footage. The composition role belongs to the declared composed bundle only; with a
-    // declared composition every listed owner is one of its parts or the composed bundle, so this
-    // clause is defence in depth with no lawful counterexample found.
+    // different footage. The composition role belongs to the declared composed bundle only: a part
+    // may carry a stream natively on the composed axis, but its support there is not the
+    // composition's.
     def owns(
         owner: SourceBundle,
         support: EvidenceSupport,

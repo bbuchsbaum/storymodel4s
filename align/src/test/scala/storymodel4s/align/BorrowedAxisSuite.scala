@@ -137,6 +137,119 @@ class BorrowedAxisSuite extends FunSuite:
     )
     assertEquals(result.map(_ => ()), Left(MappingRefusal.ForeignAxis(a.primaryAxis.id)))
 
+  // A two-part composition whose second part carries an extra stream natively on the composed
+  // axis. Bundle ids hash stream id, kind and checksum only, so that axis can be derived before
+  // the stream is bound to it.
+  private object PartOnComposedAxis:
+    private def draft(name: String) = SourceStream
+      .of(
+        StreamId.unsafe(name),
+        StreamKind.Picture,
+        Checksum.ofText(name),
+        a.primaryAxis.id,
+        a.primaryAxis.extent,
+        a.primaryAxis.timebase,
+        Vector.empty
+      )
+      .toOption
+      .get
+    private def bind(s: SourceStream, axis: PresentationAxis) = SourceStream
+      .of(s.id, s.kind, s.checksum, axis.id, axis.extent, axis.timebase, Vector.empty)
+      .toOption
+      .get
+    private val (picture, extra) = (draft("p2-picture"), draft("p2-extra"))
+    private val p2Edition = EditionId.unsafe("p2")
+    private val p2Axis = SourceBundle
+      .editionPlaybackAxis(p2Edition, Vector(picture, extra), Vector(picture.id), 0L, 40L, timebase)
+      .toOption
+      .get
+    private val cEdition = EditionId.unsafe("p2-composed")
+    private val authority = a.streams.map(_.id) :+ picture.id
+    val composedAxis: PresentationAxis = SourceBundle
+      .editionPlaybackAxis(
+        cEdition,
+        a.streams ++ Vector(picture, extra),
+        authority,
+        0L,
+        80L,
+        timebase
+      )
+      .toOption
+      .get
+    val onComposed: SourceStream = bind(extra, composedAxis)
+    private val p2Picture = bind(picture, p2Axis)
+    val p2: SourceBundle = SourceBundle
+      .of(
+        Some(p2Edition),
+        SourceKind.FilmEdition,
+        Vector(p2Picture, onComposed),
+        p2Axis,
+        Vector(picture.id),
+        Vector.empty
+      )
+      .fold(e => fail(s"part p2: ${e.message}"), identity)
+    private val receipt = SourceDerivationReceipt
+      .of("p2-composition/v1", "a then p2", Vector(a.identity, p2.identity))
+      .toOption
+      .get
+    private def segment(from: PresentationAxis, start: Long, label: String) = CompositionSegment
+      .of(
+        PlaybackInterval.on(from, 0L, 40L).toOption.get,
+        PlaybackInterval.on(composedAxis, start, start + 40L).toOption.get,
+        OccurrenceId.unsafe(label)
+      )
+      .toOption
+      .get
+    private val mappings = Vector(
+      TrackComposition
+        .of(a.primaryAxis.id, composedAxis.id, Vector(segment(a.primaryAxis, 0L, "a")), receipt)
+        .toOption
+        .get,
+      TrackComposition
+        .of(p2Axis.id, composedAxis.id, Vector(segment(p2Axis, 40L, "p2")), receipt)
+        .toOption
+        .get
+    )
+    val composedBundle: SourceBundle = SourceBundle
+      .of(
+        Some(cEdition),
+        SourceKind.FilmEdition,
+        a.streams ++ Vector(p2Picture, onComposed),
+        composedAxis,
+        authority,
+        mappings
+      )
+      .fold(e => fail(s"composed bundle: ${e.message}"), identity)
+    val declared: DeclaredComposition = DeclaredComposition
+      .of(composedBundle, NonEmptyVector.of(a, p2))
+      .fold(e => fail(s"declared composition: ${e}"), identity)
+    def onComposedAxis(owner: SourceBundle): SourceSupportStatus =
+      val anchor = EvidenceAnchor.MediaTime(
+        owner.id,
+        onComposed.id,
+        composedAxis.id,
+        PlaybackIntervalSet.one(PlaybackInterval.on(composedAxis, 2L, 5L).toOption.get)
+      )
+      val support = EvidenceSupport
+        .of(owner, Vector(anchor))
+        .fold(e => fail(s"support on the composed axis: ${e.message}"), identity)
+      SourceSupportStatus.located(TypedSupport.Anchored(support))
+    def represent(owner: SourceBundle) = SourceRepresentation.of(
+      view.copy(nodes = Vector(nodes.head)),
+      NonEmptyVector.of(a, p2).map(BundleEntry.media),
+      Some(declared),
+      Map(e(1) -> onComposedAxis(owner))
+    )
+
+  test("a part with a stream on the composed axis does not take the composition's role"):
+    import PartOnComposedAxis.*
+    assertEquals(represent(p2).map(_ => ()), Left(MappingRefusal.ForeignAxis(composedAxis.id)))
+
+  test("control: the composed bundle's own support through that stream is admitted"):
+    import PartOnComposedAxis.*
+    val result = represent(composedBundle)
+    assert(result.isRight, result.left.toOption.map(_.toString).getOrElse(""))
+
   test("control: the declared composed bundle may carry support on a part's axis"):
     val result = SourceRepresentation.of(
       view.copy(nodes = Vector(nodes.head)),
