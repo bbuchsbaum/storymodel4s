@@ -451,4 +451,38 @@ class ScannerCrosswalkSuite extends FunSuite:
     val bundle = SourceBundle
       .of(axis.edition, SourceKind.FilmEdition, streams, axis, streams.map(_.id), Vector(transform))
     assert(bundle.left.exists(_.message.contains("bundle/stream-axis")), clues(bundle))
+    // With b also composed into the primary axis the bundle is lawful, and the native-only a->b
+    // occurrence is still refused: it never reaches the edition playback axis.
+    val bIntoPrimary = TrackComposition
+      .of(
+        b.primaryAxis.id,
+        axis.id,
+        Vector(
+          CompositionSegment
+            .of(
+              PlaybackInterval.on(b.primaryAxis, 20L, 40L).toOption.get,
+              PlaybackInterval.on(axis, 40L, 60L).toOption.get,
+              OccurrenceId.unsafe("b-into-primary")
+            )
+            .toOption
+            .get
+        ),
+        SourceDerivationReceipt.of("b/v1", "b into primary", Vector(b.identity)).toOption.get
+      )
+      .toOption
+      .get
+    val lawful = SourceBundle
+      .of(
+        axis.edition,
+        SourceKind.FilmEdition,
+        streams,
+        axis,
+        streams.map(_.id),
+        Vector(transform, bIntoPrimary)
+      )
+      .fold(e => fail(e.message), identity)
+    assertEquals(
+      Reference.mediaOccurrence(lawful, transform.identity, occurrence),
+      Left(Refusal.UnknownOccurrence)
+    )
   }
