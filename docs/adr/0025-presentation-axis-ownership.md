@@ -1,6 +1,7 @@
 # ADR 0025 — Presentation axis ownership for source streams
 
-**Status:** Proposed 2026-10-23. Not accepted. It needs an owner decision (AGENTS.md SD5).
+**Status:** Accepted 2026-10-23 (AGENTS.md SD5). The owner chose the answers recorded under
+"Owner decisions".
 
 **Decider:** the owner
 
@@ -42,7 +43,7 @@ What has been measured:
 
 Every consumer that treats an equal axis as the same footage has to remember the hole. Two did not.
 
-## Decision (proposed)
+## Decision
 
 ### 1. A stream's native axis comes from one of three sources
 
@@ -57,7 +58,8 @@ Every consumer that treats an equal axis as the same footage has to remember the
    stream's `StreamKind` and not a caller-chosen axis kind. There is no cycle: `computeId` does not
    read native axes, so the bundle id exists before the axis is minted, and recomputing at `of`
    reads only those inputs.
-3. **A foreign axis named by one of the bundle's own mappings.** This is the composition case.
+3. **A foreign axis named by one of the bundle's own `TrackComposition` mappings** (owner decision
+   2). This is the composition case.
    Whether those streams really are a part's streams remains `DeclaredComposition.of`'s check
    (stream equality and extents), and consumers that need "same footage" rely on it as `align` now
    does.
@@ -123,15 +125,13 @@ core rule removes the unmapped case. The consumer guards cover the mapped-but-un
   measurement of 12 failures covered `core`, `story`, `codec` and `document` only; `align` must be
   measured too.
 
-## Questions for the owner
+## Owner decisions (2026-10-23)
 
-1. Accept stream-native axes (rule 2) as the lawful home of an unaligned clock? Or require every
-   secondary stream to declare a `ClockRepair` to the primary axis from the start, which is stricter
-   but makes "clock not yet repaired" unrepresentable?
-2. Should rule 3 admit only `TrackComposition` mappings? Today a `ClockRepair` or a self-declared
-   composition from F1's axis also names it. And should a self-declared `TrackComposition` also
-   require that the bundle's composed streams equal some other bundle's streams, which would move
-   the stream-identity check into `core`? That needs part bundles at construction time, which
-   `SourceBundle.of` does not have today.
-3. Land this before or after S3c? S3c builds the per-film identity graph and will construct media
-   bundles.
+1. **Stream-native axes are accepted** as the lawful home of an unaligned secondary clock. Rejected:
+   requiring a `ClockRepair` to the primary axis from the start, which would make "clock not yet
+   repaired" unrepresentable.
+2. **Rule 3 admits only `TrackComposition` mappings.** A `ClockRepair` or any other mapping family
+   cannot license a foreign native axis. The check that composed streams equal a part's streams
+   stays with `DeclaredComposition.of` and the consumer guards, because `SourceBundle.of` has no
+   part bundles at construction time.
+3. **Implement before S3c**, so S3c builds media bundles under the final rule.
