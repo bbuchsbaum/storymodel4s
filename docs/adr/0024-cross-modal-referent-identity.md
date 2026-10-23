@@ -177,7 +177,9 @@ remain, but the recall gets no credit and the participant is not penalized.
   distinctness.
 - A direct distinctness carries over to other mentions only through settled identity, never through
   an open class.
-- Links keep the context that licensed them, and track coverage is given as track anchors naming
-  bundle and stream, so a licence cannot be moved to other evidence.
+- Links keep the context that licensed them (compared by an injective content digest), and track
+  coverage is given as track anchors naming bundle and stream, so a licence cannot be moved to
+  other evidence. Playback overlap also requires the same bundle, because `core` lets a stream
+  declare another bundle's axis as its native axis.
 - Deferred: `TextCoreference` and explicit-contrast distinctness (text identity stays with ADR
   0012's `EntityIdentity`), Unicode name normalization, and a completeness statement for deixis.

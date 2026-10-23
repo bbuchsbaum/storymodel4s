@@ -419,14 +419,21 @@ class ReferentIdentitySuite extends FunSuite:
     val ax = film.primaryAxis
     def span(a: Long, b: Long) = PlaybackInterval.on(ax, a, b).toOption.get
     val three = new EvidenceAnchor.Track(
-      film.id,
+      SourceBundleId.unsafe("aaa"),
       stream,
       TrackId.unsafe("t1"),
       PlaybackIntervalSet.of(Vector(span(1L, 2L), span(3L, 4L), span(5L, 6L))).toOption.get
     )
     // The same field sequence split into two entries: the second entry's bundle, stream and
-    // track ids spell out the first entry's second interval.
-    val one = new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), ivs(1L -> 2L))
+    // track ids spell out the first entry's second interval. "aaa" sorts before the axis id, so
+    // coverage ordering keeps the entries in this order.
+    val one =
+      new EvidenceAnchor.Track(
+        SourceBundleId.unsafe("aaa"),
+        stream,
+        TrackId.unsafe("t1"),
+        ivs(1L -> 2L)
+      )
     val shifted = new EvidenceAnchor.Track(
       SourceBundleId.unsafe(ax.id.value),
       StreamId.unsafe("3"),
@@ -445,11 +452,21 @@ class ReferentIdentitySuite extends FunSuite:
       PlaybackIntervalSet.of(spans.toVector.map(span)).toOption.get
     val axisBundle = SourceBundleId.unsafe(ax.id.value)
     val a = Vector(
-      new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), set(1L -> 2L, 3L -> 4L)),
+      new EvidenceAnchor.Track(
+        SourceBundleId.unsafe("aaa"),
+        stream,
+        TrackId.unsafe("t1"),
+        set(1L -> 2L, 3L -> 4L)
+      ),
       new EvidenceAnchor.Track(axisBundle, StreamId.unsafe("5"), TrackId.unsafe("6"), set(7L -> 8L))
     )
     val b = Vector(
-      new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), set(1L -> 2L)),
+      new EvidenceAnchor.Track(
+        SourceBundleId.unsafe("aaa"),
+        stream,
+        TrackId.unsafe("t1"),
+        set(1L -> 2L)
+      ),
       new EvidenceAnchor.Track(
         axisBundle,
         StreamId.unsafe("3"),
@@ -462,7 +479,7 @@ class ReferentIdentitySuite extends FunSuite:
       ReferentContext.of(Vector(v1), b).toOption.get.digest
     )
 
-  test("the digest cannot move a name's embedded separators into coverage"):
+  test("a name with embedded separators does not collide with coverage"):
     val nul = 0.toChar.toString
     val forged = Vector("n", film.id.value, stream.value, "t1", film.primaryAxis.id.value, "1", "2")
       .mkString(nul)
@@ -504,6 +521,66 @@ class ReferentIdentitySuite extends FunSuite:
     assertEquals(r.relation(id("y"), id("p")), Right(ReferentRelation.Distinct))
     assertEquals(r.relation(id("p"), id("y")), Right(ReferentRelation.Distinct))
     assertEquals(r.relation(id("y"), id("q")), Right(ReferentRelation.Unknown))
+
+  test("simultaneity does not cross bundles that share an axis"):
+    // A second film declares a picture stream whose native axis is the first film's axis, so its
+    // track anchors lie on that axis too.
+    val foreign = SourceStream
+      .of(
+        stream,
+        StreamKind.Picture,
+        Checksum.ofText("referent-borrowed"),
+        film.primaryAxis.id,
+        film.primaryAxis.extent,
+        film.primaryAxis.timebase,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val edition = EditionId.unsafe("referent-borrowed")
+    val axis = SourceBundle
+      .editionPlaybackAxis(
+        edition,
+        Vector(foreign),
+        Vector(stream),
+        0L,
+        1000L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val borrowed = SourceBundle
+      .of(
+        Some(edition),
+        SourceKind.FilmEdition,
+        Vector(foreign),
+        axis,
+        Vector(stream),
+        Vector.empty
+      )
+      .fold(e => fail(s"borrowed-axis film: ${e.message}"), identity)
+    val there = ReferentMention
+      .anchored(
+        id("w"),
+        MentionOrigin.Visual,
+        borrowed,
+        EvidenceSupport
+          .of(
+            borrowed,
+            Vector(
+              EvidenceAnchor.Track(borrowed.id, stream, TrackId.unsafe("t9"), ivs(100L -> 200L))
+            )
+          )
+          .fold(e => fail(s"borrowed-axis anchor: ${e.message}"), identity),
+        None
+      )
+      .toOption
+      .get
+    val in = contextOf(Vector(v1, there), Map.empty).toOption.get
+    refusedWith(
+      DistinctLink.of(in, id("v1"), id("w"), DistinctnessBasis.SimultaneousTracks),
+      "do not overlap"
+    )
 
   test("contributory hints alone never decide identity or distinctness"):
     val toward =

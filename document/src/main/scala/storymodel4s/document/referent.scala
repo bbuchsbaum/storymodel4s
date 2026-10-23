@@ -131,23 +131,27 @@ object ReferentMention:
   */
 private[document] object ReferentExtents:
   final case class ReferentExtent(
+      bundle: SourceBundleId,
       axis: PresentationAxisId,
       stream: StreamId,
       start: Long,
       end: Long
   ):
+    // A stream may declare another bundle's axis as its native axis, so an equal axis does not
+    // make two extents the same footage: the bundle must match too.
     def overlaps(that: ReferentExtent): Boolean =
-      axis == that.axis && start < that.end && that.start < end
+      bundle == that.bundle && axis == that.axis && start < that.end && that.start < end
 
   def of(anchor: EvidenceAnchor): Vector[ReferentExtent] = anchor match
     case EvidenceAnchor.Text(_, _, _)           => Vector.empty
-    case EvidenceAnchor.MediaTime(_, s, _, set) =>
-      set.intervals.toVector.map(i => ReferentExtent(i.axis, s, i.start, i.endExclusive))
-    case EvidenceAnchor.MediaPoint(_, s, at) => Vector(ReferentExtent(at.axis, s, at.at, at.at + 1))
-    case EvidenceAnchor.Shot(_, s, _, i)     =>
-      Vector(ReferentExtent(i.axis, s, i.start, i.endExclusive))
-    case EvidenceAnchor.Track(_, s, _, set) =>
-      set.intervals.toVector.map(i => ReferentExtent(i.axis, s, i.start, i.endExclusive))
+    case EvidenceAnchor.MediaTime(b, s, _, set) =>
+      set.intervals.toVector.map(i => ReferentExtent(b, i.axis, s, i.start, i.endExclusive))
+    case EvidenceAnchor.MediaPoint(b, s, at) =>
+      Vector(ReferentExtent(b, at.axis, s, at.at, at.at + 1))
+    case EvidenceAnchor.Shot(b, s, _, i) =>
+      Vector(ReferentExtent(b, i.axis, s, i.start, i.endExclusive))
+    case EvidenceAnchor.Track(b, s, _, set) =>
+      set.intervals.toVector.map(i => ReferentExtent(b, i.axis, s, i.start, i.endExclusive))
 
   def of(support: TypedSupport): Vector[ReferentExtent] = support match
     case TypedSupport.Anchored(s) => s.anchors.toVector.flatMap(of)
