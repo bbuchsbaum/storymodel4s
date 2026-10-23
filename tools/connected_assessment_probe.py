@@ -30,10 +30,14 @@ Return JSON only: {claim_id,citations:[],handles:[],connections:[],components:[]
 citations: {id,evidence_id,quote}, exact unique contiguous source quotes including required scope.
 handles: {id,kind,citation,scope}. kind is entity,event,assertion,situation,context. citation is a
 citation ID. scope is null except for context, where world,assertion,belief,hypothetical,unknown.
+Context scope labels the evidentiary claim: assertion means what a speaker asserted, while world
+means a depicted or independently established state. An assertion-mode proof needs an assertion
+context even when the speech act occurred in the actual world. This does not verify its content.
 Use situation for a compatible scene/time interval; different predicates need not be one event.
 Use assertion for a specific utterance occurrence, not all repetitions of the same words.
-connections: {id,relation,left,right,citations,basis,explanation}. relation is same_KIND or
-different_KIND for entity,event,assertion,situation,context. Endpoints must have that kind.
+connections: {id,relation,left,right,citations,basis,explanation}. relation is exactly one of:
+same_entity,different_entity,same_event,different_event,same_assertion,different_assertion,
+same_situation,different_situation,same_context,different_context. Endpoints must have that kind.
 basis is explicit_reference,direct_correspondence,utterance_correspondence,or unresolved.
 Citations must include BOTH endpoint records. Explain the specific identity/correspondence;
 shared clothing, adjacency, the same scene, or identical words alone cannot establish identity.
@@ -50,6 +54,10 @@ connections. All contributing sources need compatible situations and contexts. F
 cores, occurrence must identify the SAME assertion, with an explicit correspondence across records.
 For other cores, occurrence may be null unless the parent requests same_occurrence.
 The model supplies these correspondences; source proximity is not a licence to invent them.
+Across components, shared roles also require identity connections. Unless eventPolicy is
+separate_scopes, their situations and contexts need explicit same_situation and same_context
+connections too, even when each individual proof has just one source. Same person alone does
+not establish same time/context. same_occurrence additionally requires the same occurrence.
 Keep distinct events/contexts in cross_scope_identity proofs; do not turn described death into fact.
 For that mode, affirms requires a same_entity path between its two argument handles; denies needs
 different_entity evidence between them. No missing connection is a denial.
