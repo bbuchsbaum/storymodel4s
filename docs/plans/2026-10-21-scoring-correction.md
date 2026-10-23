@@ -1126,3 +1126,83 @@ completed responses:9 valid and8 unfinished. One additional possible serial requ
 full bound;102 remaining requests are explicitly unattempted. The complete120-request comparison
 was restarted at8192 output tokens, matching the previous component baseline, with unchanged
 requests, prompt and judgments. Earlier successes are not substituted into this full run.
+
+The full run completed120/120 requests:117 valid,1 invalid context scope and2 unfinished responses.
+Failures remain in the fixed populations. Source items, intervals, parent claims, original component
+fields and independent references are unchanged. The prior component baseline used the same dated
+DeepSeek model, Together route and8192-token cap; it is historical, not a contemporaneous control.
+
+| Condition | Parents | Components | Reference-resolvable | Matching resolutions, old → new | Wrong resolutions, old → new | New failed parents |
+|---|---:|---:|---:|---:|---:|---:|
+| Automatic focal, primary |48|87|20|13 → 18|0 → 1|0|
+| Focal plus annotations, primary |48|87|37|7 → 21|1 → 1|3|
+| Automatic focal, body |8|21|8|6 → 8|0 → 0|0|
+| Focal plus annotations, body |8|21|14|11 → 14|0 → 0|0|
+| Context plus annotations, body |8|21|21|8 → 18|0 → 0|0|
+
+These are component judgments against frozen input-evidence references, not independent memories
+or verified video truth. The48 primary parents comprise24 natural recalls and24 authored controls;
+body diagnostics are separate. Natural attributed resolutions rise from0 to2 automatically and
+from0 to1 with annotations, with one new wrong resolution in each condition. Both errors concern
+the same unresolved-person claim (natural-u23-r740/c2), incorrectly contradicted by assigning a
+source person to the recall role without establishing that correspondence. The old incompatible-
+color error is removed. One automatic control detail is lost (control-u26-r67-supported/c5).
+Across all237 condition-component instances, matching resolutions rise45→79 and wrong resolutions
+rise1→2. Because conditions repeat claims, these are not237 independent observations. The fixed
+criterion of more matching resolutions without more wrong resolutions is not met.
+
+Independent joint whole-positive references provide a different readout. On48 primary parents,
+the new component protocol yields2 correct supported wholes and0 unsupported positives, versus
+0/1 for the old component protocol and2/0 for the old whole-claim protocol. Thus it recovers the
+old whole protocol's positive performance, without establishing an overall whole-memory gain or
+an improvement over the earlier differently defined five-resolution count. No natural whole
+becomes supported. Focal-annotation body wholes improve2→3; context-annotation body wholes2→5,
+with the grounding qualification below applying to one of those context cases.
+
+The verified floor recovery is d507-floor/focal_auto: posture/location remain supported while
+gender stays unresolved. The death speech assertion d575-death-assertion is now supported in all
+three conditions with assertion scope preserved. Its real outputs use ASR alone or annotation
+alone, so the synthetic complementary-role success is not demonstrated as an ASR-plus-annotation
+join here. Depicted-person death (d507-death/c3) and depicted/described identity
+(d507575-identity/c3) still remain unresolved even with context. The original full death/identity
+accuracy problem remains open.
+
+A reference-matching answer can still have an insufficient proof. d526-floor/context_human
+matches all four labels but cites only110–114-second records for the152–155-second target.
+Its supplied connections join those earlier records without grounding them in the target moment.
+The complete narrative may support the frozen labels; the emitted proof does not establish that
+continuity. An offline probe changes the target to10000–10003 seconds, updates the canonical ID,
+and the validator accepts the same proofs. This is a demonstrated validation boundary, not a new
+model call, a mutation kill, or a relabeling of gold. See target-scope-adverse-evidence.json.
+
+The next general repair is an evidenced binding from each recall argument and target situation
+to its supporting source graph. Agreement among source records alone is insufficient. Such a
+binding must allow cited persistence, identity and reported-event references across presentation
+times; a blanket overlap rule would reject legitimate evidence. Unknown target binding should
+retain local facts while leaving their attribution unresolved. Wrong-person and unrelated-time
+negatives must be paired with unknown-modifier, complementary-source and explicit-continuity
+positive controls before a further frozen and then held-out comparison.
+
+Local checks:57 Python tests passed,0 failed,0 skipped (51 assessment tests plus6 transport
+checks). Five compiled guard mutations each fail the named witness while its paired positive
+control passes. The synthetic-guided prompt revision improves9/12 to12/12 exact checks over10
+distinct model inputs; both runs remain. The8192 main run follows the preserved interrupted4096
+attempt:17 completed, one possible in-flight attempt,102 unattempted. No selected successes are
+stitched between runs. The original process survived a server restart and completed normally.
+
+The tools-only slice has no changed Scala types (`reference-scope.sh`: no types defined in changed
+files). The checks are local; no new native consumer or hosted-CI qualification is asserted.
+Exact code0b3f7ae05a475f354bba1bb1dfc4a1f0bcd53b19 and freeze files identify inference inputs.
+The branch is codex/connected-assessment-20261023, in checkout/, with final metadata in
+verification.json. Raw source/recall/media artifacts remain ignored under .agent-work.
+
+New work made161 confirmed calls plus at most one interrupted call;
+161 priced responses report USD0.597087180. Charging the unknown
+in-flight call its full bound gives USD0.631130580 as the new accounted upper
+cost. Including the preceding round, the conservative attempted-request ceiling is
+USD4.8066027, within the authorized USD5. The actual reported bill,
+post-run accounted upper bound and conservative request ceiling are distinct quantities.
+
+Evidence: `.agent-work/connected-assessment-20261023/` contains the frozen runs,
+`comparison-main.json`, `target-scope-adverse-evidence.json`, `costs.json`, `report.md` and
+`verification.json`. The parent accuracy issue remains open; this candidate remains local.
