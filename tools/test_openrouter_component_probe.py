@@ -7,6 +7,7 @@ from unittest.mock import patch
 import openrouter_component_probe as p
 import claim_assessment_probe as base
 from test_component_assessment_probe import fixture
+from test_connected_assessment_probe import fixture as connected_fixture
 
 class RemoteTests(unittest.TestCase):
     def test_same_model_recipe_and_output_limit(self):
@@ -27,6 +28,19 @@ class RemoteTests(unittest.TestCase):
     def test_foreign_model_rejected(self):
         r,v,_=fixture()
         self.assertEqual(p.interpret(r,dict(model='other',provider='Fireworks'))['processing'],'foreign_provider_or_model')
+    def test_connected_prompt_and_reader_share_canonical_identity(self):
+        r,v=connected_fixture();v['claim_id']=p.connected.model_input(r)['claim_id']
+        b=p.body(r,'together','connected')
+        self.assertEqual(b['max_tokens'],4096)
+        self.assertTrue(b['messages'][0]['content'].startswith(p.connected.PROMPT))
+        sent=json.loads(b['messages'][0]['content'].split('INPUT:\n',1)[1])
+        self.assertEqual(sent,p.connected.model_input(r))
+        self.assertNotIn('polarity',json.dumps(sent))
+        response=dict(model=p.remote.MODEL,provider='Together',choices=[dict(
+            finish_reason='stop',message=dict(content=json.dumps(v)))])
+        result=p.interpret(r,response,'together','connected')
+        self.assertEqual(result['processing'],'valid')
+        self.assertEqual(result['proposal']['components'][0]['status'],'Supported')
     def test_rate_limit_preserves_entire_population(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);r,_,_=fixture();r['identity']=base.identity(r)

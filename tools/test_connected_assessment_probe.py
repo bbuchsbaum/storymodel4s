@@ -205,14 +205,20 @@ class ConnectedTests(unittest.TestCase):
         self.assertEqual(statuses(assess(r,v)),['Unresolved','Unresolved'])
 
     def test_unknown_normalization_with_both_sides_is_not_conflicted(self):
-        for level in ('component','parent'):
+        for level in ('known','component','parent'):
             r,v=fixture()
             if level=='component':r['inventory']['components'][0]['assessment']['mode']='unresolved'
-            else:r['inventory']['logic']='unresolved'
-            negative=copy.deepcopy(v['components'][0]['affirms'][0])
-            negative['basis']=dict(kind='explicit_negation',explanation='Opposing proposal retained under unresolved normalization.')
+            elif level=='parent':r['inventory']['logic']='unresolved'
+            r['items'][1]['text']='Ana is not on the floor.'
+            second=add_source(r,v,'e2','b')
+            for kind,suffix in [('entity','p'),('situation','s'),('context','k')]:
+                connect(v,'same_'+kind,'a'+suffix,'b'+suffix)
+            negative=dict(sources=[second],basis=dict(kind='explicit_negation',explanation='Explicitly conflicting floor assertion.'))
             v['components'][0]['denies']=[negative]
             out=assess(r,v)
+            if level=='known':
+                self.assertEqual(statuses(out),['Conflicted','Unresolved'])
+                continue
             self.assertEqual(statuses(out),['Unresolved','Unresolved'])
             self.assertEqual(len(out['components'][0]['proposed_affirms']),1)
             self.assertEqual(len(out['components'][0]['proposed_denies']),1)
