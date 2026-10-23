@@ -205,19 +205,28 @@ final class ReferentContext private (
 
   /** Content digest of everything a licence may depend on. Why: links compare their licensing
     * context on every resolve, and a digest keeps that comparison constant-time (rule 9) and
-    * content-addressed (rule 10).
+    * content-addressed (rule 10). Every field is hashed before joining, so no embedded separator
+    * can move a field boundary, and every list is preceded by its length, so no field can move from
+    * one entry to the next.
     */
   lazy val digest: Checksum =
     val ms = mentions.values.toVector.flatMap { m =>
       Vector(m.id.value, m.origin.toString, m.support.identity.hex, m.name.fold("")(_.folded))
     }
     val cs = trackCoverage.flatMap { c =>
-      Vector(c.bundle.value, c.stream.value, c.track.value) ++
+      Vector(
+        c.bundle.value,
+        c.stream.value,
+        c.track.value,
+        c.intervals.intervals.length.toString
+      ) ++
         c.intervals.intervals.toVector.flatMap(i =>
           Vector(i.axis.value, i.start.toString, i.endExclusive.toString)
         )
     }
-    ContentAddress.digest(Vector("referent-context/v1", mentions.size.toString) ++ ms ++ cs)
+    val fields = Vector("referent-context/v1", mentions.size.toString) ++ ms ++
+      Vector(trackCoverage.size.toString) ++ cs
+    ContentAddress.digest(fields.map(f => Checksum.ofText(f).hex))
 
   override def equals(other: Any): Boolean = other match
     case that: ReferentContext => digest == that.digest

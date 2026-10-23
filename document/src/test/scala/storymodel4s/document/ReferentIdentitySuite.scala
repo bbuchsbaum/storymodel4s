@@ -415,6 +415,69 @@ class ReferentIdentitySuite extends FunSuite:
     val moved = all.updated(1, mention("v2", MentionOrigin.Visual, onTrack("t1", 310L, 390L)))
     assertNotEquals(contextOf(moved, Map(TrackId.unsafe("t1") -> ivs(100L -> 400L))), Right(ctx))
 
+  test("the digest cannot shift intervals from one coverage entry into the next"):
+    val ax = film.primaryAxis
+    def span(a: Long, b: Long) = PlaybackInterval.on(ax, a, b).toOption.get
+    val three = new EvidenceAnchor.Track(
+      film.id,
+      stream,
+      TrackId.unsafe("t1"),
+      PlaybackIntervalSet.of(Vector(span(1L, 2L), span(3L, 4L), span(5L, 6L))).toOption.get
+    )
+    // The same field sequence split into two entries: the second entry's bundle, stream and
+    // track ids spell out the first entry's second interval.
+    val one = new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), ivs(1L -> 2L))
+    val shifted = new EvidenceAnchor.Track(
+      SourceBundleId.unsafe(ax.id.value),
+      StreamId.unsafe("3"),
+      TrackId.unsafe("4"),
+      PlaybackIntervalSet.one(span(5L, 6L))
+    )
+    val a = ReferentContext.of(Vector(v1), Vector(three)).toOption.get
+    val b = ReferentContext.of(Vector(v1), Vector(one, shifted)).toOption.get
+    assertNotEquals(a.digest, b.digest)
+
+  test("the digest keeps each entry's interval count between equal-length coverages"):
+    // Two entries in each context; without per-entry interval counts both serialize alike.
+    val ax = film.primaryAxis
+    def span(a: Long, b: Long) = PlaybackInterval.on(ax, a, b).toOption.get
+    def set(spans: (Long, Long)*) =
+      PlaybackIntervalSet.of(spans.toVector.map(span)).toOption.get
+    val axisBundle = SourceBundleId.unsafe(ax.id.value)
+    val a = Vector(
+      new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), set(1L -> 2L, 3L -> 4L)),
+      new EvidenceAnchor.Track(axisBundle, StreamId.unsafe("5"), TrackId.unsafe("6"), set(7L -> 8L))
+    )
+    val b = Vector(
+      new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), set(1L -> 2L)),
+      new EvidenceAnchor.Track(
+        axisBundle,
+        StreamId.unsafe("3"),
+        TrackId.unsafe("4"),
+        set(5L -> 6L, 7L -> 8L)
+      )
+    )
+    assertNotEquals(
+      ReferentContext.of(Vector(v1), a).toOption.get.digest,
+      ReferentContext.of(Vector(v1), b).toOption.get.digest
+    )
+
+  test("the digest cannot move a name's embedded separators into coverage"):
+    val nul = 0.toChar.toString
+    val forged = Vector("n", film.id.value, stream.value, "t1", film.primaryAxis.id.value, "1", "2")
+      .mkString(nul)
+    val tricky = mention("z", MentionOrigin.Narration, recalled.support, Some(forged))
+    val plain = mention("z", MentionOrigin.Narration, recalled.support, Some("n"))
+    val a = ReferentContext.of(Vector(tricky), Vector.empty).toOption.get
+    val b = ReferentContext
+      .of(
+        Vector(plain),
+        Vector(new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), ivs(1L -> 2L)))
+      )
+      .toOption
+      .get
+    assertNotEquals(a.digest, b.digest)
+
   test("distinctness carries through settled identity, not through an open class"):
     // {x, y} is settled by one track; {p, q} shares a track but is opened by different names.
     val x = mention("x", MentionOrigin.Visual, onTrack("t1", 100L, 200L))
@@ -439,6 +502,7 @@ class ReferentIdentitySuite extends FunSuite:
       .toOption
       .get
     assertEquals(r.relation(id("y"), id("p")), Right(ReferentRelation.Distinct))
+    assertEquals(r.relation(id("p"), id("y")), Right(ReferentRelation.Distinct))
     assertEquals(r.relation(id("y"), id("q")), Right(ReferentRelation.Unknown))
 
   test("contributory hints alone never decide identity or distinctness"):
