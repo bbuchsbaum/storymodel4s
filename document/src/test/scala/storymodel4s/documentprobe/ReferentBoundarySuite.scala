@@ -119,7 +119,6 @@ class ReferentBoundarySuite extends FunSuite:
              null: storymodel4s.document.ReferentContext,
              Vector.empty[cats.data.NonEmptyVector[storymodel4s.document.ReferentMentionId]],
              Set.empty[Int],
-             Set.empty[(Int, Int)],
              Set.empty[(storymodel4s.document.ReferentMentionId, storymodel4s.document.ReferentMentionId)],
              Vector.empty[storymodel4s.document.IdentityHint])"""
       )

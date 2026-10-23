@@ -55,6 +55,7 @@ enum ReferentError:
   case UnknownMention(mention: ReferentMentionId)
   case DuplicateMention(mention: ReferentMentionId)
   case ForeignLink(left: ReferentMentionId, right: ReferentMentionId)
+  case DuplicateCoverage(track: TrackId)
   case Unlicensed(basis: String, reason: String)
 
   def message: String = this match
@@ -64,6 +65,7 @@ enum ReferentError:
     case UnknownMention(m)         => s"mention ${m.value} is not in the referent context"
     case DuplicateMention(m)       => s"mention ${m.value} appears more than once"
     case ForeignLink(l, r)         => s"link ${l.value}-${r.value} was licensed in another context"
+    case DuplicateCoverage(t)      => s"track ${t.value} has more than one coverage on one stream"
     case Unlicensed(basis, reason) => s"$basis does not license this link: $reason"
 
 /** One mention of a person or thing, in any modality. A mention is not an entity: two mentions are
@@ -86,22 +88,43 @@ final class ReferentMention private (
   override def toString: String = s"ReferentMention(${id.value}, $origin)"
 
 object ReferentMention:
-  def of(
+  /** A mention anchored in `bundle`. The support must belong to that bundle, and a visual mention
+    * must sit in media time on picture streams: an audio track is a voice, not a depicted person.
+    */
+  def anchored(
       id: ReferentMentionId,
       origin: MentionOrigin,
-      support: TypedSupport,
+      bundle: SourceBundle,
+      support: EvidenceSupport,
       name: Option[ProperName]
   ): Either[ReferentError, ReferentMention] =
     def refuse(reason: String) = Left(ReferentError.SupportFamily(id, origin.toString, reason))
-    (origin, support) match
-      case (MentionOrigin.Visual, TypedSupport.Anchored(s))
-          if s.anchors.forall(a => ReferentExtents.of(a).nonEmpty) =>
-        Right(new ReferentMention(id, origin, support, name))
-      case (MentionOrigin.Visual, _) => refuse("visual support must be anchored in media time")
-      case (MentionOrigin.Recall(_), TypedSupport.Text(_)) =>
-        Right(new ReferentMention(id, origin, support, name))
-      case (MentionOrigin.Recall(_), _) => refuse("recall support must be transcript text")
-      case _                            => Right(new ReferentMention(id, origin, support, name))
+    def onPicture(a: EvidenceAnchor): Boolean =
+      ReferentExtents.of(a).nonEmpty &&
+        bundle.stream(a.anchorStream).exists(_.kind == StreamKind.Picture)
+    support.checkedOn(bundle) match
+      case Left(_)        => refuse("the support does not belong to the bundle")
+      case Right(checked) =>
+        origin match
+          case MentionOrigin.Visual if !checked.anchors.forall(onPicture) =>
+            refuse("visual support must be anchored in media time on picture streams")
+          case MentionOrigin.Recall(_) => refuse("recall support must be transcript text")
+          case _                       =>
+            Right(new ReferentMention(id, origin, TypedSupport.Anchored(checked), name))
+
+  /** A mention in transcript or narration text. A visual mention cannot be one. */
+  def text(
+      id: ReferentMentionId,
+      origin: MentionOrigin,
+      spans: SpanSet,
+      name: Option[ProperName]
+  ): Either[ReferentError, ReferentMention] =
+    if origin == MentionOrigin.Visual then
+      Left(
+        ReferentError
+          .SupportFamily(id, origin.toString, "visual support must be anchored in media time")
+      )
+    else Right(new ReferentMention(id, origin, TypedSupport.Text(spans), name))
 
 /** Playback extents of an anchor as `(axis, stream, start, endExclusive)` ticks; a point is one
   * tick wide. Text anchors have none.
@@ -133,9 +156,9 @@ private[document] object ReferentExtents:
   /** Observed coverage as maximal stretches: touching or overlapping intervals on one axis merge,
     * so only a real gap separates two stretches.
     */
-  def stretches(coverage: Option[PlaybackIntervalSet]): Vector[(PresentationAxisId, Long, Long)] =
+  def stretches(coverage: Option[EvidenceAnchor.Track]): Vector[(PresentationAxisId, Long, Long)] =
     coverage.toVector
-      .flatMap(_.intervals.toVector)
+      .flatMap(_.intervals.intervals.toVector)
       .sortBy(i => (i.axis.value, i.start))
       .foldLeft(Vector.empty[(PresentationAxisId, Long, Long)]) { (acc, i) =>
         acc.lastOption match
@@ -143,6 +166,13 @@ private[document] object ReferentExtents:
             acc.init :+ ((ax, s, e max i.endExclusive))
           case _ => acc :+ ((i.axis, i.start, i.endExclusive))
       }
+
+  /** The track anchors of a mention on one track. */
+  def trackAnchors(support: TypedSupport, track: TrackId): Vector[EvidenceAnchor.Track] =
+    support match
+      case TypedSupport.Anchored(s) =>
+        s.anchors.toVector.collect { case a @ EvidenceAnchor.Track(_, _, t, _) if t == track => a }
+      case TypedSupport.Text(_) => Vector.empty
 
   /** Track extents of a mention, by track. */
   def tracks(support: TypedSupport): Map[TrackId, Vector[ReferentExtent]] = support match
@@ -155,33 +185,67 @@ private[document] object ReferentExtents:
 /** The mentions and observed track coverage that identity links are checked against.
   *
   * Why a context: a deictic basis needs the set of people present, and a track basis needs the
-  * track's observed coverage. A link that could be checked without them would be a label.
+  * track's observed coverage. A link that could be checked without them would be a label. Coverage
+  * is given as track anchors, so it names the bundle and stream it was observed on.
   */
 final class ReferentContext private (
     val mentions: SortedMap[ReferentMentionId, ReferentMention],
-    val trackCoverage: Map[TrackId, PlaybackIntervalSet]
+    val trackCoverage: Vector[EvidenceAnchor.Track]
 ):
   def mention(id: ReferentMentionId): Either[ReferentError, ReferentMention] =
     mentions.get(id).toRight(ReferentError.UnknownMention(id))
 
+  /** The observed coverage of one track on one stream of one bundle. */
+  def coverage(
+      bundle: SourceBundleId,
+      stream: StreamId,
+      track: TrackId
+  ): Option[EvidenceAnchor.Track] =
+    trackCoverage.find(c => c.bundle == bundle && c.stream == stream && c.track == track)
+
+  /** Content digest of everything a licence may depend on. Why: links compare their licensing
+    * context on every resolve, and a digest keeps that comparison constant-time (rule 9) and
+    * content-addressed (rule 10).
+    */
+  lazy val digest: Checksum =
+    val ms = mentions.values.toVector.flatMap { m =>
+      Vector(m.id.value, m.origin.toString, m.support.identity.hex, m.name.fold("")(_.folded))
+    }
+    val cs = trackCoverage.flatMap { c =>
+      Vector(c.bundle.value, c.stream.value, c.track.value) ++
+        c.intervals.intervals.toVector.flatMap(i =>
+          Vector(i.axis.value, i.start.toString, i.endExclusive.toString)
+        )
+    }
+    ContentAddress.digest(Vector("referent-context/v1", mentions.size.toString) ++ ms ++ cs)
+
   override def equals(other: Any): Boolean = other match
-    case that: ReferentContext =>
-      mentions == that.mentions && trackCoverage == that.trackCoverage
-    case _ => false
-  override def hashCode(): Int = (mentions, trackCoverage).##
+    case that: ReferentContext => digest == that.digest
+    case _                     => false
+  override def hashCode(): Int = digest.##
   override def toString: String =
     s"ReferentContext(mentions=${mentions.size}, tracks=${trackCoverage.size})"
 
 object ReferentContext:
-  /** `trackCoverage` gives, per track, the intervals in which the track was actually observed. */
+  /** `trackCoverage` gives, per track and stream, the intervals in which it was actually observed;
+    * one entry per bundle, stream and track.
+    */
   def of(
       mentions: Vector[ReferentMention],
-      trackCoverage: Map[TrackId, PlaybackIntervalSet]
+      trackCoverage: Vector[EvidenceAnchor.Track]
   ): Either[ReferentError, ReferentContext] =
-    mentions.groupBy(_.id).collectFirst { case (id, ms) if ms.size > 1 => id } match
-      case Some(dup) => Left(ReferentError.DuplicateMention(dup))
-      case None      =>
-        Right(new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), trackCoverage))
+    val duplicateCoverage = trackCoverage
+      .groupBy(c => (c.bundle, c.stream, c.track))
+      .collectFirst { case ((_, _, t), cs) if cs.size > 1 => t }
+    (
+      mentions.groupBy(_.id).collectFirst { case (id, ms) if ms.size > 1 => id },
+      duplicateCoverage
+    ) match
+      case (Some(dup), _) => Left(ReferentError.DuplicateMention(dup))
+      case (_, Some(t))   => Left(ReferentError.DuplicateCoverage(t))
+      case _              =>
+        val sorted = trackCoverage.sortBy(c => (c.bundle.value, c.stream.value, c.track.value))
+        Right(new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), sorted))
 
 /** A basis that is sufficient by itself to make two mentions one referent (ADR 0024 §2). Why a
   * closed enum: the licence class is fixed by the basis, so a caller cannot promote a weak basis.
@@ -246,17 +310,21 @@ object IdentityLink:
       _ <- Either.cond(left != right, (), ReferentError.SameMention(left))
       link <- basis match
         case IdentityBasis.ContinuousTrack(track) =>
-          val coverage = ReferentExtents.stretches(context.trackCoverage.get(track))
-          val extents =
-            Vector(a, b).map(m => ReferentExtents.tracks(m.support).getOrElse(track, Vector()))
+          val anchors = Vector(a, b).map(m => ReferentExtents.trackAnchors(m.support, track))
+          val places = anchors.flatten.map(t => (t.bundle, t.stream)).distinct
+          val stretches = places match
+            case Vector((bundle, stream)) =>
+              ReferentExtents.stretches(context.coverage(bundle, stream, track))
+            case _ => Vector.empty
+          val extents = anchors.map(_.flatMap(ReferentExtents.of))
           // One stretch of observed coverage must hold both mentions: a gap means unobserved.
-          val within = coverage.exists((axis, start, end) =>
+          val within = stretches.exists((axis, start, end) =>
             extents.forall(_.forall(x => x.axis == axis && x.start >= start && x.end <= end))
           )
           if a.origin != MentionOrigin.Visual || b.origin != MentionOrigin.Visual then
             refuse("a track joins only visual mentions")
-          else if extents.exists(_.isEmpty) then refuse("a mention is not on this track")
-          else if extents.flatten.map(_.stream).distinct.size != 1 then
+          else if anchors.exists(_.isEmpty) then refuse("a mention is not on this track")
+          else if places.size != 1 then
             refuse("the mentions are on this track in different streams")
           else if !within then refuse("the mentions are not in one stretch of observed coverage")
           else Right(new IdentityLink(context, a, b, basis))
@@ -363,8 +431,8 @@ enum ReferentRelation:
   /** Joined by a path of identity links in a class with no licensed distinctness inside it. */
   case Same
 
-  /** A licensed distinctness separates them: directly, or between two classes neither of which is
-    * open.
+  /** A licensed distinctness separates them: directly, or through settled identity with the two
+    * mentions it links.
     */
   case Distinct
 
@@ -382,7 +450,6 @@ final class ReferentResolution private[document] (
     val context: ReferentContext,
     val classes: Vector[NonEmptyVector[ReferentMentionId]],
     val contested: Set[Int],
-    val separated: Set[(Int, Int)],
     val apart: Set[(ReferentMentionId, ReferentMentionId)],
     val hints: Vector[IdentityHint]
 ):
@@ -398,13 +465,17 @@ final class ReferentResolution private[document] (
       ca <- classOf.get(a).toRight(ReferentError.UnknownMention(a))
       cb <- classOf.get(b).toRight(ReferentError.UnknownMention(b))
     yield
+      // A direct distinctness u-v carries over to a and b only through settled identity: a is u
+      // or settled-same as u, and b likewise for v. Inside an open class membership itself is in
+      // doubt, so only the linked mention itself carries it.
+      def sameOrSelf(x: ReferentMentionId, u: ReferentMentionId): Boolean =
+        x == u || (classOf(x) == classOf(u) && !contested(classOf(x)))
       if ca == cb && contested(ca) then ReferentRelation.Open(classes(ca).toVector)
       else if ca == cb then ReferentRelation.Same
-      // A distinctness lifts to whole classes only when neither class is open: inside an open
-      // class membership itself is in doubt, so only the directly linked pair stays distinct.
-      else if separated((ca min cb, ca max cb)) && !contested(ca) && !contested(cb) then
-        ReferentRelation.Distinct
-      else if apart(ReferentIdentity.pair(a, b)) then ReferentRelation.Distinct
+      else if apart.exists((u, v) =>
+          (sameOrSelf(a, u) && sameOrSelf(b, v)) || (sameOrSelf(a, v) && sameOrSelf(b, u))
+        )
+      then ReferentRelation.Distinct
       else ReferentRelation.Unknown
 
   /** Contributory hints recorded between the classes of two mentions; they decide nothing. */
@@ -417,9 +488,9 @@ final class ReferentResolution private[document] (
   override def equals(other: Any): Boolean = other match
     case that: ReferentResolution =>
       context == that.context && classes == that.classes && contested == that.contested &&
-      separated == that.separated && apart == that.apart && hints == that.hints
+      apart == that.apart && hints == that.hints
     case _ => false
-  override def hashCode(): Int = (context, classes, contested, separated, apart, hints).##
+  override def hashCode(): Int = (context, classes, contested, apart, hints).##
   override def toString: String =
     s"ReferentResolution(classes=${classes.size}, contested=${contested.size})"
 
@@ -470,9 +541,8 @@ object ReferentIdentity:
         val classOf = classes.zipWithIndex.flatMap((c, i) => c.toVector.map(_ -> i)).toMap
         val pairs = distinctions.map(d => (classOf(d.left.id), classOf(d.right.id)))
         val contested = pairs.collect { case (x, y) if x == y => x }.toSet
-        val separated = pairs.collect { case (x, y) if x != y => (x min y, x max y) }.toSet
         val apart = distinctions.map(d => pair(d.left.id, d.right.id)).toSet
-        Right(new ReferentResolution(context, classes, contested, separated, apart, hints))
+        Right(new ReferentResolution(context, classes, contested, apart, hints))
 
   private[document] def pair(
       a: ReferentMentionId,

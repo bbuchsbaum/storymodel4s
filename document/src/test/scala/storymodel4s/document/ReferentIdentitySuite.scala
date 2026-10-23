@@ -35,7 +35,25 @@ class ReferentIdentitySuite extends FunSuite:
       support: TypedSupport,
       named: Option[String] = None
   ): ReferentMention =
-    ReferentMention.of(id(raw), origin, support, named.map(name)).toOption.get
+    make(id(raw), origin, support, named.map(name)).toOption.get
+  // The factories take evidence support with its bundle, or transcript spans.
+  private def make(
+      at: ReferentMentionId,
+      origin: MentionOrigin,
+      support: TypedSupport,
+      named: Option[ProperName]
+  ): Either[ReferentError, ReferentMention] = support match
+    case TypedSupport.Anchored(s) => ReferentMention.anchored(at, origin, film, s, named)
+    case TypedSupport.Text(spans) => ReferentMention.text(at, origin, spans, named)
+  // Coverage per track on the film's picture stream.
+  private def contextOf(
+      mentions: Vector[ReferentMention],
+      coverage: Map[TrackId, PlaybackIntervalSet]
+  ): Either[ReferentError, ReferentContext] =
+    ReferentContext.of(
+      mentions,
+      coverage.toVector.map((t, set) => new EvidenceAnchor.Track(film.id, stream, t, set))
+    )
 
   private val speech = MentionOrigin.Dialogue(ContextId.unsafe("speech-1"))
   private val v1 = mention("v1", MentionOrigin.Visual, onTrack("t1", 100L, 200L))
@@ -50,7 +68,7 @@ class ReferentIdentitySuite extends FunSuite:
   )
   private val all = Vector(v1, v2, v3, crowded, alone, recalled)
   private def context(coverage: Map[TrackId, PlaybackIntervalSet]): ReferentContext =
-    ReferentContext.of(all, coverage).toOption.get
+    contextOf(all, coverage).toOption.get
   private val ctx = context(Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)))
   private def same(a: String, b: String, basis: IdentityBasis, in: ReferentContext = ctx) =
     IdentityLink.of(in, id(a), id(b), basis)
@@ -67,24 +85,23 @@ class ReferentIdentitySuite extends FunSuite:
 
   test("a visual mention must sit in media time"):
     refusedWith(
-      ReferentMention.of(id("x"), MentionOrigin.Visual, recalled.support, None),
+      make(id("x"), MentionOrigin.Visual, recalled.support, None),
       "media time"
     )
 
   test("a recall mention must sit in transcript text"):
     refusedWith(
-      ReferentMention
-        .of(id("x"), MentionOrigin.Recall(SurfaceUnitId.unsafe("u")), v1.support, None),
+      make(id("x"), MentionOrigin.Recall(SurfaceUnitId.unsafe("u")), v1.support, None),
       "transcript"
     )
 
   test("a dialogue mention may sit in text or media"):
-    assert(ReferentMention.of(id("x"), speech, recalled.support, None).isRight)
-    assert(ReferentMention.of(id("y"), speech, v1.support, None).isRight)
+    assert(make(id("x"), speech, recalled.support, None).isRight)
+    assert(make(id("y"), speech, v1.support, None).isRight)
 
   test("a context refuses duplicate mention ids"):
     assertEquals(
-      ReferentContext.of(Vector(v1, v1), Map.empty),
+      contextOf(Vector(v1, v1), Map.empty),
       Left(ReferentError.DuplicateMention(id("v1")))
     )
 
@@ -124,7 +141,7 @@ class ReferentIdentitySuite extends FunSuite:
     refusedWith(same("d2", "v1", IdentityBasis.DeicticReference), "another")
 
   test("deixis refuses when nobody is depicted while it is said"):
-    val quiet = ReferentContext.of(Vector(v1, alone), Map.empty).toOption.get
+    val quiet = contextOf(Vector(v1, alone), Map.empty).toOption.get
     refusedWith(
       IdentityLink.of(quiet, id("d2"), id("v1"), IdentityBasis.DeicticReference),
       "nobody"
@@ -139,7 +156,7 @@ class ReferentIdentitySuite extends FunSuite:
       mention("n2", MentionOrigin.Visual, v1.support, Some("ana")),
       mention("n3", MentionOrigin.Narration, recalled.support, None)
     )
-    val in = ReferentContext.of(named, Map.empty).toOption.get
+    val in = contextOf(named, Map.empty).toOption.get
     assert(
       IdentityLink.of(in, id("n1"), id("n2"), IdentityBasis.NamedReference(name("Ana"))).isRight
     )
@@ -167,6 +184,14 @@ class ReferentIdentitySuite extends FunSuite:
   test("simultaneity cannot separate mentions sharing a track"):
     refusedWith(apart("v1", "v2", DistinctnessBasis.SimultaneousTracks), "share a track")
 
+  test("simultaneity needs a track on both mentions"):
+    val untracked = mention("u", MentionOrigin.Visual, spoken(100L, 200L))
+    val in = contextOf(Vector(v1, untracked), Map.empty).toOption.get
+    refusedWith(
+      DistinctLink.of(in, id("v1"), id("u"), DistinctnessBasis.SimultaneousTracks),
+      "need a track"
+    )
+
   test("simultaneity separates only visual mentions"):
     refusedWith(apart("v1", "d1", DistinctnessBasis.SimultaneousTracks), "only visual")
 
@@ -177,7 +202,7 @@ class ReferentIdentitySuite extends FunSuite:
       mention("n3", MentionOrigin.Narration, recalled.support, Some("ANA")),
       mention("n4", MentionOrigin.Narration, recalled.support, None)
     )
-    val in = ReferentContext.of(named, Map.empty).toOption.get
+    val in = contextOf(named, Map.empty).toOption.get
     assert(DistinctLink.of(in, id("n1"), id("n2"), DistinctnessBasis.DifferentNames).isRight)
     refusedWith(DistinctLink.of(in, id("n1"), id("n3"), DistinctnessBasis.DifferentNames), "same")
     refusedWith(
@@ -214,10 +239,8 @@ class ReferentIdentitySuite extends FunSuite:
     // One track joins the two mentions while different names attached to them separate them.
     val ana = mention("a1", MentionOrigin.Visual, onTrack("t1", 100L, 200L), Some("Ana"))
     val beth = mention("b1", MentionOrigin.Visual, onTrack("t1", 300L, 400L), Some("Beth"))
-    val in = ReferentContext
-      .of(Vector(ana, beth), Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)))
-      .toOption
-      .get
+    val in =
+      contextOf(Vector(ana, beth), Map(TrackId.unsafe("t1") -> ivs(100L -> 400L))).toOption.get
     val joined =
       IdentityLink.of(in, id("a1"), id("b1"), IdentityBasis.ContinuousTrack(TrackId.unsafe("t1")))
     val split = DistinctLink.of(in, id("a1"), id("b1"), DistinctnessBasis.DifferentNames)
@@ -240,10 +263,8 @@ class ReferentIdentitySuite extends FunSuite:
     val a2 = mention("a2", MentionOrigin.Visual, onTrack("t1", 300L, 400L), Some("Ana"))
     val a3 = mention("a3", MentionOrigin.Visual, onTrack("t1", 500L, 600L), Some("Beth"))
     val b = mention("b", MentionOrigin.Visual, onTrack("t9", 100L, 200L))
-    val in = ReferentContext
-      .of(Vector(a1, a2, a3, b), Map(TrackId.unsafe("t1") -> ivs(100L -> 600L)))
-      .toOption
-      .get
+    val in =
+      contextOf(Vector(a1, a2, a3, b), Map(TrackId.unsafe("t1") -> ivs(100L -> 600L))).toOption.get
     val t1 = IdentityBasis.ContinuousTrack(TrackId.unsafe("t1"))
     val joins =
       Vector(("a1", "a2"), ("a2", "a3")).map((x, y) => IdentityLink.of(in, id(x), id(y), t1))
@@ -281,6 +302,145 @@ class ReferentIdentitySuite extends FunSuite:
       Left(ReferentError.UnknownMention(id("zz")))
     )
 
+  // A film with one stream per kind, built through the public axis derivation.
+  private def multi(kinds: StreamKind*): SourceBundle =
+    val drafts = kinds.toVector.zipWithIndex.map((k, i) =>
+      SourceStream
+        .of(
+          StreamId.unsafe(s"s$i"),
+          k,
+          Checksum.ofText(s"referent-multi-$i"),
+          film.primaryAxis.id,
+          film.primaryAxis.extent,
+          film.primaryAxis.timebase,
+          Vector.empty
+        )
+        .toOption
+        .get
+    )
+    val edition = EditionId.unsafe("referent-multi")
+    val axis = SourceBundle
+      .editionPlaybackAxis(
+        edition,
+        drafts,
+        drafts.map(_.id),
+        0L,
+        1000L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val streams = drafts.map(d =>
+      SourceStream
+        .of(d.id, d.kind, d.checksum, axis.id, axis.extent, axis.timebase, Vector.empty)
+        .toOption
+        .get
+    )
+    SourceBundle
+      .of(Some(edition), SourceKind.FilmEdition, streams, axis, streams.map(_.id), Vector.empty)
+      .toOption
+      .get
+  private def trackOn(b: SourceBundle, i: Int, track: String, start: Long, end: Long) =
+    val set = PlaybackIntervalSet
+      .one(PlaybackInterval.on(b.primaryAxis, start, end).toOption.get)
+    new EvidenceAnchor.Track(b.id, b.streams(i).id, TrackId.unsafe(track), set)
+  private def visualOn(raw: String, b: SourceBundle, anchor: EvidenceAnchor) =
+    ReferentMention.anchored(
+      id(raw),
+      MentionOrigin.Visual,
+      b,
+      EvidenceSupport.of(b, Vector(anchor)).toOption.get,
+      None
+    )
+
+  test("a visual mention must sit on a picture stream"):
+    val av = multi(StreamKind.Picture, StreamKind.Audio)
+    val voice = trackOn(av, 1, "speaker", 100L, 200L)
+    refusedWith(visualOn("v", av, voice), "picture streams")
+    val heard = ReferentMention.anchored(
+      id("d"),
+      speech,
+      av,
+      EvidenceSupport.of(av, Vector(voice)).toOption.get,
+      None
+    )
+    assert(heard.isRight)
+    assert(visualOn("w", av, trackOn(av, 0, "t1", 100L, 200L)).isRight)
+
+  test("a mention's support must belong to the bundle it names"):
+    val other = multi(StreamKind.Picture)
+    refusedWith(
+      ReferentMention.anchored(
+        id("x"),
+        MentionOrigin.Visual,
+        other,
+        EvidenceSupport
+          .of(
+            film,
+            Vector(EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), ivs(100L -> 200L)))
+          )
+          .toOption
+          .get,
+        None
+      ),
+      "does not belong"
+    )
+
+  test("a track joins mentions only on one stream, against that stream's coverage"):
+    val two = multi(StreamKind.Picture, StreamKind.Picture)
+    val t1 = IdentityBasis.ContinuousTrack(TrackId.unsafe("t1"))
+    val p = visualOn("p", two, trackOn(two, 0, "t1", 100L, 200L)).toOption.get
+    val q = visualOn("q", two, trackOn(two, 0, "t1", 300L, 400L)).toOption.get
+    val r = visualOn("r", two, trackOn(two, 1, "t1", 300L, 400L)).toOption.get
+    val both = Vector(trackOn(two, 0, "t1", 0L, 1000L), trackOn(two, 1, "t1", 0L, 1000L))
+    val in = ReferentContext.of(Vector(p, q, r), both).toOption.get
+    assert(IdentityLink.of(in, id("p"), id("q"), t1).isRight)
+    refusedWith(IdentityLink.of(in, id("p"), id("r"), t1), "different streams")
+    // Coverage observed only on the other stream does not cover these mentions.
+    val elsewhere = ReferentContext.of(Vector(p, q, r), Vector(both(1))).toOption.get
+    refusedWith(IdentityLink.of(elsewhere, id("p"), id("q"), t1), "one stretch")
+
+  test("a context refuses two coverages of one track on one stream"):
+    val cover = new EvidenceAnchor.Track(film.id, stream, TrackId.unsafe("t1"), ivs(100L -> 400L))
+    assertEquals(
+      ReferentContext.of(all, Vector(cover, cover)),
+      Left(ReferentError.DuplicateCoverage(TrackId.unsafe("t1")))
+    )
+
+  test("contexts with the same evidence are equal whatever the input order"):
+    val reordered = contextOf(all.reverse, Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)))
+    assertEquals(reordered.map(_.digest), Right(ctx.digest))
+    assertEquals(reordered, Right(ctx))
+    assertNotEquals(context(Map(TrackId.unsafe("t1") -> ivs(100L -> 300L))), ctx)
+    val moved = all.updated(1, mention("v2", MentionOrigin.Visual, onTrack("t1", 310L, 390L)))
+    assertNotEquals(contextOf(moved, Map(TrackId.unsafe("t1") -> ivs(100L -> 400L))), Right(ctx))
+
+  test("distinctness carries through settled identity, not through an open class"):
+    // {x, y} is settled by one track; {p, q} shares a track but is opened by different names.
+    val x = mention("x", MentionOrigin.Visual, onTrack("t1", 100L, 200L))
+    val y = mention("y", MentionOrigin.Visual, onTrack("t1", 300L, 400L))
+    val p = mention("p", MentionOrigin.Visual, onTrack("t5", 150L, 250L), Some("Ana"))
+    val q = mention("q", MentionOrigin.Visual, onTrack("t5", 300L, 400L), Some("Beth"))
+    val in = contextOf(
+      Vector(x, y, p, q),
+      Map(TrackId.unsafe("t1") -> ivs(100L -> 400L), TrackId.unsafe("t5") -> ivs(150L -> 400L))
+    ).toOption.get
+    def track(t: String) = IdentityBasis.ContinuousTrack(TrackId.unsafe(t))
+    val joins = Vector(
+      IdentityLink.of(in, id("x"), id("y"), track("t1")),
+      IdentityLink.of(in, id("p"), id("q"), track("t5"))
+    )
+    val splits = Vector(
+      DistinctLink.of(in, id("p"), id("q"), DistinctnessBasis.DifferentNames),
+      DistinctLink.of(in, id("x"), id("p"), DistinctnessBasis.SimultaneousTracks)
+    )
+    val r = ReferentIdentity
+      .resolve(in, joins.map(_.toOption.get), splits.map(_.toOption.get), Vector.empty)
+      .toOption
+      .get
+    assertEquals(r.relation(id("y"), id("p")), Right(ReferentRelation.Distinct))
+    assertEquals(r.relation(id("y"), id("q")), Right(ReferentRelation.Unknown))
+
   test("contributory hints alone never decide identity or distinctness"):
     val toward =
       IdentityHint(id("v1"), id("v3"), ContributoryBasis.AppearanceMatch, HintDirection.Toward)
@@ -293,7 +453,7 @@ class ReferentIdentitySuite extends FunSuite:
 
   test("deixis licensed in a pruned context is refused in the real one"):
     // Only v1 is present when the crowd is pruned away, so the pruned context licenses deixis.
-    val pruned = ReferentContext.of(Vector(v1, crowded), Map.empty).toOption.get
+    val pruned = contextOf(Vector(v1, crowded), Map.empty).toOption.get
     val laundered = IdentityLink.of(pruned, id("d1"), id("v1"), IdentityBasis.DeicticReference)
     assert(laundered.isRight)
     assertEquals(
@@ -309,7 +469,7 @@ class ReferentIdentitySuite extends FunSuite:
     )
 
   test("a distinctness licensed in another context is refused"):
-    val other = ReferentContext.of(Vector(v1, v3), Map.empty).toOption.get
+    val other = contextOf(Vector(v1, v3), Map.empty).toOption.get
     val split = DistinctLink.of(other, id("v1"), id("v3"), DistinctnessBasis.SimultaneousTracks)
     assertEquals(
       ReferentIdentity.resolve(ctx, Vector.empty, Vector(split.toOption.get), Vector.empty),

@@ -168,3 +168,16 @@ remain, but the recall gets no credit and the participant is not penalized.
    `Inferred` support excluded, and counts `Inferred`-only credits separately. Rejected: credit in
    a secondary analysis only, which would score conclusions the viewer is plainly meant to draw as
    unsupported recall.
+
+## Implementation notes (S3a, 2026-10-23)
+
+- The resolver answers a pair of mentions with `ReferentRelation`: `Same` is the resolved identity
+  of §2, `Open(candidates)` is a class reopened by a sufficient `DistinctLink`, `Distinct` is a
+  licensed distinctness, and `Unknown` means no licensed link decides. `Unknown` is never read as
+  distinctness.
+- A direct distinctness carries over to other mentions only through settled identity, never through
+  an open class.
+- Links keep the context that licensed them, and track coverage is given as track anchors naming
+  bundle and stream, so a licence cannot be moved to other evidence.
+- Deferred: `TextCoreference` and explicit-contrast distinctness (text identity stays with ADR
+  0012's `EntityIdentity`), Unicode name normalization, and a completeness statement for deixis.
