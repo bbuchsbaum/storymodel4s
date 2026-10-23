@@ -182,7 +182,8 @@ remain, but the recall gets no credit and the participant is not penalized.
   other evidence. Playback overlap also requires the same bundle, because `core` lets a stream
   declare another bundle's axis as its native axis.
 - Deferred: `TextCoreference` and explicit-contrast distinctness (text identity stays with ADR
-  0012's `EntityIdentity`), Unicode name normalization, and a completeness statement for deixis.
+  0012's `EntityIdentity`). Name normalization and deixis completeness are decided by
+  amendments 4 and 5 below.
 
 ## Amendment 2026-10-23: names and deixis (owner decisions 4 and 5)
 
@@ -194,13 +195,16 @@ remain, but the recall gets no credit and the participant is not penalized.
    which is the rule 7 failure. No Unicode normalization is added to `core`: `java.text.Normalizer`
    is not reliably available on Scala.js and Native. Any alias or normalization table belongs in a
    producer that records receipts. Sufficient distinctness is now `SimultaneousTracks` only.
-5. **Deixis is sufficient only where presence is certified complete.** "She", said while exactly
-   one person is on screen, licenses identity only if a typed presence-completeness claim covers
-   the utterance's interval on that bundle and stream. A claim's basis is either `HumanReviewed`
-   (for example a reviewed scene annotation) or `MeasuredDetector` (a detector whose per-interval
-   recall was measured above a declared threshold, with its receipt). Without a covering claim,
-   deixis is contributory only. The reason: deixis is sound only if nobody else was there, and the
-   S3b measurement showed sampled-frame visual evidence is weak. A detector that misses the second
-   person would turn "the one person present" into a confident wrong identity. Rejected: demoting
-   deixis outright, which would close the main route to the motivating case (the depicted woman is
-   the "she" being discussed), where a reviewed annotation can certify the few intervals involved.
+5. **Deixis is sufficient only where presence is certified complete.** "She", said while exactly one
+   person is on screen, licenses identity only if a typed presence-completeness claim covers the
+   utterance's interval on that bundle and axis. The claim's coverage is checked as evidence support
+   against the bundle and must name a picture stream of it. A claim's basis is either
+   `HumanReviewed` (for example a reviewed scene annotation) or `MeasuredDetector` (a detector whose
+   recall over the covered intervals was measured at least at a declared threshold, with its
+   receipt). Without a covering claim, a deictic link is refused; the producer may record the
+   utterance as a contributory hint instead. The reason: deixis is sound only if nobody else was
+   there, and the S3b measurement showed sampled-frame visual evidence is weak. A detector that
+   misses the second person would turn "the one person present" into a confident wrong identity.
+   Rejected: demoting deixis outright, which would close the main route to the motivating case (the
+   depicted woman is the "she" being discussed), where a reviewed annotation can certify the few
+   intervals involved.

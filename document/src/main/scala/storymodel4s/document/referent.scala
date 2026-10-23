@@ -215,6 +215,18 @@ final class PresenceClaim private (
         i.start <= e.start && e.end <= i.endExclusive
       )
 
+  /** A total content key: every field that distinguishes two claims, used to order them. */
+  private[document] def key: String =
+    val basisKey = basis match
+      case PresenceBasis.HumanReviewed(r) => s"human-reviewed:${r.bindingIdentity.hex}"
+      case PresenceBasis.MeasuredDetector(recall, threshold, r) =>
+        s"measured-detector:$recall:$threshold:${r.bindingIdentity.hex}"
+    val spans = coverage.intervals.intervals.toVector
+      .map(i => s"${i.axis.value}:${i.start}:${i.endExclusive}")
+      .mkString(",")
+    Vector(coverage.bundle.value, coverage.stream.value, coverage.axis.value, spans, basisKey)
+      .mkString("|")
+
   override def equals(other: Any): Boolean = other match
     case that: PresenceClaim => coverage == that.coverage && basis == that.basis
     case _                   => false
@@ -227,16 +239,27 @@ object PresenceClaim:
   private def atLeast(a: ExactRational, b: ExactRational): Boolean =
     BigInt(a.numerator) * BigInt(b.denominator) >= BigInt(b.numerator) * BigInt(a.denominator)
 
+  /** `coverage` is checked against `bundle` as evidence support (its intervals lie on its declared
+    * axis, within a stream of the bundle) and must name a picture stream: presence is about who is
+    * on screen.
+    */
   def of(
+      bundle: SourceBundle,
       coverage: EvidenceAnchor.MediaTime,
       basis: PresenceBasis
-  ): Either[ReferentError, PresenceClaim] = basis match
-    case PresenceBasis.MeasuredDetector(recall, threshold, _)
-        if !within01(recall) || !within01(threshold) =>
-      Left(ReferentError.InvalidPresence("recall and threshold must lie in [0, 1]"))
-    case PresenceBasis.MeasuredDetector(recall, threshold, _) if !atLeast(recall, threshold) =>
-      Left(ReferentError.InvalidPresence("measured recall is below the declared threshold"))
-    case _ => Right(new PresenceClaim(coverage, basis))
+  ): Either[ReferentError, PresenceClaim] =
+    val onPicture = bundle.stream(coverage.stream).exists(_.kind == StreamKind.Picture)
+    (EvidenceSupport.of(bundle, Vector(coverage)), basis) match
+      case (Left(e), _)    => Left(ReferentError.InvalidPresence(s"coverage: ${e.message}"))
+      case _ if !onPicture =>
+        Left(ReferentError.InvalidPresence("coverage must name a picture stream"))
+      case (_, PresenceBasis.MeasuredDetector(recall, threshold, _))
+          if !within01(recall) || !within01(threshold) =>
+        Left(ReferentError.InvalidPresence("recall and threshold must lie in [0, 1]"))
+      case (_, PresenceBasis.MeasuredDetector(recall, threshold, _))
+          if !atLeast(recall, threshold) =>
+        Left(ReferentError.InvalidPresence("measured recall is below the declared threshold"))
+      case _ => Right(new PresenceClaim(coverage, basis))
 
 /** The mentions and observed track coverage that identity links are checked against.
   *
@@ -327,9 +350,9 @@ object ReferentContext:
       case (_, Some(t))   => Left(ReferentError.DuplicateCoverage(t))
       case _              =>
         val sorted = trackCoverage.sortBy(c => (c.bundle.value, c.stream.value, c.track.value))
-        Right(
-          new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), sorted, presence)
-        )
+        // Claims are ordered by content so the same claims always give the same context.
+        val claims = presence.sortBy(_.key)
+        Right(new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), sorted, claims))
 
 /** A basis that is sufficient by itself to make two mentions one referent (ADR 0024 §2). Why a
   * closed enum: the licence class is fixed by the basis, so a caller cannot promote a weak basis.

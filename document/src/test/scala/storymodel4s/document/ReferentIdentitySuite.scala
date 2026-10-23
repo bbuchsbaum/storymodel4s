@@ -54,6 +54,7 @@ class ReferentIdentitySuite extends FunSuite:
   private def presenceOver(start: Long, end: Long, basis: PresenceBasis = reviewed) =
     PresenceClaim
       .of(
+        film,
         new EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, ivs(start -> end)),
         basis
       )
@@ -163,6 +164,7 @@ class ReferentIdentitySuite extends FunSuite:
   test("a presence claim on another bundle does not certify this one"):
     val elsewhere = PresenceClaim
       .of(
+        borrowed,
         new EvidenceAnchor.MediaTime(borrowed.id, stream, film.primaryAxis.id, ivs(0L -> 1000L)),
         reviewed
       )
@@ -176,23 +178,75 @@ class ReferentIdentitySuite extends FunSuite:
     def r(n: Long, d: Long) = ExactRational.of(n, d).toOption.get
     val cover = new EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, ivs(0L -> 1000L))
     assert(
-      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(95, 100), r(9, 10), receipt)).isRight
+      PresenceClaim
+        .of(film, cover, PresenceBasis.MeasuredDetector(r(95, 100), r(9, 10), receipt))
+        .isRight
     )
     assert(
-      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(9, 10), r(9, 10), receipt)).isRight
+      PresenceClaim
+        .of(film, cover, PresenceBasis.MeasuredDetector(r(9, 10), r(9, 10), receipt))
+        .isRight
     )
     refusedWith(
-      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(8, 10), r(9, 10), receipt)),
+      PresenceClaim.of(film, cover, PresenceBasis.MeasuredDetector(r(8, 10), r(9, 10), receipt)),
       "below the declared threshold"
     )
     refusedWith(
-      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(11, 10), r(9, 10), receipt)),
+      PresenceClaim.of(film, cover, PresenceBasis.MeasuredDetector(r(11, 10), r(9, 10), receipt)),
       "[0, 1]"
     )
     refusedWith(
-      PresenceClaim.of(cover, PresenceBasis.MeasuredDetector(r(-1, 10), r(-2, 10), receipt)),
+      PresenceClaim.of(film, cover, PresenceBasis.MeasuredDetector(r(-1, 10), r(-2, 10), receipt)),
       "[0, 1]"
     )
+
+  test("a presence claim whose intervals sit on another axis is refused"):
+    val other = multi(StreamKind.Picture)
+    val foreignIntervals = PlaybackIntervalSet
+      .one(PlaybackInterval.on(other.primaryAxis, 0L, 100L).toOption.get)
+    refusedWith(
+      PresenceClaim.of(
+        film,
+        new EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, foreignIntervals),
+        reviewed
+      ),
+      "coverage"
+    )
+
+  test("a presence claim must name a picture stream"):
+    val av = multi(StreamKind.Picture, StreamKind.Audio)
+    val onAudio = new EvidenceAnchor.MediaTime(
+      av.id,
+      av.streams(1).id,
+      av.primaryAxis.id,
+      PlaybackIntervalSet.one(PlaybackInterval.on(av.primaryAxis, 0L, 100L).toOption.get)
+    )
+    refusedWith(PresenceClaim.of(av, onAudio, reviewed), "picture stream")
+    val onPicture = new EvidenceAnchor.MediaTime(
+      av.id,
+      av.streams(0).id,
+      av.primaryAxis.id,
+      PlaybackIntervalSet.one(PlaybackInterval.on(av.primaryAxis, 0L, 100L).toOption.get)
+    )
+    assert(PresenceClaim.of(av, onPicture, reviewed).isRight)
+
+  test("the order of presence claims does not change the context"):
+    val two = Vector(presenceOver(0L, 500L), presenceOver(500L, 1000L))
+    val forward = contextOf(all, Map.empty, two).toOption.get
+    val reversed = contextOf(all, Map.empty, two.reverse).toOption.get
+    assertEquals(forward.digest, reversed.digest)
+    assertEquals(forward, reversed)
+
+  test("changing only a claim's basis changes the context digest"):
+    val other = PresenceBasis.HumanReviewed(
+      SourceDerivationReceipt
+        .of("presence-review/v1", "another reviewer", Vector.empty)
+        .toOption
+        .get
+    )
+    val a = contextOf(all, Map.empty, Vector(presenceOver(0L, 1000L))).toOption.get
+    val b = contextOf(all, Map.empty, Vector(presenceOver(0L, 1000L, other))).toOption.get
+    assertNotEquals(a.digest, b.digest)
 
   test("presence claims enter the context digest"):
     val without = contextOf(all, Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)), Vector.empty)
