@@ -427,6 +427,8 @@ class ReferentIdentitySuite extends FunSuite:
     // The same field sequence split into two entries: the second entry's bundle, stream and
     // track ids spell out the first entry's second interval. "aaa" sorts before the axis id, so
     // coverage ordering keeps the entries in this order.
+    // The coverage-list length (1 against 2) also separates these, so this test collides only
+    // when both lengths are removed; the two-against-two test below witnesses interval counts.
     val one =
       new EvidenceAnchor.Track(
         SourceBundleId.unsafe("aaa"),
@@ -522,9 +524,9 @@ class ReferentIdentitySuite extends FunSuite:
     assertEquals(r.relation(id("p"), id("y")), Right(ReferentRelation.Distinct))
     assertEquals(r.relation(id("y"), id("q")), Right(ReferentRelation.Unknown))
 
-  test("simultaneity does not cross bundles that share an axis"):
-    // A second film declares a picture stream whose native axis is the first film's axis, so its
-    // track anchors lie on that axis too.
+  // A second film that declares a picture stream whose native axis is the first film's axis, so
+  // its anchors lie on that axis too (core admits this; bd-01M5MZ8J3KV0S1JY45737X4WSH).
+  private lazy val borrowed: SourceBundle =
     val foreign = SourceStream
       .of(
         stream,
@@ -549,7 +551,7 @@ class ReferentIdentitySuite extends FunSuite:
       )
       .toOption
       .get
-    val borrowed = SourceBundle
+    val built = SourceBundle
       .of(
         Some(edition),
         SourceKind.FilmEdition,
@@ -559,28 +561,54 @@ class ReferentIdentitySuite extends FunSuite:
         Vector.empty
       )
       .fold(e => fail(s"borrowed-axis film: ${e.message}"), identity)
-    val there = ReferentMention
+    built
+  private def inBorrowed(
+      raw: String,
+      origin: MentionOrigin,
+      anchor: EvidenceAnchor
+  ): ReferentMention =
+    ReferentMention
       .anchored(
-        id("w"),
-        MentionOrigin.Visual,
+        id(raw),
+        origin,
         borrowed,
         EvidenceSupport
-          .of(
-            borrowed,
-            Vector(
-              EvidenceAnchor.Track(borrowed.id, stream, TrackId.unsafe("t9"), ivs(100L -> 200L))
-            )
-          )
+          .of(borrowed, Vector(anchor))
           .fold(e => fail(s"borrowed-axis anchor: ${e.message}"), identity),
         None
       )
       .toOption
       .get
+
+  test("simultaneity does not cross bundles that share an axis"):
+    val there = inBorrowed(
+      "w",
+      MentionOrigin.Visual,
+      EvidenceAnchor.Track(borrowed.id, stream, TrackId.unsafe("t9"), ivs(100L -> 200L))
+    )
     val in = contextOf(Vector(v1, there), Map.empty).toOption.get
     refusedWith(
       DistinctLink.of(in, id("v1"), id("w"), DistinctnessBasis.SimultaneousTracks),
       "do not overlap"
     )
+
+  test("a person in another bundle on a shared axis is not present for deixis"):
+    val elsewhere = inBorrowed(
+      "w",
+      MentionOrigin.Visual,
+      EvidenceAnchor.Track(borrowed.id, stream, TrackId.unsafe("t9"), ivs(300L -> 400L))
+    )
+    val in = contextOf(Vector(v2, alone, elsewhere), Map.empty).toOption.get
+    assert(IdentityLink.of(in, id("d2"), id("v2"), IdentityBasis.DeicticReference).isRight)
+
+  test("an utterance in another bundle on a shared axis finds nobody depicted"):
+    val said = inBorrowed(
+      "u",
+      speech,
+      EvidenceAnchor.MediaTime(borrowed.id, stream, film.primaryAxis.id, ivs(150L -> 180L))
+    )
+    val in = contextOf(Vector(v1, said), Map.empty).toOption.get
+    refusedWith(IdentityLink.of(in, id("u"), id("v1"), IdentityBasis.DeicticReference), "nobody")
 
   test("contributory hints alone never decide identity or distinctness"):
     val toward =
