@@ -22,7 +22,7 @@ def body(request,route='fireworks',protocol_name='components'):
     assessor={'components':protocol,'whole':base,'connected':connected}[protocol_name]
     prompt=assessor.PROMPT
     model_input=assessor.model_input(request)
-    return dict(model=remote.MODEL, temperature=0, max_tokens=8192 if protocol_name=='components' else 4096,
+    return dict(model=remote.MODEL, temperature=0, max_tokens=8192 if protocol_name in {'components','connected'} else 4096,
                 reasoning=dict(effort='low', exclude=True), stream=False,
                 provider=dict(remote.PROVIDER,only=[route],max_price=dict(prompt=.30,completion=1.20,request=0)),
                 messages=[dict(role='user',content=prompt+'\nINPUT:\n'+

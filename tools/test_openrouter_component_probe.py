@@ -31,7 +31,7 @@ class RemoteTests(unittest.TestCase):
     def test_connected_prompt_and_reader_share_canonical_identity(self):
         r,v=connected_fixture();v['claim_id']=p.connected.model_input(r)['claim_id']
         b=p.body(r,'together','connected')
-        self.assertEqual(b['max_tokens'],4096)
+        self.assertEqual(b['max_tokens'],8192)
         self.assertTrue(b['messages'][0]['content'].startswith(p.connected.PROMPT))
         sent=json.loads(b['messages'][0]['content'].split('INPUT:\n',1)[1])
         self.assertEqual(sent,p.connected.model_input(r))
