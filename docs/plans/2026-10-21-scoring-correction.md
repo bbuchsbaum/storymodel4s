@@ -1098,3 +1098,31 @@ conservative attempted-request bound is USD2.6004756, within the authorized USD5
 records cost zero. Raw data remain ignored under `.agent-work/facet-assessment-20261022/`, with
 frozen inputs, references, original outputs, comparison scripts, cost accounting, `report.md`
 and `verification.json`. The branch remains local and the parent accuracy issue stays open.
+
+#### Connected evidence and symmetric polarity experiment (2026-10-23)
+
+The successor separates three questions: which source participant a recall argument refers to,
+which predicates each source supports, and whether the recall affirms or denies the resulting
+proposition. Neutral argument labels replace modifier-bearing role descriptions at the assessor
+boundary. Typed, cited correspondences connect source entities, situations, contexts and utterance
+occurrences. Complementary records may cover different roles; their union must cover the component,
+and repeated assignments must be connected. Person identity alone does not establish a shared time
+or utterance. These checks establish ownership and permitted composition; the model's semantic
+judgments and correspondence proposals remain fallible.
+
+The assessor sees a canonical complete proposition without the recall's outer polarity. Only
+after it proposes affirmation or denial does the reader map those findings back to the recall.
+Positive incompatibility requirements therefore apply equally to contradicting a positive recall
+and supporting its negative counterpart. Compound and embedded scope remains intact, and unknown
+normalization retains proposals without resolving them. All56 parents and108 components remain
+fixed; the additional metadata was independently reviewed without source evidence or answer labels.
+
+The first12 synthetic checks yielded9 exact outcomes, with one invalid proposal and two scope/join
+abstentions. A prompt-only clarification of literal enum names, evidentiary context and required
+cross-component connections then yielded12/12 exact outcomes over10 distinct model inputs. These
+invented controls contain explicit uncertainty cues and demonstrate protocol use, not realistic
+accuracy. Both trials are retained. The initial4096-token real-data run was interrupted after17
+completed responses:9 valid and8 unfinished. One additional possible serial request is charged its
+full bound;102 remaining requests are explicitly unattempted. The complete120-request comparison
+was restarted at8192 output tokens, matching the previous component baseline, with unchanged
+requests, prompt and judgments. Earlier successes are not substituted into this full run.
