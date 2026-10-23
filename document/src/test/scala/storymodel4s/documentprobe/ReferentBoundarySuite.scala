@@ -95,30 +95,52 @@ class ReferentBoundarySuite extends FunSuite:
       )
     ).collect { case (name, errs) if errs.isEmpty => name }
     assertEquals(open, Nil)
-    assert(typeCheckErrors("""new storymodel4s.document.ProperName("x")""").nonEmpty)
-    assert(typeCheckErrors("""storymodel4s.document.ProperName("x")""").nonEmpty)
-    assert(
-      typeCheckErrors(
+    // Each `new` probe has the constructor's exact shape and must fail on access alone.
+    def inaccessible(errors: List[scala.compiletime.testing.Error]): Boolean =
+      errors.nonEmpty && errors.forall(_.message.contains("cannot be accessed"))
+    val newDoors = List(
+      "ProperName" -> typeCheckErrors("""new storymodel4s.document.ProperName("x")"""),
+      "IdentityLink" -> typeCheckErrors(
         """new storymodel4s.document.IdentityLink(
+             null: storymodel4s.document.ReferentContext,
              null: storymodel4s.document.ReferentMention,
              null: storymodel4s.document.ReferentMention,
              storymodel4s.document.IdentityBasis.DeicticReference)"""
-      ).nonEmpty
-    )
-    assert(
-      typeCheckErrors(
+      ),
+      "DistinctLink" -> typeCheckErrors(
         """new storymodel4s.document.DistinctLink(
+             null: storymodel4s.document.ReferentContext,
              null: storymodel4s.document.ReferentMention,
              null: storymodel4s.document.ReferentMention,
              storymodel4s.document.DistinctnessBasis.DifferentNames)"""
-      ).nonEmpty
-    )
-    assert(
-      typeCheckErrors(
+      ),
+      "ReferentResolution" -> typeCheckErrors(
         """new storymodel4s.document.ReferentResolution(
              null: storymodel4s.document.ReferentContext,
-             Vector.empty, Set.empty, Set.empty, Vector.empty)"""
-      ).nonEmpty
+             Vector.empty[cats.data.NonEmptyVector[storymodel4s.document.ReferentMentionId]],
+             Set.empty[Int],
+             Set.empty[(Int, Int)],
+             Set.empty[(storymodel4s.document.ReferentMentionId, storymodel4s.document.ReferentMentionId)],
+             Vector.empty[storymodel4s.document.IdentityHint])"""
+      )
+    )
+    assertEquals(
+      newDoors.collect { case (n, errs) if !inaccessible(errs) => n -> errs.map(_.message) },
+      Nil
+    )
+    assert(typeCheckErrors("""storymodel4s.document.ProperName("x")""").nonEmpty)
+  }
+
+  test("control: a public constructor of the same shape compiles with new") {
+    assertEquals(
+      typeCheckErrors(
+        """new storymodel4s.document.IdentityHint(
+             storymodel4s.document.ReferentMentionId.unsafe("a"),
+             storymodel4s.document.ReferentMentionId.unsafe("b"),
+             storymodel4s.document.ContributoryBasis.AppearanceMatch,
+             storymodel4s.document.HintDirection.Toward)"""
+      ),
+      Nil
     )
   }
 

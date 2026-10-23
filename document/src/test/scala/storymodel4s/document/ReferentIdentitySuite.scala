@@ -227,11 +227,59 @@ class ReferentIdentitySuite extends FunSuite:
       .get
     assertEquals(
       r.relation(id("a1"), id("b1")),
-      Right(ReferentRelation.Contested(Vector(id("a1"), id("b1"))))
+      Right(ReferentRelation.Open(Vector(id("a1"), id("b1"))))
     )
     val settled =
       ReferentIdentity.resolve(in, Vector(joined.toOption.get), Vector.empty, Vector.empty)
     assertEquals(settled.map(_.relation(id("a1"), id("b1"))), Right(Right(ReferentRelation.Same)))
+
+  test("distinctness is not lifted through an open class"):
+    // a1, a2, a3 share a track; a2 and a3 carry different names, so the class is open. A
+    // simultaneous outsider b is licensed apart from a1 only.
+    val a1 = mention("a1", MentionOrigin.Visual, onTrack("t1", 100L, 200L))
+    val a2 = mention("a2", MentionOrigin.Visual, onTrack("t1", 300L, 400L), Some("Ana"))
+    val a3 = mention("a3", MentionOrigin.Visual, onTrack("t1", 500L, 600L), Some("Beth"))
+    val b = mention("b", MentionOrigin.Visual, onTrack("t9", 100L, 200L))
+    val in = ReferentContext
+      .of(Vector(a1, a2, a3, b), Map(TrackId.unsafe("t1") -> ivs(100L -> 600L)))
+      .toOption
+      .get
+    val t1 = IdentityBasis.ContinuousTrack(TrackId.unsafe("t1"))
+    val joins =
+      Vector(("a1", "a2"), ("a2", "a3")).map((x, y) => IdentityLink.of(in, id(x), id(y), t1))
+    val splits = Vector(
+      DistinctLink.of(in, id("a2"), id("a3"), DistinctnessBasis.DifferentNames),
+      DistinctLink.of(in, id("a1"), id("b"), DistinctnessBasis.SimultaneousTracks)
+    )
+    val r = ReferentIdentity
+      .resolve(in, joins.map(_.toOption.get), splits.map(_.toOption.get), Vector.empty)
+      .toOption
+      .get
+    assertEquals(r.relation(id("a3"), id("b")), Right(ReferentRelation.Unknown))
+    assertEquals(r.relation(id("a1"), id("b")), Right(ReferentRelation.Distinct))
+    assertEquals(
+      r.relation(id("a1"), id("a3")),
+      Right(ReferentRelation.Open(Vector(id("a1"), id("a2"), id("a3"))))
+    )
+
+  test("distinctness lifts to every member of two settled classes"):
+    val split = apart("v1", "v3", DistinctnessBasis.SimultaneousTracks).toOption.get
+    val r = resolve(Vector(track, deixis), Vector(split))
+    assertEquals(r.relation(id("d2"), id("v3")), Right(ReferentRelation.Distinct))
+
+  test("touching coverage intervals are one stretch"):
+    val touching = context(Map(TrackId.unsafe("t1") -> ivs(100L -> 250L, 250L -> 400L)))
+    assert(same("v1", "v2", IdentityBasis.ContinuousTrack(TrackId.unsafe("t1")), touching).isRight)
+
+  test("a distinctness needs two different known mentions"):
+    assertEquals(
+      apart("v1", "v1", DistinctnessBasis.SimultaneousTracks),
+      Left(ReferentError.SameMention(id("v1")))
+    )
+    assertEquals(
+      apart("v1", "zz", DistinctnessBasis.SimultaneousTracks),
+      Left(ReferentError.UnknownMention(id("zz")))
+    )
 
   test("contributory hints alone never decide identity or distinctness"):
     val toward =
@@ -243,29 +291,29 @@ class ReferentIdentitySuite extends FunSuite:
     assertEquals(r.relation(id("v1"), id("v2")), Right(ReferentRelation.Same))
     assertEquals(r.hintsBetween(id("v1"), id("v3")), Vector(toward))
 
-  test("a link licensed against another context is refused"):
-    val other = ReferentContext
-      .of(Vector(v1, v2), Map(TrackId.unsafe("t1") -> ivs(100L -> 400L)))
-      .toOption
-      .get
-    val foreign = IdentityLink.of(
-      other,
-      id("v1"),
-      id("v2"),
-      IdentityBasis.ContinuousTrack(TrackId.unsafe("t1"))
-    )
-    assert(
-      ReferentIdentity
-        .resolve(ctx, Vector(foreign.toOption.get), Vector.empty, Vector.empty)
-        .isRight
-    )
-    val changed = ReferentContext
-      .of(Vector(v1, mention("v2", MentionOrigin.Visual, onTrack("t1", 310L, 390L))), Map.empty)
-      .toOption
-      .get
+  test("deixis licensed in a pruned context is refused in the real one"):
+    // Only v1 is present when the crowd is pruned away, so the pruned context licenses deixis.
+    val pruned = ReferentContext.of(Vector(v1, crowded), Map.empty).toOption.get
+    val laundered = IdentityLink.of(pruned, id("d1"), id("v1"), IdentityBasis.DeicticReference)
+    assert(laundered.isRight)
     assertEquals(
-      ReferentIdentity.resolve(changed, Vector(foreign.toOption.get), Vector.empty, Vector.empty),
+      ReferentIdentity.resolve(ctx, Vector(laundered.toOption.get), Vector.empty, Vector.empty),
+      Left(ReferentError.ForeignLink(id("d1"), id("v1")))
+    )
+
+  test("a track link licensed under other coverage is refused in a gappy context"):
+    val gappy = context(Map(TrackId.unsafe("t1") -> ivs(100L -> 250L, 300L -> 400L)))
+    assertEquals(
+      ReferentIdentity.resolve(gappy, Vector(track), Vector.empty, Vector.empty),
       Left(ReferentError.ForeignLink(id("v1"), id("v2")))
+    )
+
+  test("a distinctness licensed in another context is refused"):
+    val other = ReferentContext.of(Vector(v1, v3), Map.empty).toOption.get
+    val split = DistinctLink.of(other, id("v1"), id("v3"), DistinctnessBasis.SimultaneousTracks)
+    assertEquals(
+      ReferentIdentity.resolve(ctx, Vector.empty, Vector(split.toOption.get), Vector.empty),
+      Left(ReferentError.ForeignLink(id("v1"), id("v3")))
     )
 
   test("a hint naming an unknown mention is refused"):

@@ -5,7 +5,9 @@ import scala.collection.immutable.SortedMap
 import cats.data.NonEmptyVector
 import storymodel4s.core.*
 
-/** Identity of one referent mention in one source or recall (ADR 0024). */
+/** Identity of one referent mention in one source or recall (ADR 0024). Why its own id: mentions
+  * from video, speech and recall share no existing identifier space.
+  */
 object ReferentMentionId extends OpaqueId("ReferentMentionId")
 type ReferentMentionId = ReferentMentionId.T
 
@@ -43,7 +45,9 @@ object ProperName:
   def of(raw: String): Either[ReferentError, ProperName] =
     if raw.trim.isEmpty then Left(ReferentError.BlankName) else Right(new ProperName(raw.trim))
 
-/** Typed refusals of referent construction and identity licensing. */
+/** Typed refusals of referent construction and identity licensing. Why typed: a refused licence is
+  * a legitimate outcome that callers record (rule 12), not an exception.
+  */
 enum ReferentError:
   case BlankName
   case SupportFamily(mention: ReferentMentionId, origin: String, reason: String)
@@ -126,6 +130,20 @@ private[document] object ReferentExtents:
     case TypedSupport.Anchored(s) => s.anchors.toVector.flatMap(of)
     case TypedSupport.Text(_)     => Vector.empty
 
+  /** Observed coverage as maximal stretches: touching or overlapping intervals on one axis merge,
+    * so only a real gap separates two stretches.
+    */
+  def stretches(coverage: Option[PlaybackIntervalSet]): Vector[(PresentationAxisId, Long, Long)] =
+    coverage.toVector
+      .flatMap(_.intervals.toVector)
+      .sortBy(i => (i.axis.value, i.start))
+      .foldLeft(Vector.empty[(PresentationAxisId, Long, Long)]) { (acc, i) =>
+        acc.lastOption match
+          case Some((ax, s, e)) if ax == i.axis && i.start <= e =>
+            acc.init :+ ((ax, s, e max i.endExclusive))
+          case _ => acc :+ ((i.axis, i.start, i.endExclusive))
+      }
+
   /** Track extents of a mention, by track. */
   def tracks(support: TypedSupport): Map[TrackId, Vector[ReferentExtent]] = support match
     case TypedSupport.Anchored(s) =>
@@ -165,7 +183,9 @@ object ReferentContext:
       case None      =>
         Right(new ReferentContext(SortedMap.from(mentions.map(m => m.id -> m)), trackCoverage))
 
-/** A basis that is sufficient by itself to make two mentions one referent (ADR 0024 §2). */
+/** A basis that is sufficient by itself to make two mentions one referent (ADR 0024 §2). Why a
+  * closed enum: the licence class is fixed by the basis, so a caller cannot promote a weak basis.
+  */
 enum IdentityBasis:
   /** Both mentions lie in one observed track, inside one stretch of its coverage. */
   case ContinuousTrack(track: TrackId)
@@ -176,7 +196,9 @@ enum IdentityBasis:
   /** The same proper name is attached directly to both mentions. */
   case NamedReference(name: ProperName)
 
-/** A basis sufficient by itself to make two mentions different referents (ADR 0024 §2). */
+/** A basis sufficient by itself to make two mentions different referents (ADR 0024 §2). Why
+  * separate from identity bases: distinctness reopens a class, so it needs its own licence.
+  */
 enum DistinctnessBasis:
   /** Two visual mentions on different tracks overlap in time on one stream. Known limit: a
     * duplicate detection or a reflection also yields two tracks; the track source must rule those
@@ -187,22 +209,27 @@ enum DistinctnessBasis:
   /** Different proper names are attached directly to the two mentions. Known limit: aliases. */
   case DifferentNames
 
-/** Evidence that can rank candidates but never decides identity or distinctness by itself. */
+/** Evidence that can rank candidates but never decides identity or distinctness by itself. Why its
+  * own type: no value of it can be passed where a sufficient basis is required.
+  */
 enum ContributoryBasis:
   case AppearanceMatch, TemporalProximity, CompatibleDescription
 
 /** A licensed identity between two mentions. Construction checks the basis against the context;
-  * there is no other way to obtain one.
+  * there is no other way to obtain one. The link keeps that context, because its licence (who was
+  * present, what the track covered) holds only there.
   */
 final class IdentityLink private (
+    val context: ReferentContext,
     val left: ReferentMention,
     val right: ReferentMention,
     val basis: IdentityBasis
 ):
   override def equals(other: Any): Boolean = other match
-    case that: IdentityLink => left == that.left && right == that.right && basis == that.basis
-    case _                  => false
-  override def hashCode(): Int = (left, right, basis).##
+    case that: IdentityLink =>
+      context == that.context && left == that.left && right == that.right && basis == that.basis
+    case _ => false
+  override def hashCode(): Int = (context, left, right, basis).##
   override def toString: String = s"IdentityLink(${left.id.value}, ${right.id.value}, $basis)"
 
 object IdentityLink:
@@ -219,20 +246,20 @@ object IdentityLink:
       _ <- Either.cond(left != right, (), ReferentError.SameMention(left))
       link <- basis match
         case IdentityBasis.ContinuousTrack(track) =>
-          val coverage = context.trackCoverage.get(track).toVector.flatMap(_.intervals.toVector)
+          val coverage = ReferentExtents.stretches(context.trackCoverage.get(track))
           val extents =
             Vector(a, b).map(m => ReferentExtents.tracks(m.support).getOrElse(track, Vector()))
           // One stretch of observed coverage must hold both mentions: a gap means unobserved.
-          val within = coverage.exists(c =>
-            extents.forall(
-              _.forall(x => x.axis == c.axis && x.start >= c.start && x.end <= c.endExclusive)
-            )
+          val within = coverage.exists((axis, start, end) =>
+            extents.forall(_.forall(x => x.axis == axis && x.start >= start && x.end <= end))
           )
           if a.origin != MentionOrigin.Visual || b.origin != MentionOrigin.Visual then
             refuse("a track joins only visual mentions")
           else if extents.exists(_.isEmpty) then refuse("a mention is not on this track")
+          else if extents.flatten.map(_.stream).distinct.size != 1 then
+            refuse("the mentions are on this track in different streams")
           else if !within then refuse("the mentions are not in one stretch of observed coverage")
-          else Right(new IdentityLink(a, b, basis))
+          else Right(new IdentityLink(context, a, b, basis))
         case IdentityBasis.DeicticReference =>
           (a.origin, b.origin) match
             case (MentionOrigin.Dialogue(_), MentionOrigin.Visual) => deixis(context, a, b)
@@ -240,7 +267,7 @@ object IdentityLink:
             case _ => refuse("deixis joins one utterance mention to one visual mention")
         case IdentityBasis.NamedReference(name) =>
           if a.name.contains(name) && b.name.contains(name) then
-            Right(new IdentityLink(a, b, basis))
+            Right(new IdentityLink(context, a, b, basis))
           else refuse("the name is not attached to both mentions")
     yield link
 
@@ -256,7 +283,7 @@ object IdentityLink:
     }
     present.map(_.id) match
       case Vector(only) if only == depicted.id =>
-        Right(new IdentityLink(utterance, depicted, IdentityBasis.DeicticReference))
+        Right(new IdentityLink(context, utterance, depicted, IdentityBasis.DeicticReference))
       case Vector() =>
         Left(ReferentError.Unlicensed("DeicticReference", "nobody depicted while it is said"))
       case Vector(_) =>
@@ -264,16 +291,20 @@ object IdentityLink:
       case _ =>
         Left(ReferentError.Unlicensed("DeicticReference", "more than one person is present"))
 
-/** A licensed distinctness between two mentions. */
+/** A licensed distinctness between two mentions, kept with the context that licensed it. Why a
+  * licence: a distinctness reopens identity, so an unlicensed one would erase established links.
+  */
 final class DistinctLink private (
+    val context: ReferentContext,
     val left: ReferentMention,
     val right: ReferentMention,
     val basis: DistinctnessBasis
 ):
   override def equals(other: Any): Boolean = other match
-    case that: DistinctLink => left == that.left && right == that.right && basis == that.basis
-    case _                  => false
-  override def hashCode(): Int = (left, right, basis).##
+    case that: DistinctLink =>
+      context == that.context && left == that.left && right == that.right && basis == that.basis
+    case _ => false
+  override def hashCode(): Int = (context, left, right, basis).##
   override def toString: String = s"DistinctLink(${left.id.value}, ${right.id.value}, $basis)"
 
 object DistinctLink:
@@ -300,15 +331,17 @@ object DistinctLink:
           else if ta.isEmpty || tb.isEmpty then refuse("both mentions need a track")
           else if ta.keySet.intersect(tb.keySet).nonEmpty then refuse("the mentions share a track")
           else if !together.exists(identity) then refuse("the tracks do not overlap on one stream")
-          else Right(new DistinctLink(a, b, basis))
+          else Right(new DistinctLink(context, a, b, basis))
         case DistinctnessBasis.DifferentNames =>
           (a.name, b.name) match
-            case (Some(x), Some(y)) if x != y => Right(new DistinctLink(a, b, basis))
+            case (Some(x), Some(y)) if x != y => Right(new DistinctLink(context, a, b, basis))
             case (Some(_), Some(_))           => refuse("the names are the same")
             case _                            => refuse("both mentions need a name")
     yield link
 
-/** Which way a contributory hint points. */
+/** Which way a contributory hint points. Why: a hint against identity is recorded beside a class
+  * without reopening it (owner decision 1).
+  */
 enum HintDirection:
   case Toward, Against
 
@@ -322,26 +355,35 @@ final case class IdentityHint(
     direction: HintDirection
 )
 
-/** What the licensed links establish about two mentions. `Unknown` is not distinctness. */
+/** What the licensed links establish about two mentions. Why four cases: an absent link must not
+  * read as distinctness, and a reopened identity must not read as either answer (rule 7). `Same` is
+  * ADR 0024's resolved identity.
+  */
 enum ReferentRelation:
   /** Joined by a path of identity links in a class with no licensed distinctness inside it. */
   case Same
 
-  /** A licensed distinctness link separates their two classes. */
+  /** A licensed distinctness separates them: directly, or between two classes neither of which is
+    * open.
+    */
   case Distinct
 
   /** Their class contains a licensed distinctness: identity is reopened, with these candidates. */
-  case Contested(candidates: Vector[ReferentMentionId])
+  case Open(candidates: Vector[ReferentMentionId])
 
   /** No licensed link decides it. */
   case Unknown
 
-/** The identity classes of a referent context. Construction is private to [[ReferentIdentity]]. */
+/** The identity classes of a referent context. Why a result type: consumers ask one question,
+  * [[relation]], instead of reading classes from links. Construction is private to
+  * [[ReferentIdentity]].
+  */
 final class ReferentResolution private[document] (
     val context: ReferentContext,
     val classes: Vector[NonEmptyVector[ReferentMentionId]],
     val contested: Set[Int],
     val separated: Set[(Int, Int)],
+    val apart: Set[(ReferentMentionId, ReferentMentionId)],
     val hints: Vector[IdentityHint]
 ):
   private val classOf: Map[ReferentMentionId, Int] =
@@ -356,9 +398,13 @@ final class ReferentResolution private[document] (
       ca <- classOf.get(a).toRight(ReferentError.UnknownMention(a))
       cb <- classOf.get(b).toRight(ReferentError.UnknownMention(b))
     yield
-      if ca == cb && contested(ca) then ReferentRelation.Contested(classes(ca).toVector)
+      if ca == cb && contested(ca) then ReferentRelation.Open(classes(ca).toVector)
       else if ca == cb then ReferentRelation.Same
-      else if separated((ca min cb, ca max cb)) then ReferentRelation.Distinct
+      // A distinctness lifts to whole classes only when neither class is open: inside an open
+      // class membership itself is in doubt, so only the directly linked pair stays distinct.
+      else if separated((ca min cb, ca max cb)) && !contested(ca) && !contested(cb) then
+        ReferentRelation.Distinct
+      else if apart(ReferentIdentity.pair(a, b)) then ReferentRelation.Distinct
       else ReferentRelation.Unknown
 
   /** Contributory hints recorded between the classes of two mentions; they decide nothing. */
@@ -371,9 +417,9 @@ final class ReferentResolution private[document] (
   override def equals(other: Any): Boolean = other match
     case that: ReferentResolution =>
       context == that.context && classes == that.classes && contested == that.contested &&
-      separated == that.separated && hints == that.hints
+      separated == that.separated && apart == that.apart && hints == that.hints
     case _ => false
-  override def hashCode(): Int = (context, classes, contested, separated, hints).##
+  override def hashCode(): Int = (context, classes, contested, separated, apart, hints).##
   override def toString: String =
     s"ReferentResolution(classes=${classes.size}, contested=${contested.size})"
 
@@ -389,11 +435,12 @@ object ReferentIdentity:
       distinctions: Vector[DistinctLink],
       hints: Vector[IdentityHint]
   ): Either[ReferentError, ReferentResolution] =
-    val endpoints =
-      identities.map(l => (l.left, l.right)) ++ distinctions.map(l => (l.left, l.right))
-    val foreign = endpoints.find((l, r) =>
-      !context.mentions.get(l.id).contains(l) || !context.mentions.get(r.id).contains(r)
-    )
+    // A licence holds only in the context that granted it: a pruned context can make anyone the
+    // one person present.
+    val foreign = (identities.map(l => (l.context, l.left, l.right)) ++
+      distinctions.map(l => (l.context, l.left, l.right))).collectFirst {
+      case (c, l, r) if c != context => (l, r)
+    }
     val unknownHint =
       hints.flatMap(h => Vector(h.left, h.right)).find(!context.mentions.contains(_))
     (foreign, unknownHint) match
@@ -424,4 +471,11 @@ object ReferentIdentity:
         val pairs = distinctions.map(d => (classOf(d.left.id), classOf(d.right.id)))
         val contested = pairs.collect { case (x, y) if x == y => x }.toSet
         val separated = pairs.collect { case (x, y) if x != y => (x min y, x max y) }.toSet
-        Right(new ReferentResolution(context, classes, contested, separated, hints))
+        val apart = distinctions.map(d => pair(d.left.id, d.right.id)).toSet
+        Right(new ReferentResolution(context, classes, contested, separated, apart, hints))
+
+  private[document] def pair(
+      a: ReferentMentionId,
+      b: ReferentMentionId
+  ): (ReferentMentionId, ReferentMentionId) =
+    if Ordering[ReferentMentionId].lteq(a, b) then (a, b) else (b, a)
