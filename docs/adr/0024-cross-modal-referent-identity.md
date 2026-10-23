@@ -1,11 +1,14 @@
 # ADR 0024 — Cross-modal referent mentions and licensed identity links
 
-**Status:** Proposed 2026-10-23. Not accepted. It needs an owner decision (AGENTS.md SD5).
+**Status:** Accepted 2026-10-23 (AGENTS.md SD5). The owner chose the three answers recorded
+under "Owner decisions".
 
 **Decider:** the owner
 
-**Tracker:** epic `bd-01M5MR1KTXEP898CTN2KE3J219`. This is slice S2, `bd-01M5MR3BR0C7DCF9TRB3GEVDKV`.
-S3 (source identity graph), S4 (speech promotion) and S5 (recall binding) are blocked on this decision.
+**Tracker:** epic `bd-01M5MR1KTXEP898CTN2KE3J219`. This is slice S2,
+`bd-01M5MR3BR0C7DCF9TRB3GEVDKV`. Acceptance unblocks S3 (source identity graph) and S4 (speech
+promotion). S5 (recall binding) also waits for S3, S4 and continuity follow-up
+`bd-01M5MRVE0ZN7F5B6BE7440GFJ8`.
 
 ## Context
 
@@ -38,7 +41,7 @@ The relevant vocabulary already exists in part:
 | `ContextKind.Speech(ContextHolder)` | `story/nodes.scala` | No route from speech to `NarratedWorld` |
 | `TypedSupport.Anchored(Playback(axis, …))` | `core/support.scala` | Can already anchor support in media time |
 
-## Decision (proposed)
+## Decision
 
 ### 1. A referent mention can come from any modality
 
@@ -118,8 +121,8 @@ remain, but the recall gets no credit and the participant is not penalized.
 
 ## Consequences
 
-- New public vocabulary in a portable module. The proposal is the `document` module, next to ADR
-  0012, with no JVM-only types. Visual tracks arrive as data, never as detector code.
+- New public vocabulary in the portable `document` module, next to ADR 0012, with no JVM-only
+  types. Visual tracks arrive as data, never as detector code.
 - The track-level visual evidence is a measured dependency. The sampled-pair Qwen associations
   flip orientation and call one body two people (facet report, 2026-10-22). Until a track source
   is admitted, `ContinuousTrack` will be rare, and most visual identity will stay `Open`.
@@ -128,10 +131,20 @@ remain, but the recall gets no credit and the participant is not penalized.
   `same_entity` and `same_situation` edges in `tools/connected_assessment_probe.py` lose the
   power to establish identity or continuity.
 
-## Questions for the owner
+## Owner decisions (2026-10-23)
 
-1. Should a sufficient-alone basis be enough by itself, or should a disputed identity also require
-   the absence of any contributory evidence against it?
-2. Placement: `document`, or a new portable module? A new module needs its own decision line.
-3. Can `Inferred` claims count toward recall credit in the primary analysis, or only in a
-   declared secondary analysis?
+1. **One sufficient basis stands alone.** A single licensed sufficient basis resolves identity.
+   Contributory evidence pointing the other way, such as a changed coat or a gap in time, is
+   recorded beside the link and may prompt further acquisition. It does not reopen the link. Only
+   a `DistinctLink` with a sufficient basis makes the class `Open`. Rejected: requiring that no
+   contributory evidence points the other way. Appearance legitimately changes within a story, so
+   ordinary costume and lighting changes would become lost identities.
+2. **Placement is the `document` module, next to ADR 0012.** The new types extend its mention and
+   identity layer, stay portable and add no module or dependency. Rejected: a new portable module,
+   which would split one identity vocabulary across two modules.
+3. **`Inferred` counts in the primary analysis, with a mandatory sensitivity analysis.** The
+   scoring target is what the narrative establishes, so a recall detail supported only through
+   `Inferred(rule, premises)` earns primary credit. Every report also gives the results with
+   `Inferred` support excluded, and counts `Inferred`-only credits separately. Rejected: credit in
+   a secondary analysis only, which would score conclusions the viewer is plainly meant to draw as
+   unsupported recall.
