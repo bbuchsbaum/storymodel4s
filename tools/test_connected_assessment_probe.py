@@ -14,8 +14,8 @@ def fixture():
                                        mode='world', exclusivity=None)) for key, text, quote, core in (
         ('c1', 'A person is on the floor.', 'on the floor', 'A person is on the floor.'),
         ('c2', 'A person is dead.', 'is dead', 'A person is dead.'))]
-    r = dict(question='synthetic-only', claim=claim, intervals=[],
-             items=[dict(id='e1', text='Ana is on the floor.'), dict(id='e2', text='Beth is dead.')],
+    r = dict(question='synthetic-only', claim=claim, intervals=[dict(part='p', start=10.0, end=13.0)],
+             items=[timed('e1', 'Ana is on the floor.'), timed('e2', 'Beth is dead.')],
              inventory=dict(parentClaim=claim, logic='all', eventPolicy='compatible_situation', components=components))
     v = dict(claim_id='', citations=[], handles=[], connections=[], components=[
         dict(component_id='c1', affirms=[], denies=[], unresolved=[]),
@@ -23,6 +23,10 @@ def fixture():
     source = add_source(r, v, 'e1', 'a')
     v['components'][0]['affirms'] = [dict(sources=[source], basis=dict(kind='direct', explanation='Explicit floor assertion.'))]
     return r, v
+
+
+def timed(evidence, text, start=10.0, end=13.0, part='p'):
+    return dict(id=evidence, text=text, part=part, start=start, end=end)
 
 
 def add_source(r, v, evidence, prefix, *, roles=True, scope='world', occurrence=None):
@@ -87,7 +91,7 @@ class ConnectedTests(unittest.TestCase):
     def test_complementary_speaker_and_asr_union(self):
         r,v=fixture();r['inventory']['logic']='atomic';r['inventory']['components']=r['inventory']['components'][:1]
         c=r['inventory']['components'][0];c['assessment'].update(core='A person says that the gate is closed.',mode='assertion')
-        r['items']=[dict(id='e1',text='Ana speaks these words: the gate is closed.'),dict(id='e2',text='The gate is closed.')]
+        r['items']=[timed('e1','Ana speaks these words: the gate is closed.'),timed('e2','The gate is closed.')]
         v.update(citations=[],handles=[],connections=[],components=v['components'][:1])
         first=add_source(r,v,'e1','a',scope='assertion',occurrence='assertion')
         second=add_source(r,v,'e2','b',roles=False,scope='assertion',occurrence='assertion')
@@ -222,6 +226,77 @@ class ConnectedTests(unittest.TestCase):
             self.assertEqual(statuses(out),['Unresolved','Unresolved'])
             self.assertEqual(len(out['components'][0]['proposed_affirms']),1)
             self.assertEqual(len(out['components'][0]['proposed_denies']),1)
+
+
+class TargetBindingTests(unittest.TestCase):
+    """A proof applies to the claim's interval only through timing or a cited continuity path."""
+
+    def earlier(self):
+        # The supporting record precedes the target; e3 is an unrelated record inside it.
+        r,v=fixture();r['intervals']=[dict(part='p',start=152.0,end=155.0)]
+        r['items']=[timed('e1','Ana is on the floor.',110.0,114.0),timed('e2','Beth is dead.',110.0,114.0),
+                    timed('e3','Two men stand in the room.',152.0,155.0)]
+        add_source(r,v,'e3','c',roles=False)
+        return r,v
+
+    def test_shifted_target_unbinds_supported_proof(self):
+        r,v=fixture();self.assertEqual(statuses(assess(r,v)),['Supported','Unresolved'])
+        r['intervals']=[dict(part='p',start=10000.0,end=10003.0)]
+        out=assess(r,v)
+        self.assertEqual(statuses(out),['Unresolved','Unresolved'])
+        self.assertEqual(statuses(out,'localStatus'),['Supported','Unresolved'])
+        self.assertTrue(out['components'][0]['targetUnbound'])
+        self.assertIn('reference_unresolved',out['components'][0]['unresolved'])
+        self.assertFalse(out['summary']['allSupported'])
+
+    def test_cited_continuity_binds_earlier_record(self):
+        r,v=self.earlier()
+        self.assertEqual(statuses(assess(r,v)),['Unresolved','Unresolved'])
+        connect(v,'same_situation','as','cs')
+        out=assess(r,v)
+        self.assertEqual(statuses(out),['Supported','Unresolved'])
+        self.assertFalse(out['components'][0]['targetUnbound'])
+
+    def test_unresolved_continuity_does_not_bind(self):
+        r,v=self.earlier();connect(v,'same_situation','as','cs',basis='unresolved')
+        self.assertEqual(statuses(assess(r,v)),['Unresolved','Unresolved'])
+
+    def test_same_seconds_in_another_part_do_not_anchor(self):
+        r,v=fixture();r['intervals']=[dict(part='q',start=10.0,end=13.0)]
+        self.assertEqual(statuses(assess(r,v)),['Unresolved','Unresolved'])
+
+    def test_touching_and_untimed_records_do_not_anchor(self):
+        for item in (timed('e1','Ana is on the floor.',13.0,15.0),dict(id='e1',text='Ana is on the floor.'),
+                     timed('e1','Ana is on the floor.',float('nan'),float('nan'))):
+            r,v=fixture();r['items'][0]=item
+            self.assertEqual(statuses(assess(r,v)),['Unresolved','Unresolved'])
+
+    def test_counterevidence_from_another_moment_does_not_contradict(self):
+        r,v=fixture();r['items'][1]=timed('e2','Ana is not on the floor.',200.0,203.0)
+        second=add_source(r,v,'e2','b')
+        v['components'][0]['denies']=[dict(sources=[second],basis=dict(kind='explicit_negation',explanation='Later negation.'))]
+        out=assess(r,v)
+        self.assertEqual(statuses(out,'localStatus'),['Conflicted','Unresolved'])
+        self.assertEqual(statuses(out),['Supported','Unresolved'])
+
+    def test_identity_proof_needs_an_argument_reaching_target(self):
+        r,v=fixture();r['inventory']['logic']='atomic';r['inventory']['eventPolicy']='separate_scopes'
+        r['inventory']['components']=r['inventory']['components'][:1]
+        c=r['inventory']['components'][0]
+        c['roles'].append(dict(id='r2',kind='entity',quote='is dead',argument='described referent'))
+        c['assessment'].update(core='The depicted and described people are the same person.',mode='cross_scope_identity')
+        v['components']=v['components'][:1]
+        second=add_source(r,v,'e2','b',scope='assertion');second['roles']={'r2':'bp'}
+        v['components'][0]['affirms'][0]['sources'].append(second)
+        connect(v,'same_entity','ap','bp',basis='explicit_reference')
+        self.assertEqual(statuses(assess(r,v)),['Supported'])
+        r['intervals']=[dict(part='p',start=500.0,end=503.0)]
+        self.assertEqual(statuses(assess(r,v)),['Unresolved'])
+
+    def test_missing_or_malformed_target_is_refused(self):
+        for intervals in ([],[dict(part='p',start=1.0)]):
+            r,v=fixture();r['intervals']=intervals
+            with self.assertRaisesRegex(ValueError,'target interval'):assess(r,v)
 
 
 if __name__ == '__main__':

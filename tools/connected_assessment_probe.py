@@ -43,6 +43,10 @@ Citations must include BOTH endpoint records. Explain the specific identity/corr
 shared clothing, adjacency, the same scene, or identical words alone cannot establish identity.
 Identity paths cannot use event/situation/context edges. Different-identity evidence blocks merging.
 No sampled pair establishes continuous tracking. Report ambiguity with unresolved connections.
+The claim concerns the supplied intervals. A proof applies to them only when a source record
+overlaps an interval, or a cited same_situation path joins its situation to such a record;
+an identity proof needs a same_entity path from one argument to such a record. Similar
+descriptions at another time do not establish that the same state holds in the interval.
 
 components: {component_id,affirms:[],denies:[],unresolved:[]} for EVERY supplied core exactly once.
 Each proof is {sources:[],basis:{...}}. Each source is
@@ -138,6 +142,27 @@ def keyed(values):
     return result
 
 
+def overlaps(item, interval):
+    """Half-open overlap in one part's clock; untimed or non-finite records never overlap."""
+    try:
+        return (item['part'] == interval['part'] and
+                item['start'] < interval['end'] and interval['start'] < item['end'])
+    except (KeyError, TypeError):
+        return False
+
+
+def target_anchors(request, citations, handles):
+    """Handles whose own record overlaps a target interval: derived from timing, never asserted."""
+    intervals = request['intervals']
+    if not isinstance(intervals, list) or not intervals:
+        raise ValueError('no target interval')
+    if any(not isinstance(t, dict) or not {'part', 'start', 'end'} <= set(t) for t in intervals):
+        raise ValueError('malformed target interval')
+    items = {i['id']: i for i in request['items']}
+    timed = {e for e, i in items.items() if any(overlaps(i, t) for t in intervals)}
+    return {h for h, v in handles.items() if citations[v['citation']]['evidence'] in timed}
+
+
 class Graph:
     """Typed proposal paths; explicit inequality makes the whole equality class uncertain."""
 
@@ -226,6 +251,7 @@ def validate_proposal(request, raw):
         if c['relation'] == 'same_context' and len({h['scope'] for h in endpoints}) != 1:
             raise ValueError('different contexts cannot become equal')
     graph = Graph(handles, connections)
+    anchors = target_anchors(request, citations, handles)
     expected = {c['id']: c for c in inv['components']}
     findings = value['components']
     if not isinstance(findings, list) or len(findings) != len(expected) or {
@@ -243,8 +269,8 @@ def validate_proposal(request, raw):
         for relation in ('affirms', 'denies'):
             if not isinstance(finding[relation], list):
                 raise ValueError('proofs must be arrays')
-            proofs = [validate_proof(p, relation, component, inv, citations, handles, graph)
-                      for p in finding[relation]]
+            proofs = [validate_proof(p, relation, component, inv, citations, handles, graph,
+                                     anchors) for p in finding[relation]]
             out[relation] = [p for p in proofs if p['licensed']]
             out['proposed_' + relation] = [p for p in proofs if not p['licensed']]
         if out['proposed_affirms'] or out['proposed_denies']:
@@ -256,8 +282,16 @@ def validate_proposal(request, raw):
         positive = component['assessment']['polarity'] == 'positive'
         out['support'] = out['affirms' if positive else 'denies']
         out['counter'] = out['denies' if positive else 'affirms']
-        out['status'] = previous.component_status(out)
-        out['localStatus'] = out['status']; out['attributionUnresolved'] = False
+        out['localStatus'] = previous.component_status(out)
+        # Local proofs remain visible; only target-bound proofs are attributed to the claim.
+        bound = {k: [p for p in out[k] if p['targetBound']] for k in ('support', 'counter')}
+        out['targetUnbound'] = bool(out['support'] or out['counter']) and not (
+            bound['support'] or bound['counter'])
+        out['attributedSupport'], out['attributedCounter'] = bound['support'], bound['counter']
+        if out['targetUnbound']:
+            out['unresolved'] = sorted(set(out['unresolved']) | {'reference_unresolved'})
+        out['attributionUnresolved'] = out['targetUnbound']
+        out['status'] = previous.component_status(dict(out, **bound))
         results.append(out)
     enforce_parent_assignments(results, inv, expected, handles, graph)
     summary = previous.summarize(results, inv['logic'])
@@ -268,7 +302,7 @@ def validate_proposal(request, raw):
                 components=results, summary=summary)
 
 
-def validate_proof(proof, relation, component, inv, citations, handles, graph):
+def validate_proof(proof, relation, component, inv, citations, handles, graph, anchors):
     exact_keys(proof, 'sources basis')
     if not isinstance(proof['sources'], list) or not proof['sources']:
         raise ValueError('empty proof sources')
@@ -324,14 +358,19 @@ def validate_proof(proof, relation, component, inv, citations, handles, graph):
             licensed &= len(occurrences) == len(proof['sources']) and graph.same(occurrences)
             if meta['mode'] == 'assertion':
                 licensed &= all(handles[h]['kind'] == 'assertion' for h in occurrences)
+    if meta['mode'] == 'cross_scope_identity':
+        reach = [graph.reachable(h) for hs in assigned.values() for h in hs[:1]]
+    else:
+        reach = [graph.reachable(situations[0])]
+    bound = any(group & anchors for group in reach)
     return dict(proof, assigned=assigned, situations=situations, contexts=contexts,
-                occurrences=occurrences, licensed=bool(licensed))
+                occurrences=occurrences, licensed=bool(licensed), targetBound=bound)
 
 
 def enforce_parent_assignments(results, inv, expected, handles, graph):
     checks = {}
     for c in results:
-        for proof in c['support'] + c['counter']:
+        for proof in c['attributedSupport'] + c['attributedCounter']:
             for role, assigned in proof['assigned'].items():
                 checks.setdefault(('role', role), []).append((c, assigned))
             if inv['eventPolicy'] != 'separate_scopes':
