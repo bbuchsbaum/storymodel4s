@@ -10,16 +10,18 @@ import urllib.error
 import urllib.request
 import claim_assessment_probe as base
 import component_assessment_probe as protocol
+import connected_assessment_probe as connected
 import openrouter_claim_probe as remote
 
 
 ROUTES={'fireworks':'Fireworks','together':'Together'}
 
 def body(request,route='fireworks',protocol_name='components'):
-    if route not in ROUTES or protocol_name not in {'components','whole'}:
+    if route not in ROUTES or protocol_name not in {'components','whole','connected'}:
         raise ValueError('unknown route or protocol')
-    prompt=protocol.PROMPT if protocol_name=='components' else base.PROMPT
-    model_input=protocol.model_input(request) if protocol_name=='components' else base.model_input(request)
+    assessor={'components':protocol,'whole':base,'connected':connected}[protocol_name]
+    prompt=assessor.PROMPT
+    model_input=assessor.model_input(request)
     return dict(model=remote.MODEL, temperature=0, max_tokens=8192 if protocol_name=='components' else 4096,
                 reasoning=dict(effort='low', exclude=True), stream=False,
                 provider=dict(remote.PROVIDER,only=[route],max_price=dict(prompt=.30,completion=1.20,request=0)),
@@ -43,7 +45,8 @@ def interpret(request,response,route='fireworks',protocol_name='components'):
     if choice.get('finish_reason')!='stop' or message.get('tool_calls') or not isinstance(raw,str):
         return dict(invalid,processing='unfinished_or_nontext_response',raw=raw if isinstance(raw,str) else None)
     try:
-        return dict(processing='valid',raw=raw,proposal=(protocol.validate_proposal(request,raw) if protocol_name=='components' else base.validate_proposal(request,raw)))
+        assessor={'components':protocol,'whole':base,'connected':connected}[protocol_name]
+        return dict(processing='valid',raw=raw,proposal=assessor.validate_proposal(request,raw))
     except (ValueError,KeyError,TypeError,AttributeError) as error:
         return dict(processing='invalid_proposal',raw=raw,proposal=None,errorClass=type(error).__name__)
 
@@ -102,7 +105,7 @@ def run(root):
     for path,digest in freeze['files'].items():
         if base.sha(path)!=digest:
             raise ValueError('frozen artifact changed')
-    for path in (Path(__file__),Path(protocol.__file__),Path(base.__file__),Path(remote.__file__),root/'requests.json'):
+    for path in (Path(__file__),Path(protocol.__file__),Path(connected.__file__),Path(base.__file__),Path(remote.__file__),root/'requests.json'):
         if freeze['files'].get(str(path.absolute()))!=base.sha(path):
             raise ValueError('consumed code/input not frozen')
     route=freeze.get('route','fireworks')

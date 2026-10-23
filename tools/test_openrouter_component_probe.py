@@ -32,7 +32,7 @@ class RemoteTests(unittest.TestCase):
             root=Path(d);r,_,_=fixture();r['identity']=base.identity(r)
             rows=[dict(condition=str(i),request=r) for i in range(3)]
             base.write(root/'requests.json',dict(executions=rows))
-            paths=[Path(p.__file__),Path(p.protocol.__file__),Path(base.__file__),Path(p.remote.__file__),root/'requests.json']
+            paths=[Path(p.__file__),Path(p.protocol.__file__),Path(p.connected.__file__),Path(base.__file__),Path(p.remote.__file__),root/'requests.json']
             base.write(root/'freeze.json',dict(files={str(x.absolute()):base.sha(x) for x in paths},budgetUsd=5,priorCostBoundUsd=0))
             with patch.dict(p.os.environ,{'OPENROUTER_API_KEY':'synthetic'}),patch.object(p,'execute',return_value=dict(attempts=1,processing='http_failure',httpStatus=429)) as execute:
                 p.run(root)
