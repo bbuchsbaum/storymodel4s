@@ -290,13 +290,46 @@ class TargetBindingTests(unittest.TestCase):
         v['components'][0]['affirms'][0]['sources'].append(second)
         connect(v,'same_entity','ap','bp',basis='explicit_reference')
         self.assertEqual(statuses(assess(r,v)),['Supported'])
+        # Only the described argument's record lies in the target; its entity path still binds.
+        r['items'][0]=timed('e1','Ana is on the floor.',110.0,114.0)
+        self.assertEqual(statuses(assess(r,v)),['Supported'])
         r['intervals']=[dict(part='p',start=500.0,end=503.0)]
         self.assertEqual(statuses(assess(r,v)),['Unresolved'])
 
-    def test_missing_or_malformed_target_is_refused(self):
-        for intervals in ([],[dict(part='p',start=1.0)]):
+    def test_identity_denial_binds_through_either_argument(self):
+        r,v=fixture();r['inventory']['logic']='atomic';r['inventory']['eventPolicy']='separate_scopes'
+        r['inventory']['components']=r['inventory']['components'][:1]
+        c=r['inventory']['components'][0]
+        c['roles'].append(dict(id='r2',kind='entity',quote='is dead',argument='described referent'))
+        c['assessment'].update(core='The depicted and described people are the same person.',mode='cross_scope_identity')
+        r['items'][0]=timed('e1','Ana is on the floor.',110.0,114.0)
+        v['components']=v['components'][:1]
+        proof=v['components'][0]['affirms'].pop()
+        second=add_source(r,v,'e2','b',scope='assertion');second['roles']={'r2':'bp'}
+        proof['sources'].append(second);proof['basis']=dict(kind='explicit_negation',explanation='Named as someone else.')
+        v['components'][0]['denies']=[proof]
+        connect(v,'different_entity','ap','bp',basis='explicit_reference')
+        self.assertEqual(statuses(assess(r,v)),['Contradicted'])
+
+    def test_any_target_interval_anchors(self):
+        r,v=fixture();r['intervals']=[dict(part='q',start=0.0,end=1.0),dict(part='p',start=10.0,end=13.0)]
+        self.assertEqual(statuses(assess(r,v)),['Supported','Unresolved'])
+
+    def test_partly_bound_component_counts_unbound_proofs(self):
+        r,v=fixture();r['items'][1]=timed('e2','Ana is on the floor.',200.0,203.0)
+        second=add_source(r,v,'e2','b')
+        v['components'][0]['affirms'].append(dict(sources=[second],basis=dict(kind='direct',explanation='Later floor.')))
+        out=assess(r,v)['components'][0]
+        self.assertEqual((out['status'],out['unboundProofs'],out['targetUnbound']),('Supported',1,False))
+
+    def test_missing_or_malformed_target_is_refused_before_model_input(self):
+        bad=([],[dict(part='p',start=1.0)],[dict(part='p',start=155.0,end=152.0)],
+             [dict(part='p',start=float('-inf'),end=float('inf'))],[dict(part='p',start='10',end='13')],
+             [dict(part='p',start=True,end=13.0)],[dict(part='',start=1.0,end=2.0)])
+        for intervals in bad:
             r,v=fixture();r['intervals']=intervals
-            with self.assertRaisesRegex(ValueError,'target interval'):assess(r,v)
+            with self.assertRaisesRegex(ValueError,'target interval'):p.model_input(r)
+            with self.assertRaisesRegex(ValueError,'target interval'):p.validate_proposal(r,json.dumps(v))
 
 
 if __name__ == '__main__':

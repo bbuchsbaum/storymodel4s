@@ -5,6 +5,7 @@ The validator checks ownership and permitted composition, never semantic truth. 
 and their logical scope are supplied and reviewed; this does not extract recall components.
 """
 import json
+import math
 
 import claim_assessment_probe as base
 import component_assessment_probe as previous
@@ -117,8 +118,23 @@ def inventory(request):
     return inv
 
 
+def targets(request):
+    """The claim's intervals; refused before any model call when absent or not a real interval."""
+    intervals = request.get('intervals')
+    if not isinstance(intervals, list) or not intervals:
+        raise ValueError('no target interval')
+    for t in intervals:
+        bounds = [t.get(k) if isinstance(t, dict) else None for k in ('start', 'end')]
+        if not isinstance(t, dict) or not isinstance(t.get('part'), str) or not t['part'] or any(
+                isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x)
+                for x in bounds) or not bounds[0] < bounds[1]:
+            raise ValueError('malformed target interval')
+    return intervals
+
+
 def model_input(request):
     inv = inventory(request)
+    targets(request)
     payload = dict(eventPolicy=inv['eventPolicy'], intervals=request['intervals'],
                    items=request['items'], components=[dict(
                        id=c['id'], core=c['assessment']['core'],
@@ -153,11 +169,7 @@ def overlaps(item, interval):
 
 def target_anchors(request, citations, handles):
     """Handles whose own record overlaps a target interval: derived from timing, never asserted."""
-    intervals = request['intervals']
-    if not isinstance(intervals, list) or not intervals:
-        raise ValueError('no target interval')
-    if any(not isinstance(t, dict) or not {'part', 'start', 'end'} <= set(t) for t in intervals):
-        raise ValueError('malformed target interval')
+    intervals = targets(request)
     items = {i['id']: i for i in request['items']}
     timed = {e for e, i in items.items() if any(overlaps(i, t) for t in intervals)}
     return {h for h, v in handles.items() if citations[v['citation']]['evidence'] in timed}
@@ -287,6 +299,7 @@ def validate_proposal(request, raw):
         bound = {k: [p for p in out[k] if p['targetBound']] for k in ('support', 'counter')}
         out['targetUnbound'] = bool(out['support'] or out['counter']) and not (
             bound['support'] or bound['counter'])
+        out['unboundProofs'] = sum(not p['targetBound'] for k in ('support', 'counter') for p in out[k])
         out['attributedSupport'], out['attributedCounter'] = bound['support'], bound['counter']
         if out['targetUnbound']:
             out['unresolved'] = sorted(set(out['unresolved']) | {'reference_unresolved'})
