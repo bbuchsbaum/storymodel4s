@@ -151,6 +151,8 @@ object TemporalSupport:
                 .toRight(Refusal.ForeignSupport)
               _ <- evidence.checkedOn(owner).left.map(_ => Refusal.InvalidSupport)
               _ <- occurrenceEvidence(owner, evidence, coordinate)
+              // An anchor on the coordinate axis whose owner neither is nor composes that axis's
+              // bundle cannot reach here: SourceRepresentation.of refuses it as ForeignAxis.
               node <-
                 if !evidence.anchors.toVector.exists(_.axisId.contains(coordinate.axis.id)) then
                   Right(unavailable(State.NoSupportOnAxis, identity))

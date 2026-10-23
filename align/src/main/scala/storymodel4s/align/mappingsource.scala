@@ -253,6 +253,17 @@ object SourceRepresentation:
           )
         case Some(ps) => DeclaredComposition.of(c.composed, ps).map(_ => ())
     }
+    // A part's axis is carried by that part, or by a bundle whose own composition maps from it;
+    // whether that composition is the workspace's declared one is checked separately below.
+    def owns(owner: SourceBundle, axis: PresentationAxisId, role: BundleRole): Boolean =
+      role match
+        case BundleRole.Part(id) =>
+          owner.id == id || owner.mappings.exists {
+            case m: TrackComposition => m.relation.sourceAxis == axis
+            case _                   => false
+          }
+        case BundleRole.Composition => composition.exists(_.composed.identity == owner.identity)
+
     def membership(node: NodeSummary): Either[MappingRefusal, Map[PresentationAxisId, BundleRole]] =
       physical(node.ref) match
         case _: SourceSupportStatus.Unlocated     => Right(Map.empty)
@@ -274,9 +285,14 @@ object SourceRepresentation:
                         .distinct
                         .traverse { axis =>
                           axisRoles.filter(_._1 == axis) match
-                            case Vector((_, role)) => Right(axis -> role)
-                            case Vector()          => Left(MappingRefusal.ForeignAxis(axis))
-                            case _                 => Left(MappingRefusal.AmbiguousAxis(axis))
+                            case Vector((_, role)) if owns(bundle, axis, role) =>
+                              Right(axis -> role)
+                            // core lets a stream declare another bundle's axis as its native
+                            // axis; equal axes are the same footage only for the axis's own
+                            // bundle or a declared composition of it.
+                            case Vector(_) => Left(MappingRefusal.ForeignAxis(axis))
+                            case Vector()  => Left(MappingRefusal.ForeignAxis(axis))
+                            case _         => Left(MappingRefusal.AmbiguousAxis(axis))
                         }
                         .flatMap { entries =>
                           val nativeParts = entries.collect { case (axis, BundleRole.Part(_)) =>
