@@ -63,6 +63,80 @@ class BorrowedAxisSuite extends FunSuite:
     )
     assertEquals(result.map(_ => ()), Left(MappingRefusal.ForeignAxis(a.primaryAxis.id)))
 
+  test("a borrowing bundle's own composition over the axis does not make it the part"):
+    // Every piece of a TrackComposition is public, so the borrower can declare one from part a's
+    // axis to its own; its stream is still different footage.
+    val stream = borrowed.streams.head
+    val receipt =
+      SourceDerivationReceipt.of("self-declared/v1", "borrowed", Vector.empty).toOption.get
+    val segment = CompositionSegment
+      .of(
+        PlaybackInterval.on(a.primaryAxis, 0L, 40L).toOption.get,
+        PlaybackInterval.on(borrowed.primaryAxis, 0L, 40L).toOption.get,
+        OccurrenceId.unsafe("self")
+      )
+      .toOption
+      .get
+    val mapping = TrackComposition
+      .of(a.primaryAxis.id, borrowed.primaryAxis.id, Vector(segment), receipt)
+      .toOption
+      .get
+    val composer = SourceBundle
+      .of(
+        borrowed.edition,
+        SourceKind.FilmEdition,
+        borrowed.streams,
+        borrowed.primaryAxis,
+        borrowed.authorityTracks,
+        Vector(mapping)
+      )
+      .fold(e => fail(s"self-composing borrower: ${e.message}"), identity)
+    val listed = NonEmptyVector.of(a, b, composer).map(BundleEntry.media)
+    val result = SourceRepresentation.of(
+      view.copy(nodes = Vector(nodes.head)),
+      listed,
+      None,
+      Map(e(1) -> onPartA(composer, stream.id))
+    )
+    assertEquals(result.map(_ => ()), Left(MappingRefusal.ForeignAxis(a.primaryAxis.id)))
+
+  test("a borrowing stream that reuses the part's stream id is still different footage"):
+    val impostor = SourceStream
+      .of(
+        a.streams.head.id,
+        StreamKind.Picture,
+        Checksum.ofText("impostor-bytes"),
+        a.primaryAxis.id,
+        a.primaryAxis.extent,
+        a.primaryAxis.timebase,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val edition = EditionId.unsafe("impostor-film")
+    val axis = SourceBundle
+      .editionPlaybackAxis(edition, Vector(impostor), Vector(impostor.id), 0L, 40L, timebase)
+      .toOption
+      .get
+    val film = SourceBundle
+      .of(
+        Some(edition),
+        SourceKind.FilmEdition,
+        Vector(impostor),
+        axis,
+        Vector(impostor.id),
+        Vector.empty
+      )
+      .fold(e => fail(s"impostor film: ${e.message}"), identity)
+    val listed = NonEmptyVector.of(a, b, film).map(BundleEntry.media)
+    val result = SourceRepresentation.of(
+      view.copy(nodes = Vector(nodes.head)),
+      listed,
+      None,
+      Map(e(1) -> onPartA(film, impostor.id))
+    )
+    assertEquals(result.map(_ => ()), Left(MappingRefusal.ForeignAxis(a.primaryAxis.id)))
+
   test("control: the declared composed bundle may carry support on a part's axis"):
     val result = SourceRepresentation.of(
       view.copy(nodes = Vector(nodes.head)),

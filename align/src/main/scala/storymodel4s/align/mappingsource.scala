@@ -253,14 +253,26 @@ object SourceRepresentation:
           )
         case Some(ps) => DeclaredComposition.of(c.composed, ps).map(_ => ())
     }
-    // A part's axis is carried by that part, or by a bundle whose own composition maps from it;
-    // whether that composition is the workspace's declared one is checked separately below.
-    def owns(owner: SourceBundle, axis: PresentationAxisId, role: BundleRole): Boolean =
+    // A part's axis is that part's footage only through the part's own streams: the owner is the
+    // part, or its anchors on that axis use streams identical to the part's (a composition that
+    // carries them). A stream that merely declares the axis, even under a self-declared mapping, is
+    // different footage. The composition role belongs to the declared composed bundle only; with a
+    // declared composition every listed owner is one of its parts or the composed bundle, so this
+    // clause is defence in depth with no lawful counterexample found.
+    def owns(
+        owner: SourceBundle,
+        support: EvidenceSupport,
+        axis: PresentationAxisId,
+        role: BundleRole
+    ): Boolean =
       role match
         case BundleRole.Part(id) =>
-          owner.id == id || owner.mappings.exists {
-            case m: TrackComposition => m.relation.sourceAxis == axis
-            case _                   => false
+          owner.id == id || parts.find(_.id == id).exists { part =>
+            support.anchors.toVector
+              .filter(_.axisId.contains(axis))
+              .forall(anchor =>
+                owner.stream(anchor.anchorStream).exists(s => part.stream(s.id).contains(s))
+              )
           }
         case BundleRole.Composition => composition.exists(_.composed.identity == owner.identity)
 
@@ -285,7 +297,7 @@ object SourceRepresentation:
                         .distinct
                         .traverse { axis =>
                           axisRoles.filter(_._1 == axis) match
-                            case Vector((_, role)) if owns(bundle, axis, role) =>
+                            case Vector((_, role)) if owns(bundle, support, axis, role) =>
                               Right(axis -> role)
                             // core lets a stream declare another bundle's axis as its native
                             // axis; equal axes are the same footage only for the axis's own
