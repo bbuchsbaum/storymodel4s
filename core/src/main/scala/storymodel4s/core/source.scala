@@ -54,6 +54,11 @@ enum StreamKind:
 enum AxisKind:
   case TextCharacter, EditionPlayback, AnnotationTimeline
 
+  /** One stream's own clock (ADR 0025): never audience-facing, never a bundle's primary axis. Its
+    * id is minted per bundle and stream, so it cannot be another bundle's axis.
+    */
+  case StreamClock
+
 /** Declared rounding when a caller asks for an integral lattice. */
 enum RoundingPolicy:
   case TowardZero, TowardNegInf, TowardPosInf, NearestEven
@@ -693,6 +698,32 @@ object PresentationAxis:
       }
     }
 
+  /** The native clock of one stream of one bundle (ADR 0025). Why recomputable: every input is
+    * known to [[SourceBundle.of]] from the bundle it is building and the stream itself, so `of`
+    * re-mints the axis and refuses a stream whose native axis differs. Passing another bundle's id
+    * therefore buys nothing.
+    */
+  def streamClock(
+      bundle: SourceBundleId,
+      sourceKind: SourceKind,
+      stream: StreamId,
+      kind: StreamKind,
+      extent: AxisExtent,
+      timebase: Option[RationalTimebase]
+  ): Either[DomainError, PresentationAxis] =
+    val fp = SourceCanon.digest(
+      "stream-native-axis/v1",
+      bundle.value,
+      sourceKind.toString,
+      stream.value,
+      kind.toString,
+      extent.toString,
+      timebase.map(_.scale.toString).getOrElse("")
+    )
+    axisId(fp).map { id =>
+      new PresentationAxis(id, bundle, None, AxisKind.StreamClock, sourceKind, extent, timebase, fp)
+    }
+
   def inventedEditionPlayback(
       bundle: SourceBundleId,
       sourceKind: SourceKind,
@@ -766,7 +797,9 @@ object PlaybackCoordinate:
 
   /** A declared annotation clock supports ticks without asserting a film edition. */
   def onTimeAxis(axis: PresentationAxis, tick: Long): Either[DomainError, PlaybackCoordinate] =
-    if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline then
+    if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline &&
+      axis.kind != AxisKind.StreamClock
+    then
       Left(SourceCanon.inv("coordinate/time", "axis is not a declared time axis"))
     else
       axis.extent match
@@ -893,8 +926,9 @@ object PlaybackInterval:
       start: Long,
       endExclusive: Long
   ): Either[DomainError, PlaybackInterval] =
-    if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline then
-      Left(SourceCanon.inv("interval/time", "axis is not a declared time axis"))
+    if axis.kind != AxisKind.EditionPlayback && axis.kind != AxisKind.AnnotationTimeline &&
+      axis.kind != AxisKind.StreamClock
+    then Left(SourceCanon.inv("interval/time", "axis is not a declared time axis"))
     else if endExclusive <= start then
       Left(
         SourceCanon.fmt(
@@ -1039,6 +1073,50 @@ object SourceBundle:
         authorityTracks.map(_.value)
     SourceBundleId.from(ContentAddress.of("bundle", parts*))
 
+  /** The prospective content-addressed id of a bundle, before any stream is bound to a native axis:
+    * a producer needs it to mint stream clocks (ADR 0025). Native axes do not enter it.
+    */
+  def prospectiveId(
+      edition: Option[EditionId],
+      sourceKind: SourceKind,
+      streams: Vector[SourceStream],
+      axisKind: AxisKind,
+      authorityTracks: Vector[StreamId]
+  ): Either[DomainError, SourceBundleId] =
+    computeId(edition, sourceKind, streams, axisKind, authorityTracks)
+
+  /** ADR 0025: a stream's native axis is the primary axis, the stream clock re-minted here from
+    * this bundle's own id and the stream's own fields, or a foreign axis named as the source of one
+    * of this bundle's `TrackComposition` mappings. Anything else would let two bundles appear to
+    * share footage time.
+    */
+  private def nativeAxesOwned(
+      id: SourceBundleId,
+      sourceKind: SourceKind,
+      streams: Vector[SourceStream],
+      primaryAxis: PresentationAxis,
+      mappings: Vector[CheckedMapping]
+  ): Either[DomainError, Unit] =
+    val composedFrom = mappings.collect { case m: TrackComposition => m.relation.sourceAxis }.toSet
+    streams.foldLeft[Either[DomainError, Unit]](Right(())) { (acc, s) =>
+      acc.flatMap { _ =>
+        PresentationAxis
+          .streamClock(id, sourceKind, s.id, s.kind, s.extent, s.timebase)
+          .flatMap { clock =>
+            if s.nativeAxis == primaryAxis.id || s.nativeAxis == clock.id ||
+              composedFrom.contains(s.nativeAxis)
+            then Right(())
+            else
+              Left(
+                SourceCanon.inv(
+                  "bundle/stream-axis",
+                  s"stream ${s.id.value} native axis ${s.nativeAxis.value} is not owned by the bundle"
+                )
+              )
+          }
+      }
+    }
+
   private def validate(
       edition: Option[EditionId],
       sourceKind: SourceKind,
@@ -1072,6 +1150,8 @@ object SourceBundle:
           )
         case (other, AxisKind.EditionPlayback, None) =>
           Left(SourceCanon.inv("bundle/axis", s"$other cannot invent an edition playback axis"))
+        case (_, AxisKind.StreamClock, _) =>
+          Left(SourceCanon.inv("bundle/axis", "a stream clock is never a bundle's primary axis"))
         case _ => Right(())
       kindOk.flatMap { _ =>
         if mappings.exists(m =>
@@ -1099,7 +1179,7 @@ object SourceBundle:
             )
           )
         else
-          Right(
+          nativeAxesOwned(id, sourceKind, streams, primaryAxis, mappings).map { _ =>
             new SourceBundle(
               id,
               edition,
@@ -1109,7 +1189,7 @@ object SourceBundle:
               authorityTracks,
               mappings
             )
-          )
+          }
       }
     }
 

@@ -67,6 +67,8 @@ class SourceRepresentationSuite extends FunSuite:
   }
   test("composition covers exactly its parts") {
     compositionRefused(DeclaredComposition.of(composed, NonEmptyVector.one(a)))
+    // ADR 0025: part b's stream keeps b's axis only under a composition naming it, so a composed
+    // bundle that maps part a alone is refused when it is built, before any declaration.
     val incomplete = SourceBundle
       .of(
         composed.edition,
@@ -76,9 +78,7 @@ class SourceRepresentationSuite extends FunSuite:
         composed.authorityTracks,
         mappings.take(1)
       )
-      .toOption
-      .get
-    compositionRefused(DeclaredComposition.of(incomplete, parts))
+    assert(incomplete.left.exists(_.message.contains("bundle/stream-axis")), incomplete)
     assert(DeclaredComposition.of(composed, parts).isRight)
   }
   test("composition over an unlisted part refuses") {

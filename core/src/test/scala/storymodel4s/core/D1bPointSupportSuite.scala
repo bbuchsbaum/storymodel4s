@@ -198,8 +198,22 @@ class D1bPointSupportSuite extends FunSuite:
     )
   )
   private val receipt = right(SourceDerivationReceipt.of("point-map", "fixture", Vector.empty))
-  private def mapped(kind: StreamKind = StreamKind.Audio, nativeEnd: Long = 10L)(
-      mappings: (PresentationAxis, SourceStream) => Vector[CheckedMapping]
+
+  /** ADR 0025: the secondary stream's own clock in `b`, recomputed from the stream. */
+  private def clockOf(b: SourceBundle): PresentationAxis =
+    val s = b.streams(1)
+    right(PresentationAxis.streamClock(b.id, b.sourceKind, s.id, s.kind, s.extent, s.timebase))
+
+  /** The film plus a secondary stream. With `ownClock` the stream is rebound to its stream clock;
+    * otherwise it stays on `native`'s wider axis, which `mappings` must license (ADR 0025 rule 3).
+    * `mappings` receives the primary axis and the secondary stream's native axis.
+    */
+  private def mapped(
+      kind: StreamKind = StreamKind.Audio,
+      nativeEnd: Long = 10L,
+      ownClock: Boolean = true
+  )(
+      mappings: (PresentationAxis, PresentationAxis) => Vector[CheckedMapping]
   ): SourceBundle =
     val secondary = right(
       SourceStream.of(
@@ -223,6 +237,30 @@ class D1bPointSupportSuite extends FunSuite:
         RationalTimebase.Millisecond
       )
     )
+    val sourceAxis =
+      if ownClock then
+        right(
+          PresentationAxis.streamClock(
+            axis.bundle,
+            bundle.sourceKind,
+            secondary.id,
+            secondary.kind,
+            secondary.extent,
+            secondary.timebase
+          )
+        )
+      else native.primaryAxis
+    val bound = right(
+      SourceStream.of(
+        secondary.id,
+        secondary.kind,
+        secondary.checksum,
+        sourceAxis.id,
+        secondary.extent,
+        secondary.timebase,
+        secondary.derivedFrom
+      )
+    )
     val first = bundle.streams.head
     val picture = right(
       SourceStream.of(
@@ -239,10 +277,10 @@ class D1bPointSupportSuite extends FunSuite:
       SourceBundle.of(
         bundle.edition,
         bundle.sourceKind,
-        Vector(picture, secondary),
+        Vector(picture, bound),
         axis,
         bundle.authorityTracks,
-        mappings(axis, secondary)
+        mappings(axis, sourceAxis)
       )
     )
 
@@ -259,21 +297,22 @@ class D1bPointSupportSuite extends FunSuite:
     )
 
   test("mapped point obeys exact clock image with excluded end and ambiguous mapping refusal"):
-    def repair(axis: PresentationAxis, offset: Long) = right(
+    def repair(source: PresentationAxis, axis: PresentationAxis, offset: Long) = right(
       ClockRepair.of(
-        native.primaryAxis.id,
+        source.id,
         axis.id,
         ExactRational.integer(1000L),
         ExactRational.integer(offset),
         receipt
       )
     )
-    val b = mapped()((axis, _) => Vector(repair(axis, 20L)))
+    val b = mapped()((axis, source) => Vector(repair(source, axis, 20L)))
     assert(mappedPoint(b, 20L).isRight)
     assert(mappedPoint(b, 29L).isRight)
     assert(mappedPoint(b, 19L).isLeft)
     assert(mappedPoint(b, 30L).isLeft)
-    val ambiguous = mapped()((axis, _) => Vector(repair(axis, 20L), repair(axis, 21L)))
+    val ambiguous =
+      mapped()((axis, source) => Vector(repair(source, axis, 20L), repair(source, axis, 21L)))
     assert(mappedPoint(ambiguous, 25L).isLeft)
 
   test("composition points preserve gaps, next segment start and source bounds"):
@@ -293,11 +332,11 @@ class D1bPointSupportSuite extends FunSuite:
         receipt
       )
     )
-    val b = mapped()((axis, _) => Vector(composition(axis)))
+    val b = mapped(ownClock = false)((axis, _) => Vector(composition(axis)))
     assert(mappedPoint(b, 20L).isRight)
     assert(mappedPoint(b, 26L).isRight)
     Vector(23L, 25L, 30L).foreach(tick => assert(mappedPoint(b, tick).isLeft))
-    val truncated = mapped(nativeEnd = 3L)((axis, _) => Vector(composition(axis)))
+    val truncated = mapped(nativeEnd = 3L, ownClock = false)((axis, _) => Vector(composition(axis)))
     assert(mappedPoint(truncated, 20L).isLeft)
 
   test("point membership independently checks selected stream extent and kind"):
@@ -311,19 +350,38 @@ class D1bPointSupportSuite extends FunSuite:
         )
       )
     )
-    val b = mapped(nativeEnd = 3L)((_, _) => Vector.empty)
+    def license(axis: PresentationAxis) = Vector(
+      right(
+        TrackComposition.of(
+          native.primaryAxis.id,
+          axis.id,
+          Vector(
+            right(
+              CompositionSegment.of(
+                right(PlaybackInterval.on(native.primaryAxis, 0L, 2L)),
+                right(PlaybackInterval.on(axis, 90L, 92L)),
+                OccurrenceId.unsafe("license")
+              )
+            )
+          ),
+          receipt
+        )
+      )
+    )
+    val b = mapped(nativeEnd = 3L, ownClock = false)((axis, _) => license(axis))
     assert(nativePoint(b, 0L).isRight)
     assert(nativePoint(b, 2L).isRight)
     assert(nativePoint(b, 3L).isLeft)
-    val wrongKind = mapped(kind = StreamKind.CanonicalText)((_, _) => Vector.empty)
+    val wrongKind =
+      mapped(kind = StreamKind.CanonicalText, ownClock = false)((axis, _) => license(axis))
     assert(nativePoint(wrongKind, 2L).isLeft)
 
   test("point identity independently binds the selected stream and axis within one bundle") {
-    val b = mapped()((axis, _) =>
+    val b = mapped()((axis, source) =>
       Vector(
         right(
           ClockRepair.of(
-            native.primaryAxis.id,
+            source.id,
             axis.id,
             ExactRational.integer(1000L),
             ExactRational.integer(0L),
@@ -337,7 +395,7 @@ class D1bPointSupportSuite extends FunSuite:
       .identity
     val at = right(PlaybackInstant.on(b.primaryAxis, 5L))
     val original = identity(b.streams(1).id, at)
-    val nativeAt = right(PlaybackInstant.on(native.primaryAxis, 5L))
+    val nativeAt = right(PlaybackInstant.onTimeAxis(clockOf(b), 5L))
     val both = right(
       EvidenceSupport.of(
         b,
@@ -348,11 +406,11 @@ class D1bPointSupportSuite extends FunSuite:
       )
     )
     assertEquals(right(both.playbackOn(b.primaryAxis.id)).points, Vector(at))
-    assertEquals(right(both.playbackOn(native.primaryAxis.id)).points, Vector(nativeAt))
+    assertEquals(right(both.playbackOn(clockOf(b).id)).points, Vector(nativeAt))
     assertNotEquals(original, identity(b.streams.head.id, at))
     assertNotEquals(
       original,
-      identity(b.streams(1).id, right(PlaybackInstant.on(native.primaryAxis, 5L)))
+      identity(b.streams(1).id, right(PlaybackInstant.onTimeAxis(clockOf(b), 5L)))
     )
   }
 

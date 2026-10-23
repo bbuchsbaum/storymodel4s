@@ -29,9 +29,30 @@ class D1aSupportSuite extends FunSuite:
   private def support(bundle: SourceBundle, anchors: EvidenceAnchor*): EvidenceSupport =
     EvidenceSupport.of(bundle, anchors.toVector).toOption.get
 
-  private def withExtra(extra: SourceStream): SourceBundle =
+  /** ADR 0025: the stream's own clock in the bundle `bundle`, recomputed from the stream. */
+  private def clockFor(
+      bundle: SourceBundleId,
+      sourceKind: SourceKind,
+      s: SourceStream
+  ): PresentationAxis =
+    PresentationAxis
+      .streamClock(bundle, sourceKind, s.id, s.kind, s.extent, s.timebase)
+      .toOption
+      .get
+  private def rebind(s: SourceStream, axis: PresentationAxisId): SourceStream =
+    SourceStream
+      .of(s.id, s.kind, s.checksum, axis, s.extent, s.timebase, s.derivedFrom)
+      .toOption
+      .get
+
+  /** The film plus `extras`. With `ownClocks`, each extra is rebound to its stream clock; otherwise
+    * it keeps its drafted native axis, which `mappings` must then license (ADR 0025 rule 3).
+    */
+  private def assemble(extras: Vector[SourceStream], ownClocks: Boolean = true)(
+      mappings: PresentationAxis => Vector[CheckedMapping] = _ => Vector.empty
+  ): SourceBundle =
     val first = film()
-    val streams = first.streams :+ extra
+    val streams = first.streams ++ extras
     val id = SourceBundle
       .computeId(
         first.edition,
@@ -58,17 +79,27 @@ class D1aSupportSuite extends FunSuite:
       )
       .toOption
       .get
+    val bound =
+      if ownClocks then extras.map(s => rebind(s, clockFor(id, first.sourceKind, s).id))
+      else extras
     SourceBundle
       .of(
         first.edition,
         first.sourceKind,
-        Vector(picture, extra),
+        picture +: bound,
         axis,
         first.authorityTracks,
-        Vector.empty
+        mappings(axis)
       )
       .toOption
       .get
+  private def withExtra(extra: SourceStream): SourceBundle = assemble(Vector(extra))()
+
+  /** The native clock of `stream` inside `bundle`. */
+  private def clock(bundle: SourceBundle, stream: StreamId = StreamId.unsafe("secondary")) =
+    clockFor(bundle.id, bundle.sourceKind, bundle.streams.find(_.id == stream).get)
+  private def civ(bundle: SourceBundle, start: Long, end: Long): PlaybackInterval =
+    PlaybackInterval.onTimeAxis(clock(bundle), start, end).toOption.get
 
   private val native = SourceBundle
     .filmEdition(
@@ -93,6 +124,32 @@ class D1aSupportSuite extends FunSuite:
       )
       .toOption
       .get
+
+  /** A secondary stream left on `native`'s wider axis, licensed by a lawful composition of that
+    * axis (ADR 0025 rule 3) away from every tick the tests use.
+    */
+  private def withForeignExtra(extra: SourceStream)(
+      more: PresentationAxis => Vector[CheckedMapping] = _ => Vector.empty
+  ): SourceBundle =
+    assemble(Vector(extra), ownClocks = false) { axis =>
+      val license = TrackComposition
+        .of(
+          native.primaryAxis.id,
+          axis.id,
+          Vector(
+            CompositionSegment
+              .of(iv(native, 0L, 2L), iv0(axis, 90L, 92L), OccurrenceId.unsafe("license"))
+              .toOption
+              .get
+          ),
+          receipt
+        )
+        .toOption
+        .get
+      license +: more(axis)
+    }
+  private def iv0(axis: PresentationAxis, start: Long, end: Long): PlaybackInterval =
+    PlaybackInterval.on(axis, start, end).toOption.get
   private def mapped(bundle: SourceBundle, mappings: CheckedMapping*): SourceBundle =
     SourceBundle
       .of(
@@ -151,7 +208,7 @@ class D1aSupportSuite extends FunSuite:
           audio,
           Vector(
             EvidenceAnchor
-              .Shot(audio.id, extra().id, ShotId.unsafe("wrong-kind"), iv(native, 0L, 4L))
+              .Shot(audio.id, extra().id, ShotId.unsafe("wrong-kind"), civ(audio, 0L, 4L))
           )
         )
         .isLeft
@@ -227,20 +284,7 @@ class D1aSupportSuite extends FunSuite:
       )
       .toOption
       .get
-    val a = withExtra(first)
-    val allStreams = a.streams :+ second
-    val id = SourceBundle
-      .computeId(a.edition, a.sourceKind, allStreams, AxisKind.EditionPlayback, a.authorityTracks)
-      .toOption
-      .get
-    val axis = PresentationAxis
-      .editionPlayback(id, a.edition.get, 0L, 100L, RationalTimebase.Millisecond)
-      .toOption
-      .get
-    val bundle = SourceBundle
-      .of(a.edition, a.sourceKind, allStreams, axis, a.authorityTracks, Vector.empty)
-      .toOption
-      .get
+    val bundle = assemble(Vector(first, second))()
     val left = SpanSet.one(TextSpan.unsafe(0, 2))
     val right = SpanSet.one(TextSpan.unsafe(4, 6))
     val both = support(
@@ -285,13 +329,13 @@ class D1aSupportSuite extends FunSuite:
     val wrongNative = EvidenceAnchor.MediaTime(
       bundle.id,
       bundle.streams.head.id,
-      native.primaryAxis.id,
-      PlaybackIntervalSet.one(iv(native, 1L, 4L))
+      clock(bundle).id,
+      PlaybackIntervalSet.one(civ(bundle, 1L, 4L))
     )
     assert(EvidenceSupport.of(bundle, Vector(wrongNative)).isLeft)
 
   test("native support obeys the selected stream extent"):
-    val bundle = withExtra(extra(end = 3L))
+    val bundle = withForeignExtra(extra(end = 3L))()
     val anchor = EvidenceAnchor.MediaTime(
       bundle.id,
       extra().id,
@@ -304,7 +348,7 @@ class D1aSupportSuite extends FunSuite:
     val raw = withExtra(extra())
     val repair = ClockRepair
       .of(
-        native.primaryAxis.id,
+        clock(raw).id,
         raw.primaryAxis.id,
         ExactRational.integer(1000L),
         ExactRational.integer(20L),
@@ -318,7 +362,7 @@ class D1aSupportSuite extends FunSuite:
     assert(EvidenceSupport.of(bundle, Vector(secondary(bundle, 40L, 50L))).isLeft)
     val conflicting = ClockRepair
       .of(
-        native.primaryAxis.id,
+        clock(raw).id,
         raw.primaryAxis.id,
         ExactRational.integer(1000L),
         ExactRational.integer(21L),
@@ -335,10 +379,10 @@ class D1aSupportSuite extends FunSuite:
   test("composition image preserves gaps and refuses source segments outside stream extent"):
     val raw = withExtra(extra())
     def segment(a: Long, b: Long, c: Long, d: Long, name: String): CompositionSegment =
-      CompositionSegment.of(iv(native, a, b), iv(raw, c, d), OccurrenceId.unsafe(name)).toOption.get
+      CompositionSegment.of(civ(raw, a, b), iv(raw, c, d), OccurrenceId.unsafe(name)).toOption.get
     val composition = TrackComposition
       .of(
-        native.primaryAxis.id,
+        clock(raw).id,
         raw.primaryAxis.id,
         Vector(segment(0, 4, 20, 24, "a"), segment(5, 10, 30, 35, "b")),
         receipt
@@ -349,14 +393,13 @@ class D1aSupportSuite extends FunSuite:
     assert(EvidenceSupport.of(bundle, Vector(secondary(bundle, 20L, 24L))).isRight)
     assert(EvidenceSupport.of(bundle, Vector(secondary(bundle, 22L, 32L))).isLeft)
     assert(EvidenceSupport.of(bundle, Vector(secondary(bundle, 24L, 25L))).isLeft)
-    val short = withExtra(extra(end = 3L))
-    val shortComposition = TrackComposition
+    def shortComposition(target: PresentationAxis): TrackComposition = TrackComposition
       .of(
         native.primaryAxis.id,
-        short.primaryAxis.id,
+        target.id,
         Vector(
           CompositionSegment
-            .of(iv(native, 0, 4), iv(short, 20, 24), OccurrenceId.unsafe("bad"))
+            .of(iv(native, 0, 4), iv0(target, 20, 24), OccurrenceId.unsafe("bad"))
             .toOption
             .get
         ),
@@ -364,15 +407,19 @@ class D1aSupportSuite extends FunSuite:
       )
       .toOption
       .get
+    val short =
+      assemble(Vector(extra(end = 3L)), ownClocks = false)(a => Vector(shortComposition(a)))
     assert(
-      EvidenceSupport.of(mapped(short, shortComposition), Vector(secondary(short, 20, 24))).isLeft
+      EvidenceSupport
+        .of(mapped(short, shortComposition(short.primaryAxis)), Vector(secondary(short, 20, 24)))
+        .isLeft
     )
 
   test("full mapping and bundle identity distinguish equal relation IDs"):
     val raw = withExtra(extra())
     val first = ClockRepair
       .of(
-        native.primaryAxis.id,
+        clock(raw).id,
         raw.primaryAxis.id,
         ExactRational.integer(1000L),
         ExactRational.Zero,
@@ -382,7 +429,7 @@ class D1aSupportSuite extends FunSuite:
       .get
     val second = ClockRepair
       .of(
-        native.primaryAxis.id,
+        clock(raw).id,
         raw.primaryAxis.id,
         ExactRational.integer(1000L),
         ExactRational.integer(1L),
@@ -411,7 +458,7 @@ class D1aSupportSuite extends FunSuite:
     def repair(scale: Long, rec: SourceDerivationReceipt): ClockRepair =
       ClockRepair
         .of(
-          native.primaryAxis.id,
+          clock(raw).id,
           raw.primaryAxis.id,
           ExactRational.integer(scale),
           ExactRational.Zero,
@@ -424,12 +471,12 @@ class D1aSupportSuite extends FunSuite:
     def composition(targetStart: Long, occurrence: String): TrackComposition =
       TrackComposition
         .of(
-          native.primaryAxis.id,
+          clock(raw).id,
           raw.primaryAxis.id,
           Vector(
             CompositionSegment
               .of(
-                iv(native, 0L, 4L),
+                civ(raw, 0L, 4L),
                 iv(raw, targetStart, targetStart + 4L),
                 OccurrenceId.unsafe(occurrence)
               )
@@ -459,7 +506,20 @@ class D1aSupportSuite extends FunSuite:
     assertNotEquals(correspondence("one").identity, correspondence("two").identity)
 
   test("full bundle identity independently binds its primary fingerprint"):
-    val first = film()
+    val plain = film()
+    val picture = plain.streams.head
+    val clocked = rebind(picture, clockFor(plain.id, plain.sourceKind, picture).id)
+    val first = SourceBundle
+      .of(
+        plain.edition,
+        plain.sourceKind,
+        Vector(clocked),
+        plain.primaryAxis,
+        plain.authorityTracks,
+        plain.mappings
+      )
+      .toOption
+      .get
     val changedAxis = PresentationAxis
       .editionPlayback(first.id, first.edition.get, 0L, 101L, RationalTimebase.Millisecond)
       .toOption
@@ -481,23 +541,13 @@ class D1aSupportSuite extends FunSuite:
 
   test("clock image uses native timebase and exact fractional boundaries"):
     def image(end: Long, tb: RationalTimebase, scale: Long, offset: ExactRational): SourceBundle =
-      val local = SourceBundle
-        .filmEdition(
-          EditionId.unsafe("fractional-native"),
-          Checksum.ofText("fractional-native"),
-          0L,
-          end,
-          tb
-        )
-        .toOption
-        .get
       val stream = SourceStream
         .of(
           StreamId.unsafe("secondary"),
           StreamKind.Audio,
           Checksum.ofText("fractional-audio"),
-          local.primaryAxis.id,
-          local.primaryAxis.extent,
+          native.primaryAxis.id,
+          AxisExtent.playbackTicks(0L, end, tb).toOption.get,
           Some(tb),
           Vector.empty
         )
@@ -508,7 +558,7 @@ class D1aSupportSuite extends FunSuite:
         raw,
         ClockRepair
           .of(
-            local.primaryAxis.id,
+            clock(raw).id,
             raw.primaryAxis.id,
             ExactRational.integer(scale),
             offset,
@@ -530,15 +580,15 @@ class D1aSupportSuite extends FunSuite:
   test("equivalent mapping order has identical identity and support admission"):
     val raw = withExtra(extra())
     val a = CompositionSegment
-      .of(iv(native, 0L, 4L), iv(raw, 20L, 24L), OccurrenceId.unsafe("a"))
+      .of(civ(raw, 0L, 4L), iv(raw, 20L, 24L), OccurrenceId.unsafe("a"))
       .toOption
       .get
     val b = CompositionSegment
-      .of(iv(native, 5L, 10L), iv(raw, 30L, 35L), OccurrenceId.unsafe("b"))
+      .of(civ(raw, 5L, 10L), iv(raw, 30L, 35L), OccurrenceId.unsafe("b"))
       .toOption
       .get
     def composition(segments: Vector[CompositionSegment]): TrackComposition =
-      TrackComposition.of(native.primaryAxis.id, raw.primaryAxis.id, segments, receipt).toOption.get
+      TrackComposition.of(clock(raw).id, raw.primaryAxis.id, segments, receipt).toOption.get
     val forward = composition(Vector(a, b))
     val reverse = composition(Vector(b, a))
     assertNotEquals(forward, reverse)

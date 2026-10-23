@@ -524,8 +524,8 @@ class ReferentIdentitySuite extends FunSuite:
     assertEquals(r.relation(id("p"), id("y")), Right(ReferentRelation.Distinct))
     assertEquals(r.relation(id("y"), id("q")), Right(ReferentRelation.Unknown))
 
-  // A second film that declares a picture stream whose native axis is the first film's axis, so
-  // its anchors lie on that axis too (core admits this; bd-01M5MZ8J3KV0S1JY45737X4WSH).
+  // A second film whose picture stream sits on the first film's axis under its own declared
+  // composition from it (ADR 0025 rule 3), so its anchors lie on that axis too.
   private lazy val borrowed: SourceBundle =
     val foreign = SourceStream
       .of(
@@ -551,6 +551,25 @@ class ReferentIdentitySuite extends FunSuite:
       )
       .toOption
       .get
+    // ADR 0025: the borrowed axis is lawful only under the bundle's own composition from it.
+    val own = TrackComposition
+      .of(
+        film.primaryAxis.id,
+        axis.id,
+        Vector(
+          CompositionSegment
+            .of(
+              PlaybackInterval.on(film.primaryAxis, 0L, 1000L).toOption.get,
+              PlaybackInterval.on(axis, 0L, 1000L).toOption.get,
+              OccurrenceId.unsafe("borrowed")
+            )
+            .toOption
+            .get
+        ),
+        SourceDerivationReceipt.of("borrowed/v1", "referent", Vector.empty).toOption.get
+      )
+      .toOption
+      .get
     val built = SourceBundle
       .of(
         Some(edition),
@@ -558,7 +577,7 @@ class ReferentIdentitySuite extends FunSuite:
         Vector(foreign),
         axis,
         Vector(stream),
-        Vector.empty
+        Vector(own)
       )
       .fold(e => fail(s"borrowed-axis film: ${e.message}"), identity)
     built
