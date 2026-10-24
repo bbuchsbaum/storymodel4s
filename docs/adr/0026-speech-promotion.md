@@ -1,7 +1,7 @@
 # ADR 0026 — Defeasible promotion of speech assertions into the narrated world
 
-**Status:** Proposed 2026-10-23 (AGENTS.md SD5). The owner decides the questions under "Owner
-decisions"; each states a recommendation.
+**Status:** Accepted 2026-10-23 (AGENTS.md SD5). The owner chose the recommended answer to each
+question under "Owner decisions".
 
 **Decider:** the owner
 
