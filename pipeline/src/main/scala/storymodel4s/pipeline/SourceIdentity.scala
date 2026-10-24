@@ -159,6 +159,30 @@ object SourceIdentity:
         .map(_.toString)
     yield claim
 
+  /** Raw `[start, endExclusive]` pairs, read leniently so that a refused record can still withhold;
+    * `None` when any interval is unreadable.
+    */
+  private def rawSpans(j: Json): Option[Vector[(Long, Long)]] =
+    j.hcursor.downField("intervals").as[Vector[Vector[Long]]].toOption.flatMap { v =>
+      val pairs = v.collect { case Vector(a, z) => (a, z) }
+      Option.when(pairs.nonEmpty && pairs.size == v.size)(pairs)
+    }
+
+  /** Why a presence claim is withheld: a refused mention that may be a person on the picture
+    * overlaps it, so the claim would certify fewer people than the producer listed (ADR 0027 §2). A
+    * refused mention with unreadable intervals withholds every claim.
+    */
+  private def withholding(
+      claim: Json,
+      refused: Vector[(String, Option[Vector[(Long, Long)]])]
+  ): Option[String] =
+    val covered = rawSpans(claim).getOrElse(Vector.empty)
+    refused.collectFirst {
+      case (id, spans)
+          if spans.forall(_.exists((a, z) => covered.exists((c, d) => a < d && c < z))) =>
+        s"withheld: refused mention $id may be a person present"
+    }
+
   /** One proposal as the producer handed it over, with the producer's own guard outcome. */
   private final case class Proposal(
       id: String,
@@ -225,7 +249,17 @@ object SourceIdentity:
       // a result of the run, not a failure of it (rule 12).
       mentionIds = rawMentions.map(j => j.hcursor.downField("id").as[String].getOrElse(""))
       builtMentions = rawMentions.map(mention(b, _))
-      builtPresence = rawPresence.map(presence(b, _))
+      // Only a mention that is certainly dialogue cannot be a person on the picture.
+      refusedPeople = rawMentions
+        .zip(builtMentions)
+        .collect {
+          case (j, Left(_)) if !j.hcursor.get[String]("origin").contains("dialogue") =>
+            j.hcursor.get[String]("id").getOrElse("") -> rawSpans(j)
+        }
+        .sortBy(_._1)
+      builtPresence = rawPresence.map(j =>
+        presence(b, j).flatMap(p => withholding(j, refusedPeople).toLeft(p))
+      )
       mentions = builtMentions.collect { case Right(m) => m }
       context <- ReferentContext
         .of(mentions, Vector.empty, builtPresence.collect { case Right(p) => p })

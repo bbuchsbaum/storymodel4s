@@ -206,6 +206,44 @@ class SourceIdentitySuite extends FunSuite:
     assert(reason(p).contains("UnknownMention"), reason(p))
   }
 
+  test("a refused visual mention withholds the presence it overlaps, so deixis is not licensed") {
+    // A second person listed in the first shot whose name the factories refuse.
+    val blank = mention("v-blank", "visual", "picture", 1000, 2000, Some(" "))
+    val g = graph(inputs(ms = mentions :+ blank))
+    assertEquals(status(outcomeOf(g, "mentions", "id", "v-blank")), "refused")
+    val withheld = g.hcursor.downField("presence").downN(0).downField("outcome").focus.get
+    assertEquals(status(withheld), "refused")
+    assert(reason(withheld).contains("v-blank"), reason(withheld))
+    val o = outcomeOf(g, "proposals", "id", "p3")
+    assertEquals(status(o), "refused")
+    assert(reason(o).contains("presence is not certified"), reason(o))
+    assertEquals(rel(g, "d-she", "v-ana-1"), "Unknown")
+    // The second shot's claim does not overlap and stays admitted.
+    val other = g.hcursor.downField("presence").downN(1).downField("outcome").focus.get
+    assertEquals(status(other), "admitted")
+  }
+
+  test("a refused visual mention with an unreadable interval withholds every presence claim") {
+    val unreadable = Json.obj(
+      "id" -> s("v-odd"),
+      "origin" -> s("visual"),
+      "stream" -> s("picture"),
+      "intervals" -> Json.arr(Json.arr(Json.fromLong(1000)))
+    )
+    val g = graph(inputs(ms = mentions :+ unreadable))
+    val statuses = (0 to 1).map(i =>
+      status(g.hcursor.downField("presence").downN(i).downField("outcome").focus.get)
+    )
+    assertEquals(statuses, Vector("refused", "refused"))
+  }
+
+  test("control: a refused dialogue mention withholds no presence") {
+    val noContext = mention("d-loose", "dialogue", "audio", 1000, 2000)
+    val g = graph(inputs(ms = mentions :+ noContext))
+    assertEquals(status(outcomeOf(g, "mentions", "id", "d-loose")), "refused")
+    assertEquals(rel(g, "d-she", "v-ana-1"), "Same")
+  }
+
   test("a presence basis other than human review is refused, with its reason") {
     val g =
       graph(inputs(pr = Vector(presence(1000, 2000, "measured-detector"), presence(5000, 6000))))
