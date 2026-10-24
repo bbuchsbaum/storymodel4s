@@ -19,9 +19,19 @@ object SourceIdentity:
   val GraphSchema: String = "source-identity-graph/v1"
   val Usage: String = "sourceIdentity build INPUTS OUTPUT"
 
-  /** Input roles a recall-blind run may read (ADR 0027 §1); anything else refuses the run. */
+  /** Input roles a recall-blind run may read (ADR 0027 §1); anything else refuses the run. The
+    * recognizer's `asr-transcript` carries its words, segments and source identity in one file.
+    */
   val InputRoles: Set[String] =
-    Set("media", "annotation", "asr-words", "asr-segments", "role-labels", "model-recordings")
+    Set(
+      "media",
+      "annotation",
+      "asr-transcript",
+      "asr-words",
+      "asr-segments",
+      "role-labels",
+      "model-recordings"
+    )
 
   private type Result[A] = Either[String, A]
 

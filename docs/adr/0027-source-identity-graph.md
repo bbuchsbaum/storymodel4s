@@ -60,6 +60,20 @@ facts, the annotation TSV, the speech-recognition words and segments, the role-l
 for proposals, the language-model recordings. The producer refuses any other input path. A court
 (§7) shows that a recall path is refused and that deleting the guard fails a named test.
 
+*Amendment (S3c-2, 2026-10-24), within the approved scope:*
+- **The recognizer input.** The words and segments are read from the recognizer's `transcript.json`,
+  under the input role `asr-transcript`. It holds the same words and segments as `words.tsv` and
+  `segments.tsv`, and it is the only file that records the source SHA-256 and clock that the
+  producer verifies.
+- **The reviewed vocabulary.** The role-label list also names the in-scope characters, so "a listed
+  character" in §2 means an entry of that reviewed list.
+- **Third-person pronouns** (§2) are the singular personal ones: he and she, with their object,
+  possessive, reflexive and contracted forms. `it` and `they` are left out because they are not
+  person-singular.
+- **Time and streams.** Edition time is in 1/44100 s ticks. That represents both stream ends and
+  the recognizer's 10 ms timings exactly. Each stream's identity is the SHA-256 of its packets
+  (ffmpeg `streamhash`), so the picture and audio streams are distinct.
+
 ### 2. Mentions
 
 - **Visual.** One mention per person listed in `Name - All` for each row in scope, anchored in media
@@ -67,8 +81,8 @@ for proposals, the language-model recordings. The producer refuses any other inp
   - A character name is attached as a `ProperName`, exactly as written (owner decision N).
   - An entry on the role-label list (a profession or description such as a uniformed officer, or a
     counted group of them) yields unnamed mentions, as many as its count. The list is a reviewed
-    input of the run; in scope it covers only row 502's four entries. Role labels are not names, so
-    two officers in different rows are never joined by name.
+    input of the run; in scope it covers only row 502's three entries, which list four people. Role
+    labels are not names, so two officers in different rows are never joined by name.
   - An entry that is neither a listed character nor a listed role label withholds the row's presence
     claim (§3), with a receipt.
 - **Dialogue.** One mention per referring expression in the recognized words, anchored in media time

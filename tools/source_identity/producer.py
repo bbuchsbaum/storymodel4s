@@ -168,7 +168,9 @@ def ffmpeg_probe(media: Path) -> dict:
         num, den = (int(x) for x in s[0]["time_base"].split("/"))
         if int(s[0].get("start_pts", 0)) != 0:
             raise Refusal(f"{codec_type} stream does not start at 0")
-        end = Decimal(int(s[0]["duration_ts"])) * num / den
+        whole, rest = divmod(int(s[0]["duration_ts"]) * num * TICKS, den)
+        if rest:
+            raise Refusal(f"{codec_type} stream end is not a whole number of 1/{TICKS} s ticks")
         hashed = subprocess.run(
             [
                 "ffmpeg",
@@ -193,7 +195,7 @@ def ffmpeg_probe(media: Path) -> dict:
         m = re.fullmatch(r"\d+,\w,SHA256=([0-9a-f]{64})", hashed)
         if not m:
             raise Refusal(f"unexpected streamhash output for {codec_type}")
-        facts[kind] = {"end": ticks(end), "sha256": m.group(1)}
+        facts[kind] = {"end": whole, "sha256": m.group(1)}
     return facts
 
 
