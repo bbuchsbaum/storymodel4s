@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 import producer as p
 
@@ -374,6 +375,30 @@ class ProducerTests(unittest.TestCase):
         again, uni2 = self.produce()
         doc["inputs"] = again["inputs"] = None
         self.assertEqual((doc, uni), (again, uni2))
+
+    def probe_with(self, audio_duration_ts, audio_time_base="1/44100"):
+        streams = {"streams": [
+            {"codec_type": "video", "time_base": "1/2500", "duration_ts": 30000, "start_pts": 0},
+            {"codec_type": "audio", "time_base": audio_time_base,
+             "duration_ts": audio_duration_ts, "start_pts": 0},
+        ]}
+
+        def run(cmd, **_):
+            out = json.dumps(streams) if cmd[0] == "ffprobe" else "0,v,SHA256=" + "d" * 64
+            return mock.Mock(stdout=out)
+
+        with mock.patch.object(p.subprocess, "run", side_effect=run):
+            return p.ffmpeg_probe(Path("media"))
+
+    def test_a_stream_end_is_converted_to_ticks_exactly(self):
+        # 529200 samples at 44100 Hz and 30000 ticks at 1/2500 s are both 12 s.
+        facts = self.probe_with(529200)
+        self.assertEqual((facts["picture"]["end"], facts["audio"]["end"]), (529200, 529200))
+
+    def test_a_stream_end_off_the_edition_tick_grid_is_refused(self):
+        with self.assertRaises(p.Refusal) as caught:
+            self.probe_with(1, audio_time_base="1/48000")
+        self.assertIn("not a whole number", str(caught.exception))
 
     def test_write_refuses_an_existing_output(self):
         doc, uni = self.produce()
