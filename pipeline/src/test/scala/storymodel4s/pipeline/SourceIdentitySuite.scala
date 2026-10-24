@@ -204,6 +204,8 @@ class SourceIdentitySuite extends FunSuite:
     val p = outcomeOf(g, "proposals", "id", "p7")
     assertEquals(status(p), "refused")
     assert(reason(p).contains("UnknownMention"), reason(p))
+    // Off the picture it is still possibly a person in the shot, so it withholds that shot's claim.
+    assertEquals(rel(g, "d-she", "v-ana-1"), "Unknown")
   }
 
   test("a refused visual mention withholds the presence it overlaps, so deixis is not licensed") {
@@ -235,6 +237,33 @@ class SourceIdentitySuite extends FunSuite:
       status(g.hcursor.downField("presence").downN(i).downField("outcome").focus.get)
     )
     assertEquals(statuses, Vector("refused", "refused"))
+  }
+
+  test("a refused visual mention with an empty span withholds every presence claim") {
+    val empty = mention("v-empty", "visual", "picture", 1000, 1000, Some("Ana"))
+    val g = graph(inputs(ms = mentions :+ empty))
+    assertEquals(status(outcomeOf(g, "mentions", "id", "v-empty")), "refused")
+    assertEquals(rel(g, "d-she", "v-ana-1"), "Unknown")
+  }
+
+  test("a refused mention withholds a claim through any of its intervals") {
+    val twoSpans = Json.obj(
+      "id" -> s("v-two"),
+      "origin" -> s("visual"),
+      "stream" -> s("picture"),
+      "intervals" -> Json.arr(span(7000, 8000), span(1500, 1600)),
+      "name" -> s(" ")
+    )
+    val g = graph(inputs(ms = mentions :+ twoSpans))
+    assertEquals(rel(g, "d-she", "v-ana-1"), "Unknown")
+  }
+
+  test("control: a refused mention that only touches a claim withholds nothing") {
+    // Intervals are half-open, so [2000, 3000) shares no instant with [1000, 2000).
+    val touching = mention("v-touch", "visual", "picture", 2000, 3000, Some(" "))
+    val g = graph(inputs(ms = mentions :+ touching))
+    assertEquals(status(outcomeOf(g, "mentions", "id", "v-touch")), "refused")
+    assertEquals(rel(g, "d-she", "v-ana-1"), "Same")
   }
 
   test("control: a refused dialogue mention withholds no presence") {

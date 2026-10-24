@@ -160,11 +160,11 @@ object SourceIdentity:
     yield claim
 
   /** Raw `[start, endExclusive]` pairs, read leniently so that a refused record can still withhold;
-    * `None` when any interval is unreadable.
+    * `None` when any interval is unreadable or empty, since an empty span overlaps nothing.
     */
   private def rawSpans(j: Json): Option[Vector[(Long, Long)]] =
     j.hcursor.downField("intervals").as[Vector[Vector[Long]]].toOption.flatMap { v =>
-      val pairs = v.collect { case Vector(a, z) => (a, z) }
+      val pairs = v.collect { case Vector(a, z) if 0 <= a && a < z => (a, z) }
       Option.when(pairs.nonEmpty && pairs.size == v.size)(pairs)
     }
 
