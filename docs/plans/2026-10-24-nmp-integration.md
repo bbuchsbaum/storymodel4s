@@ -40,7 +40,8 @@ Each field is one of: (1) directly representable; (2) a checked composition of e
 Every class-3 gap carries a witness sketch, for example: a joint antecedent must not become two
 independently sufficient causes; `intersects` must not become `Overlaps`; a denial must not become
 an asserted fact. The analysis also states which admission path owns each record family: the
-`acquire` claim resolver or the `document` identity resolver of ADR 0027.
+`acquire` claim resolver (`Resolver`) or the `document` identity resolver
+(`ReferentIdentity.resolve`, ADR 0024, used by ADR 0027).
 
 ### Phase 2: ADR 0028 decisions
 
@@ -61,7 +62,8 @@ an asserted fact. The analysis also states which admission path owns each record
 A producer is identified by its transport, model as reported, skill hash and parameters, and every
 receipt carries all four. Three transports are admitted:
 
-- DeepSeek through the API (the pilot default, under the existing USD 5 cap).
+- DeepSeek through the API (the pilot default). The USD 5 cap of ADR 0027 covers the S3c round
+  only; the phase 5 pilot needs its own cap, an open owner decision.
 - Claude Code headless (`claude -p`) on the owner's subscription.
 - Codex (`codex exec`) on the owner's subscription.
 
@@ -73,13 +75,24 @@ Subscription transports need these controls, each verified by a canary run befor
 - **Isolation.** Run in an empty working directory holding only the task packet. No tools, no MCP
   servers, no web access, no session persistence. Global instruction files and memory are not
   read. `claude --bare` cannot be used, because it disables subscription sign-in, so the canary
-  must show that no user-level instructions reached the model. A recall-blind run that could read
-  the repository is not recall-blind.
+  must show that no user-level instructions reached the model. Without `--bare`, Claude Code has
+  no flag that turns off instruction-file discovery or auto-memory, and Codex has no flag that
+  turns off its shell tool (its `read-only` sandbox limits writes, not reads). Each transport
+  therefore runs under a separate `HOME` (and `CODEX_HOME`) or in a container holding only the
+  packet. Candidate flags: Claude `--tools ""`, `--strict-mcp-config`,
+  `--no-session-persistence`, `--disable-slash-commands`; Codex `--ephemeral`,
+  `--ignore-user-config`, `--ignore-rules`, `--skip-git-repo-check`, `-C`, `--output-schema`.
+- **Canary.** It must show both that no user-level instructions or memory reached the model and
+  that the model cannot read the repository or the home directory. A failed canary refuses that
+  transport. A recall-blind run that could read the repository is not recall-blind.
 - **Pinning.** Subscription models cannot be pinned exactly and have no seed or temperature
-  control. The recording is the artifact; re-running is a new sample, not a replay.
+  control. The recording is the artifact; re-running is a new sample, not a replay. DeepSeek runs
+  record a dated model pin and subscription runs record only the model as reported, so results
+  across producers do not compare like for like.
 - **Limits.** Runs count against the plan's usage windows. Batch sizes are fixed before a run.
-- **Custody.** Sending annotations and transcripts to Anthropic or OpenAI is the same disclosure
-  class as DeepSeek. Participant recall goes to no external producer until the owner records an
+- **Custody.** Whether sending annotations and transcripts to Anthropic or OpenAI is the same
+  disclosure class as DeepSeek is an open owner decision; no subscription run happens before it is
+  recorded. Participant recall goes to no external producer until the owner records an
   REB basis.
 
 Two model families also give a control for correlated errors: the pilot reports where they
