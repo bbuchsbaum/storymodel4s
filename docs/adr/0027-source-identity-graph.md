@@ -1,8 +1,9 @@
 # ADR 0027 — A recall-blind source identity graph for the Sherlock body scenes
 
-**Status:** Proposed 2026-10-24 (AGENTS.md SD5). Three owner decisions are recorded under "Owner
-decisions". Decisions N (names), A (the acceptance reading) and T (names in this text) are open. The cold review of
-`1e25a878f` found three blocking defects; this revision corrects them and the eight follow-ups.
+**Status:** Accepted 2026-10-24 (AGENTS.md SD5). The owner chose the recommended answer to each
+question under "Owner decisions". The cold review of `1e25a878f` found three blocking defects; they
+and its eight follow-ups are corrected here. The re-review of `ecfc10f6a` approved with follow-ups,
+which are folded in.
 
 **Decider:** the owner
 
@@ -24,16 +25,18 @@ What exists for Sherlock part 2 (media part b of the owner-declared presentation
 
 - **Annotation.** The Chen et al. 2017 table (`Sherlock_Segments_1000_NN_2017.tsv`, identity in
   `annotation-lineage.json`). For each segment, `Name - All` lists who appears and `Name - Speaking`
-  names the speaker. Run-2 seconds map to part-b playback seconds by `annotationToPlaybackCrosswalk`,
-  which is the identity. Segments are whole seconds, one to ten seconds long.
-- **Speech recognition.** `data/transcription/unified-v1/full/whisper_mlx/sherlock/Sherlock_part2_imovie/`
-  gives word timings, per-word probabilities and decoder segments. Its source SHA-256 equals part b's
-  byte identity (`source-manifest.json`), and its clock is `source_media` seconds from 0 over
-  1546.913 s, the duration of the stream `media-part-b-audio-0`, which starts at 0.0 like the picture
-  stream. Decoder segments 10 (78.2-119.71 s) and 11 (119.71-204.14 s) are 41 and 84 s long, so the
-  word timings inside them are not credible.
-- **Frame observations.** S3b (`bd-01M5MT2M0X9YZCD654BGAX087W`) measured sampled frame pairs as weak:
-  at most `AppearanceMatch` contributory, and no "different" edge from posture or orientation.
+  names the speaker. Run-2 seconds map to part-b playback seconds by
+  `annotationToPlaybackCrosswalk`, which is the identity. Segments are whole seconds, one to ten
+  seconds long.
+- **Speech recognition.**
+  `data/transcription/unified-v1/full/whisper_mlx/sherlock/Sherlock_part2_imovie/` gives word
+  timings, per-word probabilities and decoder segments. Its source SHA-256 equals part b's byte
+  identity (`source-manifest.json`), and its clock is `source_media` seconds from 0 over 1546.913 s,
+  the duration of the stream `media-part-b-audio-0`, which starts at 0.0 like the picture stream.
+  Decoder segments 10 (78.2-119.71 s) and 11 (119.71-204.14 s) are 41 and 84 s long, so the word
+  timings inside them are not credible.
+- **Frame observations.** S3b (`bd-01M5MT2M0X9YZCD654BGAX087W`) measured sampled frame pairs as
+  weak: at most `AppearanceMatch` contributory, and no "different" edge from posture or orientation.
 - **No person tracker, face detector or track coverage**, so `ContinuousTrack` and
   `SimultaneousTracks` have no input.
 
@@ -63,9 +66,9 @@ for proposals, the language-model recordings. The producer refuses any other inp
   time on the stream `media-part-b-video-0` over the row's interval.
   - A character name is attached as a `ProperName`, exactly as written (owner decision N).
   - An entry on the role-label list (a profession or description such as a uniformed officer, or a
-    counted group of them) yields unnamed mentions, as many as its count. The list is a reviewed input
-    of the run; in scope it covers only row 502's four entries. Role labels are not names, so two
-    officers in different rows are never joined by name.
+    counted group of them) yields unnamed mentions, as many as its count. The list is a reviewed
+    input of the run; in scope it covers only row 502's four entries. Role labels are not names, so
+    two officers in different rows are never joined by name.
   - An entry that is neither a listed character nor a listed role label withholds the row's presence
     claim (§3), with a receipt.
 - **Dialogue.** One mention per referring expression in the recognized words, anchored in media time
@@ -82,16 +85,16 @@ for proposals, the language-model recordings. The producer refuses any other inp
     Segments 10 and 11 are refused.
   - A pronoun or noun whose word probability is below 0.5 yields no mention.
   - A name mention is admitted on exact equality with the closed name vocabulary, whatever its word
-    probabilities. It errs if a misrecognition lands exactly on another in-scope character's
-    name, or if the recognizer hallucinates a name inside an accepted segment. *Disclosed:* this rule was written after seeing that word 102 has
-    probability 0.37. Under a per-word guard the body's name link would be refused (owner decision N
-    covers both readings).
+    probabilities. It errs if a misrecognition lands exactly on another in-scope character's name,
+    or if the recognizer hallucinates a name inside an accepted segment. *Disclosed:* this rule was
+    written after seeing that word 102 has probability 0.37. Under a per-word guard the body's name
+    link would be refused (owner decision N covers both readings).
 
 ### 3. Presence
 
 Each row in scope yields one `PresenceClaim` over its interval, on the picture stream, with basis
-`HumanReviewed`. Its `SourceDerivationReceipt` cites the annotation's SHA-256, the row number and the
-column. This is owner decision 1.
+`HumanReviewed`. Its `SourceDerivationReceipt` cites the annotation's SHA-256, the row number and
+the column. This is owner decision 1.
 
 The claim certifies who appears anywhere in the row, not who is on screen at each instant. Deixis
 treats a row listing one person as having nobody else in it. That is an **accepted risk, not a
@@ -117,8 +120,8 @@ Every link reaches the resolver as a proposal, and every proposal and its outcom
   "only one person present" is necessary and not sufficient. For each admitted pronoun or noun, the
   model reads the recognized words of its decoder segment and the `Name - All` and `Name - Speaking`
   entries of the overlapping and adjacent rows, but not the scene descriptions. It returns a deictic
-  proposal to one visual mention, a set of compatible candidates, or "absent or unclear", each with a
-  reason.
+  proposal to one visual mention, a set of compatible candidates, or "absent or unclear", each with
+  a reason.
 - **Producer guards on deixis, applied before the resolver,** each refusal with a receipt:
   - Only a third-person pronoun may be deictic. A description noun (woman, body, victim, and the
     rest) yields hints only.
@@ -201,14 +204,14 @@ character names in Git documentation, which owner decision T settles.
 
 Derived from the rules as written:
 
-- **Under decision N (yes):** the visual mentions of Jennifer Wilson, in every row in scope that lists her, are `Same`, by
-  `NamedReference`. The spoken name, words 102-103 in row 502, is `Same` as them by name. That link
-  needs no presence, so row 502's crowd does not matter. Under N (no), every one of these is
-  `Unknown`.
+- **Under decision N (yes):** the visual mentions of Jennifer Wilson, in every row in scope that
+  lists her, are `Same`, by `NamedReference`. The spoken name, words 102-103 in row 502, is `Same`
+  as them by name. That link needs no presence, so row 502's crowd does not matter. Under N (no),
+  every one of these is `Unknown`.
 - **The description at row 575** (words 274-278) is a noun, so it yields hints only, never deixis.
   The speaker guard would also refuse a deictic proposal to John, the only person listed. Its
-  relation to Jennifer Wilson is `Unknown`, with a `CompatibleDescription` hint if the model proposes
-  her.
+  relation to Jennifer Wilson is `Unknown`, with a `CompatibleDescription` hint if the model
+  proposes her.
 - **A pronoun in a one-person row about someone absent,** such as word 153 in row 552, where the
   only person listed is the speaker: the speaker guard refuses a deictic proposal, and the relation
   stays `Unknown`.
@@ -222,26 +225,27 @@ Derived from the rules as written:
    recording and replay.
 3. **Tracker (decided 2026-10-24).** Deferred, not dropped: `bd-01M5PYJ7237CQAGMY0GC7ESZM1`.
 
-**N. Names (open).** May the `Name - All` character names be attached to visual mentions, and may a
-spoken name be admitted on exact equality with that vocabulary despite low word probability (§2)?
+**N. Names (decided 2026-10-24: yes).** May the `Name - All` character names be attached to visual
+mentions, and may a spoken name be admitted on exact equality with that vocabulary despite low word
+probability (§2)?
 - *Recommended: yes.* The annotation is human-reviewed and recall-blind, and it is the only
-  cross-shot evidence until a tracker exists. Exact equality with a closed list of in-scope full names
-  is a stronger lexical check than a word probability.
+  cross-shot evidence until a tracker exists. Exact equality with a closed list of in-scope full
+  names is a stronger lexical check than a word probability.
 - *Cost:* the graph's visual identities become the annotation's, so the annotation can no longer be
   independent gold for them (§7). The low-probability admission is a rule chosen after seeing the
   case.
 - *If no:* visual mentions carry no names, identity across shots is `Unknown`, and the body link is
   `Unknown`.
 
-**A. The acceptance reading (open).** The bead asks for the body link to be "either licensed with a
-cited basis or Open with candidates". In the resolver's terms, `Open` is a class reopened by a
-licensed distinctness, which this graph cannot produce.
+**A. The acceptance reading (decided 2026-10-24: `Unknown` with hints).** The bead asks for the body
+link to be "either licensed with a cited basis or Open with candidates". In the resolver's terms,
+`Open` is a class reopened by a licensed distinctness, which this graph cannot produce.
 - *Recommended:* read it as "unlicensed, with its candidates recorded", which is `Unknown` with
   hints, and amend the bead.
 - *Alternative:* keep `Open` literal, which makes the bead wait for the tracker.
 
-**T. Character names in this ADR (open).** May the annotation's character names appear in this
-document, as identifiers?
+**T. Character names in this ADR (decided 2026-10-24: yes).** May the annotation's character names
+appear in this document, as identifiers?
 - *Recommended: yes.* They are identifiers, not excerpts, and the ADR cannot state the body case
   without them.
 - *If no:* the table uses row numbers and opaque person labels.
@@ -257,8 +261,8 @@ document, as identifiers?
 ### Known limits
 
 - Presence is row-granular, and segment boundaries are whole seconds.
-- Names are compared after the core's case and whitespace folding only. A title plus surname does not
-  join a first name, which fails safe (ADR 0024 amendment 4). An alias table is not in S3c.
+- Names are compared after the core's case and whitespace folding only. A title plus surname does
+  not join a first name, which fails safe (ADR 0024 amendment 4). An alias table is not in S3c.
 - Mentions in refused decoder segments, including segments 10 and 11, are missing from the graph.
 - Deixis rests on the model's proposal that a pronoun refers to someone present. The resolver checks
   only presence, and the producer only the speaker and the noun class. An off-screen referent in a
@@ -281,8 +285,9 @@ document, as identifiers?
   to him.
 - **Using frame observations or captions as identity evidence.** S3b measured them as weak, and
   captions from the same frames are not independent.
-- **Feeding the model the annotation's scene descriptions.** They often state the answer, which would
-  make the proposals a restatement of the annotation, and they would contaminate the label set.
+- **Feeding the model the annotation's scene descriptions.** They often state the answer, which
+  would make the proposals a restatement of the annotation, and they would contaminate the label
+  set.
 - **Accepting long decoder segments.** An 84-second segment's word timings would put an utterance in
   the wrong row, and presence would then certify the wrong people.
 - **A per-word probability guard on names.** It refuses the body's name link on one low-probability
