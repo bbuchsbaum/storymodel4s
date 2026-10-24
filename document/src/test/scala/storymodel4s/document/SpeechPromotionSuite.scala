@@ -4,6 +4,7 @@ import cats.data.NonEmptyVector
 import munit.FunSuite
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.story.*
 
 /** Laws of ADR 0026: a speech assertion is promoted only when every condition holds. The fixture is
@@ -77,7 +78,7 @@ class SpeechPromotionSuite extends FunSuite:
       context: ContextId,
       at: TypedSupport,
       polarity: Polarity = Polarity.Positive,
-      modality: Modality = Modality.Reported,
+      modality: Option[Modality] = None,
       lemma: String = "dead"
   ): SituationNode = SituationNode.State(
     StateNode(
@@ -86,7 +87,8 @@ class SpeechPromotionSuite extends FunSuite:
       key,
       context,
       polarity,
-      modality,
+      // Reported content may not sit in the root without a root claim, so root fixtures assert.
+      modality.getOrElse(if context == world then Modality.Asserted else Modality.Reported),
       at,
       NonEmptyVector.one(MentionId.unsafe[SituationK](s"m:$key")),
       meta(key)
@@ -96,31 +98,79 @@ class SpeechPromotionSuite extends FunSuite:
   private def theme(s: SituationNode) =
     ParticipantEdge(s.id, ParticipantRole.Theme, woman, meta(s"p:${s.id.value}"))
 
-  /** A validated model holding the twin plus `extra` situations, each with the woman as theme. */
+  private val root = SegmentId.unsafe("seg:story")
+  private val segment = SegmentNode(
+    root,
+    SegmentKind.Story,
+    1,
+    meta("seg:story"),
+    SegmentSummary.Stated(Resolved("story", meta("seg:summary"), Vector.empty)),
+    spoken(0L, 1000L)
+  )
+
+  /** A validated model holding the twin plus `extra` situations, each with the woman as theme;
+    * `edit` adjusts the graph before the hierarchy and trajectory are laid over it.
+    */
   private def model(
       extra: Vector[SituationNode] = Vector.empty,
       hypotheses: Vector[HypothesisClaim] = Vector.empty,
       base: SituationNode = twin,
-      person: EntityNode = entity
+      person: EntityNode = entity,
+      edit: NarrativeGraph => NarrativeGraph = identity
   ): StoryModel[ModelStatus.Validated] =
     val situations = base +: extra
-    val graph = NarrativeGraph(
-      Map(woman -> person),
-      situations.map(s => s.id -> s).toMap,
-      Map.empty,
-      contexts,
-      RelationLayers.empty.copy(participants = situations.map(theme))
+    val graph = edit(
+      NarrativeGraph(
+        Map(woman -> person),
+        situations.map(s => s.id -> s).toMap,
+        Map(root -> segment),
+        contexts,
+        RelationLayers.empty.copy(participants = situations.map(theme))
+      )
     )
-    val draft = right(
+    val hierarchy = NarrativeHierarchy(
+      graph.situations.values.toVector
+        .sortBy(_.id.value)
+        .map(s =>
+          ContainmentEdge(
+            NarrativeMember.Situation(s.id),
+            root,
+            HierarchyKind.PrimarySegmentation,
+            1.0,
+            meta(s"containment:${s.id.value}")
+          )
+        ),
+      Vector.empty
+    )
+    def draft(trajectory: DiscourseTrajectory) = right(
       StoryModel.draft(
         right(AnchoredNarrativeAtlas.of(film, Vector.empty)),
         graph,
-        NarrativeHierarchy.empty,
-        DiscourseTrajectory.empty,
+        hierarchy,
+        trajectory,
         hypotheses = hypotheses
       )
     )
-    val outcome = StoryValidator.validate(draft)
+    // One step per adjacent discourse pair, each claiming nothing about world time.
+    val order = draft(DiscourseTrajectory.empty).discourseOrder
+    val steps = order.zip(order.drop(1)).map { (a, b) =>
+      FlowStep(
+        a,
+        b,
+        Map.empty,
+        Estimate.Missing(MissingReason.InputUnresolved),
+        None,
+        graph.situations(a).context != graph.situations(b).context,
+        Resolved(
+          WorldTimeTransition.Unresolved(Vector.empty),
+          meta(s"flow:${a.value}:${b.value}"),
+          Vector.empty
+        ),
+        None,
+        Vector.empty
+      )
+    }
+    val outcome = StoryValidator.validate(draft(DiscourseTrajectory(steps)))
     outcome.validated.getOrElse(fail(outcome.report.violations.mkString("\n")))
 
   private def rid(raw: String) = ReferentMentionId.unsafe(raw)
@@ -149,9 +199,20 @@ class SpeechPromotionSuite extends FunSuite:
     case Left(e)  => assert(e.message.contains(fragment), e.message)
     case Right(v) => fail(s"expected a refusal containing '$fragment', got $v")
   private def contest(basis: ContestationBasis, target: SituationId = twin.id): Contestation =
-    right(Contestation.of(target, basis, meta(s"contest:$basis", anchors = Some(evidence(
-      EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, ivs(900L, 950L))
-    )))))
+    right(
+      Contestation.of(
+        target,
+        basis,
+        meta(
+          s"contest:$basis",
+          anchors = Some(
+            evidence(
+              EvidenceAnchor.MediaTime(film.id, stream, film.primaryAxis.id, ivs(900L, 950L))
+            )
+          )
+        )
+      )
+    )
 
   test("control: an uncontested assertion by an unattributed speaker is promoted"):
     val p = right(promote())
@@ -189,7 +250,7 @@ class SpeechPromotionSuite extends FunSuite:
     )
 
   test("a possible assertion is refused"):
-    val maybe = state("sit:dead", speech, spoken(350L, 380L), modality = Modality.Possible)
+    val maybe = state("sit:dead", speech, spoken(350L, 380L), modality = Some(Modality.Possible))
     refused(promote(model(base = maybe)), "not an asserted claim")
 
   test("an assertion of unknown polarity is refused"):
@@ -206,40 +267,39 @@ class SpeechPromotionSuite extends FunSuite:
     )
 
   test("an assertion with no participant is refused"):
-    val bare = SituationNode.State(
-      twin match
-        case SituationNode.State(n) => n.copy(id = SituationId.unsafe("sit:bare"))
-        case _                      => fail("twin is a state")
-    )
-    val m = model(Vector(bare))
-    val unbound = StoryModel.draft(
-      m.atlas,
-      m.graph.copy(relations =
-        m.graph.relations.copy(participants =
-          m.graph.relations.participants.filterNot(_.situation == bare.id)
+    val bare = state("sit:bare", speech, spoken(350L, 380L))
+    val v = model(
+      Vector(bare),
+      edit = g =>
+        g.copy(relations =
+          g.relations.copy(participants =
+            g.relations.participants.filterNot(_.situation == bare.id)
+          )
         )
-      ),
-      NarrativeHierarchy.empty,
-      DiscourseTrajectory.empty
     )
-    val v = StoryValidator.validate(right(unbound)).validated.getOrElse(fail("fixture refused"))
     refused(promote(v, bare.id, Map.empty), "no participant")
 
   test("one mention bound to two participants is refused"):
     val man = EntityId.unsafe("ent:man")
     refused(promote(bindings = bound + (man -> she.id)), "is bound but is not a participant")
-    val two = model()
-    val g = two.graph.copy(
-      entities = two.graph.entities + (man -> entity.copy(id = man)),
-      relations = two.graph.relations.copy(participants =
-        two.graph.relations.participants :+
-          ParticipantEdge(twin.id, ParticipantRole.Agent, man, meta("p:man"))
-      )
+    val v = model(edit =
+      g =>
+        g.copy(
+          entities = g.entities + (man -> EntityNode(
+            man,
+            Resolved("the man", meta("ent:man:label"), Vector.empty),
+            EntityType.Person,
+            NonEmptyVector.one(MentionId.unsafe[EntityK]("m:man")),
+            Vector.empty,
+            spoken(300L, 800L),
+            meta("ent:man")
+          )),
+          relations = g.relations.copy(participants =
+            g.relations.participants :+
+              ParticipantEdge(twin.id, ParticipantRole.Agent, man, meta("p:man"))
+          )
+        )
     )
-    val v = StoryValidator
-      .validate(right(StoryModel.draft(two.atlas, g, NarrativeHierarchy.empty, DiscourseTrajectory.empty)))
-      .validated
-      .getOrElse(fail("fixture refused"))
     refused(promote(v, bindings = bound + (man -> she.id)), "bound to two participants")
 
   test("a mention missing from the referent context is refused"):
@@ -305,11 +365,10 @@ class SpeechPromotionSuite extends FunSuite:
     assert(promote(model(Vector(agree, other))).isRight)
 
   test("a hypothesis on the same content keeps it open"):
-    val hyp = state("sit:hyp", world, spoken(500L, 520L), modality = Modality.Asserted)
-      match
-        case SituationNode.State(n) =>
-          SituationNode.State(n.copy(meta = meta("sit:hyp", EpistemicStatus.Hypothesized)))
-        case other => other
+    val hyp = state("sit:hyp", world, spoken(500L, 520L), modality = Some(Modality.Asserted)) match
+      case SituationNode.State(n) =>
+        SituationNode.State(n.copy(meta = meta("sit:hyp", EpistemicStatus.Hypothesized)))
+      case other => other
     val reading = Resolved("dead", meta("hyp:dead"), Vector(("alive", Credence.unmeasured)))
     val m = model(Vector(hyp), Vector(HypothesisClaim(hyp.id, reading)))
     refused(promote(m), "hypothesis on sit:hyp keeps it open")
@@ -320,12 +379,15 @@ class SpeechPromotionSuite extends FunSuite:
   test("control: a contestation of another situation does not contest it"):
     val other = state("sit:other", rival, spoken(610L, 640L), lemma = "asleep")
     val m = model(Vector(other))
-    assert(promote(m, contestations = Vector(contest(ContestationBasis.Retraction, other.id))).isRight)
+    assert(
+      promote(m, contestations = Vector(contest(ContestationBasis.Retraction, other.id))).isRight
+    )
 
   test("a contestation of a situation outside speech is refused"):
     val root = state("sit:root", world, spoken(100L, 120L), lemma = "fall")
     refused(
-      ContestationSet.of(model(Vector(root)), Vector(contest(ContestationBasis.Correction, root.id))),
+      ContestationSet
+        .of(model(Vector(root)), Vector(contest(ContestationBasis.Correction, root.id))),
       "which is not speech"
     )
 
@@ -346,7 +408,9 @@ class SpeechPromotionSuite extends FunSuite:
 
   test("a contestation of a situation absent from the model is refused"):
     refused(
-      promote(contestations = Vector(contest(ContestationBasis.Correction, SituationId.unsafe("x")))),
+      promote(contestations =
+        Vector(contest(ContestationBasis.Correction, SituationId.unsafe("x")))
+      ),
       "absent from the model"
     )
 

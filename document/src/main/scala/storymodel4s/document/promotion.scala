@@ -19,7 +19,8 @@ enum ContestationBasis:
   case Correction
 
 /** A recall-blind record that the narrative contests one speech-scoped situation. Why a checked
-  * type: a contestation blocks promotion, so it must cite evidence like any accepted claim (rule 3).
+  * type: a contestation blocks promotion, so it must cite evidence like any accepted claim (rule
+  * 3).
   */
 final class Contestation private (
     val target: SituationId,
@@ -44,9 +45,9 @@ object Contestation:
     else Left(PromotionError.UncitedContestation(target))
 
 /** The recall-blind contestations of one model (ADR 0026 §3). Why a checked set: a record is valid
-  * only against a model, where its target must be a speech-scoped situation, and the set records the
-  * model it was checked against, so a set built for one model cannot vouch for another. An empty set
-  * states that its producer found none; it is bound to its model all the same.
+  * only against a model, where its target must be a speech-scoped situation, and the set records
+  * the model it was checked against, so a set built for one model cannot vouch for another. An
+  * empty set states that its producer found none; it is bound to its model all the same.
   */
 final class ContestationSet private (
     val model: Checksum,
@@ -100,7 +101,9 @@ object ContestationSet:
       .sortBy(ContentAddress.digest(_).hex)
     val header =
       Vector("contestations/v1", model.hex, entries.length.toString).map(Checksum.ofText(_).hex)
-    ContentAddress.digest(header ++ entries.flatMap(e => Checksum.ofText(e.length.toString).hex +: e))
+    ContentAddress.digest(
+      header ++ entries.flatMap(e => Checksum.ofText(e.length.toString).hex +: e)
+    )
 
 /** Why a speech assertion was not promoted. Each condition of ADR 0026 §2 has its own case, so a
   * refusal names the condition that failed.
@@ -123,25 +126,26 @@ enum PromotionError:
   case Contested(id: SituationId, reason: String)
 
   def message: String = this match
-    case UnknownSituation(id) => s"no situation ${id.value} in the model"
-    case NotSpeech(id)        => s"${id.value} is not in a speech context"
-    case Embedded(id, e)      => s"the speech of ${id.value} is embedded in $e"
+    case UnknownSituation(id)  => s"no situation ${id.value} in the model"
+    case NotSpeech(id)         => s"${id.value} is not in a speech context"
+    case Embedded(id, e)       => s"the speech of ${id.value} is embedded in $e"
     case NotAsserted(id, m, p) =>
       s"${id.value} is not an asserted claim (modality $m, polarity $p)"
     case NoParticipants(id) => s"${id.value} has no participant to bind a referent to"
     case Unbound(e)         => s"participant ${e.value} is not bound to a referent mention"
     case SharedMention(m)   => s"mention ${m.value} is bound to two participants"
-    case UnknownBinding(e) => s"${e.value} is bound but is not a participant"
+    case UnknownBinding(e)  => s"${e.value} is bound but is not a participant"
     case BindingOutsideUtterance(e, m, why) =>
       s"mention ${m.value} cannot denote participant ${e.value}: $why"
     case OpenReferent(m)              => s"the identity of mention ${m.value} is open"
     case UnknownContestationTarget(t) => s"a contestation targets ${t.value}, absent from the model"
-    case ContestationNotSpeech(t) => s"a contestation targets ${t.value}, which is not speech"
-    case ForeignContestations     => "the contestation set was checked against another model"
-    case UncitedContestation(t)   => s"the contestation of ${t.value} cites no evidence"
+    case ContestationNotSpeech(t)     => s"a contestation targets ${t.value}, which is not speech"
+    case ForeignContestations         => "the contestation set was checked against another model"
+    case UncitedContestation(t)       => s"the contestation of ${t.value} cites no evidence"
     case Contested(id, why)           => s"${id.value} is contested: $why"
 
-/** A speech assertion that the rule `uncontested-assertion/v1` adds to the narrated world (ADR 0026).
+/** A speech assertion that the rule `uncontested-assertion/v1` adds to the narrated world (ADR
+  * 0026).
   *
   * Why an overlay and not a situation in the model: a promoted claim stays out of `StoryModel`, its
   * graph and its claim ledger, so no graph consumer can read it as depicted or surface-explicit.
@@ -182,8 +186,9 @@ object SpeechPromotion:
   /** Promotes `twin` when its speech is unembedded, its content is asserted, every participant is
     * bound to a settled dialogue mention of the utterance, and nothing contests it (ADR 0026 §2).
     *
-    * `bindings` names, per participant entity, the referent mention that denotes it. `contestations`
-    * is the recall-blind set built for this model; it enters the promotion's identity.
+    * `bindings` names, per participant entity, the referent mention that denotes it.
+    * `contestations` is the recall-blind set built for this model; it enters the promotion's
+    * identity.
     */
   def of(
       model: StoryModel[ModelStatus.Validated],
@@ -273,9 +278,8 @@ object SpeechPromotion:
       bindings: Map[EntityId, ReferentMentionId],
       resolution: ReferentResolution
   ): Either[PromotionError, Vector[(ParticipantRole, EntityId, ReferentMentionId)]] =
-    val roles = g.participantsOf.getOrElse(s.id, Vector.empty).distinct.sortBy((r, e) =>
-      (e, r.toString)
-    )
+    val roles =
+      g.participantsOf.getOrElse(s.id, Vector.empty).distinct.sortBy((r, e) => (e, r.toString))
     type Bound = Vector[(ParticipantRole, EntityId, ReferentMentionId)]
     val entities = roles.map(_._2).toSet
     // One mention denotes one referent, so two participants cannot share it.
@@ -366,9 +370,9 @@ object SpeechPromotion:
         Left(PromotionError.Contested(s.id, s"${c.basis} recorded against it"))
       case _ => Right(())
 
-  /** Digest of everything in a model that the rule reads: contexts, situations, participants, entity
-    * supports and hypotheses, with the source identity. Why not `sourceChecksum`: it covers the atlas
-    * alone. Fields are hashed before joining and lists are length-prefixed (rule 10).
+  /** Digest of everything in a model that the rule reads: contexts, situations, participants,
+    * entity supports and hypotheses, with the source identity. Why not `sourceChecksum`: it covers
+    * the atlas alone. Fields are hashed before joining and lists are length-prefixed (rule 10).
     */
   private[document] def modelDigest(m: StoryModel[?]): Checksum =
     val g = m.graph
@@ -387,9 +391,9 @@ object SpeechPromotion:
         s.polarity.toString,
         s.modality.toString,
         s.support.identity.hex
-      ) ++ list(g.participantsOf.getOrElse(s.id, Vector.empty).distinct.sortBy((r, e) =>
-        (e, r.toString)
-      ))((r, e) => Vector(r.toString, e.value))
+      ) ++ list(
+        g.participantsOf.getOrElse(s.id, Vector.empty).distinct.sortBy((r, e) => (e, r.toString))
+      )((r, e) => Vector(r.toString, e.value))
     }
     val entities = list(g.entities.values.toVector.sortBy(_.id)) { e =>
       Vector(e.id.value, e.support.identity.hex)
