@@ -144,7 +144,7 @@ class SpeechPromotionSuite extends FunSuite:
       bindings: Map[EntityId, ReferentMentionId] = bound,
       r: ReferentResolution = resolution(),
       contestations: Vector[Contestation] = Vector.empty
-  ) = SpeechPromotion.of(m, target, bindings, r, contestations)
+  ) = ContestationSet.of(m, contestations).flatMap(SpeechPromotion.of(m, target, bindings, r, _))
   private def refused(result: Either[PromotionError, ?], fragment: String): Unit = result match
     case Left(e)  => assert(e.message.contains(fragment), e.message)
     case Right(v) => fail(s"expected a refusal containing '$fragment', got $v")
@@ -284,6 +284,28 @@ class SpeechPromotionSuite extends FunSuite:
     val other = state("sit:other", rival, spoken(610L, 640L), lemma = "asleep")
     val m = model(Vector(other))
     assert(promote(m, contestations = Vector(contest(ContestationBasis.Retraction, other.id))).isRight)
+
+  test("a contestation of a situation outside speech is refused"):
+    val root = state("sit:root", world, spoken(100L, 120L), lemma = "fall")
+    refused(
+      ContestationSet.of(model(Vector(root)), Vector(contest(ContestationBasis.Correction, root.id))),
+      "which is not speech"
+    )
+
+  test("a contestation set checked against another model is refused"):
+    val other = state("sit:other", rival, spoken(610L, 640L), lemma = "asleep")
+    val foreign = right(ContestationSet.of(model(Vector(other)), Vector.empty))
+    refused(SpeechPromotion.of(model(), twin.id, bound, resolution(), foreign), "another model")
+
+  test("a promotion holds only in the model it was checked against"):
+    val p = right(promote())
+    assert(p.holdsIn(model()))
+    val alive = state("sit:alive", world, spoken(500L, 520L), polarity = Polarity.Negative)
+    assert(!p.holdsIn(model(Vector(alive))))
+
+  test("a root claim of undetermined polarity contests it"):
+    val open = state("sit:open", world, spoken(500L, 520L), polarity = Polarity.Unknown)
+    refused(promote(model(Vector(open))), "the narrated world holds sit:open")
 
   test("a contestation of a situation absent from the model is refused"):
     refused(

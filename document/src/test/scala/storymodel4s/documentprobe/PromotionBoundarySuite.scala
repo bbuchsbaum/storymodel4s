@@ -14,6 +14,7 @@ class PromotionBoundarySuite extends FunSuite:
   private val dependsOn: List[Class[?]] = List(
     classOf[storymodel4s.document.SpeechPromotion],
     classOf[storymodel4s.document.Contestation],
+    classOf[storymodel4s.document.ContestationSet],
     classOf[storymodel4s.document.IdentityHint]
   )
 
@@ -37,6 +38,12 @@ class PromotionBoundarySuite extends FunSuite:
       ),
       "SpeechPromotion fromProduct" -> typeCheckErrors(
         "storymodel4s.document.SpeechPromotion.fromProduct(EmptyTuple)"
+      ),
+      "ContestationSet mirror" -> typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.document.ContestationSet]]"
+      ),
+      "ContestationSet fromProduct" -> typeCheckErrors(
+        "storymodel4s.document.ContestationSet.fromProduct(EmptyTuple)"
       ),
       "Contestation fromProduct" -> typeCheckErrors(
         "storymodel4s.document.Contestation.fromProduct(EmptyTuple)"
@@ -62,10 +69,17 @@ class PromotionBoundarySuite extends FunSuite:
              storymodel4s.document.ContestationBasis.Deception,
              null: storymodel4s.core.ClaimMeta)"""
       ),
+      "ContestationSet" -> typeCheckErrors(
+        """new storymodel4s.document.ContestationSet(
+             storymodel4s.core.Checksum.ofText("m"),
+             Vector.empty[storymodel4s.document.Contestation],
+             storymodel4s.core.Checksum.ofText("d"))"""
+      ),
       "SpeechPromotion" -> typeCheckErrors(
         """new storymodel4s.document.SpeechPromotion(
              storymodel4s.core.StoryId.unsafe("s"),
              storymodel4s.core.Checksum.ofText("s"),
+             storymodel4s.core.Checksum.ofText("m"),
              storymodel4s.core.SituationId.unsafe("s"),
              storymodel4s.core.ContextId.unsafe("c"),
              storymodel4s.story.Predicate("dead", None, "dead"),
