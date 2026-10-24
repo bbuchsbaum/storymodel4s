@@ -1,7 +1,7 @@
 # ADR 0027 — A recall-blind source identity graph for the Sherlock body scenes
 
 **Status:** Proposed 2026-10-24 (AGENTS.md SD5). Three owner decisions are recorded under "Owner
-decisions". Decisions N (names) and A (the acceptance reading) are open. The cold review of
+decisions". Decisions N (names), A (the acceptance reading) and T (names in this text) are open. The cold review of
 `1e25a878f` found three blocking defects; this revision corrects them and the eight follow-ups.
 
 **Decider:** the owner
@@ -70,7 +70,8 @@ for proposals, the language-model recordings. The producer refuses any other inp
     claim (§3), with a receipt.
 - **Dialogue.** One mention per referring expression in the recognized words, anchored in media time
   on `media-part-b-audio-0` over the expression's word timings:
-  - third-person pronouns;
+  - third-person pronouns, including their contractions ("she's", "he's"), matched after the
+    core's case folding with trailing punctuation removed;
   - the person nouns `woman`, `man`, `girl`, `boy`, `lady`, `body` and `victim`;
   - every token sequence equal to a character name in the in-scope `Name - All` vocabulary.
   
@@ -81,8 +82,8 @@ for proposals, the language-model recordings. The producer refuses any other inp
     Segments 10 and 11 are refused.
   - A pronoun or noun whose word probability is below 0.5 yields no mention.
   - A name mention is admitted on exact equality with the closed name vocabulary, whatever its word
-    probabilities. A misrecognition that lands exactly on another in-scope character's full name is
-    the only way it errs. *Disclosed:* this rule was written after seeing that word 102 has
+    probabilities. It errs if a misrecognition lands exactly on another in-scope character's
+    name, or if the recognizer hallucinates a name inside an accepted segment. *Disclosed:* this rule was written after seeing that word 102 has
     probability 0.37. Under a per-word guard the body's name link would be refused (owner decision N
     covers both readings).
 
@@ -100,8 +101,10 @@ unlisted.
 Two rules narrow the risk:
 - **Boundary margin.** A dialogue mention counts as inside a row only if its extent lies at least
   0.5 s inside the row's interval at both ends. Recognizer word timing drifts by about that much.
-  Otherwise the producer does not propose deixis for it. The resolver also refuses it, since no
-  single presence claim covers it.
+  Otherwise the producer does not propose deixis for it. Only the producer enforces this: a mention
+  inside a row but within 0.5 s of its edge is still covered by that row's claim, so the margin has
+  its own court (§7). A 1-second row can never hold an utterance with that margin, so speech in the
+  1-second rows (507, 512 and others) is never deictic, which fails closed.
 - **Uncertified mentions.** A mention outside every certified row cannot be deictic.
 
 ### 4. Proposals, and who may make them
@@ -121,6 +124,9 @@ Every link reaches the resolver as a proposal, and every proposal and its outcom
     rest) yields hints only.
   - A deictic proposal whose target is the speaking row's `Name - Speaking` person is refused. A
     third-person reference is almost never to the speaker.
+  - A deictic proposal is refused when the row's `Name - Speaking` is blank, since the unlisted
+    speaker may be the one person listed. It is also refused when the field names more than one
+    person and the target is among them.
   - A mention outside every certified row (§3) yields no deictic proposal.
 - **Mapping.**
   - A surviving deictic proposal becomes `IdentityLink.of(..., DeicticReference)`.
@@ -164,7 +170,8 @@ codec for S3d is S3d's decision.
 Inputs, recordings, outputs and labels contain recognized words and character names. They stay under
 the local data root and never enter Git. Code and tests in Git use synthetic fixtures only. This ADR
 cites dialogue by word index and annotation by row (design rule 14d). The character names in the
-table are annotation identifiers, not dialogue or description text.
+table are annotation identifiers, not dialogue or description text. They would be the first Sherlock
+character names in Git documentation, which owner decision T settles.
 
 ### 7. Measurement and courts
 
@@ -232,6 +239,12 @@ licensed distinctness, which this graph cannot produce.
 - *Recommended:* read it as "unlicensed, with its candidates recorded", which is `Unknown` with
   hints, and amend the bead.
 - *Alternative:* keep `Open` literal, which makes the bead wait for the tracker.
+
+**T. Character names in this ADR (open).** May the annotation's character names appear in this
+document, as identifiers?
+- *Recommended: yes.* They are identifiers, not excerpts, and the ADR cannot state the body case
+  without them.
+- *If no:* the table uses row numbers and opaque person labels.
 
 ## Consequences
 
