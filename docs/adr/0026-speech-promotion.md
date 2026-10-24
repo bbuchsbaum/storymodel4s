@@ -91,7 +91,9 @@ ContestationSet)` refuses with a typed reason unless all of the following hold:
    its support must overlap both the twin's support and the entity's own support. Overlap is defined
    per support family: text spans overlap by offset, and anchored supports overlap by playback
    extent on the same bundle and axis. A text support never overlaps an anchored one. A participant
-   left unbound is refused, and so is a binding for an entity that is not a participant.
+   left unbound is refused, and so is a binding for an entity that is not a participant. A twin with
+   no participant is refused, because there is no referent to bind. Two participants cannot be bound
+   to one mention, because one mention denotes one referent.
 4. **Settled referents.** Each bound mention's class is not `Open` in the given resolution.
 5. **Uncontested.** The contestation set was built for this model (its model digest matches), and
    no contestation applies (§3).

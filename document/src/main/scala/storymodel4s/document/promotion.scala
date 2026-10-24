@@ -110,7 +110,9 @@ enum PromotionError:
   case NotSpeech(id: SituationId)
   case Embedded(id: SituationId, enclosing: String)
   case NotAsserted(id: SituationId, modality: Modality, polarity: Polarity)
+  case NoParticipants(id: SituationId)
   case Unbound(entity: EntityId)
+  case SharedMention(mention: ReferentMentionId)
   case UnknownBinding(entity: EntityId)
   case BindingOutsideUtterance(entity: EntityId, mention: ReferentMentionId, reason: String)
   case OpenReferent(mention: ReferentMentionId)
@@ -126,7 +128,9 @@ enum PromotionError:
     case Embedded(id, e)      => s"the speech of ${id.value} is embedded in $e"
     case NotAsserted(id, m, p) =>
       s"${id.value} is not an asserted claim (modality $m, polarity $p)"
-    case Unbound(e)        => s"participant ${e.value} is not bound to a referent mention"
+    case NoParticipants(id) => s"${id.value} has no participant to bind a referent to"
+    case Unbound(e)         => s"participant ${e.value} is not bound to a referent mention"
+    case SharedMention(m)   => s"mention ${m.value} is bound to two participants"
     case UnknownBinding(e) => s"${e.value} is bound but is not a participant"
     case BindingOutsideUtterance(e, m, why) =>
       s"mention ${m.value} cannot denote participant ${e.value}: $why"
@@ -272,19 +276,25 @@ object SpeechPromotion:
     val roles = g.participantsOf.getOrElse(s.id, Vector.empty).distinct.sortBy((r, e) =>
       (e, r.toString)
     )
+    type Bound = Vector[(ParticipantRole, EntityId, ReferentMentionId)]
     val entities = roles.map(_._2).toSet
-    bindings.keys.toVector.sorted.find(!entities.contains(_)) match
-      case Some(extra) => Left(PromotionError.UnknownBinding(extra))
-      case None        =>
-        roles.foldLeft[Either[PromotionError, Vector[(ParticipantRole, EntityId, ReferentMentionId)]]](
-          Right(Vector.empty)
-        ) { case (acc, (role, entity)) =>
+    // One mention denotes one referent, so two participants cannot share it.
+    val shared = bindings.toVector.groupMap(_._2)(_._1).collect {
+      case (m, es) if es.distinct.size > 1 => m
+    }
+    val extra = bindings.keys.toVector.sorted.find(!entities.contains(_))
+    if roles.isEmpty then Left(PromotionError.NoParticipants(s.id))
+    else if extra.nonEmpty then Left(PromotionError.UnknownBinding(extra.get))
+    else if shared.nonEmpty then Left(PromotionError.SharedMention(shared.toVector.sorted.head))
+    else
+      roles.foldLeft[Either[PromotionError, Bound]](Right(Vector.empty)) {
+        case (acc, (role, entity)) =>
           for
             done <- acc
             id <- bindings.get(entity).toRight(PromotionError.Unbound(entity))
             m <- denotes(g, s, entity, id, resolution)
           yield done :+ (role, entity, m)
-        }
+      }
 
   private def denotes(
       g: NarrativeGraph,
@@ -295,7 +305,7 @@ object SpeechPromotion:
   ): Either[PromotionError, ReferentMentionId] =
     def outside(why: String) = Left(PromotionError.BindingOutsideUtterance(entity, id, why))
     resolution.context.mention(id) match
-      case Left(_)                                                 => outside("not in the referent context")
+      case Left(_) => outside("not in the referent context")
       case Right(m) if m.origin != MentionOrigin.Dialogue(s.context) =>
         outside("not a dialogue mention of this speech context")
       case Right(m) if !overlap(m.support, s.support) => outside("outside the utterance")

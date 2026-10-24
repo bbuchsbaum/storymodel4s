@@ -26,6 +26,34 @@ class PromotionBoundarySuite extends FunSuite:
       ),
       Nil
     )
+    assertEquals(
+      typeCheckErrors(
+        """storymodel4s.document.IdentityHint.fromProduct(
+             (storymodel4s.document.ReferentMentionId.unsafe("a"),
+              storymodel4s.document.ReferentMentionId.unsafe("b"),
+              storymodel4s.document.ContributoryBasis.AppearanceMatch,
+              storymodel4s.document.HintDirection.Toward))"""
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        """storymodel4s.document.IdentityHint(
+             storymodel4s.document.ReferentMentionId.unsafe("a"),
+             storymodel4s.document.ReferentMentionId.unsafe("b"),
+             storymodel4s.document.ContributoryBasis.AppearanceMatch,
+             storymodel4s.document.HintDirection.Toward)"""
+      ),
+      Nil
+    )
+    // The copy probes below have this shape: a named-argument copy on a typed null.
+    assertEquals(
+      typeCheckErrors(
+        """(null: storymodel4s.document.IdentityHint).copy(
+             direction = storymodel4s.document.HintDirection.Against)"""
+      ),
+      Nil
+    )
   }
 
   test("no Mirror.ProductOf, fromProduct or apply for a promotion or a contestation") {
@@ -47,6 +75,27 @@ class PromotionBoundarySuite extends FunSuite:
       ),
       "Contestation fromProduct" -> typeCheckErrors(
         "storymodel4s.document.Contestation.fromProduct(EmptyTuple)"
+      ),
+      "ContestationSet apply" -> typeCheckErrors(
+        """storymodel4s.document.ContestationSet(
+             storymodel4s.core.Checksum.ofText("m"),
+             Vector.empty[storymodel4s.document.Contestation],
+             storymodel4s.core.Checksum.ofText("d"))"""
+      ),
+      "SpeechPromotion apply" -> typeCheckErrors(
+        """storymodel4s.document.SpeechPromotion(
+             storymodel4s.core.StoryId.unsafe("s"),
+             storymodel4s.core.Checksum.ofText("s"),
+             storymodel4s.core.Checksum.ofText("m"),
+             storymodel4s.core.SituationId.unsafe("s"),
+             storymodel4s.core.ContextId.unsafe("c"),
+             storymodel4s.story.Predicate("dead", None, "dead"),
+             storymodel4s.story.Polarity.Positive,
+             Vector.empty[(storymodel4s.story.ParticipantRole, storymodel4s.core.EntityId,
+               storymodel4s.document.ReferentMentionId)],
+             storymodel4s.core.Checksum.ofText("r"),
+             storymodel4s.core.Checksum.ofText("c"),
+             null: storymodel4s.core.ClaimMeta)"""
       ),
       "Contestation apply" -> typeCheckErrors(
         """storymodel4s.document.Contestation(
@@ -108,6 +157,12 @@ class PromotionBoundarySuite extends FunSuite:
       typeCheckErrors(
         """(null: storymodel4s.document.Contestation).copy(
              basis = storymodel4s.document.ContestationBasis.Retraction)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(null: storymodel4s.document.ContestationSet).copy(
+             records = Vector.empty[storymodel4s.document.Contestation])"""
       ).nonEmpty
     )
   }

@@ -205,6 +205,43 @@ class SpeechPromotionSuite extends FunSuite:
       "is bound but is not a participant"
     )
 
+  test("an assertion with no participant is refused"):
+    val bare = SituationNode.State(
+      twin match
+        case SituationNode.State(n) => n.copy(id = SituationId.unsafe("sit:bare"))
+        case _                      => fail("twin is a state")
+    )
+    val m = model(Vector(bare))
+    val unbound = StoryModel.draft(
+      m.atlas,
+      m.graph.copy(relations =
+        m.graph.relations.copy(participants =
+          m.graph.relations.participants.filterNot(_.situation == bare.id)
+        )
+      ),
+      NarrativeHierarchy.empty,
+      DiscourseTrajectory.empty
+    )
+    val v = StoryValidator.validate(right(unbound)).validated.getOrElse(fail("fixture refused"))
+    refused(promote(v, bare.id, Map.empty), "no participant")
+
+  test("one mention bound to two participants is refused"):
+    val man = EntityId.unsafe("ent:man")
+    refused(promote(bindings = bound + (man -> she.id)), "is bound but is not a participant")
+    val two = model()
+    val g = two.graph.copy(
+      entities = two.graph.entities + (man -> entity.copy(id = man)),
+      relations = two.graph.relations.copy(participants =
+        two.graph.relations.participants :+
+          ParticipantEdge(twin.id, ParticipantRole.Agent, man, meta("p:man"))
+      )
+    )
+    val v = StoryValidator
+      .validate(right(StoryModel.draft(two.atlas, g, NarrativeHierarchy.empty, DiscourseTrajectory.empty)))
+      .validated
+      .getOrElse(fail("fixture refused"))
+    refused(promote(v, bindings = bound + (man -> she.id)), "bound to two participants")
+
   test("a mention missing from the referent context is refused"):
     refused(promote(bindings = Map(woman -> rid("d:absent"))), "not in the referent context")
 
