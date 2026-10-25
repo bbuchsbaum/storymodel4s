@@ -330,3 +330,5 @@ dd { margin: 0; color: var(--muted); }
 .revealearly.armed { border-color: var(--warn); color: var(--warn); }
 .sink { background: var(--bg); color: var(--muted); cursor: not-allowed; font-style: italic; }
 .needevidence { color: var(--ink); font-size: 12.5px; }
+body.saving #left, body.saving #right, body.saving #timeline, body.saving #moment { pointer-events: none; }
+body.saving .formwrap { opacity: .85; }

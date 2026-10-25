@@ -53,6 +53,13 @@ S.setState = function (state) {
 };
 
 S.decision = id => S.state.decisions[id] || null;
+// One lock for every input path while a save is in flight: keys (onKey), pointer (the
+// body class disables pointer events on the panes) and the entry points below (Codex
+// re-review: a double-click could reopen another decision mid-save).
+S.setSaving = function (on) {
+  S.saving = on;
+  document.body.classList.toggle('saving', on);
+};
 S.blind = () => (S.decide ? S.decide.blind() : false);
 let maskedCache = { key: null, set: new Set() };
 S.masked = () => {
@@ -68,6 +75,7 @@ S.revealed = id => !!S.state.decisions[id]?.revealed;
 // -- selection and windows -----------------------------------------------------------------
 let candTimer = null;
 S.select = function (a, b) {
+  if (S.saving) return;
   const n = S.index.words.length;
   a = Math.max(1, Math.min(n, a));
   b = Math.max(1, Math.min(n, b));
@@ -115,6 +123,7 @@ S.nextLikely = function (after) {
 };
 
 S.goWindow = function (w) {
+  if (S.saving) return;
   S.disarmReveal();
   const ws = S.index.windows;
   w = Math.max(1, Math.min(ws.length, w));
@@ -128,6 +137,7 @@ S.goWindow = function (w) {
 };
 
 S.markRead = async function (w, value = true) {
+  if (S.saving) return;
   try {
     const out = await post('/api/window', { window: w, value });
     S.setState(out.state);
@@ -184,6 +194,7 @@ S.newGroup = function () {
 S.usedRoles = () => [...new Set(Object.values(S.state.decisions).map(d => d.reference.claim_role).filter(Boolean))];
 
 S.startDecision = async function () {
+  if (S.saving) return;
   const sp = span();
   if (!sp) return toast('Select the words of the referring expression first.');
   try {
@@ -201,6 +212,7 @@ S.startDecision = async function () {
 };
 
 S.reopen = function (id) {
+  if (S.saving) return;
   const d = S.decision(id);
   if (!d) return;
   const open = S.active;
@@ -286,6 +298,7 @@ S.removeCoref = function (i) {
 };
 
 S.createPerson = async function (label) {
+  if (S.saving) return;
   try {
     const out = await post('/api/person', { label });
     S.setState(out.state);
@@ -306,11 +319,13 @@ S.commitReference = async function () {
   // The form is locked while the save is in flight, so no edit can be made against a state
   // the server is about to replace (Codex re-reviews: reconciling in-flight edits after the
   // fact either kept stale evidence or erased the edits).
-  S.saving = true;
+  S.setSaving(true);
   S.decide.renderForm();
   try {
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
+    S.setSaving(false);
     S.setState(out.state);
+    if (S.active !== a) return; // defence in depth: only the form that saved is updated
     a.step = 2;
     // A changed referent invalidates evidence recorded for the previous person: clear the
     // form's evidence, as the server did. With the same referent, keep the unsaved draft
@@ -323,12 +338,11 @@ S.commitReference = async function () {
       a.source = blankSource();
       if (S.decision(a.id)?.staleSource) toast(`${a.id}: the referent changed, so its earlier evidence was cleared.`);
     }
-    S.saving = false;
     S.recallPane.refresh();
     S.decide.render();
     toast(`${a.id}: step 1 saved${a.calibration && !S.revealed(a.id) ? ' (blind)' : ''}`);
   } catch (e) {
-    S.saving = false;
+    S.setSaving(false);
     S.decide.renderForm();
     toast(e.message, 'error');
   }
@@ -359,6 +373,7 @@ let revealArmed = { t: 0, w: null };
 S.revealArmedFor = w => revealArmed.w === w && Date.now() - revealArmed.t < 6000;
 S.disarmReveal = () => { revealArmed = { t: 0, w: null }; };
 S.reveal = async function () {
+  if (S.saving) return;
   const w = S.calWindowOf(S.active);
   if (!w) return toast('Nothing to reveal here.');
   if (S.active && !S.decision(S.active.id)) return toast('Commit step 1 of this item before revealing the window.', 'error');
@@ -421,26 +436,28 @@ S.commitSource = async function () {
   const missing = S.decide.problems();
   if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
   if (S.saving) return;
-  S.saving = true; // locked while in flight, like step 1
+  S.setSaving(true); // locked while in flight, like step 1
   S.decide.renderForm();
   try {
     const out = await post('/api/decision/source', { id: a.id, fields: s });
-    S.saving = false;
+    S.setSaving(false);
     S.setState(out.state);
     toast(`${a.id}: committed`);
+    if (S.active !== a) return;
     S.closeDecision(true);
     // After evidence for a calibration item, stay in its window: go to the next item there
     // that still needs evidence; otherwise continue to the next likely reference.
     const inCal = (S.state.calibrationWindows || []).includes(S.index.words[a.fields.first_word - 1].window);
     if (!(inCal && S.nextAwaitingEvidence(a.fields.first_word, true, true))) S.nextLikely(a.fields.last_word);
   } catch (e) {
-    S.saving = false;
+    S.setSaving(false);
     S.decide.renderForm();
     toast(e.message, 'error');
   }
 };
 
 S.undo = async function () {
+  if (S.saving) return;
   try {
     const out = await post('/api/undo');
     S.setState(out.state);
@@ -567,7 +584,7 @@ function onKey(e) {
     if (k === '[') { F.setRate(-1); return true; }
     if (k === ']') { F.setRate(1); return true; }
     if (S.mode === 'source') return S.source.key(e);
-    if (S.saving) return true; // a save is in flight: no recall-pass key may act (film keys above still work)
+    if (S.saving) return k !== 'Tab'; // a save is in flight: no recall-pass key may act; Tab still moves focus
     return recallKey(e);
   })();
   if (handled) e.preventDefault();
