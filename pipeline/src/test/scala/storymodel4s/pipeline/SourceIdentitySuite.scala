@@ -25,7 +25,8 @@ class SourceIdentitySuite extends FunSuite:
       "origin" -> s(origin),
       "stream" -> s(stream),
       "intervals" -> Json.arr(span(a, z))
-    ) ++ name.map("name" -> s(_)) ++ context.map("context" -> s(_))*
+    ) ++ name.map("name" -> s(_)) ++ context.map("context" -> s(_)) ++
+      Option.when(origin == "dialogue")("words" -> Json.arr(Json.fromLong(a / 100)))*
   )
   private def presence(a: Long, z: Long, basis: String = "human-reviewed"): Json = Json.obj(
     "basis" -> s(basis),
@@ -118,14 +119,26 @@ class SourceIdentitySuite extends FunSuite:
 
   private def graph(text: String = inputs()): Json =
     SourceIdentity.graph(text).fold(e => fail(e), identity)
+  private def classes(g: Json): Vector[Json] =
+    g.hcursor.downField("classes").as[Vector[Json]].toOption.get
+  private def members(c: Json): Vector[String] =
+    c.hcursor.get[Vector[String]]("members").toOption.get
+
+  /** The class id (ADR 0028 §1) of the class holding a mention. */
+  private def classId(g: Json, m: String): String =
+    classes(g)
+      .find(members(_).contains(m))
+      .flatMap(_.hcursor.get[String]("id").toOption)
+      .getOrElse(fail(s"no class holds $m"))
   private def relation(g: Json, d: String, v: String): Json =
+    val c = classId(g, v)
     g.hcursor
       .downField("relations")
       .as[Vector[Json]]
       .toOption
       .get
       .find(r =>
-        r.hcursor.get[String]("dialogue").contains(d) && r.hcursor.get[String]("visual").contains(v)
+        r.hcursor.get[String]("dialogue").contains(d) && r.hcursor.get[String]("class").contains(c)
       )
       .getOrElse(fail(s"no relation $d / $v"))
   private def rel(g: Json, d: String, v: String): String =
@@ -146,12 +159,7 @@ class SourceIdentitySuite extends FunSuite:
     val g = graph()
     assertEquals(rel(g, "d-ana", "v-ana-1"), "Same")
     assertEquals(
-      g.hcursor
-        .downField("classes")
-        .as[Vector[Vector[String]]]
-        .toOption
-        .get
-        .find(_.contains("v-ana-1")),
+      classes(g).map(members).find(_.contains("v-ana-1")),
       Some(Vector("d-ana", "d-she", "v-ana-1", "v-ana-2"))
     )
     assertEquals(status(outcomeOf(g, "proposals", "id", "p1")), "licensed")
@@ -288,6 +296,80 @@ class SourceIdentitySuite extends FunSuite:
 
   test("control: every admitted role passes") {
     assert(SourceIdentity.graph(inputs(roles = SourceIdentity.InputRoles.toVector.sorted)).isRight)
+  }
+
+  test("v2: an admitted mention carries its anchor, name, context, words and class id") {
+    val g = graph()
+    def row(id: String): Json =
+      g.hcursor
+        .downField("mentions")
+        .as[Vector[Json]]
+        .toOption
+        .get
+        .find(_.hcursor.get[String]("id").contains(id))
+        .get
+    val v = row("v-ana-2").hcursor
+    assertEquals(v.get[String]("origin").toOption, Some("visual"))
+    assertEquals(v.get[String]("stream").toOption, Some("picture"))
+    assertEquals(v.downField("intervals").focus, Some(Json.arr(span(5000, 6000))))
+    assertEquals(v.get[String]("name").toOption, Some("Ana"))
+    assertEquals(v.get[String]("class").toOption, Some("d-ana"))
+    assertEquals(v.downField("words").focus, None)
+    val d = row("d-she").hcursor
+    assertEquals(d.get[String]("context").toOption, Some("ctx-s2"))
+    assertEquals(d.get[Vector[Long]]("words").toOption, Some(Vector(12L)))
+    assertEquals(d.get[String]("class").toOption, Some("d-ana"))
+  }
+
+  test("v2: a class is named by its least member and is uncontested without distinctness") {
+    val g = graph()
+    val ana = classes(g).find(members(_).contains("v-ana-1")).get.hcursor
+    assertEquals(ana.get[String]("id").toOption, Some("d-ana"))
+    assertEquals(ana.get[Boolean]("contested").toOption, Some(false))
+    assertEquals(g.hcursor.downField("distinct").focus, Some(Json.arr()))
+    assertEquals(
+      g.hcursor.downField("edition").get[String]("edition").toOption,
+      Some("synthetic-film")
+    )
+    assertEquals(g.hcursor.get[String]("schemaVersion").toOption, Some(SourceIdentity.GraphSchema))
+  }
+
+  test("v2: a dialogue mention without word indices is refused") {
+    val bare = Json.obj(
+      "id" -> s("d-bare"),
+      "origin" -> s("dialogue"),
+      "stream" -> s("audio"),
+      "context" -> s("ctx-s9"),
+      "intervals" -> Json.arr(span(7000, 7100))
+    )
+    val o = outcomeOf(graph(inputs(ms = mentions :+ bare)), "mentions", "id", "d-bare")
+    assertEquals(status(o), "refused")
+    assert(reason(o).contains("needs its word indices"), reason(o))
+  }
+
+  test("v2: word indices on a visual mention, or out of order, are refused") {
+    val onVisual = mention("v-words", "visual", "picture", 1000, 2000)
+      .deepMerge(Json.obj("words" -> Json.arr(Json.fromLong(1))))
+    val unordered = mention("d-order", "dialogue", "audio", 7000, 7100, context = Some("ctx-s9"))
+      .deepMerge(Json.obj("words" -> Json.arr(Json.fromLong(3), Json.fromLong(3))))
+    val g = graph(inputs(ms = mentions :+ onVisual :+ unordered))
+    assert(reason(outcomeOf(g, "mentions", "id", "v-words")).contains("carries no word indices"))
+    assert(reason(outcomeOf(g, "mentions", "id", "d-order")).contains("strictly increasing"))
+  }
+
+  test("control: a dialogue mention with increasing word indices is admitted") {
+    val ok = mention("d-ok", "dialogue", "audio", 7000, 7100, context = Some("ctx-s9"))
+      .deepMerge(Json.obj("words" -> Json.arr(Json.fromLong(3), Json.fromLong(4))))
+    assertEquals(
+      status(outcomeOf(graph(inputs(ms = mentions :+ ok)), "mentions", "id", "d-ok")),
+      "admitted"
+    )
+  }
+
+  test("the recognizer transcript role is admitted") {
+    assert(
+      SourceIdentity.graph(inputs(roles = Vector("media", "annotation", "asr-transcript"))).isRight
+    )
   }
 
   test("the edition needs one picture and one audio stream") {

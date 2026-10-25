@@ -383,6 +383,8 @@ def dialogue_mentions(transcript, characters, scope):
                 "stream": "audio",
                 "intervals": [span],
                 "context": f"ctx-s{w['segment_index']}",
+                # ADR 0028 §1: the graph matches a speech span to a mention by these indices.
+                "words": [x["index"] for x in run],
             }
             if name:
                 m["name"] = name

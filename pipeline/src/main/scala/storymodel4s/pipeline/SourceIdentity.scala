@@ -16,7 +16,7 @@ import storymodel4s.document.*
   */
 object SourceIdentity:
   val InputSchema: String = "source-identity-inputs/v1"
-  val GraphSchema: String = "source-identity-graph/v1"
+  val GraphSchema: String = "source-identity-graph/v2"
   val Usage: String = "sourceIdentity build INPUTS OUTPUT"
 
   /** Input roles a recall-blind run may read (ADR 0027 §1); anything else refuses the run. The
@@ -140,8 +140,25 @@ object SourceIdentity:
         case Right(Some(n)) => ProperName.of(n).map(Some(_)).left.map(_.toString)
         case Right(None)    => Right(None)
         case Left(_)        => Left("invalid name")
+      _ <- words(j, origin)
       built <- ReferentMention.anchored(id, origin, b, support, name).left.map(_.toString)
     yield built
+
+  /** A dialogue mention's recognizer word indices (ADR 0028 §1): present, non-negative and strictly
+    * increasing on dialogue, and absent on visual, so the reader can match a speech span to exactly
+    * one mention.
+    */
+  private def words(j: Json, origin: MentionOrigin): Result[Option[Vector[Long]]] =
+    (origin, j.hcursor.downField("words").focus) match
+      case (MentionOrigin.Visual, None)    => Right(None)
+      case (MentionOrigin.Visual, Some(_)) => Left("a visual mention carries no word indices")
+      case (_, None)                       => Left("a dialogue mention needs its word indices")
+      case (_, Some(w))                    =>
+        w.as[Vector[Long]] match
+          case Right(ws)
+              if ws.nonEmpty && ws.head >= 0 && ws.zip(ws.drop(1)).forall((a, z) => a < z) =>
+            Right(Some(ws))
+          case _ => Left("word indices must be non-negative and strictly increasing")
 
   private def presence(b: SourceBundle, j: Json): Result[PresenceClaim] =
     val c = j.hcursor
@@ -319,7 +336,27 @@ object SourceIdentity:
         .left
         .map(_.toString)
       relations <- relationsOf(resolution, mentions)
+      edition = c.downField("edition")
     yield
+      // ADR 0028 §1: a class is named by its least member id, and carries a contested flag.
+      val classRows = resolution.classes.zipWithIndex
+        .map((cls, i) => (cls.toVector.map(_.value).sorted, resolution.contested(i)))
+        .sortBy(_._1.head)
+      val classOf = classRows.flatMap((ms, _) => ms.map(_ -> ms.head)).toMap
+      val contestedIds = classRows.collect { case (ms, true) => ms.head }.toSet
+      // A licensed distinctness separates two classes only when neither is contested; inside a
+      // contested class membership itself is in doubt (ReferentResolution.relation).
+      val distinct = resolution.apart.toVector
+        .flatMap((u, v) =>
+          val (a, z) = (classOf(u.value), classOf(v.value))
+          Option.when(a != z && !contestedIds(a) && !contestedIds(z))(
+            if a < z then (a, z) else (z, a)
+          )
+        )
+        .distinct
+        .sorted
+      def field(j: Json, name: String): Vector[(String, Json)] =
+        j.hcursor.downField(name).focus.map(name -> _).toVector
       def relationJson(r: ReferentRelation): Json = r match
         case ReferentRelation.Open(cs) =>
           Json.obj(
@@ -334,29 +371,46 @@ object SourceIdentity:
         "inputSha256" -> Json.fromString(Checksum.ofText(inputText).hex),
         "inputs" -> Json.fromValues(manifest),
         "bundle" -> Json.fromString(b.id.value),
-        "mentions" -> Json.fromValues(mentionIds.zip(builtMentions).sortBy(_._1).map {
-          case (id, Right(_)) =>
-            Json.obj("id" -> Json.fromString(id), "outcome" -> outcome("admitted"))
-          case (id, Left(e)) =>
-            Json.obj("id" -> Json.fromString(id), "outcome" -> outcome("refused", Some(e)))
-        }),
+        "edition" -> Json.obj(
+          Vector("edition", "timebase", "start", "end")
+            .flatMap(field(edition.focus.getOrElse(Json.obj()), _))*
+        ),
+        "mentions" -> Json.fromValues(
+          mentionIds.zip(rawMentions.zip(builtMentions)).sortBy(_._1).map {
+            case (id, (j, Right(_))) =>
+              Json.obj(
+                (Vector(
+                  "id" -> Json.fromString(id),
+                  "outcome" -> outcome("admitted"),
+                  "class" -> Json.fromString(classOf(id))
+                ) ++ Vector("origin", "stream", "intervals", "name", "context", "words")
+                  .flatMap(field(j, _)))*
+              )
+            case (id, (_, Left(e))) =>
+              Json.obj("id" -> Json.fromString(id), "outcome" -> outcome("refused", Some(e)))
+          }
+        ),
         "presence" -> Json.fromValues(builtPresence.zipWithIndex.map {
           case (Right(_), i) =>
             Json.obj("index" -> Json.fromInt(i), "outcome" -> outcome("admitted"))
           case (Left(e), i) =>
             Json.obj("index" -> Json.fromInt(i), "outcome" -> outcome("refused", Some(e)))
         }),
-        "classes" -> Json.fromValues(
-          resolution.classes
-            .map(_.toVector.map(_.value).sorted)
-            .sortBy(_.head)
-            .map(c => Json.fromValues(c.map(Json.fromString)))
+        "classes" -> Json.fromValues(classRows.map { (ms, contested) =>
+          Json.obj(
+            "id" -> Json.fromString(ms.head),
+            "members" -> Json.fromValues(ms.map(Json.fromString)),
+            "contested" -> Json.fromBoolean(contested)
+          )
+        }),
+        "distinct" -> Json.fromValues(
+          distinct.map((a, z) => Json.arr(Json.fromString(a), Json.fromString(z)))
         ),
         "relations" -> Json.fromValues(relations.map { (d, v, r, hs) =>
           Json
             .obj(
               "dialogue" -> Json.fromString(d.value),
-              "visual" -> Json.fromString(v.value),
+              "class" -> Json.fromString(v.value),
               "hints" -> Json.fromValues(
                 hs.map(h =>
                   Json.obj(
@@ -385,8 +439,8 @@ object SourceIdentity:
 
   private val jsonOrder: Ordering[Json] = Ordering.by(_.noSpaces)
 
-  /** Each admitted dialogue mention against each class holding a visual mention, represented by
-    * that class's least visual mention id.
+  /** Each admitted dialogue mention against each class holding a visual mention, named by the class
+    * id of ADR 0028 §1, its least member id.
     */
   private def relationsOf(
       resolution: ReferentResolution,
@@ -396,7 +450,8 @@ object SourceIdentity:
   ] =
     val visual = mentions.filter(_.origin == MentionOrigin.Visual).map(_.id).toSet
     val representatives = resolution.classes
-      .flatMap(c => c.toVector.filter(visual).sortBy(_.value).headOption)
+      .filter(_.exists(visual))
+      .map(_.toVector.minBy(_.value))
       .sortBy(_.value)
     val dialogue = mentions
       .collect { case m if m.origin.isInstanceOf[MentionOrigin.Dialogue] => m.id }

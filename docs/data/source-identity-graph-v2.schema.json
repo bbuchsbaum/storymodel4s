@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "storymodel4s:source-identity-graph/v2",
+  "title": "source-identity-graph/v2",
+  "description": "ADR 0028 section 1: the recall-blind source identity graph written by `sourceIdentity build` for the connected assessor. Relations are licensed by the ADR 0024 resolver; hints decide nothing.",
+  "type": "object",
+  "required": ["schemaVersion", "inputSha256", "inputs", "bundle", "edition", "mentions", "presence", "classes", "distinct", "relations", "proposals"],
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^\\S+$"},
+    "outcome": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"enum": ["admitted", "refused", "refused-by-producer", "licensed", "recorded-hint"]},
+        "reason": {"type": "string"}
+      }
+    },
+    "interval": {
+      "type": "array",
+      "prefixItems": [{"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 1}],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "hint": {
+      "type": "object",
+      "required": ["basis", "direction"],
+      "additionalProperties": false,
+      "properties": {"basis": {"type": "string"}, "direction": {"enum": ["Toward", "Against"]}}
+    }
+  },
+  "properties": {
+    "schemaVersion": {"const": "source-identity-graph/v2"},
+    "inputSha256": {"$ref": "#/$defs/sha256"},
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "sha256"],
+        "properties": {"role": {"type": "string"}, "sha256": {"$ref": "#/$defs/sha256"}}
+      }
+    },
+    "bundle": {"type": "string"},
+    "edition": {
+      "type": "object",
+      "required": ["edition", "timebase", "start", "end"],
+      "additionalProperties": false,
+      "properties": {
+        "edition": {"$ref": "#/$defs/id"},
+        "timebase": {
+          "type": "array",
+          "prefixItems": [{"type": "integer", "minimum": 1}, {"type": "integer", "minimum": 1}],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "start": {"type": "integer"},
+        "end": {"type": "integer"}
+      }
+    },
+    "mentions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["id", "outcome", "class", "origin", "stream", "intervals"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "outcome": {"type": "object", "properties": {"status": {"const": "admitted"}}},
+              "class": {"$ref": "#/$defs/id"},
+              "origin": {"enum": ["visual", "dialogue"]},
+              "stream": {"enum": ["picture", "audio"]},
+              "intervals": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/interval"}},
+              "name": {"type": "string", "minLength": 1},
+              "context": {"$ref": "#/$defs/id"},
+              "words": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 0}}
+            },
+            "if": {"properties": {"origin": {"const": "dialogue"}}},
+            "then": {"required": ["context", "words"]},
+            "else": {"not": {"required": ["words"]}}
+          },
+          {
+            "type": "object",
+            "required": ["id", "outcome"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "outcome": {"type": "object", "required": ["reason"], "properties": {"status": {"const": "refused"}}}
+            }
+          }
+        ]
+      }
+    },
+    "presence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "outcome"],
+        "properties": {"index": {"type": "integer", "minimum": 0}, "outcome": {"$ref": "#/$defs/outcome"}}
+      }
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "members", "contested"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "members": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+          "contested": {"type": "boolean"}
+        }
+      }
+    },
+    "distinct": {
+      "description": "Every pair of uncontested classes separated by a licensed distinctness; a pair with no row is Unknown.",
+      "type": "array",
+      "items": {"type": "array", "prefixItems": [{"$ref": "#/$defs/id"}, {"$ref": "#/$defs/id"}], "minItems": 2, "maxItems": 2}
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["dialogue", "class", "relation", "hints"],
+        "additionalProperties": false,
+        "properties": {
+          "dialogue": {"$ref": "#/$defs/id"},
+          "class": {"$ref": "#/$defs/id"},
+          "relation": {"enum": ["Same", "Distinct", "Open", "Unknown"]},
+          "candidates": {"type": "array", "items": {"$ref": "#/$defs/id"}},
+          "hints": {"type": "array", "items": {"$ref": "#/$defs/hint"}}
+        }
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "left", "right", "outcome"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"enum": ["named", "deictic", "hint"]},
+          "left": {"type": "string"},
+          "right": {"type": "string"},
+          "outcome": {"$ref": "#/$defs/outcome"}
+        }
+      }
+    }
+  }
+}

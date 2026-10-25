@@ -274,6 +274,12 @@ class ProducerTests(unittest.TestCase):
         self.assertEqual(classes["d-w2"], "pronoun")
         self.assertEqual(classes["d-w1"], "name")
 
+    def test_a_dialogue_mention_carries_its_word_indices(self):
+        doc, _ = self.produce()
+        words = {m["id"]: m.get("words") for m in doc["mentions"]}
+        self.assertEqual(words["d-w2"], [2])
+        self.assertIsNone(words["v-r11-ana"])
+
     def test_a_role_label_yields_unnamed_mentions_by_its_count(self):
         doc, _ = self.produce()
         guards = [m for m in doc["mentions"] if m["id"].startswith("v-r12-2-guards")]
