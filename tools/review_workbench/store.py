@@ -478,6 +478,11 @@ class Store:
                     d["blind"] = e["fields"]
                 if k == "decision.revise":
                     d["revised"] = e["fields"] != d["blind"] if d["blind"] else True
+                old = d.get("reference")
+                if old and d["source"] and old["referent"] != e["fields"]["referent"]:
+                    # Evidence was recorded for a different person: it no longer supports this
+                    # decision, so the item goes back to needing evidence (v6 user review).
+                    d["source"], d["staleSource"] = None, True
                 d["reference"] = e["fields"]
                 d["t"] = e["t"]
             elif k == "decision.source" and e["id"] in out:

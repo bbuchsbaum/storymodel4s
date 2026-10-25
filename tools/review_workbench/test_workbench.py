@@ -493,6 +493,17 @@ class CalibrationCourt(unittest.TestCase):
         self.assertEqual((w1["blind"], w1["late"], w1["revealed"]), (1, 1, True))
         self.assertGreater(w1["likely"], 1)
 
+    def test_a_new_referent_clears_old_evidence(self):
+        s = done_store()
+        did = s.start_decision([60, 60])["id"]
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60})
+        s.commit_source(did, self.SRC)
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60, "claim_role": "patient"})
+        self.assertIsNotNone(s.decisions()[did]["source"])  # same person: evidence stands
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60, "referent": "Tobias"})
+        self.assertIsNone(s.decisions()[did]["source"])
+        self.assertTrue(s.decisions()[did]["staleSource"])
+
     def test_an_ordinary_decision_cannot_take_masked_words(self):
         s = done_store()
         did = s.start_decision([30, 30])["id"]

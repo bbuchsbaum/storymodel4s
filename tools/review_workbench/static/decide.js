@@ -167,7 +167,7 @@ export class DecidePane {
       w && (!a || this.S.decision(a.id))
         ? (k < n
           // An early reveal is a deliberate, outlined choice; it turns solid once all are decided.
-          ? h('button.revealearly', { type: 'button', onclick: () => this.S.reveal() }, this.S.revealArmedFor(w) ? `Press again: reveal with ${n - k} undecided` : `Reveal early (${n - k} undecided)`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R'))
+          ? h('button.revealearly', { type: 'button', class: this.S.revealArmedFor(w) ? 'revealearly armed' : 'revealearly', onclick: () => this.S.reveal() }, this.S.revealArmedFor(w) ? `Press again: reveal with ${n - k} undecided` : `Reveal early (${n - k} undecided)`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R'))
           : h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, `Reveal window ${w}`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R')))
         : null,
       this.tab === 'search' ? this.sink : null);
@@ -345,8 +345,11 @@ export class DecidePane {
     if (s.source_resolvable === 'yes' && !s.source_anchor_ids.length && !['supported', 'contradicted'].includes(s.reference_outcome)) out.push('an evidence row (A)');
     if (!s.reference_outcome) out.push('outcome');
     if (['supported', 'contradicted'].includes(s.reference_outcome) && !s.source_anchor_ids.length) out.push('an evidence row (A)');
-    const anchored = new Set(s.source_anchor_ids.filter(x => x.startsWith('row-')).flatMap(x => this.S.index.rows.find(r => r.row === Number(x.slice(4)))?.scenes || []));
-    if (s.source_scene_ids.some(id => !anchored.has(id)) && !s.source_anchor_ids.some(x => !x.startsWith('row-'))) out.push('an anchor for each scene');
+    const mentionRow = {};
+    for (const [row, ms] of Object.entries(this.S.state.source?.mentions || {})) for (const m of ms) mentionRow[m.id] = Number(row);
+    const rowsOf = x => (x.startsWith('row-') ? [Number(x.slice(4))] : mentionRow[x] ? [mentionRow[x]] : []);
+    const anchored = new Set(s.source_anchor_ids.flatMap(rowsOf).flatMap(r => this.S.index.rows.find(x => x.row === r)?.scenes || []));
+    if (s.source_scene_ids.some(id => !anchored.has(id))) out.push('an anchor for each scene');
     return out;
   }
 
@@ -356,7 +359,11 @@ export class DecidePane {
     if (!a) {
       const sel = this.S.sel;
       clear(this.formEl, h('div.formidle',
-        h('p', sel ? 'Enter starts a decision for the selected words.' : 'Select a referring expression: click a word, or press W and B to jump between likely ones.'),
+        h('p', sel ? 'Enter starts a decision for the selected words (or reopens one already there).' : 'Select a referring expression: click a word, or press W and B to jump between likely ones.'),
+        (() => {
+          const need = Object.values(this.S.state.decisions).filter(d => !d.source).length;
+          return need ? h('p.needevidence', `${need} decision${need > 1 ? 's' : ''} still need evidence: Shift+N opens the next.`) : null;
+        })(),
         sel ? h('button.primary', { type: 'button', onclick: () => this.S.startDecision() }, 'Start decision', h('kbd', { 'aria-hidden': 'true' }, 'Enter')) : null));
       return;
     }
@@ -438,9 +445,10 @@ export class DecidePane {
   }
 
   renderBody() {
-    const keep = document.activeElement === this.q;
+    const had = document.activeElement;
+    const keep = had === this.q || had === this.sink ? had : null;
     clear(this.bodyEl, this.tab === 'candidates' ? this.renderCandidates() : this.renderSearch());
-    if (keep && this.q.isConnected) this.q.focus();
+    if (keep && keep.isConnected) keep.focus();
   }
 
   render() {

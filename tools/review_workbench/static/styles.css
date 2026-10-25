@@ -154,7 +154,7 @@ video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; max
 .scenechip { border: 1px solid var(--s-timing); color: var(--s-timing); background: var(--s-timing-bg); border-radius: 9px; font-size: 11px; padding: 0 6px; cursor: pointer; }
 .clockchip { color: var(--muted); font-size: 11px; border-bottom: 1px dotted var(--muted); cursor: help; }
 .readhead { position: sticky; top: -10px; z-index: 3; background: var(--bg); padding-top: 10px; margin-top: -10px; }
-.win { scroll-margin-top: 60px; }
+.win { scroll-margin-top: 96px; }
 .blindbanner { margin: 0 0 6px; padding: 4px 10px; border-radius: 5px; background: var(--calib-soft); color: var(--calib); font-size: 12.5px; }
 .wtext { margin: 3px 0 0; font: 16px/1.62 var(--read); }
 .w { border-radius: 2px; cursor: text; padding: 0 1px; }
@@ -302,8 +302,8 @@ legend { font-weight: 600; padding: 0 4px; font-size: 13px; }
 .keycols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; }
 dd { margin: 0; color: var(--muted); }
-.toast { position: fixed; top: 5px; left: 50%; transform: translate(-50%, -10px); max-width: 46vw; background: var(--ink); color: var(--panel); padding: 6px 14px; border-radius: 6px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; max-width: 80vw; z-index: 20; }
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast { position: fixed; bottom: 16px; left: 16px; transform: translate(0, 10px); max-width: min(30vw, 420px); background: var(--ink); color: var(--panel); padding: 6px 14px; border-radius: 6px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 20; }
+.toast.show { opacity: 1; transform: translate(0, 0); }
 .toast[data-kind="error"] { background: var(--warn); color: var(--panel); }
 .fatal { padding: 20px; color: var(--warn); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
@@ -327,3 +327,6 @@ dd { margin: 0; color: var(--muted); }
 .sink { margin-top: 6px; }
 .revealearly { border: 1px solid var(--calib); background: var(--panel); color: var(--calib); border-radius: 5px; padding: 5px 12px; cursor: pointer; font-weight: 600; }
 .revealearly kbd { color: var(--calib); }
+.revealearly.armed { border-color: var(--warn); color: var(--warn); }
+.sink { background: var(--bg); color: var(--muted); cursor: not-allowed; font-style: italic; }
+.needevidence { color: var(--ink); font-size: 12.5px; }

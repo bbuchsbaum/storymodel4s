@@ -128,7 +128,8 @@ export class Film {
     const now = this.timeEl;
     if (now) {
       const r = this.rowAt(this.part, v.currentTime);
-      now.textContent = `${partName(this.part)} ${clock(v.currentTime)}${r ? ` · row ${r.row} · sc ${r.scenes.join('/')}` : ''}`;
+      now.textContent = `${String(this.part) === '1' ? 'a' : 'b'} ${clock(v.currentTime)}${r ? ` · r${r.row} · sc ${r.scenes.join('/')}` : ''}`;
+      now.title = `${partName(this.part)} ${clock(v.currentTime)}${r ? `, row ${r.row}, scene ${r.scenes.join('/')}` : ''}`;
     }
   }
 

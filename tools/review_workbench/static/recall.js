@@ -43,7 +43,7 @@ export class RecallPane {
       return block;
     });
     clear(L, h('div.readhead', h('div.panehead', h('h2', 'Recall'), h('span.count#wcount')),
-      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration words: timing, candidates and search stay hidden until the window is revealed.')),
+      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration window: suggestions hidden until revealed.')),
       h('div.reader#reader', blocks));
     this.refresh();
   }

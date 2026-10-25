@@ -93,12 +93,12 @@ function span() {
 
 // Reopen the next committed decision with no source evidence; with sameWindow, only in the
 // window of `from`. Returns whether one was found.
-S.nextAwaitingEvidence = function (from, sameWindow = false) {
+S.nextAwaitingEvidence = function (from, sameWindow = false, forwardOnly = false) {
   const w = S.index.words[from - 1].window;
   const todo = Object.values(S.state.decisions)
     .filter(d => !d.source && (!sameWindow || S.index.words[d.reference.first_word - 1].window === w))
     .sort((x, y) => x.reference.first_word - y.reference.first_word);
-  const next = todo.find(d => d.reference.first_word > from) || todo[0];
+  const next = todo.find(d => d.reference.first_word > from) || (forwardOnly ? null : todo[0]);
   if (!next) return false;
   S.reopen(next.id);
   return true;
@@ -112,6 +112,7 @@ S.nextLikely = function (after) {
 };
 
 S.goWindow = function (w) {
+  S.disarmReveal();
   const ws = S.index.windows;
   w = Math.max(1, Math.min(ws.length, w));
   S.win = w;
@@ -328,6 +329,7 @@ S.calWindowOf = function (a) {
 
 let revealArmed = { t: 0, w: null };
 S.revealArmedFor = w => revealArmed.w === w && Date.now() - revealArmed.t < 6000;
+S.disarmReveal = () => { revealArmed = { t: 0, w: null }; };
 S.reveal = async function () {
   const w = S.calWindowOf(S.active);
   if (!w) return toast('Nothing to reveal here.');
@@ -340,6 +342,7 @@ S.reveal = async function () {
   if (open && !(revealArmed.w === w && Date.now() - revealArmed.t < 6000)) {
     revealArmed = { t: Date.now(), w }; // armed for this window only
     S.decide.renderBody();
+    setTimeout(() => S.decide.renderBody(), 6050); // the "Press again" label expires visibly
     return toast(`${open} likely reference${open > 1 ? 's' : ''} in window ${w} have no decision yet and will no longer be blind. Press Shift+R again to reveal anyway.`, 'error');
   }
   try {
@@ -396,7 +399,8 @@ S.commitSource = async function () {
     S.closeDecision(true);
     // After evidence for a calibration item, stay in its window: go to the next item there
     // that still needs evidence; otherwise continue to the next likely reference.
-    if (!S.nextAwaitingEvidence(a.fields.first_word, true)) S.nextLikely(a.fields.last_word);
+    const inCal = (S.state.calibrationWindows || []).includes(S.index.words[a.fields.first_word - 1].window);
+    if (!(inCal && S.nextAwaitingEvidence(a.fields.first_word, true, true))) S.nextLikely(a.fields.last_word);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -549,6 +553,7 @@ function recallKey(e) {
     if (!S.nextAwaitingEvidence(cur)) toast('Every committed decision has its evidence.');
     return true;
   }
+  if ((k === 'W' || k === 'B' || k === 'N') && a) { toast('Close the open decision first (Esc).'); return true; }
   if ((k === 'W' || k === 'B') && !a) {
     // Hop between committed decisions and reopen one, e.g. to add evidence after a reveal.
     const ids = Object.values(S.state.decisions).sort((x, y) => x.reference.first_word - y.reference.first_word);
@@ -572,7 +577,12 @@ function recallKey(e) {
   if (k === 'f' && a && a.step === 1) { S.decide.focusFilter(); return true; }
   if (k === 'j') { S.goWindow(S.win + 1); return true; }
   if (k === 'k') { S.goWindow(S.win - 1); return true; }
-  if (k === 'm') { const done = S.state.windows[String(S.win)]?.[0]; S.markRead(S.win, !done); return true; }
+  if (k === 'm') {
+    const done = S.state.windows[String(S.win)]?.[0];
+    if (!done && (S.state.maskedWindows || []).includes(S.win)) toast(`Window ${S.win} is a calibration window that is not revealed yet.`);
+    S.markRead(S.win, !done);
+    return true;
+  }
   if (k === '/') {
     if (S.decide.searchBlind()) { S.decide.setTab('search'); S.decide.sink?.focus(); return true; }
     S.decide.setTab('search');
@@ -585,7 +595,8 @@ function recallKey(e) {
   if (k === 'Escape') { if (a) S.closeDecision(); else { S.sel = null; S.recallPane.refreshSelection(); S.decide.renderForm(); } return true; }
   if (k === 'E' && !a) { S.reopenAt(cur); return true; }
   if (k === 'Enter') {
-    if (!a && S.sel && S.recallPane.wordEls[Math.min(S.sel.a, S.sel.b)]?.dataset.did) S.reopenAt(Math.min(S.sel.a, S.sel.b));
+    const decided = S.sel ? (() => { for (let r = Math.min(S.sel.a, S.sel.b); r <= Math.max(S.sel.a, S.sel.b); r++) if (S.recallPane.wordEls[r]?.dataset.did) return r; return null; })() : null;
+    if (!a && decided) S.reopenAt(decided);
     else if (!a) S.startDecision();
     else if (a.step === 1) S.commitReference();
     else S.commitSource();
