@@ -6,7 +6,9 @@ conversion, and identity licensed without a graph. Its re-review of `b3dedab4f` 
 one-class rule reintroduced the deterministic deixis that ADR 0027 rejected, and it treated a
 contested class as `Same`. The re-review of `3d7c5225b` found that a picture record still bound
 an absent person to whoever was shown whenever the model emitted a single handle. This revision
-answers all seven and their follow-ups.
+answers all seven and their follow-ups. Its re-review of `ca9a14089` found that name containment
+bound a relational description of an absent person to the person named in it; binding is now on
+name equality.
 
 **Decider:** the owner
 
@@ -104,13 +106,15 @@ row with a speaker and a description, is refused, and its handles are unbound. A
 carries the recognizer word indices of its text and each word's UTF-16 offsets. Binding is decided
 before validation, and the model names no mentions.
 - **A picture record never binds by presence alone.** An entity handle in a picture record binds
-  only when its cited span contains, after the core's name folding, the annotation name of a visual
-  mention that overlaps the record. It then takes that mention's class. If the span contains two
-  such names, the handle is unbound.
+  only when its cited span, after the core's name folding, *equals* the annotation name of one
+  visual mention that overlaps the record, matched on whole tokens. It then takes that mention's
+  class.
+  - A longer span stays unbound, even if it contains a listed name. A relational description that
+    names someone else is one such span.
   - An unnamed description stays unbound.
   - So does the name of someone not listed in the overlapping row.
-  - The handle count no longer matters, so a model that emits one handle for an absent person
-    gains nothing.
+  - The handle count does not matter, so a model that emits one handle for an absent person gains
+    nothing.
 - **A speech record never binds by time.** A speech record's handle binds only when its cited span
   covers exactly the words of one graph dialogue mention. Then it takes that mention's class.
   - A pronoun so bound is linked to a person on screen only if the ADR 0027 resolver licensed that
@@ -162,6 +166,8 @@ Before the validator changes, S3d writes the following from outside the assessor
     control is a speech record whose span covers a name mention in the depicted person's class.
   - **The absent person in a picture record:** a one-person picture record whose single handle's
     span is an unnamed description of someone else. It must stay unbound.
+  - **A relational description:** a picture record whose span contains a listed name inside a longer
+    description of someone else. It must stay unbound. The control is a span equal to the name.
   - **No added deixis:** a speech pronoun the graph left unlinked must not bind to the person shown.
     The control is a pronoun the graph linked by a licensed deictic link, which binds to that
     person.
@@ -191,8 +197,8 @@ built from.
   yet.
 
 **J. Binding a handle (§3).**
-- *Recommended:* bind by name or exact word match. A picture handle binds only when its span names
-  an overlapping visual mention. A speech handle binds only when its span is exactly a graph
+- *Recommended:* bind by name or exact word match. A picture handle binds only when its span equals
+  the annotation name of an overlapping visual mention. A speech handle binds only when its span is exactly a graph
   dialogue mention. Speech records must carry word indices and UTF-16 offsets, which is an input
   change.
 - *Alternative (a):* bind a picture record's single handle to its single visual class, and disclose
@@ -231,13 +237,15 @@ witnesses.
 - **What the graph settles.** Identity in the assessor is licensed by the recall-blind graph. The S2
   and S5 cases become decidable from evidence the model never sees.
 - **What it costs.** Nothing binds in these cases:
-  - an unnamed description on a picture record;
+  - an unnamed or relational description on a picture record;
   - a speech span that is not an exact graph mention;
   - a mixed record.
 
   So identity coverage falls. Speech records must carry word indices and UTF-16 offsets.
-  Cross-scope denials are
-  unlicensable until a source of distinctness exists.
+  Cross-scope denials are unlicensable until a source of distinctness exists.
+- **Not a role check.** Graph binding decides which person a quoted name or mention is. It does not
+  decide which role the model assigns that handle to. Role attribution is unchecked, as it is
+  today.
 - **Two halves.** The Scala export (§1) and the Python reader (§2) can land on `main` now. The
   consumer tests (§6) and the validator changes (§3-4) land after
   `bd-01M5RAN674YW0QGQFM7RY66WXM`.
