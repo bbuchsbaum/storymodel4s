@@ -456,6 +456,7 @@ export class DecidePane {
   }
 
   renderBody() {
+    if (!this.mounted) return; // a load can finish before the pane is mounted
     const had = document.activeElement;
     const keep = had === this.q || had === this.sink ? had : null;
     clear(this.bodyEl, this.tab === 'candidates' ? this.renderCandidates() : this.renderSearch());
