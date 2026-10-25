@@ -79,6 +79,9 @@ S.select = function (a, b) {
   S.structure.refresh();
   if (S.decide.tab === 'search' && document.activeElement !== S.decide.q) S.decide.setTab('candidates');
   clearTimeout(candTimer);
+  // Invalidate any in-flight response now, not after the debounce: the selection may already
+  // be in a masked window (Codex re-review).
+  S.decide.invalidate();
   candTimer = setTimeout(() => {
     const [x, y] = span();
     S.decide.load(x, y);
@@ -294,15 +297,18 @@ S.commitReference = async function () {
   const f = a.fields;
   const missing = S.decide.problems();
   if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
+  const before = S.decision(a.id)?.reference?.referent;
   try {
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
     S.setState(out.state);
     a.step = 2;
-    // The form's evidence always comes from the log: when a changed referent invalidated the
-    // old evidence on the server, the form must not keep it ready to resubmit (Codex review).
-    const saved = S.decision(a.id)?.source;
-    a.source = saved ? structuredClone(saved) : blankSource();
-    if (S.decision(a.id)?.staleSource) toast(`${a.id}: the referent changed, so its earlier evidence was cleared.`);
+    // A changed referent invalidates evidence recorded for the previous person: clear the
+    // form's evidence, as the server did. With the same referent, keep the unsaved draft
+    // (Codex re-review: a blanket reload discarded valid edits).
+    if (before !== undefined && before !== f.referent) {
+      a.source = blankSource();
+      if (S.decision(a.id)?.staleSource) toast(`${a.id}: the referent changed, so its earlier evidence was cleared.`);
+    }
     S.recallPane.refresh();
     S.decide.render();
     toast(`${a.id}: step 1 saved${a.calibration && !S.revealed(a.id) ? ' (blind)' : ''}`);

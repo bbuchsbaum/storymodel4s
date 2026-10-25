@@ -100,6 +100,18 @@ export class DecidePane {
     return false;
   }
 
+  invalidate() {
+    // Supersede every pending request, and clear suggestions at once if the new selection or
+    // window is blind.
+    this.req = (this.req || 0) + 1;
+    if (this.blind() || (this.S.state.maskedWindows || []).includes(this.S.win)) {
+      this.cands = { hidden: true, moments: [], nominations: { one: [], zero: [], legacy: [] } };
+      this.S.filmPane.setPins([], null);
+      this.S.filmPane.markScenes([]);
+      this.renderBody();
+    }
+  }
+
   async load(first, last) {
     const a = this.S.active;
     // Only the latest request may draw. A slower, older response must never paint suggestions
@@ -118,6 +130,8 @@ export class DecidePane {
       if (req === this.req) toast(e.message, 'error');
     }
     if (req !== this.req) return;
+    // Defence in depth: never draw unhidden suggestions while the client itself is blind.
+    if (out && !out.hidden && (this.blind() || (this.S.state.maskedWindows || []).includes(this.S.win))) out = null;
     this.cands = out;
     this.pick = null;
     const hidden = !this.cands || this.cands.hidden;
