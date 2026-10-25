@@ -72,7 +72,7 @@ artifact into the recall pass.
 **Candidates point to film moments, never to persons.** No signal ranks or preselects a referent.
 
 **The person list in the recall pass is built independently of arm A.** It holds:
-- every distinct `Name - All` entry in the annotation, as a named character or a role label with its
+- every distinct `Name - All` entry in the annotation, as a named character or a role label,
   in a fixed alphabetical order, with no counts (a count is a frequency prior);
 - people the reviewer creates during the recall pass, for example "unnamed woman 1";
 - the fixed options "absent / off-screen person", "no one in the film" and "Unknown".
@@ -121,9 +121,8 @@ semantics of `2026-10-25-identity-feasibility-codex.md`, steps 1-6.
 - **Spans may cross window boundaries** (step 1).
 - **Two steps per decision, following step 5.** The reviewer first commits the reference fields:
   span, `other_coref_spans`, form, role, occurrence group, person_reference, and the referent.
-  Only then does the source
-  evidence step open: source scenes, anchors, `source_resolvable`, `reference_outcome` and
-  `ambiguity_reason`.
+  Only then does the source evidence step open: source scenes, anchors, `source_resolvable`,
+  `reference_outcome` and `ambiguity_reason`.
 - **The export fills the template's `reviewer` and `reviewed_at` columns** in `decisions.csv`
   from the log.
 - **`review-windows.csv` has no reviewed_at column,** so the private JSONL edit log carries every
