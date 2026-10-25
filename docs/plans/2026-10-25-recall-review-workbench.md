@@ -94,8 +94,11 @@ words, not by a count of decisions.
   UI. It does not stop forged requests, or reading the page's data in developer tools. Search is
   withheld inside a masked window; a typed search for a masked word made from elsewhere cannot
   be prevented, and the protocol instructs against it.
-- **Owner decision pending:** whether the neighbouring windows, whose timing can point into a
-  calibration window's scenes, are masked as well.
+- **Neighbouring windows stay unmasked (recommended; owner to confirm).** Their timing can point
+  into a calibration window's scenes, but the reviewer reads windows in order and has watched
+  the episode, so masking them would remove little and would cost timing on about 14 more of 50
+  windows. The calibration measures per-reference suggestions, not coarse position in the film.
+  This is reported as a limitation.
 
 *Amendment, 2026-10-25.* The earlier rule chose the first 5 started decisions and then every tenth.
 The workbench hill climb showed that a count-based rule cannot be kept blind. The reviewer
