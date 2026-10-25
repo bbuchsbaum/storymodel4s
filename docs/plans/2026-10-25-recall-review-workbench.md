@@ -1,6 +1,8 @@
 # Recall review workbench: a local tool for recall-to-video mapping and attribution review
 
-**Date:** 2026-10-25. Revised after the cold review of `8db49c1cd`, which blocked it on six points:
+**Date:** 2026-10-25. Revised after the cold review of `8db49c1cd`, which blocked it on six
+points, and after the re-review of `6c9e31d61` (draft-and-confirm removed; decision views held
+until sealing). The six points were:
 - agent use of real data;
 - server logging;
 - the source-first rule;
@@ -46,9 +48,12 @@ because agents are remote models.
     an invented recall, an invented annotation table, an invented transcript, and a generated test
     film (ffmpeg `testsrc` with tones). These are committed as fixtures.
 - **The server binds to `127.0.0.1` only** and refuses any other Host header.
-  - The token is a random value printed once to the owner's terminal. The first request exchanges it
-    for an HttpOnly, SameSite=Strict cookie, and later requests carry only the cookie.
-  - **Request logging is disabled.** `log_message` is overridden to write nothing.
+  - The token is a random value printed once to the owner's terminal. It is single-use: the
+    first request exchanges it for an HttpOnly, SameSite=Strict cookie, invalidates it, and
+    redirects so the token leaves the URL and browser history. Later requests carry only the
+    cookie.
+  - **Request logging is disabled.** `log_message` is overridden to write nothing, and
+    `handle_error` prints only the exception type, never a request body or traceback locals.
   - **Searches and every request that carries text are POST bodies,** never query strings.
   - Responses send `Cache-Control: no-store` and a CSP of `default-src 'self'` with no external
     loads.
@@ -68,13 +73,16 @@ artifact into the recall pass.
 
 **The person list in the recall pass is built independently of arm A.** It holds:
 - every distinct `Name - All` entry in the annotation, as a named character or a role label with its
-  count, in a fixed alphabetical order;
+  in a fixed alphabetical order, with no counts (a count is a frequency prior);
 - people the reviewer creates during the recall pass, for example "unnamed woman 1";
 - the fixed options "absent / off-screen person", "no one in the film" and "Unknown".
 
-**A mandatory "suggestions off" calibration sample** is part of the protocol. The first 5 committed
-decisions, and then every tenth one, are made with candidates and search hidden. Agreement with
-the suggestions-on decisions is reported. Every suggestion shown for a decision is logged privately.
+**A mandatory "suggestions off" calibration sample** is part of the protocol. The tool counts
+decisions as they are started (a new span selected), not windows. The first 5 started decisions,
+and then every tenth, open with candidates and search hidden. The reviewer commits step 1 blind;
+the suggestions are then revealed and the reviewer may revise, which is logged. The reported
+metric is the revision rate on these paired items, split by `reference_form`. Every suggestion
+shown for a decision is logged privately.
 
 ### 3. Two passes; the whole source pass comes first
 
@@ -85,7 +93,7 @@ the suggestions-on decisions is reported. Every suggestion shown for a decision 
 timing nomination fails. Codex records 40 rows with no nomination and 98 whose nomination changes
 across clocks, and the stopping prefix needs recall counts, which would be circular. So:
 - the workbench refuses to open any recall window until the source pass is marked complete for
-  **every** scene that any v2 selection prefix could include;
+  **every** scene that any v2 selection prefix could include, which is all 50 scenes;
 - the source pass records every row, every `Name - All` person and every recognizer person-mention,
   with completion enforced. Recall memory then cannot choose what gets reviewed.
 
@@ -99,6 +107,9 @@ owner chooses:
 - or a reported weaker separation, block by block, in order. If chosen, its limitation is stated in
   every result.
 
+The gate is configured by that recorded owner decision: complete-all by default, or per block
+under the weaker option. The decision's Mote op id is written into the private log header.
+
 ### 4. Codex's interchange is the canonical output
 
 The output is Codex's private `decisions.csv` and `review-windows.csv`, column for column, with the
@@ -109,9 +120,12 @@ semantics of `2026-10-25-identity-feasibility-codex.md`, steps 1-6.
   workbench writes whatever is agreed. Nothing is invented.
 - **Spans may cross window boundaries** (step 1).
 - **Two steps per decision, following step 5.** The reviewer first commits the reference fields:
-  span, form, role, occurrence group, person_reference, and the referent. Only then does the source
+  span, `other_coref_spans`, form, role, occurrence group, person_reference, and the referent.
+  Only then does the source
   evidence step open: source scenes, anchors, `source_resolvable`, `reference_outcome` and
   `ambiguity_reason`.
+- **The export fills the template's `reviewer` and `reviewed_at` columns** in `decisions.csv`
+  from the log.
 - **`review-windows.csv` has no reviewed_at column,** so the private JSONL edit log carries every
   timestamp.
 
@@ -198,19 +212,17 @@ persons and mentions have been resolved. A scene is complete only when every ite
   scene?" and "where is this line?".
 - **Duplicate warning.** A new decision overlapping an existing span with the same referent shows a
   warning (step 3).
-- **Draft-and-confirm,** only if the owner chooses it. An agent draft appears only after the
-  reviewer's own commit. Revealing it is logged, and disagreements go to a second-look queue.
 
 ### Structure panel (`S`; owner use)
 
-These views are for insight during review. They draw on raw evidence and the reviewer's own
-committed decisions only:
-- a **scene coverage strip** across the 50 scenes;
-- a **presence strip** per annotation person;
-- the **trajectory** of committed decisions, with recall order against film order.
+**During labelling, the panel shows raw evidence only:** a **presence strip** per annotation
+person across the film, and the recall's own timing nominations against film order. Nothing
+built from committed decisions appears while labelling. Codex publishes the block assignment, so a
+per-scene tally of decisions is a per-block tally and would show which partitions are thin.
 
-Partition labels and reference-chain links are not shown, because they would expose quarantine
-structure (constraint 5). In the source pass, only the presence strip appears.
+**After the manifest is sealed,** the panel adds views built from decisions: a scene coverage
+strip across the 50 scenes, and the trajectory of committed decisions, with recall order against
+film order.
 
 ## Efficiency features
 
@@ -259,7 +271,7 @@ structure (constraint 5). In the source pass, only the presence strip appears.
 | W5 | Source-pass UI | completion enforcement tested; review |
 | W4 | Recall-pass UI and the structure panel | works end to end on synthetic specimens |
 | W4h | Visual hill climb (`visual-hill-climb`) on **synthetic specimens only**, with a few bounded rounds scored on design quality, utility, speed of accurate annotation and structural insight | scores plateau; no regression on fixed specimens |
-| W4p | Owner pilot on throwaway material, 5 timed items; the owner alone | fixes made |
+| W4p | Owner pilot on the synthetic specimen (never another participant's recall), 5 timed items; the owner alone | fixes made |
 | W6 | Port note to storyatlas4s, including the SD5 ADR line for any promoted format | reviewed; the port is a later epic |
 
 The owner's real review then runs in this order: the full source pass first, then the recall pass.
@@ -278,6 +290,12 @@ The owner's real review then runs in this order: the full source pass first, the
 - **Suggestions anchor the reviewer.** Mitigations: candidates point to moments, never persons;
   suggestions are never preselected; the calibration sample is mandatory; and the suggestions shown
   are logged.
+- **The name-token signal resembles arm D's method,** which may raise the reference's
+  agreement with D on name cases. The calibration revision rate is reported by
+  `reference_form` so the effect is visible.
+- **Unnamed-person ids differ between passes.** The recall pass's created people are matched to
+  the source pass's unnamed ids through `source_anchor_ids`; the encoding is settled with the
+  referent on Fray #136.
 - **Video playback.** The parts are H.264 and AAC in an M4V container, which browsers play. If one
   does not, ffmpeg remuxes it to MP4 privately.
 - **Source-pass burden.** The exhaustive pass is large. That is an owner decision (constraint 3),
