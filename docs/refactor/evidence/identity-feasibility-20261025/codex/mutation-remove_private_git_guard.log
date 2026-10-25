@@ -1,0 +1,25 @@
+test_closed_legacy_interval_and_one_based_tr_are_different (test_identity_feasibility.CensusTests.test_closed_legacy_interval_and_one_based_tr_are_different) ... ok
+test_duplicate_header_and_invalid_scene_refused (test_identity_feasibility.CensusTests.test_duplicate_header_and_invalid_scene_refused) ... ok
+test_every_word_survives_screen_and_scene_misses (test_identity_feasibility.CensusTests.test_every_word_survives_screen_and_scene_misses) ... ok
+test_legacy_export_cannot_hide_an_omitted_word_or_duplicate (test_identity_feasibility.CensusTests.test_legacy_export_cannot_hide_an_omitted_word_or_duplicate) ... ok
+test_overlapping_scene_nominations_are_not_arbitrated (test_identity_feasibility.CensusTests.test_overlapping_scene_nominations_are_not_arbitrated) ... ok
+test_private_output_requires_ignore_and_preserves_prior_runs (test_identity_feasibility.CensusTests.test_private_output_requires_ignore_and_preserves_prior_runs) ... FAIL
+test_screen_does_not_claim_semantic_decisions (test_identity_feasibility.CensusTests.test_screen_does_not_claim_semantic_decisions) ... ok
+test_split_is_total_and_body_cases_cannot_be_confirmation (test_identity_feasibility.CensusTests.test_split_is_total_and_body_cases_cannot_be_confirmation) ... ok
+test_summary_and_ledger_do_not_copy_raw_text (test_identity_feasibility.CensusTests.test_summary_and_ledger_do_not_copy_raw_text) ... ok
+
+======================================================================
+FAIL: test_private_output_requires_ignore_and_preserves_prior_runs (test_identity_feasibility.CensusTests.test_private_output_requires_ignore_and_preserves_prior_runs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/tmpikmr5h1i/test_identity_feasibility.py", line 81, in test_private_output_requires_ignore_and_preserves_prior_runs
+    with self.assertRaisesRegex(ValueError, "ignored"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.092s
+
+FAILED (failures=1)
+
+EXIT_STATUS=1

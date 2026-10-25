@@ -1,0 +1,335 @@
+{
+  "counts": {
+    "boundary_disagreement_rows": 98,
+    "multiple_scene_nomination_rows": 0,
+    "no_scene_nomination_rows": 40,
+    "one_tr_vs_legacy_seconds_disagreement_rows": 94,
+    "one_vs_zero_tr_disagreement_rows": 98,
+    "person_noun_screen_rows": 49,
+    "pronoun_screen_rows": 257,
+    "review_windows": 50,
+    "screened_word_rows": 306,
+    "timing_missing_rows": 0,
+    "word_rows": 2495
+  },
+  "go_status": "not_evaluated",
+  "human_resolvable_decisions": null,
+  "inputs": {
+    "legacy_voyage_sha256": "c6e1b597f8c29a94b4b2e580fdad5c8a59e5cdaa5bdd5d12c4214f3134ae0bc7",
+    "recall_sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+    "scenes_sha256": "68cc307c19cfd429a3bd0eda84ee18d0152c87444d33a79246a7cd64d3763753",
+    "script_sha256": "bf6912da6a980fd94961cc4859a1fa158e6360e5afa63b3360cbbf7c4dd0545b",
+    "subject": "3"
+  },
+  "legacy_unit_audit": {
+    "exact_normalized_text_matches": 159,
+    "qualification": "Audit of this saved export's selection, not a claim that every omitted token is a person reference or that the original segmenter is defective.",
+    "unique_word_rows_selected_by_saved_endpoints": 2406,
+    "units": 173,
+    "word_rows_not_selected": 89,
+    "word_rows_selected_more_than_once": 2
+  },
+  "private_artifact_sha256": {
+    "decisions.csv": "448817c41c6f23bd892687eacf09258a8da50b9c98c7e264cb82c9f38aa9d4a2",
+    "review-windows.csv": "8137fb09b065146a03381e2c6cf799d3c816e291981d5021708cd8f4e642cb4a",
+    "review.html": "50d35a5a49dc33dca1e9f51f3af2ce88028d74776c501e7b0a8e5bf140779e27",
+    "word-census.json": "afa35c3a30002e8fde25485c44fa6789c62deb1b4de8b86a9ad630adafc697a7"
+  },
+  "review_burden": {
+    "additional_source_viewing_and_anchor_review": "must be added from Claude's source-scope inventory",
+    "assumptions_not_measurements": true,
+    "complete_transcript_minutes_at_100_to_200_words_per_minute": [
+      12.5,
+      24.9
+    ],
+    "decision_adjudication_minutes_per_case": [
+      2,
+      5
+    ],
+    "decision_count_unknown": true
+  },
+  "scene_counts": [
+    {
+      "person_noun": 2,
+      "scene": 2,
+      "screened_word_rows": 2,
+      "word_rows": 38
+    },
+    {
+      "pronoun": 2,
+      "scene": 3,
+      "screened_word_rows": 2,
+      "word_rows": 23
+    },
+    {
+      "pronoun": 6,
+      "scene": 4,
+      "screened_word_rows": 6,
+      "word_rows": 30
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 14,
+      "scene": 5,
+      "screened_word_rows": 16,
+      "word_rows": 70
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 13,
+      "scene": 8,
+      "screened_word_rows": 15,
+      "word_rows": 125
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 6,
+      "scene": 9,
+      "screened_word_rows": 8,
+      "word_rows": 34
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 3,
+      "scene": 10,
+      "screened_word_rows": 4,
+      "word_rows": 44
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 2,
+      "scene": 11,
+      "screened_word_rows": 3,
+      "word_rows": 43
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 12,
+      "scene": 13,
+      "screened_word_rows": 14,
+      "word_rows": 158
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 9,
+      "scene": 14,
+      "screened_word_rows": 11,
+      "word_rows": 85
+    },
+    {
+      "pronoun": 19,
+      "scene": 16,
+      "screened_word_rows": 19,
+      "word_rows": 146
+    },
+    {
+      "person_noun": 3,
+      "pronoun": 7,
+      "scene": 19,
+      "screened_word_rows": 10,
+      "word_rows": 79
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 11,
+      "scene": 22,
+      "screened_word_rows": 13,
+      "word_rows": 100
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 15,
+      "scene": 24,
+      "screened_word_rows": 16,
+      "word_rows": 91
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 4,
+      "scene": 29,
+      "screened_word_rows": 6,
+      "word_rows": 70
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 3,
+      "scene": 30,
+      "screened_word_rows": 4,
+      "word_rows": 53
+    },
+    {
+      "pronoun": 24,
+      "scene": 33,
+      "screened_word_rows": 24,
+      "word_rows": 237
+    },
+    {
+      "person_noun": 4,
+      "pronoun": 20,
+      "scene": 34,
+      "screened_word_rows": 24,
+      "word_rows": 146
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 5,
+      "scene": 35,
+      "screened_word_rows": 6,
+      "word_rows": 51
+    },
+    {
+      "pronoun": 10,
+      "scene": 36,
+      "screened_word_rows": 10,
+      "word_rows": 104
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 1,
+      "scene": 37,
+      "screened_word_rows": 2,
+      "word_rows": 28
+    },
+    {
+      "person_noun": 6,
+      "pronoun": 11,
+      "scene": 38,
+      "screened_word_rows": 17,
+      "word_rows": 109
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 8,
+      "scene": 40,
+      "screened_word_rows": 9,
+      "word_rows": 83
+    },
+    {
+      "person_noun": 1,
+      "scene": 41,
+      "screened_word_rows": 1,
+      "word_rows": 15
+    },
+    {
+      "pronoun": 6,
+      "scene": 42,
+      "screened_word_rows": 6,
+      "word_rows": 31
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 3,
+      "scene": 43,
+      "screened_word_rows": 5,
+      "word_rows": 27
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 8,
+      "scene": 44,
+      "screened_word_rows": 9,
+      "word_rows": 71
+    },
+    {
+      "pronoun": 8,
+      "scene": 45,
+      "screened_word_rows": 8,
+      "word_rows": 45
+    },
+    {
+      "person_noun": 2,
+      "pronoun": 13,
+      "scene": 46,
+      "screened_word_rows": 15,
+      "word_rows": 91
+    },
+    {
+      "person_noun": 3,
+      "pronoun": 5,
+      "scene": 47,
+      "screened_word_rows": 8,
+      "word_rows": 102
+    },
+    {
+      "person_noun": 3,
+      "pronoun": 6,
+      "scene": 48,
+      "screened_word_rows": 9,
+      "word_rows": 80
+    },
+    {
+      "person_noun": 1,
+      "pronoun": 2,
+      "scene": 49,
+      "screened_word_rows": 3,
+      "word_rows": 46
+    }
+  ],
+  "scene_nomination_policy": "Onset <= CSV one-based Princeton TR <= Offset; nomination only. Preserve both zero-based inclusive TR and gold_scene.py closed-seconds alternatives; no membership or split decision may depend on a discrepant word's nomination.",
+  "schema": "identity-feasibility-census/v1",
+  "screen_limit": "Lexical workload screen only; names, ellipsis, other descriptions and unflagged words require human review. Rows and tokens are not attribution decisions.",
+  "source_scope": {
+    "mandatory_discovery_scenes": [
+      29,
+      30
+    ],
+    "status": "not_sealed_pending_blind_reference_census"
+  },
+  "split": {
+    "assignment": {
+      "1": "confirmation",
+      "2": "confirmation",
+      "3": "confirmation",
+      "4": "discovery",
+      "5": "confirmation",
+      "6": "discovery",
+      "7": "confirmation",
+      "8": "discovery",
+      "9": "discovery",
+      "10": "discovery",
+      "11": "discovery",
+      "12": "confirmation",
+      "13": "confirmation",
+      "14": "discovery",
+      "15": "confirmation",
+      "16": "discovery",
+      "17": "confirmation",
+      "18": "confirmation",
+      "19": "discovery",
+      "20": "confirmation",
+      "21": "confirmation",
+      "22": "discovery",
+      "23": "confirmation",
+      "24": "discovery",
+      "25": "discovery",
+      "26": "confirmation",
+      "27": "discovery",
+      "28": "confirmation",
+      "29": "discovery",
+      "30": "discovery",
+      "31": "discovery",
+      "32": "discovery",
+      "33": "confirmation",
+      "34": "confirmation",
+      "35": "confirmation",
+      "36": "discovery",
+      "37": "discovery",
+      "38": "discovery",
+      "39": "discovery",
+      "40": "discovery",
+      "41": "confirmation",
+      "42": "discovery",
+      "43": "confirmation",
+      "44": "confirmation",
+      "45": "discovery",
+      "46": "confirmation",
+      "47": "confirmation",
+      "48": "discovery",
+      "49": "confirmation",
+      "50": "discovery"
+    },
+    "qualification": "Prospectively untouched for this pilot only; NN03 and this film were previously exposed. Cross-partition decisions are quarantined, never silently reassigned.",
+    "seed": "identity-feasibility-NN03-20261025-v1",
+    "unit": "source scene"
+  }
+}
