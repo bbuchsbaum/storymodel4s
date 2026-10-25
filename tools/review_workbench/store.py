@@ -266,25 +266,15 @@ class Store:
         return [w for w in self.calibration_windows() if w not in self.revealed_windows()]
 
     def reveal_window(self, window: int) -> dict:
-        """Reveal one calibration window: every decision started there keeps its blind step-1
-        answer, and revisions from now on are logged as revisions."""
+        """Reveal one calibration window. Items committed blind before the reveal keep their
+        blind answers; revisions are logged. An item started there but not committed before the
+        reveal leaves the blind sample (it is marked late) instead of blocking the reveal, so a
+        closed or undone item can never lock a window (v4 function review, B10)."""
         self._require_recall()
         if window not in self.calibration_windows():
             raise StoreError("only a calibration window can be revealed")
         if window in self.revealed_windows():
             raise StoreError("this window is already revealed")
-        win = next(w for w in self.p.windows if w["window"] == window)
-        rows = set(range(win["first"], win["last"] + 1))
-        committed = self.decisions()
-        deleted = {e["id"] for e in self.live() if e["kind"] == "decision.delete"}
-        open_items = [
-            e["id"] for e in self.live()
-            if e["kind"] == "decision.start" and e["calibration"] and e.get("span")
-            and e["id"] not in committed and e["id"] not in deleted
-            and set(range(e["span"][0], e["span"][1] + 1)) & rows
-        ]
-        if open_items:
-            raise StoreError(f"commit step 1 of {', '.join(open_items)} before revealing this window")
         return self._append({"kind": "calibration.reveal", "window": window})
 
     def _span_rows(self, did):
@@ -495,8 +485,19 @@ class Store:
                 out[e["id"]]["t"] = e["t"]
             elif k == "decision.delete":
                 out.pop(e["id"], None)
+        reveal_seq = {e["window"]: e["seq"] for e in self.events if e["kind"] == "calibration.reveal"}
+        first_ref = {}
+        for e in self.live():
+            if e["kind"] in ("decision.reference", "decision.revise"):
+                first_ref.setdefault(e["id"], e["seq"])
         for did, d in out.items():
             d["revealed"] = self._revealed(did)
+            if d["calibration"]:
+                start = starts[did]
+                wins = {self.p.census[r - 1]["window"] for r in range(start["span"][0], start["span"][1] + 1)}
+                seqs = [reveal_seq[w] for w in wins if w in reveal_seq]
+                if seqs and first_ref.get(did, 0) > min(seqs):
+                    d["calibration"], d["late"], d["blind"] = False, True, None
         return out
 
     def duplicates(self, did, first, last, referent) -> list:

@@ -469,11 +469,16 @@ class CalibrationCourt(unittest.TestCase):
         with self.assertRaisesRegex(store.StoreError, "already revealed"):
             s.reveal_window(1)
 
-    def test_a_window_waits_for_its_open_items(self):
+    def test_an_uncommitted_item_never_locks_its_window(self):
         s = done_store()
-        s.start_decision([8, 8])
-        with self.assertRaisesRegex(store.StoreError, "before revealing"):
-            s.reveal_window(1)
+        abandoned = s.start_decision([8, 8])["id"]  # closed without committing (B10)
+        s.reveal_window(1)
+        self.assertIn(1, s.revealed_windows())
+        s.commit_reference(abandoned, {**REF, "first_word": 8, "last_word": 8})
+        d = s.decisions()[abandoned]
+        self.assertFalse(d["calibration"])  # committed after the reveal: not a blind item
+        self.assertTrue(d["late"])
+        self.assertEqual(s.calibration()["items"], 0)
         with self.assertRaisesRegex(store.StoreError, "calibration window"):
             s.reveal_window(3)
 

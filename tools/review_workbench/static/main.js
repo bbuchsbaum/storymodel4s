@@ -22,7 +22,8 @@ const KEYS = {
     ['N', 'add an unnamed person'], ['Enter', 'row done, go to the next'],
   ],
   recall: [
-    ['W B', 'jump to the next or previous likely reference'], ['← →', 'move one word'],
+    ['W B', 'jump to the next or previous likely reference'], ['Shift+W B', 'reopen the next or previous decision'],
+    ['← →', 'move one word'],
     ['Shift+← →', 'extend the selection'], ['J K', 'next or previous window'],
     ['M', 'mark the window read'], ['Enter', 'start a decision or commit the current step'],
     ['1–8', 'open candidate n'], ['/', 'search'], ['C', 'add selection as co-referring span'],
@@ -30,8 +31,8 @@ const KEYS = {
     ['n p d e o', 'reference form (step 1)'],
     ['y x u', 'person? (step 1) or resolvable (step 2)'], ['s c v e', 'outcome (step 2)'],
     ['Shift+R', 'reveal this calibration window (after every reference in it is committed)'],
-    ['Shift+E', 'edit step 1 (in step 2)'],
-    ['Z', 'undo the last edit'], ['Shift+E', 'reopen the decision under the cursor'], ['Esc', 'close the form'],
+
+    ['Z', 'undo the last edit'], ['Shift+E', 'reopen the decision under the cursor; in step 2, edit step 1'], ['Esc', 'close the form'],
   ],
 };
 
@@ -176,7 +177,6 @@ S.startDecision = async function () {
     S.decide.render();
     if (out.calibration) S.filmPane.showMoment(null);
     await S.decide.load(...sp);
-    if (out.calibration) toast('Calibration item: suggestions are hidden until you commit step 1.');
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -190,7 +190,7 @@ S.reopen = function (id) {
   S.active = {
     id,
     calibration: d.calibration,
-    step: 1,
+    step: 2, // a committed decision reopens at its evidence; Shift+E goes back to step 1
     fields: structuredClone(d.reference),
     source: d.source ? structuredClone(d.source) : blankSource(),
     started: Date.now(),
@@ -283,7 +283,7 @@ S.commitReference = async function () {
     a.step = 2;
     S.recallPane.refresh();
     S.decide.render();
-    toast(a.calibration && !S.revealed(a.id) ? `${a.id}: step 1 saved. Reveal the suggestions when ready.` : `${a.id}: step 1 saved`);
+    toast(`${a.id}: step 1 saved${a.calibration && !S.revealed(a.id) ? ' (blind)' : ''}`);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -299,9 +299,10 @@ S.editStep1 = function () {
 // A reveal covers a whole calibration window and cannot be undone; do it after every reference
 // in the window has been committed blind.
 S.calWindowOf = function (a) {
-  const sp = a ? [a.fields.first_word, a.fields.last_word] : span();
-  if (!sp) return null;
   const cw = new Set(S.state.maskedWindows || []);
+  // With no item open the reader's own window counts, so a reveal is never stranded by Esc.
+  const sp = a ? [a.fields.first_word, a.fields.last_word] : span() || (cw.has(S.win) ? [S.index.windows[S.win - 1].first, S.index.windows[S.win - 1].first] : null);
+  if (!sp) return null;
   for (let r = sp[0]; r <= sp[1]; r++) {
     const w = S.index.words[r - 1].window;
     if (cw.has(w)) return w;
@@ -309,9 +310,20 @@ S.calWindowOf = function (a) {
   return null;
 };
 
+let revealArmed = 0;
 S.reveal = async function () {
   const w = S.calWindowOf(S.active);
   if (!w) return toast('Nothing to reveal here.');
+  if (S.active && !S.decision(S.active.id)) return toast('Commit step 1 of this item before revealing the window.', 'error');
+  // Warn once about likely references in the window that have no decision yet: after the
+  // reveal they can no longer be judged blind.
+  const win = S.index.windows[w - 1];
+  let open = 0;
+  for (let r = win.first; r <= win.last; r++) if (S.index.words[r - 1].screen && !S.recallPane.wordEls[r].dataset.did) open++;
+  if (open && Date.now() - revealArmed > 4000) {
+    revealArmed = Date.now();
+    return toast(`${open} likely reference${open > 1 ? 's' : ''} in window ${w} have no decision yet and will no longer be blind. Shift+R again to reveal anyway.`, 'error');
+  }
   try {
     const out = await post('/api/calibration/reveal', { window: w });
     S.setState(out.state);
@@ -458,7 +470,10 @@ async function setMode(mode) {
 
 function inText(e) {
   const t = e.target;
-  return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+  if (!t) return false;
+  // Checkboxes and radios take only Space; every other key still belongs to the workbench.
+  if (t.tagName === 'INPUT' && ['checkbox', 'radio'].includes(t.type)) return e.key === ' ';
+  return t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable;
 }
 
 function onKey(e) {
@@ -508,6 +523,14 @@ function recallKey(e) {
     S.select(e.shiftKey && S.sel ? S.sel.a : b, b);
     return true;
   }
+  if ((k === 'W' || k === 'B') && !a) {
+    // Hop between committed decisions and reopen one, e.g. to add evidence after a reveal.
+    const ids = Object.values(S.state.decisions).sort((x, y) => x.reference.first_word - y.reference.first_word);
+    const next = k === 'W' ? ids.find(d => d.reference.first_word > cur) : [...ids].reverse().find(d => d.reference.first_word < cur);
+    if (next) S.reopen(next.id);
+    else toast('No more decisions in that direction.');
+    return true;
+  }
   if (k === 'w' || k === 'b') {
     const d = k === 'w' ? 1 : -1;
     const words = S.index.words;
@@ -523,13 +546,13 @@ function recallKey(e) {
   if (k === 'k') { S.goWindow(S.win - 1); return true; }
   if (k === 'm') { const done = S.state.windows[String(S.win)]?.[0]; S.markRead(S.win, !done); return true; }
   if (k === '/') {
-    if (S.decide.searchBlind()) { toast('Search is hidden in a calibration window and while a calibration item is open.'); return true; }
+    if (S.decide.searchBlind()) { S.decide.setTab('search'); S.decide.sink?.focus(); return true; }
     S.decide.setTab('search');
     return true;
   }
   if (k === 'z') { S.undo(); return true; }
   if (/^[1-8]$/.test(k)) { if (S.decide.tab === 'search') S.decide.openHit(Number(k) - 1); else S.decide.choose(Number(k) - 1); return true; }
-  if (k === 'R' && a && a.calibration && S.decision(a.id) && !S.revealed(a.id)) { S.reveal(); return true; }
+  if (k === 'R') { S.reveal(); return true; }
   if (k === 'E' && a && a.step === 2) { S.editStep1(); return true; }
   if (k === 'Escape') { if (a) S.closeDecision(); else { S.sel = null; S.recallPane.refreshSelection(); S.decide.renderForm(); } return true; }
   if (k === 'E' && !a) { S.reopenAt(cur); return true; }
