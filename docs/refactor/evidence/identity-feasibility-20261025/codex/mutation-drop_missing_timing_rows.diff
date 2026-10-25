@@ -1,0 +1,6 @@
+--- a/tools/identity_feasibility.py
++++ b/tools/identity_feasibility.py
+@@ -118 +118,2 @@
+-        ledger.append(item)
++        if not item["timing_missing"]:
++            ledger.append(item)

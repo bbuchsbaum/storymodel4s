@@ -1,0 +1,5 @@
+--- a/tools/identity_feasibility.py
++++ b/tools/identity_feasibility.py
+@@ -181 +181 @@
+-        if check.returncode != 0:
++        if False:

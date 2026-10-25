@@ -64,7 +64,14 @@ class CensusTests(unittest.TestCase):
         split = subject.scene_split()
         self.assertEqual(set(split), set(range(1, 51)))
         self.assertEqual([split[29], split[30]], ["discovery", "discovery"])
-        self.assertEqual(list(split.values()).count("confirmation"), 24)
+        self.assertEqual(list(split.values()).count("confirmation"), 25)
+
+    def test_split_matches_frozen_v2_assignment_and_block_order(self):
+        confirmation = set(range(1, 16)) | set(range(31, 36)) | set(range(46, 51))
+        self.assertEqual(subject.scene_split(), {
+            s: "confirmation" if s in confirmation else "discovery" for s in range(1, 51)})
+        self.assertEqual(subject.block_order(), {
+            "confirmation": [31, 11, 46, 6, 1], "discovery": [26, 21, 36, 41, 16]})
 
     def test_duplicate_header_and_invalid_scene_refused(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -90,6 +97,18 @@ class CensusTests(unittest.TestCase):
             self.assertEqual((private / "review.html").stat().st_mode & 0o777, 0o600)
             with self.assertRaisesRegex(ValueError, "new or empty"):
                 subject.private_directory(private)
+
+    def test_every_private_artifact_must_be_ignored(self):
+        for exposed in subject.PRIVATE_FILES:
+            with self.subTest(exposed=exposed):
+                with tempfile.TemporaryDirectory() as folder:
+                    subprocess.run(["git", "init", "-q", folder], check=True)
+                    root = Path(folder)
+                    (root / ".gitignore").write_text("".join(
+                        f"private/{name}\n" for name in subject.PRIVATE_FILES if name != exposed))
+                    with self.assertRaisesRegex(ValueError, "Every private output"):
+                        subject.private_directory(root / "private")
+                    self.assertFalse((root / "private").exists())
 
 
 if __name__ == "__main__":

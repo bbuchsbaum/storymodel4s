@@ -1,0 +1,6 @@
+--- a/tools/identity_feasibility.py
++++ b/tools/identity_feasibility.py
+@@ -118 +118,2 @@
+-        ledger.append(item)
++        if kinds:
++            ledger.append(item)

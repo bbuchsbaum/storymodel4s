@@ -1,0 +1,5 @@
+--- a/tools/identity_feasibility.py
++++ b/tools/identity_feasibility.py
+@@ -189 +189 @@
+-        for name in PRIVATE_FILES:
++        for name in ("review.html", "word-census.json", "review-windows.csv"):

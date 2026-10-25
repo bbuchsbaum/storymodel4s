@@ -9,7 +9,9 @@ the experimental binder and the comparison runs are not complete. This packet sp
 smallest useful next step; it does not license a new production identity basis or change an ADR.
 The joint proposal remains recorded in epic notes
 `20261025T140608.260924Z-p10810-c0000-rca0d-hddbbcf` and
-`20261025T140809.851661Z-p16321-c0000-rec89-h9ebf19`.
+`20261025T140809.851661Z-p16321-c0000-rec89-h9ebf19`, with addendum
+`20261025T144732.050282Z-p39096-c0000-r1211-h23b326` and Codex acknowledgement
+`20261025T144952.841248Z-p47815-c0000-r6988-hec6c12`.
 
 ## Measured population
 
@@ -58,12 +60,12 @@ python3 -B tools/identity_feasibility.py \
 ```
 
 Both output destinations must be new (the private directory may exist only if empty). Preserve
-the recorded input hashes; a different source is a different census. The measured initial run
-is in `.agent-work/identity-feasibility-20261025/private/run-1/` in the primary repository.
+the recorded input hashes; a different source is a different census. The current v2 run
+is in `.agent-work/identity-feasibility-20261025/private/run-2/` in the primary repository.
 `review.html` displays every word and its one-based CSV row ID; `review-windows.csv` records which
 windows a human has checked; `decisions.csv` is a blank judgment template. `word-census.json`
 records nominations and flags without text. Private files are mode 600, their directory mode 700,
-and a destination inside Git must be ignored. These artifacts stay local and outside commits.
+and every generated private file inside Git must be ignored. These artifacts stay local and outside commits.
 The public summary records their initial hashes; completed review files need a new versioned
 receipt, not an assertion that the initial blank templates were reviewed.
 
@@ -99,35 +101,67 @@ uniqueness, and hash the completed artifacts. That runner is future work.
 
 ## Source scope and confirmation
 
-The assignment of all 50 source scenes is frozen in `census.json`, using seed
-`identity-feasibility-NN03-20261025-v1`. Scenes 29 and 30 are discovery-only. Sort the other
-48 scenes by SHA-256 of `seed:scene`; the first 24 are confirmation and the remainder discovery.
-This is prospective separation for the new pilot only. NN03 and this film have already been
-examined; this split cannot establish generalization to a new participant or film.
+The v2 assignment of all 50 source scenes is frozen in `census.json`, using seed
+`identity-feasibility-NN03-20261025-v2`. Group source-scene IDs into fixed contiguous blocks of
+five: 1–5, 6–10, through 46–50. These are mechanical groups, not asserted semantic story arcs.
+Force block 26–30 into discovery. Sort the other nine block starts by SHA-256 of `seed:start`;
+the first five are confirmation and the remaining four discovery. The recorded selection order
+is confirmation starts `[31, 11, 46, 6, 1]` and discovery starts `[26, 21, 36, 41, 16]`.
+Block 26–30 spans both media parts: scenes 26–27 use part a, 28–30 part b. It is not one media
+interval; source graphs and clock mappings retain their separate parts even within a block.
 
-The source-scene subset is **not sealed yet**. Use the complete blind reference census to choose
-it before any arm outputs or binder tuning. The following selection procedure is proposed here
-and must be sealed with the input packet before runs:
+**Seed history.** Only v1 was tried for the original scene-level design, published alongside the
+census at `b062895ec`; it was not preregistered before those metadata counts were seen. Cold
+review identified excessive split boundaries and a shortest-duration selection bias. Before any
+new reference labels, arm outputs or binder implementation, Codex proposed this single v2 seed
+and block rule; Claude agreed in Fray #136 @1044. Each computed it once, obtained the same
+assignment, and tried no alternative seed. Claude also inspected partition counts during this
+review. Preserve the v1 summary as `census-v1.json` and its private run as `run-1`; v2 supersedes
+it for this pilot. No further seed search follows a disappointing sample or result.
 
-- Keep the two partitions separate. Start discovery with scenes 29 and 30 as the named witness.
-  Within each partition, order other scenes by whole-scene playback duration from the pinned
-  watch-scene metadata, ascending, then numeric scene ID. Record the duration calculation and
-  source hash in the selection manifest; missing duration makes the cost estimate incomplete.
-- Add whole scenes in that fixed order until the partition contains at least 15 distinct
-  human-resolvable natural decisions and includes both pronoun and description cases. Retain
-  every natural decision in selected scenes, including unknowns and incorrect/external recalls.
-  This is the smallest prefix under the declared ordering, not a globally optimal scene subset.
-  Report source viewing, vocabulary and anchor-review costs alongside its size.
-- A decision that depends on scenes assigned to both partitions is quarantined and reported,
-  not reassigned. It is excluded from both the 80% denominator and the 15-decision minimum.
-  Report its reference form/complexity and the fraction of the full population quarantined;
-  GO applies only to the selected, non-quarantined cases and cannot establish performance on
-  these excluded hard cases. Within a partition, all source scenes needed for a decision must be selected
-  before it counts toward the minimum. Human-evidenced scene assignment can correct a nomination
-  before sealing, with a receipt; neither model outputs nor timing ambiguity can do so.
-- If all eligible scenes still give fewer than 15 resolvable decisions, lack a required reference
-  form, or exceed the accepted review budget, report insufficient feasibility. Do not recruit
-  additional participants, manufacture variants or expand after seeing arm results.
+The new split has four partition crossings among 49 adjacent source-scene pairs, versus 29 for
+v1. Claude's metadata check found confirmation nominations in 17 of the 32 recalled scenes,
+covering 1,403 words, versus 13 scenes and 1,075 words under v1. These are exposure proxies,
+not measured reference-chain quarantine rates. The actual quarantined share and whether each
+partition reaches 15 distinct decisions remain unknown pending human review. This is prospective
+separation for the new pilot only: NN03 and this film have already been examined, so it cannot
+establish generalization to a new participant or film.
+
+The source subset is **not sealed yet**. Use the complete blind reference census to select it
+before any arm outputs or binder tuning. The following v2 procedure replaces duration ranking:
+
+- Keep the partitions separate. Add whole blocks in their recorded order, starting discovery
+  with block 26–30. Stop at the smallest prefix having at least 15 distinct, independently judged,
+  non-regression human-resolvable natural decisions, including pronoun and description cases,
+  and at least two hard natural decisions spanning at least two strata: off-screen reference,
+  relational description, within-partition multi-scene dependency, or role/event/state/context
+  disambiguation. Report absent natural strata. All designed discriminating controls remain
+  mandatory and separate; they cannot fill the natural minimum or hard-case quota.
+- The reused body/identity cases count only as regression evidence, never toward the 15-decision
+  minimum or hard-natural quota. Preserve their named acceptance witness. Other natural decisions
+  from those source scenes may count only if not reused regression cases; record their provenance.
+  The regression witness keeps its complete original source-anchor set, including any anchors
+  outside scenes 29–30; it is not truncated to the recall nomination or counted as a confirmation
+  case merely because an anchor falls in a confirmation block.
+- Retain every natural decision whose required scenes are fully selected, including unknowns and
+  incorrect/external recalls. A within-partition decision needing an unselected block is an
+  explicitly reported `scope-incomplete` exclusion, not a silently omitted case. Report its count,
+  reference form and complexity, as for other exclusions.
+- A decision depending on both partitions is quarantined, never reassigned to evade the split.
+  Exclude it from both the 80% denominator and the 15-decision minimum; retain a separate row in
+  full accounting and report reference-form/complexity counts and the fraction quarantined.
+  Human evidence may correct a scene nomination before sealing, with a receipt. Neither timing
+  ambiguity nor arm outputs may choose a partition. Within-partition multi-scene cases become
+  eligible when all their source blocks are selected.
+- Report every exclusion category and the overall eligible share. GO applies only to the selected,
+  non-quarantined cases; it cannot establish performance on excluded cross-scene or hard cases.
+- Playback, vocabulary and anchor-review costs constrain feasibility; they do not reorder blocks.
+  Use the pinned watch-scene file with SHA-256
+  `681b70273fe0f77e781f87892f87b0da3f96c4908432737131cb6996c9221150` for duration estimates,
+  and record the duration convention. Missing duration means incomplete cost evidence, not zero
+  cost. If either complete partition still lacks the natural minimum, required reference forms
+  or hard cases, or exceeds the accepted review budget, report insufficient feasibility. Do not
+  add participants, manufacture variants, re-seed or expand after arm results.
 
 A human reference curator may inspect confirmation material to establish the sealed labels;
 the binder author and model tuning process must not inspect those labels or arm outputs until
@@ -219,13 +253,15 @@ passed by the census tool. Include a matching positive control for each rejectio
 ## Decision rule and handoff
 
 The current result is **not evaluated**, not GO. The agreed engineering utility screen requires
-at least 15 human-resolvable natural decisions in the assessed partition, at least 80% correct
+at least 15 independently judged, non-regression human-resolvable natural decisions in the
+assessed partition, the hard-case quota above, at least 80% correct
 attribution among those decisions, zero observed false attribution/contradiction, and every
 discriminating control passed. Discovery and confirmation are reported separately. Also report
 correct, wrong, unresolved and input-failed counts and answer coverage over every frozen natural
 decision, with reference-unknown cases separate from scorable correctness. Natural decisions and
 designed controls must never share a denominator. Small, clustered observations do not certify
-a population precision rate.
+a population precision rate. The same error gate applies to every arm and any repair. Select
+among passing arms by correct attribution at equal error, then effort, cost and reuse.
 
 If A fails, inspect the failed stage and allow one targeted seam repair before the untouched
 confirmation run. A confirmation failure stops or reframes the approach; it does not spawn an

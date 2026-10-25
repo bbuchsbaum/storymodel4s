@@ -13,6 +13,7 @@ from decimal import Decimal, InvalidOperation
 import hashlib
 import html
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -22,9 +23,10 @@ WORD = "Words"
 SECONDS = "Princeton Dataspace Word Onset Time (sec)"
 TR_INDEX = "Princeton Dataspace TR Number"
 TR = Decimal("1.5")
-SEED = "identity-feasibility-NN03-20261025-v1"
+SEED = "identity-feasibility-NN03-20261025-v2"
 PRONOUNS = frozenset("he him his himself she her hers herself they them their theirs themselves".split())
 NOUNS = frozenset("person people man men woman women girl girls boy boys lady ladies body victim victims mother father sister brother daughter son wife husband friend stranger detective officer doctor driver nurse killer murderer patient witness".split())
+PRIVATE_FILES = ("review.html", "word-census.json", "decisions.csv", "review-windows.csv")
 
 
 def digest(path):
@@ -79,12 +81,17 @@ def scene_intervals(rows, subject):
     return intervals
 
 
-def scene_split():
-    # All source scenes are allocated before reference judgments or new outputs.
-    remaining = [s for s in range(1, 51) if s not in (29, 30)]
+def block_order():
+    remaining = [s for s in range(1, 51, 5) if s != 26]
     ordered = sorted(remaining, key=lambda s: hashlib.sha256(f"{SEED}:{s}".encode()).hexdigest())
-    confirmation = set(ordered[:24])
-    return {s: "confirmation" if s in confirmation else "discovery" for s in range(1, 51)}
+    return {"confirmation": ordered[:5], "discovery": [26] + ordered[5:]}
+
+
+def scene_split():
+    # Fixed adjacent blocks reduce split boundaries without using reference judgments.
+    confirmation = set(block_order()["confirmation"])
+    return {s: "confirmation" if (s - 1) // 5 * 5 + 1 in confirmation else "discovery"
+            for s in range(1, 51)}
 
 
 def inventory(rows, intervals, window_size=50):
@@ -139,9 +146,11 @@ def inventory(rows, intervals, window_size=50):
                "scene_counts": [{"scene": s, **dict(v)} for s, v in sorted(by_scene.items())],
                "screen_limit": "Lexical workload screen only; names, ellipsis, other descriptions and unflagged words require human review. Rows and tokens are not attribution decisions.",
                "human_resolvable_decisions": None, "go_status": "not_evaluated",
-               "split": {"seed": SEED, "unit": "source scene", "assignment": scene_split(),
+               "split": {"seed": SEED, "unit": "fixed block of five adjacent source scene IDs",
+                         "block_selection_order": block_order(), "assignment": scene_split(),
+                         "supersedes": "v1 scene split; see census-v1.json and the plan's seed history",
                          "qualification": "Prospectively untouched for this pilot only; NN03 and this film were previously exposed. Cross-partition decisions are quarantined, never silently reassigned."},
-               "source_scope": {"status": "not_sealed_pending_blind_reference_census", "mandatory_discovery_scenes": [29, 30]},
+               "source_scope": {"status": "not_sealed_pending_blind_reference_census", "mandatory_discovery_scenes": list(range(26, 31))},
                "review_burden": {"assumptions_not_measurements": True,
                                  "complete_transcript_minutes_at_100_to_200_words_per_minute": [round(len(rows)/200, 1), round(len(rows)/100, 1)],
                                  "decision_adjudication_minutes_per_case": [2, 5],
@@ -177,9 +186,10 @@ def private_directory(path):
     root = subprocess.run(["git", "-C", str(ancestor), "rev-parse", "--show-toplevel"],
                           capture_output=True, text=True)
     if root.returncode == 0:
-        check = subprocess.run(["git", "-C", root.stdout.strip(), "check-ignore", "-q", str(path / "review.html")])
-        if check.returncode != 0:
-            raise ValueError("Text-bearing output inside Git must be ignored")
+        for name in PRIVATE_FILES:
+            check = subprocess.run(["git", "-C", root.stdout.strip(), "check-ignore", "-q", str(path / name)])
+            if check.returncode != 0:
+                raise ValueError("Every private output inside Git must be ignored")
     if path.exists() and any(path.iterdir()):
         raise ValueError("Private output directory must be new or empty")
     path.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -190,8 +200,9 @@ def private_directory(path):
 def write_private(path, rows, ledger, windows):
     def save(name, text):
         target = path / name
-        target.write_text(text, encoding="utf-8")
-        target.chmod(0o600)
+        descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(text)
     save("word-census.json", json.dumps(ledger, indent=2) + "\n")
     page = ["<!doctype html><meta charset='utf-8'><title>Local recall review</title>",
             "<style>body{max-width:900px;margin:40px auto;font:18px/1.8 sans-serif}sup{font-size:9px;color:#666}section{border-top:1px solid #ccc;padding:12px 0}</style>",

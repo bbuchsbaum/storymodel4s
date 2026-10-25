@@ -1,14 +1,20 @@
 {
-  "base_commit": "c566de3caa9d72e37fd58d3af10a9636c0b48740",
   "commands": {
-    "census": "See reproduction command in the plan; measured destinations census.json and private/run-1",
+    "census": "Plan reproduction command; measured destinations census.json and private/run-2",
+    "legacy_mutations": "Apply unprefixed diffs with git apply --unidiff-zero against b062895ec only; v1 logs and census-v1.json identify their baseline.",
+    "mutations": "In isolated checkout, apply each v2 .diff with git apply --unidiff-zero; run the unittest command; restore between mutants. All baselines compile.",
     "tests": "python3 -B -m unittest discover -s tools -p test_identity_feasibility.py -v"
   },
   "files_sha256": {
-    "docs/plans/2026-10-25-identity-feasibility-codex.md": "8fc3c69ad956256bbe1e5ec7fd7569b54fe91145f925606af61a5911417cb282",
-    "docs/refactor/evidence/identity-feasibility-20261025/codex/census.json": "505c9a598af69c059917114cad1a1e8c375e8ade7cbc4880d046612a85ad651a",
-    "tools/identity_feasibility.py": "bf6912da6a980fd94961cc4859a1fa158e6360e5afa63b3360cbbf7c4dd0545b",
-    "tools/test_identity_feasibility.py": "fc39bbdc44699225ad64dd42806599f02d913f849ca2dbd8d187fb30670cb455"
+    "docs/plans/2026-10-25-identity-feasibility-codex.md": "fd2e819e29edd38592681a2282cd0297fe18ac80098f102fd50fc5549d0477f2",
+    "docs/refactor/evidence/identity-feasibility-20261025/codex/census.json": "e8bd6b642a6bf44b086cd55746664f28852af462295facedb84c956dd24b127a",
+    "tools/identity_feasibility.py": "018a93384936541cc2cc211eaa6885c3547734d0d6fbe9b9df1805159131d47c",
+    "tools/test_identity_feasibility.py": "709fe0273eccf79bc4502bfc04ef8aa365a49cadabaa16b94cccaddb6bf14834"
+  },
+  "format_check": {
+    "command": "git diff --cached --check -- . ':(exclude)**/*.log'",
+    "exit": 0,
+    "qualification": "Raw unittest logs retain two trailing spaces on subtest progress lines; unfiltered diff --check exits2 on those log lines only. Source, tests, plan, JSON and mutant diffs pass."
   },
   "independent_artifact_checks": {
     "html_word_ids_exactly_once": 2495,
@@ -22,48 +28,59 @@
     "trailing_whitespace": 0
   },
   "limits": [
-    "No human reference judgments",
+    "No human reference judgments; selected source scope remains unsealed",
     "No binder implementation or accuracy evaluation",
-    "No Scala code or production changes; no Scala gate run",
-    "The unscreened-row mutation fails two tests and is not counted as an isolated mutation kill"
+    "No Scala changes or gate",
+    "Unprefixed mutation logs belong to b062895ec. Broad v1 screen mutation fails two tests and is not an isolated kill.",
+    "Exploratory v2 custody mutation log retains a second failure caused by shared subtest filesystem state; tests now isolate each fixture. Only final v2 logs count as isolated kills."
   ],
   "mutations": [
     {
+      "baseline_script_sha256": "018a93384936541cc2cc211eaa6885c3547734d0d6fbe9b9df1805159131d47c",
       "compiles": true,
+      "diff": "mutation-v2-drop_missing_timing_rows.diff",
       "exit": 1,
-      "failed": 2,
-      "isolated_named_failure": false,
-      "mutation": "drop_unscreened_rows",
+      "failed": 1,
+      "mutation": "v2-drop_missing_timing_rows",
       "named_failure": "test_every_word_survives_screen_and_scene_misses",
-      "passed": 7,
+      "passed": 10,
       "skipped": 0
     },
     {
+      "baseline_script_sha256": "018a93384936541cc2cc211eaa6885c3547734d0d6fbe9b9df1805159131d47c",
       "compiles": true,
+      "diff": "mutation-v2-skip_decisions_ignore_check.diff",
       "exit": 1,
       "failed": 1,
-      "isolated_named_failure": true,
-      "mutation": "drop_missing_timing_rows",
-      "named_failure": "test_every_word_survives_screen_and_scene_misses",
-      "passed": 8,
+      "mutation": "v2-skip_decisions_ignore_check",
+      "named_failure": "test_every_private_artifact_must_be_ignored",
+      "passed": 10,
       "skipped": 0
     },
     {
+      "baseline_script_sha256": "018a93384936541cc2cc211eaa6885c3547734d0d6fbe9b9df1805159131d47c",
       "compiles": true,
+      "diff": "mutation-v2-change_seed.diff",
       "exit": 1,
       "failed": 1,
-      "isolated_named_failure": true,
-      "mutation": "remove_private_git_guard",
-      "named_failure": "test_private_output_requires_ignore_and_preserves_prior_runs",
-      "passed": 8,
+      "mutation": "v2-change_seed",
+      "named_failure": "test_split_matches_frozen_v2_assignment_and_block_order",
+      "passed": 10,
       "skipped": 0
     }
   ],
-  "schema": "identity-feasibility-checks/v1",
+  "previous_candidate": "b062895ec",
+  "schema": "identity-feasibility-checks/v2",
+  "split_exposure_proxies_not_quarantine_rates": {
+    "adjacent_source_scene_pairs": 49,
+    "adjacent_source_scene_partition_crossings": 4,
+    "confirmation_nominated_scenes": 17,
+    "confirmation_nominated_word_rows": 1403
+  },
   "tests": {
     "exit": 0,
     "failed": 0,
-    "passed": 9,
+    "passed": 11,
     "skipped": 0
   }
 }
