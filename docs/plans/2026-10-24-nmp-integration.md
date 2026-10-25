@@ -90,10 +90,10 @@ Subscription transports need these controls, each verified by a canary run befor
   record a dated model pin and subscription runs record only the model as reported, so results
   across producers do not compare like for like.
 - **Limits.** Runs count against the plan's usage windows. Batch sizes are fixed before a run.
-- **Custody.** Whether sending annotations and transcripts to Anthropic or OpenAI is the same
-  disclosure class as DeepSeek is an open owner decision; no subscription run happens before it is
-  recorded. Participant recall goes to no external producer until the owner records an
-  REB basis.
+- **Custody (owner decision, 2026-10-24).** Film annotations and recognizer transcripts may go to
+  Anthropic and OpenAI on the same terms as DeepSeek, because the owner treats this stimulus data
+  as generally open. The decision covers film-side inputs only. Participant recall goes to no
+  external producer until the owner records an REB basis.
 
 Two model families also give a control for correlated errors: the pilot reports where they
 disagree.
