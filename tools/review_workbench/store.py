@@ -230,8 +230,14 @@ class Store:
 
     def start_decision(self) -> dict:
         """Number a new decision as it starts. Calibration items (the first five, then every
-        tenth) open with suggestions hidden; the count includes abandoned starts."""
+        tenth) open with suggestions hidden; the count includes abandoned starts. An abandoned
+        calibration item is resumed rather than replaced, so closing it cannot skip the blind
+        commit."""
         self._require_recall()
+        pending = self.pending_calibration()
+        if pending:
+            self._append({"kind": "decision.resume", "id": pending["id"]})
+            return pending
         n = 1 + sum(1 for e in self.events if e["kind"] == "decision.start")
         calibration = n <= CALIBRATION_FIRST or n % CALIBRATION_EVERY == 0
         return self._append(
@@ -242,6 +248,33 @@ class Store:
                 "calibration": calibration,
             }
         )
+
+    def pending_calibration(self):
+        """The started calibration item with no committed reference, if any."""
+        done = set(self.decisions())
+        deleted = {e["id"] for e in self.live() if e["kind"] == "decision.delete"}
+        for e in reversed(self.live()):
+            if e["kind"] == "decision.start" and e["calibration"]:
+                if e["id"] not in done and e["id"] not in deleted:
+                    return e
+        return None
+
+    def next_is_calibration(self) -> bool:
+        """Whether the next start is a calibration item, so the UI can hide suggestions for a
+        selection before the item formally starts."""
+        if self.pending_calibration():
+            return True
+        n = 1 + sum(1 for e in self.events if e["kind"] == "decision.start")
+        return n <= CALIBRATION_FIRST or n % CALIBRATION_EVERY == 0
+
+    def suggestions_blind(self, did=None) -> bool:
+        """Whether candidates and search must be withheld: for an unrevealed calibration item,
+        or, with no decision open, when the next start will be one."""
+        if did:
+            start = self._started(did)
+            d = self.decisions().get(did)
+            return bool(start["calibration"] and not (d and d["revealed"]))
+        return self.next_is_calibration()
 
     def _started(self, did):
         e = next(
@@ -282,6 +315,8 @@ class Store:
             if f[key] not in DECLARED[key]:
                 raise StoreError(f"{key} must be one of {', '.join(DECLARED[key])}")
         ref = f["referent"]
+        if f["person_reference"] == "yes" and ref is None:
+            raise StoreError("choose who this refers to, or mark it Unknown")
         ids = {p["id"] for p in self.people()}
         if ref is not None and ref not in ids and ref not in FIXED_REFERENTS:
             raise StoreError(

@@ -62,6 +62,7 @@ class App:
         src = s.source_state()
         return {
             "recallOpen": s.recall_open(),
+            "nextCalibration": s.recall_open() and s.next_is_calibration(),
             "source": {
                 "rows": src["rows"],
                 "scenes": src["scenes"],
@@ -88,6 +89,8 @@ class App:
         if path == "/api/state":
             return self.state()
         if path == "/api/search":
+            if s.recall_open() and s.suggestions_blind(body.get("id")):
+                raise StoreError("search is hidden for a calibration item until step 1 is committed")
             return {"hits": self.cands.search(str(body.get("q", "")))}
         if path == "/api/source/row":
             s.source_row(
@@ -104,7 +107,8 @@ class App:
             if not s.recall_open():
                 raise StoreError("the source pass must be complete before recall opens")
             did = body.get("id")
-            hidden = bool(body.get("hidden"))
+            # The server decides blindness; the client's flag can only add to it.
+            hidden = bool(body.get("hidden")) or s.suggestions_blind(did)
             out = self.cands.for_span(int(body["first"]), int(body["last"]))
             s.shown(
                 did,
@@ -114,6 +118,8 @@ class App:
             )
             if hidden:
                 out["moments"] = []
+                out["nominations"] = {"one": [], "zero": [], "legacy": []}
+            out["hidden"] = hidden
             return out
         elif path == "/api/window":
             s.read_window(int(body["window"]), bool(body.get("value", True)))
@@ -330,7 +336,9 @@ def handler(app, port):
 
 class Server(ThreadingHTTPServer):
     daemon_threads = True
-    request_queue_size = 64  # the UI loads its modules in parallel; a backlog of 5 resets some
+    request_queue_size = (
+        64  # the UI loads its modules in parallel; a backlog of 5 resets some
+    )
 
     def handle_error(self, request, client_address):
         # Never print a traceback: its locals and messages could carry request bodies.

@@ -25,6 +25,7 @@ WEIGHTS = {
     "echo": 2.5,
 }
 ECHO_MIN = 3  # shortest recall word run that counts as a dialogue echo
+NEARBY = 0.6  # weight of a lexical match that shares only surrounding words
 CONTEXT = 12  # recall words either side of a selection that feed lexical retrieval
 
 
@@ -182,6 +183,7 @@ class Candidates:
         query = [
             t for t in self.recall[lo - 1 : hi] if t and t not in STOP and len(t) > 1
         ]
+        selected = {t for t in self.recall[first - 1 : last] if t and t not in STOP and len(t) > 1}
         scores = self.bm25.scores(query)
         top = max(scores) if scores else 0
         if top > 0:
@@ -193,14 +195,23 @@ class Candidates:
                 row = ref if kind == "row" else self.lines[ref]["row"]
                 if row is None:
                     continue
-                shared = sorted(set(query) & set(content(self.docs[k][2])))[:4]
+                doc = set(content(self.docs[k][2]))
+                own = sorted(selected & doc)[:4]
+                near = sorted((set(query) - selected) & doc)[:4]
                 what = "annotation" if kind == "row" else "dialogue"
+                # Words shared only with the surrounding recall count for less, and the reason
+                # says so: a reviewer should not mistake context for the selection itself.
+                reason = f"{what} shares " + (
+                    f"selected: {', '.join(own)}" + (f"; nearby: {', '.join(near)}" if near else "")
+                    if own
+                    else f"nearby only: {', '.join(near)}"
+                )
                 self._add(
                     store,
                     row,
                     "lexical",
-                    f"{what} shares: {', '.join(shared)}",
-                    WEIGHTS["lexical"] * scores[k] / top,
+                    reason,
+                    WEIGHTS["lexical"] * scores[k] / top * (1.0 if own else NEARBY),
                 )
         # 4. Dialogue echo: runs of at least ECHO_MIN recall words that recur in speech.
         for part, (toks, ws) in self.speech.items():

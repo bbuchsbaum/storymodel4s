@@ -191,9 +191,41 @@ class StoreCourt(unittest.TestCase):
 
     def test_calibration_items_are_the_first_five_then_every_tenth(self):
         s = done_store()
-        flags = [s.start_decision()["calibration"] for _ in range(21)]
+        flags, ahead = [], []
+        for _ in range(21):
+            ahead.append(s.next_is_calibration())
+            e = s.start_decision()
+            flags.append(e["calibration"])
+            s.commit_reference(e["id"], {**REF, "first_word": 3, "last_word": 3})
         self.assertEqual(
             [i + 1 for i, f in enumerate(flags) if f], [1, 2, 3, 4, 5, 10, 20]
+        )
+        self.assertEqual(ahead, flags)
+
+    def test_an_abandoned_calibration_item_is_resumed_not_skipped(self):
+        s = done_store()
+        first = s.start_decision()
+        self.assertTrue(first["calibration"])
+        again = s.start_decision()  # closed without committing, then started again
+        self.assertEqual(again["id"], first["id"])
+        self.assertTrue(again["calibration"])
+
+    def test_a_person_reference_needs_a_referent(self):
+        s = done_store()
+        did = s.start_decision()["id"]
+        with self.assertRaisesRegex(store.StoreError, "who this refers to"):
+            s.commit_reference(
+                did, {**REF, "first_word": 3, "last_word": 3, "referent": None}
+            )
+        s.commit_reference(
+            did,
+            {
+                **REF,
+                "first_word": 3,
+                "last_word": 3,
+                "referent": None,
+                "person_reference": "no",
+            },
         )
 
     def test_calibration_revision_needs_a_reveal_and_is_counted(self):
@@ -394,3 +426,54 @@ class ServerCourt(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BlindnessCourt(unittest.TestCase):
+    """Calibration blindness is decided by the server, whatever the client asks for."""
+
+    def setUp(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.srv, self.app = server.serve(MANIFEST, private(), announce=False)
+        self.port = self.srv.server_address[1]
+        threading.Thread(target=self.srv.serve_forever, daemon=True).start()
+        s = self.app.store
+        for r in s.p.rows:
+            s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        c.request("GET", f"/?token={self.app.token}", headers={"Host": f"127.0.0.1:{self.port}"})
+        self.cookie = c.getresponse().getheader("Set-Cookie").split(";")[0]
+        c.close()
+
+    def tearDown(self):
+        self.srv.shutdown()
+        self.srv.server_close()
+
+    def post(self, path, body):
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        c.request("POST", path, body=json.dumps(body), headers={"Host": f"127.0.0.1:{self.port}", "Cookie": self.cookie, "Content-Type": "application/json"})
+        r = c.getresponse()
+        out = (r.status, json.loads(r.read()))
+        c.close()
+        return out
+
+    def test_candidates_are_withheld_before_a_calibration_item_starts(self):
+        status, out = self.post("/api/candidates", {"first": 60, "last": 62, "id": None, "hidden": False})
+        self.assertEqual(status, 200)
+        self.assertTrue(out["hidden"])
+        self.assertEqual(out["moments"], [])
+        self.assertEqual(out["nominations"]["one"], [])
+
+    def test_search_is_refused_for_an_unrevealed_calibration_item(self):
+        did = self.app.store.start_decision()["id"]
+        status, out = self.post("/api/search", {"q": "lantern", "id": did})
+        self.assertEqual(status, 409)
+        self.assertIn("calibration", out["error"])
+
+    def test_suggestions_return_once_calibration_is_spent(self):
+        s = self.app.store
+        for _ in range(5):
+            did = s.start_decision()["id"]
+            s.commit_reference(did, {**REF, "first_word": 3, "last_word": 3})
+        status, out = self.post("/api/candidates", {"first": 60, "last": 62, "id": None})
+        self.assertFalse(out["hidden"])
+        self.assertTrue(out["moments"])

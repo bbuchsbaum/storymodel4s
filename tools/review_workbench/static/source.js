@@ -172,7 +172,8 @@ export class SourcePass {
       const d = this.draft(row);
       const mentions = this.S.state.source.mentions[row] || [];
       const current = i === this.rowIdx;
-      const persons = [...d.present, ...[...d.unnamed].map(u => u)];
+      const persons = [...d.present, ...d.unnamed];
+      const nextOpen = mentions.find(m => !d.mentions[m.id])?.id;
       const label = p => unnamed[p]?.label ? `${unnamed[p].label} (${p})` : p;
       const lineOf = m => {
         const words = this.S.film.lines[r.part] || [];
@@ -212,15 +213,14 @@ export class SourcePass {
         h('ul', mentions.map(m => {
           const line = lineOf(m);
           return h('li', h('span.mclass', m.class), h('span.mword', `“${m.text}”`), line ? h('span.mline', line.text) : null,
-            h('select.small', {
-              'aria-label': 'Who does this mention mean?',
-              class: d.mentions[m.id] ? 'small resolved' : 'small',
-              onchange: e => { d.mentions[m.id] = e.target.value || undefined; if (!e.target.value) delete d.mentions[m.id]; this.render(); },
-            },
-            h('option', { value: '' }, 'Resolve…'),
-            persons.map(p => h('option', { value: p, selected: d.mentions[m.id] === p }, label(p))),
-            h('option', { value: 'absent', selected: d.mentions[m.id] === 'absent' }, 'absent from the frame'),
-            h('option', { value: 'unknown', selected: d.mentions[m.id] === 'unknown' }, 'unknown')));
+            h('div.mopts', { role: 'radiogroup', 'aria-label': `Who “${m.text}” means` },
+              [...persons.map(p => [p, label(p)]), ['absent', 'absent from the frame'], ['unknown', 'unknown']].map(([v, lab], k) =>
+                h('button.mopt', {
+                  type: 'button',
+                  role: 'radio',
+                  'aria-checked': String(d.mentions[m.id] === v),
+                  onclick: e => { e.stopPropagation(); d.mentions[m.id] = v; this.render(); },
+                }, current && !d.mentions[m.id] && m.id === nextOpen ? h('kbd', { 'aria-hidden': 'true' }, String(k + 1)) : null, lab))));
         }))) : null,
       current ? h('div.actions', h('button.primary', { type: 'button', onclick: e => { e.stopPropagation(); this.doneAndNext(); } }, rec?.done ? 'Save and next (Enter)' : 'Done, next row (Enter)')) : null,
       );
@@ -244,14 +244,20 @@ export class SourcePass {
       document.getElementById(`unnamed-${this.currentRow()}`)?.focus();
       return true;
     }
-    if (/^[1-9]$/.test(k)) {
+    const digit = /^Digit[1-9]$/.test(e.code) ? Number(e.code.slice(5)) : null;
+    if (digit) {
       const row = this.currentRow();
-      const n = this.S.film.rows[row].names[Number(k) - 1];
-      if (n) {
-        const d = this.draft(row);
-        d.present.has(n) ? d.present.delete(n) : d.present.add(n);
-        this.render();
+      const d = this.draft(row);
+      const open = (this.S.state.source.mentions[row] || []).find(m => !d.mentions[m.id]);
+      if (open && !e.shiftKey) {
+        // 1-9 resolve the next open mention to its nth option, in the order shown.
+        const opts = [...d.present, ...d.unnamed, 'absent', 'unknown'];
+        if (opts[digit - 1]) d.mentions[open.id] = opts[digit - 1];
+      } else {
+        const n = this.S.film.rows[row].names[digit - 1];
+        if (n) d.present.has(n) ? d.present.delete(n) : d.present.add(n);
       }
+      this.render();
       return true;
     }
     return false;

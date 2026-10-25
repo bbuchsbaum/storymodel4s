@@ -4,7 +4,7 @@ checked API, so UI checks and hill-climb specimens start from reproducible state
 
   fresh        nothing reviewed
   source-done  every source row done (recall pass open), nothing in the recall pass
-  midway       source done, three windows read, four decisions (one awaiting step 2)
+  midway       source done, three windows read, five decisions (one awaiting step 2)
 
 Usage: python3 -I fixture_state.py MANIFEST PRIVATE_DIR STATE   (PRIVATE_DIR must not exist)
 """
@@ -64,6 +64,15 @@ def midway(store):
         ("she", "pronoun", "Mara", "agent", [1], ["row-1"], "supported"),
         ("this guy", "description", "Tobias", "agent", [2], ["row-4"], "supported"),
         (
+            "a little girl",
+            "description",
+            "Girl with Lantern",
+            "experiencer",
+            [3],
+            ["row-9"],
+            "supported",
+        ),
+        (
             "the old man the harbour guy",
             "description",
             "Harbourmaster",
@@ -72,7 +81,7 @@ def midway(store):
             None,
             None,
         ),
-    ]
+    ]  # five decisions: the five calibration items are spent, so the next start is ordinary
     for phrase, form, ref, role, scenes, anchors, outcome in plan:
         a, b = find(words, phrase)
         did = store.start_decision()["id"]

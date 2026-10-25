@@ -15,14 +15,17 @@ const KEYS = {
     ['?', 'this list'],
   ],
   source: [
-    ['J K or ↓ ↑', 'next or previous row'], ['1–9', 'toggle the nth listed person'],
+    ['J K or ↓ ↑', 'next or previous row'],
+    ['1–9', 'resolve the next open mention to option n'], ['Shift+1–9', 'toggle the nth listed person'],
     ['N', 'add an unnamed person'], ['Enter', 'row done, go to the next'],
   ],
   recall: [
-    ['← →', 'move one word'], ['Shift+← →', 'extend the selection'], ['J K', 'next or previous window'],
+    ['W B', 'jump to the next or previous likely reference'], ['← →', 'move one word'],
+    ['Shift+← →', 'extend the selection'], ['J K', 'next or previous window'],
     ['M', 'mark the window read'], ['Enter', 'start a decision or commit the current step'],
     ['1–8', 'open candidate n'], ['/', 'search'], ['C', 'add selection as co-referring span'],
-    ['A', 'add the open moment as source evidence'], ['n p d e o', 'reference form (step 1)'],
+    ['A', 'add the open moment as source evidence'], ['F', 'find a person (step 1)'],
+    ['n p d e o', 'reference form (step 1)'],
     ['y x u', 'person? (step 1) or resolvable (step 2)'], ['s c v e', 'outcome (step 2)'],
     ['Z', 'undo the last edit'], ['Shift+E', 'reopen the decision under the cursor'], ['Esc', 'close the form'],
   ],
@@ -44,6 +47,9 @@ S.setState = function (state) {
 };
 
 S.decision = id => S.state.decisions[id] || null;
+S.blind = () => (S.decide ? S.decide.blind() : false);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+S.reducedMotion = () => reduced.matches;
 S.revealed = id => !!S.state.decisions[id]?.revealed;
 
 // -- selection and windows -----------------------------------------------------------------
@@ -57,12 +63,13 @@ S.select = function (a, b) {
   S.recallPane.refreshSelection();
   S.recallPane.refreshHeads();
   S.recallPane.scrollToRow(b);
+  S.structure.refresh();
   clearTimeout(candTimer);
   candTimer = setTimeout(() => {
     const [x, y] = span();
     S.decide.load(x, y);
   }, 120);
-  if (!S.active) S.decide.render();
+  if (!S.active) S.decide.renderForm();
 };
 
 function span() {
@@ -99,7 +106,10 @@ S.cueScene = function (id) {
 };
 
 S.onPick = i => S.decide.choose(i);
-S.onRow = row => S.filmPane.showMoment(row);
+S.onRow = row => {
+  S.filmPane.showMoment(row);
+  if (S.active?.step === 2) S.decide.renderForm();
+};
 
 // -- decisions ------------------------------------------------------------------------------
 function blankFields(a, b) {
@@ -141,7 +151,9 @@ S.startDecision = async function () {
     S.setState(out.state);
     S.active = { id: out.id, calibration: out.calibration, step: 1, fields: blankFields(...sp), source: blankSource(), started: Date.now() };
     S.dupes = [];
-    S.recallPane.refreshMarks();
+    S.recallPane.refresh();
+    S.decide.render();
+    if (out.calibration) S.filmPane.showMoment(null);
     await S.decide.load(...sp);
     if (out.calibration) toast('Calibration item: suggestions are hidden until you commit step 1.');
   } catch (e) {
@@ -162,6 +174,7 @@ S.reopen = function (id) {
   };
   S.sel = { a: d.reference.first_word, b: d.reference.last_word };
   S.recallPane.refresh();
+  S.decide.render();
   S.decide.load(d.reference.first_word, d.reference.last_word);
 };
 
@@ -170,10 +183,19 @@ S.reopenAt = function (row) {
   if (el?.dataset.did) S.reopen(el.dataset.did);
 };
 
-S.closeDecision = function () {
+let closeArmed = 0;
+S.closeDecision = function (force = false) {
+  const a = S.active;
+  if (!a) return;
+  const f = a.fields;
+  const dirty = a.step === 1 && !S.decision(a.id) && (f.reference_form || f.referent || (f.other_coref_spans || []).length);
+  if (dirty && !force && Date.now() - closeArmed > 2500) {
+    closeArmed = Date.now();
+    return toast('Step 1 is not committed. Press Esc again to discard it.');
+  }
   S.active = null;
   S.dupes = [];
-  S.recallPane.refreshMarks();
+  S.recallPane.refresh();
   S.decide.render();
 };
 
@@ -182,13 +204,13 @@ S.setField = function (key, value, rerender = true) {
   if (S.active.step === 2 && key in S.active.source) return S.setSource(key, value, rerender);
   S.active.fields[key] = value;
   if (key === 'referent') checkDupes();
-  if (rerender) S.decide.render();
+  if (rerender) S.decide.renderForm();
 };
 
 S.setSource = function (key, value, rerender = true) {
   if (!S.active) return;
   S.active.source[key] = value;
-  if (rerender) S.decide.render();
+  if (rerender) S.decide.renderForm();
 };
 
 async function checkDupes() {
@@ -196,7 +218,7 @@ async function checkDupes() {
   try {
     const out = await post('/api/duplicates', { id: S.active.id, first: f.first_word, last: f.last_word, referent: f.referent });
     S.dupes = out.ids;
-    S.decide.render();
+    S.decide.renderForm();
   } catch {
     S.dupes = [];
   }
@@ -208,12 +230,12 @@ S.addCoref = function () {
   const f = S.active.fields;
   if (sp[0] === f.first_word && sp[1] === f.last_word) return toast('That is the main span. Select another stretch of words first.');
   f.other_coref_spans = [...(f.other_coref_spans || []), sp];
-  S.decide.render();
+  S.decide.renderForm();
 };
 
 S.removeCoref = function (i) {
   S.active.fields.other_coref_spans.splice(i, 1);
-  S.decide.render();
+  S.decide.renderForm();
 };
 
 S.createPerson = async function (label) {
@@ -230,14 +252,15 @@ S.commitReference = async function () {
   const a = S.active;
   if (!a) return;
   const f = a.fields;
-  if (!f.reference_form) return toast('Choose the reference form (n p d e o).', 'error');
+  const missing = S.decide.problems();
+  if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
   try {
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
     S.setState(out.state);
     a.step = 2;
-    S.recallPane.refreshMarks();
+    S.recallPane.refresh();
     S.decide.render();
-    toast(`${a.id}: step 1 saved`);
+    toast(a.calibration && !S.revealed(a.id) ? `${a.id}: step 1 saved. Reveal the suggestions when ready.` : `${a.id}: step 1 saved`);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -246,7 +269,7 @@ S.commitReference = async function () {
 S.editStep1 = function () {
   if (S.active) {
     S.active.step = 1;
-    S.decide.render();
+    S.decide.renderForm();
   }
 };
 
@@ -254,10 +277,11 @@ S.reveal = async function () {
   try {
     const out = await post('/api/decision/reveal', { id: S.active.id });
     S.setState(out.state);
-    S.active.step = 1;
     const f = S.active.fields;
+    S.decide.render();
+    S.recallPane.refreshHeads();
     await S.decide.load(f.first_word, f.last_word);
-    toast('Suggestions revealed. Revise step 1 if they change your judgment; revisions are logged.');
+    toast('Suggestions revealed. Use Edit on step 1 if they change your judgment; revisions are logged.');
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -266,7 +290,7 @@ S.reveal = async function () {
 S.toggleSourceScene = function (id) {
   const s = S.active.source;
   s.source_scene_ids = s.source_scene_ids.includes(id) ? s.source_scene_ids.filter(x => x !== id) : [...s.source_scene_ids, id].sort((x, y) => x - y);
-  S.decide.render();
+  S.decide.renderForm();
 };
 
 S.addAnchorFromMoment = function () {
@@ -277,23 +301,24 @@ S.addAnchorFromMoment = function () {
   if (!s.source_anchor_ids.includes(anchor)) s.source_anchor_ids = [...s.source_anchor_ids, anchor];
   const r = S.index.rows.find(x => x.row === row);
   for (const sc of r.scenes) if (!s.source_scene_ids.includes(sc)) s.source_scene_ids = [...s.source_scene_ids, sc].sort((x, y) => x - y);
-  S.decide.render();
+  S.decide.renderForm();
 };
 
 S.removeAnchor = function (id) {
   S.active.source.source_anchor_ids = S.active.source.source_anchor_ids.filter(x => x !== id);
-  S.decide.render();
+  S.decide.renderForm();
 };
 
 S.commitSource = async function () {
   const a = S.active;
   const s = a.source;
-  if (!s.source_resolvable || !s.reference_outcome) return toast('Choose resolvable (y x u) and outcome (s c v e).', 'error');
+  const missing = S.decide.problems();
+  if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
   try {
     const out = await post('/api/decision/source', { id: a.id, fields: s });
     S.setState(out.state);
     toast(`${a.id}: committed`);
-    S.closeDecision();
+    S.closeDecision(true);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -355,6 +380,7 @@ async function setMode(mode) {
       S.recallPane = new RecallPane(S);
       S.decide = new DecidePane(S);
     }
+    S.decide.mounted = false;
     S.recallPane.build();
     S.filmPane.showMoment(null);
     S.goWindow(S.win);
@@ -373,9 +399,19 @@ function onKey(e) {
   if (inText(e)) return;
   const k = e.key;
   const F = S.filmPane;
+  const keys = document.getElementById('keys');
+  // The keys overlay is modal: only ? and Esc reach anything while it is open.
+  if (!keys.hidden) {
+    if (k === '?' || k === 'Escape') keys.hidden = true;
+    if (k !== 'Tab') e.preventDefault();
+    return;
+  }
+  // Enter and Space on a focused control activate that control, never a global action.
+  const t = e.target;
+  if ((k === 'Enter' || k === ' ') && t && t !== document.body && t.closest('button, [role=radio], [role=tab], [role=option], a, summary')) return;
   const handled = (() => {
-    if (k === '?') { const O = document.getElementById('keys'); renderKeys(); O.hidden = !O.hidden; return true; }
-    if (k === 'Escape' && !document.getElementById('keys').hidden) { document.getElementById('keys').hidden = true; return true; }
+    if (k === '?') { renderKeys(); keys.hidden = false; keys.querySelector('button')?.focus(); return true; }
+    if (k === 'Escape' && !document.getElementById('structure').hidden) { S.structure.toggle(); return true; }
     if (k === 'S') { S.structure.toggle(); return true; }
     if (k === ' ') { F.toggle(); return true; }
     if (k === 'r') { F.replay(); return true; }
@@ -401,13 +437,23 @@ function recallKey(e) {
     S.select(e.shiftKey && S.sel ? S.sel.a : b, b);
     return true;
   }
+  if (k === 'w' || k === 'b') {
+    const d = k === 'w' ? 1 : -1;
+    const words = S.index.words;
+    for (let r = cur + d; r >= 1 && r <= n; r += d) {
+      if (words[r - 1].screen && !S.recallPane.wordEls[r].dataset.did) { S.select(r, r); return true; }
+    }
+    toast(d > 0 ? 'No more likely references after this point.' : 'No likely references before this point.');
+    return true;
+  }
+  if (k === 'f' && a && a.step === 1) { S.decide.focusFilter(); return true; }
   if (k === 'j') { S.goWindow(S.win + 1); return true; }
   if (k === 'k') { S.goWindow(S.win - 1); return true; }
   if (k === 'm') { const done = S.state.windows[String(S.win)]?.[0]; S.markRead(S.win, !done); return true; }
-  if (k === '/') { S.decide.tab = 'search'; S.decide.render(); document.getElementById('q')?.focus(); return true; }
+  if (k === '/') { S.decide.setTab('search'); return true; }
   if (k === 'z') { S.undo(); return true; }
-  if (/^[1-8]$/.test(k)) { S.decide.tab = 'candidates'; S.decide.choose(Number(k) - 1); return true; }
-  if (k === 'Escape') { if (a) S.closeDecision(); else { S.sel = null; S.recallPane.refreshSelection(); S.decide.render(); } return true; }
+  if (/^[1-8]$/.test(k)) { if (S.decide.tab !== 'candidates') S.decide.setTab('candidates'); S.decide.choose(Number(k) - 1); return true; }
+  if (k === 'Escape') { if (a) S.closeDecision(); else { S.sel = null; S.recallPane.refreshSelection(); S.decide.renderForm(); } return true; }
   if (k === 'E' && !a) { S.reopenAt(cur); return true; }
   if (k === 'Enter') {
     if (!a) S.startDecision();
@@ -465,6 +511,12 @@ async function boot() {
     }
   });
   document.addEventListener('keydown', onKey);
+  // A pointer click should not leave focus on the clicked button, or the next Enter or Space
+  // would re-press it; keyboard activation (detail 0) keeps focus where the reviewer put it.
+  document.addEventListener('click', e => {
+    const b = e.target.closest?.('button');
+    if (b && e.detail > 0) setTimeout(() => b.blur(), 0);
+  });
   setInterval(tickTimer, 500);
   const start = new URLSearchParams(location.hash.slice(1)).get('mode');
   await setMode(S.state.recallOpen && start !== 'source' ? 'recall' : 'source');

@@ -58,6 +58,7 @@ export class RecallPane {
       const done = read[String(w.window)]?.[0];
       const one = new Set();
       let disagree = 0;
+      const blind = this.S.blind();
       for (let r = w.first; r <= w.last; r++) {
         const n = words[r - 1].nom;
         n.one.forEach(s => one.add(s));
@@ -75,8 +76,10 @@ export class RecallPane {
         }, done ? '✓' : ''),
         h('span.wnum', `Window ${w.window}`),
         h('span.wrange', `words ${w.first}–${w.last}`),
-        h('span.noms', [...one].sort((a, b) => a - b).map(s => h('button.scenechip', { type: 'button', title: `Nominated scene ${s} (one-based TR)`, onclick: () => this.S.cueScene(s) }, `sc ${s}`))),
-        disagree ? h('span.warnchip', { title: `${disagree} words change nomination across timing conventions` }, `±${disagree}`) : null,
+        blind
+          ? h('span.blindnote', 'timing hidden for calibration')
+          : h('span.noms', [...one].sort((a, b) => a - b).map(s => h('button.scenechip', { type: 'button', title: `Timing points to scene ${s}; click to play it`, onclick: () => this.S.cueScene(s) }, `sc ${s}`))),
+        !blind && disagree ? h('span.clockchip', { title: `${disagree} of these words point to a different scene under another timing convention` }, `${disagree} clock-sensitive`) : null,
       );
     }
     const n = Object.values(read).filter(v => v[0]).length;
@@ -125,7 +128,7 @@ export class RecallPane {
   }
 
   scrollToWindow(w) {
-    this.winEls[w]?.block.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    this.winEls[w]?.block.scrollIntoView({ block: 'start', behavior: this.S.reducedMotion() ? 'auto' : 'smooth' });
   }
 
   scrollToRow(r) {

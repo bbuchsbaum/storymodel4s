@@ -15,6 +15,8 @@ export class Film {
     this.rate = 1;
     this.pins = [];
     this.focusRow = null;
+    // Cueing plays by default; with reduced motion the reviewer starts playback (Space).
+    this.autoplay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.video.addEventListener('timeupdate', () => this.tick());
     this.video.addEventListener('play', () => this.transport());
     this.video.addEventListener('pause', () => this.transport());
@@ -49,7 +51,7 @@ export class Film {
     const at = Math.max(0, (m.cue ?? m.t0) - PAD);
     const seek = () => {
       this.video.currentTime = at;
-      if (play) this.video.play().catch(() => {});
+      if (play && this.autoplay) this.video.play().catch(() => {});
     };
     if (this.video.readyState >= 1) seek();
     else this.video.addEventListener('loadedmetadata', seek, { once: true });
@@ -96,7 +98,7 @@ export class Film {
     const now = this.timeEl;
     if (now) {
       const r = this.rowAt(this.part, v.currentTime);
-      now.textContent = `${partName(this.part)} ${clock(v.currentTime)}${r ? ` · row ${r.row} · scene ${r.scenes.join('/')}` : ''}`;
+      now.textContent = `playhead ${partName(this.part)} ${clock(v.currentTime)}${r ? ` · row ${r.row}` : ''}`;
     }
   }
 
@@ -153,7 +155,7 @@ export class Film {
           if (r) this.S.onRow?.(r.row);
         },
       }, bands, ticks, pins, head);
-      this.tracks[p] = { track, pins, pct };
+      this.tracks[p] = { track, pins, pct, frac: t => t / secs };
       return h('div.trackrow', h('span.partlabel', partName(p)), track);
     });
     clear(el, tracks);
@@ -161,13 +163,22 @@ export class Film {
 
   setPins(moments, active) {
     for (const { pins } of Object.values(this.tracks)) clear(pins);
-    moments.forEach((m, i) => {
+    // Pins that would overlap are stacked on a second lane instead of drawn over each other.
+    const lanes = {};
+    const placed = moments.map((m, i) => ({ m, i, x: this.tracks[String(m.part)].frac(m.cue ?? m.t0) })).sort((a, b) => a.x - b.x);
+    const minGap = 0.028;
+    for (const p of placed) {
+      const L = (lanes[p.m.part] ||= [-1, -1]);
+      p.lane = p.x - L[0] >= minGap ? 0 : p.x - L[1] >= minGap ? 1 : 0;
+      L[p.lane] = p.x;
+    }
+    placed.forEach(({ m, i, x, lane }) => {
       const t = this.tracks[String(m.part)];
       t.pins.append(
         h('button.pin', {
           type: 'button',
-          class: `pin${m.row === active ? ' active' : ''}`,
-          style: { left: t.pct(m.cue ?? m.t0) },
+          class: `pin lane${lane}${m.row === active ? ' active' : ''}`,
+          style: { left: `clamp(8px, ${(100 * x).toFixed(3)}%, calc(100% - 8px))` },
           title: `candidate ${i + 1}: row ${m.row}`,
           onclick: e => {
             e.stopPropagation();
