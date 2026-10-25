@@ -135,18 +135,31 @@ export class DecidePane {
       a && this.S.decision(a.id) ? h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, 'Reveal suggestions') : null);
   }
 
+  openHit(i) {
+    const x = this.hits[i];
+    if (!x) return;
+    this.S.filmPane.cue({ part: x.part, t0: x.t0, t1: x.t1 });
+    this.S.filmPane.showMoment(x.row);
+    if (this.S.active?.step === 2) this.renderForm();
+  }
+
   renderCandidates() {
-    if (this.blind() || this.cands?.hidden) return this.hiddenBox();
+    if (this.blind()) return this.hiddenBox();
+    if (this.cands?.hidden) {
+      return h('div.hiddenbox', h('strong', 'Suggestions limited'),
+        h('p', 'The next decision is a calibration item, so suggestions are shown only for the words of the decision that is open. Commit or close it to continue.'));
+    }
     const c = this.cands;
     if (!c) return h('p.empty', 'Select recall words to see candidate moments.');
     const noms = c.nominations;
-    const conv = (label, title, list) => h('span.conv', { title }, h('span.k', label), list.length ? list.join(', ') : '–');
+    const fmt = list => (list.length ? `scene ${list.join(', ')}` : 'no scene');
+    const same = fmt(noms.one) === fmt(noms.zero) && fmt(noms.one) === fmt(noms.legacy);
     return [
-      h('div.convs',
-        h('span.k', 'Timing points to scene'),
-        conv('TR', 'one-based TR convention (the census default)', noms.one),
-        conv('TR−1', 'zero-based TR convention', noms.zero),
-        conv('sec', 'closed-seconds convention', noms.legacy)),
+      h('div.convs', { title: 'Where the recall timing of these words points, under the three clock conventions (one-based TR, zero-based TR, closed seconds)' },
+        h('span.k', 'Timing'),
+        same
+          ? h('span.conv', `${fmt(noms.one)} (all three clocks agree)`)
+          : [h('span.conv', `${fmt(noms.one)} (TR)`), h('span.conv.alt', `${fmt(noms.zero)} (TR−1)`), h('span.conv.alt', `${fmt(noms.legacy)} (seconds)`)]),
       c.moments.length
         ? h('ol.cands', c.moments.map((m, i) => {
           const sigs = dedupe(m.signals);
@@ -174,28 +187,38 @@ export class DecidePane {
     return [
       this.q,
       this.hits.length
-        ? h('ol.cands', this.hits.map(x => h('li', h('button.cand', {
+        ? h('ol.cands', this.hits.slice(0, 8).map((x, i) => h('li', h('button.cand', {
           type: 'button',
-          onclick: () => {
-            this.S.filmPane.cue({ part: x.part, t0: x.t0, t1: x.t1 });
-            this.S.filmPane.showMoment(x.row);
-            if (this.S.active?.step === 2) this.renderForm();
-          },
-        }, h('span.cnum', x.kind === 'row' ? 'A' : '“'), h('span.cbody',
+          onclick: () => this.openHit(i),
+        }, h('span.cnum', String(i + 1)), h('span.cbody',
           h('span.cline', h('span.cwhere', `${partName(x.part)} ${clock(x.t0)}`), h('span.crow', `row ${x.row} · sc ${x.scenes.join('/')}`)),
-          h('span.creason', this.S.film.rows[x.row].details))))))
+          h('span.creason', x.kind === 'row' ? this.S.film.rows[x.row].details : `“${(this.S.film.lines[x.part] || []).find(l => Math.abs(l.t0 - x.t0) < 0.01)?.text ?? ''}”`))))))
         : h('p.empty', this.q.value ? 'Nothing matches.' : 'Search names, places, objects or a line of dialogue.'),
     ];
   }
 
   // -- the form --------------------------------------------------------------------------
   seg(key, opts, val) {
+    // One tab stop per group (the checked option, else the first); arrows move and choose.
+    const set = v => (this.S.active.step === 2 && key in this.S.active.source ? this.S.setSource(key, v) : this.S.setField(key, v));
+    const stop = opts.some(([v]) => v === val) ? val : opts[0][0];
     return h('div.seg', { role: 'radiogroup', 'aria-label': LABELS[key] || key },
-      opts.map(([v, k]) => h('button.segbtn', {
+      opts.map(([v, k], i) => h('button.segbtn', {
         type: 'button',
         role: 'radio',
+        tabindex: v === stop ? '0' : '-1',
+        dataset: { fid: `${key}:${v}` },
         'aria-checked': String(val === v),
-        onclick: () => (key in (this.S.active?.source || {}) && this.S.active.step === 2 ? this.S.setSource(key, v) : this.S.setField(key, v)),
+        onclick: () => set(v),
+        onkeydown: e => {
+          const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const next = opts[(i + d + opts.length) % opts.length][0];
+          set(next);
+          this.formEl.querySelector(`[data-fid="${key}:${next}"]`)?.focus();
+        },
       }, v, h('kbd', { 'aria-hidden': 'true' }, k))));
   }
 
@@ -224,6 +247,7 @@ export class DecidePane {
         role: 'option',
         class: `person ${p.kind}${value === p.id ? ' on' : ''}${filtering && i === this.hi ? ' hi' : ''}`,
         'aria-selected': String(value === p.id),
+        dataset: { fid: `person:${p.id}` },
         onclick: () => this.choosePerson(p.id),
       }, p.label)),
       q && !list.length ? h('span.hint', `No match. Shift+Enter adds “${q}” as a new person.`) : null,
@@ -275,14 +299,15 @@ export class DecidePane {
     if (a.step === 1) {
       const f = a.fields;
       const out = [];
-      if (!f.reference_form) out.push('reference form (n p d e o)');
-      if (f.person_reference === 'yes' && !f.referent) out.push('who it refers to (F)');
+      if (!f.reference_form) out.push('form');
+      if (f.person_reference === 'yes' && !f.referent) out.push('person (F)');
       return out;
     }
     const s = a.source;
     const out = [];
-    if (!s.source_resolvable) out.push('resolvable (y x u)');
-    if (!s.reference_outcome) out.push('outcome (s c v e)');
+    if (!s.source_resolvable) out.push('resolvable');
+    if (!s.reference_outcome) out.push('outcome');
+    if (['supported', 'contradicted'].includes(s.reference_outcome) && !s.source_anchor_ids.length) out.push('an evidence row (A)');
     return out;
   }
 
@@ -346,15 +371,17 @@ export class DecidePane {
     }
     const missing = this.problems();
     const footer = h('div.footer',
-      missing.length ? h('span.need', `Still needed: ${missing.join(', ')}`) : h('span.ready', 'Ready'),
+      h('div.status', { 'aria-live': 'polite' }, missing.length ? h('span.need', `Needs ${missing.join(' · ')}`) : h('span.ready', a.step === 1 ? 'Step 1 complete' : 'Ready to commit')),
       h('span.grow'),
       h('button.ghost', { type: 'button', onclick: () => this.S.closeDecision() }, 'Close', h('kbd', { 'aria-hidden': 'true' }, 'Esc')),
       a.step === 1
         ? h('button.primary', { type: 'button', disabled: missing.length > 0, onclick: () => this.S.commitReference() }, committed ? 'Save step 1' : 'Commit step 1', h('kbd', { 'aria-hidden': 'true' }, 'Enter'))
         : h('button.primary', { type: 'button', disabled: missing.length > 0, onclick: () => this.S.commitSource() }, 'Commit decision', h('kbd', { 'aria-hidden': 'true' }, 'Enter')));
+    const fid = document.activeElement?.dataset?.fid;
     clear(this.formEl, h('form.decision', { onsubmit: e => e.preventDefault(), 'aria-label': `Decision ${a.id}` },
       h('div.dhead', h('span.did', a.id), a.calibration ? h('span.calib', this.S.revealed(a.id) ? 'calibration · revealed' : 'calibration') : null, h('span.timer#timer')),
       h('div.dbody', body), footer));
+    if (fid) this.formEl.querySelector(`[data-fid="${fid}"]`)?.focus();
   }
 
   renderTabs() {

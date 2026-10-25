@@ -477,3 +477,43 @@ class BlindnessCourt(unittest.TestCase):
         status, out = self.post("/api/candidates", {"first": 60, "last": 62, "id": None})
         self.assertFalse(out["hidden"])
         self.assertTrue(out["moments"])
+
+
+class BlindnessEdgesCourt(unittest.TestCase):
+    """Paths around calibration blindness found by the v1 function critic."""
+
+    def ordinary_until_next_is_calibration(self):
+        s = done_store()
+        while True:
+            if s.next_is_calibration() and len(s.decisions()) >= 5:
+                return s
+            e = s.start_decision([3, 3])
+            s.commit_reference(e["id"], {**REF, "first_word": 3, "last_word": 3})
+            if s.decisions()[e["id"]]["calibration"]:
+                s.reveal(e["id"])
+
+    def test_undo_cannot_remove_a_start(self):
+        s = self.ordinary_until_next_is_calibration()
+        cal = s.start_decision([60, 62])
+        self.assertTrue(cal["calibration"])
+        for _ in range(8):  # undo recent decision edits; starts and reveals are skipped
+            self.assertNotIn(s.undo()["kind"], ("decision.start", "decision.resume", "decision.reveal"))
+        self.assertEqual(s.start_decision([60, 62])["id"], cal["id"])
+
+    def test_a_reopened_decision_previews_only_its_own_spans(self):
+        s = self.ordinary_until_next_is_calibration()
+        earlier = sorted(s.decisions())[-1]
+        self.assertFalse(s.suggestions_blind(earlier, (3, 3)))
+        self.assertTrue(s.suggestions_blind(earlier, (60, 62)))
+        self.assertTrue(s.suggestions_blind(earlier, None))
+        self.assertTrue(s.suggestions_blind(None, (60, 62)))
+
+    def test_supported_needs_an_anchor(self):
+        s = done_store()
+        did = s.start_decision([3, 3])["id"]
+        s.commit_reference(did, {**REF, "first_word": 3, "last_word": 3})
+        empty = {"source_scene_ids": [], "source_anchor_ids": [], "source_resolvable": "yes",
+                 "ambiguity_reason": ""}
+        with self.assertRaisesRegex(store.StoreError, "anchor"):
+            s.commit_source(did, {**empty, "reference_outcome": "supported"})
+        s.commit_source(did, {**empty, "reference_outcome": "unresolved"})

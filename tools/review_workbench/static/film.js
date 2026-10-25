@@ -68,6 +68,19 @@ export class Film {
     else this.video.pause();
   }
 
+  stepRow(d) {
+    // Move the open moment to the previous or next annotation row, in film order across parts.
+    const rows = this.rows;
+    let i = rows.findIndex(r => r.row === this.focusRow);
+    if (i < 0 && this.part) {
+      const t = this.video.currentTime;
+      i = rows.findIndex(r => String(r.part) === this.part && r.t0 <= t && t < r.t1);
+    }
+    const r = rows[Math.max(0, Math.min(rows.length - 1, (i < 0 ? 0 : i + d)))];
+    this.cue({ part: r.part, t0: r.t0, t1: r.t1 });
+    this.S.onRow?.(r.row);
+  }
+
   step(frames) {
     this.video.pause();
     this.video.currentTime = Math.max(0, this.video.currentTime + frames / 12);
@@ -156,7 +169,7 @@ export class Film {
         },
       }, bands, ticks, pins, head);
       this.tracks[p] = { track, pins, pct, frac: t => t / secs };
-      return h('div.trackrow', h('span.partlabel', partName(p)), track);
+      return [h('div.trackrow', h('span.partlabel', partName(p)), track), h('div.lanerow', h('span.partlabel'), h('div.lanes', { id: `lanes-${p}` }))];
     });
     clear(el, tracks);
   }
@@ -196,9 +209,26 @@ export class Film {
     }
   }
 
+  // Under the timeline: for each person the open row lists, where else the annotation lists
+  // them, on the same time axis. Raw evidence about the open moment, never a ranking.
+  lanes(row) {
+    for (const p of Object.keys(this.S.index.parts)) {
+      const el = document.getElementById(`lanes-${p}`);
+      if (!el) continue;
+      if (row === null || row === undefined) { clear(el); continue; }
+      const names = this.S.film.rows[row].names.slice(0, 6);
+      const secs = this.S.index.parts[p].seconds;
+      clear(el, names.map(name => h('div.lane', { title: `${name}: rows that list them in ${partName(p)}` },
+        h('span.lanename', name),
+        this.rows.filter(r => String(r.part) === p && this.S.film.rows[r.row].names.includes(name)).map(r =>
+          h('div.lseg', { class: `lseg${r.row === row ? ' here' : ''}`, style: { left: `${(100 * r.t0) / secs}%`, width: `${Math.max(0.3, (100 * (r.t1 - r.t0)) / secs)}%` } })))));
+    }
+  }
+
   showMoment(row) {
     const el = document.getElementById('moment');
     this.focusRow = row;
+    this.lanes(row);
     if (row === null || row === undefined) {
       clear(el, h('p.empty', 'Choose a candidate, a search result or a point on the timeline to see the annotation for that moment.'));
       return;

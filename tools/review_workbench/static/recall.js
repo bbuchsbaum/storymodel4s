@@ -42,7 +42,9 @@ export class RecallPane {
       this.winEls[w.window] = { block, head };
       return block;
     });
-    clear(L, h('div.panehead', h('h2', 'Recall'), h('span.count#wcount')), h('div.reader#reader', blocks));
+    clear(L, h('div.panehead', h('h2', 'Recall'), h('span.count#wcount')),
+      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration item: timing chips are hidden until step 1 is committed.'),
+      h('div.reader#reader', blocks));
     this.refresh();
   }
 
@@ -77,11 +79,13 @@ export class RecallPane {
         h('span.wnum', `Window ${w.window}`),
         h('span.wrange', `words ${w.first}–${w.last}`),
         blind
-          ? h('span.blindnote', 'timing hidden for calibration')
+          ? null
           : h('span.noms', [...one].sort((a, b) => a - b).map(s => h('button.scenechip', { type: 'button', title: `Timing points to scene ${s}; click to play it`, onclick: () => this.S.cueScene(s) }, `sc ${s}`))),
         !blind && disagree ? h('span.clockchip', { title: `${disagree} of these words point to a different scene under another timing convention` }, `${disagree} clock-sensitive`) : null,
       );
     }
+    const banner = document.getElementById('blindbanner');
+    if (banner) banner.hidden = !this.S.blind();
     const n = Object.values(read).filter(v => v[0]).length;
     const c = document.getElementById('wcount');
     if (c) c.textContent = `${n} of ${this.S.index.windows.length} windows read`;

@@ -201,7 +201,7 @@ export class SourcePass {
           type: 'checkbox', checked: true, onchange: () => { d.unnamed.delete(u); this.render(); },
         }), label(u)))),
       current ? h('div.group.add',
-        h('input.text', { id: `unnamed-${row}`, type: 'text', placeholder: 'Add an unnamed person, e.g. "man in grey coat"', onkeydown: e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); this.addUnnamed(row); } } }),
+        h('input.text', { id: `unnamed-${row}`, type: 'text', 'aria-label': 'Describe an unnamed person', placeholder: 'Unnamed person, e.g. "man in grey coat" (N)', onkeydown: e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); this.addUnnamed(row); } if (e.key === 'Escape') { e.target.value = ''; e.target.blur(); } } }),
         h('button.small', { type: 'button', onclick: () => this.addUnnamed(row) }, 'Add'),
         Object.keys(unnamed).filter(u => !d.unnamed.has(u)).length
           ? h('select.small', { 'aria-label': 'Reuse an unnamed person', onchange: e => { if (e.target.value) { d.unnamed.add(e.target.value); this.render(); } } },
@@ -249,13 +249,18 @@ export class SourcePass {
       const row = this.currentRow();
       const d = this.draft(row);
       const open = (this.S.state.source.mentions[row] || []).find(m => !d.mentions[m.id]);
-      if (open && !e.shiftKey) {
+      if (e.shiftKey) {
+        // Shift+1-9 toggle presence; a bare digit never does, so a repeated keypress cannot
+        // silently remove someone.
+        const n = this.S.film.rows[row].names[digit - 1];
+        if (n) d.present.has(n) ? d.present.delete(n) : d.present.add(n);
+      } else if (open) {
         // 1-9 resolve the next open mention to its nth option, in the order shown.
         const opts = [...d.present, ...d.unnamed, 'absent', 'unknown'];
         if (opts[digit - 1]) d.mentions[open.id] = opts[digit - 1];
       } else {
-        const n = this.S.film.rows[row].names[digit - 1];
-        if (n) d.present.has(n) ? d.present.delete(n) : d.present.add(n);
+        toast('No open mention in this row. Shift+digit toggles who is present.');
+        return true;
       }
       this.render();
       return true;

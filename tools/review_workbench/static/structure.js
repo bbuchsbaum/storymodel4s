@@ -55,10 +55,10 @@ export class Structure {
     const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, class: 'presence', role: 'img', 'aria-label': 'Who the annotation lists on screen across the film' });
     for (const [p, info] of parts) {
       svg.append(s('rect', { x: x(p, 0), y: top, width: x(p, info.seconds) - x(p, 0), height: people.length * rowH, class: Number(p) % 2 ? 'partbg odd' : 'partbg' }));
-      svg.append(s('text', { x: x(p, 0) + 3, y: 11, class: 'axis' }, partName(p)));
+      svg.append(s('text', { x: x(p, 0) + 3, y: H - 4, class: 'axis strong' }, partName(p)));
       for (let t = 60; t < info.seconds; t += 60) {
         svg.append(s('line', { x1: x(p, t), x2: x(p, t), y1: top + people.length * rowH, y2: top + people.length * rowH + 4, class: 'tickmark' }));
-        svg.append(s('text', { x: x(p, t), y: H - 4, class: 'axis', 'text-anchor': 'middle' }, `${t / 60}:00`));
+        if (x(p, t) - x(p, 0) > 50) svg.append(s('text', { x: x(p, t), y: H - 4, class: 'axis', 'text-anchor': 'middle' }, `${t / 60}:00`));
       }
     }
     for (const sc of index.scenes) {
@@ -96,7 +96,7 @@ export class Structure {
     const words = index.words;
     const scenes = index.scenes.map(x => x.scene);
     const W = this.width();
-    const left = 44;
+    const left = 52;
     const top = 8;
     const maxS = Math.max(...scenes);
     const step = maxS <= 20 ? 12 : maxS <= 40 ? 7 : 5;
@@ -110,7 +110,7 @@ export class Structure {
     }
     for (const win of index.windows) {
       svg.append(s('line', { x1: x(win.first), x2: x(win.first), y1: top, y2: top + maxS * step, class: 'winline' }));
-      svg.append(s('text', { x: x(win.first) + 2, y: H - 16, class: 'axis small' }, `w${win.window}`));
+      if (x(win.first) < W - 24) svg.append(s('text', { x: x(win.first) + 2, y: H - 16, class: 'axis small' }, `w${win.window}`));
     }
     words.forEach(w => {
       for (const sc of w.nom.one) svg.append(s('rect', { x: x(w.row) - 0.8, y: y(sc) - 3, width: 2, height: 6, class: w.boundary ? 'nom alt' : 'nom' }));
@@ -122,7 +122,8 @@ export class Structure {
       svg.append(s('rect', { x: x(a) - 2, y: top, width: Math.max(4, x(b) - x(a) + 4), height: maxS * step, class: 'selband' }));
     }
     svg.append(s('text', { x: left, y: H - 3, class: 'axis' }, 'recall order →  (click to select a word)'));
-    svg.append(s('text', { x: 4, y: top + 8, class: 'axis' }, 'scene'));
+    const yc = top + (maxS * step) / 2;
+    svg.append(s('text', { x: 12, y: yc, class: 'axis', 'text-anchor': 'middle', transform: `rotate(-90 12 ${yc})` }, 'scene'));
     svg.addEventListener('click', e => {
       const box = svg.getBoundingClientRect();
       const vx = ((e.clientX - box.left) / box.width) * W;

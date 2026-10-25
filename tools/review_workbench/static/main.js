@@ -11,7 +11,8 @@ import { Structure } from './structure.js';
 const KEYS = {
   both: [
     ['Space', 'play or pause'], ['R', 'replay the moment'], ['L', 'loop the moment'],
-    [', .', 'step one frame'], ['[ ]', 'slower or faster'], ['Shift+S', 'structure panel'],
+    [', .', 'step one frame'], ['< >', 'previous or next annotation row'], ['[ ]', 'slower or faster'],
+    ['Shift+S', 'structure panel'],
     ['?', 'this list'],
   ],
   source: [
@@ -27,6 +28,7 @@ const KEYS = {
     ['A', 'add the open moment as source evidence'], ['F', 'find a person (step 1)'],
     ['n p d e o', 'reference form (step 1)'],
     ['y x u', 'person? (step 1) or resolvable (step 2)'], ['s c v e', 'outcome (step 2)'],
+    ['Shift+R', 'reveal suggestions (calibration item, after step 1)'],
     ['Z', 'undo the last edit'], ['Shift+E', 'reopen the decision under the cursor'], ['Esc', 'close the form'],
   ],
 };
@@ -77,6 +79,13 @@ function span() {
   return s ? [Math.min(s.a, s.b), Math.max(s.a, s.b)] : null;
 }
 
+S.nextLikely = function (after) {
+  const words = S.index.words;
+  for (let r = after + 1; r <= words.length; r++) {
+    if (words[r - 1].screen && !S.recallPane.wordEls[r].dataset.did) return S.select(r, r);
+  }
+};
+
 S.goWindow = function (w) {
   const ws = S.index.windows;
   w = Math.max(1, Math.min(ws.length, w));
@@ -93,6 +102,7 @@ S.markRead = async function (w, value = true) {
   try {
     const out = await post('/api/window', { window: w, value });
     S.setState(out.state);
+    toast(`Window ${w} marked ${value ? 'read' : 'unread'}`);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -147,7 +157,7 @@ S.startDecision = async function () {
   const sp = span();
   if (!sp) return toast('Select the words of the referring expression first.');
   try {
-    const out = await post('/api/decision/start');
+    const out = await post('/api/decision/start', { span: sp });
     S.setState(out.state);
     S.active = { id: out.id, calibration: out.calibration, step: 1, fields: blankFields(...sp), source: blankSource(), started: Date.now() };
     S.dupes = [];
@@ -164,6 +174,8 @@ S.startDecision = async function () {
 S.reopen = function (id) {
   const d = S.decision(id);
   if (!d) return;
+  const pending = S.state.pendingCalibration;
+  if (pending && pending !== id) return toast(`Finish calibration item ${pending} first (Enter on any selection resumes it).`, 'error');
   S.active = {
     id,
     calibration: d.calibration,
@@ -319,6 +331,7 @@ S.commitSource = async function () {
     S.setState(out.state);
     toast(`${a.id}: committed`);
     S.closeDecision(true);
+    S.nextLikely(a.fields.last_word);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -328,10 +341,12 @@ S.undo = async function () {
   try {
     const out = await post('/api/undo');
     S.setState(out.state);
+    const what = { 'decision.reference': 'step 1', 'decision.revise': 'step 1 revision', 'decision.source': 'step 2', 'window.read': 'window mark', 'person.create': 'new person', 'decision.delete': 'deletion', 'source.row': 'source row', 'source.unnamed': 'unnamed person' }[out.undone?.kind] || 'last edit';
     if (S.active && !S.decision(S.active.id) && S.active.step === 2) S.active.step = 1;
     if (S.mode === 'source') S.source.render();
     else S.decide.render();
-    toast('Undone');
+    toast(`Undid ${what}${out.undone?.id ? ` of ${out.undone.id}` : ''}${out.undone?.row ? ` (row ${out.undone.row})` : ''}`);
+    if (S.mode === 'recall' && S.sel) { const [x, y] = span(); S.decide.load(x, y); }
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -360,11 +375,24 @@ function renderBar() {
   }
 }
 
+let keysReturn = null;
+function openKeys() {
+  keysReturn = document.activeElement;
+  renderKeys();
+  document.getElementById('keys').hidden = false;
+  document.querySelector('#keys button')?.focus();
+}
+function closeKeys() {
+  document.getElementById('keys').hidden = true;
+  if (keysReturn && keysReturn.isConnected && keysReturn !== document.body) keysReturn.focus();
+  else document.activeElement?.blur();
+}
+
 function renderKeys() {
   const O = document.getElementById('keys');
   const list = rows => h('dl', rows.map(([k, v]) => [h('dt', h('kbd', k)), h('dd', v)]));
-  clear(O, h('div.keysbox', { role: 'dialog', 'aria-label': 'Keyboard' },
-    h('div.panehead', h('h2', 'Keyboard'), h('button.ghost', { type: 'button', onclick: () => (O.hidden = true) }, 'Close')),
+  clear(O, h('div.keysbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Keyboard' },
+    h('div.panehead', h('h2', 'Keyboard'), h('button.ghost', { type: 'button', onclick: () => closeKeys() }, 'Close')),
     h('div.keycols', h('section', h('h3', S.mode === 'source' ? 'Source pass' : 'Recall pass'), list(KEYS[S.mode])), h('section', h('h3', 'Film'), list(KEYS.both)))));
 }
 
@@ -400,17 +428,19 @@ function onKey(e) {
   const k = e.key;
   const F = S.filmPane;
   const keys = document.getElementById('keys');
-  // The keys overlay is modal: only ? and Esc reach anything while it is open.
+  // The keys overlay is modal: only ? and Esc reach anything while it is open, and focus
+  // stays on its close button.
   if (!keys.hidden) {
-    if (k === '?' || k === 'Escape') keys.hidden = true;
-    if (k !== 'Tab') e.preventDefault();
+    if (k === '?' || k === 'Escape') closeKeys();
+    e.preventDefault();
     return;
   }
   // Enter and Space on a focused control activate that control, never a global action.
   const t = e.target;
   if ((k === 'Enter' || k === ' ') && t && t !== document.body && t.closest('button, [role=radio], [role=tab], [role=option], a, summary')) return;
   const handled = (() => {
-    if (k === '?') { renderKeys(); keys.hidden = false; keys.querySelector('button')?.focus(); return true; }
+    if (k === '?') { openKeys(); return true; }
+    if (k === '<' || k === '>') { F.stepRow(k === '>' ? 1 : -1); return true; }
     if (k === 'Escape' && !document.getElementById('structure').hidden) { S.structure.toggle(); return true; }
     if (k === 'S') { S.structure.toggle(); return true; }
     if (k === ' ') { F.toggle(); return true; }
@@ -452,7 +482,8 @@ function recallKey(e) {
   if (k === 'm') { const done = S.state.windows[String(S.win)]?.[0]; S.markRead(S.win, !done); return true; }
   if (k === '/') { S.decide.setTab('search'); return true; }
   if (k === 'z') { S.undo(); return true; }
-  if (/^[1-8]$/.test(k)) { if (S.decide.tab !== 'candidates') S.decide.setTab('candidates'); S.decide.choose(Number(k) - 1); return true; }
+  if (/^[1-8]$/.test(k)) { if (S.decide.tab === 'search') S.decide.openHit(Number(k) - 1); else S.decide.choose(Number(k) - 1); return true; }
+  if (k === 'R' && a && a.calibration && S.decision(a.id) && !S.revealed(a.id)) { S.reveal(); return true; }
   if (k === 'Escape') { if (a) S.closeDecision(); else { S.sel = null; S.recallPane.refreshSelection(); S.decide.renderForm(); } return true; }
   if (k === 'E' && !a) { S.reopenAt(cur); return true; }
   if (k === 'Enter') {
@@ -501,7 +532,7 @@ async function boot() {
   document.getElementById('mode-source').addEventListener('click', () => setMode('source'));
   document.getElementById('mode-recall').addEventListener('click', () => setMode('recall'));
   document.getElementById('btn-structure').addEventListener('click', () => S.structure.toggle());
-  document.getElementById('btn-keys').addEventListener('click', () => { const O = document.getElementById('keys'); renderKeys(); O.hidden = !O.hidden; });
+  document.getElementById('btn-keys').addEventListener('click', () => openKeys());
   document.getElementById('btn-export').addEventListener('click', async () => {
     try {
       const out = await post('/api/export');

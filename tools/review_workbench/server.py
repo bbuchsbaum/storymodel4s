@@ -63,6 +63,7 @@ class App:
         return {
             "recallOpen": s.recall_open(),
             "nextCalibration": s.recall_open() and s.next_is_calibration(),
+            "pendingCalibration": (s.pending_calibration() or {}).get("id") if s.recall_open() else None,
             "source": {
                 "rows": src["rows"],
                 "scenes": src["scenes"],
@@ -89,7 +90,7 @@ class App:
         if path == "/api/state":
             return self.state()
         if path == "/api/search":
-            if s.recall_open() and s.suggestions_blind(body.get("id")):
+            if s.recall_open() and s.suggestions_blind(body.get("id")):  # no span: strictest
                 raise StoreError("search is hidden for a calibration item until step 1 is committed")
             return {"hits": self.cands.search(str(body.get("q", "")))}
         if path == "/api/source/row":
@@ -108,7 +109,8 @@ class App:
                 raise StoreError("the source pass must be complete before recall opens")
             did = body.get("id")
             # The server decides blindness; the client's flag can only add to it.
-            hidden = bool(body.get("hidden")) or s.suggestions_blind(did)
+            span = (int(body["first"]), int(body["last"]))
+            hidden = bool(body.get("hidden")) or s.suggestions_blind(did, span)
             out = self.cands.for_span(int(body["first"]), int(body["last"]))
             s.shown(
                 did,
@@ -127,7 +129,8 @@ class App:
             e = s.create_person(body.get("label"))
             return {"id": e["pid"], "state": self.state()}
         elif path == "/api/decision/start":
-            e = s.start_decision()
+            sp = body.get("span")
+            e = s.start_decision([int(sp[0]), int(sp[1])] if sp else None)
             return {
                 "id": e["id"],
                 "calibration": e["calibration"],
@@ -151,7 +154,9 @@ class App:
                 )
             }
         elif path == "/api/undo":
-            s.undo()
+            e = s.undo()
+            undone = {k: e.get(k) for k in ("kind", "id", "row", "window")}
+            return {"undone": undone, "state": self.state()}
         elif path == "/api/export":
             out = s.write_export()
             return {

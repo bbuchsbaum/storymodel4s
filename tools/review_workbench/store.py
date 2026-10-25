@@ -101,10 +101,10 @@ class Store:
         ]
 
     def undo(self) -> dict:
-        """Undo the latest live edit (never the header)."""
-        live = [
-            e for e in self.live() if e["kind"] not in ("header", "suggestions.shown")
-        ]
+        """Undo the latest live edit. Starts, resumes and reveals are not edits: undoing a start
+        would renumber the calibration schedule, and a reveal cannot be unseen."""
+        fixed = ("header", "suggestions.shown", "decision.start", "decision.resume", "decision.reveal")
+        live = [e for e in self.live() if e["kind"] not in fixed]
         if not live:
             raise StoreError("nothing to undo")
         target = live[-1]
@@ -228,7 +228,7 @@ class Store:
         named = [{"id": n, "label": n, "kind": "annotation"} for n in self.p.people]
         return named + made
 
-    def start_decision(self) -> dict:
+    def start_decision(self, span=None) -> dict:
         """Number a new decision as it starts. Calibration items (the first five, then every
         tenth) open with suggestions hidden; the count includes abandoned starts. An abandoned
         calibration item is resumed rather than replaced, so closing it cannot skip the blind
@@ -236,7 +236,7 @@ class Store:
         self._require_recall()
         pending = self.pending_calibration()
         if pending:
-            self._append({"kind": "decision.resume", "id": pending["id"]})
+            self._append({"kind": "decision.resume", "id": pending["id"], "span": span})
             return pending
         n = 1 + sum(1 for e in self.events if e["kind"] == "decision.start")
         calibration = n <= CALIBRATION_FIRST or n % CALIBRATION_EVERY == 0
@@ -246,6 +246,7 @@ class Store:
                 "id": f"d{n:03d}",
                 "n": n,
                 "calibration": calibration,
+                "span": span,
             }
         )
 
@@ -267,14 +268,41 @@ class Store:
         n = 1 + sum(1 for e in self.events if e["kind"] == "decision.start")
         return n <= CALIBRATION_FIRST or n % CALIBRATION_EVERY == 0
 
-    def suggestions_blind(self, did=None) -> bool:
-        """Whether candidates and search must be withheld: for an unrevealed calibration item,
-        or, with no decision open, when the next start will be one."""
+    def spans_of(self, did) -> list:
+        """Every recall span a decision has been tied to: its start and resume spans and its
+        committed main and co-referring spans."""
+        out = []
+        for e in self.live():
+            if e.get("id") == did and e["kind"] in ("decision.start", "decision.resume") and e.get("span"):
+                out.append(tuple(e["span"]))
+            if e.get("id") == did and e["kind"] in ("decision.reference", "decision.revise"):
+                f = e["fields"]
+                out.append((f["first_word"], f["last_word"]))
+                out.extend(tuple(x) for x in f["other_coref_spans"])
+        return out
+
+    def suggestions_blind(self, did=None, span=None) -> bool:
+        """Whether candidates (for `span`) and search must be withheld.
+
+        Blind while a calibration item is open and unrevealed. When the next start will be a
+        calibration item, suggestions are shown only for the open decision's own spans, so
+        reopening or keeping an ordinary decision open cannot preview another span."""
+        pending = self.pending_calibration()
+        if pending and pending["id"] != did:
+            return True
         if did:
             start = self._started(did)
             d = self.decisions().get(did)
-            return bool(start["calibration"] and not (d and d["revealed"]))
-        return self.next_is_calibration()
+            if start["calibration"] and not (d and d["revealed"]):
+                return True
+        if not self.next_is_calibration():
+            return False
+        if not did:
+            return True
+        if span is None:  # search is not tied to a span
+            return True
+        a, b = span
+        return not any(x <= a and b <= y for x, y in self.spans_of(did))
 
     def _started(self, did):
         e = next(
@@ -355,6 +383,8 @@ class Store:
             if f[key] not in DECLARED[key]:
                 raise StoreError(f"{key} must be one of {', '.join(DECLARED[key])}")
         f["ambiguity_reason"] = (f["ambiguity_reason"] or "").strip()
+        if f["reference_outcome"] in ("supported", "contradicted") and not f["source_anchor_ids"]:
+            raise StoreError("a supported or contradicted outcome needs at least one source anchor")
         return self._append({"kind": "decision.source", "id": did, "fields": f})
 
     def delete(self, did: str) -> dict:
