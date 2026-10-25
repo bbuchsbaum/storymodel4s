@@ -56,6 +56,10 @@ onset, which agrees for 15 of 16 subjects. Its section 3 table maps gold subject
 The two origins differ on 98 of 2,495 words (3.9%), including 7 of 257 pronoun or person-noun tokens
 (`tr-origin-sensitivity.json`).
 
+A third convention exists. The inherited `gold_scene.py` uses closed word-seconds endpoints, and it
+differs from 1-based TR nomination on 94 words. The union of all three disagreements is the same 98
+words (Codex census, Fray #136).
+
 **Declared rule:**
 - **Nomination** uses the CSV's 1-based Princeton TR column within [Onset, Offset], inclusive. It
   matches the CSV's own TR numbering.
@@ -242,10 +246,14 @@ owner's.
    (Fray #124), not a clause in the epic notes.
 5. **Presence beyond rows 500-585** needs the owner to extend ADR 0027 decision 1 (section 3).
    *Owner decision.*
-6. **Pseudonymized control for C and for the drafting labellers** (not yet agreed with Codex).
-   - Run C, and the draft labelling, under one consistent renaming of the characters as well as the
-     original names. Map the answers back before scoring.
-   - **The gate is scored on the original-name condition.** The pseudonymized condition is a
-     diagnostic: its gap from the original measures dependence on prior knowledge of the episode.
-     It changes no gate.
+6. **Pseudonymized naming-sensitivity check.** Agreed with Codex (Fray #136) as an optional,
+   budgeted check, not a prerequisite.
+   - Rename the characters consistently across every text input and the relevant labels. When
+     comparing architectures under renamed input, apply the same renaming to the graph and
+     name-baseline arms.
+   - Original and renamed cases are paired, not extra independent decisions.
+   - **The gate is scored on the original-name condition.** The renamed condition is reported as
+     sensitivity to naming. It is not a unique measure of memorized-plot dependence: renaming can
+     alter linguistic cues, and visual recognition can still reveal the episode.
+   - It does not replace a new-film follow-up. It changes no gate.
 
