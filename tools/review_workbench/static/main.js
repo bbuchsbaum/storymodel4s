@@ -229,7 +229,7 @@ S.reopenAt = function (row) {
 let closeArmed = 0;
 S.closeDecision = function (force = false) {
   const a = S.active;
-  if (!a) return;
+  if (!a || (S.saving && !force)) return;
   const f = a.fields;
   const dirty = a.step === 1 && !S.decision(a.id) && (f.reference_form || f.referent || (f.other_coref_spans || []).length);
   if (dirty && !force && Date.now() - closeArmed > 2500) {
@@ -567,6 +567,7 @@ function onKey(e) {
     if (k === '[') { F.setRate(-1); return true; }
     if (k === ']') { F.setRate(1); return true; }
     if (S.mode === 'source') return S.source.key(e);
+    if (S.saving) return true; // a save is in flight: no recall-pass key may act (film keys above still work)
     return recallKey(e);
   })();
   if (handled) e.preventDefault();
