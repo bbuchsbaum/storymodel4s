@@ -42,8 +42,9 @@ retention and one attempt per request. Eight requests were sent and eight valid 
 
 The universe is 43 pairs: 8 pronoun or noun mentions, each against the visual mentions of its
 overlapping and adjacent rows. The labels are one agent's judgments, not human labels. The
-labeller made 6 tool calls in 27 s (recorded on the S3c-3 bead), so it cannot have viewed all 32
-frames. It labelled no pair `cant-tell`. The model has prior knowledge of the episode.
+labeller's harness run record shows 6 tool uses in 27 s, posted on the S3c-3 bead as note op
+`20261025T010601.530202Z-p87484-c0000-r7c62-h21669e`, so it cannot have viewed all 32 frames. No
+pair was labelled can't tell. The model has prior knowledge of the episode.
 
 | Basis | Proposed | Licensed / recorded | Refused | Pairs with this outcome | Labelled `same` among them | Precision (Wilson 95%) |
 |---|---|---|---|---|---|---|
