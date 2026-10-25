@@ -77,12 +77,24 @@ artifact into the recall pass.
 - people the reviewer creates during the recall pass, for example "unnamed woman 1";
 - the fixed options "absent / off-screen person", "no one in the film" and "Unknown".
 
-**A mandatory "suggestions off" calibration sample** is part of the protocol. The tool counts
-decisions as they are started (a new span selected), not windows. The first 5 started decisions,
-and then every tenth, open with candidates and search hidden. The reviewer commits step 1 blind;
-the suggestions are then revealed and the reviewer may revise, which is logged. The reported
-metric is the revision rate on these paired items, split by `reference_form`. Every suggestion
-shown for a decision is logged privately.
+**A mandatory "suggestions off" calibration sample** is part of the protocol. It is chosen by
+words, not by a count of decisions.
+- **Calibration windows are fixed before review:** window 1 and every eighth window, or a list in
+  the packet manifest. For NN03 that is 7 of 50 windows.
+- **Their words are masked.** No timing chip, candidate, context word, retrieval or echo token,
+  search result or timing-plot mark reaches a masked word.
+- **A calibration item is a decision started on masked words.** The reviewer commits step 1
+  blind. The suggestions for that decision's own words are then revealed, and the reviewer may
+  revise; the revision is logged. Undo cannot reach behind a reveal.
+- **The reported metric** is the revision rate on these paired items, split by `reference_form`.
+  Every suggestion shown for a decision is logged privately.
+- **Residual risk:** a typed search for a masked word, made while the selection is elsewhere,
+  cannot be prevented. The protocol instructs against it.
+
+*Amendment, 2026-10-25.* The earlier rule chose the first 5 started decisions and then every tenth.
+The workbench hill climb showed that a count-based rule cannot be kept blind. The reviewer
+sees suggestions for a span before knowing whether the next start will be a calibration item,
+and those exposures are untracked (v2 function review, finding B3).
 
 ### 3. Two passes; the whole source pass comes first
 
