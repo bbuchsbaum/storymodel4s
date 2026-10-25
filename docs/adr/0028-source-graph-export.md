@@ -198,9 +198,9 @@ built from.
 
 **J. Binding a handle (§3).**
 - *Recommended:* bind by name or exact word match. A picture handle binds only when its span equals
-  the annotation name of an overlapping visual mention. A speech handle binds only when its span is exactly a graph
-  dialogue mention. Speech records must carry word indices and UTF-16 offsets, which is an input
-  change.
+  the annotation name of an overlapping visual mention. A speech handle binds only when its span is
+  exactly a graph dialogue mention. Speech records must carry word indices and UTF-16 offsets, which
+  is an input change.
 - *Alternative (a):* bind a picture record's single handle to its single visual class, and disclose
   the error class as an accepted risk, measured by a court and a labelled sample. This covers
   unnamed descriptions, at the cost of binding some absent people.
