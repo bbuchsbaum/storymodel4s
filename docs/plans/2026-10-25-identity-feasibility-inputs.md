@@ -244,33 +244,40 @@ still respects its admission, custody and instrument-validity permissions.
 
 ### 4.2 Additions proposed here, for agreement before any arm runs
 
-These are additions to the first two epic notes. **Agreed with Codex** and recorded on the epic as
-op `20261025T144732.050282Z-p39096-c0000-r1211-h23b326`: item 2 (quarantine) and item 6
-(pseudonymization), and the population correction in section 3. That op is part of the governing
-record, and 4.1's GO gate is read together with item 2. **Still pending Codex's agreement:** items
-1, 3 and 4. **Owner decision:** item 5.
+These are additions to the first two epic notes. **Agreed with Codex** and recorded on the epic:
+item 2's quarantine rule, item 6 (pseudonymization) and the population correction in section 3, as
+op `20261025T144732.050282Z-p39096-c0000-r1211-h23b326`, acknowledged by Codex as op
+`20261025T144952.841248Z-p47815-c0000-r6988-hec6c12`; and item 2's v2 block split, as op
+`20261025T145833.208932Z-p74333-c0000-rc31c-h8d8ede`. These ops are part of the governing record,
+and 4.1's GO gate is read together with item 2. **Still pending Codex's agreement:** items 1, 3 and
+4. **Owner decision:** item 5.
 
 1. **The unit.** A natural attribution decision is one recall person-reference in NN03, a pronoun,
    description or name, together with the claim role it fills. Correlated tokens of one decision
    count once.
 2. **The split procedure: v2 contiguous blocks** (agreed with Codex; storyatlas4s Fray board, card
-   #136, messages @1043 and @1044). This replaces the v1 split, which assigned each scene on its own
-   under seed `identity-feasibility-NN03-20261025-v1`. v1 is kept as superseded, and it was replaced
+   #136, messages @1043 and @1044). It replaces the v1 split, whose shortest-duration selection
+   biased the mix toward short scenes with
+   no source candidates, and which assigned each scene on its own
+   under seed `identity-feasibility-NN03-20261025-v1`. The v1 census and seed are kept as
+   superseded, and it was replaced
    before any labels, outputs or binder work existed.
    - **Blocks.** Ten fixed blocks of five global scene ids: 1-5, 6-10, through 46-50. They are
      derived from source ordering only and are not claimed to be story arcs.
-   - **Assignment.** Block 26-30, which holds the body scenes, is forced into discovery. Seed
-     `identity-feasibility-NN03-20261025-v2` ranks the other nine blocks by SHA-256(seed:block
-     start). The first five go to confirmation and the other four to discovery. One seed only: if
-     the sample proves insufficient, that is reported and no other seed is tried.
+   - **Assignment.** Block 26-30, which holds the body scenes, is forced into discovery. Each of the
+     other nine blocks is ranked by the lowercase hex SHA-256 of the UTF-8 string
+     `identity-feasibility-NN03-20261025-v2:<start>`, where `<start>` is the block's first scene id
+     in decimal without padding, sorted ascending. The first five go to confirmation and the other
+     four to discovery. One seed only: if the sample proves insufficient, that is reported and no
+     other seed is tried.
    - **Selection.** Within each partition, whole blocks are taken in seed order, with the body block
-     first in discovery. Selection stops when the partition has at least 15 distinct non-regression
-     human-resolvable natural decisions, plus at least 2 hard natural decisions drawn from at least
-     2
-     of these strata: off-screen person, relational description, within-partition multi-scene, and
-     role, event, state or context disambiguation. Designed controls stay mandatory and separate.
-     Absent strata are reported. Measured playback, vocabulary and anchor costs act as budget
-     limits, never as a ranking.
+     first in discovery. Selection stops when the partition has at least 15 distinct non-regression,
+     non-quarantined human-resolvable natural decisions, the same decisions the gate's floor counts.
+     It also needs at least 2 hard natural decisions drawn from at least 2 of these strata:
+     off-screen person, relational description, within-partition multi-scene, and role, event, state
+     or context disambiguation. Designed controls stay mandatory and separate. Absent strata are
+     reported, and all excluded and quarantined cases stay visible in the full accounting. Measured
+     playback, vocabulary and anchor costs act as budget limits, never as a ranking.
    - **Part boundary.** Block 26-30 crosses the media-part boundary, because Part1 ends at global
      scene 27. Scenes 26-27 are part a and 28-30 are part b. A chain inside the block can cross
      parts without crossing partitions, and it uses both part crosswalks.
