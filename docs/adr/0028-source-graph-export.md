@@ -4,7 +4,9 @@
 `6f1235532` found four blocking defects: the mention choice, overlap against containment, inexact
 conversion, and identity licensed without a graph. Its re-review of `b3dedab4f` found two more: the
 one-class rule reintroduced the deterministic deixis that ADR 0027 rejected, and it treated a
-contested class as `Same`. This revision answers all six and their follow-ups.
+contested class as `Same`. The re-review of `3d7c5225b` found that a picture record still bound
+an absent person to whoever was shown whenever the model emitted a single handle. This revision
+answers all seven and their follow-ups.
 
 **Decider:** the owner
 
@@ -64,7 +66,7 @@ situations: ADR 0027 builds referent identity only.
 - **Class ids.** A class id is the least member id of the class, over all its members. Relation rows
   name classes by that id, which replaces `v1`'s least visual id.
 - **Relations** keep all four `ReferentRelation` values, with hints. Each class carries a contested
-  flag, and every class pair whose relation is `Distinct` or `Open` is written explicitly.
+  flag, and every class pair whose relation is `Distinct` is written explicitly.
 - **Unchanged:** proposal outcomes, the manifest and the input hashes are kept as in `v1`.
 - **Definition.** The exchange is defined by a JSON Schema under `docs/data/`, and courts on the
   writer check every field.
@@ -83,35 +85,42 @@ exact rational arithmetic. A record whose times are not a whole number of ticks 
 refuses the record, not the graph.
 
 The reader exposes:
-- `visual_classes(part, start, end)`: the classes of the picture-stream mentions that overlap the
-  record, half-open and strict, as `overlaps` is;
-- `mention_for_words(word_indices)`: the dialogue mention whose recognizer words are exactly these,
-  if one exists;
-- `relation(class_a, class_b)`, derived from the graph's mention-level relations:
+- `visual_mentions(part, start, end)`: the picture-stream mentions that overlap the record,
+  half-open and strict as `overlaps` is, with their annotation names;
+- `mention_for_span(record, utf16_span)`: the dialogue mention whose recognizer words the cited
+  span covers exactly, by the record's per-word UTF-16 offsets, if one exists;
+- `relation(class_a, class_b)`, derived from the graph:
   - **one class, uncontested:** `Same`;
-  - **one class, contested:** `Open`;
-  - **two classes** take the relation the graph records between them. `v2` writes every class
-    pair that is `Distinct` or `Open`, so a pair with no row is `Unknown`.
+  - **any pair involving a contested class:** unresolved;
+  - **two uncontested classes:** `Distinct` when the graph records it, and otherwise `Unknown`.
+    `v2` writes every `Distinct` class pair explicitly.
 
 It never infers a relation the graph does not state.
 
-### 3. A handle binds only through what the record is
+### 3. A handle binds only through a name or an exact word match
 
-Each record declares its modality, picture or speech. A speech record also carries the recognizer
-word indices of its text. Binding is decided before validation, and the model names no mentions.
-- **A picture record** describes what is shown. Its entity handle binds to a class only when the
-  record overlaps exactly one visual class *and* the record has exactly one entity handle. A
-  picture record with two or more entity handles binds none of them, because the extra handle may
-  be someone not shown.
+Each record declares one modality, picture or speech. A record that is both, such as an annotation
+row with a speaker and a description, is refused, and its handles are unbound. A speech record
+carries the recognizer word indices of its text and each word's UTF-16 offsets. Binding is decided
+before validation, and the model names no mentions.
+- **A picture record never binds by presence alone.** An entity handle in a picture record binds
+  only when its cited span contains, after the core's name folding, the annotation name of a visual
+  mention that overlaps the record. It then takes that mention's class. If the span contains two
+  such names, the handle is unbound.
+  - An unnamed description stays unbound.
+  - So does the name of someone not listed in the overlapping row.
+  - The handle count no longer matters, so a model that emits one handle for an absent person
+    gains nothing.
 - **A speech record never binds by time.** A speech record's handle binds only when its cited span
-  covers exactly the words of one graph dialogue mention. Then it takes that mention's class. A
-  pronoun so bound stays in its own class, which the graph leaves `Unknown` to every person on
-  screen, so no deixis is made here (ADR 0027 §4). A described person with no graph mention, such
-  as a kinship noun outside ADR 0027 §2's list, stays unbound.
+  covers exactly the words of one graph dialogue mention. Then it takes that mention's class.
+  - A pronoun so bound is linked to a person on screen only if the ADR 0027 resolver licensed that
+    link (a deictic or named link). The assessor never adds one.
+  - A described person with no graph mention, such as a kinship noun outside ADR 0027 §2's list,
+    stays unbound.
 - **Refusals leave handles unbound.** A record refused by the reader (§2), or with no qualifying
   mention, leaves its handles unbound.
 - **Equality.** Two handles are the same entity only if both are bound and `relation` is `Same`.
-  They are different only if it is `Distinct`. Every other case, `Open` included, is unresolved.
+  They are different only if it is `Distinct`. Every other case is unresolved.
 
 ### 4. Identity is graph-owned everywhere
 
@@ -144,17 +153,20 @@ check (owner decision C).
 ### 6. Consumer tests first (T6)
 
 Before the validator changes, S3d writes the following from outside the assessor module:
-- **A synthetic `v2` graph fixture.** Records get declared modalities, distinct intervals, ticks
-  that convert exactly, and word indices on speech records.
-  - **S2:** two picture records, each overlapping one visual mention, in different classes. The
+- **A synthetic `v2` graph fixture.** Records get one declared modality each, distinct intervals,
+  ticks that convert exactly, and, on speech records, word indices with UTF-16 offsets.
+  - **S2:** two picture records whose spans name two visual mentions in different classes. The
     positive control has one class.
-  - **S5, real-shaped:** a picture record overlapping one visual class, and a speech record whose
+  - **S5, real-shaped:** a picture record naming the depicted person, and a speech record whose
     described-person span covers no graph mention. It must come out unresolved. The positive
     control is a speech record whose span covers a name mention in the depicted person's class.
-  - **No deixis:** a speech record in a one-person row whose pronoun span covers a pronoun mention.
-    It must not bind to the person shown.
-  - **Two handles:** a picture record with two entity handles binds neither.
-  - **Contested class:** a class marked contested gives `Open`, which is unresolved.
+  - **The absent person in a picture record:** a one-person picture record whose single handle's
+    span is an unnamed description of someone else. It must stay unbound.
+  - **No added deixis:** a speech pronoun the graph left unlinked must not bind to the person shown.
+    The control is a pronoun the graph linked by a licensed deictic link, which binds to that
+    person.
+  - **A mixed record** is refused.
+  - **A contested class** gives unresolved.
 - **Graph-mode variants of these cases.** They run against today's validator and are marked as
   expected failures.
 
@@ -165,8 +177,9 @@ The existing pairs and their pinned outcomes stay as the no-graph record.
 The graph covers part b, rows 500-585. Records outside it overlap no mention, so their entity
 handles are unbound. Assessor coverage beyond that scope waits for more graphs. The assessor half
 has a named gate before it lands: a check that the real records (`rendered-input-pack.json`) use
-part-b seconds and the graph's edition, that each declares its modality, and that speech records
-carry word indices that match the recognizer transcript the graph was built from.
+part-b seconds and the graph's edition, that each declares one modality, and that speech records
+carry word indices and per-word UTF-16 offsets that match the recognizer transcript the graph was
+built from.
 
 ## Owner decisions
 
@@ -178,14 +191,17 @@ carry word indices that match the recognizer transcript the graph was built from
   yet.
 
 **J. Binding a handle (§3).**
-- *Recommended:* bind by modality. A picture record binds its single entity handle to its single
-  visual class. A speech record binds only by an exact word-index match to a graph dialogue
-  mention. This requires speech records to carry word indices, which is a change to the assessor's
-  input.
-- *Alternative:* speech handles never bind. No input change is needed, but every described or
-  spoken referent is unresolved, so the S5 positive control cannot pass.
+- *Recommended:* bind by name or exact word match. A picture handle binds only when its span names
+  an overlapping visual mention. A speech handle binds only when its span is exactly a graph
+  dialogue mention. Speech records must carry word indices and UTF-16 offsets, which is an input
+  change.
+- *Alternative (a):* bind a picture record's single handle to its single visual class, and disclose
+  the error class as an accepted risk, measured by a court and a labelled sample. This covers
+  unnamed descriptions, at the cost of binding some absent people.
+- *Alternative (c):* bind only from records derived from the annotation's presence column, never
+  from captions.
 - *Rejected:* binding by time to the only class present. That is deterministic deixis (ADR 0027
-  §4), and it binds absent people to whoever is shown.
+  §4), and the model's handle count would decide it.
 
 **M. Model identity edges (§4).**
 - *Recommended:* keep them as `proposed_*`, with a reason, and never let them license.
@@ -215,11 +231,12 @@ witnesses.
 - **What the graph settles.** Identity in the assessor is licensed by the recall-blind graph. The S2
   and S5 cases become decidable from evidence the model never sees.
 - **What it costs.** Nothing binds in these cases:
-  - a picture record that overlaps several people;
-  - a picture record with several entity handles;
-  - a speech span that is not an exact graph mention.
+  - an unnamed description on a picture record;
+  - a speech span that is not an exact graph mention;
+  - a mixed record.
 
-  So identity coverage falls. Speech records must carry word indices. Cross-scope denials are
+  So identity coverage falls. Speech records must carry word indices and UTF-16 offsets.
+  Cross-scope denials are
   unlicensable until a source of distinctness exists.
 - **Two halves.** The Scala export (§1) and the Python reader (§2) can land on `main` now. The
   consumer tests (§6) and the validator changes (§3-4) land after
