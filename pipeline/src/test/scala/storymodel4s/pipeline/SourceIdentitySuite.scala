@@ -366,6 +366,63 @@ class SourceIdentitySuite extends FunSuite:
     )
   }
 
+  test("v2: a graph row states the admitted values, not the producer's raw input") {
+    val raw = Json.obj(
+      "id" -> s("v-raw"),
+      "origin" -> s("visual"),
+      "stream" -> s("picture"),
+      "intervals" -> Json.arr(span(7000, 7100), span(6500, 6600)),
+      "name" -> s("  Cleo  ")
+    )
+    val g = graph(inputs(ms = mentions :+ raw))
+    val row = g.hcursor
+      .downField("mentions")
+      .as[Vector[Json]]
+      .toOption
+      .get
+      .find(_.hcursor.get[String]("id").contains("v-raw"))
+      .get
+      .hcursor
+    assertEquals(row.get[String]("name").toOption, Some("Cleo"))
+    assertEquals(
+      row.downField("intervals").focus,
+      Some(Json.arr(span(6500, 6600), span(7000, 7100)))
+    )
+  }
+
+  test("v2: a visual mention with a speech context is refused") {
+    val ctx = mention("v-ctx", "visual", "picture", 1000, 2000, Some("Ana"), Some("ctx-s1"))
+    val o = outcomeOf(graph(inputs(ms = mentions :+ ctx)), "mentions", "id", "v-ctx")
+    assertEquals(status(o), "refused")
+    assert(reason(o).contains("no speech context"), reason(o))
+  }
+
+  test("v2: empty, negative or non-integer word indices are refused") {
+    def withWords(id: String, w: Json) =
+      mention(id, "dialogue", "audio", 7000, 7100, context = Some("ctx-s9"))
+        .deepMerge(Json.obj("words" -> w))
+    val g = graph(
+      inputs(ms =
+        mentions ++ Vector(
+          withWords("d-empty", Json.arr()),
+          withWords("d-neg", Json.arr(Json.fromLong(-1))),
+          withWords("d-text", Json.arr(s("x")))
+        )
+      )
+    )
+    for id <- Vector("d-empty", "d-neg", "d-text") do
+      assert(reason(outcomeOf(g, "mentions", "id", id)).contains("strictly increasing"), id)
+  }
+
+  test("v2: the edition block carries the edition's timebase and extent") {
+    val e = graph().hcursor.downField("edition")
+    assertEquals(e.get[Vector[Long]]("timebase").toOption, Some(Vector(1L, 1000L)))
+    assertEquals(
+      (e.get[Long]("start").toOption, e.get[Long]("end").toOption),
+      (Some(0L), Some(10000L))
+    )
+  }
+
   test("the recognizer transcript role is admitted") {
     assert(
       SourceIdentity.graph(inputs(roles = Vector("media", "annotation", "asr-transcript"))).isRight

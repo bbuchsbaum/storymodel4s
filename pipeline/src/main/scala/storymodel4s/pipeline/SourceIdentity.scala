@@ -124,12 +124,19 @@ object SourceIdentity:
       set <- domain(PlaybackIntervalSet.of(spans))
     yield EvidenceAnchor.MediaTime(b.id, s.id, b.primaryAxis.id, set)
 
-  private def mention(b: SourceBundle, j: Json): Result[ReferentMention] =
+  /** A mention built through the checked factories, with the graph row that describes it. The row
+    * is written from the validated values (the trimmed name, the canonical interval set), never
+    * copied from the producer's input, so the graph states only what was admitted (ADR 0028 §1).
+    */
+  private def mention(b: SourceBundle, j: Json): Result[(ReferentMention, Json)] =
     val c = j.hcursor
     for
       id <- str(c, "id").flatMap(i => domain(ReferentMentionId.from(i)))
       origin <- str(c, "origin").flatMap {
-        case "visual"   => Right(MentionOrigin.Visual)
+        case "visual" =>
+          if c.downField("context").focus.isDefined then
+            Left("a visual mention carries no speech context")
+          else Right(MentionOrigin.Visual)
         case "dialogue" =>
           str(c, "context").flatMap(x => domain(ContextId.from(x))).map(MentionOrigin.Dialogue(_))
         case other => Left(s"unsupported origin $other")
@@ -140,9 +147,27 @@ object SourceIdentity:
         case Right(Some(n)) => ProperName.of(n).map(Some(_)).left.map(_.toString)
         case Right(None)    => Right(None)
         case Left(_)        => Left("invalid name")
-      _ <- words(j, origin)
+      ws <- words(j, origin)
       built <- ReferentMention.anchored(id, origin, b, support, name).left.map(_.toString)
-    yield built
+      kind <- b
+        .stream(anchor.stream)
+        .map(_.kind)
+        .toRight("the anchor's stream is not in the bundle")
+    yield
+      val row = Vector(
+        "origin" -> Json.fromString(
+          if origin == MentionOrigin.Visual then "visual" else "dialogue"
+        ),
+        "stream" -> Json.fromString(if kind == StreamKind.Picture then "picture" else "audio"),
+        "intervals" -> Json.fromValues(
+          anchor.intervals.intervals.toVector.map(i =>
+            Json.arr(Json.fromLong(i.start), Json.fromLong(i.endExclusive))
+          )
+        )
+      ) ++ name.map(n => "name" -> Json.fromString(n.value)) ++ (origin match
+        case MentionOrigin.Dialogue(ctx) => Vector("context" -> Json.fromString(ctx.value))
+        case _ => Vector.empty) ++ ws.map(w => "words" -> Json.fromValues(w.map(Json.fromLong)))
+      built -> Json.obj(row*)
 
   /** A dialogue mention's recognizer word indices (ADR 0028 §1): present, non-negative and strictly
     * increasing on dialogue, and absent on visual, so the reader can match a speech span to exactly
@@ -287,7 +312,7 @@ object SourceIdentity:
       builtPresence = rawPresence.map(j =>
         presence(b, j).flatMap(p => withholding(j, refusedPeople).toLeft(p))
       )
-      mentions = builtMentions.collect { case Right(m) => m }
+      mentions = builtMentions.collect { case Right((m, _)) => m }
       context <- ReferentContext
         .of(mentions, Vector.empty, builtPresence.collect { case Right(p) => p })
         .left
@@ -376,17 +401,16 @@ object SourceIdentity:
             .flatMap(field(edition.focus.getOrElse(Json.obj()), _))*
         ),
         "mentions" -> Json.fromValues(
-          mentionIds.zip(rawMentions.zip(builtMentions)).sortBy(_._1).map {
-            case (id, (j, Right(_))) =>
-              Json.obj(
-                (Vector(
+          mentionIds.zip(builtMentions).sortBy(_._1).map {
+            case (id, Right((_, row))) =>
+              Json
+                .obj(
                   "id" -> Json.fromString(id),
                   "outcome" -> outcome("admitted"),
                   "class" -> Json.fromString(classOf(id))
-                ) ++ Vector("origin", "stream", "intervals", "name", "context", "words")
-                  .flatMap(field(j, _)))*
-              )
-            case (id, (_, Left(e))) =>
+                )
+                .deepMerge(row)
+            case (id, Left(e)) =>
               Json.obj("id" -> Json.fromString(id), "outcome" -> outcome("refused", Some(e)))
           }
         ),

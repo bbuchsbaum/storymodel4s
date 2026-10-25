@@ -4,59 +4,149 @@
   "title": "source-identity-graph/v2",
   "description": "ADR 0028 section 1: the recall-blind source identity graph written by `sourceIdentity build` for the connected assessor. Relations are licensed by the ADR 0024 resolver; hints decide nothing.",
   "type": "object",
-  "required": ["schemaVersion", "inputSha256", "inputs", "bundle", "edition", "mentions", "presence", "classes", "distinct", "relations", "proposals"],
+  "required": [
+    "schemaVersion",
+    "inputSha256",
+    "inputs",
+    "bundle",
+    "edition",
+    "mentions",
+    "presence",
+    "classes",
+    "distinct",
+    "relations",
+    "proposals"
+  ],
   "additionalProperties": false,
   "$defs": {
-    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^\\S+$"},
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^\\S+$"
+    },
     "outcome": {
       "type": "object",
-      "required": ["status"],
+      "required": [
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "status": {"enum": ["admitted", "refused", "refused-by-producer", "licensed", "recorded-hint"]},
-        "reason": {"type": "string"}
+        "status": {
+          "enum": [
+            "admitted",
+            "refused",
+            "refused-by-producer",
+            "licensed",
+            "recorded-hint"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
       }
     },
     "interval": {
       "type": "array",
-      "prefixItems": [{"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 1}],
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
       "minItems": 2,
       "maxItems": 2
     },
     "hint": {
       "type": "object",
-      "required": ["basis", "direction"],
+      "required": [
+        "basis",
+        "direction"
+      ],
       "additionalProperties": false,
-      "properties": {"basis": {"type": "string"}, "direction": {"enum": ["Toward", "Against"]}}
+      "properties": {
+        "basis": {
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "Toward",
+            "Against"
+          ]
+        }
+      }
     }
   },
   "properties": {
-    "schemaVersion": {"const": "source-identity-graph/v2"},
-    "inputSha256": {"$ref": "#/$defs/sha256"},
+    "schemaVersion": {
+      "const": "source-identity-graph/v2"
+    },
+    "inputSha256": {
+      "$ref": "#/$defs/sha256"
+    },
     "inputs": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["role", "sha256"],
-        "properties": {"role": {"type": "string"}, "sha256": {"$ref": "#/$defs/sha256"}}
+        "required": [
+          "role",
+          "sha256"
+        ],
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          }
+        }
       }
     },
-    "bundle": {"type": "string"},
+    "bundle": {
+      "type": "string"
+    },
     "edition": {
       "type": "object",
-      "required": ["edition", "timebase", "start", "end"],
+      "required": [
+        "edition",
+        "timebase",
+        "start",
+        "end"
+      ],
       "additionalProperties": false,
       "properties": {
-        "edition": {"$ref": "#/$defs/id"},
+        "edition": {
+          "$ref": "#/$defs/id"
+        },
         "timebase": {
           "type": "array",
-          "prefixItems": [{"type": "integer", "minimum": 1}, {"type": "integer", "minimum": 1}],
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ],
           "minItems": 2,
           "maxItems": 2
         },
-        "start": {"type": "integer"},
-        "end": {"type": "integer"}
+        "start": {
+          "type": "integer"
+        },
+        "end": {
+          "type": "integer"
+        }
       }
     },
     "mentions": {
@@ -65,30 +155,136 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["id", "outcome", "class", "origin", "stream", "intervals"],
+            "required": [
+              "id",
+              "outcome",
+              "class",
+              "origin",
+              "stream",
+              "intervals"
+            ],
             "additionalProperties": false,
             "properties": {
-              "id": {"$ref": "#/$defs/id"},
-              "outcome": {"type": "object", "properties": {"status": {"const": "admitted"}}},
-              "class": {"$ref": "#/$defs/id"},
-              "origin": {"enum": ["visual", "dialogue"]},
-              "stream": {"enum": ["picture", "audio"]},
-              "intervals": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/interval"}},
-              "name": {"type": "string", "minLength": 1},
-              "context": {"$ref": "#/$defs/id"},
-              "words": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 0}}
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "outcome": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "admitted"
+                  }
+                }
+              },
+              "class": {
+                "$ref": "#/$defs/id"
+              },
+              "origin": {
+                "enum": [
+                  "visual",
+                  "dialogue"
+                ]
+              },
+              "stream": {
+                "enum": [
+                  "picture",
+                  "audio"
+                ]
+              },
+              "intervals": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/interval"
+                }
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "context": {
+                "$ref": "#/$defs/id"
+              },
+              "words": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
             },
-            "if": {"properties": {"origin": {"const": "dialogue"}}},
-            "then": {"required": ["context", "words"]},
-            "else": {"not": {"required": ["words"]}}
+            "if": {
+              "properties": {
+                "origin": {
+                  "const": "dialogue"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "context",
+                "words"
+              ],
+              "properties": {
+                "stream": {
+                  "const": "audio"
+                }
+              }
+            },
+            "else": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "words"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "context"
+                    ]
+                  }
+                ]
+              },
+              "properties": {
+                "stream": {
+                  "const": "picture"
+                }
+              }
+            }
           },
           {
             "type": "object",
-            "required": ["id", "outcome"],
+            "required": [
+              "id",
+              "outcome"
+            ],
             "additionalProperties": false,
             "properties": {
-              "id": {"type": "string"},
-              "outcome": {"type": "object", "required": ["reason"], "properties": {"status": {"const": "refused"}}}
+              "id": {
+                "type": "string"
+              },
+              "outcome": {
+                "type": "object",
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "refused"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ]
@@ -98,40 +294,123 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["index", "outcome"],
-        "properties": {"index": {"type": "integer", "minimum": 0}, "outcome": {"$ref": "#/$defs/outcome"}}
+        "required": [
+          "index",
+          "outcome"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "outcome": {
+            "$ref": "#/$defs/outcome"
+          }
+        }
       }
     },
     "classes": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "members", "contested"],
+        "required": [
+          "id",
+          "members",
+          "contested"
+        ],
         "additionalProperties": false,
         "properties": {
-          "id": {"$ref": "#/$defs/id"},
-          "members": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
-          "contested": {"type": "boolean"}
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "members": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "contested": {
+            "type": "boolean"
+          }
         }
       }
     },
     "distinct": {
-      "description": "Every pair of uncontested classes separated by a licensed distinctness; a pair with no row is Unknown.",
+      "description": "Every pair of distinct, uncontested classes separated by a licensed distinctness, each pair ordered (lesser id first) and listed once; a pair with no row is Unknown. Order and uniqueness are checked by the reader, since JSON Schema cannot express them.",
       "type": "array",
-      "items": {"type": "array", "prefixItems": [{"$ref": "#/$defs/id"}, {"$ref": "#/$defs/id"}], "minItems": 2, "maxItems": 2}
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "$ref": "#/$defs/id"
+          },
+          {
+            "$ref": "#/$defs/id"
+          }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      }
     },
     "relations": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["dialogue", "class", "relation", "hints"],
+        "required": [
+          "dialogue",
+          "class",
+          "relation",
+          "hints"
+        ],
         "additionalProperties": false,
         "properties": {
-          "dialogue": {"$ref": "#/$defs/id"},
-          "class": {"$ref": "#/$defs/id"},
-          "relation": {"enum": ["Same", "Distinct", "Open", "Unknown"]},
-          "candidates": {"type": "array", "items": {"$ref": "#/$defs/id"}},
-          "hints": {"type": "array", "items": {"$ref": "#/$defs/hint"}}
+          "dialogue": {
+            "$ref": "#/$defs/id"
+          },
+          "class": {
+            "$ref": "#/$defs/id"
+          },
+          "relation": {
+            "enum": [
+              "Same",
+              "Distinct",
+              "Open",
+              "Unknown"
+            ]
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/hint"
+            }
+          }
+        },
+        "if": {
+          "properties": {
+            "relation": {
+              "const": "Open"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "candidates"
+          ]
+        },
+        "else": {
+          "not": {
+            "required": [
+              "candidates"
+            ]
+          }
         }
       }
     },
@@ -139,13 +418,33 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "kind", "left", "right", "outcome"],
+        "required": [
+          "id",
+          "kind",
+          "left",
+          "right",
+          "outcome"
+        ],
         "properties": {
-          "id": {"type": "string"},
-          "kind": {"enum": ["named", "deictic", "hint"]},
-          "left": {"type": "string"},
-          "right": {"type": "string"},
-          "outcome": {"$ref": "#/$defs/outcome"}
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "named",
+              "deictic",
+              "hint"
+            ]
+          },
+          "left": {
+            "type": "string"
+          },
+          "right": {
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/$defs/outcome"
+          }
         }
       }
     }
