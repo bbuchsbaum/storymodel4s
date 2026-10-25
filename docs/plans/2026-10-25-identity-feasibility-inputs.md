@@ -256,12 +256,12 @@ and 4.1's GO gate is read together with item 2. **Still pending Codex's agreemen
    description or name, together with the claim role it fills. Correlated tokens of one decision
    count once.
 2. **The split procedure: v2 contiguous blocks** (agreed with Codex; storyatlas4s Fray board, card
-   #136, messages @1043 and @1044). It replaces the v1 split, whose shortest-duration selection
-   biased the mix toward short scenes with
-   no source candidates, and which assigned each scene on its own
-   under seed `identity-feasibility-NN03-20261025-v1`. The v1 census and seed are kept as
-   superseded, and it was replaced
-   before any labels, outputs or binder work existed.
+   #136, messages @1043 and @1044). It replaces the v1 split, which assigned each scene on its own
+   under seed `identity-feasibility-NN03-20261025-v1`. It also drops Codex's separately proposed
+   shortest-duration source-selection rule: the cold review of `b062895ec` found that rule
+   front-loaded short scenes, which are disproportionately the scenes with no producer candidate
+   (section 3). The v1 census and seed are kept as superseded. The replacement was made before any
+   labels, outputs or binder work existed.
    - **Blocks.** Ten fixed blocks of five global scene ids: 1-5, 6-10, through 46-50. They are
      derived from source ordering only and are not claimed to be story arcs.
    - **Assignment.** Block 26-30, which holds the body scenes, is forced into discovery. Each of the
