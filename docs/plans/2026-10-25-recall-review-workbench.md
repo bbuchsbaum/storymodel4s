@@ -137,6 +137,24 @@ The UI is a prototype, but these contracts are not. They are versioned JSON Sche
 - **Draft-and-confirm,** only if the owner chooses it. An agent draft is hidden until the reviewer
   commits. Revealing it is logged, and disagreements go to a second-look queue.
 
+### Structure panel (insight, toggled with `S`)
+
+The reviewer should see the shape of the recall, not only the current line. The panel draws from
+raw evidence only:
+- **Trajectory.** Recall order on one axis and film order (scene, or row and second) on the other.
+  Each committed decision and each scene nomination is a point, so jumps, revisits, skipped
+  stretches and compression show at a glance. Clicking a point jumps to it.
+- **Scene coverage.** A strip across the 50 scenes, shaded by how much recall touches each, with the
+  v2 blocks and partitions marked.
+- **Presence.** Per character, a strip of the rows where the annotation lists them, with the
+  speaking rows emphasized. "Who could 'she' be here?" becomes a vertical glance at the current
+  moment.
+- **Reference chains.** Committed decisions that share an occurrence group are linked, which shows
+  the chains that cross scenes or partitions.
+
+In the source pass, only the presence and scene strips are shown. Nothing derived from recall
+appears there.
+
 ### Source pass (arm A; no recall shown)
 
 Work goes block by block, in v2 order, discovery first.
@@ -193,12 +211,16 @@ Work goes block by block, in v2 order, discovery first.
 | W1 | Server core: config and pins, token and host guard, packet builder, Range media, frames | tests and mutants pass; review |
 | W2 | Candidates and search: nomination, name hits, BM25, dialogue echo | per-signal tests on synthetic data; review |
 | W3 | Store: JSONL log, CSV export matching Codex's template, validation, window read state | round-trip and validation tests; review |
-| W4 | Recall-pass UI | owner pilot on 5 items, timed; fixes |
+| W4 | Recall-pass UI, including the structure panel | it works end to end on the real local packet |
+| W4h | Visual hill climb of the recall-pass UI (`visual-hill-climb`): bounded, scored rounds with fixed specimens and independent critics on design quality, utility, speed of accurate annotation, and structural insight | the rounds' scores plateau; no regression on fixed specimens |
+| W4p | Owner pilot: 5 timed items on throwaway material | fixes from the pilot are made |
 | W5 | Source-pass UI and the `source-review/v1` artifact, with the source-first separation enforced | the separation guard is tested; review |
 | W6 | Port note: mapping the contracts and components to storyatlas4s Laminar | reviewed note; port is a later epic |
 
 The order for the owner is W0-W3, then **W5 before W4 is used for real**, because the source pass
-comes first. W4 can be built in parallel and piloted on synthetic or throwaway items.
+comes first. W4 can be built in parallel and piloted on synthetic or throwaway items. W4h runs on
+synthetic specimens and the real packet's non-confirmation material only, so that confirmation
+recall is not paraded before critic agents.
 
 ## Coordination
 
