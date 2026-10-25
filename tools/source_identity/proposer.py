@@ -30,7 +30,9 @@ from typing import Callable
 import urllib.error
 import urllib.request
 
-import producer
+# The sibling producer module, found even under `python3 -I`, which drops the script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import producer  # noqa: E402
 
 REQUESTS_SCHEMA = "source-identity-model-requests/v1"
 FREEZE_SCHEMA = "source-identity-model-freeze/v1"
