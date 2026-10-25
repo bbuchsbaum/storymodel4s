@@ -253,11 +253,36 @@ record, and 4.1's GO gate is read together with item 2. **Still pending Codex's 
 1. **The unit.** A natural attribution decision is one recall person-reference in NN03, a pronoun,
    description or name, together with the claim role it fills. Correlated tokens of one decision
    count once.
-2. **The split procedure.** Whole scenes are assigned to discovery or confirmation by a seeded,
-   recorded procedure before any arm output exists. Scene assignment alone does not stop
-   coreference across scenes. A decision whose reference chain spans both partitions is
-   quarantined. These rules are Codex's decision (storyatlas4s Fray board, card #136, messages @1028
-   and @1032), frozen before any output:
+2. **The split procedure: v2 contiguous blocks** (agreed with Codex; storyatlas4s Fray board, card
+   #136, messages @1043 and @1044). This replaces the v1 split, which assigned each scene on its own
+   under seed `identity-feasibility-NN03-20261025-v1`. v1 is kept as superseded, and it was replaced
+   before any labels, outputs or binder work existed.
+   - **Blocks.** Ten fixed blocks of five global scene ids: 1-5, 6-10, through 46-50. They are
+     derived from source ordering only and are not claimed to be story arcs.
+   - **Assignment.** Block 26-30, which holds the body scenes, is forced into discovery. Seed
+     `identity-feasibility-NN03-20261025-v2` ranks the other nine blocks by SHA-256(seed:block
+     start). The first five go to confirmation and the other four to discovery. One seed only: if
+     the sample proves insufficient, that is reported and no other seed is tried.
+   - **Selection.** Within each partition, whole blocks are taken in seed order, with the body block
+     first in discovery. Selection stops when the partition has at least 15 distinct non-regression
+     human-resolvable natural decisions, plus at least 2 hard natural decisions drawn from at least
+     2
+     of these strata: off-screen person, relational description, within-partition multi-scene, and
+     role, event, state or context disambiguation. Designed controls stay mandatory and separate.
+     Absent strata are reported. Measured playback, vocabulary and anchor costs act as budget
+     limits, never as a ranking.
+   - **Part boundary.** Block 26-30 crosses the media-part boundary, because Part1 ends at global
+     scene 27. Scenes 26-27 are part a and 28-30 are part b. A chain inside the block can cross
+     parts without crossing partitions, and it uses both part crosswalks.
+   - **Disclosure.** At the author's request for review, and before any labels or outputs, Claude
+     computed the v2 assignment once from the declared seed. Confirmation gets blocks 1-5, 6-10,
+     11-15, 31-35 and 46-50. As a metadata proxy, not a measured quarantine rate, 6 of 32 adjacent
+     pairs in NN03's recall order cross partitions, and confirmation holds 17 of the 32 recalled
+     scenes and 1,403 of the 2,495 recall words. No seed was rejected.
+
+   Scene assignment alone does not stop coreference across blocks. A decision whose reference chain
+   spans both partitions is quarantined. These rules are Codex's decision (card #136, messages
+   @1028 and @1032), frozen before any output:
    - **Dependencies first.** Human review establishes each decision's source-scene dependencies
      before sealing, and touching both partitions triggers quarantine. A quarantined decision cannot
      be reassigned to evade the split.
