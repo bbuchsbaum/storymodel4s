@@ -244,8 +244,11 @@ still respects its admission, custody and instrument-validity permissions.
 
 ### 4.2 Additions proposed here, for agreement before any arm runs
 
-None of these is in the joint proposal. Each needs Codex's agreement, and where marked, the
-owner's.
+These are additions to the first two epic notes. **Agreed with Codex** and recorded on the epic as
+op `20261025T144732.050282Z-p39096-c0000-r1211-h23b326`: item 2 (quarantine) and item 6
+(pseudonymization), and the population correction in section 3. That op is part of the governing
+record, and 4.1's GO gate is read together with item 2. **Still pending Codex's agreement:** items
+1, 3 and 4. **Owner decision:** item 5.
 
 1. **The unit.** A natural attribution decision is one recall person-reference in NN03, a pronoun,
    description or name, together with the claim role it fills. Correlated tokens of one decision
