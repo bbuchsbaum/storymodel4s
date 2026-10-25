@@ -138,9 +138,15 @@ class Candidates:
             m["cue"] = cue
 
     # -- signals ---------------------------------------------------------------------------
-    def for_span(self, first: int, last: int, limit: int = 8) -> dict:
-        """Candidates for recall word rows first..last (one-based, inclusive)."""
+    def for_span(self, first: int, last: int, limit: int = 8, masked=frozenset()) -> dict:
+        """Candidates for recall word rows first..last (one-based, inclusive). Words in `masked`
+        (calibration words not yet revealed) never feed context, retrieval or echo unless they
+        are inside the span itself, which the caller only allows once revealed."""
         n = len(self.recall)
+        recall = [
+            "" if (i + 1) in masked and not (first <= i + 1 <= last) else t
+            for i, t in enumerate(self.recall)
+        ]
         if not (1 <= first <= last <= n):
             raise ValueError("span outside the recall")
         store = {}
@@ -164,7 +170,7 @@ class Candidates:
                 )
         # 2. Name tokens inside the selection.
         for i in range(first - 1, last):
-            t = self.recall[i]
+            t = recall[i]
             if t in self.name_rows:
                 rows = sorted(self.name_rows[t])
                 w = WEIGHTS["name"] / math.sqrt(
@@ -181,9 +187,9 @@ class Candidates:
         # 3. Lexical retrieval over the selection plus context.
         lo, hi = max(1, first - CONTEXT), min(n, last + CONTEXT)
         query = [
-            t for t in self.recall[lo - 1 : hi] if t and t not in STOP and len(t) > 1
+            t for t in recall[lo - 1 : hi] if t and t not in STOP and len(t) > 1
         ]
-        selected = {t for t in self.recall[first - 1 : last] if t and t not in STOP and len(t) > 1}
+        selected = {t for t in recall[first - 1 : last] if t and t not in STOP and len(t) > 1}
         scores = self.bm25.scores(query)
         top = max(scores) if scores else 0
         if top > 0:
@@ -215,7 +221,7 @@ class Candidates:
                 )
         # 4. Dialogue echo: runs of at least ECHO_MIN recall words that recur in speech.
         for part, (toks, ws) in self.speech.items():
-            for a, b, j in self._echoes(lo, hi, toks):
+            for a, b, j in self._echoes(lo, hi, toks, recall):
                 w0 = ws[j]
                 r = self.p.row_at(part, w0["start_seconds"])
                 if r:
@@ -236,10 +242,10 @@ class Candidates:
             "considered": len(ranked),
         }
 
-    def _echoes(self, lo, hi, speech):
+    def _echoes(self, lo, hi, speech, recall):
         """(first, last, speech index) for maximal recall runs of >= ECHO_MIN content-bearing
         words found verbatim in the speech token stream."""
-        rec = self.recall[lo - 1 : hi]
+        rec = recall[lo - 1 : hi]
         index = defaultdict(list)
         for j in range(len(speech) - ECHO_MIN + 1):
             index[tuple(speech[j : j + ECHO_MIN])].append(j)

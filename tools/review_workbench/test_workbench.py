@@ -189,27 +189,6 @@ class StoreCourt(unittest.TestCase):
         with self.assertRaisesRegex(store.StoreError, "Name - All"):
             s.source_row(1, ["Invented Person"], [], {}, False)
 
-    def test_calibration_items_are_the_first_five_then_every_tenth(self):
-        s = done_store()
-        flags, ahead = [], []
-        for _ in range(21):
-            ahead.append(s.next_is_calibration())
-            e = s.start_decision()
-            flags.append(e["calibration"])
-            s.commit_reference(e["id"], {**REF, "first_word": 3, "last_word": 3})
-        self.assertEqual(
-            [i + 1 for i, f in enumerate(flags) if f], [1, 2, 3, 4, 5, 10, 20]
-        )
-        self.assertEqual(ahead, flags)
-
-    def test_an_abandoned_calibration_item_is_resumed_not_skipped(self):
-        s = done_store()
-        first = s.start_decision()
-        self.assertTrue(first["calibration"])
-        again = s.start_decision()  # closed without committing, then started again
-        self.assertEqual(again["id"], first["id"])
-        self.assertTrue(again["calibration"])
-
     def test_a_person_reference_needs_a_referent(self):
         s = done_store()
         did = s.start_decision()["id"]
@@ -227,23 +206,6 @@ class StoreCourt(unittest.TestCase):
                 "person_reference": "no",
             },
         )
-
-    def test_calibration_revision_needs_a_reveal_and_is_counted(self):
-        s = done_store()
-        a, b = span_of(s.p.recall_text(), "she grabs it")
-        did = s.start_decision()["id"]
-        s.commit_reference(did, {**REF, "first_word": a, "last_word": a})
-        with self.assertRaisesRegex(store.StoreError, "reveal"):
-            s.commit_reference(
-                did, {**REF, "first_word": a, "last_word": a, "referent": "Tobias"}
-            )
-        s.reveal(did)
-        s.commit_reference(
-            did, {**REF, "first_word": a, "last_word": a, "referent": "Tobias"}
-        )
-        cal = s.calibration()
-        self.assertEqual((cal["items"], cal["revised"]), (1, 1))
-        self.assertEqual(cal["byForm"]["pronoun"], {"items": 1, "revised": 1})
 
     def test_declared_values_are_enforced(self):
         s = done_store()
@@ -424,12 +386,111 @@ class ServerCourt(unittest.TestCase):
         self.assertEqual(body, bytes(range(10, 20)))
 
 
-if __name__ == "__main__":
-    unittest.main()
+class CalibrationCourt(unittest.TestCase):
+    """Calibration is decided by words: windows 1 and 8 of the synthetic recall are masked
+    until a decision on them commits blind and reveals (v2 function review, B3 and B4)."""
+
+    SRC = {"source_scene_ids": [1], "source_anchor_ids": ["row-1"], "source_resolvable": "yes",
+           "reference_outcome": "supported", "ambiguity_reason": ""}
+
+    def test_calibration_windows_are_fixed_and_masked(self):
+        s = done_store()
+        self.assertEqual(s.calibration_windows(), [1, 8])
+        self.assertIn(8, s.masked_rows())
+        self.assertNotIn(30, s.masked_rows())
+
+    def test_a_start_on_masked_words_is_calibration_whatever_the_count(self):
+        s = done_store()
+        ordinary = s.start_decision([30, 30])
+        self.assertFalse(ordinary["calibration"])
+        s.commit_reference(ordinary["id"], {**REF, "first_word": 30, "last_word": 30})
+        for span in ([8, 8], [180, 181], [25, 26]):
+            self.assertTrue(s.start_decision(span)["calibration"], span)
+
+    def test_suggestions_never_reach_masked_words(self):
+        s = done_store()
+        self.assertTrue(s.suggestions_blind(None, (8, 8)))
+        self.assertTrue(s.suggestions_blind(None, (25, 26)))  # crosses into window 2
+        self.assertFalse(s.suggestions_blind(None, (60, 62)))
+        open_ordinary = s.start_decision([60, 62])["id"]
+        self.assertTrue(s.suggestions_blind(open_ordinary, (8, 8)))  # B2/B3: no preview
+
+    def test_an_open_unrevealed_item_blinds_everything(self):
+        s = done_store()
+        cal = s.start_decision([8, 8])["id"]
+        self.assertTrue(s.suggestions_blind(cal, (60, 62)))
+        self.assertTrue(s.suggestions_blind(cal, None))
+        s.commit_reference(cal, {**REF, "first_word": 8, "last_word": 8})
+        s.reveal(cal)
+        self.assertFalse(s.suggestions_blind(cal, (8, 8)))
+        self.assertIn(8, s.exposed_rows())
+
+    def test_context_never_reads_masked_words(self):
+        s = done_store()
+        c = candidates.Candidates(s.p)
+        masked = s.masked_rows()
+        out = c.for_span(26, 27, masked=masked, limit=50)
+        reasons = " ".join(sig["reason"] for m in out["moments"] for sig in m["signals"])
+        words = s.p.recall_text()
+        for r in range(14, 26):  # the context words that window 1 would have contributed
+            w = words[r - 1].lower()
+            if len(w) > 3 and w not in " ".join(words[25:39]).lower():
+                self.assertNotIn(w, reasons, w)
+
+    def test_revision_after_reveal_is_counted(self):
+        s = done_store()
+        did = s.start_decision([8, 8])["id"]
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
+        with self.assertRaisesRegex(store.StoreError, "reveal"):
+            s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        s.reveal(did)
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        cal = s.calibration()
+        self.assertEqual((cal["items"], cal["revised"]), (1, 1))
+        self.assertEqual(s.decisions()[did]["blind"]["referent"], "Mara")
+
+    def test_undo_cannot_reach_behind_a_reveal(self):
+        s = done_store()
+        did = s.start_decision([8, 8])["id"]
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
+        s.reveal(did)
+        with self.assertRaisesRegex(store.StoreError, "after its reveal"):
+            s.undo()
+        self.assertTrue(s.decisions()[did]["revealed"])
+
+    def test_undo_cannot_remove_a_start(self):
+        s = done_store()
+        did = s.start_decision([60, 62])["id"]
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60})
+        self.assertEqual(s.undo()["kind"], "decision.reference")
+        self.assertNotEqual(s.undo()["kind"], "decision.start")
+
+    def test_step_two_evidence_must_be_consistent(self):
+        s = done_store()
+        did = s.start_decision([60, 60])["id"]
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60})
+        with self.assertRaisesRegex(store.StoreError, "supported or contradicted"):
+            s.commit_source(did, {**self.SRC, "source_anchor_ids": [], "source_scene_ids": [],
+                                  "source_resolvable": "unknown", "reference_outcome": "supported"})
+        with self.assertRaisesRegex(store.StoreError, "resolvable"):
+            s.commit_source(did, {**self.SRC, "source_anchor_ids": [], "reference_outcome": "unresolved"})
+        with self.assertRaisesRegex(store.StoreError, "unknown source anchor"):
+            s.commit_source(did, {**self.SRC, "source_anchor_ids": ["row-9999"]})
+        with self.assertRaisesRegex(store.StoreError, "anchored row"):
+            s.commit_source(did, {**self.SRC, "source_scene_ids": [7]})
+        s.commit_source(did, self.SRC)
+
+    def test_a_mention_resolves_only_to_someone_present(self):
+        s = fresh_store()
+        row = next(r for r in s.p.rows if s.mentions[r["row"]] and len(r["names"]) > 1)
+        m = s.mentions[row["row"]][0]["id"]
+        absent_name = row["names"][0]
+        with self.assertRaisesRegex(store.StoreError, "present person"):
+            s.source_row(row["row"], row["names"][1:], [], {m: absent_name}, True)
 
 
-class BlindnessCourt(unittest.TestCase):
-    """Calibration blindness is decided by the server, whatever the client asks for."""
+class BlindnessServerCourt(unittest.TestCase):
+    """The server decides blindness, whatever the client asks for."""
 
     def setUp(self):
         with contextlib.redirect_stdout(io.StringIO()):
@@ -456,64 +517,29 @@ class BlindnessCourt(unittest.TestCase):
         c.close()
         return out
 
-    def test_candidates_are_withheld_before_a_calibration_item_starts(self):
-        status, out = self.post("/api/candidates", {"first": 60, "last": 62, "id": None, "hidden": False})
+    def test_candidates_for_masked_words_are_withheld(self):
+        status, out = self.post("/api/candidates", {"first": 8, "last": 8, "id": None, "hidden": False})
         self.assertEqual(status, 200)
         self.assertTrue(out["hidden"])
-        self.assertEqual(out["moments"], [])
-        self.assertEqual(out["nominations"]["one"], [])
-
-    def test_search_is_refused_for_an_unrevealed_calibration_item(self):
-        did = self.app.store.start_decision()["id"]
-        status, out = self.post("/api/search", {"q": "lantern", "id": did})
-        self.assertEqual(status, 409)
-        self.assertIn("calibration", out["error"])
-
-    def test_suggestions_return_once_calibration_is_spent(self):
-        s = self.app.store
-        for _ in range(5):
-            did = s.start_decision()["id"]
-            s.commit_reference(did, {**REF, "first_word": 3, "last_word": 3})
+        self.assertEqual((out["moments"], out["nominations"]["one"]), ([], []))
         status, out = self.post("/api/candidates", {"first": 60, "last": 62, "id": None})
         self.assertFalse(out["hidden"])
         self.assertTrue(out["moments"])
 
+    def test_search_is_refused_on_masked_words_or_an_open_item(self):
+        status, out = self.post("/api/search", {"q": "lantern", "span": [8, 8]})
+        self.assertEqual(status, 409)
+        did = self.app.store.start_decision([8, 8])["id"]
+        status, out = self.post("/api/search", {"q": "lantern", "id": did, "span": [60, 60]})
+        self.assertEqual(status, 409)
+        status, out = self.post("/api/search", {"q": "lantern", "span": [60, 60]})
+        self.assertEqual(status, 200)
 
-class BlindnessEdgesCourt(unittest.TestCase):
-    """Paths around calibration blindness found by the v1 function critic."""
+    def test_state_carries_masked_rows_without_text(self):
+        status, out = self.post("/api/state", {})
+        self.assertEqual(out["calibrationWindows"], [1, 8])
+        self.assertIn(8, out["maskedRows"])
 
-    def ordinary_until_next_is_calibration(self):
-        s = done_store()
-        while True:
-            if s.next_is_calibration() and len(s.decisions()) >= 5:
-                return s
-            e = s.start_decision([3, 3])
-            s.commit_reference(e["id"], {**REF, "first_word": 3, "last_word": 3})
-            if s.decisions()[e["id"]]["calibration"]:
-                s.reveal(e["id"])
 
-    def test_undo_cannot_remove_a_start(self):
-        s = self.ordinary_until_next_is_calibration()
-        cal = s.start_decision([60, 62])
-        self.assertTrue(cal["calibration"])
-        for _ in range(8):  # undo recent decision edits; starts and reveals are skipped
-            self.assertNotIn(s.undo()["kind"], ("decision.start", "decision.resume", "decision.reveal"))
-        self.assertEqual(s.start_decision([60, 62])["id"], cal["id"])
-
-    def test_a_reopened_decision_previews_only_its_own_spans(self):
-        s = self.ordinary_until_next_is_calibration()
-        earlier = sorted(s.decisions())[-1]
-        self.assertFalse(s.suggestions_blind(earlier, (3, 3)))
-        self.assertTrue(s.suggestions_blind(earlier, (60, 62)))
-        self.assertTrue(s.suggestions_blind(earlier, None))
-        self.assertTrue(s.suggestions_blind(None, (60, 62)))
-
-    def test_supported_needs_an_anchor(self):
-        s = done_store()
-        did = s.start_decision([3, 3])["id"]
-        s.commit_reference(did, {**REF, "first_word": 3, "last_word": 3})
-        empty = {"source_scene_ids": [], "source_anchor_ids": [], "source_resolvable": "yes",
-                 "ambiguity_reason": ""}
-        with self.assertRaisesRegex(store.StoreError, "anchor"):
-            s.commit_source(did, {**empty, "reference_outcome": "supported"})
-        s.commit_source(did, {**empty, "reference_outcome": "unresolved"})
+if __name__ == "__main__":
+    unittest.main()

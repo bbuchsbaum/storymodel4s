@@ -62,8 +62,8 @@ class App:
         src = s.source_state()
         return {
             "recallOpen": s.recall_open(),
-            "nextCalibration": s.recall_open() and s.next_is_calibration(),
-            "pendingCalibration": (s.pending_calibration() or {}).get("id") if s.recall_open() else None,
+            "calibrationWindows": s.calibration_windows(),
+            "maskedRows": sorted(s.masked_rows()) if s.recall_open() else [],
             "source": {
                 "rows": src["rows"],
                 "scenes": src["scenes"],
@@ -90,8 +90,11 @@ class App:
         if path == "/api/state":
             return self.state()
         if path == "/api/search":
-            if s.recall_open() and s.suggestions_blind(body.get("id")):  # no span: strictest
-                raise StoreError("search is hidden for a calibration item until step 1 is committed")
+            sp = body.get("span")
+            if s.recall_open() and s.suggestions_blind(body.get("id"), tuple(sp) if sp else None):
+                raise StoreError(
+                    "search is hidden while calibration words are selected or a calibration item is open"
+                )
             return {"hits": self.cands.search(str(body.get("q", "")))}
         if path == "/api/source/row":
             s.source_row(
@@ -111,7 +114,7 @@ class App:
             # The server decides blindness; the client's flag can only add to it.
             span = (int(body["first"]), int(body["last"]))
             hidden = bool(body.get("hidden")) or s.suggestions_blind(did, span)
-            out = self.cands.for_span(int(body["first"]), int(body["last"]))
+            out = self.cands.for_span(span[0], span[1], masked=s.masked_rows())
             s.shown(
                 did,
                 out["span"],

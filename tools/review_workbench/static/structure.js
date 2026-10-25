@@ -58,7 +58,7 @@ export class Structure {
       svg.append(s('text', { x: x(p, 0) + 3, y: H - 4, class: 'axis strong' }, partName(p)));
       for (let t = 60; t < info.seconds; t += 60) {
         svg.append(s('line', { x1: x(p, t), x2: x(p, t), y1: top + people.length * rowH, y2: top + people.length * rowH + 4, class: 'tickmark' }));
-        if (x(p, t) - x(p, 0) > 50) svg.append(s('text', { x: x(p, t), y: H - 4, class: 'axis', 'text-anchor': 'middle' }, `${t / 60}:00`));
+        if (x(p, t) - x(p, 0) > 50 && x(p, info.seconds) - x(p, t) > 30) svg.append(s('text', { x: x(p, t), y: H - 4, class: 'axis', 'text-anchor': 'middle' }, `${t / 60}:00`));
       }
     }
     for (const sc of index.scenes) {
@@ -110,9 +110,21 @@ export class Structure {
     }
     for (const win of index.windows) {
       svg.append(s('line', { x1: x(win.first), x2: x(win.first), y1: top, y2: top + maxS * step, class: 'winline' }));
-      if (x(win.first) < W - 24) svg.append(s('text', { x: x(win.first) + 2, y: H - 16, class: 'axis small' }, `w${win.window}`));
+      const nearEnd = x(win.first) > W - 24;
+      svg.append(s('text', { x: nearEnd ? W - 8 : x(win.first) + 2, y: H - 16, class: 'axis small', 'text-anchor': nearEnd ? 'end' : 'start' }, `w${win.window}`));
+    }
+    // Calibration windows are drawn as shaded gaps: their timing is a suggestion.
+    const masked = this.S.masked ? this.S.masked() : new Set();
+    for (const win of index.windows) {
+      let m = 0;
+      for (let r = win.first; r <= win.last; r++) if (masked.has(r)) m++;
+      if (m) {
+        svg.append(s('rect', { x: x(win.first), y: top, width: Math.max(2, x(win.last) - x(win.first)), height: maxS * step, class: 'calband' }));
+        svg.append(s('text', { x: x(win.first) + 3, y: top + 10, class: 'axis cal' }, 'calibration'));
+      }
     }
     words.forEach(w => {
+      if (masked.has(w.row)) return;
       for (const sc of w.nom.one) svg.append(s('rect', { x: x(w.row) - 0.8, y: y(sc) - 3, width: 2, height: 6, class: w.boundary ? 'nom alt' : 'nom' }));
     });
     const sel = this.S.sel;
@@ -143,7 +155,7 @@ export class Structure {
         recall
           ? h('section', h('h3', 'Where the recall’s timing points'),
             blind
-              ? h('p.note', 'Hidden during a calibration item: timing is a suggestion.')
+              ? h('p.note', 'Hidden while a calibration item is open or calibration words are selected: timing is a suggestion.')
               : [h('p.note', 'Each mark is one recall word at the scene its one-based TR timing points to. Hollow: another clock points elsewhere. Shaded band: your selection.'), this.nominations()])
           : null),
     );

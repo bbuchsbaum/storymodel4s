@@ -69,14 +69,27 @@ export class Film {
   }
 
   stepRow(d) {
-    // Move the open moment to the previous or next annotation row, in film order across parts.
+    // Move to the previous or next annotation row, in film order across parts, starting from
+    // the playhead (so it follows wherever the reviewer scrubbed), else the open row.
     const rows = this.rows;
-    let i = rows.findIndex(r => r.row === this.focusRow);
-    if (i < 0 && this.part) {
-      const t = this.video.currentTime;
+    let i = -1;
+    if (this.part) {
+      const t = this.video.currentTime + 1.01; // cues start 1 s early
       i = rows.findIndex(r => String(r.part) === this.part && r.t0 <= t && t < r.t1);
     }
+    if (i < 0) i = rows.findIndex(r => r.row === this.focusRow);
     const r = rows[Math.max(0, Math.min(rows.length - 1, (i < 0 ? 0 : i + d)))];
+    this.cue({ part: r.part, t0: r.t0, t1: r.t1 });
+    this.S.onRow?.(r.row);
+  }
+
+  stepScene(d) {
+    const scenes = this.S.index.scenes;
+    const cur = this.rows.find(r => r.row === this.focusRow);
+    const at = cur ? Math.min(...cur.scenes) : null;
+    const i = at === null ? -1 : scenes.findIndex(s => s.scene === at);
+    const s = scenes[Math.max(0, Math.min(scenes.length - 1, i < 0 ? 0 : i + d))];
+    const r = this.rows.find(x => x.row === s.rows[0]);
     this.cue({ part: r.part, t0: r.t0, t1: r.t1 });
     this.S.onRow?.(r.row);
   }
@@ -111,7 +124,7 @@ export class Film {
     const now = this.timeEl;
     if (now) {
       const r = this.rowAt(this.part, v.currentTime);
-      now.textContent = `playhead ${partName(this.part)} ${clock(v.currentTime)}${r ? ` · row ${r.row}` : ''}`;
+      now.textContent = `${partName(this.part)} ${clock(v.currentTime)}${r ? ` · row ${r.row} · sc ${r.scenes.join('/')}` : ''}`;
     }
   }
 
@@ -121,16 +134,16 @@ export class Film {
     this.timeEl = h('span.now', '–');
     clear(
       T,
-      h('button.tbtn', { type: 'button', title: 'Play or pause (Space)', onclick: () => this.toggle(), 'aria-label': playing ? 'Pause' : 'Play' }, playing ? '❚❚' : '▶'),
-      h('button.tbtn', { type: 'button', title: 'Replay moment (R)', onclick: () => this.replay(), disabled: !this.span }, '⟲'),
-      h('button.tbtn', { type: 'button', title: 'Step back one frame (,)', onclick: () => this.step(-1) }, '‹'),
-      h('button.tbtn', { type: 'button', title: 'Step forward one frame (.)', onclick: () => this.step(1) }, '›'),
+      h('button.tbtn', { type: 'button', title: 'Play or pause (Space)', onclick: () => this.toggle(), 'aria-label': playing ? 'Pause (Space)' : 'Play (Space)' }, playing ? '❚❚' : '▶'),
+      h('button.tbtn', { type: 'button', 'aria-label': 'Replay the moment (R)', title: 'Replay moment (R)', onclick: () => this.replay(), disabled: !this.span }, '⟲'),
+      h('button.tbtn', { type: 'button', 'aria-label': 'Back one frame', title: 'Step back one frame (,)', onclick: () => this.step(-1) }, '‹'),
+      h('button.tbtn', { type: 'button', 'aria-label': 'Forward one frame', title: 'Step forward one frame (.)', onclick: () => this.step(1) }, '›'),
       this.timeEl,
       h('span.spacer'),
       h('button.tbtn', { type: 'button', title: 'Loop the moment (L)', 'aria-pressed': String(this.loop), onclick: () => this.toggleLoop() }, 'loop'),
-      h('button.tbtn', { type: 'button', title: 'Slower ([)', onclick: () => this.setRate(-1) }, '−'),
+      h('button.tbtn', { type: 'button', 'aria-label': 'Slower', title: 'Slower ([)', onclick: () => this.setRate(-1) }, '−'),
       h('span.rate', `${this.rate}×`),
-      h('button.tbtn', { type: 'button', title: 'Faster (])', onclick: () => this.setRate(1) }, '+'),
+      h('button.tbtn', { type: 'button', 'aria-label': 'Faster', title: 'Faster (])', onclick: () => this.setRate(1) }, '+'),
     );
     this.tick();
   }
@@ -169,7 +182,7 @@ export class Film {
         },
       }, bands, ticks, pins, head);
       this.tracks[p] = { track, pins, pct, frac: t => t / secs };
-      return [h('div.trackrow', h('span.partlabel', partName(p)), track), h('div.lanerow', h('span.partlabel'), h('div.lanes', { id: `lanes-${p}` }))];
+      return [h('div.trackrow', h('span.partlabel', partName(p)), track), h('div.lanerow', h('div.lanenames', { id: `lanenames-${p}` }), h('div.lanes', { id: `lanes-${p}` }))];
     });
     clear(el, tracks);
   }
@@ -211,15 +224,26 @@ export class Film {
 
   // Under the timeline: for each person the open row lists, where else the annotation lists
   // them, on the same time axis. Raw evidence about the open moment, never a ranking.
+  // Presence lanes under each part track, ELAN-style with names in the gutter: where the
+  // annotation lists each person, on the timeline's own axis. By default the people of the open
+  // row; Shift+P switches to the whole cast in fixed alphabetical order. Raw evidence only.
+  toggleCast() {
+    this.cast = !(this.cast ?? this.S.film.people.length <= 8);
+    this.lanes(this.focusRow);
+  }
+
   lanes(row) {
+    const people = this.S.film.people;
+    const here = row === null || row === undefined ? [] : this.S.film.rows[row].names;
+    const cast = this.cast ?? people.length <= 8; // a small cast is shown whole by default
+    const names = cast ? people : people.filter(n => here.includes(n));
     for (const p of Object.keys(this.S.index.parts)) {
       const el = document.getElementById(`lanes-${p}`);
+      const gut = document.getElementById(`lanenames-${p}`);
       if (!el) continue;
-      if (row === null || row === undefined) { clear(el); continue; }
-      const names = this.S.film.rows[row].names.slice(0, 6);
       const secs = this.S.index.parts[p].seconds;
+      clear(gut, names.map(n => h('span.lanename', { class: `lanename${here.includes(n) ? ' here' : ''}`, title: n }, n)));
       clear(el, names.map(name => h('div.lane', { title: `${name}: rows that list them in ${partName(p)}` },
-        h('span.lanename', name),
         this.rows.filter(r => String(r.part) === p && this.S.film.rows[r.row].names.includes(name)).map(r =>
           h('div.lseg', { class: `lseg${r.row === row ? ' here' : ''}`, style: { left: `${(100 * r.t0) / secs}%`, width: `${Math.max(0.3, (100 * (r.t1 - r.t0)) / secs)}%` } })))));
     }

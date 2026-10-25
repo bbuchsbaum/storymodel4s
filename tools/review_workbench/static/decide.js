@@ -81,9 +81,14 @@ export class DecidePane {
 
   // -- candidates ------------------------------------------------------------------------
   blind() {
+    // Mirrors the server's rule; the server still decides what it sends.
     const a = this.S.active;
-    if (a) return !!(a.calibration && !this.S.revealed(a.id));
-    return !!this.S.state.nextCalibration;
+    if (a && a.calibration && !this.S.revealed(a.id)) return true;
+    const sel = this.S.sel;
+    if (!sel) return false;
+    const m = this.S.masked();
+    for (let r = Math.min(sel.a, sel.b); r <= Math.max(sel.a, sel.b); r++) if (m.has(r)) return true;
+    return false;
   }
 
   async load(first, last) {
@@ -118,7 +123,10 @@ export class DecidePane {
       return this.renderBody();
     }
     try {
-      this.hits = (await post('/api/search', { q, id: this.S.active?.id ?? null })).hits;
+      const sel = this.S.sel;
+      const span = sel ? [Math.min(sel.a, sel.b), Math.max(sel.a, sel.b)] : null;
+      this.hits = (await post('/api/search', { q, id: this.S.active?.id ?? null, span })).hits;
+      this.q.blur(); // so digits open hits
     } catch (e) {
       toast(e.message, 'error');
     }
@@ -130,8 +138,8 @@ export class DecidePane {
     return h('div.hiddenbox',
       h('strong', 'Calibration item'),
       h('p', a
-        ? 'Suggestions and search stay hidden until you commit step 1. Find the moment yourself on the timeline; afterwards you can reveal the suggestions and revise.'
-        : 'The next decision is a calibration item, so suggestions are hidden for this selection. Press Enter to start it.'),
+        ? 'Suggestions and search stay hidden until you commit step 1. Find the moment yourself: < > step rows, { } step scenes. Afterwards you can reveal the suggestions (Shift+R) and revise.'
+        : 'These words are in a calibration window, so timing, candidates and search stay hidden. Press Enter to start the decision blind.'),
       a && this.S.decision(a.id) ? h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, 'Reveal suggestions') : null);
   }
 
@@ -145,10 +153,7 @@ export class DecidePane {
 
   renderCandidates() {
     if (this.blind()) return this.hiddenBox();
-    if (this.cands?.hidden) {
-      return h('div.hiddenbox', h('strong', 'Suggestions limited'),
-        h('p', 'The next decision is a calibration item, so suggestions are shown only for the words of the decision that is open. Commit or close it to continue.'));
-    }
+    if (this.cands?.hidden) return this.hiddenBox();
     const c = this.cands;
     if (!c) return h('p.empty', 'Select recall words to see candidate moments.');
     const noms = c.nominations;
@@ -312,6 +317,7 @@ export class DecidePane {
   }
 
   renderForm() {
+    const fid = document.activeElement?.dataset?.fid;
     const a = this.S.active;
     if (!a) {
       const sel = this.S.sel;
@@ -377,7 +383,6 @@ export class DecidePane {
       a.step === 1
         ? h('button.primary', { type: 'button', disabled: missing.length > 0, onclick: () => this.S.commitReference() }, committed ? 'Save step 1' : 'Commit step 1', h('kbd', { 'aria-hidden': 'true' }, 'Enter'))
         : h('button.primary', { type: 'button', disabled: missing.length > 0, onclick: () => this.S.commitSource() }, 'Commit decision', h('kbd', { 'aria-hidden': 'true' }, 'Enter')));
-    const fid = document.activeElement?.dataset?.fid;
     clear(this.formEl, h('form.decision', { onsubmit: e => e.preventDefault(), 'aria-label': `Decision ${a.id}` },
       h('div.dhead', h('span.did', a.id), a.calibration ? h('span.calib', this.S.revealed(a.id) ? 'calibration · revealed' : 'calibration') : null, h('span.timer#timer')),
       h('div.dbody', body), footer));

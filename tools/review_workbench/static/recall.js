@@ -43,7 +43,7 @@ export class RecallPane {
       return block;
     });
     clear(L, h('div.panehead', h('h2', 'Recall'), h('span.count#wcount')),
-      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration item: timing chips are hidden until step 1 is committed.'),
+      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration words: timing, candidates and search stay hidden here until a decision commits blind and is revealed.'),
       h('div.reader#reader', blocks));
     this.refresh();
   }
@@ -60,24 +60,30 @@ export class RecallPane {
       const done = read[String(w.window)]?.[0];
       const one = new Set();
       let disagree = 0;
-      const blind = this.S.blind();
+      let masked = 0;
+      const m = this.S.masked();
       for (let r = w.first; r <= w.last; r++) {
+        if (m.has(r)) { masked++; continue; } // calibration words never show their timing
         const n = words[r - 1].nom;
         n.one.forEach(s => one.add(s));
         if (words[r - 1].boundary) disagree++;
       }
+      const blind = masked > 0 && masked === w.last - w.first + 1;
+      block.classList.toggle('calwin', masked > 0);
       block.classList.toggle('current', w.window === this.S.win);
       block.classList.toggle('read', !!done);
       clear(
         head,
         h('button.readbox', {
           type: 'button',
+          'aria-label': `Window ${w.window} read`,
           'aria-pressed': String(!!done),
           title: 'Mark this window read (M)',
           onclick: () => this.S.markRead(w.window, !done),
         }, done ? '✓' : ''),
         h('span.wnum', `Window ${w.window}`),
         h('span.wrange', `words ${w.first}–${w.last}`),
+        masked ? h('span.caltag', { title: 'Calibration window: timing, candidates and search stay hidden for these words until a decision here commits blind and is revealed' }, 'calibration') : null,
         blind
           ? null
           : h('span.noms', [...one].sort((a, b) => a - b).map(s => h('button.scenechip', { type: 'button', title: `Timing points to scene ${s}; click to play it`, onclick: () => this.S.cueScene(s) }, `sc ${s}`))),

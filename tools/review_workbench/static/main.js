@@ -11,7 +11,8 @@ import { Structure } from './structure.js';
 const KEYS = {
   both: [
     ['Space', 'play or pause'], ['R', 'replay the moment'], ['L', 'loop the moment'],
-    [', .', 'step one frame'], ['< >', 'previous or next annotation row'], ['[ ]', 'slower or faster'],
+    [', .', 'step one frame'], ['< >', 'previous or next annotation row'], ['{ }', 'previous or next scene'],
+    ['Shift+P', 'presence lanes: open row or whole cast'], ['[ ]', 'slower or faster'],
     ['Shift+S', 'structure panel'],
     ['?', 'this list'],
   ],
@@ -50,6 +51,13 @@ S.setState = function (state) {
 
 S.decision = id => S.state.decisions[id] || null;
 S.blind = () => (S.decide ? S.decide.blind() : false);
+let maskedCache = { key: null, set: new Set() };
+S.masked = () => {
+  const rows = S.state.maskedRows || [];
+  const key = rows.length + ':' + (rows[0] ?? '') + ':' + (rows[rows.length - 1] ?? '');
+  if (maskedCache.key !== key) maskedCache = { key, set: new Set(rows) };
+  return maskedCache.set;
+};
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 S.reducedMotion = () => reduced.matches;
 S.revealed = id => !!S.state.decisions[id]?.revealed;
@@ -66,6 +74,7 @@ S.select = function (a, b) {
   S.recallPane.refreshHeads();
   S.recallPane.scrollToRow(b);
   S.structure.refresh();
+  if (S.decide.tab === 'search' && document.activeElement !== S.decide.q) S.decide.setTab('candidates');
   clearTimeout(candTimer);
   candTimer = setTimeout(() => {
     const [x, y] = span();
@@ -117,6 +126,7 @@ S.cueScene = function (id) {
 
 S.onPick = i => S.decide.choose(i);
 S.onRow = row => {
+  if (S.mode === 'source') return S.source.goRow(row);
   S.filmPane.showMoment(row);
   if (S.active?.step === 2) S.decide.renderForm();
 };
@@ -174,8 +184,8 @@ S.startDecision = async function () {
 S.reopen = function (id) {
   const d = S.decision(id);
   if (!d) return;
-  const pending = S.state.pendingCalibration;
-  if (pending && pending !== id) return toast(`Finish calibration item ${pending} first (Enter on any selection resumes it).`, 'error');
+  const open = S.active;
+  if (open && open.calibration && !S.revealed(open.id) && open.id !== id) return toast(`Finish calibration item ${open.id} first.`, 'error');
   S.active = {
     id,
     calibration: d.calibration,
@@ -311,8 +321,12 @@ S.addAnchorFromMoment = function () {
   const s = S.active.source;
   const anchor = `row-${row}`;
   if (!s.source_anchor_ids.includes(anchor)) s.source_anchor_ids = [...s.source_anchor_ids, anchor];
+  // The row's scene is the one containing its midpoint (a row ending on the next scene's
+  // first TR is not part of that scene).
   const r = S.index.rows.find(x => x.row === row);
-  for (const sc of r.scenes) if (!s.source_scene_ids.includes(sc)) s.source_scene_ids = [...s.source_scene_ids, sc].sort((x, y) => x - y);
+  const mid = (r.t0 + r.t1) / 2;
+  const sc = S.index.scenes.find(x => x.part === r.part && r.scenes.includes(x.scene) && x.t0 <= mid && mid < x.t1)?.scene ?? r.scenes[0];
+  if (sc !== undefined && !s.source_scene_ids.includes(sc)) s.source_scene_ids = [...s.source_scene_ids, sc].sort((x, y) => x - y);
   S.decide.renderForm();
 };
 
@@ -441,6 +455,8 @@ function onKey(e) {
   const handled = (() => {
     if (k === '?') { openKeys(); return true; }
     if (k === '<' || k === '>') { F.stepRow(k === '>' ? 1 : -1); return true; }
+    if (k === '{' || k === '}') { F.stepScene(k === '}' ? 1 : -1); return true; }
+    if (k === 'P') { F.toggleCast(); return true; }
     if (k === 'Escape' && !document.getElementById('structure').hidden) { S.structure.toggle(); return true; }
     if (k === 'S') { S.structure.toggle(); return true; }
     if (k === ' ') { F.toggle(); return true; }

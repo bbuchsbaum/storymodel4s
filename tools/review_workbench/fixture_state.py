@@ -57,7 +57,7 @@ def midway(store):
             "description",
             "Mara",
             "experiencer",
-            [2],
+            [1],
             ["row-1"],
             "supported",
         ),
@@ -81,10 +81,10 @@ def midway(store):
             None,
             None,
         ),
-    ]  # five decisions: the five calibration items are spent, so the next start is ordinary
+    ]  # the first two lie in calibration window 1, so they commit blind and are revealed
     for phrase, form, ref, role, scenes, anchors, outcome in plan:
         a, b = find(words, phrase)
-        did = store.start_decision()["id"]
+        did = store.start_decision([a, b])["id"]
         store.commit_reference(
             did,
             {

@@ -78,7 +78,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 /* top bar */
 .bar { display: flex; align-items: center; gap: 16px; padding: 7px 14px; background: var(--panel); border-bottom: 1px solid var(--line); flex: none; }
 .brand { display: flex; gap: 8px; align-items: center; font-weight: 600; }
-.tag { font-size: 11px; font-weight: 500; color: var(--muted); border: 1px dashed var(--muted); border-radius: 10px; padding: 0 8px; }
+.tag { font-size: 11px; font-weight: 500; color: var(--muted); background: var(--bg); border-radius: 10px; padding: 1px 8px; }
 .modes { display: flex; gap: 2px; background: var(--bg); padding: 2px; border-radius: 6px; }
 .mode { border: 0; background: none; padding: 4px 12px; border-radius: 5px; cursor: pointer; color: var(--muted); }
 .mode[aria-pressed="true"] { background: var(--panel); box-shadow: 0 0 0 1px var(--line); font-weight: 600; color: var(--ink); }
@@ -90,8 +90,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .small { padding: 1px 8px; font-size: 12.5px; }
 .primary { border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); border-radius: 5px; padding: 5px 12px; cursor: pointer; font-weight: 600; }
 .primary kbd { color: var(--on-accent); border-color: color-mix(in srgb, var(--on-accent) 45%, transparent); }
-.primary:disabled { background: var(--panel); color: var(--muted); border: 1px dashed var(--muted); cursor: not-allowed; }
-.primary:disabled kbd { color: var(--muted); border-color: var(--line); }
+.primary:disabled { opacity: .45; cursor: not-allowed; }
+
 .ghost { background: none; }
 
 main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(300px, 33fr) minmax(400px, 40fr) minmax(330px, 27fr); }
@@ -113,7 +113,7 @@ video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; max
 .tbtn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
 .timeline { display: flex; flex-direction: column; gap: 4px; flex: none; }
 .trackrow { display: flex; align-items: center; gap: 6px; }
-.partlabel { font-size: 11px; color: var(--muted); width: 44px; flex: none; }
+.partlabel { font-size: 11px; color: var(--muted); width: 92px; flex: none; text-align: right; }
 .track { position: relative; height: 40px; flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; overflow: hidden; }
 .band { position: absolute; top: 0; bottom: 0; }
 .band.even { background: color-mix(in srgb, var(--line) 40%, transparent); }
@@ -153,7 +153,7 @@ video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; max
 .noms { display: flex; gap: 3px; }
 .scenechip { border: 1px solid var(--s-timing); color: var(--s-timing); background: var(--s-timing-bg); border-radius: 9px; font-size: 11px; padding: 0 6px; cursor: pointer; }
 .clockchip { color: var(--muted); font-size: 11px; border-bottom: 1px dotted var(--muted); cursor: help; }
-.blindbanner { margin: 0 0 6px; padding: 4px 10px; border-radius: 5px; background: var(--calib-soft); color: var(--calib); font-size: 12.5px; }
+.blindbanner { position: sticky; top: 0; z-index: 2; margin: 0 0 6px; padding: 4px 10px; border-radius: 5px; background: var(--calib-soft); color: var(--calib); font-size: 12.5px; }
 .wtext { margin: 3px 0 0; font: 16px/1.62 var(--read); }
 .w { border-radius: 2px; cursor: text; padding: 0 1px; }
 .w.screen { text-decoration: underline dotted color-mix(in srgb, var(--muted) 70%, transparent); text-underline-offset: 4px; }
@@ -228,9 +228,9 @@ legend { font-weight: 600; padding: 0 4px; font-size: 13px; }
 .person { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 0 8px; font-size: 12.5px; cursor: pointer; }
 .person.created { border-style: dashed; }
 .person.fixed { color: var(--muted); }
-.person.hi { border-style: dashed; border-color: var(--accent); color: var(--accent); }
+.person.hi { background: var(--accent-soft); border-color: var(--accent); }
 .person.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.person.new { border-style: dashed; color: var(--accent); }
+.person.new { border-color: transparent; background: none; color: var(--accent); text-decoration: underline; }
 .warn { color: var(--warn); font-size: 12px; margin: 0; }
 .footer { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px 0 10px; border-top: 1px solid var(--line); background: var(--bg); }
 .footer .status { flex: 1 1 100%; font-size: 12px; }
@@ -306,11 +306,17 @@ dd { margin: 0; color: var(--muted); }
 .fatal { padding: 20px; color: var(--warn); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 
-/* presence lanes under each part track: where the open row's people appear */
-.lanerow { display: flex; gap: 6px; margin-top: -2px; }
+/* presence lanes under each part track, names in the gutter (ELAN-style) */
+.lanerow { display: flex; gap: 6px; }
+.lanenames { width: 92px; flex: none; display: flex; flex-direction: column; gap: 1px; }
+.lanenames:empty, .lanes:empty { display: none; }
+.lanename { height: 10px; font-size: 9.5px; line-height: 10px; color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lanename.here { color: var(--ink); font-weight: 600; }
 .lanes { flex: 1; display: flex; flex-direction: column; gap: 1px; }
-.lanes:empty { display: none; }
-.lane { position: relative; height: 11px; background: color-mix(in srgb, var(--line) 25%, transparent); border-radius: 2px; }
-.lanename { position: absolute; right: 3px; top: -1px; font-size: 9px; color: var(--muted); pointer-events: none; z-index: 1; }
-.lseg { position: absolute; top: 2px; bottom: 2px; background: color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 1px; }
-.lseg.here { background: var(--accent); }
+.lane { position: relative; height: 10px; background: color-mix(in srgb, var(--line) 30%, transparent); border-radius: 2px; }
+.lseg { position: absolute; top: 2px; bottom: 2px; background: color-mix(in srgb, var(--ink) 38%, transparent); border-radius: 1px; }
+.lseg.here { background: var(--ink); }
+.caltag { font-size: 11px; color: var(--calib); background: var(--calib-soft); border-radius: 9px; padding: 0 7px; }
+.win.calwin { border-left-color: var(--calib); }
+.calband { fill: var(--calib-soft); }
+.axis.cal { fill: var(--calib); }

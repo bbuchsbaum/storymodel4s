@@ -21,8 +21,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "source_identity
 import producer  # noqa: E402  (the recognizer's own mention rule; ADR 0027 guards)
 
 LOG_SCHEMA = "review-workbench-log/v0"
-CALIBRATION_FIRST = 5
-CALIBRATION_EVERY = 10
 REFERENCE_FIELDS = (
     "first_word",
     "last_word",
@@ -108,6 +106,13 @@ class Store:
         if not live:
             raise StoreError("nothing to undo")
         target = live[-1]
+        if target["kind"] in ("decision.reference", "decision.revise") and any(
+            e["kind"] == "decision.reveal" and e["id"] == target["id"] and e["seq"] > target["seq"]
+            for e in self.live()
+        ):
+            raise StoreError(
+                "a calibration answer cannot be undone after its reveal; use Edit, which is logged"
+            )
         self._append({"kind": "undo", "target": target["seq"]})
         return target
 
@@ -149,7 +154,7 @@ class Store:
         for mid, res in mentions.items():
             if mid not in ids:
                 raise StoreError("unknown mention")
-            ok = res in ("absent", "unknown") or res in known or res in uids
+            ok = res in ("absent", "unknown") or res in present or res in unnamed
             if not ok:
                 raise StoreError(
                     "a mention resolves to a present person, absent, or unknown"
@@ -228,18 +233,43 @@ class Store:
         named = [{"id": n, "label": n, "kind": "annotation"} for n in self.p.people]
         return named + made
 
+    # -- calibration: decided by words, not by count ----------------------------------------
+    # Calibration windows are fixed before review (manifest `calibrationWindows`, else window 1
+    # and every eighth window). Their words are masked: no timing chip, candidate, context word,
+    # echo or search result reaches them until a decision on them commits blind and reveals.
+    # A count-based schedule cannot do this, because anything shown before an item starts
+    # (v2 function review, B3) is then untracked.
+    def calibration_windows(self) -> list:
+        ws = [w["window"] for w in self.p.windows]
+        chosen = self.p.manifest.get("calibrationWindows")
+        if chosen is None:
+            chosen = [w for w in ws if w == 1 or w % 8 == 0]
+        return sorted(set(chosen) & set(ws))
+
+    def calibration_rows(self) -> set:
+        cw = set(self.calibration_windows())
+        return {w for win in self.p.windows if win["window"] in cw
+                for w in range(win["first"], win["last"] + 1)}
+
+    def exposed_rows(self) -> set:
+        """Calibration words whose suggestions a reveal has already shown."""
+        out = set()
+        for did, d in self.decisions().items():
+            if d["revealed"]:
+                for a, b in self.spans_of(did):
+                    out.update(range(a, b + 1))
+        return out
+
+    def masked_rows(self) -> set:
+        return self.calibration_rows() - self.exposed_rows()
+
     def start_decision(self, span=None) -> dict:
-        """Number a new decision as it starts. Calibration items (the first five, then every
-        tenth) open with suggestions hidden; the count includes abandoned starts. An abandoned
-        calibration item is resumed rather than replaced, so closing it cannot skip the blind
-        commit."""
+        """Number a new decision as it starts. It is a calibration item when its span touches a
+        masked calibration word; such items open with suggestions hidden."""
         self._require_recall()
-        pending = self.pending_calibration()
-        if pending:
-            self._append({"kind": "decision.resume", "id": pending["id"], "span": span})
-            return pending
         n = 1 + sum(1 for e in self.events if e["kind"] == "decision.start")
-        calibration = n <= CALIBRATION_FIRST or n % CALIBRATION_EVERY == 0
+        rows = set(range(span[0], span[1] + 1)) if span else set()
+        calibration = bool(rows & self.masked_rows())
         return self._append(
             {
                 "kind": "decision.start",
@@ -250,59 +280,34 @@ class Store:
             }
         )
 
-    def pending_calibration(self):
-        """The started calibration item with no committed reference, if any."""
-        done = set(self.decisions())
-        deleted = {e["id"] for e in self.live() if e["kind"] == "decision.delete"}
-        for e in reversed(self.live()):
-            if e["kind"] == "decision.start" and e["calibration"]:
-                if e["id"] not in done and e["id"] not in deleted:
-                    return e
-        return None
-
-    def next_is_calibration(self) -> bool:
-        """Whether the next start is a calibration item, so the UI can hide suggestions for a
-        selection before the item formally starts."""
-        if self.pending_calibration():
-            return True
-        n = 1 + sum(1 for e in self.events if e["kind"] == "decision.start")
-        return n <= CALIBRATION_FIRST or n % CALIBRATION_EVERY == 0
-
     def spans_of(self, did) -> list:
-        """Every recall span a decision has been tied to: its start and resume spans and its
-        committed main and co-referring spans."""
+        """Every recall span a decision has been tied to: its start span and its committed main
+        and co-referring spans."""
         out = []
         for e in self.live():
-            if e.get("id") == did and e["kind"] in ("decision.start", "decision.resume") and e.get("span"):
+            if e.get("id") != did:
+                continue
+            if e["kind"] == "decision.start" and e.get("span"):
                 out.append(tuple(e["span"]))
-            if e.get("id") == did and e["kind"] in ("decision.reference", "decision.revise"):
+            if e["kind"] in ("decision.reference", "decision.revise"):
                 f = e["fields"]
                 out.append((f["first_word"], f["last_word"]))
                 out.extend(tuple(x) for x in f["other_coref_spans"])
         return out
 
     def suggestions_blind(self, did=None, span=None) -> bool:
-        """Whether candidates (for `span`) and search must be withheld.
-
-        Blind while a calibration item is open and unrevealed. When the next start will be a
-        calibration item, suggestions are shown only for the open decision's own spans, so
-        reopening or keeping an ordinary decision open cannot preview another span."""
-        pending = self.pending_calibration()
-        if pending and pending["id"] != did:
-            return True
+        """Whether candidates and search must be withheld for `span` (the selection; None for
+        a search with nothing selected). Blind while a calibration item is open and unrevealed,
+        and whenever the span touches a masked calibration word."""
         if did:
             start = self._started(did)
             d = self.decisions().get(did)
             if start["calibration"] and not (d and d["revealed"]):
                 return True
-        if not self.next_is_calibration():
+        if span is None:
             return False
-        if not did:
-            return True
-        if span is None:  # search is not tied to a span
-            return True
         a, b = span
-        return not any(x <= a and b <= y for x, y in self.spans_of(did))
+        return bool(set(range(a, b + 1)) & self.masked_rows())
 
     def _started(self, did):
         e = next(
@@ -385,6 +390,20 @@ class Store:
         f["ambiguity_reason"] = (f["ambiguity_reason"] or "").strip()
         if f["reference_outcome"] in ("supported", "contradicted") and not f["source_anchor_ids"]:
             raise StoreError("a supported or contradicted outcome needs at least one source anchor")
+        if f["source_resolvable"] == "yes" and not f["source_anchor_ids"]:
+            raise StoreError("resolvable needs at least one source anchor")
+        rows = {r["row"]: r for r in self.p.rows}
+        mentions = {m["id"] for ms in self.mentions.values() for m in ms}
+        anchored_scenes = set()
+        for a in f["source_anchor_ids"]:
+            if a.startswith("row-") and a[4:].isdigit() and int(a[4:]) in rows:
+                anchored_scenes.update(rows[int(a[4:])]["scenes"])
+            elif a in mentions or a in self.unnamed():
+                continue
+            else:
+                raise StoreError(f"unknown source anchor {a}")
+        if anchored_scenes and not set(f["source_scene_ids"]) <= anchored_scenes:
+            raise StoreError("each source scene must contain an anchored row")
         return self._append({"kind": "decision.source", "id": did, "fields": f})
 
     def delete(self, did: str) -> dict:

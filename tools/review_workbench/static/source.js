@@ -81,6 +81,16 @@ export class SourcePass {
     this.cueRow();
   }
 
+  goRow(row) {
+    const s = this.scenes.find(x => x.rows.includes(row));
+    if (!s) return;
+    this.scene = s.scene;
+    this.rowIdx = s.rows.indexOf(row);
+    this.render();
+    this.S.filmPane.showMoment(row);
+    this.S.filmPane.markScenes([this.scene]);
+  }
+
   goScene(id) {
     this.scene = id;
     this.rowIdx = 0;
