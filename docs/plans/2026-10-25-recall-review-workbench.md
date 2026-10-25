@@ -84,12 +84,18 @@ words, not by a count of decisions.
 - **Their words are masked.** No timing chip, candidate, context word, retrieval or echo token,
   search result or timing-plot mark reaches a masked word.
 - **A calibration item is a decision started on masked words.** The reviewer commits step 1 of
-  every reference in the window blind, then reveals the whole window at once. The reveal waits
-  for the window's open items and is never reversed: undo, edit and delete cannot re-mask
-  words. Revisions after the reveal are logged. An ordinary decision cannot take masked words,
-  and calibration words never carry timing chips, even after the reveal.
-- **The reported metric** is the revision rate on these paired items, split by `reference_form`.
-  Every suggestion shown for a decision is logged privately.
+  every reference in the window blind, then reveals the whole window at once. The reveal is
+  never reversed: undo, edit and delete cannot re-mask words. Revisions after the reveal are
+  logged. An ordinary decision cannot take masked words, and calibration words never carry
+  timing chips, even after the reveal.
+- **An early reveal is allowed but deliberate.** If likely references in the window are still
+  undecided, the reveal asks for confirmation. Any decision first committed in the window after
+  its reveal is *late*: it leaves the blind sample. Each window's likely, blind, late and
+  deleted counts are reported, so a partial reveal stays visible.
+- **The reported metric** is the revision rate on *compared* items, those whose window has been
+  revealed, split by `reference_form`. *Revised* means final disagreement: the current answer
+  differs from the blind one. Pending blind items never count as unrevised. Every suggestion
+  and search shown is logged privately.
 - **Threat model:** the masking prevents inadvertent priming of an honest reviewer through the
   UI. It does not stop forged requests, or reading the page's data in developer tools. Search is
   withheld inside a masked window; a typed search for a masked word made from elsewhere cannot
