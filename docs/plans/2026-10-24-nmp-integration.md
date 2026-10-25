@@ -25,7 +25,7 @@ The external review of NMP inspected public commit `13aec7cc`. Local `main` is 3
 |---|---|---|
 | 0 | Land S3c-1 (`97161f239`): SD1 mutants, cold review, T3 gate | landed on local `main` |
 | 1 | Gap analysis, read-only: classify every NMP field against `story`, `document`, `recall`, `align`, `acquire`, `codec` | every field classified; independent review against the code |
-| 2 | ADR 0028, NMP proposal profile (owner decides) | Accepted |
+| 2 | ADR 0029, NMP proposal profile (owner decides) | Accepted |
 | 3a | Codec from NMP to proposal inputs, with the forged-authority court | landed with a mutation kill |
 | 3b | Certification registry keyed by source sha; producers cannot write it | landed with a mutation kill |
 | 3c+ | One slice per admitted semantic gap, each with its witness | each landed separately |
@@ -43,7 +43,7 @@ an asserted fact. The analysis also states which admission path owns each record
 `acquire` claim resolver (`Resolver`) or the `document` identity resolver
 (`ReferentIdentity.resolve`, ADR 0024, used by ADR 0027).
 
-### Phase 2: ADR 0028 decisions
+### Phase 2: ADR 0029 decisions
 
 - D1. The canonical model is storymodel4s. Rejected: NMP as the system of record; a separate
   LLM-specific result system (ADR 0022 already rejects it).
