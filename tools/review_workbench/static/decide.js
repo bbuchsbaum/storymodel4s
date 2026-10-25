@@ -403,7 +403,10 @@ export class DecidePane {
     if (a.step === 1) {
       if (this.role.value !== (f.claim_role || '')) this.role.value = f.claim_role || '';
       this.renderPeople();
-      body = h('fieldset.step',
+      const locked = !!this.S.saving;
+      this.filter.disabled = locked;
+      this.role.disabled = locked;
+      body = h('fieldset.step', { disabled: locked, 'aria-busy': String(locked) },
         h('legend', h('span.stepn', '1'), 'Reference'),
         h('div.field', h('span.k', 'Span'), h('span.spantext', `“${text([f.first_word, f.last_word])}”`), h('span.ids', `w${f.first_word}–${f.last_word}`)),
         h('div.field', h('span.k', 'Also'),
@@ -423,13 +426,14 @@ export class DecidePane {
     } else {
       const s = a.source;
       if (this.ambig.value !== (s.ambiguity_reason || '')) this.ambig.value = s.ambiguity_reason || '';
+      this.ambig.disabled = !!this.S.saving;
       const row = this.S.filmPane.focusRow;
       body = [
         h('div.summary', { role: 'group', 'aria-label': 'Step 1 summary' },
           h('span.stepn.done', '1'),
           h('span.sumtext', `“${text([f.first_word, f.last_word])}” → `, h('b', personLabel(f.referent)), ` · ${f.reference_form} · ${f.claim_role || 'no role'} · ${f.occurrence_group}`),
           h('button.ghost.small', { type: 'button', onclick: () => this.S.editStep1() }, 'Edit', h('kbd', { 'aria-hidden': 'true' }, 'Shift+E'))),
-        h('fieldset.step',
+        h('fieldset.step', { disabled: !!this.S.saving, 'aria-busy': String(!!this.S.saving) },
           h('legend', h('span.stepn', '2'), 'Source evidence'),
           h('div.field', h('span.k', 'Evidence'),
             s.source_anchor_ids.length ? s.source_anchor_ids.map(id => h('span.corefchip', id, h('button.x', { type: 'button', 'aria-label': `Remove ${id}`, onclick: () => this.S.removeAnchor(id) }, '×'))) : h('span.none', 'none yet'),
@@ -447,8 +451,8 @@ export class DecidePane {
       h('span.grow'),
       h('button.ghost', { type: 'button', onclick: () => this.S.closeDecision() }, 'Close', h('kbd', { 'aria-hidden': 'true' }, 'Esc')),
       a.step === 1
-        ? h('button.primary', { type: 'button', disabled: missing.length > 0, onclick: () => this.S.commitReference() }, committed ? 'Save step 1' : 'Commit step 1', h('kbd', { 'aria-hidden': 'true' }, 'Enter'))
-        : h('button.primary', { type: 'button', disabled: missing.length > 0, onclick: () => this.S.commitSource() }, 'Commit decision', h('kbd', { 'aria-hidden': 'true' }, 'Enter')));
+        ? h('button.primary', { type: 'button', disabled: missing.length > 0 || !!this.S.saving, onclick: () => this.S.commitReference() }, this.S.saving ? 'Saving…' : committed ? 'Save step 1' : 'Commit step 1', h('kbd', { 'aria-hidden': 'true' }, 'Enter'))
+        : h('button.primary', { type: 'button', disabled: missing.length > 0 || !!this.S.saving, onclick: () => this.S.commitSource() }, this.S.saving ? 'Saving…' : 'Commit decision', h('kbd', { 'aria-hidden': 'true' }, 'Enter')));
     clear(this.formEl, h('form.decision', { onsubmit: e => e.preventDefault(), 'aria-label': `Decision ${a.id}` },
       h('div.dhead', h('span.did', a.id), a.calibration ? h('span.calib', this.S.revealed(a.id) ? 'calibration · revealed' : 'calibration') : null, h('span.timer#timer')),
       h('div.dbody', body), footer));

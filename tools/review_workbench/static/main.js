@@ -244,6 +244,7 @@ S.closeDecision = function (force = false) {
 
 S.setField = function (key, value, rerender = true) {
   if (!S.active) return;
+  if (S.saving) return toast('Saving step 1; wait a moment.');
   if (S.active.step === 2 && key in S.active.source) return S.setSource(key, value, rerender);
   S.active.fields[key] = value;
   if (key === 'referent') checkDupes();
@@ -252,6 +253,7 @@ S.setField = function (key, value, rerender = true) {
 
 S.setSource = function (key, value, rerender = true) {
   if (!S.active) return;
+  if (S.saving) return toast('Saving; wait a moment.');
   S.active.source[key] = value;
   if (rerender) S.decide.renderForm();
 };
@@ -268,6 +270,7 @@ async function checkDupes() {
 }
 
 S.addCoref = function () {
+  if (S.saving) return;
   const sp = span();
   if (!S.active || !sp) return;
   const f = S.active.fields;
@@ -277,6 +280,7 @@ S.addCoref = function () {
 };
 
 S.removeCoref = function (i) {
+  if (S.saving) return;
   S.active.fields.other_coref_spans.splice(i, 1);
   S.decide.renderForm();
 };
@@ -297,7 +301,13 @@ S.commitReference = async function () {
   const f = a.fields;
   const missing = S.decide.problems();
   if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
+  if (S.saving) return;
   const before = S.decision(a.id)?.reference?.referent;
+  // The form is locked while the save is in flight, so no edit can be made against a state
+  // the server is about to replace (Codex re-reviews: reconciling in-flight edits after the
+  // fact either kept stale evidence or erased the edits).
+  S.saving = true;
+  S.decide.renderForm();
   try {
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
     S.setState(out.state);
@@ -313,10 +323,13 @@ S.commitReference = async function () {
       a.source = blankSource();
       if (S.decision(a.id)?.staleSource) toast(`${a.id}: the referent changed, so its earlier evidence was cleared.`);
     }
+    S.saving = false;
     S.recallPane.refresh();
     S.decide.render();
     toast(`${a.id}: step 1 saved${a.calibration && !S.revealed(a.id) ? ' (blind)' : ''}`);
   } catch (e) {
+    S.saving = false;
+    S.decide.renderForm();
     toast(e.message, 'error');
   }
 };
@@ -407,8 +420,12 @@ S.commitSource = async function () {
   const s = a.source;
   const missing = S.decide.problems();
   if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
+  if (S.saving) return;
+  S.saving = true; // locked while in flight, like step 1
+  S.decide.renderForm();
   try {
     const out = await post('/api/decision/source', { id: a.id, fields: s });
+    S.saving = false;
     S.setState(out.state);
     toast(`${a.id}: committed`);
     S.closeDecision(true);
@@ -417,6 +434,8 @@ S.commitSource = async function () {
     const inCal = (S.state.calibrationWindows || []).includes(S.index.words[a.fields.first_word - 1].window);
     if (!(inCal && S.nextAwaitingEvidence(a.fields.first_word, true, true))) S.nextLikely(a.fields.last_word);
   } catch (e) {
+    S.saving = false;
+    S.decide.renderForm();
     toast(e.message, 'error');
   }
 };
