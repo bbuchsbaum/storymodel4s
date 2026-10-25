@@ -75,6 +75,9 @@ export class DecidePane {
       oninput: () => this.S.setSource('ambiguity_reason', this.ambig.value, false),
     });
     this.plist = h('div.plist', { role: 'listbox', 'aria-label': 'People' });
+    // An inert box takes whatever is typed after a blind "/", so no keystroke runs a command.
+    // Created once, like the real search box, so a re-render never drops its focus.
+    this.sink = h('input.text.sink', { type: 'text', readonly: true, 'aria-label': 'Search is hidden here', placeholder: 'Search is hidden in a calibration window (Esc)', onkeydown: e => { e.stopPropagation(); if (e.key === 'Escape') { this.sink.blur(); this.setTab('candidates'); } } });
     clear(R, h('div.suggest', this.tabsEl, this.bodyEl), this.formEl);
     this.mounted = true;
   }
@@ -141,13 +144,11 @@ export class DecidePane {
 
   hiddenBox() {
     const a = this.S.active;
-    // An inert box takes whatever is typed after a blind "/", so no keystroke runs a command.
-    this.sink = h('input.text.sink', { type: 'text', readonly: true, 'aria-label': 'Search is hidden here', placeholder: 'Search is hidden here (Esc)', onkeydown: e => { e.stopPropagation(); if (e.key === 'Escape') { this.sink.blur(); this.setTab('candidates'); } } });
     const w = this.S.calWindowOf(a);
     let progress = null;
+    let n = 0, k = 0;
     if (w) {
       const win = this.S.index.windows[w - 1];
-      let n = 0, k = 0;
       for (let r = win.first; r <= win.last; r++) {
         if (!this.S.index.words[r - 1].screen) continue;
         n++;
@@ -159,10 +160,15 @@ export class DecidePane {
       h('strong', 'Calibration item'),
       h('p', a
         ? 'Timing, candidates and search stay hidden in this calibration window. Find the moment yourself: < > step rows, { } step scenes. Commit every reference in the window blind, then reveal the window (Shift+R) and revise any you would change.'
-        : 'These words are in a calibration window, so timing, candidates and search stay hidden. Press Enter to start the decision blind.'),
+        : this.S.sel
+          ? 'These words are in a calibration window, so timing, candidates and search stay hidden. Press Enter to decide them blind.'
+          : 'This is a calibration window: timing, candidates and search stay hidden. Select a reference (W) and press Enter to decide it blind.'),
       progress ? h('p.calprogress', progress) : null,
       w && (!a || this.S.decision(a.id))
-        ? h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, `Reveal window ${w}`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R'))
+        ? (k < n
+          // An early reveal is a deliberate, outlined choice; it turns solid once all are decided.
+          ? h('button.revealearly', { type: 'button', onclick: () => this.S.reveal() }, this.S.revealArmedFor(w) ? `Press again: reveal with ${n - k} undecided` : `Reveal early (${n - k} undecided)`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R'))
+          : h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, `Reveal window ${w}`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R')))
         : null,
       this.tab === 'search' ? this.sink : null);
   }
@@ -339,6 +345,8 @@ export class DecidePane {
     if (s.source_resolvable === 'yes' && !s.source_anchor_ids.length && !['supported', 'contradicted'].includes(s.reference_outcome)) out.push('an evidence row (A)');
     if (!s.reference_outcome) out.push('outcome');
     if (['supported', 'contradicted'].includes(s.reference_outcome) && !s.source_anchor_ids.length) out.push('an evidence row (A)');
+    const anchored = new Set(s.source_anchor_ids.filter(x => x.startsWith('row-')).flatMap(x => this.S.index.rows.find(r => r.row === Number(x.slice(4)))?.scenes || []));
+    if (s.source_scene_ids.some(id => !anchored.has(id)) && !s.source_anchor_ids.some(x => !x.startsWith('row-'))) out.push('an anchor for each scene');
     return out;
   }
 

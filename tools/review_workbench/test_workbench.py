@@ -482,6 +482,17 @@ class CalibrationCourt(unittest.TestCase):
         with self.assertRaisesRegex(store.StoreError, "calibration window"):
             s.reveal_window(3)
 
+    def test_a_partial_reveal_stays_visible_in_the_report(self):
+        s = done_store()
+        did = s.start_decision([8, 8])["id"]
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
+        s.reveal_window(1)
+        after = s.start_decision([14, 14])["id"]  # first started after the reveal
+        s.commit_reference(after, {**REF, "first_word": 14, "last_word": 14})
+        w1 = s.calibration()["byWindow"][1]
+        self.assertEqual((w1["blind"], w1["late"], w1["revealed"]), (1, 1, True))
+        self.assertGreater(w1["likely"], 1)
+
     def test_an_ordinary_decision_cannot_take_masked_words(self):
         s = done_store()
         did = s.start_decision([30, 30])["id"]

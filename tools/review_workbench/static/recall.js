@@ -92,7 +92,7 @@ export class RecallPane {
       );
     }
     const banner = document.getElementById('blindbanner');
-    if (banner) banner.hidden = !this.S.blind();
+    if (banner) banner.hidden = !(this.S.blind() || (this.S.state.maskedWindows || []).includes(this.S.win));
     const n = Object.values(read).filter(v => v[0]).length;
     const c = document.getElementById('wcount');
     if (c) c.textContent = `${n} of ${this.S.index.windows.length} windows read`;

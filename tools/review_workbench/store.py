@@ -490,8 +490,12 @@ class Store:
         for e in self.live():
             if e["kind"] in ("decision.reference", "decision.revise"):
                 first_ref.setdefault(e["id"], e["seq"])
+        cal_rows = self.calibration_rows()
         for did, d in out.items():
             d["revealed"] = self._revealed(did)
+            r = d["reference"]
+            if not d["calibration"] and r["first_word"] in cal_rows:
+                d["late"] = True  # decided in a calibration window only after its reveal
             if d["calibration"]:
                 start = starts[did]
                 wins = {self.p.census[r - 1]["window"] for r in range(start["span"][0], start["span"][1] + 1)}
@@ -525,10 +529,28 @@ class Store:
             g = by_form.setdefault(f, {"items": 0, "revised": 0})
             g["items"] += 1
             g["revised"] += int(d["revised"])
+        # Per calibration window: likely references (the lexical screen), blind items and late
+        # items, so a deliberate partial reveal stays visible in the report (v5 user review).
+        by_window = {}
+        decisions = self.decisions()
+        for w in self.calibration_windows():
+            win = next(x for x in self.p.windows if x["window"] == w)
+            rows = range(win["first"], win["last"] + 1)
+            in_win = [
+                d for d in decisions.values()
+                if self.p.census[d["reference"]["first_word"] - 1]["window"] == w
+            ]
+            by_window[w] = {
+                "likely": sum(1 for r in rows if self.p.census[r - 1]["screen"]),
+                "blind": sum(1 for d in in_win if d["calibration"]),
+                "late": sum(1 for d in in_win if d.get("late")),
+                "revealed": w in self.revealed_windows(),
+            }
         return {
             "items": len(items),
             "revised": sum(int(d["revised"]) for d in items),
             "byForm": by_form,
+            "byWindow": by_window,
         }
 
     # -- export ----------------------------------------------------------------------------
