@@ -113,12 +113,11 @@ export class Structure {
       const nearEnd = x(win.first) > W - 24;
       svg.append(s('text', { x: nearEnd ? W - 8 : x(win.first) + 2, y: H - 16, class: 'axis small', 'text-anchor': nearEnd ? 'end' : 'start' }, `w${win.window}`));
     }
-    // Calibration windows are drawn as shaded gaps: their timing is a suggestion.
+    // Calibration windows are drawn as shaded gaps: their words never carry timing.
     const masked = this.S.masked ? this.S.masked() : new Set();
+    const calw = new Set(this.S.state.calibrationWindows || []);
     for (const win of index.windows) {
-      let m = 0;
-      for (let r = win.first; r <= win.last; r++) if (masked.has(r)) m++;
-      if (m) {
+      if (calw.has(win.window)) {
         svg.append(s('rect', { x: x(win.first), y: top, width: Math.max(2, x(win.last) - x(win.first)), height: maxS * step, class: 'calband' }));
         svg.append(s('text', { x: x(win.first) + 3, y: top + 10, class: 'axis cal' }, 'calibration'));
       }
@@ -151,7 +150,7 @@ export class Structure {
     clear(this.el,
       h('div.panehead', h('h2', 'Structure'), h('span.count', 'raw evidence only; nothing here comes from your decisions'), h('button.ghost', { type: 'button', onclick: () => this.toggle() }, 'Close', h('kbd', { 'aria-hidden': 'true' }, 'Esc'))),
       h('div.structgrid',
-        h('section', h('h3', 'Who is on screen'), h('p.note', 'Rows of the annotation that list each person. Darker: in focus. Outlined: speaking. Red line: playhead. Click a bar to play it.'), this.presence()),
+        h('section', h('h3', 'Who is on screen'), h('p.note', 'Rows of the annotation that list each person. Darker: in focus. Darkest: speaking. Red line: playhead. Click a bar to play it.'), this.presence()),
         recall
           ? h('section', h('h3', 'Where the recall’s timing points'),
             blind

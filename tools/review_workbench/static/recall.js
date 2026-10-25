@@ -42,8 +42,8 @@ export class RecallPane {
       this.winEls[w.window] = { block, head };
       return block;
     });
-    clear(L, h('div.panehead', h('h2', 'Recall'), h('span.count#wcount')),
-      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration words: timing, candidates and search stay hidden here until a decision commits blind and is revealed.'),
+    clear(L, h('div.readhead', h('div.panehead', h('h2', 'Recall'), h('span.count#wcount')),
+      h('p.blindbanner#blindbanner', { hidden: true }, 'Calibration words: timing, candidates and search stay hidden until the window is revealed.')),
       h('div.reader#reader', blocks));
     this.refresh();
   }
@@ -68,8 +68,9 @@ export class RecallPane {
         n.one.forEach(s => one.add(s));
         if (words[r - 1].boundary) disagree++;
       }
-      const blind = masked > 0 && masked === w.last - w.first + 1;
-      block.classList.toggle('calwin', masked > 0);
+      const isCal = (this.S.state.calibrationWindows || []).includes(w.window);
+      const blind = isCal; // calibration words never carry timing chips, revealed or not
+      block.classList.toggle('calwin', isCal);
       block.classList.toggle('current', w.window === this.S.win);
       block.classList.toggle('read', !!done);
       clear(
@@ -83,7 +84,7 @@ export class RecallPane {
         }, done ? '✓' : ''),
         h('span.wnum', `Window ${w.window}`),
         h('span.wrange', `words ${w.first}–${w.last}`),
-        masked ? h('span.caltag', { title: 'Calibration window: timing, candidates and search stay hidden for these words until a decision here commits blind and is revealed' }, 'calibration') : null,
+        isCal ? h('span.caltag', { class: masked ? 'caltag' : 'caltag revealed', title: masked ? 'Calibration window: timing, candidates and search stay hidden here. Commit every reference blind, then reveal the window (Shift+R).' : 'Calibration window, revealed' }, masked ? 'calibration' : 'calibration · revealed') : null,
         blind
           ? null
           : h('span.noms', [...one].sort((a, b) => a - b).map(s => h('button.scenechip', { type: 'button', title: `Timing points to scene ${s}; click to play it`, onclick: () => this.S.cueScene(s) }, `sc ${s}`))),

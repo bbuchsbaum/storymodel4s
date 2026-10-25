@@ -84,14 +84,18 @@ export class Film {
   }
 
   stepScene(d) {
-    const scenes = this.S.index.scenes;
-    const cur = this.rows.find(r => r.row === this.focusRow);
-    const at = cur ? Math.min(...cur.scenes) : null;
-    const i = at === null ? -1 : scenes.findIndex(s => s.scene === at);
-    const s = scenes[Math.max(0, Math.min(scenes.length - 1, i < 0 ? 0 : i + d))];
-    const r = this.rows.find(x => x.row === s.rows[0]);
-    this.cue({ part: r.part, t0: r.t0, t1: r.t1 });
-    this.S.onRow?.(r.row);
+    // Scenes in film order; the current scene is the last one starting at or before the
+    // playhead (rows shared by two scenes no longer stall the jump).
+    const order = [...this.S.index.scenes].sort((a, b) => a.part - b.part || a.t0 - b.t0);
+    let i = -1;
+    if (this.part) {
+      const t = this.video.currentTime + 1.01;
+      order.forEach((s, k) => { if (String(s.part) === this.part && s.t0 <= t) i = k; });
+    }
+    const s = order[Math.max(0, Math.min(order.length - 1, i < 0 ? 0 : i + d))];
+    const r = this.rows.find(x => x.row === s.rows[0]) || this.rows.find(x => x.part === s.part && x.t0 >= s.t0);
+    this.cue({ part: s.part, t0: s.t0, t1: r ? r.t1 : s.t0 + 5, cue: s.t0 + 1.0 });
+    if (r) this.S.onRow?.(r.row);
   }
 
   step(frames) {

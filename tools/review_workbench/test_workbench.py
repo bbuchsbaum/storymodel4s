@@ -194,14 +194,14 @@ class StoreCourt(unittest.TestCase):
         did = s.start_decision()["id"]
         with self.assertRaisesRegex(store.StoreError, "who this refers to"):
             s.commit_reference(
-                did, {**REF, "first_word": 3, "last_word": 3, "referent": None}
+                did, {**REF, "first_word": 33, "last_word": 33, "referent": None}
             )
         s.commit_reference(
             did,
             {
                 **REF,
-                "first_word": 3,
-                "last_word": 3,
+                "first_word": 33,
+                "last_word": 33,
                 "referent": None,
                 "person_reference": "no",
             },
@@ -212,16 +212,16 @@ class StoreCourt(unittest.TestCase):
         did = s.start_decision()["id"]
         with self.assertRaisesRegex(store.StoreError, "reference_form"):
             s.commit_reference(
-                did, {**REF, "first_word": 1, "last_word": 1, "reference_form": "noun"}
+                did, {**REF, "first_word": 31, "last_word": 31, "reference_form": "noun"}
             )
         with self.assertRaisesRegex(store.StoreError, "referent"):
             s.commit_reference(
-                did, {**REF, "first_word": 1, "last_word": 1, "referent": "Nobody"}
+                did, {**REF, "first_word": 31, "last_word": 31, "referent": "Nobody"}
             )
 
     def test_spans_may_cross_windows(self):
         s = done_store()
-        w = s.p.windows[0]
+        w = s.p.windows[1]
         did = s.start_decision()["id"]
         s.commit_reference(
             did, {**REF, "first_word": w["last"], "last_word": w["last"] + 1}
@@ -231,7 +231,7 @@ class StoreCourt(unittest.TestCase):
     def test_undo_appends_and_restores(self):
         s = done_store()
         did = s.start_decision()["id"]
-        s.commit_reference(did, {**REF, "first_word": 3, "last_word": 3})
+        s.commit_reference(did, {**REF, "first_word": 33, "last_word": 33})
         n = len(s.events)
         s.undo()
         self.assertEqual(len(s.events), n + 1)
@@ -240,14 +240,14 @@ class StoreCourt(unittest.TestCase):
     def test_duplicates_overlap_with_the_same_referent(self):
         s = done_store()
         d1 = s.start_decision()["id"]
-        s.commit_reference(d1, {**REF, "first_word": 3, "last_word": 5})
-        self.assertEqual(s.duplicates(None, 5, 6, "Mara"), [d1])
-        self.assertEqual(s.duplicates(None, 5, 6, "Tobias"), [])
+        s.commit_reference(d1, {**REF, "first_word": 33, "last_word": 35})
+        self.assertEqual(s.duplicates(None, 35, 36, "Mara"), [d1])
+        self.assertEqual(s.duplicates(None, 35, 36, "Tobias"), [])
 
     def test_export_matches_the_template_and_withholds_the_referent(self):
         s = done_store()
         did = s.start_decision()["id"]
-        s.commit_reference(did, {**REF, "first_word": 3, "last_word": 3})
+        s.commit_reference(did, {**REF, "first_word": 33, "last_word": 33})
         s.commit_source(
             did,
             {
@@ -421,9 +421,10 @@ class CalibrationCourt(unittest.TestCase):
         self.assertTrue(s.suggestions_blind(cal, (60, 62)))
         self.assertTrue(s.suggestions_blind(cal, None))
         s.commit_reference(cal, {**REF, "first_word": 8, "last_word": 8})
-        s.reveal(cal)
+        s.reveal_window(1)
         self.assertFalse(s.suggestions_blind(cal, (8, 8)))
-        self.assertIn(8, s.exposed_rows())
+        self.assertFalse(s.suggestions_blind(None, (20, 20)))  # the whole window is revealed
+        self.assertIn(20, s.exposed_rows())
 
     def test_context_never_reads_masked_words(self):
         s = done_store()
@@ -440,10 +441,9 @@ class CalibrationCourt(unittest.TestCase):
     def test_revision_after_reveal_is_counted(self):
         s = done_store()
         did = s.start_decision([8, 8])["id"]
-        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
-        with self.assertRaisesRegex(store.StoreError, "reveal"):
-            s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
-        s.reveal(did)
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})  # corrected, still blind
+        s.reveal_window(1)
         s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
         cal = s.calibration()
         self.assertEqual((cal["items"], cal["revised"]), (1, 1))
@@ -453,10 +453,41 @@ class CalibrationCourt(unittest.TestCase):
         s = done_store()
         did = s.start_decision([8, 8])["id"]
         s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
-        s.reveal(did)
+        s.reveal_window(1)
         with self.assertRaisesRegex(store.StoreError, "after its reveal"):
             s.undo()
         self.assertTrue(s.decisions()[did]["revealed"])
+
+    def test_a_reveal_is_monotonic_and_whole_window(self):
+        s = done_store()
+        did = s.start_decision([8, 8])["id"]
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
+        s.reveal_window(1)
+        s.delete(did)
+        self.assertNotIn(14, s.masked_rows())  # deleting the item does not re-mask (B7b)
+        self.assertFalse(s.start_decision([14, 14])["calibration"])
+        with self.assertRaisesRegex(store.StoreError, "already revealed"):
+            s.reveal_window(1)
+
+    def test_a_window_waits_for_its_open_items(self):
+        s = done_store()
+        s.start_decision([8, 8])
+        with self.assertRaisesRegex(store.StoreError, "before revealing"):
+            s.reveal_window(1)
+        with self.assertRaisesRegex(store.StoreError, "calibration window"):
+            s.reveal_window(3)
+
+    def test_an_ordinary_decision_cannot_take_masked_words(self):
+        s = done_store()
+        did = s.start_decision([30, 30])["id"]
+        with self.assertRaisesRegex(store.StoreError, "calibration window"):
+            s.commit_reference(did, {**REF, "first_word": 30, "last_word": 30,
+                                     "other_coref_spans": [[24, 24]]})
+
+    def test_search_is_blind_inside_a_masked_window(self):
+        s = done_store()
+        self.assertTrue(s.suggestions_blind(None, None, 1))
+        self.assertFalse(s.suggestions_blind(None, None, 3))
 
     def test_undo_cannot_remove_a_start(self):
         s = done_store()
@@ -478,6 +509,9 @@ class CalibrationCourt(unittest.TestCase):
             s.commit_source(did, {**self.SRC, "source_anchor_ids": ["row-9999"]})
         with self.assertRaisesRegex(store.StoreError, "anchored row"):
             s.commit_source(did, {**self.SRC, "source_scene_ids": [7]})
+        with self.assertRaisesRegex(store.StoreError, "anchored row"):  # scenes with no anchor
+            s.commit_source(did, {**self.SRC, "source_anchor_ids": [], "source_scene_ids": [1],
+                                  "source_resolvable": "unknown", "reference_outcome": "unresolved"})
         s.commit_source(did, self.SRC)
 
     def test_a_mention_resolves_only_to_someone_present(self):
@@ -532,8 +566,16 @@ class BlindnessServerCourt(unittest.TestCase):
         did = self.app.store.start_decision([8, 8])["id"]
         status, out = self.post("/api/search", {"q": "lantern", "id": did, "span": [60, 60]})
         self.assertEqual(status, 409)
-        status, out = self.post("/api/search", {"q": "lantern", "span": [60, 60]})
+        status, out = self.post("/api/search", {"q": "lantern", "span": [60, 60], "window": 3})
         self.assertEqual(status, 200)
+        status, out = self.post("/api/search", {"q": "lantern", "window": 1})
+        self.assertEqual(status, 409)
+
+    def test_index_carries_no_timing_for_calibration_words(self):
+        status, out = self.post("/api/index", {})
+        w8 = out["words"][7]
+        self.assertEqual((w8["t"], w8["tr"], w8["nom"]["one"]), (None, None, []))
+        self.assertTrue(out["words"][29]["nom"]["one"])
 
     def test_state_carries_masked_rows_without_text(self):
         status, out = self.post("/api/state", {})

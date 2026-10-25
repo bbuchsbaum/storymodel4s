@@ -101,15 +101,12 @@ class Store:
     def undo(self) -> dict:
         """Undo the latest live edit. Starts, resumes and reveals are not edits: undoing a start
         would renumber the calibration schedule, and a reveal cannot be unseen."""
-        fixed = ("header", "suggestions.shown", "decision.start", "decision.resume", "decision.reveal")
+        fixed = ("header", "suggestions.shown", "decision.start", "calibration.reveal")
         live = [e for e in self.live() if e["kind"] not in fixed]
         if not live:
             raise StoreError("nothing to undo")
         target = live[-1]
-        if target["kind"] in ("decision.reference", "decision.revise") and any(
-            e["kind"] == "decision.reveal" and e["id"] == target["id"] and e["seq"] > target["seq"]
-            for e in self.live()
-        ):
+        if target["kind"] == "decision.reference" and self._revealed(target["id"]):
             raise StoreError(
                 "a calibration answer cannot be undone after its reveal; use Edit, which is logged"
             )
@@ -251,17 +248,50 @@ class Store:
         return {w for win in self.p.windows if win["window"] in cw
                 for w in range(win["first"], win["last"] + 1)}
 
+    def revealed_windows(self) -> set:
+        """Calibration windows whose suggestions have been revealed. A reveal covers a whole
+        window and is monotonic: no undo, edit or delete reverses it (v3 reviews: per-decision
+        exposure primed the rest of the window, and was reversible)."""
+        return {e["window"] for e in self.events if e["kind"] == "calibration.reveal"}
+
     def exposed_rows(self) -> set:
-        """Calibration words whose suggestions a reveal has already shown."""
-        out = set()
-        for did, d in self.decisions().items():
-            if d["revealed"]:
-                for a, b in self.spans_of(did):
-                    out.update(range(a, b + 1))
-        return out
+        rw = self.revealed_windows()
+        return {w for win in self.p.windows if win["window"] in rw
+                for w in range(win["first"], win["last"] + 1)}
 
     def masked_rows(self) -> set:
         return self.calibration_rows() - self.exposed_rows()
+
+    def masked_windows(self) -> list:
+        return [w for w in self.calibration_windows() if w not in self.revealed_windows()]
+
+    def reveal_window(self, window: int) -> dict:
+        """Reveal one calibration window: every decision started there keeps its blind step-1
+        answer, and revisions from now on are logged as revisions."""
+        self._require_recall()
+        if window not in self.calibration_windows():
+            raise StoreError("only a calibration window can be revealed")
+        if window in self.revealed_windows():
+            raise StoreError("this window is already revealed")
+        win = next(w for w in self.p.windows if w["window"] == window)
+        rows = set(range(win["first"], win["last"] + 1))
+        committed = self.decisions()
+        deleted = {e["id"] for e in self.live() if e["kind"] == "decision.delete"}
+        open_items = [
+            e["id"] for e in self.live()
+            if e["kind"] == "decision.start" and e["calibration"] and e.get("span")
+            and e["id"] not in committed and e["id"] not in deleted
+            and set(range(e["span"][0], e["span"][1] + 1)) & rows
+        ]
+        if open_items:
+            raise StoreError(f"commit step 1 of {', '.join(open_items)} before revealing this window")
+        return self._append({"kind": "calibration.reveal", "window": window})
+
+    def _span_rows(self, did):
+        out = []
+        for a, b in self.spans_of(did):
+            out.extend(range(a, b + 1))
+        return out
 
     def start_decision(self, span=None) -> dict:
         """Number a new decision as it starts. It is a calibration item when its span touches a
@@ -295,15 +325,17 @@ class Store:
                 out.extend(tuple(x) for x in f["other_coref_spans"])
         return out
 
-    def suggestions_blind(self, did=None, span=None) -> bool:
-        """Whether candidates and search must be withheld for `span` (the selection; None for
-        a search with nothing selected). Blind while a calibration item is open and unrevealed,
-        and whenever the span touches a masked calibration word."""
-        if did:
-            start = self._started(did)
-            d = self.decisions().get(did)
-            if start["calibration"] and not (d and d["revealed"]):
-                return True
+    def suggestions_blind(self, did=None, span=None, window=None) -> bool:
+        """Whether candidates and search must be withheld. Blind while a calibration item is
+        open and unrevealed, whenever the selected span touches a masked word, and, for search,
+        while the reader is inside a masked window.
+
+        Threat model: this prevents inadvertent priming of an honest reviewer through the UI.
+        It does not stop a reviewer who forges requests or reads the page's data in devtools."""
+        if did and self._started(did)["calibration"] and not self._revealed(did):
+            return True
+        if window is not None and window in self.masked_windows():
+            return True
         if span is None:
             return False
         a, b = span
@@ -357,21 +389,27 @@ class Store:
             )
         f["claim_role"] = (f["claim_role"] or "").strip()
         f["occurrence_group"] = (f["occurrence_group"] or "").strip()
-        decisions = self.decisions()
-        revealed = decisions.get(did, {}).get("revealed", False)
-        kind = "decision.revise" if revealed else "decision.reference"
-        if start["calibration"] and did in decisions and not revealed:
+        masked = self.masked_rows()
+        touched = set(range(a, b + 1)).union(*(range(x, y + 1) for x, y in spans))
+        if not start["calibration"] and touched & masked:
             raise StoreError(
-                "reveal the suggestions before revising a calibration item"
+                "these words are in a calibration window; start a separate decision on them"
             )
+        revealed = self._revealed(did)
+        kind = "decision.revise" if revealed else "decision.reference"
         return self._append({"kind": kind, "id": did, "fields": f})
 
-    def reveal(self, did: str) -> dict:
-        self._require_recall()
-        d = self.decisions().get(did)
-        if not d or not self._started(did)["calibration"]:
-            raise StoreError("only a committed calibration item can be revealed")
-        return self._append({"kind": "decision.reveal", "id": did})
+    def _revealed(self, did) -> bool:
+        """A calibration item is revealed once every calibration window its start touches is."""
+        start = self._started(did)
+        if not start["calibration"]:
+            return False
+        a, b = start["span"]
+        cw = {w["window"]: w for w in self.p.windows}
+        touched = {self.p.census[r - 1]["window"] for r in range(a, b + 1)}
+        cal = touched & set(self.calibration_windows())
+        return bool(cal) and cal <= self.revealed_windows()
+
 
     def commit_source(self, did: str, fields: dict) -> dict:
         self._require_recall()
@@ -393,17 +431,19 @@ class Store:
         if f["source_resolvable"] == "yes" and not f["source_anchor_ids"]:
             raise StoreError("resolvable needs at least one source anchor")
         rows = {r["row"]: r for r in self.p.rows}
-        mentions = {m["id"] for ms in self.mentions.values() for m in ms}
+        mention_rows = {m["id"]: row for row, ms in self.mentions.items() for m in ms}
         anchored_scenes = set()
         for a in f["source_anchor_ids"]:
             if a.startswith("row-") and a[4:].isdigit() and int(a[4:]) in rows:
                 anchored_scenes.update(rows[int(a[4:])]["scenes"])
-            elif a in mentions or a in self.unnamed():
+            elif a in mention_rows:
+                anchored_scenes.update(rows[mention_rows[a]]["scenes"])
+            elif a in self.unnamed():
                 continue
             else:
                 raise StoreError(f"unknown source anchor {a}")
-        if anchored_scenes and not set(f["source_scene_ids"]) <= anchored_scenes:
-            raise StoreError("each source scene must contain an anchored row")
+        if not set(f["source_scene_ids"]) <= anchored_scenes:
+            raise StoreError("each source scene must contain an anchored row or mention")
         return self._append({"kind": "decision.source", "id": did, "fields": f})
 
     def delete(self, did: str) -> dict:
@@ -442,23 +482,21 @@ class Store:
                         "revised": False,
                     },
                 )
-                if (
-                    k == "decision.reference"
-                    and d["blind"] is None
-                    and d["calibration"]
-                ):
+                # Before its window is revealed a calibration item may be corrected and is
+                # still blind; the blind answer is the last one committed before the reveal.
+                if k == "decision.reference" and d["calibration"]:
                     d["blind"] = e["fields"]
                 if k == "decision.revise":
-                    d["revised"] = d["revised"] or e["fields"] != d["reference"]
+                    d["revised"] = e["fields"] != d["blind"] if d["blind"] else True
                 d["reference"] = e["fields"]
                 d["t"] = e["t"]
-            elif k == "decision.reveal" and e["id"] in out:
-                out[e["id"]]["revealed"] = True
             elif k == "decision.source" and e["id"] in out:
                 out[e["id"]]["source"] = e["fields"]
                 out[e["id"]]["t"] = e["t"]
             elif k == "decision.delete":
                 out.pop(e["id"], None)
+        for did, d in out.items():
+            d["revealed"] = self._revealed(did)
         return out
 
     def duplicates(self, did, first, last, referent) -> list:

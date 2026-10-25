@@ -10,7 +10,7 @@ import { Structure } from './structure.js';
 
 const KEYS = {
   both: [
-    ['Space', 'play or pause'], ['R', 'replay the moment'], ['L', 'loop the moment'],
+    ['Space', 'play or pause'], ['r', 'replay the moment'], ['l', 'loop the moment'],
     [', .', 'step one frame'], ['< >', 'previous or next annotation row'], ['{ }', 'previous or next scene'],
     ['Shift+P', 'presence lanes: open row or whole cast'], ['[ ]', 'slower or faster'],
     ['Shift+S', 'structure panel'],
@@ -29,7 +29,8 @@ const KEYS = {
     ['A', 'add the open moment as source evidence'], ['F', 'find a person (step 1)'],
     ['n p d e o', 'reference form (step 1)'],
     ['y x u', 'person? (step 1) or resolvable (step 2)'], ['s c v e', 'outcome (step 2)'],
-    ['Shift+R', 'reveal suggestions (calibration item, after step 1)'],
+    ['Shift+R', 'reveal this calibration window (after every reference in it is committed)'],
+    ['Shift+E', 'edit step 1 (in step 2)'],
     ['Z', 'undo the last edit'], ['Shift+E', 'reopen the decision under the cursor'], ['Esc', 'close the form'],
   ],
 };
@@ -295,15 +296,31 @@ S.editStep1 = function () {
   }
 };
 
+// A reveal covers a whole calibration window and cannot be undone; do it after every reference
+// in the window has been committed blind.
+S.calWindowOf = function (a) {
+  const sp = a ? [a.fields.first_word, a.fields.last_word] : span();
+  if (!sp) return null;
+  const cw = new Set(S.state.maskedWindows || []);
+  for (let r = sp[0]; r <= sp[1]; r++) {
+    const w = S.index.words[r - 1].window;
+    if (cw.has(w)) return w;
+  }
+  return null;
+};
+
 S.reveal = async function () {
+  const w = S.calWindowOf(S.active);
+  if (!w) return toast('Nothing to reveal here.');
   try {
-    const out = await post('/api/decision/reveal', { id: S.active.id });
+    const out = await post('/api/calibration/reveal', { window: w });
     S.setState(out.state);
-    const f = S.active.fields;
+    S.index = await post('/api/index'); // revealed words still carry no timing; candidates do
     S.decide.render();
     S.recallPane.refreshHeads();
-    await S.decide.load(f.first_word, f.last_word);
-    toast('Suggestions revealed. Use Edit on step 1 if they change your judgment; revisions are logged.');
+    const f = S.active?.fields;
+    if (f) await S.decide.load(f.first_word, f.last_word);
+    toast(`Window ${w} revealed. Edit step 1 (Shift+E) if the suggestions change your judgment; revisions are logged.`);
   } catch (e) {
     toast(e.message, 'error');
   }
@@ -356,7 +373,15 @@ S.undo = async function () {
     const out = await post('/api/undo');
     S.setState(out.state);
     const what = { 'decision.reference': 'step 1', 'decision.revise': 'step 1 revision', 'decision.source': 'step 2', 'window.read': 'window mark', 'person.create': 'new person', 'decision.delete': 'deletion', 'source.row': 'source row', 'source.unnamed': 'unnamed person' }[out.undone?.kind] || 'last edit';
-    if (S.active && !S.decision(S.active.id) && S.active.step === 2) S.active.step = 1;
+    if (S.active) {
+      // Keep the open form in step with the log: an undone commit must not linger in the form.
+      const d = S.decision(S.active.id);
+      if (!d && S.active.step === 2) S.active.step = 1;
+      if (d) {
+        S.active.fields = structuredClone(d.reference);
+        if (d.source) S.active.source = structuredClone(d.source);
+      }
+    }
     if (S.mode === 'source') S.source.render();
     else S.decide.render();
     toast(`Undid ${what}${out.undone?.id ? ` of ${out.undone.id}` : ''}${out.undone?.row ? ` (row ${out.undone.row})` : ''}`);
@@ -486,7 +511,8 @@ function recallKey(e) {
   if (k === 'w' || k === 'b') {
     const d = k === 'w' ? 1 : -1;
     const words = S.index.words;
-    for (let r = cur + d; r >= 1 && r <= n; r += d) {
+    const from = S.sel ? cur + d : cur; // with nothing selected, the window's first word counts
+    for (let r = from; r >= 1 && r <= n; r += d) {
       if (words[r - 1].screen && !S.recallPane.wordEls[r].dataset.did) { S.select(r, r); return true; }
     }
     toast(d > 0 ? 'No more likely references after this point.' : 'No likely references before this point.');
@@ -496,10 +522,15 @@ function recallKey(e) {
   if (k === 'j') { S.goWindow(S.win + 1); return true; }
   if (k === 'k') { S.goWindow(S.win - 1); return true; }
   if (k === 'm') { const done = S.state.windows[String(S.win)]?.[0]; S.markRead(S.win, !done); return true; }
-  if (k === '/') { S.decide.setTab('search'); return true; }
+  if (k === '/') {
+    if (S.decide.searchBlind()) { toast('Search is hidden in a calibration window and while a calibration item is open.'); return true; }
+    S.decide.setTab('search');
+    return true;
+  }
   if (k === 'z') { S.undo(); return true; }
   if (/^[1-8]$/.test(k)) { if (S.decide.tab === 'search') S.decide.openHit(Number(k) - 1); else S.decide.choose(Number(k) - 1); return true; }
   if (k === 'R' && a && a.calibration && S.decision(a.id) && !S.revealed(a.id)) { S.reveal(); return true; }
+  if (k === 'E' && a && a.step === 2) { S.editStep1(); return true; }
   if (k === 'Escape') { if (a) S.closeDecision(); else { S.sel = null; S.recallPane.refreshSelection(); S.decide.renderForm(); } return true; }
   if (k === 'E' && !a) { S.reopenAt(cur); return true; }
   if (k === 'Enter') {

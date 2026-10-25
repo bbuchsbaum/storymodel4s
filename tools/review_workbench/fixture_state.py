@@ -81,7 +81,7 @@ def midway(store):
             None,
             None,
         ),
-    ]  # the first two lie in calibration window 1, so they commit blind and are revealed
+    ]  # the first two lie in calibration window 1: they commit blind, then the window is revealed
     for phrase, form, ref, role, scenes, anchors, outcome in plan:
         a, b = find(words, phrase)
         did = store.start_decision([a, b])["id"]
@@ -98,8 +98,6 @@ def midway(store):
                 "referent": ref,
             },
         )
-        if store.decisions()[did]["calibration"]:
-            store.reveal(did)
         if scenes:
             store.commit_source(
                 did,
@@ -111,6 +109,8 @@ def midway(store):
                     "ambiguity_reason": "",
                 },
             )
+        if did == "d002":
+            store.reveal_window(1)  # both window-1 references are committed blind
 
 
 def main(argv):

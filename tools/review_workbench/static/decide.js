@@ -80,6 +80,12 @@ export class DecidePane {
   }
 
   // -- candidates ------------------------------------------------------------------------
+  searchBlind() {
+    const a = this.S.active;
+    if (a && a.calibration && !this.S.revealed(a.id)) return true;
+    return (this.S.state.maskedWindows || []).includes(this.S.win) || this.blind();
+  }
+
   blind() {
     // Mirrors the server's rule; the server still decides what it sends.
     const a = this.S.active;
@@ -125,7 +131,7 @@ export class DecidePane {
     try {
       const sel = this.S.sel;
       const span = sel ? [Math.min(sel.a, sel.b), Math.max(sel.a, sel.b)] : null;
-      this.hits = (await post('/api/search', { q, id: this.S.active?.id ?? null, span })).hits;
+      this.hits = (await post('/api/search', { q, id: this.S.active?.id ?? null, span, window: this.S.win })).hits;
       this.q.blur(); // so digits open hits
     } catch (e) {
       toast(e.message, 'error');
@@ -138,9 +144,11 @@ export class DecidePane {
     return h('div.hiddenbox',
       h('strong', 'Calibration item'),
       h('p', a
-        ? 'Suggestions and search stay hidden until you commit step 1. Find the moment yourself: < > step rows, { } step scenes. Afterwards you can reveal the suggestions (Shift+R) and revise.'
+        ? 'Timing, candidates and search stay hidden in this calibration window. Find the moment yourself: < > step rows, { } step scenes. Commit every reference in the window blind, then reveal the window (Shift+R) and revise any you would change.'
         : 'These words are in a calibration window, so timing, candidates and search stay hidden. Press Enter to start the decision blind.'),
-      a && this.S.decision(a.id) ? h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, 'Reveal suggestions') : null);
+      a && this.S.decision(a.id) && !this.S.revealed(a.id)
+        ? h('button.primary', { type: 'button', onclick: () => this.S.reveal() }, `Reveal window ${this.S.calWindowOf(a) ?? ''}`, h('kbd', { 'aria-hidden': 'true' }, 'Shift+R'))
+        : null);
   }
 
   openHit(i) {
@@ -188,7 +196,7 @@ export class DecidePane {
   }
 
   renderSearch() {
-    if (this.blind()) return this.hiddenBox();
+    if (this.searchBlind()) return this.hiddenBox();
     return [
       this.q,
       this.hits.length
@@ -362,7 +370,7 @@ export class DecidePane {
         h('div.summary', { role: 'group', 'aria-label': 'Step 1 summary' },
           h('span.stepn.done', '1'),
           h('span.sumtext', `“${text([f.first_word, f.last_word])}” → `, h('b', personLabel(f.referent)), ` · ${f.reference_form} · ${f.claim_role || 'no role'} · ${f.occurrence_group}`),
-          h('button.ghost.small', { type: 'button', onclick: () => this.S.editStep1() }, 'Edit')),
+          h('button.ghost.small', { type: 'button', onclick: () => this.S.editStep1() }, 'Edit', h('kbd', { 'aria-hidden': 'true' }, 'Shift+E'))),
         h('fieldset.step',
           h('legend', h('span.stepn', '2'), 'Source evidence'),
           h('div.field', h('span.k', 'Evidence'),

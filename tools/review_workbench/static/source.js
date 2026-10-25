@@ -81,6 +81,24 @@ export class SourcePass {
     this.cueRow();
   }
 
+  togglePresent(row, name, on) {
+    const d = this.draft(row);
+    if (on) d.present.add(name);
+    else {
+      d.present.delete(name);
+      // A mention resolved to someone no longer present is reopened, visibly.
+      for (const [mid, who] of Object.entries(d.mentions)) {
+        if (who === name) {
+          delete d.mentions[mid];
+          toast(`${name} is no longer present, so their mention is open again.`);
+        }
+      }
+    }
+    const focused = document.activeElement?.id;
+    this.render();
+    if (focused) document.getElementById(focused)?.focus();
+  }
+
   goRow(row) {
     const s = this.scenes.find(x => x.rows.includes(row));
     if (!s) return;
@@ -205,7 +223,7 @@ export class SourcePass {
         h('span.k', 'Present'),
         t.names.length ? null : h('span.none', 'Name - All is empty'),
         t.names.map(n => h('label.toggle', h('input', {
-          type: 'checkbox', checked: d.present.has(n), onchange: e => { e.target.checked ? d.present.add(n) : d.present.delete(n); this.render(); },
+          type: 'checkbox', id: `pres-${row}-${n}`, checked: d.present.has(n), onchange: e => this.togglePresent(row, n, e.target.checked),
         }), n)),
         [...d.unnamed].map(u => h('label.toggle.unnamed', h('input', {
           type: 'checkbox', checked: true, onchange: () => { d.unnamed.delete(u); this.render(); },
@@ -263,7 +281,7 @@ export class SourcePass {
         // Shift+1-9 toggle presence; a bare digit never does, so a repeated keypress cannot
         // silently remove someone.
         const n = this.S.film.rows[row].names[digit - 1];
-        if (n) d.present.has(n) ? d.present.delete(n) : d.present.add(n);
+        if (n) return this.togglePresent(row, n, !d.present.has(n)), true;
       } else if (open) {
         // 1-9 resolve the next open mention to its nth option, in the order shown.
         const opts = [...d.present, ...d.unnamed, 'absent', 'unknown'];

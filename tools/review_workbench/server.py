@@ -64,6 +64,8 @@ class App:
             "recallOpen": s.recall_open(),
             "calibrationWindows": s.calibration_windows(),
             "maskedRows": sorted(s.masked_rows()) if s.recall_open() else [],
+            "maskedWindows": s.masked_windows() if s.recall_open() else [],
+            "revealedWindows": sorted(s.revealed_windows()),
             "source": {
                 "rows": src["rows"],
                 "scenes": src["scenes"],
@@ -80,7 +82,14 @@ class App:
     def api(self, path, body):
         s = self.store
         if path == "/api/index":
-            return self.packet.index()
+            # Calibration-window words carry no timing or nominations in the index at all; the
+            # client never holds them (v3 function review, B9).
+            idx = self.packet.index()
+            cal = s.calibration_rows()
+            for w in idx["words"]:
+                if w["row"] in cal:
+                    w.update(t=None, tr=None, boundary=False, cal=True, nom={"one": [], "zero": [], "legacy": []})
+            return idx
         if path == "/api/film-text":
             return self.packet.film_text()
         if path == "/api/recall-text":
@@ -91,9 +100,12 @@ class App:
             return self.state()
         if path == "/api/search":
             sp = body.get("span")
-            if s.recall_open() and s.suggestions_blind(body.get("id"), tuple(sp) if sp else None):
+            win = body.get("window")
+            if s.recall_open() and s.suggestions_blind(
+                body.get("id"), tuple(sp) if sp else None, int(win) if win is not None else None
+            ):
                 raise StoreError(
-                    "search is hidden while calibration words are selected or a calibration item is open"
+                    "search is hidden in a calibration window and while a calibration item is open"
                 )
             return {"hits": self.cands.search(str(body.get("q", "")))}
         if path == "/api/source/row":
@@ -124,6 +136,7 @@ class App:
             if hidden:
                 out["moments"] = []
                 out["nominations"] = {"one": [], "zero": [], "legacy": []}
+                out.pop("considered", None)
             out["hidden"] = hidden
             return out
         elif path == "/api/window":
@@ -141,8 +154,8 @@ class App:
             }
         elif path == "/api/decision/reference":
             s.commit_reference(body["id"], body["fields"])
-        elif path == "/api/decision/reveal":
-            s.reveal(body["id"])
+        elif path == "/api/calibration/reveal":
+            s.reveal_window(int(body["window"]))
         elif path == "/api/decision/source":
             s.commit_source(body["id"], body["fields"])
         elif path == "/api/decision/delete":
