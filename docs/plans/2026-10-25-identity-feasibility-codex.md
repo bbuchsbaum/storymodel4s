@@ -11,7 +11,56 @@ The joint proposal remains recorded in epic notes
 `20261025T140608.260924Z-p10810-c0000-rca0d-hddbbcf` and
 `20261025T140809.851661Z-p16321-c0000-rec89-h9ebf19`, with addendum
 `20261025T144732.050282Z-p39096-c0000-r1211-h23b326` and Codex acknowledgement
-`20261025T144952.841248Z-p47815-c0000-r6988-hec6c12`.
+`20261025T144952.841248Z-p47815-c0000-r6988-hec6c12`. The v2 split is recorded in
+`20261025T145833.208932Z-p74333-c0000-rc31c-h8d8ede` and
+`20261025T150226.205969Z-p86870-c0000-r2d67-h4192f1`.
+
+## Current direction: direct LLM baseline first (owner amendment, 25 October)
+
+The owner asked to codify the LLM/representation discussion and slightly deemphasize process.
+This section supersedes graph-first sequencing in the earlier joint proposal, companion packet
+and handoffs. The frozen population, reference custody and evaluation criteria below remain.
+The hypothesis to test is that a strong, context-rich LLM can infer useful recall-to-source
+mappings directly. Current binder refusals do not establish a limit on that capability.
+
+1. **Run C first:** direct LLM interpretation into the existing experimental result fields, with
+   coherent timestamped source records, equivalent recall context and evidence references.
+   Reuse admitted transcripts, visual descriptions and optional human scene annotations; preserve
+   their origins and uncertainty. Add frames/clips only within the declared evidence budget.
+   Keep annotation-assisted and annotation-free results separate. Do not require successful AMR
+   parsing, a complete source graph or the S3d graph reader before this baseline.
+2. **Judge it with a small evaluator and blind human references.** Human review establishes the
+   reference answers and source scope; constructing A's reviewed source graph is separate work,
+   not a prerequisite for C. Freeze prompts, model/configuration, input hashes and output contract
+   before assessment. Existing templates and receipts suffice; no new framework is required.
+3. **Compare and diagnose.** Retain A (reviewed source graph), B (automatic graph) and D
+   (annotation-name baseline) as the planned comparisons on the same cases and evidence budget.
+   Their shared minimal binder follows the first C result; graph preparation must not delay it.
+   Build additional graph inference, ASR repair, tracking or diarization only for an observed
+   failure or a concrete comparison. Preserve useful existing graph work for reuse and inspection.
+
+The representation records an interpretation; it does not prescribe how it must be inferred.
+Its existing layers are source anchors, local `PropositionChart` semantics, story entities and
+situations with contexts, recall units, and checked mapping records, with versioned JSON codecs
+and analysis exports. This is a project format, not a universal video/recall interchange standard.
+AMR/PENMAN is an optional adapter into `PropositionChart`; PropBank frames are optional annotations
+and numbered roles are frame-specific. Direct model extraction is another route. Document-level
+coreference, temporal and modal ideas have UMR influence, without a claim of UMR conformance.
+No new public schema, ontology or dependency is needed to test this direction.
+
+Keep participant-stated detail separate from system-inferred bindings. The model must preserve
+omissions, wrong roles, uncertainty, external content and reported/believed context rather than
+repair the recall to the canonical plot. Missing system evidence is not participant failure.
+Check source IDs, spans, types and target/context consistency deterministically; those checks
+cannot prove semantic truth. Model confidence and agent agreement are not calibration. Outputs
+remain experimental proposals under rule 13; production acceptance still follows existing ADRs.
+
+**Keep the process proportional.** Reuse the frozen packet, one result table and the existing
+review/check rules. A new prerequisite must name the observed failure or specific correctness
+question it resolves; otherwise record it as a non-blocking follow-up. No separate review round
+for each planning detail, new ADR for ordinary prompt changes, or full Scala gate for this docs
+amendment. New public vocabulary and production-policy changes still follow the standing rules.
+The next deliverable is measured baseline performance, not another infrastructure milestone.
 
 ## Measured population
 
@@ -183,10 +232,11 @@ words/minute, the first complete transcript pass takes roughly 12.5–24.9 minut
 planning assumptions, not measured throughput or a promise that 30 suitable decisions exist.
 Record actual time for the first review batch before committing to the full budget.
 
-Add source playback, source-only graph annotation, vocabulary classification, exact anchor
-checking and disagreement adjudication from Claude's scene-cost inventory. The 306 lexical
-matches neither predict 306 decisions nor bound the total review burden. The next owner-facing
-cost estimate should use the chosen scene manifest and actual first-batch rate.
+Add source playback, vocabulary classification, exact anchor checking and disagreement
+adjudication from Claude's scene-cost inventory. Budget source-only graph annotation separately
+for A; it does not delay C. The 306 lexical matches neither predict 306 decisions nor bound the
+total review burden. The next owner-facing cost estimate should use the chosen scene manifest
+and actual first-batch rate.
 
 ## Experimental adapter and binder contract
 
@@ -263,12 +313,15 @@ designed controls must never share a denominator. Small, clustered observations 
 a population precision rate. The same error gate applies to every arm and any repair. Select
 among passing arms by correct attribution at equal error, then effort, cost and reuse.
 
-If A fails, inspect the failed stage and allow one targeted seam repair before the untouched
-confirmation run. A confirmation failure stops or reframes the approach; it does not spawn an
-unbounded series of infrastructure slices. If B loses through absent discourse referents, test
-an evidence-citing scene entity inventory/coreference repair first. ASR, tracking and diarization
-are justified only by measured failures that require them. If C wins under the same error gate,
-that selects a comparative follow-up, not automatic production adoption.
+Start discovery with C, then use A/B/D to compare and identify failures. Select the candidate
+using the same gate and tie-breakers above, without inspecting confirmation outputs or labels.
+Allow one targeted repair to the selected approach based on discovery evidence, then fix it for
+the untouched confirmation run. A confirmation failure stops or reframes the approach; it does
+not spawn an unbounded series of infrastructure slices. If B loses through absent discourse
+referents, test an evidence-citing scene entity inventory/coreference repair first. ASR, tracking
+and diarization are justified only by measured failures that require them. If C wins, carry the
+direct approach forward and narrow S3d/S5 to demonstrated needs; production adoption still needs
+the applicable policy decision. A failing A alone cannot veto a passing C.
 
 The motivating body/identity diagnostic and paired negatives remain a named witness. If human
 review finds it resolvable, we cannot claim the issue solved while it remains unresolved. If the
@@ -280,9 +333,10 @@ Rename every relevant text input and label consistently across compared arms; sc
 on original names. Renaming does not uniquely test plot memorization and does not replace a
 new-film evaluation.
 
-Next: reconcile the two feasibility halves, choose the qualified human reviewer, complete the
-blind reference census and source-only annotations, seal source scope/costs and confirmation
-custody, then commission the bounded experimental binder/comparison. New spend, participant-data
-routing and production policy amendments remain owner decisions when concrete. The existing
+Next: choose the qualified human reviewer, complete the blind reference census, seal source
+scope/costs and confirmation custody, then run the bounded direct baseline through the existing
+S5/S6 work items. Source-only graph annotation and the shared A/B/D binder follow for comparison.
+Apply existing owner authorizations for scope/spend; resolve any remaining concrete budget, data
+routing or production-policy decision before its dependent action. The existing
 constraint on new paid model runs before S0/S1 land remains. No new model calls were made for
 this packet.
