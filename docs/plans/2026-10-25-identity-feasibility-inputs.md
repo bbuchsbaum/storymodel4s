@@ -25,24 +25,45 @@ The records are those the connected assessor consumed in `connected-main-03/requ
 | Record clock maps to the graph's edition (section 2) | `docs/data/sherlock/timebase-repair.json`, `annotationToPlaybackCrosswalk` `annotation-raw-to-part-playback-v1` (status established): run-1 maps to `media-part-a`, run-2 to `media-part-b`, both identity. All 111 ASR records' start and end equal their segment's `source_media` times, which confirms the mapping on this data | Established; the reader's part argument must be passed through this declared table, not inferred from names |
 | Record times are whole ticks (section 2) | All 858 start and end values are whole 1/44100 s ticks, and none is reversed. They are serialized as JSON floats, and the reader refuses floats | The caller parses with `parse_float=Decimal` |
 | Long decoder segments | 8 of the 111 ASR records lie in segments longer than 30 s, which ADR 0027 section 2 refuses | Those records' speech handles stay unbound |
-| One modality per record (section 3) | A `manual-annotation` row carries both a description and a speaker, so under ADR 0028 it is a mixed record and is refused. That is 159 of the 429 records | **Open for the adapter specification (Codex half):** split each row into a picture part and a speech part for arm A, or leave it out |
+| One modality per record (section 3) | A `manual-annotation` row carries both a description and a speaker, so under ADR 0028 it is a mixed record and is refused. That is 159 of the 429 records | **Decided in the adapter specification (Codex half):** manual annotation stays annotation-origin evidence. A mixed row is not split into a visual observation. Source-field-qualified anchors (column, exact extent and producer mapping) may be materialized only where provenance supports the decomposition; otherwise the row stays mixed and unbound |
 
 ## 2. The recall timing convention
 
-**Established as the Princeton clock.**
-- **Receipt:** `docs/plans/2026-09-02-gold-scene-preregistration.md` section 2. The
-  `Recall_Scene_n50_Onsets` file (sha256 `68cc307c…3753`) gives TR indices at 1.5 s on the Princeton
-  clock. This was fixed by last-offset against last-word agreement for 15 of 16 subjects. The
-  section 3 table maps gold subject 3 to NN03.
-- **My independent NN03 check:**
-  - NN03's last coded offset is TR 713 (1069.5 s), which equals the Princeton maximum TR of 713. It
-    is 1.1 s after the last Princeton word onset.
-  - The OpenNeuro clock gives a maximum TR of 718 and a last word 6.4 s *after* the coded end, which
-    is inconsistent.
-  - The Princeton TR equals floor(onset / 1.5) + 1 for all 2,495 words.
-- **Consequence:** items may be selected through the Princeton TR column. The watch-scene file
-  restarts its numbering per part, so a global scene id is 27 plus the Part2 scene number. Watch TRs
-  are local to each part, so the annotation's continuous TR minus 946 gives the part-b local TR.
+**Clock: the Princeton clock. Index origin: not established beyond plus or minus one TR.**
+
+**Receipt.** `docs/plans/2026-09-02-gold-scene-preregistration.md` section 2 says the
+`Recall_Scene_n50_Onsets` file (sha256 `68cc307c…3753`) gives TR indices at 1.5 s on the Princeton
+clock. This was fixed by comparing the last coded offset times 1.5 with the last Princeton word
+onset, which agrees for 15 of 16 subjects. Its section 3 table maps gold subject 3 to NN03.
+
+**My independent NN03 check:**
+- The last coded offset is TR 713. With 1-based TRs covering [(n-1)·1.5, n·1.5), it ends at
+  1069.5 s, 1.1 s after the last Princeton word onset (1068.4 s). The Princeton maximum TR is also
+  713.
+- The OpenNeuro clock gives a maximum TR of 718 and a last word 6.4 s after the coded end, which is
+  inconsistent. So the clock is Princeton.
+- The CSV's Princeton TR equals floor(onset / 1.5) + 1 for all 2,495 words.
+
+**Index origin.** The data do not settle whether Onset and Offset are 1-based TR indices, covering
+[(n-1)·1.5, n·1.5), or 0-based ones covering [n·1.5, (n+1)·1.5). The NN03 evidence points both ways:
+- The first coded onset (TR 6) falls exactly on the first word (9.0 s) under the 0-based reading.
+- The last coded offset (TR 713) contains the last word under the 1-based reading.
+- 40 words fall outside every coded interval under 1-based, and 43 under 0-based. NN03's 33
+  intervals tile, apart from 2 gaps.
+
+The two origins differ on 98 of 2,495 words (3.9%), including 7 of 257 pronoun or person-noun tokens
+(`tr-origin-sensitivity.json`).
+
+**Declared rule:**
+- **Nomination** uses the CSV's 1-based Princeton TR column within [Onset, Offset], inclusive. It
+  matches the CSV's own TR numbering.
+- **The 98 boundary words** are flagged, kept in the population, and reported under both origins.
+- **No inclusion or selection rule may depend on a boundary word's scene.** Scene membership only
+  nominates a review window; it never decides a reference (see the population half).
+
+**Part-local watch TRs.** The watch-scene file restarts its numbering per part, so a global scene id
+is 27 plus the Part2 scene number. Watch TRs are local to each part, so the annotation's continuous
+TR minus 946 gives the part-b local TR.
 
 ## 3. Scope cost: the scenes NN03 recalls
 
