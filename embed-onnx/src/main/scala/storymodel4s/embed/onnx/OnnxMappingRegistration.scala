@@ -59,7 +59,8 @@ object OnnxMappingRegistration:
         externalMismatch: Double = 0.5,
         missingSemantic: Double = 0.5,
         distortionPenalty: Double = 0.3,
-        selectedLevel: Option[Int] = None
+        selectedLevel: Option[Int] = None,
+        contentPolicy: ContentCostPolicy = ContentCostPolicy.HistoricalV1
     ): Either[OnnxMappingRefusal, Config] =
       if metric != EmbeddingMetric.HalfCosineDistance then Left(OnnxMappingRefusal.StrictMetric)
       else if selectedLevel.exists(_ < 0) then Left(OnnxMappingRefusal.Configuration)
@@ -72,7 +73,8 @@ object OnnxMappingRegistration:
             externalFloor,
             externalMismatch,
             missingSemantic,
-            distortionPenalty
+            distortionPenalty,
+            contentPolicy = contentPolicy
           )
           .left
           .map(OnnxMappingRefusal.Pricing.apply)
@@ -357,7 +359,8 @@ object OnnxMappingRegistration:
             p.externalMismatch,
             p.missingSemantic,
             p.distortionPenalty,
-            Some(session)
+            Some(session),
+            contentPolicy = p.contentPolicy
           )
           .left
           .map(OnnxMappingRefusal.Pricing.apply)
@@ -388,5 +391,6 @@ object OnnxMappingRegistration:
       model.externalFloor,
       model.externalMismatch,
       model.missingSemantic,
-      model.distortionPenalty
+      model.distortionPenalty,
+      model.contentPolicy
     )

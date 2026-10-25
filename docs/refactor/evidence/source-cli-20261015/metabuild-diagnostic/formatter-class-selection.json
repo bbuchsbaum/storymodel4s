@@ -1,0 +1,13 @@
+{
+  "artifact": "io.github.alexarchambault:is-terminal:0.1.1",
+  "sha256": "73735b053b01ff47b53d28ab2d9b23fd86447f6fb6463dd462258067ad6ad3fa",
+  "multiRelease": true,
+  "baseClassMajor": 52,
+  "versions22ClassMajor": 67,
+  "observedJdk22MaximumClassMajor": 66,
+  "observedFailure": "UnsupportedClassVersionError for io/github/alexarchambault/isterminal/IsTerminal during formatter dependency loading",
+  "jdk17And21Selection": "Java 8 base class, inspected with javap --multi-release; no fresh formatter execution on those JDKs",
+  "jdk25FormattingExit": 0,
+  "reviewer": "/root/workflow_audit",
+  "ciChange": "none"
+}

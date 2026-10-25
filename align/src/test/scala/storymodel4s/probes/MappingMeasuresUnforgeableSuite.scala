@@ -4,6 +4,26 @@ import munit.FunSuite
 import scala.compiletime.testing.typeCheckErrors
 import storymodel4s.align.*
 
+/** A public same-shape witness isolates visibility failures from argument/type errors. */
+final case class NormalizedMassControl(
+    universe: TargetUniverseId,
+    prior: ReferencePriorId,
+    temperature: Double,
+    mass: Map[Destination, Double],
+    stage: StageEntryId,
+    population: NormalizationPopulation
+)
+
+object NormalizedMassControl:
+  def fromProduct(p: Product): NormalizedMassControl = NormalizedMassControl(
+    p.productElement(0).asInstanceOf[TargetUniverseId],
+    p.productElement(1).asInstanceOf[ReferencePriorId],
+    p.productElement(2).asInstanceOf[Double],
+    p.productElement(3).asInstanceOf[Map[Destination, Double]],
+    p.productElement(4).asInstanceOf[StageEntryId],
+    p.productElement(5).asInstanceOf[NormalizationPopulation]
+  )
+
 class MappingMeasuresUnforgeableSuite extends FunSuite:
   private val dependencies = Vector(
     classOf[DerivationBinding],
@@ -125,7 +145,7 @@ class MappingMeasuresUnforgeableSuite extends FunSuite:
     )
     assert(
       typeCheckErrors(
-        """import storymodel4s.align.*; import storymodel4s.core.*; import storymodel4s.recall.*; import storymodel4s.recall.RecallGraphStatus.Checked; import cats.data.*; new NormalizedScoreMass(??? : TargetUniverseId, ??? : ReferencePriorId, 1.0, Map.empty, ??? : StageEntryId)"""
+        """import storymodel4s.align.*; import storymodel4s.core.*; import storymodel4s.recall.*; import storymodel4s.recall.RecallGraphStatus.Checked; import cats.data.*; new NormalizedScoreMass(??? : TargetUniverseId, ??? : ReferencePriorId, 1.0, Map.empty, ??? : StageEntryId, NormalizationPopulation.SuppliedDestinations)"""
       ).nonEmpty
     )
     assert(
@@ -355,4 +375,47 @@ class MappingMeasuresUnforgeableSuite extends FunSuite:
         """import storymodel4s.align.*; import storymodel4s.core.*; import storymodel4s.recall.*; import storymodel4s.recall.RecallGraphStatus.Checked; import cats.data.*; summon[scala.deriving.Mirror.ProductOf[CalibratedProbability]]"""
       ).nonEmpty
     )
+  }
+
+  inline val massImports =
+    "import storymodel4s.align.*; import storymodel4s.probes.*; import scala.deriving.Mirror; "
+  inline val massArguments =
+    "((??? : TargetUniverseId), (??? : ReferencePriorId), 1.0, Map.empty, (??? : StageEntryId), NormalizationPopulation.AdmittedSourceTargets)"
+
+  test("normalized population constructor and apply have same-shape public controls") {
+    assertEquals(typeCheckErrors(massImports + "new NormalizedMassControl" + massArguments), Nil)
+    assert(typeCheckErrors(massImports + "new NormalizedScoreMass" + massArguments).nonEmpty)
+    assertEquals(typeCheckErrors(massImports + "NormalizedMassControl" + massArguments), Nil)
+    assert(typeCheckErrors(massImports + "NormalizedScoreMass" + massArguments).nonEmpty)
+  }
+  test("normalized population copy has a same-shape public control") {
+    assertEquals(
+      typeCheckErrors(
+        massImports + "(??? : NormalizedMassControl).copy(population = NormalizationPopulation.SuppliedDestinations)"
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        massImports + "(??? : NormalizedScoreMass).copy(population = NormalizationPopulation.SuppliedDestinations)"
+      ).nonEmpty
+    )
+  }
+  test("normalized population fromProduct has a same-shape public control") {
+    assertEquals(
+      typeCheckErrors(massImports + "NormalizedMassControl.fromProduct(" + massArguments + ")"),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        massImports + "NormalizedScoreMass.fromProduct(" + massArguments + ")"
+      ).nonEmpty
+    )
+  }
+  test("normalized population Mirror has a same-shape public control") {
+    assertEquals(
+      typeCheckErrors(massImports + "summon[Mirror.ProductOf[NormalizedMassControl]]"),
+      Nil
+    )
+    assert(typeCheckErrors(massImports + "summon[Mirror.ProductOf[NormalizedScoreMass]]").nonEmpty)
   }

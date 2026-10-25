@@ -533,15 +533,16 @@ final class CostBreakdown private (
     val reductions: Map[CostTerm, StructuralReductionReceipt],
     /** How much of the evidence this record's cost could rest on was measured.
       *
-      * `total` is scaled up to eligible support, which assumes the unmeasured eligible terms behave
-      * like the measured ones. [[SupportAssessment.Assessed]] names that assumption: a share below
-      * `1.0` says how much of the cost is extrapolation. The share is exactly `1.0` when every
-      * eligible term was measured, but it can also ROUND to `1.0` when the unmeasured eligible
-      * weight is below the denominator's precision, so whether anything was assumed is answered by
-      * the basis (measured versus eligible terms), not by the number. A consumer comparing costs
-      * across cells with different support is comparing claims of different strength, and this is
-      * what lets it notice — or refuse. A cell with no denominator is
-      * [[SupportAssessment.Unestablished]], and an external or unreachable record is
+      * Historical `total` is scaled up to eligible support, which assumes the unmeasured eligible
+      * terms behave like the measured ones. [[SupportAssessment.Assessed]] names that assumption: a
+      * share below `1.0` says how much of the cost is extrapolation. The share is exactly `1.0`
+      * when every eligible term was measured, but it can also ROUND to `1.0` when the unmeasured
+      * eligible weight is below the denominator's precision, so whether anything was assumed is
+      * answered by the basis (measured versus eligible terms), not by the number. A consumer
+      * comparing costs across cells with different support is comparing claims of different
+      * strength, and this is what lets it notice — or refuse. MeasuredSemanticV1 uses only the
+      * observed semantic distance and performs no support extrapolation. A cell with no denominator
+      * is [[SupportAssessment.Unestablished]], and an external or unreachable record is
       * [[SupportAssessment.NotApplicable]]: neither carries a number, so neither can be sorted
       * above a cell that measured something.
       */
@@ -707,7 +708,8 @@ object CostBreakdown:
       eligible: Set[CostTerm],
       weights: CostWeights,
       total: => Double,
-      providerOutcomes: Map[CostTerm, Estimate[Double]] = Map.empty
+      providerOutcomes: Map[CostTerm, Estimate[Double]] = Map.empty,
+      requireMeasurement: Boolean = false
   ): Either[AlignError, CostBreakdown] =
     val basis =
       CellSupportBasis.fromWeights(terms.keySet -- imputedTerms.keySet, eligible, weights)
@@ -719,7 +721,7 @@ object CostBreakdown:
       case assessed: SupportAssessment.Assessed     => assessed.share <= 0.0
       case missing: SupportAssessment.Unestablished =>
         lostPositiveWeight && missing.reason == SupportUnestablishedReason.ZeroEligibleWeight
-    if unassessable then
+    if unassessable || (requireMeasurement && !(basis.measuredWeight > 0.0)) then
       checked(
         Map.empty,
         None,

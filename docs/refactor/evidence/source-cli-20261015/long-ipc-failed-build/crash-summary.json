@@ -1,0 +1,33 @@
+{
+  "signal": "SIGTRAP",
+  "termination": "Trace/BPT trap: 5",
+  "applicationSpecificInformation": {
+    "libsystem_c.dylib": [
+      "detected buffer overflow"
+    ]
+  },
+  "triggeredFrames": [
+    {
+      "symbol": "__chk_fail_overflow",
+      "offset": 24
+    },
+    {
+      "symbol": "__memcpy_chk",
+      "offset": 40
+    },
+    {
+      "symbol": "Java_org_scalasbt_ipcsocket_JNIUnixDomainSocketLibraryProvider_bindNative",
+      "offset": 140
+    },
+    {
+      "symbol": null,
+      "offset": null
+    },
+    {
+      "symbol": null,
+      "offset": null
+    }
+  ],
+  "sourceDiagnosticFile": "java-2026-10-15-205556.ips",
+  "interpretation": "SIGTRAP in sbt IPC bind; BootServerSocket uses XDG_RUNTIME_DIR or java.io.tmpdir for a sockaddr_un path. Retry changes only IPC root to a short private directory."
+}

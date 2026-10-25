@@ -1,0 +1,14 @@
+{
+  "mutation": "Restore exact legacy main and its imports from3f9a3e12; removes retired-route refusal",
+  "compiled": true,
+  "exit": 1,
+  "tests": 2,
+  "failed": 1,
+  "passed": 1,
+  "namedFailure": "test_legacy_entrypoint_refuses_before_gold_or_prediction_reads",
+  "assertion": "unexpected gold read",
+  "originalSourceSha256": "80674b771602ef77472122cd8973478e37b090ae163461cd9a831d369d5151a5",
+  "mutantSha256": "16a245ac03ebaea958071e0340386f64f3497867fdac5d30000e176a48661238",
+  "logSha256": "ab1a1990cddfc34d7830f2ea790cc3266eedf4d86c69aff6120a8850c0464714",
+  "dataRead": "None; gold reader replaced by named failing spy; only synthetic import metadata loaded."
+}

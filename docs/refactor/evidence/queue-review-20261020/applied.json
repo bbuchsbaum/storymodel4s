@@ -1,0 +1,395 @@
+{
+  "sets_sha256": "f5c1911cc56050756e1d213741b4a220c5f4eb29483850acf9e1df6a14ae9e9d",
+  "batch_sha256": "35d87f1cc4d3b829a9b6d45195df63290f4f729c7eb22cbf514adf0054d07d3f",
+  "commands": [
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TAMJ95K9D7H248A8387YW4",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M3DED3GT9S8RB2JSPA68B7ZB",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M4YP83C7925M22V0K5AQ88BX",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M50K0WR735JQWF6FZKY85C6E",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M50K8E8KMRGY0MYXJRT0SZ8G",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M50K95JAQB34R876FWMV85J0",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M50K9WYM4TQSX106M7Q2YAF4",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M50KAP8CB5MMBQE3BX4RQ2PF",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M5DAFJ2M42RNRC6T1TWFBFNE",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M5DAG1ZBER090DC52PB19CPH",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M5DAGPJTNF8FFNPPWF7P3XDC",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M5DAH6B093N2WZCNZ160JMJ6",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TA0G1VSRQ992HJFWP13ZCM",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TA0X79Y4BQZP0B6AT919C9",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TAKTB61XNXV4Y6A9J3CB0C",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M35P2EKWC52PZTMN2R5NMDFR",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M4EA3TVCGSVSA114DQX9588N",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M50KBFT26DRB77VFHPRHYNA2",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M527J6FFT2XMK50MGVREB7CF",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M17JFDHKHPD6N6JWA7NCMM4A",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M1836WDBB72KXXPKG23PSSWT",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M184XP908JX51S3ZYFX20HC7",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TA19PH7GDT1Q2WXEKD6RE2",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TA8VM5B6XQWR6CVH25HB7V",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M2TAJABHFWN5ZDYNST15Y9G5",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "set",
+        "bd-01M37C6V3SXA33Z255HFK3GAZ3",
+        "fields bound by planned-sets.json"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mote",
+        "--actor",
+        "codex-queue-review",
+        "batch",
+        "planned-batch.jsonl"
+      ],
+      "exit": 0,
+      "stdout": "accepted tag_add entity=bd-01M50K95JAQB34R876FWMV85J0 parent=- kind=queue-next-20261020 op=20261021T022358.921875Z-p77367-c0000-r1729-hef9126\naccepted tag_add entity=bd-01M50K9WYM4TQSX106M7Q2YAF4 parent=- kind=queue-next-20261020 op=20261021T022404.802909Z-p77367-c0001-r8115-h31b960\naccepted tag_add entity=bd-01M50KAP8CB5MMBQE3BX4RQ2PF parent=- kind=queue-next-20261020 op=20261021T022410.693078Z-p77367-c0002-r43f6-hffc20d\naccepted tag_add entity=bd-01M4EA3TVCGSVSA114DQX9588N parent=- kind=queue-next-20261020 op=20261021T022416.600096Z-p77367-c0003-ra28d-hba3b51\naccepted dep_add entity=bd-01M50KBFT26DRB77VFHPRHYNA2 parent=bd-01M2TA0X79Y4BQZP0B6AT919C9 kind=blocks op=20261021T022422.446354Z-p77367-c0004-rdfdd-haf71e5\naccepted rel_add entity=bd-01M5E3J13V6CVABAMCRC69AG07 parent=bd-01M2TA01EHVRF6MQ1N00XTVK1K kind=parent op=20261021T022428.322952Z-p77367-c0005-r48d1-h92a10a\naccepted note entity=bd-01M5E33RPWBT8NAGKCKJMMN6FN parent=- kind=- op=20261021T022434.239173Z-p77367-c0006-r9d3d-hf5e021\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "storymodel4s-source-pins/v1",
+  "sources": [
+    {
+      "name": "grakern",
+      "url": "https://github.com/canardlapin/grakern.git",
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "declaredBy": "storymodel4s",
+      "variable": "grakernRevision"
+    },
+    {
+      "name": "graph4s",
+      "url": "https://github.com/canardlapin/graph4s.git",
+      "revision": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "declaredBy": "grakern",
+      "variable": "Graph4sRevision"
+    },
+    {
+      "name": "gale",
+      "url": "https://github.com/canardlapin/gale.git",
+      "revision": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "declaredBy": "grakern",
+      "variable": "GaleRevision"
+    }
+  ]
+}

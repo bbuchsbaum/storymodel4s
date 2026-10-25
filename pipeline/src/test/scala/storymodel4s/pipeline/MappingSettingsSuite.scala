@@ -191,3 +191,35 @@ class MappingSettingsSuite extends FunSuite:
     variants.foreach(v => assert(MappingSettings.decode(v, root).isLeft))
     assert(MappingSettings.decode(MappingCli.Template, root).isRight)
   }
+
+  test("ordinary source-reference ONNX configuration reaches measured conditional producer") {
+    val root = inputs()
+    val text = changed(
+      _.mapObject(
+        _.add("profile", Json.fromString(MappingPipeline.OnnxSourceProfile))
+          .add("mode", Json.fromString("reference-only"))
+      )
+    )
+    val settings = right(MappingSettings.decode(text, root))
+    val batch = right(settings.executeReference(prepared(root), OnnxMappingFixture.model(32)))
+    val run = batch.outcomes.head.run.getOrElse(fail(batch.outcomes.head.failure.toString))
+    assertEquals(
+      run.onnx.get.pricing.contentPolicy,
+      storymodel4s.align.ContentCostPolicy.MeasuredSemanticV1
+    )
+    assertEquals(
+      run.execution.reference.profile.population,
+      storymodel4s.align.NormalizationPopulation.AdmittedSourceTargets
+    )
+  }
+
+  test("source-reference profiles refuse paired or omitted mode before provider execution") {
+    val root = inputs()
+    val omitted =
+      changed(_.mapObject(_.add("profile", Json.fromString(MappingPipeline.OnnxSourceProfile))))
+    val paired = right(io.circe.parser.parse(omitted))
+      .mapObject(_.add("mode", Json.fromString("paired")))
+      .noSpaces
+    assert(MappingSettings.decode(omitted, root).isLeft)
+    assert(MappingSettings.decode(paired, root).isLeft)
+  }

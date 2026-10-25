@@ -1,0 +1,14 @@
+{
+  "sourceSha256": "361d424518550b9f3bb3fe3076051116c925011842f0f29e4ecb96b865ca4a22",
+  "mutation": "assert Counter(embedded) == Counter(legal), \"embedded notice inventory differs\" => assert True",
+  "compiled": true,
+  "exit": 1,
+  "tests": 15,
+  "failingNamedTests": [
+    "test_omitted_embedded_notice_refuses_for_every_origin",
+    "test_duplicate_embedded_association_refuses_for_every_origin"
+  ],
+  "failingSubtests": 4,
+  "passingSiblings": 13,
+  "logSha256": "b7c7a8a6e3fd27926468b0374538f304915ccdf13741ed78f79a12980498c4ae"
+}

@@ -1,0 +1,24 @@
+{
+  "purpose": "diagnostic-only; uncommitted build files over e5bd6aed",
+  "inputs": {
+    "project/CliDistribution.scala": "29e2637986ad53589f58b06ba8701356e15f2488a68d2658015d994e5affb30e",
+    "build.sbt": "a7f6996cdab2c6b79f7584ebecdc2b7dd520c806b1f79614c2a1d2108be238bc"
+  },
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-Xmx4G",
+    "-J-XX:ActiveProcessorCount=4",
+    "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/tmp",
+    "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/boot",
+    "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/global",
+    "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/staging",
+    "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/ivy",
+    "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/repositories",
+    "-Dsbt.override.build.repos=true",
+    "scalafmtSbt",
+    "githubWorkflowGenerate"
+  ],
+  "exit": 1,
+  "logSha256": "4c3f231136da7ee22e276a6ef6cde0791e1ee86c58067a0cd6f08607f9de01e7"
+}

@@ -1,0 +1,68 @@
+docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.patch:6: trailing whitespace.
++ 
+docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.patch:9: trailing whitespace.
++ 
+docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.patch:13: trailing whitespace.
++ 
+docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.patch:14: trailing whitespace.
++ 
+docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.patch:83: trailing whitespace.
++ 
+docs/refactor/evidence/decision-confidence-20261015/restored-entrypoint-mutation.patch:84: trailing whitespace.
++ 
+tools/release/licenses/anthropic-2.34.0.txt:8: new blank line at EOF.
+tools/release/licenses/cats-collections-0.9.10.txt:8: trailing whitespace.
++so, subject to the following conditions: 
+tools/release/licenses/cats-collections-0.9.10.txt:11: trailing whitespace.
++copies or substantial portions of the Software. 
+tools/release/licenses/cats-collections-0.9.10.txt:19: trailing whitespace.
++SOFTWARE. 
+tools/release/licenses/slf4j-2.0.17.txt:1: trailing whitespace.
++Copyright (c) 2004-2022 QOS.ch Sarl (Switzerland)
+tools/release/licenses/slf4j-2.0.17.txt:2: trailing whitespace.
++All rights reserved.
+tools/release/licenses/slf4j-2.0.17.txt:3: trailing whitespace.
++
+tools/release/licenses/slf4j-2.0.17.txt:4: trailing whitespace.
++Permission is hereby granted, free  of charge, to any person obtaining
+tools/release/licenses/slf4j-2.0.17.txt:5: trailing whitespace.
++a  copy  of this  software  and  associated  documentation files  (the
+tools/release/licenses/slf4j-2.0.17.txt:6: trailing whitespace.
++"Software"), to  deal in  the Software without  restriction, including
+tools/release/licenses/slf4j-2.0.17.txt:7: trailing whitespace.
++without limitation  the rights to  use, copy, modify,  merge, publish,
+tools/release/licenses/slf4j-2.0.17.txt:8: trailing whitespace.
++distribute,  sublicense, and/or sell  copies of  the Software,  and to
+tools/release/licenses/slf4j-2.0.17.txt:9: trailing whitespace.
++permit persons to whom the Software  is furnished to do so, subject to
+tools/release/licenses/slf4j-2.0.17.txt:10: trailing whitespace.
++the following conditions:
+tools/release/licenses/slf4j-2.0.17.txt:11: trailing whitespace.
++
+tools/release/licenses/slf4j-2.0.17.txt:12: trailing whitespace.
++The  above  copyright  notice  and  this permission  notice  shall  be
+tools/release/licenses/slf4j-2.0.17.txt:13: trailing whitespace.
++included in all copies or substantial portions of the Software.
+tools/release/licenses/slf4j-2.0.17.txt:14: trailing whitespace.
++
+tools/release/licenses/slf4j-2.0.17.txt:15: trailing whitespace.
++THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
+tools/release/licenses/slf4j-2.0.17.txt:16: trailing whitespace.
++EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
+tools/release/licenses/slf4j-2.0.17.txt:17: trailing whitespace.
++MERCHANTABILITY,    FITNESS    FOR    A   PARTICULAR    PURPOSE    AND
+tools/release/licenses/slf4j-2.0.17.txt:18: trailing whitespace.
++NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+tools/release/licenses/slf4j-2.0.17.txt:19: trailing whitespace.
++LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+tools/release/licenses/slf4j-2.0.17.txt:20: trailing whitespace.
++OF CONTRACT, TORT OR OTHERWISE,  ARISING FROM, OUT OF OR IN CONNECTION
+tools/release/licenses/slf4j-2.0.17.txt:21: trailing whitespace.
++WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+tools/release/licenses/slf4j-2.0.17.txt:22: trailing whitespace.
++
+tools/release/licenses/slf4j-2.0.17.txt:23: trailing whitespace.
++
+tools/release/licenses/slf4j-2.0.17.txt:24: trailing whitespace.
++
+tools/release/licenses/slf4j-2.0.17.txt:22: new blank line at EOF.

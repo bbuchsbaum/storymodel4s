@@ -1,0 +1,35 @@
+{
+  "coordinate": "com.standardwebhooks:standardwebhooks:1.1.0",
+  "commit": "b57537b4939afb932bccfed18d6853ec6b6f0d81",
+  "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/b57537b4939afb932bccfed18d6853ec6b6f0d81/libraries/LICENSE",
+  "sourceArchiveUrl": "https://repo.maven.apache.org/maven2/com/standardwebhooks/standardwebhooks/1.1.0/standardwebhooks-1.1.0-sources.jar",
+  "sourceArchiveSha256": "9e0773b1165133c326a0d1b0601caf2c8cfdfb3b586f5d7accb858d7d2c952ac",
+  "sourceMatches": [
+    {
+      "path": "com/standardwebhooks/exceptions/WebhookVerificationException.java",
+      "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/b57537b4939afb932bccfed18d6853ec6b6f0d81/libraries/java/src/main/java/com/standardwebhooks/exceptions/WebhookVerificationException.java",
+      "matches": true,
+      "sha256": "fb5c7fa3a358b73585723e57db60a0658794734a11b555cf2c4b3e9030870d1a"
+    },
+    {
+      "path": "com/standardwebhooks/exceptions/WebhookSigningException.java",
+      "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/b57537b4939afb932bccfed18d6853ec6b6f0d81/libraries/java/src/main/java/com/standardwebhooks/exceptions/WebhookSigningException.java",
+      "matches": true,
+      "sha256": "411aca53f51856254929248b570ba8d7894c3d2bc83ebcaa801f132db182bcda"
+    },
+    {
+      "path": "com/standardwebhooks/WebhookBase.java",
+      "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/b57537b4939afb932bccfed18d6853ec6b6f0d81/libraries/java/src/main/java/com/standardwebhooks/WebhookBase.java",
+      "matches": true,
+      "sha256": "f3fdeea6e2b87a0a060f2953935ab38ef8b52f305201a7ec7e11bb9ce129fe20"
+    },
+    {
+      "path": "com/standardwebhooks/Webhook.java",
+      "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/b57537b4939afb932bccfed18d6853ec6b6f0d81/libraries/java/src/main/java/com/standardwebhooks/Webhook.java",
+      "matches": true,
+      "sha256": "130a3d25b5ad0bfd6efe27e289395b33d46d2a60f40f634626da49abc8e4c676"
+    }
+  ],
+  "file": "standardwebhooks-1.1.0.txt",
+  "sha256": "5ec8c7b26b64d881a6706617bed25c049f97f2f35de034c756de8546fd6dbe27"
+}

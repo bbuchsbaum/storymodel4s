@@ -10,7 +10,7 @@ import storymodel4s.embed.onnx.{OnnxMappingRegistration, OnnxSentenceEmbedder}
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
-/** One offline execution boundary owns profiles, registrations and both published estimands. */
+/** One offline boundary owns registrations and the explicitly selected mapping estimands. */
 object MappingPipeline:
   private enum OrganizationOrigin:
     case Lexical, Captions, Onnx
@@ -34,11 +34,36 @@ object MappingPipeline:
       tieBudget: Int,
       requested: Vector[Capability],
       networkRequests: Int = 0,
-      retries: Int = 0
+      retries: Int = 0,
+      selectedLevel: Int = 0,
+      reconstructionProfile: Option[StructuredReconstruction.Profile] = None,
+      groupingRoots: Option[Vector[(SourceNodeRef, Int)]] = None
   )
   val LexicalProfile: String = "mapping-lexical-pair/v1"
   val OnnxProfile: String = "mapping-onnx-pair/v1"
   val CaptionProfile: String = "mapping-caption-pair/v1"
+  val LexicalSourceProfile: String = "mapping-lexical-source-reference/v1"
+  val OnnxSourceProfile: String = "mapping-onnx-source-reference/v1"
+  val CaptionSourceProfile: String = "mapping-caption-source-reference/v1"
+
+  private[pipeline] def sourceConditional(config: Config): Boolean =
+    Set(LexicalSourceProfile, OnnxSourceProfile, CaptionSourceProfile)(config.profile)
+  private def matchesProfile(actual: String, historical: String): Boolean =
+    actual == historical || (historical match
+      case LexicalProfile => actual == LexicalSourceProfile
+      case OnnxProfile    => actual == OnnxSourceProfile
+      case CaptionProfile => actual == CaptionSourceProfile
+      case _              => false)
+  private def contentPolicy(config: Config): ContentCostPolicy =
+    if sourceConditional(config) then ContentCostPolicy.MeasuredSemanticV1
+    else ContentCostPolicy.HistoricalV1
+  private def referenceProfile(
+      universe: DeclaredUniverse,
+      config: Config
+  ): Either[AlignError, LocalReference.Profile] =
+    if sourceConditional(config) then
+      LocalReference.Profile.sourceTargets(universe, config.temperature)
+    else LocalReference.Profile.of(universe, config.temperature)
 
   /** The facade mints this value by consuming its registration's actual originating evidence. */
   final class Run private[MappingPipeline] (
@@ -123,15 +148,15 @@ object MappingPipeline:
     else if request.level != run.execution.reference.profile.level then Left(Reason.WrongResolution)
     else
       val originMatches = run.organizationOrigin match
-        case OrganizationOrigin.Lexical  => run.config.profile == LexicalProfile
+        case OrganizationOrigin.Lexical  => matchesProfile(run.config.profile, LexicalProfile)
         case OrganizationOrigin.Captions =>
-          run.config.profile == CaptionProfile &&
+          matchesProfile(run.config.profile, CaptionProfile) &&
           run.caption
             .map(_.evidence)
             .orElse(run.captionPackage.map(_.produced.evidence))
             .contains(run.execution.reference.evidence)
         case OrganizationOrigin.Onnx =>
-          run.config.profile == OnnxProfile &&
+          matchesProfile(run.config.profile, OnnxProfile) &&
           run.onnx.exists(_.evidence == run.execution.reference.evidence)
       if !originMatches then Left(Reason.UnsupportedOrigin)
       else
@@ -211,23 +236,226 @@ object MappingPipeline:
             .map(stages => new Organization(run, request, computed, stages))
         }
 
-  private def configText(c: Config): String = Canonical.print(
-    Json.obj(
-      "profile" -> Json.fromString(c.profile),
-      "temperature" -> Json.fromString(c.temperature.toString),
-      "perLevel" -> Json.fromInt(c.perLevel),
-      "tieBudget" -> Json.fromInt(c.tieBudget),
-      "requested" -> Json.fromValues(c.requested.map(v => Json.fromString(v.toString))),
-      "networkRequests" -> Json.fromInt(c.networkRequests),
-      "retries" -> Json.fromInt(c.retries)
+  /** Only genuine registrations can publish a reference facade run and organization origin. */
+  final class ReferenceRun private[MappingPipeline] (
+      val execution: MappingRun.ReferenceExecution,
+      val reference: MappingResult,
+      val config: Config,
+      val registration: Checksum,
+      val caption: Option[CaptionMapping.Registered],
+      val onnx: Option[OnnxMappingRegistration.Registered],
+      val captionPackage: Option[CaptionMapping.PackageRegistered]
+  ):
+    private[MappingPipeline] val organizationOrigin: OrganizationOrigin =
+      if onnx.nonEmpty then OrganizationOrigin.Onnx
+      else if caption.nonEmpty || captionPackage.nonEmpty then OrganizationOrigin.Captions
+      else OrganizationOrigin.Lexical
+    val identity: Checksum = ContentAddress.digest(
+      Vector(
+        "mapping-pipeline-reference/v1",
+        registration.hex,
+        execution.identity.hex,
+        reference.digest.hex,
+        referenceConfigText(config)
+      )
+    )
+    override def equals(other: Any): Boolean = other match
+      case r: ReferenceRun => identity == r.identity
+      case _               => false
+    override def hashCode: Int = identity.hashCode
+    override def toString: String = s"ReferenceRun(${identity.short()})"
+
+  /** The genuine producer certifies only the exact reference member and original-unit readout. */
+  final class ReferenceOrganization private[MappingPipeline] (
+      val run: ReferenceRun,
+      val request: MeasurementCompatibility.Request,
+      val result: OrganizationReadout.Result,
+      val stages: Vector[StageReceipt]
+  ):
+    val verdict: MeasurementCompatibility.Verdict =
+      MeasurementCompatibility.Verdict.CompatibleWithDeclaredPolicy
+    val reasons: Vector[MeasurementCompatibility.Reason] =
+      Vector(MeasurementCompatibility.Reason.ExecutedIndependentContent)
+    val identity: Checksum = ContentAddress.digest(
+      Vector(
+        "pipeline-reference-organization/v1",
+        run.identity.hex,
+        run.execution.identity.hex,
+        run.reference.digest.hex,
+        request.digest.hex,
+        result.order.digest.hex
+      )
+    )
+    override def equals(other: Any): Boolean = other match
+      case o: ReferenceOrganization => identity == o.identity
+      case _                        => false
+    override def hashCode: Int = identity.hashCode
+    override def toString: String = s"Organization(${identity.short()}, $verdict)"
+
+  /** Provider declarations and unregistered numerical records cannot enter this producer door. */
+  def referenceOrganization(
+      run: ReferenceRun,
+      request: MeasurementCompatibility.Request
+  ): Either[MeasurementCompatibility.Reason, ReferenceOrganization] =
+    import cats.syntax.all.*
+    import MeasurementCompatibility.{Axis, Reason}
+    import OrganizationReadout.{Dependence, Order, Row}
+    if run.execution.reference.profile.population == NormalizationPopulation.AdmittedSourceTargets
+    then Left(Reason.ConditionalMeasureUnsupported)
+    else if request.organization != AnalysisGrain.InferenceUnit(
+        run.execution.inventory.segmentation
+      )
+    then Left(Reason.ForeignSegmentation)
+    else if request.level != run.execution.reference.profile.level then Left(Reason.WrongResolution)
+    else
+      val originMatches = run.organizationOrigin match
+        case OrganizationOrigin.Lexical  => matchesProfile(run.config.profile, LexicalProfile)
+        case OrganizationOrigin.Captions =>
+          matchesProfile(run.config.profile, CaptionProfile) &&
+          run.caption
+            .map(_.evidence)
+            .orElse(run.captionPackage.map(_.produced.evidence))
+            .contains(run.execution.reference.evidence)
+        case OrganizationOrigin.Onnx =>
+          matchesProfile(run.config.profile, OnnxProfile) &&
+          run.onnx.exists(_.evidence == run.execution.reference.evidence)
+      if !originMatches then Left(Reason.UnsupportedOrigin)
+      else
+        val view = run.execution.view
+        // This named axis uses declared discourse rank, never scoring-space midpoint or part ID.
+        val positions = run.execution.reference.profile.universe.targets.flatMap { ref =>
+          val position = request.axis match
+            case Axis.Discourse  => view.node(ref).map(_.discoursePosition.toDouble)
+            case Axis.StoryWorld => view.worldOrder.flatMap(_.get(ref)).map(_.toDouble)
+          position.map(ref -> _)
+        }
+        val result = for
+          order <- Order.onSource(positions, run.execution.source, request.axis)
+          rows <- run.reference.inventory.units.traverse { unit =>
+            run.reference.outcome(unit.id) match
+              case Some(outcome) if outcome.processing == ProcessingStatus.Complete =>
+                outcome.measures.normalized match
+                  case Some(m) => Row.of(unit.id, m.mass, m.mass.keys.toVector)
+                  case _       => Right(Row.unavailable(unit.id))
+              case Some(outcome) =>
+                Right(
+                  Row.unavailable(unit.id, outcome.processing.isInstanceOf[ProcessingStatus.Failed])
+                )
+              case _ => Right(Row.unavailable(unit.id, true))
+          }
+          result <- OrganizationReadout.compute(rows, order, Dependence.DeclaredIndependentRows)
+        yield result
+        result.left.map(_ => Reason.UnsupportedOrigin).flatMap { computed =>
+          Stage.values.toVector
+            .traverse { stage =>
+              val policy = stage match
+                case Stage.Candidates =>
+                  s"canonical-content/tie-complete/k=${run.config.perLevel}/budget=${run.config.tieBudget}"
+                case Stage.Rendering =>
+                  run.onnx.fold(s"canonical-content/${run.organizationOrigin}")(_.context.policy)
+                case Stage.Scoring =>
+                  s"checked-local-pricing/${run.organizationOrigin}/registration=${run.registration.hex}"
+                case Stage.Context    => "fixed-unit-content/no-neighbor-context"
+                case Stage.Refinement => "not-run/reference-no-refinement"
+                case Stage.Inference  =>
+                  s"independent-local-score-mass/${run.execution.reference.profile.fingerprint.hex}"
+                case Stage.Decision   => "raw-argmax-diagnostic/counts-consume-full-rows"
+                case Stage.Projection =>
+                  "original-inference-units/preserve-adjacencies/no-word-copy"
+              val provider = run.onnx.filter(_ => stage == Stage.Scoring) match
+                case Some(registration) =>
+                  ProviderIdentity
+                    .of(
+                      registration.queryRecord.provider.render + "/" + registration.documentRecord.provider.render,
+                      registration.queryRecord.model.modelId + "/" + registration.documentRecord.model.modelId,
+                      run.registration
+                    )
+                    .map(ProviderStatus.Identified(_))
+                case _ =>
+                  Right(
+                    ProviderStatus.NotApplicable(
+                      "deterministic stage; acquisition origin retained by pipeline registration"
+                    )
+                  )
+              provider.flatMap(p =>
+                StageReceipt.of(
+                  stage,
+                  policy,
+                  run.identity,
+                  Vector(
+                    run.registration,
+                    run.execution.reference.evidence.identity.checksum,
+                    run.reference.digest,
+                    request.digest
+                  ),
+                  p
+                )
+              )
+            }
+            .left
+            .map(_ => Reason.UnsupportedOrigin)
+            .map(stages => new ReferenceOrganization(run, request, computed, stages))
+        }
+
+  private def baseConfig(c: Config): Json = Json.obj(
+    "profile" -> Json.fromString(c.profile),
+    "temperature" -> Json.fromString(c.temperature.toString),
+    "perLevel" -> Json.fromInt(c.perLevel),
+    "tieBudget" -> Json.fromInt(c.tieBudget),
+    "requested" -> Json.fromValues(c.requested.map(v => Json.fromString(v.toString))),
+    "networkRequests" -> Json.fromInt(c.networkRequests),
+    "retries" -> Json.fromInt(c.retries)
+  )
+  private def referenceConfigText(c: Config): String = Canonical.print(
+    baseConfig(c).deepMerge(
+      Json.obj(
+        "mode" -> Json.fromString("reference-only"),
+        "selectionVersion" -> Json.fromString("mapping-reference-selection/v1"),
+        "selectedLevel" -> Json.fromInt(c.selectedLevel)
+      )
     )
   )
 
+  private def configText(c: Config): String =
+    val legacy = baseConfig(c)
+    Canonical.print(
+      if c.selectedLevel == 0 && c.reconstructionProfile.isEmpty && c.groupingRoots.isEmpty then
+        legacy
+      else
+        legacy.deepMerge(
+          Json.obj(
+            "selectionVersion" -> Json.fromString("mapping-selection/v1"),
+            "selectedLevel" -> Json.fromInt(c.selectedLevel),
+            "reconstruction" -> Json.fromString(
+              c.reconstructionProfile
+                .getOrElse(StructuredReconstruction.Profile.sherlock())
+                .fingerprint
+                .hex
+            ),
+            "grouping" -> c.groupingRoots.fold(Json.fromString("source-root-discourse-order"))(rs =>
+              Json.fromValues(
+                rs.map((ref, rank) => Json.arr(Json.fromString(ref.key), Json.fromInt(rank)))
+              )
+            )
+          )
+        )
+    )
+
   def validate(config: Config): Either[Refusal, Unit] = Either.cond(
-    Set(LexicalProfile, CaptionProfile, OnnxProfile)(
+    Set(
+      LexicalProfile,
+      CaptionProfile,
+      OnnxProfile,
+      LexicalSourceProfile,
+      CaptionSourceProfile,
+      OnnxSourceProfile
+    )(
       config.profile
     ) && config.temperature.isFinite &&
-      config.temperature > 0 && config.perLevel > 0 && config.tieBudget >= config.perLevel &&
+      config.temperature > 0 && config.selectedLevel >= 0 &&
+      config.reconstructionProfile.forall(
+        _.decision.fill == StructuredReconstruction.FillPolicy.Disabled
+      ) && config.perLevel > 0 && config.tieBudget >= config.perLevel &&
       config.networkRequests == 0 && config.retries == 0 &&
       config.requested.nonEmpty && config.requested.distinct.size == config.requested.size,
     (),
@@ -240,21 +468,26 @@ object MappingPipeline:
       .left
       .map(e => Refusal.Alignment(AlignError.InvalidConfig("candidates", e.message)))
 
-  /** Local annotation scoring is executed here; supplied score tables cannot acquire its identity.
-    */
-  def lexical(
+  private def lexicalEvidence(
       recall: RecallGraph[Checked],
       view: SourceView,
       inventory: RecallInventory,
       source: SourceRepresentation,
-      config: Config
-  ): Either[Refusal, Run] =
+      config: Config,
+      referenceOnly: Boolean
+  ): Either[Refusal, (LocalEvidence, Checksum)] =
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == LexicalProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, LexicalProfile), (), Refusal.InvalidConfig)
       candidatesConfig <- candidateConfig(config)
       candidates <- StrictCandidateGenerator
-        .canonicalLevel(StrictSemanticChannel.Lexical, candidatesConfig, recall, view, 0)
+        .canonicalLevel(
+          StrictSemanticChannel.Lexical,
+          candidatesConfig,
+          recall,
+          view,
+          config.selectedLevel
+        )
         .left
         .map(e => Refusal.Alignment(AlignError.InvalidConfig("candidates", e.message)))
       model <- StrictCostModel
@@ -263,7 +496,8 @@ object MappingPipeline:
           weights = CostWeights.semanticOnly,
           functionPrior = FunctionPrior.none,
           externalMismatch = 0.0,
-          distortionPenalty = 0.0
+          distortionPenalty = 0.0,
+          contentPolicy = contentPolicy(config)
         )
         .left
         .map(Refusal.Alignment(_))
@@ -273,15 +507,28 @@ object MappingPipeline:
         .map(Refusal.Alignment(_))
       registration = ContentAddress.digest(
         Vector(
-          "executed-canonical-lexical/v1",
+          if referenceOnly then "executed-canonical-lexical/reference/v1"
+          else "executed-canonical-lexical/v1",
           evidence.identity.checksum.hex,
           source.digest.hex,
           inventory.digest.hex,
-          configText(config)
+          if referenceOnly then referenceConfigText(config) else configText(config)
         )
       )
-      run <- execute(recall, view, inventory, source, evidence, config, registration, None, None)
-    yield run
+    yield evidence -> registration
+
+  /** Local annotation scoring is executed here; caller score tables grant no origin. */
+  def lexical(
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      inventory: RecallInventory,
+      source: SourceRepresentation,
+      config: Config
+  ): Either[Refusal, Run] =
+    lexicalEvidence(recall, view, inventory, source, config, referenceOnly = false).flatMap {
+      (evidence, registration) =>
+        execute(recall, view, inventory, source, evidence, config, registration, None, None)
+    }
 
   /** Consuming the registration itself prevents an unrelated genuine envelope being attached. */
   def captions(registration: CaptionMapping.Registered, config: Config): Either[Refusal, Run] =
@@ -289,10 +536,12 @@ object MappingPipeline:
     val session = produced.session
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        produced.config.perLevel == expected.perLevel &&
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel &&
           produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap &&
           produced.config.space == expected.space,
         (),
@@ -321,10 +570,12 @@ object MappingPipeline:
     val session = produced.session
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == CaptionProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
         (),
         Refusal.ForeignRegistration
       )
@@ -391,16 +642,21 @@ object MappingPipeline:
         context.representation.digest.hex,
         registration.evidence.identity.checksum.hex,
         registration.basis.toString
-      ) ++ parameters ++ c.selectedLevel.toVector.flatMap(level =>
-        Vector("selected-level/v1", level.toString)
-      ) ++ records
+      ) ++ parameters ++ (if p.contentPolicy == ContentCostPolicy.HistoricalV1 then Vector.empty
+                          else Vector(p.contentPolicy.toString)) ++ c.selectedLevel.toVector
+        .flatMap(level => Vector("selected-level/v1", level.toString)) ++ records
     )
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
       expected <- candidateConfig(config)
       _ <- Either.cond(
-        c.candidates.perLevel == expected.perLevel &&
+        p.contentPolicy == contentPolicy(config) && (c.selectedLevel
+          .contains(config.selectedLevel) ||
+          (c.selectedLevel.isEmpty && config.selectedLevel == 0 &&
+            config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty &&
+            context.source.nodes
+              .forall(_.level == 0))) && c.candidates.perLevel == expected.perLevel &&
           c.candidates.policy == expected.policy,
         (),
         Refusal.ForeignRegistration
@@ -431,18 +687,24 @@ object MappingPipeline:
       captionPackage: Option[CaptionMapping.PackageRegistered] = None
   ): Either[Refusal, Run] =
     for
+      _ <- Either.cond(
+        !sourceConditional(config),
+        (),
+        Refusal.MissingCapability("source-conditional profiles require reference-only execution")
+      )
       universe <- DeclaredUniverse
-        .of(view.nodes.filter(_.level == 0).map(_.ref), TargetGrain.SingleLevel(0))
+        .of(
+          view.nodes.filter(_.level == config.selectedLevel).map(_.ref),
+          TargetGrain.SingleLevel(config.selectedLevel)
+        )
         .left
         .map(Refusal.Projection(_))
-      reference <- LocalReference.Profile
-        .of(universe, config.temperature)
-        .left
+      reference <- referenceProfile(universe, config).left
         .map(Refusal.Alignment(_))
       // Presentation order is an explicit reconstruction assumption in this named preset.
       roots = view.nodes.filter(_.parent.isEmpty).sortBy(n => (n.discoursePosition, n.ref.key))
       grouping <- StructuredReconstruction.Grouping
-        .of(view, roots.zipWithIndex.map((n, i) => n.ref -> i))
+        .of(view, config.groupingRoots.getOrElse(roots.zipWithIndex.map((n, i) => n.ref -> i)))
         .left
         .map(Refusal.Alignment(_))
       execution <- MappingRun
@@ -453,7 +715,7 @@ object MappingPipeline:
           source,
           evidence,
           reference,
-          StructuredReconstruction.Profile.sherlock(),
+          config.reconstructionProfile.getOrElse(StructuredReconstruction.Profile.sherlock()),
           grouping
         )
         .left
@@ -461,6 +723,208 @@ object MappingPipeline:
       local <- execution.referenceRecord.left.map(Refusal.Projection(_))
       structured <- execution.reconstructionRecord.left.map(Refusal.Projection(_))
     yield new Run(execution, local, structured, config, registration, caption, onnx, captionPackage)
+
+  /** The same genuine lexical evidence enters the independent producer without a grouping. */
+  def referenceLexical(
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      inventory: RecallInventory,
+      source: SourceRepresentation,
+      config: Config
+  ): Either[Refusal, ReferenceRun] =
+    lexicalEvidence(recall, view, inventory, source, config, referenceOnly = true).flatMap {
+      (evidence, registration) =>
+        referenceExecute(
+          recall,
+          view,
+          inventory,
+          source,
+          evidence,
+          config,
+          registration,
+          None,
+          None
+        )
+    }
+
+  /** Consuming the registration itself prevents an unrelated genuine envelope being attached. */
+  def referenceCaptions(
+      registration: CaptionMapping.Registered,
+      config: Config
+  ): Either[Refusal, ReferenceRun] =
+    val produced = registration.produced
+    val session = produced.session
+    for
+      _ <- validate(config)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
+      expected <- candidateConfig(config)
+      _ <- Either.cond(
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel &&
+          produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap &&
+          produced.config.space == expected.space,
+        (),
+        Refusal.ForeignRegistration
+      )
+      run <- referenceExecute(
+        session.recall,
+        session.view,
+        produced.inventory,
+        session.source,
+        produced.evidence,
+        config,
+        registration.identity,
+        Some(registration),
+        None
+      )
+    yield run
+
+  /** Multipart captions consume one registered global session, retaining correspondence provenance.
+    */
+  def referenceCaptions(
+      registration: CaptionMapping.PackageRegistered,
+      config: Config
+  ): Either[Refusal, ReferenceRun] =
+    val produced = registration.produced
+    val session = produced.session
+    for
+      _ <- validate(config)
+      _ <- Either.cond(matchesProfile(config.profile, CaptionProfile), (), Refusal.InvalidConfig)
+      expected <- candidateConfig(config)
+      _ <- Either.cond(
+        produced.contentPolicy == contentPolicy(
+          config
+        ) && produced.selectedLevel == config.selectedLevel && produced.config.perLevel == expected.perLevel && produced.config.policy == expected.policy && produced.config.lexicalOverlap == expected.lexicalOverlap && produced.config.space == expected.space,
+        (),
+        Refusal.ForeignRegistration
+      )
+      run <- referenceExecute(
+        session.recall,
+        session.view,
+        produced.inventory,
+        session.source,
+        produced.evidence,
+        config,
+        registration.identity,
+        None,
+        None,
+        Some(registration)
+      )
+    yield run
+
+  /** An actual ONNX record or checked replay supplies the exact provider/render origin. */
+  def referenceOnnx(
+      registration: OnnxMappingRegistration.Registered,
+      inventory: RecallInventory,
+      config: Config
+  ): Either[Refusal, ReferenceRun] =
+    val context = registration.context
+    val c = registration.config
+    val p = c.pricing
+    val parameters = Vector(
+      c.querySensitivity.toString,
+      c.documentSensitivity.toString,
+      c.metric.tag,
+      c.emptyPolicy.toString,
+      c.candidates.policy.toString,
+      c.candidates.perLevel.toString,
+      c.candidates.lexicalOverlap.toString,
+      c.candidates.space.getOrElse("")
+    ) ++
+      CostTerm.values.toVector.map(t => p.weights(t).toString) ++
+      p.functionPrior.costs.toVector
+        .sortBy(_._1.ordinal)
+        .flatMap((k, v) => Vector(k.toString, v.toString)) ++
+      Vector(
+        p.externalFloor.toString,
+        p.externalMismatch.toString,
+        p.missingSemantic.toString,
+        p.distortionPenalty.toString
+      )
+    val records = Vector(registration.queryRecord, registration.documentRecord).flatMap { r =>
+      Vector(
+        r.provider.render,
+        r.runtimeIdentity,
+        r.model.modelId,
+        r.model.revision,
+        r.model.modelChecksum.hex,
+        r.model.tokenizerChecksum.hex,
+        r.model.maxTokens.toString,
+        r.model.license,
+        r.result.receipt.digest.render
+      )
+    }
+    val identity = ContentAddress.digest(
+      Vector(
+        "onnx-mapping-run-registration/v1",
+        context.policy,
+        context.representation.digest.hex,
+        registration.evidence.identity.checksum.hex,
+        registration.basis.toString
+      ) ++ parameters ++ (if p.contentPolicy == ContentCostPolicy.HistoricalV1 then Vector.empty
+                          else Vector(p.contentPolicy.toString)) ++ c.selectedLevel.toVector
+        .flatMap(level => Vector("selected-level/v1", level.toString)) ++ records
+    )
+    for
+      _ <- validate(config)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
+      expected <- candidateConfig(config)
+      _ <- Either.cond(
+        p.contentPolicy == contentPolicy(config) && c.selectedLevel.contains(
+          config.selectedLevel
+        ) && c.candidates.perLevel == expected.perLevel &&
+          c.candidates.policy == expected.policy,
+        (),
+        Refusal.ForeignRegistration
+      )
+      run <- referenceExecute(
+        context.recall,
+        context.source,
+        inventory,
+        context.representation,
+        registration.evidence,
+        config,
+        identity,
+        None,
+        Some(registration)
+      )
+    yield run
+
+  private def referenceExecute(
+      recall: RecallGraph[Checked],
+      view: SourceView,
+      inventory: RecallInventory,
+      source: SourceRepresentation,
+      evidence: LocalEvidence,
+      config: Config,
+      registration: Checksum,
+      caption: Option[CaptionMapping.Registered],
+      onnx: Option[OnnxMappingRegistration.Registered],
+      captionPackage: Option[CaptionMapping.PackageRegistered] = None
+  ): Either[Refusal, ReferenceRun] =
+    for
+      _ <- validate(config)
+      _ <- Either.cond(
+        config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty,
+        (),
+        Refusal.MissingCapability("reference-only mode refuses reconstruction settings")
+      )
+      universe <- DeclaredUniverse
+        .of(
+          view.nodes.filter(_.level == config.selectedLevel).map(_.ref),
+          TargetGrain.SingleLevel(config.selectedLevel)
+        )
+        .left
+        .map(Refusal.Projection(_))
+      profile <- referenceProfile(universe, config).left
+        .map(Refusal.Alignment(_))
+      execution <- MappingRun
+        .computeReference(recall, view, inventory, source, evidence, profile)
+        .left
+        .map(Refusal.Alignment(_))
+      record <- execution.record.left.map(Refusal.Projection(_))
+    yield new ReferenceRun(execution, record, config, registration, caption, onnx, captionPackage)
 
   /** Failure of one observation remains visible and does not discard its successful siblings. */
   final class Outcome private[MappingPipeline] (
@@ -506,7 +970,10 @@ object MappingPipeline:
     validate(config)
       .flatMap(_ =>
         Either.cond(
-          config.profile == LexicalProfile || (config.profile == CaptionProfile &&
+          matchesProfile(config.profile, LexicalProfile) || (matchesProfile(
+            config.profile,
+            CaptionProfile
+          ) &&
             prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty),
           (),
           Refusal.MissingCapability(
@@ -527,7 +994,7 @@ object MappingPipeline:
                 None
               )
             case Right(recall) =>
-              (if config.profile == LexicalProfile then
+              (if matchesProfile(config.profile, LexicalProfile) then
                  lexical(
                    recall.graph,
                    prepared.source,
@@ -551,7 +1018,9 @@ object MappingPipeline:
                        recall.graph,
                        recall.inventory,
                        candidates,
-                       context._2
+                       context._2,
+                       selectedLevel = config.selectedLevel,
+                       contentPolicy = contentPolicy(config)
                      )
                      .left
                      .map(_ => Refusal.ForeignRegistration)
@@ -590,7 +1059,7 @@ object MappingPipeline:
   ): Either[Refusal, Batch] =
     for
       _ <- validate(config)
-      _ <- Either.cond(config.profile == OnnxProfile, (), Refusal.InvalidConfig)
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
       _ <- Either.cond(
         prepared.source.captionContext.isEmpty,
         (),
@@ -606,7 +1075,8 @@ object MappingPipeline:
           functionPrior = FunctionPrior.none,
           externalMismatch = 0.0,
           distortionPenalty = 0.0,
-          selectedLevel = Some(0)
+          selectedLevel = Some(config.selectedLevel),
+          contentPolicy = contentPolicy(config)
         )
         .left
         .map(_ => Refusal.InvalidConfig)
@@ -654,6 +1124,216 @@ object MappingPipeline:
         outcome.run.fold("failed:" + outcome.failure.getOrElse("unknown"))(_.identity.hex)
       }
       new Batch(prepared, config, outcomes, binding)
+
+  /** Failure of one observation remains visible and does not discard its successful siblings. */
+  final class ReferenceOutcome private[MappingPipeline] (
+      val participant: String,
+      val session: String,
+      val observation: Option[Checksum],
+      val failure: Option[String],
+      val run: Option[ReferenceRun],
+      val prepared: Option[StudyPreparation.Recall]
+  ):
+    private def parts = (participant, session, observation, failure, run, prepared)
+    override def equals(other: Any): Boolean = other match
+      case o: ReferenceOutcome => parts == o.parts
+      case _                   => false
+    override def hashCode: Int = parts.hashCode
+    override def toString: String =
+      s"MappingReferenceOutcome($participant, $session, ${run.nonEmpty})"
+
+  /** The attempted batch remains content-bound even if every participant fails or it is empty. */
+  final class ReferenceBatch private[MappingPipeline] (
+      val prepared: StudyPreparation.Prepared,
+      val config: Config,
+      val outcomes: Vector[ReferenceOutcome],
+      private val providerBinding: Vector[String] = Vector.empty
+  ):
+    val identity: Checksum = ContentAddress.digest(
+      Vector(
+        "mapping-reference-batch-plan/v1",
+        prepared.source.edition.hex,
+        prepared.source.representation.digest.hex,
+        prepared.config.profile,
+        referenceConfigText(config)
+      ) ++ prepared.source.captionContext.toVector.flatMap((pack, blend) =>
+        Vector(pack.identity.hex, blend.toString)
+      ) ++ prepared.outcomes.map(_.attempt.hex) ++ providerBinding
+    )
+    override def equals(other: Any): Boolean = other match
+      case b: ReferenceBatch => identity == b.identity
+      case _                 => false
+    override def hashCode: Int = identity.hashCode
+    override def toString: String =
+      s"MappingReferenceBatch(${identity.short()}, ${outcomes.size} outcomes)"
+
+  def referenceBatch(
+      prepared: StudyPreparation.Prepared,
+      config: Config
+  ): Either[Refusal, ReferenceBatch] =
+    validate(config)
+      .flatMap(_ =>
+        Either.cond(
+          config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty &&
+            (matchesProfile(config.profile, LexicalProfile) || (matchesProfile(
+              config.profile,
+              CaptionProfile
+            ) &&
+              prepared.source.captionContext.nonEmpty && prepared.source.boundCaptions.nonEmpty)),
+          (),
+          Refusal.MissingCapability(
+            "registered evidence required: use the typed ONNX or caption registration entry"
+          )
+        )
+      )
+      .map { _ =>
+        val outcomes = prepared.outcomes.map { input =>
+          input.result match
+            case Left(reason) =>
+              new ReferenceOutcome(
+                input.input.participant,
+                input.input.session,
+                None,
+                Some(reason.toString),
+                None,
+                None
+              )
+            case Right(recall) =>
+              (if matchesProfile(config.profile, LexicalProfile) then
+                 referenceLexical(
+                   recall.graph,
+                   prepared.source,
+                   recall.inventory,
+                   prepared.source.representation,
+                   config
+                 )
+               else
+                 for
+                   candidates <- candidateConfig(config)
+                   context <- prepared.source.captionContext.toRight(
+                     Refusal.MissingCapability("verified caption package required")
+                   )
+                   joined <- prepared.source.boundCaptions.toRight(
+                     Refusal.MissingCapability("checked correspondence required")
+                   )
+                   registration <- CaptionMapping
+                     .fromPackage(
+                       context._1,
+                       joined,
+                       recall.graph,
+                       recall.inventory,
+                       candidates,
+                       context._2,
+                       selectedLevel = config.selectedLevel,
+                       contentPolicy = contentPolicy(config)
+                     )
+                     .left
+                     .map(_ => Refusal.ForeignRegistration)
+                   run <- referenceCaptions(registration, config)
+                 yield run
+              ) match
+                case Left(reason) =>
+                  new ReferenceOutcome(
+                    recall.participant,
+                    recall.session,
+                    Some(recall.observation),
+                    Some(reason.toString),
+                    None,
+                    Some(recall)
+                  )
+                case Right(run) =>
+                  new ReferenceOutcome(
+                    recall.participant,
+                    recall.session,
+                    Some(recall.observation),
+                    None,
+                    Some(run),
+                    Some(recall)
+                  )
+        }
+        new ReferenceBatch(prepared, config, outcomes)
+      }
+
+  /** Execute the checked local encoder against every attempted observation and retain both members.
+    * Source and recall payloads use keyed sensitive receipts even for admitted public examples.
+    */
+  def referenceBatchOnnx(
+      prepared: StudyPreparation.Prepared,
+      config: Config,
+      encoder: OnnxSentenceEmbedder
+  ): Either[Refusal, ReferenceBatch] =
+    for
+      _ <- validate(config)
+      _ <- Either.cond(
+        config.reconstructionProfile.isEmpty && config.groupingRoots.isEmpty,
+        (),
+        Refusal.InvalidConfig
+      )
+      _ <- Either.cond(matchesProfile(config.profile, OnnxProfile), (), Refusal.InvalidConfig)
+      _ <- Either.cond(
+        prepared.source.captionContext.isEmpty,
+        (),
+        Refusal.MissingCapability("ONNX caption fusion is unavailable; use the caption profile")
+      )
+      candidates <- candidateConfig(config)
+      settings <- OnnxMappingRegistration.Config
+        .of(
+          candidates,
+          Sensitivity.Sensitive,
+          Sensitivity.Sensitive,
+          weights = CostWeights.semanticOnly,
+          functionPrior = FunctionPrior.none,
+          externalMismatch = 0.0,
+          distortionPenalty = 0.0,
+          selectedLevel = Some(config.selectedLevel),
+          contentPolicy = contentPolicy(config)
+        )
+        .left
+        .map(_ => Refusal.InvalidConfig)
+    yield
+      val outcomes = prepared.outcomes.map { input =>
+        input.result match
+          case Left(reason) =>
+            new ReferenceOutcome(
+              input.input.participant,
+              input.input.session,
+              None,
+              Some(reason.toString),
+              None,
+              None
+            )
+          case Right(recall) =>
+            val result = for
+              context <- prepared.source
+                .scoringContext(recall.graph)
+                .left
+                .map(_ => Refusal.MissingCapability("checked source rendering unavailable"))
+              registration <- OnnxMappingRegistration
+                .record(encoder, context, settings)
+                .left
+                .map(_ => Refusal.ForeignRegistration)
+              run <- referenceOnnx(registration, recall.inventory, config)
+            yield run
+            new ReferenceOutcome(
+              recall.participant,
+              recall.session,
+              Some(recall.observation),
+              result.left.toOption.map(_.toString),
+              result.toOption,
+              Some(recall)
+            )
+      }
+      val binding = Vector(
+        "onnx-batch/v1",
+        encoder.model.coordinate,
+        encoder.model.modelChecksum.hex,
+        encoder.model.tokenizerChecksum.hex,
+        encoder.info.provider.render,
+        encoder.runtimeIdentity
+      ) ++ outcomes.map { outcome =>
+        outcome.run.fold("failed:" + outcome.failure.getOrElse("unknown"))(_.identity.hex)
+      }
+      new ReferenceBatch(prepared, config, outcomes, binding)
 
   /** Project both owned mapping members over one declared source selection and optional recall
     * clock.
@@ -785,7 +1465,7 @@ object MappingPipeline:
             })
           )
         )
-      manifest = StudyArtifacts.manifest("mapping-temporal-batch/v1", files, metadata)
+      manifest = StudyArtifacts.manifest("mapping-temporal-batch/v2", files, metadata)
       receipt <- StudyArtifacts
         .publish(output, files, manifest, resume)
         .left
@@ -814,12 +1494,23 @@ object MappingPipeline:
       result <- resolved.execute(prepared)
     yield result
 
+  /** Resolve an explicit reference-only settings file through ordinary checked preparation. */
+  def analyzeReference(study: Path, settings: Path): Either[FacadeFailure, ReferenceBatch] =
+    for
+      resolved <- MappingSettings.load(settings)
+      prepared <- StudyCli.load(study.toString).left.map(FacadeFailure.Preparation(_))
+      result <- resolved.executeReference(prepared)
+    yield result
+
   /** Inspect counts and requested capabilities without publishing participant or source content. */
   def inspect(batch: Batch): Json = Json.obj(
+    "schema" -> Json.fromString("mapping-summary/v2"),
     "plan" -> Json.fromString(batch.identity.hex),
     "attempts" -> Json.fromInt(batch.outcomes.size),
     "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
     "failed" -> Json.fromInt(batch.outcomes.count(_.failure.nonEmpty)),
+    "coverage" -> coverage(batch),
+    "models" -> Json.fromValues(batch.outcomes.flatMap(_.run).map(modelMetadata)),
     "missingCapabilities" -> Json.fromValues(
       batch.config.requested
         .filterNot(_ == Capability.Mapping)
@@ -827,6 +1518,176 @@ object MappingPipeline:
         .map(v => Json.fromString(v.toString))
     )
   )
+
+  private def processingLabel(status: ProcessingStatus): String = status match
+    case ProcessingStatus.Complete                 => "Complete"
+    case ProcessingStatus.ExcludedByInputPolicy(_) => "Excluded"
+    case ProcessingStatus.Failed(_)                => "Failed"
+
+  private def unitCoverage(o: Outcome, unit: RecallUnitId, reference: Boolean): Json =
+    val record = o.run.map(r => if reference then r.reference else r.reconstruction)
+    val row = record.flatMap(_.outcome(unit))
+    val local = o.run.flatMap(_.execution.reference.outcome(unit))
+    val available = row.exists(r =>
+      if reference then r.measures.normalized.nonEmpty else r.measures.posterior.nonEmpty
+    )
+    val reason = row match
+      case None    => Some("RunNotProduced")
+      case Some(r) =>
+        r.processing match
+          case ProcessingStatus.ExcludedByInputPolicy(reason) => Some(reason)
+          case ProcessingStatus.Failed(failure)               => Some(failure.toString)
+          case ProcessingStatus.Complete => Option.unless(available)("MeasureNotProduced")
+    Json.obj(
+      "processing" -> row.fold(Json.fromString("NotProduced"))(r =>
+        Json.fromString(processingLabel(r.processing))
+      ),
+      "measureAvailable" -> Json.fromBoolean(available),
+      "unavailableReason" -> reason.fold(Json.Null)(Json.fromString),
+      "overflow" -> local.fold(Json.Null)(r => Json.fromBoolean(r.overflow.nonEmpty)),
+      "uniformSemantic" -> local.fold(Json.Null)(r => Json.fromBoolean(r.uniformSemantic.nonEmpty)),
+      "uniformCosts" -> (local match
+        case Some(c: LocalReference.Computed) if reference =>
+          Json.fromBoolean(c.information == LocalReference.Information.UniformCosts)
+        case _ => Json.Null)
+    )
+
+  private def observationCoverage(o: Outcome): Json = Json.obj(
+    "participant" -> Json.fromString(o.participant),
+    "session" -> Json.fromString(o.session),
+    "observation" -> o.observation.fold(Json.Null)(v => Json.fromString(v.hex)),
+    "failure" -> o.failure.fold(Json.Null)(Json.fromString),
+    "declaredUnits" -> o.prepared.fold(Json.Null)(p => Json.fromInt(p.inventory.units.size)),
+    "units" -> Json.fromValues(o.prepared.toVector.flatMap(_.inventory.units).map { u =>
+      Json.obj(
+        "unit" -> Json.fromString(u.id.value),
+        "reference" -> unitCoverage(o, u.id, true),
+        "reconstruction" -> unitCoverage(o, u.id, false)
+      )
+    })
+  )
+
+  private def coverage(batch: Batch): Json =
+    val units =
+      batch.outcomes.flatMap(o => o.prepared.toVector.flatMap(_.inventory.units).map(o -> _))
+    def member(reference: Boolean): Json =
+      val rows = units.map((o, u) => unitCoverage(o, u.id, reference).hcursor)
+      val measured = rows.count(_.get[Boolean]("measureAvailable").contains(true))
+      def count(field: String): Json =
+        Json.fromInt(rows.count(_.get[Boolean](field).contains(true)))
+      Json.obj(
+        "declaredUnits" -> Json.fromInt(rows.size),
+        "measuredUnits" -> Json.fromInt(measured),
+        "unavailableUnits" -> Json.fromInt(rows.size - measured),
+        "measuredFractionOfKnownUnits" ->
+          (if rows.isEmpty then Json.Null
+           else Json.fromDoubleOrNull(measured.toDouble / rows.size)),
+        "overflowUnits" -> count("overflow"),
+        "uniformSemanticUnits" -> count("uniformSemantic"),
+        "uniformCostUnits" -> count("uniformCosts")
+      )
+    Json.obj(
+      "prepared" -> Json.fromInt(batch.outcomes.count(_.prepared.nonEmpty)),
+      "runProduced" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+      "unknownUnitObservations" -> Json.fromInt(batch.outcomes.count(_.prepared.isEmpty)),
+      "aggregation" -> Json.fromString(
+        "pooled-known-units; unknown unit counts excluded from denominator"
+      ),
+      "diagnosticCounts" -> Json.fromString("nonexclusive; uniform costs do not mean unavailable"),
+      "reference" -> member(true),
+      "reconstruction" -> member(false),
+      "observations" -> Json.fromValues(batch.outcomes.map(observationCoverage))
+    )
+
+  /** Inspect counts and requested capabilities without publishing participant or source content. */
+  def inspect(batch: ReferenceBatch): Json = Json.obj(
+    "schema" -> Json.fromString("mapping-summary/reference/v1"),
+    "plan" -> Json.fromString(batch.identity.hex),
+    "attempts" -> Json.fromInt(batch.outcomes.size),
+    "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+    "failed" -> Json.fromInt(batch.outcomes.count(_.failure.nonEmpty)),
+    "coverage" -> coverage(batch),
+    "models" -> Json.fromValues(batch.outcomes.flatMap(_.run).map(modelMetadata)),
+    "missingCapabilities" -> Json.fromValues(
+      batch.config.requested
+        .filterNot(_ == Capability.Mapping)
+        .distinct
+        .map(v => Json.fromString(v.toString))
+    )
+  )
+
+  private def unitCoverage(o: ReferenceOutcome, unit: RecallUnitId, reference: Boolean): Json =
+    val record = o.run.map(_.reference)
+    val row = record.flatMap(_.outcome(unit))
+    val local = o.run.flatMap(_.execution.reference.outcome(unit))
+    val available = row.exists(r =>
+      if reference then r.measures.normalized.nonEmpty else r.measures.posterior.nonEmpty
+    )
+    val reason = row match
+      case None    => Some("RunNotProduced")
+      case Some(r) =>
+        r.processing match
+          case ProcessingStatus.ExcludedByInputPolicy(reason) => Some(reason)
+          case ProcessingStatus.Failed(failure)               => Some(failure.toString)
+          case ProcessingStatus.Complete => Option.unless(available)("MeasureNotProduced")
+    Json.obj(
+      "processing" -> row.fold(Json.fromString("NotProduced"))(r =>
+        Json.fromString(processingLabel(r.processing))
+      ),
+      "measureAvailable" -> Json.fromBoolean(available),
+      "unavailableReason" -> reason.fold(Json.Null)(Json.fromString),
+      "overflow" -> local.fold(Json.Null)(r => Json.fromBoolean(r.overflow.nonEmpty)),
+      "uniformSemantic" -> local.fold(Json.Null)(r => Json.fromBoolean(r.uniformSemantic.nonEmpty)),
+      "uniformCosts" -> (local match
+        case Some(c: LocalReference.Computed) if reference =>
+          Json.fromBoolean(c.information == LocalReference.Information.UniformCosts)
+        case _ => Json.Null)
+    )
+
+  private def observationCoverage(o: ReferenceOutcome): Json = Json.obj(
+    "participant" -> Json.fromString(o.participant),
+    "session" -> Json.fromString(o.session),
+    "observation" -> o.observation.fold(Json.Null)(v => Json.fromString(v.hex)),
+    "failure" -> o.failure.fold(Json.Null)(Json.fromString),
+    "declaredUnits" -> o.prepared.fold(Json.Null)(p => Json.fromInt(p.inventory.units.size)),
+    "units" -> Json.fromValues(o.prepared.toVector.flatMap(_.inventory.units).map { u =>
+      Json.obj(
+        "unit" -> Json.fromString(u.id.value),
+        "reference" -> unitCoverage(o, u.id, true)
+      )
+    })
+  )
+
+  private def coverage(batch: ReferenceBatch): Json =
+    val units =
+      batch.outcomes.flatMap(o => o.prepared.toVector.flatMap(_.inventory.units).map(o -> _))
+    def member(reference: Boolean): Json =
+      val rows = units.map((o, u) => unitCoverage(o, u.id, reference).hcursor)
+      val measured = rows.count(_.get[Boolean]("measureAvailable").contains(true))
+      def count(field: String): Json =
+        Json.fromInt(rows.count(_.get[Boolean](field).contains(true)))
+      Json.obj(
+        "declaredUnits" -> Json.fromInt(rows.size),
+        "measuredUnits" -> Json.fromInt(measured),
+        "unavailableUnits" -> Json.fromInt(rows.size - measured),
+        "measuredFractionOfKnownUnits" ->
+          (if rows.isEmpty then Json.Null
+           else Json.fromDoubleOrNull(measured.toDouble / rows.size)),
+        "overflowUnits" -> count("overflow"),
+        "uniformSemanticUnits" -> count("uniformSemantic"),
+        "uniformCostUnits" -> count("uniformCosts")
+      )
+    Json.obj(
+      "prepared" -> Json.fromInt(batch.outcomes.count(_.prepared.nonEmpty)),
+      "runProduced" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+      "unknownUnitObservations" -> Json.fromInt(batch.outcomes.count(_.prepared.isEmpty)),
+      "aggregation" -> Json.fromString(
+        "pooled-known-units; unknown unit counts excluded from denominator"
+      ),
+      "diagnosticCounts" -> Json.fromString("nonexclusive; uniform costs do not mean unavailable"),
+      "reference" -> member(true),
+      "observations" -> Json.fromValues(batch.outcomes.map(observationCoverage))
+    )
 
   /** Export the same checked paired results, preserving publication and resume guards. */
   def exportResults(
@@ -837,6 +1698,7 @@ object MappingPipeline:
     publishExchange(batch, output, resume).left.map(FacadeFailure.Publication(_, output))
 
   private def runMetadata(run: Run): Json = Json.obj(
+    "model" -> modelMetadata(run),
     "run" -> Json.fromString(run.identity.hex),
     "registration" -> Json.fromString(run.registration.hex),
     "execution" -> Json.fromString(run.execution.identity.hex),
@@ -859,6 +1721,65 @@ object MappingPipeline:
     )
   )
 
+  private[pipeline] def modelMetadata(run: Run): Json =
+    val reference = run.execution.reference.profile
+    val reconstruction = run.execution.reconstruction
+    val profile = reconstruction.profile
+    Json.obj(
+      "run" -> Json.fromString(run.identity.hex),
+      "reference" -> Json.obj(
+        "kind" -> Json.fromString(MeasureKind.NormalizedScoreMass.toString),
+        "profile" -> Json.fromString(reference.fingerprint.hex),
+        "level" -> Json.fromInt(reference.level),
+        "universe" -> Json.fromString(reference.universe.id.digest.hex),
+        "targets" -> Json.fromInt(reference.universe.targets.size),
+        "temperature" -> Json.fromDoubleOrNull(reference.temperature),
+        "prior" -> Json.fromString(reference.prior.toString),
+        "normalization" -> Json.fromString(reference.normalization.toString)
+      ),
+      "reconstruction" -> Json.obj(
+        "kind" -> Json.fromString(MeasureKind.ModelPosterior.toString),
+        "profile" -> Json.fromString(profile.fingerprint.hex),
+        "historicalSherlock" -> Json.fromBoolean(profile.historicalSherlock),
+        "temperature" -> Json.fromDoubleOrNull(profile.inference.temperature),
+        "decisionPolicy" -> Json.fromString(profile.decision.fingerprint.hex),
+        "order" -> Json.fromString(profile.decision.order.toString),
+        "backwardPenalty" -> Json.fromDoubleOrNull(profile.decision.backwardPenalty),
+        "forwardPenalty" -> Json.fromDoubleOrNull(profile.decision.forwardPenalty),
+        "fill" -> Json.fromString(profile.decision.fill.toString),
+        "grouping" -> Json.fromString(reconstruction.grouping.fingerprint.hex),
+        "groupingOrderBasis" -> Json.fromString(
+          if run.config.groupingRoots.nonEmpty then "explicit source-bound roots and ranks"
+          else "source-root discourse position, then source key"
+        ),
+        "decisions" -> Json.fromValues(reconstruction.decisions.map { d =>
+          Json.obj(
+            "unit" -> Json.fromString(d.unit.value),
+            "rawArgmax" -> d.rawArgmax.fold(Json.Null)(s => Json.fromString(s.toString)),
+            "rawArgmaxMass" -> d.rawArgmaxMass.fold(Json.Null)(Json.fromDoubleOrNull),
+            "chosenTarget" -> d.anchor.fold(Json.Null)(s => Json.fromString(s.key)),
+            "chosenMass" -> d.chosenMass.fold(Json.Null)(Json.fromDoubleOrNull),
+            "origin" -> Json.fromString(d.origin.toString)
+          )
+        })
+      ),
+      "interpretation" -> Json.obj(
+        "reference" -> Json.fromString(
+          "Normalized local cost mass over admitted states; not calibrated correctness."
+        ),
+        "reconstruction" -> Json.fromString(
+          "Model-conditional posterior and declared trajectory decisions; not observed human retrieval."
+        ),
+        "fidelity" -> Json.fromString(
+          "Checked gate consequences; factual-distortion detection has not been empirically validated."
+        ),
+        "calibration" -> Json.fromString("Unavailable: no correctness calibration artifact."),
+        "efficacy" -> Json.fromString(
+          "Not established by structural admission or policy compatibility."
+        )
+      )
+    )
+
   private def runFiles(run: Run): Vector[(String, String)] = Vector(
     s"${run.identity.hex}-reference.json" -> MappingCodecs.encode(run.reference),
     s"${run.identity.hex}-reconstruction.json" -> MappingCodecs.encode(run.reconstruction)
@@ -868,20 +1789,17 @@ object MappingPipeline:
     */
   def publish(run: Run, output: Path, resume: Boolean): Either[String, Checksum] =
     val files = runFiles(run)
-    val manifest = StudyArtifacts.manifest("mapping-run/v1", files, runMetadata(run))
+    val manifest = StudyArtifacts.manifest("mapping-run/v2", files, runMetadata(run))
     StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
 
   private[pipeline] def artifacts(batch: Batch): (Vector[(String, String)], String) =
-    def processingLabel(status: ProcessingStatus): String = status match
-      case ProcessingStatus.Complete                 => "Complete"
-      case ProcessingStatus.ExcludedByInputPolicy(_) => "Excluded"
-      case ProcessingStatus.Failed(_)                => "Failed"
     val outcomes = batch.outcomes
     val inputs = outcomes
       .flatMap(_.prepared)
       .map(r => s"${r.observation.hex}-recall.json" -> StudyPreparation.encode(r))
     val files = inputs ++ outcomes.flatMap(_.run).flatMap(runFiles)
     val metadata = Json.obj(
+      "summary" -> inspect(batch),
       "plan" -> Json.fromString(batch.identity.hex),
       "sourceEdition" -> Json.fromString(batch.prepared.source.edition.hex),
       "config" -> Canonical.parse(configText(batch.config)).toOption.get,
@@ -924,7 +1842,7 @@ object MappingPipeline:
         )
       })
     )
-    files -> StudyArtifacts.manifest("mapping-batch/v1", files, metadata)
+    files -> StudyArtifacts.manifest("mapping-batch/v2", files, metadata)
 
   def publish(batch: Batch, output: Path, resume: Boolean): Either[String, Checksum] =
     val (files, manifest) = artifacts(batch)
@@ -938,7 +1856,7 @@ object MappingPipeline:
   /** Export the original pair and lossless tables, retaining the facade's provider registration. */
   def publishExchange(run: Run, output: Path, resume: Boolean): Either[String, Checksum] =
     exchangeFiles(run).flatMap { files =>
-      val manifest = StudyArtifacts.manifest("mapping-exchange-run/v1", files, runMetadata(run))
+      val manifest = StudyArtifacts.manifest("mapping-exchange-run/v2", files, runMetadata(run))
       StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
     }
 
@@ -957,13 +1875,115 @@ object MappingPipeline:
       val inputs = original.filter(_._1.endsWith("-recall.json"))
       val files = inputs ++ pairs.flatten
       val metadata = Canonical.parse(manifest).toOption.get.hcursor.downField("metadata").focus.get
-      files -> StudyArtifacts.manifest("mapping-exchange-batch/v1", files, metadata)
+      files -> StudyArtifacts.manifest("mapping-exchange-batch/v2", files, metadata)
 
   /** Complete paired exchange through the same source, outcomes and publication boundary. */
   def publishExchange(batch: Batch, output: Path, resume: Boolean): Either[String, Checksum] =
     exchangeArtifacts(batch).flatMap { (files, manifest) =>
       StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
     }
+
+  private[pipeline] def modelMetadata(run: ReferenceRun): Json =
+    val profile = run.execution.reference.profile
+    Json.obj(
+      "run" -> Json.fromString(run.identity.hex),
+      "reference" -> Json
+        .obj(
+          "kind" -> Json.fromString(MeasureKind.NormalizedScoreMass.toString),
+          "profile" -> Json.fromString(profile.fingerprint.hex),
+          "level" -> Json.fromInt(profile.level),
+          "universe" -> Json.fromString(profile.universe.id.digest.hex),
+          "targets" -> Json.fromInt(profile.universe.targets.size),
+          "temperature" -> Json.fromDoubleOrNull(profile.temperature),
+          "prior" -> Json.fromString(profile.prior.toString),
+          "normalization" -> Json.fromString(profile.normalization.toString)
+        )
+        .deepMerge(
+          if profile.population == NormalizationPopulation.SuppliedDestinations then Json.obj()
+          else
+            Json.obj(
+              "population" -> Json.fromString(profile.population.scope),
+              "sourceMembership" -> Json.fromString("unestablished")
+            )
+        ),
+      "interpretation" -> Json.fromString(
+        "Local cost mass; not calibrated correctness. Structural checks do not establish empirical fidelity detection or scientific efficacy."
+      )
+    )
+
+  /** The checked record supports the same temporal projection without any paired computation. */
+  def temporal(
+      run: ReferenceRun,
+      request: TemporalProjection.Request,
+      timing: Option[RecallTiming]
+  ): Either[Refusal, TemporalProjection.Projection] =
+    TemporalProjection
+      .compile(run.reference, TemporalQuery.Measure.NormalizedScoreMass, request, timing)
+      .left
+      .map(Refusal.Temporal(_))
+
+  private[pipeline] def referenceArtifacts(
+      batch: ReferenceBatch,
+      exchange: Boolean
+  ): Either[String, (Vector[(String, String)], String)] =
+    import cats.syntax.all.*
+    for
+      inputs <- batch.outcomes.flatMap(_.prepared).traverse { r =>
+        StudyPreparation
+          .publishRecall(r)
+          .left
+          .map(_.toString)
+          .map(_ => s"${r.observation.hex}-recall.json" -> StudyPreparation.encode(r))
+      }
+      members <- batch.outcomes.flatMap(_.run).traverse { run =>
+        if exchange then
+          MappingExchange
+            .encode(run.execution)
+            .left
+            .map(_.toString)
+            .map(bundle => bundle.files.map((name, text) => s"${run.identity.hex}--$name" -> text))
+        else
+          Right(
+            Vector(s"${run.identity.hex}-reference.json" -> MappingCodecs.encode(run.reference))
+          )
+      }
+    yield
+      val files = inputs ++ members.flatten
+      val metadata = Json.obj(
+        "summary" -> inspect(batch),
+        "sourceEdition" -> Json.fromString(batch.prepared.source.edition.hex),
+        "sourceRepresentation" -> Json.fromString(batch.prepared.source.representation.digest.hex),
+        "config" -> Canonical.parse(referenceConfigText(batch.config)).toOption.get,
+        "outcomes" -> Json.fromValues(
+          batch.outcomes.map(o =>
+            Json.obj(
+              "participant" -> Json.fromString(o.participant),
+              "session" -> Json.fromString(o.session),
+              "observation" -> o.observation.fold(Json.Null)(x => Json.fromString(x.hex)),
+              "failure" -> o.failure.fold(Json.Null)(Json.fromString),
+              "run" -> o.run.fold(Json.Null)(r => Json.fromString(r.identity.hex)),
+              "execution" -> o.run.fold(Json.Null)(r => Json.fromString(r.execution.identity.hex)),
+              "registration" -> o.run.fold(Json.Null)(r => Json.fromString(r.registration.hex)),
+              "record" -> o.run.fold(Json.Null)(r => Json.fromString(r.reference.digest.hex))
+            )
+          )
+        )
+      )
+      files -> StudyArtifacts.manifest(
+        if exchange then "mapping-exchange-batch/reference/v1" else "mapping-batch/reference/v1",
+        files,
+        metadata
+      )
+
+  def publishReference(
+      batch: ReferenceBatch,
+      output: Path,
+      resume: Boolean,
+      exchange: Boolean = false
+  ): Either[String, Checksum] =
+    referenceArtifacts(batch, exchange).flatMap((files, manifest) =>
+      StudyArtifacts.publish(output, files, manifest, resume).left.map(_.toString)
+    )
 
 /** A thin offline command shares preparation, execution and publication with the typed API. */
 object MappingCli:
@@ -977,8 +1997,10 @@ object MappingCli:
     import cats.syntax.all.*
     for
       json <- parser.parse(text).left.map(_ => "invalid configuration")
+      selection <- MappingSelectionSettings.decode(json)
+      base = json.mapObject(_.remove("selection"))
       _ <- Either.cond(
-        json.asObject.exists(
+        base.asObject.exists(
           _.keys.toSet == Set(
             "profile",
             "temperature",
@@ -1003,7 +2025,18 @@ object MappingCli:
       )
       network <- json.hcursor.get[Int]("networkRequests").left.map(_ => "invalid configuration")
       retries <- json.hcursor.get[Int]("retries").left.map(_ => "invalid configuration")
-      result = MappingPipeline.Config(profile, t, perLevel, budget, requested, network, retries)
+      result = MappingPipeline.Config(
+        profile,
+        t,
+        perLevel,
+        budget,
+        requested,
+        network,
+        retries,
+        selection._1,
+        selection._2,
+        selection._3
+      )
       _ <- MappingPipeline.validate(result).left.map(_.toString)
     yield result
 
@@ -1018,44 +2051,51 @@ object MappingCli:
         resume: Boolean,
         exchange: Boolean
     ): Int =
+      def path(value: String): Either[FacadeFailure, Path] = scala.util
+        .Try(Path.of(value).toAbsolutePath)
+        .toEither
+        .left
+        .map(_ => FacadeFailure.InvalidConfiguration)
       val result = for
-        configPath <- scala.util
-          .Try(Path.of(settings).toAbsolutePath)
-          .toEither
-          .left
-          .map(_ => FacadeFailure.InvalidConfiguration)
-        studyPath <- scala.util
-          .Try(Path.of(study))
-          .toEither
-          .left
-          .map(_ => FacadeFailure.InvalidConfiguration)
-        outcomes <- MappingPipeline.analyze(studyPath, configPath)
-        destination <- scala.util
-          .Try(Path.of(output))
-          .toEither
-          .left
-          .map(_ => FacadeFailure.InvalidConfiguration)
-        receipt <-
-          if exchange then MappingPipeline.exportResults(outcomes, destination, resume)
-          else
-            MappingPipeline
-              .publish(outcomes, destination, resume)
-              .left
-              .map(FacadeFailure.Publication(_, destination))
-      yield (outcomes, receipt)
-      result match
-        case Left(reason)            => refuse(reason.diagnostic.noSpaces)
-        case Right((batch, receipt)) =>
-          out(
-            Canonical.print(
-              MappingPipeline
-                .inspect(batch)
-                .deepMerge(Json.obj("manifest" -> Json.fromString(receipt.hex)))
+        configPath <- path(settings)
+        resolved <- MappingSettings.load(configPath)
+        prepared <- StudyCli.load(study).left.map(FacadeFailure.Preparation(_))
+        destination <- path(output)
+        result <-
+          if resolved.referenceOnly then
+            for
+              batch <- resolved.executeReference(prepared)
+              receipt <- MappingPipeline
+                .publishReference(batch, destination, resume, exchange)
+                .left
+                .map(FacadeFailure.Publication(_, destination))
+            yield (
+              MappingPipeline.inspect(batch),
+              receipt,
+              batch.outcomes.exists(_.failure.nonEmpty),
+              batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping)
             )
+          else
+            for
+              batch <- resolved.execute(prepared)
+              receipt <- (if exchange then
+                            MappingPipeline.publishExchange(batch, destination, resume)
+                          else MappingPipeline.publish(batch, destination, resume)).left
+                .map(FacadeFailure.Publication(_, destination))
+            yield (
+              MappingPipeline.inspect(batch),
+              receipt,
+              batch.outcomes.exists(_.failure.nonEmpty),
+              batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping)
+            )
+      yield result
+      result match
+        case Left(reason)                               => refuse(reason.diagnostic.noSpaces)
+        case Right((summary, receipt, failed, missing)) =>
+          out(
+            Canonical.print(summary.deepMerge(Json.obj("manifest" -> Json.fromString(receipt.hex))))
           )
-          if batch.outcomes.exists(_.failure.nonEmpty) then 3
-          else if batch.config.requested.exists(_ != MappingPipeline.Capability.Mapping) then 4
-          else 0
+          if failed then 3 else if missing then 4 else 0
     def temporalExecute(
         study: String,
         settings: String,

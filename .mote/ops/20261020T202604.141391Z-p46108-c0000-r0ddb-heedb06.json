@@ -1,0 +1,1 @@
+{"actor":"codex-mapping-20261020","entity":"bd-01M5DAG1ZBER090DC52PB19CPH","kind":"reserve_open","mode":"exclusive","op":"20261020T202604.141391Z-p46108-c0000-r0ddb-heedb06","paths":["pipeline/src/test/scala/storymodel4s/pipeline/WeightedMappingSuite.scala"],"reservation_id":"rv-01M5DFW5ZD1V7PHK92CFNF3TBY","ts":"2026-10-20T20:26:04.141391Z","ttl_s":3600,"v":2}

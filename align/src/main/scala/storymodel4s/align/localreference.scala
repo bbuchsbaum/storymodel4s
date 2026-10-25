@@ -9,7 +9,7 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 object LocalReference:
   /** The normalization prior is distinct from any function prior already used in pricing. */
   enum Prior:
-    case UniformAdmittedStates
+    case UniformAdmittedStates, UniformAdmittedSourceTargets
 
   /** The numerical rule is versioned so a profile identifies the quantity it produces. */
   enum Normalization:
@@ -22,20 +22,30 @@ object LocalReference:
   /** Missing local measurement never acquires a uniform mass by default. */
   enum NotComputedReason:
     case TieOverflow, Unranked, NoAdmittedTargets, PriorOnlyTargetCost, UnmeasuredTargetCost
+    case IncomparableTargetCosts
 
   /** A checked, single-level declaration makes the denominator and normalization explicit. */
   final class Profile private[LocalReference] (
       val universe: DeclaredUniverse,
       val temperature: Double,
-      val level: Int
+      val level: Int,
+      val population: NormalizationPopulation
   ):
-    val prior: Prior = Prior.UniformAdmittedStates
+    val prior: Prior = population match
+      case NormalizationPopulation.SuppliedDestinations  => Prior.UniformAdmittedStates
+      case NormalizationPopulation.AdmittedSourceTargets => Prior.UniformAdmittedSourceTargets
+    val priorId: ReferencePriorId = ReferencePriorId.unsafe(population match
+      case NormalizationPopulation.SuppliedDestinations  => "uniform-admitted-states/v1"
+      case NormalizationPopulation.AdmittedSourceTargets => "uniform-admitted-source-targets/v1")
     val normalization: Normalization = Normalization.ShiftedExponentialCostV1
     val externalAlternatives: Vector[ExternalState] =
-      ExternalState.values.toVector.filterNot(_ == ExternalState.Unranked)
+      if population == NormalizationPopulation.AdmittedSourceTargets then Vector.empty
+      else ExternalState.values.toVector.filterNot(_ == ExternalState.Unranked)
     val fingerprint: Checksum = MappingRender.digest(
       Vector(
-        "local-reference/profile/v1",
+        if population == NormalizationPopulation.SuppliedDestinations then
+          "local-reference/profile/v1"
+        else "local-reference/source-targets/v1",
         universe.id.digest.hex,
         CanonicalDouble.render(temperature),
         prior.toString,
@@ -53,13 +63,28 @@ object LocalReference:
   object Profile:
     /** Source membership and the actual grain are checked by the executing producer. */
     def of(universe: DeclaredUniverse, temperature: Double): Either[AlignError, Profile] =
+      checked(universe, temperature, NormalizationPopulation.SuppliedDestinations)
+
+    /** Localize conditionally on nominated admitted targets; source membership is unestablished. */
+    def sourceTargets(
+        universe: DeclaredUniverse,
+        temperature: Double
+    ): Either[AlignError, Profile] =
+      checked(universe, temperature, NormalizationPopulation.AdmittedSourceTargets)
+
+    private def checked(
+        universe: DeclaredUniverse,
+        temperature: Double,
+        population: NormalizationPopulation
+    ): Either[AlignError, Profile] =
       if !temperature.isFinite || !(temperature > 0.0) then
         Left(refused("temperature must be finite and positive"))
       else if universe.targets.isEmpty then Left(refused("target universe must be nonempty"))
       else
         universe.grain match
-          case TargetGrain.SingleLevel(level) => Right(new Profile(universe, temperature, level))
-          case _                              => Left(refused("v1 requires a single target level"))
+          case TargetGrain.SingleLevel(level) =>
+            Right(new Profile(universe, temperature, level, population))
+          case _ => Left(refused("v1 requires a single target level"))
 
   /** Every unit retains its full original prices and nomination accounting, including exclusions.
     */
@@ -191,6 +216,28 @@ object LocalReference:
           case _                                    => true
       }
     then unavailable(NotComputedReason.UnmeasuredTargetCost)
+    else if profile.population == NormalizationPopulation.AdmittedSourceTargets then
+      val grouped = targets.groupBy(_._1.anchor.get).toVector.sortBy(_._1.key)
+      val comparable = targets.forall { (_, cost) =>
+        cost.terms.keySet == Set(CostTerm.Semantic) && cost.imputedTerms.isEmpty &&
+        cost.total == cost.terms(CostTerm.Semantic) && (cost.support match
+          case assessed: SupportAssessment.Assessed =>
+            assessed.basis.measuredTerms == Set(CostTerm.Semantic) &&
+            assessed.basis.eligibleTerms == Set(CostTerm.Semantic)
+          case _ => false)
+      } && grouped.forall { (_, modes) => modes.map(_._2.total).distinct.size == 1 }
+      if !comparable then unavailable(NotComputedReason.IncomparableTargetCosts)
+      else
+        val values = grouped.map(_._2.head._2.total)
+        val least = values.min
+        val mass = sourceTargetMass(
+          grouped.map((_, modes) => modes.map((state, cost) => state -> cost.total)),
+          profile.temperature
+        )
+        val information =
+          if values.forall(_ == least) then Information.UniformCosts
+          else Information.DistinguishedCosts
+        new Computed(unit, costs, mass, information, overflow, uniform, semantics)
     else
       val values = admitted.map(_._2.total)
       val least = values.min
@@ -202,3 +249,18 @@ object LocalReference:
         if values.forall(_ == least) then Information.UniformCosts
         else Information.DistinguishedCosts
       new Computed(unit, costs, mass, information, overflow, uniform, semantics)
+
+  /** One target gets one prior share even if its equal-cost fidelity states multiply. */
+  private[align] def sourceTargetMass(
+      groups: Vector[Vector[(AlignState, Double)]],
+      temperature: Double
+  ): Map[AlignState, Double] =
+    val least = groups.map(_.head._2).min
+    val weights = groups.map(modes => math.exp(-((modes.head._2 - least) / temperature)))
+    val denominator = weights.sorted.sum
+    groups
+      .zip(weights)
+      .flatMap { (modes, weight) =>
+        modes.map((state, _) => state -> (weight / denominator / modes.size))
+      }
+      .toMap

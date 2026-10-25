@@ -451,6 +451,20 @@ lazy val media = project
   )
   .dependsOn(core.jvm, corpus.jvm)
 
+lazy val cliRuntimeProjects = ScopeFilter(inDependencies(ThisProject, includeRoot = true))
+lazy val cliRuntimeProjectInput = Def.task {
+  CliDistribution.ProjectInput(
+    thisProjectRef.value.project,
+    baseDirectory.value,
+    projectID.value,
+    (Compile / exportedProducts).value.files,
+    (Runtime / update).value,
+    licenses.value,
+    scmInfo.value,
+    scalaVersion.value
+  )
+}
+
 /** JVM-only story-build orchestrator (ADR 0009): text through `provider-agent` charts, the
   * `ChartProposalProvider`, and `NarrativeCompiler` to a three-file pre-bundle on disk. It owns
   * I/O, receipt composition, and file layout, and no semantics. No portable module depends on it.
@@ -474,7 +488,8 @@ lazy val pipeline = project
       target.value,
       version.value,
       scalaVersion.value,
-      (Runtime / fullClasspath).value.files
+      (Runtime / fullClasspath).value.files,
+      cliRuntimeProjectInput.all(cliRuntimeProjects).value
     ),
     CliDistribution.cliDistribution := CliDistribution.archive(
       CliDistribution.stageCliDistribution.value

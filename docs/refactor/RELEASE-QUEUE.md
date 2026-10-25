@@ -1,6 +1,75 @@
 # Current release queue
 
-## 15 October: publication workstreams
+## Current execution: `queue-next-20261020` (20 October 2026)
+
+The [all-open review](evidence/queue-review-20261020/README.md) covers every one of the
+108 unfinished baseline Motes. Its [per-ticket dispositions](evidence/queue-review-20261020/dispositions.md)
+and live Mote supersede the dated next-action prose below; accepted owner scope is preserved.
+
+| Order | Work record | Remaining acceptance |
+| --- | --- | --- |
+| 1 | Integration `bd-01M5E3J13V6CVABAMCRC69AG07` | Prepare the exact S1/mapping integration candidate, including all 22 pre-existing ancestors and declared Git-pin qualification; review the actual tree/bundle/consumer and concrete final integration action. |
+| 2 | U1 `bd-01M50K95JAQB34R876FWMV85J0` | Resolve and accept the own-study trust/ADR decision; reviewed proposal alone is insufficient. |
+| 3 | U2 `bd-01M50K9WYM4TQSX106M7Q2YAF4` | Implement the accepted authority contract through existing exports/cache/resume; waits for U1. |
+| 4 | U3 `bd-01M50KAP8CB5MMBQE3BX4RQ2PF` | Independent unfamiliar-file acceptance through CLI/readers/Atlas; waits for S1/U2. |
+| Fallback | StageTrace `bd-01M4EA3TVCGSVSA114DQX9588N` | Populate the concrete cost/exclusion fixture; P2, release nonblocking. |
+
+S1 and mapping A–H remain review until actual authorized landing. Their existing exact
+local gates are not fresh integration/default-pin or hosted evidence. Keep the historical
+instrument branch's separate integration and real organization preview as subsequent work.
+Native remains P1 but blocked on runtime route/delivery; E1–E3 remain independent of software
+release and wait for actual resources, eligibility and scientific freeze. No merge, push,
+study opening or package publication is performed by this queue update.
+
+```sh
+mote ls --tag queue-next-20261020
+mote ls --tag queue-next-20261020 --ready
+```
+
+## Retained owner decisions: `reality-check-20261015` (15 October 2026)
+
+Owner instruction: proceed with the four reality-check actions, keeping grakern pinned to
+GitHub for now. The complete dependency-ordered packet is the decision note on
+`bd-01M2TA01EHVRF6MQ1N00XTVK1K`; each slice below carries its own falsifiable acceptance criteria.
+This section supersedes the earlier publication-first queue and stale constructor priorities.
+
+| Order / lane | Ticket | Required result |
+| --- | --- | --- |
+| First: source/CLI | `bd-01M50K8E8KMRGY0MYXJRT0SZ8G` | Fresh exact Git-pin build without local overrides; verified extracted bundle; offline paired/weighted reader replay; truthful per-artifact Maven deferral. |
+| Parallel runtime delivery | `bd-01M4YP83C7925M22V0K5AQ88BX` | Accepted corrected Native artifact selected and qualified in the exact producer/consumer; preserve original/fixed regression evidence. |
+| Own-study contract | `bd-01M50K95JAQB34R876FWMV85J0` | Reviewed local admission/ADR contract, trusted inputs and scope, with positive and refusal examples. |
+| Own-study implementation, after contract | `bd-01M50K9WYM4TQSX106M7Q2YAF4` | Configuration, preparation and export preserve the approved authority and exact text; forged/mismatched/widened claims refuse. |
+| Own-study independent acceptance, after S1/U2 | `bd-01M50KAP8CB5MMBQE3BX4RQ2PF` | Independent unfamiliar-file run, complete accounting, both mappings, three weights, readers and exact pinned Atlas readback. |
+| Research protocol, independent of release | `bd-01M50KBFT26DRB77VFHPRHYNA2` | Prospective frozen estimand, split/exposure, arms, sample/precision, thresholds, launch guards and scientific review. |
+| Research material, after protocol/resources | `bd-01M50KC744836VNJ8F8A4AHNWH` | Approved fresh eligible material, blinded coding, preserved ambiguity and an independent exposure/inventory audit. |
+| Research execution, after material/instrument repair | `bd-01M50KD0NHVPCEHGZND9H18M6E` | One frozen execution, complete denominators, independent estimates/readout and bounded supported/contradicted/inconclusive verdicts. |
+
+```sh
+mote ls --tag reality-check-20261015
+mote ls --tag reality-check-20261015 --ready
+```
+
+The tag also includes the existing delivery/release/infrastructure containers, Native ticket,
+G3 study, coder/resource decision and instrument repair. Containment uses `rel`; only actual
+prerequisites use blocking `dep` edges. Research does not block software qualification. The
+planning ticket `bd-01M50K0WR735JQWF6FZKY85C6E` covers these index/tracker changes only.
+
+Grakern stays at source pin `0329c43c88a0b71e9aa4456723bb16bac2fa3841` unless a reviewed
+change is necessary. Preserve its transitive graph4s/Gale source pins and the future staged
+publication candidates. Do not substitute the binary-dependent publication branch, a floating
+ref, missing Maven dependency or unverified local checkout. S1 supplies source/CLI delivery;
+the full grakern-dependent Maven matrix and Central setup are deferred, not passed. The
+infrastructure and final release parents remain open for their unsatisfied broader acceptance.
+
+Carry forward the completed journey, imaging within published-index scope, docs deployment,
+constructor repairs and stable-boundary judgment. Keep the StageTrace cost-retention witness
+as its existing nonblocking follow-up. Existing scientific claims and the physical-synchronization
+limit are unchanged. See [PLAN](PLAN.md#current-follow-through-reality-check-15-october-2026)
+for baseline evidence, stopping conditions and the distinction between delivery and efficacy.
+
+<a id="15-october-publication-workstreams"></a>
+
+## Historical: publication workstreams before the GitHub-pin decision
 
 The owner authorized completing the four infrastructure actions below. This table supersedes
 the earlier statements that site authorization was missing. The final release gate stays open

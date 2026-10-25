@@ -33,6 +33,66 @@ class PairedReaderTests(unittest.TestCase):
             entry["bytes"] = str(len(raw))
         files["manifest.json"] = json.dumps(manifest)
 
+    def reconcile_v2_summary(self, manifest):
+        metadata = manifest["metadata"]
+        summary = metadata["summary"]
+        outcomes = metadata["outcomes"]
+        complete = [outcome for outcome in outcomes if outcome["execution"] == "complete"]
+        summary["completed"] = len(complete)
+        summary["failed"] = len(outcomes) - len(complete)
+        summary["models"] = [outcome["mapping"]["model"] for outcome in complete]
+        coverage = summary["coverage"]
+        coverage["runProduced"] = len(complete)
+        for member in ("reference", "reconstruction"):
+            units = [unit for observation in coverage["observations"] for unit in observation["units"]]
+            measured = sum(unit[member]["measureAvailable"] for unit in units)
+            coverage[member].update(
+                declaredUnits=len(units),
+                measuredUnits=measured,
+                unavailableUnits=len(units) - measured,
+                overflowUnits=sum(unit[member].get("overflow", False) for unit in units),
+                uniformSemanticUnits=sum(unit[member].get("uniformSemantic", False) for unit in units),
+                uniformCostUnits=sum(unit[member].get("uniformCosts", False) for unit in units),
+            )
+            if units:
+                coverage[member]["measuredFractionOfKnownUnits"] = measured / len(units)
+            else:
+                coverage[member].pop("measuredFractionOfKnownUnits", None)
+
+    def make_all_failed(self, files):
+        manifest = parse(files["manifest.json"])
+        for outcome, observation in zip(
+            manifest["metadata"]["outcomes"],
+            manifest["metadata"]["summary"]["coverage"]["observations"],
+        ):
+            if outcome["execution"] == "complete":
+                prefix = outcome["run"] + "--"
+                for path in list(files):
+                    if path.startswith(prefix):
+                        del files[path]
+                manifest["files"] = [entry for entry in manifest["files"] if not entry["path"].startswith(prefix)]
+                outcome.update(execution="failed", structuralValidity="not-produced", failure="synthetic-all-failed", mapping=None, run=None, registration=None, readiness="not-executed")
+                for unit in outcome["units"]:
+                    unit.update(reference="Failed", reconstruction="Failed")
+                observation["failure"] = "synthetic-all-failed"
+                for unit in observation["units"]:
+                    unit["reference"] = {"processing": "NotProduced", "measureAvailable": False, "unavailableReason": "RunNotProduced"}
+                    unit["reconstruction"] = {"processing": "NotProduced", "measureAvailable": False, "unavailableReason": "RunNotProduced"}
+        self.reconcile_v2_summary(manifest)
+        files["manifest.json"] = json.dumps(manifest)
+        return files
+
+    def test_v1_wrapper_accepts_unchanged_pair_payloads(self):
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        manifest["schemaVersion"] = "mapping-exchange-batch/v1"
+        del manifest["metadata"]["summary"]
+        for outcome in manifest["metadata"]["outcomes"]:
+            if outcome["execution"] == "complete":
+                del outcome["mapping"]["model"]
+        files["manifest.json"] = json.dumps(manifest)
+        self.assertEqual(read_publication(files)["schema"], "mapping-exchange-batch/v1")
+
     def test_publication_accounts_for_two_recalls_and_one_failed_attempt(self):
         value = read_publication(self.files())
         self.assertEqual(len(value["pairs"]), 2)
@@ -96,6 +156,57 @@ class PairedReaderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "attempt denominator"):
             read_publication(files)
 
+    def test_dropped_v2_coverage_observation_refuses_after_rehash(self):
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        manifest["metadata"]["summary"]["coverage"]["observations"].pop()
+        files["manifest.json"] = json.dumps(manifest)
+        with self.assertRaisesRegex(ValueError, "coverage observation denominator"):
+            read_publication(files)
+
+    def test_contradictory_v2_model_metadata_refuses_after_rehash(self):
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        manifest["metadata"]["summary"]["models"][0]["reference"]["temperature"] = 99.0
+        files["manifest.json"] = json.dumps(manifest)
+        with self.assertRaisesRegex(ValueError, "summary executed model"):
+            read_publication(files)
+
+    def test_v2_diagnostic_total_and_reference_temperature_refuse(self):
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        manifest["metadata"]["summary"]["coverage"]["reference"]["overflowUnits"] += 1
+        files["manifest.json"] = json.dumps(manifest)
+        with self.assertRaisesRegex(ValueError, "coverage diagnostic totals"):
+            read_publication(files)
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        run = manifest["metadata"]["outcomes"][0]["mapping"]
+        run["model"]["reference"]["temperature"] = 2.0
+        manifest["metadata"]["summary"]["models"][0]["reference"]["temperature"] = 2.0
+        files["manifest.json"] = json.dumps(manifest)
+        with self.assertRaisesRegex(ValueError, "reference normalized temperature"):
+            read_publication(files)
+
+    def test_empty_and_all_failed_v2_wrappers_preserve_zero_known_boundary(self):
+        all_failed = self.make_all_failed(self.files())
+        value = read_publication(all_failed)
+        self.assertEqual(value["pairs"], [])
+        self.assertEqual(value["metadata"]["summary"]["coverage"]["reference"]["declaredUnits"], 2)
+        files = self.files()
+        manifest = parse(files["manifest.json"])
+        manifest["metadata"]["attempts"] = []
+        manifest["metadata"]["outcomes"] = []
+        manifest["files"] = []
+        summary = manifest["metadata"]["summary"]
+        summary.update(attempts=0, completed=0, failed=0, models=[])
+        coverage = summary["coverage"]
+        coverage.update(prepared=0, runProduced=0, unknownUnitObservations=0, observations=[])
+        for member in ("reference", "reconstruction"):
+            coverage[member] = {"declaredUnits": 0, "measuredUnits": 0, "unavailableUnits": 0, "overflowUnits": 0, "uniformSemanticUnits": 0, "uniformCostUnits": 0}
+        files = {"manifest.json": json.dumps(manifest)}
+        self.assertEqual(read_publication(files)["outcomes"], [])
+
     def test_foreign_source_edition_refuses(self):
         files = self.metadata(lambda m: m.update(sourceEdition="0" * 64))
         with self.assertRaisesRegex(ValueError, "source edition"):
@@ -151,6 +262,12 @@ class PairedReaderTests(unittest.TestCase):
                      mapping=None, run=None, registration=None, readiness="not-executed")
         for unit in first["units"]:
             unit.update(reference="Failed", reconstruction="Failed")
+        observation = manifest["metadata"]["summary"]["coverage"]["observations"][0]
+        observation["failure"] = "synthetic-failure-control"
+        for unit in observation["units"]:
+            unit["reference"] = {"processing": "NotProduced", "measureAvailable": False, "unavailableReason": "RunNotProduced"}
+            unit["reconstruction"] = {"processing": "NotProduced", "measureAvailable": False, "unavailableReason": "RunNotProduced"}
+        self.reconcile_v2_summary(manifest)
         files["manifest.json"] = json.dumps(manifest)
         # Consistent failed-attempt control still accounts for the imported recall's unit.
         self.assertEqual(len(read_publication(files)["pairs"]), 1)

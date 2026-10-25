@@ -1,0 +1,75 @@
+{
+  "source": "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c",
+  "status": "failed",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--no-checkout",
+        "/Users/bbuchsbaum/code/scala/storymodel4s",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/checkout"
+      ],
+      "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/command-00.log",
+      "exit": 0,
+      "logSha256": "a76f17b86024b9705099d257e1ad4adc9d6e94d62152044c90d66852d2972a9d"
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c"
+      ],
+      "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/checkout",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/command-01.log",
+      "exit": 0,
+      "logSha256": "fae7b7437dccdf65bc57a05103468a5e979ce5a42ef345e3f6ba0df7e65c41d5"
+    },
+    {
+      "argv": [
+        "java",
+        "-version"
+      ],
+      "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/checkout",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/command-02.log",
+      "exit": 0,
+      "logSha256": "852095cab44f83f526a130175f3bc152581bb2d201848eac9af0a95668e1db0a"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx4G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-Dsbt.boot.directory=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/boot",
+        "-Dsbt.global.base=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/global",
+        "-Dsbt.global.staging=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/staging",
+        "-Dsbt.ivy.home=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/ivy",
+        "-Dsbt.repository.config=/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/repositories",
+        "-Dsbt.override.build.repos=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "embedGrakern/test",
+        "pipeline/test",
+        "pipeline/cliDistribution"
+      ],
+      "cwd": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/checkout",
+      "log": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/command-03.log",
+      "exit": 1,
+      "logSha256": "74dc1219188f3b49036e77c33f997fe5b968e374455e1597d448bb281e15a1b5"
+    }
+  ],
+  "started": 1792111866.7387352,
+  "isolation": {
+    "boot": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/boot",
+    "global": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/global",
+    "staging": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/staging",
+    "ivy": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/ivy",
+    "coursier": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/coursier",
+    "config": "/Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/config"
+  },
+  "error": "command failed: /Users/bbuchsbaum/code/scala/storymodel4s/.agent-work/reality-check-20261015/fresh-baseline/command-03.log",
+  "finished": 1792111975.4385548
+}

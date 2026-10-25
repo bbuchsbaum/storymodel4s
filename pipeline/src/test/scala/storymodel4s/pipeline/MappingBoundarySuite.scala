@@ -1039,3 +1039,349 @@ summon[scala.deriving.Mirror.ProductOf[TimedSourceView]]""").nonEmpty)
       ).nonEmpty
     )
   }
+
+  test("MappingPipeline.ReferenceRun constructor refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(execution: MappingRun.ReferenceExecution, reference: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
+new Open(??? : MappingRun.ReferenceExecution, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+new MappingPipeline.ReferenceRun(??? : MappingRun.ReferenceExecution, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceRun apply refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(execution: MappingRun.ReferenceExecution, reference: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
+Open(??? : MappingRun.ReferenceExecution, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+MappingPipeline.ReferenceRun(??? : MappingRun.ReferenceExecution, ??? : MappingResult, ??? : MappingPipeline.Config, ??? : Checksum, ??? : Option[CaptionMapping.Registered], ??? : Option[OnnxMappingRegistration.Registered], ??? : Option[CaptionMapping.PackageRegistered])"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceRun copy refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(execution: MappingRun.ReferenceExecution, reference: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered]);
+(??? : Open).copy()"""),
+      Nil
+    )
+    assert(typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+(??? : MappingPipeline.ReferenceRun).copy()""").nonEmpty)
+  }
+
+  test("MappingPipeline.ReferenceRun fromProduct refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(execution: MappingRun.ReferenceExecution, reference: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
+object Open { def fromProduct(p: Product): Open = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(p) }
+Open.fromProduct(???)"""),
+      Nil
+    )
+    assert(typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+MappingPipeline.ReferenceRun.fromProduct(???)""").nonEmpty)
+  }
+
+  test("MappingPipeline.ReferenceRun Mirror refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(execution: MappingRun.ReferenceExecution, reference: MappingResult, config: MappingPipeline.Config, registration: Checksum, caption: Option[CaptionMapping.Registered], onnx: Option[OnnxMappingRegistration.Registered], captionPackage: Option[CaptionMapping.PackageRegistered])
+summon[scala.deriving.Mirror.ProductOf[Open]]"""),
+      Nil
+    )
+    assert(typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+summon[scala.deriving.Mirror.ProductOf[MappingPipeline.ReferenceRun]]""").nonEmpty)
+  }
+
+  test("MappingPipeline.ReferenceOutcome constructor refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(participant: String, session: String, observation: Option[Checksum], failure: Option[String], run: Option[MappingPipeline.ReferenceRun], prepared: Option[StudyPreparation.Recall])
+new Open(??? : String, ??? : String, ??? : Option[Checksum], ??? : Option[String], ??? : Option[MappingPipeline.ReferenceRun], ??? : Option[StudyPreparation.Recall])"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+new MappingPipeline.ReferenceOutcome(??? : String, ??? : String, ??? : Option[Checksum], ??? : Option[String], ??? : Option[MappingPipeline.ReferenceRun], ??? : Option[StudyPreparation.Recall])"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceOutcome apply refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(participant: String, session: String, observation: Option[Checksum], failure: Option[String], run: Option[MappingPipeline.ReferenceRun], prepared: Option[StudyPreparation.Recall])
+Open(??? : String, ??? : String, ??? : Option[Checksum], ??? : Option[String], ??? : Option[MappingPipeline.ReferenceRun], ??? : Option[StudyPreparation.Recall])"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+MappingPipeline.ReferenceOutcome(??? : String, ??? : String, ??? : Option[Checksum], ??? : Option[String], ??? : Option[MappingPipeline.ReferenceRun], ??? : Option[StudyPreparation.Recall])"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceOutcome copy refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(participant: String, session: String, observation: Option[Checksum], failure: Option[String], run: Option[MappingPipeline.ReferenceRun], prepared: Option[StudyPreparation.Recall]);
+(??? : Open).copy()"""),
+      Nil
+    )
+    assert(typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+(??? : MappingPipeline.ReferenceOutcome).copy()""").nonEmpty)
+  }
+
+  test("MappingPipeline.ReferenceOutcome fromProduct refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(participant: String, session: String, observation: Option[Checksum], failure: Option[String], run: Option[MappingPipeline.ReferenceRun], prepared: Option[StudyPreparation.Recall])
+object Open { def fromProduct(p: Product): Open = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(p) }
+Open.fromProduct(???)"""),
+      Nil
+    )
+    assert(typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+MappingPipeline.ReferenceOutcome.fromProduct(???)""").nonEmpty)
+  }
+
+  test("MappingPipeline.ReferenceOutcome Mirror refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+case class Open(participant: String, session: String, observation: Option[Checksum], failure: Option[String], run: Option[MappingPipeline.ReferenceRun], prepared: Option[StudyPreparation.Recall])
+summon[scala.deriving.Mirror.ProductOf[Open]]"""),
+      Nil
+    )
+    assert(typeCheckErrors("""import storymodel4s.align.*
+import storymodel4s.core.*
+import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
+import storymodel4s.pipeline.*
+import storymodel4s.media.*
+import storymodel4s.embed.onnx.OnnxMappingRegistration
+import storymodel4s.align.bridge.*
+summon[scala.deriving.Mirror.ProductOf[MappingPipeline.ReferenceOutcome]]""").nonEmpty)
+  }
+
+  test("MappingPipeline.ReferenceBatch constructor refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; case class Open(prepared: StudyPreparation.Prepared, config: MappingPipeline.Config, outcomes: Vector[MappingPipeline.ReferenceOutcome]); new Open(??? : StudyPreparation.Prepared, ??? : MappingPipeline.Config, ??? : Vector[MappingPipeline.ReferenceOutcome])"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; new MappingPipeline.ReferenceBatch(??? : StudyPreparation.Prepared, ??? : MappingPipeline.Config, ??? : Vector[MappingPipeline.ReferenceOutcome])"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceBatch apply refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; case class Open(prepared: StudyPreparation.Prepared, config: MappingPipeline.Config, outcomes: Vector[MappingPipeline.ReferenceOutcome]); Open(??? : StudyPreparation.Prepared, ??? : MappingPipeline.Config, ??? : Vector[MappingPipeline.ReferenceOutcome])"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; MappingPipeline.ReferenceBatch(??? : StudyPreparation.Prepared, ??? : MappingPipeline.Config, ??? : Vector[MappingPipeline.ReferenceOutcome])"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceBatch copy refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; case class Open(prepared: StudyPreparation.Prepared, config: MappingPipeline.Config, outcomes: Vector[MappingPipeline.ReferenceOutcome]); (??? : Open).copy()"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; (??? : MappingPipeline.ReferenceBatch).copy()"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceBatch fromProduct refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; case class Open(prepared: StudyPreparation.Prepared, config: MappingPipeline.Config, outcomes: Vector[MappingPipeline.ReferenceOutcome]); object Open { def fromProduct(p: Product): Open = summon[scala.deriving.Mirror.ProductOf[Open]].fromProduct(p) }; Open.fromProduct(???)"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; MappingPipeline.ReferenceBatch.fromProduct(???)"""
+      ).nonEmpty
+    )
+  }
+
+  test("MappingPipeline.ReferenceBatch Mirror refuses with matching positive control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; case class Open(prepared: StudyPreparation.Prepared, config: MappingPipeline.Config, outcomes: Vector[MappingPipeline.ReferenceOutcome]); summon[scala.deriving.Mirror.ProductOf[Open]]"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.*; summon[scala.deriving.Mirror.ProductOf[MappingPipeline.ReferenceBatch]]"""
+      ).nonEmpty
+    )
+  }

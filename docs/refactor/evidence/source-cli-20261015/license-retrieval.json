@@ -1,0 +1,132 @@
+[
+  {
+    "file": "Apache-2.0.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+        "resolvedUrl": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+        "httpStatus": 200,
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "file": "Apache-2.0.txt"
+      }
+    ]
+  },
+  {
+    "file": "LGPL-2.1.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt",
+        "resolvedUrl": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt",
+        "httpStatus": 200,
+        "bytes": 26419,
+        "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+        "file": "LGPL-2.1.txt"
+      }
+    ]
+  },
+  {
+    "file": "cats-2.13.0.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/typelevel/cats/v2.13.0/COPYING",
+        "resolvedUrl": "https://raw.githubusercontent.com/typelevel/cats/v2.13.0/COPYING",
+        "httpStatus": 200,
+        "bytes": 14141,
+        "sha256": "56976829a6edd3cdefbd6bf2c764f31cb1817dfd1d14d349a152044ef0155917",
+        "file": "cats-2.13.0.txt"
+      }
+    ]
+  },
+  {
+    "file": "cats-collections-0.9.10.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/typelevel/cats-collections/v0.9.10/COPYING",
+        "resolvedUrl": "https://raw.githubusercontent.com/typelevel/cats-collections/v0.9.10/COPYING",
+        "httpStatus": 200,
+        "bytes": 2691,
+        "sha256": "0f0501c52b9a68a02933fff8500df244c35682744bcf179af61d70ed511d64b7",
+        "file": "cats-collections-0.9.10.txt"
+      }
+    ]
+  },
+  {
+    "file": "cats-parse-1.1.0.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/typelevel/cats-parse/v1.1.0/COPYING",
+        "error": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/typelevel/cats-parse/v1.1.0/LICENSE",
+        "resolvedUrl": "https://raw.githubusercontent.com/typelevel/cats-parse/v1.1.0/LICENSE",
+        "httpStatus": 200,
+        "bytes": 1072,
+        "sha256": "bd16cdf2d68dc6e51888df9a9bdc7e09b80daf8c395e851d4b91122b624e39a8",
+        "file": "cats-parse-1.1.0.txt"
+      }
+    ]
+  },
+  {
+    "file": "jawn-1.6.0.txt",
+    "status": "unresolved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/typelevel/jawn/v1.6.0/COPYING",
+        "error": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/typelevel/jawn/v1.6.0/LICENSE",
+        "error": "HTTP Error 404: Not Found"
+      }
+    ]
+  },
+  {
+    "file": "anthropic-2.34.0.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/anthropics/anthropic-sdk-java/v2.34.0/LICENSE",
+        "resolvedUrl": "https://raw.githubusercontent.com/anthropics/anthropic-sdk-java/v2.34.0/LICENSE",
+        "httpStatus": 200,
+        "bytes": 1056,
+        "sha256": "8bf96984ff8bcfae7e48cae76a529e8a25317ba9e02abf7fd3cc64fdf95657a6",
+        "file": "anthropic-2.34.0.txt"
+      }
+    ]
+  },
+  {
+    "file": "onnxruntime-1.29.0.txt",
+    "status": "retrieved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.29.0/LICENSE",
+        "resolvedUrl": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.29.0/LICENSE",
+        "httpStatus": 200,
+        "bytes": 1073,
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+        "file": "onnxruntime-1.29.0.txt"
+      }
+    ]
+  },
+  {
+    "file": "standardwebhooks-1.1.0.txt",
+    "status": "unresolved",
+    "attempts": [
+      {
+        "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/v1.1.0/LICENSE",
+        "error": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/standard-webhooks/standard-webhooks/java-v1.1.0/LICENSE",
+        "error": "HTTP Error 404: Not Found"
+      }
+    ]
+  }
+]

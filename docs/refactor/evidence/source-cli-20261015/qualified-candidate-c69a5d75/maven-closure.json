@@ -1,0 +1,4092 @@
+{
+  "source": "c69a5d754a21fa455c64901334d9509278401091",
+  "candidateVersion": "1.0.0",
+  "poms": {
+    "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0": {
+      "sha256": "47ec9af9fab145bdc0314a46aa848e5804cd75b8f2b79c560b8c4c8bbc240146",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0": {
+      "sha256": "ead58387897647fcd16882f00f8f3d1f61e11d668af23cb58e878ab6e677c788",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0": {
+      "sha256": "eaa0824d25af048751ccd732b7aad09cc56371aa608abf43fef834b1af5b268a",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0": {
+      "sha256": "a2708140e5c15e7da1fde60361752c92fcffc23aed1d1ced4c20cbe2509a475e",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-align_native0.5_3:1.0.0": {
+      "sha256": "eaf7f4931bdbe0d1ecba5ca5fe0a02ddc0b955cad3826a51e93f3bc5f55c6f66",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-align_sjs1_3:1.0.0": {
+      "sha256": "e1300aaf919fa921f7059df7e3e71a8bffa6b00fc97ca8aeed5d91dc82ca67ff",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-amr-interop_3:1.0.0": {
+      "sha256": "7aa41dbcc0fb0fe7580019a5345f75e4072a367bbb5131165efb616af04854bc",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-parse_3:1.1.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-amr-interop_native0.5_3:1.0.0": {
+      "sha256": "5095bd2929881419ec9490873449e8665766241a605556899a2867229bc44d44",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-parse_native0.5_3:1.1.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-amr-interop_sjs1_3:1.0.0": {
+      "sha256": "c885dfda490910b6eb18870b2656cc57b13e7d6c2a88a093a039644029772522",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-parse_sjs1_3:1.1.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-codec_3:1.0.0": {
+      "sha256": "a5cbd10a983e9cf93598ee3193b9a26edde54275ba2fade8948690c7d82ceff2",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-laws_3:1.0.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-codec_native0.5_3:1.0.0": {
+      "sha256": "39fd5e9f9a9ca7d7ce491d312ffb20ed927c5ce1aff1834bd7a608c5bbb5532d",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-laws_native0.5_3:1.0.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_native0.5_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_native0.5_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-codec_sjs1_3:1.0.0": {
+      "sha256": "6333826898d3c58104ece26406e18a3a812bf69e61138cd57f313de63028e262",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-laws_sjs1_3:1.0.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_sjs1_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_sjs1_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0": {
+      "sha256": "3c9b9bcbd35081e669ea79320a24050e76bfd53415a662f97f7121b1c4a9b778",
+      "dependencies": [
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0": {
+      "sha256": "e17f576fd2894c0f550b98ae1b1ae32b15d2d072fc1e418264890baff2e822d4",
+      "dependencies": [
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_native0.5_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_native0.5_3:0.9.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0": {
+      "sha256": "017318d61d60037866ea8f523e3092a92e86c5e9737115c2ae3d0661e449f1f8",
+      "dependencies": [
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_sjs1_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-collections-core_sjs1_3:0.9.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-corpus-intake_3:1.0.0": {
+      "sha256": "89e2226b4d8dabe2622979610d182378a76345299d13ae32693a3ef39ade6517",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-corpus_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-corpus_3:1.0.0": {
+      "sha256": "65b5c5d8c118178c76954636f4fccd1d781d9c38751e42feecdf1dbf3edf41be",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-corpus_native0.5_3:1.0.0": {
+      "sha256": "94e7853e4412e26b3c5a4abd469b964b4ede4347010be3f44c7d4635adf6ec4c",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_native0.5_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_native0.5_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-corpus_sjs1_3:1.0.0": {
+      "sha256": "5241b88844101879e9ba94fc3e4ee4a549ab3bb7972f1b408661c2a5a28fa1c5",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_sjs1_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_sjs1_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-document_3:1.0.0": {
+      "sha256": "9ad73ccd59e6b0e8bf6cddad85595090d7b61029b140bda09d424f9af81aeb0f",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-document_native0.5_3:1.0.0": {
+      "sha256": "6bb6c6b2bc5a23949b747f27449a5492648205e5fa75855401d3e655bfd4632b",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-document_sjs1_3:1.0.0": {
+      "sha256": "a7fd697fd7df5fa755bba3d88e4e9b2621d33b8a7821057eae9880bce0c3dee0",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-embed-bench_3:1.0.0": {
+      "sha256": "43aac51bf97b3b68fdf6341ff58ed40801bc0d3bbece86672f94db7a3e43a9d6",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-corpus-intake_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-onnx_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-grakern_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-codec_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-fixtures_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-laws_3:1.0.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-embed-core_3:1.0.0": {
+      "sha256": "688552584540fedd6fb08782d99f6a5e063bfe0c4728d10ea19d0df657039364",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-embed-core_native0.5_3:1.0.0": {
+      "sha256": "96c9d486f2bb0804b0033a077b078226d9e70f8fd5309cdab164d3d8600aeba0",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-embed-core_sjs1_3:1.0.0": {
+      "sha256": "9fd52aa25f9d8beacb8fb221d43ec7cee6a9b02ed3e385bdfc1ed795b6303164",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-embed-grakern_3:1.0.0": {
+      "sha256": "8de6a1dc407aa4fafea2925277af3db1ab1f9c88810cb3672d5ac14f294b39d8",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-embed-onnx_3:1.0.0": {
+      "sha256": "cab46f95e71bd34b91167da210c325842b46f469f4227f0965d4dad2951117b4",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "com.microsoft.onnxruntime:onnxruntime:1.29.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "ai.djl.huggingface:tokenizers:0.36.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0": {
+      "sha256": "576cea2b694569704303429a186aa284bfcf9e7a025d3d80b48a2606684cbdf1",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0": {
+      "sha256": "8c7d8c27dd079164995e280b47df0ffdff0f9b5a53ac97abdbe204c47d074c33",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0": {
+      "sha256": "c2d73c76cb1e0dbfc46b48612262b2236173a4ea7db9d03763ade68d1860fca1",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-fixtures_3:1.0.0": {
+      "sha256": "0a6a8ead08083b945b9af4a54bc2e12e8346500bbf0629ebe6923cf94aec736c",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-codec_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-fixtures_native0.5_3:1.0.0": {
+      "sha256": "7cddd4b46e627c2b1d262b5964915b70c9e162e8e762d0d1a28cc2aef09e7671",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-codec_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-fixtures_sjs1_3:1.0.0": {
+      "sha256": "d98f4468cdfb5e4aa11c9645fe9bed00673453f782c7955028504e6ad27ffd64",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-codec_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-view_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-interview_3:1.0.0": {
+      "sha256": "fdd4334d31d28e92fbaa4251ea9d9bb37da67d936311782677369c52338e7dde",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-interview_native0.5_3:1.0.0": {
+      "sha256": "930ee6a5d6318277a369d21ff966a76749c97db21d85eedaf1d6797def027cec",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-interview_sjs1_3:1.0.0": {
+      "sha256": "5b98b216c3cc0c3025abaa99e2797413a10fcd6a5cd3f0dab0fc6c667ad996c3",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-laws_3:1.0.0": {
+      "sha256": "5e10adf4b9071c39d4e9dd68e9f0e6d800e3a57d4963adbcadd9bcdd9c99606d",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:discipline-munit_3:2.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-laws_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_3:1.19.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-laws_native0.5_3:1.0.0": {
+      "sha256": "08fac2515f046f69972666ad37d27aafaf5fad9e96519846c75c6c5e54e483b7",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:discipline-munit_native0.5_3:2.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-laws_native0.5_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_native0.5_3:1.19.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-laws_sjs1_3:1.0.0": {
+      "sha256": "6186489eebe70de14177e6096f00914c3f288e5d1770761a5d664158a38620d1",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-interview_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:discipline-munit_sjs1_3:2.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-laws_sjs1_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalacheck:scalacheck_sjs1_3:1.19.0",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-media_3:1.0.0": {
+      "sha256": "0da149069ea9f3b034662cac85ea3730cb8393948d1a404494ca33c6c56106e0",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-corpus_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-pipeline_3:1.0.0": {
+      "sha256": "2c425026eaff7c99cae6dceececac043cd969e27b474e6b9eb231511c4b662e1",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-provider-agent_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-provider-parser_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-codec_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-corpus-intake_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-embed-onnx_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-media_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-fixtures_3:1.0.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0": {
+      "sha256": "18d6dd7186d40e80c7c4156302fcb130b2e099a6d8c985e4bea7c8a4c357e20c",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0": {
+      "sha256": "77fd86d1ef1dce99955f9111eea09aa71b291edd5d18924f1165c75112f1ab9c",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0": {
+      "sha256": "e805c4e75c0f655191c4ba29ca2c098e90236db1ca7e8c21257434bb5527c8e6",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-provider-agent_3:1.0.0": {
+      "sha256": "48de51e66ced81ec7ca4de4e6d2d22d60d15fa2496196ebb4bfc37882670ddd1",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-provider-parser_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "com.anthropic:anthropic-java:2.34.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-provider-parser_3:1.0.0": {
+      "sha256": "54693714b52ec32c0eedbb94195672e0109aa3bd3141f8e48d7d6b309d01a9eb",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-amr-interop_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:cats-core_3:2.13.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-core_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.circe:circe-parser_3:0.14.10",
+          "scope": "compile",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0": {
+      "sha256": "adbfd42b2c186d1c98a8d75d96db9b0152fd73e50040f4a54cb133f0410274a3",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0": {
+      "sha256": "1dc5030a91b4c36d73fe4a9c439c75a1e31178dbd87dbbd84292b47d8f97ba44",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0": {
+      "sha256": "747144ae4908188649251be20b2b0f81cb818a37b47c1d74953134d95c8ac18f",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0": {
+      "sha256": "be249389fbfec381d4a69d02ee872610ef04d2d6c928f57353283cd60d5f55d9",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0": {
+      "sha256": "6d9a5b582883e7026ee8ae1549fc061aa91500e801d401e6303ca30267186b03",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0": {
+      "sha256": "d0fc5649f2a1fac671b8ce653e6bae8ffe005ca775cf93b9e031a10c5dd37778",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-view_3:1.0.0": {
+      "sha256": "08d72eec784b2925ca476060731208f3781d7bdd63f626a5263d19b4b48aaa95",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-view_native0.5_3:1.0.0": {
+      "sha256": "75262e60c361e022fb9b5ab30eb1592c677481926bfdc529d78a69efbbe5afe5",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_native0.5_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:test-interface_native0.5_3:0.5.12",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:nativelib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:clib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:posixlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:windowslib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:javalib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-native:auxlib_native0.5_3:0.5.12",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_native0.5_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_native0.5_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    },
+    "io.github.bbuchsbaum:storymodel4s-view_sjs1_3:1.0.0": {
+      "sha256": "1bb957c230e6b674e81394788865b11b48382fce60d108a44cc677aa1345efa7",
+      "dependencies": [
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-core_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-proposition_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-features_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-acquire_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-story_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-document_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-recall_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "io.github.bbuchsbaum:storymodel4s-align_sjs1_3:1.0.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-lang:scala3-library_sjs1_3:3.7.4",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-library_2.13:1.22.0",
+          "scope": "compile",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scala-js:scalajs-test-bridge_2.13:1.22.0",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.typelevel:scalac-compat-annotation_3:0.1.4",
+          "scope": "provided",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit_sjs1_3:1.3.4",
+          "scope": "test",
+          "optional": false
+        },
+        {
+          "coordinate": "org.scalameta:munit-scalacheck_sjs1_3:1.3.0",
+          "scope": "test",
+          "optional": false
+        }
+      ]
+    }
+  },
+  "publicRootPomChecks": {
+    "ai.djl.huggingface:tokenizers:0.36.0": {
+      "url": "https://repo.maven.apache.org/maven2/ai/djl/huggingface/tokenizers/0.36.0/tokenizers-0.36.0.pom",
+      "httpStatus": 200,
+      "bytes": 1457,
+      "sha256": "9cdb34c0721d3130dd833b415976f5f64133d502c645e3b03713d0b1c14604be"
+    },
+    "com.anthropic:anthropic-java:2.34.0": {
+      "url": "https://repo.maven.apache.org/maven2/com/anthropic/anthropic-java/2.34.0/anthropic-java-2.34.0.pom",
+      "httpStatus": 200,
+      "bytes": 1811,
+      "sha256": "284a9d5428389f51b0aa737986ef59d87a038a945d76e3ab46a98843ffb4bad1"
+    },
+    "com.microsoft.onnxruntime:onnxruntime:1.29.0": {
+      "url": "https://repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.29.0/onnxruntime-1.29.0.pom",
+      "httpStatus": 200,
+      "bytes": 1684,
+      "sha256": "8745955f8de3bc0bdbfa99525b836ee285dd6ad22e70bfb5d96537a76b24be92"
+    },
+    "io.circe:circe-core_3:0.14.10": {
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_3/0.14.10/circe-core_3-0.14.10.pom",
+      "httpStatus": 200,
+      "bytes": 3082,
+      "sha256": "7e8387bb2eefed50e1a480d544650c64c14105ffe26d8d845162f17dba9831d2"
+    },
+    "io.circe:circe-core_native0.5_3:0.14.10": {
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_native0.5_3/0.14.10/circe-core_native0.5_3-0.14.10.pom",
+      "httpStatus": 200,
+      "bytes": 18319,
+      "sha256": "ca466fa48e15fdd11ca5f26b1215c0d530c93803a80ff2dacebcd453dead27a1"
+    },
+    "io.circe:circe-core_sjs1_3:0.14.10": {
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_sjs1_3/0.14.10/circe-core_sjs1_3-0.14.10.pom",
+      "httpStatus": 200,
+      "bytes": 3509,
+      "sha256": "b0d66170bcfdc5a89b2744ab3110210be23fd18b4dcc7fec512be983da7b9743"
+    },
+    "io.circe:circe-parser_3:0.14.10": {
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_3/0.14.10/circe-parser_3-0.14.10.pom",
+      "httpStatus": 200,
+      "bytes": 3084,
+      "sha256": "c7a38e9acaecf253d1664375f162a3e99ba366a697f8a22007ad5ecf5b072175"
+    },
+    "io.circe:circe-parser_native0.5_3:0.14.10": {
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_native0.5_3/0.14.10/circe-parser_native0.5_3-0.14.10.pom",
+      "httpStatus": 200,
+      "bytes": 18321,
+      "sha256": "6f1fe44314ecb325077c21b3d76f71fd849b541b33e665dfb0aff8a5378deb41"
+    },
+    "io.circe:circe-parser_sjs1_3:0.14.10": {
+      "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_sjs1_3/0.14.10/circe-parser_sjs1_3-0.14.10.pom",
+      "httpStatus": 200,
+      "bytes": 3514,
+      "sha256": "6ff46d1596104a983715f2a25ac4267045d2448252839835c23dcad0a91cc5bd"
+    },
+    "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT": {
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-core_3/0.1-0329c43-SNAPSHOT/grakern-core_3-0.1-0329c43-SNAPSHOT.pom",
+      "httpStatus": 404
+    },
+    "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT": {
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-engine-jvm_3/0.1-0329c43-SNAPSHOT/grakern-engine-jvm_3-0.1-0329c43-SNAPSHOT.pom",
+      "httpStatus": 404
+    },
+    "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT": {
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-graph4s_3/0.1-0329c43-SNAPSHOT/grakern-graph4s_3-0.1-0329c43-SNAPSHOT.pom",
+      "httpStatus": 404
+    },
+    "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT": {
+      "url": "https://repo.maven.apache.org/maven2/io/github/canardlapin/grakern-standard_3/0.1-0329c43-SNAPSHOT/grakern-standard_3-0.1-0329c43-SNAPSHOT.pom",
+      "httpStatus": 404
+    },
+    "org.scala-js:scalajs-library_2.13:1.22.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-js/scalajs-library_2.13/1.22.0/scalajs-library_2.13-1.22.0.pom",
+      "httpStatus": 200,
+      "bytes": 2704,
+      "sha256": "e589d89212992a56a515eb13c62f464bb39c020f06f5cbfd2db514cded8b862f"
+    },
+    "org.scala-js:scalajs-test-bridge_2.13:1.22.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-js/scalajs-test-bridge_2.13/1.22.0/scalajs-test-bridge_2.13-1.22.0.pom",
+      "httpStatus": 200,
+      "bytes": 2969,
+      "sha256": "b1c4a3c82a9bb20895b9ece0068164e68dc53870f194900607770c2af896a063"
+    },
+    "org.scala-lang:scala3-library_3:3.7.4": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.pom",
+      "httpStatus": 200,
+      "bytes": 4321,
+      "sha256": "d099f9ecd83bd357f9089cc7ff3e149dd7b84d4cf9f88a0ed639b8142b08ec90"
+    },
+    "org.scala-lang:scala3-library_sjs1_3:3.7.4": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_sjs1_3/3.7.4/scala3-library_sjs1_3-3.7.4.pom",
+      "httpStatus": 200,
+      "bytes": 5144,
+      "sha256": "19284b233aff7b035d1585fe55e2e2b3adf1633521b9596cc8cb3967946184fc"
+    },
+    "org.scala-native:auxlib_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/auxlib_native0.5_3/0.5.12/auxlib_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 5811,
+      "sha256": "44ae1ff79cfd371dd1da47ab3b0ece44928fc50b9e18d23eff4564adc06057c8"
+    },
+    "org.scala-native:clib_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/clib_native0.5_3/0.5.12/clib_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 4483,
+      "sha256": "6da13301dabbb79537b5ffa1345e2f361cc111ba76397534a2881c63a136e068"
+    },
+    "org.scala-native:javalib_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/javalib_native0.5_3/0.5.12/javalib_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 7141,
+      "sha256": "d981af5fe5481db3ddc252967e6b0a36e26e43ed3931bf9c2bb94d12735cb495"
+    },
+    "org.scala-native:nativelib_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/nativelib_native0.5_3/0.5.12/nativelib_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 4525,
+      "sha256": "775cf68d1f0bafba016c31fc4ecc2bfc0e1875b1f252ceb90dbf515db8fe93f5"
+    },
+    "org.scala-native:posixlib_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/posixlib_native0.5_3/0.5.12/posixlib_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 5817,
+      "sha256": "4a44351b0a444e73531cda3736a53cf6a793d3e32161c4a78729f12bddfa71ab"
+    },
+    "org.scala-native:scala3lib_native0.5_3:3.7.4+0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/scala3lib_native0.5_3/3.7.4%2B0.5.12/scala3lib_native0.5_3-3.7.4%2B0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 5998,
+      "sha256": "2a46b8e4de47112d8743f2f632a39ff19d1b1535db64722493f5f416f5ccf1cf"
+    },
+    "org.scala-native:test-interface_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/test-interface_native0.5_3/0.5.12/test-interface_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 9910,
+      "sha256": "bbeb15b64a2b7467aedf3c9a2d2b9db47efea292f5e136444d84eea84b35fe79"
+    },
+    "org.scala-native:windowslib_native0.5_3:0.5.12": {
+      "url": "https://repo.maven.apache.org/maven2/org/scala-native/windowslib_native0.5_3/0.5.12/windowslib_native0.5_3-0.5.12.pom",
+      "httpStatus": 200,
+      "bytes": 5823,
+      "sha256": "1b136e6dc755df6802dd68eadbfd19fdc12935f55a0f72bf847843dae2d94876"
+    },
+    "org.scalacheck:scalacheck_3:1.19.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.pom",
+      "httpStatus": 200,
+      "bytes": 2525,
+      "sha256": "02a5ea96bc1186113ad3f04d594c2ecfb289127c13e2a118babcc8cf77137727"
+    },
+    "org.scalacheck:scalacheck_native0.5_3:1.19.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_native0.5_3/1.19.0/scalacheck_native0.5_3-1.19.0.pom",
+      "httpStatus": 200,
+      "bytes": 15043,
+      "sha256": "aac62bf2591ddb3d18442743a3506fd61e9d51dab7b8781bddba2df1d868d603"
+    },
+    "org.scalacheck:scalacheck_sjs1_3:1.19.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalacheck/scalacheck_sjs1_3/1.19.0/scalacheck_sjs1_3-1.19.0.pom",
+      "httpStatus": 200,
+      "bytes": 2743,
+      "sha256": "fc401de07f6c0741456ff4f1cd5ef3fd01e3c24c1919f5513d72fe627b66d5a2"
+    },
+    "org.scalameta:munit-scalacheck_3:1.3.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.3.0/munit-scalacheck_3-1.3.0.pom",
+      "httpStatus": 200,
+      "bytes": 2179,
+      "sha256": "055518fb5462c17eef6f7db7f6a4d0741991f4ceffd3ae4c0d34c3d0547ed157"
+    },
+    "org.scalameta:munit-scalacheck_native0.5_3:1.3.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_native0.5_3/1.3.0/munit-scalacheck_native0.5_3-1.3.0.pom",
+      "httpStatus": 200,
+      "bytes": 17424,
+      "sha256": "e5825f1c7bc485b9a4f8aace3903cf6c8f5577a4ecda908389eb7ac52e3cc86a"
+    },
+    "org.scalameta:munit-scalacheck_sjs1_3:1.3.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_sjs1_3/1.3.0/munit-scalacheck_sjs1_3-1.3.0.pom",
+      "httpStatus": 200,
+      "bytes": 2606,
+      "sha256": "a5bda791398316291f1fe959f2576af131b2674eea754a0c1f20896beb818e4d"
+    },
+    "org.scalameta:munit_3:1.3.4": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.pom",
+      "httpStatus": 200,
+      "bytes": 2517,
+      "sha256": "4326ffb4f944abdb6c11cc42939e0d84763d1ffaf12b9cab20381db470845ad9"
+    },
+    "org.scalameta:munit_native0.5_3:1.3.4": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_native0.5_3/1.3.4/munit_native0.5_3-1.3.4.pom",
+      "httpStatus": 200,
+      "bytes": 18754,
+      "sha256": "c8fac11747e9920bf95b1c4ad75660abfd2995f9af653b69d1bd159bad4747fc"
+    },
+    "org.scalameta:munit_sjs1_3:1.3.4": {
+      "url": "https://repo.maven.apache.org/maven2/org/scalameta/munit_sjs1_3/1.3.4/munit_sjs1_3-1.3.4.pom",
+      "httpStatus": 200,
+      "bytes": 2984,
+      "sha256": "436906c7b64d079dfa205463b59b498e7d43dd7691b3a0054f2c8e5b6abfaff4"
+    },
+    "org.typelevel:cats-collections-core_3:0.9.10": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.pom",
+      "httpStatus": 200,
+      "bytes": 2974,
+      "sha256": "976c996da4249c6e043adcd7e600d4dce2bb881dc98d0a01e15569a46e32659d"
+    },
+    "org.typelevel:cats-collections-core_native0.5_3:0.9.10": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_native0.5_3/0.9.10/cats-collections-core_native0.5_3-0.9.10.pom",
+      "httpStatus": 200,
+      "bytes": 18211,
+      "sha256": "11d79960a2ed2815c4e2f41eee274076cfaf73ca26f51a83ff8304591808155e"
+    },
+    "org.typelevel:cats-collections-core_sjs1_3:0.9.10": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_sjs1_3/0.9.10/cats-collections-core_sjs1_3-0.9.10.pom",
+      "httpStatus": 200,
+      "bytes": 3401,
+      "sha256": "826f91e2e021965531fe08dd305a949c4f5a6b46013875a4dd397c19eba1cfa1"
+    },
+    "org.typelevel:cats-core_3:2.13.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.pom",
+      "httpStatus": 200,
+      "bytes": 6535,
+      "sha256": "b2a0f180b36cd27136d5594e1468b31c4819324175487fed7b8464f4ee015ed4"
+    },
+    "org.typelevel:cats-core_native0.5_3:2.13.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_native0.5_3/2.13.0/cats-core_native0.5_3-2.13.0.pom",
+      "httpStatus": 200,
+      "bytes": 24060,
+      "sha256": "8408de19590845438632ac6a66248badbe3e4a18da261da3ebe9c27ced7daf96"
+    },
+    "org.typelevel:cats-core_sjs1_3:2.13.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_sjs1_3/2.13.0/cats-core_sjs1_3-2.13.0.pom",
+      "httpStatus": 200,
+      "bytes": 6967,
+      "sha256": "80d5dd1edcf6a3691b37003f02f725f4fae1b1a06a40cfdcbbfd45bcae4a012a"
+    },
+    "org.typelevel:cats-laws_3:2.13.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-laws_3/2.13.0/cats-laws_3-2.13.0.pom",
+      "httpStatus": 200,
+      "bytes": 6863,
+      "sha256": "b919f3ea0fecdf2e04219df00387505eb1737f4f0ba668252f7faca6bba13764"
+    },
+    "org.typelevel:cats-laws_native0.5_3:2.13.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-laws_native0.5_3/2.13.0/cats-laws_native0.5_3-2.13.0.pom",
+      "httpStatus": 200,
+      "bytes": 26686,
+      "sha256": "114089058f92c235b74513ac0acd6b412809909f0040a6413ecd9f27a2862a46"
+    },
+    "org.typelevel:cats-laws_sjs1_3:2.13.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-laws_sjs1_3/2.13.0/cats-laws_sjs1_3-2.13.0.pom",
+      "httpStatus": 200,
+      "bytes": 7305,
+      "sha256": "9f56e54e34c6e340537a563b84df4dd9c5130e9eba139458ec4605cd2b721da7"
+    },
+    "org.typelevel:cats-parse_3:1.1.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_3/1.1.0/cats-parse_3-1.1.0.pom",
+      "httpStatus": 200,
+      "bytes": 3182,
+      "sha256": "6b5b889bc78421e9ec32724a177c2dff8005ebfe90fd6d1f6f8c4d7de179beb9"
+    },
+    "org.typelevel:cats-parse_native0.5_3:1.1.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_native0.5_3/1.1.0/cats-parse_native0.5_3-1.1.0.pom",
+      "httpStatus": 200,
+      "bytes": 19363,
+      "sha256": "60975a8f095591a0f6a40eda455fc46f758dbf7b98a3385f20a949dba1aea58a"
+    },
+    "org.typelevel:cats-parse_sjs1_3:1.1.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_sjs1_3/1.1.0/cats-parse_sjs1_3-1.1.0.pom",
+      "httpStatus": 200,
+      "bytes": 3409,
+      "sha256": "eb0712cf47ae229e9ef29007f548857fc5fc43cffa343363a39b2859400b28cd"
+    },
+    "org.typelevel:discipline-munit_3:2.0.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_3/2.0.0/discipline-munit_3-2.0.0.pom",
+      "httpStatus": 200,
+      "bytes": 2767,
+      "sha256": "2cf68c29b686c1ab0ae46d43574ba9119ca4ece2e73505bee7d2ebb81978e6f2"
+    },
+    "org.typelevel:discipline-munit_native0.5_3:2.0.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_native0.5_3/2.0.0/discipline-munit_native0.5_3-2.0.0.pom",
+      "httpStatus": 200,
+      "bytes": 19153,
+      "sha256": "6aac211dcc64168c4c500649109af0c16a5873ea2880b130ff0da4719a514a6e"
+    },
+    "org.typelevel:discipline-munit_sjs1_3:2.0.0": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/discipline-munit_sjs1_3/2.0.0/discipline-munit_sjs1_3-2.0.0.pom",
+      "httpStatus": 200,
+      "bytes": 3199,
+      "sha256": "94cc9f52ba68bc0eb4abbabbf782b707240e9298ca7b18a0d383ebefe70fdcef"
+    },
+    "org.typelevel:scalac-compat-annotation_3:0.1.4": {
+      "url": "https://repo.maven.apache.org/maven2/org/typelevel/scalac-compat-annotation_3/0.1.4/scalac-compat-annotation_3-0.1.4.pom",
+      "httpStatus": 200,
+      "bytes": 2447,
+      "sha256": "527543e5b50054b8da70e596000e6c6ab68e81b1db21a04d8f1be6e3020e23e3"
+    }
+  },
+  "unresolvedRoots": [
+    "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT",
+    "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT",
+    "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT",
+    "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT"
+  ],
+  "affectedCandidateArtifacts": {
+    "io.github.bbuchsbaum:storymodel4s-embed-bench_3:1.0.0": [
+      "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT"
+    ],
+    "io.github.bbuchsbaum:storymodel4s-embed-grakern_3:1.0.0": [
+      "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT"
+    ]
+  },
+  "scope": "Actual candidate POM graph and public direct-root availability; full public transitive resolution and publication retain their separate preflight.",
+  "publication": "deferred-not-published"
+}

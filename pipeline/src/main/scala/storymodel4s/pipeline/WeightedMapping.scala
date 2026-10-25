@@ -10,7 +10,7 @@ import storymodel4s.core.Checksum
 /** A declared sweep executes interior profiles once per successful run and preserves every attempt.
   */
 object WeightedMapping:
-  val SchemaVersion: String = "weighted-mapping-batch/v1"
+  val SchemaVersion: String = "weighted-mapping-batch/v2"
 
   private[pipeline] def artifacts(
       batch: MappingPipeline.Batch,
@@ -40,6 +40,26 @@ object WeightedMapping:
               val descriptor = Json.obj(
                 "run" -> Json.fromString(run.identity.hex),
                 "lambda" -> Json.fromString(weight.toString),
+                "kind" -> Json.fromString(selection.kind.toString),
+                "dispatchedMember" -> Json.fromString(
+                  if weight.isReference then "Reference"
+                  else if weight.isReconstruction then "Reconstruction"
+                  else "Weighted"
+                ),
+                "temperature" -> Json.fromDoubleOrNull(
+                  if weight.isReference then run.execution.reference.profile.temperature
+                  else if weight.isReconstruction then
+                    run.execution.reconstruction.profile.inference.temperature
+                  else selection.profile.inference.temperature
+                ),
+                "decisionPolicy" -> Json.fromString(
+                  if weight.isReference then "RawArgmax"
+                  else if weight.isReconstruction then
+                    run.execution.reconstruction.profile.decision.fingerprint.hex
+                  else "RawArgmax"
+                ),
+                "endpointContinuity" -> Json.fromString("Not promised by weighted v1"),
+                "model" -> MappingPipeline.modelMetadata(run),
                 "prefix" -> Json.fromString(prefix),
                 "manifest" -> Json.fromString(bundle.digest.hex)
               )
@@ -105,12 +125,16 @@ object MappingWeightCli:
         case Right((batch, receipt)) =>
           out(
             Canonical.print(
-              Json.obj(
-                "manifest" -> Json.fromString(receipt.hex),
-                "attempts" -> Json.fromInt(batch.outcomes.size),
-                "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
-                "readouts" -> Json.arr(Json.fromString("mapping"))
-              )
+              MappingPipeline
+                .inspect(batch)
+                .deepMerge(
+                  Json.obj(
+                    "manifest" -> Json.fromString(receipt.hex),
+                    "attempts" -> Json.fromInt(batch.outcomes.size),
+                    "completed" -> Json.fromInt(batch.outcomes.count(_.run.nonEmpty)),
+                    "readouts" -> Json.arr(Json.fromString("mapping"))
+                  )
+                )
             )
           )
           if batch.outcomes.exists(_.failure.nonEmpty) then 3 else 0

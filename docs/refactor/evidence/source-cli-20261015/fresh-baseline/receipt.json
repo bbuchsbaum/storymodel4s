@@ -1,0 +1,94 @@
+{
+  "source": "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c",
+  "status": "passed",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--no-checkout",
+        "/Users/bbuchsbaum/code/scala/storymodel4s",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/checkout"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline",
+      "log": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/command-00.log",
+      "exit": 0,
+      "logSha256": "4683b1c299996ecd63a52964335c940ff6756358cbd267afc433db873c151f4a"
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/checkout",
+      "log": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/command-01.log",
+      "exit": 0,
+      "logSha256": "fae7b7437dccdf65bc57a05103468a5e979ce5a42ef345e3f6ba0df7e65c41d5"
+    },
+    {
+      "argv": [
+        "java",
+        "-version"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/checkout",
+      "log": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/command-02.log",
+      "exit": 0,
+      "logSha256": "852095cab44f83f526a130175f3bc152581bb2d201848eac9af0a95668e1db0a"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx4G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/repositories",
+        "-Dsbt.override.build.repos=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "embedGrakern/test",
+        "pipeline/test",
+        "pipeline/cliDistribution"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/checkout",
+      "log": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/command-03.log",
+      "exit": 0,
+      "logSha256": "f04ec715d246f8fc3bc893bde1275b5f445569b8b7db58114f94442c90428e13"
+    }
+  ],
+  "started": 1792112611.6804218,
+  "ipcDirectory": "/private/tmp/sm4s-ipc-fvlnoqkv",
+  "isolation": {
+    "boot": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/boot",
+    "global": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/global",
+    "staging": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/staging",
+    "ivy": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/ivy",
+    "coursier": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/coursier",
+    "config": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/config",
+    "tmp": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/tmp"
+  },
+  "fetchedSources": [
+    {
+      "url": "git@github-canardlapin:canardlapin/grakern.git",
+      "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "clean": true
+    },
+    {
+      "url": "git@github-canardlapin:canardlapin/gale.git",
+      "sha": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "clean": true
+    },
+    {
+      "url": "git@github-canardlapin:canardlapin/graph4s.git",
+      "sha": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "clean": true
+    }
+  ],
+  "finished": 1792112836.388646
+}

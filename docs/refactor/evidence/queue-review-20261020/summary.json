@@ -1,0 +1,29 @@
+{
+  "baseline": 108,
+  "before_status": {
+    "open": 90,
+    "doing": 4,
+    "review": 14
+  },
+  "planned_status": {
+    "open": 86,
+    "blocked": 7,
+    "review": 15
+  },
+  "before_priority": {
+    "1": 14,
+    "2": 31,
+    "3": 63
+  },
+  "planned_priority": {
+    "1": 8,
+    "2": 37,
+    "3": 63
+  },
+  "changed_priority": 6,
+  "changed_status": 8,
+  "set_commands": 29,
+  "batch_operations": 7,
+  "new_integration_ticket": "bd-01M5E3J13V6CVABAMCRC69AG07",
+  "no_baseline_ticket_closed": true
+}

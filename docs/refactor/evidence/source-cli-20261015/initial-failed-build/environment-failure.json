@@ -1,0 +1,32 @@
+{
+  "classification": "environment-inconclusive",
+  "failure": "No space left on device",
+  "buildExit": 1,
+  "testsRun": false,
+  "retainedSources": [
+    {
+      "url": "git@github-canardlapin:canardlapin/gale.git",
+      "sha": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "clean": true
+    },
+    {
+      "url": "git@github-canardlapin:canardlapin/graph4s.git",
+      "sha": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "clean": true
+    },
+    {
+      "url": "git@github-canardlapin:canardlapin/grakern.git",
+      "sha": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "clean": true
+    }
+  ],
+  "removedOwnTemporaryDirectories": [
+    "checkout",
+    "boot",
+    "global",
+    "staging",
+    "ivy",
+    "coursier",
+    "config"
+  ]
+}

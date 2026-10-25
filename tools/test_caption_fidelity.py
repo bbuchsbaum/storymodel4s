@@ -1,0 +1,202 @@
+"""Binding failures must not become caption-quality evidence."""
+
+import copy
+import hashlib
+import unittest
+
+from caption_fidelity import (
+    assessment_summary,
+    changed_top,
+    ranked_prices,
+    requests,
+    stratified_selection,
+    validate_outcome,
+)
+
+
+class CaptionFidelityTest(unittest.TestCase):
+    def setUp(self):
+        self.source = {
+            "frames": {
+                "sha256": "f" * 64,
+                "width": 32,
+                "height": 32,
+                "count": 6,
+                "pixelFormat": "bgr24",
+            },
+            "model": {"repo": "synthetic", "revision": "fixed"},
+            "extents": [{"id": "extent", "ordinals": [0, 2, 5]}],
+            "recipe": {
+                "prompt": "Describe visible content.",
+                "minPixels": 1024,
+                "maxPixels": 1024,
+                "maxNewTokens": 96,
+                "greedy": True,
+                "presentation": "image-sequence",
+                "seed": 0,
+            },
+        }
+        self.cases = [{"id": "sample", "extentId": "extent", "ordinals": [0, 2, 5]}]
+        self.arms = requests(self.source, self.cases, "/synthetic/frames.bgr")
+        request = self.arms["joint"]
+        self.outcome = {
+            "schema": "storymodel4s.media.caption-outcome",
+            "schemaVersion": 1,
+            "requestId": request["requestId"],
+            "recipe": copy.deepcopy(request["recipe"]),
+            "frames": copy.deepcopy(request["frames"]),
+            "model": request["model"],
+            "applied": {
+                **request["recipe"],
+                "promptSha256": hashlib.sha256(
+                    request["recipe"]["prompt"].encode()
+                ).hexdigest(),
+            },
+            "offline": {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"},
+            "extents": [
+                {"id": "sample", "ordinals": [0, 2, 5], "text": "A blue cube."}
+            ],
+            "coverage": {"requested": 1, "observed": 1},
+        }
+
+    def test_valid_outcome_and_fixed_comparison_inputs(self):
+        validate_outcome(self.arms["joint"], self.outcome)
+        for arm in self.arms.values():
+            self.assertEqual(arm["model"], self.source["model"])
+            self.assertEqual(arm["recipe"]["maxNewTokens"], 96)
+            self.assertEqual(arm["frames"]["sha256"], "f" * 64)
+        self.assertEqual(len({r["requestId"] for r in self.arms.values()}), 3)
+
+    def test_separate_calls_preserve_exact_noncontiguous_frame_ownership(self):
+        self.assertEqual(
+            self.arms["separate-images"]["extents"],
+            [
+                {"id": "sample:image-1", "ordinals": [0]},
+                {"id": "sample:image-2", "ordinals": [2]},
+                {"id": "sample:image-3", "ordinals": [5]},
+            ],
+        )
+        self.assertEqual(self.source["extents"][0]["id"], "extent")
+
+    def test_another_arms_outcome_is_refused(self):
+        with self.assertRaises(ValueError):
+            validate_outcome(self.arms["identity-aware"], self.outcome)
+
+    def test_wrong_request_id_with_identical_payload_is_refused(self):
+        self.outcome["requestId"] = "0" * 64
+        with self.assertRaises(ValueError):
+            validate_outcome(self.arms["joint"], self.outcome)
+
+    def test_changed_frame_ownership_is_refused(self):
+        self.outcome["extents"][0]["ordinals"] = [0, 1, 5]
+        with self.assertRaisesRegex(ValueError, "extent coverage"):
+            validate_outcome(self.arms["joint"], self.outcome)
+
+    def test_missing_caption_cannot_pass_a_declared_coverage_count(self):
+        self.outcome["extents"] = []
+        with self.assertRaisesRegex(ValueError, "extent coverage"):
+            validate_outcome(self.arms["joint"], self.outcome)
+
+    def test_false_applied_prompt_is_refused(self):
+        self.outcome["applied"]["promptSha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "applied prompt"):
+            validate_outcome(self.arms["joint"], self.outcome)
+
+    def test_case_cannot_silently_select_different_images(self):
+        self.cases[0]["ordinals"] = [0, 1, 2]
+        with self.assertRaisesRegex(ValueError, "case ordinals"):
+            requests(self.source, self.cases, "/synthetic/frames.bgr")
+
+
+class AssessmentSummaryTest(unittest.TestCase):
+    def setUp(self):
+        self.references = {
+            "cases": [
+                {
+                    "id": "case-1",
+                    "facts": ["visible cube", "cube is blue"],
+                    "development": False,
+                }
+            ]
+        }
+        self.key = {"case-1-v1": "first", "case-1-v2": "second"}
+        common = {
+            "false_merge": "0",
+            "false_split": "0",
+            "unsupported_identity": "0",
+            "other_unsupported": "0",
+            "continuing_subject_retained": "yes",
+        }
+        self.rows = [
+            {**common, "variant_id": "case-1-v1", "facts": "CP"},
+            {**common, "variant_id": "case-1-v2", "facts": "AA", "false_merge": "1"},
+        ]
+
+    def test_partial_facts_are_not_counted_as_complete(self):
+        result = assessment_summary(self.rows, self.references, self.key)
+        self.assertEqual(result["first"]["all"]["coveredFacts"], 1)
+        self.assertEqual(result["first"]["all"]["partialFacts"], 1)
+        self.assertEqual(result["second"]["all"]["coveredFacts"], 0)
+        self.assertEqual(result["second"]["all"]["identityErrorIntervals"], 1)
+
+    def test_duplicate_rows_cannot_substitute_for_missing_variant(self):
+        with self.assertRaises(ValueError):
+            assessment_summary([self.rows[0], self.rows[0]], self.references, self.key)
+
+    def test_missing_fact_rating_is_not_silently_an_abstention(self):
+        self.rows[0]["facts"] = "C"
+        with self.assertRaises(ValueError):
+            assessment_summary(self.rows, self.references, self.key)
+
+
+class StratifiedSelectionTest(unittest.TestCase):
+    def test_each_temporal_stratum_is_represented_without_known_cases(self):
+        extents = [{"id": str(n)} for n in range(24)]
+        chosen = stratified_selection(
+            extents, {str(n) for n in range(0, 24, 4)}, "fixed", 6
+        )
+        self.assertEqual(len(chosen), 6)
+        self.assertEqual([int(e["id"]) // 4 for e in chosen], list(range(6)))
+        self.assertTrue(all(int(e["id"]) % 4 != 0 for e in chosen))
+        self.assertEqual(
+            chosen,
+            stratified_selection(
+                extents, {str(n) for n in range(0, 24, 4)}, "fixed", 6
+            ),
+        )
+
+    def test_exhausted_stratum_refuses_instead_of_sampling_another_period(self):
+        with self.assertRaises(ValueError):
+            stratified_selection([{"id": "0"}, {"id": "1"}], {"0"}, "fixed", 2)
+
+
+class RetrievalRankingTest(unittest.TestCase):
+    def test_missing_and_flat_prices_remain_different_statuses(self):
+        missing = [{"row": "1", "target": "a", "price": "missing"}]
+        flat = [{"row": str(n), "target": str(n), "price": "1"} for n in [1, 2]]
+        self.assertEqual(ranked_prices(missing, "price")["status"], "unavailable")
+        self.assertEqual(ranked_prices(flat, "price")["status"], "flat")
+        self.assertEqual(ranked_prices(flat, "price")["top"], [])
+
+    def test_ties_use_stable_source_key_and_report_their_size(self):
+        rows = [
+            {"row": str(n), "target": key, "price": str(value)}
+            for n, key, value in [(1, "z", 0.2), (2, "a", 0.2), (3, "c", 0.8)]
+        ]
+        result = ranked_prices(rows, "price")
+        self.assertEqual([r["target"] for r in result["top"]], ["a", "z", "c"])
+        self.assertEqual(result["bestTieCount"], 2)
+
+    def test_price_change_is_not_misreported_as_target_rank_change(self):
+        low = {"top": [{"target": "a", "cost": 0.1}]}
+        high = {"top": [{"target": "a", "cost": 0.2}]}
+        self.assertFalse(changed_top(low, high, 1))
+        self.assertTrue(changed_top(low, {"top": [{"target": "b", "cost": 0.1}]}, 1))
+
+    def test_nonfinite_observation_is_not_a_rankable_value(self):
+        with self.assertRaises(ValueError):
+            ranked_prices([{"row": "1", "target": "a", "price": "nan"}], "price")
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,258 @@
+diff --git a/align/src/main/scala/storymodel4s/align/hsmm.scala b/align/src/main/scala/storymodel4s/align/hsmm.scala
+index 19e9151..b66516a 100644
+--- a/align/src/main/scala/storymodel4s/align/hsmm.scala
++++ b/align/src/main/scala/storymodel4s/align/hsmm.scala
+@@ -746,6 +746,77 @@ final case class AblationResult(
+   * posterior. Refinement passes re-weight emissions by relation preservation over the admissible
+   * states only and never widen the state space.
+   */
++private[storymodel4s] object HsmmProfileRecorder:
++  final val FullRun = 1
++  final val LogA = 2
++  final val Emissions = 3
++  final val Alpha = 4
++  final val Beta = 5
++  final val LogZ = 6
++  final val PosteriorRows = 7
++  final val Flow = 8
++  final val FlowEntries = 9
++  final val Reweight = 10
++  final val ViterbiEmissions = 11
++  final val Viterbi = 12
++  private final val Capacity = 4096
++  private val heapSampleMillis =
++    Option(System.getProperty("hsmm.audit.heapSampleMillis")).flatMap(_.toLongOption).filter(_ > 0L)
++  private val sampledMaxHeap = new java.util.concurrent.atomic.AtomicLong(-1L)
++  private val sampledCount = new java.util.concurrent.atomic.AtomicLong(0L)
++  private[storymodel4s] val heapSampler: Option[Thread] = heapSampleMillis.map { interval =>
++    val thread = new Thread(() =>
++      while !Thread.currentThread.isInterrupted do
++        val used = java.lang.management.ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed
++        var prior = sampledMaxHeap.get()
++        while used > prior && !sampledMaxHeap.compareAndSet(prior, used) do prior = sampledMaxHeap.get()
++        sampledCount.incrementAndGet(): Unit
++        Thread.sleep(interval)
++    , "hsmm-profile-heap-sampler")
++    thread.setDaemon(true)
++    thread.start()
++    thread
++  }
++  def heapSampling: Option[(Long, Long, Long)] =
++    heapSampleMillis.map(interval => (interval, sampledMaxHeap.get(), sampledCount.get()))
++  final class Row(val invocation: Long, val phase: Int, val pass: Int, val startedNanos: Long, val elapsedNanos: Long, val allocatedBytes: Long, val logicalCount: Long)
++  private val invocations = Array.ofDim[Long](Capacity)
++  private val phases = Array.ofDim[Int](Capacity)
++  private val passes = Array.ofDim[Int](Capacity)
++  private val starts = Array.ofDim[Long](Capacity)
++  private val elapsed = Array.ofDim[Long](Capacity)
++  private val allocations = Array.ofDim[Long](Capacity)
++  private val logicalCounts = Array.ofDim[Long](Capacity)
++  private var size = 0
++  private val nextInvocation = new java.util.concurrent.atomic.AtomicLong(0L)
++  private lazy val allocated: Option[com.sun.management.ThreadMXBean] =
++    try
++      java.lang.management.ManagementFactory.getThreadMXBean match
++        case bean: com.sun.management.ThreadMXBean if bean.isThreadAllocatedMemorySupported =>
++          if !bean.isThreadAllocatedMemoryEnabled then bean.setThreadAllocatedMemoryEnabled(true)
++          Option.when(bean.isThreadAllocatedMemoryEnabled)(bean)
++        case _ => None
++    catch case _: Throwable => None
++  private def allocation: Long = allocated.fold(-1L)(_.getThreadAllocatedBytes(Thread.currentThread().getId))
++  def beginInvocation(): Long = nextInvocation.incrementAndGet()
++  def startedNanos(): Long = System.nanoTime()
++  def startedAllocation(): Long = allocation
++  def finished(invocation: Long, phase: Int, pass: Int, started: Long, beforeAllocation: Long, logicalCount: Long = -1L): Unit =
++    if size >= Capacity then throw IllegalStateException(s"HSMM profile capacity $Capacity exceeded")
++    val end = System.nanoTime()
++    val afterAllocation = allocation
++    invocations(size) = invocation
++    phases(size) = phase
++    passes(size) = pass
++    starts(size) = started
++    elapsed(size) = end - started
++    allocations(size) = if beforeAllocation >= 0L && afterAllocation >= 0L then afterAllocation - beforeAllocation else -1L
++    logicalCounts(size) = logicalCount
++    size += 1
++  def reset(): Unit = size = 0
++  def drain(): Vector[Row] =
++    Vector.tabulate(size)(i => new Row(invocations(i), phases(i), passes(i), starts(i), elapsed(i), allocations(i), logicalCounts(i)))
++
+ object GraphHsmm:
+ 
+   def infer(
+@@ -828,6 +899,9 @@ object GraphHsmm:
+     AlignError,
+     (AlignmentMatrix, TransitionFlow, Vector[AlignState], Double, Costs, Adm, Int)
+   ] =
++    val invocation = HsmmProfileRecorder.beginInvocation()
++    val whole = HsmmProfileRecorder.startedNanos()
++    val wholeAllocation = HsmmProfileRecorder.startedAllocation()
+     val tau = config.temperature
+ 
+     // 1. The mode gate and local prices come from the evidence, computed once for every consumer
+@@ -842,18 +916,27 @@ object GraphHsmm:
+ 
+       // log transition matrices A_i(s, t): a mixture of "go/stay external" and a feature softmax
+       // over the source states available at i+1
++      val logAStarted = HsmmProfileRecorder.startedNanos()
++      val logAStartedAllocation = HsmmProfileRecorder.startedAllocation()
+       val logA: Vector[Map[AlignState, Map[AlignState, Double]]] =
+         (0 until units.size - 1).toVector.map { i =>
+           val from = states(i)
+           val to = states(i + 1)
+           from.map(s => s -> transitionRow(view, config.transitions, s, to)).toMap
+         }
++      HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.LogA, 0, logAStarted, logAStartedAllocation)
+ 
+       def forwardBackward(
+-          costs: Vector[Map[AlignState, Double]]
++          costs: Vector[Map[AlignState, Double]],
++          profilePass: Int
+       ): (AlignmentMatrix, TransitionFlow, Double) =
++        val emissionStarted = HsmmProfileRecorder.startedNanos()
++        val emissionStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         val logE = costs.map(_.view.mapValues(c => -c / tau).toMap)
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.Emissions, profilePass, emissionStarted, emissionStartedAllocation)
+         val n = units.size
++        val alphaStarted = HsmmProfileRecorder.startedNanos()
++        val alphaStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         val logAlpha = Array.ofDim[Map[AlignState, Double]](n)
+         val logPi = -AlignmentMath.log(states(0).size.toDouble)
+         logAlpha(0) = states(0).map(s => s -> (logPi + logE(0)(s))).toMap
+@@ -862,6 +945,9 @@ object GraphHsmm:
+             val acc = states(i - 1).map(s => logAlpha(i - 1)(s) + logA(i - 1)(s)(t))
+             t -> (logE(i)(t) + logSumExp(acc))
+           }.toMap
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.Alpha, profilePass, alphaStarted, alphaStartedAllocation)
++        val betaStarted = HsmmProfileRecorder.startedNanos()
++        val betaStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         val logBeta = Array.ofDim[Map[AlignState, Double]](n)
+         logBeta(n - 1) = states(n - 1).map(s => s -> 0.0).toMap
+         for i <- (n - 2) to 0 by -1 do
+@@ -869,14 +955,23 @@ object GraphHsmm:
+             val acc = states(i + 1).map(t => logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t))
+             s -> logSumExp(acc)
+           }.toMap
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.Beta, profilePass, betaStarted, betaStartedAllocation)
+         // deterministic summation order: iterate states, not a map (review #30)
++        val logZStarted = HsmmProfileRecorder.startedNanos()
++        val logZStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         val logZ = logSumExp(states(n - 1).map(s => logAlpha(n - 1)(s)))
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.LogZ, profilePass, logZStarted, logZStartedAllocation)
++        val rowsStarted = HsmmProfileRecorder.startedNanos()
++        val rowsStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         val rows = (0 until n).toVector.map { i =>
+           AlignmentRow(
+             units(i).id,
+             states(i).map(s => s -> AlignmentMath.exp(logAlpha(i)(s) + logBeta(i)(s) - logZ)).toMap
+           )
+         }
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.PosteriorRows, profilePass, rowsStarted, rowsStartedAllocation)
++        val flowStarted = HsmmProfileRecorder.startedNanos()
++        val flowStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         val steps = (0 until n - 1).toVector.map { i =>
+           val mass = for
+             s <- states(i)
+@@ -886,12 +981,18 @@ object GraphHsmm:
+           )
+           FlowStep(units(i).id, units(i + 1).id, mass.toMap)
+         }
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.Flow, profilePass, flowStarted, flowStartedAllocation)
++        val flowEntriesStarted = HsmmProfileRecorder.startedNanos()
++        val flowEntriesAllocation = HsmmProfileRecorder.startedAllocation()
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.FlowEntries, profilePass, flowEntriesStarted, flowEntriesAllocation, steps.iterator.map(_.mass.size.toLong).sum)
+         (AlignmentMatrix(rows), TransitionFlow(steps), logZ)
+ 
+       var costs = baseCost
+-      var (posterior, flow, logZ) = forwardBackward(costs)
++      var (posterior, flow, logZ) = forwardBackward(costs, 0)
+       var pass = 0
+       while pass < config.refinementPasses do
++        val reweightStarted = HsmmProfileRecorder.startedNanos()
++        val reweightStartedAllocation = HsmmProfileRecorder.startedAllocation()
+         costs = RelationPreservation.reweight(
+           baseCost,
+           units,
+@@ -900,13 +1001,22 @@ object GraphHsmm:
+           view,
+           config.refinementWeight
+         )
+-        val r = forwardBackward(costs)
++        HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.Reweight, pass + 1, reweightStarted, reweightStartedAllocation)
++        val r = forwardBackward(costs, pass + 1)
+         posterior = r._1
+         flow = r._2
+         logZ = r._3
+         pass += 1
+ 
+-      val path = viterbi(units, states, costs.map(_.view.mapValues(c => -c / tau).toMap), logA)
++      val viterbiEmissionStarted = HsmmProfileRecorder.startedNanos()
++      val viterbiEmissionStartedAllocation = HsmmProfileRecorder.startedAllocation()
++      val viterbiLogE = costs.map(_.view.mapValues(c => -c / tau).toMap)
++      HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.ViterbiEmissions, pass, viterbiEmissionStarted, viterbiEmissionStartedAllocation)
++      val viterbiStarted = HsmmProfileRecorder.startedNanos()
++      val viterbiStartedAllocation = HsmmProfileRecorder.startedAllocation()
++      val path = viterbi(units, states, viterbiLogE, logA)
++      HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.Viterbi, pass, viterbiStarted, viterbiStartedAllocation)
++      HsmmProfileRecorder.finished(invocation, HsmmProfileRecorder.FullRun, pass, whole, wholeAllocation)
+       (
+         posterior,
+         flow,
+
+diff --git a/pipeline/src/test/scala/storymodel4s/pipeline/MappingWorkloadCapture.scala b/pipeline/src/test/scala/storymodel4s/pipeline/MappingWorkloadCapture.scala
+index 3c37b0a..6bbf28a 100644
+--- a/pipeline/src/test/scala/storymodel4s/pipeline/MappingWorkloadCapture.scala
++++ b/pipeline/src/test/scala/storymodel4s/pipeline/MappingWorkloadCapture.scala
+@@ -182,6 +182,11 @@ object MappingWorkloadCapture:
+       "threadAllocatedBytes" -> m.allocatedBytes.fold(Json.Null)(Json.fromLong)
+     )
+ 
++  private def profileRows(cell: String, repetition: Int): Json =
++    Json.fromValues(HsmmProfileRecorder.drain().map { row =>
++      Json.obj("cell" -> Json.fromString(cell), "repetition" -> Json.fromInt(repetition), "invocation" -> Json.fromLong(row.invocation), "phase" -> Json.fromInt(row.phase), "pass" -> Json.fromInt(row.pass), "startedNanos" -> Json.fromLong(row.startedNanos), "elapsedNanos" -> Json.fromLong(row.elapsedNanos), "threadAllocatedBytes" -> (if row.allocatedBytes >= 0L then Json.fromLong(row.allocatedBytes) else Json.Null), "logicalCount" -> (if row.logicalCount >= 0L then Json.fromLong(row.logicalCount) else Json.Null))
++    })
++
+   private def once(
+       root: Path,
+       sourceSize: Int,
+@@ -190,6 +195,7 @@ object MappingWorkloadCapture:
+       selectedWeights: Vector[StructuralWeight],
+       index: Int
+   ): Json =
++    HsmmProfileRecorder.reset()
+     write(root, "source.txt", text(sourceSize))
+     write(root, "recall.txt", text(recallSize))
+     val prepared = measure(prepare(root, recallSize))
+@@ -244,6 +250,7 @@ object MappingWorkloadCapture:
+     val weightedExport = measure(
+       right(WeightedMapping.publish(batch, selectedWeights, weightedOutput, resume = false))
+     )
++    val profile = profileRows(label, index)
+     Json.obj(
+       "sourceUnits" -> Json.fromInt(sourceSize),
+       "recallUnits" -> Json.fromInt(recallSize),
+@@ -302,6 +309,7 @@ object MappingWorkloadCapture:
+         )
+       ),
+       "stateProductsAdjacent" -> Json.fromLong(stateProducts(paired.value)),
++      "hsmmProfile" -> profile,
+       "members" -> Json.obj(
+         "reference" -> Json.fromString(paired.value.reference.digest.hex),
+         "reconstruction" -> Json.fromString(paired.value.reconstruction.digest.hex),
+@@ -365,6 +373,16 @@ object MappingWorkloadCapture:
+               "availableProcessors" -> Json.fromInt(Runtime.getRuntime.availableProcessors()),
+               "heapPeakBytes" -> Json.fromLong(heapPeak),
+               "heapPeakStatus" -> Json.fromString("JVM cumulative; not attributed to a stage"),
++              "hsmmHeapSampling" -> HsmmProfileRecorder.heapSampling.fold(Json.obj(
++                "status" -> Json.fromString("disabled; set hsmm.audit.heapSampleMillis only for a separate sampled run")
++              )) { case (interval, maxHeap, samples) =>
++                Json.obj(
++                  "status" -> Json.fromString("sampled simultaneously; not pool-peak sum"),
++                  "intervalMillis" -> Json.fromLong(interval),
++                  "maximumHeapBytes" -> Json.fromLong(maxHeap),
++                  "samples" -> Json.fromLong(samples)
++                )
++              },
+               "processRssBytes" -> Json.Null,
+               "processRssStatus" -> Json.fromString("Unavailable: no portable JVM API"),
+               "threadAllocationStatus" -> Json.fromString(

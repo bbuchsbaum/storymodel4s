@@ -1,0 +1,460 @@
+{
+  "schema": "storymodel4s-source-cli-qualification/v1",
+  "status": "source-cli-qualified",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792119709.5433118,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--no-checkout",
+        "/Users/bbuchsbaum/code/scala/storymodel4s",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "f51a9e9939017c6362f25c626be5ce69eec472fc9f35ad836c42ad2727741a4f"
+    },
+    {
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "c69a5d754a21fa455c64901334d9509278401091"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+      "log": "command-001.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "55f351829aba1e1a646e00320e080611228eadffafb734bcc8c5bc63a5c41340"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home/bin/java",
+        "-version"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75",
+      "log": "command-002.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "42a7cc673edfb4df1649add8bb6469e37e0b05fa2875c5b0402da69b93273835"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx8G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/repositories",
+        "-Dsbt.override.build.repos=true",
+        "set ThisBuild / tlFatalWarnings := true",
+        "githubWorkflowGenerate",
+        "checkAll",
+        "pipeline/cliDistribution"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+      "log": "command-003.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "8df95a0d9bc65e7e29cf92202062f47ce3db04335b85b5b6bdae0f3f257d4a34"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout/tools/test_cli_distribution.py",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/verification",
+      "log": "command-004.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "5fd7fc4c27ed5acefef96e1271c1423a8927ade761689e1c822801fd750a2221"
+    },
+    {
+      "argv": [
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "template"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-005.log",
+      "expectedExit": 0,
+      "stdout": "runtime/mapping.json",
+      "stdoutSha256": "5f798fd4c02d8586757360aa4d4ac00c939fb55a6328b46682d3bf95176d21fb",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-c",
+        "import socket,sys\ntry:\n s=socket.create_connection(('127.0.0.1',49228),2);s.close()\nexcept PermissionError:\n sys.exit(23)\nexcept OSError:\n sys.exit(24)\nelse:\n sys.exit(0)\n"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-006.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-c",
+        "import socket,sys\ntry:\n s=socket.create_connection(('127.0.0.1',49228),2);s.close()\nexcept PermissionError:\n sys.exit(23)\nexcept OSError:\n sys.exit(24)\nelse:\n sys.exit(0)\n"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-007.log",
+      "expectedExit": 23,
+      "exit": 23,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "online-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-008.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "68dce43f330f21225f9989ebb0d253775d7a388f7ce5676f2409ae15992bebad"
+    },
+    {
+      "argv": [
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingWeight",
+        "study.json",
+        "mapping.json",
+        "0/1,1/2,1/1",
+        "online-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-009.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "f7c3b55ce96ce9c428212d406fb35f2c4f475eadadc7141a8ba717de55ef769c"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime/readers/read_mapping.py",
+        "--directory",
+        "online-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-010.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "d763b33cb78f1fc7ccb54da41f2078de3f8f6e23dfb3c4a03ddfd74841c6a3a2"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime/readers/read_weighted_mapping.py",
+        "online-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-011.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "fb76c83e79f4fc24830c1db2f369cc34ae3766b0d71e2fed2f86f88c34c81bc7"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "offline-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-012.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "68dce43f330f21225f9989ebb0d253775d7a388f7ce5676f2409ae15992bebad"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingWeight",
+        "study.json",
+        "mapping.json",
+        "0/1,1/2,1/1",
+        "offline-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-013.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "f7c3b55ce96ce9c428212d406fb35f2c4f475eadadc7141a8ba717de55ef769c"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime/readers/read_mapping.py",
+        "--directory",
+        "offline-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-014.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "d763b33cb78f1fc7ccb54da41f2078de3f8f6e23dfb3c4a03ddfd74841c6a3a2"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime/readers/read_weighted_mapping.py",
+        "offline-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-015.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "fb76c83e79f4fc24830c1db2f369cc34ae3766b0d71e2fed2f86f88c34c81bc7"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "offline-exchange",
+        "--resume"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-016.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "68dce43f330f21225f9989ebb0d253775d7a388f7ce5676f2409ae15992bebad"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/installed/storymodel4s-0.1-c69a5d7-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "offline-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/runtime",
+      "log": "command-017.log",
+      "expectedExit": 2,
+      "exit": 2,
+      "logSha256": "a0138a27b60b5eb0d3ee7dd10e419835265b46d19d8681d8f3018178fd99ca18"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx8G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/repositories",
+        "-Dsbt.override.build.repos=true",
+        "set ThisBuild / version := \"1.0.0\"",
+        "acquireJVM/makePom",
+        "acquireNative/makePom",
+        "acquireJS/makePom",
+        "alignJVM/makePom",
+        "alignNative/makePom",
+        "alignJS/makePom",
+        "amrInteropJVM/makePom",
+        "amrInteropNative/makePom",
+        "amrInteropJS/makePom",
+        "codecJVM/makePom",
+        "codecNative/makePom",
+        "codecJS/makePom",
+        "coreJVM/makePom",
+        "coreNative/makePom",
+        "coreJS/makePom",
+        "corpusIntake/makePom",
+        "corpusJVM/makePom",
+        "corpusNative/makePom",
+        "corpusJS/makePom",
+        "documentJVM/makePom",
+        "documentNative/makePom",
+        "documentJS/makePom",
+        "embedBench/makePom",
+        "embedCoreJVM/makePom",
+        "embedCoreNative/makePom",
+        "embedCoreJS/makePom",
+        "embedGrakern/makePom",
+        "embedOnnx/makePom",
+        "featuresJVM/makePom",
+        "featuresNative/makePom",
+        "featuresJS/makePom",
+        "fixturesJVM/makePom",
+        "fixturesNative/makePom",
+        "fixturesJS/makePom",
+        "interviewJVM/makePom",
+        "interviewNative/makePom",
+        "interviewJS/makePom",
+        "lawsJVM/makePom",
+        "lawsNative/makePom",
+        "lawsJS/makePom",
+        "media/makePom",
+        "pipeline/makePom",
+        "propositionJVM/makePom",
+        "propositionNative/makePom",
+        "propositionJS/makePom",
+        "providerAgent/makePom",
+        "providerParser/makePom",
+        "recallJVM/makePom",
+        "recallNative/makePom",
+        "recallJS/makePom",
+        "storyJVM/makePom",
+        "storyNative/makePom",
+        "storyJS/makePom",
+        "viewJVM/makePom",
+        "viewNative/makePom",
+        "viewJS/makePom"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+      "log": "command-018.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "236c65c74b6e3df6f09e655a601359f22ff127c684b3dd8c67b33ec9681462c9"
+    }
+  ],
+  "source": "c69a5d754a21fa455c64901334d9509278401091",
+  "ipcDirectory": "/private/tmp/sm4s-ipc-0z3ldip0",
+  "isolation": {
+    "boot": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/boot",
+    "global": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/global",
+    "staging": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/staging",
+    "ivy": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/ivy",
+    "coursier": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/coursier",
+    "config": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/config",
+    "tmp": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/tmp"
+  },
+  "heapGiB": 8,
+  "tests": {
+    "tasks": 56,
+    "passed": 11067,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "fetchedSources": [
+    {
+      "url": "https://github.com/canardlapin/grakern.git",
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "clean": true,
+      "transport": "configured-ssh"
+    },
+    {
+      "url": "https://github.com/canardlapin/gale.git",
+      "revision": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+      "clean": true,
+      "transport": "configured-ssh"
+    },
+    {
+      "url": "https://github.com/canardlapin/graph4s.git",
+      "revision": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+      "clean": true,
+      "transport": "configured-ssh"
+    }
+  ],
+  "artifact": {
+    "archiveSha256": "dc99dca194ea808b60161d11fc4b26845d40e1b1600f9b46c8aa7f37deb7edb9",
+    "archiveBytes": 143475273,
+    "manifestSha256": "ee253e5bf492397c20059851c72e0d68f1e28aab6fbcdf6300c19d0861327477",
+    "files": 182
+  },
+  "networkDenial": {
+    "mechanism": "macOS sandbox deny network*",
+    "onlineControlExit": 0,
+    "deniedControlExit": 23
+  },
+  "runtime": {
+    "onlineOfflineBytesEqual": true,
+    "pairedAndThreeWeights": true,
+    "independentReaders": {
+      "read_mapping.py": "aa8b2358c9c703a3c90c90b1b2da97200e07363e6d64b6748343f023be909ae6",
+      "read_weighted_mapping.py": "3d6be7829763eeb895599f86ab0cf645dc2eac86c919179e70c7e1ed6c565cc1"
+    },
+    "readback": {
+      "online": {
+        "pairs": 1,
+        "attempts": 1,
+        "weightedMembers": 3
+      },
+      "offline": {
+        "pairs": 1,
+        "attempts": 1,
+        "weightedMembers": 3
+      }
+    },
+    "inputs": {
+      "source.txt": "4b8d9d501b96b4568c5a61b54afb37cab155afd8cd2bc7f180aeb28ec2e8709e",
+      "recall.txt": "6a13364a36a31e930e61ae1eb25bdc9b777e744b4a775699d937e7f0a5882d4b",
+      "study.json": "4f500f559d7477e96005eb27dd5998ddd2f0896a88309cfe12155f94b50eaf2e",
+      "mapping.json": "5f798fd4c02d8586757360aa4d4ac00c939fb55a6328b46682d3bf95176d21fb"
+    }
+  },
+  "mavenClosure": {
+    "path": "maven-closure.json",
+    "sha256": "de7063e3418fdfd543fba4d6b8062b5325198eda96848213449731a00544d94c",
+    "candidatePoms": 56,
+    "unresolvedRoots": [
+      "io.github.canardlapin:grakern-core_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-engine-jvm_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-graph4s_3:0.1-0329c43-SNAPSHOT",
+      "io.github.canardlapin:grakern-standard_3:0.1-0329c43-SNAPSHOT"
+    ],
+    "affectedCandidateArtifacts": [
+      "io.github.bbuchsbaum:storymodel4s-embed-bench_3:1.0.0",
+      "io.github.bbuchsbaum:storymodel4s-embed-grakern_3:1.0.0"
+    ]
+  },
+  "finishedUnix": 1792121543.094211
+}
