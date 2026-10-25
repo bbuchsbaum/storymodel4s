@@ -101,7 +101,7 @@ class Store:
     def undo(self) -> dict:
         """Undo the latest live edit. Starts, resumes and reveals are not edits: undoing a start
         would renumber the calibration schedule, and a reveal cannot be unseen."""
-        fixed = ("header", "suggestions.shown", "decision.start", "calibration.reveal")
+        fixed = ("header", "suggestions.shown", "search.shown", "decision.start", "calibration.reveal")
         live = [e for e in self.live() if e["kind"] not in fixed]
         if not live:
             raise StoreError("nothing to undo")
@@ -442,6 +442,13 @@ class Store:
             raise StoreError("unknown decision")
         return self._append({"kind": "decision.delete", "id": did})
 
+    def searched(self, did, query: str, span, window, rows) -> dict:
+        """Log a search and the rows it showed (private log), like suggestions shown."""
+        return self._append(
+            {"kind": "search.shown", "id": did, "q": query, "span": span, "window": window,
+             "rows": rows}
+        )
+
     def shown(self, did, span, rows, hidden: bool) -> dict:
         return self._append(
             {
@@ -527,17 +534,32 @@ class Store:
         return state
 
     def calibration(self) -> dict:
+        """The calibration summary. Definitions (Codex review follow-up):
+        - an item is a decision started on masked words and first committed before its window's
+          reveal (its blind answer is the last step-1 commit before the reveal);
+        - an item is *compared* once its window is revealed: only compared items enter the
+          revision rate, so pending blind items are never counted as unrevised;
+        - *revised* means final disagreement: the current step-1 answer differs from the blind
+          answer. Changing an answer and changing it back is not a revision;
+        - deleted calibration items are counted per window, so attrition is visible."""
         items = [d for d in self.decisions().values() if d["calibration"]]
+        compared = [d for d in items if d["revealed"]]
         by_form = {}
-        for d in items:
+        for d in compared:
             f = (d["blind"] or d["reference"])["reference_form"]
-            g = by_form.setdefault(f, {"items": 0, "revised": 0})
-            g["items"] += 1
+            g = by_form.setdefault(f, {"compared": 0, "revised": 0})
+            g["compared"] += 1
             g["revised"] += int(d["revised"])
         # Per calibration window: likely references (the lexical screen), blind items and late
         # items, so a deliberate partial reveal stays visible in the report (v5 user review).
         by_window = {}
         decisions = self.decisions()
+        deleted_cal = {}
+        starts = {e["id"]: e for e in self.live() if e["kind"] == "decision.start"}
+        for e in self.live():
+            if e["kind"] == "decision.delete" and starts.get(e["id"], {}).get("calibration"):
+                w = self.p.census[starts[e["id"]]["span"][0] - 1]["window"]
+                deleted_cal[w] = deleted_cal.get(w, 0) + 1
         for w in self.calibration_windows():
             win = next(x for x in self.p.windows if x["window"] == w)
             rows = range(win["first"], win["last"] + 1)
@@ -550,10 +572,12 @@ class Store:
                 "blind": sum(1 for d in in_win if d["calibration"]),
                 "late": sum(1 for d in in_win if d.get("late")),
                 "revealed": w in self.revealed_windows(),
+                "deleted": deleted_cal.get(w, 0),
             }
         return {
             "items": len(items),
-            "revised": sum(int(d["revised"]) for d in items),
+            "compared": len(compared),
+            "revised": sum(int(d["revised"]) for d in compared),
             "byForm": by_form,
             "byWindow": by_window,
         }

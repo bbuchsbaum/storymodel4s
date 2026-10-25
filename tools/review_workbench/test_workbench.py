@@ -103,6 +103,23 @@ class PacketCourt(unittest.TestCase):
         with self.assertRaisesRegex(packet.PacketError, "recall"):
             packet.Packet(bad)
 
+    def test_every_row_is_reachable_from_some_scene(self):
+        # The complete-all gate needs every row; the source pass reaches rows only via scenes.
+        p = packet.Packet(MANIFEST)
+        in_scenes = {r for sc in p.scenes for r in sc["rows"]}
+        self.assertEqual(in_scenes, {r["row"] for r in p.rows})
+        tr_less = [r for r in p.rows if r.get("sceneByTime")]
+        self.assertEqual(len(tr_less), 1)
+        self.assertEqual(tr_less[0]["scenes"], [5])
+
+    def test_the_gate_opens_by_walking_scenes(self):
+        s = fresh_store()
+        for sc in s.p.scenes:
+            for row in sc["rows"]:
+                r = next(x for x in s.p.rows if x["row"] == row)
+                s.source_row(row, r["names"], [], {m["id"]: "unknown" for m in s.mentions[row]}, True)
+        self.assertTrue(s.recall_open())
+
     def test_rows_without_tr_keep_their_part(self):
         p = packet.Packet(MANIFEST)
         self.assertEqual({r["part"] for r in p.rows}, {1, 2})
@@ -376,6 +393,13 @@ class ServerCourt(unittest.TestCase):
             self.req("GET", "/missing", cookie=cookie)
         self.assertEqual(err.getvalue() + out.getvalue(), "")
 
+    def test_base_class_errors_carry_custody_headers(self):
+        cookie, _ = self.login()
+        status, headers, _ = self.req("PUT", "/api/index", {}, cookie=cookie)
+        self.assertEqual(status, 501)
+        self.assertEqual(headers["Cache-Control"], "no-store")
+        self.assertIn("default-src 'self'", headers["Content-Security-Policy"])
+
     def test_media_supports_ranges(self):
         cookie, _ = self.login()
         status, headers, body = self.req(
@@ -446,7 +470,7 @@ class CalibrationCourt(unittest.TestCase):
         s.reveal_window(1)
         s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
         cal = s.calibration()
-        self.assertEqual((cal["items"], cal["revised"]), (1, 1))
+        self.assertEqual((cal["items"], cal["compared"], cal["revised"]), (1, 1, 1))
         self.assertEqual(s.decisions()[did]["blind"]["referent"], "Mara")
 
     def test_undo_cannot_reach_behind_a_reveal(self):
@@ -481,6 +505,25 @@ class CalibrationCourt(unittest.TestCase):
         self.assertEqual(s.calibration()["items"], 0)
         with self.assertRaisesRegex(store.StoreError, "calibration window"):
             s.reveal_window(3)
+
+    def test_only_compared_items_enter_the_revision_rate(self):
+        s = done_store()
+        did = s.start_decision([8, 8])["id"]
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
+        cal = s.calibration()
+        self.assertEqual((cal["items"], cal["compared"], cal["revised"]), (1, 0, 0))
+        s.reveal_window(1)
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})  # changed back
+        cal = s.calibration()
+        self.assertEqual((cal["compared"], cal["revised"]), (1, 0))  # final agreement
+
+    def test_deleted_calibration_items_are_counted(self):
+        s = done_store()
+        did = s.start_decision([8, 8])["id"]
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})
+        s.delete(did)
+        self.assertEqual(s.calibration()["byWindow"][1]["deleted"], 1)
 
     def test_a_partial_reveal_stays_visible_in_the_report(self):
         s = done_store()

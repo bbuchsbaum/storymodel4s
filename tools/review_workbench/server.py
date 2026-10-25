@@ -107,7 +107,10 @@ class App:
                 raise StoreError(
                     "search is hidden in a calibration window and while a calibration item is open"
                 )
-            return {"hits": self.cands.search(str(body.get("q", "")))}
+            hits = self.cands.search(str(body.get("q", "")))
+            if s.recall_open():
+                s.searched(body.get("id"), str(body.get("q", "")), sp, win, [h["row"] for h in hits])
+            return {"hits": hits}
         if path == "/api/source/row":
             s.source_row(
                 int(body["row"]),
@@ -226,6 +229,12 @@ def handler(app, port):
 
         def log_error(self, *args):
             pass
+
+        def send_error(self, code, message=None, explain=None):
+            # Errors raised by the base class (bad method, bad request line) get the same
+            # no-store and CSP headers as every other response (Codex review follow-up).
+            self.close_connection = True
+            self._send(code, (message or "error").encode("utf-8", "replace"))
 
         def _headers(self, code, ctype, length, extra=()):
             self.send_response(code)

@@ -148,6 +148,24 @@ class Packet:
         self.scenes.sort(key=lambda s: s["scene"])
         for r in self.rows:
             r["scenes"] = [s["scene"] for s in self.scenes if r["row"] in s["rows"]]
+        # Rows with blank TR bounds (the real table has some) get no TR-based scene. Assign each
+        # to the scene of its part that contains its midpoint, else the nearest one in time, so
+        # the source pass can reach every row the complete-all gate requires (Codex review).
+        for r in self.rows:
+            if r["scenes"]:
+                continue
+            same = [s for s in self.scenes if s["part"] == r["part"]]
+            if not same:
+                raise PacketError(f"annotation row {r['row']} has no scene in its part")
+            mid = (r["t0"] + r["t1"]) / 2
+            inside = [s for s in same if s["t0"] <= mid < s["t1"]]
+            best = inside[0] if inside else min(
+                same, key=lambda s: min(abs(mid - s["t0"]), abs(mid - s["t1"]))
+            )
+            best["rows"].append(r["row"])
+            best["rows"].sort()
+            r["scenes"] = [best["scene"]]
+            r["sceneByTime"] = True
         self.transcripts = {}
         for part in parts:
             t = json.loads(self.paths[f"transcript{part}"].read_text())

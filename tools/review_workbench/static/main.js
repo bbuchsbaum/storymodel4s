@@ -298,6 +298,11 @@ S.commitReference = async function () {
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
     S.setState(out.state);
     a.step = 2;
+    // The form's evidence always comes from the log: when a changed referent invalidated the
+    // old evidence on the server, the form must not keep it ready to resubmit (Codex review).
+    const saved = S.decision(a.id)?.source;
+    a.source = saved ? structuredClone(saved) : blankSource();
+    if (S.decision(a.id)?.staleSource) toast(`${a.id}: the referent changed, so its earlier evidence was cleared.`);
     S.recallPane.refresh();
     S.decide.render();
     toast(`${a.id}: step 1 saved${a.calibration && !S.revealed(a.id) ? ' (blind)' : ''}`);
@@ -417,7 +422,7 @@ S.undo = async function () {
       if (!d && S.active.step === 2) S.active.step = 1;
       if (d) {
         S.active.fields = structuredClone(d.reference);
-        if (d.source) S.active.source = structuredClone(d.source);
+        S.active.source = d.source ? structuredClone(d.source) : blankSource();
       }
     }
     if (S.mode === 'source') S.source.render();

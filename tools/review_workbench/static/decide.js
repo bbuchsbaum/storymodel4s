@@ -102,12 +102,23 @@ export class DecidePane {
 
   async load(first, last) {
     const a = this.S.active;
-    try {
-      this.cands = await post('/api/candidates', { first, last, id: a?.id ?? null, hidden: this.blind() });
-    } catch (e) {
-      toast(e.message, 'error');
-      this.cands = null;
+    // Only the latest request may draw. A slower, older response must never paint suggestions
+    // after the reader has moved into a masked window (Codex review).
+    const req = (this.req = (this.req || 0) + 1);
+    if (this.blind() || (this.S.state.maskedWindows || []).includes(this.S.win)) {
+      this.cands = { hidden: true, moments: [], nominations: { one: [], zero: [], legacy: [] } };
+      this.S.filmPane.setPins([], null);
+      this.S.filmPane.markScenes([]);
+      this.renderBody();
     }
+    let out = null;
+    try {
+      out = await post('/api/candidates', { first, last, id: a?.id ?? null, hidden: this.blind() });
+    } catch (e) {
+      if (req === this.req) toast(e.message, 'error');
+    }
+    if (req !== this.req) return;
+    this.cands = out;
     this.pick = null;
     const hidden = !this.cands || this.cands.hidden;
     this.S.filmPane.setPins(hidden ? [] : this.cands.moments, null);

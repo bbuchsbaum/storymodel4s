@@ -483,6 +483,7 @@ def build(out: Path, media: bool = True) -> dict:
             clock[part] = e
         scene_tr[sid] = (part, int(t0 // TR), int((clock[part] - TR / 2) // TR))
     shift = {1: 0, 2: int(clock[1] // TR) + 1}
+    last_part1 = max(r["n"] for r in rows if r["part"] == 1)
     with open(out / "annotation.tsv", "w", newline="") as f:
         w = csv.writer(f, delimiter="\t")
         w.writerow(ANNOT_COLS)
@@ -492,8 +493,10 @@ def build(out: Path, media: bool = True) -> dict:
                     r["n"],
                     f"{r['s']:.2f}",
                     f"{r['e']:.2f}",
-                    int(r["s"] // TR) + shift[r["part"]],
-                    int((r["e"] - 0.01) // TR) + shift[r["part"]],
+                    # The last row of part one has blank TR bounds, as rows do at the end of
+                    # the real table's first part; the packet must still place it in a scene.
+                    "" if r["n"] == last_part1 else int(r["s"] // TR) + shift[r["part"]],
+                    "" if r["n"] == last_part1 else int((r["e"] - 0.01) // TR) + shift[r["part"]],
                     r["scene"],
                     r["details"],
                     r["inout"],
