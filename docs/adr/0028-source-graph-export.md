@@ -1,14 +1,18 @@
 # ADR 0028 — Exporting the source identity graph to the connected assessor
 
-**Status:** Proposed 2026-10-25. Every question under "Owner decisions" is open. The cold review of
-`6f1235532` found four blocking defects: the mention choice, overlap against containment, inexact
-conversion, and identity licensed without a graph. Its re-review of `b3dedab4f` found two more: the
-one-class rule reintroduced the deterministic deixis that ADR 0027 rejected, and it treated a
-contested class as `Same`. The re-review of `3d7c5225b` found that a picture record still bound
-an absent person to whoever was shown whenever the model emitted a single handle. This revision
-answers all seven and their follow-ups. Its re-review of `ca9a14089` found that name containment
-bound a relational description of an absent person to the person named in it; binding is now on
-name equality.
+**Status:** Accepted 2026-10-25 (AGENTS.md SD5). The owner chose the recommended answer to each of
+E, J, M, G, A and C ("proceed with 1-6").
+
+The ADR went through five cold reviews:
+- **`6f1235532`** found four blocking defects: the mention choice, overlap against containment,
+  inexact conversion, and identity licensed without a graph.
+- **`b3dedab4f`** found two more. The one-class rule reintroduced the deterministic deixis that ADR
+  0027 rejected, and it treated a contested class as `Same`.
+- **`3d7c5225b`** found that a picture record still bound an absent person to whoever was shown,
+  whenever the model emitted a single handle.
+- **`ca9a14089`** found that name containment bound a relational description of an absent person
+  to the person named in it. Binding is now on name equality.
+- **`010925e55`** was approved.
 
 **Decider:** the owner
 
@@ -189,14 +193,14 @@ built from.
 
 ## Owner decisions
 
-**E. The export (§1-2).**
+**E. The export (§1-2) (decided 2026-10-25: recommended).**
 - *Recommended:* a new graph version written by `sourceIdentity build`, with a JSON Schema and a
   checked Python reader.
 - *Alternative:* a circe codec in `codec` for the document module's resolution types. That would be
   portable, but the assessor is Python and reads a file, so it adds a Scala surface nobody consumes
   yet.
 
-**J. Binding a handle (§3).**
+**J. Binding a handle (§3) (decided 2026-10-25: recommended).**
 - *Recommended:* bind by name or exact word match. A picture handle binds only when its span equals
   the annotation name of an overlapping visual mention. A speech handle binds only when its span is
   exactly a graph dialogue mention. Speech records must carry word indices and UTF-16 offsets, which
@@ -209,25 +213,25 @@ built from.
 - *Rejected:* binding by time to the only class present. That is deterministic deixis (ADR 0027
   §4), and the model's handle count would decide it.
 
-**M. Model identity edges (§4).**
+**M. Model identity edges (§4) (decided 2026-10-25: recommended).**
 - *Recommended:* keep them as `proposed_*`, with a reason, and never let them license.
 - *Alternative:* drop them from the output. That is simpler, but the record of what the model
   claimed is lost.
 
-**G. Runs without a graph.**
+**G. Runs without a graph (decided 2026-10-25: recommended).**
 - *Recommended:* allow them only as a declared comparison arm. Their identity results are labelled
   `model-proposed` and are never reported as licensed. Rule 13 already bars model-licensed
   identity, and this makes that visible without discarding the existing measured arms.
 - *Alternative:* remove the no-graph mode. Every film then needs a graph before any identity result
   exists.
 
-**A. S3d's acceptance.** The S3d bead asks to turn the S2 and S3 expected failures into passing
-witnesses.
+**A. S3d's acceptance (decided 2026-10-25: recommended).** The S3d bead asks to turn the S2 and S3
+expected failures into passing witnesses.
 - *Recommended:* amend it to the graph-mode S2 and S5 witnesses (§6), and move S3 to the continuity
   bead (§5).
 - *Alternative:* keep S3 in S3d and let S3d wait for a continuity source.
 
-**C. Continuity.**
+**C. Continuity (decided 2026-10-25: recommended).**
 - *Recommended:* its own ADR now, from `bd-01M5MRVE0ZN7F5B6BE7440GFJ8`. Annotation rows and
   scene-cut boundaries can bound segments without tracks.
 - *Alternative:* wait for track input (`bd-01M5PYJ7237CQAGMY0GC7ESZM1`).
