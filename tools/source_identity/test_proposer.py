@@ -106,10 +106,12 @@ class ProposerTests(unittest.TestCase):
         self.prepared()
         for r in self.requests():
             self.assertEqual(
-                set(r["input"]), {"mention", "class", "text", "rows", "candidates"}
+                set(r["input"]), {"mention", "class", "seconds", "text", "rows", "candidates"}
             )
             for row in r["input"]["rows"]:
-                self.assertEqual(set(row), {"row", "seconds", "people", "speaking"})
+                self.assertEqual(
+                    set(row), {"row", "seconds", "people", "speaking", "overlapsMention"}
+                )
         blob = (self.exp / "requests.json").read_text()
         self.assertNotIn("synthetic", blob)  # the fixture's scene-description column
         self.assertNotIn("p-name-", blob)  # no proposals
@@ -118,6 +120,13 @@ class ProposerTests(unittest.TestCase):
         self.prepared()
         r = next(r for r in self.requests() if r["mention"] == "d-w2")
         self.assertEqual(r["input"]["text"], "[[she's]] woman her")
+
+    def test_the_model_is_told_when_the_mention_is_spoken_and_which_row_is_on_screen(self):
+        self.prepared()
+        r = next(r for r in self.requests() if r["mention"] == "d-w2")
+        self.assertEqual(r["input"]["seconds"], ["4", "4.3"])
+        flags = {row["row"]: row["overlapsMention"] for row in r["input"]["rows"]}
+        self.assertEqual(flags, {10: False, 11: True, 12: False})
 
     def test_requests_are_the_frozen_universe_mentions(self):
         self.prepared()
@@ -265,6 +274,27 @@ class ProposerTests(unittest.TestCase):
                 lambda: m.materialize(self.run_dir, self.exp, self.exp / "out")
             ),
         )
+
+    def test_a_recording_edited_with_its_summary_is_refused(self):
+        self.executed()
+        out, summary = self.exp / "outputs.jsonl", self.exp / "execution.json"
+        rows = [json.loads(x) for x in out.read_text().splitlines()]
+        for row in rows:
+            if row["mention"] == "d-w5":
+                row["proposal"]["target"] = "v-r12-2-guards-1"  # a target the reply never named
+        out.write_text("".join(json.dumps(x, sort_keys=True) + "\n" for x in rows))
+        s = json.loads(summary.read_text())
+        s["outputsSha256"] = m.file_sha(out)
+        summary.write_bytes(m.canonical(s) + b"\n")
+        self.assertIn("differs from its reply", self.refused(
+            lambda: m.materialize(self.run_dir, self.exp, self.exp / "out")))
+
+    def test_requests_changed_after_execution_are_refused_by_materialize(self):
+        self.executed()
+        path = self.exp / "requests.json"
+        path.write_text(path.read_text().replace('"reason"', '"reason" ', 1) + " ")
+        self.assertIn("requests differ from the freeze", self.refused(
+            lambda: m.materialize(self.run_dir, self.exp, self.exp / "out")))
 
     def test_materialize_replays_identically(self):
         self.executed()

@@ -18,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import concurrent.futures
+from decimal import Decimal
 import hashlib
 import json
 import math
@@ -28,6 +29,7 @@ import tempfile
 import time
 from typing import Callable
 import urllib.error
+import http.client
 import urllib.request
 
 # The sibling producer module, found even under `python3 -I`, which drops the script directory.
@@ -52,14 +54,16 @@ PROVIDER = dict(
     zdr=True,
     max_price=dict(prompt=PROMPT_PRICE, completion=COMPLETION_PRICE, request=0),
 )
-MAX_TOKENS = 2048
+MAX_TOKENS = 8192  # this pin reasons at length, and reasoning counts toward the cap
 BUDGET_CEILING_USD = 5.0  # owner decision 2 of ADR 0027
 DECISIONS = ("deictic", "candidates", "absent-or-unclear")
 
 PROMPT = """You read speech-recognition text from a film scene. One expression in it is marked
 [[like this]]. It is a third-person pronoun or a noun describing a person. The input also lists the
 people that annotators recorded in the nearby rows of the film, each with an id, and the listed
-speaker of each row. The recognition text may contain errors.
+speaker of each row. "seconds" says when the expression is spoken, and rows with
+"overlapsMention": true are the ones on screen at that moment. The recognition text may contain
+errors.
 
 Decide what the marked expression refers to, and answer with one JSON object and nothing else:
 {"decision": D, "target": ID or null, "candidates": [IDs], "reason": "one short sentence"}
@@ -134,6 +138,7 @@ def model_inputs(inputs: dict, universe: dict, transcript: dict) -> list[dict]:
             {
                 "mention": mention,
                 "class": m["class"],
+                "seconds": [str(Decimal(t) / producer.TICKS) for t in m["span"]],
                 "text": text,
                 "rows": [
                     {
@@ -144,6 +149,7 @@ def model_inputs(inputs: dict, universe: dict, transcript: dict) -> list[dict]:
                             for v in rows[n]["visual"]
                         ],
                         "speaking": rows[n]["speaking"],
+                        "overlapsMention": bool(producer.overlapping([rows[n]], m["span"])),
                     }
                     for n in listed
                 ],
@@ -362,7 +368,7 @@ def execute(
         except urllib.error.HTTPError as error:
             # Error bodies can echo inputs; keep only the status, never credentials.
             result.update(processing="http_failure", httpStatus=error.code)
-        except (OSError, ValueError, KeyError, TypeError) as error:
+        except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException) as error:
             result.update(
                 processing="transport_failure", errorClass=type(error).__name__
             )
@@ -372,7 +378,7 @@ def execute(
     results = []
     with output.open(
         "x", encoding="utf-8"
-    ) as stream, concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+    ) as stream, concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
         for result in pool.map(one, requests):
             results.append(result)
             stream.write(json.dumps(result, ensure_ascii=False, sort_keys=True) + "\n")
@@ -483,6 +489,24 @@ def materialize(run_dir: Path, experiment: Path, out: Path) -> dict:
     ):
         raise Refusal("recordings do not cover exactly the frozen requests")
     inputs = json.loads(inputs_path.read_text("utf-8"))
+    if freeze.get("requestsSha256") != file_sha(experiment / "requests.json"):
+        raise Refusal("requests differ from the freeze")
+    if summary.get("freezeSha256") != file_sha(experiment / "freeze.json"):
+        raise Refusal("the execution summary belongs to another freeze")
+    # The recorded proposal is re-derived from the raw reply and the frozen input, so a recording
+    # cannot carry a proposal the reply did not contain.
+    by_identity = {q["identity"]: q for q in requests}
+    for res in results:
+        q = by_identity[res["identity"]]
+        if res.get("mention") != q["mention"]:
+            raise Refusal("a recording names another mention than its request")
+        if res.get("processing") == "valid":
+            try:
+                again = validate(q["input"], res.get("raw"))
+            except (ValueError, TypeError, KeyError):
+                raise Refusal("a recorded reply does not validate against its request")
+            if again != res.get("proposal"):
+                raise Refusal("a recorded proposal differs from its reply")
     proposals, outcomes = proposals_from(inputs, results)
     doc = dict(inputs)
     doc["inputs"] = sorted(
