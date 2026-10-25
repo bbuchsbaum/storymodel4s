@@ -252,9 +252,22 @@ owner's.
    count once.
 2. **The split procedure.** Whole scenes are assigned to discovery or confirmation by a seeded,
    recorded procedure before any arm output exists. Scene assignment alone does not stop
-   coreference across scenes. A decision whose reference chain spans both partitions is quarantined
-   (Codex, storyatlas4s Fray board, card #136, message @1028). The human reference assigns it before
-   any arm output exists, it stays in the full accounting as its own row, and its count is reported.
+   coreference across scenes. A decision whose reference chain spans both partitions is
+   quarantined. These rules are Codex's decision (storyatlas4s Fray board, card #136, messages @1028
+   and @1032), frozen before any output:
+   - **Dependencies first.** Human review establishes each decision's source-scene dependencies
+     before sealing, and touching both partitions triggers quarantine. A quarantined decision cannot
+     be reassigned to evade the split.
+   - **Outside the gate.** Quarantined decisions are excluded from the 80% utility-rate denominator
+     and from the 15-decision floor.
+   - **Still reported.** They are kept as a separate row in full accounting, with counts by
+     reference form and complexity.
+   - **The share that became ungatable is reported.** GO is qualified as applying only to the
+     selected, non-quarantined decisions, and it is never a claim about cross-scene attribution.
+   - **Limits are shown, not repaired silently.** If quarantine removes the hard cases or makes the
+     sample insufficient, the packet shows that limitation rather than changing the split.
+   - **Within-partition cases stay eligible.** Decisions spanning several scenes on one side remain
+     eligible once all their required scenes are selected.
 3. **The control list.** The discriminating controls are wrong person, off-screen person, time,
    state, context and relational description.
 4. **Unresolved is never a participant failure.** This restates a principle from the planning thread
