@@ -83,18 +83,26 @@ words, not by a count of decisions.
   the packet manifest. For NN03 that is 7 of 50 windows.
 - **Their words are masked.** No timing chip, candidate, context word, retrieval or echo token,
   search result or timing-plot mark reaches a masked word.
-- **A calibration item is a decision started on masked words.** The reviewer commits step 1
-  blind. The suggestions for that decision's own words are then revealed, and the reviewer may
-  revise; the revision is logged. Undo cannot reach behind a reveal.
+- **A calibration item is a decision started on masked words.** The reviewer commits step 1 of
+  every reference in the window blind, then reveals the whole window at once. The reveal waits
+  for the window's open items and is never reversed: undo, edit and delete cannot re-mask
+  words. Revisions after the reveal are logged. An ordinary decision cannot take masked words,
+  and calibration words never carry timing chips, even after the reveal.
 - **The reported metric** is the revision rate on these paired items, split by `reference_form`.
   Every suggestion shown for a decision is logged privately.
-- **Residual risk:** a typed search for a masked word, made while the selection is elsewhere,
-  cannot be prevented. The protocol instructs against it.
+- **Threat model:** the masking prevents inadvertent priming of an honest reviewer through the
+  UI. It does not stop forged requests, or reading the page's data in developer tools. Search is
+  withheld inside a masked window; a typed search for a masked word made from elsewhere cannot
+  be prevented, and the protocol instructs against it.
+- **Owner decision pending:** whether the neighbouring windows, whose timing can point into a
+  calibration window's scenes, are masked as well.
 
 *Amendment, 2026-10-25.* The earlier rule chose the first 5 started decisions and then every tenth.
 The workbench hill climb showed that a count-based rule cannot be kept blind. The reviewer
 sees suggestions for a span before knowing whether the next start will be a calibration item,
-and those exposures are untracked (v2 function review, finding B3).
+and those exposures are untracked (v2 function review, finding B3). A per-decision reveal also
+primed the rest of its window and could be reversed (v3 reviews); hence the whole-window,
+monotonic reveal.
 
 ### 3. Two passes; the whole source pass comes first
 
