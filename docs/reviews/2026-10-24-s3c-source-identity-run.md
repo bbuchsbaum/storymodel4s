@@ -41,8 +41,9 @@ retention and one attempt per request. Eight requests were sent and eight valid 
 ## Measurement against the frozen labels (§7)
 
 The universe is 43 pairs: 8 pronoun or noun mentions, each against the visual mentions of its
-overlapping and adjacent rows. The labels are one agent's judgments, not human labels. That agent
-did not view every frame, and the model has prior knowledge of the episode.
+overlapping and adjacent rows. The labels are one agent's judgments, not human labels. The
+labeller made 6 tool calls in 27 s (recorded on the S3c-3 bead), so it cannot have viewed all 32
+frames. It labelled no pair `cant-tell`. The model has prior knowledge of the episode.
 
 | Basis | Proposed | Licensed / recorded | Refused | Pairs with this outcome | Labelled `same` among them | Precision (Wilson 95%) |
 |---|---|---|---|---|---|---|
@@ -65,21 +66,23 @@ did not view every frame, and the model has prior knowledge of the episode.
   of 28: 27 visual mentions plus the spoken name. The link is annotation-derived, as §8 predicts
   under decision N.
 - **The row-575 description.** Word 276 is a noun, so it can only receive hints, and it is
-  `Unknown` to every class, as §8 predicts. The model judged it absent or unclear, so it received
-  no hint.
-  - **Finding: §7 cannot reach this link.** The candidate universe pairs a mention only with people
-    listed in its overlapping and adjacent rows. Rows 574-576 list only Sherlock and John, so
-    Jennifer Wilson was never a candidate for word 276.
-  - That is not a model failure, and no hint can produce the link. It needs a rule for
-    candidates who are absent from the screen, or another source such as tracks
+  `Unknown` to every class, which is the outcome §8 predicts. The model judged it absent or
+  unclear, so no proposal was made and the noun guard was not exercised.
+  - **Finding: §8's hint toward her is unreachable under §4.** The model input, like the §7
+    universe, offers a mention only the people listed in its overlapping and adjacent rows. Rows
+    574-576 list only Sherlock and John, so Jennifer Wilson was never offered for word 276.
+  - That is not a model failure: no hint toward her was possible. Reaching her needs a rule for
+    candidates absent from the screen, or another source such as tracks
     (`bd-01M5PYJ7237CQAGMY0GC7ESZM1`). This belongs to S3d's reading of the graph.
 - **A pronoun about someone absent** (word 153, row 552): the model judged it absent or unclear, so
-  no deixis was proposed and the relation stays `Unknown`, as §8 predicts.
+  no deixis was proposed and the relation stays `Unknown`. That is the outcome §8 predicts, but the
+  speaker guard it names was not exercised.
 
 ## Limits
 
 - **Small sample.** There are eight model calls and three positive labels. These numbers show the
-  pipeline runs end to end and fails closed; they do not estimate accuracy.
+  pipeline runs end to end; they do not estimate accuracy. The producer's segment and probability
+  guards refused input here. No deixis guard was exercised, because the model proposed no deixis.
 - **Coarse presence.** Presence is per row, and row boundaries are whole seconds.
 - **Segments 10 and 11** (78-204 s) yield no mentions.
 - **Prior knowledge.** The model and the labeller both know the episode. That input is
