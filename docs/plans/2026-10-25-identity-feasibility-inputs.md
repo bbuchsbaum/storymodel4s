@@ -252,9 +252,9 @@ owner's.
    count once.
 2. **The split procedure.** Whole scenes are assigned to discovery or confirmation by a seeded,
    recorded procedure before any arm output exists. Scene assignment alone does not stop
-   coreference across scenes. A decision whose reference chain spans both partitions is
-   quarantined: kept out of both gate denominators, with its count reported (Codex, card #136,
-   message @1028).
+   coreference across scenes. A decision whose reference chain spans both partitions is quarantined
+   (Codex, storyatlas4s Fray board, card #136, message @1028). The human reference assigns it before
+   any arm output exists, it stays in the full accounting as its own row, and its count is reported.
 3. **The control list.** The discriminating controls are wrong person, off-screen person, time,
    state, context and relational description.
 4. **Unresolved is never a participant failure.** This restates a principle from the planning thread
