@@ -54,9 +54,7 @@ onset, which agrees for 15 of 16 subjects. Its section 3 table maps gold subject
   intervals tile, apart from 2 gaps.
 
 The two origins differ on 98 of 2,495 words (3.9%), including 7 of the 257 pronoun or person-noun
-tokens in all 2,495 words (256 fall inside coded
-scenes)
-(`tr-origin-sensitivity.json`).
+tokens in all 2,495 words, 256 of which fall inside coded scenes (`tr-origin-sensitivity.json`).
 
 A third convention exists. The inherited `gold_scene.py` uses closed word-seconds endpoints, and it
 differs from 1-based TR nomination on 94 words. The union of all three disagreements is the same 98
@@ -145,8 +143,13 @@ tokens, not decisions: many co-refer, and some refer to no person.
 | 49 | b | 963-981 | 0 (0) | 0 (0) | 20 / 2 / 0 | 46 | 0 / 0 |
 
 **For scene selection (input to the inclusion rule):**
-- **Scenes with no producer candidate** can enter only with arm A. Under arm B their speech-side
-  failures are input failures, not binder failures.
+- **Scenes with no producer candidate stay in the same frozen population for every arm** (A, B, D
+  and C). Membership never depends on an arm's capability (correction from Codex, storyatlas4s Fray
+  board, card #136, message @1028).
+  - Zero dialogue candidates alone is not proof of input failure. Each item records its measured
+    stage, which separates three cases: refused or missing ASR input; admitted input with a
+    candidate omission; and the separate availability of visual or annotation evidence.
+  - Where B cannot answer, its measured stage is recorded. The scene is not removed.
 - **Repairs differ by scene.** Nine of the ten have refused long segments overlapping the scene, so
   an ASR repair would bear on them. Scene 44 has no refused segment, so an ASR repair would not help
   it. Scenes 10, 36 and 41 have refused segments *and* admitted words with no candidate (in 36 the
@@ -248,7 +251,10 @@ owner's.
    description or name, together with the claim role it fills. Correlated tokens of one decision
    count once.
 2. **The split procedure.** Whole scenes are assigned to discovery or confirmation by a seeded,
-   recorded procedure before any arm output exists, so co-referring tokens cannot cross the split.
+   recorded procedure before any arm output exists. Scene assignment alone does not stop
+   coreference across scenes. A decision whose reference chain spans both partitions is
+   quarantined: kept out of both gate denominators, with its count reported (Codex, card #136,
+   message @1028).
 3. **The control list.** The discriminating controls are wrong person, off-screen person, time,
    state, context and relational description.
 4. **Unresolved is never a participant failure.** This restates a principle from the planning thread
@@ -256,8 +262,7 @@ owner's.
 5. **Presence beyond rows 500-585** needs the owner to extend ADR 0027 decision 1 (section 3).
    *Owner decision.*
 6. **Pseudonymized naming-sensitivity check.** Agreed with Codex (storyatlas4s Fray board, card
-   #136, message @1025) as an optional,
-   budgeted check, not a prerequisite.
+   #136, message @1025) as an optional, budgeted check, not a prerequisite.
    - Rename the characters consistently across every text input and the relevant labels. When
      comparing architectures under renamed input, apply the same renaming to the graph and
      name-baseline arms.
