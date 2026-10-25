@@ -305,7 +305,11 @@ S.commitReference = async function () {
     // A changed referent invalidates evidence recorded for the previous person: clear the
     // form's evidence, as the server did. With the same referent, keep the unsaved draft
     // (Codex re-review: a blanket reload discarded valid edits).
-    if (before !== undefined && before !== f.referent) {
+    // Compare with what the server committed, not the editable form: the picker can change
+    // while the request is in flight (Codex re-review).
+    const after = S.decision(a.id)?.reference?.referent;
+    a.fields = structuredClone(S.decision(a.id).reference); // the form shows what was committed
+    if (before !== undefined && before !== after) {
       a.source = blankSource();
       if (S.decision(a.id)?.staleSource) toast(`${a.id}: the referent changed, so its earlier evidence was cleared.`);
     }
