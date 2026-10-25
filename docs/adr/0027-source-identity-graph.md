@@ -68,11 +68,12 @@ for proposals, the language-model recordings. The producer refuses any other inp
 - **The reviewed vocabulary.** The role-label list also names the in-scope characters, so "a listed
   character" in §2 means an entry of that reviewed list.
 - **Third-person pronouns** (§2) are the singular personal ones: he and she, with their object,
-  possessive, reflexive and contracted forms. `it` and `they` are left out because they are not
-  person-singular.
+  possessive, reflexive and contracted forms. This is an owner decision (2026-10-24, "P" below).
 - **Time and streams.** Edition time is in 1/44100 s ticks. That represents both stream ends and
   the recognizer's 10 ms timings exactly. Each stream's identity is the SHA-256 of its packets
-  (ffmpeg `streamhash`), so the picture and audio streams are distinct.
+  (ffmpeg `streamhash`), so the picture and audio streams are distinct. `media-part-b-video-0`
+  and `media-part-b-audio-0` in this ADR name those two streams as `source-manifest.json` does;
+  they are not identifiers in the graph.
 
 ### 2. Mentions
 
@@ -263,6 +264,17 @@ appear in this document, as identifiers?
 - *Recommended: yes.* They are identifiers, not excerpts, and the ADR cannot state the body case
   without them.
 - *If no:* the table uses row numbers and opaque person labels.
+
+**P. Pronouns (decided 2026-10-24: he and she only).** Do "third-person pronouns" in §2 include
+`it` and singular `they`?
+- *Recommended: no.* Deixis links a pronoun to one present person, and neither the resolver nor
+  the producer checks grammatical number. A plural `they` said while one person is shown would be
+  proposed as that person. `it` does not refer to people in this scope.
+- *Measured effect in scope:* the wider set adds three tokens in accepted segments. One fails the
+  probability guard, one falls in row 502 with seven people listed, and one falls in a row whose
+  only listed person is the speaker. None could yield a licensed link.
+- *Cost:* a film with a character referred to as `they` would lose those mentions. The pronoun list
+  should become a declared input of each run rather than a constant.
 
 ## Consequences
 

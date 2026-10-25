@@ -63,7 +63,8 @@ A producer is identified by its transport, model as reported, skill hash and par
 receipt carries all four. Three transports are admitted:
 
 - DeepSeek through the API (the pilot default). The USD 5 cap of ADR 0027 covers the S3c round
-  only; the phase 5 pilot needs its own cap, an open owner decision.
+  only. The phase 5 pilot has its own cap of USD 15 (owner decision, 2026-10-24), accounted as
+  reported, accounted upper bound and attempted bound, as in ADR 0027.
 - Claude Code headless (`claude -p`) on the owner's subscription.
 - Codex (`codex exec`) on the owner's subscription.
 
