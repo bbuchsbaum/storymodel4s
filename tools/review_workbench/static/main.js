@@ -164,6 +164,8 @@ S.markRead = async function (w, value = true) {
   } catch (e) {
     S.release(lockTok);
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -233,6 +235,8 @@ S.startDecision = async function () {
   } catch (e) {
     S.release(lockTok);
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -335,6 +339,8 @@ S.createPerson = async function (label) {
   } catch (e) {
     S.release(lockTok);
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -352,8 +358,8 @@ S.commitReference = async function () {
   // fact either kept stale evidence or erased the edits).
   lockTok = S.acquire();
   if (!lockTok) return;
-  S.decide.renderForm();
   try {
+    S.decide.renderForm();
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
     S.release(lockTok);
     S.setState(out.state);
@@ -377,6 +383,8 @@ S.commitReference = async function () {
     S.release(lockTok);
     S.decide.renderForm();
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -438,6 +446,8 @@ S.reveal = async function () {
   } catch (e) {
     S.release(lockTok);
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -476,8 +486,8 @@ S.commitSource = async function () {
   if (S.saving) return;
   lockTok = S.acquire(); // locked while in flight, like step 1
   if (!lockTok) return;
-  S.decide.renderForm();
   try {
+    S.decide.renderForm();
     const out = await post('/api/decision/source', { id: a.id, fields: s });
     S.release(lockTok);
     S.setState(out.state);
@@ -492,6 +502,8 @@ S.commitSource = async function () {
     S.release(lockTok);
     S.decide.renderForm();
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -521,6 +533,8 @@ S.undo = async function () {
   } catch (e) {
     S.release(lockTok);
     toast(e.message, 'error');
+  } finally {
+    S.release(lockTok); // always freed, whatever throws
   }
 };
 
@@ -740,11 +754,15 @@ async function boot() {
   document.getElementById('btn-structure').addEventListener('click', () => S.structure.toggle());
   document.getElementById('btn-keys').addEventListener('click', () => openKeys());
   document.getElementById('btn-export').addEventListener('click', async () => {
+    const lockTok = S.acquire(); // export writes files: it takes the lock too
+    if (!lockTok) return toast('A save is in progress; export again in a moment.');
     try {
       const out = await post('/api/export');
       toast(`Wrote ${out.written.join(' and ')} to the private export folder.`);
     } catch (e) {
       toast(e.message, 'error');
+    } finally {
+      S.release(lockTok);
     }
   });
   document.addEventListener('keydown', onKey);

@@ -142,6 +142,8 @@ export class SourcePass {
       this.S.release(lockTok);
       toast(e.message, 'error');
       return false;
+    } finally {
+      this.S.release(lockTok); // always freed, whatever throws
     }
   }
 
@@ -169,6 +171,8 @@ export class SourcePass {
     } catch (e) {
       this.S.release(lockTok);
       toast(e.message, 'error');
+    } finally {
+      this.S.release(lockTok);
     }
   }
 
