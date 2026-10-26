@@ -239,6 +239,15 @@ class Store:
         "calibration.reveal",
     )
 
+    @staticmethod
+    def _shows_recall(e) -> bool:
+        """Whether an event proves recall was seen. A search proves it only when it carries
+        recall context (a window, a selected span or an open decision); a search without one
+        could come from the source pass (Codex review of ed640af52)."""
+        if e["kind"] == "search.shown":
+            return any(e.get(k) is not None for k in ("window", "span", "id"))
+        return e["kind"] in Store.RECALL_WORK
+
     def exposure(self) -> dict:
         """Actual, historical order of exposure, read from the full append-only history: undo
         cannot reverse what the reviewer saw (Codex review of c9b329cf9).
@@ -249,7 +258,7 @@ class Store:
         - A log whose recall work predates the recall.opened instrumentation reports a known prior
           exposure with incomplete timing, never a later opening as the first."""
         first_open = next((e for e in self.events if e["kind"] == "recall.opened"), None)
-        first_work = next((e for e in self.events if e["kind"] in self.RECALL_WORK), None)
+        first_work = next((e for e in self.events if self._shows_recall(e)), None)
         if first_work is None:
             status, boundary = "none recorded", None
         elif first_open is not None and first_open["seq"] <= first_work["seq"]:

@@ -734,6 +734,21 @@ class ReferenceFirstGateCourt(unittest.TestCase):
         e = s.exposure()
         self.assertEqual((e["sourceRowsDoneBeforeRecall"], e["sourceRowsDoneOnlyAfterRecall"]), (1, 0))
 
+    def test_a_source_only_search_is_not_recall_exposure(self):
+        # Codex's witness: source row, a search with no recall context, source row, recall.
+        s = store.Store(packet.Packet(self.manifest()), private())
+        for k in (0, 1):
+            r = s.p.rows[k]
+            s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
+            if k == 0:
+                s.searched(None, "lantern", None, None, [20])
+        s.note_recall_opened()
+        e = s.exposure()
+        self.assertEqual(e["recallExposure"], "recorded")
+        self.assertEqual((e["sourceRowsDoneBeforeRecall"], e["sourceRowsDoneOnlyAfterRecall"]), (2, 0))
+        s.searched(None, "lantern", None, 3, [20])  # a recall-pass search does count
+        self.assertTrue(s._shows_recall(s.events[-1]))
+
     def test_a_legacy_log_reports_known_prior_exposure(self):
         # Recall work recorded before the recall.opened instrumentation existed.
         s = store.Store(packet.Packet(self.manifest()), private())

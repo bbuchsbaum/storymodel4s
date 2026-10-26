@@ -109,7 +109,8 @@ class App:
                     "search is hidden in a calibration window and while a calibration item is open"
                 )
             hits = self.cands.search(str(body.get("q", "")))
-            if s.recall_open():
+            # Only a recall-pass search (with a window, span or decision) is a recall exposure.
+            if s.recall_open() and any(x is not None for x in (win, sp, body.get("id"))):
                 s.searched(body.get("id"), str(body.get("q", "")), sp, win, [h["row"] for h in hits])
             return {"hits": hits}
         if path == "/api/source/row":
