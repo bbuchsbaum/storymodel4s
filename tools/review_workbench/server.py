@@ -95,6 +95,7 @@ class App:
         if path == "/api/recall-text":
             if not s.recall_open():
                 raise StoreError("the source pass must be complete before recall opens")
+            s.note_recall_opened()  # exposure order is recorded for the export
             return {"words": self.packet.recall_text()}
         if path == "/api/state":
             return self.state()
@@ -108,7 +109,8 @@ class App:
                     "search is hidden in a calibration window and while a calibration item is open"
                 )
             hits = self.cands.search(str(body.get("q", "")))
-            if s.recall_open():
+            # Only a recall-pass search (with a window, span or decision) is a recall exposure.
+            if s.recall_open() and any(x is not None for x in (win, sp, body.get("id"))):
                 s.searched(body.get("id"), str(body.get("q", "")), sp, win, [h["row"] for h in hits])
             return {"hits": hits}
         if path == "/api/source/row":
@@ -147,6 +149,8 @@ class App:
         elif path == "/api/person":
             e = s.create_person(body.get("label"))
             return {"id": e["pid"], "state": self.state()}
+        elif path == "/api/person/rename":
+            s.rename_person(body.get("id"), body.get("label"))
         elif path == "/api/decision/start":
             sp = body.get("span")
             e = s.start_decision([int(sp[0]), int(sp[1])] if sp else None)
@@ -169,7 +173,7 @@ class App:
                     body.get("id"),
                     int(body["first"]),
                     int(body["last"]),
-                    body.get("referent"),
+                    body.get("referent_ids") or [],
                 )
             }
         elif path == "/api/undo":
@@ -179,6 +183,7 @@ class App:
         elif path == "/api/export":
             out = s.write_export()
             return {
+                "folder": out.name,
                 "written": [p.name for p in sorted(out.iterdir())],
                 "state": self.state(),
             }

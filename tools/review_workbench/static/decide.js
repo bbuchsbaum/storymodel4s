@@ -19,7 +19,9 @@ const FORMS = [['name', 'n'], ['pronoun', 'p'], ['description', 'd'], ['ellipsis
 const PERSONREF = [['yes', 'y'], ['no', 'x'], ['unknown', 'u']];
 const RESOLVABLE = [['yes', 'y'], ['no', 'x'], ['unknown', 'u']];
 const OUTCOME = [['supported', 's'], ['contradicted', 'c'], ['unresolved', 'v'], ['external', 'e']];
-const FIXED = [['absent', 'absent / off-screen'], ['none', 'no one in the film'], ['unknown', 'Unknown']];
+// Statuses with no referent id (decision schema v2). There is no generic "absent" person: an
+// off-screen known person is identified with their own id.
+const FIXED = [['unknown', 'Unknown'], ['external', 'outside the film'], ['not_person', 'not a person']];
 const ROLES = ['agent', 'patient', 'experiencer', 'recipient', 'possessor', 'theme', 'speaker', 'addressee'];
 const LABELS = {
   reference_form: 'Reference form',
@@ -58,7 +60,7 @@ export class DecidePane {
     this.filter = h('input.text.filter', {
       type: 'text',
       'aria-label': 'Filter people',
-      placeholder: 'Type to filter (F), ↑↓, Enter',
+      placeholder: 'Filter (F), ↑↓, Enter; Alt+Enter adds an alternative',
       oninput: () => { this.hi = 0; this.renderPeople(); },
       onkeydown: e => this.filterKey(e),
     });
@@ -293,11 +295,13 @@ export class DecidePane {
       .sort((a, b) => a.r - b.r || a.i - b.i)
       .map(x => x.p);
     const fixed = FIXED.filter(([, label]) => !q || label.toLowerCase().includes(q)).map(([id, label]) => ({ id, label, kind: 'fixed' }));
-    return [...listed.map(p => ({ ...p, label: p.kind === 'created' ? `${p.label} (${p.id})` : p.label })), ...fixed];
+    return [...listed, ...fixed];
   }
 
   renderPeople() {
-    const value = this.S.active?.fields.referent ?? null;
+    const f = this.S.active?.fields || {};
+    const ids = f.referent_ids || [];
+    const isOn = p => (p.kind === 'fixed' ? f.referent_status === p.id : ids.includes(p.id));
     const list = this.people();
     this.hi = Math.min(this.hi, Math.max(0, list.length - 1));
     const q = this.filter.value.trim();
@@ -306,20 +310,54 @@ export class DecidePane {
       list.map((p, i) => h('button.person', {
         type: 'button',
         role: 'option',
-        class: `person ${p.kind}${value === p.id ? ' on' : ''}${filtering && i === this.hi ? ' hi' : ''}`,
-        'aria-selected': String(value === p.id),
+        class: `person ${p.kind}${isOn(p) ? ' on' : ''}${filtering && i === this.hi ? ' hi' : ''}`,
+        'aria-selected': String(isOn(p)),
+        title: p.kind === 'fixed' ? undefined : `${p.label} (${p.origin}); Alt+click adds as an alternative`,
         dataset: { fid: `person:${p.id}` },
-        onclick: () => this.choosePerson(p.id),
+        onclick: e => (p.kind === 'fixed' ? this.chooseStatus(p.id) : this.choosePerson(p.id, e.altKey)),
       }, p.label)),
-      q && !list.length ? h('span.hint', `No match. Shift+Enter adds “${q}” as a new person.`) : null,
-      q && list.length ? h('button.person.new', { type: 'button', onclick: () => this.createFromFilter() }, `+ new “${q}”`) : null);
+      q && !list.length && !this.renaming ? h('span.hint', `No match. Shift+Enter adds “${q}” as a new person.`) : null,
+      q && list.length && !this.renaming ? h('button.person.new', { type: 'button', onclick: () => this.createFromFilter() }, `+ new “${q}”`) : null,
+      this.renameTarget() ? h('button.small.rename', { type: 'button', onclick: () => this.startRename() }, this.renaming ? 'Type the new label, Enter' : 'Rename') : null);
   }
 
-  choosePerson(id) {
-    this.S.setField('referent', this.S.active.fields.referent === id ? null : id, false);
+  // One person: identified. With Alt (or Alt+Enter), add or remove an alternative: two or more
+  // alternatives make the reference ambiguous. Several ids are alternatives, never a group.
+  choosePerson(id, add = false) {
+    const f = this.S.active.fields;
+    let ids = f.referent_status === 'identified' || f.referent_status === 'ambiguous' ? [...(f.referent_ids || [])] : [];
+    if (add) ids = ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id];
+    else ids = ids.length === 1 && ids[0] === id ? [] : [id];
+    const status = ids.length >= 2 ? 'ambiguous' : ids.length === 1 ? 'identified' : null;
+    this.S.setReferent(status, ids, status ? 'yes' : f.person_reference);
     this.filter.value = '';
     this.filter.blur();
     this.renderForm();
+  }
+
+  chooseStatus(status) {
+    const f = this.S.active.fields;
+    const pr = status === 'not_person' ? 'no' : status === 'external' ? 'yes' : f.person_reference === 'no' ? 'unknown' : f.person_reference;
+    this.S.setReferent(f.referent_status === status ? null : status, [], pr);
+    this.filter.value = '';
+    this.filter.blur();
+    this.renderForm();
+  }
+
+  renameTarget() {
+    const f = this.S.active?.fields || {};
+    if (f.referent_status !== 'identified') return null;
+    const p = this.S.state.people.find(x => x.id === f.referent_ids[0]);
+    return p && p.kind === 'created' ? p : null;
+  }
+
+  startRename() {
+    const p = this.renameTarget();
+    if (!p) return;
+    this.renaming = p.id;
+    this.filter.value = p.label;
+    this.filter.focus();
+    this.renderPeople();
   }
 
   async createFromFilter() {
@@ -338,10 +376,17 @@ export class DecidePane {
     else if (e.key === 'ArrowUp') { e.preventDefault(); this.hi = Math.max(0, this.hi - 1); this.renderPeople(); }
     else if (e.key === 'Enter') {
       e.preventDefault();
+      if (this.renaming) {
+        const pid = this.renaming;
+        this.renaming = null;
+        return this.S.renamePerson(pid, this.filter.value.trim()).then(() => { this.filter.value = ''; this.filter.blur(); this.renderForm(); });
+      }
       if (e.shiftKey) return this.createFromFilter();
       if (!this.filter.value.trim()) return toast('Type part of a name first.');
-      if (list[this.hi]) this.choosePerson(list[this.hi].id);
+      const pick = list[this.hi];
+      if (pick) (pick.kind === 'fixed' ? this.chooseStatus(pick.id) : this.choosePerson(pick.id, e.altKey));
     } else if (e.key === 'Escape') {
+      this.renaming = null;
       this.filter.value = '';
       this.filter.blur();
       this.renderPeople();
@@ -361,7 +406,12 @@ export class DecidePane {
       const f = a.fields;
       const out = [];
       if (!f.reference_form) out.push('form');
-      if (f.person_reference === 'yes' && !f.referent) out.push('person (F)');
+      if (!f.referent_status) out.push('person (F)');
+      else if (f.referent_status === 'ambiguous' && f.referent_ids.length < 2) out.push('a second candidate (Alt+click)');
+      else {
+        const ok = { identified: ['yes'], ambiguous: ['yes'], external: ['yes'], not_person: ['no'], unknown: ['yes', 'unknown'] }[f.referent_status];
+        if (!ok.includes(f.person_reference)) out.push(`person? ${ok.join(' or ')} for ${f.referent_status.replace('_', ' ')}`);
+      }
       return out;
     }
     const s = a.source;
@@ -395,9 +445,12 @@ export class DecidePane {
     const f = a.fields;
     const committed = this.S.decision(a.id);
     const text = r => this.S.recallText.slice(r[0] - 1, r[1]).join(' ');
-    const personLabel = id => {
-      const p = this.S.state.people.find(x => x.id === id);
-      return p ? p.label : (FIXED.find(x => x[0] === id)?.[1] ?? '—');
+    const label = id => this.S.state.people.find(x => x.id === id)?.label ?? id;
+    const referentText = () => {
+      if (!f.referent_status) return null;
+      if (f.referent_status === 'identified') return label(f.referent_ids[0]);
+      if (f.referent_status === 'ambiguous') return `${f.referent_ids.map(label).join(' or ')} (ambiguous)`;
+      return FIXED.find(x => x[0] === f.referent_status)?.[1];
     };
     let body;
     if (a.step === 1) {
@@ -416,7 +469,7 @@ export class DecidePane {
           h('button.small', { type: 'button', title: 'Select another stretch of words, then press C', onclick: () => this.S.addCoref() }, '+ selection', h('kbd', { 'aria-hidden': 'true' }, 'C'))),
         h('div.field', h('span.k', 'Form'), this.seg('reference_form', FORMS, f.reference_form)),
         h('div.field', h('span.k', 'Person?'), this.seg('person_reference', PERSONREF, f.person_reference)),
-        h('div.field.col', h('span.k', 'Refers to', f.referent ? h('span.chosen', personLabel(f.referent)) : null), h('div.picker', this.filter, this.plist)),
+        h('div.field.col', h('span.k', 'Refers to', f.referent_status ? h('span.chosen', referentText()) : null), h('div.picker', this.filter, this.plist)),
         h('div.field.two',
           h('label', h('span.k', 'Claim role'), this.role, h('datalist#roles', [...new Set([...ROLES, ...this.S.usedRoles()])].map(r => h('option', { value: r })))),
           h('label', h('span.k', 'Occurrence'), h('select.text', { 'aria-label': 'Occurrence group', onchange: e => this.S.setField('occurrence_group', e.target.value, false) },
@@ -431,7 +484,7 @@ export class DecidePane {
       body = [
         h('div.summary', { role: 'group', 'aria-label': 'Step 1 summary' },
           h('span.stepn.done', '1'),
-          h('span.sumtext', `“${text([f.first_word, f.last_word])}” → `, h('b', personLabel(f.referent)), ` · ${f.reference_form} · ${f.claim_role || 'no role'} · ${f.occurrence_group}`),
+          h('span.sumtext', `“${text([f.first_word, f.last_word])}” → `, h('b', referentText() ?? '—'), ` · ${f.reference_form} · ${f.claim_role || 'no role'} · ${f.occurrence_group}`),
           h('button.ghost.small', { type: 'button', onclick: () => this.S.editStep1() }, 'Edit', h('kbd', { 'aria-hidden': 'true' }, 'Shift+E'))),
         h('fieldset.step', { disabled: !!this.S.saving, 'aria-busy': String(!!this.S.saving) },
           h('legend', h('span.stepn', '2'), 'Source evidence'),

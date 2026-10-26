@@ -193,7 +193,8 @@ function blankFields(a, b) {
     claim_role: '',
     occurrence_group: S.newGroup(),
     person_reference: 'yes',
-    referent: null,
+    referent_status: null,
+    referent_ids: [],
   };
 }
 
@@ -272,7 +273,7 @@ S.closeDecision = function (force = false) {
   const a = S.active;
   if (!a || (S.saving && !force)) return;
   const f = a.fields;
-  const dirty = a.step === 1 && !S.decision(a.id) && (f.reference_form || f.referent || (f.other_coref_spans || []).length);
+  const dirty = a.step === 1 && !S.decision(a.id) && (f.reference_form || f.referent_status || (f.other_coref_spans || []).length);
   if (dirty && !force && Date.now() - closeArmed > 2500) {
     closeArmed = Date.now();
     return toast('Step 1 is not committed. Press Esc again to discard it.');
@@ -288,8 +289,35 @@ S.setField = function (key, value, rerender = true) {
   if (S.saving) return toast('Saving step 1; wait a moment.');
   if (S.active.step === 2 && key in S.active.source) return S.setSource(key, value, rerender);
   S.active.fields[key] = value;
-  if (key === 'referent') checkDupes();
+
   if (rerender) S.decide.renderForm();
+};
+
+// Who the reference means (decision schema v2): a status, its referent ids, and the person?
+// answer it implies. Several ids are alternatives (ambiguous), never a group of people.
+S.setReferent = function (status, ids, personRef) {
+  if (!S.active || S.saving) return;
+  const f = S.active.fields;
+  f.referent_status = status;
+  f.referent_ids = ids;
+  if (personRef) f.person_reference = personRef;
+  checkDupes();
+};
+
+S.renamePerson = async function (id, label) {
+  if (!label) return;
+  const lockTok = S.acquire(); // a rename changes server state: it takes the lock
+  if (!lockTok) return;
+  try {
+    const out = await post('/api/person/rename', { id, label });
+    S.release(lockTok);
+    S.setState(out.state);
+    toast(`Renamed to “${label}” (its id is unchanged)`);
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    S.release(lockTok);
+  }
 };
 
 S.setSource = function (key, value, rerender = true) {
@@ -302,7 +330,7 @@ S.setSource = function (key, value, rerender = true) {
 async function checkDupes() {
   const f = S.active.fields;
   try {
-    const out = await post('/api/duplicates', { id: S.active.id, first: f.first_word, last: f.last_word, referent: f.referent });
+    const out = await post('/api/duplicates', { id: S.active.id, first: f.first_word, last: f.last_word, referent_ids: f.referent_ids || [] });
     S.dupes = out.ids;
     S.decide.renderForm();
   } catch {
@@ -335,7 +363,7 @@ S.createPerson = async function (label) {
     const out = await post('/api/person', { label });
     S.release(lockTok);
     S.setState(out.state);
-    S.setField('referent', out.id);
+    S.setReferent('identified', [out.id], 'yes');
   } catch (e) {
     S.release(lockTok);
     toast(e.message, 'error');
@@ -352,7 +380,8 @@ S.commitReference = async function () {
   const missing = S.decide.problems();
   if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
   if (S.saving) return;
-  const before = S.decision(a.id)?.reference?.referent;
+  const key = r => (r ? JSON.stringify([r.referent_status ?? null, r.referent_ids ?? [], r.referent ?? null]) : undefined);
+  const before = key(S.decision(a.id)?.reference);
   // The form is locked while the save is in flight, so no edit can be made against a state
   // the server is about to replace (Codex re-reviews: reconciling in-flight edits after the
   // fact either kept stale evidence or erased the edits).
@@ -370,7 +399,7 @@ S.commitReference = async function () {
     // (Codex re-review: a blanket reload discarded valid edits).
     // Compare with what the server committed, not the editable form: the picker can change
     // while the request is in flight (Codex re-review).
-    const after = S.decision(a.id)?.reference?.referent;
+    const after = key(S.decision(a.id)?.reference);
     a.fields = structuredClone(S.decision(a.id).reference); // the form shows what was committed
     if (before !== undefined && before !== after) {
       a.source = blankSource();

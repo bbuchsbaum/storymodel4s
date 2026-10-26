@@ -95,7 +95,8 @@ def midway(store):
                 "claim_role": role,
                 "occurrence_group": f"g{did[1:].lstrip('0')}",
                 "person_reference": "yes",
-                "referent": ref,
+                "referent_status": "identified",
+                "referent_ids": [store.annotation_id(ref)],
             },
         )
         if scenes:
