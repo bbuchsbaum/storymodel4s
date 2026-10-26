@@ -124,6 +124,8 @@ export class SourcePass {
       toast(`Resolve ${open.length} mention${open.length > 1 ? 's' : ''} before marking the row done.`, 'error');
       return false;
     }
+    const lockTok = this.S.acquire(); // source-pass saves share the one lock (Codex re-review)
+    if (!lockTok) return false;
     try {
       const out = await post('/api/source/row', {
         row,
@@ -132,10 +134,12 @@ export class SourcePass {
         mentions: d.mentions,
         done: true,
       });
+      this.S.release(lockTok);
       this.S.setState(out.state);
       delete this.drafts[row];
       return true;
     } catch (e) {
+      this.S.release(lockTok);
       toast(e.message, 'error');
       return false;
     }
@@ -153,13 +157,17 @@ export class SourcePass {
       input?.focus();
       return;
     }
+    const lockTok = this.S.acquire();
+    if (!lockTok) return;
     try {
       const out = await post('/api/source/unnamed', { label: text, scene: this.scene });
+      this.S.release(lockTok);
       this.S.setState(out.state);
       this.draft(row).unnamed.add(out.uid);
       input.value = '';
       this.render();
     } catch (e) {
+      this.S.release(lockTok);
       toast(e.message, 'error');
     }
   }

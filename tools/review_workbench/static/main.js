@@ -60,6 +60,21 @@ S.setSaving = function (on) {
   S.saving = on;
   document.body.classList.toggle('saving', on);
 };
+// The lock has an owner: only the action that acquired it can release it, so a stale error
+// handler cannot free a newer action's lock (Codex re-review).
+S.acquire = function () {
+  if (S.saving) return null;
+  const tok = {};
+  S.lockOwner = tok;
+  S.setSaving(true);
+  return tok;
+};
+S.release = function (tok) {
+  if (tok && S.lockOwner === tok) {
+    S.lockOwner = null;
+    S.setSaving(false);
+  }
+};
 S.blind = () => (S.decide ? S.decide.blind() : false);
 let maskedCache = { key: null, set: new Set() };
 S.masked = () => {
@@ -137,15 +152,17 @@ S.goWindow = function (w) {
 };
 
 S.markRead = async function (w, value = true) {
+  let lockTok = null;
   if (S.saving) return;
   try {
-    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
+    lockTok = S.acquire(); // one asynchronous change at a time (Codex re-review)
+    if (!lockTok) return;
     const out = await post('/api/window', { window: w, value });
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     toast(`Window ${w} marked ${value ? 'read' : 'unread'}`);
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     toast(e.message, 'error');
   }
 };
@@ -197,13 +214,15 @@ S.newGroup = function () {
 S.usedRoles = () => [...new Set(Object.values(S.state.decisions).map(d => d.reference.claim_role).filter(Boolean))];
 
 S.startDecision = async function () {
+  let lockTok = null;
   if (S.saving) return;
   const sp = span();
   if (!sp) return toast('Select the words of the referring expression first.');
   try {
-    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
+    lockTok = S.acquire(); // one asynchronous change at a time (Codex re-review)
+    if (!lockTok) return;
     const out = await post('/api/decision/start', { span: sp });
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     S.active = { id: out.id, calibration: out.calibration, step: 1, fields: blankFields(...sp), source: blankSource(), started: Date.now() };
     S.dupes = [];
@@ -212,7 +231,7 @@ S.startDecision = async function () {
     if (out.calibration) S.filmPane.showMoment(null);
     await S.decide.load(...sp);
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     toast(e.message, 'error');
   }
 };
@@ -304,20 +323,23 @@ S.removeCoref = function (i) {
 };
 
 S.createPerson = async function (label) {
+  let lockTok = null;
   if (S.saving) return;
   try {
-    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
+    lockTok = S.acquire(); // one asynchronous change at a time (Codex re-review)
+    if (!lockTok) return;
     const out = await post('/api/person', { label });
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     S.setField('referent', out.id);
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     toast(e.message, 'error');
   }
 };
 
 S.commitReference = async function () {
+  let lockTok = null;
   const a = S.active;
   if (!a) return;
   const f = a.fields;
@@ -328,11 +350,12 @@ S.commitReference = async function () {
   // The form is locked while the save is in flight, so no edit can be made against a state
   // the server is about to replace (Codex re-reviews: reconciling in-flight edits after the
   // fact either kept stale evidence or erased the edits).
-  S.setSaving(true);
+  lockTok = S.acquire();
+  if (!lockTok) return;
   S.decide.renderForm();
   try {
     const out = await post('/api/decision/reference', { id: a.id, fields: f });
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     if (S.active !== a) return; // defence in depth: only the form that saved is updated
     a.step = 2;
@@ -351,7 +374,7 @@ S.commitReference = async function () {
     S.decide.render();
     toast(`${a.id}: step 1 saved${a.calibration && !S.revealed(a.id) ? ' (blind)' : ''}`);
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     S.decide.renderForm();
     toast(e.message, 'error');
   }
@@ -382,6 +405,7 @@ let revealArmed = { t: 0, w: null };
 S.revealArmedFor = w => revealArmed.w === w && Date.now() - revealArmed.t < 6000;
 S.disarmReveal = () => { revealArmed = { t: 0, w: null }; };
 S.reveal = async function () {
+  let lockTok = null;
   if (S.saving) return;
   const w = S.calWindowOf(S.active);
   if (!w) return toast('Nothing to reveal here.');
@@ -398,9 +422,10 @@ S.reveal = async function () {
     return toast(`${open} likely reference${open > 1 ? 's' : ''} in window ${w} have no decision yet and will no longer be blind. Press Shift+R again to reveal anyway.`, 'error');
   }
   try {
-    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
+    lockTok = S.acquire(); // one asynchronous change at a time (Codex re-review)
+    if (!lockTok) return;
     const out = await post('/api/calibration/reveal', { window: w });
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     S.index = await post('/api/index'); // revealed words still carry no timing; candidates do
     S.decide.render();
@@ -411,7 +436,7 @@ S.reveal = async function () {
     else { const win = S.index.windows[S.win - 1]; await S.decide.load(win.first, win.last); }
     toast(`Window ${w} revealed. Edit step 1 (Shift+E) if the suggestions change your judgment; revisions are logged.`);
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     toast(e.message, 'error');
   }
 };
@@ -443,16 +468,18 @@ S.removeAnchor = function (id) {
 };
 
 S.commitSource = async function () {
+  let lockTok = null;
   const a = S.active;
   const s = a.source;
   const missing = S.decide.problems();
   if (missing.length) return toast(`Still needed: ${missing.join(', ')}`, 'error');
   if (S.saving) return;
-  S.setSaving(true); // locked while in flight, like step 1
+  lockTok = S.acquire(); // locked while in flight, like step 1
+  if (!lockTok) return;
   S.decide.renderForm();
   try {
     const out = await post('/api/decision/source', { id: a.id, fields: s });
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     toast(`${a.id}: committed`);
     if (S.active !== a) return;
@@ -462,18 +489,20 @@ S.commitSource = async function () {
     const inCal = (S.state.calibrationWindows || []).includes(S.index.words[a.fields.first_word - 1].window);
     if (!(inCal && S.nextAwaitingEvidence(a.fields.first_word, true, true))) S.nextLikely(a.fields.last_word);
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     S.decide.renderForm();
     toast(e.message, 'error');
   }
 };
 
 S.undo = async function () {
+  let lockTok = null;
   if (S.saving) return;
   try {
-    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
+    lockTok = S.acquire(); // one asynchronous change at a time (Codex re-review)
+    if (!lockTok) return;
     const out = await post('/api/undo');
-    S.setSaving(false);
+    S.release(lockTok);
     S.setState(out.state);
     const what = { 'decision.reference': 'step 1', 'decision.revise': 'step 1 revision', 'decision.source': 'step 2', 'window.read': 'window mark', 'person.create': 'new person', 'decision.delete': 'deletion', 'source.row': 'source row', 'source.unnamed': 'unnamed person' }[out.undone?.kind] || 'last edit';
     if (S.active) {
@@ -490,7 +519,7 @@ S.undo = async function () {
     toast(`Undid ${what}${out.undone?.id ? ` of ${out.undone.id}` : ''}${out.undone?.row ? ` (row ${out.undone.row})` : ''}`);
     if (S.mode === 'recall' && S.sel) { const [x, y] = span(); S.decide.load(x, y); }
   } catch (e) {
-    S.setSaving(false);
+    S.release(lockTok);
     toast(e.message, 'error');
   }
 };
@@ -598,7 +627,7 @@ function onKey(e) {
     if (k === '.') { F.step(1); return true; }
     if (k === '[') { F.setRate(-1); return true; }
     if (k === ']') { F.setRate(1); return true; }
-    if (S.mode === 'source') return S.source.key(e);
+    if (S.mode === 'source') return S.saving ? k !== 'Tab' : S.source.key(e);
     if (S.saving) return k !== 'Tab'; // a save is in flight: no recall-pass key may act; Tab still moves focus
     return recallKey(e);
   })();
