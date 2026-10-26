@@ -139,17 +139,46 @@ owner chooses:
 The gate is configured by that recorded owner decision: complete-all by default, or per block
 under the weaker option. The decision's Mote op id is written into the private log header.
 
+*Amendment, 2026-10-25 (owner's direct-first plan; Codex, Fray #140 @1058).* The reference review
+no longer waits for an exhaustive source pass. The owner's direct-first plan, reviewed by Codex at
+`8553e728a`, runs C before the A/B/D comparison and needs only human reference answers and a
+sealed scope, not the A graph.
+- **The reference route opens the recall pass directly** (gate mode `reference-first`).
+  `complete-all` remains available.
+- **The source pass is a separate, source-only workflow** for arm A. Its artifact never holds
+  recall-answer mappings and stays out of the recall reference UI. A separate source-only
+  reviewer is preferable when the same owner has already reviewed recall.
+- **Actual exposure is recorded, not assumed.** The log records each time recall text is served,
+  and every export states when recall was first opened and how many source rows were done before
+  and after. The owner's prior exposure is disclosed; it is never called blindness or treated as
+  cured by UI order.
+
 ### 4. Codex's interchange is the canonical output
 
 The output is Codex's private `decisions.csv` and `review-windows.csv`, column for column, with the
 semantics of `2026-10-25-identity-feasibility-codex.md`, steps 1-6.
 
-- **The referent has no column in the current template.** Before W3, it is agreed with Codex on Fray
-  #136 either as a new `referent_id` column or as a stated encoding in `source_anchor_ids`. The
-  workbench writes whatever is agreed. Nothing is invented.
+- **The referent is exported under decision schema v2** (Codex, Fray #140 @1058). Every template
+  column is kept, and two are appended:
+  - `referent_status`: identified, ambiguous, unknown, external or not_person;
+  - `referent_ids`: a JSON array of opaque, stable ids. Identified has exactly one, ambiguous at
+    least two alternatives (never a group), and the other statuses none.
+
+  The status must agree with `person_reference`, and stays separate from `source_resolvable` and
+  `reference_outcome`.
+- **A private referents registry (`referents.json`)** holds each id, label and origin, drawn from
+  the review's own inventory, never from arm outputs. Annotation entries get ids derived from
+  the frozen entry text. Reviewer-created people keep their id through renames. There is no
+  generic absent person: an off-screen known person is identified, and external means outside the
+  film.
+- **Exports are versioned and private.** Each binds `decisions.csv`, the unchanged
+  `review-windows.csv`, `referents.json` and a copy of the append-only log to the parent input
+  hashes in an export manifest. The frozen originals are never edited. A decision without the
+  referent fields exports as "referent not captured", never as unknown.
 - **Spans may cross window boundaries** (step 1).
 - **Two steps per decision, following step 5.** The reviewer first commits the reference fields:
-  span, `other_coref_spans`, form, role, occurrence group, person_reference, and the referent.
+  span, `other_coref_spans`, form, role, occurrence group, person_reference, and the referent
+  status and ids.
   Only then does the source evidence step open: source scenes, anchors, `source_resolvable`,
   `reference_outcome` and `ambiguity_reason`.
 - **The export fills the template's `reviewer` and `reviewed_at` columns** in `decisions.csv`
