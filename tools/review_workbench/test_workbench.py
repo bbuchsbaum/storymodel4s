@@ -65,8 +65,10 @@ REF = {
     "claim_role": "agent",
     "occurrence_group": "g1",
     "person_reference": "yes",
-    "referent": "Mara",
+    "referent_status": "identified",
+    "referent_ids": [store.Store.annotation_id("Mara")],
 }
+TOBIAS = {"referent_status": "identified", "referent_ids": [store.Store.annotation_id("Tobias")]}
 
 
 class PacketCourt(unittest.TestCase):
@@ -209,9 +211,13 @@ class StoreCourt(unittest.TestCase):
     def test_a_person_reference_needs_a_referent(self):
         s = done_store()
         did = s.start_decision()["id"]
-        with self.assertRaisesRegex(store.StoreError, "who this refers to"):
+        with self.assertRaisesRegex(store.StoreError, "exactly one"):
             s.commit_reference(
-                did, {**REF, "first_word": 33, "last_word": 33, "referent": None}
+                did, {**REF, "first_word": 33, "last_word": 33, "referent_ids": []}
+            )
+        with self.assertRaisesRegex(store.StoreError, "requires person"):
+            s.commit_reference(
+                did, {**REF, "first_word": 33, "last_word": 33, "person_reference": "no"}
             )
         s.commit_reference(
             did,
@@ -219,7 +225,8 @@ class StoreCourt(unittest.TestCase):
                 **REF,
                 "first_word": 33,
                 "last_word": 33,
-                "referent": None,
+                "referent_status": "not_person",
+                "referent_ids": [],
                 "person_reference": "no",
             },
         )
@@ -231,9 +238,9 @@ class StoreCourt(unittest.TestCase):
             s.commit_reference(
                 did, {**REF, "first_word": 31, "last_word": 31, "reference_form": "noun"}
             )
-        with self.assertRaisesRegex(store.StoreError, "referent"):
+        with self.assertRaisesRegex(store.StoreError, "unknown referent id"):
             s.commit_reference(
-                did, {**REF, "first_word": 31, "last_word": 31, "referent": "Nobody"}
+                did, {**REF, "first_word": 31, "last_word": 31, "referent_ids": ["ann-nobody"]}
             )
 
     def test_spans_may_cross_windows(self):
@@ -258,10 +265,10 @@ class StoreCourt(unittest.TestCase):
         s = done_store()
         d1 = s.start_decision()["id"]
         s.commit_reference(d1, {**REF, "first_word": 33, "last_word": 35})
-        self.assertEqual(s.duplicates(None, 35, 36, "Mara"), [d1])
-        self.assertEqual(s.duplicates(None, 35, 36, "Tobias"), [])
+        self.assertEqual(s.duplicates(None, 35, 36, REF["referent_ids"]), [d1])
+        self.assertEqual(s.duplicates(None, 35, 36, TOBIAS["referent_ids"]), [])
 
-    def test_export_matches_the_template_and_withholds_the_referent(self):
+    def test_export_is_schema_v2_with_ids_not_labels(self):
         s = done_store()
         did = s.start_decision()["id"]
         s.commit_reference(did, {**REF, "first_word": 33, "last_word": 33})
@@ -278,10 +285,13 @@ class StoreCourt(unittest.TestCase):
         s.read_window(1)
         out = s.export()
         header = next(csv.reader(io.StringIO(out["decisions.csv"])))
-        self.assertEqual(header, synth.DECISION_COLS)
-        self.assertNotIn("Mara", out["decisions.csv"])
-        self.assertFalse(out["referentExported"])
+        self.assertEqual(header, synth.DECISION_COLS + ["referent_status", "referent_ids"])
+        self.assertNotIn("Mara", out["decisions.csv"])  # labels live only in the registry
         row = list(csv.DictReader(io.StringIO(out["decisions.csv"])))[0]
+        self.assertEqual(row["referent_status"], "identified")
+        self.assertEqual(json.loads(row["referent_ids"]), REF["referent_ids"])
+        reg = json.loads(out["referents.json"])
+        self.assertIn({"id": REF["referent_ids"][0], "label": "Mara", "origin": "annotation entry"}, reg["referents"])
         self.assertEqual(
             (row["reviewer"], row["reference_outcome"]),
             ("synthetic-reviewer", "supported"),
@@ -465,13 +475,13 @@ class CalibrationCourt(unittest.TestCase):
     def test_revision_after_reveal_is_counted(self):
         s = done_store()
         did = s.start_decision([8, 8])["id"]
-        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, **TOBIAS})
         s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})  # corrected, still blind
         s.reveal_window(1)
-        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, **TOBIAS})
         cal = s.calibration()
         self.assertEqual((cal["items"], cal["compared"], cal["revised"]), (1, 1, 1))
-        self.assertEqual(s.decisions()[did]["blind"]["referent"], "Mara")
+        self.assertEqual(s.decisions()[did]["blind"]["referent_ids"], REF["referent_ids"])
 
     def test_undo_cannot_reach_behind_a_reveal(self):
         s = done_store()
@@ -513,7 +523,7 @@ class CalibrationCourt(unittest.TestCase):
         cal = s.calibration()
         self.assertEqual((cal["items"], cal["compared"], cal["revised"]), (1, 0, 0))
         s.reveal_window(1)
-        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, "referent": "Tobias"})
+        s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8, **TOBIAS})
         s.commit_reference(did, {**REF, "first_word": 8, "last_word": 8})  # changed back
         cal = s.calibration()
         self.assertEqual((cal["compared"], cal["revised"]), (1, 0))  # final agreement
@@ -543,7 +553,7 @@ class CalibrationCourt(unittest.TestCase):
         s.commit_source(did, self.SRC)
         s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60, "claim_role": "patient"})
         self.assertIsNotNone(s.decisions()[did]["source"])  # same person: evidence stands
-        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60, "referent": "Tobias"})
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60, **TOBIAS})
         self.assertIsNone(s.decisions()[did]["source"])
         self.assertTrue(s.decisions()[did]["staleSource"])
 
@@ -591,6 +601,125 @@ class CalibrationCourt(unittest.TestCase):
         absent_name = row["names"][0]
         with self.assertRaisesRegex(store.StoreError, "present person"):
             s.source_row(row["row"], row["names"][1:], [], {m: absent_name}, True)
+
+
+class ReferentContractCourt(unittest.TestCase):
+    """Decision schema v2 and the referents registry (Codex, Fray #140 @1058), on synthetic data."""
+
+    def commit(self, s, row, **ref):
+        did = s.start_decision([row, row])["id"]
+        s.commit_reference(did, {**REF, "first_word": row, "last_word": row, **ref})
+        return did
+
+    def rows(self, s):
+        return {r["decision_id"]: r for r in csv.DictReader(io.StringIO(s.export()["decisions.csv"]))}
+
+    def test_each_status_round_trips_through_the_export(self):
+        s = done_store()
+        mara, tobias = REF["referent_ids"][0], TOBIAS["referent_ids"][0]
+        cases = {
+            "identified": dict(referent_status="identified", referent_ids=[mara]),
+            "ambiguous": dict(referent_status="ambiguous", referent_ids=[mara, tobias]),
+            "unknown": dict(referent_status="unknown", referent_ids=[], person_reference="unknown"),
+            "external": dict(referent_status="external", referent_ids=[]),
+            "not_person": dict(referent_status="not_person", referent_ids=[], person_reference="no"),
+        }
+        ids = {name: self.commit(s, 30 + k, **ref) for k, (name, ref) in enumerate(cases.items())}
+        rows = self.rows(s)
+        for name, did in ids.items():
+            self.assertEqual(rows[did]["referent_status"], name)
+            self.assertEqual(json.loads(rows[did]["referent_ids"]), cases[name]["referent_ids"])
+
+    def test_ambiguous_needs_two_and_unknown_none(self):
+        s = done_store()
+        did = s.start_decision([30, 30])["id"]
+        with self.assertRaisesRegex(store.StoreError, "at least two"):
+            s.commit_reference(did, {**REF, "first_word": 30, "last_word": 30, "referent_status": "ambiguous"})
+        with self.assertRaisesRegex(store.StoreError, "carries no referent ids"):
+            s.commit_reference(did, {**REF, "first_word": 30, "last_word": 30, "referent_status": "unknown"})
+        with self.assertRaisesRegex(store.StoreError, "requires person"):
+            s.commit_reference(did, {**REF, "first_word": 30, "last_word": 30, "referent_status": "external",
+                                     "referent_ids": [], "person_reference": "unknown"})
+
+    def test_an_off_screen_known_person_is_identified_with_their_own_id(self):
+        # There is no generic "absent" referent: an off-screen known person keeps their id.
+        s = done_store()
+        self.assertNotIn("absent", {p["id"] for p in s.people()})
+        did = self.commit(s, 30, **TOBIAS)
+        self.assertEqual(json.loads(self.rows(s)[did]["referent_ids"]), TOBIAS["referent_ids"])
+
+    def test_ids_are_opaque_and_survive_a_rename(self):
+        s = done_store()
+        pid = s.create_person("woman on the quay")["pid"]
+        did = self.commit(s, 30, referent_status="identified", referent_ids=[pid])
+        s.rename_person(pid, "harbour clerk")
+        reg = {r["id"]: r for r in s.registry()["referents"]}
+        self.assertEqual(reg[pid]["label"], "harbour clerk")
+        self.assertEqual(json.loads(self.rows(s)[did]["referent_ids"]), [pid])
+        for r in reg.values():  # never a display name, an index or a row number
+            self.assertNotEqual(r["id"], r["label"])
+            self.assertFalse(r["id"].isdigit())
+        with self.assertRaisesRegex(store.StoreError, "reviewer-created"):
+            s.rename_person(REF["referent_ids"][0], "Someone")
+
+    def test_an_invalid_id_is_refused(self):
+        s = done_store()
+        did = s.start_decision([30, 30])["id"]
+        with self.assertRaisesRegex(store.StoreError, "unknown referent id"):
+            s.commit_reference(did, {**REF, "first_word": 30, "last_word": 30, "referent_ids": ["Mara"]})
+
+    def test_a_legacy_decision_exports_as_not_captured(self):
+        s = done_store()
+        did = s.start_decision([30, 30])["id"]
+        legacy = {k: v for k, v in REF.items() if not k.startswith("referent")}
+        s._append({"kind": "decision.reference", "id": did,
+                   "fields": {**legacy, "first_word": 30, "last_word": 30, "other_coref_spans": [], "referent": "Mara"}})
+        row = self.rows(s)[did]
+        self.assertEqual((row["referent_status"], row["referent_ids"]), ("", ""))  # not "unknown"
+
+    def test_a_changed_referent_status_clears_evidence(self):
+        s = done_store()
+        did = self.commit(s, 60)
+        s.commit_source(did, CalibrationCourt.SRC)
+        s.commit_reference(did, {**REF, "first_word": 60, "last_word": 60, "referent_status": "ambiguous",
+                                 "referent_ids": REF["referent_ids"] + TOBIAS["referent_ids"]})
+        self.assertIsNone(s.decisions()[did]["source"])
+
+    def test_export_is_versioned_and_bound_by_a_manifest(self):
+        s = done_store()
+        self.commit(s, 30)
+        first, second = s.write_export(), s.write_export()
+        self.assertEqual((first.name, second.name), ("v001", "v002"))
+        man = json.loads((first / "export-manifest.json").read_text())
+        self.assertEqual(man["decisionSchema"], "decisions/v2")
+        for name in ("decisions.csv", "review-windows.csv", "referents.json", "log.jsonl"):
+            body = (first / name).read_text()
+            self.assertEqual(man["files"][name], __import__("hashlib").sha256(body.encode()).hexdigest())
+        self.assertEqual(man["parentInputs"]["recall"], json.loads(MANIFEST.read_text())["inputs"]["recall"]["sha256"])
+        self.assertEqual((first / "decisions.csv").stat().st_mode & 0o777, 0o600)
+
+
+class ReferenceFirstGateCourt(unittest.TestCase):
+    """The reference route opens recall directly; the export records exposure order."""
+
+    def manifest(self):
+        m = json.loads(MANIFEST.read_text())
+        m["gate"] = {"mode": "reference-first", "decisionOp": "synthetic"}
+        path = SPEC / f"reference-first-{next(_n)}.json"
+        path.write_text(json.dumps(m))
+        return path
+
+    def test_recall_opens_without_the_source_pass_and_exposure_is_recorded(self):
+        s = store.Store(packet.Packet(self.manifest()), private())
+        self.assertTrue(s.recall_open())
+        r = s.p.rows[0]
+        s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
+        s.note_recall_opened()
+        r = s.p.rows[1]
+        s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
+        e = s.exposure()
+        self.assertEqual((e["sourceRowsDoneBeforeRecall"], e["sourceRowsDoneAfterRecall"]), (1, 1))
+        self.assertIsNotNone(e["recallFirstOpened"])
 
 
 class BlindnessServerCourt(unittest.TestCase):

@@ -9,6 +9,7 @@ that the log has not earned.
 from datetime import datetime, timezone
 from decimal import Decimal
 import csv
+import hashlib
 import io
 import json
 import os
@@ -29,7 +30,8 @@ REFERENCE_FIELDS = (
     "claim_role",
     "occurrence_group",
     "person_reference",
-    "referent",
+    "referent_status",
+    "referent_ids",
 )
 SOURCE_FIELDS = (
     "source_scene_ids",
@@ -38,8 +40,25 @@ SOURCE_FIELDS = (
     "reference_outcome",
     "ambiguity_reason",
 )
-FIXED_REFERENTS = ("absent", "none", "unknown")
+# Decision schema v2 (Codex, Fray #140 @1058): referent status and opaque, stable referent ids,
+# kept apart from evidence anchors. One referent per decision: identified has exactly one id,
+# ambiguous at least two alternatives, and the other statuses none.
+REFERENT_STATUS = ("identified", "ambiguous", "unknown", "external", "not_person")
+STATUS_PERSON_REFERENCE = {
+    "identified": {"yes"},
+    "ambiguous": {"yes"},
+    "external": {"yes"},
+    "not_person": {"no"},
+    "unknown": {"yes", "unknown"},
+}
+DECISION_SCHEMA = "decisions/v2"
+EXPORT_SCHEMA = "review-workbench-export/v1"
 MENTION_RESOLUTIONS = ("present", "absent", "unknown")
+
+
+def referent_key(fields: dict):
+    """What a decision says about who is meant; a change here invalidates old evidence."""
+    return (fields.get("referent_status"), tuple(fields.get("referent_ids") or ()), fields.get("referent"))
 
 
 class StoreError(Exception):
@@ -193,12 +212,43 @@ class Store:
         return {"rows": rows, "scenes": scenes, "unnamed": self.unnamed()}
 
     def recall_open(self) -> bool:
-        """The source-first gate. complete-all: every row of every scene is done."""
+        """The gate, set by the recorded owner decision in the manifest.
+        - reference-first: the reference review opens the recall pass directly; the source pass
+          is a separate source-only workflow (Codex #140 @1058, owner's direct-first plan);
+        - complete-all: every row of every scene is done first."""
         mode = self.p.manifest["gate"]["mode"]
+        if mode == "reference-first":
+            return True
         if mode != "complete-all":
             raise StoreError(f"gate mode not implemented: {mode}")
         rows = self.source_state()["rows"]
         return all(rows.get(r["row"], {}).get("done") for r in self.p.rows)
+
+    def note_recall_opened(self) -> dict:
+        """Record that recall text was served, so the export can state the actual exposure
+        order between the source pass and the recall pass."""
+        return self._append({"kind": "recall.opened"})
+
+    def exposure(self) -> dict:
+        """Actual order of exposure: when recall was first served, and how many source rows
+        were done before and after. The reviewer's prior exposure is disclosed, not cured."""
+        first = next((e for e in self.events if e["kind"] == "recall.opened"), None)
+        done_before = done_after = 0
+        seen = set()
+        for e in self.live():
+            if e["kind"] == "source.row" and e["done"] and e["row"] not in seen:
+                seen.add(e["row"])
+                if first is None or e["seq"] < first["seq"]:
+                    done_before += 1
+                else:
+                    done_after += 1
+        return {
+            "gate": self.p.manifest["gate"],
+            "recallFirstOpened": first["t"] if first else None,
+            "sourceRowsDoneBeforeRecall": done_before,
+            "sourceRowsDoneAfterRecall": done_after,
+            "sourceRows": len(self.p.rows),
+        }
 
     def _require_recall(self):
         if not self.recall_open():
@@ -218,17 +268,53 @@ class Store:
         label = (label or "").strip()
         if not label:
             raise StoreError("a new person needs a short label")
-        pid = f"p{1 + sum(1 for e in self.events if e['kind'] == 'person.create')}"
+        pid = f"rev-{1 + sum(1 for e in self.events if e['kind'] == 'person.create')}"
         return self._append({"kind": "person.create", "pid": pid, "label": label})
 
+    def rename_person(self, pid: str, label: str) -> dict:
+        """Rename a reviewer-created person; the id never changes."""
+        self._require_recall()
+        label = (label or "").strip()
+        if not label:
+            raise StoreError("a person needs a label")
+        if pid not in {p["id"] for p in self.people() if p["kind"] == "created"}:
+            raise StoreError("only a reviewer-created person can be renamed")
+        return self._append({"kind": "person.rename", "pid": pid, "label": label})
+
+    @staticmethod
+    def annotation_id(entry: str) -> str:
+        """An opaque, stable id for an annotation entry: derived from the frozen entry text, so
+        it survives resume, but it is not the display name, a list index or a row number."""
+        return "ann-" + hashlib.sha256(entry.encode("utf-8")).hexdigest()[:12]
+
     def people(self) -> list:
-        made = [
-            {"id": e["pid"], "label": e["label"], "kind": "created"}
-            for e in self.live()
-            if e["kind"] == "person.create"
+        """The reference review's own inventory (never filled from arm outputs): annotation
+        entries in alphabetical order, then reviewer-created people with their current labels."""
+        made, labels = [], {}
+        for e in self.live():
+            if e["kind"] == "person.create":
+                made.append(e["pid"])
+                labels[e["pid"]] = e["label"]
+            elif e["kind"] == "person.rename":
+                labels[e["pid"]] = e["label"]
+        named = [
+            {"id": self.annotation_id(n), "label": n, "kind": "annotation", "origin": "annotation entry"}
+            for n in self.p.people
         ]
-        named = [{"id": n, "label": n, "kind": "annotation"} for n in self.p.people]
-        return named + made
+        created = [
+            {"id": pid, "label": labels[pid], "kind": "created", "origin": "reviewer-created"}
+            for pid in made
+        ]
+        return named + created
+
+    def registry(self) -> dict:
+        return {
+            "schema": "review-workbench-referents/v1",
+            "subject": self.p.manifest["subject"],
+            "referents": [
+                {"id": p["id"], "label": p["label"], "origin": p["origin"]} for p in self.people()
+            ],
+        }
 
     # -- calibration: decided by words, not by count ----------------------------------------
     # Calibration windows are fixed before review (manifest `calibrationWindows`, else window 1
@@ -369,14 +455,26 @@ class Store:
         for key in ("reference_form", "person_reference"):
             if f[key] not in DECLARED[key]:
                 raise StoreError(f"{key} must be one of {', '.join(DECLARED[key])}")
-        ref = f["referent"]
-        if f["person_reference"] == "yes" and ref is None:
-            raise StoreError("choose who this refers to, or mark it Unknown")
-        ids = {p["id"] for p in self.people()}
-        if ref is not None and ref not in ids and ref not in FIXED_REFERENTS:
-            raise StoreError(
-                "the referent must be a listed person, a created person, or fixed"
-            )
+        status = f["referent_status"]
+        rids = f["referent_ids"]
+        if status not in REFERENT_STATUS:
+            raise StoreError(f"referent_status must be one of {', '.join(REFERENT_STATUS)}")
+        if not isinstance(rids, list) or not all(isinstance(x, str) for x in rids):
+            raise StoreError("referent_ids is a list of referent ids")
+        known = {p["id"] for p in self.people()}
+        if any(x not in known for x in rids):
+            raise StoreError("unknown referent id")
+        if len(set(rids)) != len(rids):
+            raise StoreError("referent ids must be distinct")
+        if status == "identified" and len(rids) != 1:
+            raise StoreError("identified needs exactly one referent")
+        if status == "ambiguous" and len(rids) < 2:
+            raise StoreError("ambiguous needs at least two candidate referents")
+        if status in ("unknown", "external", "not_person") and rids:
+            raise StoreError(f"{status} carries no referent ids")
+        if f["person_reference"] not in STATUS_PERSON_REFERENCE[status]:
+            allowed = " or ".join(sorted(STATUS_PERSON_REFERENCE[status]))
+            raise StoreError(f"{status} requires person? = {allowed}")
         f["claim_role"] = (f["claim_role"] or "").strip()
         f["occurrence_group"] = (f["occurrence_group"] or "").strip()
         masked = self.masked_rows()
@@ -486,7 +584,7 @@ class Store:
                 if k == "decision.revise":
                     d["revised"] = e["fields"] != d["blind"] if d["blind"] else True
                 old = d.get("reference")
-                if old and d["source"] and old["referent"] != e["fields"]["referent"]:
+                if old and d["source"] and referent_key(old) != referent_key(e["fields"]):
                     # Evidence was recorded for a different person: it no longer supports this
                     # decision, so the item goes back to needing evidence (v6 user review).
                     d["source"], d["staleSource"] = None, True
@@ -516,12 +614,13 @@ class Store:
                     d["calibration"], d["late"], d["blind"] = False, True, None
         return out
 
-    def duplicates(self, did, first, last, referent) -> list:
-        """Committed decisions whose span overlaps this one with the same referent (step 3)."""
+    def duplicates(self, did, first, last, referent_ids) -> list:
+        """Committed decisions whose span overlaps this one and share a referent (step 3)."""
         out = []
+        ids = set(referent_ids or [])
         for d in self.decisions().values():
             r = d["reference"]
-            if d["id"] != did and r["referent"] == referent and referent is not None:
+            if d["id"] != did and ids & set(r.get("referent_ids") or []):
                 if r["first_word"] <= last and first <= r["last_word"]:
                     out.append(d["id"])
         return out
@@ -584,19 +683,17 @@ class Store:
 
     # -- export ----------------------------------------------------------------------------
     def export(self) -> dict:
-        """Codex's two templates, column for column. The referent is written only under an
-        encoding agreed on Fray #136 (manifest `referentEncoding`); until then it stays in the
-        log and the export says so."""
-        enc = self.p.manifest.get("referentEncoding")
-        cols = list(self.p.decision_columns)
-        if enc == "referent_id-column" and "referent_id" not in cols:
-            cols.append("referent_id")
+        """Decision schema v2: Codex's template columns, unchanged and in order, with
+        referent_status and referent_ids appended (Fray #140 @1058). A decision logged before
+        the referent fields existed exports both as empty: referent not captured, never unknown."""
+        cols = list(self.p.decision_columns) + ["referent_status", "referent_ids"]
         reviewer = self.p.manifest.get("reviewer") or ""
         buf = io.StringIO()
         w = csv.writer(buf, lineterminator="\n")
         w.writerow(cols)
         for did, d in sorted(self.decisions().items()):
             r, s = d["reference"], d["source"] or {}
+            captured = "referent_status" in r
             row = {
                 "decision_id": did,
                 "first_word": r["first_word"],
@@ -613,7 +710,8 @@ class Store:
                 "ambiguity_reason": s.get("ambiguity_reason", ""),
                 "reviewer": reviewer,
                 "reviewed_at": d["t"],
-                "referent_id": r["referent"] or "",
+                "referent_status": r["referent_status"] if captured else "",
+                "referent_ids": json.dumps(r["referent_ids"]) if captured else "",
             }
             w.writerow([row[c] for c in cols])
         wbuf = io.StringIO()
@@ -634,16 +732,38 @@ class Store:
         return {
             "decisions.csv": buf.getvalue(),
             "review-windows.csv": wbuf.getvalue(),
-            "referentExported": enc is not None,
+            "referents.json": json.dumps(self.registry(), indent=1) + "\n",
+            "log.jsonl": self.path.read_text(),
         }
 
     def write_export(self) -> Path:
-        out = self.dir / "export"
-        out.mkdir(mode=0o700, exist_ok=True)
+        """A new versioned export directory: the four files plus an export manifest binding
+        their hashes to the parent inputs. The frozen originals are never written."""
+        root = self.dir / "export"
+        root.mkdir(mode=0o700, exist_ok=True)
+        n = 1 + sum(1 for p in root.iterdir() if p.is_dir() and p.name.startswith("v"))
+        out = root / f"v{n:03d}"
+        out.mkdir(mode=0o700)
         files = self.export()
-        for name in ("decisions.csv", "review-windows.csv"):
+        digests = {}
+        for name, text in files.items():
             path = out / name
-            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             with os.fdopen(fd, "w") as f:
-                f.write(files[name])
+                f.write(text)
+            digests[name] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        manifest = {
+            "schema": EXPORT_SCHEMA,
+            "decisionSchema": DECISION_SCHEMA,
+            "exportedAt": now(),
+            "subject": self.p.manifest["subject"],
+            "packetManifest": self.p.manifest_sha,
+            "parentInputs": {k: v["sha256"] for k, v in self.p.manifest["inputs"].items()},
+            "files": digests,
+            "exposure": self.exposure(),
+            "calibration": self.calibration(),
+        }
+        fd = os.open(out / "export-manifest.json", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w") as f:
+            f.write(json.dumps(manifest, indent=1) + "\n")
         return out

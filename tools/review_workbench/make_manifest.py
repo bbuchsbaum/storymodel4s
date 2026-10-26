@@ -73,6 +73,13 @@ def main():
         "--gate-op", required=True, help="Mote op recording the owner's gate decision"
     )
     ap.add_argument("--subject", default="NN03")
+    ap.add_argument(
+        "--gate-mode",
+        default="reference-first",
+        choices=["reference-first", "complete-all"],
+        help="reference-first opens the recall pass directly (owner's direct-first plan); "
+        "complete-all requires the whole source pass first",
+    )
     a = ap.parse_args()
     repo, census = Path(a.repo).resolve(), Path(a.census_dir).resolve()
     out = Path(a.out_dir)
@@ -111,8 +118,7 @@ def main():
             p: {"path": str(repo / m), "sha256": sha(repo / m)}
             for p, m in MEDIA.items()
         },
-        "gate": {"mode": "complete-all", "decisionOp": a.gate_op},
-        "referentEncoding": None,
+        "gate": {"mode": a.gate_mode, "decisionOp": a.gate_op},
         "reviewer": a.reviewer,
     }
     out.mkdir(mode=0o700, parents=True)
