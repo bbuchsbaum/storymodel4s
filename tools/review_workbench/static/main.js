@@ -139,10 +139,13 @@ S.goWindow = function (w) {
 S.markRead = async function (w, value = true) {
   if (S.saving) return;
   try {
+    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
     const out = await post('/api/window', { window: w, value });
+    S.setSaving(false);
     S.setState(out.state);
     toast(`Window ${w} marked ${value ? 'read' : 'unread'}`);
   } catch (e) {
+    S.setSaving(false);
     toast(e.message, 'error');
   }
 };
@@ -198,7 +201,9 @@ S.startDecision = async function () {
   const sp = span();
   if (!sp) return toast('Select the words of the referring expression first.');
   try {
+    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
     const out = await post('/api/decision/start', { span: sp });
+    S.setSaving(false);
     S.setState(out.state);
     S.active = { id: out.id, calibration: out.calibration, step: 1, fields: blankFields(...sp), source: blankSource(), started: Date.now() };
     S.dupes = [];
@@ -207,6 +212,7 @@ S.startDecision = async function () {
     if (out.calibration) S.filmPane.showMoment(null);
     await S.decide.load(...sp);
   } catch (e) {
+    S.setSaving(false);
     toast(e.message, 'error');
   }
 };
@@ -300,10 +306,13 @@ S.removeCoref = function (i) {
 S.createPerson = async function (label) {
   if (S.saving) return;
   try {
+    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
     const out = await post('/api/person', { label });
+    S.setSaving(false);
     S.setState(out.state);
     S.setField('referent', out.id);
   } catch (e) {
+    S.setSaving(false);
     toast(e.message, 'error');
   }
 };
@@ -389,7 +398,9 @@ S.reveal = async function () {
     return toast(`${open} likely reference${open > 1 ? 's' : ''} in window ${w} have no decision yet and will no longer be blind. Press Shift+R again to reveal anyway.`, 'error');
   }
   try {
+    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
     const out = await post('/api/calibration/reveal', { window: w });
+    S.setSaving(false);
     S.setState(out.state);
     S.index = await post('/api/index'); // revealed words still carry no timing; candidates do
     S.decide.render();
@@ -400,6 +411,7 @@ S.reveal = async function () {
     else { const win = S.index.windows[S.win - 1]; await S.decide.load(win.first, win.last); }
     toast(`Window ${w} revealed. Edit step 1 (Shift+E) if the suggestions change your judgment; revisions are logged.`);
   } catch (e) {
+    S.setSaving(false);
     toast(e.message, 'error');
   }
 };
@@ -459,7 +471,9 @@ S.commitSource = async function () {
 S.undo = async function () {
   if (S.saving) return;
   try {
+    S.setSaving(true); // one asynchronous change at a time (Codex re-review)
     const out = await post('/api/undo');
+    S.setSaving(false);
     S.setState(out.state);
     const what = { 'decision.reference': 'step 1', 'decision.revise': 'step 1 revision', 'decision.source': 'step 2', 'window.read': 'window mark', 'person.create': 'new person', 'decision.delete': 'deletion', 'source.row': 'source row', 'source.unnamed': 'unnamed person' }[out.undone?.kind] || 'last edit';
     if (S.active) {
@@ -476,6 +490,7 @@ S.undo = async function () {
     toast(`Undid ${what}${out.undone?.id ? ` of ${out.undone.id}` : ''}${out.undone?.row ? ` (row ${out.undone.row})` : ''}`);
     if (S.mode === 'recall' && S.sel) { const [x, y] = span(); S.decide.load(x, y); }
   } catch (e) {
+    S.setSaving(false);
     toast(e.message, 'error');
   }
 };
