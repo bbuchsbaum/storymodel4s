@@ -718,8 +718,32 @@ class ReferenceFirstGateCourt(unittest.TestCase):
         r = s.p.rows[1]
         s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
         e = s.exposure()
-        self.assertEqual((e["sourceRowsDoneBeforeRecall"], e["sourceRowsDoneAfterRecall"]), (1, 1))
+        self.assertEqual((e["sourceRowsDoneBeforeRecall"], e["sourceRowsDoneOnlyAfterRecall"]), (1, 1))
+        self.assertEqual(e["recallExposure"], "recorded")
         self.assertIsNotNone(e["recallFirstOpened"])
+
+    def test_undo_cannot_rewrite_exposure(self):
+        s = store.Store(packet.Packet(self.manifest()), private())
+        r = s.p.rows[0]
+        s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
+        s.note_recall_opened()
+        s.undo()  # undoes the source row (recall.opened is not an edit)
+        self.assertEqual(s.events[-1]["kind"], "undo")
+        self.assertEqual(s.events[s.events[-1]["target"]]["kind"], "source.row")
+        s.source_row(r["row"], r["names"], [], {m["id"]: "unknown" for m in s.mentions[r["row"]]}, True)
+        e = s.exposure()
+        self.assertEqual((e["sourceRowsDoneBeforeRecall"], e["sourceRowsDoneOnlyAfterRecall"]), (1, 0))
+
+    def test_a_legacy_log_reports_known_prior_exposure(self):
+        # Recall work recorded before the recall.opened instrumentation existed.
+        s = store.Store(packet.Packet(self.manifest()), private())
+        did = s.start_decision([30, 30])["id"]
+        s.commit_reference(did, {**REF, "first_word": 30, "last_word": 30})
+        s.note_recall_opened()  # the first instrumented opening comes later
+        e = s.exposure()
+        self.assertEqual(e["recallExposure"], "known prior; timing incomplete")
+        self.assertIsNone(e["recallFirstOpened"])
+        self.assertIsNotNone(e["earliestRecallEvidence"])
 
 
 class BlindnessServerCourt(unittest.TestCase):

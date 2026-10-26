@@ -120,7 +120,10 @@ class Store:
     def undo(self) -> dict:
         """Undo the latest live edit. Starts, resumes and reveals are not edits: undoing a start
         would renumber the calibration schedule, and a reveal cannot be unseen."""
-        fixed = ("header", "suggestions.shown", "search.shown", "decision.start", "calibration.reveal")
+        fixed = (
+            "header", "suggestions.shown", "search.shown", "decision.start", "calibration.reveal",
+            "recall.opened",
+        )
         live = [e for e in self.live() if e["kind"] not in fixed]
         if not live:
             raise StoreError("nothing to undo")
@@ -229,24 +232,44 @@ class Store:
         order between the source pass and the recall pass."""
         return self._append({"kind": "recall.opened"})
 
+    # Events that can only happen once the reviewer has seen recall.
+    RECALL_WORK = (
+        "recall.opened", "decision.start", "decision.reference", "decision.revise",
+        "decision.source", "window.read", "person.create", "suggestions.shown", "search.shown",
+        "calibration.reveal",
+    )
+
     def exposure(self) -> dict:
-        """Actual order of exposure: when recall was first served, and how many source rows
-        were done before and after. The reviewer's prior exposure is disclosed, not cured."""
-        first = next((e for e in self.events if e["kind"] == "recall.opened"), None)
-        done_before = done_after = 0
-        seen = set()
-        for e in self.live():
-            if e["kind"] == "source.row" and e["done"] and e["row"] not in seen:
-                seen.add(e["row"])
-                if first is None or e["seq"] < first["seq"]:
-                    done_before += 1
+        """Actual, historical order of exposure, read from the full append-only history: undo
+        cannot reverse what the reviewer saw (Codex review of c9b329cf9).
+        - The recall boundary is the earliest event that shows recall was seen: a served recall
+          text or any recall-pass work.
+        - A source row counts as done before recall if a done event for it precedes that
+          boundary, even if it was later undone.
+        - A log whose recall work predates the recall.opened instrumentation reports a known prior
+          exposure with incomplete timing, never a later opening as the first."""
+        first_open = next((e for e in self.events if e["kind"] == "recall.opened"), None)
+        first_work = next((e for e in self.events if e["kind"] in self.RECALL_WORK), None)
+        if first_work is None:
+            status, boundary = "none recorded", None
+        elif first_open is not None and first_open["seq"] <= first_work["seq"]:
+            status, boundary = "recorded", first_open
+        else:
+            status, boundary = "known prior; timing incomplete", first_work
+        before, after = set(), set()
+        for e in self.events:
+            if e["kind"] == "source.row" and e.get("done"):
+                if boundary is None or e["seq"] < boundary["seq"]:
+                    before.add(e["row"])
                 else:
-                    done_after += 1
+                    after.add(e["row"])
         return {
             "gate": self.p.manifest["gate"],
-            "recallFirstOpened": first["t"] if first else None,
-            "sourceRowsDoneBeforeRecall": done_before,
-            "sourceRowsDoneAfterRecall": done_after,
+            "recallExposure": status,
+            "recallFirstOpened": boundary["t"] if status == "recorded" else None,
+            "earliestRecallEvidence": boundary["t"] if boundary else None,
+            "sourceRowsDoneBeforeRecall": len(before),
+            "sourceRowsDoneOnlyAfterRecall": len(after - before),
             "sourceRows": len(self.p.rows),
         }
 
