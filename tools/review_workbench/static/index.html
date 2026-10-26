@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recall review workbench</title>
+<link rel="stylesheet" href="/static/styles.css">
+<script type="module" src="/static/main.js"></script>
+</head>
+<body>
+<header class="bar" id="bar">
+  <div class="brand"><span class="subject" id="subject">…</span><span class="tag" id="synthetic" hidden>synthetic specimen</span></div>
+  <nav class="modes" aria-label="Pass">
+    <button type="button" id="mode-source" class="mode" aria-pressed="true">Source pass</button>
+    <button type="button" id="mode-recall" class="mode" aria-pressed="false">Recall pass</button>
+  </nav>
+  <div class="progress" id="progress" aria-live="polite"></div>
+  <div class="tools">
+    <button type="button" id="btn-structure" title="Structure (S)">Structure</button>
+    <button type="button" id="btn-export" title="Write decisions.csv and review-windows.csv">Export</button>
+    <button type="button" id="btn-keys" title="Keyboard (?)">Keys</button>
+  </div>
+</header>
+<main id="main">
+  <section class="pane left" id="left" aria-label="Reading"></section>
+  <section class="pane film" id="film" aria-label="Film">
+    <div class="player">
+      <video id="video" preload="auto" playsinline></video>
+      <div class="transport" id="transport"></div>
+    </div>
+    <div class="timeline" id="timeline" aria-label="Film timeline"></div>
+    <div class="moment" id="moment"></div>
+  </section>
+  <section class="pane right" id="right" aria-label="Candidates and decision"></section>
+</main>
+<div class="drawer" id="structure" hidden></div>
+<div class="overlay" id="keys" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
