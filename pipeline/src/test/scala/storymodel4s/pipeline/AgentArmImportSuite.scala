@@ -74,7 +74,9 @@ class AgentArmImportSuite extends FunSuite:
       .toOption
       .get
       .flatMap(_.hcursor.get[Vector[Json]]("units").toOption.get)
-      .map(u => u.hcursor.get[String]("id").toOption.get -> u.hcursor.downField("outcome").focus.get)
+      .map(u =>
+        u.hcursor.get[String]("id").toOption.get -> u.hcursor.downField("outcome").focus.get
+      )
       .toMap
 
   private def kind(o: Json): String = o.hcursor.get[String]("kind").toOption.get

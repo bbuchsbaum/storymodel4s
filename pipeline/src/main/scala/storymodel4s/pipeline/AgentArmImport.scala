@@ -83,7 +83,7 @@ object AgentArmImport:
       case Some(u) =>
         u.hcursor.downField(field).focus match
           case None | Some(Json.Null) => Json.obj("kind" -> Json.fromString("abstention"))
-          case Some(v) =>
+          case Some(v)                =>
             v.asNumber.flatMap(_.toInt) match
               case Some(scene) if scene >= 1 && scene <= SceneCount =>
                 Json.obj("kind" -> Json.fromString("label"), "scene" -> Json.fromInt(scene))
@@ -115,18 +115,21 @@ object AgentArmImport:
         (),
         Refusal.InvalidManifest
       )
-      sourceSha <- doc.hcursor.get[String]("sourceInputSha256").left.map(_ => Refusal.InvalidManifest)
+      sourceSha <- doc.hcursor
+        .get[String]("sourceInputSha256")
+        .left
+        .map(_ => Refusal.InvalidManifest)
       people <- doc.hcursor.get[Vector[Json]]("participants").left.map(_ => Refusal.InvalidManifest)
       selected = people.filter(p =>
         partition == "all" || p.hcursor.get[String]("partition").contains(partition)
       )
       _ <- Either.cond(selected.nonEmpty, (), Refusal.InvalidManifest)
-      built <- selected.foldLeft[Either[Refusal, Vector[(Json, Vector[Json])]]](Right(Vector.empty)) {
-        (acc, p) =>
+      built <- selected
+        .foldLeft[Either[Refusal, Vector[(Json, Vector[Json])]]](Right(Vector.empty)) { (acc, p) =>
           acc.flatMap { done =>
             participant(p, replies, field).map(done :+ _)
           }
-      }
+        }
       arm = Json.obj(
         "schema" -> Json.fromString(ArmSchema),
         "unitManifestSha256" -> Json.fromString(Checksum.ofBytes(manifestBytes).hex),
@@ -172,15 +175,17 @@ object AgentArmImport:
       byId <- recorded.foldLeft[Either[Refusal, Map[String, Json]]](Right(Map.empty)) { (acc, u) =>
         acc.flatMap { m =>
           u.hcursor.get[String]("id") match
-            case Left(_) => Left(Refusal.InvalidReply(name))
+            case Left(_)                     => Left(Refusal.InvalidReply(name))
             case Right(id) if m.contains(id) => Left(Refusal.DuplicateUnit(name, id))
-            case Right(id) => Right(m.updated(id, u))
+            case Right(id)                   => Right(m.updated(id, u))
         }
       }
       known = units.map(_.id).toSet
       _ <- byId.keys.find(id => !known.contains(id)).map(Refusal.UnknownUnit(name, _)).toLeft(())
       _ <- units
-        .find(mu => byId.get(mu.id).exists(_.hcursor.get[Int]("index").toOption != Some(mu.ordinal)))
+        .find(mu =>
+          byId.get(mu.id).exists(_.hcursor.get[Int]("index").toOption != Some(mu.ordinal))
+        )
         .map(mu => Refusal.OrdinalMismatch(name, mu.id))
         .toLeft(())
     yield
