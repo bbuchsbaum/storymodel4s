@@ -1,0 +1,815 @@
+{
+  "configuration": {
+    "bootstrapMethod": "paired-participant-cluster-percentile",
+    "confidence": 0.95,
+    "percentileIndices": "floor(alpha/2*n),floor((1-alpha/2)*n)-1",
+    "primary": "participant-average-paired-difference",
+    "resamples": 2000,
+    "schema": "storymodel4s.bench.scene-scoring-config/v1",
+    "secondary": "pooled-unit-weighted-paired-difference",
+    "seed": 20260902,
+    "unitWeight": 1
+  },
+  "configurationSha256": "533ef8fdbbbd996b42faa12a7e0a6fa3984a00fbf704d28b81f86badb4f2ffb0",
+  "eligibleParticipants": 10,
+  "evaluationSupportSha256": "b411c972fc0cb23256468302c6fe76c7529d6760c0f60cbd0fe3dbf2a8c32557",
+  "inputParticipants": 11,
+  "inputReceipts": {
+    "arm_a": "ea0bb68ab9d11471e289c810b05b04b5dc5b3104249d1dae30f4046953997009",
+    "arm_b": "1170a688a34d3147a4f8f9ca434e36fb2e88f5198463f9cdb5f8aac0c980954a",
+    "manifest": "7408c72545e49895a19ed16144afe09601334d258ef1621744563b3b55e38188",
+    "support": "f65ac58eb0cf63149536d067970275abab30159caecdf0f164114fe076e331fa"
+  },
+  "participants": [
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 156,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 172,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 173,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 58.97435897435897,
+          "sceneWithinOne": 80.76923076923077
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 156,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 172,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 173,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 84.61538461538461,
+          "sceneWithinOne": 94.87179487179488
+        }
+      ],
+      "exactDifferencePoints": 25.641025641025642,
+      "exclusions": {
+        "outside-coded-intervals": 17
+      },
+      "goldEligibleUnits": 156,
+      "inputUnits": 173,
+      "participant": "NN03_ANT_202231_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 173,
+      "transcriptOrderEligibleUnits": 173,
+      "transitionCoverage": {
+        "adjacentInputPairs": 172,
+        "goldEligiblePairs": 139,
+        "timedPairs": 172
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 86,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 95,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 96,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 54.651162790697676,
+          "sceneWithinOne": 84.88372093023256
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 86,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 95,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 96,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 73.25581395348837,
+          "sceneWithinOne": 89.53488372093024
+        }
+      ],
+      "exactDifferencePoints": 18.604651162790695,
+      "exclusions": {
+        "outside-coded-intervals": 10
+      },
+      "goldEligibleUnits": 86,
+      "inputUnits": 96,
+      "participant": "NN04_ATE_163931_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 96,
+      "transcriptOrderEligibleUnits": 96,
+      "transitionCoverage": {
+        "adjacentInputPairs": 95,
+        "goldEligiblePairs": 77,
+        "timedPairs": 95
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 0,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": null,
+          "labelledAdjacentPairs": 67,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 68,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": null,
+          "sceneExact": null,
+          "sceneWithinOne": null
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 0,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": null,
+          "labelledAdjacentPairs": 67,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 68,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": null,
+          "sceneExact": null,
+          "sceneWithinOne": null
+        }
+      ],
+      "exactDifferencePoints": null,
+      "exclusions": {
+        "no-gold-source": 68
+      },
+      "goldEligibleUnits": 0,
+      "inputUnits": 68,
+      "participant": "NN05_MUN_151631_final",
+      "primaryParticipation": "no-gold-eligible-units",
+      "timingEligibleUnits": 68,
+      "transcriptOrderEligibleUnits": 68,
+      "transitionCoverage": {
+        "adjacentInputPairs": 67,
+        "goldEligiblePairs": 0,
+        "timedPairs": 67
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 100,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 103,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 104,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 52.0,
+          "sceneWithinOne": 76.0
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 100,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 103,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 104,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 68.0,
+          "sceneWithinOne": 87.0
+        }
+      ],
+      "exactDifferencePoints": 16.0,
+      "exclusions": {
+        "outside-coded-intervals": 4
+      },
+      "goldEligibleUnits": 100,
+      "inputUnits": 104,
+      "participant": "NN06_SQT_213031_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 104,
+      "transcriptOrderEligibleUnits": 104,
+      "transitionCoverage": {
+        "adjacentInputPairs": 103,
+        "goldEligiblePairs": 95,
+        "timedPairs": 103
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 90,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 97,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 98,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 1.0,
+          "sceneExact": 43.333333333333336,
+          "sceneWithinOne": 52.22222222222222
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 90,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 97,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 98,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 75.55555555555556,
+          "sceneWithinOne": 88.88888888888889
+        }
+      ],
+      "exactDifferencePoints": 32.22222222222222,
+      "exclusions": {
+        "outside-coded-intervals": 8
+      },
+      "goldEligibleUnits": 90,
+      "inputUnits": 98,
+      "participant": "NN07_SKS_213031_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 98,
+      "transcriptOrderEligibleUnits": 98,
+      "transitionCoverage": {
+        "adjacentInputPairs": 97,
+        "goldEligiblePairs": 83,
+        "timedPairs": 97
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 154,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 180,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 181,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 62.98701298701299,
+          "sceneWithinOne": 79.87012987012987
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 154,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 180,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 181,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 82.46753246753246,
+          "sceneWithinOne": 94.15584415584415
+        }
+      ],
+      "exactDifferencePoints": 19.480519480519476,
+      "exclusions": {
+        "outside-coded-intervals": 27
+      },
+      "goldEligibleUnits": 154,
+      "inputUnits": 181,
+      "participant": "NN08_OLZ_224031_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 181,
+      "transcriptOrderEligibleUnits": 181,
+      "transitionCoverage": {
+        "adjacentInputPairs": 180,
+        "goldEligiblePairs": 131,
+        "timedPairs": 180
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 124,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 147,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 148,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 50.806451612903224,
+          "sceneWithinOne": 74.19354838709677
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 124,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 147,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 148,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 76.61290322580645,
+          "sceneWithinOne": 87.09677419354838
+        }
+      ],
+      "exactDifferencePoints": 25.806451612903224,
+      "exclusions": {
+        "outside-coded-intervals": 24
+      },
+      "goldEligibleUnits": 124,
+      "inputUnits": 148,
+      "participant": "NN11_NMA_233131_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 148,
+      "transcriptOrderEligibleUnits": 148,
+      "transitionCoverage": {
+        "adjacentInputPairs": 147,
+        "goldEligiblePairs": 105,
+        "timedPairs": 147
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 303,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 337,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 338,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0,
+          "sceneExact": 82.50825082508251,
+          "sceneWithinOne": 93.06930693069307
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 303,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 337,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 338,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0,
+          "sceneExact": 90.75907590759076,
+          "sceneWithinOne": 96.6996699669967
+        }
+      ],
+      "exactDifferencePoints": 8.250825082508243,
+      "exclusions": {
+        "outside-coded-intervals": 35
+      },
+      "goldEligibleUnits": 303,
+      "inputUnits": 338,
+      "participant": "NN13_DII_241731_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 338,
+      "transcriptOrderEligibleUnits": 338,
+      "transitionCoverage": {
+        "adjacentInputPairs": 337,
+        "goldEligiblePairs": 275,
+        "timedPairs": 337
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 80,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 96,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 97,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 73.75,
+          "sceneWithinOne": 86.25
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 80,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 96,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 97,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0.0,
+          "sceneExact": 85.0,
+          "sceneWithinOne": 91.25
+        }
+      ],
+      "exactDifferencePoints": 11.25,
+      "exclusions": {
+        "outside-coded-intervals": 17
+      },
+      "goldEligibleUnits": 80,
+      "inputUnits": 97,
+      "participant": "NN15_DBF_242231_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 97,
+      "transcriptOrderEligibleUnits": 97,
+      "transitionCoverage": {
+        "adjacentInputPairs": 96,
+        "goldEligiblePairs": 65,
+        "timedPairs": 96
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 79,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 88,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 89,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0,
+          "sceneExact": 59.49367088607595,
+          "sceneWithinOne": 78.48101265822785
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 79,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 88,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 89,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0,
+          "sceneExact": 74.68354430379746,
+          "sceneWithinOne": 83.54430379746836
+        }
+      ],
+      "exactDifferencePoints": 15.189873417721515,
+      "exclusions": {
+        "outside-coded-intervals": 10
+      },
+      "goldEligibleUnits": 79,
+      "inputUnits": 89,
+      "participant": "NN16_DBN_242731_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 89,
+      "transcriptOrderEligibleUnits": 89,
+      "transitionCoverage": {
+        "adjacentInputPairs": 88,
+        "goldEligiblePairs": 69,
+        "timedPairs": 88
+      }
+    },
+    {
+      "arms": [
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 327,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 351,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 352,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0,
+          "sceneExact": 70.9480122324159,
+          "sceneWithinOne": 88.37920489296636
+        },
+        {
+          "goldEligibleOutcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 327,
+            "provider-failure": 0
+          },
+          "goldEligiblePredictionCoverage": 1.0,
+          "labelledAdjacentPairs": 351,
+          "outcomes": {
+            "abstention": 0,
+            "invalid": 0,
+            "label": 352,
+            "provider-failure": 0
+          },
+          "predictionCoverage": 1.0,
+          "sceneDistanceAmongLabelledEligible": 0,
+          "sceneExact": 81.03975535168196,
+          "sceneWithinOne": 93.88379204892966
+        }
+      ],
+      "exactDifferencePoints": 10.091743119266056,
+      "exclusions": {
+        "outside-coded-intervals": 25
+      },
+      "goldEligibleUnits": 327,
+      "inputUnits": 352,
+      "participant": "NN17_DBE_242331_final",
+      "primaryParticipation": "eligible",
+      "timingEligibleUnits": 352,
+      "transcriptOrderEligibleUnits": 352,
+      "transitionCoverage": {
+        "adjacentInputPairs": 351,
+        "goldEligiblePairs": 303,
+        "timedPairs": 351
+      }
+    }
+  ],
+  "partition": "development",
+  "qualification": "fixed-support localization comparison; not behavioral-recovery or calibration evidence",
+  "schema": "storymodel4s.bench.scene-comparison/v1",
+  "series": {
+    "sceneExact": {
+      "ciStatus": "estimated",
+      "leaveOneParticipantOut": [
+        {
+          "omitted": "NN03_ANT_202231_final",
+          "primaryDifferencePoints": 17.432920677547937
+        },
+        {
+          "omitted": "NN04_ATE_163931_final",
+          "primaryDifferencePoints": 18.214740064018486
+        },
+        {
+          "omitted": "NN06_SQT_213031_final",
+          "primaryDifferencePoints": 18.50414574877301
+        },
+        {
+          "omitted": "NN07_SKS_213031_final",
+          "primaryDifferencePoints": 16.701676612970537
+        },
+        {
+          "omitted": "NN08_OLZ_224031_final",
+          "primaryDifferencePoints": 18.11742136204862
+        },
+        {
+          "omitted": "NN11_NMA_233131_final",
+          "primaryDifferencePoints": 17.414540014005983
+        },
+        {
+          "omitted": "NN13_DII_241731_final",
+          "primaryDifferencePoints": 19.36516518404987
+        },
+        {
+          "omitted": "NN15_DBF_242231_final",
+          "primaryDifferencePoints": 19.031923526550784
+        },
+        {
+          "omitted": "NN16_DBN_242731_final",
+          "primaryDifferencePoints": 18.59415981347062
+        },
+        {
+          "omitted": "NN17_DBE_242331_final",
+          "primaryDifferencePoints": 19.160618735521226
+        }
+      ],
+      "perParticipantDifferences": {
+        "NN03_ANT_202231_final": 25.641025641025642,
+        "NN04_ATE_163931_final": 18.604651162790695,
+        "NN06_SQT_213031_final": 16.0,
+        "NN07_SKS_213031_final": 32.22222222222222,
+        "NN08_OLZ_224031_final": 19.480519480519476,
+        "NN11_NMA_233131_final": 25.806451612903224,
+        "NN13_DII_241731_final": 8.250825082508243,
+        "NN15_DBF_242231_final": 11.25,
+        "NN16_DBN_242731_final": 15.189873417721515,
+        "NN17_DBE_242331_final": 10.091743119266056
+      },
+      "primaryCI95": [
+        13.678538374150044,
+        22.88046139535048
+      ],
+      "primaryParticipantAverageDifferencePoints": 18.25373117389571,
+      "secondaryCI95": [
+        11.84146930884485,
+        22.232645403377106
+      ],
+      "secondaryPooledUnitWeightedDifferencePoints": 16.1440960640427
+    },
+    "sceneWithinOne": {
+      "ciStatus": "estimated",
+      "leaveOneParticipantOut": [
+        {
+          "omitted": "NN03_ANT_202231_final",
+          "primaryDifferencePoints": 10.967223431226408
+        },
+        {
+          "omitted": "NN04_ATE_163931_final",
+          "primaryDifferencePoints": 12.0173791325449
+        },
+        {
+          "omitted": "NN06_SQT_213031_final",
+          "primaryDifferencePoints": 11.311952775955753
+        },
+        {
+          "omitted": "NN07_SKS_213031_final",
+          "primaryDifferencePoints": 8.460100924103902
+        },
+        {
+          "omitted": "NN08_OLZ_224031_final",
+          "primaryDifferencePoints": 10.946873410876389
+        },
+        {
+          "omitted": "NN11_NMA_233131_final",
+          "primaryDifferencePoints": 11.100483241905573
+        },
+        {
+          "omitted": "NN13_DII_241731_final",
+          "primaryDifferencePoints": 12.130801327477572
+        },
+        {
+          "omitted": "NN15_DBF_242231_final",
+          "primaryDifferencePoints": 11.978619442622419
+        },
+        {
+          "omitted": "NN16_DBN_242731_final",
+          "primaryDifferencePoints": 11.971587093817918
+        },
+        {
+          "omitted": "NN17_DBE_242331_final",
+          "primaryDifferencePoints": 11.922554203070941
+        }
+      ],
+      "perParticipantDifferences": {
+        "NN03_ANT_202231_final": 14.102564102564102,
+        "NN04_ATE_163931_final": 4.651162790697683,
+        "NN06_SQT_213031_final": 11.0,
+        "NN07_SKS_213031_final": 36.666666666666664,
+        "NN08_OLZ_224031_final": 14.285714285714278,
+        "NN11_NMA_233131_final": 12.903225806451616,
+        "NN13_DII_241731_final": 3.6303630363036206,
+        "NN15_DBF_242231_final": 5.0,
+        "NN16_DBN_242731_final": 5.063291139240505,
+        "NN17_DBE_242331_final": 5.504587155963307
+      },
+      "primaryCI95": [
+        6.392917962971178,
+        17.97626082963854
+      ],
+      "primaryParticipantAverageDifferencePoints": 11.280757498360177,
+      "secondaryCI95": [
+        5.862566074002885,
+        15.622641509433961
+      ],
+      "secondaryPooledUnitWeightedDifferencePoints": 9.67311541027351
+    }
+  },
+  "transitionPolicy": "original adjacent units only; no gap bridging",
+  "unitManifestSha256": "7408c72545e49895a19ed16144afe09601334d258ef1621744563b3b55e38188"
+}
