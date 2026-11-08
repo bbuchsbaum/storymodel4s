@@ -66,6 +66,17 @@ object OrganizationControl:
   def fromProduct(value: Product): OrganizationControl =
     summon[scala.deriving.Mirror.ProductOf[OrganizationControl]].fromProduct(value)
 
+final case class ReferenceOrganizationControl(
+    run: MappingPipeline.ReferenceRun,
+    request: MeasurementCompatibility.Request,
+    result: OrganizationReadout.Result,
+    stages: Vector[StageReceipt]
+)
+
+object ReferenceOrganizationControl:
+  def fromProduct(value: Product): ReferenceOrganizationControl =
+    summon[scala.deriving.Mirror.ProductOf[ReferenceOrganizationControl]].fromProduct(value)
+
 /** Every closed door has its own same-shape positive control outside the owning package. */
 class OrganizationBoundarySuite extends FunSuite:
 
@@ -568,6 +579,90 @@ class OrganizationBoundarySuite extends FunSuite:
     assertEquals(
       typeCheckErrors(
         "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; summon[Mirror.ProductOf[OrganizationControl]]"
+      ),
+      Nil
+    )
+  }
+
+  test("ReferenceOrganization closes constructor with an accepting control") {
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; new MappingPipeline.ReferenceOrganization(null, null, null, Vector.empty)"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; new ReferenceOrganizationControl(null, null, null, Vector.empty)"
+      ),
+      Nil
+    )
+  }
+
+  test("ReferenceOrganization closes apply with an accepting control") {
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; MappingPipeline.ReferenceOrganization(null, null, null, Vector.empty)"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; ReferenceOrganizationControl(null, null, null, Vector.empty)"
+      ),
+      Nil
+    )
+  }
+
+  test("ReferenceOrganization closes copy with an accepting control") {
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; null.asInstanceOf[MappingPipeline.ReferenceOrganization].copy(run = null)"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; null.asInstanceOf[ReferenceOrganizationControl].copy(run = null)"
+      ),
+      Nil
+    )
+  }
+
+  test("ReferenceOrganization closes fromProduct with an accepting control") {
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; MappingPipeline.ReferenceOrganization.fromProduct((null, null, null, Vector.empty))"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; ReferenceOrganizationControl.fromProduct((null, null, null, Vector.empty))"
+      ),
+      Nil
+    )
+  }
+
+  test("ReferenceOrganization closes product construction with an accepting control") {
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; summon[Mirror.ProductOf[MappingPipeline.ReferenceOrganization]].fromProduct((null, null, null, Vector.empty))"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; summon[Mirror.ProductOf[ReferenceOrganizationControl]].fromProduct((null, null, null, Vector.empty))"
+      ),
+      Nil
+    )
+  }
+
+  test("ReferenceOrganization closes Mirror with an accepting control") {
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; summon[Mirror.ProductOf[MappingPipeline.ReferenceOrganization]]"
+      ).nonEmpty
+    )
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.align.*; import storymodel4s.pipeline.MappingPipeline; import storymodel4s.consumer.*; import scala.deriving.Mirror; summon[Mirror.ProductOf[ReferenceOrganizationControl]]"
       ),
       Nil
     )

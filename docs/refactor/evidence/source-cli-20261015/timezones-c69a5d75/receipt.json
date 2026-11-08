@@ -1,0 +1,103 @@
+{
+  "schema": "storymodel4s-cli-timezone-reproducibility/v1",
+  "status": "qualified-timezone-reproducibility",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792121575.3498628,
+  "commands": [
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx8G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/repositories",
+        "-Dsbt.override.build.repos=true",
+        "-J-Duser.timezone=America/Toronto",
+        "eval java.time.ZoneId.systemDefault.getId",
+        "pipeline/cliDistribution"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "c940ad075eb1eb2987465643bf4d99f3af729b3f80e56d6557de852a2f13f16e"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout/tools/test_cli_distribution.py",
+        "--compare-archives",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-timezones-c69a5d75/qualification.zip",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-timezones-c69a5d75/toronto.zip"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-timezones-c69a5d75",
+      "log": "command-001.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "5b9c03521fab50130e93f9769bf5637778f8218ac3b44fc772ee9698e140ffc8"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx8G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/repositories",
+        "-Dsbt.override.build.repos=true",
+        "-J-Duser.timezone=Pacific/Honolulu",
+        "eval java.time.ZoneId.systemDefault.getId",
+        "pipeline/cliDistribution"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+      "log": "command-002.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "beaac76de127a751caa8ab1c5f8877be19911e2f40c8d7c4f15962b51a37a6e4"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout/tools/test_cli_distribution.py",
+        "--compare-archives",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-timezones-c69a5d75/qualification.zip",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-timezones-c69a5d75/honolulu.zip"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-timezones-c69a5d75",
+      "log": "command-003.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "2a74e0d957fddf3f14ad8153f10f41e8404361dd8041791d41c241b0293060bd"
+    }
+  ],
+  "source": "c69a5d754a21fa455c64901334d9509278401091",
+  "producerReceiptSha256": "4f8131c0a52e48e5592b7c4a665f2e063fef0ac26850a7055ce3485343697caa",
+  "archives": {
+    "qualification": {
+      "sha256": "dc99dca194ea808b60161d11fc4b26845d40e1b1600f9b46c8aa7f37deb7edb9",
+      "bytes": 143475273
+    },
+    "toronto": {
+      "timezone": "America/Toronto",
+      "sha256": "dc99dca194ea808b60161d11fc4b26845d40e1b1600f9b46c8aa7f37deb7edb9",
+      "bytes": 143475273
+    },
+    "honolulu": {
+      "timezone": "Pacific/Honolulu",
+      "sha256": "dc99dca194ea808b60161d11fc4b26845d40e1b1600f9b46c8aa7f37deb7edb9",
+      "bytes": 143475273
+    }
+  },
+  "archiveBytesEqual": true,
+  "finishedUnix": 1792121680.582195
+}

@@ -1,0 +1,34 @@
+diff --git a/project/CliDistribution.scala b/project/CliDistribution.scala
+index 682c8745..259bbe40 100644
+--- a/project/CliDistribution.scala
++++ b/project/CliDistribution.scala
+@@ -114,17 +114,18 @@ object CliDistribution {
+ 
+   private def embeddedNotices(file: File): Vector[Notice] = {
+     if (file.isDirectory)
+-      return members(file).collect { case (entry, name) if legalName(name) =>
+-        require(safeRelative(name), "unsafe legal product entry")
+-        require(
+-          entry.length() > 0 && entry.length() <= 4 * 1024 * 1024,
+-          "invalid legal product entry size"
+-        )
+-        Notice(
+-          "embedded/" + name,
+-          IO.readBytes(entry),
+-          obj("kind" -> quoted("jar-entry"), "entry" -> quoted(name))
+-        )
++      return members(file).collect {
++        case (entry, name) if legalName(name) =>
++          require(safeRelative(name), "unsafe legal product entry")
++          require(
++            entry.length() > 0 && entry.length() <= 4 * 1024 * 1024,
++            "invalid legal product entry size"
++          )
++          Notice(
++            "embedded/" + name,
++            IO.readBytes(entry),
++            obj("kind" -> quoted("jar-entry"), "entry" -> quoted(name))
++          )
+       }
+     val jar = new ZipFile(file)
+     try {

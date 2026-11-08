@@ -16,6 +16,7 @@ object MeasurementCompatibility:
   enum Reason:
     case OriginalUnitsRequired, WrongResolution, ForeignSegmentation, StructuredInference
     case UnprovenUpstreamStages, ExecutedIndependentContent, UnsupportedOrigin
+    case ConditionalMeasureUnsupported
 
   /** Checked declaration; it is a request and conveys no execution authority. */
   final class Request private (
@@ -68,6 +69,10 @@ object MeasurementCompatibility:
     val mismatch = request.organization != record.roles.organization ||
       request.organization != AnalysisGrain.InferenceUnit(record.inventory.segmentation)
     if mismatch then new Assessment(Verdict.Incompatible, Vector(Reason.ForeignSegmentation))
+    else if record.outcomes.exists(
+        _.measures.normalized.exists(_.population == NormalizationPopulation.AdmittedSourceTargets)
+      )
+    then new Assessment(Verdict.Incompatible, Vector(Reason.ConditionalMeasureUnsupported))
     else if record.ledger.entries.exists(e =>
         e.provenance match
           case p: StageProvenance.Derived =>

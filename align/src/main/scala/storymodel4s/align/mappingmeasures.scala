@@ -60,12 +60,21 @@ object RawScores:
       derivation
     )
 
+/** The normalization population travels with the measure; conditioning never proves membership. */
+enum NormalizationPopulation:
+  case SuppliedDestinations, AdmittedSourceTargets
+  def scope: String = this match
+    case SuppliedDestinations  => "unit/supplied-destinations"
+    case AdmittedSourceTargets => "unit/nominated-admitted-source-targets"
+
+/** Normalized scores retain their population independently of the surrounding producer profile. */
 final class NormalizedScoreMass private (
     val universe: TargetUniverseId,
     val prior: ReferencePriorId,
     val temperature: Double,
     val mass: Map[Destination, Double],
-    val stage: StageEntryId
+    val stage: StageEntryId,
+    val population: NormalizationPopulation
 )
 object NormalizedScoreMass:
   def of(
@@ -74,6 +83,33 @@ object NormalizedScoreMass:
       temperature: Double,
       mass: Map[Destination, Double],
       stage: StageEntryId
+  ): Either[MappingRefusal, NormalizedScoreMass] =
+    checked(universe, prior, temperature, mass, stage, NormalizationPopulation.SuppliedDestinations)
+
+  /** Condition on nominated admitted source targets without asserting source membership. */
+  def sourceTargets(
+      universe: TargetUniverseId,
+      prior: ReferencePriorId,
+      temperature: Double,
+      mass: Map[Destination, Double],
+      stage: StageEntryId
+  ): Either[MappingRefusal, NormalizedScoreMass] =
+    checked(
+      universe,
+      prior,
+      temperature,
+      mass,
+      stage,
+      NormalizationPopulation.AdmittedSourceTargets
+    )
+
+  private def checked(
+      universe: TargetUniverseId,
+      prior: ReferencePriorId,
+      temperature: Double,
+      mass: Map[Destination, Double],
+      stage: StageEntryId,
+      population: NormalizationPopulation
   ): Either[MappingRefusal, NormalizedScoreMass] =
     val sum = mass.toVector.sortBy(_._1.key).map(_._2).sum
     if !temperature.isFinite || !(temperature > 0.0) || !MappingMeasureChecks.mass(mass.values) then
@@ -88,7 +124,14 @@ object NormalizedScoreMass:
         MappingRefusal
           .InvalidValue("normalizedScoreMass", "row must sum to one within the declared tolerance")
       )
-    else Right(new NormalizedScoreMass(universe, prior, temperature, mass, stage))
+    else if population == NormalizationPopulation.AdmittedSourceTargets &&
+      mass.keys.exists { case Destination.External(_) => true; case _ => false }
+    then
+      Left(
+        MappingRefusal
+          .InvalidValue("normalizedScoreMass", "source conditioning refuses external destinations")
+      )
+    else Right(new NormalizedScoreMass(universe, prior, temperature, mass, stage, population))
 
 /** Transport carries its declared row budget; it is not a normalized posterior. */
 final class TransportMass private (

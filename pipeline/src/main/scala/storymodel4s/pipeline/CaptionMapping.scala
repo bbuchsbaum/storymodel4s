@@ -56,7 +56,9 @@ object CaptionMapping:
       source: SourceRepresentation,
       inventory: RecallInventory,
       config: StrictCandidateConfig,
-      blend: Double
+      blend: Double,
+      selectedLevel: Int = 0,
+      contentPolicy: ContentCostPolicy = ContentCostPolicy.HistoricalV1
   ): Either[Refusal, Registered] =
     val bytes = outcomeBytes.clone()
     for
@@ -89,7 +91,10 @@ object CaptionMapping:
         .map(Refusal.Media(_))
       scoring <- CaptionScoring.of(blend, declared).left.map(Refusal.Media(_))
       session <- scoring.session(recall, view, source).left.map(Refusal.Media(_))
-      produced <- CaptionScoring.produce(session, inventory, config).left.map(Refusal.Scoring(_))
+      produced <- CaptionScoring
+        .produce(session, inventory, config, selectedLevel, contentPolicy)
+        .left
+        .map(Refusal.Scoring(_))
     yield new Registered(media, produced, expected)
 
   /** A complete checked package and the declared correspondence own one global evidence run. */
@@ -120,7 +125,9 @@ object CaptionMapping:
       recall: RecallGraph[Checked],
       inventory: RecallInventory,
       config: StrictCandidateConfig,
-      blend: Double
+      blend: Double,
+      selectedLevel: Int = 0,
+      contentPolicy: ContentCostPolicy = ContentCostPolicy.HistoricalV1
   ): Either[Refusal, PackageRegistered] = for
     actual <- VideoSourceInput.project(media).left.map(_ => Refusal.ArtifactMismatch)
     _ <- Either.cond(actual.artifact == joined.media.artifact, (), Refusal.ArtifactMismatch)
@@ -132,5 +139,8 @@ object CaptionMapping:
       .session(recall, joined.view, joined.view.representation)
       .left
       .map(Refusal.Media(_))
-    produced <- CaptionScoring.produce(session, inventory, config).left.map(Refusal.Scoring(_))
+    produced <- CaptionScoring
+      .produce(session, inventory, config, selectedLevel, contentPolicy)
+      .left
+      .map(Refusal.Scoring(_))
   yield new PackageRegistered(media, joined, produced)

@@ -1,0 +1,766 @@
+{
+  "full_snapshot_sha256": "aafa303d345e8f1487387f8749408c542d68ea92e290fede0cfbc6a467524af3",
+  "records": {
+    "bd-01M17JFDHKHPD6N6JWA7NCMM4A": {
+      "body_sha256": "623a6a047c408b0b4eeb3f4d22588ba539e591ff5df3e759bc066965ca33dba6",
+      "title": "[later][owner-blocked] OSF gptkz (Ost 2022) serial reproduction: needs owner-authenticated OSF inspection (raw reproductions or coded tables?)",
+      "status": "blocked",
+      "priority": 3,
+      "deps": [],
+      "relations": [],
+      "tags": [
+        "milestone-research",
+        "release-later"
+      ]
+    },
+    "bd-01M1836WDBB72KXXPKG23PSSWT": {
+      "body_sha256": "09241d262b2e3bdfc5f1e7f468f4bbde0971f5b89a38e62d7a2922a390601203",
+      "title": "[maintenance] Audit construction-probe Mirror coverage and incremental dependency anchors",
+      "status": "open",
+      "priority": 3,
+      "deps": [],
+      "relations": [],
+      "tags": [
+        "milestone-maintenance",
+        "release-later"
+      ]
+    },
+    "bd-01M184XP908JX51S3ZYFX20HC7": {
+      "body_sha256": "db41df6cda8bff97c9a829539b84447c615c030fff10aee4753ab17b637fd509",
+      "title": "[owner] Q5 owner-action list: four remaining dispositions (pyannote terms, MF2, FilmFestival REB, recall-corpus REB)",
+      "status": "blocked",
+      "priority": 3,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "milestone-owner",
+        "needs-owner",
+        "release-later"
+      ]
+    },
+    "bd-01M2TA01EHVRF6MQ1N00XTVK1K": {
+      "body_sha256": "81d2111346bd1948163ad6fc35a48b623c158d41debfe6f8862a165e0a28d137",
+      "title": "DELIVERY: usable recall mapping and defensible organization measurement",
+      "status": "open",
+      "priority": 1,
+      "deps": [],
+      "relations": [],
+      "tags": [
+        "delivery-20260919",
+        "epic",
+        "mapper-plan",
+        "milestone-delivery",
+        "queue-container",
+        "reality-check-20261015",
+        "release-1.0"
+      ]
+    },
+    "bd-01M2TA0G1VSRQ992HJFWP13ZCM": {
+      "body_sha256": "0865a361c7be5d1341a646854c9d5b6baaab87da8d5d3dea2fd8b3ca2b33b23d",
+      "title": "OWNER: may participant recall prose go to hosted model APIs (per corpus), and at what spend?",
+      "status": "blocked",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "llm",
+        "mapper-plan",
+        "milestone-owner",
+        "needs-owner",
+        "owner-decision",
+        "phase1a",
+        "release-later"
+      ]
+    },
+    "bd-01M2TA0X79Y4BQZP0B6AT919C9": {
+      "body_sha256": "fffef67dc3bbe7fedd84d4ae32d9060411cd4de8bd2a6e1c5a783f17c8bad482",
+      "title": "OWNER: people and protocol approval for second human codings (reference comparison)",
+      "status": "blocked",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "human-ceiling",
+        "mapper-plan",
+        "milestone-owner",
+        "needs-owner",
+        "owner-decision",
+        "phase1b",
+        "reality-check-20261015",
+        "release-later"
+      ]
+    },
+    "bd-01M2TA19PH7GDT1Q2WXEKD6RE2": {
+      "body_sha256": "637887dbcbd76dbbd17bb7a28e3d8acb5a7606cc9043e6dd246e19bb0949d693",
+      "title": "[media] Finish FilmFestival clip-boundary verification and Memento T4 decision",
+      "status": "open",
+      "priority": 3,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "filmfestival",
+        "mapper-plan",
+        "media",
+        "milestone-owner",
+        "needs-owner",
+        "owner-decision",
+        "release-later"
+      ]
+    },
+    "bd-01M2TA8VM5B6XQWR6CVH25HB7V": {
+      "body_sha256": "3684aa36b7be21349e32e2ade2fe3a8e492949accd28c55501f7ff8de0ad8801",
+      "title": "[research] Phase 1b: FilmFestival clock work for the scene-within-film task",
+      "status": "open",
+      "priority": 3,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA4BFRMK8WNA79PPRT8YCD"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "data",
+        "filmfestival",
+        "mapper-plan",
+        "milestone-research",
+        "phase1b",
+        "release-later"
+      ]
+    },
+    "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ": {
+      "body_sha256": "5828de720f59a79f5ebb7337caa1fc1fdaace1cb8c8f412ee0ce170e33ce227e",
+      "title": "[research] Phase 1b: repair the instruments -- risk-coverage on the emitted decision; retire agreement as a decoder judge",
+      "status": "review",
+      "priority": 2,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M524EH6SS8K32632Y2J6ZTMF"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M5258T8EQFN4MTCE5A912QWY"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M527J6FFT2XMK50MGVREB7CF"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "benchmark",
+        "instruments",
+        "mapper-plan",
+        "milestone-research",
+        "phase1b",
+        "reality-check-20261015",
+        "release-later"
+      ]
+    },
+    "bd-01M2TAJABHFWN5ZDYNST15Y9G5": {
+      "body_sha256": "262225f2c547de8cc709a08a4c81dd2bb641e13394a51e915447024c795e81a5",
+      "title": "[research] Phase 3 H3: coder-independent inputs (dialogue, captions, crowd) and the independence ablation",
+      "status": "open",
+      "priority": 3,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA4BFRMK8WNA79PPRT8YCD"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TADR4KM1S4J46HK2C3BN76"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "hypothesis",
+        "mapper-plan",
+        "milestone-research",
+        "phase3",
+        "release-later",
+        "tracks"
+      ]
+    },
+    "bd-01M2TAKTB61XNXV4Y6A9J3CB0C": {
+      "body_sha256": "674f69afc56b8f054f06a80158b3a07c28f70187e4dde77722349f3f9139e25f",
+      "title": "[release] Phase 4: release infrastructure -- publishing, MiMa baseline, deployed docs",
+      "status": "open",
+      "priority": 2,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M19G69RQCHMT2EMG11XFT4WX"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA2283FC7FSA2G7TJ1WSMN"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M50K8E8KMRGY0MYXJRT0SZ8G"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "delivery-20260919",
+        "mapper-plan",
+        "milestone-release",
+        "phase4",
+        "reality-check-20261015",
+        "release",
+        "release-1.0"
+      ]
+    },
+    "bd-01M2TAMJ95K9D7H248A8387YW4": {
+      "body_sha256": "fe3ad3ccd4c650cc3cd0a198a0b51aa8588754331d768ac8582a7be143c5bb2f",
+      "title": "[release] Phase 4: 1.0 release gate and stability table",
+      "status": "open",
+      "priority": 1,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M168TZ3VRQYSE7TNT5JKJTSJ"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M16DBEH9PKER423BZ47ZKBMV"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M17010MM68DG7B49DMEKA2AA"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M19FPY1EC5QNTW6SBG3QYT3R"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M19N0W937KVZCK78F6X57X1D"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M19XMQN4VK4WSTVSHBD3X1YB"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M1D215EY4T5BR0VRJ694AMBQ"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAM66RTEMY3VVHA3N2MYXK"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M354E83Z4Z7DR4KPP6Q45MAJ"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35B103S2KHRSF853GD2FYHW"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35JFJCQ2ANTVED792H705X6"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35JG7DXD7NSEE4WVEKT3CSF"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35JGSMRABV1ANW341W76JWV"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35JHB8QV2A8T2WJY4EVR0A2"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35MHPFFKQHSJKC07VMWC7CW"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35P83TCNHBSDY6NSK13Q3K0"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35PB1H5PDD55YVKR4TQ8M66"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M379NZZ67GZJMWVBT5XNA0ZD"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M4B896MCEE43Q9QMR4HT60R0"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M4YP83C7925M22V0K5AQ88BX"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M50KAP8CB5MMBQE3BX4RQ2PF"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "delivery-20260919",
+        "gate",
+        "mapper-plan",
+        "milestone-release",
+        "phase4",
+        "queue-container",
+        "reality-check-20261015",
+        "release",
+        "release-1.0"
+      ]
+    },
+    "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6": {
+      "body_sha256": "728785855ef5b0df4f071c2ea67ba9a9a6c48890d0d37b31e482772cee1c099a",
+      "title": "G2 (1.1): demonstrate the public organization-analysis preview journey",
+      "status": "open",
+      "priority": 2,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2WTGF981AY7RCN8QC42JSPT"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2WVHF4B5DAXJYY4W91VK4WV"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2WVHVVYQBKSBSW573HZYR9Q"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M35B05TC6GBED9Z3HZMX618E"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        },
+        {
+          "kind": "parent",
+          "parent": "bd-01M35P2EKWC52PZTMN2R5NMDFR"
+        }
+      ],
+      "tags": [
+        "delivery-20260919",
+        "lane-next",
+        "milestone-organization",
+        "release-1.1"
+      ]
+    },
+    "bd-01M35P2EKWC52PZTMN2R5NMDFR": {
+      "body_sha256": "6c76ac028384812b0d577d915f6f967f7f6d96aef11466c918a6d992e913fa90",
+      "title": "[1.1] Recall organization analyses: compatibility, organization counts, synthetic recovery (moved from 1.0 by owner decision)",
+      "status": "open",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "container",
+        "milestone-organization",
+        "organization",
+        "queue-container",
+        "release-1.1"
+      ]
+    },
+    "bd-01M37C6V3SXA33Z255HFK3GAZ3": {
+      "body_sha256": "e9faa729b81b413fc67e632547a35b17bdbbfa3b8f945ceb7a916106d275849f",
+      "title": "[follow-up] align: NodeSummary admits a negative level; SourceView cannot promise level >= 0",
+      "status": "open",
+      "priority": 3,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX"
+        }
+      ],
+      "tags": [
+        "milestone-maintenance",
+        "release-later"
+      ]
+    },
+    "bd-01M3DED3GT9S8RB2JSPA68B7ZB": {
+      "body_sha256": "fe7e12857909a8d195b014906803602f4723e8e16cd01eaf9a0a0833b7154016",
+      "title": "[Fixtures] Forgotten-bag and Silent River workspace packets for design replication",
+      "status": "open",
+      "priority": 2,
+      "deps": [],
+      "relations": [],
+      "tags": [
+        "atlas-handoff",
+        "milestone-view",
+        "north-star-plan",
+        "release-later"
+      ]
+    },
+    "bd-01M4EA3TVCGSVSA114DQX9588N": {
+      "body_sha256": "0e4056541e3b0bd08d66e1022cd3569e3e3860fd1af2d7aeffa8037888601959",
+      "title": "[G1] Populate StageTrace cost-receipt retention witnesses",
+      "status": "open",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TACM78289S4TECE91GT5K2"
+        }
+      ],
+      "tags": [
+        "g1",
+        "milestone-evidence",
+        "queue-next-20261020",
+        "release-1.0"
+      ]
+    },
+    "bd-01M4YP83C7925M22V0K5AQ88BX": {
+      "body_sha256": "233ca7a8d04be85157db681223cf594f79a17d54a65e1b70c81d0d1dc6359fcb",
+      "title": "Qualify Scala Native zero-hash string literals before stable publication",
+      "status": "blocked",
+      "priority": 1,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C"
+        }
+      ],
+      "tags": [
+        "milestone-release",
+        "reality-check-20261015",
+        "release-1.0"
+      ]
+    },
+    "bd-01M50K0WR735JQWF6FZKY85C6E": {
+      "body_sha256": "ff7e5c60c79c163cf3d117bac40e7eb256db82b9d239281a4538185ac7650217",
+      "title": "[reality-check] Record the four-workstream execution plan",
+      "status": "review",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "planning",
+        "reality-check-20261015"
+      ]
+    },
+    "bd-01M50K8E8KMRGY0MYXJRT0SZ8G": {
+      "body_sha256": "a348c98b2f9631d213b3d2ac343d8f64269578b2e3e5054ec20751b04065ce78",
+      "title": "[reality-check S1] Qualify the GitHub-pinned source build and offline CLI",
+      "status": "review",
+      "priority": 1,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C"
+        }
+      ],
+      "tags": [
+        "milestone-release",
+        "reality-check-20261015",
+        "release-1.0"
+      ]
+    },
+    "bd-01M50K95JAQB34R876FWMV85J0": {
+      "body_sha256": "a76c8eb2b59137557689e3a82d05ff4021aede5de0627be1be8a290079a2ba82",
+      "title": "[reality-check U1] Specify own-study local export admission",
+      "status": "blocked",
+      "priority": 1,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "milestone-inputs",
+        "queue-next-20261020",
+        "reality-check-20261015",
+        "release-1.0"
+      ]
+    },
+    "bd-01M50K9WYM4TQSX106M7Q2YAF4": {
+      "body_sha256": "3eec01013d340ae61561f569a67e8ddc83f3e0a9e60f04ed823615c5aa4b6e2f",
+      "title": "[reality-check U2] Connect the approved own-study admission through CLI and exports",
+      "status": "open",
+      "priority": 1,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M50K95JAQB34R876FWMV85J0"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "milestone-inputs",
+        "queue-next-20261020",
+        "reality-check-20261015",
+        "release-1.0"
+      ]
+    },
+    "bd-01M50KAP8CB5MMBQE3BX4RQ2PF": {
+      "body_sha256": "d77bf92879ebe28bce61a6ab3f46278c0903fe4ca38bf6482f606c05563440d6",
+      "title": "[reality-check U3] Demonstrate an independent own-study file-to-result journey",
+      "status": "open",
+      "priority": 1,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M50K8E8KMRGY0MYXJRT0SZ8G"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M50K9WYM4TQSX106M7Q2YAF4"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "milestone-delivery",
+        "queue-next-20261020",
+        "reality-check-20261015",
+        "release-1.0"
+      ]
+    },
+    "bd-01M50KBFT26DRB77VFHPRHYNA2": {
+      "body_sha256": "884a23bcbd305f4e8ec83cd921ac31f812677da3ec453ce80005e46bb0ed8a93",
+      "title": "[reality-check E1] Freeze the identity/event and organization evaluation protocol",
+      "status": "blocked",
+      "priority": 2,
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TA0X79Y4BQZP0B6AT919C9"
+        }
+      ],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA9KKVFWPQ74HN90P0SM68"
+        }
+      ],
+      "tags": [
+        "milestone-research",
+        "reality-check-20261015",
+        "release-later"
+      ]
+    },
+    "bd-01M527J6FFT2XMK50MGVREB7CF": {
+      "body_sha256": "27e4631dc4bc561f6015f0e3a7d22105c33b84cd1016059d80bfb5b33fdc353e",
+      "title": "[instrument] Adapt frozen historical outcomes and exact-rational transport",
+      "status": "review",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ"
+        }
+      ],
+      "tags": [
+        "instrument-comparison-20261016",
+        "reality-check-20261015"
+      ]
+    },
+    "bd-01M5DAFJ2M42RNRC6T1TWFBFNE": {
+      "body_sha256": "740c6516299e4276010cd3771c5a04da5c45f3e236e314668ec15e2f0a285b97",
+      "title": "[mapping audit A] Reconcile measured-unit coverage in ordinary batch summaries",
+      "status": "review",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M5DAE8KHF6VX3RE2V5RJG64T"
+        }
+      ],
+      "tags": [
+        "mapper-plan",
+        "mapper-slice",
+        "mapping-audit-20261020"
+      ]
+    },
+    "bd-01M5DAG1ZBER090DC52PB19CPH": {
+      "body_sha256": "82cffc6ea1fa81fd320e0dd75ba60a3e309703af2f572a5eec617eae27ce6c7c",
+      "title": "[mapping audit B] Publish model assumptions and scientific claim boundaries",
+      "status": "review",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M5DAE8KHF6VX3RE2V5RJG64T"
+        }
+      ],
+      "tags": [
+        "mapper-plan",
+        "mapper-slice",
+        "mapping-audit-20261020"
+      ]
+    },
+    "bd-01M5DAGPJTNF8FFNPPWF7P3XDC": {
+      "body_sha256": "af89e91256200e294c7206c9940efd0970e2c3fb43a4e95fa1811c25600e249c",
+      "title": "[mapping audit C] Pin weighted endpoint semantics with an independent numerical witness",
+      "status": "review",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M5DAE8KHF6VX3RE2V5RJG64T"
+        }
+      ],
+      "tags": [
+        "mapper-plan",
+        "mapper-slice",
+        "mapping-audit-20261020"
+      ]
+    },
+    "bd-01M5DAH6B093N2WZCNZ160JMJ6": {
+      "body_sha256": "253e95f85dec401e5b4c594db9491dc973d8cb734aea096084e63f1471067a03",
+      "title": "[mapping audit D] Agree selectable-policy and reference-only producer contracts",
+      "status": "review",
+      "priority": 2,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M5DAE8KHF6VX3RE2V5RJG64T"
+        }
+      ],
+      "tags": [
+        "mapper-plan",
+        "mapper-slice",
+        "mapping-audit-20261020"
+      ]
+    },
+    "bd-01M5E3J13V6CVABAMCRC69AG07": {
+      "body_sha256": "01da5edfaba5aaa540caf5928884348ec8515166c012c004c64ba0bae91ffdb3",
+      "title": "[delivery] Prepare exact integration of reviewed source CLI and mapping work",
+      "status": "open",
+      "priority": 1,
+      "deps": [],
+      "relations": [
+        {
+          "kind": "parent",
+          "parent": "bd-01M2TA01EHVRF6MQ1N00XTVK1K"
+        }
+      ],
+      "tags": [
+        "milestone-delivery",
+        "queue-next-20261020",
+        "queue-review-20261020"
+      ]
+    }
+  }
+}

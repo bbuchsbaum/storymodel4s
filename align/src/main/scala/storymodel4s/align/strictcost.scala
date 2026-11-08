@@ -207,6 +207,10 @@ object SemanticOutcomeSummary:
       outcomes.collect { case Estimate.Missing(r) => r }.groupMapReduce(identity)(_ => 1)(_ + _)
     )
 
+/** A fixed measurement basis prevents missing auxiliary evidence from changing target prices. */
+enum ContentCostPolicy:
+  case HistoricalV1, MeasuredSemanticV1
+
 /** Checked strict prices accept controlled content channels and no arbitrary scoring callback. */
 final class StrictCostModel private (
     val semantic: StrictSemanticChannel,
@@ -217,7 +221,8 @@ final class StrictCostModel private (
     val missingSemantic: Double,
     val distortionPenalty: Double,
     val surfaceSession: Option[SurfaceScoringSession],
-    val captionSession: Option[CaptionScoring.Session]
+    val captionSession: Option[CaptionScoring.Session],
+    val contentPolicy: ContentCostPolicy
 ):
   private[align] def externalCost(unit: RecallUnit, state: ExternalState): Double =
     if state == ExternalState.Unranked || ExternalStates.natural(unit.function) == state then
@@ -235,35 +240,50 @@ final class StrictCostModel private (
       .left
       .map(r => AlignError.StrictScoring(unit.id, node.ref, r))
       .flatMap { (u, t, grain, semanticEstimate) =>
-        for
-          chart <- StrictScoring.reduction(unit, node, view, u, t, chart = true)
-          structural <- StrictScoring.reduction(unit, node, view, u, t, chart = false)
-          price = ContentCostScoring.terms(
-            u,
-            t,
-            grain,
+        if contentPolicy == ContentCostPolicy.MeasuredSemanticV1 then
+          CostBreakdown.derived(
+            semanticEstimate.toOption.map(CostTerm.Semantic -> _).toMap,
             mode,
-            semanticEstimate,
-            chart.estimate,
-            structural.estimate,
-            structuralConfigured = false,
-            missingSemantic,
-            distortionPenalty
-          )
-          result <- CostBreakdown.derived(
-            price.values,
-            mode,
-            price.missing,
-            Some(view.structuralCoverage(node.ref)),
-            Map(CostTerm.Chart -> chart.receipt, CostTerm.Structural -> structural.receipt),
-            price.semanticImputed,
-            price.eligible,
+            Set.empty,
+            None,
+            Map.empty,
+            Map.empty,
+            if semanticEstimate.isEligible then Set(CostTerm.Semantic) else Set.empty,
             weights,
-            DefaultLocalCostModel
-              .blend(price.values, weights, functionPrior(u.function), price.eligible),
-            Map(CostTerm.Semantic -> semanticEstimate, CostTerm.Chart -> chart.estimate)
+            semanticEstimate.toOption.getOrElse(0.0),
+            Map(CostTerm.Semantic -> semanticEstimate),
+            requireMeasurement = true
           )
-        yield result
+        else
+          for
+            chart <- StrictScoring.reduction(unit, node, view, u, t, chart = true)
+            structural <- StrictScoring.reduction(unit, node, view, u, t, chart = false)
+            price = ContentCostScoring.terms(
+              u,
+              t,
+              grain,
+              mode,
+              semanticEstimate,
+              chart.estimate,
+              structural.estimate,
+              structuralConfigured = false,
+              missingSemantic,
+              distortionPenalty
+            )
+            result <- CostBreakdown.derived(
+              price.values,
+              mode,
+              price.missing,
+              Some(view.structuralCoverage(node.ref)),
+              Map(CostTerm.Chart -> chart.receipt, CostTerm.Structural -> structural.receipt),
+              price.semanticImputed,
+              price.eligible,
+              weights,
+              DefaultLocalCostModel
+                .blend(price.values, weights, functionPrior(u.function), price.eligible),
+              Map(CostTerm.Semantic -> semanticEstimate, CostTerm.Chart -> chart.estimate)
+            )
+          yield result
       }
 
   override def toString: String = s"StrictCostModel(${semantic.kind}, $weights)"
@@ -278,11 +298,21 @@ object StrictCostModel:
       missingSemantic: Double = 0.5,
       distortionPenalty: Double = 0.3,
       surfaceSession: Option[SurfaceScoringSession] = None,
-      captionSession: Option[CaptionScoring.Session] = None
+      captionSession: Option[CaptionScoring.Session] = None,
+      contentPolicy: ContentCostPolicy = ContentCostPolicy.HistoricalV1
   ): Either[AlignError, StrictCostModel] =
     val finiteNonnegative =
       Vector(externalFloor, externalMismatch, distortionPenalty) ++ functionPrior.costs.values
-    if semantic.isInstanceOf[StrictSemanticChannel.CaptionLexical] && !captionSession.exists(
+    if contentPolicy == ContentCostPolicy.MeasuredSemanticV1 &&
+      (weights != CostWeights.semanticOnly || functionPrior != FunctionPrior.none || distortionPenalty != 0.0)
+    then
+      Left(
+        AlignError.InvalidConfig(
+          "strict cost",
+          "measured semantic policy requires semantic-only weights and no function or distortion prior"
+        )
+      )
+    else if semantic.isInstanceOf[StrictSemanticChannel.CaptionLexical] && !captionSession.exists(
         _.channel == semantic
       )
     then
@@ -323,7 +353,8 @@ object StrictCostModel:
           missingSemantic,
           distortionPenalty,
           surfaceSession,
-          captionSession
+          captionSession,
+          contentPolicy
         )
       )
 

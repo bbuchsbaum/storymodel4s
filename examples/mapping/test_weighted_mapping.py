@@ -15,6 +15,27 @@ from check_corruptions import repack
 class WeightedReaderTests(unittest.TestCase):
     fixtures = {}
 
+    def test_v1_base_wrapper_accepts_unchanged_pair_payloads_after_rehash(self):
+        files = copy.deepcopy(self.fixtures["text"])
+        base_path = "base--manifest.json"
+        base = json.loads(files[base_path])
+        base["schemaVersion"] = "mapping-exchange-batch/v1"
+        del base["metadata"]["summary"]
+        for outcome in base["metadata"]["outcomes"]:
+            if outcome["execution"] == "complete":
+                del outcome["mapping"]["model"]
+        files[base_path] = json.dumps(base)
+        outer = json.loads(files["manifest.json"])
+        outer["schemaVersion"] = "weighted-mapping-batch/v1"
+        outer["metadata"]["baseManifest"] = hashlib.sha256(files[base_path].encode()).hexdigest()
+        for member in outer["metadata"]["members"]:
+            for key in ("kind", "dispatchedMember", "temperature", "decisionPolicy", "endpointContinuity", "model"):
+                del member[key]
+        entry = next(value for value in outer["files"] if value["path"] == base_path)
+        entry["sha256"] = hashlib.sha256(files[base_path].encode()).hexdigest()
+        files["manifest.json"] = json.dumps(outer)
+        self.assertEqual(read_sweep(files)[0]["schema"], "mapping-exchange-batch/v1")
+
     def test_actual_sweep_preserves_endpoint_bytes_and_attempts(self):
         for name, files in self.fixtures.items():
             base, members = read_sweep(files)
@@ -38,6 +59,14 @@ class WeightedReaderTests(unittest.TestCase):
             files["manifest.json"] = json.dumps(manifest)
             with self.assertRaisesRegex(ValueError, "weighted attempt denominator"):
                 read_sweep(files)
+
+    def test_contradictory_v2_dispatch_descriptor_refuses(self):
+        files = copy.deepcopy(self.fixtures["text"])
+        outer = json.loads(files["manifest.json"])
+        outer["metadata"]["members"][0]["dispatchedMember"] = "Reconstruction"
+        files["manifest.json"] = json.dumps(outer)
+        with self.assertRaisesRegex(ValueError, "weighted dispatch"):
+            read_sweep(files)
 
     def test_changed_fraction_requires_new_bound_member(self):
         files = copy.deepcopy(self.fixtures["text"])

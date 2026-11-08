@@ -1,0 +1,765 @@
+{
+  "schema": "mapping-audit/local-gates/v1",
+  "sourceSHA": "a11c79726ea817a23c5e4096ee0b7848aa47b71b",
+  "grakernOverrideSHA": "8efc5efade4e56c6e0b29745bd1b108d4c9a9d57",
+  "evidenceClass": "LocallyObserved",
+  "gates": [
+    {
+      "label": "jvm",
+      "number": 29,
+      "log": "mapping-audit-final-29-jvm.log",
+      "exitCode": 0,
+      "producerSHA": "a11c79726ea817a23c5e4096ee0b7848aa47b71b",
+      "cwd": "/tmp/storymodel-mapping-audit-20261020",
+      "metadata": {
+        "schema_version": 1,
+        "started_utc": "2026-10-20T21:55:20.476613+00:00",
+        "finished_utc": "2026-10-20T21:59:20.059295+00:00",
+        "duration_seconds": 239.582827,
+        "command": [
+          "sbt",
+          "-batch",
+          "-J-Xmx4g",
+          "-Dsbt.supershell=false",
+          "-Dsbt.log.noformat=true",
+          "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+          "set ThisBuild / tlFatalWarnings := true",
+          "acquireJVM/test; alignJVM/test; amrInteropJVM/test; codecJVM/test; coreJVM/test; corpusJVM/test; corpusIntake/test; documentJVM/test; embedBench/test; embedCoreJVM/test; embedGrakern/test; embedOnnx/test; featuresJVM/test; fixturesJVM/test; interviewJVM/test; lawsJVM/test; media/test; pipeline/test; propositionJVM/test; providerAgent/test; providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
+        ],
+        "cwd": "/private/tmp/storymodel-mapping-audit-20261020",
+        "log": "/tmp/mapping-audit-final-29-jvm.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 7200.0,
+        "log_bytes": 2552599
+      },
+      "rawLogSHA256": "26ce0769e5555ddf0add8ddf80f6d09945b5c2e22f911483608f393143d8cec4",
+      "testSummaryRows": [
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 1061,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1061,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 404,
+          "failed": 0,
+          "errors": 0,
+          "passed": 404,
+          "skipped": 0
+        },
+        {
+          "total": 257,
+          "failed": 0,
+          "errors": 0,
+          "passed": 257,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159,
+          "skipped": 0
+        },
+        {
+          "total": 189,
+          "failed": 0,
+          "errors": 0,
+          "passed": 189,
+          "skipped": 0
+        },
+        {
+          "total": 176,
+          "failed": 0,
+          "errors": 0,
+          "passed": 175,
+          "skipped": 1
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170,
+          "skipped": 0
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28,
+          "skipped": 0
+        },
+        {
+          "total": 51,
+          "failed": 0,
+          "errors": 0,
+          "passed": 51,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 165,
+          "failed": 0,
+          "errors": 0,
+          "passed": 165,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117,
+          "skipped": 0
+        },
+        {
+          "total": 155,
+          "failed": 0,
+          "errors": 0,
+          "passed": 152,
+          "skipped": 3
+        },
+        {
+          "total": 395,
+          "failed": 0,
+          "errors": 0,
+          "passed": 395,
+          "skipped": 0
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 76,
+          "skipped": 1
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        }
+      ],
+      "testTotals": {
+        "total": 4487,
+        "failed": 0,
+        "errors": 0,
+        "passed": 4482,
+        "skipped": 5
+      }
+    },
+    {
+      "label": "reference-capture",
+      "number": 30,
+      "log": "mapping-audit-final-30-reference-capture.log",
+      "exitCode": 0,
+      "producerSHA": "a11c79726ea817a23c5e4096ee0b7848aa47b71b",
+      "cwd": "/tmp/storymodel-mapping-audit-20261020",
+      "metadata": {
+        "schema_version": 1,
+        "started_utc": "2026-10-20T21:59:20.261739+00:00",
+        "finished_utc": "2026-10-20T22:01:27.520419+00:00",
+        "duration_seconds": 127.258568,
+        "command": [
+          "/usr/bin/time",
+          "-l",
+          "/opt/homebrew/Cellar/openjdk/25.0.1/libexec/openjdk.jdk/Contents/Home/bin/java",
+          "-Xmx1g",
+          "-cp",
+          "/private/tmp/storymodel-mapping-audit-20261020/pipeline/target/scala-3.7.4/test-classes:/private/tmp/storymodel-mapping-audit-20261020/pipeline/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/provider-agent/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/provider-parser/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/core/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/proposition/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/amr-interop/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/acquire/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/document/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/features/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/story/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/align/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/recall/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/embed-core/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/codec/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/interview/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/view/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/corpus-intake/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/corpus/.jvm/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/embed-onnx/target/scala-3.7.4/test-classes:/private/tmp/storymodel-mapping-audit-20261020/embed-onnx/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/media/target/scala-3.7.4/classes:/private/tmp/storymodel-mapping-audit-20261020/fixtures/.jvm/target/scala-3.7.4/classes:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/scalac-compat-annotation_3/0.1.4/scalac-compat-annotation_3-0.1.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scalameta/munit_3/1.3.4/munit_3-1.3.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scalameta/munit-scalacheck_3/1.3.0/munit-scalacheck_3-1.3.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/io/circe/circe-core_3/0.14.10/circe-core_3-0.14.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/io/circe/circe-parser_3/0.14.10/circe-parser_3-0.14.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/anthropic/anthropic-java/2.34.0/anthropic-java-2.34.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.29.0/onnxruntime-1.29.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/ai/djl/huggingface/tokenizers/0.36.0/tokenizers-0.36.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scalameta/junit-interface/1.3.4/junit-interface-1.3.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scalameta/munit-diff_3/1.3.4/munit-diff_3-1.3.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/portable-scala/portable-scala-reflect_2.13/1.1.3/portable-scala-reflect_2.13-1.1.3.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scalacheck/scalacheck_3/1.19.0/scalacheck_3-1.19.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/io/circe/circe-numbers_3/0.14.10/circe-numbers_3-0.14.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/io/circe/circe-jawn_3/0.14.10/circe-jawn_3-0.14.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/cats-parse_3/1.1.0/cats-parse_3-1.1.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/anthropic/anthropic-java-client-okhttp/2.34.0/anthropic-java-client-okhttp-2.34.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.9.10/kotlin-stdlib-jdk8-1.9.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/ai/djl/api/0.36.0/api-0.36.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/typelevel/jawn-parser_3/1.6.0/jawn-parser_3-1.6.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/anthropic/anthropic-java-core/2.34.0/anthropic-java-core-2.34.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.10/kotlin-stdlib-1.9.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.9.10/kotlin-stdlib-jdk7-1.9.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.1/gson-2.13.1.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.27.1/commons-compress-1.27.1.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.18.2/jackson-core-2.18.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.18.2/jackson-databind-2.18.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/google/errorprone/error_prone_annotations/2.38.0/error_prone_annotations-2.38.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/standardwebhooks/standardwebhooks/1.1.0/standardwebhooks-1.1.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/io/swagger/core/v3/swagger-annotations/2.2.31/swagger-annotations-2.2.31.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.18.2/jackson-annotations-2.18.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.18.2/jackson-datatype-jdk8-2.18.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.2/jackson-datatype-jsr310-2.18.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/jackson/module/jackson-module-kotlin/2.18.2/jackson-module-kotlin-2.18.2.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5/5.2.4/httpcore5-5.2.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/apache/httpcomponents/client5/httpclient5/5.3.1/httpclient5-5.3.1.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/github/victools/jsonschema-generator/4.38.0/jsonschema-generator-4.38.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/github/victools/jsonschema-module-jackson/4.38.0/jsonschema-module-jackson-4.38.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/github/victools/jsonschema-module-swagger-2/4.38.0/jsonschema-module-swagger-2-4.38.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/squareup/okio/okio/3.6.0/okio-3.6.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/1.9.10/kotlin-stdlib-common-1.9.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/commons-codec/commons-codec/1.17.1/commons-codec-1.17.1.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/commons-io/commons-io/2.16.1/commons-io-2.16.1.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-reflect/1.8.10/kotlin-reflect-1.8.10.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5-h2/5.2.4/httpcore5-h2-5.2.4.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/fasterxml/classmate/1.7.0/classmate-1.7.0.jar:/Users/bbuchsbaum/Library/Caches/Coursier/v1/https/repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar",
+          "storymodel4s.pipeline.MappingWorkloadCapture"
+        ],
+        "cwd": "/private/tmp/storymodel-mapping-audit-20261020",
+        "log": "/tmp/mapping-audit-final-30-reference-capture.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 7200.0,
+        "log_bytes": 345800
+      },
+      "rawLogSHA256": "75f1c0719b3364a26527c2a55d86adcf5915d4bdaaa8f612f522e90e42f0956d",
+      "testSummaryRows": []
+    },
+    {
+      "label": "js",
+      "number": 31,
+      "log": "mapping-audit-final-31-js.log",
+      "exitCode": 0,
+      "producerSHA": "a11c79726ea817a23c5e4096ee0b7848aa47b71b",
+      "cwd": "/tmp/storymodel-mapping-audit-20261020",
+      "metadata": {
+        "schema_version": 1,
+        "started_utc": "2026-10-20T22:01:27.620219+00:00",
+        "finished_utc": "2026-10-20T22:09:27.973234+00:00",
+        "duration_seconds": 480.353494,
+        "command": [
+          "sbt",
+          "-batch",
+          "-J-Xmx4g",
+          "-Dsbt.supershell=false",
+          "-Dsbt.log.noformat=true",
+          "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+          "set ThisBuild / tlFatalWarnings := true",
+          "acquireJS/test; alignJS/test; amrInteropJS/test; codecJS/test; coreJS/test; corpusJS/test; documentJS/test; embedCoreJS/test; featuresJS/test; fixturesJS/test; interviewJS/test; lawsJS/test; propositionJS/test; recallJS/test; storyJS/test; viewJS/test"
+        ],
+        "cwd": "/private/tmp/storymodel-mapping-audit-20261020",
+        "log": "/tmp/mapping-audit-final-31-js.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 7200.0,
+        "log_bytes": 126661
+      },
+      "rawLogSHA256": "2eb37998d70789c6fc81a272688e7a57ffd0faee4d5b184a5c9363ce5cc83ff0",
+      "testSummaryRows": [
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 1041,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1041,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 403,
+          "failed": 0,
+          "errors": 0,
+          "passed": 403,
+          "skipped": 0
+        },
+        {
+          "total": 257,
+          "failed": 0,
+          "errors": 0,
+          "passed": 257,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117,
+          "skipped": 0
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        }
+      ],
+      "testTotals": {
+        "total": 3319,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3319,
+        "skipped": 0
+      }
+    },
+    {
+      "label": "native",
+      "number": 32,
+      "log": "mapping-audit-final-32-native.log",
+      "exitCode": 0,
+      "producerSHA": "a11c79726ea817a23c5e4096ee0b7848aa47b71b",
+      "cwd": "/tmp/storymodel-mapping-audit-20261020",
+      "metadata": {
+        "schema_version": 1,
+        "started_utc": "2026-10-20T22:09:28.173664+00:00",
+        "finished_utc": "2026-10-20T23:11:45.336999+00:00",
+        "duration_seconds": 1620.612124,
+        "command": [
+          "sbt",
+          "-batch",
+          "-J-Xmx4g",
+          "-Dsbt.supershell=false",
+          "-Dsbt.log.noformat=true",
+          "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+          "set ThisBuild / tlFatalWarnings := true",
+          "acquireNative/test; alignNative/test; amrInteropNative/test; codecNative/test; coreNative/test; corpusNative/test; documentNative/test; embedCoreNative/test; featuresNative/test; fixturesNative/test; interviewNative/test; lawsNative/test; propositionNative/test; recallNative/test; storyNative/test; viewNative/test",
+          "scalafmtCheckAll",
+          "scalafmtSbtCheck"
+        ],
+        "cwd": "/private/tmp/storymodel-mapping-audit-20261020",
+        "log": "/tmp/mapping-audit-final-32-native.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 7200.0,
+        "log_bytes": 134730
+      },
+      "rawLogSHA256": "ec212610c3645b08bbfab495570903ceab7a483e9ccaaa497f8354a0fa7da80f",
+      "testSummaryRows": [
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138,
+          "skipped": 0
+        },
+        {
+          "total": 1041,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1041,
+          "skipped": 0
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92,
+          "skipped": 0
+        },
+        {
+          "total": 403,
+          "failed": 0,
+          "errors": 0,
+          "passed": 403,
+          "skipped": 0
+        },
+        {
+          "total": 257,
+          "failed": 0,
+          "errors": 0,
+          "passed": 257,
+          "skipped": 0
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116,
+          "skipped": 0
+        },
+        {
+          "total": 186,
+          "failed": 0,
+          "errors": 0,
+          "passed": 186,
+          "skipped": 0
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 160,
+          "failed": 0,
+          "errors": 0,
+          "passed": 160,
+          "skipped": 0
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104,
+          "skipped": 0
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117,
+          "skipped": 0
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81,
+          "skipped": 0
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77,
+          "skipped": 0
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167,
+          "skipped": 0
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133,
+          "skipped": 0
+        }
+      ],
+      "testTotals": {
+        "total": 3319,
+        "failed": 0,
+        "errors": 0,
+        "passed": 3319,
+        "skipped": 0
+      }
+    },
+    {
+      "label": "storyatlas",
+      "number": 33,
+      "log": "mapping-audit-final-33-storyatlas.log",
+      "exitCode": 0,
+      "producerSHA": "a11c79726ea817a23c5e4096ee0b7848aa47b71b",
+      "cwd": "/tmp/storyatlas-mapping-consumer-20261020.jd2wfwk4",
+      "metadata": {
+        "schema_version": 1,
+        "started_utc": "2026-10-20T23:11:45.648633+00:00",
+        "finished_utc": "2026-10-20T23:32:52.732078+00:00",
+        "duration_seconds": 207.540353,
+        "command": [
+          "sbt",
+          "-batch",
+          "-J-Xmx4g",
+          "-Dsbt.supershell=false",
+          "-Dsbt.log.noformat=true",
+          "-Dstoryatlas4s.storymodel4s.build=/tmp/storymodel-mapping-audit-20261020",
+          "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+          "set ThisBuild / tlFatalWarnings := true",
+          "compileAll",
+          "testAll",
+          "scalafmtCheckAll",
+          "scalafmtSbtCheck"
+        ],
+        "cwd": "/private/tmp/storyatlas-mapping-consumer-20261020.jd2wfwk4",
+        "log": "/tmp/mapping-audit-final-33-storyatlas.log",
+        "exit_code": 0,
+        "child_returncode": 0,
+        "reason": "exited",
+        "detail": null,
+        "timeout_seconds": 7200.0,
+        "log_bytes": 30280
+      },
+      "rawLogSHA256": "4b4e5f393437db83df96fe3aeda745c2d12fde4cdd7caa1f2e8da2229ec686ee",
+      "testSummaryRows": [
+        {
+          "total": 22,
+          "failed": 0,
+          "errors": 0,
+          "passed": 22,
+          "skipped": 0
+        },
+        {
+          "total": 26,
+          "failed": 0,
+          "errors": 0,
+          "passed": 26,
+          "skipped": 0
+        },
+        {
+          "total": 100,
+          "failed": 0,
+          "errors": 0,
+          "passed": 100,
+          "skipped": 0
+        },
+        {
+          "total": 100,
+          "failed": 0,
+          "errors": 0,
+          "passed": 100,
+          "skipped": 0
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15,
+          "skipped": 0
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15,
+          "skipped": 0
+        },
+        {
+          "total": 90,
+          "failed": 0,
+          "errors": 0,
+          "passed": 90,
+          "skipped": 0
+        },
+        {
+          "total": 87,
+          "failed": 0,
+          "errors": 0,
+          "passed": 87,
+          "skipped": 0
+        },
+        {
+          "total": 59,
+          "failed": 0,
+          "errors": 0,
+          "passed": 59,
+          "skipped": 0
+        },
+        {
+          "total": 4,
+          "failed": 0,
+          "errors": 0,
+          "passed": 4,
+          "skipped": 0
+        }
+      ],
+      "testTotals": {
+        "total": 518,
+        "failed": 0,
+        "errors": 0,
+        "passed": 518,
+        "skipped": 0
+      }
+    }
+  ],
+  "limits": [
+    "No hosted CI or release claim.",
+    "Local grakern override differs from default dependency pin.",
+    "Raw logs and execution metadata retained in primary .agent-work/mapping-audit-20261020.",
+    "Native runtime is uncontrolled with respect to host contention and ScalaCheck seeds; timings are not performance acceptance.",
+    "Native UTC endpoints span about 62 minutes; runner duration_seconds is 1620.612124. Retain both clocks without attributing a cause."
+  ],
+  "consumerSHA": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "guardMutations": [
+    {
+      "name": "reference-projection",
+      "path": "align/src/main/scala/storymodel4s/align/mappingresult.scala",
+      "task": "alignJVM/testOnly storymodel4s.align.MappingRunSuite",
+      "namedFailure": "reference authority refuses a changed normalized row",
+      "passedSiblings": 7,
+      "failed": 1,
+      "errors": 0,
+      "exitCode": 1,
+      "restoredSourceSha256": "08ddcf774f0ac85026b8531a88df044af25bd98baad13222a6f385422bc1eb37",
+      "log": "mapping-audit-mutant-23-reference-projection.log",
+      "rawLogSHA256": "1d59cef3e37ecbecf70170090df5804a2575ffcf668f68a4afae316849a247b9"
+    },
+    {
+      "name": "reference-inventory",
+      "path": "align/src/main/scala/storymodel4s/align/mappingrun.scala",
+      "task": "alignJVM/testOnly storymodel4s.align.MappingRunSuite",
+      "namedFailure": "reference-only executes independently and matches the paired scientific outcomes",
+      "passedSiblings": 7,
+      "failed": 1,
+      "errors": 0,
+      "exitCode": 1,
+      "restoredSourceSha256": "e8372062f19ecb4dfcf7e1541cce0761536450e8c306fadcecd4120a292c99d9",
+      "log": "mapping-audit-mutant-24-reference-inventory.log",
+      "rawLogSHA256": "fcc0383954711dba50ae3241276814fe780e65331fc8c5522e03dfb1da71899a"
+    },
+    {
+      "name": "selected-nomination",
+      "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+      "task": "pipeline/testOnly storymodel4s.pipeline.MappingPipelineSuite",
+      "namedFailure": "nonzero complete cut is nominated before lexical pricing and reference needs no grouping",
+      "passedSiblings": 20,
+      "failed": 1,
+      "errors": 0,
+      "exitCode": 1,
+      "restoredSourceSha256": "4bc3057c859d63bdeb80b5e2ec323a9a546f169c121e3509131ece3723b74aea",
+      "log": "mapping-audit-mutant-25-selected-nomination.log",
+      "rawLogSHA256": "95d7b22df425a320b02026ad976b6a24821d10de1205c1fac60f5f7c06f6d277"
+    },
+    {
+      "name": "reference-batch-mode",
+      "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+      "task": "pipeline/testOnly storymodel4s.pipeline.MappingPipelineSuite",
+      "namedFailure": "explicit reconstruction policies leave local evidence and reference outcomes unchanged",
+      "passedSiblings": 20,
+      "failed": 1,
+      "errors": 0,
+      "exitCode": 1,
+      "restoredSourceSha256": "4bc3057c859d63bdeb80b5e2ec323a9a546f169c121e3509131ece3723b74aea",
+      "log": "mapping-audit-mutant-26-reference-batch-mode.log",
+      "rawLogSHA256": "ca52e49966485a004e38db4865fd5693e6cfc26b26a77f400a3cbf6a1e4eb85c"
+    },
+    {
+      "name": "reference-codec",
+      "path": "codec/src/main/scala/storymodel4s/codec/mapping.scala",
+      "task": "pipeline/testOnly storymodel4s.pipeline.MappingPipelineSuite",
+      "namedFailure": "registered reference-only context round-trips with distinct authority and no paired substitute",
+      "passedSiblings": 20,
+      "failed": 1,
+      "errors": 0,
+      "exitCode": 1,
+      "restoredSourceSha256": "5be3bbf79952a137cdbfbcfc34574c1d05ebd658037b5270651a5cc5d787ac94",
+      "log": "mapping-audit-mutant-27-reference-codec.log",
+      "rawLogSHA256": "e89edeaf09d7c7e8b55b6aa8883a4331be3824ddbe3945a48d381703ddacc253"
+    },
+    {
+      "name": "onnx-legacy-cut",
+      "path": "pipeline/src/main/scala/storymodel4s/pipeline/MappingPipeline.scala",
+      "task": "pipeline/testOnly storymodel4s.pipeline.ReferenceOnnxSelectionSuite",
+      "namedFailure": "reference ONNX refuses absent selection before local-reference nomination",
+      "passedSiblings": 2,
+      "failed": 1,
+      "errors": 0,
+      "exitCode": 1,
+      "restoredSourceSha256": "4bc3057c859d63bdeb80b5e2ec323a9a546f169c121e3509131ece3723b74aea",
+      "log": "mapping-audit-mutant-28-onnx-legacy-cut.log",
+      "rawLogSHA256": "65490d435d2fc45b66968c1af9951cb29dd3b95ab432eaeaf39135e881ce0446"
+    }
+  ]
+}

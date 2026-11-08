@@ -1,0 +1,23 @@
+{
+  "schema": "sherlock-qwen-review/local-artifacts/v1",
+  "issue": "bd-01M5E7ZXABPHBG8P4Y2KN8SZ0V",
+  "sourceCheckoutSHA": "a62f9c1ce55c595b68f4881429f79c92a53f8d38",
+  "filesSHA256": {
+    "verification.log.meta.json": "efc596d5b294988d846ad81cfaea7cfcdfd8e69c8a4128afc3cbf87e8dd6cc78",
+    "comparison.html": "cd856394ac3152700ab49397fc1ce5bbaf9a72eddcdd47ed951d99975e4b6376",
+    "README.md": "09b2a72f8769c348467dc137cd6dc2e41652d2993d52b611d82481bb4d557551",
+    "verification.json": "289f5b8ac382c78cc3055f7ca16928f97fe3cdaabe76e892338a7748f1a6aaeb",
+    "verify.py": "9e32f614cf2e696531c61a7769964135a2a3130855fc558d07d6060565d22889",
+    "verification.log": "289f5b8ac382c78cc3055f7ca16928f97fe3cdaabe76e892338a7748f1a6aaeb"
+  },
+  "existingRun": "data/transcription/asr-comparison-qwen-20261020/run-2",
+  "newInferenceExecuted": false,
+  "humanAudioAdjudication": false,
+  "verificationExit": 0,
+  "selectedExcerpts": 3,
+  "selectedSeconds": 325,
+  "newMediaCopies": 0,
+  "productionChanged": false,
+  "wordTiming": null,
+  "interpretation": "Retained ASR alternatives; no accuracy ranking or downstream mapping/scoring performed."
+}

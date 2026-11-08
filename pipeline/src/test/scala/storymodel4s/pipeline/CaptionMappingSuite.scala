@@ -318,3 +318,37 @@ class CaptionMappingSuite extends FunSuite:
     assertEquals(a.caption, Some(first))
     assertEquals(b.caption, Some(second))
   }
+
+  test("caption source profile binds measured pricing and rejects historical registration") {
+    val registered = right(
+      CaptionMapping.replay(
+        frames,
+        request,
+        envelope,
+        bytes(envelope.outcomeFile),
+        pins,
+        recall,
+        view,
+        representation,
+        inventory,
+        config,
+        0.8,
+        contentPolicy = ContentCostPolicy.MeasuredSemanticV1
+      )
+    )
+    val settings = MappingPipeline.Config(
+      MappingPipeline.CaptionSourceProfile,
+      1.0,
+      3,
+      3,
+      Vector(MappingPipeline.Capability.Mapping)
+    )
+    val run = right(MappingPipeline.referenceCaptions(registered, settings))
+    assertEquals(
+      run.execution.reference.profile.population,
+      NormalizationPopulation.AdmittedSourceTargets
+    )
+    assert(run.reference.outcomes.flatMap(_.measures.normalized).nonEmpty)
+    assert(MappingPipeline.referenceCaptions(right(replay()), settings).isLeft)
+    assertNotEquals(registered.identity, right(replay()).identity)
+  }

@@ -1,0 +1,42 @@
+{
+  "schema": "storymodel4s-prospective-exposure-audit/v1",
+  "assessedCommit": "04bd1d8d5ede7f05d70f3ca4bb33b5f8a4483226",
+  "readScope": "Only committed split/read-ledger metadata and previously published report; no corpus bytes, sealed gold or new model outputs read. No read guard invoked.",
+  "corpora": {
+    "friends": {
+      "split": "docs/data/friends/test-split.json",
+      "splitSha256": "bb6b56138679501f6947614cdeac36c889306db7d5272574a6e547558f894dc3",
+      "ledger": "docs/data/friends/test-split-reads.json",
+      "ledgerSha256": "fdfb7431009dc880208ffdb2c3a7d19cd3203782651a3de762d23cf13bf5fe83",
+      "participantCounts": {
+        "development": 13,
+        "test": 10,
+        "pool": 23
+      },
+      "finalOpeningCount": 0,
+      "countOnlyReadCount": 0,
+      "recordedExposureStatus": "model-untouched, not unseen",
+      "assessment": "Metadata-only check; zero recorded openings is not proof against bypasses, renamed outputs, or model-training exposure. Existing Phase1a-2 prohibition remains."
+    },
+    "memento": {
+      "split": "docs/data/memento/test-split.json",
+      "splitSha256": "12f69fad936b8c694ccff282e21f20b2745d5e0840054b3875bbe51c83ea028d",
+      "ledger": "docs/data/memento/test-split-reads.json",
+      "ledgerSha256": "91fa631da736d1bf6acf31416ceccaf181f077b5973aee55451e681708683f8c",
+      "participantCounts": {
+        "development": 60,
+        "test": 63,
+        "pool": 123
+      },
+      "finalOpeningCount": 0,
+      "countOnlyReadCount": 0,
+      "recordedExposureStatus": "model-untouched, not unseen",
+      "assessment": "Metadata-only check; zero recorded openings is not proof against bypasses, renamed outputs, or model-training exposure. Existing Phase1a-2 prohibition remains."
+    },
+    "organizationChallenge": {
+      "report": "docs/refactor/evidence/organization-challenge-20261014/REPORT.md",
+      "reportSha256": "05b53dda15fb79afbd708a038c2ba0a37220a42a0b35a6a35fdc55b708369896",
+      "assessment": "Report explicitly states the holdout has been opened. Neither those held-out cases nor their renamed/rewritten versions establish a fresh independent evaluation set."
+    }
+  }
+}

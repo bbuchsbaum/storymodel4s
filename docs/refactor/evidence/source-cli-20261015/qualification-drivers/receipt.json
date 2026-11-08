@@ -1,0 +1,12 @@
+{
+  "status": "prepared-drivers-only",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "docs/refactor/evidence/source-cli-20261015/qualification-drivers/driver-courts.py"
+  ],
+  "exit": 0,
+  "logSha256": "80ca5a82f79947136f3ed748a6564d8d94a57b3fb39a23dcb59b60b4eb644a6b",
+  "review": "Atlas driver adds official sbt-plugin Ivy fallback after retained Central-only failure; no product pins changed. Original source/override/TZ controls preserved; retry execution pending.",
+  "producer": "c69a5d754a21fa455c64901334d9509278401091",
+  "consumer": "50a160168daa03c51fcab60a4eaaed66674da83a"
+}

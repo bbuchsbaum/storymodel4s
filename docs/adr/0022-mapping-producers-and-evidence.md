@@ -363,3 +363,61 @@ enabling a publishing job, changing a release version or authorizing a release t
 
 Rejected alternatives: a new assembly dependency, silently resolving libraries at user runtime,
 flattening jars and merging unrelated resources, or using an unordered classpath wildcard.
+
+## 2026-10-21: fixed-basis source-conditional localization
+
+Owner authorized implementation of the general scoring correction in
+`bd-01M5EA1JDF877X4RZPJY6EFJDJ`. Add a versioned measured-semantic policy requiring a single
+positive semantic basis and no auxiliary priors. Disabled terms do not count as measurements;
+unavailable semantic values are not imputed. Normalize equally over nominated admitted source
+targets, not fidelity states or external floors. Attach typed conditioning to the exported
+measure and its identity. This establishes a conditional location, not source membership.
+Preserve historical policy factories and rendering. Consumers unable to retain conditioning
+must refuse it. The evaluation and falsifiers are frozen in the
+[scoring protocol](../plans/2026-10-21-scoring-correction.md).
+
+Rejected alternative: a heterogeneous observed-term sum without rescaling makes sparsely
+described targets artificially cheaper. A general entailment score is also outside this slice:
+symmetric chart compatibility does not establish directional event support.
+
+
+## Amendment 2026-10-21: attributed claim assessments alongside event alignment
+
+Owner authorization: proceed with the mixed-memory assessment plan, 2026-10-21;
+Mote `bd-01M5FGET6020C9B1BC2YCBKY52`, child of `bd-01M5EA1JDF877X4RZPJY6EFJDJ`.
+
+Add `ClaimAssessmentReceipt` as a checked record of attributed judgments over a separately
+declared question population and exact `MappingResult`. Preserve all existing mapping values,
+fidelity modes and signature semantics. A question identifies an existing recall unit, source
+event and facet; source citations retain their actual origin, which may be a different shot.
+That cross-shot semantic relationship is an assessor assertion, not proved by physical overlap.
+
+Keep recall commitment/availability independent of source evidence: expressed, reviewed not
+expressed, extraction unresolved and reference unresolved. Unknown identity does not erase an
+expressed action. Preserve supporting citations, counterevidence and unresolved reasons
+independently; any remaining uncertainty prevents a resolved verdict, and conflicting evidence
+remains conflicted. Only an attributed review may assert nonexpression. A missing chart cannot.
+
+The constructor checks complete, duplicate-free question accounting, unit/span and source-citation
+ownership, chart-element membership, declared chart-owner digest/scope association, and chart
+provenance agreement. Optional chart references retain the whole chart, including embedding
+context. In this first version charts attach to represented text support; media citations remain
+available without a chart attachment. A supplied matching owner digest and spans cannot establish
+that the chart was correctly extracted from that material. Assessor identity and procedure are
+recorded assertions. Structural admission does not establish semantic truth or execution.
+
+Counts use the fixed, declared question population. Expressed but reference-unresolved claims stay
+in the expressed denominator; failed extraction has its own count because commitment is unknown.
+Support, contradiction, conflict and unresolved counts remain available. Repeated citations cannot
+multiply a question's credit. No new fidelity fraction or probability is exported. `mappingDigest`
+and `populationDigest` identify only their named objects; neither claims to hash all receipt content.
+
+The first executable comparison is a test-only, conservative structural rule conditional on
+controlled event/entity/context correspondence, with explicit polarity opposition. It is evaluated
+separately from extraction. General semantic entailment, automatic claim decomposition, caption
+improvement and held-out participant/movie accuracy remain separate acceptance work.
+
+Rejected: treating checked charts or matching quotations as truth; treating unequal slots or
+missing evidence as contradiction; inferring nonexpression from extraction failure; silently dropping
+unresolved claims; changing old `FidelityReport` or alignment scores in this additive slice; and
+inventing a parallel proposition ontology instead of retaining existing charts and evidence types.

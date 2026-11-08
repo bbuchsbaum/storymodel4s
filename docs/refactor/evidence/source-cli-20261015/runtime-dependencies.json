@@ -1,0 +1,892 @@
+{
+  "source": "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c",
+  "sourceProducts": 20,
+  "externalArtifacts": [
+    {
+      "ordinal": 20,
+      "coordinate": "org.scala-lang:scala3-library_3:3.7.4",
+      "sha256": "73089d33f763b94758170e0a66be978f9397c14b7795e343898aa89b3d7b6639",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "scala3-library_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala3-library_3/3.7.4/scala3-library_3-3.7.4.jar",
+        "extraAttributes": {
+          "info.versionScheme": "semver-spec"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 21,
+      "coordinate": "io.circe:circe-core_3:0.14.10",
+      "sha256": "587332f06f6120113013079445157f6cd129ab6dd22cf56e078b5d3e7e3b789a",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "circe-core_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/io/circe/circe-core_3/0.14.10/circe-core_3-0.14.10.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/io.circe/circe-core_3/0.14.10/",
+          "info.releaseNotesUrl": "https://github.com/circe/circe/releases/tag/v0.14.10",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 22,
+      "coordinate": "io.circe:circe-parser_3:0.14.10",
+      "sha256": "99bdbe80911883779348b8eba80f2c2a136f4ea40e41ca5a0164706a27471a96",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "circe-parser_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/io/circe/circe-parser_3/0.14.10/circe-parser_3-0.14.10.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/io.circe/circe-parser_3/0.14.10/",
+          "info.releaseNotesUrl": "https://github.com/circe/circe/releases/tag/v0.14.10",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 23,
+      "coordinate": "com.anthropic:anthropic-java:2.34.0",
+      "sha256": "cd342e2653125e686341a6b708962fcfd87d7818a34c80e97aeca006402594f1",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "anthropic-java",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/anthropic/anthropic-java/2.34.0/anthropic-java-2.34.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 24,
+      "coordinate": "org.typelevel:cats-core_3:2.13.0",
+      "sha256": "e2abfcdfe041ce08d8407412b09d55eb33eb85655c22c9c8815712d3aad633c6",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "cats-core_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-core_3/2.13.0/cats-core_3-2.13.0.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/org.typelevel/cats-docs_3/2.13.0/",
+          "info.releaseNotesUrl": "https://github.com/typelevel/cats/releases/tag/v2.13.0",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 25,
+      "coordinate": "org.typelevel:cats-collections-core_3:0.9.10",
+      "sha256": "9db07413c4f133f1a0deb80582a515b4a94bfb4bc1c3f7026b15518b5dd2deed",
+      "licenses": [
+        "BSD-3",
+        "MIT"
+      ],
+      "artifact": {
+        "name": "cats-collections-core_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-collections-core_3/0.9.10/cats-collections-core_3-0.9.10.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://javadoc.io/doc/org.typelevel/cats-collections-core_3/0.9.10/",
+          "info.releaseNotesUrl": "https://github.com/typelevel/cats-collections/releases/tag/v0.9.10",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 26,
+      "coordinate": "com.microsoft.onnxruntime:onnxruntime:1.29.0",
+      "sha256": "5933bbc0c6c4d89afc04bf7c11011de23a947509c1352e5bf5936e62a84e4d10",
+      "licenses": [
+        "MIT License"
+      ],
+      "artifact": {
+        "name": "onnxruntime",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.29.0/onnxruntime-1.29.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 27,
+      "coordinate": "ai.djl.huggingface:tokenizers:0.36.0",
+      "sha256": "78764d19760647d3c53c819be04fcd2fd9d1e805dd60a2ed835f53efb3fafade",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "tokenizers",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/ai/djl/huggingface/tokenizers/0.36.0/tokenizers-0.36.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 28,
+      "coordinate": "org.scala-lang:scala-library:2.13.16",
+      "sha256": "1ebb2b6f9e4eb4022497c19b1e1e825019c08514f962aaac197145f88ed730f1",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "scala-library",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.16/scala-library-2.13.16.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.scala-lang.org/api/2.13.16/"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 29,
+      "coordinate": "io.circe:circe-numbers_3:0.14.10",
+      "sha256": "eab3fa2de4f239e7095fbc1141ee484db6446e7a2f3d7598d20080296f4ba125",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "circe-numbers_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/io/circe/circe-numbers_3/0.14.10/circe-numbers_3-0.14.10.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/io.circe/circe-numbers_3/0.14.10/",
+          "info.releaseNotesUrl": "https://github.com/circe/circe/releases/tag/v0.14.10",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 30,
+      "coordinate": "io.circe:circe-jawn_3:0.14.10",
+      "sha256": "e7d6dc2323e5961154f8e3f60669c5dd33ffdb3d95cc3f2fb2ed44d8adcf9877",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "circe-jawn_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/io/circe/circe-jawn_3/0.14.10/circe-jawn_3-0.14.10.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/io.circe/circe-jawn_3/0.14.10/",
+          "info.releaseNotesUrl": "https://github.com/circe/circe/releases/tag/v0.14.10",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 31,
+      "coordinate": "org.typelevel:cats-parse_3:1.1.0",
+      "sha256": "a6f9869c69119f554fec3a0e88679914c922b0f5cd05480ab9056baa974a6528",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "cats-parse_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-parse_3/1.1.0/cats-parse_3-1.1.0.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/org.typelevel/cats-parse_3/1.1.0/",
+          "info.releaseNotesUrl": "https://github.com/typelevel/cats-parse/releases/tag/v1.1.0",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 32,
+      "coordinate": "com.anthropic:anthropic-java-client-okhttp:2.34.0",
+      "sha256": "bbf6bb2e2dd266ef33d812d9ed8b4ac99802b719da83cb32e6334cc5a93dfa65",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "anthropic-java-client-okhttp",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/anthropic/anthropic-java-client-okhttp/2.34.0/anthropic-java-client-okhttp-2.34.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 33,
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10",
+      "sha256": "a4c74d94d64ce1abe53760fe0389dd941f6fc558d0dab35e47c085a11ec80f28",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "kotlin-stdlib-jdk8",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.9.10/kotlin-stdlib-jdk8-1.9.10.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 34,
+      "coordinate": "org.typelevel:cats-kernel_3:2.13.0",
+      "sha256": "a6afaad274e2a0fbbd189bfe3a0e91810bd562745573995011943427ea489040",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "cats-kernel_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/typelevel/cats-kernel_3/2.13.0/cats-kernel_3-2.13.0.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/org.typelevel/cats-docs_3/2.13.0/",
+          "info.releaseNotesUrl": "https://github.com/typelevel/cats/releases/tag/v2.13.0",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 35,
+      "coordinate": "org.typelevel:algebra_3:2.13.0",
+      "sha256": "c2751d6b6b02650e56065b6b5affc116de186f9c8e47519d5bc58728991fce41",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "algebra_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/typelevel/algebra_3/2.13.0/algebra_3-2.13.0.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/org.typelevel/cats-docs_3/2.13.0/",
+          "info.releaseNotesUrl": "https://github.com/typelevel/cats/releases/tag/v2.13.0",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 36,
+      "coordinate": "ai.djl:api:0.36.0",
+      "sha256": "3d720dad798114f824a9efa32de4cc15e7bebf0e8f2a0cc68fde101d490d0c0a",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "api",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/ai/djl/api/0.36.0/api-0.36.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 37,
+      "coordinate": "org.typelevel:jawn-parser_3:1.6.0",
+      "sha256": "7eda53af568b548938472ca55d235c310f9fcf5262c1e4847185ce6655aa6cd1",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "jawn-parser_3",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/typelevel/jawn-parser_3/1.6.0/jawn-parser_3-1.6.0.jar",
+        "extraAttributes": {
+          "info.apiURL": "https://www.javadoc.io/doc/org.typelevel/jawn-parser_3/1.6.0/",
+          "info.releaseNotesUrl": "https://github.com/typelevel/jawn/releases/tag/v1.6.0",
+          "info.versionScheme": "early-semver"
+        },
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 38,
+      "coordinate": "com.anthropic:anthropic-java-core:2.34.0",
+      "sha256": "50f6d1ab23a14ce3102b17deb19b6f5d310329ccf8303358c2b8ed714dec3d29",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "anthropic-java-core",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/anthropic/anthropic-java-core/2.34.0/anthropic-java-core-2.34.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 39,
+      "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+      "sha256": "b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "okhttp",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 40,
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:1.9.10",
+      "sha256": "55e989c512b80907799f854309f3bc7782c5b3d13932442d0379d5c472711504",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "kotlin-stdlib",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.10/kotlin-stdlib-1.9.10.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 41,
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10",
+      "sha256": "ac6361bf9ad1ed382c2103d9712c47cdec166232b4903ed596e8876b0681c9b7",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "kotlin-stdlib-jdk7",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.9.10/kotlin-stdlib-jdk7-1.9.10.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 42,
+      "coordinate": "com.google.code.gson:gson:2.13.1",
+      "sha256": "94855942d4992f112946d3de1c334e709237b8126d8130bf07807c018a4a2120",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "gson",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.1/gson-2.13.1.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 43,
+      "coordinate": "net.java.dev.jna:jna:5.17.0",
+      "sha256": "b3a9408e7c51e08ef0e3bfcc08f443f6ec0f6191ba8cd7c18d53d2b22e5bdbc0",
+      "licenses": [
+        "Apache-2.0",
+        "LGPL-2.1-or-later"
+      ],
+      "artifact": {
+        "name": "jna",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 44,
+      "coordinate": "org.apache.commons:commons-compress:1.27.1",
+      "sha256": "293d80f54b536b74095dcd7ea3cf0a29bbfc3402519281332495f4420d370d16",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "commons-compress",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.27.1/commons-compress-1.27.1.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 45,
+      "coordinate": "org.slf4j:slf4j-api:2.0.17",
+      "sha256": "7b751d952061954d5abfed7181c1f645d336091b679891591d63329c622eb832",
+      "licenses": [
+        "MIT"
+      ],
+      "artifact": {
+        "name": "slf4j-api",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 46,
+      "coordinate": "com.fasterxml.jackson.core:jackson-core:2.18.2",
+      "sha256": "d8054ae7c0d1c2d2f55d28e46026ebe5892881f3fab5f439233184381c3b4a1f",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jackson-core",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.18.2/jackson-core-2.18.2.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 47,
+      "coordinate": "com.fasterxml.jackson.core:jackson-databind:2.18.2",
+      "sha256": "4b364e6850dc89172fcf1d4dd26b8ff5488eda44ff4657e22dd265203dd5ab3c",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jackson-databind",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.18.2/jackson-databind-2.18.2.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 48,
+      "coordinate": "com.google.errorprone:error_prone_annotations:2.38.0",
+      "sha256": "6661d5335090a5fc61dd869d2095bc6c1e2156e3aa47a6e4ababdf64c99a7889",
+      "licenses": [
+        "Apache 2.0"
+      ],
+      "artifact": {
+        "name": "error_prone_annotations",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/google/errorprone/error_prone_annotations/2.38.0/error_prone_annotations-2.38.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 49,
+      "coordinate": "com.standardwebhooks:standardwebhooks:1.1.0",
+      "sha256": "3ac0668492900eb0069dba61458ea1fe32e6bfaeecd1d95cc617c72567750bcc",
+      "licenses": [
+        "The MIT License"
+      ],
+      "artifact": {
+        "name": "standardwebhooks",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/standardwebhooks/standardwebhooks/1.1.0/standardwebhooks-1.1.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 50,
+      "coordinate": "io.swagger.core.v3:swagger-annotations:2.2.31",
+      "sha256": "8cb2155211480e5fbd24388a6dc81baeea6dd50f8fcc6504cf4f39e4e3acf96c",
+      "licenses": [
+        "Apache License 2.0"
+      ],
+      "artifact": {
+        "name": "swagger-annotations",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/io/swagger/core/v3/swagger-annotations/2.2.31/swagger-annotations-2.2.31.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 51,
+      "coordinate": "com.fasterxml.jackson.core:jackson-annotations:2.18.2",
+      "sha256": "581bd61000ef7648943f781ca05689e56d03f6052748365a8e2b3a9b5d3fa32f",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jackson-annotations",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.18.2/jackson-annotations-2.18.2.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 52,
+      "coordinate": "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.2",
+      "sha256": "f30d77f5826b9e9813342e84ab412095ed4ed5cf4fef6f93cebb848cb0fd0294",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jackson-datatype-jdk8",
+        "type": "bundle",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.18.2/jackson-datatype-jdk8-2.18.2.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 53,
+      "coordinate": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2",
+      "sha256": "e2d202d4606e23aeaf8a5a9632db06f5fefd5b63d251c3f503f9faaa78530e5c",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jackson-datatype-jsr310",
+        "type": "bundle",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.2/jackson-datatype-jsr310-2.18.2.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 54,
+      "coordinate": "com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2",
+      "sha256": "77f373478d7f124717863f9545d64974bb9b3062acd7c0f37ed94a3b70433a01",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jackson-module-kotlin",
+        "type": "bundle",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/module/jackson-module-kotlin/2.18.2/jackson-module-kotlin-2.18.2.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 55,
+      "coordinate": "org.apache.httpcomponents.core5:httpcore5:5.2.4",
+      "sha256": "a7f62496113f66f9e27c26b84c44f5ce4555c6270083cdf2d45f255336cd52af",
+      "licenses": [
+        "Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "httpcore5",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5/5.2.4/httpcore5-5.2.4.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 56,
+      "coordinate": "org.apache.httpcomponents.client5:httpclient5:5.3.1",
+      "sha256": "08346a757c617f6ecc66af9f099260adde1f3a1351fa81cb22fc17482b31f823",
+      "licenses": [
+        "Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "httpclient5",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/apache/httpcomponents/client5/httpclient5/5.3.1/httpclient5-5.3.1.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 57,
+      "coordinate": "com.github.victools:jsonschema-generator:4.38.0",
+      "sha256": "ade4aeb301db4028ac6bcba016c31405677e37aae6eebaf13c99de3fdb3531b4",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jsonschema-generator",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/github/victools/jsonschema-generator/4.38.0/jsonschema-generator-4.38.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 58,
+      "coordinate": "com.github.victools:jsonschema-module-jackson:4.38.0",
+      "sha256": "36fbd3f1c27379c3ba8420ac2cb0b42411f7bc3b3df8bdd11d8d7e024a1c28ca",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jsonschema-module-jackson",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/github/victools/jsonschema-module-jackson/4.38.0/jsonschema-module-jackson-4.38.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 59,
+      "coordinate": "com.github.victools:jsonschema-module-swagger-2:4.38.0",
+      "sha256": "b76c0df657bcf88cca46d7ad540938552e10127a7c28d2136f62b631666997c1",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "jsonschema-module-swagger-2",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/github/victools/jsonschema-module-swagger-2/4.38.0/jsonschema-module-swagger-2-4.38.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 60,
+      "coordinate": "com.squareup.okio:okio:3.6.0",
+      "sha256": "8e63292e5c53bb93c4a6b0c213e79f15990fed250c1340f1c343880e1c9c39b5",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "okio",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio/3.6.0/okio-3.6.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 61,
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10",
+      "sha256": "cde3341ba18a2ba262b0b7cf6c55b20c90e8d434e42c9a13e6a3f770db965a88",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "kotlin-stdlib-common",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/1.9.10/kotlin-stdlib-common-1.9.10.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 62,
+      "coordinate": "org.jetbrains:annotations:13.0",
+      "sha256": "ace2a10dc8e2d5fd34925ecac03e4988b2c0f851650c94b8cef49ba1bd111478",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "annotations",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 63,
+      "coordinate": "commons-codec:commons-codec:1.17.1",
+      "sha256": "f9f6cb103f2ddc3c99a9d80ada2ae7bf0685111fd6bffccb72033d1da4e6ff23",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "commons-codec",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.17.1/commons-codec-1.17.1.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 64,
+      "coordinate": "commons-io:commons-io:2.16.1",
+      "sha256": "f41f7baacd716896447ace9758621f62c1c6b0a91d89acee488da26fc477c84f",
+      "licenses": [
+        "Apache-2.0"
+      ],
+      "artifact": {
+        "name": "commons-io",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/commons-io/commons-io/2.16.1/commons-io-2.16.1.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 65,
+      "coordinate": "org.jetbrains.kotlin:kotlin-reflect:1.8.10",
+      "sha256": "99672410459045090d062a0194ed87008e2371f06946b6bfa7287c697f924bea",
+      "licenses": [
+        "The Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "kotlin-reflect",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-reflect/1.8.10/kotlin-reflect-1.8.10.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 66,
+      "coordinate": "org.apache.httpcomponents.core5:httpcore5-h2:5.2.4",
+      "sha256": "dc1a95e73eb04db93451533d390ce02c53b301a10dc343d08c862f2934b3d30e",
+      "licenses": [
+        "Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "httpcore5-h2",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5-h2/5.2.4/httpcore5-h2-5.2.4.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 67,
+      "coordinate": "com.fasterxml:classmate:1.7.0",
+      "sha256": "cb868f231c5cceb89d795ea00e6e1b7a93b8f4ac1ce1d8be76dde322dff4a046",
+      "licenses": [
+        "Apache License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "classmate",
+        "type": "bundle",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/fasterxml/classmate/1.7.0/classmate-1.7.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    },
+    {
+      "ordinal": 68,
+      "coordinate": "com.squareup.okio:okio-jvm:3.6.0",
+      "sha256": "67543f0736fc422ae927ed0e504b98bc5e269fda0d3500579337cb713da28412",
+      "licenses": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "artifact": {
+        "name": "okio-jvm",
+        "type": "jar",
+        "extension": "jar",
+        "configurations": [],
+        "url": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar",
+        "extraAttributes": {},
+        "allowInsecureProtocol": false
+      }
+    }
+  ],
+  "catalogRows": 51,
+  "metadataReports": [
+    "codec/.jvm",
+    "embed-onnx",
+    "media",
+    "provider-agent"
+  ]
+}

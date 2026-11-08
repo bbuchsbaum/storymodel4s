@@ -1,0 +1,61 @@
+"""Original synthetic protocol strings only; no narrative, media or participant material."""
+import json
+import tempfile
+from pathlib import Path
+import unittest
+from unittest.mock import patch
+import openrouter_component_probe as p
+import claim_assessment_probe as base
+from test_component_assessment_probe import fixture
+from test_connected_assessment_probe import fixture as connected_fixture
+
+class RemoteTests(unittest.TestCase):
+    def test_same_model_recipe_and_output_limit(self):
+        r,_,_=fixture(); b=p.body(r)
+        self.assertEqual(b['model'],p.remote.MODEL)
+        self.assertEqual(b['max_tokens'],8192)
+        self.assertFalse(b['provider']['allow_fallbacks'])
+        self.assertEqual(b['provider']['max_price']['request'],0)
+    def test_pinned_alternate_route_keeps_privacy_and_baseline_prompt(self):
+        r,_,_=fixture();b=p.body(r,'together','whole')
+        self.assertEqual(b['provider']['only'],['together'])
+        self.assertTrue(b['provider']['zdr']);self.assertEqual(b['provider']['data_collection'],'deny')
+        self.assertEqual(b['max_tokens'],4096)
+        self.assertTrue(b['messages'][0]['content'].startswith(base.PROMPT))
+        self.assertNotIn('components',b['messages'][0]['content'].split('INPUT:',1)[1])
+        with self.assertRaises(ValueError):p.body(r,'unknown')
+
+    def test_foreign_model_rejected(self):
+        r,v,_=fixture()
+        self.assertEqual(p.interpret(r,dict(model='other',provider='Fireworks'))['processing'],'foreign_provider_or_model')
+    def test_connected_prompt_and_reader_share_canonical_identity(self):
+        r,v=connected_fixture();v['claim_id']=p.connected.model_input(r)['claim_id']
+        b=p.body(r,'together','connected')
+        self.assertEqual(b['max_tokens'],8192)
+        self.assertTrue(b['messages'][0]['content'].startswith(p.connected.PROMPT))
+        sent=json.loads(b['messages'][0]['content'].split('INPUT:\n',1)[1])
+        self.assertEqual(sent,p.connected.model_input(r))
+        self.assertNotIn('polarity',json.dumps(sent))
+        response=dict(model=p.remote.MODEL,provider='Together',choices=[dict(
+            finish_reason='stop',message=dict(content=json.dumps(v)))])
+        result=p.interpret(r,response,'together','connected')
+        self.assertEqual(result['processing'],'valid')
+        self.assertEqual(result['proposal']['components'][0]['status'],'Supported')
+    def test_rate_limit_preserves_entire_population(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);r,_,_=fixture();r['identity']=base.identity(r)
+            rows=[dict(condition=str(i),request=r) for i in range(3)]
+            base.write(root/'requests.json',dict(executions=rows))
+            paths=[Path(p.__file__),Path(p.protocol.__file__),Path(p.connected.__file__),Path(base.__file__),Path(p.remote.__file__),root/'requests.json']
+            base.write(root/'freeze.json',dict(files={str(x.absolute()):base.sha(x) for x in paths},budgetUsd=5,priorCostBoundUsd=0))
+            with patch.dict(p.os.environ,{'OPENROUTER_API_KEY':'synthetic'}),patch.object(p,'execute',return_value=dict(attempts=1,processing='http_failure',httpStatus=429)) as execute:
+                p.run(root)
+            self.assertEqual(execute.call_count,1)
+            out=[json.loads(x) for x in (root/'outputs.jsonl').read_text().splitlines()]
+            self.assertEqual(len(out),3)
+            self.assertEqual([x['attempts'] for x in out],[1,0,0])
+    def test_long_completion_never_parsed(self):
+        r,v,_=fixture();response=dict(model=p.remote.MODEL,provider='Fireworks',choices=[dict(finish_reason='length',message=dict(content=json.dumps(v)))])
+        self.assertIsNone(p.interpret(r,response)['proposal'])
+
+if __name__=='__main__':unittest.main()

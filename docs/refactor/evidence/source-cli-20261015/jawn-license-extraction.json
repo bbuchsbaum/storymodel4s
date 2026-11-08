@@ -1,0 +1,9 @@
+{
+  "file": "jawn-1.6.0.txt",
+  "url": "https://repo.maven.apache.org/maven2/org/typelevel/jawn-parser_3/1.6.0/jawn-parser_3-1.6.0-sources.jar#jawn/AsyncParser.scala",
+  "sourceArchiveSha256": "aaa1b3284e5056fcb1be6a955eefffc82f78662df371d8e6b5a4aa70e379527d",
+  "memberSha256": "6730882a855ef671d48711337edae7bf266f6e2e6245af2625f34b735e43249a",
+  "extraction": "initial complete block comment, followed by newline",
+  "bytes": 1111,
+  "sha256": "7f073dda25f7c8e7d185e5da4048fe6c5124963be715f801c816042ac9484519"
+}

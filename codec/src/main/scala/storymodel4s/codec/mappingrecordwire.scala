@@ -78,7 +78,9 @@ private[codec] object MappingRecordWire:
           "reason" -> str(v.reason.toString),
           "asserted" -> optional(v.asserted)(receipt)
         )
-      case v: StageProvenance.Derived => tagged("derived", "receipt" -> receipt(v.receipt)))
+      case v: StageProvenance.Derived          => tagged("derived", "receipt" -> receipt(v.receipt))
+      case v: StageProvenance.ReferenceDerived =>
+        tagged("reference-derived", "receipt" -> receipt(v.receipt)))
   )
   def stages(value: UnitStageRefs): Json = obj(
     "inference" -> str(value.inference.digest.hex),
@@ -189,6 +191,9 @@ private[codec] object MappingRecordWire:
         "prior" -> str(r.prior.value),
         "temperature" -> number(r.temperature),
         "stage" -> str(r.stage.digest.hex)
+      ).deepMerge(
+        if r.population == NormalizationPopulation.SuppliedDestinations then obj()
+        else obj("population" -> str(r.population.toString))
       )
     ),
     "transport" -> optional(value.transport)(r =>
@@ -203,6 +208,8 @@ private[codec] object MappingRecordWire:
     )
   )
   def values(value: UnitMeasures): Json =
+    val normalizedScope =
+      value.normalized.fold(NormalizationPopulation.SuppliedDestinations.scope)(_.population.scope)
     def row(
         kind: MeasureKind,
         channel: Option[String],
@@ -217,7 +224,7 @@ private[codec] object MappingRecordWire:
         "raw_value" -> number(value),
         "normalization_scope" -> str(kind match
           case MeasureKind.RawScore              => "not-normalized"
-          case MeasureKind.NormalizedScoreMass   => "unit/supplied-destinations"
+          case MeasureKind.NormalizedScoreMass   => normalizedScope
           case MeasureKind.TransportMass         => "not-row-normalized"
           case MeasureKind.ModelPosterior        => "unit/supplied-model-states"
           case MeasureKind.CalibratedProbability => "calibrated-event"),
@@ -271,7 +278,11 @@ private[codec] object MappingRecordWire:
   )
   def encode(value: MappingResult): Json = obj(
     "schema" -> str("storymodel4s.mapping-record"),
-    "schemaVersion" -> str("mapping-record/v0.1"),
+    "schemaVersion" -> str(
+      if value.ledger.entries.exists(_.provenance.isInstanceOf[StageProvenance.ReferenceDerived])
+      then "mapping-record/reference/v1"
+      else "mapping-record/v0.1"
+    ),
     "record_digest" -> str(value.digest.hex),
     "inventory" -> MappingSourceWire.inventory(value.inventory),
     "source" -> MappingSourceWire.source(value.source),

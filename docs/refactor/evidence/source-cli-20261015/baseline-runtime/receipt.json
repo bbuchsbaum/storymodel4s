@@ -1,0 +1,261 @@
+{
+  "schema": "storymodel4s-source-cli-qualification/v1",
+  "status": "existing-package-runtime-control-passed",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792112906.759398,
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/checkout/tools/test_cli_distribution.py",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "7e14979475d4434f2af7dbf25e82ee36831f7639b3af437c2d7cd3e9a8bc0c23"
+    },
+    {
+      "argv": [
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "template"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-001.log",
+      "expectedExit": 0,
+      "stdout": "runtime/mapping.json",
+      "stdoutSha256": "5f798fd4c02d8586757360aa4d4ac00c939fb55a6328b46682d3bf95176d21fb",
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-c",
+        "import socket,sys\ntry:\n s=socket.create_connection(('127.0.0.1',64002),2);s.close()\nexcept PermissionError:\n sys.exit(23)\nexcept OSError:\n sys.exit(24)\nelse:\n sys.exit(0)\n"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-002.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-c",
+        "import socket,sys\ntry:\n s=socket.create_connection(('127.0.0.1',64002),2);s.close()\nexcept PermissionError:\n sys.exit(23)\nexcept OSError:\n sys.exit(24)\nelse:\n sys.exit(0)\n"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-003.log",
+      "expectedExit": 23,
+      "exit": 23,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "online-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-004.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "cc029edfb9a2960c3d8230c501a28e1fbd2b3c7f3a05fd90295b4f9224d6dc02"
+    },
+    {
+      "argv": [
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingWeight",
+        "study.json",
+        "mapping.json",
+        "0/1,1/2,1/1",
+        "online-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-005.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "e9fb31eea7394fe837e959a4d5ecd40a934f7876a47c31d81589f8e29fecf8f5"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime/readers/read_mapping.py",
+        "--directory",
+        "online-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-006.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "d763b33cb78f1fc7ccb54da41f2078de3f8f6e23dfb3c4a03ddfd74841c6a3a2"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime/readers/read_weighted_mapping.py",
+        "online-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-007.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "fb76c83e79f4fc24830c1db2f369cc34ae3766b0d71e2fed2f86f88c34c81bc7"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "offline-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-008.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "cc029edfb9a2960c3d8230c501a28e1fbd2b3c7f3a05fd90295b4f9224d6dc02"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingWeight",
+        "study.json",
+        "mapping.json",
+        "0/1,1/2,1/1",
+        "offline-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-009.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "e9fb31eea7394fe837e959a4d5ecd40a934f7876a47c31d81589f8e29fecf8f5"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime/readers/read_mapping.py",
+        "--directory",
+        "offline-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-010.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "d763b33cb78f1fc7ccb54da41f2078de3f8f6e23dfb3c4a03ddfd74841c6a3a2"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime/readers/read_weighted_mapping.py",
+        "offline-weighted"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-011.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "fb76c83e79f4fc24830c1db2f369cc34ae3766b0d71e2fed2f86f88c34c81bc7"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "offline-exchange",
+        "--resume"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-012.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "cc029edfb9a2960c3d8230c501a28e1fbd2b3c7f3a05fd90295b4f9224d6dc02"
+    },
+    {
+      "argv": [
+        "sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "sh",
+        "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/installed/storymodel4s-0.1-e5bd6ae-SNAPSHOT/bin/storymodel4s",
+        "mappingRun",
+        "exchange",
+        "study.json",
+        "mapping.json",
+        "offline-exchange"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/baseline-readback/runtime",
+      "log": "command-013.log",
+      "expectedExit": 2,
+      "exit": 2,
+      "logSha256": "5974e06f162cadbd3b5fc56b3b9aef52894784a91c388fb0d654b519f1ee0806"
+    }
+  ],
+  "source": "e5bd6aed352aa7da5aba1f1e37fb1aadb2ee6f7c",
+  "networkDenial": {
+    "mechanism": "macOS sandbox deny network*",
+    "onlineControlExit": 0,
+    "deniedControlExit": 23
+  },
+  "runtime": {
+    "onlineOfflineBytesEqual": true,
+    "pairedAndThreeWeights": true,
+    "independentReaders": {
+      "__pycache__/read_mapping.cpython-314.pyc": "fbb775ed924cdeca28dbeaab34aa134447f424dacb04cf951ecaa09715ea30ea",
+      "read_mapping.py": "aa8b2358c9c703a3c90c90b1b2da97200e07363e6d64b6748343f023be909ae6",
+      "read_weighted_mapping.py": "3d6be7829763eeb895599f86ab0cf645dc2eac86c919179e70c7e1ed6c565cc1"
+    },
+    "readback": {
+      "online": {
+        "pairs": 1,
+        "attempts": 1,
+        "weightedMembers": 3
+      },
+      "offline": {
+        "pairs": 1,
+        "attempts": 1,
+        "weightedMembers": 3
+      }
+    },
+    "inputs": {
+      "source.txt": "4b8d9d501b96b4568c5a61b54afb37cab155afd8cd2bc7f180aeb28ec2e8709e",
+      "recall.txt": "6a13364a36a31e930e61ae1eb25bdc9b777e744b4a775699d937e7f0a5882d4b",
+      "study.json": "4f500f559d7477e96005eb27dd5998ddd2f0896a88309cfe12155f94b50eaf2e",
+      "mapping.json": "5f798fd4c02d8586757360aa4d4ac00c939fb55a6328b46682d3bf95176d21fb"
+    }
+  }
+}

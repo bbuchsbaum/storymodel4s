@@ -1,0 +1,28 @@
+[
+  {
+    "argv": [
+      "git",
+      "clone",
+      "--no-hardlinks",
+      "--no-checkout",
+      "/Users/bbuchsbaum/code/scala/storyatlas4s",
+      "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/checkout"
+    ],
+    "exit": 0,
+    "log": "prepare-0.log",
+    "logSha256": "1ff224630532e828b5fb649bd672cc86edaeebe0420cff200afef768dc5e7061"
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-c69a5d75-ivy/checkout",
+      "checkout",
+      "--detach",
+      "50a160168daa03c51fcab60a4eaaed66674da83a"
+    ],
+    "exit": 0,
+    "log": "prepare-1.log",
+    "logSha256": "9067b1ac263d8015a2d871821fb12262a371013b6e72ab9a5cbb561eed918217"
+  }
+]

@@ -503,3 +503,21 @@ class MappingMeasuresSuite extends FunSuite:
     assert(value.isRight, value.toString)
     assertEquals(value.toOption.get.viewFingerprint, ViewFingerprint.of(withoutHierarchy))
   }
+
+  test("source-conditioned mass refuses external destinations even when row sums to one") {
+    invalid(
+      NormalizedScoreMass
+        .sourceTargets(universe.id, prior, 1.0, Map(destination -> 0.4, external -> 0.6), scoring),
+      "normalizedScoreMass"
+    )
+    val value = NormalizedScoreMass
+      .sourceTargets(universe.id, prior, 1.0, Map(destination -> 1.0), scoring)
+      .toOption
+      .get
+    assertEquals(value.population, NormalizationPopulation.AdmittedSourceTargets)
+    assertEquals(value.mass(destination), 1.0)
+    assertEquals(
+      NormalizedScoreMass.of(universe.id, prior, 1.0, value.mass, scoring).toOption.get.population,
+      NormalizationPopulation.SuppliedDestinations
+    )
+  }

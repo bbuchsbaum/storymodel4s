@@ -1,0 +1,34 @@
+[
+  {
+    "name": "source-revision",
+    "sourceFile": "tools/release/qualify-source-cli.py",
+    "sourceSha256": "1efea18a2ea3d15f196958cd90c028c970f0c1108c1b853464794819493f46ab",
+    "mutantSha256": "d34640308a52aef4967dba2b37a45aaff2c7ef9fb8bc26a7b6135f12d24cc1ba",
+    "compiled": true,
+    "exit": 1,
+    "namedFailure": "test_wrong_revision_and_dirty_source_refuse",
+    "failingTests": [
+      "test_wrong_revision_and_dirty_source_refuse"
+    ],
+    "errors": 0,
+    "testsRun": 13,
+    "siblingTestsPassed": 12,
+    "rawLogSha256": "b615f57c30279d102a1f5ce14c19387daa6c8e822c4b71224de7c0abb510a99b"
+  },
+  {
+    "name": "notice-artifact",
+    "sourceFile": "tools/test_cli_distribution.py",
+    "sourceSha256": "4dc82c03c3fd7bc38ff5f444d34ddc76cc2574bcc6bac3f1f375293509ce18c4",
+    "mutantSha256": "8d758951cfa349ab37eb5f5beb37d195d03be152261e05814957d5118f68a1b0",
+    "compiled": true,
+    "exit": 1,
+    "namedFailure": "test_supplement_is_bound_to_exact_dependency_bytes",
+    "failingTests": [
+      "test_supplement_is_bound_to_exact_dependency_bytes"
+    ],
+    "errors": 0,
+    "testsRun": 13,
+    "siblingTestsPassed": 12,
+    "rawLogSha256": "39ddb8e32d86d0131bada23ab51a9e57b7d4d89f2860e899c29492380e9b088d"
+  }
+]

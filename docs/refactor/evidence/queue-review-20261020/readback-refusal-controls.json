@@ -1,0 +1,25 @@
+{
+  "scope": "In-memory synthetic projection substitutions only; live tracker unchanged.",
+  "cases": [
+    {
+      "synthetic_tampering": "body",
+      "outcome": "refused",
+      "reason": "Full projected field differs: bd-01M50K95JAQB34R876FWMV85J0/body"
+    },
+    {
+      "synthetic_tampering": "dependency",
+      "outcome": "refused",
+      "reason": "Actual E1 resource edge missing"
+    },
+    {
+      "synthetic_tampering": "relation",
+      "outcome": "refused",
+      "reason": "Actual integration containment missing"
+    },
+    {
+      "synthetic_tampering": "tag",
+      "outcome": "refused",
+      "reason": "Actual integration tranche tag missing"
+    }
+  ]
+}

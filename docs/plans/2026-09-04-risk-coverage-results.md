@@ -1,5 +1,15 @@
 # Risk–coverage on the Sherlock arms, and what it says about the shipped decode
 
+**Instrument status, 15 October 2026:** the table and interpretation below are preserved as
+historical adverse evidence. They do not establish risk–coverage for the final emitted
+decision: the old instrument ranks raw-argmax mass even when decoding chooses another anchor,
+and removes missing decisions/scores before constructing its coverage denominator. Nominal
+coverage labels can also differ from attained coverage under ties. A random-order estimate
+inside an arm's interval does not by itself establish the stated chance comparison.
+The positional `risk_coverage.py` command now refuses before reading gold. No corrected
+historical result or new gold read is claimed here; the fixed-support emitted-decision repair
+and ledgered recomputation remain on Mote `bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ`.
+
 W1 item 5 of `2026-09-04-own-the-metric.md`. The plan argues that calibrated abstention is where this
 design genuinely wins and that the abstention *rate* cannot show it, because higher is neither better
 nor worse. The curve can: accuracy as a function of how much of the recall you answer for, and the

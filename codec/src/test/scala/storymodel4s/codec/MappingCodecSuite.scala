@@ -679,3 +679,86 @@ class MappingCodecSuite extends FunSuite:
     )
     assertEquals(MappingCodecs.encode(decoded), expectedEncoding)
   }
+
+  test("supplied conditional measure survives decoding and binds population into identity") {
+    val original = miniature
+    val unit = original.outcomes.head
+    val prior = ReferencePriorId.unsafe("synthetic-conditional-control")
+    val values = unit.measures.raw.head.values
+    assert(values.keys.forall { case Destination.Target(_) => true; case _ => false })
+    val policies = MappingPolicies
+      .of(
+        original.policies.inference,
+        original.policies.context,
+        original.policies.candidate,
+        ReferencePrior.Declared(prior),
+        original.policies.decision,
+        original.policies.universe
+      )
+      .toOption
+      .get
+    def record(conditional: Boolean): MappingResult =
+      val normalized =
+        (if conditional then
+           NormalizedScoreMass
+             .sourceTargets(policies.universe.id, prior, 1.0, values, unit.stages.get.inference)
+         else
+           NormalizedScoreMass.of(
+             policies.universe.id,
+             prior,
+             1.0,
+             values,
+             unit.stages.get.inference
+           )
+        ).toOption.get
+      val measures = UnitMeasures.of(unit.measures.raw, Some(normalized), None, None).toOption.get
+      val row = UnitOutcome
+        .computed(
+          unit.unit,
+          measures,
+          unit.links,
+          unit.decision.get.basis,
+          unit.decision.get.request,
+          unit.stages.get
+        )
+        .toOption
+        .get
+      MappingResult
+        .checked(
+          original.inventory,
+          original.source,
+          policies,
+          original.roles,
+          original.ledger,
+          row +: original.outcomes.tail
+        )
+        .toOption
+        .get
+    val conditional = record(true)
+    val legacy = record(false)
+    assertNotEquals(conditional.digest, legacy.digest)
+    val decoded = roundTrip(conditional, context(conditional))
+    assertEquals(
+      decoded.outcomes.head.measures.normalized.get.population,
+      NormalizationPopulation.AdmittedSourceTargets
+    )
+    assert(!MappingCodecs.encode(legacy).contains("\"population\""))
+    val wrongScope = MappingCodecs
+      .encode(conditional)
+      .replace("unit/nominated-admitted-source-targets", "unit/supplied-destinations")
+    assert(MappingCodecs.decode(wrongScope, context(conditional)).isLeft)
+    def stripPopulation(value: Json): Json = value.arrayOrObject(
+      value,
+      rows => Json.fromValues(rows.map(stripPopulation)),
+      obj =>
+        Json.fromJsonObject(
+          io.circe.JsonObject.fromIterable(
+            obj.toVector.filterNot(_._1 == "population").map((key, v) => key -> stripPopulation(v))
+          )
+        )
+    )
+    val originalJson = MappingCodecs.toJson(conditional)
+    val stripped = stripPopulation(originalJson)
+    assert(stripped != originalJson)
+    assert(decode(stripped, context(conditional)).isLeft)
+  }

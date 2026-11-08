@@ -6,6 +6,15 @@ confidence. The old positional CLI and prediction-dependent `label` helper are r
 `score_ladder.py` refuses before reading gold until its separate readout-migration ticket
 adopts this contract. Do not use a historical script to bypass the fixed denominator.
 
+The positional `risk_coverage.py` command also refuses before any gold or prediction read.
+Its historical calculation joined raw-argmax confidence to potentially different emitted
+decisions and dropped missing decisions/scores before defining coverage. Its numerical helpers
+remain only for auditing the archived calculation. Replacement risk–coverage requires the
+same frozen unit/support identities, complete outcomes, and separately checked emitted-decision
+score evidence; that replacement is not yet qualified. See instrument bead
+`bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ`. Retiring the unsafe route does not complete its repair or
+recompute any historical gold result.
+
 ## Freeze observation identity
 
 Export from a committed revision with the actual pipeline segmenter. This opens raw recall

@@ -1,0 +1,85 @@
+--- risk_coverage.py
++++ mutant/risk_coverage.py
+@@ -15,7 +15,7 @@
+ import statistics
+ import sys
+ 
+-from gold_scene import gold_subject_of, scene_at
++from gold_scene import cluster_boot, gold_subject_of, load_gold, scene_at
+ 
+ DEFAULT_CONFIDENCE = "mapAnchorMass"
+ COVERAGE_GRID = [i / 100.0 for i in range(5, 101, 5)]
+@@ -102,10 +102,69 @@
+ 
+ 
+ def main(argv):
+-    print("LEGACY_RISK_COVERAGE_RETIRED: requires frozen unit/support identities and "
+-          "qualified emitted-decision scores; see SCORING.md. No gold has been opened.",
+-          file=sys.stderr)
+-    return 2
++    args = argv[1:]
++    tolerance, confidence_column = 0, DEFAULT_CONFIDENCE
++    positional = []
++    i = 0
++    while i < len(args):
++        if args[i] == "--tolerance":
++            tolerance = int(args[i + 1])
++            i += 2
++        elif args[i] == "--confidence":
++            confidence_column = args[i + 1]
++            i += 2
++        else:
++            positional.append(args[i])
++            i += 1
++    if len(positional) < 3 or len(positional) % 2 == 0:
++        print(__doc__)
++        return 2
++
++    gold = load_gold(positional[0])
++    arms = [
++        (positional[i], positional[i + 1]) for i in range(1, len(positional) - 1, 2)
++    ]
++
++    print(f"confidence: {confidence_column}   scene tolerance: {tolerance}")
++    for name, directory in arms:
++        rows, dropped = load_scored(directory, confidence_column)
++        per_part = with_gold(rows, gold)
++        if not per_part:
++            print(f"   {name:22s} no participant with gold")
++            continue
++        pooled = [u for k in sorted(per_part) for u in per_part[k]]
++        points = curve(pooled, tolerance)
++        area = aurc(pooled, tolerance)
++        floor = shuffled_aurc(pooled, tolerance)
++        lo, hi = cluster_boot(per_part, lambda u: aurc(u, tolerance))
++        at = {c: a for c, a in points}
++
++        def nearest(target):
++            key = min(at, key=lambda c: abs(c - target))
++            return at[key]
++
++        note = (
++            f"  ({dropped} units dropped for an unwritten confidence)"
++            if dropped
++            else ""
++        )
++        print(
++            f"   {name:22s} AURC {area:5.2f}  95% CI "
++            f"[{'  n/a' if lo is None else f'{lo:5.2f}'}, "
++            f"{'  n/a' if hi is None else f'{hi:5.2f}'}]"
++            f"  random-order AURC {floor:5.2f}"
++        )
++        print(
++            f"   {'':22s} accuracy at coverage: "
++            f"25% {nearest(0.25):5.1f}   50% {nearest(0.50):5.1f}   "
++            f"75% {nearest(0.75):5.1f}   100% {nearest(1.00):5.1f}{note}"
++        )
++        if lo is not None and lo <= floor <= hi:
++            print(
++                f"   {'':22s} random ordering falls inside this arm's CI: on these units the "
++                f"confidence does not order them better than chance"
++            )
++    return 0
+ 
+ 
+ if __name__ == "__main__":

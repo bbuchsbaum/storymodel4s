@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "sbt",
+    "-batch",
+    "-J-Xmx4G",
+    "-J-XX:ActiveProcessorCount=4",
+    "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/tmp",
+    "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/boot",
+    "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/global",
+    "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/staging",
+    "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/ivy",
+    "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-shortipc/fresh-baseline/repositories",
+    "-Dsbt.override.build.repos=true",
+    "scalafmtSbt",
+    "githubWorkflowGenerate"
+  ],
+  "jdk": "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home",
+  "exit": 0,
+  "logSha256": "011d2a80a340d59149b995ca126b040360ad67013c795f0a0f8899f06b80d62c"
+}

@@ -44,13 +44,28 @@ object MappingResult:
           val derived = entry.provenance.asInstanceOf[StageProvenance.Derived]
           (derived.execution, derived.member)
       }.distinct
+      val referenceOwners = ledger.entries.collect {
+        case entry if entry.provenance.isInstanceOf[StageProvenance.ReferenceDerived] =>
+          entry.provenance.asInstanceOf[StageProvenance.ReferenceDerived].execution
+      }.distinct
       val unboundLocalLinks = outcomes.flatMap(_.links).exists { link =>
         link.derivation == MeasureDerivation.Supplied &&
         (link.gate != GateOutcome.NotGated ||
           link.fidelity.isInstanceOf[FidelityStatus.Assessed] ||
           link.termSupport.isInstanceOf[TermSupportStatus.Evaluated])
       }
-      if owners.isEmpty && unboundLocalLinks then
+      if referenceOwners.nonEmpty then
+        if owners.nonEmpty || referenceOwners.size != 1 then
+          Left(MappingRefusal.BindingMismatch("execution"))
+        else
+          referenceOwners.head.record.flatMap { expected =>
+            Either.cond(
+              result.digest == expected.digest,
+              result,
+              MappingRefusal.BindingMismatch("executed reference projection")
+            )
+          }
+      else if owners.isEmpty && unboundLocalLinks then
         Left(MappingRefusal.BindingMismatch("local evidence execution required"))
       else if owners.isEmpty then Right(result)
       else if owners.size != 1 then Left(MappingRefusal.BindingMismatch("execution"))
@@ -71,6 +86,15 @@ object MappingResult:
   ): Either[MappingRefusal, MappingResult] =
     MappingRun
       .parts(execution, member)
+      .flatMap(p =>
+        validate(execution.inventory, execution.source, p.policies, p.roles, p.ledger, p.outcomes)
+      )
+
+  private[align] def referenceExecuted(
+      execution: MappingRun.ReferenceExecution
+  ): Either[MappingRefusal, MappingResult] =
+    MappingRun
+      .referenceParts(execution)
       .flatMap(p =>
         validate(execution.inventory, execution.source, p.policies, p.roles, p.ledger, p.outcomes)
       )
@@ -266,7 +290,8 @@ private[align] object MappingResultRender:
               number(m.temperature),
               weighted(m.mass),
               m.stage.digest.hex
-            )
+            ) ++ (if m.population == NormalizationPopulation.SuppliedDestinations then Vector.empty
+                  else Vector(m.population.scope))
           )
         )
       ),

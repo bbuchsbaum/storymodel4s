@@ -1,0 +1,65 @@
+{
+  "schema": "storyatlas4s-producer-compatibility/v1",
+  "status": "failed",
+  "qualification": "LocallyObserved",
+  "publication": "not-published",
+  "startedUnix": 1792121721.165035,
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home/bin/java",
+        "-version"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234",
+      "log": "command-000.log",
+      "expectedExit": 0,
+      "exit": 0,
+      "logSha256": "42a7cc673edfb4df1649add8bb6469e37e0b05fa2875c5b0402da69b93273835"
+    },
+    {
+      "argv": [
+        "sbt",
+        "-batch",
+        "-J-Xmx6G",
+        "-J-XX:ActiveProcessorCount=4",
+        "-J-Djava.io.tmpdir=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/tmp",
+        "-Dsbt.boot.directory=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/boot",
+        "-Dsbt.global.base=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/global",
+        "-Dsbt.global.staging=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/staging",
+        "-Dsbt.ivy.home=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/ivy",
+        "-Dsbt.repository.config=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/repositories",
+        "-Dsbt.override.build.repos=true",
+        "-Dstoryatlas4s.storymodel4s.build=/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-s1-candidate-c69a5d75/checkout",
+        "set ThisBuild / tlFatalWarnings := true",
+        "compileAll",
+        "testAll",
+        "app/fastLinkJS",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "cwd": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/checkout",
+      "log": "command-001.log",
+      "expectedExit": 0,
+      "exit": 1,
+      "logSha256": "af410a6e95f46765b77afbdaa251672fc3063d6a9631aeb5bf107ebb1571e74e"
+    }
+  ],
+  "producer": "c69a5d754a21fa455c64901334d9509278401091",
+  "consumer": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "producerReceiptSha256": "4f8131c0a52e48e5592b7c4a665f2e063fef0ac26850a7055ce3485343697caa",
+  "heapGiB": 6,
+  "producerRoute": "explicit isolated source override; consumer default pin remains eb48a5622bf02d08c175d2956811fd35d4aaeb92",
+  "intaglioPin": "2fa5c682f4a95b8e73daad78dd9302d7aff46e11",
+  "uiQualification": "not performed; unchanged consumer compile/tests/bundle only",
+  "isolation": {
+    "boot": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/boot",
+    "global": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/global",
+    "staging": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/staging",
+    "ivy": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/ivy",
+    "coursier": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/coursier",
+    "config": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/config",
+    "tmp": "/Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/tmp"
+  },
+  "error": "command exit differs; inspect /Volumes/My Passport for Mac/agent-work/storymodel4s/reality-check-20261015-atlas-consumer-286b5234/command-001.log",
+  "finishedUnix": 1792121733.569346
+}

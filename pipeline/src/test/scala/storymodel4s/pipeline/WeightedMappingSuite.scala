@@ -153,6 +153,29 @@ class WeightedMappingSuite extends FunSuite:
       val batch = right(MappingPipeline.batch(prepared, config))
       parity(batch.outcomes.head.run.get)
       val (files, manifest) = right(WeightedMapping.artifacts(batch, weights))
+      val metadata = right(io.circe.parser.parse(manifest)).hcursor.downField("metadata")
+      val members = right(metadata.get[Vector[Json]]("members"))
+      assertEquals(
+        members.map(m => right(m.hcursor.get[String]("lambda"))),
+        Vector("0/1", "1/2", "1/1")
+      )
+      assertEquals(
+        members.map(m => right(m.hcursor.get[String]("dispatchedMember"))),
+        Vector("Reference", "Weighted", "Reconstruction")
+      )
+      assertEquals(
+        members.map(m => right(m.hcursor.get[Double]("temperature"))),
+        Vector(1.0, 0.15, 0.15)
+      )
+      assertEquals(
+        members.map(m => right(m.hcursor.get[String]("kind"))),
+        Vector("NormalizedScoreMass", "ModelPosterior", "ModelPosterior")
+      )
+      assertEquals(right(members(1).hcursor.get[String]("decisionPolicy")), "RawArgmax")
+      assertEquals(
+        right(members(2).hcursor.get[String]("decisionPolicy")),
+        batch.outcomes.head.run.get.execution.reconstruction.profile.decision.fingerprint.hex
+      )
       println(
         "WEIGHTED_MAPPING_FIXTURE\tmultipart\t" + Canonical.print(
           Json.obj((("manifest.json" -> manifest) +: files).map((n, s) => n -> Json.fromString(s))*)
