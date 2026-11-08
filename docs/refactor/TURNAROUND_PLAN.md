@@ -1,5 +1,8 @@
 # Storymodel4s: delivery turnaround plan
 
+> **Historical record (2026-11-08).** Consultant proposal; superseded by
+> [docs/ROADMAP.md](../ROADMAP.md).
+
 > Historical consultant proposal. Operative delivery and dependencies are in
 > [PLAN.md](PLAN.md), [BACKLOG.md](BACKLOG.md) and live Mote, as reconciled on
 > 19 and 22 September 2026. Do not import this proposal as a second queue.

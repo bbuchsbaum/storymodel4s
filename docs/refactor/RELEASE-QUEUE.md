@@ -1,5 +1,8 @@
 # Current release queue
 
+> **Historical record (2026-11-08).** The release lane is now one track in
+> [docs/ROADMAP.md](../ROADMAP.md). Kept for its acceptance records.
+
 ## 15 October: publication workstreams
 
 The owner authorized completing the four infrastructure actions below. This table supersedes

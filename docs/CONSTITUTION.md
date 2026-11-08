@@ -1,5 +1,8 @@
 # storymodel4s — constitution
 
+> **Historical record (2026-11-08).** A draft that was never ratified. Its commitments are carried
+> by [VISION.md](../VISION.md) and the AGENTS.md design contract.
+
 **Status: DRAFT, open for dissent** on the mote `constitution` topic. Nothing here is settled.
 It is a file rather than only a board thread because a successor should need one document, not
 three hundred posts — see Article X.

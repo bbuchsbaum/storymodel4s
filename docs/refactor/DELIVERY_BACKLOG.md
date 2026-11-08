@@ -1,5 +1,8 @@
 # Delivery backlog overview
 
+> **Historical record (2026-11-08).** Consultant planning keys; superseded by
+> [docs/ROADMAP.md](../ROADMAP.md).
+
 These are historical consultant planning keys, not live tracker items. Their import
 was reconciled into [BACKLOG.md](BACKLOG.md), [BACKLOG.json](BACKLOG.json) and live
 Mote on 19 September, with the temporal-workflow amendment on 22 September. Use

@@ -1,0 +1,218 @@
+{
+  "schema": "storymodel4s.mapping-decomposition/v1",
+  "protocolSha256": "586f4f0007e340143144f6794541dbdfc85a80e7ab188f2ae49158eddb12c652",
+  "scriptSha256": "70442932bca960709ce9c601119cb2b8e32bb12fd674498afaf8d6d6bb0a5a1c",
+  "goldSha256": "68cc307c19cfd429a3bd0eda84ee18d0152c87444d33a79246a7cd64d3763753",
+  "precheckUnits": 1744,
+  "eligibleUnits": 1499,
+  "participantsWithGold": 10,
+  "participantAveragePercent": {
+    "no-trace": 0.0,
+    "retrieval-miss": 25.32,
+    "ranking-miss": 16.42,
+    "decode-rescue": 24.6,
+    "decode-loss": 5.32,
+    "hit": 28.33,
+    "localExact": 33.65,
+    "finalExact": 60.95,
+    "localWithin1": 43.53,
+    "finalWithin1": 79.41,
+    "nonSourceDominant": 85.7
+  },
+  "pooledPercent": {
+    "no-trace": 0.0,
+    "retrieval-miss": 25.62,
+    "ranking-miss": 13.94,
+    "decode-rescue": 25.68,
+    "decode-loss": 4.54,
+    "hit": 30.22,
+    "localExact": 34.76,
+    "finalExact": 65.24,
+    "localWithin1": 43.9,
+    "finalWithin1": 82.66,
+    "nonSourceDominant": 85.99
+  },
+  "goldNominationLevel": {
+    "scene-only": 143,
+    "both": 500,
+    "none": 384,
+    "row-only": 472
+  },
+  "perParticipant": {
+    "NN03_ANT_202231_final": {
+      "eligible": 156,
+      "classes": {
+        "ranking-miss": 30,
+        "hit": 40,
+        "decode-rescue": 37,
+        "retrieval-miss": 37,
+        "decode-loss": 12
+      },
+      "extra": {
+        "localExact": 52,
+        "finalExact": 92,
+        "localWithin1": 63,
+        "finalWithin1": 126,
+        "nonSourceDominant": 141
+      }
+    },
+    "NN04_ATE_163931_final": {
+      "eligible": 86,
+      "classes": {
+        "ranking-miss": 15,
+        "decode-rescue": 18,
+        "hit": 28,
+        "retrieval-miss": 18,
+        "decode-loss": 7
+      },
+      "extra": {
+        "localExact": 35,
+        "finalExact": 47,
+        "localWithin1": 49,
+        "finalWithin1": 73,
+        "nonSourceDominant": 71
+      }
+    },
+    "NN05_MUN_151631_final": {
+      "eligible": 0,
+      "classes": {},
+      "extra": {}
+    },
+    "NN06_SQT_213031_final": {
+      "eligible": 100,
+      "classes": {
+        "decode-rescue": 25,
+        "hit": 18,
+        "ranking-miss": 20,
+        "retrieval-miss": 31,
+        "decode-loss": 6
+      },
+      "extra": {
+        "localExact": 24,
+        "finalExact": 52,
+        "localWithin1": 38,
+        "finalWithin1": 76,
+        "nonSourceDominant": 86
+      }
+    },
+    "NN07_SKS_213031_final": {
+      "eligible": 90,
+      "classes": {
+        "ranking-miss": 19,
+        "decode-rescue": 18,
+        "hit": 17,
+        "retrieval-miss": 29,
+        "decode-loss": 7
+      },
+      "extra": {
+        "localExact": 24,
+        "finalExact": 39,
+        "localWithin1": 31,
+        "finalWithin1": 47,
+        "nonSourceDominant": 80
+      }
+    },
+    "NN08_OLZ_224031_final": {
+      "eligible": 154,
+      "classes": {
+        "decode-rescue": 33,
+        "retrieval-miss": 44,
+        "hit": 48,
+        "ranking-miss": 21,
+        "decode-loss": 8
+      },
+      "extra": {
+        "localExact": 56,
+        "finalExact": 97,
+        "localWithin1": 71,
+        "finalWithin1": 123,
+        "nonSourceDominant": 125
+      }
+    },
+    "NN11_NMA_233131_final": {
+      "eligible": 124,
+      "classes": {
+        "retrieval-miss": 40,
+        "decode-rescue": 30,
+        "ranking-miss": 22,
+        "hit": 24,
+        "decode-loss": 8
+      },
+      "extra": {
+        "localExact": 32,
+        "finalExact": 63,
+        "localWithin1": 44,
+        "finalWithin1": 92,
+        "nonSourceDominant": 107
+      }
+    },
+    "NN13_DII_241731_final": {
+      "eligible": 303,
+      "classes": {
+        "hit": 134,
+        "decode-rescue": 92,
+        "ranking-miss": 17,
+        "retrieval-miss": 54,
+        "decode-loss": 6
+      },
+      "extra": {
+        "localExact": 140,
+        "finalExact": 250,
+        "localWithin1": 154,
+        "finalWithin1": 282,
+        "nonSourceDominant": 261
+      }
+    },
+    "NN15_DBF_242231_final": {
+      "eligible": 80,
+      "classes": {
+        "retrieval-miss": 15,
+        "decode-rescue": 20,
+        "hit": 32,
+        "ranking-miss": 11,
+        "decode-loss": 2
+      },
+      "extra": {
+        "localExact": 34,
+        "finalExact": 59,
+        "localWithin1": 40,
+        "finalWithin1": 69,
+        "nonSourceDominant": 59
+      }
+    },
+    "NN16_DBN_242731_final": {
+      "eligible": 79,
+      "classes": {
+        "hit": 20,
+        "retrieval-miss": 13,
+        "ranking-miss": 20,
+        "decode-rescue": 22,
+        "decode-loss": 4
+      },
+      "extra": {
+        "localExact": 24,
+        "finalExact": 47,
+        "localWithin1": 33,
+        "finalWithin1": 62,
+        "nonSourceDominant": 75
+      }
+    },
+    "NN17_DBE_242331_final": {
+      "eligible": 327,
+      "classes": {
+        "decode-rescue": 90,
+        "ranking-miss": 34,
+        "retrieval-miss": 103,
+        "hit": 92,
+        "decode-loss": 8
+      },
+      "extra": {
+        "localExact": 100,
+        "finalExact": 232,
+        "localWithin1": 135,
+        "finalWithin1": 289,
+        "nonSourceDominant": 284
+      }
+    }
+  }
+}

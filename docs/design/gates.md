@@ -1,5 +1,8 @@
 # Quality gates (v0 — provisional)
 
+> **Historical record (2026-11-08).** Provisional v0 gate names (G0-G3), which collide with later
+> plans. Not in force.
+
 All thresholds are provisional engineering targets, revisited after five gold
 stories and compared with inter-annotator ceilings (design record §32.5).
 Blocking gates: G0, G1, G2, temporal acyclicity.

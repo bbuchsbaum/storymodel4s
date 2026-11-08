@@ -1,350 +1,228 @@
 # AGENTS.md
 
-storymodel4s is a Scala 3 library for neurosymbolic representation of stories and videos, human
-recall of them, and the mapping between the two, for downstream psychology and neuroimaging work.
-The design record is `NARRATIVE_PROCESS_ALIGNMENT_NOTES.md`. The delivery index is
-`docs/refactor/PLAN.md`, and the tracker is Mote (`.mote/`, `mote ready`).
-
-This file is the short, current guide. Longer rationale and the measured cases behind each rule
-live in linked documents. **Rule ids are stable, so cite them:** L1-L10, T1-T7, SD1-SD8, design
-rules 1-14 and governance items 1-7. The text before the 2026-09-23 refactor is
-`git show 604080fc:AGENTS.md`, which is on `main`. "§4" in older documents means rule 4
-(evidence), and "§5" and "§7" mean governance items 5 and 7. Section headings here are unnumbered
-so they don't collide with those ids.
+storymodel4s is a Scala 3 library for structured, symbolic representation of stories and films,
+of people's recall of them, and of the mapping between the two, for psychology and neuroimaging.
 
 | Read | For |
 |---|---|
-| This file | how work runs, the design contract, landing, build |
-| [docs/EVIDENCE.md](docs/EVIDENCE.md) | rule 4 in full: what counts as proof, how to run a gate, how to scope a finding |
-| [docs/design/design-contract-notes.md](docs/design/design-contract-notes.md) | the cases behind design rules 1-14 |
-| [docs/design/unforgeable-types.md](docs/design/unforgeable-types.md) | the working pattern for rule 8 |
-| [docs/governance/fleet-mode.md](docs/governance/fleet-mode.md) | fleet protocol, liveness history, single-developer mode (archived) |
+| [VISION.md](VISION.md) | what we are building and the commitments that don't change |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | the one current plan: milestones, the finish line, open decisions |
+| This file | how work runs, the design contract, build and landing |
+| [docs/adr/README.md](docs/adr/README.md) | architecture decisions, with one status each |
+| [docs/EVIDENCE.md](docs/EVIDENCE.md) | what counts as proof of a fix or of a measurement |
 
-## How work runs (operating mode, owner decision 2026-10-06)
+Mote (`.mote/`, `mote ready`) is the tracker, and it holds current status. Documents hold
+direction, not status. Documents bannered as historical (listed in
+[docs/README.md](docs/README.md)) are records, not guidance.
 
-Use one primary agent, with at most one helper or independent reviewer at a time. The primary
-agent coordinates the work and prepares integration within the owner's authorized scope.
-The [October stocktake](docs/refactor/STATE-20261006.md) records the recovered work and restart queue.
+## How work runs
 
-- **Mote is authoritative for tickets and ownership.** Use an existing bead, set your actor per
-  call (`--actor`) or with `MOTE_ACTOR`, and run `mote begin` before editing. Reserve narrow paths,
-  respect live claims, and release unfinished work with a useful handoff. Never run `mote actor
-  set` in a shared checkout: it relabels other actors' posts.
-- **One writer per scope.** Use the second agent for a separable task or an independent review.
-  Keep decisions and evidence on the relevant Mote bead; communicate with the owner in chat.
-  Announce governing-file edits in chat before making them.
-- **Review exact commits.** A reviewer who did not author the change checks the exact SHA.
-  Preserve the scoped gate, test totals, mutation evidence where required, and cold review
-  protections below. Documentation-only changes need review and a format check (T2).
-- **Run one heavy gate at a time** in a standalone clone or verified export. Check for another
-  active build before starting. No Fray daemon, gate-lock card, historical lead, staffing role
-  or message-board acknowledgment is required in this mode. Existing Fray records are historical
-  evidence; use Fray again only when the owner requests it.
-- **Preserve other work.** Do not close a bead holding another actor's live reservations. Keep
-  commits narrow and record the exact landing and remote state separately. Cleanup, publication
-  and release follow the owner's authorization.
-- **The audit trail is git and Mote.** Record what changed, commands and results, remaining
-  acceptance, and the next action. A saved receipt or closed child is not proof of its parent.
+Since 2026-11-08 the owner has ruled that we do the best engineering we can and do not let the
+good be the enemy of progress.
 
-This mode supersedes fleet staffing, timers, escalation ladders, board announcements and board
-lock requirements in older documents and tickets. Design rules 1-14, evidence discipline,
-cross-repository consumer checks and exact-revision review remain in force. Historical operating
-instructions are available with `git show 0500bc10:AGENTS.md`.
+- **Work from a Mote bead.** Set the actor per call (`--actor` or `MOTE_ACTOR`), and run
+  `mote begin` before editing. Close the bead when its exact commit lands. Never run
+  `mote actor set` in a shared checkout.
+- **Keep one writer per scope.** A second agent should take a separable task or an independent
+  review. Communicate with the owner in chat.
+- **Size beads to land.** A bead is about a day's work with one acceptance criterion. Prefer the
+  smallest slice that lands.
+- **Commit early to a branch.** Uncommitted work is lost. Never let a scratch clone, `/tmp` or an
+  ignored directory hold the only copy of anything. Push work-in-progress branches you care
+  about, because in early November 2026 a deleted ignored directory took unlanded branches with it.
+- **Review substantial work cold.** A fresh-context agent, or Codex, reviews the exact commit.
+  Rewriting your own work catches prose errors; only running it catches a wrong number.
+- **Split findings into two kinds.** A BLOCK is correctness, a broken boundary, or an invalid
+  measurement, and it holds a landing. Anything else becomes a follow-up bead.
+- **Match ceremony to the claim.**
+  - Development work on seen data is engineering: commit inputs, commands and results, and move
+    on.
+  - Pre-registration and frozen gold apply only to held-out or new-dataset validation, and to
+    claims of accuracy or superiority.
 
-## Historical fleet liveness and current delivery rules
-
-L1-L5 and L9-L10 are retained for stable historical citations; their fleet timers and staffing
-requirements are inactive in the October mode. L6-L8 and the technical delivery rules remain useful.
-
-- **L1. Zero-ship is a P0.** If no non-`.mote` commit lands on `main` in 24 hours, diagnosing the
-  merge path comes before any review.
-- **L2. A landable slice has a named lander within an hour.** "I will not land my own work" is
-  always followed by who will.
-- **L3. A block is priced.** A BLOCK carries a patch, or a named owner who has accepted the fix,
-  with a deadline. Otherwise it is marked *advisory, not blocking*, and it expires after 4 hours.
-- **L4. Reap the ledger before reading it.** Superseded, abandoned, landed and
-  landed-out-of-band rows emit no blocking reasons and stay out of the default queue.
-- **L5. A design thread terminates.** Within 50 posts or 24 hours it produces a landed change, a
-  bead with an owner, or a written "not doing this".
-- **L6. No disclaimer rituals.** State what you are doing, and omit what you are not.
-- **L7. Correct in place, once, then act.**
-- **L8. Prefer the smallest landable slice** to the most complete analysis.
-- **L9. These rules expire.** If they don't raise the number of landed commits within a week,
-  replace them rather than add to them.
-- **L10. No permanent single point of failure.** The ladder is the named actor, then the lead,
-  then any active actor who is neither proposer nor reviewer, then the owner. "Active" is
-  measured with `tools/who-is-live.sh`, never with a presence lease. A recut that only swaps a
-  stale role-holder is bookkeeping, not a new proposal.
-- **T1. Size beads to land.** A bead is about a day of work with one acceptance criterion. Split
-  epics into child beads before starting them, close each child when its exact SHA lands, and let parents close
-  with their children.
-- **T2. Land reviewed slices promptly.** Don't batch many slices behind one gate. Changes that
-  touch only docs or `.mote` are gate-inert: they need review and a format check, not a full
-  gate.
-- **T3. Tier the gate.** A bounded slice lands on the `tools/reference-scope.sh` modules, run on
-  every platform they build, serially, with bound totals. The full `checkAll` with CI's
-  fatal warnings runs on `main` on a schedule. Red on `main` is a P0 that preempts new work.
-- **T4. Price every review finding** as BLOCK or FOLLOW-UP.
-  - BLOCK means correctness, forgeability, measurement validity, or a failing witness.
-  - Only a BLOCK holds a landing.
-  - A FOLLOW-UP becomes its own bead, and the reviewed slice lands.
-- **T5. Waiting is the main cost.** Record a blocker and its next action on the bead, and raise
-  decisions requiring the owner in chat. Keep review findings attached to the exact candidate.
-- **T6. Agree the seam before splitting work.** For cross-owner work, record the contract and a
-  failing consumer test, written from outside the module, first. Use at most two agents.
-- **T7. Count what passed.** Report sbt's `Passed`, `Failed` and skipped counts. `Total`
-  includes skipped tests.
-
-The measured cases behind L1-L10 are in `fleet-mode.md`. T1-T7 came from 2026-09-22/23: 111
-commits landed and 49 more waited reviewed on an integration branch, while few beads closed.
-
-## Standing rules carried over from single-developer mode
-
-- **SD1. A mechanism replaces confidence.** A claim that needs a reviewer also needs a runnable
-  falsifier. Mutation is the default: delete the guard, watch a *named* test fail, restore it.
-- **SD2. Landing authority** has three parts:
-  - a green gate, scoped per T3, on the exact merge result;
-  - a clean merge-result tree over exactly the touched paths;
-  - bound test totals and command receipts, plus an independent reviewer's verdict on the exact
-    SHA.
-
-  The primary agent integrates within the owner's authorized scope. The gate log must contain
-  totals: a run with no totals did not run.
-- **SD3. Uncommitted is lost, and unreferenced is invisible.**
-  - Commit to a branch as soon as the code compiles.
-  - Never let a scratch clone or `/tmp` be the only copy of anything, including drafts.
-  - Before you conclude that work is gone, sweep `git fsck --dangling`.
-- **SD5. ADRs gate vocabulary.** No new module, dependency or public vocabulary without an ADR
-  line that records the rejected alternative. The owner decides ADRs. The primary agent may accept
-  amendments within scope the owner has approved, as it did for the S2 section on 2026-09-23.
-- **SD6. Read your work cold, in a separate pass,** with a fresh-context agent or reviewer. Never
-  approve in the same breath as authoring. Rereading catches prose. Only measurement catches a
-  wrong number or a wrong object.
-- SD4, SD7 and SD8 governed the one-developer protocol. They are archived in `fleet-mode.md`.
+Retired: the fleet, Fray, message-board, liveness (L1-L10), candidate and premerge protocols.
+Their text is in `docs/governance/fleet-mode.md` and in `git show 9b5a1f270:AGENTS.md`.
 
 ## Layout
 
-Flat module directories, `CrossType.Pure`, cross-built for JVM, Scala.js and Native unless the
-row says JVM-only. The namespace is flat: `storymodel4s.<module>`.
+The module directories are flat and use `CrossType.Pure`. Each module is cross-built for JVM,
+Scala.js and Native unless its row says JVM-only. Packages follow `storymodel4s.<module>`.
 
 | Module      | Package                   | Responsibility |
 |-------------|---------------------------|----------------|
-| `core`      | `storymodel4s.core`       | Opaque IDs, `TextSpan`/`SpanSet`, source atlas, claims/evidence/credence, provenance, content hashing |
-| `proposition` | `storymodel4s.proposition` | Canonical local semantic contract: partial, evidence-backed `PropositionChart` |
-| `amr-interop` | `storymodel4s.amr`      | Standards-compatible AMR adapter (PENMAN, checked graphs, conversion to and from charts); nothing outside depends on AMR types |
-| `features`  | `storymodel4s.features`   | Aligned feature tracks: typed spaces, estimates with coverage, window plans and reducers, derivation DAG, sidecars, feature-use ledger. Depends only on `core` |
-| `acquire`   | `storymodel4s.acquire`    | Autonomous acquisition protocol: task packets, proposal-only results, critic findings, typed patches, `ResolutionState` |
-| `story`     | `storymodel4s.story`      | Narrative ontology: entities, situations, contexts, relation layers, hierarchy, validators, `AlignmentSource` |
-| `document`  | `storymodel4s.document`   | Mention graph, exact-coreference quotient, projection to narrative nodes |
+| `core`      | `storymodel4s.core`       | Opaque IDs, `TextSpan`/`SpanSet`, source atlas, claims/evidence/credence, provenance, hashing |
+| `proposition` | `storymodel4s.proposition` | Partial, evidence-backed `PropositionChart` |
+| `amr-interop` | `storymodel4s.amr`      | AMR adapter (PENMAN, checked graphs, chart conversion); nothing depends on AMR types |
+| `features`  | `storymodel4s.features`   | Aligned feature tracks, window plans, derivation DAG, sidecars. Depends only on `core` |
+| `acquire`   | `storymodel4s.acquire`    | Acquisition protocol: task packets, proposals, critic findings, typed patches, resolution |
+| `story`     | `storymodel4s.story`      | Narrative ontology: entities, situations, contexts, relation layers, hierarchy, validators |
+| `document`  | `storymodel4s.document`   | Mention graph, coreference quotient, referent identity, projection to narrative nodes |
 | `recall`    | `storymodel4s.recall`     | Recall units, inventories, timing, discourse functions, recall relations and graph |
-| `align`     | `storymodel4s.align`      | Local evidence, costs, candidate policy, graph-HSMM inference, checked mapping records, readouts |
-| `interview` | `storymodel4s.interview`  | Autobiographical Interview: transcript atlas, detail atoms, target-episode induction, profiles |
-| `embed-core` | `storymodel4s.embed`     | Portable embedding contract (ADR 0001): fingerprints, spaces, batches, validated vectors, deterministic baselines, cache, remote policy |
-| `embed-grakern` | `storymodel4s.embed.grakern` | **JVM-only** structural WL-kernel channel over charts; grakern by pinned SHA (`-Dstorymodel4s.grakern.build=<checkout>` to override) |
-| `embed-onnx` | `storymodel4s.embed.onnx` | **JVM-only** local sentence-embedding channel with pinned model and tokenizer checksums |
+| `align`     | `storymodel4s.align`      | Local evidence, costs, candidates, graph-HSMM inference, mapping records, readouts |
+| `interview` | `storymodel4s.interview`  | Autobiographical Interview: transcript atlas, detail atoms, episodes, profiles |
+| `embed-core` | `storymodel4s.embed`     | Portable embedding contract: fingerprints, spaces, vectors, baselines, cache |
+| `embed-grakern` | `storymodel4s.embed.grakern` | **JVM-only** WL-kernel channel over charts; grakern by pinned SHA |
+| `embed-onnx` | `storymodel4s.embed.onnx` | **JVM-only** local sentence embeddings with pinned model checksums |
 | `view`      | `storymodel4s.view`       | Portable semantic view artifacts for Narrative Codex and Atlas |
 | `codec`     | `storymodel4s.codec`      | Canonical circe JSON codecs, mapping records and exchange |
-| `corpus`    | `storymodel4s.corpus`     | Portable corpus-intake contract (ADR 0018): coordinates, cells, segmentations, links, profiles, manifest, refusals; no I/O |
-| `corpus-intake` | `storymodel4s.corpus.intake` | **JVM-only** corpus readers (xlsx/zip/tsv), byte verifier, receipts; owns I/O, no semantics |
-| `media`     | `storymodel4s.media`      | **JVM-only** media acquisition (ADR 0007 §4): fixture manifests, ffprobe ingest, scene/caption workers; the only module that spawns processes |
-| `provider-parser` | `storymodel4s.provider.parser` | **JVM-only** AMR parser-provider contract with receipted transport and admission |
-| `provider-agent` | `storymodel4s.provider.agent` | **JVM-only** remote parser adapter (ADR 0008) with content-keyed record/replay |
-| `pipeline`  | `storymodel4s.pipeline`   | **JVM-only** orchestration and commands (`storyBuild`, exchange export); owns I/O and exit status, no semantics |
+| `corpus`    | `storymodel4s.corpus`     | Portable corpus-intake contract: coordinates, cells, segmentations, manifests; no I/O |
+| `corpus-intake` | `storymodel4s.corpus.intake` | **JVM-only** corpus readers, byte verifier, receipts |
+| `media`     | `storymodel4s.media`      | **JVM-only** media acquisition: ffprobe ingest, scene/caption/ASR workers; only module that spawns processes |
+| `provider-parser` | `storymodel4s.provider.parser` | **JVM-only** parser-provider contract with receipted transport |
+| `provider-agent` | `storymodel4s.provider.agent` | **JVM-only** remote parser adapter with content-keyed record/replay |
+| `pipeline`  | `storymodel4s.pipeline`   | **JVM-only** orchestration and commands; owns I/O and exit status, no semantics |
 | `fixtures`  | `storymodel4s.fixtures`   | Hand-authored War of the Ghosts model, paraphrases, interview example |
-| `laws`      | `storymodel4s.laws`       | Published Discipline law suites and ScalaCheck generators |
-| `embed-bench` | `storymodel4s.bench`    | **JVM-only** evaluation harness against checksum-verified frozen gold; no portable module depends on it |
+| `laws`      | `storymodel4s.laws`       | Discipline law suites and ScalaCheck generators |
+| `embed-bench` | `storymodel4s.bench`    | **JVM-only** evaluation harness; no portable module depends on it |
 
-## Build, test and mechanised checks
+## Build and test
 
-- The toolchain is Scala 3.7.4, sbt 1.12.14 and sbt-typelevel 0.8.7. Tests use munit and
-  munit-scalacheck, and the laws use discipline-munit. `Test / parallelExecution := false`.
-- **Gates.** `sbt testJVM` for a fast loop. A slice gate uses the modules printed by
-  `bash tools/reference-scope.sh "$(git merge-base main CAND)" CAND` (T3). The full gate is
-  `checkAll` (`compileAll; testAll; scalafmtCheckAll; scalafmtSbtCheck`). CI's setting is
-  `'set ThisBuild / tlFatalWarnings := true'`: keep `-Wunused:all -Wvalue-discard` clean. After
-  touching build settings, run `sbt githubWorkflowGenerate`.
-- **sbt does not build in a linked git worktree** (jgit raises `NoWorkTreeException`). Gate in a
-  standalone clone (`git clone --shared`) or in a `git archive <sha>` export. A `--shared` clone
-  borrows the primary repository's objects, so `git fsck` inside it cannot prove a commit is
-  safe: check the primary repository (SD3). Never gate the
-  shared primary tree: it contains other agents' untracked files.
-- `embed-grakern` clones its pinned grakern revision unless `-Dstorymodel4s.grakern.build`, or
-  `STORYMODEL4S_GRAKERN_BUILD`, names a local checkout.
-- **Scripts. Run these instead of re-deriving the rules by eye:**
-  - `tools/reference-scope.sh`: the modules and exact command a gate must cover. It exits 3
-    rather than emit an empty command.
-  - `tools/premerge-check.sh`: retained guard for the historical Mote candidate protocol. It
-    requires candidate authorization, ledger reconciliation and a discussion-board read; use it
-    when that protocol is explicitly selected. In the October mode, verify the exact merge tree,
-    gate receipts/totals, live reservations and independent review required by SD2 directly.
-  - `tools/nan-polarity.sh`: a survey of fail-open and fail-closed numeric guards (rule 7).
-  - `tools/who-is-live.sh`: who actually acted recently. Run it before assigning work or waiting
-    on someone.
-- When a rule has caught a real break more than once, the next step is a script, not a firmer
-  sentence.
+- **Toolchain.** Scala 3.7.4, sbt 1.12.14 and sbt-typelevel 0.8.7. Tests use munit,
+  munit-scalacheck and discipline-munit. `Test / parallelExecution := false`.
+- **Gates.**
+  - Use `sbt testJVM` for a fast loop.
+  - A slice gate covers the modules printed by
+    `bash tools/reference-scope.sh "$(git merge-base main CAND)" CAND`. That is every module
+    that references a changed type, run serially on every platform they build (JVM, JS,
+    Native).
+  - The full gate is `checkAll` (`compileAll; testAll; scalafmtCheckAll; scalafmtSbtCheck`).
+    CI runs it with `'set ThisBuild / tlFatalWarnings := true'`, so keep
+    `-Wunused:all -Wvalue-discard` clean.
+  - After touching build settings, run `sbt githubWorkflowGenerate`.
+- **sbt does not build in a linked git worktree** (jgit raises `NoWorkTreeException`).
+  - Gate in a standalone `git clone --shared` or in a `git archive <sha>` export.
+  - Never gate the shared primary tree.
+  - A `--shared` clone borrows the primary's objects, so run `git fsck` in the primary.
+- **Disk.** Check `df -h /System/Volumes/Data` before a full gate. A gate export takes about
+  3 GB, and you must delete your own exports when you finish.
+- **Overrides.** `embed-grakern` clones its pinned grakern revision unless
+  `-Dstorymodel4s.grakern.build` or `STORYMODEL4S_GRAKERN_BUILD` names a local checkout.
+- **Reporting a gate.**
+  - Run one heavy gate at a time.
+  - Never pipe a gate's output.
+  - Capture the exit status.
+  - Report sbt's Passed, Failed and skipped counts. A run with no totals did not run.
+  - Run formatting last.
+- **Scripts.**
+  - `tools/reference-scope.sh` gives a gate's modules.
+  - `tools/nan-polarity.sh` surveys fail-open numeric guards (rule 7).
+  - When a rule has caught a real break more than once, write a script for it.
 
-## Design contract (non-negotiable)
+## Design contract
 
-Rules 1-14 bind every change. The measured cases behind them are in
+Rules 1-14 bind every change. The cases behind them are in
 [design-contract-notes.md](docs/design/design-contract-notes.md).
 
-1. **No single-vector core.** Embeddings are sidecar feature views. They never participate in
-   identity, equality or graph structure.
-2. **Typed, not stringly typed.** Relation, role, context, status and modality families are
-   enums. Unknown ontologies enter through `Custom(namespace, label)`, never through raw strings.
-3. **Evidence first.** Every accepted explicit claim cites `SpanSet` evidence, and inferences
-   cite upstream claims. `Credence.rawScore` is never a probability without a recorded
-   `calibrationModel`.
-4. **Contexts are mandatory.** Every situation lives in a `ContextFrame` whose root is
-   `NarratedWorld`. Reported, believed or intended content never becomes root-world fact by
-   default.
+1. **No single-vector core.** Embeddings are sidecar feature views and one evidence channel among
+   several. They never take part in identity, equality or graph structure.
+2. **Typed, not stringly typed.**
+   - Relation, role, context, status and modality families are enums.
+   - Unknown ontologies enter through `Custom(namespace, label)`.
+3. **Evidence first.**
+   - Every accepted explicit claim cites `SpanSet` or playback evidence.
+   - An inference cites its upstream claims.
+   - `Credence.rawScore` is never a probability without a recorded `calibrationModel`.
+4. **Contexts are mandatory.**
+   - Every situation lives in a `ContextFrame` rooted at `NarratedWorld`.
+   - Reported, believed or intended content never becomes root-world fact by default.
 5. **Discourse time, story-world time and recall time are different.**
-6. **Alignment is partial, unbalanced and hierarchical.** Recall may omit, merge, split, reorder,
-   revisit, elaborate or go external. External destinations are explicit states.
+6. **Alignment is partial, unbalanced and hierarchical.**
+   - Recall may omit, merge, split, reorder, revisit, elaborate or go external.
+   - External destinations are explicit states.
 7. **Truth, salience, phenomenology and veridicality are different, and none is derived from
-   another.** Most defects here fall into one class: *a value that cannot be told apart from a
-   different value it must be told apart from.* The test: name two things that ought to differ,
-   then ask which published field differs between them.
-   - **No default licence.** An unmeasurable value never gets a plausible number, and an
-     unestablished status never gets a confident one. When the licence cannot be established,
-     take the conservative truthful status, and file the typed basis as its own bead.
-   - **Typing a conflated quantity launders it.** Use one coordinate per meaning, never one
-     wrapper over both. A map key is a comparability claim. Such a migration is not sliceable: a
-     half-done one is an undone one that looks done.
-   - **NaN polarity.** Prefer the fail-closed shape, `if x > 0 then compute else safe`. A NaN
-     finding has three separate questions: polarity, reachability, and what actually comes out,
-     which must be run. Validate finiteness at the source of a weight or score. A type that
-     advertises checked construction must refuse non-finite input.
-   - **An empty-guard constant declares its class:** forced, delete-sentinel,
-     conservative-as-1.0, conservative-as-0.0 or flattering. Do not unify the constants.
-8. **Unforgeable boundaries.** Invalid states are unrepresentable where rules are stable
-   (phantom states, smart constructors). Where the ontology is open, use validated and versioned
-   data (PropBank frames).
-   - A private constructor on a `case` class is not a boundary: `fromProduct`, `Mirror` and a
-     qualified-private `copy` all remain.
-   - A validating type is a `final` non-case class with explicit accessors, structural
-     `equals`/`hashCode`, an intentional `toString`, and construction private to its checked
-     factory. A type that hides a field must close its read doors too.
-   - **Cartesian-product test.** If some combination of individually lawful field values is
-     false, because validity depends on a relation, provenance, order, identity or context, the
-     type is born unforgeable. That applies to new types as well as old ones.
-   - The checked factory must take enough context to prove the relation, and a court must kill
-     removal of the check.
-   - Courts compile-refuse `apply`, `copy`, `fromProduct` and `Mirror.ProductOf`, each with its
-     own same-shape positive control. Prove the boundary from *outside* the defining package: a
-     probe inside it, or inside a subpackage of a `private[x]` scope, cannot fail on private-scoped
-     access. A subpackage probe only shows that a door is closed even to the package itself.
-   - Scala privacy is enforced by the compiler, not the JVM. This buys soundness for Scala
-     consumers only.
-   - A validator whose return type is its own argument type, on a publicly constructible type,
-     signals a missing boundary.
-   - See [unforgeable-types.md](docs/design/unforgeable-types.md).
+   another.**
+   - Never give a value that can't be told apart from one it must be told apart from.
+   - An unmeasurable value gets no plausible number.
+   - Prefer fail-closed NaN guards (`if x > 0 then compute else safe`), and validate finiteness
+     at the source.
+   - An empty-guard constant declares its class.
+8. **Unforgeable boundaries.**
+   - Cartesian-product test: if some combination of individually lawful field values is false,
+     the type must be born unforgeable.
+   - Where validity depends on a relation, provenance, order, identity or context, the type is
+     a `final` non-case class.
+     - Its construction is private to a checked factory that takes enough context to prove the
+       relation.
+     - It has explicit accessors and structural `equals`/`hashCode`.
+   - A private constructor on a `case` class is not a boundary.
+   - Prove a boundary from outside the defining package, with a compile-refusal probe that has
+     a positive control. See [unforgeable-types.md](docs/design/unforgeable-types.md).
 9. **Sparse.** No dense all-pairs allocations in core paths.
-10. **Deterministic IDs and receipts.** Content-addressed IDs; builds are diffable.
-11. **Portable modules stay portable.** Core depends only on cats-core and cats-collections. No
-    HTTP, LLM, ONNX, JVM-only API or graph database in portable modules.
-12. Prefer `Either[DomainError, A]` or `ValidatedNec` to exceptions.
-13. **Unattended builds are P0.** No human is in the loop of a build. Agents return typed
-    proposals with evidence. Only the deterministic resolver accepts claims. Unresolved and
-    alternative outcomes are legitimate results.
+10. **Deterministic IDs and receipts.** IDs are content-addressed, and builds are diffable.
+11. **Portable modules stay portable.**
+    - Core depends only on cats-core and cats-collections.
+    - No HTTP, LLM, ONNX, JVM-only API or graph database in a portable module.
+12. **Errors are values.** Prefer `Either[DomainError, A]` or `ValidatedNec` to exceptions.
+13. **Unattended builds.**
+    - No human is in a build's loop.
+    - Providers, including LLMs, return typed proposals with evidence.
+    - Only deterministic resolvers accept claims.
+    - Unresolved and alternative outcomes are legitimate results.
 14. **Fixture policy.**
     - (a) AMR gold comes only from published guideline examples, or from licensed corpora in
       authorized environments.
     - (b) Project charts are machine-generated silver with receipts.
-    - (c) War of the Ghosts is a researcher-reviewed narrative acceptance fixture, never
-      hand-authored AMR.
+    - (c) War of the Ghosts is a researcher-reviewed narrative fixture, never hand-authored AMR.
     - (d) No story text, recall transcript or excerpt enters the repository before it passes
-      `docs/design/story-text-admission-checklist.md`. The answers live in the text file's own
-      header and are checked by someone other than the proposer. Participant recall is barred
-      until the owner records an REB basis; pseudonymization is a technical control, not consent.
+      `docs/design/story-text-admission-checklist.md`, checked by someone other than the
+      proposer, with the answers in the text file's own header. Participant recall is barred
+      until the owner records an REB basis; pseudonymization is not consent. Data stays under
+      `data/`, which is ignored.
 
-Two more principles belong with these rules:
-- **An impossibility claim needs more scrutiny than a positive one.** Ask whether any
-  configuration would make it work.
-- **An identity or class is derived from what it describes, never asserted by the caller.** Ask:
-  if the caller lied here, what would catch it?
+Two principles go with the rules:
 
-## Evidence discipline (rule 4)
+- An impossibility claim needs more scrutiny than a positive one.
+- An identity or class is derived from what it describes, never asserted by the caller.
 
-Rule 4 has 35 sub-rules, all in [docs/EVIDENCE.md](docs/EVIDENCE.md). Its core:
+## Evidence
 
-- **A finding has a chain.** Say which link you reached:
+The full text is in [docs/EVIDENCE.md](docs/EVIDENCE.md).
 
-  | link | question | method |
-  |---|---|---|
-  | permits | can the code produce this? | read it |
-  | occurs | does it actually happen? | measure the corpus |
-  | produces | what comes out when it does? | run it |
-  | consumes | who depends on that output? | trace forward |
-
-- **Read the artifact, not the status.** Check the body length, the test totals, the log and the
-  directory size, not the report that the step succeeded.
-- **Proof of a fix.**
-  - A control must fail for the *named* property.
-  - A mutation kill counts only if the mutant compiles and the named assertion fails while its
-    siblings pass.
-  - A fixture must tell the hypotheses apart.
-  - An inequality is not a discriminating assertion.
-  - A positive control requires old code capable of the tested thing; otherwise call it a
+- **Say which link of the chain a finding reached.** A finding *permits* when you read the code,
+  *occurs* when you measured it, *produces* when you ran it, and *consumes* when you traced it
+  forward.
+- **Read the artifact, not the status line.** That means test totals, logs and file sizes.
+- **Prove a fix with a mutation.** Delete the guard and watch a *named* test fail.
+  - A mutant counts only if it compiles and the named assertion fails while its siblings pass.
+  - A fixture must tell the hypotheses apart; an inequality is not a discriminating assertion.
+  - A positive control needs old code capable of the tested thing; otherwise call it a
     regression guard.
-  - Compile-time probes need a clean recompile.
-- **Running a gate.**
-  - Never pipe a gate.
-  - Capture the exit status in the log.
-  - Totals or it did not run.
-  - Run formatting last.
-  - A compile error anywhere means the gate is inconclusive.
-  - Verify the export before gating it.
-  - A backgrounded gate's exit is the fork's, not the run's.
-  - An author's gate is `LocallyObserved`: cite CI by run URL, matrix cell and SHA.
+  - Compile-time probes need a clean recompile; mutation runs leave stale probes.
+- **A gate is inconclusive** if anything fails to compile. Verify an export before gating it.
+  A backgrounded gate's exit status is the fork's, not the run's.
+- **Report metrics at the stage they measure.** Retrieval, local ranking and decoding are
+  reported separately, so that an order prior cannot hide a weak content channel.
 - **Shell traps.**
-  - Never put message bodies in inline double-quoted arguments: backticks execute. Use a file
-    or `--body-file`.
+  - Put message bodies in files, never inline in double quotes.
   - Never `head` a list whose length is the finding.
-  - `>` inside `[ ]` is a redirect.
-  - An equality test over two failed substitutions passes.
-- **Scoping a finding.**
-  - Sweep the shape, not the spelling, and sweep your own work first.
-  - Reading a branch establishes permission, not occurrence.
-  - Trace the consequence before escalating it.
-- **What a number may claim.**
-  - Run the estimand check: where does our own uncertainty go, and does it correlate with a
-    subject property? If it does, that is P1.
-  - No value and low support are different failures.
-  - Dropping a term from a normalized aggregate rescales the rest.
+  - Use `/usr/bin/grep` on source, because ugrep skips files containing a NUL byte.
 
 ## Integration and landing
 
-The primary agent holds these rules when integrating, and authors hold them when preparing a slice.
-The full text is governance item 3 in `fleet-mode.md`.
-
-- **Verify the branch before merging.** Afterwards, print the SHA that should have moved. Never
-  `reset --hard` shared branches.
-- **Ancestry.** Nothing unlanded may sit in a candidate's parent chain. Git is authoritative
-  over any ledger: run `git merge-base --is-ancestor` rather than trusting a status string.
-- **A conflict-free merge is not a working merge.** When two changes touch one file, test the
-  merged tree.
-- **Reference scope.** The gate covers every module that references the changed type, found by a
-  grep across main and test sources, not only the module that contains it. Run
-  `tools/reference-scope.sh` in a clone checked out at the candidate, passing the merge base. For
-  a stacked candidate, take the union across its commits.
-- **Stale bases.** A delta that is gate-inert (touching only docs, `AGENTS.md` or `.mote`)
-  never invalidates a gate. A delta that touches a gated input does; gated inputs are a `.scala`
-  file in a gated module, `build.sbt` and `project/`.
-  - If the delta touches the same file as the candidate, the author rebases and re-gates.
-  - If it touches different modules, the primary agent gates the merged tree.
+- **Before merging:**
+  - verify ancestry with `git merge-base --is-ancestor`;
+  - test the merged tree, because a conflict-free merge is not a working merge;
+  - print the moved SHA afterwards.
+- **Shared trees:** commit with `git commit --only <paths>`, and never `reset --hard` a shared
+  branch.
+- **Ancestry and stale bases.**
+  - Nothing unlanded may sit in a candidate's parent chain.
+  - For a stacked candidate, gate the union of its commits' reference scopes.
+  - A delta touching only docs or `.mote` never invalidates a gate; one touching a gated
+    `.scala` file, `build.sbt` or `project/` does.
+- **Refresh before integrating.** Check Git status, Mote claims and reservations, and the
+  owner's latest instruction immediately before landing.
+- **Others' work.** Reserve narrow paths. Never close a bead that holds another actor's live
+  reservation. Before concluding work is lost, run `git fsck --dangling` in the primary
+  repository.
 - **Sibling seam.** `storyatlas4s` builds this repository from source. For a change to anything
-  it consumes, compiling and running its tests is part of the gate: it runs before landing, not
-  as a follow-up. Landing first and checking after is how `04fdf6b` broke the sibling app.
-- **Refresh state immediately before integration.** Check Git status, Mote claims/reservations
-  and current owner instructions. A correction can arrive inside the gate window; verify that
-  integration remains authorized and that the commit message is still true.
-- **Commit narrowly.** Use `git commit --only <paths>` in shared trees, and check the whole
-  `git status --short` first. Record a landing where it is tracked before announcing it.
+  it consumes, compile and test storyatlas4s before landing.
+- **New vocabulary.** A new module, dependency or public vocabulary needs an ADR line that
+  records the rejected alternative. The owner decides ADRs.
 
 ## Style
 
 - scalafmt 3.10.7, `maxColumn = 100`.
-- Every public type has Scaladoc with a one-line "why", not just "what".
-- One law or invariant per property, and adversarial fixtures for every prohibited failure mode
-  in the design record (§27.2, §52.3).
+- Every public type has Scaladoc with a one-line "why".
+- Write one law or invariant per property. Every prohibited failure mode gets adversarial
+  fixtures.

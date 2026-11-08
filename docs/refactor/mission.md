@@ -1,5 +1,8 @@
 # Mission
 
+> **Historical record (2026-11-08).** Consultant draft. The adopted text is
+> [VISION.md](../../VISION.md).
+
 Deliver a usable, reproducible system for modeling written and audiovisual narratives, modeling their recall, and exporting evidence-grounded recall-to-source mappings for downstream data analysis.
 
 ## The delivery contract

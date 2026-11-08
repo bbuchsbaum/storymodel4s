@@ -1,5 +1,9 @@
 # Narrative Process Alignment: Cumulative Discussion Notes
 
+> **Historical record (2026-11-08).** The original conceptual discussion, not a binding design.
+> Binding decisions are in [VISION.md](VISION.md), the AGENTS.md design contract and [the
+> ADRs](docs/adr/README.md).
+
 ## Record status
 
 - **Purpose:** Preserve the complete substance and evolution of a multipart discussion, ending in a concrete plan for a library implementation.

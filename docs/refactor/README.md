@@ -1,5 +1,8 @@
 # Refactor review and delivery index
 
+> **Historical record (2026-11-08).** This index is superseded by [docs/ROADMAP.md](../ROADMAP.md)
+> and [docs/README.md](../README.md).
+
 Start with [PLAN.md](PLAN.md): the assessment, decisions, execution order and stopping gates.
 [BACKLOG.md](BACKLOG.md) maps that plan to live Mote work; [RECONCILIATION.json](RECONCILIATION.json)
 accounts for the 119 initially unfinished tickets and 17 intake issues filed concurrently on

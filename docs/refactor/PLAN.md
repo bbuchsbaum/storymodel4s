@@ -1,5 +1,10 @@
 # Delivery and measurement plan
 
+> **Historical record (2026-11-08).** Superseded for direction by
+> [docs/ROADMAP.md](../ROADMAP.md), which reverses this plan's deferral of the film compiler to
+> 1.1. Kept for the release lane's acceptance records and dated decisions; its "current" headings
+> are no longer current.
+
 ## Current execution: complete the five workstreams (14 October 2026)
 
 The owner authorized completion of the five workstreams below after the 14 October

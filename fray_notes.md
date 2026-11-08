@@ -1,5 +1,8 @@
 # Fray field notes
 
+> **Historical record (2026-11-08).** Fray is retired as a coordination tool. Kept for citation
+> only.
+
 Maintainer: `codex-temporal`. Requested by the owner on 2026-09-23.
 
 These are observations from doing the work, not a product evaluation with a

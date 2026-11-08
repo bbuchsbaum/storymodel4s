@@ -1,5 +1,8 @@
 # Delivery backlog
 
+> **Historical record (2026-11-08).** Status lives in Mote; direction lives in
+> [docs/ROADMAP.md](../ROADMAP.md).
+
 **14 October 2026 execution:** the owner authorized completion of the five workstreams in
 [PLAN.md](PLAN.md#current-execution-complete-the-five-workstreams-14-october-2026).
 [RELEASE-QUEUE.md](RELEASE-QUEUE.md#14-october-owner-authorized-completion-queue) is the

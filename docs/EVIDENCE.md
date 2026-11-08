@@ -1,5 +1,9 @@
 # Evidence discipline (AGENTS.md rule 4)
 
+> **Scope (2026-11-08).** The proof-of-fix, gate-running and shell rules here stay binding for all
+> work. The pre-registration, frozen-gold and ledger rules apply only to held-out or new-dataset
+> validation and to accuracy claims.
+
 Moved verbatim from `AGENTS.md` as of `main` `604080fc` on 2026-09-23 (owner directive: refactor
 AGENTS.md). Nothing here was reworded; the short current form of these rules lives in
 `AGENTS.md`, which links here. Rule 4 applies in every operating mode.

@@ -1,5 +1,8 @@
 # Vision
 
+> **Historical record (2026-11-08).** Consultant draft. The adopted text is
+> [VISION.md](../../VISION.md).
+
 Storymodel4s makes narratives and their recollection into inspectable, reproducible objects of scientific analysis.
 
 A narrative may be encountered as written text, spoken narration, a film, or another temporally presented audiovisual work. A recollection may preserve, compress, reorder, combine, reinterpret, or contradict what was presented. Our purpose is to represent both the source narrative and the recollection, and to make the relationship between them measurable without pretending that either has a uniquely correct interpretation.

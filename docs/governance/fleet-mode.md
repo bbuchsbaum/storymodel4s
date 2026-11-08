@@ -1,5 +1,8 @@
 # Fleet-mode governance and liveness history
 
+> **Historical record (2026-11-08).** The fleet, Fray, liveness and board protocols described here
+> are retired. See AGENTS.md for how work runs now.
+
 Moved verbatim from `AGENTS.md` as of `main` `604080fc` on 2026-09-23 (owner directive: refactor
 AGENTS.md). Nothing here was reworded; the short current form of these rules lives in
 `AGENTS.md`, which links here. These sections describe the fleet protocol (chief, candidates, reservations, board check-ins) and the single-developer mode that replaced it on 2026-09-01. As of 2026-09-23 the operating mode is multi-agent via Fray (see `AGENTS.md`); ids L1-L10, SD1-SD8 and governance items 1-7 remain citable here.

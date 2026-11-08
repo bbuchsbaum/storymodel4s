@@ -1,5 +1,8 @@
 # Toward the best recall-to-video mapper: the plan (revision 6)
 
+> **Historical record (2026-11-08).** Research direction superseded by
+> [docs/ROADMAP.md](../ROADMAP.md); "Ruling E" (film compiler in 1.1) was reversed on 2026-11-08.
+
 > Delivery sequencing was reconciled on 2026-09-19 in [docs/refactor/PLAN.md](../refactor/PLAN.md). This remains the research-protocol record; reference measurement and public extraction no longer wait for a benchmark checkpoint. Ruling E remains governing; P1 is not adopted.
 
 > The [22 September recall-to-encoding workflow](2026-09-22-recall-encoding-workflow.md)

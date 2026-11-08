@@ -3,13 +3,14 @@
 **Pre-release. No library artifact has been released; APIs will change without
 notice.**
 
-storymodel4s is a Scala 3 library for representing written stories, human
-recall of those stories, and the mapping between the two.
+storymodel4s is a Scala 3 library for representing stories and films, human
+recall of them, and the mapping between the two.
 
 For the demonstrated file-to-result workflow, start with the
 [mapping command guide](docs/guide/mapping-facade.md), then the
-[imaging readback](docs/guide/imaging.md). The [current delivery plan](docs/refactor/PLAN.md)
-records qualified capabilities and remaining release acceptance; the
+[imaging readback](docs/guide/imaging.md). The [roadmap](docs/ROADMAP.md) is the current plan;
+[docs/README.md](docs/README.md) maps the documentation. The historical
+[delivery plan](docs/refactor/PLAN.md) keeps release acceptance records; the
 [release preparation guide](docs/release-preparation.md) covers the local CLI bundle and
 publication checks.
 
@@ -24,7 +25,7 @@ AMR-compatible local kernel), a multiplex narrative graph with contexts,
 hierarchy, and typed temporal/causal relations, and embedding feature views that
 retrieve but never adjudicate.
 
-Read the project [vision](vision.md) and [mission](mission.md) for the scientific
+Read the project [vision and mission](VISION.md) for the scientific
 object, operating commitments, and the boundary between current capabilities
 and programme work.
 
