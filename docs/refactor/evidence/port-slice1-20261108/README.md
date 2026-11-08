@@ -11,7 +11,7 @@ manifest and the recorded harness replies, then check four things:
 - unit id against the manifest;
 - ordinal;
 - no duplicate units;
-- no units missing from the manifest.
+- no reply units that are unknown to the manifest.
 
 They write a `storymodel4s.bench.scene-outcomes/v1` arm. Every manifest unit receives an
 outcome: label, abstention, invalid, or provider-failure with a reason. Categorical choices only;

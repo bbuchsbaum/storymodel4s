@@ -17,9 +17,9 @@ class AgentArmImportSuite extends FunSuite:
       "onsetSeconds" -> Json.fromString(s"$ordinal.5")
     )
 
-  private def manifest(dir: Path): Path =
+  private def manifest(dir: Path, schema: String = AgentArmImport.ManifestSchema): Path =
     val doc = Json.obj(
-      "schema" -> Json.fromString(AgentArmImport.ManifestSchema),
+      "schema" -> Json.fromString(schema),
       "sourceInputSha256" -> Json.fromString("s" * 64),
       "participants" -> Json.arr(
         Json.obj(
@@ -142,10 +142,56 @@ class AgentArmImportSuite extends FunSuite:
     )
     assertEquals(Files.readString(out), "keep")
 
-  test("a manifest of another schema is refused"):
+  test("a manifest of another schema is refused, all else valid"):
     val (m, r, out) = fixture()
-    write(m, Json.obj("schema" -> Json.fromString("other"))): Unit
+    manifest(m.getParent, schema = "other"): Unit
     assertEquals(
       AgentArmImport.run(m, r, "narrative", "development", out),
       Left(Refusal.InvalidManifest)
     )
+
+  test("a reply lacking the requested field is invalid, never an abstention"):
+    val (m, r, out) = fixture()
+    replies(r, "NN04_x", Json.obj("index" -> Json.fromInt(0), "id" -> Json.fromString("b0")))
+    AgentArmImport.run(m, r, "narrative", "development", out).toOption.get: Unit
+    val o = outcomes(out)("b0")
+    assertEquals(kind(o), "invalid")
+    assertEquals(o.hcursor.get[String]("reason").toOption, Some("missing-field"))
+
+  test("scene 0 is out of range"):
+    val (m, r, out) = fixture()
+    replies(r, "NN04_x", reply(0, "b0", Json.fromInt(0)))
+    AgentArmImport.run(m, r, "narrative", "development", out).toOption.get: Unit
+    assertEquals(kind(outcomes(out)("b0")), "invalid")
+
+  test("a reply without an index is refused as an ordinal mismatch"):
+    val (m, r, out) = fixture()
+    replies(r, "NN04_x", Json.obj("id" -> Json.fromString("b0"), "narrative" -> Json.fromInt(2)))
+    assertEquals(
+      AgentArmImport.run(m, r, "narrative", "development", out),
+      Left(Refusal.OrdinalMismatch("NN04_x", "b0"))
+    )
+
+  test("a missing replies directory is refused rather than read as all failures"):
+    val (m, r, out) = fixture()
+    assertEquals(
+      AgentArmImport.run(m, r.resolve("nope"), "narrative", "development", out),
+      Left(Refusal.RepliesMissing)
+    )
+
+  test("unit identity fields are copied from the manifest"):
+    val (m, r, out) = fixture()
+    AgentArmImport.run(m, r, "narrative", "development", out).toOption.get: Unit
+    val j = parse(Files.readString(out)).toOption.get
+    assertEquals(j.hcursor.get[String]("sourceInputSha256").toOption, Some("s" * 64))
+    val a2 = j.hcursor
+      .get[Vector[Json]]("participants")
+      .toOption
+      .get
+      .flatMap(_.hcursor.get[Vector[Json]]("units").toOption.get)
+      .find(_.hcursor.get[String]("id").contains("a2"))
+      .get
+      .hcursor
+    assertEquals(a2.get[Int]("ordinal").toOption, Some(2))
+    assertEquals(a2.get[String]("textSha256").toOption, Some("t" * 64))
+    assertEquals(a2.get[String]("onsetSeconds").toOption, Some("2.5"))

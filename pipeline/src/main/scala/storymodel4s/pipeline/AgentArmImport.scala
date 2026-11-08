@@ -10,10 +10,12 @@ import storymodel4s.core.Checksum
 /** Imports recorded agent (LLM) mapper outputs as a frozen-scorer scene-outcome arm.
   *
   * Why: the LLM mapper is evaluated by the same frozen scorer as every other producer, so its
-  * recorded replies must enter through checked unit identity (manifest id, ordinal, text hash and
-  * onset) and every manifest unit must receive an explicit outcome. A missing reply is a provider
-  * failure with a reason, never a silently dropped unit; a null choice is an abstention; anything
-  * else that is not a scene in range is invalid. No scores, probabilities or calibration are
+  * recorded replies are joined to manifest units by id and checked against the manifest ordinal;
+  * the text hash and onset written to the arm are copied from the manifest, not asserted by the
+  * reply. Every manifest unit receives an explicit outcome. A missing reply is a provider failure
+  * with a reason, never a silently dropped unit; an explicit null choice is an abstention; a reply
+  * that lacks the requested field is invalid (`missing-field`), never an abstention; any other
+  * value that is not an integral scene in range is invalid. No scores, probabilities or calibration are
   * carried: the arm records categorical choices only.
   */
 object AgentArmImport:
@@ -25,7 +27,7 @@ object AgentArmImport:
 
   /** Why the import refused; each case names the violated identity or input condition. */
   enum Refusal:
-    case ManifestRead, InvalidManifest, UnknownPartition, OutputExists, OutputWrite
+    case ManifestRead, InvalidManifest, UnknownPartition, OutputExists, OutputWrite, RepliesMissing
     case ReplyRead(participant: String)
     case InvalidReply(participant: String)
     case UnknownUnit(participant: String, id: String)
@@ -82,7 +84,12 @@ object AgentArmImport:
         )
       case Some(u) =>
         u.hcursor.downField(field).focus match
-          case None | Some(Json.Null) => Json.obj("kind" -> Json.fromString("abstention"))
+          case None =>
+            Json.obj(
+              "kind" -> Json.fromString("invalid"),
+              "reason" -> Json.fromString("missing-field")
+            )
+          case Some(Json.Null) => Json.obj("kind" -> Json.fromString("abstention"))
           case Some(v)                =>
             v.asNumber.flatMap(_.toInt) match
               case Some(scene) if scene >= 1 && scene <= SceneCount =>
@@ -103,6 +110,7 @@ object AgentArmImport:
   ): Either[Refusal, Written] =
     for
       _ <- Either.cond(!Files.exists(output), (), Refusal.OutputExists)
+      _ <- Either.cond(Files.isDirectory(replies), (), Refusal.RepliesMissing)
       _ <- Either.cond(
         Set("development", "untouchedTest", "all").contains(partition),
         (),
@@ -134,7 +142,7 @@ object AgentArmImport:
         "schema" -> Json.fromString(ArmSchema),
         "unitManifestSha256" -> Json.fromString(Checksum.ofBytes(manifestBytes).hex),
         "sourceInputSha256" -> Json.fromString(sourceSha),
-        "identityPolicy" -> Json.fromString("manifest-id-ordinal-text-onset"),
+        "identityPolicy" -> Json.fromString("manifest-id-and-reply-index"),
         "producer" -> Json.obj(
           "kind" -> Json.fromString("agent-recorded-replies"),
           "field" -> Json.fromString(field),
@@ -143,9 +151,7 @@ object AgentArmImport:
         "participants" -> Json.fromValues(built.map(_._1))
       )
       bytes = (printer.print(arm) + "\n").getBytes(StandardCharsets.UTF_8)
-      _ <-
-        try Right(Files.write(output, bytes, java.nio.file.StandardOpenOption.CREATE_NEW): Unit)
-        catch case NonFatal(_) => Left(Refusal.OutputWrite)
+      _ <- publish(output, bytes)
     yield
       val kinds = built.flatMap(_._2).flatMap(_.hcursor.get[String]("kind").toOption)
       Written(
@@ -156,6 +162,25 @@ object AgentArmImport:
         kinds.count(_ == "invalid"),
         kinds.count(_ == "provider-failure")
       )
+
+  /** Write to a sibling temporary file, then hard-link it into place: atomic, never replaces. */
+  private def publish(output: Path, bytes: Array[Byte]): Either[Refusal, Unit] =
+    var staging = Option.empty[Path]
+    try
+      val target = output.toAbsolutePath
+      val tmp = Files.createTempFile(target.getParent, ".agent-arm-", ".pending")
+      staging = Some(tmp)
+      Files.write(tmp, bytes): Unit
+      Files.createLink(target, tmp): Unit
+      Right(())
+    catch
+      case _: java.nio.file.FileAlreadyExistsException => Left(Refusal.OutputExists)
+      case NonFatal(_)                                 => Left(Refusal.OutputWrite)
+    finally
+      staging.foreach { p =>
+        try { Files.deleteIfExists(p): Unit }
+        catch case NonFatal(_) => ()
+      }
 
   private def participant(
       p: Json,
