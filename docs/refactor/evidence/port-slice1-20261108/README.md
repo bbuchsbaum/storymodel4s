@@ -51,22 +51,22 @@ The full scorer output, with per-participant values, is in
 
 ## Cold review and re-gate
 
-A fresh-context review of \`7601d194c\` returned two BLOCKs:
+A fresh-context review of `7601d194c` returned two BLOCKs:
 
 - a reply lacking the requested field became an abstention;
 - the schema test could not fail.
 
-Both are fixed at \`5a61e9382\`, together with these follow-ups:
+Both are fixed at `5a61e9382`, together with these follow-ups:
 
 - a missing replies directory is refused;
 - the output is published through a hard link, which is atomic and never replaces a file;
 - tests cover scene 0, a missing index, and preserved unit identity;
 - the identity-policy wording is corrected.
 
-Re-gate at \`5a61e9382\`, in a standalone clone with fatal warnings on:
+Re-gate at `5a61e9382`, in a standalone clone with fatal warnings on:
 
-- \`pipeline\`: **442 tests, 0 failed**; \`scalafmtCheckAll\` is clean;
-- \`AgentArmImportSuite\`: 13 of 13.
+- `pipeline`: **442 tests, 0 failed**; `scalafmtCheckAll` is clean;
+- `AgentArmImportSuite`: 13 of 13.
 
 Mutation kills, one named test each, with the other 12 tests passing:
 
