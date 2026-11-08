@@ -15,8 +15,8 @@ import storymodel4s.core.Checksum
   * reply. Every manifest unit receives an explicit outcome. A missing reply is a provider failure
   * with a reason, never a silently dropped unit; an explicit null choice is an abstention; a reply
   * that lacks the requested field is invalid (`missing-field`), never an abstention; any other
-  * value that is not an integral scene in range is invalid. No scores, probabilities or calibration are
-  * carried: the arm records categorical choices only.
+  * value that is not an integral scene in range is invalid. No scores, probabilities or calibration
+  * are carried: the arm records categorical choices only.
   */
 object AgentArmImport:
   val ArmSchema: String = "storymodel4s.bench.scene-outcomes/v1"
@@ -90,7 +90,7 @@ object AgentArmImport:
               "reason" -> Json.fromString("missing-field")
             )
           case Some(Json.Null) => Json.obj("kind" -> Json.fromString("abstention"))
-          case Some(v)                =>
+          case Some(v)         =>
             v.asNumber.flatMap(_.toInt) match
               case Some(scene) if scene >= 1 && scene <= SceneCount =>
                 Json.obj("kind" -> Json.fromString("label"), "scene" -> Json.fromInt(scene))
