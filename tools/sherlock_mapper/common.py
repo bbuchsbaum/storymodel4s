@@ -204,6 +204,8 @@ def score(pred_by_participant, label="pred"):
             near += abs(sc - g[uid]) <= 1
         if n:
             per[name] = dict(n=n, exact=exact / n, within1=near / n, abstain=none / n)
+    if not per:
+        return dict(label=label, participants=0, units=0, participantAverage={}, pooled={}, per={})
     pa = {
         k: round(100 * statistics.mean(p[k] for p in per.values()), 2)
         for k in ("exact", "within1", "abstain")
@@ -264,7 +266,7 @@ def score_span(pred_by_participant):
         ks = [k for k in pred if k in g]
         if ks:
             vals.append(sum(pred[k] in sg.get(k, {g[k]}) for k in ks) / len(ks))
-    return round(100 * statistics.mean(vals), 2)
+    return round(100 * statistics.mean(vals), 2) if vals else None
 
 
 FROZEN = DATA / "study/recall-to-video/all17-monofill"
