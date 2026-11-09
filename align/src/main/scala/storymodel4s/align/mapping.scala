@@ -307,9 +307,11 @@ object UnitOutcome:
     *
     * A choice (`ExternalDecode`) carries exactly one link, to the chosen destination; an abstention
     * carries none. Links name `CandidateSetId.categorical`, because no numeric basis keys exist.
-    * Measures are empty, so no reader can find a score for this unit. Source and universe
-    * membership of the destination is checked by `MappingResult.checked`. A raw argmax request is
-    * refused: it has no categorical meaning.
+    * Measures are empty, so no reader can find a score for this unit. Links must be supplied, never
+    * derived from an inference result: a result-bound link would carry that result's gate, fidelity
+    * and term support, and bind the record to an inference that did not make this decision. Source
+    * and universe membership of the destination is checked by `MappingResult.checked`. A raw argmax
+    * request is refused: it has no categorical meaning.
     */
   def categorical(
       unit: RecallUnitId,
@@ -317,9 +319,7 @@ object UnitOutcome:
       links: Vector[MappingLink],
       stages: UnitStageRefs
   ): Either[MappingRefusal, UnitOutcome] =
-    val foreignLink = links.exists(_.derivation match
-      case d: MeasureDerivation.FromResult => d.unit != unit
-      case MeasureDerivation.Supplied      => false)
+    val resultBound = links.exists(_.derivation != MeasureDerivation.Supplied)
     val candidateSet = CandidateSetId.categorical(stages.candidates, unit)
     val expected = request match
       case DecisionRequest.ExternalDecode(chosen, _) => Vector(chosen)
@@ -334,7 +334,7 @@ object UnitOutcome:
         )
       case DecisionRequest.Abstain(_, reason) if reason.trim.isEmpty =>
         Left(MappingRefusal.InvalidValue("decision.abstention", "reason must be nonempty"))
-      case _ if foreignLink => Left(MappingRefusal.BindingMismatch("outcome.unit"))
+      case _ if resultBound => Left(MappingRefusal.BindingMismatch("categorical.link"))
       case _ if links.exists(_.inferenceStage != stages.inference) =>
         Left(MappingRefusal.BindingMismatch("outcome.inferenceStage"))
       case _ if links.exists(_.candidateSet != candidateSet) =>

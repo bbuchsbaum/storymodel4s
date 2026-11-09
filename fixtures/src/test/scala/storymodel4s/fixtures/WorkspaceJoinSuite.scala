@@ -436,6 +436,36 @@ class WorkspaceJoinSuite extends FunSuite:
     )
   }
 
+  test("selection export names the mapping version of the record it copies from") {
+    val address = workspace.recallAddress(recall.ordered.head.id).get
+    def version(w: SourceRecallWorkspace): Option[String] =
+      WorkspaceSubsetCodec
+        .selected(w, policyId, Set(address))
+        .toOption
+        .flatMap(p => Canonical.parse(p.dataJson).toOption)
+        .flatMap(_.hcursor.get[String]("mapping_version").toOption)
+    assertEquals(version(workspace), Some(MappingCodecs.SchemaVersion))
+    val unit = recall.ordered.head.id
+    val producer = DecisionPolicyId.unsafe("synthetic-llm-producer/v1")
+    val chosen = Destination.Target(target)
+    val categorical = UnitOutcome
+      .categorical(
+        unit,
+        DecisionRequest.ExternalDecode(chosen, producer),
+        Vector(
+          MappingLink.ungated(chosen, stages, CandidateSetId.categorical(stages.candidates, unit))
+        ),
+        stages
+      )
+      .flatMap(o =>
+        MappingResult.checked(inventory, source, policies, roles, ledger, outcomes.updated(0, o))
+      )
+      .fold(e => fail(e.message), identity)
+    val opened = create(records = Vector(WorkspaceMappingInput(policyId, categorical, None)))
+      .fold(e => fail(e.toString), identity)
+    assertEquals(version(opened), Some(MappingCodecs.CategoricalSchemaVersion))
+  }
+
   test("selection export copies complete original rows and binds exact text/table/data payloads") {
     val address = workspace.recallAddress(recall.ordered.head.id).get
     val payload = WorkspaceSubsetCodec.selected(workspace, policyId, Set(address)).toOption.get

@@ -114,7 +114,7 @@ object WorkspaceSubsetCodec:
             "policy" -> str(policyId.value),
             "original_record_digest" -> policy.record.digest.asJson,
             "mapping_schema" -> str(MappingCodecs.Schema),
-            "mapping_version" -> str(MappingCodecs.SchemaVersion),
+            "mapping_version" -> recordJson.hcursor.downField("schemaVersion").focus.get,
             "selection" -> Json.fromValues(selectedAddresses.map(str)),
             "mapping_context" -> context,
             "presentation_clocks" -> workspace.clocks.fold[Json](obj("status" -> str("absent")))(

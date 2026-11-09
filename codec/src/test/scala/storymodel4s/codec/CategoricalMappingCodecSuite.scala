@@ -194,7 +194,7 @@ class CategoricalMappingCodecSuite extends FunSuite:
     )
   }
 
-  test("a result-bound link derived for a foreign unit refuses by binding") {
+  test("a result-bound link refuses: a categorical outcome carries only supplied links") {
     val f = MappingCodecFixture
     val base = f.record()
     val own = base.outcomes.head
@@ -227,8 +227,38 @@ class CategoricalMappingCodecSuite extends FunSuite:
         Vector(l),
         refs
       )
-    assert(attempt(own.unit).isRight, "same-shape control: the unit's own bound link is admitted")
-    assertEquals(attempt(foreign), Left(MappingRefusal.BindingMismatch("outcome.unit")))
+    val (destination, _) = bound(own.unit)
+    val supplied = UnitOutcome.categorical(
+      own.unit,
+      DecisionRequest.ExternalDecode(destination, policy),
+      Vector(
+        MappingLink.ungated(destination, refs, CandidateSetId.categorical(refs.candidates, own.unit))
+      ),
+      refs
+    )
+    assert(supplied.isRight, "same-shape control: a supplied link to that destination is admitted")
+    assertEquals(attempt(own.unit), Left(MappingRefusal.BindingMismatch("categorical.link")))
+    assertEquals(attempt(foreign), Left(MappingRefusal.BindingMismatch("categorical.link")))
+  }
+
+  test("a target in the source but outside the declared universe refuses") {
+    val outside = miniature.source.targets.map(_.ref).find(r => !miniature.policies.universe.targets.contains(r))
+    assert(outside.isDefined, "fixture has a source target outside the universe")
+    assert(record(choice(Destination.Target(outside.get))).isLeft)
+  }
+
+  test("two categorical policies give different digests") {
+    val other = DecisionPolicyId.unsafe("synthetic-llm-producer/v2")
+    val second = UnitOutcome
+      .categorical(
+        row.unit,
+        DecisionRequest.ExternalDecode(chosen, other),
+        Vector(link(chosen)),
+        stages
+      )
+      .flatMap(record)
+      .fold(e => fail(e.message), identity)
+    assertNotEquals(second.digest, record(choice()).toOption.get.digest)
   }
 
   test("a destination outside the source refuses") {
