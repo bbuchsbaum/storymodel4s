@@ -41,9 +41,9 @@ on. The research harness it ports is `tools/sherlock_mapper/`, described in
      found in the cache.
 3. **Text-exchange record/replay**, with an importer for the harness cache.
    - **Acceptance:** zero unrecorded calls, and the arm is byte-identical to slice 1.
-4. **The typed `MappingResult`**, through the categorical door, plus the codec round trip and
-   the voyage TSV and sidecar.
-   - **Acceptance:** the decoded arm equals slice 1.
+4. **Superseded 2026-11-09** by the
+   [categorical mapping plan](2026-11-09-categorical-mapping-and-transfer-plan.md): 4a
+   categorical decision support, 4b a typed bundle with an independent reader.
 5. **v3 claims** as a `ClaimAssessmentReceipt`, and the automatic condition (ASR plus frames,
    time converted to scene only at scoring).
    - **Acceptance:** 74.97 is reproduced.

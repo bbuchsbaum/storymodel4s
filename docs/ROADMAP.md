@@ -12,7 +12,23 @@ representations and the mapping: annotations, speech, captions, frames, identity
 discourse. Embeddings and temporal order are evidence channels, not the representation. See
 [VISION.md](../VISION.md#the-event-layer-is-the-core).
 
+## Direction (revised 2026-11-09)
+
+Direct LLM mapping is a primary mapping method. The next milestone is a reproducible categorical
+mapping artifact with independent inspection and source-support lookup. Transfer evaluation
+follows on verified reference data. Rich source and recall event representations remain a core
+objective and are developed through bounded, evaluated capabilities. Structured decoding is
+introduced where experiments show a benefit. See the
+[working plan](plans/2026-11-09-categorical-mapping-and-transfer-plan.md).
+
 ## Where we are (2026-11-08)
+
+- **Direct LLM mapping reaches 75-79% narrative scene agreement** on Sherlock development
+  ([mapper plan](plans/2026-11-08-sherlock-mapper-plan.md)), and the library replays it from
+  recordings with no model call. This measures narrative scene coding only: referent scenes,
+  cited rows, who-did-what and within-scene detail are unmeasured. The model reads the
+  surrounding recall, so its labels are not an independent measure of recall order. Adding an
+  order prior did not help.
 
 - **Accuracy has not moved since September.** The last registered Sherlock development figure is
   61% scene-exact, participant-averaged (2026-09-23). The earlier pooled figures (63.8%, 65.2%)
@@ -42,6 +58,24 @@ discourse. Embeddings and temporal order are evidence channels, not the represen
 The NN03 u92 failure (the recalled body at the crime scene) is the typical case, not an outlier.
 
 ## Milestones
+
+The near-term sequence, from the working plan:
+
+- **M1. Categorical mapping artifact** (port step 4): categorical decision support in `align`,
+  then recorded responses to a typed, saved bundle that a short Python reader can inspect,
+  with every unit accounted for.
+- **M2. FilmFestival transfer evaluation**: verify scene correspondence and gold joins, freeze
+  the method, report film identity and scene agreement separately. These participants were
+  used in development, so it is a transfer evaluation, not a confirmation.
+- **M3. Evidence improvements**: speaker-labelled dialogue first, each a new packet version
+  scored against the frozen baseline.
+- **M4. First rich-event capability: who-did-what in recurring scenes**, on a bounded set of
+  difficult scenes, judged on distinctions scene labels cannot make.
+
+E1-E4 below describe the full event program. Each layer is now built as bounded capabilities
+that must show their value (grounding, analysis, inspectability or saved computation; scene
+accuracy is one possible benefit). E4's structured decoding is pursued only where an
+experiment shows it helps.
 
 Each milestone has one exit criterion. Engineering metrics are measured on the Sherlock
 development partition, without pre-registration. Each metric is reported per stage:
