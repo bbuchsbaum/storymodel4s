@@ -70,7 +70,72 @@ object AgentReplay:
         .orElse(u.asString.flatMap(s => FilmOutline.harnessStrip(s).toIntOption))
     }
 
-  /** Replay one participant. `serve` answers one prompt from recordings and never calls a model. */
+  /** One chunk's replay: the prompt, attempts used, and the accepted reply's attempt and units.
+    * `accepted` is empty when every attempt failed to parse.
+    */
+  final case class ChunkReplay(
+      chunk: Int,
+      prompt: String,
+      attempts: Int,
+      accepted: Option[(Int, Vector[Json])]
+  ):
+    def receipt: ChunkReceipt = ChunkReceipt(chunk, attempts, accepted.isDefined)
+
+  /** Replay every chunk of one participant, following the harness's attempt loop. `serve` answers
+    * one prompt from recordings and never calls a model.
+    */
+  def chunks(
+      name: String,
+      outline: String,
+      units: Vector[AgentPrompts.RecallUnit],
+      chunk: Int,
+      serve: String => Either[ExchangeFailure, ModelReply]
+  ): Either[Failure, Vector[ChunkReplay]] =
+    units.grouped(chunk).toVector.zipWithIndex.foldLeft[Either[Failure, Vector[ChunkReplay]]](
+      Right(Vector.empty)
+    ) { case (acc, (g, ci)) =>
+      acc.flatMap { done =>
+        val prompt = AgentPrompts.prompt(outline, units, g.head.index, g.last.index)
+        def attempt(n: Int): Either[Failure, ChunkReplay] =
+          if n == Attempts then Right(ChunkReplay(ci, prompt, n, None))
+          else
+            serve(prompt + suffix(n)) match
+              case Left(ExchangeFailure.RecordingMissing(_)) =>
+                Left(Failure.Unrecorded(name, ci, n))
+              case Left(other)  => Left(Failure.Exchange(name, ci, n, other.code.toString))
+              case Right(reply) =>
+                parseReply(reply.text).flatMap(_.hcursor.get[Vector[Json]]("units").toOption) match
+                  case Some(items) => Right(ChunkReplay(ci, prompt, n + 1, Some(n -> items)))
+                  case None        => attempt(n + 1)
+        attempt(0).map(done :+ _)
+      }
+    }
+
+  /** Each answered unit's last reply item (a later chunk overwrites an earlier one, as the harness
+    * did), with the chunk and attempt that produced it.
+    */
+  def answered(
+      name: String,
+      replays: Vector[ChunkReplay]
+  ): Either[Failure, Map[Int, (Json, ChunkReplay, Int)]] =
+    replays.foldLeft[Either[Failure, Map[Int, (Json, ChunkReplay, Int)]]](Right(Map.empty)) {
+      (acc, r) =>
+        r.accepted.fold(acc) { (attempt, items) =>
+          items.foldLeft(acc) { (m, x) =>
+            m.flatMap(mm =>
+              unitKey(x).map(k => mm.updated(k, (x, r, attempt))).toRight(
+                Failure.BadUnitKey(name, r.chunk)
+              )
+            )
+          }
+        }
+    }
+
+  /** Replay one participant into the reply file the arm import reads. A unit the replies never
+    * answered is left out and listed in `missing` (the arm import records a provider failure); a
+    * reply item without a `narrative` field keeps that absence (the arm import records invalid
+    * output). Only an explicit null reaches the arm as a null.
+    */
   def participant(
       name: String,
       outline: String,
@@ -79,48 +144,18 @@ object AgentReplay:
       chunk: Int,
       serve: String => Either[ExchangeFailure, ModelReply]
   ): Either[Failure, (Json, Vector[ChunkReceipt])] =
-    val groups = units.grouped(chunk).toVector
-    val replayed = groups.zipWithIndex.foldLeft[
-      Either[Failure, (Map[Int, Json], Vector[ChunkReceipt])]
-    ](Right(Map.empty -> Vector.empty)) { case (acc, (g, ci)) =>
-      acc.flatMap { (out, receipts) =>
-        val prompt = AgentPrompts.prompt(outline, units, g.head.index, g.last.index)
-        def attempt(n: Int): Either[Failure, (Option[Vector[Json]], Int)] =
-          if n == Attempts then Right(None -> n)
-          else
-            serve(prompt + suffix(n)) match
-              case Left(ExchangeFailure.RecordingMissing(_)) =>
-                Left(Failure.Unrecorded(name, ci, n))
-              case Left(other)  => Left(Failure.Exchange(name, ci, n, other.code.toString))
-              case Right(reply) =>
-                parseReply(reply.text).flatMap(_.hcursor.get[Vector[Json]]("units").toOption) match
-                  case Some(items) => Right(Some(items) -> (n + 1))
-                  case None        => attempt(n + 1)
-        attempt(0).flatMap { (items, used) =>
-          items
-            .getOrElse(Vector.empty)
-            .foldLeft[Either[Failure, Map[Int, Json]]](Right(out)) { (m, x) =>
-              m.flatMap(mm =>
-                unitKey(x).map(mm.updated(_, x)).toRight(Failure.BadUnitKey(name, ci))
-              )
-            }
-            .map(o => o -> (receipts :+ ChunkReceipt(ci, used, items.isDefined)))
-        }
-      }
-    }
     for
-      (out, receipts) <- replayed
+      replays <- chunks(name, outline, units, chunk, serve)
+      out <- answered(name, replays)
       rows <- units.foldLeft[Either[Failure, Vector[Json]]](Right(Vector.empty)) { (acc, u) =>
         acc.flatMap { done =>
           ids.get(u.index).toRight(Failure.MissingId(name, u.index)).map { id =>
-            done :+ Json.obj(
-              "index" -> Json.fromInt(u.index),
-              "id" -> Json.fromString(id),
-              "narrative" -> out
-                .get(u.index)
-                .flatMap(_.hcursor.downField("narrative").focus)
-                .getOrElse(Json.Null)
-            )
+            out.get(u.index).fold(done) { (item, _, _) =>
+              done :+ Json.fromFields(
+                Vector("index" -> Json.fromInt(u.index), "id" -> Json.fromString(id)) ++
+                  item.hcursor.downField("narrative").focus.map("narrative" -> _)
+              )
+            }
           }
         }
       }
@@ -130,4 +165,4 @@ object AgentReplay:
         units.filterNot(u => out.contains(u.index)).map(u => Json.fromInt(u.index))
       ),
       "units" -> Json.fromValues(rows)
-    ) -> receipts
+    ) -> replays.map(_.receipt)

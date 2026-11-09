@@ -76,13 +76,24 @@ class AgentReplaySuite extends FunSuite:
     )
     assertEquals(got.map(_.hcursor.get[Int]("index").toOption.get), Vector(3, 4, 9))
 
-  test("a unit the reply omits is written as null and listed missing, as the harness did"):
+  test("an omitted unit is left out and listed missing; a missing field stays missing"):
     val table = Map(
       first -> """{"units": [{"u": 3, "narrative": 1}]}""",
-      second -> """{"units": [{"u": 9, "narrative": 2}]}"""
+      second -> """{"units": [{"u": 9}]}"""
     )
     val (doc, _) = AgentReplay.participant("P", "OUT", units, ids, 2, serving(table)).toOption.get
     assertEquals(doc.hcursor.get[Vector[Int]]("missing").toOption, Some(Vector(4)))
+    val got = doc.hcursor.get[Vector[Json]]("units").toOption.get
+    assertEquals(got.map(_.hcursor.get[Int]("index").toOption.get), Vector(3, 9))
+    assertEquals(got.last.hcursor.downField("narrative").focus, None)
+    assertEquals(
+      storymodel4s.pipeline.AgentArmImport
+        .outcomeOf(Some(got.last), "narrative")
+        .hcursor
+        .get[String]("reason")
+        .toOption,
+      Some("missing-field")
+    )
 
   test("three unparsable attempts leave the chunk empty, not refused"):
     val table = Map(
