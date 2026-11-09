@@ -232,7 +232,8 @@ class CategoricalMappingCodecSuite extends FunSuite:
       own.unit,
       DecisionRequest.ExternalDecode(destination, policy),
       Vector(
-        MappingLink.ungated(destination, refs, CandidateSetId.categorical(refs.candidates, own.unit))
+        MappingLink
+          .ungated(destination, refs, CandidateSetId.categorical(refs.candidates, own.unit))
       ),
       refs
     )
