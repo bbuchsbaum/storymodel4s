@@ -192,12 +192,15 @@ class MappingCodecSuite extends FunSuite:
       MappingCodecError.Reserved("measurement_compatibility")
     )
   }
-  test("v0.2 refuses with UnsupportedSchema before parsing its body") {
-    val json = Json.obj("schemaVersion" -> Json.fromString("mapping-record/v0.2"))
+  test("v0.3 refuses with UnsupportedSchema before parsing its body") {
+    val json = Json.obj("schemaVersion" -> Json.fromString("mapping-record/v0.3"))
     refused(
       decode(json, context(miniature)),
       MappingCodecError.Wire(
-        CodecError.UnsupportedSchema("mapping-record/v0.2", Vector(MappingCodecs.SchemaVersion))
+        CodecError.UnsupportedSchema(
+          "mapping-record/v0.3",
+          Vector(MappingCodecs.SchemaVersion, MappingCodecs.CategoricalSchemaVersion)
+        )
       )
     )
   }
@@ -404,7 +407,7 @@ class MappingCodecSuite extends FunSuite:
         row.unit,
         measures,
         links,
-        row.decision.get.basis,
+        row.decision.get.numerical.get.basis,
         DecisionRequest.RawArgmax,
         stages
       )
@@ -717,7 +720,7 @@ class MappingCodecSuite extends FunSuite:
           unit.unit,
           measures,
           unit.links,
-          unit.decision.get.basis,
+          unit.decision.get.numerical.get.basis,
           unit.decision.get.request,
           unit.stages.get
         )

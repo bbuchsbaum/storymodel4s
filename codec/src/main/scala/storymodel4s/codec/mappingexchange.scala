@@ -9,6 +9,9 @@ import storymodel4s.recall.RecallTiming
 /** Lossless analysis files derived from one checked mapping. No inference runs here. */
 object MappingExchange:
   val SchemaVersion: String = "mapping-exchange/v0.1"
+
+  /** The exchange around a `mapping-record/v0.2` record, which may hold categorical decisions. */
+  val CategoricalSchemaVersion: String = "mapping-exchange/v0.2"
   val ReferenceSchemaVersion: String = "mapping-exchange/reference/v1"
   val PairSchemaVersion: String = "mapping-exchange-pair/v1"
   val PairTemporalSchemaVersion: String = "mapping-exchange-pair-temporal/v1"
@@ -401,10 +404,10 @@ object MappingExchange:
         val manifest = MappingJson.print(
           Json.obj(
             "schemaVersion" -> Json.fromString(
-              if field(json, "schemaVersion").asString
-                  .contains(MappingCodecs.ReferenceSchemaVersion)
-              then ReferenceSchemaVersion
-              else SchemaVersion
+              field(json, "schemaVersion").asString match
+                case Some(MappingCodecs.ReferenceSchemaVersion)   => ReferenceSchemaVersion
+                case Some(MappingCodecs.CategoricalSchemaVersion) => CategoricalSchemaVersion
+                case _                                            => SchemaVersion
             ),
             "mapping_digest" -> Json.fromString(digest),
             "inventory_digest" -> field(inventory, "digest"),
@@ -419,7 +422,12 @@ object MappingExchange:
               "temporal_projection" -> unavailable("not-supplied-to-base-exchange"),
               "scanner_alignment" -> unavailable("not-supplied-to-base-exchange"),
               "organization" -> unavailable("not-supplied-to-base-exchange"),
-              "calibration" -> unavailable("not-admitted-by-mapping-record/v0.1"),
+              "calibration" -> unavailable(
+                if field(json, "schemaVersion").asString
+                    .contains(MappingCodecs.CategoricalSchemaVersion)
+                then "not-admitted-by-mapping-record/v0.2"
+                else "not-admitted-by-mapping-record/v0.1"
+              ),
               "paired_profiles" -> unavailable("single-record-component")
             ),
             "files" -> Json.fromValues(files)
@@ -445,7 +453,9 @@ object MappingExchange:
       parsed <- Canonical.parse(manifest).left.map(_ => Error.InvalidManifest)
       _ <- MappingJson.uniqueObjectKeys(manifest).left.map(_ => Error.InvalidManifest)
       _ <- Either.cond(
-        parsed.hcursor.get[String]("schemaVersion").contains(SchemaVersion),
+        parsed.hcursor
+          .get[String]("schemaVersion")
+          .exists(v => v == SchemaVersion || v == CategoricalSchemaVersion),
         (),
         Error.InvalidManifest
       )

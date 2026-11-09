@@ -360,48 +360,67 @@ private[align] object MappingResultRender:
       sequence(Vector("external-decode", chosen.key, policy.value))
     case DecisionRequest.Abstain(policy, reason) =>
       sequence(Vector("abstain", policy.value, reason))
-  private def decision(value: UnitDecision): String = sequence(
-    Vector(
-      value.basis.kind.toString,
-      optional(value.basis.channel),
-      optional(value.chosen.map(_.key)),
-      value.origin match
-        case DecisionOrigin.RawArgmax                => "raw-argmax"
-        case DecisionOrigin.StructuredDecode(policy) =>
-          sequence(Vector("structured-decode", policy.value))
-        case DecisionOrigin.GapFill(policy)    => sequence(Vector("gap-fill", policy.value))
-        case DecisionOrigin.Abstention(reason) => sequence(Vector("abstention", reason))
-      ,
-      optional(
-        value.rawArgmax.map((destination, score) =>
-          sequence(Vector(destination.key, number(score)))
+  private def decisionOrigin(value: DecisionOrigin): String = value match
+    case DecisionOrigin.RawArgmax                => "raw-argmax"
+    case DecisionOrigin.StructuredDecode(policy) =>
+      sequence(Vector("structured-decode", policy.value))
+    case DecisionOrigin.GapFill(policy)        => sequence(Vector("gap-fill", policy.value))
+    case DecisionOrigin.Abstention(reason)     => sequence(Vector("abstention", reason))
+    case DecisionOrigin.ProducerChoice(policy) => sequence(Vector("producer-choice", policy.value))
+  private def calibration(value: DecisionCalibration): String = value match
+    case status: DecisionCalibration.Unavailable =>
+      sequence(Vector("unavailable", status.reason.toString))
+    case status: DecisionCalibration.Calibrated =>
+      sequence(
+        Vector(
+          "calibrated",
+          number(status.probability.probability.value),
+          status.probability.artifact.value,
+          status.probability.event match
+            case CalibratedEvent.ChosenDecisionCorrect(policy) =>
+              sequence(Vector("chosen-decision-correct", policy.value))
         )
-      ),
-      value.decodedMass match
-        case mass: DecodedTargetMass.InCandidateSupport =>
-          sequence(Vector("in-candidate-support", number(mass.value)))
-        case _: DecodedTargetMass.OutsideCandidateSupport => "outside-candidate-support"
-        case _: DecodedTargetMass.NoDecision              => "no-decision"
-      ,
-      value.calibration match
-        case status: DecisionCalibration.Unavailable =>
-          sequence(Vector("unavailable", status.reason.toString))
-        case status: DecisionCalibration.Calibrated =>
-          sequence(
-            Vector(
-              "calibrated",
-              number(status.probability.probability.value),
-              status.probability.artifact.value,
-              status.probability.event match
-                case CalibratedEvent.ChosenDecisionCorrect(policy) =>
-                  sequence(Vector("chosen-decision-correct", policy.value))
+      )
+
+  /** Numerical rendering is unchanged from G1. A categorical decision renders a distinct leading
+    * tag and a different arity, so no categorical decision shares a digest with a numerical one.
+    */
+  private def decision(value: UnitDecision): String = value.support match
+    case support: DecisionSupport.Numerical =>
+      sequence(
+        Vector(
+          support.basis.kind.toString,
+          optional(support.basis.channel),
+          optional(value.chosen.map(_.key)),
+          decisionOrigin(value.origin),
+          optional(
+            support.rawArgmax.map((destination, score) =>
+              sequence(Vector(destination.key, number(score)))
             )
-          )
-      ,
-      optional(value.policy.map(_.value)),
-      request(value.request)
-    )
-  )
+          ),
+          support.decodedMass match
+            case mass: DecodedTargetMass.InCandidateSupport =>
+              sequence(Vector("in-candidate-support", number(mass.value)))
+            case _: DecodedTargetMass.OutsideCandidateSupport => "outside-candidate-support"
+            case _: DecodedTargetMass.NoDecision              => "no-decision"
+          ,
+          calibration(value.calibration),
+          optional(value.policy.map(_.value)),
+          request(value.request)
+        )
+      )
+    case support: DecisionSupport.Categorical =>
+      sequence(
+        Vector(
+          "categorical",
+          support.policy.value,
+          optional(value.chosen.map(_.key)),
+          decisionOrigin(value.origin),
+          calibration(value.calibration),
+          optional(value.policy.map(_.value)),
+          request(value.request)
+        )
+      )
   private def outcome(value: UnitOutcome): String = sequence(
     Vector(
       value.unit.value,

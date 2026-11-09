@@ -107,40 +107,67 @@ private[codec] object MappingRecordWire:
       tagged("external-decode", "chosen" -> str(chosen.key), "policy" -> str(policy.value))
     case DecisionRequest.Abstain(policy, reason) =>
       tagged("abstain", "policy" -> str(policy.value), "reason" -> str(reason))
-  def decision(value: UnitDecision): Json = obj(
-    "basis" -> basis(value.basis),
-    "request" -> request(value.request),
-    "decoded_target_id" -> optional(value.chosen)(v => str(v.key)),
-    "decision_origin" -> (value.origin match
-      case DecisionOrigin.RawArgmax                => tagged("raw-argmax")
-      case DecisionOrigin.StructuredDecode(policy) =>
-        tagged("structured-decode", "decision_policy_id" -> str(policy.value))
-      case DecisionOrigin.GapFill(policy) =>
-        tagged("gap-fill", "decision_policy_id" -> str(policy.value))
-      case DecisionOrigin.Abstention(reason) => tagged("abstention", "reason" -> str(reason))),
-    "raw_argmax" -> optional(value.rawArgmax)((destination, v) =>
-      obj("destination" -> str(destination.key), "value" -> number(v))
-    ),
-    "decoded_target_mass" -> (value.decodedMass match
-      case v: DecodedTargetMass.InCandidateSupport =>
-        tagged("value", "value" -> number(v.value), "decision_in_candidate_support" -> Json.True)
-      case _: DecodedTargetMass.OutsideCandidateSupport =>
-        tagged("value", "value" -> number(0.0), "decision_in_candidate_support" -> Json.False)
-      case _: DecodedTargetMass.NoDecision => tagged("no-decision")),
-    "calibration" -> (value.calibration match
-      case v: DecisionCalibration.Unavailable =>
-        tagged("unavailable", "reason" -> str(v.reason.toString))
-      case v: DecisionCalibration.Calibrated =>
-        tagged(
-          "calibrated",
-          "probability" -> number(v.probability.probability.value),
-          "artifact" -> str(v.probability.artifact.value),
-          "event" -> (v.probability.event match
-            case CalibratedEvent.ChosenDecisionCorrect(policy) =>
-              tagged("chosen-decision-correct", "decision_policy_id" -> str(policy.value)))
-        )),
-    "decision_policy_id" -> optional(value.policy)(v => str(v.value))
-  )
+  def origin(value: DecisionOrigin): Json = value match
+    case DecisionOrigin.RawArgmax                => tagged("raw-argmax")
+    case DecisionOrigin.StructuredDecode(policy) =>
+      tagged("structured-decode", "decision_policy_id" -> str(policy.value))
+    case DecisionOrigin.GapFill(policy) =>
+      tagged("gap-fill", "decision_policy_id" -> str(policy.value))
+    case DecisionOrigin.Abstention(reason)     => tagged("abstention", "reason" -> str(reason))
+    case DecisionOrigin.ProducerChoice(policy) =>
+      tagged("producer-choice", "decision_policy_id" -> str(policy.value))
+  def calibration(value: DecisionCalibration): Json = value match
+    case v: DecisionCalibration.Unavailable =>
+      tagged("unavailable", "reason" -> str(v.reason.toString))
+    case v: DecisionCalibration.Calibrated =>
+      tagged(
+        "calibrated",
+        "probability" -> number(v.probability.probability.value),
+        "artifact" -> str(v.probability.artifact.value),
+        "event" -> (v.probability.event match
+          case CalibratedEvent.ChosenDecisionCorrect(policy) =>
+            tagged("chosen-decision-correct", "decision_policy_id" -> str(policy.value)))
+      )
+
+  /** A numerical decision encodes exactly as in v0.1 (no support key). A categorical decision names
+    * its support kind and carries no basis, argmax or target mass fields at all.
+    */
+  def decision(value: UnitDecision): Json = value.support match
+    case support: DecisionSupport.Numerical =>
+      obj(
+        "basis" -> basis(support.basis),
+        "request" -> request(value.request),
+        "decoded_target_id" -> optional(value.chosen)(v => str(v.key)),
+        "decision_origin" -> origin(value.origin),
+        "raw_argmax" -> optional(support.rawArgmax)((destination, v) =>
+          obj("destination" -> str(destination.key), "value" -> number(v))
+        ),
+        "decoded_target_mass" -> (support.decodedMass match
+          case v: DecodedTargetMass.InCandidateSupport =>
+            tagged(
+              "value",
+              "value" -> number(v.value),
+              "decision_in_candidate_support" -> Json.True
+            )
+          case _: DecodedTargetMass.OutsideCandidateSupport =>
+            tagged("value", "value" -> number(0.0), "decision_in_candidate_support" -> Json.False)
+          case _: DecodedTargetMass.NoDecision => tagged("no-decision")),
+        "calibration" -> calibration(value.calibration),
+        "decision_policy_id" -> optional(value.policy)(v => str(v.value))
+      )
+    case support: DecisionSupport.Categorical =>
+      obj(
+        "support" -> tagged("categorical", "decision_policy_id" -> str(support.policy.value)),
+        "request" -> request(value.request),
+        "decoded_target_id" -> optional(value.chosen)(v => str(v.key)),
+        "decision_origin" -> origin(value.origin),
+        "calibration" -> calibration(value.calibration),
+        "decision_policy_id" -> optional(value.policy)(v => str(v.value))
+      )
+
+  /** True when any decision needs `mapping-record/v0.2` to be read without reinterpretation. */
+  def categorical(value: MappingResult): Boolean =
+    value.outcomes.exists(_.decision.exists(_.numerical.isEmpty))
   def fidelityStatus(value: FidelityStatus): Json = value match
     case FidelityStatus.NotApplicable  => tagged("not-applicable")
     case v: FidelityStatus.NotAssessed => tagged("not-assessed", "reason" -> str(v.reason.toString))
@@ -281,6 +308,7 @@ private[codec] object MappingRecordWire:
     "schemaVersion" -> str(
       if value.ledger.entries.exists(_.provenance.isInstanceOf[StageProvenance.ReferenceDerived])
       then "mapping-record/reference/v1"
+      else if categorical(value) then "mapping-record/v0.2"
       else "mapping-record/v0.1"
     ),
     "record_digest" -> str(value.digest.hex),

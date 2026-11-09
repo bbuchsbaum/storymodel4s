@@ -8,7 +8,14 @@ import MappingJson.*
 /** Canonical, contextual interchange for one complete checked mapping. */
 object MappingCodecs:
   val Schema: String = "storymodel4s.mapping-record"
+
+  /** Written for a record whose decisions all have numerical support. */
   val SchemaVersion: String = "mapping-record/v0.1"
+
+  /** Written when any decision has categorical support, so a v0.1 reader refuses it by version.
+    */
+  val CategoricalSchemaVersion: String = "mapping-record/v0.2"
+  val SupportedSchemaVersions: Vector[String] = Vector(SchemaVersion, CategoricalSchemaVersion)
   def encode(value: MappingResult): String = print(MappingRecordWire.encode(value))
   def toJson(value: MappingResult): Json = MappingRecordWire.encode(value)
 
@@ -74,9 +81,9 @@ object MappingCodecs:
       json <- Canonical.parse(text).left.map(MappingCodecError.Wire(_))
       version <- field[String](json, "schemaVersion")
       _ <- Either.cond(
-        version == SchemaVersion,
+        SupportedSchemaVersions.contains(version),
         (),
-        MappingCodecError.Wire(CodecError.UnsupportedSchema(version, Vector(SchemaVersion)))
+        MappingCodecError.Wire(CodecError.UnsupportedSchema(version, SupportedSchemaVersions))
       )
       schema <- field[String](json, "schema")
       _ <- Either.cond(schema == Schema, (), MappingCodecError.ValueMismatch("schema"))
@@ -107,7 +114,16 @@ object MappingCodecs:
       )
       ledger <- field[Json](json, "stage_assumption_receipts").flatMap(MappingMetadataRead.ledger)
       outcomes <- field[Vector[Json]](json, "outcomes").flatMap(
-        _.traverse(v => MappingOutcomeRead.outcome(v, ledger, policies, context.source, derivation))
+        _.traverse(v =>
+          MappingOutcomeRead.outcome(
+            v,
+            ledger,
+            policies,
+            context.source,
+            derivation,
+            version == CategoricalSchemaVersion
+          )
+        )
       )
       result <- checked(
         MappingResult.checked(context.inventory, context.source, policies, roles, ledger, outcomes)

@@ -67,7 +67,7 @@ object WorkspaceVoyage:
               posterior <- outcome.measures.posterior.toRight(Unavailable.PosteriorNotSupplied)
               decision <- outcome.decision
                 .filter(d =>
-                  d.basis.kind == MeasureKind.ModelPosterior &&
+                  d.numerical.exists(_.basis.kind == MeasureKind.ModelPosterior) &&
                     d.origin == DecisionOrigin.RawArgmax && d.request == DecisionRequest.RawArgmax
                 )
                 .toRight(Unavailable.DecisionNotPosteriorArgmax)

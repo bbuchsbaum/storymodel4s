@@ -52,9 +52,9 @@ class MappingOutcomeSuite extends FunSuite:
   test("p3 keeps e7's value") {
     val row = outcome(Map(e3 -> 0.9, e7 -> 0.4), DecisionRequest.ExternalDecode(e7, policy))
     val decision = row.decision.get
-    assertEquals(decision.rawArgmax, Some(e3 -> 0.9))
+    assertEquals(decision.numerical.get.rawArgmax, Some(e3 -> 0.9))
     assertEquals(decision.chosen, Some(e7))
-    assertMass(decision.decodedMass, 0.4)
+    assertMass(decision.numerical.get.decodedMass, 0.4)
     assertEquals(decision.origin, DecisionOrigin.StructuredDecode(policy))
     assertEquals(row.localization, LocalizationStatus.Located)
     assertEquals(outcome(Map(e3 -> 0.9, e7 -> 0.4)).decision.get.chosen, Some(e3))
@@ -64,13 +64,15 @@ class MappingOutcomeSuite extends FunSuite:
       outcome(Map(e3 -> 0.9, e7 -> 0.4), DecisionRequest.ExternalDecode(e8, policy)).decision.get
     assertEquals(decision.origin, DecisionOrigin.GapFill(policy))
     assertEquals(decision.chosen, Some(e8))
-    assert(decision.decodedMass.isInstanceOf[DecodedTargetMass.OutsideCandidateSupport])
+    assert(
+      decision.numerical.get.decodedMass.isInstanceOf[DecodedTargetMass.OutsideCandidateSupport]
+    )
   }
   test("in-support zero stays") {
     val decision =
       outcome(Map(e3 -> 1.0, e7 -> 0.0), DecisionRequest.ExternalDecode(e7, policy)).decision.get
     assertEquals(decision.origin, DecisionOrigin.StructuredDecode(policy))
-    assertMass(decision.decodedMass, 0.0)
+    assertMass(decision.numerical.get.decodedMass, 0.0)
   }
   test("listed fill target is still GapFill") {
     val row = outcome(
@@ -80,7 +82,10 @@ class MappingOutcomeSuite extends FunSuite:
     )
     assertEquals(row.links.map(_.destination).toSet, Set(e3, e7, e8))
     assertEquals(row.decision.get.origin, DecisionOrigin.GapFill(policy))
-    assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.OutsideCandidateSupport])
+    assert(
+      row.decision.get.numerical.get.decodedMass
+        .isInstanceOf[DecodedTargetMass.OutsideCandidateSupport]
+    )
   }
   test("agreeing decode stays StructuredDecode") {
     val decision =
@@ -97,7 +102,7 @@ class MappingOutcomeSuite extends FunSuite:
   test("p7 tie by key, both kept") {
     Vector(VectorMap(e8 -> 0.5, e3 -> 0.5), VectorMap(e3 -> 0.5, e8 -> 0.5)).foreach { values =>
       val row = outcome(values)
-      assertEquals(row.decision.get.rawArgmax, Some(e3 -> 0.5))
+      assertEquals(row.decision.get.numerical.get.rawArgmax, Some(e3 -> 0.5))
       assertEquals(row.links.map(_.destination), Vector(e3, e8))
     }
     assertEquals(outcome(VectorMap(e8 -> 0.0, e3 -> -0.0)).decision.get.chosen, Some(e3))
@@ -107,9 +112,11 @@ class MappingOutcomeSuite extends FunSuite:
       request =>
         val row = outcome(Map.empty, request, Vector(raw(Map(e8 -> 8.0), "other")))
         assertEquals(row.decision.get.chosen, None)
-        assertEquals(row.decision.get.rawArgmax, None)
+        assertEquals(row.decision.get.numerical.get.rawArgmax, None)
         assertEquals(row.decision.get.origin, DecisionOrigin.Abstention("EmptyDecisionBasis"))
-        assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
+        assert(
+          row.decision.get.numerical.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision]
+        )
         assertEquals(row.localization, LocalizationStatus.Unranked)
         assertEquals(row.links.map(_.destination), Vector(e8))
     }
@@ -119,8 +126,8 @@ class MappingOutcomeSuite extends FunSuite:
     assertEquals(row.processing, ProcessingStatus.Complete)
     assertEquals(row.localization, LocalizationStatus.NotComputed)
     assertEquals(row.decision.get.chosen, None)
-    assertEquals(row.decision.get.rawArgmax, Some(e3 -> 0.9))
-    assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
+    assertEquals(row.decision.get.numerical.get.rawArgmax, Some(e3 -> 0.9))
+    assert(row.decision.get.numerical.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
     assertEquals(row.decision.get.origin, DecisionOrigin.Abstention("decoder declined"))
     assertEquals(row.decision.get.policy, Some(policy))
     assertEquals(row.stages, Some(stages))
@@ -130,13 +137,13 @@ class MappingOutcomeSuite extends FunSuite:
       val row = outcome(values)
       assertEquals(row.localization, LocalizationStatus.Nonlocalizable)
       assertEquals(row.decision.get.chosen, Some(external))
-      assertEquals(row.decision.get.rawArgmax, Some(external -> values(external)))
+      assertEquals(row.decision.get.numerical.get.rawArgmax, Some(external -> values(external)))
     }
   }
   test("raw direction is respected including negative scores") {
     val row = outcome(Map(e3 -> -0.9, external -> -1.2), direction = ScoreDirection.LowerIsBetter)
-    assertEquals(row.decision.get.rawArgmax, Some(external -> -1.2))
-    assertMass(row.decision.get.decodedMass, -1.2)
+    assertEquals(row.decision.get.numerical.get.rawArgmax, Some(external -> -1.2))
+    assertMass(row.decision.get.numerical.get.decodedMass, -1.2)
   }
   test("failed and excluded units carry no invented decision or measures") {
     val failure = ProcessingFailure.ProviderFailure("synthetic refusal")
@@ -277,7 +284,7 @@ class MappingOutcomeSuite extends FunSuite:
         )
         .toOption
         .get
-      assertMass(row.decision.get.decodedMass, value)
+      assertMass(row.decision.get.numerical.get.decodedMass, value)
     }
   }
 
@@ -438,7 +445,7 @@ class MappingOutcomeSuite extends FunSuite:
             row.unit,
             row.measures,
             row.links,
-            decision.basis,
+            decision.numerical.get.basis,
             decision.request,
             row.stages.get
           )

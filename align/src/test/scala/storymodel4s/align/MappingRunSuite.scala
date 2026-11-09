@@ -106,7 +106,7 @@ class MappingRunSuite extends FunSuite:
         row.unit,
         measures,
         row.links,
-        row.decision.get.basis,
+        row.decision.get.numerical.get.basis,
         DecisionRequest.RawArgmax,
         row.stages.get
       )
@@ -160,7 +160,7 @@ class MappingRunSuite extends FunSuite:
         row.unit,
         measures,
         links,
-        row.decision.get.basis,
+        row.decision.get.numerical.get.basis,
         DecisionRequest.RawArgmax,
         stages
       )
@@ -222,7 +222,9 @@ class MappingRunSuite extends FunSuite:
     assert(row.measures.posterior.get.mass.keys.exists(_.anchor.contains(a)))
     assert(row.decision.get.origin.isInstanceOf[DecisionOrigin.GapFill])
     assertEquals(
-      row.decision.get.decodedMass.asInstanceOf[DecodedTargetMass.InCandidateSupport].value,
+      row.decision.get.numerical.get.decodedMass
+        .asInstanceOf[DecodedTargetMass.InCandidateSupport]
+        .value,
       0.0
     )
   }
@@ -354,7 +356,7 @@ class MappingRunSuite extends FunSuite:
         row.unit,
         measures,
         row.links,
-        row.decision.get.basis,
+        row.decision.get.numerical.get.basis,
         DecisionRequest.RawArgmax,
         row.stages.get
       )

@@ -65,6 +65,9 @@ enum DecisionOrigin:
   case GapFill(policy: DecisionPolicyId)
   case Abstention(reason: String)
 
+  /** A producer's categorical choice: no score ranked it, so it is never an argmax or decode. */
+  case ProducerChoice(policy: DecisionPolicyId)
+
 type DecodedTargetMass = UnitOutcome.DecodedMass
 object DecodedTargetMass:
   export UnitOutcome.DecodedMass.{InCandidateSupport, OutsideCandidateSupport, NoDecision}
@@ -77,6 +80,11 @@ object DecisionCalibration:
   export UnitOutcome.Calibration.{Unavailable, Calibrated}
 
 type UnitDecision = UnitOutcome.Decision
+
+/** What licensed a decision: a numerical basis, or a producer's score-free categorical choice. */
+type DecisionSupport = UnitOutcome.Support
+object DecisionSupport:
+  export UnitOutcome.Support.{Numerical, Categorical}
 
 /** One outcome for every inventory unit, including processing failures and explicit abstention. */
 final class UnitOutcome private (
@@ -115,17 +123,42 @@ object UnitOutcome:
     /** Reserved: no construction door in G1. */
     final class Calibrated private (val probability: CalibratedProbability) extends Calibration
 
-  /** Constructed only after the actual basis, link inventory and unit bindings agree. */
+  /** Why a decision may be read as it is; each case carries only what its producer measured. */
+  sealed trait Support
+  object Support:
+
+    /** Scores resolved from `UnitMeasures`: the only support that has an argmax or a mass. */
+    final class Numerical private (
+        val basis: DecisionBasis,
+        val rawArgmax: Option[(Destination, Double)],
+        val decodedMass: DecodedTargetMass
+    ) extends Support
+    object Numerical:
+      private[UnitOutcome] def derived(
+          basis: DecisionBasis,
+          rawArgmax: Option[(Destination, Double)],
+          decodedMass: DecodedTargetMass
+      ): Numerical = new Numerical(basis, rawArgmax, decodedMass)
+
+    /** A producer's categorical choice or abstention; no number exists to rank or calibrate it. */
+    final class Categorical private (val policy: DecisionPolicyId) extends Support
+    object Categorical:
+      private[UnitOutcome] def derived(policy: DecisionPolicyId): Categorical =
+        new Categorical(policy)
+
+  /** Constructed only after the actual support, link inventory and unit bindings agree. */
   final class Decision private[UnitOutcome] (
-      val basis: DecisionBasis,
+      val support: DecisionSupport,
       val chosen: Option[Destination],
       val origin: DecisionOrigin,
-      val rawArgmax: Option[(Destination, Double)],
-      val decodedMass: DecodedTargetMass,
       val calibration: DecisionCalibration,
       val policy: Option[DecisionPolicyId],
       val request: DecisionRequest
-  )
+  ):
+    /** The numerical support, absent (never defaulted) for a categorical decision. */
+    def numerical: Option[Support.Numerical] = support match
+      case value: Support.Numerical => Some(value)
+      case _: Support.Categorical   => None
 
   def computed(
       unit: RecallUnitId,
@@ -202,11 +235,9 @@ object UnitOutcome:
                     case Destination.Target(_)   => LocalizationStatus.Located
                   (Some(destination), provenance, mass, location)
               val decision = new Decision(
-                basis,
+                Support.Numerical.derived(basis, argmax, decodedMass),
                 chosen,
                 origin,
-                argmax,
-                decodedMass,
                 Calibration.Unavailable.derived(),
                 policy,
                 request
@@ -240,24 +271,23 @@ object UnitOutcome:
           )
           for
             decision <- outcome.decision.toRight(MappingRefusal.BindingMismatch("fill.decision"))
+            numerical <- decision.numerical.toRight(MappingRefusal.BindingMismatch("fill.decision"))
             posterior <- outcome.measures.posterior.toRight(
               MappingRefusal.BindingMismatch("fill.posterior")
             )
             _ <- posterior.binding.checkResult(execution.reconstruction.inference)
             _ <- Either.cond(
               posterior.unit == actual.unit &&
-                decision.basis.kind == MeasureKind.ModelPosterior &&
+                numerical.basis.kind == MeasureKind.ModelPosterior &&
                 decision.chosen == actual.anchor.map(Destination.Target(_)) &&
                 decision.policy.contains(expectedPolicy),
               (),
               MappingRefusal.BindingMismatch("fill.execution")
             )
             retained = new Decision(
-              decision.basis,
+              numerical,
               decision.chosen,
               DecisionOrigin.GapFill(expectedPolicy),
-              decision.rawArgmax,
-              decision.decodedMass,
               decision.calibration,
               decision.policy,
               decision.request
@@ -272,6 +302,100 @@ object UnitOutcome:
             outcome.stages
           )
       }
+
+  /** A producer's score-free choice or explicit no-assignment, bound like a computed outcome.
+    *
+    * A choice (`ExternalDecode`) carries exactly one link, to the chosen destination; an abstention
+    * carries none. Links name `CandidateSetId.categorical`, because no numeric basis keys exist.
+    * Measures are empty, so no reader can find a score for this unit. Source and universe
+    * membership of the destination is checked by `MappingResult.checked`. A raw argmax request is
+    * refused: it has no categorical meaning.
+    */
+  def categorical(
+      unit: RecallUnitId,
+      request: DecisionRequest,
+      links: Vector[MappingLink],
+      stages: UnitStageRefs
+  ): Either[MappingRefusal, UnitOutcome] =
+    val foreignLink = links.exists(_.derivation match
+      case d: MeasureDerivation.FromResult => d.unit != unit
+      case MeasureDerivation.Supplied      => false)
+    val candidateSet = CandidateSetId.categorical(stages.candidates, unit)
+    val expected = request match
+      case DecisionRequest.ExternalDecode(chosen, _) => Vector(chosen)
+      case _                                         => Vector.empty
+    request match
+      case DecisionRequest.RawArgmax =>
+        Left(
+          MappingRefusal.InvalidValue(
+            "decision.request",
+            "a categorical decision needs an explicit choice or abstention"
+          )
+        )
+      case DecisionRequest.Abstain(_, reason) if reason.trim.isEmpty =>
+        Left(MappingRefusal.InvalidValue("decision.abstention", "reason must be nonempty"))
+      case _ if foreignLink => Left(MappingRefusal.BindingMismatch("outcome.unit"))
+      case _ if links.exists(_.inferenceStage != stages.inference) =>
+        Left(MappingRefusal.BindingMismatch("outcome.inferenceStage"))
+      case _ if links.exists(_.candidateSet != candidateSet) =>
+        Left(MappingRefusal.CandidateSetMismatch(unit))
+      case _ if links.map(_.destination) != expected =>
+        Left(MappingRefusal.LinkDestinationsMismatch)
+      case DecisionRequest.ExternalDecode(destination, policy) =>
+        val localization = destination match
+          case Destination.External(ExternalState.Unranked) => LocalizationStatus.Unranked
+          case Destination.External(_)                      => LocalizationStatus.Nonlocalizable
+          case Destination.Target(_)                        => LocalizationStatus.Located
+        Right(
+          categoricalOutcome(
+            unit,
+            localization,
+            links,
+            new Decision(
+              Support.Categorical.derived(policy),
+              Some(destination),
+              DecisionOrigin.ProducerChoice(policy),
+              Calibration.Unavailable.derived(),
+              Some(policy),
+              request
+            ),
+            stages
+          )
+        )
+      case DecisionRequest.Abstain(policy, reason) =>
+        Right(
+          categoricalOutcome(
+            unit,
+            LocalizationStatus.NotComputed,
+            links,
+            new Decision(
+              Support.Categorical.derived(policy),
+              None,
+              DecisionOrigin.Abstention(reason),
+              Calibration.Unavailable.derived(),
+              Some(policy),
+              request
+            ),
+            stages
+          )
+        )
+
+  private def categoricalOutcome(
+      unit: RecallUnitId,
+      localization: LocalizationStatus,
+      links: Vector[MappingLink],
+      decision: Decision,
+      stages: UnitStageRefs
+  ): UnitOutcome =
+    new UnitOutcome(
+      unit,
+      ProcessingStatus.Complete,
+      localization,
+      links,
+      UnitMeasures.empty,
+      Some(decision),
+      Some(stages)
+    )
 
   def failed(unit: RecallUnitId, failure: ProcessingFailure): UnitOutcome =
     new UnitOutcome(

@@ -35,7 +35,7 @@ class WorkspaceFixtureSuite extends FunSuite:
     assertEquals(row.cell(ring).get.normalized, Some(0.25))
     assertEquals(row.cell(quiet).get.normalized, Some(0.25))
     assertEquals(row.cell(Destination.External(ExternalState.Intrusion)).get.normalized, Some(0.5))
-    assertEquals(row.outcome.decision.get.rawArgmax.map(_._1), Some(ring))
+    assertEquals(row.outcome.decision.get.numerical.get.rawArgmax.map(_._1), Some(ring))
     assertEquals(row.outcome.decision.get.chosen, Some(quiet))
     assert(row.cell(quiet).get.chosen)
     assertEquals(row.cell(ring).get.posterior, Vector.empty)

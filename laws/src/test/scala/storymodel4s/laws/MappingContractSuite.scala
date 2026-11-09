@@ -38,9 +38,12 @@ class MappingContractSuite extends FunSuite:
     val record = MappingMiniature.record
     assertEquals(outcome(record, "p5").localization, LocalizationStatus.Nonlocalizable)
     val decision = outcome(record, "p3").decision.get
-    assertEquals(decision.rawArgmax, Some(Destination.Target(target("e3")) -> 0.9))
+    assertEquals(decision.numerical.get.rawArgmax, Some(Destination.Target(target("e3")) -> 0.9))
     assertEquals(decision.chosen, Some(Destination.Target(target("e7"))))
-    assertEquals(decision.decodedMass.asInstanceOf[DecodedTargetMass.InCandidateSupport].value, 0.4)
+    assertEquals(
+      decision.numerical.get.decodedMass.asInstanceOf[DecodedTargetMass.InCandidateSupport].value,
+      0.4
+    )
     assert(decision.origin.isInstanceOf[DecisionOrigin.StructuredDecode])
   }
   test("p7 retains both tied alternatives and every authored link is unassessed") {

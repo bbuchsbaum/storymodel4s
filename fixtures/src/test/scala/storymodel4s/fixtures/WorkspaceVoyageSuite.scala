@@ -312,7 +312,7 @@ class WorkspaceVoyageSuite extends FunSuite:
             outcome.unit,
             outcome.measures,
             outcome.links,
-            outcome.decision.get.basis,
+            outcome.decision.get.numerical.get.basis,
             if index == 0 then
               DecisionRequest.ExternalDecode(outcome.decision.get.chosen.get, decoder)
             else DecisionRequest.Abstain(decoder, "control"),

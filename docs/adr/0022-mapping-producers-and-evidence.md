@@ -421,3 +421,28 @@ Rejected: treating checked charts or matching quotations as truth; treating uneq
 missing evidence as contradiction; inferring nonexpression from extraction failure; silently dropping
 unresolved claims; changing old `FidelityReport` or alignment scores in this additive slice; and
 inventing a parallel proposition ontology instead of retaining existing charts and evidence types.
+
+## Implementation note 2026-11-09: categorical decision support (step 4a)
+
+Plan: `docs/plans/2026-11-09-categorical-mapping-and-transfer-plan.md`, section 4a.
+
+`UnitOutcome.Decision` now carries a sealed `DecisionSupport`. `Numerical` holds the existing
+basis, raw argmax and decoded target mass, and only `computed` and the fill retention door build
+it. `Categorical` holds the producer's `DecisionPolicyId` and nothing numeric. The checked factory
+`UnitOutcome.categorical` takes the unit, an `ExternalDecode` choice or an `Abstain` reason, links
+and stage references. It refuses a raw argmax request, a blank abstention reason, a link bound to
+another unit, a link on another inference stage, a link with another candidate set, and any link
+set other than exactly the chosen destination (none for an abstention). Its measures are empty, so
+a temporal query refuses it with `MissingMeasure`. Links name `CandidateSetId.categorical`, which is
+domain-separated from every numeric key set, including the empty one. `MappingResult.checked`
+applies the same source and universe membership checks to a categorical destination as to any
+other. A categorical choice has the origin `ProducerChoice`; its calibration stays unavailable.
+
+Wire: numerical decisions encode byte-identically to v0.1. A categorical decision names its support
+kind and has no basis, argmax or mass fields. A record holding any categorical decision is written
+as `mapping-record/v0.2` (its exchange as `mapping-exchange/v0.2`); other records stay v0.1. Readers
+accept both and refuse a categorical decision inside a v0.1 document, so a v0.1-only reader refuses
+a categorical record by version. The record digest renders categorical support with its own tag.
+
+Rejected: fabricating a numeric basis for a categorical choice, such as a one-hot raw score. It
+would make a choice look scored and calibratable, and a digest could not tell it from a real score.

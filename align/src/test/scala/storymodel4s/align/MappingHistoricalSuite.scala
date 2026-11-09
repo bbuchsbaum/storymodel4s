@@ -75,7 +75,7 @@ class MappingHistoricalSuite extends FunSuite:
         raw.values,
         result.costs(outcome.unit).map((s, c) => Destination.of(s) -> c.total)
       )
-      assertEquals(outcome.decision.get.basis.kind, MeasureKind.ModelPosterior)
+      assertEquals(outcome.decision.get.numerical.get.basis.kind, MeasureKind.ModelPosterior)
     }
   }
   test("Unranked row argmax is external") {
@@ -83,7 +83,7 @@ class MappingHistoricalSuite extends FunSuite:
     record.outcomes.foreach { row =>
       assertEquals(row.decision.get.chosen, Some(Destination.External(ExternalState.Unranked)))
       assertEquals(
-        row.decision.get.rawArgmax,
+        row.decision.get.numerical.get.rawArgmax,
         Some(Destination.External(ExternalState.Unranked) -> 1.0)
       )
       assertEquals(row.localization, LocalizationStatus.Unranked)
@@ -186,8 +186,8 @@ class MappingHistoricalSuite extends FunSuite:
       val decision = row.decision.get
       assertEquals(decision.chosen, None)
       assert(decision.origin.isInstanceOf[DecisionOrigin.Abstention])
-      assert(decision.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
-      assert(decision.rawArgmax.nonEmpty)
+      assert(decision.numerical.get.decodedMass.isInstanceOf[DecodedTargetMass.NoDecision])
+      assert(decision.numerical.get.rawArgmax.nonEmpty)
       assertEquals(row.localization, LocalizationStatus.NotComputed)
     }
   }
@@ -196,7 +196,10 @@ class MappingHistoricalSuite extends FunSuite:
     record.outcomes.foreach { row =>
       assertEquals(row.decision.get.chosen, Some(Destination.Target(AnnaFixture.e1)))
       assert(row.decision.get.origin.isInstanceOf[DecisionOrigin.GapFill])
-      assert(row.decision.get.decodedMass.isInstanceOf[DecodedTargetMass.OutsideCandidateSupport])
+      assert(
+        row.decision.get.numerical.get.decodedMass
+          .isInstanceOf[DecodedTargetMass.OutsideCandidateSupport]
+      )
     }
   }
   test("a supplied in-support decode remains StructuredDecode") {
@@ -227,7 +230,9 @@ class MappingHistoricalSuite extends FunSuite:
         case (s, m) if Destination.of(s) == chosen => m
       }.get
       assertEquals(
-        row.decision.get.decodedMass.asInstanceOf[DecodedTargetMass.InCandidateSupport].value,
+        row.decision.get.numerical.get.decodedMass
+          .asInstanceOf[DecodedTargetMass.InCandidateSupport]
+          .value,
         expected
       )
     }

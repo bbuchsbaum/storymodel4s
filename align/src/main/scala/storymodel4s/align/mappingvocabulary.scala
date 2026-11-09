@@ -120,6 +120,16 @@ object CandidateSetId:
       )
     )
 
+  /** A categorical producer has no numeric basis keys; this identity is domain-separated from every
+    * numeric key set, including the empty one, so the two cannot be confused.
+    */
+  def categorical(candidates: StageEntryId, unit: RecallUnitId): CandidateSetId =
+    new CandidateSetId(
+      MappingRender.digest(
+        Vector("candidate-set/categorical/v1", candidates.digest.hex, unit.value)
+      )
+    )
+
 enum CandidateCoverage:
   case Truncated(perLevel: Int)
   case Complete

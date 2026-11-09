@@ -240,12 +240,17 @@ private[codec] object MappingOutcomeRead:
         case other => invalid("link.derivation", s"unknown status $other")
       _ <- exact(value, MappingRecordWire.link(result), "link")
     yield result
+
+  /** `admitsCategorical` is false for a v0.1 document: a categorical decision there is refused
+    * rather than reinterpreted.
+    */
   def outcome(
       value: Json,
       ledger: StageLedger,
       policies: MappingPolicies,
       source: SourceRepresentation,
-      context: Option[MappingBoundContext]
+      context: Option[MappingBoundContext],
+      admitsCategorical: Boolean
   ): Result[UnitOutcome] =
     def failure(value: Json): Result[ProcessingFailure] = for
       kind <- status(value)
@@ -273,15 +278,42 @@ private[codec] object MappingOutcomeRead:
             decision <- field[Json](value, "decision")
               .flatMap(v => readOptional(v)(j => Right(j)))
               .flatMap(_.toRight(MappingCodecError.ValueMismatch("complete.decision")))
-            basis <- field[Json](decision, "basis").flatMap(basis)
             request <- field[Json](decision, "request").flatMap(request)
             stages <- field[Json](value, "stages")
               .flatMap(v => readOptional(v)(j => MappingMetadataRead.stages(j, ledger)))
               .flatMap(_.toRight(MappingCodecError.ValueMismatch("complete.stages")))
-            candidate <- candidates(basis, measures, unit, stages)
-            links <- field[Vector[Json]](value, "links")
-              .flatMap(_.traverse(v => link(v, unit, stages, candidate, source, context)))
-            result <- checked(UnitOutcome.computed(unit, measures, links, basis, request, stages))
+            linkRows <- field[Vector[Json]](value, "links")
+            result <- decision.hcursor.downField("support").focus match
+              case None =>
+                for
+                  basis <- field[Json](decision, "basis").flatMap(basis)
+                  candidate <- candidates(basis, measures, unit, stages)
+                  links <- linkRows.traverse(v => link(v, unit, stages, candidate, source, context))
+                  result <- checked(
+                    UnitOutcome.computed(unit, measures, links, basis, request, stages)
+                  )
+                yield result
+              case Some(support) =>
+                for
+                  kind <- status(support)
+                  _ <- Either.cond(
+                    kind == "categorical",
+                    (),
+                    MappingCodecError.Wire(
+                      CodecError.Decode("decision.support", s"unknown support $kind")
+                    )
+                  )
+                  _ <- Either.cond(
+                    admitsCategorical,
+                    (),
+                    MappingCodecError.ValueMismatch(
+                      "categorical decision support requires mapping-record/v0.2"
+                    )
+                  )
+                  candidate = CandidateSetId.categorical(stages.candidates, unit)
+                  links <- linkRows.traverse(v => link(v, unit, stages, candidate, source, context))
+                  result <- checked(UnitOutcome.categorical(unit, request, links, stages))
+                yield result
           yield result
         case other => invalid("processing_status", s"unknown status $other")
       _ <- exact(value, MappingRecordWire.outcome(result), "outcome")
