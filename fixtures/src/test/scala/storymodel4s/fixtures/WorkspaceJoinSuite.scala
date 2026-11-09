@@ -466,6 +466,29 @@ class WorkspaceJoinSuite extends FunSuite:
     assertEquals(version(opened), Some(MappingCodecs.CategoricalSchemaVersion))
   }
 
+  test("a categorical choice in the source but outside the declared universe refuses") {
+    val unit = recall.ordered.head.id
+    val producer = DecisionPolicyId.unsafe("synthetic-llm-producer/v1")
+    def attempt(ref: SourceNodeRef) =
+      val chosen = Destination.Target(ref)
+      UnitOutcome
+        .categorical(
+          unit,
+          DecisionRequest.ExternalDecode(chosen, producer),
+          Vector(
+            MappingLink.ungated(chosen, stages, CandidateSetId.categorical(stages.candidates, unit))
+          ),
+          stages
+        )
+        .flatMap(o =>
+          MappingResult.checked(inventory, source, policies, roles, ledger, outcomes.updated(0, o))
+        )
+    val outside = source.targets.find(_.level != 0).get.ref
+    assert(!universe.targets.contains(outside))
+    assert(attempt(target).isRight, "same-shape control: a target inside the universe is admitted")
+    assertEquals(attempt(outside).left.toOption, Some(MappingRefusal.UniverseMismatch))
+  }
+
   test("selection export copies complete original rows and binds exact text/table/data payloads") {
     val address = workspace.recallAddress(recall.ordered.head.id).get
     val payload = WorkspaceSubsetCodec.selected(workspace, policyId, Set(address)).toOption.get

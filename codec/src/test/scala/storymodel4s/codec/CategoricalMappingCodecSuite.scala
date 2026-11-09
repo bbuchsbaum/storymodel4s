@@ -241,12 +241,6 @@ class CategoricalMappingCodecSuite extends FunSuite:
     assertEquals(attempt(foreign), Left(MappingRefusal.BindingMismatch("categorical.link")))
   }
 
-  test("a target in the source but outside the declared universe refuses") {
-    val outside = miniature.source.targets.map(_.ref).find(r => !miniature.policies.universe.targets.contains(r))
-    assert(outside.isDefined, "fixture has a source target outside the universe")
-    assert(record(choice(Destination.Target(outside.get))).isLeft)
-  }
-
   test("two categorical policies give different digests") {
     val other = DecisionPolicyId.unsafe("synthetic-llm-producer/v2")
     val second = UnitOutcome
