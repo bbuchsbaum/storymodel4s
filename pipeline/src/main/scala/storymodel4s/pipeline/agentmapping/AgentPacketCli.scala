@@ -86,5 +86,7 @@ import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
     "developmentWithoutUnitTable" -> Json.fromValues(missing.map(Json.fromString))
   )
   Files.writeString(out, doc.spaces2 + "\n"): scala.Unit
-  println(s"outline ${sha(outline)} participants=${dev.size} skipped=${skipped.size} " +
-    s"missing=${missing.size}")
+  println(
+    s"outline ${sha(outline)} participants=${dev.size} skipped=${skipped.size} " +
+      s"missing=${missing.size}"
+  )
