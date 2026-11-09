@@ -1,0 +1,236 @@
+{
+  "schema" : "storymodel4s.agentmapping.replay-receipt/v1",
+  "provider" : "claude-code-cli",
+  "model" : "opus",
+  "outlineSha256" : "70239406862ce19baaecf3326fd15f55a96bb6de4ad013f7a98a094e3165d910",
+  "systemSha256" : "aef7cb6f564b8b1d9c2891d9ed6f000e993cf7c59f8089ed7a27911d7210841a",
+  "chunk" : 60,
+  "modelCalls" : 0,
+  "participants" : [
+    {
+      "participant" : "NN03_ANT_202231_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 2,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN04_ATE_163931_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN05_MUN_151631_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN06_SQT_213031_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN07_SKS_213031_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN08_OLZ_224031_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 2,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 3,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN11_NMA_233131_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 2,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN13_DII_241731_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 2,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 3,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 4,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 5,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN15_DBF_242231_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN16_DBN_242731_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    },
+    {
+      "participant" : "NN17_DBE_242331_final",
+      "chunks" : [
+        {
+          "chunk" : 0,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 1,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 2,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 3,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 4,
+          "attempts" : 1,
+          "accepted" : true
+        },
+        {
+          "chunk" : 5,
+          "attempts" : 1,
+          "accepted" : true
+        }
+      ]
+    }
+  ]
+}
