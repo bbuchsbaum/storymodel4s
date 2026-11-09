@@ -58,9 +58,13 @@ object AgentAnswers:
 
   private def alternatives(scenes: Int)(j: Json): Option[Vector[Alternative]] =
     j.asArray.flatMap { xs =>
-      val parsed = xs.map(_.asArray.collect {
-        case Vector(s, p) if p.isNumber => scene(scenes)(s).map(Alternative(_, p))
-      }.flatten)
+      val parsed = xs.map(
+        _.asArray
+          .collect {
+            case Vector(s, p) if p.isNumber => scene(scenes)(s).map(Alternative(_, p))
+          }
+          .flatten
+      )
       Option.when(parsed.forall(_.isDefined))(parsed.flatten)
     }
 
@@ -73,9 +77,9 @@ object AgentAnswers:
   private def confidence(j: Json): Option[Double] =
     j.asNumber.map(_.toDouble).filter(d => d.isFinite && d >= 0.0 && d <= 1.0)
 
-  /** Read one reply item. Scene numbers must be integral and in `1..scenes`; rows are
-    * non-negative integers (whether a row exists is checked against the source later); confidence
-    * is a finite number in `[0, 1]`.
+  /** Read one reply item. Scene numbers must be integral and in `1..scenes`; rows are non-negative
+    * integers (whether a row exists is checked against the source later); confidence is a finite
+    * number in `[0, 1]`.
     */
   def answer(item: Json, scenes: Int, chunk: Int, attempt: Int, prompt: String): Answer =
     Answer(
@@ -89,8 +93,8 @@ object AgentAnswers:
       prompt
     )
 
-  /** Replay one participant and give every inventory unit's outcome, in unit order, with the
-    * chunk replays (for the receipt). `serve` answers from recordings and never calls a model.
+  /** Replay one participant and give every inventory unit's outcome, in unit order, with the chunk
+    * replays (for the receipt). `serve` answers from recordings and never calls a model.
     */
   def participant(
       name: String,
@@ -99,23 +103,31 @@ object AgentAnswers:
       chunk: Int,
       scenes: Int,
       serve: String => Either[ExchangeFailure, ModelReply]
-  ): Either[AgentReplay.Failure, (Vector[(AgentPrompts.RecallUnit, Outcome)], Vector[
-    AgentReplay.ChunkReplay
-  ])] =
+  ): Either[
+    AgentReplay.Failure,
+    (
+        Vector[(AgentPrompts.RecallUnit, Outcome)],
+        Vector[
+          AgentReplay.ChunkReplay
+        ]
+    )
+  ] =
     for
       replays <- AgentReplay.chunks(name, outline, units, chunk, serve)
       out <- AgentReplay.answered(name, replays)
     yield
       val outcomes = units.grouped(chunk).toVector.zip(replays).flatMap { (group, own) =>
         group.map { u =>
-          u -> out.get(u.index).fold(
-            if own.accepted.isEmpty then Outcome.Unparsable(own.chunk, own.attempts)
-            else Outcome.Omitted(own.chunk, own.attempts)
-          ) { (item, r, attempt) =>
-            Outcome.Answered(
-              answer(item, scenes, r.chunk, attempt, r.prompt + AgentReplay.suffix(attempt))
-            )
-          }
+          u -> out
+            .get(u.index)
+            .fold(
+              if own.accepted.isEmpty then Outcome.Unparsable(own.chunk, own.attempts)
+              else Outcome.Omitted(own.chunk, own.attempts)
+            ) { (item, r, attempt) =>
+              Outcome.Answered(
+                answer(item, scenes, r.chunk, attempt, r.prompt + AgentReplay.suffix(attempt))
+              )
+            }
         }
       }
       outcomes -> replays

@@ -12,8 +12,8 @@ import storymodel4s.provider.agent.{
 }
 
 /** Synthetic distinctions the all-successful development replay cannot exercise: narrative and
-  * referent differ, a cited row lies outside the narrative scene, and omitted, unparsable,
-  * invalid, absent and explicit-null answers all occur.
+  * referent differ, a cited row lies outside the narrative scene, and omitted, unparsable, invalid,
+  * absent and explicit-null answers all occur.
   */
 class AgentAnswersSuite extends FunSuite:
   import AgentAnswers.{Alternative, Field, Outcome}
@@ -48,7 +48,12 @@ class AgentAnswersSuite extends FunSuite:
     assertEquals(a.referent, Field.Value(3))
     assertEquals(
       a.alternatives,
-      Field.Value(Vector(Alternative(7, Json.fromDoubleOrNull(0.6)), Alternative(8, Json.fromDoubleOrNull(0.25))))
+      Field.Value(
+        Vector(
+          Alternative(7, Json.fromDoubleOrNull(0.6)),
+          Alternative(8, Json.fromDoubleOrNull(0.25))
+        )
+      )
     )
     assertEquals(a.rows, Field.Value(Vector(120, 9)))
     assertEquals(a.confidence, Field.Value(0.8))
@@ -112,7 +117,11 @@ class AgentAnswersSuite extends FunSuite:
     val ids = units.map(u => u.index -> s"id${u.index}").toMap
     val (doc, _) = AgentReplay.participant("P", "OUT", units, ids, 3, serving(table)).toOption.get
     val (typed, _) = AgentAnswers.participant("P", "OUT", units, 3, 50, serving(table)).toOption.get
-    val projected = doc.hcursor.get[Vector[Json]]("units").toOption.get.map(_.hcursor.downField("narrative").focus)
+    val projected = doc.hcursor
+      .get[Vector[Json]]("units")
+      .toOption
+      .get
+      .map(_.hcursor.downField("narrative").focus)
     val fromTyped = typed.map {
       case (_, Outcome.Answered(a)) =>
         a.narrative match

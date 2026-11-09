@@ -91,25 +91,31 @@ object AgentReplay:
       chunk: Int,
       serve: String => Either[ExchangeFailure, ModelReply]
   ): Either[Failure, Vector[ChunkReplay]] =
-    units.grouped(chunk).toVector.zipWithIndex.foldLeft[Either[Failure, Vector[ChunkReplay]]](
-      Right(Vector.empty)
-    ) { case (acc, (g, ci)) =>
-      acc.flatMap { done =>
-        val prompt = AgentPrompts.prompt(outline, units, g.head.index, g.last.index)
-        def attempt(n: Int): Either[Failure, ChunkReplay] =
-          if n == Attempts then Right(ChunkReplay(ci, prompt, n, None))
-          else
-            serve(prompt + suffix(n)) match
-              case Left(ExchangeFailure.RecordingMissing(_)) =>
-                Left(Failure.Unrecorded(name, ci, n))
-              case Left(other)  => Left(Failure.Exchange(name, ci, n, other.code.toString))
-              case Right(reply) =>
-                parseReply(reply.text).flatMap(_.hcursor.get[Vector[Json]]("units").toOption) match
-                  case Some(items) => Right(ChunkReplay(ci, prompt, n + 1, Some(n -> items)))
-                  case None        => attempt(n + 1)
-        attempt(0).map(done :+ _)
+    units
+      .grouped(chunk)
+      .toVector
+      .zipWithIndex
+      .foldLeft[Either[Failure, Vector[ChunkReplay]]](
+        Right(Vector.empty)
+      ) { case (acc, (g, ci)) =>
+        acc.flatMap { done =>
+          val prompt = AgentPrompts.prompt(outline, units, g.head.index, g.last.index)
+          def attempt(n: Int): Either[Failure, ChunkReplay] =
+            if n == Attempts then Right(ChunkReplay(ci, prompt, n, None))
+            else
+              serve(prompt + suffix(n)) match
+                case Left(ExchangeFailure.RecordingMissing(_)) =>
+                  Left(Failure.Unrecorded(name, ci, n))
+                case Left(other)  => Left(Failure.Exchange(name, ci, n, other.code.toString))
+                case Right(reply) =>
+                  parseReply(reply.text).flatMap(
+                    _.hcursor.get[Vector[Json]]("units").toOption
+                  ) match
+                    case Some(items) => Right(ChunkReplay(ci, prompt, n + 1, Some(n -> items)))
+                    case None        => attempt(n + 1)
+          attempt(0).map(done :+ _)
+        }
       }
-    }
 
   /** Each answered unit's last reply item (a later chunk overwrites an earlier one, as the harness
     * did), with the chunk and attempt that produced it.
@@ -123,9 +129,11 @@ object AgentReplay:
         r.accepted.fold(acc) { (attempt, items) =>
           items.foldLeft(acc) { (m, x) =>
             m.flatMap(mm =>
-              unitKey(x).map(k => mm.updated(k, (x, r, attempt))).toRight(
-                Failure.BadUnitKey(name, r.chunk)
-              )
+              unitKey(x)
+                .map(k => mm.updated(k, (x, r, attempt)))
+                .toRight(
+                  Failure.BadUnitKey(name, r.chunk)
+                )
             )
           }
         }
