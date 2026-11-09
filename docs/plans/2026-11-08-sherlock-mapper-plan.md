@@ -224,3 +224,26 @@ judging only the named detail: 7 right, 3 partly right or too trivial, 1 wrong.
   needs a new packet version and a new recording, not a replay.
 - The three partial calls are minor wordings and one visual detail. A severity field (minor or
   material) on gist-detail would separate them.
+
+### 2026-11-09: Haiku 5.5 against Opus 5.5 (development scout)
+
+The v2 mapper was rerun on the 11 development participants with `claude-haiku-5-5`, same prompts,
+packet and chunking (run `scout-haiku55-v2`, 34 calls). The Opus figures are the recorded
+`a1v2-opus` run. Both are scored by the frozen scorer on the 10 participants with gold (1,499
+units).
+
+| | Opus 5.5 | Haiku 5.5 |
+|---|---:|---:|
+| Narrative agreement, participant average | 79.20 | 78.23 |
+| Pooled | 81.39 | 80.39 |
+| Within one scene, participant average | 90.69 | 90.52 |
+| Units omitted or null, of 1,744 | 0 | 0 |
+
+- Haiku is higher for 4 participants, lower for 5 and tied for 1 (−6.0 to +3.5 points). The
+  paired mean difference is −1.0 point, 95% interval about −3.3 to +1.4 over ten participants.
+- The models give the same narrative scene on 92.6% of the 1,744 units, and a different referent
+  scene on 107 of the 1,669 units where both give one.
+- Every Haiku call parsed on its first attempt and reported `claude-haiku-5-5`.
+
+This is development data on which the prompt was tuned with Opus, so it says the cheaper model
+is a plausible second arm, not that the two are equivalent elsewhere.
