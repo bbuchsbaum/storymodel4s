@@ -255,6 +255,24 @@ class Scorer(unittest.TestCase):
             report["participants_with_every_session"]["participants"], ["p1", "p2"]
         )
 
+    def test_interval_resamples_participants_and_is_reproducible(self):
+        rates = {f"p{i}": {"n": 10, "hits": i, "rate": i / 10} for i in range(1, 9)}
+        a = ff_score.participant_average(rates)
+        self.assertEqual(a, ff_score.participant_average(rates))
+        lo, hi = a["interval95"]
+        self.assertTrue(lo < a["rate"] < hi)
+        self.assertTrue(0.1 <= lo and hi <= 0.8)
+        same = {f"p{i}": {"n": 3, "hits": 3, "rate": 1.0} for i in range(4)}
+        self.assertEqual(ff_score.participant_average(same)["interval95"], [1.0, 1.0])
+        one = {
+            "p1": {"n": 3, "hits": 3, "rate": 1.0},
+            "p2": {"n": 0, "hits": 0, "rate": None},
+        }
+        self.assertEqual(
+            ff_score.participant_average(one),
+            {"participants": 1, "rate": 1.0, "interval95": None},
+        )
+
     def test_a_prediction_for_an_unknown_utterance_is_refused(self):
         with self.assertRaises(ff_score.ScoreError):
             self.run_score(

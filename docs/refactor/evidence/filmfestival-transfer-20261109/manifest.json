@@ -1,0 +1,224 @@
+{
+ "attempts": 3,
+ "calls": 63,
+ "chunk": 60,
+ "dictionarySha256": "39ef679b883222875bfe5bdc6795154e79cdc85d5d788352c6e6945343f560f1",
+ "longestPromptChars": 121435,
+ "maxPromptChars": 400000,
+ "model": "opus",
+ "packetSha256": "c5dc1b137d3ba1b2cfffe2a2f2afb4683e566708dbe4d7d11d429a6fcfac5ec5",
+ "population": {
+  "run-01": {
+   "all": 2682,
+   "film_labelled": 2574,
+   "scene_specific": 2335
+  },
+  "run-02": {
+   "all": 544,
+   "film_labelled": 528,
+   "scene_specific": 471
+  }
+ },
+ "scenes": 216,
+ "schema": "storymodel4s.filmfestival.transfer-manifest/v1",
+ "sessions": [
+  {
+   "participant": "sub-01",
+   "promptSha256": [
+    "28f171bf78d583035712f168194cd9be535eeaef3af38edf74717f9125876131",
+    "5a204cdf56d0dbb4fc4e45102e0f2d97d7f056a36da6a02cdc7e892ac72eae44"
+   ],
+   "session": "run-01",
+   "units": 104
+  },
+  {
+   "participant": "sub-02",
+   "promptSha256": [
+    "9f5b3d2050634219f18f8ea16db321dad670903ed47a5a48bf9e1493716f2b8b",
+    "92974a2ceded76afbf0f782c5d947dea58c3bbe0925a94bf4b1e9088cccc4012",
+    "be9c87c7b2418bf55c01c476968dbb136e8b48a9cff6193cd41ddf6dd2a8f538"
+   ],
+   "session": "run-01",
+   "units": 123
+  },
+  {
+   "participant": "sub-07",
+   "promptSha256": [
+    "b74854017214968a04663a06a1141002b3079bb9ebc57b8e66c1bcc5a3ee01c6",
+    "a1b56a168368b3b90c8301114f16421095c8db809c3255352313115684263515",
+    "3a615ac68d77baa71d4206cf5ddfa59f384dc2fa81e92907564174097bb318c5",
+    "a6efa32478eb92db19af825c5f16650be6dfd7ac09b562194c8c548c95d43173",
+    "9e487f3ebfb7a4eb8f40cbf0f92586aaadcaacc656013a71af3246b884d57401",
+    "fea5cefcc17f2d9e328bec115678805816cee6bcbdddb3ce330d4d34164bb976"
+   ],
+   "session": "run-01",
+   "units": 325
+  },
+  {
+   "participant": "sub-08",
+   "promptSha256": [
+    "d1542291161e3e9c3fdc98bc0796504789c32b2cb30e1fae2b26536447c093d3",
+    "8c72c32d2a2be25212b37d238ce7839b574f39a57086fab2ce9b881f475f7ac8",
+    "55fb0df9ddd646abbb70be66b20d513ac18cd729d84332c3cd34ecc1d09c67c5",
+    "b3394246d7a1f5703d2f695e18773d560620787572bd90dc6a4e4e454733c28b",
+    "23a6df11e25575534b2b5be616e06a1419ce2b713379160778236109a0fad0b8"
+   ],
+   "session": "run-01",
+   "units": 271
+  },
+  {
+   "participant": "sub-08",
+   "promptSha256": [
+    "d535f16f3058ad4e903e5539ff85ae64842b762782c16851505b90ec1daad868",
+    "283e3ea6adbed60ea39433f3a01e2e517ea4a0cc78b32fcb97954ffb8cef9dc6",
+    "46dff73748108557eb5247b62a726e4ae69791cc962aa3933781a8fced32d27e"
+   ],
+   "session": "run-02",
+   "units": 149
+  },
+  {
+   "participant": "sub-09",
+   "promptSha256": [
+    "a3071dff30669778a8ca441332fad1087d6ec13c9608d4e1f28592ba2dd7f363",
+    "bb805044168bb7bc955dd3f11dd01efaf95743150934132100ab7d2ee5474b0c",
+    "af000ac12a2ff6297ce99972b53e8fc09de288229013febeca1c6b426ad8b6e2"
+   ],
+   "session": "run-01",
+   "units": 175
+  },
+  {
+   "participant": "sub-10",
+   "promptSha256": [
+    "4d79f2f4738964801f604ca7fd1cada883f62322ed7e0ee041b493709e3d0916",
+    "162b87c18129dc7a83e8fa382d91d92a89f6f1ed6f7932fdb20bc3b7c2ca4ea5",
+    "df6c82c5fcd9c4bf1e9165fe98c4091695dd3e30b50993f3b0dff78673730673",
+    "0fec084de967c27b16ddcd96c07b1c863820b1359b77b01bc203f741a53f6aa1"
+   ],
+   "session": "run-01",
+   "units": 221
+  },
+  {
+   "participant": "sub-10",
+   "promptSha256": [
+    "81ea7324362dd5f4ebd2a73a9d6572b1e1b6086d5c1fef92917f9f7e48200777",
+    "3daea4b1c86bc697f5ac4615b78879b421c8c701a1435935dbd2a1aae05538eb",
+    "c2d9b0fb938be7f24879ad049c933271e28576395c7053de39dd0420360ba7ea"
+   ],
+   "session": "run-02",
+   "units": 155
+  },
+  {
+   "participant": "sub-11",
+   "promptSha256": [
+    "cdffd5579ead39a448f4792d4e12108fee55d08af1f0c28e10f268bbaa49e048",
+    "98194c81d69144c819e564a227a63a79b72667a9b70ae82127515c4087cbd10a",
+    "575c720b3f06fe8f52d384c918494c4c97729321289f92adeaea1082f383512a",
+    "8b81014714dbd8983a0ae274ac07907a3f5b9e4be6f24ef549b13f4aa2c0d6e5",
+    "15ec9fcb3733cc9737a737f837f8684fefa72785f80ae2da93b3b5019480cd3b"
+   ],
+   "session": "run-01",
+   "units": 262
+  },
+  {
+   "participant": "sub-12",
+   "promptSha256": [
+    "f61595d48aed6cb69cb79de0990b43741e6cc12cf94d621e130084eedbf87ba2",
+    "1261f041de48e9f354e7ab798d22469dc2ca6be5bc6db37247592d4e3247086e",
+    "180b867c0a7bb58c997c6a7290d7116a54af0408252b6ce34cd40a1420f7f81c"
+   ],
+   "session": "run-01",
+   "units": 154
+  },
+  {
+   "participant": "sub-13",
+   "promptSha256": [
+    "0759ffdb10410524edd05291125aa0ea44321a2b76b55b127e9c6a6f7e0e4f1b",
+    "92673dcca6f074c87e5ebd5dbc4ab3fffd8706b433b545c1166723a76bcd244e",
+    "1f2c1d1b2f0d5b0325609005f55d6603cb1ecad522cf5004f5dac39042adac67"
+   ],
+   "session": "run-01",
+   "units": 162
+  },
+  {
+   "participant": "sub-14",
+   "promptSha256": [
+    "392b8442fe3eb4e6eeb89b631c1e41370128fc64887069c8439139c422d605a1",
+    "53939f50f93256dc7bd5369731733709d088cc2b791b2a56c8858feb8a4e013a"
+   ],
+   "session": "run-01",
+   "units": 104
+  },
+  {
+   "participant": "sub-16",
+   "promptSha256": [
+    "a6380febac5b9e6bc621bcf1363c686735c8529aea7b59c135203f1a2fd20bde",
+    "106190a8c4810bca247cfaa43f6033c0f5895f9feb5480444c110874a2760257",
+    "0ac0554e65294af42ed5310a2fa0d5d7d8e84dbada804b284fdde16a93b64952",
+    "454f79858a4b889fedbba03290df2f8b5b7193f7389249f5717f57a4c7ce7ba2"
+   ],
+   "session": "run-01",
+   "units": 189
+  },
+  {
+   "participant": "sub-16",
+   "promptSha256": [
+    "d18f3348cd7c32d088dd1f481b347af69fbb2450b0e20fcbcaa6b36e495e1263",
+    "4f929f4a9c1505023bd4c7f567c48a12cfc0fa9f2a2995e2499f030963b184d5"
+   ],
+   "session": "run-02",
+   "units": 72
+  },
+  {
+   "participant": "sub-17",
+   "promptSha256": [
+    "e8f388b775699c262e968a11e890dd1e0343457f2fd29fb075938acb5fd69fec",
+    "4089d9b99aec5b2bedf9d61a77da825d95f64eaea610209507997c5d2a034b87",
+    "86225ea0856451accca89d8ce76e777e2d9743ce65e46f736c98dd18c432eb75"
+   ],
+   "session": "run-01",
+   "units": 140
+  },
+  {
+   "participant": "sub-18",
+   "promptSha256": [
+    "4a6cd1bd915acd9a01364c7ef50da66757d6d6b12a27ecb872a67ba1a8c1b8fa"
+   ],
+   "session": "run-01",
+   "units": 58
+  },
+  {
+   "participant": "sub-18",
+   "promptSha256": [
+    "f8def43cabe0f851c89a60df795fb07a09bde9b706646b64ee495c17be0c8d07",
+    "72e4dc7a169143fb961d003b4dc969f5374ab111979a15f5f25129d2c2425a32",
+    "4aecf2c4183f59d83824717b190243b5da046abdabdf480e591e5be5f69ae2fe"
+   ],
+   "session": "run-02",
+   "units": 168
+  },
+  {
+   "participant": "sub-19",
+   "promptSha256": [
+    "f6c9518317f41ac68282ac6b4a533e6de122a5fd4cb26e3f09a82b302e608be0",
+    "7e816730efca2c479b6e904d01b11bd8e18a4c7aa7cc68293d70429fc0a1eec8",
+    "23351defcf34098339076517134222bf1162d31a573ced779d03bd16aa9c32c2",
+    "42c3c794d9c81e790d888d2f99a072ac7aee4139bd894e2f534b98f2d511d551"
+   ],
+   "session": "run-01",
+   "units": 203
+  },
+  {
+   "participant": "sub-20",
+   "promptSha256": [
+    "7053e6913be4f98dabb1bf556d05a0a792a8f7dc8aa062a3debb514631919709",
+    "e34e8cfb65cd9ec4773cf5b5b64963a299515f1f045fa918df503dc3ba54a799",
+    "011a342903206fa02de111f9feb198045a11edbd8007f540f5183b4c5c9c1b5f",
+    "41cf299384cf90b8ac01628ee7db67a7c570d49dd8f99fa0d0f0888ec33a04ae"
+   ],
+   "session": "run-01",
+   "units": 191
+  }
+ ],
+ "systemSha256": "d45e17549b048e34d2af95ae900a1441263e1ced955dd2717b7dfd7190904498",
+ "validSceneTargets": 203
+}

@@ -5,8 +5,8 @@ It implements section T of the
 [categorical mapping plan](2026-11-09-categorical-mapping-and-transfer-plan.md). The owner agreed
 the choices on 2026-11-09, with corrections from an external review.
 
-**Status.** The decisions below are fixed. The prompt text, the packet and their hashes are added
-in a freeze commit (see [Freeze](#freeze)). No model is called before that commit.
+**Status.** The decisions below are fixed, and the prompt, packet and scorer are frozen at the
+values under [Freeze](#freeze). No model has been called on this corpus.
 
 ## What this evaluation is
 
@@ -27,7 +27,7 @@ runs.
 |---|---|---|
 | Reference labels | `derived/gold-scenematched.tsv` | `0433e14f…ae16bd0` |
 | Film annotation (JL) | `derived/annotation-JL.tsv` | `f8b164c1…bc7485bc` |
-| Coding scheme | `recall_scenematched/_scenematching_codingscheme.xlsx` | recorded at freeze |
+| Coding scheme | `recall_scenematched/_scenematching_codingscheme.xlsx` | `6aa3e021…624ca20c` |
 
 The scorer refuses a reference file that does not have 3,226 utterances.
 
@@ -151,18 +151,41 @@ retry policy is a failure; it is never dropped.
 
 ## Freeze
 
-One commit records all of the following, and the first model call cites it:
+Frozen values, produced by `tools/filmfestival/ff_map.py manifest` with no model call. The
+manifest is [manifest.json](../refactor/evidence/filmfestival-transfer-20261109/manifest.json);
+`ff_map.py run` refuses unless what it renders equals that manifest.
 
-- the prompt text and its hash;
-- the packet construction and the rendered packet's hash;
-- the scene dictionary (216 scenes, 203 valid) and its hash;
-- the scorer at its commit, reproducing the population table above;
-- the retry policy;
-- the context-size check.
+| Item | Value |
+|---|---|
+| System prompt (`ff_packet.SYSTEM`) | SHA-256 `d45e1754…90904498` |
+| Rendered packet (16,693 words) | SHA-256 `c5dc1b13…fcfac5ec5` |
+| Scene dictionary | 216 scenes, 203 valid; SHA-256 `39ef679b…43f560f1` |
+| Participant-sessions | 19 (15 first, 4 second) |
+| Utterances | 3,226 |
+| Calls, before retries | 63, each prompt hashed in the manifest |
+| Longest prompt | 121,435 characters; a prompt over 400,000 refuses the run |
+| Model, chunk, attempts | `opus`, 60, 3 |
+
+The prompt is the Sherlock v2 prompt with three changes the corpus requires:
+
+- it describes ten short films recalled in any order, with scene numbers that run across films;
+- each judgement may be a scene, a film without a scene, or nothing;
+- title cards are marked and cannot be chosen.
+
+The packet lists, for each film, its scenes and rows with times from the start of the film, then
+that film's speech as a separate list. It has no locations, people or scene summaries, because
+the annotation has none.
+
+Differences from the Sherlock harness, fixed here:
+
+- a reply item for a unit outside the chunk it was asked about is dropped, and the unit counts
+  as omitted;
+- a reply item with a missing key or a wrong type is a failure for that judgement.
 
 The scorer's synthetic tests (`tools/filmfestival/test_ff_score.py`) cover film-only answers,
 multi-scene references, cartoon exclusion, title-scene exclusion, explicit non-assignment and
-processing failure.
+processing failure. `test_ff_map.py` covers the packet, the reply parser and the run logic with a
+stand-in model.
 
 ## Known limits
 

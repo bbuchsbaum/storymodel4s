@@ -19,6 +19,7 @@ PREDICTIONS_DIR holds <participant>_<session>.json files, each
 
 import json
 import os
+import random
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -91,10 +92,29 @@ def rate(flags):
     }
 
 
+BOOTSTRAP_DRAWS = 5000
+BOOTSTRAP_SEED = 20261109
+
+
 def participant_average(per_participant):
-    """Mean of per-participant rates; participants with no eligible utterance are left out."""
-    rates = [r["rate"] for r in per_participant.values() if r["n"]]
-    return {"participants": len(rates), "rate": mean(rates)}
+    """Mean of per-participant rates, with a 95% interval from resampling participants.
+
+    Participants with no eligible utterance are left out. Whole participants are resampled, so
+    one person's utterances stay together. With fewer than two participants there is no interval.
+    """
+    rates = [r["rate"] for _, r in sorted(per_participant.items()) if r["n"]]
+    out = {"participants": len(rates), "rate": mean(rates), "interval95": None}
+    if len(rates) >= 2:
+        rng = random.Random(BOOTSTRAP_SEED)
+        draws = sorted(
+            mean([rates[rng.randrange(len(rates))] for _ in rates])
+            for _ in range(BOOTSTRAP_DRAWS)
+        )
+        out["interval95"] = [
+            draws[int(0.025 * BOOTSTRAP_DRAWS)],
+            draws[int(0.975 * BOOTSTRAP_DRAWS) - 1],
+        ]
+    return out
 
 
 def summarise(judged):
