@@ -106,7 +106,8 @@ The first two also fail the golden-bundle test, as they should.
 - Each bundle was reloaded and compared before the command reported.
 - Every unit table's text equals its rebuilt unit's text, for all 11 participants.
 - Unit-by-unit against the frozen slice-1 arm ([parity.py](parity.py),
-  [parity-result.txt](parity-result.txt)): **0 narrative mismatches in 1,744 units**, in both the unit rows and the checked records. (The 1,499 figure elsewhere is
+  [parity-result.txt](parity-result.txt)): **0 narrative mismatches in 1,744 units**, in both
+  the unit rows and the checked records. (The 1,499 figure elsewhere is
   the 10 participants with gold.)
 - Replay reply files are byte-identical to slice 3's, and the arm built from them is byte-identical
   to slice 1's.
