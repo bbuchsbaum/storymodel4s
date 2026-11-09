@@ -104,7 +104,7 @@ object AgentReplay:
                 unitKey(x).map(mm.updated(_, x)).toRight(Failure.BadUnitKey(name, ci))
               )
             }
-            .map(o => o -> (receipts :+ ChunkReceipt(ci, used, items.nonEmpty)))
+            .map(o => o -> (receipts :+ ChunkReceipt(ci, used, items.isDefined)))
         }
       }
     }

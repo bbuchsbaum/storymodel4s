@@ -70,7 +70,9 @@ private def die(msg: String): Nothing =
   *
   * Replays every development participant's v2 mapping from text-exchange recordings, with no model
   * client, and writes one reply file per participant (`agentMappingArm` reads them) plus a receipt
-  * of the recording keys used. Any exchange the replay needs and cannot find refuses the run.
+  * of the attempts each chunk used. Any exchange the replay needs and cannot find refuses the run,
+  * and so does a development participant without a unit table: the replay never maps a smaller
+  * population than the partition names. Replies keep only the `narrative` choice.
   */
 @main def agentMappingReplay(
     annotation: String,
@@ -90,6 +92,8 @@ private def die(msg: String): Nothing =
   val in = AgentPackets
     .load(annotation, transcriptA, transcriptB, captions, partition, unitsDir)
     .fold(die, identity)
+  if in.missing.nonEmpty then die(s"development without a unit table: ${in.missing.mkString(",")}")
+  if in.development.isEmpty then die("no development participants to replay")
   val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => die(e.message), identity)
   val system = AgentPrompts.system(AgentPrompts.Version.V2)
   val provider = TextExchange.SubscriptionCliProvider

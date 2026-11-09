@@ -96,6 +96,21 @@ class AgentReplaySuite extends FunSuite:
     assertEquals(receipts.head, ChunkReceipt(0, 3, false))
     assertEquals(doc.hcursor.get[Vector[Int]]("missing").toOption, Some(Vector(3, 4)))
 
+  test("an accepted empty reply is accepted, and a later chunk overwrites an earlier key"):
+    val table = Map(
+      first -> """{"units": [{"u": 9, "narrative": 1}, {"u": 3, "narrative": 5}]}""",
+      second -> """{"units": [{"u": 9, "narrative": 2}]}"""
+    )
+    val (doc, receipts) =
+      AgentReplay.participant("P", "OUT", units, ids, 2, serving(table)).toOption.get
+    val nine = doc.hcursor.get[Vector[Json]]("units").toOption.get.last
+    assertEquals(nine.hcursor.get[Int]("narrative").toOption, Some(2))
+    val empty = Map(first -> """{"units": []}""", second -> """{"units": []}""")
+    assertEquals(
+      AgentReplay.participant("P", "OUT", units, ids, 2, serving(empty)).map(_._2),
+      Right(Vector(ChunkReceipt(0, 1, true), ChunkReceipt(1, 1, true)))
+    )
+
   test("a retry the replay needs but cannot find is an unrecorded call"):
     val table = Map(first -> "x", second -> """{"units": []}""")
     assertEquals(

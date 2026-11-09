@@ -56,7 +56,10 @@ object AgentPackets:
         .get[Vector[String]]("development")
         .left
         .map(_ => "partition has no development list")
-      untouched = part.hcursor.get[Vector[String]]("untouchedTest").getOrElse(Vector.empty)
+      untouched <- part.hcursor
+        .get[Vector[String]]("untouchedTest")
+        .left
+        .map(_ => "partition has no untouchedTest list")
       _ <- Either.cond(
         development.forall(d => !untouched.contains(d)),
         (),
