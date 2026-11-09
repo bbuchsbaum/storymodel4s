@@ -60,23 +60,48 @@ def rows_by_number(bundle):
 
 
 def record_outcome(bundle, interpretation, unit_id):
-    """The checked record's outcome for a unit: (status, detail)."""
+    """The checked record's outcome for a unit, as (kind, detail).
+
+    kind is "choice" (detail: the scene number, or the target key if the source
+    dictionary does not list it), "no-assignment" (detail: the stated reason), or
+    the processing status of a unit with no decision (detail: the failure).
+    """
     record = bundle["interpretations"][interpretation]["record"]
+    scene_of = {s["target"]: s["scene"] for s in bundle["source"]["scenes"]}
     for outcome in record["outcomes"]:
         if outcome["unit"] != unit_id:
             continue
         processing = outcome["processing_status"]
         if processing["status"] != "complete":
             failure = processing.get("failure", {})
-            return processing[
-                "status"
-            ], f'{failure.get("status")}: {failure.get("detail")}'
+            return processing["status"], f'{failure.get("status")}: {failure.get("detail")}'
         decision = outcome["decision"]["value"]
-        target = decision.get("decoded_target_id")
-        if target is None:
+        if decision["support"]["status"] != "categorical":
+            raise BundleError("bundle record holds a non-categorical decision")
+        target = decision["decoded_target_id"]
+        if target["status"] != "present":
             return "no-assignment", decision["decision_origin"].get("reason")
-        return "choice", target
+        return "choice", scene_of.get(target["value"], target["value"])
     raise BundleError(f"record {interpretation} has no unit {unit_id}")
+
+
+def check_unit(bundle, unit):
+    """Refuse a bundle whose unit row and checked records disagree."""
+    for name in ("narrative", "referent"):
+        kind, detail = record_outcome(bundle, name, unit["unit"])
+        field = unit[name]
+        answered = unit["processing"]["status"] == "answered"
+        expected = (
+            ("choice", field["value"])
+            if answered and field["status"] == "value"
+            else ("no-assignment", None)
+            if answered and field["status"] == "null"
+            else ("failed", None)
+        )
+        if kind != expected[0] or (kind == "choice" and detail != expected[1]):
+            raise BundleError(
+                f'unit {unit["index"]}: {name} row says {field["status"]}, record says {kind}'
+            )
 
 
 def describe_field(field, render=str):
@@ -103,6 +128,7 @@ def describe_unit(bundle, unit):
             else f"scene {number} (not in source)"
         )
 
+    check_unit(bundle, unit)
     processing = unit["processing"]
     lines = [
         f'unit {unit["index"]} ({unit["unit"]})',
@@ -110,9 +136,9 @@ def describe_unit(bundle, unit):
         f'(chunk {processing["chunk"]}, {processing["attempts"]} attempt(s))',
     ]
     for name in ("narrative", "referent"):
-        status, detail = record_outcome(bundle, name, unit["unit"])
+        kind, detail = record_outcome(bundle, name, unit["unit"])
         lines.append(f"{name}: {describe_field(unit[name], scene_text)}")
-        lines.append(f"  record: {status} ({detail})")
+        lines.append(f"  record: {kind}" + (f" ({detail})" if kind != "choice" else f" of scene {detail}"))
     if processing["status"] != "answered":
         return lines
     lines.append(
@@ -151,6 +177,8 @@ def describe_unit(bundle, unit):
 def summary(bundle):
     provenance = bundle["provenance"]
     units = bundle["units"]
+    for unit in units:
+        check_unit(bundle, unit)
     counts = {}
     for unit in units:
         status = unit["processing"]["status"]

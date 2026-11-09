@@ -210,7 +210,8 @@ private def die(msg: String): Nothing =
         p => TextExchange.replay(recordings, provider, model, system, p)
       )
       .fold(f => die(f.toString), identity)
-    val named = outcomes.map((u, o) => ids.getOrElse(u.index, die(s"$name: no id for ${u.index}")) -> o)
+    val named =
+      outcomes.map((u, o) => ids.getOrElse(u.index, die(s"$name: no id for ${u.index}")) -> o)
     if named.map(_._1) != inventory.units.map(_.id.value) then
       die(s"$name: unit table ids do not match the rebuilt recall inventory")
     val keyed = inventory.units.map(_.id).zip(named.map(_._2))

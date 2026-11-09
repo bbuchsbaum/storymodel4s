@@ -60,7 +60,8 @@ object AgentMappingRecord:
     TimedSourceView.of(segments, parts, artifact).left.map(_.message).flatMap { view =>
       val leaves = view.nodes.filter(_.level == 0).sortBy(_.discoursePosition)
       val byRow = atlas.rows.map(_.row).sorted.zip(leaves).toMap
-      val scenes = atlas.scenes.flatMap(s => byRow.get(s.firstRow).flatMap(_.parent).map(s.ordinal -> _))
+      val scenes =
+        atlas.scenes.flatMap(s => byRow.get(s.firstRow).flatMap(_.parent).map(s.ordinal -> _))
       Either.cond(
         leaves.size == atlas.rows.size && scenes.size == atlas.scenes.size &&
           scenes.map(_._2).distinct.size == scenes.size,

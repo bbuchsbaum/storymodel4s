@@ -1,0 +1,3862 @@
+{
+  "schema" : "storymodel4s.agentmapping.bundle/v1",
+  "provenance" : {
+    "participant" : "P00",
+    "provider" : "synthetic-cli",
+    "model" : "synthetic-model",
+    "systemSha256" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073",
+    "outlineSha256" : "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd",
+    "annotationSha256" : "a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e",
+    "recallSha256" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e",
+    "chunk" : 3,
+    "parser" : "agent-answers/v1",
+    "modelCalls" : 0
+  },
+  "meaning" : {
+    "narrative" : "the scene the retelling is narrating at this unit",
+    "referent" : "the scene containing the specifically mentioned content",
+    "alternatives" : "self-reported narrative alternatives [scene, p]; not a distribution, not calibrated",
+    "confidence" : "self-reported; absent means unavailable, never 0",
+    "rows" : "rows cited for the unit; the reply does not say which interpretation they support, and a resolvable citation is not evidence that the row supports the claim"
+  },
+  "interpretations" : {
+    "narrative" : {
+      "policy" : "agent-localization/v2:narrative",
+      "recordDigest" : "bf2bc23845dc6314984eae83913660e1d50b031d58de96584fdb9a5665772667",
+      "record" : {
+        "schema" : "storymodel4s.mapping-record",
+        "schemaVersion" : "mapping-record/v0.2",
+        "record_digest" : "bf2bc23845dc6314984eae83913660e1d50b031d58de96584fdb9a5665772667",
+        "inventory" : {
+          "digest" : "cfc07dc08c5c320abcf195ebb2e019902578efeeebce2253eba904455e54055f",
+          "transcript_checksum" : "39c5931f2d84a91996479e0b881e5b25b2df3f84fc9a07502c8cfd1950a93a76",
+          "segmentation_id" : "6d311d0cf65ab6ce9575114d3ff8ed22075e0b7013e35a3882b417ddef657b42",
+          "word_id_policy" : {
+            "name" : "input-artifact-sha256+zero-based-parsed-word-index/v1",
+            "input_artifact" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e"
+          },
+          "words" : [
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:0",
+              "index" : 0,
+              "start" : 0,
+              "end_exclusive" : 1,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:1",
+              "index" : 1,
+              "start" : 2,
+              "end_exclusive" : 5,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:2",
+              "index" : 2,
+              "start" : 6,
+              "end_exclusive" : 12,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:3",
+              "index" : 3,
+              "start" : 13,
+              "end_exclusive" : 15,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:4",
+              "index" : 4,
+              "start" : 16,
+              "end_exclusive" : 19,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:5",
+              "index" : 5,
+              "start" : 20,
+              "end_exclusive" : 24,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:6",
+              "index" : 6,
+              "start" : 26,
+              "end_exclusive" : 30,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:7",
+              "index" : 7,
+              "start" : 31,
+              "end_exclusive" : 33,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:8",
+              "index" : 8,
+              "start" : 34,
+              "end_exclusive" : 41,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:9",
+              "index" : 9,
+              "start" : 42,
+              "end_exclusive" : 44,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:10",
+              "index" : 10,
+              "start" : 45,
+              "end_exclusive" : 46,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:11",
+              "index" : 11,
+              "start" : 47,
+              "end_exclusive" : 51,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:12",
+              "index" : 12,
+              "start" : 53,
+              "end_exclusive" : 54,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:13",
+              "index" : 13,
+              "start" : 55,
+              "end_exclusive" : 60,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:14",
+              "index" : 14,
+              "start" : 61,
+              "end_exclusive" : 63,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:15",
+              "index" : 15,
+              "start" : 64,
+              "end_exclusive" : 67,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:16",
+              "index" : 16,
+              "start" : 68,
+              "end_exclusive" : 71,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:17",
+              "index" : 17,
+              "start" : 73,
+              "end_exclusive" : 78,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:18",
+              "index" : 18,
+              "start" : 79,
+              "end_exclusive" : 83,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:19",
+              "index" : 19,
+              "start" : 84,
+              "end_exclusive" : 89,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:20",
+              "index" : 20,
+              "start" : 90,
+              "end_exclusive" : 93,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:21",
+              "index" : 21,
+              "start" : 94,
+              "end_exclusive" : 95,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:22",
+              "index" : 22,
+              "start" : 96,
+              "end_exclusive" : 102,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:23",
+              "index" : 23,
+              "start" : 104,
+              "end_exclusive" : 111,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u4"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:24",
+              "index" : 24,
+              "start" : 112,
+              "end_exclusive" : 115,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u4"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:25",
+              "index" : 25,
+              "start" : 116,
+              "end_exclusive" : 123,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u4"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:26",
+              "index" : 26,
+              "start" : 125,
+              "end_exclusive" : 132,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u5"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:27",
+              "index" : 27,
+              "start" : 133,
+              "end_exclusive" : 136,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u5"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:28",
+              "index" : 28,
+              "start" : 137,
+              "end_exclusive" : 144,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u5"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:29",
+              "index" : 29,
+              "start" : 146,
+              "end_exclusive" : 150,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:30",
+              "index" : 30,
+              "start" : 151,
+              "end_exclusive" : 153,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:31",
+              "index" : 31,
+              "start" : 154,
+              "end_exclusive" : 157,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:32",
+              "index" : 32,
+              "start" : 158,
+              "end_exclusive" : 159,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:33",
+              "index" : 33,
+              "start" : 160,
+              "end_exclusive" : 168,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            }
+          ],
+          "units" : [
+            {
+              "id" : "story:6604ff971e69:u0",
+              "ordinal" : 0,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s0"
+                  },
+                  "start" : 0,
+                  "end_exclusive" : 25
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:0",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:1",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:2",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:3",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:4",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:5"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u1",
+              "ordinal" : 1,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s1"
+                  },
+                  "start" : 26,
+                  "end_exclusive" : 52
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:6",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:7",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:8",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:9",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:10",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:11"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u2",
+              "ordinal" : 2,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s2"
+                  },
+                  "start" : 53,
+                  "end_exclusive" : 72
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:12",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:13",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:14",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:15",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:16"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u3",
+              "ordinal" : 3,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s3"
+                  },
+                  "start" : 73,
+                  "end_exclusive" : 103
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:17",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:18",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:19",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:20",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:21",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:22"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u4",
+              "ordinal" : 4,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s4"
+                  },
+                  "start" : 104,
+                  "end_exclusive" : 124
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:23",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:24",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:25"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u5",
+              "ordinal" : 5,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s5"
+                  },
+                  "start" : 125,
+                  "end_exclusive" : 145
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:26",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:27",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:28"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u6",
+              "ordinal" : 6,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s6"
+                  },
+                  "start" : 146,
+                  "end_exclusive" : 169
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:29",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:30",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:31",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:32",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:33"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            }
+          ]
+        },
+        "source" : {
+          "digest" : "8f2a4006a37701b8b27582c2d0aa4cd8aaa22bdb4a3895b75d971323241a2e94",
+          "view_fingerprint" : "09fd3bdb901512bb0f68581865556df8cfddb46fca6690f83f9164295d72a7e1",
+          "scope_digest" : "6b08061ed7ae847539b9ade626abd2094e4c023abbc5460b177b09de7acc662d",
+          "target_id_scheme" : "target-id/source-node-ref/v1",
+          "bundles" : [
+            {
+              "status" : "media",
+              "id" : "bundle:311a5cab9922",
+              "identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+              "role" : "part",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-a"
+              },
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "primary_axis" : "axis:f1beae15b99b",
+              "authority_tracks" : [
+                "stream:a39dbee6c2a4"
+              ],
+              "streams" : [
+                {
+                  "id" : "stream:a39dbee6c2a4",
+                  "kind" : {
+                    "status" : "Picture"
+                  },
+                  "checksum" : "a952b0ddb84e0665fde8cd87209fb4d2fcf26ad548e02b999f43f2c2bde92352",
+                  "native_axis" : "axis:f1beae15b99b",
+                  "extent" : {
+                    "status" : "playback-ticks",
+                    "start_tick" : "0",
+                    "end_exclusive_tick" : "76000",
+                    "timebase" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "timebase" : {
+                    "status" : "present",
+                    "value" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "derived_from" : [
+                  ]
+                }
+              ]
+            },
+            {
+              "status" : "media",
+              "id" : "bundle:19e1d4b47675",
+              "identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+              "role" : "part",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-b"
+              },
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "primary_axis" : "axis:d3b9e0971bce",
+              "authority_tracks" : [
+                "stream:a3da62e2eca7"
+              ],
+              "streams" : [
+                {
+                  "id" : "stream:a3da62e2eca7",
+                  "kind" : {
+                    "status" : "Picture"
+                  },
+                  "checksum" : "8ef6fa0abeb443cdecb00638d9f9bca1a81f8e3346c41ac988847421d2b66dfe",
+                  "native_axis" : "axis:d3b9e0971bce",
+                  "extent" : {
+                    "status" : "playback-ticks",
+                    "start_tick" : "0",
+                    "end_exclusive_tick" : "30000",
+                    "timebase" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "timebase" : {
+                    "status" : "present",
+                    "value" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "derived_from" : [
+                  ]
+                }
+              ]
+            }
+          ],
+          "axes" : [
+            {
+              "id" : "axis:d3b9e0971bce",
+              "bundle" : "bundle:19e1d4b47675",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-b"
+              },
+              "kind" : "EditionPlayback",
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "extent" : {
+                "status" : "playback-ticks",
+                "start_tick" : "0",
+                "end_exclusive_tick" : "30000",
+                "timebase" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "origin" : {
+                "status" : "present",
+                "value" : "0"
+              },
+              "timebase" : {
+                "status" : "present",
+                "value" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "fingerprint" : "5c82d6b3752c7302b4a78289039bf379cb550b556b4b0bd4c24464668d6ee830"
+            },
+            {
+              "id" : "axis:f1beae15b99b",
+              "bundle" : "bundle:311a5cab9922",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-a"
+              },
+              "kind" : "EditionPlayback",
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "extent" : {
+                "status" : "playback-ticks",
+                "start_tick" : "0",
+                "end_exclusive_tick" : "76000",
+                "timebase" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "origin" : {
+                "status" : "present",
+                "value" : "0"
+              },
+              "timebase" : {
+                "status" : "present",
+                "value" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "fingerprint" : "9f99886666b1ad6ee87f69556e6ed7f991c46dc32c6bb0f74432f8ca3ae1000c"
+            }
+          ],
+          "coordinate_mappings" : [
+          ],
+          "composition" : {
+            "status" : "absent",
+            "reason" : "not-supplied"
+          },
+          "targets" : [
+            {
+              "target_id" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+              "level" : 1,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "25000"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "25000",
+                          "end_exclusive_tick" : "50000"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "50000",
+                          "end_exclusive_tick" : "75000"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-point",
+                      "axis" : "axis:f1beae15b99b",
+                      "tick" : "50000"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+              "level" : 1,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "12500"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "12500",
+                          "end_exclusive_tick" : "30000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:d3b9e0971bce",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:19e1d4b47675"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "25000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "25000",
+                          "end_exclusive_tick" : "50000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:3",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-point",
+                      "axis" : "axis:f1beae15b99b",
+                      "tick" : "50000"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:4",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "50000",
+                          "end_exclusive_tick" : "75000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:5",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "12500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:d3b9e0971bce",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:19e1d4b47675"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:6",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "12500",
+                          "end_exclusive_tick" : "30000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:d3b9e0971bce",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:19e1d4b47675"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            }
+          ]
+        },
+        "policies" : {
+          "inference_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "no inference executed; recorded model choice"
+          },
+          "context_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "the model read the film packet and the surrounding recall"
+          },
+          "candidate_policy_id" : {
+            "status" : "unknown",
+            "reason" : "every scene was offered in the prompt; no candidate set computed"
+          },
+          "reference_prior_id" : {
+            "status" : "not-applicable",
+            "reason" : "categorical choice; no scores"
+          },
+          "decision_policy_id" : {
+            "status" : "declared",
+            "id" : "agent-localization/v2:narrative"
+          },
+          "target_universe_id" : {
+            "id" : "705ba4ad6a075209f97554791457288e81dec7458281d22e2647ff0d7ec21098",
+            "grain" : {
+              "status" : "single-level",
+              "level" : 1
+            },
+            "targets" : [
+              "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+              "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+            ]
+          }
+        },
+        "roles" : {
+          "inference_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "6d311d0cf65ab6ce9575114d3ff8ed22075e0b7013e35a3882b417ddef657b42"
+          },
+          "organization_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "6d311d0cf65ab6ce9575114d3ff8ed22075e0b7013e35a3882b417ddef657b42"
+          },
+          "projection_unit" : {
+            "status" : "targets",
+            "grain" : {
+              "status" : "single-level",
+              "level" : 1
+            }
+          }
+        },
+        "stage_assumption_receipts" : [
+          {
+            "id" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+            "stage" : "Candidates",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "d39ccd3185d723ac757b70287c8e4cef2e8ce6869a03511175aefa92542921e0",
+            "stage" : "Rendering",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "540d83ddffeb61a54a3650fb908886e1d71ce62f2e1a8ec78aaba73ce56aef58",
+            "stage" : "Scoring",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "1426ea4e3369df73cbc0310f7b2bfdf9f7340ceb1516a900d2924a84881229e5",
+            "stage" : "Context",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "4a9997ff37131f88e559138e3c7c55b2e025f120b968f33fcd7eb1e0d72f69af",
+            "stage" : "Refinement",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+            "stage" : "Inference",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637",
+            "stage" : "Decision",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "CallerSuppliedDecision",
+              "asserted" : {
+                "status" : "present",
+                "value" : {
+                  "stage" : "Decision",
+                  "policy" : "agent-localization/v2:narrative",
+                  "config" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073",
+                  "inputs" : [
+                    "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd"
+                  ],
+                  "provider" : {
+                    "status" : "identified",
+                    "provider" : "synthetic-cli",
+                    "model" : "synthetic-model",
+                    "artifact" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id" : "1fbc936ea14b6e720ea0f601c2aef2f84693a0d482d5df7997f54dca1f81a5e0",
+            "stage" : "Projection",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          }
+        ],
+        "derivation_source" : {
+          "status" : "none"
+        },
+        "outcomes" : [
+          {
+            "unit" : "story:6604ff971e69:u0",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "67056015c480bacc90f497bd0292eea51a7e291b79999e400b4ea7146568e8b3",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+                  "policy" : "agent-localization/v2:narrative"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+              }
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u1",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "request" : {
+                  "status" : "abstain",
+                  "policy" : "agent-localization/v2:narrative",
+                  "reason" : "model reported no narrative assignment"
+                },
+                "decoded_target_id" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "decision_origin" : {
+                  "status" : "abstention",
+                  "reason" : "model reported no narrative assignment"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+              }
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u2",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "provider-failure",
+                "detail" : "unit omitted from the accepted reply (chunk 0, 1 attempts)"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u3",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "no parsable reply for chunk 1 after 3 attempts"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u4",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "narrative is not a scene in range"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u5",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "d9d9f38c6e175b862847fefaa24e1d2ee4403ede922f11e93be1ff7ea6023058",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                  "policy" : "agent-localization/v2:narrative"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+              }
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u6",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "73b903edf782dc83cf541bb07ba9da5ac89cf302286896748f55018c7836355d",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                  "policy" : "agent-localization/v2:narrative"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization/v2:narrative"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "referent" : {
+      "policy" : "agent-localization/v2:referent",
+      "recordDigest" : "854eeeff9e88c33d3fb7e6100fc18b31d51e4a36450d82e39a688d209540471a",
+      "record" : {
+        "schema" : "storymodel4s.mapping-record",
+        "schemaVersion" : "mapping-record/v0.2",
+        "record_digest" : "854eeeff9e88c33d3fb7e6100fc18b31d51e4a36450d82e39a688d209540471a",
+        "inventory" : {
+          "digest" : "cfc07dc08c5c320abcf195ebb2e019902578efeeebce2253eba904455e54055f",
+          "transcript_checksum" : "39c5931f2d84a91996479e0b881e5b25b2df3f84fc9a07502c8cfd1950a93a76",
+          "segmentation_id" : "6d311d0cf65ab6ce9575114d3ff8ed22075e0b7013e35a3882b417ddef657b42",
+          "word_id_policy" : {
+            "name" : "input-artifact-sha256+zero-based-parsed-word-index/v1",
+            "input_artifact" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e"
+          },
+          "words" : [
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:0",
+              "index" : 0,
+              "start" : 0,
+              "end_exclusive" : 1,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:1",
+              "index" : 1,
+              "start" : 2,
+              "end_exclusive" : 5,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:2",
+              "index" : 2,
+              "start" : 6,
+              "end_exclusive" : 12,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:3",
+              "index" : 3,
+              "start" : 13,
+              "end_exclusive" : 15,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:4",
+              "index" : 4,
+              "start" : 16,
+              "end_exclusive" : 19,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:5",
+              "index" : 5,
+              "start" : 20,
+              "end_exclusive" : 24,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u0"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:6",
+              "index" : 6,
+              "start" : 26,
+              "end_exclusive" : 30,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:7",
+              "index" : 7,
+              "start" : 31,
+              "end_exclusive" : 33,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:8",
+              "index" : 8,
+              "start" : 34,
+              "end_exclusive" : 41,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:9",
+              "index" : 9,
+              "start" : 42,
+              "end_exclusive" : 44,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:10",
+              "index" : 10,
+              "start" : 45,
+              "end_exclusive" : 46,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:11",
+              "index" : 11,
+              "start" : 47,
+              "end_exclusive" : 51,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u1"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:12",
+              "index" : 12,
+              "start" : 53,
+              "end_exclusive" : 54,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:13",
+              "index" : 13,
+              "start" : 55,
+              "end_exclusive" : 60,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:14",
+              "index" : 14,
+              "start" : 61,
+              "end_exclusive" : 63,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:15",
+              "index" : 15,
+              "start" : 64,
+              "end_exclusive" : 67,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:16",
+              "index" : 16,
+              "start" : 68,
+              "end_exclusive" : 71,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u2"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:17",
+              "index" : 17,
+              "start" : 73,
+              "end_exclusive" : 78,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:18",
+              "index" : 18,
+              "start" : 79,
+              "end_exclusive" : 83,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:19",
+              "index" : 19,
+              "start" : 84,
+              "end_exclusive" : 89,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:20",
+              "index" : 20,
+              "start" : 90,
+              "end_exclusive" : 93,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:21",
+              "index" : 21,
+              "start" : 94,
+              "end_exclusive" : 95,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:22",
+              "index" : 22,
+              "start" : 96,
+              "end_exclusive" : 102,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u3"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:23",
+              "index" : 23,
+              "start" : 104,
+              "end_exclusive" : 111,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u4"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:24",
+              "index" : 24,
+              "start" : 112,
+              "end_exclusive" : 115,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u4"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:25",
+              "index" : 25,
+              "start" : 116,
+              "end_exclusive" : 123,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u4"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:26",
+              "index" : 26,
+              "start" : 125,
+              "end_exclusive" : 132,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u5"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:27",
+              "index" : 27,
+              "start" : 133,
+              "end_exclusive" : 136,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u5"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:28",
+              "index" : 28,
+              "start" : 137,
+              "end_exclusive" : 144,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u5"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:29",
+              "index" : 29,
+              "start" : 146,
+              "end_exclusive" : 150,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:30",
+              "index" : 30,
+              "start" : 151,
+              "end_exclusive" : 153,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:31",
+              "index" : 31,
+              "start" : 154,
+              "end_exclusive" : 157,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:32",
+              "index" : 32,
+              "start" : 158,
+              "end_exclusive" : 159,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            },
+            {
+              "id" : "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:33",
+              "index" : 33,
+              "start" : 160,
+              "end_exclusive" : 168,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:6604ff971e69:u6"
+              }
+            }
+          ],
+          "units" : [
+            {
+              "id" : "story:6604ff971e69:u0",
+              "ordinal" : 0,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s0"
+                  },
+                  "start" : 0,
+                  "end_exclusive" : 25
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:0",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:1",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:2",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:3",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:4",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:5"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u1",
+              "ordinal" : 1,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s1"
+                  },
+                  "start" : 26,
+                  "end_exclusive" : 52
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:6",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:7",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:8",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:9",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:10",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:11"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u2",
+              "ordinal" : 2,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s2"
+                  },
+                  "start" : 53,
+                  "end_exclusive" : 72
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:12",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:13",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:14",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:15",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:16"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u3",
+              "ordinal" : 3,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s3"
+                  },
+                  "start" : 73,
+                  "end_exclusive" : 103
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:17",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:18",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:19",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:20",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:21",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:22"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u4",
+              "ordinal" : 4,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s4"
+                  },
+                  "start" : 104,
+                  "end_exclusive" : 124
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:23",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:24",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:25"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u5",
+              "ordinal" : 5,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s5"
+                  },
+                  "start" : 125,
+                  "end_exclusive" : 145
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:26",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:27",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:28"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:6604ff971e69:u6",
+              "ordinal" : 6,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "present",
+                    "value" : "story:6604ff971e69:s6"
+                  },
+                  "start" : 146,
+                  "end_exclusive" : 169
+                }
+              ],
+              "words" : [
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:29",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:30",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:31",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:32",
+                "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e:word:33"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            }
+          ]
+        },
+        "source" : {
+          "digest" : "8f2a4006a37701b8b27582c2d0aa4cd8aaa22bdb4a3895b75d971323241a2e94",
+          "view_fingerprint" : "09fd3bdb901512bb0f68581865556df8cfddb46fca6690f83f9164295d72a7e1",
+          "scope_digest" : "6b08061ed7ae847539b9ade626abd2094e4c023abbc5460b177b09de7acc662d",
+          "target_id_scheme" : "target-id/source-node-ref/v1",
+          "bundles" : [
+            {
+              "status" : "media",
+              "id" : "bundle:311a5cab9922",
+              "identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+              "role" : "part",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-a"
+              },
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "primary_axis" : "axis:f1beae15b99b",
+              "authority_tracks" : [
+                "stream:a39dbee6c2a4"
+              ],
+              "streams" : [
+                {
+                  "id" : "stream:a39dbee6c2a4",
+                  "kind" : {
+                    "status" : "Picture"
+                  },
+                  "checksum" : "a952b0ddb84e0665fde8cd87209fb4d2fcf26ad548e02b999f43f2c2bde92352",
+                  "native_axis" : "axis:f1beae15b99b",
+                  "extent" : {
+                    "status" : "playback-ticks",
+                    "start_tick" : "0",
+                    "end_exclusive_tick" : "76000",
+                    "timebase" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "timebase" : {
+                    "status" : "present",
+                    "value" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "derived_from" : [
+                  ]
+                }
+              ]
+            },
+            {
+              "status" : "media",
+              "id" : "bundle:19e1d4b47675",
+              "identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+              "role" : "part",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-b"
+              },
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "primary_axis" : "axis:d3b9e0971bce",
+              "authority_tracks" : [
+                "stream:a3da62e2eca7"
+              ],
+              "streams" : [
+                {
+                  "id" : "stream:a3da62e2eca7",
+                  "kind" : {
+                    "status" : "Picture"
+                  },
+                  "checksum" : "8ef6fa0abeb443cdecb00638d9f9bca1a81f8e3346c41ac988847421d2b66dfe",
+                  "native_axis" : "axis:d3b9e0971bce",
+                  "extent" : {
+                    "status" : "playback-ticks",
+                    "start_tick" : "0",
+                    "end_exclusive_tick" : "30000",
+                    "timebase" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "timebase" : {
+                    "status" : "present",
+                    "value" : {
+                      "numerator" : "1",
+                      "denominator" : "2500"
+                    }
+                  },
+                  "derived_from" : [
+                  ]
+                }
+              ]
+            }
+          ],
+          "axes" : [
+            {
+              "id" : "axis:d3b9e0971bce",
+              "bundle" : "bundle:19e1d4b47675",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-b"
+              },
+              "kind" : "EditionPlayback",
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "extent" : {
+                "status" : "playback-ticks",
+                "start_tick" : "0",
+                "end_exclusive_tick" : "30000",
+                "timebase" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "origin" : {
+                "status" : "present",
+                "value" : "0"
+              },
+              "timebase" : {
+                "status" : "present",
+                "value" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "fingerprint" : "5c82d6b3752c7302b4a78289039bf379cb550b556b4b0bd4c24464668d6ee830"
+            },
+            {
+              "id" : "axis:f1beae15b99b",
+              "bundle" : "bundle:311a5cab9922",
+              "edition" : {
+                "status" : "present",
+                "value" : "sherlock-nn2017-media-part-a"
+              },
+              "kind" : "EditionPlayback",
+              "source_kind" : {
+                "status" : "FilmEdition"
+              },
+              "extent" : {
+                "status" : "playback-ticks",
+                "start_tick" : "0",
+                "end_exclusive_tick" : "76000",
+                "timebase" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "origin" : {
+                "status" : "present",
+                "value" : "0"
+              },
+              "timebase" : {
+                "status" : "present",
+                "value" : {
+                  "numerator" : "1",
+                  "denominator" : "2500"
+                }
+              },
+              "fingerprint" : "9f99886666b1ad6ee87f69556e6ed7f991c46dc32c6bb0f74432f8ca3ae1000c"
+            }
+          ],
+          "coordinate_mappings" : [
+          ],
+          "composition" : {
+            "status" : "absent",
+            "reason" : "not-supplied"
+          },
+          "targets" : [
+            {
+              "target_id" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+              "level" : 1,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "25000"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "25000",
+                          "end_exclusive_tick" : "50000"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "50000",
+                          "end_exclusive_tick" : "75000"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-point",
+                      "axis" : "axis:f1beae15b99b",
+                      "tick" : "50000"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+              "level" : 1,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "12500"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "12500",
+                          "end_exclusive_tick" : "30000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:d3b9e0971bce",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:19e1d4b47675"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "25000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "25000",
+                          "end_exclusive_tick" : "50000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:3",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-point",
+                      "axis" : "axis:f1beae15b99b",
+                      "tick" : "50000"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:4",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "3bb0f32b6aff95d98fa404428a65c11efea1ded2c6c44c6ff1d779b070604fce",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:311a5cab9922",
+                      "stream" : "stream:a39dbee6c2a4",
+                      "kind" : "media-time",
+                      "axis" : "axis:f1beae15b99b",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:f1beae15b99b",
+                          "start_tick" : "50000",
+                          "end_exclusive_tick" : "75000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:f1beae15b99b",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:311a5cab9922"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:5",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "0",
+                          "end_exclusive_tick" : "12500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:d3b9e0971bce",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:19e1d4b47675"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:6",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "b78253af227d6636d6b7c729bdafc055cc9d4206a9177c0f7bc5328388ef64e3",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:19e1d4b47675",
+                      "stream" : "stream:a3da62e2eca7",
+                      "kind" : "media-time",
+                      "axis" : "axis:d3b9e0971bce",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:d3b9e0971bce",
+                          "start_tick" : "12500",
+                          "end_exclusive_tick" : "30000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:d3b9e0971bce",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:19e1d4b47675"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            }
+          ]
+        },
+        "policies" : {
+          "inference_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "no inference executed; recorded model choice"
+          },
+          "context_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "the model read the film packet and the surrounding recall"
+          },
+          "candidate_policy_id" : {
+            "status" : "unknown",
+            "reason" : "every scene was offered in the prompt; no candidate set computed"
+          },
+          "reference_prior_id" : {
+            "status" : "not-applicable",
+            "reason" : "categorical choice; no scores"
+          },
+          "decision_policy_id" : {
+            "status" : "declared",
+            "id" : "agent-localization/v2:referent"
+          },
+          "target_universe_id" : {
+            "id" : "705ba4ad6a075209f97554791457288e81dec7458281d22e2647ff0d7ec21098",
+            "grain" : {
+              "status" : "single-level",
+              "level" : 1
+            },
+            "targets" : [
+              "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+              "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+            ]
+          }
+        },
+        "roles" : {
+          "inference_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "6d311d0cf65ab6ce9575114d3ff8ed22075e0b7013e35a3882b417ddef657b42"
+          },
+          "organization_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "6d311d0cf65ab6ce9575114d3ff8ed22075e0b7013e35a3882b417ddef657b42"
+          },
+          "projection_unit" : {
+            "status" : "targets",
+            "grain" : {
+              "status" : "single-level",
+              "level" : 1
+            }
+          }
+        },
+        "stage_assumption_receipts" : [
+          {
+            "id" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+            "stage" : "Candidates",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "d39ccd3185d723ac757b70287c8e4cef2e8ce6869a03511175aefa92542921e0",
+            "stage" : "Rendering",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "540d83ddffeb61a54a3650fb908886e1d71ce62f2e1a8ec78aaba73ce56aef58",
+            "stage" : "Scoring",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "1426ea4e3369df73cbc0310f7b2bfdf9f7340ceb1516a900d2924a84881229e5",
+            "stage" : "Context",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "4a9997ff37131f88e559138e3c7c55b2e025f120b968f33fcd7eb1e0d72f69af",
+            "stage" : "Refinement",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+            "stage" : "Inference",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33",
+            "stage" : "Decision",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "CallerSuppliedDecision",
+              "asserted" : {
+                "status" : "present",
+                "value" : {
+                  "stage" : "Decision",
+                  "policy" : "agent-localization/v2:referent",
+                  "config" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073",
+                  "inputs" : [
+                    "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd"
+                  ],
+                  "provider" : {
+                    "status" : "identified",
+                    "provider" : "synthetic-cli",
+                    "model" : "synthetic-model",
+                    "artifact" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id" : "1fbc936ea14b6e720ea0f601c2aef2f84693a0d482d5df7997f54dca1f81a5e0",
+            "stage" : "Projection",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          }
+        ],
+        "derivation_source" : {
+          "status" : "none"
+        },
+        "outcomes" : [
+          {
+            "unit" : "story:6604ff971e69:u0",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "67056015c480bacc90f497bd0292eea51a7e291b79999e400b4ea7146568e8b3",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                  "policy" : "agent-localization/v2:referent"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+              }
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u1",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "reply item has no referent field"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u2",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "provider-failure",
+                "detail" : "unit omitted from the accepted reply (chunk 0, 1 attempts)"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u3",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "no parsable reply for chunk 1 after 3 attempts"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u4",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "request" : {
+                  "status" : "abstain",
+                  "policy" : "agent-localization/v2:referent",
+                  "reason" : "model reported no specific referent"
+                },
+                "decoded_target_id" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "decision_origin" : {
+                  "status" : "abstention",
+                  "reason" : "model reported no specific referent"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+              }
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u5",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "d9d9f38c6e175b862847fefaa24e1d2ee4403ede922f11e93be1ff7ea6023058",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                  "policy" : "agent-localization/v2:referent"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+              }
+            }
+          },
+          {
+            "unit" : "story:6604ff971e69:u6",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "73b903edf782dc83cf541bb07ba9da5ac89cf302286896748f55018c7836355d",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+                  "policy" : "agent-localization/v2:referent"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization/v2:referent"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization/v2:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "units" : [
+    {
+      "index" : 0,
+      "unit" : "story:6604ff971e69:u0",
+      "processing" : {
+        "status" : "answered",
+        "chunk" : 0,
+        "attempts" : 1
+      },
+      "narrative" : {
+        "status" : "value",
+        "value" : 1
+      },
+      "referent" : {
+        "status" : "value",
+        "value" : 2
+      },
+      "alternatives" : {
+        "status" : "value",
+        "value" : [
+          [
+            1,
+            0.6
+          ],
+          [
+            2,
+            0.3
+          ]
+        ]
+      },
+      "rows" : {
+        "status" : "value",
+        "value" : [
+          5,
+          2,
+          999
+        ]
+      },
+      "confidence" : {
+        "status" : "value",
+        "value" : 0.8
+      },
+      "responseKey" : "e05ad84d1966e543756a899324569a6996ed9ce5488fa50ab772bd35a3f1529c"
+    },
+    {
+      "index" : 1,
+      "unit" : "story:6604ff971e69:u1",
+      "processing" : {
+        "status" : "answered",
+        "chunk" : 0,
+        "attempts" : 1
+      },
+      "narrative" : {
+        "status" : "null"
+      },
+      "referent" : {
+        "status" : "absent"
+      },
+      "alternatives" : {
+        "status" : "absent"
+      },
+      "rows" : {
+        "status" : "absent"
+      },
+      "confidence" : {
+        "status" : "absent"
+      },
+      "responseKey" : "e05ad84d1966e543756a899324569a6996ed9ce5488fa50ab772bd35a3f1529c"
+    },
+    {
+      "index" : 2,
+      "unit" : "story:6604ff971e69:u2",
+      "processing" : {
+        "status" : "omitted",
+        "chunk" : 0,
+        "attempts" : 1
+      },
+      "narrative" : {
+        "status" : "absent"
+      },
+      "referent" : {
+        "status" : "absent"
+      },
+      "alternatives" : {
+        "status" : "absent"
+      },
+      "rows" : {
+        "status" : "absent"
+      },
+      "confidence" : {
+        "status" : "absent"
+      },
+      "responseKey" : null
+    },
+    {
+      "index" : 3,
+      "unit" : "story:6604ff971e69:u3",
+      "processing" : {
+        "status" : "unparsable",
+        "chunk" : 1,
+        "attempts" : 3
+      },
+      "narrative" : {
+        "status" : "absent"
+      },
+      "referent" : {
+        "status" : "absent"
+      },
+      "alternatives" : {
+        "status" : "absent"
+      },
+      "rows" : {
+        "status" : "absent"
+      },
+      "confidence" : {
+        "status" : "absent"
+      },
+      "responseKey" : null
+    },
+    {
+      "index" : 4,
+      "unit" : "story:6604ff971e69:u4",
+      "processing" : {
+        "status" : "answered",
+        "chunk" : 0,
+        "attempts" : 1
+      },
+      "narrative" : {
+        "status" : "invalid",
+        "raw" : 99
+      },
+      "referent" : {
+        "status" : "null"
+      },
+      "alternatives" : {
+        "status" : "absent"
+      },
+      "rows" : {
+        "status" : "absent"
+      },
+      "confidence" : {
+        "status" : "absent"
+      },
+      "responseKey" : "e05ad84d1966e543756a899324569a6996ed9ce5488fa50ab772bd35a3f1529c"
+    },
+    {
+      "index" : 5,
+      "unit" : "story:6604ff971e69:u5",
+      "processing" : {
+        "status" : "answered",
+        "chunk" : 0,
+        "attempts" : 1
+      },
+      "narrative" : {
+        "status" : "value",
+        "value" : 2
+      },
+      "referent" : {
+        "status" : "value",
+        "value" : 2
+      },
+      "alternatives" : {
+        "status" : "absent"
+      },
+      "rows" : {
+        "status" : "absent"
+      },
+      "confidence" : {
+        "status" : "absent"
+      },
+      "responseKey" : "e05ad84d1966e543756a899324569a6996ed9ce5488fa50ab772bd35a3f1529c"
+    },
+    {
+      "index" : 6,
+      "unit" : "story:6604ff971e69:u6",
+      "processing" : {
+        "status" : "answered",
+        "chunk" : 0,
+        "attempts" : 1
+      },
+      "narrative" : {
+        "status" : "value",
+        "value" : 2
+      },
+      "referent" : {
+        "status" : "value",
+        "value" : 2
+      },
+      "alternatives" : {
+        "status" : "absent"
+      },
+      "rows" : {
+        "status" : "absent"
+      },
+      "confidence" : {
+        "status" : "absent"
+      },
+      "responseKey" : "e05ad84d1966e543756a899324569a6996ed9ce5488fa50ab772bd35a3f1529c"
+    }
+  ],
+  "source" : {
+    "scenes" : [
+      {
+        "scene" : 1,
+        "target" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+        "label" : "1. Opening",
+        "firstRow" : 1,
+        "lastRow" : 4
+      },
+      {
+        "scene" : 2,
+        "target" : "seg:timed-group:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+        "label" : "2. Cartoon",
+        "firstRow" : 5,
+        "lastRow" : 6
+      }
+    ],
+    "rows" : [
+      {
+        "row" : 1,
+        "target" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:1",
+        "scene" : 1,
+        "part" : "media-part-a",
+        "start" : "0:00",
+        "end" : "0:10",
+        "text" : "A man walks in the rain."
+      },
+      {
+        "row" : 2,
+        "target" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:2",
+        "scene" : 1,
+        "part" : "media-part-a",
+        "start" : "0:10",
+        "end" : "0:20",
+        "text" : "The man knocks on a red door."
+      },
+      {
+        "row" : 3,
+        "target" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:3",
+        "scene" : 1,
+        "part" : "media-part-a",
+        "start" : "0:20",
+        "end" : "0:20",
+        "text" : "Smash cut to black."
+      },
+      {
+        "row" : 4,
+        "target" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:4",
+        "scene" : 1,
+        "part" : "media-part-a",
+        "start" : "0:20",
+        "end" : "0:30",
+        "text" : "Black screen between reels."
+      },
+      {
+        "row" : 5,
+        "target" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:5",
+        "scene" : 2,
+        "part" : "media-part-b",
+        "start" : "0:00",
+        "end" : "0:05",
+        "text" : "People in costumes parade."
+      },
+      {
+        "row" : 6,
+        "target" : "sit:timed:a08298f07c63adbd0b2123d01947db85b9f75801353dcae0418c03868ca0177e:6",
+        "scene" : 2,
+        "part" : "media-part-b",
+        "start" : "0:05",
+        "end" : "0:12",
+        "text" : "Popcorn pops in a machine."
+      }
+    ]
+  }
+}

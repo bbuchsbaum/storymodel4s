@@ -60,7 +60,12 @@ class AgentBundleSuite extends FunSuite:
     AgentMappingRecord.inventory(recallCsv).fold(e => fail(e), identity)
 
   private val producer =
-    Producer("synthetic-cli", "synthetic-model", Checksum.ofText("system"), Checksum.ofText("outline"))
+    Producer(
+      "synthetic-cli",
+      "synthetic-model",
+      Checksum.ofText("system"),
+      Checksum.ofText("outline")
+    )
 
   private def answered(
       narrative: Field[Int],
@@ -75,7 +80,12 @@ class AgentBundleSuite extends FunSuite:
       answered(
         Field.Value(1),
         Field.Value(2),
-        Field.Value(Vector(Alternative(1, Json.fromDoubleOrNull(0.6)), Alternative(2, Json.fromDoubleOrNull(0.3)))),
+        Field.Value(
+          Vector(
+            Alternative(1, Json.fromDoubleOrNull(0.6)),
+            Alternative(2, Json.fromDoubleOrNull(0.3))
+          )
+        ),
         Field.Value(Vector(5, 2, 999)),
         Field.Value(0.8)
       ),
@@ -84,14 +94,19 @@ class AgentBundleSuite extends FunSuite:
       Outcome.Unparsable(1, 3),
       answered(Field.Invalid(Json.fromInt(99)), Field.Null)
     )
-    assert(inventory.units.size > special.size, s"fixture needs more units: ${inventory.units.size}")
+    assert(
+      inventory.units.size > special.size,
+      s"fixture needs more units: ${inventory.units.size}"
+    )
     special ++ Vector.fill(inventory.units.size - special.size)(
       answered(Field.Value(2), Field.Value(2))
     )
 
   private lazy val keyed = inventory.units.map(_.id).zip(outcomes)
   private def record(i: Interpretation) =
-    AgentMappingRecord.record(i, inventory, film, producer, keyed).fold(e => fail(e.message), identity)
+    AgentMappingRecord
+      .record(i, inventory, film, producer, keyed)
+      .fold(e => fail(e.message), identity)
   private lazy val narrative = record(Interpretation.Narrative)
   private lazy val referent = record(Interpretation.Referent)
   private lazy val unitRows = inventory.units.zip(outcomes).map { (u, o) =>
@@ -155,7 +170,9 @@ class AgentBundleSuite extends FunSuite:
     assertEquals(
       narrative.outcomes(2).processing,
       ProcessingStatus.Failed(
-        ProcessingFailure.ProviderFailure("unit omitted from the accepted reply (chunk 0, 1 attempts)")
+        ProcessingFailure.ProviderFailure(
+          "unit omitted from the accepted reply (chunk 0, 1 attempts)"
+        )
       )
     )
     assertEquals(

@@ -9,10 +9,10 @@ import storymodel4s.recall.RecallInventory
   * full answer, provenance, and the source dictionary needed to resolve a cited row.
   *
   * Why a bundle: a mapping record alone cannot be read without regenerating its source and
-  * inventory, and it has no place for self-reported alternatives, confidence or row citations.
-  * The bundle keeps those as plain per-unit observations beside the records, so a reader with no
-  * Scala process can inspect any unit, and a Scala reader can still re-check the records. It holds
-  * film annotation text and unit ids, so it is written under the ignored data root.
+  * inventory, and it has no place for self-reported alternatives, confidence or row citations. The
+  * bundle keeps those as plain per-unit observations beside the records, so a reader with no Scala
+  * process can inspect any unit, and a Scala reader can still re-check the records. It holds film
+  * annotation text and unit ids, so it is written under the ignored data root.
   */
 object AgentBundle:
   val Schema: String = "storymodel4s.agentmapping.bundle/v1"
@@ -77,7 +77,7 @@ object AgentBundle:
           a.confidence,
           Some(key(a.prompt))
         )
-      case Outcome.Omitted(chunk, attempts) => blank(index, unit, "omitted", chunk, attempts)
+      case Outcome.Omitted(chunk, attempts)    => blank(index, unit, "omitted", chunk, attempts)
       case Outcome.Unparsable(chunk, attempts) =>
         blank(index, unit, "unparsable", chunk, attempts)
 
@@ -259,7 +259,9 @@ object AgentBundle:
         .downField("record")
         .focus
         .toRight(s"no $name record")
-        .flatMap(j => MappingCodecs.decode(j.noSpaces, context).left.map(e => s"$name: ${e.message}"))
+        .flatMap(j =>
+          MappingCodecs.decode(j.noSpaces, context).left.map(e => s"$name: ${e.message}")
+        )
     for
       _ <- Either.cond(c.get[String]("schema").contains(Schema), (), "not an agent mapping bundle")
       narrative <- record("narrative")
