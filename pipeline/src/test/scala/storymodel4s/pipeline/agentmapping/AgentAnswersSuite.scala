@@ -63,8 +63,8 @@ class AgentAnswersSuite extends FunSuite:
     )
     assertEquals(a.narrative, Field.Null)
     assertEquals(a.referent, Field.Invalid(Json.fromInt(51)))
-    assert(a.alternatives.isInstanceOf[Field.Invalid])
-    assert(a.rows.isInstanceOf[Field.Invalid])
+    assertEquals(a.alternatives, Field.Invalid(item("""[[7, "high"]]""")))
+    assertEquals(a.rows, Field.Invalid(item("[-1]")))
     assertEquals(a.confidence, Field.Absent)
 
   test("a non-integral scene and an out-of-range confidence are invalid, not rounded"):
