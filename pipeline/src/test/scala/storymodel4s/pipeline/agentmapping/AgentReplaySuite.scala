@@ -101,7 +101,7 @@ class AgentReplaySuite extends FunSuite:
       first -> """{"units": [{"u": 9, "narrative": 1}, {"u": 3, "narrative": 5}]}""",
       second -> """{"units": [{"u": 9, "narrative": 2}]}"""
     )
-    val (doc, receipts) =
+    val (doc, _) =
       AgentReplay.participant("P", "OUT", units, ids, 2, serving(table)).toOption.get
     val nine = doc.hcursor.get[Vector[Json]]("units").toOption.get.last
     assertEquals(nine.hcursor.get[Int]("narrative").toOption, Some(2))
