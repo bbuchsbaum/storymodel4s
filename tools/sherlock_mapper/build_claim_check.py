@@ -75,8 +75,9 @@ def build(run, seed):
             f'<div class="recall">{ctx}</div>'
             f'<div class="claim"><b>Extracted claim:</b> {html.escape(who)} — '
             f'{html.escape(str(cl.get("what")))}'
-            f'{" @ " + html.escape(str(cl["where"])) if cl.get("where") else ""}</div>'
-            f'<ul class="ev">{ev}</ul><div class="opts">{radios}</div>'
+            f'{"<br><span class=pid>film location label (ignore): " + html.escape(str(cl["where"])) + "</span>" if cl.get("where") else ""}</div>'
+            f'<p class="pid">Film moments the model cited as evidence. Watch any or all; answer once '
+            f'for the claim, judged against the film as a whole.</p><ul class="ev">{ev}</ul><div class="opts">{radios}</div>'
             f'<input class="note" id="n{i}" placeholder="optional note" oninput="save()"></section>'
         )
     page = (
@@ -128,8 +129,11 @@ h2{font-size:15px;margin:0 0 6px}.pid{color:var(--mut);font-weight:400;font-size
 .note{width:100%;box-sizing:border-box;padding:4px 6px;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:4px}
 button{cursor:pointer}
 </style></head><body>
-<header><b>Claim check</b>: for each item, judge the extracted claim against the film. The
-model's own verdict is hidden. <span id="prog"></span>
+<header><b>Claim check</b>, two steps per item. <b>1.</b> Is the extracted claim a fair
+reading of the <b>bold</b> sentence (grey lines are context only)? If not, choose "Claim misreads
+the recall sentence". <b>2.</b> Otherwise, is the claim true of the film as a whole? The clips are
+where the model looked, a starting point only. The model's own verdict is hidden.
+<span id="prog"></span>
 <button onclick="exportAns()">Export answers</button></header>
 <main><div>{{CARDS}}</div><aside><video id="v" controls preload="none"></video>
 <p class="pid">Clip plays the cited annotation row (2 s lead-in).</p></aside></main>

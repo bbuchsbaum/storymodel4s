@@ -174,3 +174,38 @@ Two are doubtful. One marks the not-a-suicide conclusion as contradicted, althou
 supports it.
 The other has a claim attached to the wrong unit. Fidelity labels need a human-checked sample
 before scientific use.
+
+### 2026-11-08: owner blind check of v3 fidelity, and a graded verifier
+
+The owner rated 50 v3 claims blind: 30 the model called contradicted, 10 not in the film, 10
+supported (seed 11; answers kept under the data root). The sampled estimate above was wrong.
+
+| v3 label | Owner: supports | contradicts | misread | can't tell | not in film |
+|---|---:|---:|---:|---:|---:|
+| contradicted (30) | 19 | 6 | 3 | 1 | 1 |
+| not in film (10) | 2 | 4 | 1 | 3 | 0 |
+| supported (10) | 9 | 0 | 1 | 0 | 0 |
+
+Contradiction precision is 6/30, and the owner's notes call most of those six partial. The
+recurring case is a recognisable event with a wrong detail; the three-way label has no place
+for it, and neither did the form.
+
+`verify_claims.py` re-judges each claim in a second pass, blind to the extractor's label, on a
+graded scale: supported, gist-detail (naming the wrong detail), contradicted (the gist itself is
+false), inference, unverifiable, invented, misread.
+
+| Owner \ verifier | supported | gist-detail | contradicted | inference | other |
+|---|---:|---:|---:|---:|---:|
+| supports (30) | 9 | 17 | 0 | 2 | 2 |
+| contradicts (10) | 1 | 8 | 0 | 1 | 0 |
+| misread (5) | 1 | 1 | 1 | 1 | 1 |
+| can't tell (4) | 0 | 3 | 0 | 1 | 0 |
+| not in film (1) | 0 | 1 | 0 | 0 | 0 |
+
+- False contradictions fall from 19 to 0: no claim the owner supported is called contradicted.
+- Eight of the owner's ten contradicts become gist-detail, which matches the owner's notes.
+- The open question is the 17 owner-supported claims the verifier calls gist-detail. For 6 the
+  owner's note names the same detail; the other 11 need a short follow-up check of the named
+  detail alone.
+- The 50 items were used to design the scale, so they are calibration, not a held-out test.
+- Scene mapping is unaffected; these labels never fed it.
