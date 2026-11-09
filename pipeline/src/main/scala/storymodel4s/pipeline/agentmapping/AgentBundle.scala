@@ -98,6 +98,29 @@ object AgentBundle:
 
   private def str(s: String) = Json.fromString(s)
 
+  private def statusOf(f: Field[?]): String = f match
+    case Field.Absent     => "absent"
+    case Field.Null       => "null"
+    case Field.Value(_)   => "value"
+    case Field.Invalid(_) => "invalid"
+
+  /** Counts a run must show: processing statuses, and each field's status over answered units. A
+    * field that is invalid everywhere is otherwise hidden behind "answered".
+    */
+  def counts(units: Vector[UnitRow]): Json =
+    def tally(xs: Vector[String]) =
+      Json.fromFields(xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size)))
+    val answered = units.filter(_.status == "answered")
+    Json.obj(
+      "units" -> Json.fromInt(units.size),
+      "processing" -> tally(units.map(_.status)),
+      "narrative" -> tally(answered.map(u => statusOf(u.narrative))),
+      "referent" -> tally(answered.map(u => statusOf(u.referent))),
+      "alternatives" -> tally(answered.map(u => statusOf(u.alternatives))),
+      "rows" -> tally(answered.map(u => statusOf(u.rows))),
+      "confidence" -> tally(answered.map(u => statusOf(u.confidence)))
+    )
+
   private def field[A](f: Field[A])(value: A => Json): Json = f match
     case Field.Absent     => Json.obj("status" -> str("absent"))
     case Field.Null       => Json.obj("status" -> str("null"))
@@ -244,7 +267,9 @@ object AgentBundle:
   final case class Loaded(narrative: MappingResult, referent: MappingResult, units: Vector[UnitRow])
 
   /** Read a bundle against a regenerated inventory and source. The embedded records are decoded
-    * through the mapping codec, which re-derives and compares them; nothing is trusted as written.
+    * through the mapping codec, which re-derives and compares them. Each record must carry its
+    * slot's decision policy, and each unit row must agree with both records. Provenance and the
+    * source dictionary are read as written: they are descriptions, not checked values.
     */
   def decode(
       bundle: Json,
@@ -273,4 +298,33 @@ object AgentBundle:
         (),
         "unit rows do not match the inventory"
       )
+      _ <- agreement(AgentMappingRecord.Interpretation.Narrative, narrative, units, film)
+      _ <- agreement(AgentMappingRecord.Interpretation.Referent, referent, units, film)
     yield Loaded(narrative, referent, units)
+
+  /** A record must be the one its slot names, and each unit row must say what the record says. */
+  private def agreement(
+      interpretation: AgentMappingRecord.Interpretation,
+      record: MappingResult,
+      units: Vector[UnitRow],
+      film: AgentMappingRecord.Film
+  ): Either[String, Unit] =
+    import storymodel4s.align.{DecisionPolicy, Destination, ProcessingStatus}
+    val name = interpretation.field
+    val slot = record.policies.decision == DecisionPolicy.Declared(interpretation.policy)
+    val rows = units.zip(record.outcomes).forall { (row, outcome) =>
+      val field = interpretation match
+        case AgentMappingRecord.Interpretation.Narrative => row.narrative
+        case AgentMappingRecord.Interpretation.Referent  => row.referent
+      val complete = outcome.processing == ProcessingStatus.Complete
+      (row.status, field) match
+        case ("answered", Field.Value(scene)) =>
+          complete && film.scenes.get(scene).exists(ref =>
+            outcome.decision.flatMap(_.chosen).contains(Destination.Target(ref))
+          )
+        case ("answered", Field.Null) => complete && outcome.decision.exists(_.chosen.isEmpty)
+        case _                        => !complete
+    }
+    if !slot then Left(s"the $name slot does not hold the $name record")
+    else if !rows then Left(s"a unit row disagrees with the $name record")
+    else Right(())

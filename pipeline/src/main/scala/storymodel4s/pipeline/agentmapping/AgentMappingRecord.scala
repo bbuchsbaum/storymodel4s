@@ -29,13 +29,21 @@ object AgentMappingRecord:
   /** The film as mapping targets: a timed source view and the target of each scene ordinal. */
   final case class Film(view: TimedSourceView, scenes: Map[Int, SourceNodeRef])
 
-  /** Who produced the decisions, for the decision stage's receipt. */
+  /** Who produced the decisions, for the decision stage's receipt. `recallSha256` is the recall
+    * word table the units came from.
+    */
   final case class Producer(
       provider: String,
       model: String,
       systemSha256: Checksum,
-      outlineSha256: Checksum
-  )
+      outlineSha256: Checksum,
+      recallSha256: Checksum
+  ):
+    /** The model as far as it is known: a provider label and a model name, no registered artifact.
+      * The digest is of exactly that description, so it cannot be mistaken for the prompt or for a
+      * model file.
+      */
+    def identity: Checksum = Checksum.ofText(s"model-by-name/v1\n$provider\n$model")
 
   private def locus(m: SherlockAnnotations.MediaLocus): MediaLocus = m match
     case SherlockAnnotations.MediaLocus.Extent(p, iv)  => MediaLocus.Extent(p, iv)
@@ -74,6 +82,36 @@ object AgentMappingRecord:
     * spaces, titled `sherlock-recall`, segmented by the standard segmenter.
     */
   def inventory(recallCsv: Array[Byte]): Either[String, RecallInventory] =
+    recall(recallCsv).map(_.inventory)
+
+  /** A rebuilt recall: the inventory and each unit's text, in unit order. */
+  final case class Recall(inventory: RecallInventory, texts: Vector[String])
+
+  /** Bind the unit table the model was shown to the rebuilt inventory. A unit id encodes only the
+    * transcript and the unit's position, so equal ids do not show that the model saw this unit's
+    * text. The table text must also equal the unit's text (tabs and line breaks as one space,
+    * trimmed, which is how the table was written); otherwise an answer about one stretch of speech
+    * would be saved against another.
+    */
+  def bind(
+      units: Vector[AgentPrompts.RecallUnit],
+      ids: Map[Int, String],
+      recall: Recall
+  ): Either[String, Vector[RecallUnitId]] =
+    val named = units.map(u => ids.get(u.index))
+    val inventoryIds = recall.inventory.units.map(_.id)
+    if named.exists(_.isEmpty) then Left("a unit has no manifest id")
+    else if named.flatten != inventoryIds.map(_.value) then
+      Left("unit table ids do not match the rebuilt recall inventory")
+    else
+      units
+        .zip(recall.texts)
+        .find((u, text) => text.replaceAll("[\\t\\n\\r]+", " ").trim != u.text)
+        .map((u, _) => s"unit ${u.index}: table text is not the rebuilt unit's text")
+        .toLeft(inventoryIds)
+
+  /** The inventory and unit texts, by the unit manifest's recipe (see `inventory`). */
+  def recall(recallCsv: Array[Byte]): Either[String, Recall] =
     val content = new String(recallCsv, java.nio.charset.StandardCharsets.UTF_8)
     val lines = content.split('\n').toVector.map(_.stripSuffix("\r")).filter(_.nonEmpty)
     lines match
@@ -94,7 +132,7 @@ object AgentMappingRecord:
             )
             .left
             .map(_.message)
-        yield inventory
+        yield Recall(inventory, graph.ordered.map(_.text))
       case _ => Left("expected a header row starting with 'Words'")
 
   private def ledger(
@@ -102,12 +140,12 @@ object AgentMappingRecord:
       producer: Producer
   ): Either[MappingRefusal, (StageLedger, UnitStageRefs)] =
     for
-      identity <- ProviderIdentity.of(producer.provider, producer.model, producer.systemSha256)
+      identity <- ProviderIdentity.of(producer.provider, producer.model, producer.identity)
       receipt <- StageReceipt.of(
         Stage.Decision,
         interpretation.policy.value,
         producer.systemSha256,
-        Vector(producer.outlineSha256),
+        Vector(producer.outlineSha256, producer.recallSha256),
         ProviderStatus.Identified(identity)
       )
       entries <- Stage.values.toVector.foldLeft[Either[MappingRefusal, Vector[StageEntry]]](

@@ -1,15 +1,18 @@
 """Tests for read_bundle.py on the synthetic bundle the Scala writer is pinned to.
 
-Run: python3 -m unittest tools/agentmapping/test_read_bundle.py
+Run from the repository root: python3 tools/agentmapping/test_read_bundle.py
 """
 
 import copy
 import json
 import pathlib
+import sys
 import tempfile
 import unittest
 
-import read_bundle
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+
+import read_bundle  # noqa: E402
 
 FIXTURE = (
     pathlib.Path(__file__).resolve().parents[2]
@@ -62,6 +65,36 @@ class ReadBundle(unittest.TestCase):
         edited["units"][0]["narrative"]["value"] = 2
         with self.assertRaises(read_bundle.BundleError):
             read_bundle.summary(edited)
+
+    def test_alternatives_are_reported_as_self_reports(self):
+        self.assertIn(
+            "alternatives (self-reported, narrative only, not a distribution): "
+            "scene 1 p=0.6; scene 2 p=0.3",
+            self.lines(0),
+        )
+
+    def write(self, bundle):
+        handle = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        self.addCleanup(pathlib.Path(handle.name).unlink)
+        json.dump(bundle, handle)
+        handle.close()
+        return handle.name
+
+    def test_missing_and_duplicated_units_are_refused(self):
+        fewer = copy.deepcopy(self.bundle)
+        del fewer["units"][2]
+        doubled = copy.deepcopy(self.bundle)
+        doubled["units"].append(doubled["units"][0])
+        for edited in (fewer, doubled):
+            with self.assertRaises(read_bundle.BundleError):
+                read_bundle.load(self.write(edited))
+
+    def test_swapped_records_are_refused(self):
+        swapped = copy.deepcopy(self.bundle)
+        slots = swapped["interpretations"]
+        slots["narrative"], slots["referent"] = slots["referent"], slots["narrative"]
+        with self.assertRaises(read_bundle.BundleError):
+            read_bundle.summary(read_bundle.load(self.write(swapped)))
 
     def test_wrong_schema_is_refused(self):
         with tempfile.NamedTemporaryFile("w", suffix=".json") as handle:

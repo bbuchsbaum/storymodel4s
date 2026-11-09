@@ -40,6 +40,13 @@ def load(path):
     for key in ("provenance", "interpretations", "units", "source"):
         if key not in bundle:
             raise BundleError(f"bundle has no {key}")
+    ids = [unit["unit"] for unit in bundle["units"]]
+    if len(set(ids)) != len(ids):
+        raise BundleError("a unit appears twice")
+    for name in ("narrative", "referent"):
+        outcomes = bundle["interpretations"][name]["record"]["outcomes"]
+        if [o["unit"] for o in outcomes] != ids:
+            raise BundleError(f"unit rows do not match the {name} record's units")
     return bundle
 
 
@@ -165,7 +172,7 @@ def describe_unit(bundle, unit):
             lines.append(f"  r{number}: not in source")
             continue
         note = ""
-        if narrative is not None and row["scene"] != narrative:
+        if narrative is not None and row["scene"] is not None and row["scene"] != narrative:
             note = "  [outside the narrative scene]"
         lines.append(
             f'  r{number}: scene {row["scene"]}, part {row["part"]}, '

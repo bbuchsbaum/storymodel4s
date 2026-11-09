@@ -19,7 +19,8 @@ Bead bd-01M6Z1HRKYBVHTP4115937PR7F, epic bd-01M6Y7MWZGP29TNDJ90SG36A45. Design:
   - three attempts per chunk, with the fixed strict-JSON retry suffix;
   - the harness's reply extraction and Python `int()` unit keys;
   - later chunks overwrite earlier keys;
-  - a missing unit is written as null and listed as missing.
+  - a missing unit is written as null and listed as missing. (Changed in step 4b, 2026-11-09: a
+    missing unit is now left out of the reply file and still listed. Development has none.)
 - **Commands.** `agentHarnessImport` and `agentMappingReplay`.
   - Replay holds no model client.
   - Replay refuses an exchange it needs but cannot find.

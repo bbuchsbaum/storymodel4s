@@ -77,6 +77,21 @@ class AgentAnswersSuite extends FunSuite:
     assertEquals(a.narrative, Field.Invalid(Json.fromDoubleOrNull(7.5)))
     assertEquals(a.confidence, Field.Invalid(Json.fromDoubleOrNull(1.2)))
 
+  test("a zero confidence is a value, and a numeric string is not a scene"):
+    val a = AgentAnswers.answer(item("""{"narrative": "12", "referent": 12.0, "conf": 0}"""), 50, 0, 0, "P")
+    assertEquals(a.confidence, Field.Value(0.0))
+    assertEquals(a.narrative, Field.Invalid(Json.fromString("12")))
+    assertEquals(a.referent, Field.Value(12))
+
+  test("alternatives keep the reported numbers verbatim; a malformed entry invalidates the field"):
+    val kept = AgentAnswers.answer(item("""{"alts": [[3, 0.9], [4, 1.5]]}"""), 50, 0, 0, "P")
+    assertEquals(
+      kept.alternatives,
+      Field.Value(Vector(Alternative(3, item("0.9")), Alternative(4, item("1.5"))))
+    )
+    val arity = AgentAnswers.answer(item("""{"alts": [[3, 0.9, 1], [4, 0.1]]}"""), 50, 0, 0, "P")
+    assertEquals(arity.alternatives, Field.Invalid(item("[[3, 0.9, 1], [4, 0.1]]")))
+
   test("an explicit null referent is kept as null, not as a missing answer"):
     val a = AgentAnswers.answer(item("""{"narrative": 4, "referent": null}"""), 50, 0, 0, "P")
     assertEquals(a.referent, Field.Null)

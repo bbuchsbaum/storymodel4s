@@ -157,7 +157,8 @@ private def die(msg: String): Nothing =
   * Replays every development participant from recordings, with no model client, and writes one
   * bundle per participant (see `AgentBundle`): both interpretations as checked categorical records,
   * every unit's full answer, and the source dictionary. Each bundle is read back and re-checked
-  * before the command reports. `RECALL_DIR` holds `<participant>.csv` word tables. The output holds
+  * before the command reports, and `bundle-receipt.json` records per-field status counts. A unit
+  * table whose text is not the rebuilt recall unit's text refuses the run. `RECALL_DIR` holds `<participant>.csv` word tables. The output holds
   * film and recall-derived text, so keep it outside the repository.
   */
 @main def agentMappingBundle(
@@ -186,12 +187,6 @@ private def die(msg: String): Nothing =
   val system = AgentPrompts.system(AgentPrompts.Version.V2)
   val provider = TextExchange.SubscriptionCliProvider
   val film = AgentMappingRecord.film(in.atlas, in.annotationSha256).fold(die, identity)
-  val producer = Producer(
-    provider,
-    model,
-    Checksum.ofBytes(system.getBytes(StandardCharsets.UTF_8)),
-    Checksum.ofBytes(in.outline.getBytes(StandardCharsets.UTF_8))
-  )
   val (scenes, rows) = AgentBundleSource.dictionary(in.atlas, film)
   val bundles = in.development.map { name =>
     val units = AgentPackets.units(in, name).fold(die, identity)
@@ -199,7 +194,16 @@ private def die(msg: String): Nothing =
     val csv =
       try Files.readAllBytes(Path.of(recallDir).resolve(s"$name.csv"))
       catch case scala.util.control.NonFatal(_) => die(s"$name: cannot read recall table")
-    val inventory = AgentMappingRecord.inventory(csv).fold(e => die(s"$name: $e"), identity)
+    val recall = AgentMappingRecord.recall(csv).fold(e => die(s"$name: $e"), identity)
+    val inventory = recall.inventory
+    val bound = AgentMappingRecord.bind(units, ids, recall).fold(e => die(s"$name: $e"), identity)
+    val producer = Producer(
+      provider,
+      model,
+      Checksum.ofBytes(system.getBytes(StandardCharsets.UTF_8)),
+      Checksum.ofBytes(in.outline.getBytes(StandardCharsets.UTF_8)),
+      Checksum.ofBytes(csv)
+    )
     val (outcomes, replays) = AgentAnswers
       .participant(
         name,
@@ -210,20 +214,16 @@ private def die(msg: String): Nothing =
         p => TextExchange.replay(recordings, provider, model, system, p)
       )
       .fold(f => die(f.toString), identity)
-    val named =
-      outcomes.map((u, o) => ids.getOrElse(u.index, die(s"$name: no id for ${u.index}")) -> o)
-    if named.map(_._1) != inventory.units.map(_.id.value) then
-      die(s"$name: unit table ids do not match the rebuilt recall inventory")
-    val keyed = inventory.units.map(_.id).zip(named.map(_._2))
+    val keyed = bound.zip(outcomes.map(_._2))
     def record(i: Interpretation) = AgentMappingRecord
       .record(i, inventory, film, producer, keyed)
       .fold(e => die(s"$name ${i.field}: ${e.message}"), identity)
     val narrative = record(Interpretation.Narrative)
     val referent = record(Interpretation.Referent)
-    val unitRows = outcomes.zip(named).map { case ((u, o), (id, _)) =>
+    val unitRows = outcomes.zip(bound).map { case ((u, o), id) =>
       AgentBundle.unitRow(
         u.index,
-        id,
+        id.value,
         o,
         p => TextExchange.key(provider, model, system, p).checksum.hex
       )
@@ -261,9 +261,21 @@ private def die(msg: String): Nothing =
     Files.writeString(out.resolve(s"$name.bundle.json"), doc.spaces2 + "\n"): scala.Unit
   }
   val all = bundles.flatMap(_._3)
-  def count(status: String) = all.count(_.status == status)
-  println(
-    s"bundles=${bundles.size} units=${all.size} answered=${count("answered")} " +
-      s"omitted=${count("omitted")} unparsable=${count("unparsable")} " +
-      s"exchanges=${bundles.map(_._4).sum} modelCalls=0"
+  val receipt = Json.obj(
+    "schema" -> Json.fromString("storymodel4s.agentmapping.bundle-receipt/v1"),
+    "provider" -> Json.fromString(provider),
+    "model" -> Json.fromString(model),
+    "chunk" -> Json.fromInt(chunk),
+    "modelCalls" -> Json.fromInt(0),
+    "exchanges" -> Json.fromInt(bundles.map(_._4).sum),
+    "total" -> AgentBundle.counts(all),
+    "participants" -> Json.fromValues(bundles.map { (name, doc, rows, _) =>
+      Json.obj(
+        "participant" -> Json.fromString(name),
+        "bundleSha256" -> Json.fromString(sha(doc.spaces2 + "\n")),
+        "counts" -> AgentBundle.counts(rows)
+      )
+    })
   )
+  Files.writeString(out.resolve("bundle-receipt.json"), receipt.spaces2 + "\n"): scala.Unit
+  println(s"bundles=${bundles.size} modelCalls=0 ${AgentBundle.counts(all).noSpaces}")

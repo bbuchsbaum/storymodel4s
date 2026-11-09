@@ -121,12 +121,15 @@ Outcome rules:
 | Explicit `"narrative": null` | The model reported no narrative assignment |
 | Explicit `"referent": null` | No specific referent reported, as the prompt allows |
 | `conf` absent | Confidence unavailable |
-| Exchange failure, or three unparsable attempts | Failed processing, with the actual cause |
+| Three unparsable attempts for a chunk | Failed processing for its units, with that cause |
+| A recorded exchange is missing or failed | The run refuses; no bundle is written |
 
 An explicit null is recorded as what the response says, without inferring intention.
 
-- The harness projection (`AgentReplay.participant`, narrative only, missing as null) stays as
-  the parity artifact for slices 1 and 3, labelled as such. The typed path does not read it.
+- The arm projection (`AgentReplay.participant`, narrative only) stays for slices 1 and 3. It no
+  longer writes null for an omitted unit or a missing field, so the arm import records those as
+  a provider failure and an invalid output. Development has neither, so its arm is unchanged.
+  The typed path does not read the projection.
 - The artifact is a bundle (`storymodel4s.agentmapping.bundle/v1`) holding:
   - a narrative mapping record and a referent mapping record (codec v0.2, categorical);
   - per-unit observations: alternatives, confidence, rows, response key, attempt;

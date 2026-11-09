@@ -23,7 +23,7 @@ class AgentBundleSuite extends FunSuite:
     "Segment Number\tStart Time (s) \tEnd Time (s) \tStart TR\tEnd TR\tScene Segments\t" +
       "Scene Details - A Level \tSpace-In/Outdoor\tName - All\tName - Focus\tName - Speaking\t" +
       "Location\tCamera Angle\tMusic Presence \tWords on Screen "
-  private val table = Vector(
+  private val annotation = Vector(
     header,
     "1\t0\t10\t1\t7\t1. Opening\tA man walks in the rain.\tOutdoor\tMan\tMan\t\tStreet\tLong\tNo\t",
     "2\t10\t20\t8\t14\t\tThe man knocks on a red door.\tOutdoor\tMan\t\tMan\tStreet\tMedium\tNo\t",
@@ -39,12 +39,12 @@ class AgentBundleSuite extends FunSuite:
       try new String(stream.readAllBytes(), StandardCharsets.UTF_8)
       finally stream.close()
     val record = TimebaseRepair
-      .parse(json.replace("0" * 64, Checksum.ofBytes(table).hex))
+      .parse(json.replace("0" * 64, Checksum.ofBytes(annotation).hex))
       .fold(e => fail(e.message), identity)
-    SherlockAnnotations.parse(table, record).fold(e => fail(e.message), identity)
+    SherlockAnnotations.parse(annotation, record).fold(e => fail(e.message), identity)
 
   private lazy val film =
-    AgentMappingRecord.film(atlas, Checksum.ofBytes(table)).fold(e => fail(e), identity)
+    AgentMappingRecord.film(atlas, Checksum.ofBytes(annotation)).fold(e => fail(e), identity)
 
   private val recallCsv = ("Words" +: Vector(
     "A man walked in the rain.",
@@ -56,16 +56,19 @@ class AgentBundleSuite extends FunSuite:
     "That is all I remember."
   ).flatMap(_.split(' '))).mkString("\n").getBytes(StandardCharsets.UTF_8)
 
-  private lazy val inventory =
-    AgentMappingRecord.inventory(recallCsv).fold(e => fail(e), identity)
+  private lazy val recall = AgentMappingRecord.recall(recallCsv).fold(e => fail(e), identity)
+  private lazy val inventory = recall.inventory
+  private lazy val table =
+    recall.texts.zipWithIndex.map((t, i) => AgentPrompts.RecallUnit(i, t))
+  private lazy val ids = inventory.units.zipWithIndex.map((u, i) => i -> u.id.value).toMap
 
-  private val producer =
-    Producer(
-      "synthetic-cli",
-      "synthetic-model",
-      Checksum.ofText("system"),
-      Checksum.ofText("outline")
-    )
+  private val producer = Producer(
+    "synthetic-cli",
+    "synthetic-model",
+    Checksum.ofText("system"),
+    Checksum.ofText("outline"),
+    Checksum.ofBytes(recallCsv)
+  )
 
   private def answered(
       narrative: Field[Int],
@@ -121,7 +124,7 @@ class AgentBundleSuite extends FunSuite:
         producer.model,
         producer.systemSha256.hex,
         producer.outlineSha256.hex,
-        Checksum.ofBytes(table).hex,
+        Checksum.ofBytes(annotation).hex,
         Checksum.ofBytes(recallCsv).hex,
         3
       ),
@@ -202,10 +205,9 @@ class AgentBundleSuite extends FunSuite:
     )
 
   test("the bundle reloads to the same records and the same unit rows"):
-    val text = bundle.spaces2
-    val loaded = parse(text).left
+    val loaded = parse(bundle.spaces2).left
       .map(_.message)
-      .flatMap(AgentBundle.decode(_, inventory, film))
+      .flatMap(reload)
       .fold(e => fail(e), identity)
     assertEquals(loaded.narrative.digest, narrative.digest)
     assertEquals(loaded.referent.digest, referent.digest)
@@ -215,11 +217,66 @@ class AgentBundleSuite extends FunSuite:
     assertEquals(loaded.units(2).status, "omitted")
     assertEquals(loaded.units(3).status, "unparsable")
 
-  test("a bundle whose record was edited does not reload"):
-    val edited = parse(
-      bundle.noSpaces.replace(film.scenes(1).key, film.scenes(2).key)
-    ).toOption.get
-    assert(AgentBundle.decode(edited, inventory, film).isLeft)
+  private def reload(doc: Json) = AgentBundle.decode(doc, inventory, film)
+  private def edit(path: String*)(f: Json => Json): Json =
+    path.foldLeft(bundle.hcursor: io.circe.ACursor)((c, k) =>
+      k.toIntOption.fold(c.downField(k))(c.downN)
+    ).withFocus(f).top.get
+
+  test("a bundle whose unit row was edited does not reload"):
+    assert(reload(bundle).isRight, "control: the unedited bundle reloads")
+    val edited = edit("units", "0", "narrative", "value")(_ => Json.fromInt(2))
+    assertEquals(reload(edited), Left("a unit row disagrees with the narrative record"))
+    val nulled = edit("units", "0", "referent")(_ => Json.obj("status" -> Json.fromString("null")))
+    assertEquals(reload(nulled), Left("a unit row disagrees with the referent record"))
+
+  test("a bundle whose records were swapped does not reload"):
+    val slots = bundle.hcursor.downField("interpretations")
+    val swapped = edit("interpretations")(_ =>
+      Json.obj(
+        "narrative" -> slots.downField("referent").focus.get,
+        "referent" -> slots.downField("narrative").focus.get
+      )
+    )
+    assertEquals(reload(swapped), Left("the narrative slot does not hold the narrative record"))
+
+  test("a bundle whose record outcome was edited does not reload"):
+    val edited = edit("interpretations", "narrative", "record", "outcomes", "0")(o =>
+      parse(o.noSpaces.replace(film.scenes(1).key, film.scenes(2).key)).toOption.get
+    )
+    assert(reload(edited).left.exists(_.startsWith("narrative:")), reload(edited).toString)
+
+  test("a bundle that drops a unit row does not reload"):
+    val fewer = edit("units")(u => Json.fromValues(u.asArray.get.drop(1)))
+    assertEquals(reload(fewer), Left("unit rows do not match the inventory"))
+
+  test("binding needs the table's text to be the unit's text, not only matching ids"):
+    assertEquals(AgentMappingRecord.bind(table, ids, recall), Right(inventory.units.map(_.id)))
+    val shifted = table.updated(1, table(1).copy(text = table(1).text + " and more"))
+    assertEquals(
+      AgentMappingRecord.bind(shifted, ids, recall),
+      Left("unit 1: table text is not the rebuilt unit's text")
+    )
+    assertEquals(
+      AgentMappingRecord.bind(table, ids - 2, recall),
+      Left("a unit has no manifest id")
+    )
+    assertEquals(
+      AgentMappingRecord.bind(table.dropRight(1), ids, recall),
+      Left("unit table ids do not match the rebuilt recall inventory")
+    )
+
+  test("counts show each field's status, so an everywhere-invalid field cannot hide"):
+    val c = AgentBundle.counts(unitRows).hcursor
+    assertEquals(c.downField("processing").get[Int]("answered").toOption, Some(unitRows.size - 2))
+    assertEquals(c.downField("processing").get[Int]("omitted").toOption, Some(1))
+    assertEquals(c.downField("narrative").get[Int]("invalid").toOption, Some(1))
+    assertEquals(c.downField("referent").get[Int]("absent").toOption, Some(1))
+    assertEquals(c.downField("confidence").get[Int]("value").toOption, Some(1))
+
+  test("the provider identity is of the named model, never the prompt"):
+    assertNotEquals(producer.identity, producer.systemSha256)
+    assertNotEquals(producer.identity, producer.copy(model = "other").identity)
 
   test("a cited row resolves through the source dictionary, outside the narrative scene"):
     val rows = bundle.hcursor.downField("source").get[Vector[Json]]("rows").toOption.get
