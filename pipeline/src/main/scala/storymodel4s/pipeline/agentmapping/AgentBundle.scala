@@ -109,7 +109,9 @@ object AgentBundle:
     */
   def counts(units: Vector[UnitRow]): Json =
     def tally(xs: Vector[String]) =
-      Json.fromFields(xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size)))
+      Json.fromFields(
+        xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size))
+      )
     val answered = units.filter(_.status == "answered")
     Json.obj(
       "units" -> Json.fromInt(units.size),
@@ -319,9 +321,9 @@ object AgentBundle:
       val complete = outcome.processing == ProcessingStatus.Complete
       (row.status, field) match
         case ("answered", Field.Value(scene)) =>
-          complete && film.scenes.get(scene).exists(ref =>
-            outcome.decision.flatMap(_.chosen).contains(Destination.Target(ref))
-          )
+          complete && film.scenes
+            .get(scene)
+            .exists(ref => outcome.decision.flatMap(_.chosen).contains(Destination.Target(ref)))
         case ("answered", Field.Null) => complete && outcome.decision.exists(_.chosen.isEmpty)
         case _                        => !complete
     }

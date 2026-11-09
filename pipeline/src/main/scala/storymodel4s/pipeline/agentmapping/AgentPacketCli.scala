@@ -158,8 +158,9 @@ private def die(msg: String): Nothing =
   * bundle per participant (see `AgentBundle`): both interpretations as checked categorical records,
   * every unit's full answer, and the source dictionary. Each bundle is read back and re-checked
   * before the command reports, and `bundle-receipt.json` records per-field status counts. A unit
-  * table whose text is not the rebuilt recall unit's text refuses the run. `RECALL_DIR` holds `<participant>.csv` word tables. The output holds
-  * film and recall-derived text, so keep it outside the repository.
+  * table whose text is not the rebuilt recall unit's text refuses the run. `RECALL_DIR` holds
+  * `<participant>.csv` word tables. The output holds film and recall-derived text, so keep it
+  * outside the repository.
   */
 @main def agentMappingBundle(
     annotation: String,

@@ -219,9 +219,13 @@ class AgentBundleSuite extends FunSuite:
 
   private def reload(doc: Json) = AgentBundle.decode(doc, inventory, film)
   private def edit(path: String*)(f: Json => Json): Json =
-    path.foldLeft(bundle.hcursor: io.circe.ACursor)((c, k) =>
-      k.toIntOption.fold(c.downField(k))(c.downN)
-    ).withFocus(f).top.get
+    path
+      .foldLeft(bundle.hcursor: io.circe.ACursor)((c, k) =>
+        k.toIntOption.fold(c.downField(k))(c.downN)
+      )
+      .withFocus(f)
+      .top
+      .get
 
   test("a bundle whose unit row was edited does not reload"):
     assert(reload(bundle).isRight, "control: the unedited bundle reloads")

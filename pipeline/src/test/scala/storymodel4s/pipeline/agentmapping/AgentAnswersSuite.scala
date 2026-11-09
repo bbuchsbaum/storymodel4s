@@ -78,7 +78,13 @@ class AgentAnswersSuite extends FunSuite:
     assertEquals(a.confidence, Field.Invalid(Json.fromDoubleOrNull(1.2)))
 
   test("a zero confidence is a value, and a numeric string is not a scene"):
-    val a = AgentAnswers.answer(item("""{"narrative": "12", "referent": 12.0, "conf": 0}"""), 50, 0, 0, "P")
+    val a = AgentAnswers.answer(
+      item("""{"narrative": "12", "referent": 12.0, "conf": 0}"""),
+      50,
+      0,
+      0,
+      "P"
+    )
     assertEquals(a.confidence, Field.Value(0.0))
     assertEquals(a.narrative, Field.Invalid(Json.fromString("12")))
     assertEquals(a.referent, Field.Value(12))

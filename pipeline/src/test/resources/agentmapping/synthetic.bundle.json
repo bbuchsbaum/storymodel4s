@@ -22,11 +22,11 @@
   "interpretations" : {
     "narrative" : {
       "policy" : "agent-localization/v2:narrative",
-      "recordDigest" : "bf2bc23845dc6314984eae83913660e1d50b031d58de96584fdb9a5665772667",
+      "recordDigest" : "03d7dde811a50bc2327e546afbe420653df932e9f52c5ed0c77c6e3115a0232d",
       "record" : {
         "schema" : "storymodel4s.mapping-record",
         "schemaVersion" : "mapping-record/v0.2",
-        "record_digest" : "bf2bc23845dc6314984eae83913660e1d50b031d58de96584fdb9a5665772667",
+        "record_digest" : "03d7dde811a50bc2327e546afbe420653df932e9f52c5ed0c77c6e3115a0232d",
         "inventory" : {
           "digest" : "cfc07dc08c5c320abcf195ebb2e019902578efeeebce2253eba904455e54055f",
           "transcript_checksum" : "39c5931f2d84a91996479e0b881e5b25b2df3f84fc9a07502c8cfd1950a93a76",
@@ -1275,7 +1275,7 @@
             }
           },
           {
-            "id" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637",
+            "id" : "45760689eab4996605f8ed03fc7f3cc15ac4ad2c1c91869a25f279b06eecb6f2",
             "stage" : "Decision",
             "provenance" : {
               "status" : "unknown",
@@ -1287,13 +1287,14 @@
                   "policy" : "agent-localization/v2:narrative",
                   "config" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073",
                   "inputs" : [
-                    "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd"
+                    "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd",
+                    "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e"
                   ],
                   "provider" : {
                     "status" : "identified",
                     "provider" : "synthetic-cli",
                     "model" : "synthetic-model",
-                    "artifact" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073"
+                    "artifact" : "d15cae80f4870ec0666f14de846648a53ad62a02725e4c0c6d2c19b69546fa12"
                   }
                 }
               }
@@ -1407,7 +1408,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+                "decision" : "45760689eab4996605f8ed03fc7f3cc15ac4ad2c1c91869a25f279b06eecb6f2"
               }
             }
           },
@@ -1476,7 +1477,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+                "decision" : "45760689eab4996605f8ed03fc7f3cc15ac4ad2c1c91869a25f279b06eecb6f2"
               }
             }
           },
@@ -1700,7 +1701,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+                "decision" : "45760689eab4996605f8ed03fc7f3cc15ac4ad2c1c91869a25f279b06eecb6f2"
               }
             }
           },
@@ -1795,7 +1796,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "1649b201e2b2d3d67dec48aeea666b26d6181df357ae1ac46ae8188c2b9f9637"
+                "decision" : "45760689eab4996605f8ed03fc7f3cc15ac4ad2c1c91869a25f279b06eecb6f2"
               }
             }
           }
@@ -1804,11 +1805,11 @@
     },
     "referent" : {
       "policy" : "agent-localization/v2:referent",
-      "recordDigest" : "854eeeff9e88c33d3fb7e6100fc18b31d51e4a36450d82e39a688d209540471a",
+      "recordDigest" : "76830d47ff757dbbce4426006d78a2aaec1c2b8e16b568e7fd7c1a6d4e7047cf",
       "record" : {
         "schema" : "storymodel4s.mapping-record",
         "schemaVersion" : "mapping-record/v0.2",
-        "record_digest" : "854eeeff9e88c33d3fb7e6100fc18b31d51e4a36450d82e39a688d209540471a",
+        "record_digest" : "76830d47ff757dbbce4426006d78a2aaec1c2b8e16b568e7fd7c1a6d4e7047cf",
         "inventory" : {
           "digest" : "cfc07dc08c5c320abcf195ebb2e019902578efeeebce2253eba904455e54055f",
           "transcript_checksum" : "39c5931f2d84a91996479e0b881e5b25b2df3f84fc9a07502c8cfd1950a93a76",
@@ -3057,7 +3058,7 @@
             }
           },
           {
-            "id" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33",
+            "id" : "4ffb9366edfb87fd71b9046f939804bfb0686a45304dbc7663609d8c72a0dcd0",
             "stage" : "Decision",
             "provenance" : {
               "status" : "unknown",
@@ -3069,13 +3070,14 @@
                   "policy" : "agent-localization/v2:referent",
                   "config" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073",
                   "inputs" : [
-                    "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd"
+                    "318678825324247b8176d59f83c30bd94d23d2e3ac5cd4a743b0683ee58b88cd",
+                    "4fad72d8747cbc96e233ff952c1c6a1c62e8e0069c722085127e508aa8a2486e"
                   ],
                   "provider" : {
                     "status" : "identified",
                     "provider" : "synthetic-cli",
                     "model" : "synthetic-model",
-                    "artifact" : "bbc5e661e106c6dcd8dc6dd186454c2fcba3c710fb4d8e71a60c93eaf077f073"
+                    "artifact" : "d15cae80f4870ec0666f14de846648a53ad62a02725e4c0c6d2c19b69546fa12"
                   }
                 }
               }
@@ -3189,7 +3191,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+                "decision" : "4ffb9366edfb87fd71b9046f939804bfb0686a45304dbc7663609d8c72a0dcd0"
               }
             }
           },
@@ -3387,7 +3389,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+                "decision" : "4ffb9366edfb87fd71b9046f939804bfb0686a45304dbc7663609d8c72a0dcd0"
               }
             }
           },
@@ -3482,7 +3484,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+                "decision" : "4ffb9366edfb87fd71b9046f939804bfb0686a45304dbc7663609d8c72a0dcd0"
               }
             }
           },
@@ -3577,7 +3579,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "a8a727dc0b6264fdc0f64ea4bcc790fb0dab41efc7ce0f29891f86389e0c7d33"
+                "decision" : "4ffb9366edfb87fd71b9046f939804bfb0686a45304dbc7663609d8c72a0dcd0"
               }
             }
           }
