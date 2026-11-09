@@ -150,3 +150,119 @@ private def die(msg: String): Nothing =
     case Right(done) =>
       println(s"imported ${done.records} " + done.models.toVector.sorted.mkString(" "))
     case Left(r) => die(r.toString)
+
+/** CLI: `agentMappingBundle ANNOTATION TRANSCRIPT_A TRANSCRIPT_B CAPTIONS PARTITION UNITS_DIR
+  * RECALL_DIR RECORDINGS MODEL CHUNK OUTPUT_DIR`.
+  *
+  * Replays every development participant from recordings, with no model client, and writes one
+  * bundle per participant (see `AgentBundle`): both interpretations as checked categorical records,
+  * every unit's full answer, and the source dictionary. Each bundle is read back and re-checked
+  * before the command reports. `RECALL_DIR` holds `<participant>.csv` word tables. The output holds
+  * film and recall-derived text, so keep it outside the repository.
+  */
+@main def agentMappingBundle(
+    annotation: String,
+    transcriptA: String,
+    transcriptB: String,
+    captions: String,
+    partition: String,
+    unitsDir: String,
+    recallDir: String,
+    recordingsDir: String,
+    model: String,
+    chunk: Int,
+    outputDir: String
+): scala.Unit =
+  import AgentMappingRecord.{Interpretation, Producer}
+  val out = Path.of(outputDir)
+  if chunk <= 0 then die("chunk must be positive")
+  if Files.exists(out) then die("output directory exists")
+  val in = AgentPackets
+    .load(annotation, transcriptA, transcriptB, captions, partition, unitsDir)
+    .fold(die, identity)
+  if in.missing.nonEmpty then die(s"development without a unit table: ${in.missing.mkString(",")}")
+  if in.development.isEmpty then die("no development participants to replay")
+  val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => die(e.message), identity)
+  val system = AgentPrompts.system(AgentPrompts.Version.V2)
+  val provider = TextExchange.SubscriptionCliProvider
+  val film = AgentMappingRecord.film(in.atlas, in.annotationSha256).fold(die, identity)
+  val producer = Producer(
+    provider,
+    model,
+    Checksum.ofBytes(system.getBytes(StandardCharsets.UTF_8)),
+    Checksum.ofBytes(in.outline.getBytes(StandardCharsets.UTF_8))
+  )
+  val (scenes, rows) = AgentBundleSource.dictionary(in.atlas, film)
+  val bundles = in.development.map { name =>
+    val units = AgentPackets.units(in, name).fold(die, identity)
+    val ids = AgentPackets.unitIds(in, name).fold(die, identity)
+    val csv =
+      try Files.readAllBytes(Path.of(recallDir).resolve(s"$name.csv"))
+      catch case scala.util.control.NonFatal(_) => die(s"$name: cannot read recall table")
+    val inventory = AgentMappingRecord.inventory(csv).fold(e => die(s"$name: $e"), identity)
+    val (outcomes, replays) = AgentAnswers
+      .participant(
+        name,
+        in.outline,
+        units,
+        chunk,
+        in.atlas.scenes.size,
+        p => TextExchange.replay(recordings, provider, model, system, p)
+      )
+      .fold(f => die(f.toString), identity)
+    val named = outcomes.map((u, o) => ids.getOrElse(u.index, die(s"$name: no id for ${u.index}")) -> o)
+    if named.map(_._1) != inventory.units.map(_.id.value) then
+      die(s"$name: unit table ids do not match the rebuilt recall inventory")
+    val keyed = inventory.units.map(_.id).zip(named.map(_._2))
+    def record(i: Interpretation) = AgentMappingRecord
+      .record(i, inventory, film, producer, keyed)
+      .fold(e => die(s"$name ${i.field}: ${e.message}"), identity)
+    val narrative = record(Interpretation.Narrative)
+    val referent = record(Interpretation.Referent)
+    val unitRows = outcomes.zip(named).map { case ((u, o), (id, _)) =>
+      AgentBundle.unitRow(
+        u.index,
+        id,
+        o,
+        p => TextExchange.key(provider, model, system, p).checksum.hex
+      )
+    }
+    val doc = AgentBundle.encode(
+      AgentBundle.Provenance(
+        name,
+        provider,
+        model,
+        producer.systemSha256.hex,
+        producer.outlineSha256.hex,
+        in.annotationSha256.hex,
+        Checksum.ofBytes(csv).hex,
+        chunk
+      ),
+      narrative,
+      referent,
+      unitRows,
+      scenes,
+      rows
+    )
+    val reread = io.circe.jawn
+      .parse(doc.spaces2)
+      .left
+      .map(_.message)
+      .flatMap(AgentBundle.decode(_, inventory, film))
+      .fold(e => die(s"$name: bundle does not reload: $e"), identity)
+    if reread.narrative.digest != narrative.digest || reread.referent.digest != referent.digest ||
+      reread.units != unitRows
+    then die(s"$name: reloaded bundle differs")
+    (name, doc, unitRows, replays.map(_.attempts).sum)
+  }
+  Files.createDirectories(out): scala.Unit
+  bundles.foreach { (name, doc, _, _) =>
+    Files.writeString(out.resolve(s"$name.bundle.json"), doc.spaces2 + "\n"): scala.Unit
+  }
+  val all = bundles.flatMap(_._3)
+  def count(status: String) = all.count(_.status == status)
+  println(
+    s"bundles=${bundles.size} units=${all.size} answered=${count("answered")} " +
+      s"omitted=${count("omitted")} unparsable=${count("unparsable")} " +
+      s"exchanges=${bundles.map(_._4).sum} modelCalls=0"
+  )

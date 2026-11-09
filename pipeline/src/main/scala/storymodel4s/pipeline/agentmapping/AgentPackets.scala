@@ -19,7 +19,9 @@ object AgentPackets:
       development: Vector[String],
       skipped: Vector[String],
       missing: Vector[String],
-      unitsDir: Path
+      unitsDir: Path,
+      atlas: SherlockAnnotations.Atlas,
+      annotationSha256: storymodel4s.core.Checksum
   )
 
   private def bytes(p: String): Either[String, Array[Byte]] =
@@ -81,7 +83,15 @@ object AgentPackets:
         catch case NonFatal(_) => Left(s"cannot list $unitsDir")
     yield
       val (dev, skipped) = tables.partition(development.contains)
-      Inputs(outline, dev, skipped, development.sorted.filterNot(tables.contains), dir)
+      Inputs(
+        outline,
+        dev,
+        skipped,
+        development.sorted.filterNot(tables.contains),
+        dir,
+        atlas,
+        storymodel4s.core.Checksum.ofBytes(table)
+      )
 
   /** One participant's recall units, in table order. */
   def units(in: Inputs, name: String): Either[String, Vector[AgentPrompts.RecallUnit]] =
