@@ -101,7 +101,7 @@ Every utterance falls in exactly one class:
 | Multi-scene, contiguous | 476 | an unbroken range of scenes |
 | Multi-scene, non-contiguous | 120 | several scenes with a gap |
 | Film only | 252 | the scheme's film-only code: a title mention, a remark on the whole film |
-| Memory search within a film | 44 | a film code with scene −1, which the scheme defines as memory search |
+| Memory search within a film | 44 | a film code with scene −1 (the scheme: memory search) |
 | Non-film | 117 | memory search, gave up, or off task |
 | Cartoon | 7 | out of scope |
 
