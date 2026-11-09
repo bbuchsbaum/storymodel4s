@@ -16,12 +16,14 @@ and it keeps its dictionary film for film identity.
 
 Usage:
     ff_score.py population GOLD CODES ANNOTATION
-    ff_score.py score GOLD CODES ANNOTATION PREDICTIONS_DIR FIELD OUTPUT
+    ff_score.py score GOLD CODES ANNOTATION MANIFEST PREDICTIONS_DIR FIELD OUTPUT
+MANIFEST is the frozen manifest; the three inputs must have the hashes it records.
 FIELD is `referent` or `narrative`. PREDICTIONS_DIR must hold one <participant>_<session>.json
 for every participant-session of the reference, each
 {"participant", "session", "units": [{"row": <gold_row>, "<FIELD>": <prediction>}, ...]}.
 """
 
+import hashlib
 import json
 import os
 import random
@@ -308,6 +310,26 @@ def load_predictions(directory, field, gold):
     return predictions
 
 
+def file_sha(path):
+    with open(path, "rb") as handle:
+        return hashlib.sha256(handle.read()).hexdigest()
+
+
+def check_inputs(manifest_path, gold_path, codes_path, annotation_path):
+    """The scored reference must be the frozen one."""
+    with open(manifest_path, encoding="utf-8") as handle:
+        manifest = json.load(handle)
+    for name, path in (
+        ("goldSha256", gold_path),
+        ("codesSha256", codes_path),
+        ("annotationSha256", annotation_path),
+    ):
+        if manifest.get(name) != file_sha(path):
+            raise ScoreError(
+                f"{os.path.basename(path)} is not the file the manifest froze ({name})"
+            )
+
+
 def main(argv):
     if len(argv) == 4 and argv[0] == "population":
         gold = ff_gold.load_gold(argv[1], argv[2])
@@ -320,22 +342,30 @@ def main(argv):
         }
         print(json.dumps(out, indent=1, sort_keys=True))
         return 0
-    if len(argv) == 7 and argv[0] == "score":
-        if os.path.exists(argv[6]):
+    if len(argv) == 8 and argv[0] == "score":
+        (
+            gold_path,
+            codes_path,
+            annotation_path,
+            manifest_path,
+            replies,
+            field,
+            output,
+        ) = argv[1:]
+        if os.path.exists(output):
             print("refused: output exists", file=sys.stderr)
             return 2
-        gold = ff_gold.load_gold(argv[1], argv[2])
-        film_of, valid = ff_gold.load_dictionary(argv[3])
-        ff_gold.check_join(gold, film_of)
         try:
-            report = score(
-                gold, film_of, valid, load_predictions(argv[4], argv[5], gold)
-            )
-        except ScoreError as error:
+            check_inputs(manifest_path, gold_path, codes_path, annotation_path)
+            gold = ff_gold.load_gold(gold_path, codes_path)
+            film_of, valid = ff_gold.load_dictionary(annotation_path)
+            ff_gold.check_join(gold, film_of)
+            report = score(gold, film_of, valid, load_predictions(replies, field, gold))
+        except (ScoreError, ff_gold.GoldError) as error:
             print(f"refused: {error}", file=sys.stderr)
             return 2
-        report["field"] = argv[5]
-        with open(argv[6], "w", encoding="utf-8") as handle:
+        report["field"] = field
+        with open(output, "w", encoding="utf-8") as handle:
             json.dump(report, handle, indent=1, sort_keys=True)
             handle.write("\n")
         return 0

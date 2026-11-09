@@ -10,9 +10,11 @@ import pathlib
 import sys
 import tempfile
 import unittest
+import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import ff_codes  # noqa: E402
 import ff_gold  # noqa: E402
 import ff_map  # noqa: E402
 import ff_packet  # noqa: E402
@@ -267,19 +269,31 @@ class Run(Fixture):
         write(tracked, json.dumps(doc))
         out = os.path.join(self.dir.name, "out")
         args = argparse.Namespace(manifest=tracked, out_dir=out)
-        self.assertIsNone(ff_map.refusal(args, doc, {}))
+        todo = [("p1", "run-01"), ("p1", "run-02")]
+        self.assertIsNone(ff_map.refusal(args, doc, {}, todo))
+        missing = argparse.Namespace(manifest=None, out_dir=out)
+        self.assertIn("tracked manifest", ff_map.refusal(missing, doc, {}, todo))
         self.assertIn(
-            "tracked manifest",
-            ff_map.refusal(argparse.Namespace(manifest=None, out_dir=out), doc, {}),
+            "differ", ff_map.refusal(args, dict(doc, chunk=doc["chunk"] + 1), {}, todo)
         )
+        routed = {"ANTHROPIC_BASE_URL": "x"}
+        self.assertIn("ANTHROPIC_BASE_URL", ff_map.refusal(args, doc, routed, todo))
         self.assertIn(
-            "differ", ff_map.refusal(args, dict(doc, chunk=doc["chunk"] + 1), {})
+            "unknown participant-session", ff_map.refusal(args, doc, {}, None)
         )
-        self.assertIn(
-            "ANTHROPIC_BASE_URL", ff_map.refusal(args, doc, {"ANTHROPIC_BASE_URL": "x"})
-        )
+
+    def test_a_finished_session_is_never_overwritten_but_others_may_still_run(self):
+        _, _, doc = ff_map.manifest(self.root)
+        tracked = os.path.join(self.dir.name, "tracked.json")
+        write(tracked, json.dumps(doc))
+        out = os.path.join(self.dir.name, "out")
+        args = argparse.Namespace(manifest=tracked, out_dir=out)
         write(os.path.join(out, "replies", "p1_run-01.json"), "{}")
-        self.assertIn("replies already exist", ff_map.refusal(args, doc, {}))
+        self.assertIn(
+            "p1_run-01 already exists",
+            ff_map.refusal(args, doc, {}, [("p1", "run-01")]),
+        )
+        self.assertIsNone(ff_map.refusal(args, doc, {}, [("p1", "run-02")]))
 
     def test_only_selects_named_sessions_and_refuses_unknown_ones(self):
         todo = [("p1", "run-01"), ("p1", "run-02")]
@@ -292,6 +306,85 @@ class Run(Fixture):
         self.assertEqual(env, {"HOME": "/h"})
         self.assertNotEqual(ff_map.cache_key("s", "a"), ff_map.cache_key("s", "b"))
         self.assertNotEqual(ff_map.cache_key("s", "a"), ff_map.cache_key("t", "a"))
+
+
+def workbook(path, rows):
+    """A minimal xlsx whose first sheet holds `rows` of shared-string cells."""
+    strings = []
+
+    def ref(text):
+        if text not in strings:
+            strings.append(text)
+        return strings.index(text)
+
+    ns = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
+    body = ""
+    for n, cells in enumerate(rows, start=1):
+        body += f'<row r="{n}">'
+        for letter, text in zip("ABC", cells):
+            if text is not None:
+                body += f'<c r="{letter}{n}" t="s"><v>{ref(text)}</v></c>'
+        body += "</row>"
+    shared = "".join(f"<si><t>{t}</t></si>" for t in strings)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with zipfile.ZipFile(path, "w") as z:
+        z.writestr(
+            "xl/worksheets/sheet1.xml",
+            f"<worksheet {ns}><sheetData>{body}</sheetData></worksheet>",
+        )
+        z.writestr("xl/sharedStrings.xml", f"<sst {ns}>{shared}</sst>")
+
+
+class Codes(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        head = ("movies", "scenes", "text")
+        workbook(
+            os.path.join(self.dir.name, "sub-01_recall.xlsx"),
+            [head, ("3", "3000", "a"), ("3", "-1", "b")],
+        )
+        workbook(
+            os.path.join(self.dir.name, "sub-02_recall1.xlsx"),
+            [head, ("11", "1, 107", "c")],
+        )
+        workbook(
+            os.path.join(self.dir.name, "sub-02_recall2.xlsx"),
+            [head, ("-1", "-1", "d"), ("5", "81,82", "e")],
+        )
+        workbook(
+            os.path.join(self.dir.name, "_scenematching_codingscheme.xlsx"), [("x",)]
+        )
+
+    def test_rows_carry_participant_session_excel_row_and_raw_codes(self):
+        self.assertEqual(
+            ff_codes.rows(self.dir.name),
+            [
+                ("sub-01", "run-01", 2, 3, "3000"),
+                ("sub-01", "run-01", 3, 3, "-1"),
+                ("sub-02", "run-01", 2, 11, "1, 107"),
+                ("sub-02", "run-02", 2, -1, "-1"),
+                ("sub-02", "run-02", 3, 5, "81,82"),
+            ],
+        )
+
+    def test_an_unexpected_header_is_refused(self):
+        workbook(
+            os.path.join(self.dir.name, "sub-03_recall.xlsx"),
+            [("scenes", "movies"), ("1", "2")],
+        )
+        with self.assertRaises(ValueError):
+            ff_codes.rows(self.dir.name)
+
+    def test_a_film_code_with_a_blank_scene_cell_cannot_be_classified(self):
+        workbook(
+            os.path.join(self.dir.name, "sub-04_recall.xlsx"),
+            [("movies", "scenes"), ("3", None)],
+        )
+        blank = [r for r in ff_codes.rows(self.dir.name) if r[0] == "sub-04"]
+        self.assertEqual(blank, [("sub-04", "run-01", 2, 3, "")])
+        with self.assertRaises(ff_gold.GoldError):
+            ff_gold.classify(3, [], "")
 
 
 class Call(unittest.TestCase):

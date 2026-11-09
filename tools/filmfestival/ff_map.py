@@ -6,6 +6,7 @@ Protocol: docs/plans/2026-11-09-filmfestival-transfer-protocol.md.
 Usage:
     ff_map.py manifest DATA_ROOT OUT_DIR      render every prompt and write their hashes; no calls
     ff_map.py run DATA_ROOT OUT_DIR MANIFEST [--jobs N] [--only sub-01_run-01,...]
+    ff_map.py smoke OUT_DIR                   one call with no corpus content, to check the model
 
 DATA_ROOT is the repository's data directory. OUT_DIR must be outside the repository's tracked
 files (it holds recall text in the recorded prompts). MANIFEST is the tracked, frozen manifest;
@@ -338,8 +339,8 @@ def map_session(packet, gold_path, participant, session, cache_dir, version):
     }
 
 
-def refusal(args, doc, environ):
-    """Why `run` must not start, or None."""
+def refusal(args, doc, environ, todo):
+    """Why `run` must not start, or None. `todo` is the participant-sessions it would map."""
     if not args.manifest:
         return "run needs the tracked manifest"
     with open(args.manifest, encoding="utf-8") as handle:
@@ -348,9 +349,12 @@ def refusal(args, doc, environ):
     routed = [v for v in ROUTING_VARIABLES if environ.get(v)]
     if routed:
         return f"{routed[0]} is set; calls must use the subscription"
+    if todo is None:
+        return "--only names an unknown participant-session"
     replies_dir = os.path.join(args.out_dir, "replies")
-    if os.path.exists(replies_dir) and os.listdir(replies_dir):
-        return "replies already exist"
+    for participant, session in todo:
+        if os.path.exists(os.path.join(replies_dir, f"{participant}_{session}.json")):
+            return f"a reply file for {participant}_{session} already exists"
     return None
 
 
@@ -364,6 +368,18 @@ def selected(todo, only):
 
 
 def main(argv):
+    ap = argparse.ArgumentParser()
+    if len(argv) == 2 and argv[0] == "smoke":
+        # No film or recall content: only whether the CLI reports exactly the frozen model.
+        os.makedirs(argv[1], exist_ok=True)
+        record = call(
+            "Reply with the single word: ready",
+            "You are a test probe.",
+            argv[1],
+            cli_version(),
+        )
+        print(json.dumps({k: record[k] for k in ("model", "modelUsage", "cliVersion")}))
+        return 0
     ap = argparse.ArgumentParser()
     ap.add_argument("command", choices=["manifest", "run"])
     ap.add_argument("data_root")
@@ -396,11 +412,9 @@ def main(argv):
             )
         )
         return 0
-    why = refusal(args, doc, os.environ)
     gold_path = paths(args.data_root)[0]
     todo = selected(sessions(gold_path), args.only)
-    if why is None and todo is None:
-        why = "--only names an unknown participant-session"
+    why = refusal(args, doc, os.environ, todo)
     if why:
         print(f"refused: {why}", file=sys.stderr)
         return 2

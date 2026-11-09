@@ -6,7 +6,7 @@ It implements section T of the
 the choices on 2026-11-09, with corrections from an external review.
 
 **Status.** The decisions below are fixed, and the prompt, packet and scorer are frozen at the
-values under [Freeze](#freeze). No model has been called on this corpus.
+values under [Freeze](#freeze). No model has been given any content from this corpus.
 
 ## What this evaluation is
 
@@ -125,11 +125,12 @@ resamples four participants and is reported with that caveat.
   is correct when it belongs to the reference set. Alternatives earn nothing. A film-only answer,
   a scene that is not a valid target, no assignment and a processing failure are all misses, and
   each is counted.
-- **A scene answer that is not a valid target** (a title card, the cartoon) is an answer, not a
-  processing failure. It is never a scene hit. It keeps its dictionary film for film identity.
   - Single-scene, contiguous and non-contiguous utterances are reported separately. A hit on a
     multi-scene reference is a localization measure; it does not show that every referenced event
     was recovered.
+- **A scene answer that is not a valid target** (a title card, the cartoon) is an answer, not a
+  processing failure. It is never a scene hit, even when the reference lists that scene. It keeps
+  its dictionary film for film identity.
 - **Film identity.** The predicted film, from a scene or a film-only answer, equals the reference
   film. Reported over film-reference utterances and over all film-labelled utterances.
 - **Film only, and memory search within a film.** For each, counts of: the right film without a
@@ -169,8 +170,13 @@ participant-session has exactly one reply file.
   - The CLI version and the reported model are recorded with every call and in every reply file.
 - **Chunks and retries.** As on Sherlock: 60 utterances per call, the whole session's utterances
   shown for context, up to three attempts per chunk with the fixed strict-JSON suffix.
-- **Recording.** Every exchange is recorded by content hash before it is parsed, so the run can be
-  replayed with no model call.
+- **Recording.** Every reply the CLI returns from the frozen model is recorded by content hash
+  before it is parsed, so the run can be replayed with no model call. A CLI error is retried and
+  not recorded. A reply from another model stops the run and is not recorded.
+- **Partial replies.** A reply that parses but leaves out some of its units is accepted; those
+  units count as omitted and are not asked again.
+- **Stopping.** A protocol failure in one participant-session does not interrupt the others
+  already running; no reply file is written for any session until all have finished.
 - **Order.** Participant-sessions run independently. No result is inspected before every
   participant-session of both sessions has finished, except to detect a protocol failure
   (truncation, a refused call).
@@ -195,6 +201,12 @@ manifest is [manifest.json](../refactor/evidence/filmfestival-transfer-20261109/
 | CLI flags and retry suffix | in the manifest |
 
 The run compares what it renders with the tracked manifest, not with a copy beside its output.
+The scorer refuses a reference, annotation or raw-code file whose hash differs from the
+manifest's. A session that already has a reply file is never mapped again.
+
+One call with no film or recall content was made on 2026-11-09 to check the model identity: asked
+for `claude-opus-5-5`, CLI 2.1.321 reported exactly that model. The CLI version is read once at
+the start of a run and stamped on every record.
 
 The prompt is the Sherlock v2 prompt with three changes the corpus requires:
 

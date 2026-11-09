@@ -269,6 +269,23 @@ class Scoring(Base):
         cartoon = self.session({("p1", "run-01", 4): scene(1)})
         self.assertEqual(cartoon["film_only"]["wrong_film"], 1)
 
+    def test_an_invalid_target_is_never_a_scene_hit_even_when_the_reference_lists_it(
+        self,
+    ):
+        # Scene 5 is film 2's title card, and the reference {5, 7} lists it.
+        report = self.session({("p1", "run-01", 3): scene(5)})
+        self.assertEqual(report["scene"]["pooled"]["hits"], 0)
+        self.assertEqual(report["scene"]["prediction_kinds"]["invalid_scene"], 1)
+        self.assertEqual(report["film"]["film_reference"]["pooled"]["hits"], 1)
+        self.assertEqual(
+            self.session({("p1", "run-01", 3): scene(7)})["scene"]["pooled"]["hits"], 1
+        )
+
+    def test_a_title_card_of_another_film_is_a_wrong_film(self):
+        report = self.session({("p1", "run-01", 4): scene(5)})["film_only"]
+        self.assertEqual(report["wrong_film"], 1)
+        self.assertEqual(report["title_or_invalid_scene_in_correct_film"], 0)
+
     def test_in_film_memory_search_is_described_separately(self):
         self.assertEqual(
             self.session({("p1", "run-01", 7): NONE})["film_search"]["none"], 1
@@ -421,6 +438,28 @@ class Files(Base):
             ff_score.load_predictions(
                 self.reply_dir(drop=("p3", "run-01")), "referent", self.gold
             )
+
+    def test_two_files_for_one_session_are_refused(self):
+        directory = self.reply_dir()
+        doc = {"participant": "p3", "session": "run-01", "units": []}
+        self.write(os.path.join(directory, "zz-copy.json"), json.dumps(doc))
+        with self.assertRaises(ff_score.ScoreError):
+            ff_score.load_predictions(directory, "referent", self.gold)
+
+    def test_scored_inputs_must_be_the_frozen_files(self):
+        gold, codes = self.files(ROWS, "frozen")
+        manifest = {
+            "goldSha256": ff_score.file_sha(gold),
+            "codesSha256": ff_score.file_sha(codes),
+            "annotationSha256": ff_score.file_sha(self.annotation),
+        }
+        path = self.write("manifest.json", json.dumps(manifest))
+        ff_score.check_inputs(path, gold, codes, self.annotation)
+        other, _ = self.files(ROWS[:-1], "other")
+        with self.assertRaises(ff_score.ScoreError):
+            ff_score.check_inputs(path, other, codes, self.annotation)
+        with self.assertRaises(ff_score.ScoreError):
+            ff_score.check_inputs(path, gold, codes, gold)
 
     def test_a_repeated_row_and_a_wrong_field_are_refused(self):
         with self.assertRaises(ff_score.ScoreError):
