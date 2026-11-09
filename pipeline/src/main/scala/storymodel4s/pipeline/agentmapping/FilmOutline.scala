@@ -4,6 +4,7 @@ import io.circe.Json
 import io.circe.jawn.JawnParser
 import java.math.RoundingMode
 import java.nio.charset.StandardCharsets
+import scala.util.chaining.*
 import storymodel4s.corpus.intake.SherlockAnnotations
 
 /** Renders the whole-film evidence packet an agent mapper reads: every annotation row with its
@@ -177,4 +178,4 @@ object FilmOutline:
           said.get(r.row).toVector.map(s => "    dialogue: " + s.mkString(" "))
       }
       .mkString("\n")
-      .strip()
+      .pipe(harnessStrip)

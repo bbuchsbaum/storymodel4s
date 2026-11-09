@@ -9,18 +9,18 @@ class AgentPromptsSuite extends FunSuite:
 
   private val table =
     "unit\tfunction\trecallText\textra\n" +
-      "0\tn\tfirst thing\tz\n" +
-      "1\tn\tsecond, with \"quotes\" inside\tz\n" +
-      "2\tn\tthird\tz\n"
+      "3\tn\tfirst thing\tz\n" +
+      "4\tn\tsecond, with \"quotes\" inside\tz\n" +
+      "9\tn\tthird\tz\n"
 
   test("units are read in file order from the named columns"):
     assertEquals(
       AgentPrompts.units(table),
       Right(
         Vector(
-          RecallUnit(0, "first thing"),
-          RecallUnit(1, "second, with \"quotes\" inside"),
-          RecallUnit(2, "third")
+          RecallUnit(3, "first thing"),
+          RecallUnit(4, "second, with \"quotes\" inside"),
+          RecallUnit(9, "third")
         )
       )
     )
@@ -37,6 +37,9 @@ class AgentPromptsSuite extends FunSuite:
       Left(Refusal.MissingColumn("recallText"))
     )
 
+  test("a row without its recall cell is refused, not rendered as empty"):
+    assertEquals(AgentPrompts.units("unit\trecallText\n3\n"), Left(Refusal.MissingCell(2)))
+
   test("a non-integer unit index is refused"):
     assertEquals(AgentPrompts.units("unit\trecallText\nx\ty\n"), Left(Refusal.BadIndex(2)))
 
@@ -46,11 +49,11 @@ class AgentPromptsSuite extends FunSuite:
     assertEquals(ps.size, 2)
     assertEquals(
       ps(1),
-      "FILM ANNOTATION\nOUT\n\nPARTICIPANT RECALL (all units)\n[0] first thing\n" +
-        "[1] second, with \"quotes\" inside\n[2] third\n\n" +
-        "TARGET UNITS: map every unit numbered 2 through 2 inclusive."
+      "FILM ANNOTATION\nOUT\n\nPARTICIPANT RECALL (all units)\n[3] first thing\n" +
+        "[4] second, with \"quotes\" inside\n[9] third\n\n" +
+        "TARGET UNITS: map every unit numbered 9 through 9 inclusive."
     )
-    assert(ps(0).endsWith("numbered 0 through 1 inclusive."))
+    assert(ps(0).endsWith("numbered 3 through 4 inclusive."))
 
   test("the v2 system prompt is the recorded text, byte for byte"):
     val s = AgentPrompts.system(AgentPrompts.Version.V2)

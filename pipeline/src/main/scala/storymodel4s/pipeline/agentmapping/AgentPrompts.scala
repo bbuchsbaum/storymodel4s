@@ -23,6 +23,7 @@ object AgentPrompts:
     case MissingColumn(name: String)
     case QuotedCell(line: Int)
     case BadIndex(line: Int)
+    case MissingCell(line: Int)
     case Empty
 
   def system(version: Version): String =
@@ -53,10 +54,10 @@ object AgentPrompts:
               val index =
                 try Some(cells(ui).toInt)
                 catch case NonFatal(_) => None
-              index
-                .zip(cells.lift(ti))
-                .map((n, t) => done :+ RecallUnit(n, t))
-                .toRight(Refusal.BadIndex(i + 2))
+              (index, cells.lift(ti)) match
+                case (None, _)          => Left(Refusal.BadIndex(i + 2))
+                case (_, None)          => Left(Refusal.MissingCell(i + 2))
+                case (Some(n), Some(t)) => Right(done :+ RecallUnit(n, t))
           }
         }
       yield out

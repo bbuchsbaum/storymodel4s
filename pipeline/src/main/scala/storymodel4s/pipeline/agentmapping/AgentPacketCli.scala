@@ -33,6 +33,7 @@ import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
     System.err.println(s"refused: $msg")
     sys.exit(2)
   val out = Path.of(output)
+  if chunk <= 0 then die("chunk must be positive")
   if Files.exists(out) then die("output exists")
   val record = TimebaseRepair.loadCommitted().fold(e => die(e.message), identity)
   val atlas =
@@ -52,15 +53,17 @@ import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
     .flatMap(_.hcursor.get[Vector[String]]("development").toOption)
     .getOrElse(die("partition has no development list"))
     .toSet
-  val tables = Files
-    .list(Path.of(unitsDir))
-    .iterator
-    .asScala
-    .map(_.getFileName.toString)
-    .collect { case s"recall-map-$name.tsv" => name }
-    .toVector
-    .sorted
+  val listing = Files.list(Path.of(unitsDir))
+  val tables =
+    try
+      listing.iterator.asScala
+        .map(_.getFileName.toString)
+        .collect { case s"recall-map-$name.tsv" => name }
+        .toVector
+        .sorted
+    finally listing.close()
   val (dev, skipped) = tables.partition(development.contains)
+  val missing = development.toVector.sorted.filterNot(tables.contains)
   val system = AgentPrompts.system(AgentPrompts.Version.V2)
   val prompts = dev.map { name =>
     val table = Files.readString(Path.of(unitsDir).resolve(s"recall-map-$name.tsv"))
@@ -79,7 +82,9 @@ import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
     "systemSha256" -> Json.fromString(sha(system)),
     "chunk" -> Json.fromInt(chunk),
     "participants" -> Json.fromValues(prompts),
-    "skippedNotDevelopment" -> Json.fromValues(skipped.map(Json.fromString))
+    "skippedNotDevelopment" -> Json.fromValues(skipped.map(Json.fromString)),
+    "developmentWithoutUnitTable" -> Json.fromValues(missing.map(Json.fromString))
   )
   Files.writeString(out, doc.spaces2 + "\n"): scala.Unit
-  println(s"outline ${sha(outline)} participants=${dev.size} skipped=${skipped.size}")
+  println(s"outline ${sha(outline)} participants=${dev.size} skipped=${skipped.size} " +
+    s"missing=${missing.size}")
