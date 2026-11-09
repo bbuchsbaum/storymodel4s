@@ -209,3 +209,18 @@ false), inference, unverifiable, invented, misread.
   detail alone.
 - The 50 items were used to design the scale, so they are calibration, not a held-out test.
 - Scene mapping is unaffected; these labels never fed it.
+
+### 2026-11-08: owner check of the verifier's named details
+
+The owner checked the 11 owner-supported claims (no note) that the verifier called gist-detail,
+judging only the named detail: 7 right, 3 partly right or too trivial, 1 wrong.
+
+- With the 6 cases where the owner's own note named the same detail, the verifier's gist-detail
+  calls on owner-supported claims hold in 16 of 17, fully or partly. The graded labels can be
+  used; the three-way v3 label should not be.
+- The one wrong call is a speaker attribution: the verifier gave a line to the wrong officer.
+  The packet's dialogue has no speaker labels (the transcript is not diarized, and the
+  annotation's "Name - Speaking" column is not rendered). Rendering it is a packet change, so it
+  needs a new packet version and a new recording, not a replay.
+- The three partial calls are minor wordings and one visual detail. A severity field (minor or
+  material) on gist-detail would separate them.
