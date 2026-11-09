@@ -86,8 +86,8 @@ def speech(transcript_path):
     """Non-suspect transcript segments of one clip, in order: (start seconds, text)."""
     with open(transcript_path, encoding="utf-8") as handle:
         doc = json.load(handle)
-    if doc.get("outcome") not in (None, "success") and doc.get("failure"):
-        raise ff_gold.GoldError(f"transcription failed: {transcript_path}")
+    if doc.get("outcome") != "complete":
+        raise ff_gold.GoldError(f"transcription did not complete: {transcript_path}")
     out = []
     for segment in doc["segments"]:
         text = segment["text"].strip()

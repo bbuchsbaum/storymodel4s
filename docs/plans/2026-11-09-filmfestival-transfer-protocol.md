@@ -28,8 +28,11 @@ runs.
 | Reference labels | `derived/gold-scenematched.tsv` | `0433e14f…ae16bd0` |
 | Film annotation (JL) | `derived/annotation-JL.tsv` | `f8b164c1…bc7485bc` |
 | Coding scheme | `recall_scenematched/_scenematching_codingscheme.xlsx` | `6aa3e021…624ca20c` |
+| Raw scene codes | the 19 workbooks in `recall_scenematched/`, columns A and B | in the manifest |
 
-The scorer refuses a reference file that does not have 3,226 utterances.
+The scorer refuses a reference file that does not have 3,226 utterances. The raw scene codes are
+read from the workbooks by `tools/filmfestival/ff_codes.py`, because the derived file writes two
+different codes as an empty scene list (see [Population](#population)).
 
 ## Decisions
 
@@ -81,11 +84,14 @@ The scorer refuses a reference file that does not have 3,226 utterances.
 Counted by `tools/filmfestival/ff_score.py population`, with the cartoon excluded from the film
 counts:
 
-| Session | All utterances | Scene-specific, ten films | Film-labelled, ten films |
-|---|---:|---:|---:|
-| First | 2,682 | 2,335 | 2,574 |
-| Second | 544 | 471 | 528 |
-| Combined | 3,226 | 2,806 | 3,102 |
+| Session | All utterances | Scene-specific | Film-labelled | Film reference |
+|---|---:|---:|---:|---:|
+| First | 2,682 | 2,335 | 2,574 | 2,543 |
+| Second | 544 | 471 | 528 | 515 |
+| Combined | 3,226 | 2,806 | 3,102 | 3,058 |
+
+"Film-labelled" is every utterance carrying one of the ten film codes. "Film reference" leaves
+out memory search within a film (below), which refers to no film content.
 
 Every utterance falls in exactly one class:
 
@@ -94,29 +100,41 @@ Every utterance falls in exactly one class:
 | Single scene | 2,210 | one specific scene |
 | Multi-scene, contiguous | 476 | an unbroken range of scenes |
 | Multi-scene, non-contiguous | 120 | several scenes with a gap |
-| Film, no scene | 296 | a film is named but no scene |
+| Film only | 252 | the scheme's film-only code: a title mention, a remark on the whole film |
+| Memory search within a film | 44 | a film code with scene −1, which the scheme defines as memory search |
 | Non-film | 117 | memory search, gave up, or off task |
 | Cartoon | 7 | out of scope |
 
+The derived reference file cannot tell the last two classes apart, so they are separated by the
+raw workbook codes. The prompt tells the model to give no assignment for memory search, so the 44
+are near-certain film-identity misses by instruction. They are therefore reported on their own,
+and film identity is reported both with and without them.
+
 Every scene id in the reference exists in the dictionary and belongs to the film its utterance
-names (checked on load; a mismatch refuses).
+names (checked on load; a mismatch refuses). One reference, "68 70", counts as non-contiguous
+only because scene 68 is a title card.
 
 ## Scoring
 
-All rates are reported per session, as the mean of per-participant rates and pooled, with the
-denominator. Uncertainty is computed by resampling participants, so one participant's utterances
-stay together.
+Every rate, including each stratum and each film, is reported per session three ways: pooled,
+per participant, and as the mean of per-participant rates with a 95% interval from resampling
+participants, so one participant's utterances stay together. The second session's interval
+resamples four participants and is reported with that caveat.
 
 - **Scene agreement (primary).** Over scene-specific utterances. The one selected referent scene
   is correct when it belongs to the reference set. Alternatives earn nothing. A film-only answer,
-  no assignment and a processing failure are all misses, and each is counted.
+  a scene that is not a valid target, no assignment and a processing failure are all misses, and
+  each is counted.
+- **A scene answer that is not a valid target** (a title card, the cartoon) is an answer, not a
+  processing failure. It is never a scene hit. It keeps its dictionary film for film identity.
   - Single-scene, contiguous and non-contiguous utterances are reported separately. A hit on a
     multi-scene reference is a localization measure; it does not show that every referenced event
     was recovered.
-- **Film identity.** Over film-labelled utterances. The predicted film, from a scene or a
-  film-only answer, equals the reference film.
-- **Film, no scene.** Counts of: the right film without a scene; a scene in the right film
-  (invented precision); the wrong film; no assignment; failure.
+- **Film identity.** The predicted film, from a scene or a film-only answer, equals the reference
+  film. Reported over film-reference utterances and over all film-labelled utterances.
+- **Film only, and memory search within a film.** For each, counts of: the right film without a
+  scene; a scene in the right film (invented precision); a title card of the right film; the
+  wrong film; no assignment; failure.
 - **Non-film utterances.** Counts of: assigned to one of the ten films; explicit no assignment;
   processing failure. A failure is never a correct non-assignment. Memory-search speech can occur
   inside a film's discussion, so these counts are described, not scored as right or wrong.
@@ -130,17 +148,25 @@ stay together.
   features and eight are short films; this breakdown is descriptive. A film's obscurity does not
   show that the model has not seen it.
 - **Session comparison.** Only within the four participants who have both sessions. Comparing all
-  15 with those four would confound session with participant.
+  15 with those four would confound session with participant. Even within the four, the two
+  sessions cover mostly different films (one participant's first session is two films), so a
+  session difference is also a film difference. It is described, not interpreted.
 - **Narrative judgement.** Scored the same way, as the secondary output.
 
-Processing failures are reported with their causes. An utterance with no valid answer after the
-retry policy is a failure; it is never dropped.
+Processing failures are reported with counts by cause. An utterance with no valid answer after
+the retry policy is a failure; it is never dropped. The scorer refuses unless every
+participant-session has exactly one reply file.
 
 ## Execution
 
-- **Model and calls.** The same model and call path as the Sherlock development runs: Claude Opus
-  through the subscription CLI, with the API key removed from the environment. The CLI version and
-  the reported model are recorded per call.
+- **Model and calls.** The same model and call path as the Sherlock development runs. Those runs
+  asked for the alias `opus`, and every one of their 260 recorded calls reported
+  `claude-opus-5-5`. This run names `claude-opus-5-5` exactly, so the alias cannot move.
+  - A call whose reply reports any other model, or more than one, stops the run and is not
+    recorded.
+  - Calls go through the subscription CLI with the API key removed. The run refuses to start if
+    a variable that would route calls elsewhere is set.
+  - The CLI version and the reported model are recorded with every call and in every reply file.
 - **Chunks and retries.** As on Sherlock: 60 utterances per call, the whole session's utterances
   shown for context, up to three attempts per chunk with the fixed strict-JSON suffix.
 - **Recording.** Every exchange is recorded by content hash before it is parsed, so the run can be
@@ -160,11 +186,15 @@ manifest is [manifest.json](../refactor/evidence/filmfestival-transfer-20261109/
 | System prompt (`ff_packet.SYSTEM`) | SHA-256 `d45e1754…90904498` |
 | Rendered packet (16,693 words) | SHA-256 `c5dc1b13…fcfac5ec5` |
 | Scene dictionary | 216 scenes, 203 valid; SHA-256 `39ef679b…43f560f1` |
+| Reference, annotation, raw codes | SHA-256 of each, in the manifest |
 | Participant-sessions | 19 (15 first, 4 second) |
 | Utterances | 3,226 |
 | Calls, before retries | 63, each prompt hashed in the manifest |
 | Longest prompt | 121,435 characters; a prompt over 400,000 refuses the run |
-| Model, chunk, attempts | `opus`, 60, 3 |
+| Model, chunk, attempts | `claude-opus-5-5`, 60, 3 |
+| CLI flags and retry suffix | in the manifest |
+
+The run compares what it renders with the tracked manifest, not with a copy beside its output.
 
 The prompt is the Sherlock v2 prompt with three changes the corpus requires:
 
@@ -180,7 +210,16 @@ Differences from the Sherlock harness, fixed here:
 
 - a reply item for a unit outside the chunk it was asked about is dropped, and the unit counts
   as omitted;
-- a reply item with a missing key or a wrong type is a failure for that judgement.
+- a reply item with a missing key or a wrong type is a failure for that judgement;
+- a reply that cannot be parsed in any way is retried, then its chunk fails; it cannot stop the
+  run;
+- a unit answered twice in one session keeps the last answer, and the repeat is counted in the
+  reply file.
+
+An independent review of the first frozen draft (02f88d89a) found four defects before any model
+call: a title-card answer was scored as a processing failure; memory search within a film was
+mixed into the film-only class; one reply shape could stop the run for good; and the CLI version
+and reported model were not recorded or checked. All four are fixed here, with tests.
 
 The scorer's synthetic tests (`tools/filmfestival/test_ff_score.py`) cover film-only answers,
 multi-scene references, cartoon exclusion, title-scene exclusion, explicit non-assignment and

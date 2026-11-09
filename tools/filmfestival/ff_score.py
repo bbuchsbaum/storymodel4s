@@ -10,10 +10,15 @@ A prediction for one utterance is one of:
     {"status": "failed", "reason": "..."}                 no valid answer was obtained
 A failure is never a correct non-assignment. An utterance with no prediction is a failure.
 
+A scene answer that names a real scene which is not a valid target (a title card, the cartoon)
+is an answer, not a processing failure. It is its own kind, `invalid_scene`: never a scene hit,
+and it keeps its dictionary film for film identity.
+
 Usage:
-    ff_score.py population GOLD ANNOTATION
-    ff_score.py score GOLD ANNOTATION PREDICTIONS_DIR FIELD OUTPUT
-PREDICTIONS_DIR holds <participant>_<session>.json files, each
+    ff_score.py population GOLD CODES ANNOTATION
+    ff_score.py score GOLD CODES ANNOTATION PREDICTIONS_DIR FIELD OUTPUT
+FIELD is `referent` or `narrative`. PREDICTIONS_DIR must hold one <participant>_<session>.json
+for every participant-session of the reference, each
 {"participant", "session", "units": [{"row": <gold_row>, "<FIELD>": <prediction>}, ...]}.
 """
 
@@ -26,50 +31,66 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import ff_gold  # noqa: E402
 
-SCHEMA = "storymodel4s.filmfestival.transfer-score/v1"
+SCHEMA = "storymodel4s.filmfestival.transfer-score/v2"
+FIELDS = ("referent", "narrative")
+KINDS = ("scene", "invalid_scene", "film", "none", "failed")
+BOOTSTRAP_DRAWS = 5000
+BOOTSTRAP_SEED = 20261109
 
 
 class ScoreError(ValueError):
     pass
 
 
-def normalise(prediction, film_of, valid):
-    """A checked prediction: (kind, film, scene) with kind in scene|film|none|failed.
+def is_int(x):
+    return isinstance(x, int) and not isinstance(x, bool)
 
-    A scene answer must name a valid target; its film comes from the dictionary, never from the
-    reply. Anything else that is not a well-formed answer is a failure with its reason.
+
+def normalise(prediction, film_of, valid):
+    """A checked prediction: a dict with `kind`, and `film`, `scene`, `reason` where they apply.
+
+    A scene answer's film comes from the dictionary, never from the reply.
     """
+
+    def failed(reason):
+        return {"kind": "failed", "film": None, "scene": None, "reason": reason}
+
+    if prediction is None:
+        return failed("no-prediction")
     if not isinstance(prediction, dict) or prediction.get("status") != "answered":
-        return ("failed", None, None)
+        reason = prediction.get("reason") if isinstance(prediction, dict) else None
+        return failed(reason if isinstance(reason, str) and reason else "unspecified")
     kind = prediction.get("kind")
     if kind == "scene":
         scene = prediction.get("scene")
-        if isinstance(scene, int) and not isinstance(scene, bool) and scene in valid:
-            return ("scene", film_of[scene], scene)
-        return ("failed", None, None)
+        if not is_int(scene) or scene not in film_of:
+            return failed("unknown-scene")
+        if scene in valid:
+            return {"kind": "scene", "film": film_of[scene], "scene": scene}
+        film = film_of[scene] if film_of[scene] in ff_gold.FILMS else None
+        return {"kind": "invalid_scene", "film": film, "scene": scene}
     if kind == "film":
         film = prediction.get("film")
-        if (
-            isinstance(film, int)
-            and not isinstance(film, bool)
-            and film in ff_gold.FILMS
-        ):
-            return ("film", film, None)
-        return ("failed", None, None)
+        if is_int(film) and film in ff_gold.FILMS:
+            return {"kind": "film", "film": film, "scene": None}
+        return failed("unknown-film")
     if kind == "none":
-        return ("none", None, None)
-    return ("failed", None, None)
+        return {"kind": "none", "film": None, "scene": None}
+    return failed("unknown-kind")
 
 
 def judge(utterance, prediction):
-    """What one prediction is, against one reference. Returns a dict of flags."""
-    kind, film, scene = prediction
+    """What one checked prediction is, against one reference."""
     cls = utterance["cls"]
-    out = {"cls": cls, "kind": kind}
+    out = {"cls": cls, "kind": prediction["kind"], "reason": prediction.get("reason")}
     if cls in ff_gold.SCENE_CLASSES:
-        out["scene_hit"] = kind == "scene" and scene in utterance["scenes"]
-    if cls in ff_gold.SCENE_CLASSES or cls == "film_noscene":
-        out["film_hit"] = kind in ("scene", "film") and film == utterance["film"]
+        out["scene_hit"] = (
+            prediction["kind"] == "scene" and prediction["scene"] in utterance["scenes"]
+        )
+    if cls in ff_gold.FILM_CLASSES:
+        out["film_hit"] = (
+            prediction["film"] is not None and prediction["film"] == utterance["film"]
+        )
     return out
 
 
@@ -92,10 +113,6 @@ def rate(flags):
     }
 
 
-BOOTSTRAP_DRAWS = 5000
-BOOTSTRAP_SEED = 20261109
-
-
 def participant_average(per_participant):
     """Mean of per-participant rates, with a 95% interval from resampling participants.
 
@@ -110,96 +127,102 @@ def participant_average(per_participant):
             mean([rates[rng.randrange(len(rates))] for _ in rates])
             for _ in range(BOOTSTRAP_DRAWS)
         )
-        out["interval95"] = [
-            draws[int(0.025 * BOOTSTRAP_DRAWS)],
-            draws[int(0.975 * BOOTSTRAP_DRAWS) - 1],
-        ]
+        lo, hi = int(0.025 * BOOTSTRAP_DRAWS), int(0.975 * BOOTSTRAP_DRAWS) - 1
+        out["interval95"] = [draws[lo], draws[hi]]
     return out
 
 
+def both_ways(records, key):
+    """A rate pooled, per participant, and as the participant average."""
+    groups = {}
+    for j in records:
+        groups.setdefault(j["utterance"]["participant"], []).append(j["flags"][key])
+    by_participant = {p: rate(flags) for p, flags in sorted(groups.items())}
+    return {
+        "pooled": rate([j["flags"][key] for j in records]),
+        "participant_average": participant_average(by_participant),
+        "by_participant": by_participant,
+    }
+
+
+def kinds(records):
+    out = dict.fromkeys(KINDS, 0)
+    for j in records:
+        out[j["flags"]["kind"]] += 1
+    return out
+
+
+def film_breakdown(records):
+    """For utterances with a film but no scene: where the answers went."""
+
+    def count(pred):
+        return sum(1 for j in records if pred(j["flags"]))
+
+    return {
+        "n": len(records),
+        "film_only_correct_film": count(
+            lambda f: f["kind"] == "film" and f["film_hit"]
+        ),
+        "scene_in_correct_film": count(
+            lambda f: f["kind"] == "scene" and f["film_hit"]
+        ),
+        "title_or_invalid_scene_in_correct_film": count(
+            lambda f: f["kind"] == "invalid_scene" and f["film_hit"]
+        ),
+        "wrong_film": count(
+            lambda f: f["kind"] in ("scene", "invalid_scene", "film")
+            and not f["film_hit"]
+        ),
+        "none": count(lambda f: f["kind"] == "none"),
+        "failed": count(lambda f: f["kind"] == "failed"),
+    }
+
+
 def summarise(judged):
-    """All reported quantities for one set of (utterance, flags, chance) records."""
+    """All reported quantities for one set of judged utterances."""
 
-    def of(pred):
-        return [j for j in judged if pred(j)]
+    def of(*classes):
+        return [j for j in judged if j["flags"]["cls"] in classes]
 
-    scene = of(lambda j: j["flags"]["cls"] in ff_gold.SCENE_CLASSES)
-    labelled = of(lambda j: "film_hit" in j["flags"])
-
-    def by_participant(records, key):
-        groups = {}
-        for j in records:
-            groups.setdefault(j["utterance"]["participant"], []).append(j["flags"][key])
-        return {p: rate(flags) for p, flags in sorted(groups.items())}
-
-    def kinds(records):
-        out = {"scene": 0, "film": 0, "none": 0, "failed": 0}
-        for j in records:
-            out[j["flags"]["kind"]] += 1
-        return out
-
-    scene_by_p = by_participant(scene, "scene_hit")
-    film_by_p = by_participant(labelled, "film_hit")
-    noscene = of(lambda j: j["flags"]["cls"] == "film_noscene")
+    scene = of(*ff_gold.SCENE_CLASSES)
+    labelled = of(*ff_gold.FILM_CLASSES)
+    reference = [j for j in labelled if j["flags"]["cls"] != "film_search"]
+    reasons = {}
+    for j in judged:
+        if j["flags"]["kind"] == "failed":
+            reasons[j["flags"]["reason"]] = reasons.get(j["flags"]["reason"], 0) + 1
     report = {
         "utterances": len(judged),
+        "prediction_kinds": kinds(judged),
+        "failure_reasons": dict(sorted(reasons.items())),
         "scene": {
-            "pooled": rate([j["flags"]["scene_hit"] for j in scene]),
-            "participant_average": participant_average(scene_by_p),
-            "by_participant": scene_by_p,
+            **both_ways(scene, "scene_hit"),
             "strata": {
-                c: rate(
-                    [j["flags"]["scene_hit"] for j in scene if j["flags"]["cls"] == c]
-                )
+                c: both_ways([j for j in scene if j["flags"]["cls"] == c], "scene_hit")
                 for c in ff_gold.SCENE_CLASSES
             },
             "prediction_kinds": kinds(scene),
             "chance_given_film": mean([j["chance"][0] for j in scene]),
             "chance_end_to_end": mean([j["chance"][1] for j in scene]),
             "by_film": {
-                str(f): rate(
-                    [
-                        j["flags"]["scene_hit"]
-                        for j in scene
-                        if j["utterance"]["film"] == f
-                    ]
+                str(f): both_ways(
+                    [j for j in scene if j["utterance"]["film"] == f], "scene_hit"
                 )
                 for f in ff_gold.FILMS
             },
         },
         "film": {
-            "pooled": rate([j["flags"]["film_hit"] for j in labelled]),
-            "participant_average": participant_average(film_by_p),
-            "by_participant": film_by_p,
+            "film_labelled": both_ways(labelled, "film_hit"),
+            "film_reference": both_ways(reference, "film_hit"),
         },
-        "film_noscene": {
-            "n": len(noscene),
-            "film_only_correct_film": sum(
-                1
-                for j in noscene
-                if j["flags"]["kind"] == "film" and j["flags"]["film_hit"]
-            ),
-            "scene_in_correct_film": sum(
-                1
-                for j in noscene
-                if j["flags"]["kind"] == "scene" and j["flags"]["film_hit"]
-            ),
-            "wrong_film": sum(
-                1
-                for j in noscene
-                if j["flags"]["kind"] in ("scene", "film")
-                and not j["flags"]["film_hit"]
-            ),
-            "none": sum(1 for j in noscene if j["flags"]["kind"] == "none"),
-            "failed": sum(1 for j in noscene if j["flags"]["kind"] == "failed"),
-        },
+        "film_only": film_breakdown(of("film_only")),
+        "film_search": film_breakdown(of("film_search")),
     }
     for cls in ("nonfilm", "cartoon"):
-        records = of(lambda j, c=cls: j["flags"]["cls"] == c)
-        k = kinds(records)
+        k = kinds(of(cls))
         report[cls] = {
-            "n": len(records),
-            "assigned_a_film": k["scene"] + k["film"],
+            "n": len(of(cls)),
+            "assigned_a_film": k["scene"] + k["invalid_scene"] + k["film"],
             "no_assignment": k["none"],
             "failed": k["failed"],
         }
@@ -215,8 +238,10 @@ def score(gold, film_of, valid, predictions):
     judged = []
     for u in gold:
         key = (u["participant"], u["session"], u["row"])
-        prediction = normalise(predictions.get(key), film_of, valid)
-        record = {"utterance": u, "flags": judge(u, prediction)}
+        record = {
+            "utterance": u,
+            "flags": judge(u, normalise(predictions.get(key), film_of, valid)),
+        }
         if u["cls"] in ff_gold.SCENE_CLASSES:
             record["chance"] = chance(u, film_of, valid)
         judged.append(record)
@@ -224,13 +249,14 @@ def score(gold, film_of, valid, predictions):
     report = {
         "schema": SCHEMA,
         "population": ff_gold.population(gold),
+        "classes": ff_gold.classes(gold),
         "valid_scene_targets": len(valid),
         "sessions": {
             s: summarise([j for j in judged if j["utterance"]["session"] == s])
             for s in sessions
         },
     }
-    # Session comparison is only meaningful within the participants who have both sessions.
+    # A session comparison is only meaningful within the participants who have every session.
     if len(sessions) > 1:
         both = set.intersection(
             *[{u["participant"] for u in gold if u["session"] == s} for s in sessions]
@@ -252,43 +278,64 @@ def score(gold, film_of, valid, predictions):
     return report
 
 
-def load_predictions(directory, field):
-    predictions = {}
+def load_predictions(directory, field, gold):
+    """Predictions for `field`; refuses unless every participant-session has exactly one file."""
+    if field not in FIELDS:
+        raise ScoreError(f"field must be one of {FIELDS}")
+    wanted = {(u["participant"], u["session"]) for u in gold}
+    predictions, seen = {}, set()
     for name in sorted(os.listdir(directory)):
         if not name.endswith(".json"):
             continue
         with open(os.path.join(directory, name), encoding="utf-8") as handle:
             doc = json.load(handle)
+        session = (doc["participant"], doc["session"])
+        if session in seen:
+            raise ScoreError(f"two files for {session}")
+        seen.add(session)
         for unit in doc["units"]:
             key = (doc["participant"], doc["session"], unit["row"])
             if key in predictions:
                 raise ScoreError(f"duplicate prediction for {key}")
-            predictions[key] = unit.get(field)
+            if field not in unit:
+                raise ScoreError(f"no {field} prediction for {key}")
+            predictions[key] = unit[field]
+    if seen != wanted:
+        missing = sorted(wanted - seen) or sorted(seen - wanted)
+        raise ScoreError(
+            f"participant-sessions do not match the reference: {missing[0]}"
+        )
     return predictions
 
 
 def main(argv):
-    if len(argv) == 3 and argv[0] == "population":
-        gold = ff_gold.load_gold(argv[1])
-        film_of, valid = ff_gold.load_dictionary(argv[2])
+    if len(argv) == 4 and argv[0] == "population":
+        gold = ff_gold.load_gold(argv[1], argv[2])
+        film_of, valid = ff_gold.load_dictionary(argv[3])
         ff_gold.check_join(gold, film_of)
-        print(
-            json.dumps(
-                {"population": ff_gold.population(gold), "targets": len(valid)},
-                indent=1,
-            )
-        )
+        out = {
+            "population": ff_gold.population(gold),
+            "classes": ff_gold.classes(gold),
+            "targets": len(valid),
+        }
+        print(json.dumps(out, indent=1, sort_keys=True))
         return 0
-    if len(argv) == 6 and argv[0] == "score":
-        if os.path.exists(argv[5]):
+    if len(argv) == 7 and argv[0] == "score":
+        if os.path.exists(argv[6]):
             print("refused: output exists", file=sys.stderr)
             return 2
-        gold = ff_gold.load_gold(argv[1])
-        film_of, valid = ff_gold.load_dictionary(argv[2])
+        gold = ff_gold.load_gold(argv[1], argv[2])
+        film_of, valid = ff_gold.load_dictionary(argv[3])
         ff_gold.check_join(gold, film_of)
-        report = score(gold, film_of, valid, load_predictions(argv[3], argv[4]))
-        report["field"] = argv[4]
-        with open(argv[5], "w", encoding="utf-8") as handle:
+        try:
+            report = score(
+                gold, film_of, valid, load_predictions(argv[4], argv[5], gold)
+            )
+        except ScoreError as error:
+            print(f"refused: {error}", file=sys.stderr)
+            return 2
+        report["field"] = argv[5]
+        with open(argv[6], "w", encoding="utf-8") as handle:
             json.dump(report, handle, indent=1, sort_keys=True)
             handle.write("\n")
         return 0

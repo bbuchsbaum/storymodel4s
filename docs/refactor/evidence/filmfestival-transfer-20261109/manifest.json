@@ -1,26 +1,61 @@
 {
+ "annotationSha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc",
  "attempts": 3,
  "calls": 63,
  "chunk": 60,
+ "classes": {
+  "run-01": {
+   "cartoon": 7,
+   "film_only": 208,
+   "film_search": 31,
+   "multi_contig": 414,
+   "multi_noncontig": 111,
+   "nonfilm": 101,
+   "single": 1810
+  },
+  "run-02": {
+   "film_only": 44,
+   "film_search": 13,
+   "multi_contig": 62,
+   "multi_noncontig": 9,
+   "nonfilm": 16,
+   "single": 400
+  }
+ },
+ "cliFlags": [
+  "--tools",
+  "",
+  "--no-session-persistence",
+  "--setting-sources",
+  "",
+  "--strict-mcp-config",
+  "--output-format",
+  "json"
+ ],
+ "codesSha256": "a6c51295ee86dbd9b9dc057debdf20756e20f52f1269cf3c7a93695c847c4fcd",
  "dictionarySha256": "39ef679b883222875bfe5bdc6795154e79cdc85d5d788352c6e6945343f560f1",
+ "goldSha256": "0433e14f192fa783c010edcfb3f0db4f297b31f1d53bc0ab577619221ae16bd0",
  "longestPromptChars": 121435,
  "maxPromptChars": 400000,
- "model": "opus",
+ "model": "claude-opus-5-5",
  "packetSha256": "c5dc1b137d3ba1b2cfffe2a2f2afb4683e566708dbe4d7d11d429a6fcfac5ec5",
  "population": {
   "run-01": {
    "all": 2682,
    "film_labelled": 2574,
+   "film_reference": 2543,
    "scene_specific": 2335
   },
   "run-02": {
    "all": 544,
    "film_labelled": 528,
+   "film_reference": 515,
    "scene_specific": 471
   }
  },
+ "retrySuffix": "\n\nReply with strictly valid JSON only (attempt {attempt}).",
  "scenes": 216,
- "schema": "storymodel4s.filmfestival.transfer-manifest/v1",
+ "schema": "storymodel4s.filmfestival.transfer-manifest/v2",
  "sessions": [
   {
    "participant": "sub-01",
