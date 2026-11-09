@@ -1,0 +1,23 @@
+arm keys ['identityPolicy', 'participants', 'producer', 'schema', 'sourceInputSha256', 'unitManifestSha256']
+arm participant keys ['participant', 'units'] unit keys ['id', 'onsetSeconds', 'ordinal', 'outcome', 'textSha256']
+{
+ "participants": 11,
+ "units": 1744,
+ "narrative_mismatches": 0,
+ "arm_kinds": {
+  "label": 1744
+ },
+ "referent": {
+  "value": 1683,
+  "null": 61
+ },
+ "narrative_referent_differ": 72,
+ "confidence": {
+  "value": 1744
+ },
+ "alternatives": {
+  "value": 1744
+ },
+ "cited_rows": 3225,
+ "unresolved_rows": 0
+}

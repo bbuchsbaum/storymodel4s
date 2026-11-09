@@ -1,0 +1,317 @@
+{
+  "schema" : "storymodel4s.agentmapping.bundle-receipt/v1",
+  "provider" : "claude-code-cli",
+  "model" : "opus",
+  "chunk" : 60,
+  "modelCalls" : 0,
+  "exchanges" : 34,
+  "total" : {
+    "units" : 1744,
+    "processing" : {
+      "answered" : 1744
+    },
+    "narrative" : {
+      "value" : 1744
+    },
+    "referent" : {
+      "null" : 61,
+      "value" : 1683
+    },
+    "alternatives" : {
+      "value" : 1744
+    },
+    "rows" : {
+      "value" : 1744
+    },
+    "confidence" : {
+      "value" : 1744
+    }
+  },
+  "participants" : [
+    {
+      "participant" : "NN03_ANT_202231_final",
+      "bundleSha256" : "d48a4679e662150b97d365f4b12643098ac1ed17df75bdb458410159b7a2d865",
+      "counts" : {
+        "units" : 173,
+        "processing" : {
+          "answered" : 173
+        },
+        "narrative" : {
+          "value" : 173
+        },
+        "referent" : {
+          "null" : 5,
+          "value" : 168
+        },
+        "alternatives" : {
+          "value" : 173
+        },
+        "rows" : {
+          "value" : 173
+        },
+        "confidence" : {
+          "value" : 173
+        }
+      }
+    },
+    {
+      "participant" : "NN04_ATE_163931_final",
+      "bundleSha256" : "30517dfd6c0b4a748dfeab4293658bdae3de188cb45f407f6cbde41f7f07cd48",
+      "counts" : {
+        "units" : 96,
+        "processing" : {
+          "answered" : 96
+        },
+        "narrative" : {
+          "value" : 96
+        },
+        "referent" : {
+          "value" : 96
+        },
+        "alternatives" : {
+          "value" : 96
+        },
+        "rows" : {
+          "value" : 96
+        },
+        "confidence" : {
+          "value" : 96
+        }
+      }
+    },
+    {
+      "participant" : "NN05_MUN_151631_final",
+      "bundleSha256" : "1f5f8a6804a01036ee91fecc927eba14d486b68b060fb7ecee1d74c18ecab4e8",
+      "counts" : {
+        "units" : 68,
+        "processing" : {
+          "answered" : 68
+        },
+        "narrative" : {
+          "value" : 68
+        },
+        "referent" : {
+          "null" : 3,
+          "value" : 65
+        },
+        "alternatives" : {
+          "value" : 68
+        },
+        "rows" : {
+          "value" : 68
+        },
+        "confidence" : {
+          "value" : 68
+        }
+      }
+    },
+    {
+      "participant" : "NN06_SQT_213031_final",
+      "bundleSha256" : "a8505fa22545c1b07bd20d570f943bb9e36a9f9429708b7f85fbd5176b365dd2",
+      "counts" : {
+        "units" : 104,
+        "processing" : {
+          "answered" : 104
+        },
+        "narrative" : {
+          "value" : 104
+        },
+        "referent" : {
+          "null" : 4,
+          "value" : 100
+        },
+        "alternatives" : {
+          "value" : 104
+        },
+        "rows" : {
+          "value" : 104
+        },
+        "confidence" : {
+          "value" : 104
+        }
+      }
+    },
+    {
+      "participant" : "NN07_SKS_213031_final",
+      "bundleSha256" : "6b01897fba2dcec7c053cb5960ce04e111c30f89e38aaafed5be7930a1f9e0da",
+      "counts" : {
+        "units" : 98,
+        "processing" : {
+          "answered" : 98
+        },
+        "narrative" : {
+          "value" : 98
+        },
+        "referent" : {
+          "null" : 4,
+          "value" : 94
+        },
+        "alternatives" : {
+          "value" : 98
+        },
+        "rows" : {
+          "value" : 98
+        },
+        "confidence" : {
+          "value" : 98
+        }
+      }
+    },
+    {
+      "participant" : "NN08_OLZ_224031_final",
+      "bundleSha256" : "6d100912e93c50232f95c501b67e6db503db21ebe03752ee6d78ee42a13cfadc",
+      "counts" : {
+        "units" : 181,
+        "processing" : {
+          "answered" : 181
+        },
+        "narrative" : {
+          "value" : 181
+        },
+        "referent" : {
+          "null" : 2,
+          "value" : 179
+        },
+        "alternatives" : {
+          "value" : 181
+        },
+        "rows" : {
+          "value" : 181
+        },
+        "confidence" : {
+          "value" : 181
+        }
+      }
+    },
+    {
+      "participant" : "NN11_NMA_233131_final",
+      "bundleSha256" : "6d86a3900ee7410d040ac343a2bd03a2e331446909ec0f4787d76e3eadeeb1f3",
+      "counts" : {
+        "units" : 148,
+        "processing" : {
+          "answered" : 148
+        },
+        "narrative" : {
+          "value" : 148
+        },
+        "referent" : {
+          "null" : 6,
+          "value" : 142
+        },
+        "alternatives" : {
+          "value" : 148
+        },
+        "rows" : {
+          "value" : 148
+        },
+        "confidence" : {
+          "value" : 148
+        }
+      }
+    },
+    {
+      "participant" : "NN13_DII_241731_final",
+      "bundleSha256" : "732eda95e7f0ed6517e593852959065c7781d4088de85ff0b22ebf817d677758",
+      "counts" : {
+        "units" : 338,
+        "processing" : {
+          "answered" : 338
+        },
+        "narrative" : {
+          "value" : 338
+        },
+        "referent" : {
+          "null" : 10,
+          "value" : 328
+        },
+        "alternatives" : {
+          "value" : 338
+        },
+        "rows" : {
+          "value" : 338
+        },
+        "confidence" : {
+          "value" : 338
+        }
+      }
+    },
+    {
+      "participant" : "NN15_DBF_242231_final",
+      "bundleSha256" : "37d0f478f3d2a3304e968f080ac8daf4a8f0834418ba3fc63b32feaded38aa42",
+      "counts" : {
+        "units" : 97,
+        "processing" : {
+          "answered" : 97
+        },
+        "narrative" : {
+          "value" : 97
+        },
+        "referent" : {
+          "null" : 3,
+          "value" : 94
+        },
+        "alternatives" : {
+          "value" : 97
+        },
+        "rows" : {
+          "value" : 97
+        },
+        "confidence" : {
+          "value" : 97
+        }
+      }
+    },
+    {
+      "participant" : "NN16_DBN_242731_final",
+      "bundleSha256" : "9eb9d89255549dea6650d45a2f4b5ab441b3051b96250a47c0e2316ef627ca2d",
+      "counts" : {
+        "units" : 89,
+        "processing" : {
+          "answered" : 89
+        },
+        "narrative" : {
+          "value" : 89
+        },
+        "referent" : {
+          "null" : 6,
+          "value" : 83
+        },
+        "alternatives" : {
+          "value" : 89
+        },
+        "rows" : {
+          "value" : 89
+        },
+        "confidence" : {
+          "value" : 89
+        }
+      }
+    },
+    {
+      "participant" : "NN17_DBE_242331_final",
+      "bundleSha256" : "88374849c1839b0118c369828edb76d33bff22ba5a9965ce33ed3c29bed607ed",
+      "counts" : {
+        "units" : 352,
+        "processing" : {
+          "answered" : 352
+        },
+        "narrative" : {
+          "value" : 352
+        },
+        "referent" : {
+          "null" : 18,
+          "value" : 334
+        },
+        "alternatives" : {
+          "value" : 352
+        },
+        "rows" : {
+          "value" : 352
+        },
+        "confidence" : {
+          "value" : 352
+        }
+      }
+    }
+  ]
+}

@@ -57,7 +57,7 @@ goes in with the pin bump.
 
 ## 4b: recorded responses to a bundle
 
-Commit ac4b42a96.
+Commits ac4b42a96 (implementation) through 173343bdc (review fixes).
 
 - `AgentAnswers` reads each reply item into narrative, referent, alternatives, rows and
   confidence, each as absent, explicit null, valid or invalid. Each unit is answered, omitted, or
@@ -69,11 +69,23 @@ Commit ac4b42a96.
 - The replay's arm projection no longer writes null for an omitted unit or a missing field.
 - `tools/agentmapping/read_bundle.py` reads a bundle with the standard library only.
 
-Gate at ac4b42a96, clean clone, `tlFatalWarnings := true`: `pipeline/test` passed 486, failed 0;
-`providerAgent/test` passed 82, failed 0, skipped 1; format check clean. Python reader tests: 6
+Gate at 173343bdc, clean clone, `tlFatalWarnings := true`: `pipeline/test` passed 494, failed 0;
+`providerAgent/test` passed 82, failed 0, skipped 1; format check clean. Python reader tests: 9
 passed.
 
-Mutations:
+An independent review of ac4b42a96 found that the command bound answers to units by id alone. A
+unit id encodes the transcript and the unit's position, not its text, so the command now also
+requires each table text to equal the rebuilt unit's text. Its other findings fixed in
+173343bdc:
+
+- the Scala reader refuses swapped records and unit rows that disagree with a record;
+- the Python reader refuses missing or duplicated units;
+- the command writes per-field status counts ([bundle-receipt.json](bundle-receipt.json));
+- the provider identity is a digest of the named model, not of the prompt.
+
+The rest are bead `bd-01M714FSQMKRJMRGAAKMHS41KP`.
+
+Mutations, run at ac4b42a96:
 
 - **An absent field treated as a no-assignment.**
   - Fails "an explicit null is a no-assignment; an absent or invalid field is invalid output".
@@ -92,8 +104,9 @@ The first two also fail the golden-bundle test, as they should.
 
 - 11 participants, 1,744 units, all answered; 34 exchanges; 0 model calls.
 - Each bundle was reloaded and compared before the command reported.
-- Unit-by-unit against the frozen slice-1 arm ([parity.py](parity.py)): **0 narrative mismatches
-  in 1,744 units**, in both the unit rows and the checked records. (The 1,499 figure elsewhere is
+- Every unit table's text equals its rebuilt unit's text, for all 11 participants.
+- Unit-by-unit against the frozen slice-1 arm ([parity.py](parity.py),
+  [parity-result.txt](parity-result.txt)): **0 narrative mismatches in 1,744 units**, in both the unit rows and the checked records. (The 1,499 figure elsewhere is
   the 10 participants with gold.)
 - Replay reply files are byte-identical to slice 3's, and the arm built from them is byte-identical
   to slice 1's.
@@ -107,6 +120,7 @@ What the bundles hold that the narrative-only replay discarded:
 | Narrative and referent differ | 72 |
 | Alternatives present | 1,744 |
 | Confidence present | 1,744 |
+| Rows field valid | 1,744 |
 | Rows cited | 3,225, all resolving in the source dictionary |
 
 None of these is scored. Alternatives and confidence are self-reports; a resolving citation is a
