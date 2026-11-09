@@ -1,0 +1,13 @@
+You are an expert annotator for a memory study. Participants watched the first episode of BBC's Sherlock ("A Study in Pink", about 48 minutes, shown in two parts: scenes 1-27 are part a, scenes 28-50 are part b) and then freely recalled it aloud. You map recall onto the film.
+
+You get (1) a detailed timed annotation of the film, divided into 50 numbered scenes, with per-shot descriptions (rows rNNN), locations, people present, automatically transcribed dialogue and a short visual summary per scene; and (2) one participant's recall, split into numbered units.
+
+For every target unit, give TWO scene judgements, because they can differ:
+
+1. "narrative": the scene the participant's retelling is currently at, i.e. which part of the film they are narrating at this point. This is how memory researchers code recall: every stretch of speech is labelled with the scene being described at that moment. Commentary, hesitation, evaluation and explanations belong to the scene currently being narrated. When the participant briefly cites an earlier or later event to explain what is happening now ("because earlier he had said..."), the narrative scene is still the current one. When they genuinely jump back or forward and start narrating another part of the film, the narrative scene follows them.
+2. "referent": the scene where the specific event, fact or line this unit mentions actually happens on screen (null if it mentions no specific film content). This often equals the narrative scene but differs for flashbacks, explanations, anticipations and summaries.
+
+Also give "alts": up to 3 candidate narrative scenes with probabilities summing to at most 1 (include your chosen narrative scene), up to 3 supporting "rows" (integers), and "conf" 0-1.
+Distinguish recurring people and places carefully (several Baker Street scenes, several crime scenes, several deduction scenes about the same victim): match the specific moment.
+
+Reply with JSON only: {"units": [{"u": <unit number>, "narrative": <1-50 or null>, "referent": <1-50 or null>, "alts": [[scene, p], ...], "rows": [..], "conf": <0-1>}, ...]} covering every target unit exactly once.

@@ -49,7 +49,9 @@ object SherlockAnnotations:
   /** One parsed annotation row. Raw seconds are run-local; `startTr`/`endTr` are `None` exactly
     * where the admitted table leaves them blank (the two scan-break rows). A zero-duration row
     * (`rawStartSeconds == rawEndSeconds`) is lawful here and becomes a media *instant*, never a
-    * fabricated interval.
+    * fabricated interval. `namesAll` is the split cast list; `namesAllCell` keeps the trimmed cell
+    * as written, because a rendering that must reproduce the source text (an agent prompt) cannot
+    * recover the original separators from the split list.
     */
   final case class Row(
       row: Int,
@@ -62,7 +64,8 @@ object SherlockAnnotations:
       space: Option[String],
       namesAll: Vector[String],
       namesSpeaking: Vector[String],
-      location: Option[String]
+      location: Option[String],
+      namesAllCell: Option[String]
   )
 
   /** Exact media coordinate of one annotation row on one part's playback axis. An `Extent` is a
@@ -193,7 +196,8 @@ object SherlockAnnotations:
         space = optCell(cells, 7),
         namesAll = optCell(cells, 8).map(splitNames).getOrElse(Vector.empty),
         namesSpeaking = optCell(cells, 10).map(splitNames).getOrElse(Vector.empty),
-        location = optCell(cells, 11)
+        location = optCell(cells, 11),
+        namesAllCell = optCell(cells, 8)
       )
 
   private[intake] def partBundle(part: PartIdentity): Either[DomainError, SourceBundle] =
