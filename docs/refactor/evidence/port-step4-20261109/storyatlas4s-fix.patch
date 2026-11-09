@@ -1,0 +1,31 @@
+diff --git a/app/src/main/scala/storyatlas4s/app/WorkspaceInspector.scala b/app/src/main/scala/storyatlas4s/app/WorkspaceInspector.scala
+index 55c959a..60ed816 100644
+--- a/app/src/main/scala/storyatlas4s/app/WorkspaceInspector.scala
++++ b/app/src/main/scala/storyatlas4s/app/WorkspaceInspector.scala
+@@ -146,7 +146,9 @@ private[app] object WorkspaceInspector:
+               p(s"Localization: ${row.outcome.localization}"),
+               p(
+                 row.outcome.decision.fold("Decision basis: not supplied")(d =>
+-                  s"Decision basis: ${d.basis.kind}"
++                  d.numerical.fold("Decision basis: categorical choice (no scores)")(n =>
++                    s"Decision basis: ${n.basis.kind}"
++                  )
+                 )
+               ),
+               p(s"Inference policy: ${c.policy.record.policies.inference}"),
+diff --git a/edition/src/test/scala/storyatlas4s/edition/WorkspacePacketSuite.scala b/edition/src/test/scala/storyatlas4s/edition/WorkspacePacketSuite.scala
+index ada16f8..08abfec 100644
+--- a/edition/src/test/scala/storyatlas4s/edition/WorkspacePacketSuite.scala
++++ b/edition/src/test/scala/storyatlas4s/edition/WorkspacePacketSuite.scala
+@@ -102,7 +102,10 @@ class WorkspacePacketSuite extends FunSuite:
+     assertEquals(row.cell(Destination.Target(quiet)).get.normalized, Some(0.25))
+     assertEquals(row.cell(Destination.External(ExternalState.Intrusion)).get.normalized, Some(0.5))
+     assertEquals(row.cell(Destination.Target(ring)).get.posterior, Vector.empty)
+-    assertEquals(row.outcome.decision.get.rawArgmax.map(_._1), Some(Destination.Target(ring)))
++    assertEquals(
++      row.outcome.decision.get.numerical.get.rawArgmax.map(_._1),
++      Some(Destination.Target(ring))
++    )
+     assertEquals(row.outcome.decision.get.chosen, Some(Destination.Target(quiet)))
+     assertEquals(
+       workspace.policy(b).get.matrix.row(u0).get.cell(Destination.Target(quiet)).get.normalized,
