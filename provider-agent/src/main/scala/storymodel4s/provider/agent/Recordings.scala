@@ -45,6 +45,9 @@ object RecordingKey:
       }
     )
 
+  /** Adopt a digest already framed under its own key domain (see `TextExchange`). */
+  private[agent] def fromChecksum(digest: Checksum): RecordingKey = digest
+
   extension (key: RecordingKey) def checksum: Checksum = key
 
 type RecordingKey = RecordingKey.RecordingKey
