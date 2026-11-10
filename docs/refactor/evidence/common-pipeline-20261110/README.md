@@ -53,3 +53,52 @@ recorded in the export. Guards tightened after the review: a unit's line must be
 its prompt; chunk bounds must be the units each chunk owns and what the prompt says it asks
 about; the index names each participant-session. Known and accepted: a reply containing `NaN`
 is accepted by Python and refused here, which fails closed.
+
+## Slice 2b: supplied recall units and checked records
+
+Commits after 3d60a686c, to cc6299d22.
+
+- `DiscourseFunction.NotAssessed` (ADR 0022 amendment, decision 2). The cost model gives it no
+  natural external state and no prior; the interview pipeline never classifies it as an episode.
+- `PreparedRecall.supplied` builds a checked recall inventory from a study's own units, marked
+  not assessed. A recall is identified by its units alone, so it is the same in every condition.
+- `StudyRecord` decides each stated answer against the source and builds the two checked
+  categorical records. A film-only answer is a choice of the film; the choosable targets come
+  from the source view.
+- The FilmFestival source export numbers each film's collection with the film number the prompts
+  show (1-10); the cartoon intros take 11 and 12.
+
+Full gate at 2be5376a3, clean clone, fatal warnings:
+
+| Run | Module runs | Passed | Failed |
+|---|---:|---:|---:|
+| JVM | 16 | 3,962 | 0 |
+| JS | 10 | 2,760 | 0 |
+| Native | 10 | 2,760 | 0 |
+| storyatlas4s (`claude/storymodel4s-pin-20261109`) | 10 | 518 | 0 |
+
+Format check clean. The commits after 2be5376a3 change only `pipeline` and docs; re-gate at
+cc6299d22: `pipeline/test` 537 passed, 0 failed; `providerAgent/test` 82 passed, 1 skipped;
+format check clean.
+
+Acceptance at cc6299d22, both annotation-assisted runs, zero model calls: all 76 records
+construct (19 sessions, two judgements, two models). Judgement counts equal the Python scorer's
+prediction kinds summed over both sessions:
+
+| Model | Judgement | Scene | Film | None | Failed |
+|---|---|---:|---:|---:|---:|
+| `claude-opus-5-5` | referent | 2,804 | 276 | 146 | 0 |
+| `claude-opus-5-5` | narrative | 2,891 | 219 | 116 | 0 |
+| `claude-haiku-5-5` | referent | 2,852 | 230 | 144 | 0 |
+| `claude-haiku-5-5` | narrative | 2,945 | 190 | 91 | 0 |
+
+Mutants at 2be5376a3, each failing a named test: a non-target scene accepted as a choice; the
+universe widened to every scene; supplied units marked as assertions; a natural external state
+given to an unassessed unit; the cartoon accepted as a film.
+
+Independent review of 2be5376a3: no blocking defect. It verified that texts, unit ids and
+inventory cannot disagree, that a forged non-target judgement is refused, and that the Sherlock
+ledger is unchanged. Its findings for later slices are in the design note. Open, and not yet
+reachable: an unassessed unit is not neutral in the HSMM cost model (every named external state
+costs the mismatch), and supplied units carry `ExpressedUncertainty.Unmarked` although no hedge
+detector ran.
