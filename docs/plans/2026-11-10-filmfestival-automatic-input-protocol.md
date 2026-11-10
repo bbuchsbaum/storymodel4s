@@ -7,8 +7,10 @@ reference and its classes, the referent as primary judgement, the three kinds of
 mapper arms, independent participant-sessions, and the reporting. The owner agreed the choices
 below on 2026-11-09.
 
-**Status.** Draft. No frame, transcript or recall from this corpus has been sent to a model for
-this condition. Values under [Freeze](#freeze) are filled in by two freeze commits.
+**Status.** The description stage is frozen (see [Freeze](#freeze)); the mapping stage is not
+yet. Before the description freeze, no frame, transcript or recall from this corpus had been
+sent to a model for this condition; two calls were made on a generated grey image to check the
+tooling.
 
 ## Why
 
@@ -35,7 +37,7 @@ This condition therefore changes the input and nothing downstream.
 Where uniformity is not possible, this page says so.
 
 A check on the design: re-scoring the landed annotation-assisted run with the extended scorer
-reproduces every published figure exactly, and its near agreement equals the within-one-scene
+reproduces every published figure exactly, and its within-one-scene agreement equals the within-one-scene
 figures already reported (Opus 95.9% and 94.5%).
 
 ## The film record
@@ -135,7 +137,8 @@ each with its own chance level:
 - For a time answer the selected scene is the strict scene. A time past the end of the clip has
   no selected scene.
 - **Within one scene is the same quantity in every condition,** and is the companion measure
-  for comparing conditions. Chance for a uniform guess in the correct film is 15.7% for a scene
+  for comparing conditions. Chance for a uniform guess in the correct film (pooled over both
+  sessions; reports give it per session) is 15.7% for a scene
   answer and 16.6% for a time answer.
 - **Within 2 seconds describes tolerance to the clock** and to where in a moment the model
   places its time. It is not compared with the annotation-assisted condition: its chance level
@@ -195,9 +198,31 @@ Two freezes, because the film record depends on the frame descriptions.
 
 No result is scored until every arm has finished.
 
+### Description freeze (2026-11-10)
+
+Manifests are in [the evidence directory](../refactor/evidence/filmfestival-auto-20261110/).
+`ff_caption.py run` refuses unless what it plans equals the tracked caption manifest.
+
 | Item | Value |
 |---|---|
-| Frames | to be recorded at the description freeze |
+| Frames | 1,359, one every 2 seconds, each at its intended timestamp |
+| Frame list (`frames.json`) | SHA-256 `2425939c…5750823a` |
+| Caption manifest | SHA-256 `e6d22464…314e27fb6`; 91 calls of up to 16 frames |
+| Model | `claude-sonnet-5-5` |
+| Instruction | SHA-256 `dfe6f8f6…30a25c7f` (the Sherlock instruction, unchanged) |
+| Attempts per batch | 3 |
+| A description | 2 words to 400 characters, not one of 21 refusal or load-failure phrases |
+| Undescribed frames allowed | 2% of a film's frames |
+
+The stage was reviewed independently twice. The second review found no blocking defect and
+judged it fit to run. Smoke calls on a generated grey image confirmed that the CLI reports
+exactly the named model when the file-reading tool is in use, that the only file read was the
+batch's image, and that the read was matched to a successful result.
+
+### Mapping freeze
+
+| Item | Value |
+|---|---|
 | Film record | to be recorded at the mapping freeze |
 | Clock constants | to be recorded at the mapping freeze |
 
