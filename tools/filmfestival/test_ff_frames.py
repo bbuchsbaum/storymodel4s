@@ -3,6 +3,7 @@
 Run from the repository root: python3 tools/filmfestival/test_ff_frames.py
 """
 
+import argparse
 import io
 import json
 import os
@@ -131,6 +132,27 @@ class Times(unittest.TestCase):
         ):
             with self.assertRaises(ff_frames.FrameError):
                 ff_frames.check_times("x", stamps, names, seconds)
+
+    def test_frames_are_chosen_by_timestamp_and_never_by_the_fps_filter(self):
+        self.assertEqual(
+            ff_frames.FILTER, "select='gte(t,selected_n*2)',showinfo,scale=512:-2"
+        )
+        self.assertNotIn("fps", ff_frames.FILTER)
+        commands = []
+
+        def tool(cmd):
+            commands.append(cmd)
+            return argparse.Namespace(stdout="", stderr=SHOWINFO, returncode=0)
+
+        self.addCleanup(setattr, ff_frames, "tool", ff_frames.tool)
+        ff_frames.tool = tool
+        self.assertEqual(ff_frames.sample("clip.mp4", "out"), [0.0, 2.0, 4.04])
+        cmd = commands[0]
+        self.assertEqual(cmd[cmd.index("-vf") + 1], ff_frames.FILTER)
+        self.assertEqual(cmd[cmd.index("-fps_mode") + 1], "passthrough")
+        self.assertEqual(cmd[cmd.index("-start_number") + 1], "1")
+        self.assertEqual(cmd[cmd.index("-i") + 1], "clip.mp4")
+        self.assertFalse(any("fps=" in part for part in cmd))
 
     def test_source_timestamps_are_read_from_showinfo_frame_lines_only(self):
         found = [float(m.group(1)) for m in ff_frames.PTS.finditer(SHOWINFO)]

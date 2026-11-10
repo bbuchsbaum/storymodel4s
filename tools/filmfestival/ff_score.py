@@ -517,7 +517,8 @@ def check_replies(directory, manifest, manifest_sha):
                 f"{name} is not from the manifest's condition, {condition}"
             )
         recorded = reply.get("manifestSha256")
-        if recorded is None and "condition" not in reply and condition == ANNOTATION:
+        if recorded is None and "condition" not in reply:
+            # A landed annotation file: any other condition was refused just above.
             continue
         if recorded != manifest_sha or "condition" not in reply:
             raise ScoreError(f"{name} was not run under this manifest")

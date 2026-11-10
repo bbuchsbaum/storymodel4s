@@ -136,6 +136,11 @@ class Parsing(unittest.TestCase):
             "1.05",
             "1:05.",
             "1:05.1234",
+            "1:0\u0665",
+            "\uff11:05",
+            "\u0661:05",
+            "1:05.\u0665",
+            "1\uff1a05",
             ":05",
             "1:",
             "a:05",
@@ -192,6 +197,32 @@ class Intervals(Base):
             ff_time.CLOCK[film]["C0"] = wrong
             with self.assertRaises(ff_gold.GoldError):
                 self.build()
+
+    def test_scene_numbers_that_do_not_follow_time_are_refused(self):
+        # Scene 3 would start after scene 4: the film's first scene by number does not hold
+        # its first content row.
+        rows = [
+            r[:3] + ({100: 112, 104: 114, 110: 100}[r[3]],) + r[4:]
+            if r[2] in (3, 4)
+            else r
+            for r in ROWS
+        ]
+        with self.assertRaises(ff_gold.GoldError) as raised:
+            self.build(rows)
+        self.assertIn("not increasing", str(raised.exception))
+
+    def test_the_first_content_row_must_be_where_the_clock_says(self):
+        # The annotation moves; the clock does not.
+        for start in (99, 101):
+            moved = [r[:3] + (start, r[4]) if r[3] == 100 else r for r in ROWS]
+            with self.assertRaises(ff_gold.GoldError) as raised:
+                self.build(moved)
+            self.assertIn("first content row starts at", str(raised.exception))
+        # A title row is not content: moving the title card changes nothing.
+        earlier = [r[:3] + (90, r[4]) if r[3] == 95 else r for r in ROWS]
+        self.assertEqual(
+            ff_time.canonical(self.build(earlier)), ff_time.canonical(self.table)
+        )
 
     def test_an_annotation_that_does_not_fit_the_clip_is_refused(self):
         with self.assertRaises(ff_gold.GoldError):

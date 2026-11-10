@@ -26,7 +26,7 @@ scene starts. The first scene starts at 0, because the clip starts at the first 
 last scene ends at the end of the clip, and includes that instant.
 
 Time strings. `m:ss`, `mm:ss` and either with a decimal fraction of a second, and nothing else:
-no bare number of seconds, no hours, no surrounding space, seconds 00-59.
+no bare number of seconds, no hours, no surrounding space, seconds 00-59, ASCII digits only.
 """
 
 import json
@@ -55,7 +55,7 @@ CLOCK = {
 }
 # A scene is near a time when its interval lies within this many seconds of it.
 TOLERANCE = "2"
-TIME = re.compile(r"(\d{1,2}):([0-5]\d(?:\.\d{1,3})?)")
+TIME = re.compile(r"([0-9]{1,2}):([0-5][0-9](?:\.[0-9]{1,3})?)")
 
 
 def is_int(x):
@@ -115,10 +115,6 @@ def build(rows, film_of, valid, durations):
                 )
         own = [s for s in own if s in valid]
         begin = [to_clip(film, starts[s]) for s in own]
-        if begin[0] > Fraction(CLOCK[film]["b"]):
-            raise ff_gold.GoldError(
-                f"film {film}: no scene holds the first content row"
-            )
         bounds = begin + [duration]
         if any(a >= b for a, b in zip(bounds, bounds[1:])):
             raise ff_gold.GoldError(

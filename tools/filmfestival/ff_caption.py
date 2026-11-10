@@ -1,29 +1,47 @@
 #!/usr/bin/env python3
-"""Describe the sampled FilmFestival frames with a vision model, blind to the film.
+"""Describe the sampled FilmFestival frames with a vision model, blind to the film's identity.
 
 Protocol: docs/plans/2026-11-10-filmfestival-automatic-input-protocol.md, "Frame descriptions".
 
 Usage:
-    ff_caption.py manifest OUT_DIR                 plan every batch and write hashes; no calls
+    ff_caption.py manifest OUT_DIR [NAME]          plan every batch and write hashes; no calls
     ff_caption.py run OUT_DIR MANIFEST [--jobs N]  describe the frames; writes frame-captions.json
     ff_caption.py smoke OUT_DIR                    one call on a generated solid-colour image
+    ff_caption.py audit OUT_DIR                    print what a person should check; no calls
 
 OUT_DIR holds frames.json and frames/ from ff_frames.py. MANIFEST is the tracked, frozen
-manifest; `run` refuses unless what it plans equals it.
+manifest; `run` refuses unless what it plans equals it. `manifest` writes
+OUT_DIR/caption-manifest.json, or OUT_DIR/NAME, and never overwrites.
 
-Blind by construction. The frame files live in directories named after the films, so the model
-is never shown them. Each batch is copied into a fresh temporary directory under neutral names
-(img_01.jpg, img_02.jpg, ...), and the prompt is one fixed line followed by those paths and
-nothing else. A path that contains a film's name is refused before any call. No recall, no
-annotation, no film title and no film number is sent.
+Blind to everything we add. The frame files live in directories named after the films, so the
+model is never shown them. Each batch is copied into a fresh temporary directory under neutral
+names (img_01.jpg, img_02.jpg, ...), and the prompt is one fixed line followed by those paths
+and nothing else. A path that contains a film's name is refused before any call. No recall, no
+annotation, no film title and no film number is sent. The picture itself is not hidden: a frame
+can show an on-screen title.
+
+File access is confined and audited. The CLI runs with the Read tool only, in `--restricted`
+mode (file tools confined to the working directory and `--add-dir`, both the batch's temporary
+directory) and with permission prompts answered by nobody. Replies are read from the CLI's
+event stream, so every tool the model used is seen: a call that used any tool but Read, or read
+any path outside the batch's directory, is a protocol failure and is not recorded. The paths
+read are kept in the call's record. A frame the model did not read gets no description from
+that reply, whatever the reply says about it.
 
 Calls go through `ff_map.call`, so the model check, the stripped API key, the atomic cache write
 and the recorded CLI version are the mapper's. A batch is 16 frames of one film in time order.
-The cache key is the SHA-256 of (model, instruction, the content hashes of the frames asked for,
-attempt number), so it follows the images and not their paths. A batch gets up to three attempts;
-each later attempt asks only for the frames still lacking a usable description. A frame without
-one after that is recorded as undescribed. If more than 2% of any film's frames are undescribed,
-`run` exits non-zero and writes no captions file.
+The cache key is the SHA-256 of (model, instruction, the place in the batch and content hash of
+each frame asked for, attempt number). It follows the images and not their paths; the place is
+included so that two identical frames from different batches cannot share a reply that names
+another file. A batch gets up to three attempts; each later attempt asks only for the frames
+still lacking a usable description.
+
+A usable description is text of at least 3 words and at most 400 characters that does not match
+one of NOT_A_DESCRIPTION, a short list of phrases with which a model declines or reports an
+error instead of describing ("unable to", "cannot read", "error", ...). Anything else is asked
+again, and after three attempts the frame is recorded as undescribed. If more than 2% of any
+film's frames are undescribed, `run` exits non-zero and writes no captions file. A frame that
+really shows the word "error" will be lost to the pattern; `audit` lists what was lost.
 """
 
 import argparse
@@ -31,6 +49,7 @@ import contextlib
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -55,11 +74,42 @@ ATTEMPTS = 3
 MAX_UNDESCRIBED = 0.02
 # A longer reply is not the one sentence asked for; the frame is asked again.
 MAX_DESCRIPTION_CHARS = 400
-# `{frames}` is the temporary directory holding the batch.
+MIN_DESCRIPTION_WORDS = 3
+# Phrases of a refusal or an error report, matched as whole words in any case. A reply holding
+# one is not a description.
+NOT_A_DESCRIPTION = (
+    "unable to",
+    "not able to",
+    "cannot read",
+    "can't read",
+    "could not read",
+    "couldn't read",
+    "cannot view",
+    "can't view",
+    "cannot see",
+    "can't see",
+    "cannot access",
+    "can't access",
+    "i don't have",
+    "i do not have",
+    "no image",
+    "failed to",
+    "error",
+)
+_NOT_A_DESCRIPTION = re.compile(
+    "|".join(
+        rf"(?<![a-z]){re.escape(phrase)}(?![a-z])" for phrase in NOT_A_DESCRIPTION
+    ),
+    re.IGNORECASE,
+)
+# `{frames}` is the temporary directory holding the batch. `--restricted` confines the file
+# tools to it; `--permission-prompts none` denies anything that would ask; the event stream
+# (`stream-json`, which needs `--verbose` with `-p`) shows every tool the model used.
 CLI_FLAGS = ["--tools", "Read", "--allowedTools", "Read", "--add-dir", "{frames}"]
+CLI_FLAGS += ["--restricted", "--permission-prompts", "none"]
 CLI_FLAGS += ["--no-session-persistence", "--setting-sources", ""]
-CLI_FLAGS += ["--strict-mcp-config", "--output-format", "json"]
-MANIFEST_SCHEMA = "storymodel4s.filmfestival.caption-manifest/v1"
+CLI_FLAGS += ["--strict-mcp-config", "--output-format", "stream-json", "--verbose"]
+MANIFEST_SCHEMA = "storymodel4s.filmfestival.caption-manifest/v2"
 CAPTIONS_SCHEMA = "storymodel4s.filmfestival.frame-captions/v1"
 
 
@@ -77,8 +127,11 @@ def leak(text):
     return None
 
 
-def key(hashes, attempt):
-    return ff_packet.sha(json.dumps([MODEL, SYSTEM, hashes, attempt]))
+def key(asked, attempt):
+    """The cache key of one call. `asked` is [(place in the batch, content hash), ...]."""
+    return ff_packet.sha(
+        json.dumps([MODEL, SYSTEM, [list(pair) for pair in asked], attempt])
+    )
 
 
 def plan(frames_doc):
@@ -117,11 +170,13 @@ def staged(root, frames, positions):
 
 
 def usable(value):
-    """A description as one line of text, or None when the reply's value cannot be used."""
+    """A description as one line of text, or None when the reply's value is not one."""
     if not isinstance(value, str):
         return None
     text = " ".join(value.split())
-    return text if 0 < len(text) <= MAX_DESCRIPTION_CHARS else None
+    if len(text) > MAX_DESCRIPTION_CHARS or len(text.split()) < MIN_DESCRIPTION_WORDS:
+        return None
+    return None if _NOT_A_DESCRIPTION.search(text) else text
 
 
 def read_reply(text, positions):
@@ -150,9 +205,40 @@ def read_reply(text, positions):
     return {p: d for p, d in found.items() if d is not None}, stray
 
 
+def audit_reads(directory):
+    """The check `ff_map.call` runs on a call's record before it is kept.
+
+    Every tool the model used must be Read, on a path inside `directory`. The paths are added to
+    the record as `readPaths`, and their base names as `readNames`.
+    """
+
+    def check(record):
+        paths = []
+        for use in record.get("toolUses") or []:
+            given = (
+                use["input"].get("file_path")
+                if isinstance(use["input"], dict)
+                else None
+            )
+            if use["name"] != "Read" or not isinstance(given, str):
+                raise ff_map.ProtocolFailure(
+                    f"the model used the tool {use['name']!r}, not Read on a file"
+                )
+            resolved = os.path.realpath(os.path.join(directory, given))
+            if os.path.dirname(resolved) != directory:
+                raise ff_map.ProtocolFailure(
+                    f"the model read {given}, outside the batch's directory"
+                )
+            paths.append(resolved)
+        record["readPaths"] = paths
+        record["readNames"] = sorted({os.path.basename(p) for p in paths})
+
+    return check
+
+
 def describe(root, frames, cache_dir, version):
     """Descriptions for one batch: ([description or None per frame], receipt)."""
-    found, attempts, stray = {}, 0, 0
+    found, attempts, stray, unread, reads = {}, 0, 0, 0, []
     for attempt in range(ATTEMPTS):
         missing = [p for p in range(len(frames)) if p not in found]
         if not missing:
@@ -168,12 +254,23 @@ def describe(root, frames, cache_dir, version):
                 version,
                 flags=[f.replace("{frames}", directory) for f in CLI_FLAGS],
                 cwd=directory,
-                key=key([frames[p]["sha256"] for p in missing], attempt),
+                key=key([(p, frames[p]["sha256"]) for p in missing], attempt),
+                check=audit_reads(directory),
             )
         got, extra = read_reply(record["result"], missing)
-        found.update(got)
+        # A description of a file the model did not open is not a description of the frame.
+        seen = set(record.get("readNames") or [])
+        unread += sum(1 for p in got if neutral(p) not in seen)
+        found.update({p: d for p, d in got.items() if neutral(p) in seen})
         stray += extra
-    receipt = {"attempts": attempts, "strayNames": stray}
+        reads.append(record.get("readNames") or [])
+    receipt = {
+        "attempts": attempts,
+        "strayNames": stray,
+        "describedButNotRead": unread,
+        "eventTypes": record.get("eventTypes") if attempts else None,
+        "reads": reads,
+    }
     return [found.get(p) for p in range(len(frames))], receipt
 
 
@@ -192,13 +289,15 @@ def manifest(out_dir):
         "retrySuffix": ff_map.SUFFIX,
         "maxUndescribedFraction": MAX_UNDESCRIBED,
         "maxDescriptionChars": MAX_DESCRIPTION_CHARS,
+        "minDescriptionWords": MIN_DESCRIPTION_WORDS,
+        "notADescription": list(NOT_A_DESCRIPTION),
         "framesSha256": ff_frames.file_sha(os.path.join(out_dir, "frames.json")),
         "frames": sum(len(b["frames"]) for b in batches),
         "batches": [
             {
                 "film": b["film"],
                 "frames": len(b["frames"]),
-                "key": key([f["sha256"] for f in b["frames"]], 0),
+                "key": key([(p, f["sha256"]) for p, f in enumerate(b["frames"])], 0),
             }
             for b in batches
         ],
@@ -273,7 +372,11 @@ def write_json(path, doc):
 
 
 def smoke(out_dir):
-    """One call on a generated grey image: whether the CLI reads an image as the frozen model."""
+    """One call on a generated grey image, through the same path as a real batch.
+
+    Returns (what was seen, problems). It shows whether the CLI accepts the flags, reports
+    exactly the frozen model, and emits the events the read audit depends on.
+    """
     os.makedirs(out_dir, exist_ok=True)
     image = os.path.join(out_dir, "smoke.jpg")
     cmd = ["ffmpeg", "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i"]
@@ -281,15 +384,73 @@ def smoke(out_dir):
     subprocess.run(cmd, check=True, timeout=60)
     frame = {"file": "smoke.jpg", "sha256": ff_frames.file_sha(image), "seconds": 0}
     descriptions, receipt = describe(out_dir, [frame], out_dir, ff_map.cli_version())
-    return {"model": MODEL, "described": descriptions[0] is not None, **receipt}
+    events = receipt["eventTypes"] or {}
+    problems = []
+    if not events.get("assistant"):
+        problems.append("the stream held no assistant event")
+    if receipt["reads"][0] != [neutral(0)]:
+        problems.append("no tool-use event shows the model reading the image")
+    if descriptions[0] is None:
+        problems.append("the image got no usable description")
+    seen = {"model": MODEL, "description": descriptions[0], **receipt}
+    return seen, problems
+
+
+def words(text):
+    return len(text.split())
+
+
+def audit(captions):
+    """Lines a person should read before the descriptions are frozen into a film record."""
+    lines = [
+        "film\tdescribed\tundescribed\tmean_chars\tmax_chars\tmean_words\tmax_words\tover_30_words"
+    ]
+    texts = [
+        (film, row["seconds"], row["description"])
+        for film in sorted(captions["films"], key=int)
+        for row in captions["films"][film]
+    ]
+    for film in sorted(captions["films"], key=int):
+        own = [t for f, _, t in texts if f == film]
+        said = [t for t in own if t is not None]
+        chars, count = [len(t) for t in said] or [0], [words(t) for t in said] or [0]
+        lines.append(
+            f"{film}\t{len(said)}\t{len(own) - len(said)}\t"
+            f"{sum(chars) / len(chars):.1f}\t{max(chars)}\t"
+            f"{sum(count) / len(count):.1f}\t{max(count)}\t"
+            f"{sum(1 for c in count if c > 30)}"
+        )
+    for film, seconds, text in texts:
+        if text is None:
+            lines.append(f"undescribed\tfilm {film}\t{seconds} s")
+        elif words(text) < 5:
+            lines.append(f"short\tfilm {film}\t{seconds} s\t{text}")
+    repeats = {}
+    for film, seconds, text in texts:
+        if text is not None:
+            repeats.setdefault(text, []).append(f"{film}@{seconds}")
+    for text, where in repeats.items():
+        if len(where) > 10:
+            lines.append(f"repeated {len(where)} times\t{' '.join(where)}\t{text}")
+    return lines
 
 
 def main(argv):
     if len(argv) == 2 and argv[0] == "smoke":
-        print(json.dumps(smoke(argv[1])))
+        seen, problems = smoke(argv[1])
+        print(json.dumps(seen, indent=1))
+        for problem in problems:
+            print(f"FAILED: {problem}", file=sys.stderr)
+        return 1 if problems else 0
+    if len(argv) == 2 and argv[0] == "audit":
+        with open(
+            os.path.join(argv[1], "frame-captions.json"), encoding="utf-8"
+        ) as handle:
+            print("\n".join(audit(json.load(handle))))
         return 0
-    if len(argv) == 2 and argv[0] == "manifest":
-        path = os.path.join(argv[1], "caption-manifest.json")
+    if len(argv) in (2, 3) and argv[0] == "manifest":
+        name = argv[2] if len(argv) == 3 else "caption-manifest.json"
+        path = os.path.join(argv[1], os.path.basename(name))
         if os.path.exists(path):
             print("refused: manifest exists", file=sys.stderr)
             return 2

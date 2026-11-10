@@ -59,8 +59,9 @@ happens on screen. This often equals the narrative scene but differs for flashba
 explanations, anticipations and summaries."""
 
 _ANSWERS = """Each judgement is one of three kinds:
-- A time in a film: give the film number and a time within the scene, as "m:ss" from the start \
-of that film. Use this only when the unit points to a particular scene.
+- A moment in a film: give the film number and the time of that moment, as "m:ss" from the \
+start of that film; if it spans a stretch of the film, give a time in the middle of it. Use \
+this only when the unit points to a particular scene.
 - A film without a particular scene: when the unit is about a film as a whole (naming it or its \
 title, a general summary or opinion of it, saying which film comes next), give the film number \
 and null for the time. Do not invent a time to be more precise than the unit is.

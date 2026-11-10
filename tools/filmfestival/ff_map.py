@@ -251,6 +251,37 @@ def cli_version():
     return done.stdout.strip()
 
 
+def read_stream(text):
+    """A `--output-format stream-json` reply: (result object, tool uses, event-type counts).
+
+    The stream is one JSON object per line. The last object of type `result` is the same object
+    the `json` format prints (`result`, `is_error`, `usage`, `modelUsage`). Every `tool_use`
+    block inside an `assistant` event's message is a tool the model called, with its input.
+    Raises ValueError for a line that is not a JSON object or a stream with no result.
+    """
+    result, tool_uses, event_types = None, [], {}
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        event = json.loads(line)
+        if not isinstance(event, dict):
+            raise ValueError("a stream line is not an object")
+        kind = str(event.get("type"))
+        event_types[kind] = event_types.get(kind, 0) + 1
+        if kind == "result":
+            result = event
+        message = event.get("message") if kind == "assistant" else None
+        content = message.get("content") if isinstance(message, dict) else None
+        for block in content if isinstance(content, list) else []:
+            if isinstance(block, dict) and block.get("type") == "tool_use":
+                tool_uses.append(
+                    {"name": block.get("name"), "input": block.get("input")}
+                )
+    if result is None:
+        raise ValueError("the stream holds no result")
+    return result, tool_uses, event_types
+
+
 def call(
     model,
     prompt,
@@ -262,6 +293,7 @@ def call(
     flags=None,
     cwd=None,
     key=None,
+    check=None,
 ):
     """One cached subscription-CLI call; returns its record.
 
@@ -271,6 +303,11 @@ def call(
     Every caller shares this path. `flags` replaces the mapper's CLI flags (the frame describer
     needs the Read tool), `cwd` replaces the empty working directory, and `key` replaces the
     cache key of (model, system, prompt) for a caller whose prompt does not identify its input.
+
+    When the flags ask for `--output-format stream-json`, the reply is read from the event
+    stream and the record also holds the tools the model used (`toolUses`) and how many events
+    of each type were seen (`eventTypes`). `check(record)` may then refuse the call by raising
+    ProtocolFailure; a refused call is not recorded.
     """
     path = os.path.join(cache_dir, f"{key or cache_key(model, system, prompt)}.json")
     if os.path.exists(path):
@@ -278,6 +315,7 @@ def call(
             return json.load(handle)
     cmd = ["claude", "-p", "--model", model, "--system-prompt", system]
     cmd += CLI_FLAGS if flags is None else flags
+    streamed = "stream-json" in cmd
     last = None
     for attempt in range(retries + 1):
         with tempfile.TemporaryDirectory() as empty:
@@ -292,8 +330,11 @@ def call(
                 timeout=timeout,
             )
         try:
-            doc = json.loads(done.stdout)
-        except json.JSONDecodeError:
+            if streamed:
+                doc, tool_uses, event_types = read_stream(done.stdout)
+            else:
+                doc = json.loads(done.stdout)
+        except ValueError:
             last = f"non-json stdout (exit {done.returncode})"
             continue
         if (
@@ -317,6 +358,11 @@ def call(
             "modelUsage": reported,
             "result": doc["result"],
         }
+        if streamed:
+            record["toolUses"] = tool_uses
+            record["eventTypes"] = event_types
+        if check is not None:
+            check(record)
         partial = f"{path}.{os.getpid()}.{time.time_ns()}.part"
         with open(partial, "w", encoding="utf-8") as handle:
             json.dump(record, handle)
