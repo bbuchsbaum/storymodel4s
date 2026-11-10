@@ -461,8 +461,8 @@ def reply_documents(directory):
             raise ScoreError("the directory mixes bundles and reply files")
         try:
             loaded = study_bundle.load_directory(directory)
-        except (study_bundle.BundleError, KeyError) as error:
-            raise ScoreError(f"bundle refused: {error!r}")
+        except study_bundle.BundleError as error:
+            raise ScoreError(f"bundle refused: {error}")
         return {name: study_bundle.reply_document(b) for name, b in loaded.items()}
     docs = {}
     for name in names:
@@ -627,6 +627,8 @@ def main(argv):
             check_replies(replies, manifest, file_sha(manifest_path))
             table = None
             if condition != ANNOTATION:
+                if any(n.endswith(".bundle.json") for n in os.listdir(replies)):
+                    raise ScoreError("bundles of a time condition are not read yet")
                 table = check_times(manifest, annotation_path, replies)
             gold = ff_gold.load_gold(gold_path, codes_path)
             film_of, valid = ff_gold.load_dictionary(annotation_path)

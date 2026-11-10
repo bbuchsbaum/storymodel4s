@@ -64,10 +64,15 @@ class StudyBundleSuite extends FunSuite:
     protocolName,
     Checksum.ofText("SYSTEM").hex,
     "0" * 64,
-    PreparedRecall.Segmentation("supplied", Checksum.ofText("x"), PreparedRecall.SuppliedRecipe)
+    PreparedRecall.Segmentation(
+      "supplied",
+      Checksum.ofText(texts.mkString("|")),
+      PreparedRecall.SuppliedRecipe
+    )
   )
+  private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
+  private lazy val expected = StudyBundle.Expected("p1", "s1", units, producer)
   private def recordsFor(condition: String): Map[String, MappingResult] =
-    val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
     StudyBundle.Fields.map { f =>
       f -> right(
         StudyRecord
@@ -94,7 +99,7 @@ class StudyBundleSuite extends FunSuite:
       .map(_.hcursor.downField(field).downField("judgement").get[String]("kind").toOption.get)
 
   private def edited(f: Json => Json): Either[String, StudyBundle.Loaded] =
-    StudyBundle.decode(f(bundle), view, recall)
+    StudyBundle.decode(f(bundle), view, recall, expected)
   private def unit(i: Int)(f: Json => Json)(b: Json): Json =
     b.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(i, f(us(i))))))
   private def field(name: String, key: String, value: Json)(u: Json): Json =
@@ -141,7 +146,7 @@ class StudyBundleSuite extends FunSuite:
 
   test("a bundle reads back to the same two records, through text"):
     val loaded = right(parse(bundle.noSpaces).left.map(_.message).flatMap { b =>
-      StudyBundle.decode(b, view, recall)
+      StudyBundle.decode(b, view, recall, expected)
     })
     StudyBundle.Fields.foreach(f => assertEquals(loaded.records(f).digest, records(f).digest))
     assertEquals(loaded.units.size, 6)
@@ -180,31 +185,88 @@ class StudyBundleSuite extends FunSuite:
       )
     }
     assertEquals(
-      StudyBundle.decode(swapped, view, recall).left.toOption,
+      StudyBundle.decode(swapped, view, recall, expected).left.toOption,
       Some("the narrative slot does not hold the narrative record")
     )
     val short = bundle.mapObject(o => o.add("units", o("units").get.mapArray(_.dropRight(1))))
     assertEquals(
-      StudyBundle.decode(short, view, recall).left.toOption,
+      StudyBundle.decode(short, view, recall, expected).left.toOption,
       Some("unit rows are not the recall's units")
     )
     val other = StudyBundle.encode(provenance, view, recordsFor("automatic"), rows)
     assertEquals(
-      StudyBundle.decode(other, view, recall).left.toOption,
+      StudyBundle.decode(other, view, recall, expected).left.toOption,
       Some("the narrative slot does not hold the narrative record")
     )
 
   test("a bundle is refused against another recall or another source"):
     val otherRecall = recallOf(texts.updated(0, "she left"))
     assertEquals(
-      StudyBundle.decode(bundle, view, otherRecall).left.toOption,
-      Some("unit rows are not the recall's units")
+      StudyBundle.decode(bundle, view, otherRecall, expected).left.toOption,
+      Some("the recall is not the study's units")
     )
-    assert(StudyBundle.decode(bundle, source("Anna left."), recall).isLeft)
+    assert(StudyBundle.decode(bundle, source("Anna left."), recall, expected).isLeft)
     assertEquals(
-      StudyBundle.decode(Json.obj("schema" -> Json.fromString("x")), view, recall).left.toOption,
+      StudyBundle
+        .decode(Json.obj("schema" -> Json.fromString("x")), view, recall, expected)
+        .left
+        .toOption,
       Some("not a v2 mapping bundle")
     )
+
+  private def top(key: String, value: Json)(u: Json): Json = u.mapObject(_.add(key, value))
+  private def provenanceSays(key: String, value: String)(b: Json): Json =
+    b.mapObject(o => o.add("provenance", o("provenance").get.mapObject(_.add(key, Json.fromString(value)))))
+
+  test("an extra cannot use a row's own key"):
+    val smuggled = json("""{"referent":{"status":"answered","kind":"scene","scene":1},"row":99}""")
+    assertEquals(
+      edited(unit(3)(top("extras", smuggled))).left.toOption,
+      Some("an extra uses a row's own key")
+    )
+
+  test("a row's number and study key are the study's, in the study's order"):
+    val swapped = unit(0)(top("row", Json.fromInt(11))).andThen(unit(1)(top("row", Json.fromInt(10))))
+    assertEquals(edited(swapped).left.toOption, Some("unit rows are not the recall's units"))
+    assertEquals(
+      edited(unit(0)(top("u", Json.fromString("1")))).left.toOption,
+      Some("unit rows are not the recall's units")
+    )
+
+  test("a failure keeps its own kind and reason, and processing follows the judgements"):
+    val invalid = json("""{"kind":"invalid","reason":"missing-field"}""")
+    assertEquals(
+      edited(unit(4)(field("referent", "judgement", invalid))).left.toOption,
+      Some("a referent judgement is not what its stated answer gives against this source")
+    )
+    assertEquals(
+      edited(unit(4)(top("processing", Json.fromString("answered")))).left.toOption,
+      Some("a unit's processing does not match its judgements")
+    )
+    // An unknown scene restated as a known one no longer gives the judgement the row holds.
+    val one = json("""{"status":"answered","kind":"scene","scene":1,"film_stated":1}""")
+    assertEquals(
+      edited(unit(5)(field("referent", "stated", one))).left.toOption,
+      Some("a referent judgement is not what its stated answer gives against this source")
+    )
+
+  test("a bundle relabelled as another participant, model or instruction is refused"):
+    assertEquals(
+      edited(provenanceSays("participant", "p2")).left.toOption,
+      Some("provenance names another participant")
+    )
+    assertEquals(
+      edited(provenanceSays("model", "other")).left.toOption,
+      Some("provenance names another model")
+    )
+    // The record itself is bound to the producer: another model's records do not pass as this one's.
+    val other = expected.copy(producer = StudyRecord.producer("cli", "other", "SYSTEM", view, recall))
+    assertEquals(
+      StudyBundle.decode(provenanceSays("model", "other")(bundle), view, recall, other).left.toOption,
+      Some("a unit row disagrees with the narrative record")
+    )
+    val reworded = expected.copy(producer = StudyRecord.producer("cli", "m", "OTHER", view, recall))
+    assert(StudyBundle.decode(bundle, view, recall, reworded).isLeft)
 
   test("the committed synthetic bundle is what the writer produces"):
     val actual = bundle.spaces2 + "\n"

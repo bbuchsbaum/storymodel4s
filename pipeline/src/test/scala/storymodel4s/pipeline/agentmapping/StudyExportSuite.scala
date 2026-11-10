@@ -90,6 +90,15 @@ class StudyExportSuite extends FunSuite:
     )
     assertEquals(bad("schema", Json.fromString("other")), Left("not a study export"))
 
+  test("an extra may not use a row's own key or repeat"):
+    val refusal = Left("an extra uses a row's own key, or is listed twice")
+    def extras(names: String*) =
+      StudyExport.parseIndex(indexDoc(Map("extras" -> Json.fromValues(names.map(Json.fromString)))))
+    assertEquals(extras("conf", "referent"), refusal)
+    assertEquals(extras("row"), refusal)
+    assertEquals(extras("conf", "conf"), refusal)
+    assert(extras("conf", "alts").isRight)
+
   test("the condition must be a plain name, because it becomes part of a policy id"):
     assertEquals(
       StudyExport.parseIndex(indexDoc(Map("condition" -> Json.fromString("auto:x")))),

@@ -28,15 +28,6 @@ import sys
 
 SCHEMA = "storymodel4s.agentmapping.bundle/v2"
 FIELDS = ("narrative", "referent")
-DECISIONS = ("scene", "film", "none")
-FAILURES = (
-    "invalid-scene",
-    "unknown-scene",
-    "unknown-film",
-    "invalid",
-    "omitted",
-    "unparsable-chunk",
-)
 
 
 class BundleError(ValueError):
@@ -45,6 +36,9 @@ class BundleError(ValueError):
 
 def is_int(x):
     return isinstance(x, int) and not isinstance(x, bool)
+
+
+RESERVED = ("u", "row", "unit", "processing") + FIELDS
 
 
 def record_outcomes(bundle, field):
@@ -65,76 +59,116 @@ def record_outcomes(bundle, field):
     return out
 
 
+def judge(stated, scenes, films):
+    """The judgement a stated answer gives against the bundle's source dictionary, and the
+    record outcome it requires. The same rule as the library's `StudyRecord.judge`.
+    """
+    failed = ("failed", None)
+    if not isinstance(stated, dict):
+        raise BundleError("a stated answer is not an object")
+    if stated.get("status") == "failed":
+        reason = stated.get("reason")
+        if not isinstance(reason, str):
+            raise BundleError("a failure has no reason")
+        if reason in ("omitted", "unparsable-chunk"):
+            return {"kind": reason}, failed
+        return {"kind": "invalid", "reason": reason}, failed
+    if stated.get("status") != "answered":
+        raise BundleError("a stated answer is neither answered nor failed")
+    kind = stated.get("kind")
+    if kind == "scene":
+        number = stated.get("scene")
+        if not is_int(number):
+            raise BundleError("a stated scene is not an integer")
+        scene = scenes.get(number)
+        if scene is None:
+            return {"kind": "unknown-scene", "stated": str(number)}, failed
+        judgement = {"scene": number}
+        if "collection" in scene:
+            judgement["collection"] = scene["collection"]
+        if scene["isTarget"]:
+            return {"kind": "scene", **judgement}, ("choice", scene["target"])
+        return {"kind": "invalid-scene", **judgement}, failed
+    if kind == "film":
+        number = stated.get("film")
+        if not is_int(number):
+            raise BundleError("a stated film is not an integer")
+        film = films.get(number)
+        if film is None or not film["isTarget"]:
+            return {"kind": "unknown-film", "stated": str(number)}, failed
+        return {"kind": "film", "collection": number}, ("choice", film["target"])
+    if kind == "none":
+        return {"kind": "none"}, ("none", None)
+    raise BundleError("a stated answer has an unknown kind")
+
+
+def decision_receipt(record):
+    for receipt in record["stage_assumption_receipts"]:
+        if receipt["stage"] == "Decision":
+            return receipt["provenance"]["asserted"]["value"]
+    raise BundleError("a record has no decision receipt")
+
+
 def check(bundle):
-    """Refuse a bundle whose rows, stated answers, source dictionary and records disagree."""
+    """Refuse a bundle that is not consistent with itself.
+
+    Every judgement is derived again from its stated answer and the source dictionary and must
+    be what the row holds; each record must then hold that outcome for the unit. Each record
+    must be its slot's, under the bundle's condition and protocol, and must name the bundle's
+    model, provider, instruction and units.
+
+    What this cannot check: that the unit numbers and row keys are the study's, and that the
+    records are intact. Both need the study export; the library's `StudyBundle.decode` checks
+    them. A scorer's join against its reference catches a row key the study does not have.
+    """
     for key in ("provenance", "interpretations", "units", "source"):
         if key not in bundle:
             raise BundleError(f"bundle has no {key}")
+    provenance = bundle["provenance"]
     units = bundle["units"]
-    numbers = [unit["u"] for unit in units]
-    if len(set(numbers)) != len(numbers):
-        raise BundleError("a unit number appears twice")
+    if [unit["u"] for unit in units] != list(range(1, len(units) + 1)) or not all(
+        is_int(unit["u"]) for unit in units
+    ):
+        raise BundleError("units are not numbered 1 to n in order")
     scenes = {s["scene"]: s for s in bundle["source"]["scenes"]}
     films = {c["collection"]: c for c in bundle["source"]["collections"]}
+    for unit in units:
+        extras = unit["extras"]
+        if not isinstance(extras, dict) or any(key in RESERVED for key in extras):
+            raise BundleError(f'unit {unit["u"]}: an extra uses a row\'s own key')
     for field in FIELDS:
+        slot = bundle["interpretations"][field]
+        policy = f'agent-localization:{provenance["condition"]}:{provenance["protocol"]}:{field}'
+        receipt = decision_receipt(slot["record"])
+        declared = slot["record"]["policies"]["decision_policy_id"]
+        if not (slot["policy"] == declared.get("id") == receipt["policy"] == policy):
+            raise BundleError(f"the {field} slot does not hold the {field} record")
+        producer = receipt["provider"]
+        if (
+            producer.get("model") != provenance["model"]
+            or producer.get("provider") != provenance["provider"]
+            or receipt["config"] != provenance["systemSha256"]
+            or provenance["segmentation"]["artifactSha256"] not in receipt["inputs"]
+            or bundle["source"]["artifact"] not in receipt["inputs"]
+        ):
+            raise BundleError(f"the {field} record is not from the run the bundle names")
         outcomes = record_outcomes(bundle, field)
         if [o[0] for o in outcomes] != [unit["unit"] for unit in units]:
             raise BundleError(f"unit rows do not match the {field} record's units")
         for unit, (_, kind, target) in zip(units, outcomes):
             where = f'unit {unit["u"]} {field}'
-            stated, judgement = unit[field]["stated"], unit[field]["judgement"]
-            j = judgement.get("kind")
-            answered = stated.get("status") == "answered"
-            if j == "scene" or j == "invalid-scene":
-                scene = scenes.get(judgement.get("scene"))
-                ok = (
-                    answered
-                    and stated.get("kind") == "scene"
-                    and stated.get("scene") == judgement.get("scene")
-                    and scene is not None
-                    and scene["isTarget"] == (j == "scene")
-                    and scene.get("collection") == judgement.get("collection")
-                )
-                expected = ("choice", scene["target"]) if ok and j == "scene" else None
-            elif j == "film":
-                film = films.get(judgement.get("collection"))
-                ok = (
-                    answered
-                    and stated.get("kind") == "film"
-                    and stated.get("film") == judgement.get("collection")
-                    and film is not None
-                    and film["isTarget"]
-                )
-                expected = ("choice", film["target"]) if ok else None
-            elif j == "none":
-                ok = answered and stated.get("kind") == "none"
-                expected = ("none", None)
-            elif j in ("unknown-scene", "unknown-film"):
-                ok = answered and stated.get("kind") == ("scene" if j == "unknown-scene" else "film")
-                expected = None
-            elif j in FAILURES:
-                ok = not answered
-                expected = None
-            else:
-                raise BundleError(f"{where}: unknown judgement kind {j}")
-            if not ok:
+            judgement, expected = judge(unit[field]["stated"], scenes, films)
+            if unit[field]["judgement"] != judgement:
                 raise BundleError(f"{where}: the judgement does not follow from the stated answer")
-            if (expected or ("failed", None)) != (kind, target):
-                raise BundleError(f"{where}: row says {j}, record says {kind}")
-    if unit_processing_mismatch(units):
-        raise BundleError("a unit's processing does not match its judgements")
-    return bundle
-
-
-def unit_processing_mismatch(units):
+            if expected != (kind, target):
+                raise BundleError(f'{where}: row says {judgement["kind"]}, record says {kind}')
     for unit in units:
         kinds = {unit[f]["judgement"]["kind"] for f in FIELDS}
-        if unit["processing"] == "answered":
-            if kinds & {"omitted", "unparsable-chunk"}:
-                return True
-        elif kinds != {unit["processing"]}:
-            return True
-    return False
+        whole = kinds & {"omitted", "unparsable-chunk"}
+        processing = "answered" if not whole else (kinds.pop() if len(kinds) == 1 else None)
+        if unit["processing"] != processing:
+            raise BundleError("a unit's processing does not match its judgements")
+    return bundle
 
 
 def load(path):
@@ -142,7 +176,10 @@ def load(path):
         bundle = json.load(handle)
     if not isinstance(bundle, dict) or bundle.get("schema") != SCHEMA:
         raise BundleError(f"not a {SCHEMA} document")
-    return check(bundle)
+    try:
+        return check(bundle)
+    except (KeyError, TypeError, AttributeError) as error:
+        raise BundleError(f"malformed bundle: {error!r}")
 
 
 def reply_document(bundle):
@@ -171,6 +208,9 @@ def load_directory(directory):
     if not names:
         raise BundleError("no bundles in the directory")
     bundles = {name: load(os.path.join(directory, name)) for name in names}
+    for name, b in bundles.items():
+        if name != f'{b["provenance"]["participant"]}_{b["provenance"]["session"]}.bundle.json':
+            raise BundleError(f"{name} is not named for its participant and session")
     keys = {(b["provenance"]["participant"], b["provenance"]["session"]) for b in bundles.values()}
     if len(keys) != len(bundles):
         raise BundleError("two bundles for one participant-session")

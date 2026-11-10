@@ -122,6 +122,70 @@ class StudyBundle(unittest.TestCase):
 
         self.refused(promote, "row says none, record says failed")
 
+    def test_an_extra_cannot_overwrite_a_prediction(self):
+        def change(b):
+            b["units"][3]["extras"] = {
+                "referent": {"status": "answered", "kind": "scene", "scene": 1},
+                "row": 99,
+            }
+
+        self.refused(change, "an extra uses a row's own key")
+
+    def test_an_unknown_scene_or_film_restated_as_a_known_one_is_refused(self):
+        def scene(b):
+            b["units"][5]["referent"]["stated"]["scene"] = 1
+
+        self.refused(scene, "does not follow from the stated answer")
+
+        def film(b):
+            b["units"][2]["narrative"]["stated"]["film"] = 3
+
+        self.refused(film, "does not follow from the stated answer")
+
+    def test_a_number_must_be_an_integer(self):
+        def boolean(b):
+            b["units"][0]["referent"]["stated"]["scene"] = True
+
+        self.refused(boolean, "not an integer")
+        self.refused(lambda b: b["units"][0].__setitem__("u", "1"), "numbered 1 to n")
+
+    def test_swapped_slots_are_refused(self):
+        def change(b):
+            i = b["interpretations"]
+            i["narrative"], i["referent"] = i["referent"], i["narrative"]
+            for unit in b["units"]:
+                unit["narrative"], unit["referent"] = unit["referent"], unit["narrative"]
+
+        self.refused(change, "slot does not hold")
+
+    def test_a_relabelled_run_is_refused(self):
+        self.refused(
+            lambda b: b["provenance"].__setitem__("model", "another"),
+            "not from the run the bundle names",
+        )
+        self.refused(
+            lambda b: b["provenance"].__setitem__("condition", "automatic"),
+            "slot does not hold",
+        )
+
+    def test_a_failure_keeps_its_own_kind(self):
+        def change(b):
+            b["units"][4]["referent"]["judgement"] = {"kind": "invalid", "reason": "x"}
+
+        self.refused(change, "does not follow from the stated answer")
+
+    def test_a_malformed_bundle_is_refused_not_crashed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            broken = copy.deepcopy(self.bundle)
+            broken["units"][0]["referent"]["stated"] = None
+            del broken["units"][1]["extras"]
+            for i, doc in enumerate((broken, {"schema": study_bundle.SCHEMA, "units": 3})):
+                path = os.path.join(tmp, f"{i}.bundle.json")
+                with open(path, "w", encoding="utf-8") as handle:
+                    json.dump(doc, handle)
+                with self.assertRaises(study_bundle.BundleError):
+                    study_bundle.load(path)
+
     def test_a_non_target_cannot_be_called_a_scene_choice(self):
         def change(b):
             b["units"][1]["referent"]["judgement"]["kind"] = "scene"
@@ -146,7 +210,7 @@ class StudyBundle(unittest.TestCase):
 
     def test_a_dropped_or_repeated_unit_is_refused(self):
         self.refused(lambda b: b["units"].pop(), "do not match")
-        self.refused(lambda b: b["units"][1].__setitem__("u", 1), "appears twice")
+        self.refused(lambda b: b["units"][1].__setitem__("u", 1), "numbered 1 to n")
 
     def test_another_version_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -162,6 +226,13 @@ class StudyBundle(unittest.TestCase):
             os.makedirs(run)
             other = copy.deepcopy(self.bundle)
             other["provenance"]["session"] = "s2"
+            wrong = os.path.join(tmp, "wrong")
+            os.makedirs(wrong)
+            with open(os.path.join(wrong, "p9_s1.bundle.json"), "w", encoding="utf-8") as h:
+                json.dump(self.bundle, h)
+            with self.assertRaises(study_bundle.BundleError) as caught:
+                study_bundle.load_directory(wrong)
+            self.assertIn("not named for", str(caught.exception))
             for name, bundle in (("p1_s1", self.bundle), ("p1_s2", other)):
                 with open(os.path.join(run, name + ".bundle.json"), "w", encoding="utf-8") as h:
                     json.dump(bundle, h)

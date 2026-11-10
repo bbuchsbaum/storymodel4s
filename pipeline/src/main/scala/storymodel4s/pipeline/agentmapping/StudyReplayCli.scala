@@ -127,6 +127,8 @@ object StudyExport:
         else if attempts <= 0 || !suffix.contains("{attempt}") || !unitLine.contains("{u}") ||
           !unitLine.contains("{text}") || !chunkLine.contains("{lo}") || !chunkLine.contains("{hi}")
         then Left("index.json has unusable replay parameters")
+        else if extras.exists(StudyBundle.ReservedKeys) || extras.distinct != extras then
+          Left("an extra uses a row's own key, or is listed twice")
         else if !named then Left("a participant or session name is not a plain name")
         else if !Name.matches(condition) then Left("the condition is not a plain name")
         else if sessions.map(_.name).distinct.size != sessions.size then
@@ -481,7 +483,14 @@ object StudyExport:
       .parse(text)
       .left
       .map(_.message)
-      .flatMap(StudyBundle.decode(_, view, recall))
+      .flatMap(
+        StudyBundle.decode(
+          _,
+          view,
+          recall,
+          StudyBundle.Expected(entry.participant, entry.session, s.units, producer)
+        )
+      )
       .fold(e => refuse(s"${entry.name}: bundle does not reload: $e"), identity)
     if StudyBundle.Fields.exists(f => reread.records(f).digest != records(f).digest) then
       refuse(s"${entry.name}: reloaded bundle differs")
