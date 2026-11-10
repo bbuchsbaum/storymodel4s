@@ -23,6 +23,7 @@ class StudyReplaySuite extends FunSuite:
   private val shown = units.map(line).mkString("\n")
   private val chunks =
     Vector(Chunk(1, 3, s"A\n$shown\nmap 1-3"), Chunk(4, 5, s"A\n$shown\nmap 4-5"))
+  private def asks(c: Chunk) = s"map ${c.lo}-${c.hi}"
   private def suffix(n: Int) = if n == 0 then "" else s" (attempt $n)"
 
   private def serving(table: Map[String, String]): String => Either[ExchangeFailure, ModelReply] =
@@ -37,7 +38,7 @@ class StudyReplaySuite extends FunSuite:
       table: Map[String, String],
       cs: Vector[Chunk] = chunks,
       us: Vector[RecallUnit] = units
-  ) = StudyReplay.session(us, cs, protocol, 3, suffix, line, serving(table))
+  ) = StudyReplay.session(us, cs, protocol, 3, suffix, line, asks, serving(table))
 
   private def item(j: String) = parse(j).toOption.get
   private def reply(items: String*) = s"""{"units": [${items.mkString(",")}]}"""
@@ -137,8 +138,9 @@ class StudyReplaySuite extends FunSuite:
     assertEquals(run(StrictChunked, Map.empty, inside), Left(Failure.PromptOmitsUnit(0, 2)))
 
   test("chunk bounds must be the first and last unit each chunk owns, in order"):
+    // Bounds that still partition the units, but are not what the prompt asked about.
     val shifted = Vector(Chunk(1, 4, chunks(0).prompt), Chunk(5, 5, chunks(1).prompt))
-    assert(run(StrictChunked, Map.empty, shifted).left.exists(_ != Failure.ChunkBounds(0)))
+    assertEquals(run(StrictChunked, Map.empty, shifted), Left(Failure.ChunkBounds(0)))
     val loose = Vector(Chunk(0, 3, chunks(0).prompt), chunks(1))
     assertEquals(run(StrictChunked, Map.empty, loose), Left(Failure.ChunkBounds(0)))
     val wide = Vector(chunks(0), Chunk(4, 9, chunks(1).prompt))

@@ -47,6 +47,7 @@ object StudyExport:
       retrySuffix: String,
       extras: Vector[String],
       unitLine: String,
+      chunkLine: String,
       manifestSha256: String,
       sessions: Vector[Entry]
   )
@@ -75,6 +76,7 @@ object StudyExport:
         suffix <- c.get[String]("retrySuffix")
         extras <- c.get[Vector[String]]("extras")
         unitLine <- c.get[String]("unitLine")
+        chunkLine <- c.get[String]("chunkLine")
         manifest <- c.get[String]("manifestSha256")
         entries <- c.get[Vector[Json]]("sessions")
         sessions <- entries.foldLeft[io.circe.Decoder.Result[Vector[Entry]]](Right(Vector.empty)) {
@@ -98,6 +100,7 @@ object StudyExport:
         suffix,
         extras,
         unitLine,
+        chunkLine,
         manifest,
         sessions
       )
@@ -113,6 +116,7 @@ object StudyExport:
             suffix,
             extras,
             unitLine,
+            chunkLine,
             manifest,
             sessions
           ) =>
@@ -121,7 +125,7 @@ object StudyExport:
         else if Checksum.ofText(system).hex != systemSha then
           Left("the system prompt does not have its recorded hash")
         else if attempts <= 0 || !suffix.contains("{attempt}") || !unitLine.contains("{u}") ||
-          !unitLine.contains("{text}")
+          !unitLine.contains("{text}") || !chunkLine.contains("{lo}") || !chunkLine.contains("{hi}")
         then Left("index.json has unusable replay parameters")
         else if !named then Left("a participant or session name is not a plain name")
         else if sessions.map(_.name).distinct.size != sessions.size then
@@ -141,6 +145,7 @@ object StudyExport:
                 suffix,
                 extras,
                 unitLine,
+                chunkLine,
                 manifest,
                 sessions
               )
@@ -224,6 +229,8 @@ object StudyExport:
     if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
   def line(u: StudyReplay.RecallUnit): String =
     index.unitLine.replace("{u}", u.u.toString).replace("{text}", u.text)
+  def asks(c: StudyReplay.Chunk): String =
+    index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
   val results = index.sessions.map { entry =>
     val s = StudyExport.session(dir, entry).fold(refuse, identity)
     val (replies, receipts) = StudyReplay
@@ -234,6 +241,7 @@ object StudyExport:
         index.attempts,
         suffix,
         line,
+        asks,
         p => TextExchange.replay(recordings, provider, index.model, index.system, p)
       )
       .fold(f => refuse(s"${s.participant} ${s.session}: $f"), identity)

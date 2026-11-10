@@ -169,7 +169,8 @@ object StudyReplay:
         Json.fromFields(head ++ Vector("referent" -> failed(reason), "narrative" -> failed(reason)))
 
   /** Replay one participant-session. `serve` answers one prompt from recordings and never calls a
-    * model; `unitLine` is how a prompt shows one unit.
+    * model; `unitLine` is how a prompt shows one unit, and `chunkLine` how it names the units it
+    * asks about.
     */
   def session(
       units: Vector[RecallUnit],
@@ -178,6 +179,7 @@ object StudyReplay:
       attempts: Int,
       suffix: Int => String,
       unitLine: RecallUnit => String,
+      chunkLine: Chunk => String,
       serve: String => Either[ExchangeFailure, ModelReply]
   ): Either[Failure, (Vector[(RecallUnit, UnitReply)], Vector[Receipt])] =
     def owner(u: Int): Vector[Int] =
@@ -189,6 +191,10 @@ object StudyReplay:
       units.find(u => !lines(unitLine(u))).map(u => Failure.PromptOmitsUnit(i, u.u))
     }.nextOption
     val uncovered = units.find(u => owner(u.u).size != 1).map(u => Failure.UnitOutsideChunks(u.u))
+    // The prompt itself says which units it asks about; the recorded bounds must be those.
+    val asked = chunks.zipWithIndex.collectFirst {
+      case (c, i) if !c.prompt.split('\n').contains(chunkLine(c)) => Failure.ChunkBounds(i)
+    }
     // Each chunk's bounds must be the first and last unit it owns, and the chunks must take the
     // units in order. Otherwise shifted bounds would change which answers the strict rules drop.
     val bounds =
@@ -251,7 +257,7 @@ object StudyReplay:
             )
           }
       }
-    shown.orElse(uncovered).orElse(bounds) match
+    shown.orElse(uncovered).orElse(bounds).orElse(asked) match
       case Some(failure) => Left(failure)
       case None          =>
         val start: Either[Failure, State] = Right((Map.empty, Set.empty, Vector.empty))

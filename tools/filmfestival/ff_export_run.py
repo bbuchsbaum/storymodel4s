@@ -107,6 +107,7 @@ def build(data_root, manifest_path):
         "retrySuffix": tracked["retrySuffix"],
         "extras": list(condition.extras),
         "unitLine": "[{u}] {text}",
+        "chunkLine": "TARGET UNITS: map every unit numbered {lo} through {hi} inclusive.",
         "manifestSha256": ff_map.file_sha(manifest_path),
         "sessions": entries,
     }

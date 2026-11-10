@@ -30,6 +30,7 @@ class StudyExportSuite extends FunSuite:
       "retrySuffix" -> Json.fromString(" (attempt {attempt})"),
       "extras" -> Json.arr(Json.fromString("conf")),
       "unitLine" -> Json.fromString("[{u}] {text}"),
+      "chunkLine" -> Json.fromString("map {lo}-{hi}"),
       "manifestSha256" -> Json.fromString("ab"),
       "sessions" -> sessions.getOrElse(Json.arr(entry))
     )
@@ -81,6 +82,10 @@ class StudyExportSuite extends FunSuite:
     )
     assertEquals(
       bad("unitLine", Json.fromString("{text}")),
+      Left("index.json has unusable replay parameters")
+    )
+    assertEquals(
+      bad("chunkLine", Json.fromString("map")),
       Left("index.json has unusable replay parameters")
     )
     assertEquals(bad("schema", Json.fromString("other")), Left("not a study export"))
