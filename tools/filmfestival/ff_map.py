@@ -61,14 +61,19 @@ def suffix(attempt):
     return "" if attempt == 0 else SUFFIX.format(attempt=attempt)
 
 
-def parse_json(text):
-    """The first JSON object (else array) in a reply, as the Sherlock harness extracted it."""
+def parse_json(text, bare_rows=True):
+    """The first JSON object (else array) in a reply, as the Sherlock harness extracted it.
+
+    `bare_rows` rewrites unquoted row ids (r114) as numbers, which the annotation-assisted reply
+    may contain. A caller whose reply holds free text switches it off.
+    """
     s = text.strip()
     if s.startswith("```"):
         if "\n" not in s:
             raise ValueError("a code fence with no line break")
         s = s.split("\n", 1)[1].rsplit("```", 1)[0]
-    s = re.sub(r"(?<=[\[,\s])r(\d+)(?=[\],\s])", r"\1", s)
+    if bare_rows:
+        s = re.sub(r"(?<=[\[,\s])r(\d+)(?=[\],\s])", r"\1", s)
     for opener, closer in (("{", "}"), ("[", "]")):
         i, j = s.find(opener), s.rfind(closer)
         if i != -1 and j > i:
@@ -128,20 +133,36 @@ def cli_version():
     return done.stdout.strip()
 
 
-def call(model, prompt, system, cache_dir, version, timeout=1800, retries=2):
+def call(
+    model,
+    prompt,
+    system,
+    cache_dir,
+    version,
+    timeout=1800,
+    retries=2,
+    flags=None,
+    cwd=None,
+    key=None,
+):
     """One cached subscription-CLI call; returns its record.
 
     A reply is recorded only if the CLI reports exactly the frozen model; anything else is a
     protocol failure. The record is written whole or not at all.
+
+    Every caller shares this path. `flags` replaces the mapper's CLI flags (the frame describer
+    needs the Read tool), `cwd` replaces the empty working directory, and `key` replaces the
+    cache key of (model, system, prompt) for a caller whose prompt does not identify its input.
     """
-    path = os.path.join(cache_dir, f"{cache_key(model, system, prompt)}.json")
+    path = os.path.join(cache_dir, f"{key or cache_key(model, system, prompt)}.json")
     if os.path.exists(path):
         with open(path, encoding="utf-8") as handle:
             return json.load(handle)
-    cmd = ["claude", "-p", "--model", model, "--system-prompt", system] + CLI_FLAGS
+    cmd = ["claude", "-p", "--model", model, "--system-prompt", system]
+    cmd += CLI_FLAGS if flags is None else flags
     last = None
     for attempt in range(retries + 1):
-        with tempfile.TemporaryDirectory() as cwd:
+        with tempfile.TemporaryDirectory() as empty:
             started = time.time()
             done = subprocess.run(
                 cmd,
@@ -149,7 +170,7 @@ def call(model, prompt, system, cache_dir, version, timeout=1800, retries=2):
                 capture_output=True,
                 text=True,
                 env=child_environment(os.environ),
-                cwd=cwd,
+                cwd=empty if cwd is None else cwd,
                 timeout=timeout,
             )
         try:
