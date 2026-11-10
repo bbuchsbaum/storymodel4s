@@ -11,7 +11,7 @@
     "manifestSha256" : "0000000000000000000000000000000000000000000000000000000000000000",
     "segmentation" : {
       "kind" : "supplied",
-      "artifactSha256" : "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+      "artifactSha256" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac",
       "recipe" : "supplied-units/v1"
     },
     "modelCalls" : 0

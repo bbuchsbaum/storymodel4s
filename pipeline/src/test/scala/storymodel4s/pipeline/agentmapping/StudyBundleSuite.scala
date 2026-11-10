@@ -216,7 +216,9 @@ class StudyBundleSuite extends FunSuite:
 
   private def top(key: String, value: Json)(u: Json): Json = u.mapObject(_.add(key, value))
   private def provenanceSays(key: String, value: String)(b: Json): Json =
-    b.mapObject(o => o.add("provenance", o("provenance").get.mapObject(_.add(key, Json.fromString(value)))))
+    b.mapObject(o =>
+      o.add("provenance", o("provenance").get.mapObject(_.add(key, Json.fromString(value))))
+    )
 
   test("an extra cannot use a row's own key"):
     val smuggled = json("""{"referent":{"status":"answered","kind":"scene","scene":1},"row":99}""")
@@ -226,7 +228,8 @@ class StudyBundleSuite extends FunSuite:
     )
 
   test("a row's number and study key are the study's, in the study's order"):
-    val swapped = unit(0)(top("row", Json.fromInt(11))).andThen(unit(1)(top("row", Json.fromInt(10))))
+    val swapped =
+      unit(0)(top("row", Json.fromInt(11))).andThen(unit(1)(top("row", Json.fromInt(10))))
     assertEquals(edited(swapped).left.toOption, Some("unit rows are not the recall's units"))
     assertEquals(
       edited(unit(0)(top("u", Json.fromString("1")))).left.toOption,
@@ -260,9 +263,13 @@ class StudyBundleSuite extends FunSuite:
       Some("provenance names another model")
     )
     // The record itself is bound to the producer: another model's records do not pass as this one's.
-    val other = expected.copy(producer = StudyRecord.producer("cli", "other", "SYSTEM", view, recall))
+    val other =
+      expected.copy(producer = StudyRecord.producer("cli", "other", "SYSTEM", view, recall))
     assertEquals(
-      StudyBundle.decode(provenanceSays("model", "other")(bundle), view, recall, other).left.toOption,
+      StudyBundle
+        .decode(provenanceSays("model", "other")(bundle), view, recall, other)
+        .left
+        .toOption,
       Some("a unit row disagrees with the narrative record")
     )
     val reworded = expected.copy(producer = StudyRecord.producer("cli", "m", "OTHER", view, recall))

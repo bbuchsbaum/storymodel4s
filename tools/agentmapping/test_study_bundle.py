@@ -241,13 +241,13 @@ class StudyBundle(unittest.TestCase):
             self.assertEqual(sorted(os.listdir(out)), ["p1_s1.json", "p1_s2.json"])
             with self.assertRaises(study_bundle.BundleError):
                 study_bundle.write_replies(run, out)
-            other["provenance"]["model"] = "another"
+            other["provenance"]["manifestSha256"] = "1" * 64
             with open(os.path.join(run, "p1_s2.bundle.json"), "w", encoding="utf-8") as h:
                 json.dump(other, h)
             with self.assertRaises(study_bundle.BundleError) as caught:
                 study_bundle.load_directory(run)
-            self.assertIn("one model", str(caught.exception))
-            other["provenance"].update(model="m", session="s1")
+            self.assertIn("one manifestSha256", str(caught.exception))
+            other["provenance"].update(manifestSha256="0" * 64, session="s1")
             with open(os.path.join(run, "p1_s2.bundle.json"), "w", encoding="utf-8") as h:
                 json.dump(other, h)
             with self.assertRaises(study_bundle.BundleError):

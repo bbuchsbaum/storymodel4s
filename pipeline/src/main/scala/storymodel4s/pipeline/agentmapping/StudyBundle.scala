@@ -13,9 +13,9 @@ import storymodel4s.codec.{ExpectedMappingContext, MappingCodecs}
   * failed. A row keeps what the reply stated and how the source judged it. So a scene that is not a
   * target stays visible with its film, a film-only answer stays apart from no assignment, and a
   * scorer can read the bundle without the records' internals. Rows are built from the judgements
-  * and never parsed back out of a record. Reading a bundle derives every judgement and both
-  * records again and requires the bundle to hold exactly those. A bundle holds source text and unit
-  * ids; keep it outside the repository.
+  * and never parsed back out of a record. Reading a bundle derives every judgement and both records
+  * again and requires the bundle to hold exactly those. A bundle holds source text and unit ids;
+  * keep it outside the repository.
   */
 object StudyBundle:
   val Schema: String = "storymodel4s.agentmapping.bundle/v2"
@@ -206,8 +206,8 @@ object StudyBundle:
   /** What a reader recovers: both records, re-checked, and the unit rows as written. */
   final case class Loaded(records: Map[String, MappingResult], units: Vector[Json])
 
-  /** Keys a self-reported extra may not use: they would overwrite a row's own fields wherever
-    * a row is flattened into a reply file.
+  /** Keys a self-reported extra may not use: they would overwrite a row's own fields wherever a row
+    * is flattened into a reply file.
     */
   val ReservedKeys: Set[String] = Set("u", "row", "unit", "processing") ++ Fields
 
@@ -244,8 +244,8 @@ object StudyBundle:
     * record these rows give under this producer and this condition's policy. That last comparison
     * binds the rows, the source, the recall, the model, the provider and the instruction to the
     * record. Provenance must name the same participant, session, model, provider, instruction and
-    * units. Extras and the source dictionary are descriptions and are read as written, except
-    * that an extra may not use a row's own key.
+    * units. Extras and the source dictionary are descriptions and are read as written, except that
+    * an extra may not use a row's own key.
     */
   def decode(
       bundle: Json,
@@ -268,7 +268,9 @@ object StudyBundle:
       _ <- says("provider", expected.producer.provider)
       _ <- says("systemSha256", expected.producer.systemSha256.hex)
       _ <- Either.cond(
-        p.downField("segmentation").get[String]("artifactSha256").toOption
+        p.downField("segmentation")
+          .get[String]("artifactSha256")
+          .toOption
           .contains(recall.segmentation.artifactSha256.hex) &&
           expected.units.map(_.text) == recall.texts,
         (),
@@ -276,9 +278,11 @@ object StudyBundle:
       )
       units <- c.get[Vector[Json]]("units").left.map(_ => "no units")
       _ <- Either.cond(
-        units.map(_.hcursor.get[String]("unit").toOption) == recall.unitIds.map(u => Some(u.value)) &&
-          units.map(u => (u.hcursor.get[Int]("u").toOption, u.hcursor.downField("row").focus)) ==
-          expected.units.map(u => (Some(u.u), Some(u.row))),
+        units.map(_.hcursor.get[String]("unit").toOption) == recall.unitIds.map(u =>
+          Some(u.value)
+        ) &&
+          units.map(u => (u.hcursor.downField("u").focus, u.hcursor.downField("row").focus)) ==
+          expected.units.map(u => (Some(Json.fromInt(u.u)), Some(u.row))),
         (),
         "unit rows are not the recall's units"
       )
@@ -310,7 +314,8 @@ object StudyBundle:
         units.zipWithIndex.forall { (u, i) =>
           val kinds = Fields.map(f => judged(f)(i).kind).toSet
           val whole = kinds.intersect(Set("omitted", "unparsable-chunk"))
-          val processing = if whole.isEmpty then Some("answered") else Option.when(kinds.size == 1)(kinds.head)
+          val processing =
+            if whole.isEmpty then Some("answered") else Option.when(kinds.size == 1)(kinds.head)
           u.hcursor.get[String]("processing").toOption == processing
         },
         (),
