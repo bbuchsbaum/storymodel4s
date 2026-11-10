@@ -229,8 +229,11 @@ The scorer refuses a reference, annotation or raw-code file whose hash differs f
 manifest's. A session that already has a reply file is never mapped again.
 
 One call per arm with no film or recall content was made on 2026-11-09 to check the model
-identity: asked for each full model id, CLI 2.1.321 reported exactly that model. The CLI version is read once at
-the start of a run and stamped on every record.
+identity: asked for each full model id, CLI 2.1.321 reported exactly that model. The CLI version
+is read once at the start of a run and stamped on every record.
+
+The arm comparison (`tools/filmfestival/ff_compare.py`) was committed while the run was in
+progress and before any reply file existed.
 
 The prompt is the Sherlock v2 prompt with three changes the corpus requires:
 
