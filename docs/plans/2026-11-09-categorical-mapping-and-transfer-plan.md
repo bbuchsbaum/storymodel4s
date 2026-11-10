@@ -184,3 +184,143 @@ alone under that narrower claim.
   recipient combinations that scene labels cannot. Include correct, role-swapped and partly
   wrong recalls. Grow the event representation when it shows useful grounding, analysis,
   inspectability or saved computation; scene accuracy is one possible benefit, not the only one.
+
+## Revision 2026-11-10: the scientific preview
+
+Steps 4a, 4b and T are done (see [Where things stand](#where-things-stand)). This revision sets
+the next milestone and replaces the E and R ordering above. It follows an external review of
+2026-11-10 and the owner's requirement that outputs be uniform across datasets and conditions.
+
+### The milestone
+
+A **scientific preview**: a researcher-usable workflow with a stated claim boundary.
+
+> A researcher can supply timed film descriptions and recall transcripts, obtain auditable
+> scene-localization results through a documented command, inspect every assignment and
+> failure, and reproduce the saved analysis without another model call.
+
+- Video-derived film input uses the same workflow as a separately qualified input mode.
+- Recall audio is a later adapter. It adds transcription error and its own validation problem.
+- The preview is a localization and annotation tool. Other uses of its labels are experimental
+  until they have their own evidence (see [Claim boundary](#claim-boundary)).
+
+### Where things stand
+
+| Result | Figure |
+|---|---|
+| Sherlock development, narrative scene | 79.2% |
+| Sherlock registered read, narrative scene | 75.4%, against 55.2% for the old mapper |
+| FilmFestival annotation-assisted, referent scene | 86.4% and 84.8% by session |
+| FilmFestival automatic input, referent scene | 78.5% and 78.9% |
+
+- **Sherlock development:** 10 participants; the prompt was tuned here.
+- **Sherlock registered read:** 5 participants, 635 units. It is new participants on the same
+  film, and coarse gold statistics had been seen beforehand.
+- **FilmFestival annotation-assisted:** a transfer test; another method had used these
+  participants.
+- **FilmFestival automatic input:** scored; the independent check is pending.
+
+These are not one progression. Sherlock's reference is narrative coding with one scene per unit.
+FilmFestival's is referent coding, and a multi-scene reference counts a hit on any listed scene.
+The units, the grain and the reference differ. Haiku 5.5 is 1 to 2 points below Opus 5.5 with
+annotations and 4 to 9 points below with automatic input.
+
+What exists and is not yet connected:
+
+- an ordinary-file command surface (`studyPrepare`, `mappingRun`; see
+  [the command guide](../guide/mapping-facade.md)) and release qualification work;
+- the categorical bundle and its Python reader, fed only by a Sherlock-specific loader;
+- FilmFestival runs in Python tools that write their own reply and score files;
+- record and replay of model exchanges in the library, with no live call path.
+
+### Deliveries
+
+1. **Release contract.**
+   - Accepted when inputs, output meanings, supported analyses, governance and exclusions are
+     written and agreed, and every retained ticket has an observable acceptance criterion.
+2. **One recorded pipeline.**
+   - Sherlock and FilmFestival pass through the same source, recall and outcome contracts and
+     the same reader.
+   - Recorded predictions survive unit by unit.
+   - A third, synthetic study needs no corpus-specific branch.
+3. **Live execution.**
+   - A fresh authorized study runs from the documented command, with recording, bounded
+     retries, resume, model identity and usage receipts.
+   - Offline replay makes no model call and reproduces the output.
+4. **Ordinary transcripts.**
+   - The existing segmenter is connected, with offsets and provenance kept.
+   - Supplied and automatic units are compared on both corpora, with segmentation error
+     reported apart from mapping error.
+5. **Measurement qualification.**
+   - A report says which uses are supported, unsupported or inconclusive, with uncertainty and
+     full denominators.
+   - Its evidence is blinded double coding, a frozen prospective evaluation, baselines and
+     error analysis.
+6. **Independent usability.**
+   - Someone outside the implementation completes a new study and a documented analysis
+     without help.
+   - That covers installation, a tutorial on shareable data, Python and R readback, cost and
+     run time, troubleshooting and methods guidance.
+
+Order: 1 to 3 are the engineering priority. Preparation for the human coding in 5 starts
+alongside them and does not wait for integration. Documentation grows with the workflow.
+
+**First slice of delivery 2:** FilmFestival recorded responses, into the shared categorical
+bundle, read by the existing independent reader, with every outcome preserved and time answers
+handled explicitly. It tests the common contract before live calls make failures harder to
+diagnose.
+
+Rules that carry over to every delivery:
+
+- Narrative and referent stay separate. Scene answers and time answers stay distinguishable.
+  Missing support and processing failures stay distinct from a reported non-assignment.
+- A new dataset or input condition is an input adapter into the same prediction format, scorer
+  and report. Where that is impossible, the document says so.
+- Evaluation code is frozen and independently reviewed before a corpus is sent to a model, and
+  results are independently recomputed before they are reported. Both caught real defects in
+  each FilmFestival run.
+
+### Measurement qualification (delivery 5)
+
+- **Double coding gives reliability under a rubric, not a universal ceiling.** Narrative and
+  referent coding are defined separately. Coders do not see model answers. Disagreements are
+  kept before adjudication. Ambiguous and unassignable recalls are included. The budget is set
+  after a small timing pilot.
+- **"Unseen data" names its target.** New participants, new films, new annotation styles and
+  automatic inputs are different tests. For the preview's promise the decisive one is a frozen
+  pipeline on unfamiliar films and participants. Whether a model saw a film in training may
+  stay unknown and is reported separately.
+- **Baselines travel with every score.** On FilmFestival a context-free word match scores about
+  39% and knowing the previous reference scene 75% to 83%. A model given only film titles and
+  lengths scored 37% strict, far above the 7% of a uniform guess. Scene agreement on ordered
+  recall has a large floor that comes from structure.
+
+### Claim boundary
+
+Scene agreement does not validate every downstream measure.
+
+| Use | Status for the preview |
+|---|---|
+| Which scene a recall unit refers to or narrates | supported, with stated agreement and limits |
+| Inspecting and correcting assignments | supported |
+| Recall order and chronology | not supported |
+| Fidelity of recalled detail; who did what | experimental |
+| Omissions; comparisons between participants or groups | not yet evaluated |
+
+- Order is unsupported because the mapper reads the surrounding recall, so its labels are not
+  an independent measure of order.
+- The fidelity verifier has not been tested on fresh items.
+
+### Backlog
+
+Mote holds 163 unfinished tickets (130 open, 24 in review, 7 blocked, 2 in progress). Each gets
+one of three dispositions: required for the preview; retained research programme, with its
+rationale kept; superseded or duplicate. A ticket is closed only when its requirement is
+obsolete or met. Work waiting on integration is part of the triage.
+
+### After the preview
+
+The event-representation programme continues as bounded, evaluated capabilities. The first is
+who-did-what in recurring scenes, evaluated on fresh examples once the common workflow is
+usable. Speaker-labelled evidence and fidelity follow as new packet versions against a frozen
+baseline.

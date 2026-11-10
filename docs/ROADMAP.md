@@ -21,6 +21,15 @@ objective and are developed through bounded, evaluated capabilities. Structured 
 introduced where experiments show a benefit. See the
 [working plan](plans/2026-11-09-categorical-mapping-and-transfer-plan.md).
 
+## Next milestone (2026-11-10): scientific preview
+
+A researcher supplies timed film descriptions and recall transcripts, gets auditable
+scene-localization results from a documented command, can inspect every assignment and failure,
+and can reproduce the saved analysis without another model call. The deliveries, the claim
+boundary and the current results are in the
+[working plan's 2026-11-10 revision](plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview).
+M1 and M2 below are done; M3 and M4 follow the preview.
+
 ## Where we are (2026-11-08)
 
 - **Direct LLM mapping reaches 75-79% narrative scene agreement** on Sherlock development
