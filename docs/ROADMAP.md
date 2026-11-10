@@ -27,7 +27,7 @@ A researcher supplies timed film descriptions and recall transcripts, gets audit
 scene-localization results from a documented command, can inspect every assignment and failure,
 and can reproduce the saved analysis without another model call. The deliveries, the claim
 boundary and the current results are in the
-[working plan's 2026-11-10 revision](plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview).
+[working plan][preview-plan], in its 2026-11-10 revision.
 M1 and M2 below are done; M3 and M4 follow the preview.
 
 ## Where we are (2026-11-08)
@@ -225,3 +225,5 @@ See [branch-triage-20261108.md](branch-triage-20261108.md). In order:
 5. Ratify ADR 0001 (status "Proposed") and ADR 0019's 2026-09-23 amendment.
 6. Rule 7 and missing evidence: E3 replaces constant 0.5 terms. Retiring the imputed-neutral
    design (`MayBeImputed`, `missingSemantic` in `align`) needs its own ADR.
+
+[preview-plan]: plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview
