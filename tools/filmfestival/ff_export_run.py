@@ -31,6 +31,9 @@ import ff_map  # noqa: E402
 import ff_packet  # noqa: E402
 
 SCHEMA = "storymodel4s.agentmapping.study-export/v1"
+# The rules by which each condition's replies were read (see StudyReplay.ReplyProtocol). The
+# time conditions read other fields and get a protocol of their own; until then they refuse.
+REPLY_PROTOCOL = {ff_map.ANNOTATION: "strict-chunked/v1"}
 
 
 class ExportError(ValueError):
@@ -42,15 +45,21 @@ def build(data_root, manifest_path):
     with open(manifest_path, encoding="utf-8") as handle:
         tracked = json.load(handle)
     condition_name = tracked.get("condition", ff_map.ANNOTATION)
+    if condition_name not in REPLY_PROTOCOL:
+        raise ExportError(
+            f"no reply protocol is defined yet for the {condition_name} condition"
+        )
     made = ff_map.plan(data_root, tracked.get("model"), condition_name)
     if made["manifest"] != tracked:
         raise ExportError("the rendered run differs from the manifest")
     condition, packet = made["condition"], made["packet"]
     gold_path = ff_map.paths(data_root)[0]
-    times = {
-        (r["participant"], r["run"], int(r["gold_row"])): (r["start_s"], r["end_s"])
-        for r in ff_gold.read_tsv(gold_path)
-    }
+    times = {}
+    for r in ff_gold.read_tsv(gold_path):
+        key = (r["participant"], r["run"], int(r["gold_row"]))
+        if key in times:
+            raise ExportError(f"the reference repeats {key}")
+        times[key] = (r["start_s"], r["end_s"])
     sessions, entries = {}, []
     for entry in tracked["sessions"]:
         participant, session = entry["participant"], entry["session"]
@@ -93,6 +102,7 @@ def build(data_root, manifest_path):
         "system": condition.system,
         "systemSha256": ff_packet.sha(condition.system),
         "chunk": tracked["chunk"],
+        "replyProtocol": REPLY_PROTOCOL[condition_name],
         "attempts": tracked["attempts"],
         "retrySuffix": tracked["retrySuffix"],
         "extras": list(condition.extras),

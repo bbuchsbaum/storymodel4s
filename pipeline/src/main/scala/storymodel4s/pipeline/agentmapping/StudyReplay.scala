@@ -10,7 +10,9 @@ import storymodel4s.provider.agent.{ExchangeFailure, ModelReply}
   * rules. A replay must reproduce what each harness concluded, unit by unit, or the saved results
   * are not the recorded results. The differing rules are therefore one named value, and everything
   * else (the attempt loop, the retry suffix, the lookup by exact prompt text) is shared. Prompts
-  * are opaque: this code renders nothing, so it carries no knowledge of any corpus. It refuses a
+  * are opaque: this code renders nothing, so it knows no film, corpus or packet layout. It does
+  * know the reply contract's field names (`narrative`, `referent` and their `_film` fields); a
+  * study with other judgements would need those named in its export. It refuses a
   * prompt that does not show every unit of the session, because otherwise "the model saw this unit"
   * would rest on whoever exported the prompts.
   */
@@ -31,6 +33,9 @@ object StudyReplay:
     case StrictChunked
 
   object ReplyProtocol:
+    /** A protocol by the name an export records. Names are versioned, so a change of rules is a
+      * new name and an old export cannot be read under new rules by accident.
+      */
     def named(name: String): Option[ReplyProtocol] = name match
       case "coercing-open/v1"  => Some(CoercingOpen)
       case "strict-chunked/v1" => Some(StrictChunked)
@@ -58,6 +63,7 @@ object StudyReplay:
     case BadUnitKey(chunk: Int)
     case PromptOmitsUnit(chunk: Int, unit: Int)
     case UnitOutsideChunks(unit: Int)
+    case ChunkBounds(chunk: Int)
 
   /** What the replies established for one unit, before any judgement is read from it. */
   enum UnitReply:
@@ -176,10 +182,25 @@ object StudyReplay:
   ): Either[Failure, (Vector[(RecallUnit, UnitReply)], Vector[Receipt])] =
     def owner(u: Int): Vector[Int] =
       chunks.zipWithIndex.collect { case (c, i) if c.lo <= u && u <= c.hi => i }
+    // A unit is shown when its line is a whole line of the prompt. A substring test would pass a
+    // truncated text, or a line that happens to occur inside another unit or the film record.
     val shown = chunks.zipWithIndex.iterator.flatMap { (c, i) =>
-      units.find(u => !c.prompt.contains(unitLine(u))).map(u => Failure.PromptOmitsUnit(i, u.u))
+      val lines = c.prompt.split('\n').toSet
+      units.find(u => !lines(unitLine(u))).map(u => Failure.PromptOmitsUnit(i, u.u))
     }.nextOption
     val uncovered = units.find(u => owner(u.u).size != 1).map(u => Failure.UnitOutsideChunks(u.u))
+    // Each chunk's bounds must be the first and last unit it owns, and the chunks must take the
+    // units in order. Otherwise shifted bounds would change which answers the strict rules drop.
+    val bounds =
+      if uncovered.nonEmpty then None
+      else
+        val owned = chunks.indices.toVector.map(i => units.filter(u => owner(u.u).head == i))
+        chunks.indices
+          .find { i =>
+            owned(i).isEmpty || owned(i).head.u != chunks(i).lo || owned(i).last.u != chunks(i).hi
+          }
+          .map(Failure.ChunkBounds(_))
+          .orElse(Option.when(owned.flatten != units)(Failure.ChunkBounds(0)))
     def attempt(ci: Int, prompt: String, n: Int): Either[Failure, (Option[Vector[Json]], Int)] =
       if n == attempts then Right(None -> n)
       else
@@ -230,7 +251,7 @@ object StudyReplay:
             )
           }
       }
-    shown.orElse(uncovered) match
+    shown.orElse(uncovered).orElse(bounds) match
       case Some(failure) => Left(failure)
       case None          =>
         val start: Either[Failure, State] = Right((Map.empty, Set.empty, Vector.empty))

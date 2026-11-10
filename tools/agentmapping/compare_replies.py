@@ -34,6 +34,9 @@ def main(argv):
         print(__doc__, file=sys.stderr)
         return 2
     recorded, replayed = load(argv[0]), load(argv[1])
+    if not recorded or not any(doc["units"] for doc in recorded.values()):
+        print("refused: nothing to compare", file=sys.stderr)
+        return 2
     differences, units = [], 0
     kinds = collections.Counter()
     receipts = collections.Counter()
@@ -60,7 +63,11 @@ def main(argv):
                 kinds[f"{field}:{kind(x[field])}"] += 1
             if x != y:
                 differences.append((name, x.get("u")))
-    print(json.dumps({"files": len(recorded), "units": units, "differences": len(differences)}))
+    print(
+        json.dumps(
+            {"files": len(recorded), "units": units, "differences": len(differences)}
+        )
+    )
     print(json.dumps(dict(sorted(receipts.items()))))
     print(json.dumps(dict(sorted(kinds.items()))))
     for d in differences[:10]:

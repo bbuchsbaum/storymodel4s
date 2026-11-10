@@ -124,6 +124,30 @@ class StudyReplaySuite extends FunSuite:
     val hidden = chunks.updated(1, Chunk(4, 5, chunks(1).prompt.replace("[2] text 2", "[2] other")))
     assertEquals(run(StrictChunked, Map.empty, hidden), Left(Failure.PromptOmitsUnit(1, 2)))
 
+  test("a unit's line must be a whole line of the prompt, not a fragment of one"):
+    def withSecond(text: String) =
+      units.updated(1, RecallUnit(2, Json.fromInt(20), text))
+    // The export says unit 2 is "text", but the prompt showed "[2] text 2".
+    assertEquals(
+      run(StrictChunked, Map.empty, chunks, withSecond("text")),
+      Left(Failure.PromptOmitsUnit(0, 2))
+    )
+    // A line that occurs only inside another line does not count either.
+    val inside = chunks.map(c => c.copy(prompt = c.prompt.replace("[2] text 2", "x [2] text 2 y")))
+    assertEquals(run(StrictChunked, Map.empty, inside), Left(Failure.PromptOmitsUnit(0, 2)))
+
+  test("chunk bounds must be the first and last unit each chunk owns, in order"):
+    val shifted = Vector(Chunk(1, 4, chunks(0).prompt), Chunk(5, 5, chunks(1).prompt))
+    assert(run(StrictChunked, Map.empty, shifted).left.exists(_ != Failure.ChunkBounds(0)))
+    val loose = Vector(Chunk(0, 3, chunks(0).prompt), chunks(1))
+    assertEquals(run(StrictChunked, Map.empty, loose), Left(Failure.ChunkBounds(0)))
+    val wide = Vector(chunks(0), Chunk(4, 9, chunks(1).prompt))
+    assertEquals(run(StrictChunked, Map.empty, wide), Left(Failure.ChunkBounds(1)))
+    val swapped = Vector(Chunk(4, 5, chunks(1).prompt), Chunk(1, 3, chunks(0).prompt))
+    assertEquals(run(StrictChunked, Map.empty, swapped), Left(Failure.ChunkBounds(0)))
+    val empty = chunks :+ Chunk(7, 8, chunks(1).prompt)
+    assertEquals(run(StrictChunked, Map.empty, empty), Left(Failure.ChunkBounds(2)))
+
   test("a unit that no chunk, or more than one chunk, asks about is refused"):
     assertEquals(run(StrictChunked, Map.empty, chunks.take(1)), Left(Failure.UnitOutsideChunks(4)))
     val overlapping = Vector(chunks(0), Chunk(3, 5, chunks(1).prompt))
