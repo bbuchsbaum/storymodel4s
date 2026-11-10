@@ -108,22 +108,48 @@ class ExportSource(unittest.TestCase):
         )
         self.assertEqual(len(out), len(self.rows))
 
-    def test_cartoon_and_title_only_rows_are_marked_and_a_mixed_scene_is_not(self):
+    def test_cartoon_and_title_rows_are_marked_row_by_row(self):
         out, _, _ = ff_export_source.build(self.path)
         film_of, valid = ff_gold.load_dictionary(self.path)
         by_scene = {}
         for row in out:
             by_scene.setdefault(int(row[5]), []).append(row)
-        for scene, rows in by_scene.items():
-            expected = "" if scene in valid else "no"
-            self.assertEqual({r[11] for r in rows}, {expected}, scene)
+        for row in out:
+            title = ff_gold.TITLE_MARK in row[1]
+            expected = "" if int(row[5]) in valid and not title else "no"
+            self.assertEqual(row[11], expected, row[0])
         cartoon = [r for r in out if r[10].startswith("Cartoon intro")]
         self.assertEqual(len(cartoon), 2)
         self.assertEqual({r[11] for r in cartoon}, {"no"})
-        mixed = [rows for rows in by_scene.values() if len(rows) == 2]
+        # One scene mixes a title row with a content row: only the title row is marked, so the
+        # scene is still a target and its first target row is the content row.
+        mixed = [rows for rows in by_scene.values() if len({r[11] for r in rows}) == 2]
         self.assertEqual(len(mixed), 1)
         self.assertIn(ff_gold.TITLE_MARK, mixed[0][0][1])
-        self.assertEqual([r[11] for r in mixed[0]], ["", ""])
+        self.assertEqual([r[11] for r in mixed[0]], ["no", ""])
+        self.assertIn(int(mixed[0][0][5]), valid)
+        # A scene is a target exactly when any of its rows is.
+        targets = {
+            scene for scene, rows in by_scene.items() if any(r[11] == "" for r in rows)
+        }
+        self.assertEqual(targets, set(valid))
+
+    def test_each_films_first_target_row_is_its_first_row_that_is_not_a_title_card(
+        self,
+    ):
+        out, _, _ = ff_export_source.build(self.path)
+        first = {}
+        for row in out:
+            if row[11] == "":
+                first.setdefault(row[9], row)
+        for row in first.values():
+            self.assertNotIn(ff_gold.TITLE_MARK, row[1])
+        earlier_titles = [
+            r
+            for r in out
+            if r[11] == "no" and r[9] in first and int(r[0]) < int(first[r[9]][0])
+        ]
+        self.assertTrue(earlier_titles)
 
     def test_groups_collections_and_labels(self):
         out, _, _ = ff_export_source.build(self.path)
@@ -187,7 +213,7 @@ class ExportSource(unittest.TestCase):
             lines[:6],
             [
                 f"rows={len(self.rows)}",
-                f"targetRows={11}",
+                f"targetRows={10}",
                 "groups=22",
                 "collections=12",
                 "targetGroupCount=10",

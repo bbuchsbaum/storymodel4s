@@ -119,6 +119,19 @@ renderer is delivery 3's job, with the exported prompts as its test.
    - Sherlock record digests equal the existing bundles; no corpus name remains in the generic
      path.
 
+## Carried into slice 2 from the review of slice 1
+
+- **The universe must come from the source.** The view derives its target scenes and films, but
+  a caller can still declare a wider universe. The bundle builder takes the universe from the
+  view, and the reader checks the record's universe against the regenerated view.
+- **Targets and the digest.** Row target marks are in the artifact checksum, and so in every
+  node id, when a source comes through the file codec. A source built directly with a
+  caller-supplied artifact id does not carry them in its digest. The pipeline builds sources
+  only through the codec.
+- A collection that spans two parts is reported as unlocated, the rule groups already follow.
+- Part extents written by the FilmFestival exporter are the annotation's coverage, not media
+  durations.
+
 ## Notes
 
 - The interval-table hash of the Python tools is over rounded text. Matching it is not an

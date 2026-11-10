@@ -131,7 +131,13 @@ def build(annotation_path):
                 "",
                 str(collection),
                 labels[collection],
-                "" if scene in valid else NOT_TARGET,
+                # A row is a target unless its scene is not a valid target or the row itself is
+                # a title card. A scene that mixes a title row with content (one exists) keeps
+                # the content row, so the scene stays a target and its first target row is the
+                # first content row, which is where the film's clip starts.
+                ""
+                if scene in valid and ff_gold.TITLE_MARK not in r["description"]
+                else NOT_TARGET,
             ]
         )
     parts = [
