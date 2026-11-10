@@ -21,7 +21,8 @@ class StudyReplaySuite extends FunSuite:
   private val units = (1 to 5).toVector.map(i => RecallUnit(i, Json.fromInt(i * 10), s"text $i"))
   private def line(u: RecallUnit) = s"[${u.u}] ${u.text}"
   private val shown = units.map(line).mkString("\n")
-  private val chunks = Vector(Chunk(1, 3, s"A\n$shown\nmap 1-3"), Chunk(4, 5, s"A\n$shown\nmap 4-5"))
+  private val chunks =
+    Vector(Chunk(1, 3, s"A\n$shown\nmap 1-3"), Chunk(4, 5, s"A\n$shown\nmap 4-5"))
   private def suffix(n: Int) = if n == 0 then "" else s" (attempt $n)"
 
   private def serving(table: Map[String, String]): String => Either[ExchangeFailure, ModelReply] =
@@ -78,9 +79,13 @@ class StudyReplaySuite extends FunSuite:
       s"""{"x": 1}""",
       "7"
     )
-    val (replies, receipts) = run(StrictChunked, Map(first, chunks(1).prompt -> reply())).toOption.get
+    val (replies, receipts) =
+      run(StrictChunked, Map(first, chunks(1).prompt -> reply())).toOption.get
     assertEquals(receipts, Vector(Receipt(0, 1, true, 6, 0), Receipt(1, 1, true, 0, 0)))
-    assertEquals(replies.map(_._2.isInstanceOf[UnitReply.Answered]), Vector(true, false, false, false, false))
+    assertEquals(
+      replies.map(_._2.isInstanceOf[UnitReply.Answered]),
+      Vector(true, false, false, false, false)
+    )
     // Unit 4 was answered only by the first chunk's reply, which it does not belong to.
     assertEquals(replies(3)._2, UnitReply.Omitted)
 
@@ -90,8 +95,12 @@ class StudyReplaySuite extends FunSuite:
       s"""{"u": 3.7, $ok}""",
       s"""{"u": 4, "narrative": 9}"""
     )
-    val (replies, receipts) = run(CoercingOpen, Map(first, chunks(1).prompt -> reply())).toOption.get
-    assertEquals(replies.map(_._2.isInstanceOf[UnitReply.Answered]), Vector(false, true, true, true, false))
+    val (replies, receipts) =
+      run(CoercingOpen, Map(first, chunks(1).prompt -> reply())).toOption.get
+    assertEquals(
+      replies.map(_._2.isInstanceOf[UnitReply.Answered]),
+      Vector(false, true, true, true, false)
+    )
     assertEquals(receipts.map(_.itemsOutsideChunk), Vector(0, 0))
     val bad = chunks(0).prompt -> reply("""{"x": 1}""")
     assertEquals(run(CoercingOpen, Map(bad, second)), Left(Failure.BadUnitKey(0)))
@@ -105,7 +114,10 @@ class StudyReplaySuite extends FunSuite:
     assertEquals(receipts.head.repeatedUnits, 1)
     replies.head._2 match
       case UnitReply.Answered(i) =>
-        assertEquals(StudyReplay.stated(StrictChunked, i, "referent"), Stated.Scene(4, Json.fromInt(1)))
+        assertEquals(
+          StudyReplay.stated(StrictChunked, i, "referent"),
+          Stated.Scene(4, Json.fromInt(1))
+        )
       case other => fail(other.toString)
 
   test("a prompt that does not show a unit of the session is refused"):
@@ -121,7 +133,9 @@ class StudyReplaySuite extends FunSuite:
     def strict(j: String) = StudyReplay.strictInteger(item(j))
     assertEquals(strict("5"), Some(BigInt(5)))
     assertEquals(strict("-2"), Some(BigInt(-2)))
-    Vector("5.0", "5e0", "\"5\"", "true", "null", "[5]").foreach(j => assertEquals(strict(j), None, j))
+    Vector("5.0", "5e0", "\"5\"", "true", "null", "[5]").foreach(j =>
+      assertEquals(strict(j), None, j)
+    )
 
   test("strict judgements: scene, film without a scene, nothing, and three kinds of failure"):
     def read(j: String) = StudyReplay.stated(StrictChunked, item(j), "referent")
@@ -133,8 +147,14 @@ class StudyReplaySuite extends FunSuite:
     assertEquals(read("""{"referent_film": 2}"""), Stated.Invalid("missing-field"))
     assertEquals(read("""{"referent": "7", "referent_film": 2}"""), Stated.Invalid("invalid-scene"))
     assertEquals(read("""{"referent": 7.0, "referent_film": 2}"""), Stated.Invalid("invalid-scene"))
-    assertEquals(read("""{"referent": null, "referent_film": "two"}"""), Stated.Invalid("invalid-film"))
-    assertEquals(read("""{"referent": null, "referent_film": true}"""), Stated.Invalid("invalid-film"))
+    assertEquals(
+      read("""{"referent": null, "referent_film": "two"}"""),
+      Stated.Invalid("invalid-film")
+    )
+    assertEquals(
+      read("""{"referent": null, "referent_film": true}"""),
+      Stated.Invalid("invalid-film")
+    )
 
   test("open judgements read the scene field alone"):
     def read(j: String) = StudyReplay.stated(CoercingOpen, item(j), "narrative")
@@ -159,9 +179,21 @@ class StudyReplaySuite extends FunSuite:
     assertEquals(StudyReplay.prediction(Stated.NoAssignment), none)
     val omitted = StudyReplay.unitRow(StrictChunked, units(1), UnitReply.Omitted, Vector("conf"))
     val failure = item("""{"status": "failed", "reason": "omitted"}""")
-    assertEquals(omitted, Json.obj("u" -> Json.fromInt(2), "row" -> Json.fromInt(20), "referent" -> failure, "narrative" -> failure))
-    val unparsable = StudyReplay.unitRow(StrictChunked, units(1), UnitReply.UnparsableChunk, Vector.empty)
-    assertEquals(unparsable.hcursor.downField("referent").get[String]("reason").toOption, Some("unparsable-chunk"))
+    assertEquals(
+      omitted,
+      Json.obj(
+        "u" -> Json.fromInt(2),
+        "row" -> Json.fromInt(20),
+        "referent" -> failure,
+        "narrative" -> failure
+      )
+    )
+    val unparsable =
+      StudyReplay.unitRow(StrictChunked, units(1), UnitReply.UnparsableChunk, Vector.empty)
+    assertEquals(
+      unparsable.hcursor.downField("referent").get[String]("reason").toOption,
+      Some("unparsable-chunk")
+    )
 
   test("protocols are named, and an unknown name is not a protocol"):
     assertEquals(ReplyProtocol.named("strict-chunked/v1"), Some(StrictChunked))

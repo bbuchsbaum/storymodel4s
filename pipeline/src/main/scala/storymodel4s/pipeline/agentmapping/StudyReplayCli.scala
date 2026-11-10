@@ -8,8 +8,8 @@ import storymodel4s.core.Checksum
 import storymodel4s.provider.agent.{Recordings, TextExchange}
 
 /** A study's replay inputs as exported (`storymodel4s.agentmapping.study-export/v1`): the system
-  * prompt, the reply rules' parameters, and per participant-session its units and recorded
-  * prompts. Nothing in it names a corpus-specific rule.
+  * prompt, the reply rules' parameters, and per participant-session its units and recorded prompts.
+  * Nothing in it names a corpus-specific rule.
   */
 object StudyExport:
   val Schema: String = "storymodel4s.agentmapping.study-export/v1"
@@ -66,7 +66,11 @@ object StudyExport:
               hashes <- e.hcursor.get[Vector[String]]("promptSha256")
             yield done :+ (file -> hashes)
           }
-        yield (schema, systemSha, Index(model, condition, system, attempts, suffix, extras, unitLine, manifest, sessions))
+        yield (
+          schema,
+          systemSha,
+          Index(model, condition, system, attempts, suffix, extras, unitLine, manifest, sessions)
+        )
       read.left.map(_ => "index.json is malformed").flatMap { (schema, systemSha, value) =>
         if schema != Schema then Left("not a study export")
         else if Checksum.ofText(value.system).hex != systemSha then
@@ -187,7 +191,10 @@ object StudyExport:
   }
   Files.createDirectories(out): scala.Unit
   results.foreach { (name, doc, _, _) =>
-    Files.write(out.resolve(name), (doc.spaces2 + "\n").getBytes(StandardCharsets.UTF_8)): scala.Unit
+    Files.write(
+      out.resolve(name),
+      (doc.spaces2 + "\n").getBytes(StandardCharsets.UTF_8)
+    ): scala.Unit
   }
   println(
     s"replayed sessions=${results.size} units=${results.map(_._3).sum} " +

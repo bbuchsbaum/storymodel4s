@@ -8,11 +8,11 @@ import storymodel4s.provider.agent.{ExchangeFailure, ModelReply}
   *
   * Why: the two research harnesses that produced our recordings read replies by slightly different
   * rules. A replay must reproduce what each harness concluded, unit by unit, or the saved results
-  * are not the recorded results. The differing rules are therefore one named value, and
-  * everything else (the attempt loop, the retry suffix, the lookup by exact prompt text) is shared.
-  * Prompts are opaque: this code renders nothing, so it carries no knowledge of any corpus. It
-  * refuses a prompt that does not show every unit of the session, because otherwise "the model saw
-  * this unit" would rest on whoever exported the prompts.
+  * are not the recorded results. The differing rules are therefore one named value, and everything
+  * else (the attempt loop, the retry suffix, the lookup by exact prompt text) is shared. Prompts
+  * are opaque: this code renders nothing, so it carries no knowledge of any corpus. It refuses a
+  * prompt that does not show every unit of the session, because otherwise "the model saw this unit"
+  * would rest on whoever exported the prompts.
   */
 object StudyReplay:
 
@@ -24,9 +24,9 @@ object StudyReplay:
       */
     case CoercingOpen
 
-    /** The second harness: a unit key must be an integer literal; an item that is not for a unit
-      * of the chunk asked about is dropped and counted; a judgement needs both its scene field
-      * and its film field.
+    /** The second harness: a unit key must be an integer literal; an item that is not for a unit of
+      * the chunk asked about is dropped and counted; a judgement needs both its scene field and its
+      * film field.
       */
     case StrictChunked
 
@@ -100,23 +100,25 @@ object StudyReplay:
     protocol match
       case ReplyProtocol.CoercingOpen =>
         scene match
-          case None                 => Stated.Invalid("missing-field")
-          case Some(s) if s.isNull  => Stated.NoAssignment
-          case Some(s)              =>
-            s.asNumber.flatMap(_.toBigInt).fold(Stated.Invalid("invalid-scene"))(
-              Stated.Scene(_, Json.Null)
-            )
+          case None                => Stated.Invalid("missing-field")
+          case Some(s) if s.isNull => Stated.NoAssignment
+          case Some(s)             =>
+            s.asNumber
+              .flatMap(_.toBigInt)
+              .fold(Stated.Invalid("invalid-scene"))(
+                Stated.Scene(_, Json.Null)
+              )
       case ReplyProtocol.StrictChunked =>
         (scene, fields.flatMap(_(s"${field}_film"))) match
           case (Some(s), Some(film)) =>
             strictInteger(s) match
-              case Some(n)            => Stated.Scene(n, film)
-              case None if !s.isNull  => Stated.Invalid("invalid-scene")
-              case None               =>
+              case Some(n)           => Stated.Scene(n, film)
+              case None if !s.isNull => Stated.Invalid("invalid-scene")
+              case None              =>
                 strictInteger(film) match
-                  case Some(f)              => Stated.Collection(f)
-                  case None if film.isNull  => Stated.NoAssignment
-                  case None                 => Stated.Invalid("invalid-film")
+                  case Some(f)             => Stated.Collection(f)
+                  case None if film.isNull => Stated.NoAssignment
+                  case None                => Stated.Invalid("invalid-film")
           case _ => Stated.Invalid("missing-field")
 
   private def failed(reason: String): Json =
@@ -135,11 +137,11 @@ object StudyReplay:
         )
       case Stated.Collection(film) =>
         answered("kind" -> Json.fromString("film"), "film" -> Json.fromBigInt(film))
-      case Stated.NoAssignment   => answered("kind" -> Json.fromString("none"))
+      case Stated.NoAssignment    => answered("kind" -> Json.fromString("none"))
       case Stated.Invalid(reason) => failed(reason)
 
-  /** One unit's row of a reply file: both judgements, and the extra fields the condition asked
-    * for, each as the reply gave it or null. A unit with no answer has only its two failures.
+  /** One unit's row of a reply file: both judgements, and the extra fields the condition asked for,
+    * each as the reply gave it or null. A unit with no answer has only its two failures.
     */
   def unitRow(
       protocol: ReplyProtocol,
@@ -183,7 +185,7 @@ object StudyReplay:
       else
         serve(prompt + suffix(n)) match
           case Left(ExchangeFailure.RecordingMissing(_)) => Left(Failure.Unrecorded(ci, n))
-          case Left(other) => Left(Failure.Exchange(ci, n, other.code.toString))
+          case Left(other)  => Left(Failure.Exchange(ci, n, other.code.toString))
           case Right(reply) =>
             AgentReplay
               .parseReply(reply.text)
@@ -204,12 +206,20 @@ object StudyReplay:
                 case ReplyProtocol.CoercingOpen =>
                   key
                     .toRight(Failure.BadUnitKey(ci))
-                    .map(k => (map.updated(k, item), outside, repeated + (if map.contains(k) then 1 else 0)))
+                    .map(k =>
+                      (map.updated(k, item), outside, repeated + (if map.contains(k) then 1 else 0))
+                    )
                 case ReplyProtocol.StrictChunked =>
                   key.filter(k => item.isObject && c.lo <= k && k <= c.hi) match
                     case None    => Right((map, outside + 1, repeated))
                     case Some(k) =>
-                      Right((map.updated(k, item), outside, repeated + (if map.contains(k) then 1 else 0)))
+                      Right(
+                        (
+                          map.updated(k, item),
+                          outside,
+                          repeated + (if map.contains(k) then 1 else 0)
+                        )
+                      )
             }
           }
           .map { (map, outside, repeated) =>
@@ -228,9 +238,11 @@ object StudyReplay:
           .foldLeft(start) { case (acc, (c, ci)) => acc.flatMap(take(_, c, ci)) }
           .map { (answers, acceptedChunks, receipts) =>
             units.map { u =>
-              u -> answers.get(u.u).fold(
-                if acceptedChunks(owner(u.u).head) then UnitReply.Omitted
-                else UnitReply.UnparsableChunk
-              )(UnitReply.Answered(_))
+              u -> answers
+                .get(u.u)
+                .fold(
+                  if acceptedChunks(owner(u.u).head) then UnitReply.Omitted
+                  else UnitReply.UnparsableChunk
+                )(UnitReply.Answered(_))
             } -> receipts
           }
