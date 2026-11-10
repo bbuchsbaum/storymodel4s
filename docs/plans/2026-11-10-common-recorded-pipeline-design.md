@@ -161,11 +161,19 @@ without Scala, and `ff_score.py score` accepts a directory of them in place of r
 - A row holds each judgement twice: as the reply stated it, in the form a scorer reads, and as
   the library decided it against the source. A scene that is not a target keeps its scene and
   film there, although the record holds only a failure.
-- Reading re-checks everything that can be derived: each record through the mapping codec, each
-  judgement from its stated answer and this source, and each row against both records. The
-  Python reader makes the same row checks from the bundle's own source dictionary. The scorer
-  also requires each judgement to be the kind it gives the same stated answer itself.
+- The library's reader takes the regenerated source, recall, study units and producer, and
+  trusts nothing a row says. It derives every judgement again from its stated answer, builds
+  both records again from those judgements, and requires the bundle to hold exactly those rows
+  and records. That binds each row's number and study key, the model, the provider, the
+  instruction, the source and the recall to the record.
+- The Python reader has only the bundle. It derives each judgement again from the stated answer
+  and the bundle's source dictionary, requires each record to hold that outcome and to name the
+  bundle's condition, model, provider, instruction and units, and refuses an extra that uses a
+  row's own key. It cannot check that row keys are the study's or that a record is intact; the
+  library's reader does. The scorer also requires each judgement to be the kind it gives the
+  same stated answer against the annotation.
 - Rows are keyed by the study's unit number and row key, within a participant and session.
+- Bundles of a time condition are refused by the scorer until slice 4 reads them.
 - The v1 bundle and its reader are unchanged. Sherlock moves to v2 in slice 5.
 - A bundle is about 4.7 MB for a 170-unit session, because each of its two records repeats the
   recall inventory and the source's nodes. Files are written compact for that reason.
