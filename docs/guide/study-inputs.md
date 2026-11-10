@@ -91,6 +91,38 @@ pipe-separated terms. The part file is an array of objects containing `part`,
 timebase is seconds per tick. Declare the complete extent explicitly. Annotation endpoints do
 not establish the duration or a common clock across parts.
 
+### Collections and targets
+
+A source whose groups belong to larger wholes (scenes in several films) uses the second header:
+the nine columns above, in the same order, followed by these three.
+
+```csv
+collection,collection_label,target
+```
+
+- `collection` and `collection_label` name the collection of the row's group: a positive
+  ordinal, unique among collections, and a label. Both are filled or both are empty.
+- A row with a collection needs a group. Every row of a group names the same collection, and
+  either every group has a collection or none has.
+- `target` is empty, or `no` for a row that is source content and not something a mapping may
+  choose (a title card, material outside the study). Any other value refuses.
+
+Collections become nodes one level above groups, and each group's parent is its collection. A
+group is a target if any of its rows is; a collection is a target if any of its groups is. Rows,
+groups and collections that are not targets stay in the source. A mapping that answers with
+scenes or whole films declares the target groups and target collections as its universe.
+A collection has a physical location only when all its located rows are in one part.
+The embedding-surface rendering that scored mappings use does not yet render a collection and
+refuses a source that has them. Sources with collections serve categorical producers.
+
+A file is read under the header it carries. Its header is part of its identity, so the same rows
+under the two headers are different sources, and a file with the first header keeps the
+identity it had before the second existed. Print what a file declares, without its text, with:
+
+```sh
+sbt 'pipeline/runMain storymodel4s.pipeline.timedSourceSummary annotations.csv parts.json'
+```
+
 These declarations identify annotation coverage. Checksums are computed by the adapter; no media
 edition or picture stream is asserted. Checked media replay has its own registration. Point events remain points, group
 support preserves gaps, and unlocated descendants remain visible. No story-world order is

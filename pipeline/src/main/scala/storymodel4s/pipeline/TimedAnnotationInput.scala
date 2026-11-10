@@ -7,6 +7,9 @@ import storymodel4s.codec.TimedSourceArtifactCodec
 object TimedAnnotationInput:
   val Header: Vector[String] = TimedSourceArtifactCodec.Header
 
+  /** The header that adds a collection level and a per-row target mark. */
+  val HeaderV2: Vector[String] = TimedSourceArtifactCodec.HeaderV2
+
   def prepare(csv: Array[Byte], descriptor: Array[Byte]): Either[String, TimedSourceView] =
     TimedSourceArtifactCodec.prepare(csv, descriptor)
 
