@@ -1,0 +1,67 @@
+{
+ "post_hoc": true,
+ "schema": "storymodel4s.filmfestival.transfer-baselines/v1",
+ "sessions": {
+  "run-01": {
+   "hits": {
+    "copy_forward_oracle": 945,
+    "lexical_jaccard": 610,
+    "lexical_tfidf": 920,
+    "lexical_tfidf_given_film": 1105,
+    "mapper": 1989,
+    "modal_scene_per_film_given_film": 284,
+    "order_oracle": 1764
+   },
+   "n": 2335,
+   "rates": {
+    "copy_forward_oracle": 0.40471092077087795,
+    "lexical_jaccard": 0.26124197002141325,
+    "lexical_tfidf": 0.39400428265524623,
+    "lexical_tfidf_given_film": 0.4732334047109208,
+    "mapper": 0.8518201284796574,
+    "modal_scene_per_film_given_film": 0.12162740899357602,
+    "order_oracle": 0.7554603854389722
+   },
+   "within_one_scene": {
+    "hits": 2231,
+    "rate": 0.9554603854389722
+   },
+   "wrong_scene": {
+    "adjacent": 242,
+    "n": 326,
+    "same_film": 326
+   }
+  },
+  "run-02": {
+   "hits": {
+    "copy_forward_oracle": 244,
+    "lexical_jaccard": 118,
+    "lexical_tfidf": 179,
+    "lexical_tfidf_given_film": 215,
+    "mapper": 397,
+    "modal_scene_per_film_given_film": 67,
+    "order_oracle": 391
+   },
+   "n": 471,
+   "rates": {
+    "copy_forward_oracle": 0.5180467091295117,
+    "lexical_jaccard": 0.2505307855626327,
+    "lexical_tfidf": 0.38004246284501064,
+    "lexical_tfidf_given_film": 0.4564755838641189,
+    "mapper": 0.8428874734607219,
+    "modal_scene_per_film_given_film": 0.14225053078556263,
+    "order_oracle": 0.8301486199575372
+   },
+   "within_one_scene": {
+    "hits": 448,
+    "rate": 0.9511677282377919
+   },
+   "wrong_scene": {
+    "adjacent": 51,
+    "n": 71,
+    "same_film": 71
+   }
+  }
+ },
+ "valid_scene_targets": 203
+}
