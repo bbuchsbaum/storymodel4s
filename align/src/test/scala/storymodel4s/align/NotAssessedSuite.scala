@@ -81,3 +81,16 @@ class NotAssessedSuite extends FunSuite:
       model.externalCost(assertion, ExternalState.Commentary),
       model.externalFloor + model.externalMismatch
     )
+
+  test("an unassessed unit has no preferred level, so no level pays a granularity cost"):
+    val model = DefaultLocalCostModel()
+    val view = AnnaFixture.view
+    def granularity(f: DiscourseFunction) = view.nodes.map { node =>
+      node.level -> model.cost(unit(f), node, FidelityMode.Faithful, view).terms(CostTerm.Granularity)
+    }
+    assert(view.nodes.map(_.level).distinct.size > 1, "the fixture needs more than one level")
+    assert(granularity(DiscourseFunction.NotAssessed).forall(_._2 == 0.0))
+    // The same contentless unit, assessed as an assertion, prefers a scene and pays elsewhere.
+    val assertion = granularity(DiscourseFunction.EpisodicAssertion)
+    assert(assertion.exists((level, cost) => level != 1 && cost > 0.0))
+    assert(assertion.filter(_._1 == 1).forall(_._2 == 0.0))
