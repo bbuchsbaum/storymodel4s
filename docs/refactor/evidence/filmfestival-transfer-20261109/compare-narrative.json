@@ -1,0 +1,110 @@
+{
+ "agreement": {
+  "run-01": {
+   "both_scene": 2388,
+   "n": 2682,
+   "same": 2348,
+   "same_scene": 2119
+  },
+  "run-02": {
+   "both_scene": 496,
+   "n": 544,
+   "same": 468,
+   "same_scene": 433
+  }
+ },
+ "field": "narrative",
+ "schema": "storymodel4s.filmfestival.transfer-arm-comparison/v1",
+ "sessions": {
+  "run-01": {
+   "film_reference": {
+    "by_participant": {
+     "sub-01": 0.0,
+     "sub-02": 0.0,
+     "sub-07": 0.0,
+     "sub-08": 0.0,
+     "sub-09": 0.0,
+     "sub-10": 0.0,
+     "sub-11": 0.0,
+     "sub-12": 0.0,
+     "sub-13": 0.0,
+     "sub-14": 0.0,
+     "sub-16": 0.0,
+     "sub-17": 0.0,
+     "sub-18": 0.0,
+     "sub-19": 0.0,
+     "sub-20": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.0
+    ],
+    "mean_difference": 0.0,
+    "participants": 15,
+    "secondary_higher": 0,
+    "secondary_lower": 0
+   },
+   "scene": {
+    "by_participant": {
+     "sub-01": -0.05882352941176472,
+     "sub-02": -0.00917431192660545,
+     "sub-07": 0.0,
+     "sub-08": 0.0,
+     "sub-09": -0.013071895424836666,
+     "sub-10": 0.00990099009900991,
+     "sub-11": -0.009049773755656076,
+     "sub-12": -0.05633802816901401,
+     "sub-13": -0.036231884057971064,
+     "sub-14": -0.011235955056179803,
+     "sub-16": 0.04166666666666663,
+     "sub-17": 0.00877192982456132,
+     "sub-18": -0.018867924528301883,
+     "sub-19": -0.030864197530864224,
+     "sub-20": 0.033333333333333326
+    },
+    "interval95": [
+     -0.023858671162469928,
+     0.0037011484674144427
+    ],
+    "mean_difference": -0.009998971995841514,
+    "participants": 15,
+    "secondary_higher": 4,
+    "secondary_lower": 9
+   }
+  },
+  "run-02": {
+   "film_reference": {
+    "by_participant": {
+     "sub-08": 0.0,
+     "sub-10": 0.0,
+     "sub-16": 0.0,
+     "sub-18": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.0
+    ],
+    "mean_difference": 0.0,
+    "participants": 4,
+    "secondary_higher": 0,
+    "secondary_lower": 0
+   },
+   "scene": {
+    "by_participant": {
+     "sub-08": -0.015503875968992165,
+     "sub-10": -0.03875968992248058,
+     "sub-16": -0.01538461538461533,
+     "sub-18": 0.027027027027027084
+    },
+    "interval95": [
+     -0.032915921288014266,
+     0.016394301278022272
+    ],
+    "mean_difference": -0.010655288562265247,
+    "participants": 4,
+    "secondary_higher": 1,
+    "secondary_lower": 3
+   }
+  }
+ }
+}
