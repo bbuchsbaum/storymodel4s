@@ -158,7 +158,9 @@ object StudyExport:
     */
   def unitsChecksum(units: Vector[StudyReplay.RecallUnit]): Checksum =
     Checksum.ofText(
-      units.map(u => Json.arr(Json.fromInt(u.u), u.row, Json.fromString(u.text)).noSpaces).mkString("\n")
+      units
+        .map(u => Json.arr(Json.fromInt(u.u), u.row, Json.fromString(u.text)).noSpaces)
+        .mkString("\n")
     )
 
   def index(dir: Path): Either[String, Index] = json(dir.resolve("index.json")).flatMap(parseIndex)
