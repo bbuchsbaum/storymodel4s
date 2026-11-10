@@ -56,8 +56,9 @@ The second session's interval resamples four participants.
 | 4 The Shoe | 90.3% | 134 | | 9 Post-it Love | 89.3% | 84 |
 | 5 Keith Reynolds | 85.8% | 360 | | 10 Bus Stop | 86.3% | 314 |
 
-The range is 82.6% to 92.4%, with no visible advantage for the two commercial excerpts (films 1
-and 5). The five wordless films (2, 4, 6, 8, 9) are not lower than the others. Second-session
+The range is 82.6% to 92.4%. The two commercial excerpts (films 1 and 7) show no consistent
+advantage: film 1 is among the highest and film 7 is the lowest. The five wordless films (2, 4,
+6, 8, 9) are not lower than the others. Second-session
 per-film counts are small (19 to 139) and are in the score file.
 
 ## Film identity, Opus 5.5

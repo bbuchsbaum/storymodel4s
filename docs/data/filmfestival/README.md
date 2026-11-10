@@ -37,9 +37,11 @@ Neither remaining item blocks analysis. §3 bars *committing* recall prose to Gi
 reading the staged bytes from the git-ignored data root, which is where they live and stay.
 
 No video is committed. The release withholds it: *"Due to copyright issues, we are not uploading the
-movie video files."* Public copies of eight films and the cartoon, with their trimmed clips, are
-staged locally, git-ignored, at `data/filmfestival/media`; the two commercial excerpts are not.
-`media-manifest.json` identifies those files without their content. `data/filmfestival/FILMS.md`
+movie video files."* Public copies of all ten films and the cartoon, with their trimmed clips, are
+staged locally, git-ignored, at `data/filmfestival/media`. The two commercial excerpts (Catch Me
+If You Can and The Prisoner) were added on 2026-10-20; until then they were absent.
+`media-manifest.json` identifies the files without their content. It predates that addition and
+does not list the two excerpts. `data/filmfestival/FILMS.md`
 records where public copies of each film are, for local research use; it names commercial works and
 is itself not for Git admission.
 
@@ -96,7 +98,10 @@ project-authored `FILMS.md`.
   fitted on Sherlock's 97.9% non-decreasing scene index, must be re-fitted on a development split
   rather than inherited.
 - **Five of the ten films contain no speech.** Anything leaning on transcript will behave differently
-  here, and the captioning lane has no video for the two commercial excerpts.
+  here. (Since 2026-10-20 the captioning lane has video for every film; see above.) Speech
+  recognition exists for all eleven clips under
+  `data/transcription/unified-v1/full/whisper_mlx/filmfestival/`; the five wordless films have
+  complete transcripts with no segments.
 - **`filmfest-textdata` covers six films, not ten**, and its `cmiyc_long` is a longer cut than the
   346 s presented in the scanner, so its onsets are not interchangeable with the fMRI clock without
   care. Its value is a second, independent, crowd-sourced segmentation on the same timeline —
