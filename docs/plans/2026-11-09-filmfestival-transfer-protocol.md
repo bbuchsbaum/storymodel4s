@@ -21,6 +21,27 @@ on first recall sessions and scored for film identity only (about 67%). No scene
 no LLM has been run. No partition was ever drawn. Annotation descriptions were visible in those
 runs.
 
+## Arms
+
+Amended 2026-11-09, before any corpus content was sent to a model, on the owner's decision.
+
+| Arm | Model | Role |
+|---|---|---|
+| Primary | `claude-opus-5-5` | the method that produced the Sherlock development result |
+| Secondary | `claude-haiku-5-5` | the same prompts and packet with a cheaper model |
+
+- The transfer claim is about the primary arm. The secondary arm asks whether the cheaper model
+  holds up on this corpus; it is a different method and is always labelled as such.
+- Both arms send byte-identical prompts. Their manifests differ only in the model.
+- Each arm runs without sight of the other's replies. Neither is scored until both have finished.
+- The arms are compared within participant: the difference in each participant's scene agreement,
+  per session, with an interval from resampling participants. Agreement between the two arms'
+  answers is reported as a description.
+- Why a second arm: a development scout on Sherlock (recorded in the
+  [mapper plan](2026-11-08-sherlock-mapper-plan.md)) put Haiku 5.5 within about one point of
+  Opus 5.5 (78.2 against 79.2), with an interval that includes zero. That is development data on
+  a coarser task, so it motivates the comparison and does not answer it.
+
 ## Inputs
 
 | Input | File under `data/filmfestival/` | SHA-256 |
@@ -162,9 +183,9 @@ participant-session has exactly one reply file.
 
 - **Model and calls.** The same model and call path as the Sherlock development runs. Those runs
   asked for the alias `opus`, and every one of their 260 recorded calls reported
-  `claude-opus-5-5`. This run names `claude-opus-5-5` exactly, so the alias cannot move.
-  - A call whose reply reports any other model, or more than one, stops the run and is not
-    recorded.
+  `claude-opus-5-5`. Each arm here names its model exactly, so an alias cannot move.
+  - A call whose reply reports any model but its arm's, or more than one, stops the run and is
+    not recorded.
   - Calls go through the subscription CLI with the API key removed. The run refuses to start if
     a variable that would route calls elsewhere is set.
   - The CLI version and the reported model are recorded with every call and in every reply file.
@@ -184,8 +205,11 @@ participant-session has exactly one reply file.
 ## Freeze
 
 Frozen values, produced by `tools/filmfestival/ff_map.py manifest` with no model call. The
-manifest is [manifest.json](../refactor/evidence/filmfestival-transfer-20261109/manifest.json);
-`ff_map.py run` refuses unless what it renders equals that manifest.
+manifests are
+[manifest-opus.json](../refactor/evidence/filmfestival-transfer-20261109/manifest-opus.json) and
+[manifest-haiku.json](../refactor/evidence/filmfestival-transfer-20261109/manifest-haiku.json).
+`ff_map.py run` takes its arm from the manifest it is given and refuses unless what it renders
+equals that manifest.
 
 | Item | Value |
 |---|---|
@@ -195,17 +219,17 @@ manifest is [manifest.json](../refactor/evidence/filmfestival-transfer-20261109/
 | Reference, annotation, raw codes | SHA-256 of each, in the manifest |
 | Participant-sessions | 19 (15 first, 4 second) |
 | Utterances | 3,226 |
-| Calls, before retries | 63, each prompt hashed in the manifest |
+| Calls, before retries | 63 per arm, each prompt hashed in the manifest |
 | Longest prompt | 121,435 characters; a prompt over 400,000 refuses the run |
-| Model, chunk, attempts | `claude-opus-5-5`, 60, 3 |
+| Models, chunk, attempts | `claude-opus-5-5` and `claude-haiku-5-5`; 60; 3 |
 | CLI flags and retry suffix | in the manifest |
 
 The run compares what it renders with the tracked manifest, not with a copy beside its output.
 The scorer refuses a reference, annotation or raw-code file whose hash differs from the
 manifest's. A session that already has a reply file is never mapped again.
 
-One call with no film or recall content was made on 2026-11-09 to check the model identity: asked
-for `claude-opus-5-5`, CLI 2.1.321 reported exactly that model. The CLI version is read once at
+One call per arm with no film or recall content was made on 2026-11-09 to check the model
+identity: asked for each full model id, CLI 2.1.321 reported exactly that model. The CLI version is read once at
 the start of a run and stamped on every record.
 
 The prompt is the Sherlock v2 prompt with three changes the corpus requires:

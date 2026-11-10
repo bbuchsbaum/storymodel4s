@@ -4,9 +4,11 @@
 Protocol: docs/plans/2026-11-09-filmfestival-transfer-protocol.md.
 
 Usage:
-    ff_map.py manifest DATA_ROOT OUT_DIR      render every prompt and write their hashes; no calls
+    ff_map.py manifest DATA_ROOT OUT_DIR MODEL   render every prompt and write hashes; no calls
     ff_map.py run DATA_ROOT OUT_DIR MANIFEST [--jobs N] [--only sub-01_run-01,...]
-    ff_map.py smoke OUT_DIR                   one call with no corpus content, to check the model
+    ff_map.py smoke OUT_DIR MODEL                one call with no corpus content
+
+MODEL is one of the two arms (see ARMS). `run` takes its arm from MANIFEST.
 
 DATA_ROOT is the repository's data directory. OUT_DIR must be outside the repository's tracked
 files (it holds recall text in the recorded prompts). MANIFEST is the tracked, frozen manifest;
@@ -34,9 +36,10 @@ import ff_codes  # noqa: E402
 import ff_gold  # noqa: E402
 import ff_packet  # noqa: E402
 
-# The model the Sherlock development runs reported for the `opus` alias, named exactly so that
-# the alias cannot move underneath the evaluation.
-MODEL = "claude-opus-5-5"
+# The two arms, each named exactly so that an alias cannot move underneath the evaluation. The
+# primary arm is the model the Sherlock development runs reported for the `opus` alias.
+PRIMARY = "claude-opus-5-5"
+ARMS = (PRIMARY, "claude-haiku-5-5")
 CLI_FLAGS = ["--tools", "", "--no-session-persistence", "--setting-sources", ""]
 CLI_FLAGS += ["--strict-mcp-config", "--output-format", "json"]
 # Variables that would route a call away from the owner's subscription.
@@ -112,8 +115,8 @@ def child_environment(environ):
     return {k: v for k, v in environ.items() if k != "ANTHROPIC_API_KEY"}
 
 
-def cache_key(system, prompt):
-    return ff_packet.sha(json.dumps([MODEL, system, prompt]))
+def cache_key(model, system, prompt):
+    return ff_packet.sha(json.dumps([model, system, prompt]))
 
 
 def cli_version():
@@ -125,17 +128,17 @@ def cli_version():
     return done.stdout.strip()
 
 
-def call(prompt, system, cache_dir, version, timeout=1800, retries=2):
+def call(model, prompt, system, cache_dir, version, timeout=1800, retries=2):
     """One cached subscription-CLI call; returns its record.
 
     A reply is recorded only if the CLI reports exactly the frozen model; anything else is a
     protocol failure. The record is written whole or not at all.
     """
-    path = os.path.join(cache_dir, f"{cache_key(system, prompt)}.json")
+    path = os.path.join(cache_dir, f"{cache_key(model, system, prompt)}.json")
     if os.path.exists(path):
         with open(path, encoding="utf-8") as handle:
             return json.load(handle)
-    cmd = ["claude", "-p", "--model", MODEL, "--system-prompt", system] + CLI_FLAGS
+    cmd = ["claude", "-p", "--model", model, "--system-prompt", system] + CLI_FLAGS
     last = None
     for attempt in range(retries + 1):
         with tempfile.TemporaryDirectory() as cwd:
@@ -163,10 +166,10 @@ def call(prompt, system, cache_dir, version, timeout=1800, retries=2):
             time.sleep(10 * (attempt + 1))
             continue
         reported = sorted((doc.get("modelUsage") or {}).keys())
-        if reported != [MODEL]:
-            raise ProtocolFailure(f"the CLI reported models {reported}, not {MODEL}")
+        if reported != [model]:
+            raise ProtocolFailure(f"the CLI reported models {reported}, not {model}")
         record = {
-            "model": MODEL,
+            "model": model,
             "cliVersion": version,
             "systemSha": ff_packet.sha(system),
             "promptSha": ff_packet.sha(prompt),
@@ -211,7 +214,7 @@ def codes_text(data_root):
     return "\n".join(lines) + "\n"
 
 
-def manifest(data_root):
+def manifest(data_root, model):
     """Everything a run will send, by hash, and the reference it will be scored against.
 
     Returns (packet, raw-code table text, manifest).
@@ -248,7 +251,8 @@ def manifest(data_root):
         codes,
         {
             "schema": MANIFEST_SCHEMA,
-            "model": MODEL,
+            "model": model,
+            "primaryArm": model == PRIMARY,
             "cliFlags": CLI_FLAGS,
             "chunk": CHUNK,
             "attempts": ATTEMPTS,
@@ -271,7 +275,7 @@ def manifest(data_root):
     )
 
 
-def map_session(packet, gold_path, participant, session, cache_dir, version):
+def map_session(model, packet, gold_path, participant, session, cache_dir, version):
     units = ff_packet.units(gold_path, participant, session)
     answered, accepted_chunk, receipts = {}, {}, []
     for index, (lo, hi, prompt) in enumerate(ff_packet.chunks(packet, units, CHUNK)):
@@ -279,7 +283,7 @@ def map_session(packet, gold_path, participant, session, cache_dir, version):
         for attempt in range(ATTEMPTS):
             used = attempt + 1
             record = call(
-                prompt + suffix(attempt), ff_packet.SYSTEM, cache_dir, version
+                model, prompt + suffix(attempt), ff_packet.SYSTEM, cache_dir, version
             )
             try:
                 parsed = parse_json(record["result"])["units"]
@@ -332,7 +336,7 @@ def map_session(packet, gold_path, participant, session, cache_dir, version):
     return {
         "participant": participant,
         "session": session,
-        "model": MODEL,
+        "model": model,
         "cliVersion": version,
         "chunks": receipts,
         "units": out,
@@ -367,12 +371,17 @@ def selected(todo, only):
     return chosen if len(chosen) == len(wanted) else None
 
 
+def write_text(path, text):
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(text)
+
+
 def main(argv):
-    ap = argparse.ArgumentParser()
-    if len(argv) == 2 and argv[0] == "smoke":
-        # No film or recall content: only whether the CLI reports exactly the frozen model.
+    if len(argv) == 3 and argv[0] == "smoke" and argv[2] in ARMS:
+        # No film or recall content: only whether the CLI reports exactly the named model.
         os.makedirs(argv[1], exist_ok=True)
         record = call(
+            argv[2],
             "Reply with the single word: ready",
             "You are a test probe.",
             argv[1],
@@ -380,38 +389,39 @@ def main(argv):
         )
         print(json.dumps({k: record[k] for k in ("model", "modelUsage", "cliVersion")}))
         return 0
-    ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=["manifest", "run"])
-    ap.add_argument("data_root")
-    ap.add_argument("out_dir")
-    ap.add_argument("manifest", nargs="?")
-    ap.add_argument("--jobs", type=int, default=4)
-    ap.add_argument("--only")
-    args = ap.parse_args(argv)
-    packet, codes, doc = manifest(args.data_root)
-    if args.command == "manifest":
-        manifest_path = os.path.join(args.out_dir, "manifest.json")
+    if len(argv) == 4 and argv[0] == "manifest" and argv[3] in ARMS:
+        data_root, out_dir, model = argv[1:]
+        manifest_path = os.path.join(out_dir, "manifest.json")
         if os.path.exists(manifest_path):
             print("refused: manifest exists", file=sys.stderr)
             return 2
-        os.makedirs(args.out_dir, exist_ok=True)
-        with open(manifest_path, "w", encoding="utf-8") as handle:
-            json.dump(doc, handle, indent=1, sort_keys=True)
-            handle.write("\n")
-        with open(
-            os.path.join(args.out_dir, "packet.txt"), "w", encoding="utf-8"
-        ) as handle:
-            handle.write(packet)
-        with open(
-            os.path.join(args.out_dir, "scene-codes.tsv"), "w", encoding="utf-8"
-        ) as handle:
-            handle.write(codes)
-        print(
-            json.dumps(
-                {k: doc[k] for k in ("packetSha256", "systemSha256", "calls", "model")}
-            )
-        )
+        packet, codes, doc = manifest(data_root, model)
+        os.makedirs(out_dir, exist_ok=True)
+        write_text(manifest_path, json.dumps(doc, indent=1, sort_keys=True) + "\n")
+        write_text(os.path.join(out_dir, "packet.txt"), packet)
+        write_text(os.path.join(out_dir, "scene-codes.tsv"), codes)
+        keys = ("packetSha256", "systemSha256", "calls", "model", "primaryArm")
+        print(json.dumps({k: doc[k] for k in keys}))
         return 0
+    ap = argparse.ArgumentParser()
+    ap.add_argument("command", choices=["run"])
+    ap.add_argument("data_root")
+    ap.add_argument("out_dir")
+    ap.add_argument("manifest")
+    ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--only")
+    try:
+        args = ap.parse_args(argv)
+    except SystemExit:
+        print(__doc__, file=sys.stderr)
+        return 2
+    # The arm is whatever the tracked manifest names; it is never chosen on the command line.
+    with open(args.manifest, encoding="utf-8") as handle:
+        model = json.load(handle).get("model")
+    if model not in ARMS:
+        print("refused: the manifest names no known arm", file=sys.stderr)
+        return 2
+    packet, _, doc = manifest(args.data_root, model)
     gold_path = paths(args.data_root)[0]
     todo = selected(sessions(gold_path), args.only)
     why = refusal(args, doc, os.environ, todo)
@@ -423,20 +433,18 @@ def main(argv):
     os.makedirs(cache_dir, exist_ok=True)
     os.makedirs(replies_dir, exist_ok=True)
     version = cli_version()
+
+    def one(key):
+        return map_session(model, packet, gold_path, key[0], key[1], cache_dir, version)
+
     with ThreadPoolExecutor(args.jobs) as pool:
-        results = list(
-            pool.map(
-                lambda k: map_session(
-                    packet, gold_path, k[0], k[1], cache_dir, version
-                ),
-                todo,
-            )
-        )
+        results = list(pool.map(one, todo))
     for result in results:
         name = f"{result['participant']}_{result['session']}.json"
-        with open(os.path.join(replies_dir, name), "w", encoding="utf-8") as handle:
-            json.dump(result, handle, indent=1)
-    print(f"sessions={len(results)} units={sum(len(r['units']) for r in results)}")
+        write_text(os.path.join(replies_dir, name), json.dumps(result, indent=1))
+    print(
+        f"model={model} sessions={len(results)} units={sum(len(r['units']) for r in results)}"
+    )
     return 0
 
 

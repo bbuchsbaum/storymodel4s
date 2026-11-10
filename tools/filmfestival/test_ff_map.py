@@ -189,14 +189,14 @@ class Run(Fixture):
     def run_session(self, replies):
         seen = []
 
-        def fake(prompt, system, cache_dir, version):
+        def fake(model, prompt, system, cache_dir, version):
             seen.append(prompt)
             return {"result": replies[len(seen) - 1]}
 
         self.patch(ff_map, "call", fake)
         self.patch(ff_map, "CHUNK", 3)
         return ff_map.map_session(
-            self.packet, self.gold, "p1", "run-01", None, "cli 1.0"
+            ff_map.PRIMARY, self.packet, self.gold, "p1", "run-01", None, "cli 1.0"
         ), seen
 
     def test_omitted_units_and_unparsable_chunks_are_different_failures(self):
@@ -228,7 +228,7 @@ class Run(Fixture):
         self.assertTrue(seen[2].endswith("(attempt 1)."))
         self.assertTrue(seen[3].endswith("(attempt 2)."))
         self.assertEqual(
-            (result["model"], result["cliVersion"]), (ff_map.MODEL, "cli 1.0")
+            (result["model"], result["cliVersion"]), (ff_map.PRIMARY, "cli 1.0")
         )
 
     def test_referent_and_narrative_are_not_swapped_and_repeats_are_counted(self):
@@ -252,7 +252,7 @@ class Run(Fixture):
         self.assertEqual(result["chunks"][0]["repeatedUnits"], 1)
 
     def test_manifest_counts_and_refuses_an_oversized_prompt(self):
-        _, codes, doc = ff_map.manifest(self.root)
+        _, codes, doc = ff_map.manifest(self.root, ff_map.PRIMARY)
         self.assertEqual(codes, self.codes)
         self.assertEqual(doc["calls"], 2)
         self.assertEqual([s["units"] for s in doc["sessions"]], [5, 1])
@@ -261,10 +261,10 @@ class Run(Fixture):
         self.assertEqual(doc["codesSha256"], ff_packet.sha(self.codes))
         self.patch(ff_map, "MAX_PROMPT_CHARS", 100)
         with self.assertRaises(ff_gold.GoldError):
-            ff_map.manifest(self.root)
+            ff_map.manifest(self.root, ff_map.PRIMARY)
 
     def test_run_refuses_without_the_frozen_manifest_or_with_rerouted_calls(self):
-        _, _, doc = ff_map.manifest(self.root)
+        _, _, doc = ff_map.manifest(self.root, ff_map.PRIMARY)
         tracked = os.path.join(self.dir.name, "tracked.json")
         write(tracked, json.dumps(doc))
         out = os.path.join(self.dir.name, "out")
@@ -283,7 +283,7 @@ class Run(Fixture):
         )
 
     def test_a_finished_session_is_never_overwritten_but_others_may_still_run(self):
-        _, _, doc = ff_map.manifest(self.root)
+        _, _, doc = ff_map.manifest(self.root, ff_map.PRIMARY)
         tracked = os.path.join(self.dir.name, "tracked.json")
         write(tracked, json.dumps(doc))
         out = os.path.join(self.dir.name, "out")
@@ -295,6 +295,27 @@ class Run(Fixture):
         )
         self.assertIsNone(ff_map.refusal(args, doc, {}, [("p1", "run-02")]))
 
+    def test_the_two_arms_send_identical_prompts_and_differ_only_in_the_model(self):
+        opus, haiku = ff_map.ARMS
+        self.assertEqual((opus, haiku), ("claude-opus-5-5", "claude-haiku-5-5"))
+        _, _, a = ff_map.manifest(self.root, opus)
+        _, _, b = ff_map.manifest(self.root, haiku)
+        self.assertEqual((a["primaryArm"], b["primaryArm"]), (True, False))
+        differing = {k for k in a if a[k] != b[k]}
+        self.assertEqual(differing, {"model", "primaryArm"})
+
+    def test_a_reply_must_come_from_the_arm_that_was_asked(self):
+        def fake_run(cmd, **kwargs):
+            body = {"result": "ok", "modelUsage": {"claude-opus-5-5": {}}}
+            return argparse.Namespace(stdout=json.dumps(body), returncode=0)
+
+        self.patch(ff_map.subprocess, "run", fake_run)
+        cache = os.path.join(self.dir.name, "cache")
+        os.makedirs(cache)
+        with self.assertRaises(ff_map.ProtocolFailure):
+            ff_map.call("claude-haiku-5-5", "P", "S", cache, "cli 9")
+        self.assertEqual(os.listdir(cache), [])
+
     def test_only_selects_named_sessions_and_refuses_unknown_ones(self):
         todo = [("p1", "run-01"), ("p1", "run-02")]
         self.assertEqual(ff_map.selected(todo, None), todo)
@@ -304,8 +325,16 @@ class Run(Fixture):
     def test_the_api_key_is_removed_and_the_cache_key_depends_on_the_prompt(self):
         env = ff_map.child_environment({"ANTHROPIC_API_KEY": "k", "HOME": "/h"})
         self.assertEqual(env, {"HOME": "/h"})
-        self.assertNotEqual(ff_map.cache_key("s", "a"), ff_map.cache_key("s", "b"))
-        self.assertNotEqual(ff_map.cache_key("s", "a"), ff_map.cache_key("t", "a"))
+        opus, haiku = ff_map.ARMS
+        self.assertNotEqual(
+            ff_map.cache_key(opus, "s", "a"), ff_map.cache_key(opus, "s", "b")
+        )
+        self.assertNotEqual(
+            ff_map.cache_key(opus, "s", "a"), ff_map.cache_key(opus, "t", "a")
+        )
+        self.assertNotEqual(
+            ff_map.cache_key(opus, "s", "a"), ff_map.cache_key(haiku, "s", "a")
+        )
 
 
 def workbook(path, rows):
@@ -409,31 +438,34 @@ class Call(unittest.TestCase):
         return commands
 
     def test_a_reply_is_recorded_whole_with_the_cli_version_and_reused(self):
-        commands = self.cli({ff_map.MODEL: {}})
+        commands = self.cli({ff_map.PRIMARY: {}})
         os.environ["ANTHROPIC_API_KEY"] = "k"
         self.addCleanup(os.environ.pop, "ANTHROPIC_API_KEY", None)
-        record = ff_map.call("P", "S", self.dir.name, "cli 9")
+        record = ff_map.call(ff_map.PRIMARY, "P", "S", self.dir.name, "cli 9")
         self.assertEqual((record["result"], record["cliVersion"]), ("ok", "cli 9"))
-        self.assertEqual(record["modelUsage"], [ff_map.MODEL])
+        self.assertEqual(record["modelUsage"], [ff_map.PRIMARY])
         self.assertEqual(
-            os.listdir(self.dir.name), [ff_map.cache_key("S", "P") + ".json"]
+            os.listdir(self.dir.name),
+            [ff_map.cache_key(ff_map.PRIMARY, "S", "P") + ".json"],
         )
         cmd, kwargs = commands[0]
-        self.assertEqual(cmd[:4], ["claude", "-p", "--model", ff_map.MODEL])
+        self.assertEqual(cmd[:4], ["claude", "-p", "--model", ff_map.PRIMARY])
         self.assertNotIn("ANTHROPIC_API_KEY", kwargs["env"])
         self.assertEqual(kwargs["input"], "P")
-        self.assertEqual(ff_map.call("P", "S", self.dir.name, "cli 9"), record)
+        self.assertEqual(
+            ff_map.call(ff_map.PRIMARY, "P", "S", self.dir.name, "cli 9"), record
+        )
         self.assertEqual(len(commands), 1)
 
     def test_a_reply_from_another_model_is_a_protocol_failure_and_is_not_recorded(self):
         for usage in (
             {"claude-haiku-5-5": {}},
-            {ff_map.MODEL: {}, "claude-haiku-5-5": {}},
+            {ff_map.PRIMARY: {}, "claude-haiku-5-5": {}},
             {},
         ):
             self.cli(usage)
             with self.assertRaises(ff_map.ProtocolFailure):
-                ff_map.call("P", "S", self.dir.name, "cli 9")
+                ff_map.call(ff_map.PRIMARY, "P", "S", self.dir.name, "cli 9")
             self.assertEqual(os.listdir(self.dir.name), [])
 
 

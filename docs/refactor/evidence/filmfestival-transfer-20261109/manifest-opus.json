@@ -53,6 +53,7 @@
    "scene_specific": 471
   }
  },
+ "primaryArm": true,
  "retrySuffix": "\n\nReply with strictly valid JSON only (attempt {attempt}).",
  "scenes": 216,
  "schema": "storymodel4s.filmfestival.transfer-manifest/v2",
