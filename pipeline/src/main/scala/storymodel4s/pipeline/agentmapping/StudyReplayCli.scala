@@ -279,3 +279,99 @@ object StudyExport:
     s"replayed sessions=${results.size} units=${results.map(_._3).sum} " +
       s"exchanges=${results.map(_._4).sum} modelCalls=0"
   )
+
+/** CLI: `agentStudyRecords SOURCE_CSV PARTS_JSON EXPORT_DIR RECORDINGS_DIR PROVIDER OUTPUT_FILE`.
+  *
+  * Replays every participant-session of an exported study, with no model client, and builds its
+  * two checked categorical records (narrative, referent) over the timed source and the supplied
+  * recall units. It writes a receipt of counts by judgement and each record's digest; it writes
+  * no bundle yet. A record that does not construct refuses the run. The receipt holds no text.
+  */
+@main def agentStudyRecords(
+    sourceCsv: String,
+    partsJson: String,
+    exportDir: String,
+    recordingsDir: String,
+    provider: String,
+    outputFile: String
+): scala.Unit =
+  def refuse(msg: String): Nothing =
+    System.err.println(s"refused: $msg")
+    sys.exit(2)
+  val out = Path.of(outputFile)
+  if Files.exists(out) then refuse("output exists")
+  def bytes(p: String): Array[Byte] =
+    try Files.readAllBytes(Path.of(p))
+    catch case NonFatal(_) => refuse(s"cannot read $p")
+  val view = storymodel4s.codec.TimedSourceArtifactCodec
+    .prepareChecked(bytes(sourceCsv), bytes(partsJson))
+    .fold(r => refuse(s"source: $r"), identity)
+  val dir = Path.of(exportDir)
+  val index = StudyExport.index(dir).fold(refuse, identity)
+  val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => refuse(e.message), identity)
+  def suffix(n: Int): String =
+    if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
+  def line(u: StudyReplay.RecallUnit): String =
+    index.unitLine.replace("{u}", u.u.toString).replace("{text}", u.text)
+  def asks(c: StudyReplay.Chunk): String =
+    index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
+  val fields = Vector("narrative", "referent")
+  def tally(xs: Vector[String]): Json =
+    Json.fromFields(xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size)))
+  val sessions = index.sessions.map { entry =>
+    val s = StudyExport.session(dir, entry).fold(refuse, identity)
+    val (replies, _) = StudyReplay
+      .session(
+        s.units,
+        s.chunks,
+        index.protocol,
+        index.attempts,
+        suffix,
+        line,
+        asks,
+        p => TextExchange.replay(recordings, provider, index.model, index.system, p)
+      )
+      .fold(f => refuse(s"${entry.name}: $f"), identity)
+    val artifact = Checksum.ofBytes(bytes(dir.resolve(entry.file).toString))
+    val recall = PreparedRecall
+      .supplied(entry.name, s.units.map(_.text), artifact)
+      .fold(e => refuse(s"${entry.name}: $e"), identity)
+    val producer = StudyRecord.producer(provider, index.model, index.system, view, recall)
+    val perField = fields.map { field =>
+      val judgements = replies.map((_, r) => StudyRecord.judge(view, index.protocol, r, field))
+      val policy = StudyRecord.policy(index.condition, index.protocolName, field)
+      val record = StudyRecord
+        .record(field, policy, recall, view, producer, judgements)
+        .fold(e => refuse(s"${entry.name} $field: ${e.message}"), identity)
+      (field, judgements.map(_.kind), record.digest.hex)
+    }
+    (entry, s.units.size, perField)
+  }
+  val doc = Json.obj(
+    "schema" -> Json.fromString("storymodel4s.agentmapping.study-records-receipt/v1"),
+    "model" -> Json.fromString(index.model),
+    "condition" -> Json.fromString(index.condition),
+    "protocol" -> Json.fromString(index.protocolName),
+    "sourceArtifact" -> Json.fromString(view.artifact.hex),
+    "sourceRepresentation" -> Json.fromString(view.representation.digest.hex),
+    "modelCalls" -> Json.fromInt(0),
+    "units" -> Json.fromInt(sessions.map(_._2).sum),
+    "judgements" -> Json.fromFields(fields.map { field =>
+      field -> tally(sessions.flatMap(_._3.filter(_._1 == field).flatMap(_._2)))
+    }),
+    "sessions" -> Json.fromValues(sessions.map { (entry, units, perField) =>
+      Json.obj(
+        "participant" -> Json.fromString(entry.participant),
+        "session" -> Json.fromString(entry.session),
+        "units" -> Json.fromInt(units),
+        "records" -> Json.fromFields(perField.map { (field, kinds, digest) =>
+          field -> Json.obj("digest" -> Json.fromString(digest), "judgements" -> tally(kinds))
+        })
+      )
+    })
+  )
+  Files.write(out, (doc.spaces2 + "\n").getBytes(StandardCharsets.UTF_8)): scala.Unit
+  println(
+    s"records sessions=${sessions.size} units=${sessions.map(_._2).sum} modelCalls=0 " +
+      doc.hcursor.downField("judgements").focus.fold("")(_.noSpaces)
+  )

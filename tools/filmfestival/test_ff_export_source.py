@@ -101,7 +101,10 @@ class ExportSource(unittest.TestCase):
         self.assertEqual(facts["collections"], 12)
         self.assertEqual(facts["targetGroups"], sorted(valid))
         self.assertEqual(len(valid), 10)
-        self.assertEqual(facts["targetCollections"], [2, 3, 4, 5, 6, 8, 9, 10, 11, 12])
+        # A film's collection is its film number; the cartoon intros take 11 and 12.
+        self.assertEqual(facts["targetCollections"], list(range(1, 11)))
+        cartoon = sorted({int(r[9]) for r in out if r[10].startswith("Cartoon intro")})
+        self.assertEqual(cartoon, [11, 12])
         self.assertEqual(
             facts["collectionOfFilmCode"],
             {str(code): c for code, c in zip(range(1, 11), facts["targetCollections"])},
@@ -154,8 +157,10 @@ class ExportSource(unittest.TestCase):
     def test_groups_collections_and_labels(self):
         out, _, _ = ff_export_source.build(self.path)
         self.assertEqual(out[0][5:7], ["1", "scene 1"])
-        self.assertEqual(out[0][9:11], ["1", "Cartoon intro 1"])
-        self.assertEqual(out[-1][9:11], ["12", "Invented Film 12"])
+        # The first row is the first cartoon intro (collection 11); the last film in presentation
+        # order is the tenth film (collection 10), whatever its position among the twelve.
+        self.assertEqual(out[0][9:11], ["11", "Cartoon intro 1"])
+        self.assertEqual(out[-1][9:11], ["10", "Invented Film 12"])
         self.assertEqual([r[0] for r in out], [str(n) for n in range(1, len(out) + 1)])
         self.assertEqual({r[2] for r in out}, {"run-01", "run-02"})
 

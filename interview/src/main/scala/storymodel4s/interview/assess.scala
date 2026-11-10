@@ -57,6 +57,9 @@ object MemoryAddress:
     case DiscourseFunction.TaskCommentary =>
       Some(Discourse(InterviewDiscourseFunction.TaskCommentary))
     case DiscourseFunction.Uninterpretable => Some(Unresolved)
+    // The interview pipeline classifies its own units. One that arrives unassessed has no
+    // address it could be given, so it is unresolved, never an episode by default.
+    case DiscourseFunction.NotAssessed => Some(Unresolved)
 
 /** Traditional facet of an internal detail. */
 enum DetailFacet:

@@ -139,11 +139,20 @@ object AgentMappingRecord:
       interpretation: Interpretation,
       producer: Producer
   ): Either[MappingRefusal, (StageLedger, UnitStageRefs)] =
+    ledgerFor(interpretation.policy, producer)
+
+  /** The stage ledger of a recorded categorical producer: the decision stage carries the
+    * producer's receipt, and every other stage is marked as not run.
+    */
+  private[agentmapping] def ledgerFor(
+      policy: DecisionPolicyId,
+      producer: Producer
+  ): Either[MappingRefusal, (StageLedger, UnitStageRefs)] =
     for
       identity <- ProviderIdentity.of(producer.provider, producer.model, producer.identity)
       receipt <- StageReceipt.of(
         Stage.Decision,
-        interpretation.policy.value,
+        policy.value,
         producer.systemSha256,
         Vector(producer.outlineSha256, producer.recallSha256),
         ProviderStatus.Identified(identity)

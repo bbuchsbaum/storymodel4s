@@ -96,8 +96,20 @@ def build(annotation_path):
                 raise ExportError(
                     f"film name {r['film']!r} does not start with its position {number}"
                 )
-            collections[key] = number
-            labels[number] = match.group(2)
+            # A film's collection carries the film number the prompts show and the replies use
+            # (1-10), so no reader needs a translation table. The two cartoon intros, which are
+            # not films of the study, take the numbers after them.
+            code = film_of[whole(r["scene_number"], "scene", segment)]
+            if code == ff_gold.CARTOON:
+                code = (
+                    max(ff_gold.FILMS)
+                    + 1
+                    + sum(1 for c in collections.values() if c > max(ff_gold.FILMS))
+                )
+            if code in labels:
+                raise ExportError(f"two films would take collection {code}")
+            collections[key] = code
+            labels[code] = match.group(2)
         collection = collections[key]
         scene = whole(r["scene_number"], "scene", segment)
         if scene_collection.setdefault(scene, collection) != collection:

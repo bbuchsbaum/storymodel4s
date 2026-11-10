@@ -1067,7 +1067,9 @@ object FunctionPrior:
       DiscourseFunction.Association -> 0.5,
       DiscourseFunction.Evaluation -> 0.5,
       DiscourseFunction.TaskCommentary -> 0.6,
-      DiscourseFunction.Uninterpretable -> 0.6
+      DiscourseFunction.Uninterpretable -> 0.6,
+      // No function was assessed, so there is nothing to base a prior on: it adds no cost.
+      DiscourseFunction.NotAssessed -> 0.0
     )
   )
   val none: FunctionPrior = FunctionPrior(Map.empty)
@@ -1092,16 +1094,19 @@ trait LocalCostModel:
   def externalCost(unit: RecallUnit, state: ExternalState): Double
 
 object ExternalStates:
-  /** The external destination presupposed by a discourse function. */
-  def natural(f: DiscourseFunction): ExternalState = f match
-    case DiscourseFunction.Association       => ExternalState.Association
-    case DiscourseFunction.Evaluation        => ExternalState.Commentary
-    case DiscourseFunction.TaskCommentary    => ExternalState.Commentary
-    case DiscourseFunction.SourceMonitoring  => ExternalState.Commentary
-    case DiscourseFunction.Inference         => ExternalState.SourceConsistentInference
-    case DiscourseFunction.Uninterpretable   => ExternalState.Uninterpretable
-    case DiscourseFunction.EpisodicAssertion => ExternalState.Intrusion
-    case DiscourseFunction.Summary           => ExternalState.Intrusion
+  /** The external destination presupposed by a discourse function. A unit whose function was
+    * not assessed presupposes none, so no external state is preferred for it.
+    */
+  def natural(f: DiscourseFunction): Option[ExternalState] = f match
+    case DiscourseFunction.Association       => Some(ExternalState.Association)
+    case DiscourseFunction.Evaluation        => Some(ExternalState.Commentary)
+    case DiscourseFunction.TaskCommentary    => Some(ExternalState.Commentary)
+    case DiscourseFunction.SourceMonitoring  => Some(ExternalState.Commentary)
+    case DiscourseFunction.Inference         => Some(ExternalState.SourceConsistentInference)
+    case DiscourseFunction.Uninterpretable   => Some(ExternalState.Uninterpretable)
+    case DiscourseFunction.EpisodicAssertion => Some(ExternalState.Intrusion)
+    case DiscourseFunction.Summary           => Some(ExternalState.Intrusion)
+    case DiscourseFunction.NotAssessed       => None
 
 /** The default local cost model. Terms are composed lexicographically after the mode gate: only
   * admissible pairs reach here, and only *present* terms enter the total. The optional
@@ -1191,7 +1196,7 @@ final case class DefaultLocalCostModel(
 
   def externalCost(unit: RecallUnit, state: ExternalState): Double =
     if state == ExternalState.Unranked then externalFloor
-    else if ExternalStates.natural(unit.function) == state then externalFloor
+    else if ExternalStates.natural(unit.function).contains(state) then externalFloor
     else externalFloor + externalMismatch
 
   def cost(

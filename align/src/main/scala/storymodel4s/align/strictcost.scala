@@ -225,7 +225,7 @@ final class StrictCostModel private (
     val contentPolicy: ContentCostPolicy
 ):
   private[align] def externalCost(unit: RecallUnit, state: ExternalState): Double =
-    if state == ExternalState.Unranked || ExternalStates.natural(unit.function) == state then
+    if state == ExternalState.Unranked || ExternalStates.natural(unit.function).contains(state) then
       externalFloor
     else externalFloor + externalMismatch
 
