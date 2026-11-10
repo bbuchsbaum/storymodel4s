@@ -1,0 +1,207 @@
+{
+ "across_conditions": true,
+ "agreement": {
+  "run-01": {
+   "both_scene": 2394,
+   "n": 2682,
+   "same": 1074,
+   "same_scene": 811
+  },
+  "run-02": {
+   "both_scene": 501,
+   "n": 544,
+   "same": 218,
+   "same_scene": 177
+  }
+ },
+ "field": "narrative",
+ "primary": {
+  "condition": "norecord",
+  "manifestSha256": "221772add2d67f7248cf4e06f80e7a9e1dee00afcad89f5f29783d47c6c5d53c",
+  "model": "claude-opus-5-5"
+ },
+ "schema": "storymodel4s.filmfestival.transfer-arm-comparison/v3",
+ "secondary": {
+  "condition": "auto",
+  "manifestSha256": "54e3f957c21594b29d15f2cdffe1b46c70092f02b498c39e9002919e2eba71a4",
+  "model": "claude-opus-5-5"
+ },
+ "sessions": {
+  "run-01": {
+   "film_reference": {
+    "by_participant": {
+     "sub-01": 0.0,
+     "sub-02": 0.0,
+     "sub-07": 0.0,
+     "sub-08": 0.0,
+     "sub-09": 0.0,
+     "sub-10": 0.0,
+     "sub-11": 0.0,
+     "sub-12": 0.0,
+     "sub-13": 0.0,
+     "sub-14": 0.0,
+     "sub-16": 0.0,
+     "sub-17": 0.0,
+     "sub-18": 0.0,
+     "sub-19": 0.0,
+     "sub-20": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.0
+    ],
+    "mean_difference": 0.0,
+    "participants": 15,
+    "secondary_higher": 0,
+    "secondary_lower": 0
+   },
+   "scene": {
+    "by_participant": {
+     "sub-01": 0.3529411764705882,
+     "sub-02": 0.5504587155963303,
+     "sub-07": 0.4533333333333333,
+     "sub-08": 0.4872881355932204,
+     "sub-09": 0.281045751633987,
+     "sub-10": 0.3118811881188118,
+     "sub-11": 0.42533936651583715,
+     "sub-12": 0.5140845070422535,
+     "sub-13": 0.21014492753623193,
+     "sub-14": 0.4269662921348314,
+     "sub-16": 0.3214285714285714,
+     "sub-17": 0.5526315789473685,
+     "sub-18": 0.5471698113207546,
+     "sub-19": 0.4320987654320988,
+     "sub-20": 0.3944444444444444
+    },
+    "interval95": [
+     0.3652564638402672,
+     0.4685565011735699
+    ],
+    "mean_difference": 0.4174171043699108,
+    "participants": 15,
+    "secondary_higher": 15,
+    "secondary_lower": 0
+   },
+   "scene_adjacent": {
+    "by_participant": {
+     "sub-01": 0.19117647058823528,
+     "sub-02": 0.3027522935779816,
+     "sub-07": 0.2733333333333333,
+     "sub-08": 0.2923728813559322,
+     "sub-09": 0.0980392156862745,
+     "sub-10": 0.06930693069306926,
+     "sub-11": 0.18552036199095023,
+     "sub-12": 0.2464788732394365,
+     "sub-13": 0.07246376811594202,
+     "sub-14": 0.1797752808988764,
+     "sub-16": 0.08333333333333326,
+     "sub-17": 0.33333333333333337,
+     "sub-18": 0.4339622641509434,
+     "sub-19": 0.28395061728395055,
+     "sub-20": 0.1611111111111111
+    },
+    "interval95": [
+     0.16325375397331898,
+     0.26890335400957377
+    ],
+    "mean_difference": 0.21379400457951353,
+    "participants": 15,
+    "secondary_higher": 15,
+    "secondary_lower": 0
+   },
+   "scene_within_2s": {
+    "by_participant": {
+     "sub-01": 0.36764705882352944,
+     "sub-02": 0.5688073394495412,
+     "sub-07": 0.43,
+     "sub-08": 0.48305084745762716,
+     "sub-09": 0.2679738562091503,
+     "sub-10": 0.29702970297029707,
+     "sub-11": 0.42986425339366513,
+     "sub-12": 0.5140845070422535,
+     "sub-13": 0.2028985507246377,
+     "sub-14": 0.3595505617977528,
+     "sub-16": 0.3214285714285714,
+     "sub-17": 0.5350877192982456,
+     "sub-18": 0.5283018867924529,
+     "sub-19": 0.4320987654320988,
+     "sub-20": 0.36111111111111105
+    },
+    "interval95": [
+     0.35393921342496293,
+     0.4588284602475858
+    ],
+    "mean_difference": 0.4065956487953956,
+    "participants": 15,
+    "secondary_higher": 15,
+    "secondary_lower": 0
+   }
+  },
+  "run-02": {
+   "film_reference": {
+    "by_participant": {
+     "sub-08": 0.0,
+     "sub-10": 0.0,
+     "sub-16": 0.0,
+     "sub-18": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.0
+    ],
+    "mean_difference": 0.0,
+    "participants": 4,
+    "secondary_higher": 0,
+    "secondary_lower": 0
+   },
+   "scene": {
+    "by_participant": {
+     "sub-08": 0.5426356589147286,
+     "sub-10": 0.5891472868217055,
+     "sub-16": 0.3846153846153846,
+     "sub-18": 0.31756756756756754
+    },
+    "interval95": [
+     0.35109147609147606,
+     0.5658914728682171
+    ],
+    "mean_difference": 0.45849147447984656,
+    "participants": 4,
+    "secondary_higher": 4,
+    "secondary_lower": 0
+   },
+   "scene_adjacent": {
+    "by_participant": {
+     "sub-08": 0.2558139534883721,
+     "sub-10": 0.4031007751937984,
+     "sub-16": 0.3076923076923077,
+     "sub-18": 0.1283783783783784
+    },
+    "interval95": [
+     0.17320686070686073,
+     0.36627906976744184
+    ],
+    "mean_difference": 0.27374635368821415,
+    "participants": 4,
+    "secondary_higher": 4,
+    "secondary_lower": 0
+   },
+   "scene_within_2s": {
+    "by_participant": {
+     "sub-08": 0.5581395348837209,
+     "sub-10": 0.6046511627906976,
+     "sub-16": 0.46153846153846156,
+     "sub-18": 0.28378378378378377
+    },
+    "interval95": [
+     0.3523727215587681,
+     0.5813953488372092
+    ],
+    "mean_difference": 0.477028235749166,
+    "participants": 4,
+    "secondary_higher": 4,
+    "secondary_lower": 0
+   }
+  }
+ }
+}

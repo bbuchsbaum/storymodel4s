@@ -1,0 +1,164 @@
+{
+ "across_conditions": false,
+ "agreement": {
+  "run-01": {
+   "both_scene": 2319,
+   "n": 2682,
+   "same": 2386,
+   "same_scene": 2092
+  },
+  "run-02": {
+   "both_scene": 472,
+   "n": 544,
+   "same": 475,
+   "same_scene": 421
+  }
+ },
+ "field": "referent",
+ "primary": {
+  "condition": "annotation",
+  "manifestSha256": "2a8d61166a9e414b4d5474f758cc0c4babb2de07544de66a3aa4e6e0df77c047",
+  "model": "claude-opus-5-5"
+ },
+ "schema": "storymodel4s.filmfestival.transfer-arm-comparison/v3",
+ "secondary": {
+  "condition": "annotation",
+  "manifestSha256": "9cd6e46ccfd04ff7fceed1bed8ba1f6d57113615975248488ec674445782606c",
+  "model": "claude-haiku-5-5"
+ },
+ "sessions": {
+  "run-01": {
+   "film_reference": {
+    "by_participant": {
+     "sub-01": 0.0117647058823529,
+     "sub-02": 0.0,
+     "sub-07": 0.0031948881789137795,
+     "sub-08": 0.0,
+     "sub-09": 0.0,
+     "sub-10": 0.0,
+     "sub-11": 0.0,
+     "sub-12": 0.0,
+     "sub-13": 0.0,
+     "sub-14": 0.0,
+     "sub-16": 0.0,
+     "sub-17": 0.0,
+     "sub-18": 0.0,
+     "sub-19": 0.0,
+     "sub-20": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.002778926266992417
+    ],
+    "mean_difference": 0.000997306270751112,
+    "participants": 15,
+    "secondary_higher": 2,
+    "secondary_lower": 0
+   },
+   "scene": {
+    "by_participant": {
+     "sub-01": -0.02941176470588236,
+     "sub-02": -0.00917431192660556,
+     "sub-07": 0.0033333333333332993,
+     "sub-08": -0.021186440677966045,
+     "sub-09": -0.019607843137254832,
+     "sub-10": -0.014851485148514865,
+     "sub-11": -0.022624434389140302,
+     "sub-12": -0.08450704225352113,
+     "sub-13": -0.036231884057971064,
+     "sub-14": -0.022471910112359605,
+     "sub-16": 0.017857142857142905,
+     "sub-17": 0.00877192982456132,
+     "sub-18": 0.0,
+     "sub-19": -0.0679012345679012,
+     "sub-20": 0.022222222222222143
+    },
+    "interval95": [
+     -0.032872454862915006,
+     -0.005134960454603999
+    ],
+    "mean_difference": -0.018385581515990488,
+    "participants": 15,
+    "secondary_higher": 4,
+    "secondary_lower": 10
+   },
+   "scene_adjacent": {
+    "by_participant": {
+     "sub-01": -0.044117647058823595,
+     "sub-02": -0.00917431192660545,
+     "sub-07": 0.0,
+     "sub-08": 0.0,
+     "sub-09": 0.02614379084967322,
+     "sub-10": -0.00990099009900991,
+     "sub-11": -0.004524886877828038,
+     "sub-12": -0.014084507042253502,
+     "sub-13": -0.007246376811594235,
+     "sub-14": -0.011235955056179803,
+     "sub-16": 0.0,
+     "sub-17": 0.00877192982456143,
+     "sub-18": 0.0,
+     "sub-19": -0.04320987654320996,
+     "sub-20": 0.02777777777777779
+    },
+    "interval95": [
+     -0.015022919368850014,
+     0.003866836715421096
+    ],
+    "mean_difference": -0.005386736864232803,
+    "participants": 15,
+    "secondary_higher": 3,
+    "secondary_lower": 8
+   }
+  },
+  "run-02": {
+   "film_reference": {
+    "by_participant": {
+     "sub-08": 0.006993006993006978,
+     "sub-10": 0.0,
+     "sub-16": 0.0,
+     "sub-18": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.005244755244755234
+    ],
+    "mean_difference": 0.0017482517482517446,
+    "participants": 4,
+    "secondary_higher": 1,
+    "secondary_lower": 0
+   },
+   "scene": {
+    "by_participant": {
+     "sub-08": -0.015503875968992165,
+     "sub-10": -0.023255813953488302,
+     "sub-16": -0.015384615384615441,
+     "sub-18": 0.006756756756756799
+    },
+    "interval95": [
+     -0.021288014311270087,
+     0.001191598575319558
+    ],
+    "mean_difference": -0.011846887137584777,
+    "participants": 4,
+    "secondary_higher": 1,
+    "secondary_lower": 3
+   },
+   "scene_adjacent": {
+    "by_participant": {
+     "sub-08": 0.015503875968992276,
+     "sub-10": 0.007751937984496027,
+     "sub-16": 0.0,
+     "sub-18": 0.0
+    },
+    "interval95": [
+     0.0,
+     0.011627906976744207
+    ],
+    "mean_difference": 0.005813953488372076,
+    "participants": 4,
+    "secondary_higher": 2,
+    "secondary_lower": 0
+   }
+  }
+ }
+}

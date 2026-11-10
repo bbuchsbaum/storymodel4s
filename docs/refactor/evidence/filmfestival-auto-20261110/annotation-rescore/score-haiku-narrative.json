@@ -1,0 +1,5425 @@
+{
+ "answers": "scene",
+ "chance_guess": "uniform valid scene",
+ "classes": {
+  "run-01": {
+   "cartoon": 7,
+   "film_only": 208,
+   "film_search": 31,
+   "multi_contig": 414,
+   "multi_noncontig": 111,
+   "nonfilm": 101,
+   "single": 1810
+  },
+  "run-02": {
+   "film_only": 44,
+   "film_search": 13,
+   "multi_contig": 62,
+   "multi_noncontig": 9,
+   "nonfilm": 16,
+   "single": 400
+  }
+ },
+ "condition": "annotation",
+ "field": "narrative",
+ "manifestSha256": "9cd6e46ccfd04ff7fceed1bed8ba1f6d57113615975248488ec674445782606c",
+ "model": "claude-haiku-5-5",
+ "participants_with_every_session": {
+  "participants": [
+   "sub-08",
+   "sub-10",
+   "sub-16",
+   "sub-18"
+  ],
+  "sessions": {
+   "run-01": {
+    "cartoon": {
+     "assigned_a_film": 0,
+     "failed": 0,
+     "n": 0,
+     "no_assignment": 0
+    },
+    "chance": {
+     "end_to_end": {
+      "scene": 0.005875449441981806,
+      "scene_adjacent": 0.015436136256606144
+     },
+     "given_film": {
+      "scene": 0.06095031728550895,
+      "scene_adjacent": 0.15882254053214664
+     }
+    },
+    "failure_reasons": {},
+    "film": {
+     "film_labelled": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 270,
+        "n": 270,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 213,
+        "n": 213,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 185,
+        "n": 185,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 56,
+        "n": 56,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 724,
+       "n": 724,
+       "rate": 1.0
+      }
+     },
+     "film_reference": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 270,
+        "n": 270,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 210,
+        "n": 210,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 183,
+        "n": 183,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 56,
+        "n": 56,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 719,
+       "n": 719,
+       "rate": 1.0
+      }
+     }
+    },
+    "film_only": {
+     "failed": 0,
+     "film_only_correct_film": 43,
+     "n": 60,
+     "none": 0,
+     "scene_in_correct_film": 17,
+     "title_or_invalid_scene_in_correct_film": 0,
+     "wrong_film": 0
+    },
+    "film_search": {
+     "failed": 0,
+     "film_only_correct_film": 0,
+     "n": 5,
+     "none": 0,
+     "scene_in_correct_film": 5,
+     "title_or_invalid_scene_in_correct_film": 0,
+     "wrong_film": 0
+    },
+    "nonfilm": {
+     "assigned_a_film": 6,
+     "failed": 0,
+     "n": 15,
+     "no_assignment": 9
+    },
+    "prediction_kinds": {
+     "failed": 0,
+     "film": 45,
+     "invalid_scene": 0,
+     "none": 9,
+     "scene": 685
+    },
+    "scene": {
+     "by_film": {
+      "1": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 31,
+         "n": 34,
+         "rate": 0.9117647058823529
+        },
+        "sub-10": {
+         "hits": 34,
+         "n": 37,
+         "rate": 0.918918918918919
+        },
+        "sub-16": {
+         "hits": 22,
+         "n": 25,
+         "rate": 0.88
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.88,
+         0.918918918918919
+        ],
+        "participants": 3,
+        "rate": 0.9035612082670906
+       },
+       "pooled": {
+        "hits": 87,
+        "n": 96,
+        "rate": 0.90625
+       }
+      },
+      "10": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 25,
+         "n": 29,
+         "rate": 0.8620689655172413
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 0.8620689655172413
+       },
+       "pooled": {
+        "hits": 25,
+        "n": 29,
+        "rate": 0.8620689655172413
+       }
+      },
+      "2": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 20,
+         "n": 21,
+         "rate": 0.9523809523809523
+        },
+        "sub-10": {
+         "hits": 18,
+         "n": 20,
+         "rate": 0.9
+        },
+        "sub-16": {
+         "hits": 16,
+         "n": 19,
+         "rate": 0.8421052631578947
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8421052631578947,
+         0.9523809523809522
+        ],
+        "participants": 3,
+        "rate": 0.8981620718462824
+       },
+       "pooled": {
+        "hits": 54,
+        "n": 60,
+        "rate": 0.9
+       }
+      },
+      "3": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 47,
+         "n": 54,
+         "rate": 0.8703703703703703
+        },
+        "sub-10": {
+         "hits": 57,
+         "n": 61,
+         "rate": 0.9344262295081968
+        },
+        "sub-16": {
+         "hits": 22,
+         "n": 27,
+         "rate": 0.8148148148148148
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8148148148148148,
+         0.9344262295081968
+        ],
+        "participants": 3,
+        "rate": 0.8732038048977939
+       },
+       "pooled": {
+        "hits": 126,
+        "n": 142,
+        "rate": 0.8873239436619719
+       }
+      },
+      "4": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 18,
+         "n": 18,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 13,
+         "n": 14,
+         "rate": 0.9285714285714286
+        },
+        "sub-16": {
+         "hits": 9,
+         "n": 10,
+         "rate": 0.9
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.942857142857143
+       },
+       "pooled": {
+        "hits": 40,
+        "n": 42,
+        "rate": 0.9523809523809523
+       }
+      },
+      "5": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 45,
+         "n": 55,
+         "rate": 0.8181818181818182
+        },
+        "sub-10": {
+         "hits": 42,
+         "n": 46,
+         "rate": 0.9130434782608695
+        },
+        "sub-16": {
+         "hits": 27,
+         "n": 30,
+         "rate": 0.9
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8181818181818182,
+         0.9130434782608695
+        ],
+        "participants": 3,
+        "rate": 0.8770750988142293
+       },
+       "pooled": {
+        "hits": 114,
+        "n": 131,
+        "rate": 0.8702290076335878
+       }
+      },
+      "6": {
+       "by_participant": {
+        "sub-16": {
+         "hits": 25,
+         "n": 33,
+         "rate": 0.7575757575757576
+        },
+        "sub-18": {
+         "hits": 20,
+         "n": 24,
+         "rate": 0.8333333333333334
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.7575757575757576,
+         0.8333333333333334
+        ],
+        "participants": 2,
+        "rate": 0.7954545454545454
+       },
+       "pooled": {
+        "hits": 45,
+        "n": 57,
+        "rate": 0.7894736842105263
+       }
+      },
+      "7": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 16,
+         "n": 16,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 4,
+         "n": 6,
+         "rate": 0.6666666666666666
+        },
+        "sub-16": {
+         "hits": 14,
+         "n": 17,
+         "rate": 0.8235294117647058
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.6666666666666666,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.8300653594771242
+       },
+       "pooled": {
+        "hits": 34,
+        "n": 39,
+        "rate": 0.8717948717948718
+       }
+      },
+      "8": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 17,
+         "n": 21,
+         "rate": 0.8095238095238095
+        },
+        "sub-10": {
+         "hits": 18,
+         "n": 18,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8095238095238095,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 0.9047619047619048
+       },
+       "pooled": {
+        "hits": 35,
+        "n": 39,
+        "rate": 0.8974358974358975
+       }
+      },
+      "9": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 17,
+         "n": 17,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 6,
+         "n": 7,
+         "rate": 0.8571428571428571
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8571428571428571,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 0.9285714285714286
+       },
+       "pooled": {
+        "hits": 23,
+        "n": 24,
+        "rate": 0.9583333333333334
+       }
+      }
+     },
+     "by_participant": {
+      "sub-08": {
+       "hits": 211,
+       "n": 236,
+       "rate": 0.8940677966101694
+      },
+      "sub-10": {
+       "hits": 186,
+       "n": 202,
+       "rate": 0.9207920792079208
+      },
+      "sub-16": {
+       "hits": 141,
+       "n": 168,
+       "rate": 0.8392857142857143
+      },
+      "sub-18": {
+       "hits": 45,
+       "n": 53,
+       "rate": 0.8490566037735849
+      }
+     },
+     "chance_end_to_end": 0.005875449441981806,
+     "chance_given_film": 0.06095031728550895,
+     "participant_average": {
+      "interval95": [
+       0.8441711590296497,
+       0.9074299379090451
+      ],
+      "participants": 4,
+      "rate": 0.8758005484693474
+     },
+     "pooled": {
+      "hits": 583,
+      "n": 659,
+      "rate": 0.8846737481031867
+     },
+     "prediction_kinds": {
+      "failed": 0,
+      "film": 1,
+      "invalid_scene": 0,
+      "none": 0,
+      "scene": 658
+     },
+     "strata": {
+      "multi_contig": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 38,
+         "n": 38,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 19,
+         "n": 19,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 30,
+         "n": 30,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 11,
+         "n": 12,
+         "rate": 0.9166666666666666
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9375,
+         1.0
+        ],
+        "participants": 4,
+        "rate": 0.9791666666666666
+       },
+       "pooled": {
+        "hits": 98,
+        "n": 99,
+        "rate": 0.98989898989899
+       }
+      },
+      "multi_noncontig": {
+       "by_participant": {
+        "sub-10": {
+         "hits": 0,
+         "n": 1,
+         "rate": 0.0
+        },
+        "sub-16": {
+         "hits": 11,
+         "n": 12,
+         "rate": 0.9166666666666666
+        },
+        "sub-18": {
+         "hits": 2,
+         "n": 2,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.0,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.6388888888888888
+       },
+       "pooled": {
+        "hits": 13,
+        "n": 15,
+        "rate": 0.8666666666666667
+       }
+      },
+      "single": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 173,
+         "n": 198,
+         "rate": 0.8737373737373737
+        },
+        "sub-10": {
+         "hits": 167,
+         "n": 182,
+         "rate": 0.9175824175824175
+        },
+        "sub-16": {
+         "hits": 100,
+         "n": 126,
+         "rate": 0.7936507936507936
+        },
+        "sub-18": {
+         "hits": 32,
+         "n": 39,
+         "rate": 0.8205128205128205
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8070818070818071,
+         0.8956598956598956
+        ],
+        "participants": 4,
+        "rate": 0.8513708513708513
+       },
+       "pooled": {
+        "hits": 472,
+        "n": 545,
+        "rate": 0.8660550458715597
+       }
+      }
+     }
+    },
+    "scene_adjacent": {
+     "by_film": {
+      "1": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 34,
+         "n": 34,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 37,
+         "n": 37,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 24,
+         "n": 25,
+         "rate": 0.96
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.96,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.9866666666666667
+       },
+       "pooled": {
+        "hits": 95,
+        "n": 96,
+        "rate": 0.9895833333333334
+       }
+      },
+      "10": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 29,
+         "n": 29,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 29,
+        "n": 29,
+        "rate": 1.0
+       }
+      },
+      "2": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 21,
+         "n": 21,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 18,
+         "n": 20,
+         "rate": 0.9
+        },
+        "sub-16": {
+         "hits": 18,
+         "n": 19,
+         "rate": 0.9473684210526315
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.9491228070175438
+       },
+       "pooled": {
+        "hits": 57,
+        "n": 60,
+        "rate": 0.95
+       }
+      },
+      "3": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 54,
+         "n": 54,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 60,
+         "n": 61,
+         "rate": 0.9836065573770492
+        },
+        "sub-16": {
+         "hits": 26,
+         "n": 27,
+         "rate": 0.9629629629629629
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9629629629629629,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.9821898401133374
+       },
+       "pooled": {
+        "hits": 140,
+        "n": 142,
+        "rate": 0.9859154929577465
+       }
+      },
+      "4": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 18,
+         "n": 18,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 14,
+         "n": 14,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 9,
+         "n": 10,
+         "rate": 0.9
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.9666666666666667
+       },
+       "pooled": {
+        "hits": 41,
+        "n": 42,
+        "rate": 0.9761904761904762
+       }
+      },
+      "5": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 54,
+         "n": 55,
+         "rate": 0.9818181818181818
+        },
+        "sub-10": {
+         "hits": 46,
+         "n": 46,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 30,
+         "n": 30,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9818181818181818,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.993939393939394
+       },
+       "pooled": {
+        "hits": 130,
+        "n": 131,
+        "rate": 0.9923664122137404
+       }
+      },
+      "6": {
+       "by_participant": {
+        "sub-16": {
+         "hits": 33,
+         "n": 33,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 23,
+         "n": 24,
+         "rate": 0.9583333333333334
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9583333333333334,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 0.9791666666666667
+       },
+       "pooled": {
+        "hits": 56,
+        "n": 57,
+        "rate": 0.9824561403508771
+       }
+      },
+      "7": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 16,
+         "n": 16,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 6,
+         "n": 6,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 17,
+         "n": 17,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         1.0,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 39,
+        "n": 39,
+        "rate": 1.0
+       }
+      },
+      "8": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 21,
+         "n": 21,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 18,
+         "n": 18,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         1.0,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 39,
+        "n": 39,
+        "rate": 1.0
+       }
+      },
+      "9": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 17,
+         "n": 17,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 6,
+         "n": 7,
+         "rate": 0.8571428571428571
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8571428571428571,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 0.9285714285714286
+       },
+       "pooled": {
+        "hits": 23,
+        "n": 24,
+        "rate": 0.9583333333333334
+       }
+      }
+     },
+     "by_participant": {
+      "sub-08": {
+       "hits": 235,
+       "n": 236,
+       "rate": 0.9957627118644068
+      },
+      "sub-10": {
+       "hits": 199,
+       "n": 202,
+       "rate": 0.9851485148514851
+      },
+      "sub-16": {
+       "hits": 163,
+       "n": 168,
+       "rate": 0.9702380952380952
+      },
+      "sub-18": {
+       "hits": 52,
+       "n": 53,
+       "rate": 0.9811320754716981
+      }
+     },
+     "participant_average": {
+      "interval95": [
+       0.9739657001414427,
+       0.9921050527662296
+      ],
+      "participants": 4,
+      "rate": 0.9830703493564213
+     },
+     "pooled": {
+      "hits": 649,
+      "n": 659,
+      "rate": 0.9848254931714719
+     },
+     "strata": {
+      "multi_contig": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 38,
+         "n": 38,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 19,
+         "n": 19,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 30,
+         "n": 30,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 12,
+         "n": 12,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         1.0,
+         1.0
+        ],
+        "participants": 4,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 99,
+        "n": 99,
+        "rate": 1.0
+       }
+      },
+      "multi_noncontig": {
+       "by_participant": {
+        "sub-10": {
+         "hits": 1,
+         "n": 1,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 12,
+         "n": 12,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 2,
+         "n": 2,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         1.0,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       }
+      },
+      "single": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 197,
+         "n": 198,
+         "rate": 0.9949494949494949
+        },
+        "sub-10": {
+         "hits": 179,
+         "n": 182,
+         "rate": 0.9835164835164835
+        },
+        "sub-16": {
+         "hits": 121,
+         "n": 126,
+         "rate": 0.9603174603174603
+        },
+        "sub-18": {
+         "hits": 38,
+         "n": 39,
+         "rate": 0.9743589743589743
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9661172161172161,
+         0.9898018648018647
+        ],
+        "participants": 4,
+        "rate": 0.9782856032856033
+       },
+       "pooled": {
+        "hits": 535,
+        "n": 545,
+        "rate": 0.981651376146789
+       }
+      }
+     }
+    },
+    "time_outside_clip": 0,
+    "utterances": 739
+   },
+   "run-02": {
+    "cartoon": {
+     "assigned_a_film": 0,
+     "failed": 0,
+     "n": 0,
+     "no_assignment": 0
+    },
+    "chance": {
+     "end_to_end": {
+      "scene": 0.005794191166473179,
+      "scene_adjacent": 0.015343101879451537
+     },
+     "given_film": {
+      "scene": 0.05640067341604312,
+      "scene_adjacent": 0.14993506478136773
+     }
+    },
+    "failure_reasons": {},
+    "film": {
+     "film_labelled": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 143,
+        "n": 143,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 150,
+        "n": 150,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 69,
+        "n": 69,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 166,
+        "n": 166,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 528,
+       "n": 528,
+       "rate": 1.0
+      }
+     },
+     "film_reference": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 143,
+        "n": 143,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 138,
+        "n": 138,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 69,
+        "n": 69,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 165,
+        "n": 165,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 515,
+       "n": 515,
+       "rate": 1.0
+      }
+     }
+    },
+    "film_only": {
+     "failed": 0,
+     "film_only_correct_film": 25,
+     "n": 44,
+     "none": 0,
+     "scene_in_correct_film": 19,
+     "title_or_invalid_scene_in_correct_film": 0,
+     "wrong_film": 0
+    },
+    "film_search": {
+     "failed": 0,
+     "film_only_correct_film": 0,
+     "n": 13,
+     "none": 0,
+     "scene_in_correct_film": 13,
+     "title_or_invalid_scene_in_correct_film": 0,
+     "wrong_film": 0
+    },
+    "nonfilm": {
+     "assigned_a_film": 5,
+     "failed": 0,
+     "n": 16,
+     "no_assignment": 11
+    },
+    "prediction_kinds": {
+     "failed": 0,
+     "film": 27,
+     "invalid_scene": 0,
+     "none": 11,
+     "scene": 506
+    },
+    "scene": {
+     "by_film": {
+      "1": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 16,
+         "n": 19,
+         "rate": 0.8421052631578947
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 0.8421052631578947
+       },
+       "pooled": {
+        "hits": 16,
+        "n": 19,
+        "rate": 0.8421052631578947
+       }
+      },
+      "10": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 44,
+         "n": 57,
+         "rate": 0.7719298245614035
+        },
+        "sub-10": {
+         "hits": 38,
+         "n": 44,
+         "rate": 0.8636363636363636
+        },
+        "sub-16": {
+         "hits": 31,
+         "n": 38,
+         "rate": 0.8157894736842105
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.7719298245614036,
+         0.8636363636363636
+        ],
+        "participants": 3,
+        "rate": 0.8171185539606592
+       },
+       "pooled": {
+        "hits": 113,
+        "n": 139,
+        "rate": 0.8129496402877698
+       }
+      },
+      "2": {
+       "by_participant": {},
+       "participant_average": {
+        "interval95": null,
+        "participants": 0,
+        "rate": null
+       },
+       "pooled": {
+        "hits": 0,
+        "n": 0,
+        "rate": null
+       }
+      },
+      "3": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 26,
+         "n": 30,
+         "rate": 0.8666666666666667
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 0.8666666666666667
+       },
+       "pooled": {
+        "hits": 26,
+        "n": 30,
+        "rate": 0.8666666666666667
+       }
+      },
+      "4": {
+       "by_participant": {},
+       "participant_average": {
+        "interval95": null,
+        "participants": 0,
+        "rate": null
+       },
+       "pooled": {
+        "hits": 0,
+        "n": 0,
+        "rate": null
+       }
+      },
+      "5": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 22,
+         "n": 28,
+         "rate": 0.7857142857142857
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 0.7857142857142857
+       },
+       "pooled": {
+        "hits": 22,
+        "n": 28,
+        "rate": 0.7857142857142857
+       }
+      },
+      "6": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 38,
+         "n": 45,
+         "rate": 0.8444444444444444
+        },
+        "sub-10": {
+         "hits": 23,
+         "n": 27,
+         "rate": 0.8518518518518519
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8444444444444444,
+         0.8518518518518519
+        ],
+        "participants": 2,
+        "rate": 0.8481481481481481
+       },
+       "pooled": {
+        "hits": 61,
+        "n": 72,
+        "rate": 0.8472222222222222
+       }
+      },
+      "7": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 26,
+         "n": 27,
+         "rate": 0.9629629629629629
+        },
+        "sub-10": {
+         "hits": 32,
+         "n": 33,
+         "rate": 0.9696969696969697
+        },
+        "sub-18": {
+         "hits": 31,
+         "n": 32,
+         "rate": 0.96875
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9629629629629629,
+         0.9696969696969697
+        ],
+        "participants": 3,
+        "rate": 0.9671366442199775
+       },
+       "pooled": {
+        "hits": 89,
+        "n": 92,
+        "rate": 0.967391304347826
+       }
+      },
+      "8": {
+       "by_participant": {
+        "sub-16": {
+         "hits": 16,
+         "n": 18,
+         "rate": 0.8888888888888888
+        },
+        "sub-18": {
+         "hits": 17,
+         "n": 24,
+         "rate": 0.7083333333333334
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.7083333333333334,
+         0.8888888888888888
+        ],
+        "participants": 2,
+        "rate": 0.7986111111111112
+       },
+       "pooled": {
+        "hits": 33,
+        "n": 42,
+        "rate": 0.7857142857142857
+       }
+      },
+      "9": {
+       "by_participant": {
+        "sub-10": {
+         "hits": 22,
+         "n": 25,
+         "rate": 0.88
+        },
+        "sub-16": {
+         "hits": 7,
+         "n": 9,
+         "rate": 0.7777777777777778
+        },
+        "sub-18": {
+         "hits": 15,
+         "n": 15,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.7777777777777778,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.8859259259259259
+       },
+       "pooled": {
+        "hits": 44,
+        "n": 49,
+        "rate": 0.8979591836734694
+       }
+      }
+     },
+     "by_participant": {
+      "sub-08": {
+       "hits": 108,
+       "n": 129,
+       "rate": 0.8372093023255814
+      },
+      "sub-10": {
+       "hits": 115,
+       "n": 129,
+       "rate": 0.8914728682170543
+      },
+      "sub-16": {
+       "hits": 54,
+       "n": 65,
+       "rate": 0.8307692307692308
+      },
+      "sub-18": {
+       "hits": 127,
+       "n": 148,
+       "rate": 0.8581081081081081
+      }
+     },
+     "chance_end_to_end": 0.005794191166473179,
+     "chance_given_film": 0.05640067341604312,
+     "participant_average": {
+      "interval95": [
+       0.8339892665474061,
+       0.877906976744186
+      ],
+      "participants": 4,
+      "rate": 0.8543898773549936
+     },
+     "pooled": {
+      "hits": 404,
+      "n": 471,
+      "rate": 0.8577494692144374
+     },
+     "prediction_kinds": {
+      "failed": 0,
+      "film": 1,
+      "invalid_scene": 0,
+      "none": 0,
+      "scene": 470
+     },
+     "strata": {
+      "multi_contig": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 10,
+         "n": 11,
+         "rate": 0.9090909090909091
+        },
+        "sub-10": {
+         "hits": 16,
+         "n": 17,
+         "rate": 0.9411764705882353
+        },
+        "sub-16": {
+         "hits": 6,
+         "n": 6,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 27,
+         "n": 28,
+         "rate": 0.9642857142857143
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9228896103896104,
+         0.9852941176470589
+        ],
+        "participants": 4,
+        "rate": 0.9536382734912147
+       },
+       "pooled": {
+        "hits": 59,
+        "n": 62,
+        "rate": 0.9516129032258065
+       }
+      },
+      "multi_noncontig": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 0,
+         "n": 1,
+         "rate": 0.0
+        },
+        "sub-10": {
+         "hits": 4,
+         "n": 4,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 1,
+         "n": 1,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 2,
+         "n": 3,
+         "rate": 0.6666666666666666
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.25,
+         1.0
+        ],
+        "participants": 4,
+        "rate": 0.6666666666666666
+       },
+       "pooled": {
+        "hits": 7,
+        "n": 9,
+        "rate": 0.7777777777777778
+       }
+      },
+      "single": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 98,
+         "n": 117,
+         "rate": 0.8376068376068376
+        },
+        "sub-10": {
+         "hits": 95,
+         "n": 108,
+         "rate": 0.8796296296296297
+        },
+        "sub-16": {
+         "hits": 47,
+         "n": 58,
+         "rate": 0.8103448275862069
+        },
+        "sub-18": {
+         "hits": 98,
+         "n": 117,
+         "rate": 0.8376068376068376
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8171603300913646,
+         0.8691239316239316
+        ],
+        "participants": 4,
+        "rate": 0.8412970331073779
+       },
+       "pooled": {
+        "hits": 338,
+        "n": 400,
+        "rate": 0.845
+       }
+      }
+     }
+    },
+    "scene_adjacent": {
+     "by_film": {
+      "1": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 18,
+         "n": 19,
+         "rate": 0.9473684210526315
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 0.9473684210526315
+       },
+       "pooled": {
+        "hits": 18,
+        "n": 19,
+        "rate": 0.9473684210526315
+       }
+      },
+      "10": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 51,
+         "n": 57,
+         "rate": 0.8947368421052632
+        },
+        "sub-10": {
+         "hits": 41,
+         "n": 44,
+         "rate": 0.9318181818181818
+        },
+        "sub-16": {
+         "hits": 35,
+         "n": 38,
+         "rate": 0.9210526315789473
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.8947368421052632,
+         0.9318181818181818
+        ],
+        "participants": 3,
+        "rate": 0.9158692185007974
+       },
+       "pooled": {
+        "hits": 127,
+        "n": 139,
+        "rate": 0.9136690647482014
+       }
+      },
+      "2": {
+       "by_participant": {},
+       "participant_average": {
+        "interval95": null,
+        "participants": 0,
+        "rate": null
+       },
+       "pooled": {
+        "hits": 0,
+        "n": 0,
+        "rate": null
+       }
+      },
+      "3": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 30,
+         "n": 30,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       }
+      },
+      "4": {
+       "by_participant": {},
+       "participant_average": {
+        "interval95": null,
+        "participants": 0,
+        "rate": null
+       },
+       "pooled": {
+        "hits": 0,
+        "n": 0,
+        "rate": null
+       }
+      },
+      "5": {
+       "by_participant": {
+        "sub-18": {
+         "hits": 26,
+         "n": 28,
+         "rate": 0.9285714285714286
+        }
+       },
+       "participant_average": {
+        "interval95": null,
+        "participants": 1,
+        "rate": 0.9285714285714286
+       },
+       "pooled": {
+        "hits": 26,
+        "n": 28,
+        "rate": 0.9285714285714286
+       }
+      },
+      "6": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 43,
+         "n": 45,
+         "rate": 0.9555555555555556
+        },
+        "sub-10": {
+         "hits": 27,
+         "n": 27,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9555555555555556,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 0.9777777777777779
+       },
+       "pooled": {
+        "hits": 70,
+        "n": 72,
+        "rate": 0.9722222222222222
+       }
+      },
+      "7": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 26,
+         "n": 27,
+         "rate": 0.9629629629629629
+        },
+        "sub-10": {
+         "hits": 33,
+         "n": 33,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 32,
+         "n": 32,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9629629629629629,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.9876543209876543
+       },
+       "pooled": {
+        "hits": 91,
+        "n": 92,
+        "rate": 0.9891304347826086
+       }
+      },
+      "8": {
+       "by_participant": {
+        "sub-16": {
+         "hits": 18,
+         "n": 18,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 24,
+         "n": 24,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         1.0,
+         1.0
+        ],
+        "participants": 2,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 42,
+        "n": 42,
+        "rate": 1.0
+       }
+      },
+      "9": {
+       "by_participant": {
+        "sub-10": {
+         "hits": 24,
+         "n": 25,
+         "rate": 0.96
+        },
+        "sub-16": {
+         "hits": 9,
+         "n": 9,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 15,
+         "n": 15,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.96,
+         1.0
+        ],
+        "participants": 3,
+        "rate": 0.9866666666666667
+       },
+       "pooled": {
+        "hits": 48,
+        "n": 49,
+        "rate": 0.9795918367346939
+       }
+      }
+     },
+     "by_participant": {
+      "sub-08": {
+       "hits": 120,
+       "n": 129,
+       "rate": 0.9302325581395349
+      },
+      "sub-10": {
+       "hits": 125,
+       "n": 129,
+       "rate": 0.9689922480620154
+      },
+      "sub-16": {
+       "hits": 62,
+       "n": 65,
+       "rate": 0.9538461538461539
+      },
+      "sub-18": {
+       "hits": 145,
+       "n": 148,
+       "rate": 0.9797297297297297
+      }
+     },
+     "participant_average": {
+      "interval95": [
+       0.939922480620155,
+       0.9743609888958726
+      ],
+      "participants": 4,
+      "rate": 0.9582001724443585
+     },
+     "pooled": {
+      "hits": 452,
+      "n": 471,
+      "rate": 0.9596602972399151
+     },
+     "strata": {
+      "multi_contig": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 10,
+         "n": 11,
+         "rate": 0.9090909090909091
+        },
+        "sub-10": {
+         "hits": 17,
+         "n": 17,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 6,
+         "n": 6,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 28,
+         "n": 28,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9318181818181818,
+         1.0
+        ],
+        "participants": 4,
+        "rate": 0.9772727272727273
+       },
+       "pooled": {
+        "hits": 61,
+        "n": 62,
+        "rate": 0.9838709677419355
+       }
+      },
+      "multi_noncontig": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 1,
+         "n": 1,
+         "rate": 1.0
+        },
+        "sub-10": {
+         "hits": 4,
+         "n": 4,
+         "rate": 1.0
+        },
+        "sub-16": {
+         "hits": 1,
+         "n": 1,
+         "rate": 1.0
+        },
+        "sub-18": {
+         "hits": 3,
+         "n": 3,
+         "rate": 1.0
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         1.0,
+         1.0
+        ],
+        "participants": 4,
+        "rate": 1.0
+       },
+       "pooled": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       }
+      },
+      "single": {
+       "by_participant": {
+        "sub-08": {
+         "hits": 109,
+         "n": 117,
+         "rate": 0.9316239316239316
+        },
+        "sub-10": {
+         "hits": 104,
+         "n": 108,
+         "rate": 0.9629629629629629
+        },
+        "sub-16": {
+         "hits": 55,
+         "n": 58,
+         "rate": 0.9482758620689655
+        },
+        "sub-18": {
+         "hits": 114,
+         "n": 117,
+         "rate": 0.9743589743589743
+        }
+       },
+       "participant_average": {
+        "interval95": [
+         0.9394586894586895,
+         0.9686609686609686
+        ],
+        "participants": 4,
+        "rate": 0.9543054327537086
+       },
+       "pooled": {
+        "hits": 382,
+        "n": 400,
+        "rate": 0.955
+       }
+      }
+     }
+    },
+    "time_outside_clip": 0,
+    "utterances": 544
+   }
+  }
+ },
+ "population": {
+  "run-01": {
+   "all": 2682,
+   "film_labelled": 2574,
+   "film_reference": 2543,
+   "scene_specific": 2335
+  },
+  "run-02": {
+   "all": 544,
+   "film_labelled": 528,
+   "film_reference": 515,
+   "scene_specific": 471
+  }
+ },
+ "schema": "storymodel4s.filmfestival.transfer-score/v4",
+ "sessions": {
+  "run-01": {
+   "cartoon": {
+    "assigned_a_film": 0,
+    "failed": 0,
+    "n": 7,
+    "no_assignment": 7
+   },
+   "chance": {
+    "end_to_end": {
+     "scene": 0.00628474383181612,
+     "scene_adjacent": 0.016020928049282183
+    },
+    "given_film": {
+     "scene": 0.06221874723978811,
+     "scene_adjacent": 0.15811827935415124
+    }
+   },
+   "failure_reasons": {},
+   "film": {
+    "film_labelled": {
+     "by_participant": {
+      "sub-01": {
+       "hits": 86,
+       "n": 86,
+       "rate": 1.0
+      },
+      "sub-02": {
+       "hits": 119,
+       "n": 119,
+       "rate": 1.0
+      },
+      "sub-07": {
+       "hits": 317,
+       "n": 317,
+       "rate": 1.0
+      },
+      "sub-08": {
+       "hits": 270,
+       "n": 270,
+       "rate": 1.0
+      },
+      "sub-09": {
+       "hits": 168,
+       "n": 168,
+       "rate": 1.0
+      },
+      "sub-10": {
+       "hits": 213,
+       "n": 213,
+       "rate": 1.0
+      },
+      "sub-11": {
+       "hits": 244,
+       "n": 245,
+       "rate": 0.9959183673469387
+      },
+      "sub-12": {
+       "hits": 154,
+       "n": 154,
+       "rate": 1.0
+      },
+      "sub-13": {
+       "hits": 154,
+       "n": 155,
+       "rate": 0.9935483870967742
+      },
+      "sub-14": {
+       "hits": 99,
+       "n": 99,
+       "rate": 1.0
+      },
+      "sub-16": {
+       "hits": 185,
+       "n": 185,
+       "rate": 1.0
+      },
+      "sub-17": {
+       "hits": 134,
+       "n": 134,
+       "rate": 1.0
+      },
+      "sub-18": {
+       "hits": 56,
+       "n": 56,
+       "rate": 1.0
+      },
+      "sub-19": {
+       "hits": 185,
+       "n": 185,
+       "rate": 1.0
+      },
+      "sub-20": {
+       "hits": 188,
+       "n": 188,
+       "rate": 1.0
+      }
+     },
+     "participant_average": {
+      "interval95": [
+       0.9982795698924731,
+       1.0
+      ],
+      "participants": 15,
+      "rate": 0.9992977836295809
+     },
+     "pooled": {
+      "hits": 2572,
+      "n": 2574,
+      "rate": 0.9992229992229992
+     }
+    },
+    "film_reference": {
+     "by_participant": {
+      "sub-01": {
+       "hits": 85,
+       "n": 85,
+       "rate": 1.0
+      },
+      "sub-02": {
+       "hits": 113,
+       "n": 113,
+       "rate": 1.0
+      },
+      "sub-07": {
+       "hits": 313,
+       "n": 313,
+       "rate": 1.0
+      },
+      "sub-08": {
+       "hits": 270,
+       "n": 270,
+       "rate": 1.0
+      },
+      "sub-09": {
+       "hits": 168,
+       "n": 168,
+       "rate": 1.0
+      },
+      "sub-10": {
+       "hits": 210,
+       "n": 210,
+       "rate": 1.0
+      },
+      "sub-11": {
+       "hits": 239,
+       "n": 239,
+       "rate": 1.0
+      },
+      "sub-12": {
+       "hits": 153,
+       "n": 153,
+       "rate": 1.0
+      },
+      "sub-13": {
+       "hits": 154,
+       "n": 155,
+       "rate": 0.9935483870967742
+      },
+      "sub-14": {
+       "hits": 99,
+       "n": 99,
+       "rate": 1.0
+      },
+      "sub-16": {
+       "hits": 183,
+       "n": 183,
+       "rate": 1.0
+      },
+      "sub-17": {
+       "hits": 132,
+       "n": 132,
+       "rate": 1.0
+      },
+      "sub-18": {
+       "hits": 56,
+       "n": 56,
+       "rate": 1.0
+      },
+      "sub-19": {
+       "hits": 183,
+       "n": 183,
+       "rate": 1.0
+      },
+      "sub-20": {
+       "hits": 184,
+       "n": 184,
+       "rate": 1.0
+      }
+     },
+     "participant_average": {
+      "interval95": [
+       0.9987096774193548,
+       1.0
+      ],
+      "participants": 15,
+      "rate": 0.9995698924731183
+     },
+     "pooled": {
+      "hits": 2542,
+      "n": 2543,
+      "rate": 0.9996067636649626
+     }
+    }
+   },
+   "film_only": {
+    "failed": 0,
+    "film_only_correct_film": 141,
+    "n": 208,
+    "none": 1,
+    "scene_in_correct_film": 66,
+    "title_or_invalid_scene_in_correct_film": 0,
+    "wrong_film": 0
+   },
+   "film_search": {
+    "failed": 0,
+    "film_only_correct_film": 0,
+    "n": 31,
+    "none": 1,
+    "scene_in_correct_film": 30,
+    "title_or_invalid_scene_in_correct_film": 0,
+    "wrong_film": 0
+   },
+   "nonfilm": {
+    "assigned_a_film": 30,
+    "failed": 0,
+    "n": 101,
+    "no_assignment": 71
+   },
+   "prediction_kinds": {
+    "failed": 0,
+    "film": 163,
+    "invalid_scene": 0,
+    "none": 80,
+    "scene": 2439
+   },
+   "scene": {
+    "by_film": {
+     "1": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 3,
+        "n": 5,
+        "rate": 0.6
+       },
+       "sub-02": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 33,
+        "n": 37,
+        "rate": 0.8918918918918919
+       },
+       "sub-08": {
+        "hits": 31,
+        "n": 34,
+        "rate": 0.9117647058823529
+       },
+       "sub-09": {
+        "hits": 4,
+        "n": 11,
+        "rate": 0.36363636363636365
+       },
+       "sub-10": {
+        "hits": 34,
+        "n": 37,
+        "rate": 0.918918918918919
+       },
+       "sub-11": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-12": {
+        "hits": 20,
+        "n": 21,
+        "rate": 0.9523809523809523
+       },
+       "sub-13": {
+        "hits": 15,
+        "n": 19,
+        "rate": 0.7894736842105263
+       },
+       "sub-14": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-16": {
+        "hits": 22,
+        "n": 25,
+        "rate": 0.88
+       },
+       "sub-17": {
+        "hits": 9,
+        "n": 10,
+        "rate": 0.9
+       },
+       "sub-19": {
+        "hits": 16,
+        "n": 19,
+        "rate": 0.8421052631578947
+       },
+       "sub-20": {
+        "hits": 20,
+        "n": 21,
+        "rate": 0.9523809523809523
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7473481351676841,
+        0.9093871972686657
+       ],
+       "participants": 14,
+       "rate": 0.8394680523185609
+      },
+      "pooled": {
+       "hits": 227,
+       "n": 261,
+       "rate": 0.8697318007662835
+      }
+     },
+     "10": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 9,
+        "n": 14,
+        "rate": 0.6428571428571429
+       },
+       "sub-02": {
+        "hits": 23,
+        "n": 25,
+        "rate": 0.92
+       },
+       "sub-07": {
+        "hits": 36,
+        "n": 44,
+        "rate": 0.8181818181818182
+       },
+       "sub-09": {
+        "hits": 25,
+        "n": 32,
+        "rate": 0.78125
+       },
+       "sub-11": {
+        "hits": 29,
+        "n": 35,
+        "rate": 0.8285714285714286
+       },
+       "sub-12": {
+        "hits": 20,
+        "n": 25,
+        "rate": 0.8
+       },
+       "sub-13": {
+        "hits": 19,
+        "n": 23,
+        "rate": 0.8260869565217391
+       },
+       "sub-17": {
+        "hits": 15,
+        "n": 20,
+        "rate": 0.75
+       },
+       "sub-18": {
+        "hits": 25,
+        "n": 29,
+        "rate": 0.8620689655172413
+       },
+       "sub-19": {
+        "hits": 31,
+        "n": 37,
+        "rate": 0.8378378378378378
+       },
+       "sub-20": {
+        "hits": 25,
+        "n": 30,
+        "rate": 0.8333333333333334
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7660396226031022,
+        0.8453288858817345
+       ],
+       "participants": 11,
+       "rate": 0.8091079529836857
+      },
+      "pooled": {
+       "hits": 257,
+       "n": 314,
+       "rate": 0.8184713375796179
+      }
+     },
+     "2": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-02": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-07": {
+        "hits": 28,
+        "n": 29,
+        "rate": 0.9655172413793104
+       },
+       "sub-08": {
+        "hits": 20,
+        "n": 21,
+        "rate": 0.9523809523809523
+       },
+       "sub-09": {
+        "hits": 5,
+        "n": 7,
+        "rate": 0.7142857142857143
+       },
+       "sub-10": {
+        "hits": 18,
+        "n": 20,
+        "rate": 0.9
+       },
+       "sub-11": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-12": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-13": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       },
+       "sub-14": {
+        "hits": 4,
+        "n": 6,
+        "rate": 0.6666666666666666
+       },
+       "sub-16": {
+        "hits": 16,
+        "n": 19,
+        "rate": 0.8421052631578947
+       },
+       "sub-17": {
+        "hits": 9,
+        "n": 10,
+        "rate": 0.9
+       },
+       "sub-19": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8405560709132137,
+        0.9394565960355434
+       ],
+       "participants": 14,
+       "rate": 0.8920668311321668
+      },
+      "pooled": {
+       "hits": 174,
+       "n": 190,
+       "rate": 0.9157894736842105
+      }
+     },
+     "3": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 4,
+        "n": 5,
+        "rate": 0.8
+       },
+       "sub-02": {
+        "hits": 10,
+        "n": 14,
+        "rate": 0.7142857142857143
+       },
+       "sub-07": {
+        "hits": 52,
+        "n": 58,
+        "rate": 0.896551724137931
+       },
+       "sub-08": {
+        "hits": 47,
+        "n": 54,
+        "rate": 0.8703703703703703
+       },
+       "sub-09": {
+        "hits": 27,
+        "n": 35,
+        "rate": 0.7714285714285715
+       },
+       "sub-10": {
+        "hits": 57,
+        "n": 61,
+        "rate": 0.9344262295081968
+       },
+       "sub-11": {
+        "hits": 27,
+        "n": 29,
+        "rate": 0.9310344827586207
+       },
+       "sub-12": {
+        "hits": 20,
+        "n": 23,
+        "rate": 0.8695652173913043
+       },
+       "sub-13": {
+        "hits": 32,
+        "n": 41,
+        "rate": 0.7804878048780488
+       },
+       "sub-14": {
+        "hits": 16,
+        "n": 21,
+        "rate": 0.7619047619047619
+       },
+       "sub-16": {
+        "hits": 22,
+        "n": 27,
+        "rate": 0.8148148148148148
+       },
+       "sub-17": {
+        "hits": 19,
+        "n": 24,
+        "rate": 0.7916666666666666
+       },
+       "sub-19": {
+        "hits": 14,
+        "n": 18,
+        "rate": 0.7777777777777778
+       },
+       "sub-20": {
+        "hits": 29,
+        "n": 30,
+        "rate": 0.9666666666666667
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7979469462768753,
+        0.8756180717863812
+       ],
+       "participants": 14,
+       "rate": 0.8343557716135318
+      },
+      "pooled": {
+       "hits": 376,
+       "n": 440,
+       "rate": 0.8545454545454545
+      }
+     },
+     "4": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 19,
+        "n": 22,
+        "rate": 0.8636363636363636
+       },
+       "sub-08": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       },
+       "sub-10": {
+        "hits": 13,
+        "n": 14,
+        "rate": 0.9285714285714286
+       },
+       "sub-11": {
+        "hits": 14,
+        "n": 16,
+        "rate": 0.875
+       },
+       "sub-12": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       },
+       "sub-13": {
+        "hits": 9,
+        "n": 11,
+        "rate": 0.8181818181818182
+       },
+       "sub-14": {
+        "hits": 5,
+        "n": 9,
+        "rate": 0.5555555555555556
+       },
+       "sub-16": {
+        "hits": 9,
+        "n": 10,
+        "rate": 0.9
+       },
+       "sub-20": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8178691678691679,
+        0.9504208754208755
+       ],
+       "participants": 12,
+       "rate": 0.893226911976912
+      },
+      "pooled": {
+       "hits": 119,
+       "n": 134,
+       "rate": 0.8880597014925373
+      }
+     },
+     "5": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 5,
+        "n": 7,
+        "rate": 0.7142857142857143
+       },
+       "sub-02": {
+        "hits": 12,
+        "n": 14,
+        "rate": 0.8571428571428571
+       },
+       "sub-07": {
+        "hits": 13,
+        "n": 16,
+        "rate": 0.8125
+       },
+       "sub-08": {
+        "hits": 45,
+        "n": 55,
+        "rate": 0.8181818181818182
+       },
+       "sub-09": {
+        "hits": 19,
+        "n": 28,
+        "rate": 0.6785714285714286
+       },
+       "sub-10": {
+        "hits": 42,
+        "n": 46,
+        "rate": 0.9130434782608695
+       },
+       "sub-11": {
+        "hits": 23,
+        "n": 28,
+        "rate": 0.8214285714285714
+       },
+       "sub-12": {
+        "hits": 14,
+        "n": 16,
+        "rate": 0.875
+       },
+       "sub-13": {
+        "hits": 19,
+        "n": 28,
+        "rate": 0.6785714285714286
+       },
+       "sub-14": {
+        "hits": 14,
+        "n": 16,
+        "rate": 0.875
+       },
+       "sub-16": {
+        "hits": 27,
+        "n": 30,
+        "rate": 0.9
+       },
+       "sub-17": {
+        "hits": 21,
+        "n": 22,
+        "rate": 0.9545454545454546
+       },
+       "sub-19": {
+        "hits": 21,
+        "n": 23,
+        "rate": 0.9130434782608695
+       },
+       "sub-20": {
+        "hits": 26,
+        "n": 31,
+        "rate": 0.8387096774193549
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7847223053444251,
+        0.8734467008147132
+       ],
+       "participants": 14,
+       "rate": 0.8321445647620261
+      },
+      "pooled": {
+       "hits": 301,
+       "n": 360,
+       "rate": 0.8361111111111111
+      }
+     },
+     "6": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       },
+       "sub-02": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-07": {
+        "hits": 28,
+        "n": 31,
+        "rate": 0.9032258064516129
+       },
+       "sub-09": {
+        "hits": 19,
+        "n": 21,
+        "rate": 0.9047619047619048
+       },
+       "sub-11": {
+        "hits": 23,
+        "n": 27,
+        "rate": 0.8518518518518519
+       },
+       "sub-12": {
+        "hits": 12,
+        "n": 13,
+        "rate": 0.9230769230769231
+       },
+       "sub-13": {
+        "hits": 4,
+        "n": 7,
+        "rate": 0.5714285714285714
+       },
+       "sub-14": {
+        "hits": 13,
+        "n": 14,
+        "rate": 0.9285714285714286
+       },
+       "sub-16": {
+        "hits": 25,
+        "n": 33,
+        "rate": 0.7575757575757576
+       },
+       "sub-17": {
+        "hits": 14,
+        "n": 15,
+        "rate": 0.9333333333333333
+       },
+       "sub-18": {
+        "hits": 20,
+        "n": 24,
+        "rate": 0.8333333333333334
+       },
+       "sub-19": {
+        "hits": 19,
+        "n": 20,
+        "rate": 0.95
+       },
+       "sub-20": {
+        "hits": 18,
+        "n": 19,
+        "rate": 0.9473684210526315
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8046691031410895,
+        0.9138102328842828
+       ],
+       "participants": 13,
+       "rate": 0.8694236253397805
+      },
+      "pooled": {
+       "hits": 213,
+       "n": 244,
+       "rate": 0.8729508196721312
+      }
+     },
+     "7": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 5,
+        "n": 7,
+        "rate": 0.7142857142857143
+       },
+       "sub-02": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-07": {
+        "hits": 26,
+        "n": 30,
+        "rate": 0.8666666666666667
+       },
+       "sub-08": {
+        "hits": 16,
+        "n": 16,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 9,
+        "n": 10,
+        "rate": 0.9
+       },
+       "sub-10": {
+        "hits": 4,
+        "n": 6,
+        "rate": 0.6666666666666666
+       },
+       "sub-11": {
+        "hits": 27,
+        "n": 33,
+        "rate": 0.8181818181818182
+       },
+       "sub-12": {
+        "hits": 13,
+        "n": 15,
+        "rate": 0.8666666666666667
+       },
+       "sub-16": {
+        "hits": 14,
+        "n": 17,
+        "rate": 0.8235294117647058
+       },
+       "sub-17": {
+        "hits": 13,
+        "n": 13,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 14,
+        "n": 14,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 10,
+        "n": 18,
+        "rate": 0.5555555555555556
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7647914721444132,
+        0.9144781144781144
+       ],
+       "participants": 12,
+       "rate": 0.8433869507398919
+      },
+      "pooled": {
+       "hits": 161,
+       "n": 190,
+       "rate": 0.8473684210526315
+      }
+     },
+     "8": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 4,
+        "n": 7,
+        "rate": 0.5714285714285714
+       },
+       "sub-02": {
+        "hits": 8,
+        "n": 8,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 20,
+        "n": 21,
+        "rate": 0.9523809523809523
+       },
+       "sub-08": {
+        "hits": 17,
+        "n": 21,
+        "rate": 0.8095238095238095
+       },
+       "sub-10": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 16,
+        "n": 17,
+        "rate": 0.9411764705882353
+       },
+       "sub-12": {
+        "hits": 4,
+        "n": 4,
+        "rate": 1.0
+       },
+       "sub-14": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 12,
+        "n": 13,
+        "rate": 0.9230769230769231
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8123488711724005,
+        0.9808709808709809
+       ],
+       "participants": 9,
+       "rate": 0.910842969666499
+      },
+      "pooled": {
+       "hits": 108,
+       "n": 118,
+       "rate": 0.9152542372881356
+      }
+     },
+     "9": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 11,
+        "n": 12,
+        "rate": 0.9166666666666666
+       },
+       "sub-08": {
+        "hits": 17,
+        "n": 17,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 14,
+        "n": 17,
+        "rate": 0.8235294117647058
+       },
+       "sub-12": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       },
+       "sub-14": {
+        "hits": 5,
+        "n": 6,
+        "rate": 0.8333333333333334
+       },
+       "sub-16": {
+        "hits": 6,
+        "n": 7,
+        "rate": 0.8571428571428571
+       },
+       "sub-20": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8770100632845731,
+        0.9717813051146383
+       ],
+       "participants": 9,
+       "rate": 0.9243956841996057
+      },
+      "pooled": {
+       "hits": 77,
+       "n": 84,
+       "rate": 0.9166666666666666
+      }
+     }
+    },
+    "by_participant": {
+     "sub-01": {
+      "hits": 51,
+      "n": 68,
+      "rate": 0.75
+     },
+     "sub-02": {
+      "hits": 98,
+      "n": 109,
+      "rate": 0.8990825688073395
+     },
+     "sub-07": {
+      "hits": 266,
+      "n": 300,
+      "rate": 0.8866666666666667
+     },
+     "sub-08": {
+      "hits": 211,
+      "n": 236,
+      "rate": 0.8940677966101694
+     },
+     "sub-09": {
+      "hits": 116,
+      "n": 153,
+      "rate": 0.7581699346405228
+     },
+     "sub-10": {
+      "hits": 186,
+      "n": 202,
+      "rate": 0.9207920792079208
+     },
+     "sub-11": {
+      "hits": 190,
+      "n": 221,
+      "rate": 0.8597285067873304
+     },
+     "sub-12": {
+      "hits": 127,
+      "n": 142,
+      "rate": 0.8943661971830986
+     },
+     "sub-13": {
+      "hits": 106,
+      "n": 138,
+      "rate": 0.7681159420289855
+     },
+     "sub-14": {
+      "hits": 73,
+      "n": 89,
+      "rate": 0.8202247191011236
+     },
+     "sub-16": {
+      "hits": 141,
+      "n": 168,
+      "rate": 0.8392857142857143
+     },
+     "sub-17": {
+      "hits": 100,
+      "n": 114,
+      "rate": 0.8771929824561403
+     },
+     "sub-18": {
+      "hits": 45,
+      "n": 53,
+      "rate": 0.8490566037735849
+     },
+     "sub-19": {
+      "hits": 145,
+      "n": 162,
+      "rate": 0.8950617283950617
+     },
+     "sub-20": {
+      "hits": 158,
+      "n": 180,
+      "rate": 0.8777777777777778
+     }
+    },
+    "chance_end_to_end": 0.00628474383181612,
+    "chance_given_film": 0.06221874723978811,
+    "participant_average": {
+     "interval95": [
+      0.824500225598679,
+      0.8784042224388797
+     ],
+     "participants": 15,
+     "rate": 0.8526392811814291
+    },
+    "pooled": {
+     "hits": 2013,
+     "n": 2335,
+     "rate": 0.8620985010706638
+    },
+    "prediction_kinds": {
+     "failed": 0,
+     "film": 11,
+     "invalid_scene": 0,
+     "none": 0,
+     "scene": 2324
+    },
+    "strata": {
+     "multi_contig": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 14,
+        "n": 15,
+        "rate": 0.9333333333333333
+       },
+       "sub-02": {
+        "hits": 30,
+        "n": 32,
+        "rate": 0.9375
+       },
+       "sub-07": {
+        "hits": 32,
+        "n": 32,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 38,
+        "n": 38,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 26,
+        "n": 28,
+        "rate": 0.9285714285714286
+       },
+       "sub-10": {
+        "hits": 19,
+        "n": 19,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 36,
+        "n": 37,
+        "rate": 0.972972972972973
+       },
+       "sub-12": {
+        "hits": 27,
+        "n": 28,
+        "rate": 0.9642857142857143
+       },
+       "sub-13": {
+        "hits": 32,
+        "n": 33,
+        "rate": 0.9696969696969697
+       },
+       "sub-14": {
+        "hits": 22,
+        "n": 23,
+        "rate": 0.9565217391304348
+       },
+       "sub-16": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       },
+       "sub-17": {
+        "hits": 29,
+        "n": 29,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 11,
+        "n": 12,
+        "rate": 0.9166666666666666
+       },
+       "sub-19": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 25,
+        "n": 28,
+        "rate": 0.8928571428571429
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9466868110346371,
+        0.9820220841959972
+       ],
+       "participants": 15,
+       "rate": 0.9648270645009777
+      },
+      "pooled": {
+       "hits": 401,
+       "n": 414,
+       "rate": 0.9685990338164251
+      }
+     },
+     "multi_noncontig": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 13,
+        "n": 17,
+        "rate": 0.7647058823529411
+       },
+       "sub-02": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 2,
+        "n": 2,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 10,
+        "n": 12,
+        "rate": 0.8333333333333334
+       },
+       "sub-10": {
+        "hits": 0,
+        "n": 1,
+        "rate": 0.0
+       },
+       "sub-11": {
+        "hits": 6,
+        "n": 7,
+        "rate": 0.8571428571428571
+       },
+       "sub-12": {
+        "hits": 5,
+        "n": 8,
+        "rate": 0.625
+       },
+       "sub-13": {
+        "hits": 9,
+        "n": 15,
+        "rate": 0.6
+       },
+       "sub-14": {
+        "hits": 6,
+        "n": 8,
+        "rate": 0.75
+       },
+       "sub-16": {
+        "hits": 11,
+        "n": 12,
+        "rate": 0.9166666666666666
+       },
+       "sub-17": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       },
+       "sub-18": {
+        "hits": 2,
+        "n": 2,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.6467987194877951,
+        0.9039115646258503
+       ],
+       "participants": 14,
+       "rate": 0.793624116313192
+      },
+      "pooled": {
+       "hits": 89,
+       "n": 111,
+       "rate": 0.8018018018018018
+      }
+     },
+     "single": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 24,
+        "n": 36,
+        "rate": 0.6666666666666666
+       },
+       "sub-02": {
+        "hits": 61,
+        "n": 70,
+        "rate": 0.8714285714285714
+       },
+       "sub-07": {
+        "hits": 232,
+        "n": 266,
+        "rate": 0.8721804511278195
+       },
+       "sub-08": {
+        "hits": 173,
+        "n": 198,
+        "rate": 0.8737373737373737
+       },
+       "sub-09": {
+        "hits": 80,
+        "n": 113,
+        "rate": 0.7079646017699115
+       },
+       "sub-10": {
+        "hits": 167,
+        "n": 182,
+        "rate": 0.9175824175824175
+       },
+       "sub-11": {
+        "hits": 148,
+        "n": 177,
+        "rate": 0.8361581920903954
+       },
+       "sub-12": {
+        "hits": 95,
+        "n": 106,
+        "rate": 0.8962264150943396
+       },
+       "sub-13": {
+        "hits": 65,
+        "n": 90,
+        "rate": 0.7222222222222222
+       },
+       "sub-14": {
+        "hits": 45,
+        "n": 58,
+        "rate": 0.7758620689655172
+       },
+       "sub-16": {
+        "hits": 100,
+        "n": 126,
+        "rate": 0.7936507936507936
+       },
+       "sub-17": {
+        "hits": 63,
+        "n": 76,
+        "rate": 0.8289473684210527
+       },
+       "sub-18": {
+        "hits": 32,
+        "n": 39,
+        "rate": 0.8205128205128205
+       },
+       "sub-19": {
+        "hits": 112,
+        "n": 129,
+        "rate": 0.8682170542635659
+       },
+       "sub-20": {
+        "hits": 126,
+        "n": 144,
+        "rate": 0.875
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7839062810309805,
+        0.8565507377932131
+       ],
+       "participants": 15,
+       "rate": 0.8217571345022312
+      },
+      "pooled": {
+       "hits": 1523,
+       "n": 1810,
+       "rate": 0.8414364640883978
+      }
+     }
+    }
+   },
+   "scene_adjacent": {
+    "by_film": {
+     "1": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 5,
+        "n": 5,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 37,
+        "n": 37,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 34,
+        "n": 34,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 7,
+        "n": 11,
+        "rate": 0.6363636363636364
+       },
+       "sub-10": {
+        "hits": 37,
+        "n": 37,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-12": {
+        "hits": 21,
+        "n": 21,
+        "rate": 1.0
+       },
+       "sub-13": {
+        "hits": 18,
+        "n": 19,
+        "rate": 0.9473684210526315
+       },
+       "sub-14": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-16": {
+        "hits": 24,
+        "n": 25,
+        "rate": 0.96
+       },
+       "sub-17": {
+        "hits": 10,
+        "n": 10,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 19,
+        "n": 19,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 21,
+        "n": 21,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8952922077922078,
+        0.9905263157894737
+       ],
+       "participants": 14,
+       "rate": 0.9495522898154477
+      },
+      "pooled": {
+       "hits": 253,
+       "n": 261,
+       "rate": 0.9693486590038314
+      }
+     },
+     "10": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 12,
+        "n": 14,
+        "rate": 0.8571428571428571
+       },
+       "sub-02": {
+        "hits": 25,
+        "n": 25,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 41,
+        "n": 44,
+        "rate": 0.9318181818181818
+       },
+       "sub-09": {
+        "hits": 29,
+        "n": 32,
+        "rate": 0.90625
+       },
+       "sub-11": {
+        "hits": 31,
+        "n": 35,
+        "rate": 0.8857142857142857
+       },
+       "sub-12": {
+        "hits": 23,
+        "n": 25,
+        "rate": 0.92
+       },
+       "sub-13": {
+        "hits": 20,
+        "n": 23,
+        "rate": 0.8695652173913043
+       },
+       "sub-17": {
+        "hits": 19,
+        "n": 20,
+        "rate": 0.95
+       },
+       "sub-18": {
+        "hits": 29,
+        "n": 29,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 33,
+        "n": 37,
+        "rate": 0.8918918918918919
+       },
+       "sub-20": {
+        "hits": 27,
+        "n": 30,
+        "rate": 0.9
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8933488676423459,
+        0.9472690976100068
+       ],
+       "participants": 11,
+       "rate": 0.9193074939962291
+      },
+      "pooled": {
+       "hits": 289,
+       "n": 314,
+       "rate": 0.9203821656050956
+      }
+     },
+     "2": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 8,
+        "n": 8,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 8,
+        "n": 8,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 29,
+        "n": 29,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 21,
+        "n": 21,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 6,
+        "n": 7,
+        "rate": 0.8571428571428571
+       },
+       "sub-10": {
+        "hits": 18,
+        "n": 20,
+        "rate": 0.9
+       },
+       "sub-11": {
+        "hits": 11,
+        "n": 11,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-13": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-14": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 18,
+        "n": 19,
+        "rate": 0.9473684210526315
+       },
+       "sub-17": {
+        "hits": 10,
+        "n": 10,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9544038668098819,
+        1.0
+       ],
+       "participants": 14,
+       "rate": 0.9788936627282492
+      },
+      "pooled": {
+       "hits": 186,
+       "n": 190,
+       "rate": 0.9789473684210527
+      }
+     },
+     "3": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 4,
+        "n": 5,
+        "rate": 0.8
+       },
+       "sub-02": {
+        "hits": 11,
+        "n": 14,
+        "rate": 0.7857142857142857
+       },
+       "sub-07": {
+        "hits": 56,
+        "n": 58,
+        "rate": 0.9655172413793104
+       },
+       "sub-08": {
+        "hits": 54,
+        "n": 54,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 31,
+        "n": 35,
+        "rate": 0.8857142857142857
+       },
+       "sub-10": {
+        "hits": 60,
+        "n": 61,
+        "rate": 0.9836065573770492
+       },
+       "sub-11": {
+        "hits": 29,
+        "n": 29,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 21,
+        "n": 23,
+        "rate": 0.9130434782608695
+       },
+       "sub-13": {
+        "hits": 40,
+        "n": 41,
+        "rate": 0.975609756097561
+       },
+       "sub-14": {
+        "hits": 20,
+        "n": 21,
+        "rate": 0.9523809523809523
+       },
+       "sub-16": {
+        "hits": 26,
+        "n": 27,
+        "rate": 0.9629629629629629
+       },
+       "sub-17": {
+        "hits": 23,
+        "n": 24,
+        "rate": 0.9583333333333334
+       },
+       "sub-19": {
+        "hits": 17,
+        "n": 18,
+        "rate": 0.9444444444444444
+       },
+       "sub-20": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8989693786893402,
+        0.9705481381612653
+       ],
+       "participants": 14,
+       "rate": 0.937666235547504
+      },
+      "pooled": {
+       "hits": 422,
+       "n": 440,
+       "rate": 0.9590909090909091
+      }
+     },
+     "4": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 21,
+        "n": 22,
+        "rate": 0.9545454545454546
+       },
+       "sub-08": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 14,
+        "n": 14,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 16,
+        "n": 16,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       },
+       "sub-13": {
+        "hits": 9,
+        "n": 11,
+        "rate": 0.8181818181818182
+       },
+       "sub-14": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 9,
+        "n": 10,
+        "rate": 0.9
+       },
+       "sub-20": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9261784511784512,
+        0.9924242424242425
+       ],
+       "participants": 12,
+       "rate": 0.9634680134680135
+      },
+      "pooled": {
+       "hits": 129,
+       "n": 134,
+       "rate": 0.9626865671641791
+      }
+     },
+     "5": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 6,
+        "n": 7,
+        "rate": 0.8571428571428571
+       },
+       "sub-02": {
+        "hits": 14,
+        "n": 14,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 15,
+        "n": 16,
+        "rate": 0.9375
+       },
+       "sub-08": {
+        "hits": 54,
+        "n": 55,
+        "rate": 0.9818181818181818
+       },
+       "sub-09": {
+        "hits": 22,
+        "n": 28,
+        "rate": 0.7857142857142857
+       },
+       "sub-10": {
+        "hits": 46,
+        "n": 46,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 27,
+        "n": 28,
+        "rate": 0.9642857142857143
+       },
+       "sub-12": {
+        "hits": 16,
+        "n": 16,
+        "rate": 1.0
+       },
+       "sub-13": {
+        "hits": 26,
+        "n": 28,
+        "rate": 0.9285714285714286
+       },
+       "sub-14": {
+        "hits": 16,
+        "n": 16,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       },
+       "sub-17": {
+        "hits": 22,
+        "n": 22,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 23,
+        "n": 23,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 30,
+        "n": 31,
+        "rate": 0.967741935483871
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9228084415584416,
+        0.9874917709019091
+       ],
+       "participants": 14,
+       "rate": 0.9587696002154528
+      },
+      "pooled": {
+       "hits": 347,
+       "n": 360,
+       "rate": 0.9638888888888889
+      }
+     },
+     "6": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-07": {
+        "hits": 31,
+        "n": 31,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 21,
+        "n": 21,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 27,
+        "n": 27,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 13,
+        "n": 13,
+        "rate": 1.0
+       },
+       "sub-13": {
+        "hits": 4,
+        "n": 7,
+        "rate": 0.5714285714285714
+       },
+       "sub-14": {
+        "hits": 14,
+        "n": 14,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 33,
+        "n": 33,
+        "rate": 1.0
+       },
+       "sub-17": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 23,
+        "n": 24,
+        "rate": 0.9583333333333334
+       },
+       "sub-19": {
+        "hits": 20,
+        "n": 20,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 19,
+        "n": 19,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.887112887112887,
+        1.0
+       ],
+       "participants": 13,
+       "rate": 0.9568348318348318
+      },
+      "pooled": {
+       "hits": 239,
+       "n": 244,
+       "rate": 0.9795081967213115
+      }
+     },
+     "7": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 6,
+        "n": 7,
+        "rate": 0.8571428571428571
+       },
+       "sub-02": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-07": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 16,
+        "n": 16,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 10,
+        "n": 10,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 33,
+        "n": 33,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 17,
+        "n": 17,
+        "rate": 1.0
+       },
+       "sub-17": {
+        "hits": 13,
+        "n": 13,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 14,
+        "n": 14,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 15,
+        "n": 18,
+        "rate": 0.8333333333333334
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9289321789321789,
+        1.0
+       ],
+       "participants": 12,
+       "rate": 0.9666305916305916
+      },
+      "pooled": {
+       "hits": 185,
+       "n": 190,
+       "rate": 0.9736842105263158
+      }
+     },
+     "8": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 8,
+        "n": 8,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 21,
+        "n": 21,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 21,
+        "n": 21,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 17,
+        "n": 17,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 4,
+        "n": 4,
+        "rate": 1.0
+       },
+       "sub-14": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 13,
+        "n": 13,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 9,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 118,
+       "n": 118,
+       "rate": 1.0
+      }
+     },
+     "9": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 12,
+        "n": 12,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 17,
+        "n": 17,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 16,
+        "n": 17,
+        "rate": 0.9411764705882353
+       },
+       "sub-12": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       },
+       "sub-14": {
+        "hits": 5,
+        "n": 6,
+        "rate": 0.8333333333333334
+       },
+       "sub-16": {
+        "hits": 6,
+        "n": 7,
+        "rate": 0.8571428571428571
+       },
+       "sub-20": {
+        "hits": 8,
+        "n": 9,
+        "rate": 0.8888888888888888
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9003527336860669,
+        0.9869281045751634
+       ],
+       "participants": 9,
+       "rate": 0.9467268388837016
+      },
+      "pooled": {
+       "hits": 80,
+       "n": 84,
+       "rate": 0.9523809523809523
+      }
+     }
+    },
+    "by_participant": {
+     "sub-01": {
+      "hits": 63,
+      "n": 68,
+      "rate": 0.9264705882352942
+     },
+     "sub-02": {
+      "hits": 104,
+      "n": 109,
+      "rate": 0.9541284403669725
+     },
+     "sub-07": {
+      "hits": 293,
+      "n": 300,
+      "rate": 0.9766666666666667
+     },
+     "sub-08": {
+      "hits": 235,
+      "n": 236,
+      "rate": 0.9957627118644068
+     },
+     "sub-09": {
+      "hits": 135,
+      "n": 153,
+      "rate": 0.8823529411764706
+     },
+     "sub-10": {
+      "hits": 199,
+      "n": 202,
+      "rate": 0.9851485148514851
+     },
+     "sub-11": {
+      "hits": 214,
+      "n": 221,
+      "rate": 0.9683257918552036
+     },
+     "sub-12": {
+      "hits": 137,
+      "n": 142,
+      "rate": 0.9647887323943662
+     },
+     "sub-13": {
+      "hits": 126,
+      "n": 138,
+      "rate": 0.9130434782608695
+     },
+     "sub-14": {
+      "hits": 86,
+      "n": 89,
+      "rate": 0.9662921348314607
+     },
+     "sub-16": {
+      "hits": 163,
+      "n": 168,
+      "rate": 0.9702380952380952
+     },
+     "sub-17": {
+      "hits": 112,
+      "n": 114,
+      "rate": 0.9824561403508771
+     },
+     "sub-18": {
+      "hits": 52,
+      "n": 53,
+      "rate": 0.9811320754716981
+     },
+     "sub-19": {
+      "hits": 157,
+      "n": 162,
+      "rate": 0.9691358024691358
+     },
+     "sub-20": {
+      "hits": 172,
+      "n": 180,
+      "rate": 0.9555555555555556
+     }
+    },
+    "participant_average": {
+     "interval95": [
+      0.9437524412324921,
+      0.9729427678424281
+     ],
+     "participants": 15,
+     "rate": 0.9594331779725706
+    },
+    "pooled": {
+     "hits": 2248,
+     "n": 2335,
+     "rate": 0.9627408993576018
+    },
+    "strata": {
+     "multi_contig": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 30,
+        "n": 32,
+        "rate": 0.9375
+       },
+       "sub-07": {
+        "hits": 32,
+        "n": 32,
+        "rate": 1.0
+       },
+       "sub-08": {
+        "hits": 38,
+        "n": 38,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 26,
+        "n": 28,
+        "rate": 0.9285714285714286
+       },
+       "sub-10": {
+        "hits": 19,
+        "n": 19,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 37,
+        "n": 37,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 27,
+        "n": 28,
+        "rate": 0.9642857142857143
+       },
+       "sub-13": {
+        "hits": 33,
+        "n": 33,
+        "rate": 1.0
+       },
+       "sub-14": {
+        "hits": 22,
+        "n": 23,
+        "rate": 0.9565217391304348
+       },
+       "sub-16": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       },
+       "sub-17": {
+        "hits": 29,
+        "n": 29,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 12,
+        "n": 12,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 27,
+        "n": 28,
+        "rate": 0.9642857142857143
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.970988612836439,
+        0.9952380952380953
+       ],
+       "participants": 15,
+       "rate": 0.9834109730848861
+      },
+      "pooled": {
+       "hits": 407,
+       "n": 414,
+       "rate": 0.9830917874396136
+      }
+     },
+     "multi_noncontig": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 17,
+        "n": 17,
+        "rate": 1.0
+       },
+       "sub-02": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       },
+       "sub-07": {
+        "hits": 2,
+        "n": 2,
+        "rate": 1.0
+       },
+       "sub-09": {
+        "hits": 11,
+        "n": 12,
+        "rate": 0.9166666666666666
+       },
+       "sub-10": {
+        "hits": 1,
+        "n": 1,
+        "rate": 1.0
+       },
+       "sub-11": {
+        "hits": 7,
+        "n": 7,
+        "rate": 1.0
+       },
+       "sub-12": {
+        "hits": 7,
+        "n": 8,
+        "rate": 0.875
+       },
+       "sub-13": {
+        "hits": 12,
+        "n": 15,
+        "rate": 0.8
+       },
+       "sub-14": {
+        "hits": 8,
+        "n": 8,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 12,
+        "n": 12,
+        "rate": 1.0
+       },
+       "sub-17": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 2,
+        "n": 2,
+        "rate": 1.0
+       },
+       "sub-19": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       },
+       "sub-20": {
+        "hits": 8,
+        "n": 8,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9363095238095239,
+        1.0
+       ],
+       "participants": 14,
+       "rate": 0.9708333333333333
+      },
+      "pooled": {
+       "hits": 106,
+       "n": 111,
+       "rate": 0.954954954954955
+      }
+     },
+     "single": {
+      "by_participant": {
+       "sub-01": {
+        "hits": 31,
+        "n": 36,
+        "rate": 0.8611111111111112
+       },
+       "sub-02": {
+        "hits": 67,
+        "n": 70,
+        "rate": 0.9571428571428572
+       },
+       "sub-07": {
+        "hits": 259,
+        "n": 266,
+        "rate": 0.9736842105263158
+       },
+       "sub-08": {
+        "hits": 197,
+        "n": 198,
+        "rate": 0.9949494949494949
+       },
+       "sub-09": {
+        "hits": 98,
+        "n": 113,
+        "rate": 0.8672566371681416
+       },
+       "sub-10": {
+        "hits": 179,
+        "n": 182,
+        "rate": 0.9835164835164835
+       },
+       "sub-11": {
+        "hits": 170,
+        "n": 177,
+        "rate": 0.96045197740113
+       },
+       "sub-12": {
+        "hits": 103,
+        "n": 106,
+        "rate": 0.9716981132075472
+       },
+       "sub-13": {
+        "hits": 81,
+        "n": 90,
+        "rate": 0.9
+       },
+       "sub-14": {
+        "hits": 56,
+        "n": 58,
+        "rate": 0.9655172413793104
+       },
+       "sub-16": {
+        "hits": 121,
+        "n": 126,
+        "rate": 0.9603174603174603
+       },
+       "sub-17": {
+        "hits": 74,
+        "n": 76,
+        "rate": 0.9736842105263158
+       },
+       "sub-18": {
+        "hits": 38,
+        "n": 39,
+        "rate": 0.9743589743589743
+       },
+       "sub-19": {
+        "hits": 124,
+        "n": 129,
+        "rate": 0.9612403100775194
+       },
+       "sub-20": {
+        "hits": 137,
+        "n": 144,
+        "rate": 0.9513888888888888
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9290907649188985,
+        0.9686951657604995
+       ],
+       "participants": 15,
+       "rate": 0.9504211980381034
+      },
+      "pooled": {
+       "hits": 1735,
+       "n": 1810,
+       "rate": 0.9585635359116023
+      }
+     }
+    }
+   },
+   "time_outside_clip": 0,
+   "utterances": 2682
+  },
+  "run-02": {
+   "cartoon": {
+    "assigned_a_film": 0,
+    "failed": 0,
+    "n": 0,
+    "no_assignment": 0
+   },
+   "chance": {
+    "end_to_end": {
+     "scene": 0.005794191166473179,
+     "scene_adjacent": 0.015343101879451537
+    },
+    "given_film": {
+     "scene": 0.05640067341604312,
+     "scene_adjacent": 0.14993506478136773
+    }
+   },
+   "failure_reasons": {},
+   "film": {
+    "film_labelled": {
+     "by_participant": {
+      "sub-08": {
+       "hits": 143,
+       "n": 143,
+       "rate": 1.0
+      },
+      "sub-10": {
+       "hits": 150,
+       "n": 150,
+       "rate": 1.0
+      },
+      "sub-16": {
+       "hits": 69,
+       "n": 69,
+       "rate": 1.0
+      },
+      "sub-18": {
+       "hits": 166,
+       "n": 166,
+       "rate": 1.0
+      }
+     },
+     "participant_average": {
+      "interval95": [
+       1.0,
+       1.0
+      ],
+      "participants": 4,
+      "rate": 1.0
+     },
+     "pooled": {
+      "hits": 528,
+      "n": 528,
+      "rate": 1.0
+     }
+    },
+    "film_reference": {
+     "by_participant": {
+      "sub-08": {
+       "hits": 143,
+       "n": 143,
+       "rate": 1.0
+      },
+      "sub-10": {
+       "hits": 138,
+       "n": 138,
+       "rate": 1.0
+      },
+      "sub-16": {
+       "hits": 69,
+       "n": 69,
+       "rate": 1.0
+      },
+      "sub-18": {
+       "hits": 165,
+       "n": 165,
+       "rate": 1.0
+      }
+     },
+     "participant_average": {
+      "interval95": [
+       1.0,
+       1.0
+      ],
+      "participants": 4,
+      "rate": 1.0
+     },
+     "pooled": {
+      "hits": 515,
+      "n": 515,
+      "rate": 1.0
+     }
+    }
+   },
+   "film_only": {
+    "failed": 0,
+    "film_only_correct_film": 25,
+    "n": 44,
+    "none": 0,
+    "scene_in_correct_film": 19,
+    "title_or_invalid_scene_in_correct_film": 0,
+    "wrong_film": 0
+   },
+   "film_search": {
+    "failed": 0,
+    "film_only_correct_film": 0,
+    "n": 13,
+    "none": 0,
+    "scene_in_correct_film": 13,
+    "title_or_invalid_scene_in_correct_film": 0,
+    "wrong_film": 0
+   },
+   "nonfilm": {
+    "assigned_a_film": 5,
+    "failed": 0,
+    "n": 16,
+    "no_assignment": 11
+   },
+   "prediction_kinds": {
+    "failed": 0,
+    "film": 27,
+    "invalid_scene": 0,
+    "none": 11,
+    "scene": 506
+   },
+   "scene": {
+    "by_film": {
+     "1": {
+      "by_participant": {
+       "sub-18": {
+        "hits": 16,
+        "n": 19,
+        "rate": 0.8421052631578947
+       }
+      },
+      "participant_average": {
+       "interval95": null,
+       "participants": 1,
+       "rate": 0.8421052631578947
+      },
+      "pooled": {
+       "hits": 16,
+       "n": 19,
+       "rate": 0.8421052631578947
+      }
+     },
+     "10": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 44,
+        "n": 57,
+        "rate": 0.7719298245614035
+       },
+       "sub-10": {
+        "hits": 38,
+        "n": 44,
+        "rate": 0.8636363636363636
+       },
+       "sub-16": {
+        "hits": 31,
+        "n": 38,
+        "rate": 0.8157894736842105
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7719298245614036,
+        0.8636363636363636
+       ],
+       "participants": 3,
+       "rate": 0.8171185539606592
+      },
+      "pooled": {
+       "hits": 113,
+       "n": 139,
+       "rate": 0.8129496402877698
+      }
+     },
+     "2": {
+      "by_participant": {},
+      "participant_average": {
+       "interval95": null,
+       "participants": 0,
+       "rate": null
+      },
+      "pooled": {
+       "hits": 0,
+       "n": 0,
+       "rate": null
+      }
+     },
+     "3": {
+      "by_participant": {
+       "sub-18": {
+        "hits": 26,
+        "n": 30,
+        "rate": 0.8666666666666667
+       }
+      },
+      "participant_average": {
+       "interval95": null,
+       "participants": 1,
+       "rate": 0.8666666666666667
+      },
+      "pooled": {
+       "hits": 26,
+       "n": 30,
+       "rate": 0.8666666666666667
+      }
+     },
+     "4": {
+      "by_participant": {},
+      "participant_average": {
+       "interval95": null,
+       "participants": 0,
+       "rate": null
+      },
+      "pooled": {
+       "hits": 0,
+       "n": 0,
+       "rate": null
+      }
+     },
+     "5": {
+      "by_participant": {
+       "sub-18": {
+        "hits": 22,
+        "n": 28,
+        "rate": 0.7857142857142857
+       }
+      },
+      "participant_average": {
+       "interval95": null,
+       "participants": 1,
+       "rate": 0.7857142857142857
+      },
+      "pooled": {
+       "hits": 22,
+       "n": 28,
+       "rate": 0.7857142857142857
+      }
+     },
+     "6": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 38,
+        "n": 45,
+        "rate": 0.8444444444444444
+       },
+       "sub-10": {
+        "hits": 23,
+        "n": 27,
+        "rate": 0.8518518518518519
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8444444444444444,
+        0.8518518518518519
+       ],
+       "participants": 2,
+       "rate": 0.8481481481481481
+      },
+      "pooled": {
+       "hits": 61,
+       "n": 72,
+       "rate": 0.8472222222222222
+      }
+     },
+     "7": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 26,
+        "n": 27,
+        "rate": 0.9629629629629629
+       },
+       "sub-10": {
+        "hits": 32,
+        "n": 33,
+        "rate": 0.9696969696969697
+       },
+       "sub-18": {
+        "hits": 31,
+        "n": 32,
+        "rate": 0.96875
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9629629629629629,
+        0.9696969696969697
+       ],
+       "participants": 3,
+       "rate": 0.9671366442199775
+      },
+      "pooled": {
+       "hits": 89,
+       "n": 92,
+       "rate": 0.967391304347826
+      }
+     },
+     "8": {
+      "by_participant": {
+       "sub-16": {
+        "hits": 16,
+        "n": 18,
+        "rate": 0.8888888888888888
+       },
+       "sub-18": {
+        "hits": 17,
+        "n": 24,
+        "rate": 0.7083333333333334
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7083333333333334,
+        0.8888888888888888
+       ],
+       "participants": 2,
+       "rate": 0.7986111111111112
+      },
+      "pooled": {
+       "hits": 33,
+       "n": 42,
+       "rate": 0.7857142857142857
+      }
+     },
+     "9": {
+      "by_participant": {
+       "sub-10": {
+        "hits": 22,
+        "n": 25,
+        "rate": 0.88
+       },
+       "sub-16": {
+        "hits": 7,
+        "n": 9,
+        "rate": 0.7777777777777778
+       },
+       "sub-18": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.7777777777777778,
+        1.0
+       ],
+       "participants": 3,
+       "rate": 0.8859259259259259
+      },
+      "pooled": {
+       "hits": 44,
+       "n": 49,
+       "rate": 0.8979591836734694
+      }
+     }
+    },
+    "by_participant": {
+     "sub-08": {
+      "hits": 108,
+      "n": 129,
+      "rate": 0.8372093023255814
+     },
+     "sub-10": {
+      "hits": 115,
+      "n": 129,
+      "rate": 0.8914728682170543
+     },
+     "sub-16": {
+      "hits": 54,
+      "n": 65,
+      "rate": 0.8307692307692308
+     },
+     "sub-18": {
+      "hits": 127,
+      "n": 148,
+      "rate": 0.8581081081081081
+     }
+    },
+    "chance_end_to_end": 0.005794191166473179,
+    "chance_given_film": 0.05640067341604312,
+    "participant_average": {
+     "interval95": [
+      0.8339892665474061,
+      0.877906976744186
+     ],
+     "participants": 4,
+     "rate": 0.8543898773549936
+    },
+    "pooled": {
+     "hits": 404,
+     "n": 471,
+     "rate": 0.8577494692144374
+    },
+    "prediction_kinds": {
+     "failed": 0,
+     "film": 1,
+     "invalid_scene": 0,
+     "none": 0,
+     "scene": 470
+    },
+    "strata": {
+     "multi_contig": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-10": {
+        "hits": 16,
+        "n": 17,
+        "rate": 0.9411764705882353
+       },
+       "sub-16": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 27,
+        "n": 28,
+        "rate": 0.9642857142857143
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9228896103896104,
+        0.9852941176470589
+       ],
+       "participants": 4,
+       "rate": 0.9536382734912147
+      },
+      "pooled": {
+       "hits": 59,
+       "n": 62,
+       "rate": 0.9516129032258065
+      }
+     },
+     "multi_noncontig": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 0,
+        "n": 1,
+        "rate": 0.0
+       },
+       "sub-10": {
+        "hits": 4,
+        "n": 4,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 1,
+        "n": 1,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 2,
+        "n": 3,
+        "rate": 0.6666666666666666
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.25,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 0.6666666666666666
+      },
+      "pooled": {
+       "hits": 7,
+       "n": 9,
+       "rate": 0.7777777777777778
+      }
+     },
+     "single": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 98,
+        "n": 117,
+        "rate": 0.8376068376068376
+       },
+       "sub-10": {
+        "hits": 95,
+        "n": 108,
+        "rate": 0.8796296296296297
+       },
+       "sub-16": {
+        "hits": 47,
+        "n": 58,
+        "rate": 0.8103448275862069
+       },
+       "sub-18": {
+        "hits": 98,
+        "n": 117,
+        "rate": 0.8376068376068376
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8171603300913646,
+        0.8691239316239316
+       ],
+       "participants": 4,
+       "rate": 0.8412970331073779
+      },
+      "pooled": {
+       "hits": 338,
+       "n": 400,
+       "rate": 0.845
+      }
+     }
+    }
+   },
+   "scene_adjacent": {
+    "by_film": {
+     "1": {
+      "by_participant": {
+       "sub-18": {
+        "hits": 18,
+        "n": 19,
+        "rate": 0.9473684210526315
+       }
+      },
+      "participant_average": {
+       "interval95": null,
+       "participants": 1,
+       "rate": 0.9473684210526315
+      },
+      "pooled": {
+       "hits": 18,
+       "n": 19,
+       "rate": 0.9473684210526315
+      }
+     },
+     "10": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 51,
+        "n": 57,
+        "rate": 0.8947368421052632
+       },
+       "sub-10": {
+        "hits": 41,
+        "n": 44,
+        "rate": 0.9318181818181818
+       },
+       "sub-16": {
+        "hits": 35,
+        "n": 38,
+        "rate": 0.9210526315789473
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.8947368421052632,
+        0.9318181818181818
+       ],
+       "participants": 3,
+       "rate": 0.9158692185007974
+      },
+      "pooled": {
+       "hits": 127,
+       "n": 139,
+       "rate": 0.9136690647482014
+      }
+     },
+     "2": {
+      "by_participant": {},
+      "participant_average": {
+       "interval95": null,
+       "participants": 0,
+       "rate": null
+      },
+      "pooled": {
+       "hits": 0,
+       "n": 0,
+       "rate": null
+      }
+     },
+     "3": {
+      "by_participant": {
+       "sub-18": {
+        "hits": 30,
+        "n": 30,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": null,
+       "participants": 1,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 30,
+       "n": 30,
+       "rate": 1.0
+      }
+     },
+     "4": {
+      "by_participant": {},
+      "participant_average": {
+       "interval95": null,
+       "participants": 0,
+       "rate": null
+      },
+      "pooled": {
+       "hits": 0,
+       "n": 0,
+       "rate": null
+      }
+     },
+     "5": {
+      "by_participant": {
+       "sub-18": {
+        "hits": 26,
+        "n": 28,
+        "rate": 0.9285714285714286
+       }
+      },
+      "participant_average": {
+       "interval95": null,
+       "participants": 1,
+       "rate": 0.9285714285714286
+      },
+      "pooled": {
+       "hits": 26,
+       "n": 28,
+       "rate": 0.9285714285714286
+      }
+     },
+     "6": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 43,
+        "n": 45,
+        "rate": 0.9555555555555556
+       },
+       "sub-10": {
+        "hits": 27,
+        "n": 27,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9555555555555556,
+        1.0
+       ],
+       "participants": 2,
+       "rate": 0.9777777777777779
+      },
+      "pooled": {
+       "hits": 70,
+       "n": 72,
+       "rate": 0.9722222222222222
+      }
+     },
+     "7": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 26,
+        "n": 27,
+        "rate": 0.9629629629629629
+       },
+       "sub-10": {
+        "hits": 33,
+        "n": 33,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 32,
+        "n": 32,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9629629629629629,
+        1.0
+       ],
+       "participants": 3,
+       "rate": 0.9876543209876543
+      },
+      "pooled": {
+       "hits": 91,
+       "n": 92,
+       "rate": 0.9891304347826086
+      }
+     },
+     "8": {
+      "by_participant": {
+       "sub-16": {
+        "hits": 18,
+        "n": 18,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 24,
+        "n": 24,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 2,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 42,
+       "n": 42,
+       "rate": 1.0
+      }
+     },
+     "9": {
+      "by_participant": {
+       "sub-10": {
+        "hits": 24,
+        "n": 25,
+        "rate": 0.96
+       },
+       "sub-16": {
+        "hits": 9,
+        "n": 9,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 15,
+        "n": 15,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.96,
+        1.0
+       ],
+       "participants": 3,
+       "rate": 0.9866666666666667
+      },
+      "pooled": {
+       "hits": 48,
+       "n": 49,
+       "rate": 0.9795918367346939
+      }
+     }
+    },
+    "by_participant": {
+     "sub-08": {
+      "hits": 120,
+      "n": 129,
+      "rate": 0.9302325581395349
+     },
+     "sub-10": {
+      "hits": 125,
+      "n": 129,
+      "rate": 0.9689922480620154
+     },
+     "sub-16": {
+      "hits": 62,
+      "n": 65,
+      "rate": 0.9538461538461539
+     },
+     "sub-18": {
+      "hits": 145,
+      "n": 148,
+      "rate": 0.9797297297297297
+     }
+    },
+    "participant_average": {
+     "interval95": [
+      0.939922480620155,
+      0.9743609888958726
+     ],
+     "participants": 4,
+     "rate": 0.9582001724443585
+    },
+    "pooled": {
+     "hits": 452,
+     "n": 471,
+     "rate": 0.9596602972399151
+    },
+    "strata": {
+     "multi_contig": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 10,
+        "n": 11,
+        "rate": 0.9090909090909091
+       },
+       "sub-10": {
+        "hits": 17,
+        "n": 17,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 6,
+        "n": 6,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 28,
+        "n": 28,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9318181818181818,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 0.9772727272727273
+      },
+      "pooled": {
+       "hits": 61,
+       "n": 62,
+       "rate": 0.9838709677419355
+      }
+     },
+     "multi_noncontig": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 1,
+        "n": 1,
+        "rate": 1.0
+       },
+       "sub-10": {
+        "hits": 4,
+        "n": 4,
+        "rate": 1.0
+       },
+       "sub-16": {
+        "hits": 1,
+        "n": 1,
+        "rate": 1.0
+       },
+       "sub-18": {
+        "hits": 3,
+        "n": 3,
+        "rate": 1.0
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        1.0,
+        1.0
+       ],
+       "participants": 4,
+       "rate": 1.0
+      },
+      "pooled": {
+       "hits": 9,
+       "n": 9,
+       "rate": 1.0
+      }
+     },
+     "single": {
+      "by_participant": {
+       "sub-08": {
+        "hits": 109,
+        "n": 117,
+        "rate": 0.9316239316239316
+       },
+       "sub-10": {
+        "hits": 104,
+        "n": 108,
+        "rate": 0.9629629629629629
+       },
+       "sub-16": {
+        "hits": 55,
+        "n": 58,
+        "rate": 0.9482758620689655
+       },
+       "sub-18": {
+        "hits": 114,
+        "n": 117,
+        "rate": 0.9743589743589743
+       }
+      },
+      "participant_average": {
+       "interval95": [
+        0.9394586894586895,
+        0.9686609686609686
+       ],
+       "participants": 4,
+       "rate": 0.9543054327537086
+      },
+      "pooled": {
+       "hits": 382,
+       "n": 400,
+       "rate": 0.955
+      }
+     }
+    }
+   },
+   "time_outside_clip": 0,
+   "utterances": 544
+  }
+ },
+ "valid_scene_targets": 203
+}
