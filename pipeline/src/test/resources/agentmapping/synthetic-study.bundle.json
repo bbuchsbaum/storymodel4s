@@ -1,0 +1,3210 @@
+{
+  "schema" : "storymodel4s.agentmapping.bundle/v2",
+  "provenance" : {
+    "participant" : "p1",
+    "session" : "s1",
+    "condition" : "annotation",
+    "model" : "m",
+    "provider" : "cli",
+    "protocol" : "strict-chunked/v1",
+    "systemSha256" : "d621c1a7169f2ca51bc8674da52e9572178a66a1dde88da24da78fe4951703f9",
+    "manifestSha256" : "0000000000000000000000000000000000000000000000000000000000000000",
+    "segmentation" : {
+      "kind" : "supplied",
+      "artifactSha256" : "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+      "recipe" : "supplied-units/v1"
+    },
+    "modelCalls" : 0
+  },
+  "meaning" : {
+    "narrative" : "the scene the retelling is narrating at this unit",
+    "referent" : "the scene containing the specifically mentioned content",
+    "stated" : "the answer as the reply gave it, in the form a scorer reads",
+    "judgement" : "the answer decided against the source: scene, film (a film with no particular scene), none, invalid-scene (a real scene that is not a target), unknown-scene, unknown-film, invalid, omitted, unparsable-chunk",
+    "extras" : "self-reported fields kept verbatim; not scores, not calibrated"
+  },
+  "interpretations" : {
+    "narrative" : {
+      "policy" : "agent-localization:annotation:strict-chunked/v1:narrative",
+      "recordDigest" : "10b6d40d606e495c11d78b5512391a07b1d22175bb024bd99a5b64fcdd398b7c",
+      "record" : {
+        "schema" : "storymodel4s.mapping-record",
+        "schemaVersion" : "mapping-record/v0.2",
+        "record_digest" : "10b6d40d606e495c11d78b5512391a07b1d22175bb024bd99a5b64fcdd398b7c",
+        "inventory" : {
+          "digest" : "cbd5ddc8e13f0cbb63db4120ff95792c76f0d944258fd4979346e553ffda4670",
+          "transcript_checksum" : "81ffcd0cc2739d4fbd10a26b5fea2052b7c9cac9e26235829a927711b268ebbb",
+          "segmentation_id" : "1e7d262da342dff0aeead81b9142fcc34619d0966ac8b1604651ed309c4fe51e",
+          "word_id_policy" : {
+            "name" : "input-artifact-sha256+zero-based-parsed-word-index/v1",
+            "input_artifact" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac"
+          },
+          "words" : [
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:0",
+              "index" : 0,
+              "start" : 0,
+              "end_exclusive" : 3,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u0"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:1",
+              "index" : 1,
+              "start" : 4,
+              "end_exclusive" : 8,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u0"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:2",
+              "index" : 2,
+              "start" : 9,
+              "end_exclusive" : 11,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u0"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:3",
+              "index" : 3,
+              "start" : 12,
+              "end_exclusive" : 16,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u1"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:4",
+              "index" : 4,
+              "start" : 17,
+              "end_exclusive" : 20,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u1"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:5",
+              "index" : 5,
+              "start" : 21,
+              "end_exclusive" : 26,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u1"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:6",
+              "index" : 6,
+              "start" : 27,
+              "end_exclusive" : 28,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u2"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:7",
+              "index" : 7,
+              "start" : 29,
+              "end_exclusive" : 34,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u2"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:8",
+              "index" : 8,
+              "start" : 35,
+              "end_exclusive" : 37,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u3"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:9",
+              "index" : 9,
+              "start" : 38,
+              "end_exclusive" : 42,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u3"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:10",
+              "index" : 10,
+              "start" : 43,
+              "end_exclusive" : 45,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u4"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:11",
+              "index" : 11,
+              "start" : 46,
+              "end_exclusive" : 50,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u5"
+              }
+            }
+          ],
+          "units" : [
+            {
+              "id" : "story:8c07d728ac82:u0",
+              "ordinal" : 0,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 0,
+                  "end_exclusive" : 11
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:0",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:1",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:2"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u1",
+              "ordinal" : 1,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 12,
+                  "end_exclusive" : 26
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:3",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:4",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:5"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u2",
+              "ordinal" : 2,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 27,
+                  "end_exclusive" : 34
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:6",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:7"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u3",
+              "ordinal" : 3,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 35,
+                  "end_exclusive" : 42
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:8",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:9"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u4",
+              "ordinal" : 4,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 43,
+                  "end_exclusive" : 45
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:10"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u5",
+              "ordinal" : 5,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 46,
+                  "end_exclusive" : 50
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:11"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            }
+          ]
+        },
+        "source" : {
+          "digest" : "2aaf28ecef38a21d3cf1790935900b755feb6a65699611766414e1b251c07874",
+          "view_fingerprint" : "ba235f285adac3aa9cd1363135d4843d593c24a568a167e892d98c7768632459",
+          "scope_digest" : "2503e9a729b14fc6a33d4a3152bec63b2da9583a7e8e8ec39bcb1d94f33f4661",
+          "target_id_scheme" : "target-id/source-node-ref/v1",
+          "bundles" : [
+            {
+              "status" : "media",
+              "id" : "bundle:209750432c51",
+              "identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+              "role" : "part",
+              "edition" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "source_kind" : {
+                "status" : "AnnotationTable"
+              },
+              "primary_axis" : "axis:ad1425ada726",
+              "authority_tracks" : [
+                "stream:80a754e33833"
+              ],
+              "streams" : [
+                {
+                  "id" : "stream:80a754e33833",
+                  "kind" : {
+                    "status" : "Annotation"
+                  },
+                  "checksum" : "9b9d7e8892ab9731e7aecf18e5fbd8bacb9991ae411c4f93f892d1ea1f70b2c1",
+                  "native_axis" : "axis:ad1425ada726",
+                  "extent" : {
+                    "status" : "playback-ticks",
+                    "start_tick" : "0",
+                    "end_exclusive_tick" : "100",
+                    "timebase" : {
+                      "numerator" : "1",
+                      "denominator" : "10"
+                    }
+                  },
+                  "timebase" : {
+                    "status" : "present",
+                    "value" : {
+                      "numerator" : "1",
+                      "denominator" : "10"
+                    }
+                  },
+                  "derived_from" : [
+                  ]
+                }
+              ]
+            }
+          ],
+          "axes" : [
+            {
+              "id" : "axis:ad1425ada726",
+              "bundle" : "bundle:209750432c51",
+              "edition" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "kind" : "AnnotationTimeline",
+              "source_kind" : {
+                "status" : "AnnotationTable"
+              },
+              "extent" : {
+                "status" : "playback-ticks",
+                "start_tick" : "0",
+                "end_exclusive_tick" : "100",
+                "timebase" : {
+                  "numerator" : "1",
+                  "denominator" : "10"
+                }
+              },
+              "origin" : {
+                "status" : "present",
+                "value" : "0"
+              },
+              "timebase" : {
+                "status" : "present",
+                "value" : {
+                  "numerator" : "1",
+                  "denominator" : "10"
+                }
+              },
+              "fingerprint" : "c1f1f72ed43b7860d2b6f08bcf6f52571b84acc51f0e15b14d09d465cc84438e"
+            }
+          ],
+          "coordinate_mappings" : [
+          ],
+          "composition" : {
+            "status" : "absent",
+            "reason" : "not-supplied"
+          },
+          "targets" : [
+            {
+              "target_id" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "level" : 2,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "10",
+                          "end_exclusive_tick" : "20"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "20",
+                          "end_exclusive_tick" : "30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+              "level" : 2,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "40",
+                          "end_exclusive_tick" : "50"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "level" : 2,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-point",
+                      "axis" : "axis:ad1425ada726",
+                      "tick" : "50"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "10",
+                          "end_exclusive_tick" : "20"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "20",
+                          "end_exclusive_tick" : "30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "40",
+                          "end_exclusive_tick" : "50"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-point",
+                      "axis" : "axis:ad1425ada726",
+                      "tick" : "50"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "10",
+                          "end_exclusive_tick" : "20"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "20",
+                          "end_exclusive_tick" : "30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "40",
+                          "end_exclusive_tick" : "50"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-point",
+                      "axis" : "axis:ad1425ada726",
+                      "tick" : "50"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            }
+          ]
+        },
+        "policies" : {
+          "inference_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "no inference executed; recorded model choice"
+          },
+          "context_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "the model read the film record and the session's recall"
+          },
+          "candidate_policy_id" : {
+            "status" : "unknown",
+            "reason" : "every target was offered in the prompt; no candidate set computed"
+          },
+          "reference_prior_id" : {
+            "status" : "not-applicable",
+            "reason" : "categorical choice; no scores"
+          },
+          "decision_policy_id" : {
+            "status" : "declared",
+            "id" : "agent-localization:annotation:strict-chunked/v1:narrative"
+          },
+          "target_universe_id" : {
+            "id" : "583fcb2ffb6407bf04ef36c7dc18eec33276aafa6036be547e2e99c2a8c7a172",
+            "grain" : {
+              "status" : "hierarchy",
+              "levels" : [
+                1,
+                2
+              ]
+            },
+            "targets" : [
+              "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4"
+            ]
+          }
+        },
+        "roles" : {
+          "inference_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "1e7d262da342dff0aeead81b9142fcc34619d0966ac8b1604651ed309c4fe51e"
+          },
+          "organization_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "1e7d262da342dff0aeead81b9142fcc34619d0966ac8b1604651ed309c4fe51e"
+          },
+          "projection_unit" : {
+            "status" : "targets",
+            "grain" : {
+              "status" : "hierarchy",
+              "levels" : [
+                1,
+                2
+              ]
+            }
+          }
+        },
+        "stage_assumption_receipts" : [
+          {
+            "id" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+            "stage" : "Candidates",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "d39ccd3185d723ac757b70287c8e4cef2e8ce6869a03511175aefa92542921e0",
+            "stage" : "Rendering",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "540d83ddffeb61a54a3650fb908886e1d71ce62f2e1a8ec78aaba73ce56aef58",
+            "stage" : "Scoring",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "1426ea4e3369df73cbc0310f7b2bfdf9f7340ceb1516a900d2924a84881229e5",
+            "stage" : "Context",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "4a9997ff37131f88e559138e3c7c55b2e025f120b968f33fcd7eb1e0d72f69af",
+            "stage" : "Refinement",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+            "stage" : "Inference",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "84ec9abf65ab13ae66c054fd857bdeea4e3cc127ca46749e8a0838046428ae3a",
+            "stage" : "Decision",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "CallerSuppliedDecision",
+              "asserted" : {
+                "status" : "present",
+                "value" : {
+                  "stage" : "Decision",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:narrative",
+                  "config" : "d621c1a7169f2ca51bc8674da52e9572178a66a1dde88da24da78fe4951703f9",
+                  "inputs" : [
+                    "e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41",
+                    "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac"
+                  ],
+                  "provider" : {
+                    "status" : "identified",
+                    "provider" : "cli",
+                    "model" : "m",
+                    "artifact" : "c8a4dbd9490a020df83ca7bea275e8f7a9976ca3b81b73c694a469b0267a9601"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id" : "1fbc936ea14b6e720ea0f601c2aef2f84693a0d482d5df7997f54dca1f81a5e0",
+            "stage" : "Projection",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          }
+        ],
+        "derivation_source" : {
+          "status" : "none"
+        },
+        "outcomes" : [
+          {
+            "unit" : "story:8c07d728ac82:u0",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "916feef68eff7b0d9fed4bc1ecbec2c552de54db8c4a4b635057e102cc0f3429",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "84ec9abf65ab13ae66c054fd857bdeea4e3cc127ca46749e8a0838046428ae3a"
+              }
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u1",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "5fb82182f8ce142f0d0031f24189c614b5fe602c46e277ff6617c6b9c5310ff8",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "84ec9abf65ab13ae66c054fd857bdeea4e3cc127ca46749e8a0838046428ae3a"
+              }
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u2",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "narrative names film 2, which is not a film of the source"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u3",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                },
+                "request" : {
+                  "status" : "abstain",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:narrative",
+                  "reason" : "model reported no narrative assignment"
+                },
+                "decoded_target_id" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "decision_origin" : {
+                  "status" : "abstention",
+                  "reason" : "model reported no narrative assignment"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization:annotation:strict-chunked/v1:narrative"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "84ec9abf65ab13ae66c054fd857bdeea4e3cc127ca46749e8a0838046428ae3a"
+              }
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u4",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "provider-failure",
+                "detail" : "unit omitted from the accepted reply"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u5",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "narrative: missing-field"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          }
+        ]
+      }
+    },
+    "referent" : {
+      "policy" : "agent-localization:annotation:strict-chunked/v1:referent",
+      "recordDigest" : "04bf82bc84eed7459b5652a0483bcad77fc6e763e64566f883fdd3d43bb4d342",
+      "record" : {
+        "schema" : "storymodel4s.mapping-record",
+        "schemaVersion" : "mapping-record/v0.2",
+        "record_digest" : "04bf82bc84eed7459b5652a0483bcad77fc6e763e64566f883fdd3d43bb4d342",
+        "inventory" : {
+          "digest" : "cbd5ddc8e13f0cbb63db4120ff95792c76f0d944258fd4979346e553ffda4670",
+          "transcript_checksum" : "81ffcd0cc2739d4fbd10a26b5fea2052b7c9cac9e26235829a927711b268ebbb",
+          "segmentation_id" : "1e7d262da342dff0aeead81b9142fcc34619d0966ac8b1604651ed309c4fe51e",
+          "word_id_policy" : {
+            "name" : "input-artifact-sha256+zero-based-parsed-word-index/v1",
+            "input_artifact" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac"
+          },
+          "words" : [
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:0",
+              "index" : 0,
+              "start" : 0,
+              "end_exclusive" : 3,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u0"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:1",
+              "index" : 1,
+              "start" : 4,
+              "end_exclusive" : 8,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u0"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:2",
+              "index" : 2,
+              "start" : 9,
+              "end_exclusive" : 11,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u0"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:3",
+              "index" : 3,
+              "start" : 12,
+              "end_exclusive" : 16,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u1"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:4",
+              "index" : 4,
+              "start" : 17,
+              "end_exclusive" : 20,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u1"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:5",
+              "index" : 5,
+              "start" : 21,
+              "end_exclusive" : 26,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u1"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:6",
+              "index" : 6,
+              "start" : 27,
+              "end_exclusive" : 28,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u2"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:7",
+              "index" : 7,
+              "start" : 29,
+              "end_exclusive" : 34,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u2"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:8",
+              "index" : 8,
+              "start" : 35,
+              "end_exclusive" : 37,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u3"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:9",
+              "index" : 9,
+              "start" : 38,
+              "end_exclusive" : 42,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u3"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:10",
+              "index" : 10,
+              "start" : 43,
+              "end_exclusive" : 45,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u4"
+              }
+            },
+            {
+              "id" : "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:11",
+              "index" : 11,
+              "start" : 46,
+              "end_exclusive" : 50,
+              "membership" : {
+                "status" : "member",
+                "unit" : "story:8c07d728ac82:u5"
+              }
+            }
+          ],
+          "units" : [
+            {
+              "id" : "story:8c07d728ac82:u0",
+              "ordinal" : 0,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 0,
+                  "end_exclusive" : 11
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:0",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:1",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:2"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u1",
+              "ordinal" : 1,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 12,
+                  "end_exclusive" : 26
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:3",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:4",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:5"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u2",
+              "ordinal" : 2,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 27,
+                  "end_exclusive" : 34
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:6",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:7"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u3",
+              "ordinal" : 3,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 35,
+                  "end_exclusive" : 42
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:8",
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:9"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u4",
+              "ordinal" : 4,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 43,
+                  "end_exclusive" : 45
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:10"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            },
+            {
+              "id" : "story:8c07d728ac82:u5",
+              "ordinal" : 5,
+              "spans" : [
+                {
+                  "unit" : {
+                    "status" : "absent",
+                    "reason" : "not-supplied"
+                  },
+                  "start" : 46,
+                  "end_exclusive" : 50
+                }
+              ],
+              "words" : [
+                "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac:word:11"
+              ],
+              "decomposition" : {
+                "status" : "not-assessed",
+                "reason" : "NoDecompositionDetector"
+              },
+              "semantics" : "CategoricalReferent"
+            }
+          ]
+        },
+        "source" : {
+          "digest" : "2aaf28ecef38a21d3cf1790935900b755feb6a65699611766414e1b251c07874",
+          "view_fingerprint" : "ba235f285adac3aa9cd1363135d4843d593c24a568a167e892d98c7768632459",
+          "scope_digest" : "2503e9a729b14fc6a33d4a3152bec63b2da9583a7e8e8ec39bcb1d94f33f4661",
+          "target_id_scheme" : "target-id/source-node-ref/v1",
+          "bundles" : [
+            {
+              "status" : "media",
+              "id" : "bundle:209750432c51",
+              "identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+              "role" : "part",
+              "edition" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "source_kind" : {
+                "status" : "AnnotationTable"
+              },
+              "primary_axis" : "axis:ad1425ada726",
+              "authority_tracks" : [
+                "stream:80a754e33833"
+              ],
+              "streams" : [
+                {
+                  "id" : "stream:80a754e33833",
+                  "kind" : {
+                    "status" : "Annotation"
+                  },
+                  "checksum" : "9b9d7e8892ab9731e7aecf18e5fbd8bacb9991ae411c4f93f892d1ea1f70b2c1",
+                  "native_axis" : "axis:ad1425ada726",
+                  "extent" : {
+                    "status" : "playback-ticks",
+                    "start_tick" : "0",
+                    "end_exclusive_tick" : "100",
+                    "timebase" : {
+                      "numerator" : "1",
+                      "denominator" : "10"
+                    }
+                  },
+                  "timebase" : {
+                    "status" : "present",
+                    "value" : {
+                      "numerator" : "1",
+                      "denominator" : "10"
+                    }
+                  },
+                  "derived_from" : [
+                  ]
+                }
+              ]
+            }
+          ],
+          "axes" : [
+            {
+              "id" : "axis:ad1425ada726",
+              "bundle" : "bundle:209750432c51",
+              "edition" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "kind" : "AnnotationTimeline",
+              "source_kind" : {
+                "status" : "AnnotationTable"
+              },
+              "extent" : {
+                "status" : "playback-ticks",
+                "start_tick" : "0",
+                "end_exclusive_tick" : "100",
+                "timebase" : {
+                  "numerator" : "1",
+                  "denominator" : "10"
+                }
+              },
+              "origin" : {
+                "status" : "present",
+                "value" : "0"
+              },
+              "timebase" : {
+                "status" : "present",
+                "value" : {
+                  "numerator" : "1",
+                  "denominator" : "10"
+                }
+              },
+              "fingerprint" : "c1f1f72ed43b7860d2b6f08bcf6f52571b84acc51f0e15b14d09d465cc84438e"
+            }
+          ],
+          "coordinate_mappings" : [
+          ],
+          "composition" : {
+            "status" : "absent",
+            "reason" : "not-supplied"
+          },
+          "targets" : [
+            {
+              "target_id" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "level" : 2,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "10",
+                          "end_exclusive_tick" : "20"
+                        }
+                      ]
+                    },
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "20",
+                          "end_exclusive_tick" : "30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+              "level" : 2,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "40",
+                          "end_exclusive_tick" : "50"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "level" : 2,
+              "parent" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-point",
+                      "axis" : "axis:ad1425ada726",
+                      "tick" : "50"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "10",
+                          "end_exclusive_tick" : "20"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "20",
+                          "end_exclusive_tick" : "30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "40",
+                          "end_exclusive_tick" : "50"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4",
+              "level" : 1,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-point",
+                      "axis" : "axis:ad1425ada726",
+                      "tick" : "50"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "10",
+                          "end_exclusive_tick" : "20"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "20",
+                          "end_exclusive_tick" : "30"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-time",
+                      "axis" : "axis:ad1425ada726",
+                      "intervals" : [
+                        {
+                          "axis" : "axis:ad1425ada726",
+                          "start_tick" : "40",
+                          "end_exclusive_tick" : "50"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            },
+            {
+              "target_id" : "sit:timed:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4",
+              "level" : 0,
+              "parent" : {
+                "status" : "present",
+                "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4"
+              },
+              "support_status" : {
+                "status" : "located",
+                "support_relation" : "evidence-support",
+                "source_support" : {
+                  "status" : "anchored",
+                  "bundle_identity" : "67d045001e81eb8b0380bbcfb562c7a4082be536617ba0cc577b05862bd8b979",
+                  "anchors" : [
+                    {
+                      "bundle" : "bundle:209750432c51",
+                      "stream" : "stream:80a754e33833",
+                      "kind" : "media-point",
+                      "axis" : "axis:ad1425ada726",
+                      "tick" : "50"
+                    }
+                  ]
+                }
+              },
+              "axis_membership" : [
+                {
+                  "axis" : "axis:ad1425ada726",
+                  "role" : {
+                    "status" : "part",
+                    "bundle" : "bundle:209750432c51"
+                  }
+                }
+              ],
+              "support_coverage" : {
+                "status" : "complete"
+              },
+              "propositional_scope" : {
+                "status" : "undeclared",
+                "reason" : "ProviderAbstained"
+              }
+            }
+          ]
+        },
+        "policies" : {
+          "inference_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "no inference executed; recorded model choice"
+          },
+          "context_policy_id" : {
+            "status" : "unspecified",
+            "reason" : "the model read the film record and the session's recall"
+          },
+          "candidate_policy_id" : {
+            "status" : "unknown",
+            "reason" : "every target was offered in the prompt; no candidate set computed"
+          },
+          "reference_prior_id" : {
+            "status" : "not-applicable",
+            "reason" : "categorical choice; no scores"
+          },
+          "decision_policy_id" : {
+            "status" : "declared",
+            "id" : "agent-localization:annotation:strict-chunked/v1:referent"
+          },
+          "target_universe_id" : {
+            "id" : "583fcb2ffb6407bf04ef36c7dc18eec33276aafa6036be547e2e99c2a8c7a172",
+            "grain" : {
+              "status" : "hierarchy",
+              "levels" : [
+                1,
+                2
+              ]
+            },
+            "targets" : [
+              "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+              "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+              "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4"
+            ]
+          }
+        },
+        "roles" : {
+          "inference_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "1e7d262da342dff0aeead81b9142fcc34619d0966ac8b1604651ed309c4fe51e"
+          },
+          "organization_unit" : {
+            "status" : "inference-unit",
+            "segmentation_id" : "1e7d262da342dff0aeead81b9142fcc34619d0966ac8b1604651ed309c4fe51e"
+          },
+          "projection_unit" : {
+            "status" : "targets",
+            "grain" : {
+              "status" : "hierarchy",
+              "levels" : [
+                1,
+                2
+              ]
+            }
+          }
+        },
+        "stage_assumption_receipts" : [
+          {
+            "id" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+            "stage" : "Candidates",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "d39ccd3185d723ac757b70287c8e4cef2e8ce6869a03511175aefa92542921e0",
+            "stage" : "Rendering",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "540d83ddffeb61a54a3650fb908886e1d71ce62f2e1a8ec78aaba73ce56aef58",
+            "stage" : "Scoring",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "1426ea4e3369df73cbc0310f7b2bfdf9f7340ceb1516a900d2924a84881229e5",
+            "stage" : "Context",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "4a9997ff37131f88e559138e3c7c55b2e025f120b968f33fcd7eb1e0d72f69af",
+            "stage" : "Refinement",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+            "stage" : "Inference",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          },
+          {
+            "id" : "6f1dc331a720195c36d0780f9fbbda2b6d63c72bb4b117f8d7919374f19c2d5e",
+            "stage" : "Decision",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "CallerSuppliedDecision",
+              "asserted" : {
+                "status" : "present",
+                "value" : {
+                  "stage" : "Decision",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:referent",
+                  "config" : "d621c1a7169f2ca51bc8674da52e9572178a66a1dde88da24da78fe4951703f9",
+                  "inputs" : [
+                    "e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41",
+                    "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac"
+                  ],
+                  "provider" : {
+                    "status" : "identified",
+                    "provider" : "cli",
+                    "model" : "m",
+                    "artifact" : "c8a4dbd9490a020df83ca7bea275e8f7a9976ca3b81b73c694a469b0267a9601"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id" : "1fbc936ea14b6e720ea0f601c2aef2f84693a0d482d5df7997f54dca1f81a5e0",
+            "stage" : "Projection",
+            "provenance" : {
+              "status" : "unknown",
+              "reason" : "NotRun",
+              "asserted" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            }
+          }
+        ],
+        "derivation_source" : {
+          "status" : "none"
+        },
+        "outcomes" : [
+          {
+            "unit" : "story:8c07d728ac82:u0",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "916feef68eff7b0d9fed4bc1ecbec2c552de54db8c4a4b635057e102cc0f3429",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization:annotation:strict-chunked/v1:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "6f1dc331a720195c36d0780f9fbbda2b6d63c72bb4b117f8d7919374f19c2d5e"
+              }
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u1",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "referent names scene 2, which is not a target"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u2",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "present",
+              "value" : {
+                "status" : "not-assessed",
+                "reason" : "NoGateEvaluation"
+              }
+            },
+            "localization_status" : "Located",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+              {
+                "destination" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+                "inference_stage_id" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidate_set_id" : "162c491f9ccb095f5d9e294ce0691b8a1eabd82cc0a5a3f1cc9b7fcc3ec5ac52",
+                "derivation" : {
+                  "status" : "supplied"
+                },
+                "gate_outcome" : {
+                  "status" : "not-gated"
+                },
+                "fidelity_status" : {
+                  "status" : "not-assessed",
+                  "reason" : "NoGateEvaluation"
+                },
+                "fidelity_facets" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "term_support" : {
+                  "status" : "not-computed",
+                  "reason" : "NoCostBreakdown"
+                }
+              }
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "request" : {
+                  "status" : "external-decode",
+                  "chosen" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "decoded_target_id" : {
+                  "status" : "present",
+                  "value" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3"
+                },
+                "decision_origin" : {
+                  "status" : "producer-choice",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization:annotation:strict-chunked/v1:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "6f1dc331a720195c36d0780f9fbbda2b6d63c72bb4b117f8d7919374f19c2d5e"
+              }
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u3",
+            "processing_status" : {
+              "status" : "complete"
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "present",
+              "value" : {
+                "support" : {
+                  "status" : "categorical",
+                  "decision_policy_id" : "agent-localization:annotation:strict-chunked/v1:referent"
+                },
+                "request" : {
+                  "status" : "abstain",
+                  "policy" : "agent-localization:annotation:strict-chunked/v1:referent",
+                  "reason" : "model reported no referent assignment"
+                },
+                "decoded_target_id" : {
+                  "status" : "absent",
+                  "reason" : "not-supplied"
+                },
+                "decision_origin" : {
+                  "status" : "abstention",
+                  "reason" : "model reported no referent assignment"
+                },
+                "calibration" : {
+                  "status" : "unavailable",
+                  "reason" : "NoCalibrationArtifact"
+                },
+                "decision_policy_id" : {
+                  "status" : "present",
+                  "value" : "agent-localization:annotation:strict-chunked/v1:referent"
+                }
+              }
+            },
+            "stages" : {
+              "status" : "present",
+              "value" : {
+                "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
+                "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
+                "decision" : "6f1dc331a720195c36d0780f9fbbda2b6d63c72bb4b117f8d7919374f19c2d5e"
+              }
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u4",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "provider-failure",
+                "detail" : "unit omitted from the accepted reply"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          },
+          {
+            "unit" : "story:8c07d728ac82:u5",
+            "processing_status" : {
+              "status" : "failed",
+              "failure" : {
+                "status" : "invalid-output",
+                "detail" : "referent names scene 99, which the source does not have"
+              }
+            },
+            "fidelity_assessment_status" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "localization_status" : "NotComputed",
+            "measures" : {
+              "raw" : [
+              ],
+              "normalized" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "transport" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              },
+              "posterior" : {
+                "status" : "absent",
+                "reason" : "not-supplied"
+              }
+            },
+            "mapping_links" : [
+            ],
+            "links" : [
+            ],
+            "decision" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            },
+            "stages" : {
+              "status" : "absent",
+              "reason" : "not-supplied"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "units" : [
+    {
+      "u" : 1,
+      "unit" : "story:8c07d728ac82:u0",
+      "row" : 10,
+      "processing" : "answered",
+      "narrative" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "scene",
+          "scene" : 1,
+          "film_stated" : 1
+        },
+        "judgement" : {
+          "kind" : "scene",
+          "scene" : 1,
+          "collection" : 1
+        }
+      },
+      "referent" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "scene",
+          "scene" : 1,
+          "film_stated" : 1
+        },
+        "judgement" : {
+          "kind" : "scene",
+          "scene" : 1,
+          "collection" : 1
+        }
+      },
+      "extras" : {
+        "conf" : 0.8
+      }
+    },
+    {
+      "u" : 2,
+      "unit" : "story:8c07d728ac82:u1",
+      "row" : 11,
+      "processing" : "answered",
+      "narrative" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "scene",
+          "scene" : 1,
+          "film_stated" : 1
+        },
+        "judgement" : {
+          "kind" : "scene",
+          "scene" : 1,
+          "collection" : 1
+        }
+      },
+      "referent" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "scene",
+          "scene" : 2,
+          "film_stated" : 1
+        },
+        "judgement" : {
+          "kind" : "invalid-scene",
+          "scene" : 2,
+          "collection" : 1
+        }
+      },
+      "extras" : {
+        "conf" : 0.5
+      }
+    },
+    {
+      "u" : 3,
+      "unit" : "story:8c07d728ac82:u2",
+      "row" : 12,
+      "processing" : "answered",
+      "narrative" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "film",
+          "film" : 2
+        },
+        "judgement" : {
+          "kind" : "unknown-film",
+          "stated" : "2"
+        }
+      },
+      "referent" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "film",
+          "film" : 3
+        },
+        "judgement" : {
+          "kind" : "film",
+          "collection" : 3
+        }
+      },
+      "extras" : {
+        "conf" : 0.4
+      }
+    },
+    {
+      "u" : 4,
+      "unit" : "story:8c07d728ac82:u3",
+      "row" : 13,
+      "processing" : "answered",
+      "narrative" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "none"
+        },
+        "judgement" : {
+          "kind" : "none"
+        }
+      },
+      "referent" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "none"
+        },
+        "judgement" : {
+          "kind" : "none"
+        }
+      },
+      "extras" : {
+        "conf" : null
+      }
+    },
+    {
+      "u" : 5,
+      "unit" : "story:8c07d728ac82:u4",
+      "row" : 14,
+      "processing" : "omitted",
+      "narrative" : {
+        "stated" : {
+          "status" : "failed",
+          "reason" : "omitted"
+        },
+        "judgement" : {
+          "kind" : "omitted"
+        }
+      },
+      "referent" : {
+        "stated" : {
+          "status" : "failed",
+          "reason" : "omitted"
+        },
+        "judgement" : {
+          "kind" : "omitted"
+        }
+      },
+      "extras" : {
+        
+      }
+    },
+    {
+      "u" : 6,
+      "unit" : "story:8c07d728ac82:u5",
+      "row" : 15,
+      "processing" : "answered",
+      "narrative" : {
+        "stated" : {
+          "status" : "failed",
+          "reason" : "missing-field"
+        },
+        "judgement" : {
+          "kind" : "invalid",
+          "reason" : "missing-field"
+        }
+      },
+      "referent" : {
+        "stated" : {
+          "status" : "answered",
+          "kind" : "scene",
+          "scene" : 99,
+          "film_stated" : 1
+        },
+        "judgement" : {
+          "kind" : "unknown-scene",
+          "stated" : "99"
+        }
+      },
+      "extras" : {
+        "conf" : null
+      }
+    }
+  ],
+  "source" : {
+    "artifact" : "e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41",
+    "representation" : "2aaf28ecef38a21d3cf1790935900b755feb6a65699611766414e1b251c07874",
+    "collections" : [
+      {
+        "collection" : 1,
+        "target" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+        "label" : "Harbour film",
+        "isTarget" : true
+      },
+      {
+        "collection" : 2,
+        "target" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+        "label" : "Cartoon",
+        "isTarget" : false
+      },
+      {
+        "collection" : 3,
+        "target" : "seg:timed-collection:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+        "label" : "Station film",
+        "isTarget" : true
+      }
+    ],
+    "scenes" : [
+      {
+        "scene" : 1,
+        "target" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:1",
+        "label" : "scene 1",
+        "isTarget" : true,
+        "collection" : 1
+      },
+      {
+        "scene" : 2,
+        "target" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:2",
+        "label" : "scene 2",
+        "isTarget" : false,
+        "collection" : 1
+      },
+      {
+        "scene" : 3,
+        "target" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:3",
+        "label" : "scene 3",
+        "isTarget" : false,
+        "collection" : 2
+      },
+      {
+        "scene" : 4,
+        "target" : "seg:timed-group:e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41:4",
+        "label" : "scene 4",
+        "isTarget" : true,
+        "collection" : 3
+      }
+    ],
+    "rows" : [
+      {
+        "row" : 1,
+        "isTarget" : true,
+        "scene" : 1,
+        "part" : "a",
+        "startTick" : 10,
+        "endTick" : 20,
+        "text" : "Anna arrived."
+      },
+      {
+        "row" : 2,
+        "isTarget" : false,
+        "scene" : 2,
+        "part" : "a",
+        "startTick" : 20,
+        "endTick" : 30,
+        "text" : "A title card."
+      },
+      {
+        "row" : 3,
+        "isTarget" : false,
+        "scene" : 3,
+        "part" : "a",
+        "startTick" : 40,
+        "endTick" : 50,
+        "text" : "A mouse dances."
+      },
+      {
+        "row" : 4,
+        "isTarget" : true,
+        "scene" : 4,
+        "part" : "a",
+        "startTick" : 50,
+        "endTick" : 50,
+        "text" : "Bob left."
+      }
+    ]
+  }
+}

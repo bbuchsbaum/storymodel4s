@@ -121,8 +121,8 @@ def check(bundle):
                 raise BundleError(f"{where}: the judgement does not follow from the stated answer")
             if (expected or ("failed", None)) != (kind, target):
                 raise BundleError(f"{where}: row says {j}, record says {kind}")
-        if unit_processing_mismatch(units):
-            raise BundleError("a unit's processing does not match its judgements")
+    if unit_processing_mismatch(units):
+        raise BundleError("a unit's processing does not match its judgements")
     return bundle
 
 
