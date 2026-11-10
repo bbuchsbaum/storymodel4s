@@ -151,6 +151,25 @@ renderer is delivery 3's job, with the exported prompts as its test.
   cost's preferred level falls through to the default. No path feeds supplied units to a cost
   model today. Both need a decision before one does.
 
+## Slice 3 as built: the v2 bundle
+
+`agentStudyBundle` replays an exported study and writes one
+`storymodel4s.agentmapping.bundle/v2` file per participant-session. `StudyBundle.decode` reads
+one back against a regenerated source and recall. `tools/agentmapping/study_bundle.py` reads one
+without Scala, and `ff_score.py score` accepts a directory of them in place of reply files.
+
+- A row holds each judgement twice: as the reply stated it, in the form a scorer reads, and as
+  the library decided it against the source. A scene that is not a target keeps its scene and
+  film there, although the record holds only a failure.
+- Reading re-checks everything that can be derived: each record through the mapping codec, each
+  judgement from its stated answer and this source, and each row against both records. The
+  Python reader makes the same row checks from the bundle's own source dictionary. The scorer
+  also requires each judgement to be the kind it gives the same stated answer itself.
+- Rows are keyed by the study's unit number and row key, within a participant and session.
+- The v1 bundle and its reader are unchanged. Sherlock moves to v2 in slice 5.
+- A bundle is about 4.7 MB for a 170-unit session, because each of its two records repeats the
+  recall inventory and the source's nodes. Files are written compact for that reason.
+
 ## Notes
 
 - The interval-table hash of the Python tools is over rounded text. Matching it is not an

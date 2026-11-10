@@ -86,7 +86,9 @@ class NotAssessedSuite extends FunSuite:
     val model = DefaultLocalCostModel()
     val view = AnnaFixture.view
     def granularity(f: DiscourseFunction) = view.nodes.map { node =>
-      node.level -> model.cost(unit(f), node, FidelityMode.Faithful, view).terms(CostTerm.Granularity)
+      node.level -> model
+        .cost(unit(f), node, FidelityMode.Faithful, view)
+        .terms(CostTerm.Granularity)
     }
     assert(view.nodes.map(_.level).distinct.size > 1, "the fixture needs more than one level")
     assert(granularity(DiscourseFunction.NotAssessed).forall(_._2 == 0.0))
