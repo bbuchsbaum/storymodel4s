@@ -9,8 +9,8 @@ import storymodel4s.align.MappingResult
 import storymodel4s.core.Checksum
 import storymodel4s.pipeline.TimedAnnotationInput
 
-/** The v2 bundle on an invented two-film source: every kind of judgement in one session, the
-  * round trip, and each way a tampered bundle is refused.
+/** The v2 bundle on an invented two-film source: every kind of judgement in one session, the round
+  * trip, and each way a tampered bundle is refused.
   */
 class StudyBundleSuite extends FunSuite:
   import StudyReplay.{RecallUnit, ReplyProtocol, UnitReply}
@@ -40,6 +40,7 @@ class StudyBundleSuite extends FunSuite:
     right(PreparedRecall.supplied("p1_s1", ts, Checksum.ofText(ts.mkString("|"))))
   private lazy val recall = recallOf(texts)
   private val protocol = ReplyProtocol.StrictChunked
+  private val protocolName = "strict-chunked/v1"
   private def item(body: String) = UnitReply.Answered(json(body))
   private val replies = Vector(
     item("""{"referent":1,"referent_film":1,"narrative":1,"narrative_film":1,"conf":0.8}"""),
@@ -60,7 +61,7 @@ class StudyBundleSuite extends FunSuite:
     "annotation",
     "m",
     "cli",
-    protocol.name,
+    protocolName,
     Checksum.ofText("SYSTEM").hex,
     "0" * 64,
     PreparedRecall.Segmentation("supplied", Checksum.ofText("x"), PreparedRecall.SuppliedRecipe)
@@ -72,7 +73,7 @@ class StudyBundleSuite extends FunSuite:
         StudyRecord
           .record(
             f,
-            StudyRecord.policy(condition, protocol.name, f),
+            StudyRecord.policy(condition, protocolName, f),
             recall,
             view,
             producer,
@@ -160,7 +161,8 @@ class StudyBundleSuite extends FunSuite:
   test("a stated answer and judgement changed together are refused by the record"):
     val four = json("""{"status":"answered","kind":"scene","scene":4,"film_stated":3}""")
     val judged = json("""{"kind":"scene","scene":4,"collection":3}""")
-    val both = unit(0)(field("referent", "stated", four).andThen(field("referent", "judgement", judged)))
+    val both =
+      unit(0)(field("referent", "stated", four).andThen(field("referent", "judgement", judged)))
     assertEquals(edited(both).left.toOption, Some("a unit row disagrees with the referent record"))
     // An invalid scene promoted to no assignment: the record holds a failure there.
     val quiet = unit(1)(
