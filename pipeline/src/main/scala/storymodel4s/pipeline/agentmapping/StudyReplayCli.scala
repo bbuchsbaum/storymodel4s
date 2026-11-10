@@ -390,3 +390,111 @@ object StudyExport:
     s"records sessions=${sessions.size} units=${sessions.map(_._2).sum} modelCalls=0 " +
       doc.hcursor.downField("judgements").focus.fold("")(_.noSpaces)
   )
+
+/** CLI: `agentStudyBundle SOURCE_CSV PARTS_JSON EXPORT_DIR RECORDINGS_DIR PROVIDER OUTPUT_DIR`.
+  *
+  * Replays every participant-session of an exported study, with no model client, and writes one
+  * bundle per participant-session (see `StudyBundle`). Each bundle is read back and re-checked
+  * before the command reports. Bundles hold source text and unit ids; keep the output outside the
+  * repository.
+  */
+@main def agentStudyBundle(
+    sourceCsv: String,
+    partsJson: String,
+    exportDir: String,
+    recordingsDir: String,
+    provider: String,
+    outputDir: String
+): scala.Unit =
+  def refuse(msg: String): Nothing =
+    System.err.println(s"refused: $msg")
+    sys.exit(2)
+  val out = Path.of(outputDir)
+  if Files.exists(out) then refuse("output directory exists")
+  def bytes(p: String): Array[Byte] =
+    try Files.readAllBytes(Path.of(p))
+    catch case NonFatal(_) => refuse(s"cannot read $p")
+  val view = storymodel4s.codec.TimedSourceArtifactCodec
+    .prepareChecked(bytes(sourceCsv), bytes(partsJson))
+    .fold(r => refuse(s"source: $r"), identity)
+  val dir = Path.of(exportDir)
+  val index = StudyExport.index(dir).fold(refuse, identity)
+  val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => refuse(e.message), identity)
+  def suffix(n: Int): String =
+    if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
+  def line(u: StudyReplay.RecallUnit): String =
+    index.unitLine.replace("{u}", u.u.toString).replace("{text}", u.text)
+  def asks(c: StudyReplay.Chunk): String =
+    index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
+  val bundles = index.sessions.map { entry =>
+    val s = StudyExport.session(dir, entry).fold(refuse, identity)
+    val (replies, _) = StudyReplay
+      .session(
+        s.units,
+        s.chunks,
+        index.protocol,
+        index.attempts,
+        suffix,
+        line,
+        asks,
+        p => TextExchange.replay(recordings, provider, index.model, index.system, p)
+      )
+      .fold(f => refuse(s"${entry.name}: $f"), identity)
+    val recall = PreparedRecall
+      .supplied(entry.name, s.units.map(_.text), StudyExport.unitsChecksum(s.units))
+      .fold(e => refuse(s"${entry.name}: $e"), identity)
+    val producer = StudyRecord.producer(provider, index.model, index.system, view, recall)
+    val rows = replies.zip(recall.unitIds).map { case ((u, r), id) =>
+      StudyBundle.row(view, index.protocol, u, id.value, r, index.extras)
+    }
+    val records = StudyBundle.Fields.map { f =>
+      f -> StudyRecord
+        .record(
+          f,
+          StudyRecord.policy(index.condition, index.protocolName, f),
+          recall,
+          view,
+          producer,
+          rows.map(_.judgement(f))
+        )
+        .fold(e => refuse(s"${entry.name} $f: ${e.message}"), identity)
+    }.toMap
+    val doc = StudyBundle.encode(
+      StudyBundle.Provenance(
+        entry.participant,
+        entry.session,
+        index.condition,
+        index.model,
+        provider,
+        index.protocolName,
+        Checksum.ofText(index.system).hex,
+        index.manifestSha256,
+        recall.segmentation
+      ),
+      view,
+      records,
+      rows
+    )
+    val text = doc.spaces2 + "\n"
+    val reread = io.circe.jawn
+      .parse(text)
+      .left
+      .map(_.message)
+      .flatMap(StudyBundle.decode(_, view, recall))
+      .fold(e => refuse(s"${entry.name}: bundle does not reload: $e"), identity)
+    if StudyBundle.Fields.exists(f => reread.records(f).digest != records(f).digest) then
+      refuse(s"${entry.name}: reloaded bundle differs")
+    (entry.name, text, rows)
+  }
+  Files.createDirectories(out): scala.Unit
+  bundles.foreach { (name, text, _) =>
+    Files.write(out.resolve(s"$name.bundle.json"), text.getBytes(StandardCharsets.UTF_8)): scala.Unit
+  }
+  val kinds = StudyBundle.Fields.map { f =>
+    val xs = bundles.flatMap(_._3.map(_.judgement(f).kind))
+    f -> Json.fromFields(xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size)))
+  }
+  println(
+    s"bundles=${bundles.size} units=${bundles.map(_._3.size).sum} modelCalls=0 " +
+      Json.fromFields(kinds).noSpaces
+  )

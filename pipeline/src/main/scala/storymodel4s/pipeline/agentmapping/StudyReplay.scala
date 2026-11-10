@@ -146,6 +146,23 @@ object StudyReplay:
       case Stated.NoAssignment    => answered("kind" -> Json.fromString("none"))
       case Stated.Invalid(reason) => failed(reason)
 
+  /** Read a judgement back from its reply-file form; `None` for a failure or an unknown form. It
+    * is the inverse of `prediction` on the three kinds of answer.
+    */
+  def statedOf(prediction: Json): Option[Stated] =
+    val c = prediction.hcursor
+    if !c.get[String]("status").contains("answered") then None
+    else
+      c.get[String]("kind").toOption.flatMap {
+        case "scene" =>
+          c.downField("scene").focus.flatMap(strictInteger).map { n =>
+            Stated.Scene(n, c.downField("film_stated").focus.getOrElse(Json.Null))
+          }
+        case "film" => c.downField("film").focus.flatMap(strictInteger).map(Stated.Collection(_))
+        case "none" => Some(Stated.NoAssignment)
+        case _      => None
+      }
+
   /** One unit's row of a reply file: both judgements, and the extra fields the condition asked for,
     * each as the reply gave it or null. A unit with no answer has only its two failures.
     */
