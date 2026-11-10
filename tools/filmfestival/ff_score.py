@@ -482,9 +482,16 @@ def check_times(manifest, annotation_path, replies):
     lengths, and must be the ones the manifest froze. Every time prediction in `replies` is then
     recomputed from its raw answer and must equal what the reply file holds. Returns the table.
     """
-    if "clipSeconds" not in manifest or "sceneIntervalsSha256" not in manifest:
+    lengths, clock = manifest.get("clipSeconds"), manifest.get("clock")
+    if (
+        not isinstance(lengths, dict)
+        or not isinstance(manifest.get("sceneIntervalsSha256"), str)
+        or sorted(lengths) != sorted(str(film) for film in ff_gold.FILMS)
+    ):
         raise ScoreError("the manifest of a time condition freezes no scene intervals")
-    seconds = {int(film): s for film, s in manifest["clipSeconds"].items()}
+    if clock != {str(film): ff_time.CLOCK[film] for film in ff_time.CLOCK}:
+        raise ScoreError("the manifest's clock is not this scorer's clock")
+    seconds = {int(film): s for film, s in lengths.items()}
     table = ff_time.load(annotation_path, seconds)
     frozen = hashlib.sha256(ff_time.canonical(table).encode("utf-8")).hexdigest()
     if manifest["sceneIntervalsSha256"] != frozen:

@@ -55,6 +55,8 @@ class Base(unittest.TestCase):
         self.silent = set()
         # Frames described only when asked again; frames never opened; extra tool calls.
         self.slow, self.unread, self.more_uses = set(), set(), []
+        # Frames whose Read returns an error; frames whose Read has no result in the stream.
+        self.read_errors, self.no_result = set(), set()
         self.reply = None
         self.addCleanup(setattr, ff_map.subprocess, "run", ff_map.subprocess.run)
         ff_map.subprocess.run = self.cli
@@ -89,11 +91,17 @@ class Base(unittest.TestCase):
             }
             result = json.dumps(answer)
         events = [{"type": "system", "subtype": "init", "cwd": cwd}]
-        for use in self.uses(cwd, seen):
+        for number, use in enumerate(self.uses(cwd, seen)):
+            use = dict(use, id=f"toolu_{number}")
             events.append({"type": "assistant", "message": {"content": [use]}})
-            events.append(
-                {"type": "user", "message": {"content": [{"type": "tool_result"}]}}
-            )
+            opened = os.path.basename(str((use.get("input") or {}).get("file_path")))
+            content = seen.get(opened)
+            if content in self.no_result:
+                continue
+            outcome = {"type": "tool_result", "tool_use_id": use["id"]}
+            if content in self.read_errors:
+                outcome["is_error"] = True
+            events.append({"type": "user", "message": {"content": [outcome]}})
         events.append(
             {
                 "type": "assistant",
@@ -402,14 +410,32 @@ class Replies(unittest.TestCase):
         found, _ = self.read({"img_01.jpg": "a door marked , r12 , opens"})
         self.assertEqual(found, {0: "a door marked , r12 , opens"})
 
-    def test_fewer_than_three_words_or_more_than_400_characters_is_not_one(self):
-        self.assertEqual(ff_caption.usable("black screen here"), "black screen here")
+    def test_a_black_frame_can_be_described(self):
+        for text in (
+            "Black screen.",
+            "A completely black screen with no image or text visible.",
+            "A black frame; no image is visible.",
+        ):
+            self.assertEqual(ff_caption.usable(text), text)
+
+    def test_a_report_that_the_file_did_not_load_is_not_a_description(self):
+        for text in (
+            "The image could not be loaded.",
+            "Image not available.",
+            "Could not open the file img_03.jpg.",
+            "Permission denied for this file.",
+            "File not found in the directory.",
+        ):
+            self.assertIsNone(ff_caption.usable(text), text)
+
+    def test_fewer_than_two_words_or_more_than_400_characters_is_not_one(self):
+        self.assertEqual(ff_caption.usable("black screen"), "black screen")
         for text in (
             "",
             "   ",
             "\n",
             "black",
-            "black screen",
+            "Black.",
             "x" * 401,
             None,
             3,
@@ -420,7 +446,8 @@ class Replies(unittest.TestCase):
         self.assertIsNone(ff_caption.usable("ab " * 133 + "ab"))
 
     def test_a_refusal_or_an_error_report_is_not_a_description(self):
-        self.assertEqual(len(ff_caption.NOT_A_DESCRIPTION), 17)
+        self.assertEqual(len(ff_caption.NOT_A_DESCRIPTION), 21)
+        self.assertNotIn("no image", ff_caption.NOT_A_DESCRIPTION)
         for phrase in ff_caption.NOT_A_DESCRIPTION:
             for text in (
                 f"I am sorry, {phrase} this image file.",
@@ -432,7 +459,6 @@ class Replies(unittest.TestCase):
             "Unable to read the file img_03.jpg.",
             "I can't view images in this session.",
             "Error: file not found at that path",
-            "There is no image at this path.",
         ):
             self.assertIsNone(ff_caption.usable(text), text)
 
@@ -452,8 +478,9 @@ class Stream(unittest.TestCase):
     def lines(self, *events):
         return "\n".join(e if isinstance(e, str) else json.dumps(e) for e in events)
 
-    def read_use(self, path, name="Read"):
-        block = {"type": "tool_use", "name": name, "input": {"file_path": path}}
+    def read_use(self, path, name="Read", use_id="t1"):
+        block = {"type": "tool_use", "id": use_id, "name": name}
+        block["input"] = {"file_path": path}
         return {"type": "assistant", "message": {"content": [block]}}
 
     RESULT = {
@@ -468,7 +495,7 @@ class Stream(unittest.TestCase):
             {"type": "system", "subtype": "init"},
             "",
             self.read_use("/d/img_01.jpg"),
-            {"type": "user", "message": {"content": [{"type": "tool_result"}]}},
+            self.outcome("t1"),
             {
                 "type": "assistant",
                 "message": {
@@ -489,11 +516,52 @@ class Stream(unittest.TestCase):
         self.assertEqual(
             uses,
             [
-                {"name": "Read", "input": {"file_path": "/d/img_01.jpg"}},
-                {"name": "Bash", "input": {"command": "ls"}},
+                {
+                    "id": "t1",
+                    "name": "Read",
+                    "input": {"file_path": "/d/img_01.jpg"},
+                    "ok": True,
+                },
+                {"id": None, "name": "Bash", "input": {"command": "ls"}, "ok": False},
             ],
         )
         self.assertEqual(types, {"system": 1, "assistant": 2, "user": 1, "result": 1})
+
+    def outcome(self, use_id, **more):
+        block = dict({"type": "tool_result", "tool_use_id": use_id}, **more)
+        return {"type": "user", "message": {"role": "user", "content": [block]}}
+
+    def oks(self, *events):
+        _, uses, _ = ff_map.read_stream(self.lines(*events, self.RESULT))
+        return [use["ok"] for use in uses]
+
+    def test_a_read_succeeded_only_if_its_own_result_says_so(self):
+        read = self.read_use("/d/img_01.jpg")
+        self.assertEqual(self.oks(read, self.outcome("t1")), [True])
+        self.assertEqual(self.oks(read, self.outcome("t1", is_error=False)), [True])
+        self.assertEqual(self.oks(read, self.outcome("t1", content="pixels")), [True])
+        # An error result, no result, or a result for another tool use is not a read.
+        self.assertEqual(self.oks(read, self.outcome("t1", is_error=True)), [False])
+        self.assertEqual(self.oks(read), [False])
+        self.assertEqual(self.oks(read, self.outcome("t2")), [False])
+        self.assertEqual(self.oks(read, self.outcome(None)), [False])
+        self.assertEqual(
+            self.oks(read, self.outcome("t1"), self.outcome("t1", is_error=True)),
+            [False],
+        )
+        # A result block the assistant wrote itself is not a result.
+        own = {
+            "type": "assistant",
+            "message": {"content": [self.outcome("t1")["message"]["content"][0]]},
+        }
+        self.assertEqual(self.oks(read, own), [False])
+        second = self.read_use("/d/img_02.jpg", use_id="t2")
+        self.assertEqual(
+            self.oks(
+                read, second, self.outcome("t2"), self.outcome("t1", is_error=True)
+            ),
+            [False, True],
+        )
 
     def test_events_of_unknown_shape_are_counted_and_do_not_break_the_reader(self):
         text = self.lines(
@@ -554,7 +622,8 @@ class Stream(unittest.TestCase):
         )
         self.assertEqual(streamed["result"], "ok")
         self.assertEqual(
-            streamed["toolUses"], [{"name": "Read", "input": {"file_path": "/x"}}]
+            streamed["toolUses"],
+            [{"id": "t1", "name": "Read", "input": {"file_path": "/x"}, "ok": False}],
         )
         self.assertEqual(streamed["eventTypes"], {"assistant": 1, "result": 1})
 
@@ -654,6 +723,41 @@ class Reads(Base):
         self.assertEqual((receipt["attempts"], receipt["describedButNotRead"]), (3, 3))
         self.assertEqual(receipt["reads"][1:], [[], []])
 
+    def test_a_read_that_failed_or_has_no_result_is_not_a_read(self):
+        self.read_errors, self.no_result = {"picture 10-20"}, {"picture 10-41"}
+        self.assertEqual(self.run_main(), 1)
+        self.assertFalse(os.path.exists(os.path.join(self.out, "frame-captions.json")))
+        # Each alone is 1 of 50 frames, within the limit, and is recorded as undescribed.
+        for case in ("read_errors", "no_result"):
+            self.read_errors, self.no_result = set(), set()
+            setattr(self, case, {"picture 10-20"})
+            for name in os.listdir(os.path.join(self.out, "caption-cache")):
+                os.remove(os.path.join(self.out, "caption-cache", name))
+            self.assertEqual(self.run_main(), 0, case)
+            doc = self.captions()
+            self.assertIsNone(doc["films"]["10"][20]["description"])
+            self.assertEqual(doc["films"]["10"][19]["description"], "saw picture 10-19")
+            receipt = [b for b in doc["batches"] if b["film"] == 10][1]
+            self.assertEqual(
+                (
+                    receipt["attempts"],
+                    receipt["describedButNotRead"],
+                    receipt["failedReads"],
+                ),
+                (3, 3, 3),
+            )
+            self.assertNotIn("img_05.jpg", receipt["reads"][0])
+            self.assertEqual(len(receipt["reads"][0]), 15)
+            os.remove(os.path.join(self.out, "frame-captions.json"))
+
+    def test_a_failed_read_outside_the_batch_is_still_a_protocol_failure(self):
+        self.more_uses = [
+            {"type": "tool_use", "name": "Read", "input": {"file_path": "/etc/hosts"}}
+        ]
+        self.read_errors = {None}
+        with self.assertRaises(ff_map.ProtocolFailure):
+            ff_caption.main(["run", self.out, self.tracked(), "--jobs", "1"])
+
     def test_a_stream_with_no_tool_use_events_describes_nothing(self):
         self.addCleanup(setattr, self, "uses", self.uses)
         self.uses = lambda cwd, seen: []
@@ -696,6 +800,8 @@ class Smoke(Base):
         self.assertEqual(ff_caption.main(["smoke", target]), 0)
         seen = json.loads(sys.stdout.getvalue())
         self.assertEqual(seen["reads"], [["img_01.jpg"]])
+        self.assertEqual(seen["readMatchedToItsResult"], True)
+        self.assertEqual(seen["failedReads"], 0)
         self.assertEqual(seen["eventTypes"]["assistant"], 2)
         self.assertEqual(seen["description"], "saw a grey picture")
         self.assertEqual(seen["model"], "claude-sonnet-5-5")
@@ -708,6 +814,15 @@ class Smoke(Base):
         self.assertIn(
             "FAILED: the image got no usable description", sys.stderr.getvalue()
         )
+
+    def test_smoke_fails_loudly_when_the_read_has_no_matching_result(self):
+        self.no_result = {"a grey picture"}
+        target = os.path.join(self.dir.name, "smoke")
+        self.assertEqual(ff_caption.main(["smoke", target]), 1)
+        seen = json.loads(sys.stdout.getvalue())
+        self.assertEqual(seen["readMatchedToItsResult"], False)
+        self.assertEqual(seen["failedReads"], 3)
+        self.assertIn("successful result", sys.stderr.getvalue())
 
     def test_smoke_fails_loudly_when_another_model_answers(self):
         self.model = "claude-haiku-5-5"
@@ -723,6 +838,10 @@ class Audit(unittest.TestCase):
             {"seconds": 2, "description": None},
             {"seconds": 4, "description": "Black screen with text."},
             {"seconds": 6, "description": long},
+            {
+                "seconds": 8,
+                "description": "A poster showing an image of a loaded cart.",
+            },
         ]
         same = [
             {"seconds": 2 * k, "description": "A plain black screen with no detail."}
@@ -733,17 +852,23 @@ class Audit(unittest.TestCase):
             for k in range(10)
         ]
         lines = ff_caption.audit({"films": {"10": same + ten, "2": rows}})
-        self.assertEqual(lines[1].split("\t")[:3], ["2", "3", "1"])
-        self.assertEqual(lines[1].split("\t")[4:], ["154", "14.0", "31", "1"])
+        # Film 2: 4 described (7, 4, 31 and 9 words), 1 undescribed, 1 over 30 words.
+        self.assertEqual(lines[1].split("\t")[:3], ["2", "4", "1"])
+        self.assertEqual(lines[1].split("\t")[4:], ["154", "12.8", "31", "1"])
         self.assertEqual(lines[2].split("\t")[:3], ["10", "21", "0"])
         self.assertEqual(lines[2].split("\t")[-1], "0")
         self.assertIn("undescribed\tfilm 2\t2 s", lines)
         self.assertIn("short\tfilm 2\t4 s\tBlack screen with text.", lines)
+        # Accepted, but a person should look: it mentions an image and something loaded.
+        self.assertIn(
+            "suspect\tfilm 2\t8 s\tA poster showing an image of a loaded cart.", lines
+        )
+        self.assertEqual(sum(line.startswith("suspect") for line in lines), 1)
         repeated = [line for line in lines if line.startswith("repeated")]
         self.assertEqual(len(repeated), 1)
         self.assertTrue(repeated[0].startswith("repeated 11 times\t10@0 10@2 "))
         self.assertTrue(repeated[0].endswith("A plain black screen with no detail."))
-        self.assertEqual(len(lines), 3 + 3)
+        self.assertEqual(len(lines), 3 + 4)
 
 
 class Manifest(Base):
@@ -763,7 +888,7 @@ class Manifest(Base):
         )
         self.assertEqual(ff_caption.main(["manifest", self.out]), 2)
         self.assertEqual(
-            (doc["minDescriptionWords"], doc["maxDescriptionChars"]), (3, 400)
+            (doc["minDescriptionWords"], doc["maxDescriptionChars"]), (2, 400)
         )
         self.assertEqual(doc["notADescription"], list(ff_caption.NOT_A_DESCRIPTION))
         self.assertIn("--restricted", doc["cliFlags"])

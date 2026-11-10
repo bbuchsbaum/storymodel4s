@@ -753,14 +753,14 @@ class Uniform(Fixture):
             for out in (self.annotated, self.automatic)
         ]
         self.assertEqual(set(loaded[0]), set(loaded[1]))
+        scores = self.score(self.annotated), self.score(self.automatic)
         replies = [
-            ff_compare.replies(os.path.join(out, "replies"), "referent")
-            for out in (self.annotated, self.automatic)
+            ff_compare.replies(os.path.join(out, "replies"), "referent", score)
+            for out, score in zip((self.annotated, self.automatic), scores)
         ]
         self.assertEqual(replies[0][("p1", "run-01", 2)], ("scene", 7003))
         self.assertEqual(replies[1][("p1", "run-01", 2)], ("scene", 7003))
         self.assertEqual(replies[1][("p1", "run-01", 9)], ("time_outside", 1))
-        scores = self.score(self.annotated), self.score(self.automatic)
         out = ff_compare.compare(*scores, *replies, across_conditions=True)
         self.assertEqual(out["primary"]["condition"], "annotation")
         self.assertEqual(out["secondary"]["condition"], "auto")
@@ -803,10 +803,16 @@ class Uniform(Fixture):
         write(path, json.dumps(doc))
         self.assertIsInstance(self.score(self.automatic, "narrative"), dict)
 
-    def test_scoring_refuses_other_scene_intervals_than_the_frozen_ones(self):
+    def test_scoring_refuses_another_clock_or_other_scene_intervals(self):
         ff_time.CLOCK[2]["b"] = "0.25"
         self.assertEqual(self.score(self.automatic), 2)
-        self.assertIn("scene intervals", sys.stderr.getvalue())
+        self.assertIn("clock is not this scorer's clock", sys.stderr.getvalue())
+        ff_time.CLOCK[2]["b"] = "0"
+        # The same clock and clips under a changed conversion rule give other intervals.
+        rule = ff_time.to_clip
+        self.patch(ff_time, "to_clip", lambda film, at: rule(film, at) / 2)
+        self.assertEqual(self.score(self.automatic), 2)
+        self.assertIn("scene intervals are not the ones", sys.stderr.getvalue())
 
 
 class Identity(Fixture):
@@ -975,6 +981,73 @@ class Identity(Fixture):
         fewer = dict(scores["haiku"], population={})
         with self.assertRaises(ff_score.ScoreError):
             ff_compare.compare(scores["opus"], fewer, {}, {})
+
+    def test_comparison_refuses_reply_directories_that_are_not_the_scored_runs(self):
+        replies = [self.reply(FIRST), self.reply(SECOND)]
+        opus = self.annotated(ff_map.PRIMARY)
+        haiku = self.annotated(ff_map.ARMS[1])
+        auto, _ = self.run_condition("auto", replies)
+        none, _ = self.run_condition("norecord", replies)
+        paths = {}
+        for name, out in (("opus", opus), ("haiku", haiku), ("auto", auto)):
+            paths[name] = os.path.join(out, "score.json")
+            with open(paths[name], "w") as handle:
+                json.dump(self.score(out, out)[1], handle)
+
+        def command(a, b, dir_a, dir_b, *flags):
+            target = os.path.join(self.dir.name, f"cmp{len(os.listdir(self.dir.name))}")
+            args = [paths[a], paths[b], os.path.join(dir_a, "replies")]
+            args += [os.path.join(dir_b, "replies"), "referent", target]
+            code = ff_compare.main(list(flags) + args)
+            self.assertEqual(os.path.exists(target), code == 0)
+            return code
+
+        across = "--across-conditions"
+        self.assertEqual(command("opus", "auto", opus, auto, across), 0)
+        # The no-record replies passed as the automatic run: same model, another manifest.
+        self.assertEqual(command("opus", "auto", opus, none, across), 2)
+        self.assertIn("not from the score file's run", sys.stderr.getvalue())
+        self.assertEqual(command("opus", "haiku", opus, haiku), 0)
+        self.assertEqual(command("opus", "haiku", opus, opus), 2)
+        self.assertEqual(command("opus", "haiku", haiku, haiku), 2)
+        self.assertIn("not from the score file's model", sys.stderr.getvalue())
+        # Landed reply files record no manifest: the model check alone applies to them.
+        self.landed(haiku)
+        self.assertEqual(command("opus", "haiku", opus, haiku), 0)
+        self.landed(opus)
+        self.assertEqual(command("opus", "haiku", haiku, opus), 2)
+
+    def test_scoring_a_time_manifest_without_its_intervals_or_clock_is_a_refusal(self):
+        replies = [self.reply(FIRST), self.reply(SECOND)]
+        auto, _ = self.run_condition("auto", replies)
+        path = os.path.join(auto, "manifest.json")
+        with open(path) as handle:
+            doc = json.load(handle)
+        target = os.path.join(self.dir.name, "never.json")
+        args = [self.gold, self.codes_path, self.annotation, path]
+        args += [os.path.join(auto, "replies"), "referent", target]
+        changes = [
+            (key, None) for key in ("clipSeconds", "sceneIntervalsSha256", "clock")
+        ]
+        changes += [
+            ("clipSeconds", {"1": 40.0}),
+            ("clipSeconds", [40.0]),
+            ("clock", {}),
+        ]
+        changes += [("clipSeconds", dict(doc["clipSeconds"], x=1.0))]
+        for key, value in changes:
+            edited = {k: v for k, v in doc.items() if k != key}
+            if value is not None:
+                edited[key] = value
+            write(path, json.dumps(edited))
+            # The replies must name this manifest for the check under test to be reached.
+            sha = ff_frames.file_sha(path)
+            self.rewrite(auto, lambda d: d.update(manifestSha256=sha))
+            self.assertEqual(ff_score.main(["score"] + args), 2, (key, value))
+            self.assertIn(
+                "refused: the manifest", sys.stderr.getvalue().split("\n")[-2]
+            )
+        self.assertFalse(os.path.exists(target))
 
     def test_the_comparison_command_takes_the_mode_as_a_flag(self):
         replies = [self.reply(FIRST), self.reply(SECOND)]

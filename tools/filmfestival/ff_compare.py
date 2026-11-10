@@ -75,14 +75,23 @@ def answer(prediction):
     )
 
 
-def replies(directory, field):
-    """{(participant, session, row): answer} for every reply file in a directory."""
+def replies(directory, field, score):
+    """{(participant, session, row): answer} for every reply file in a directory.
+
+    The directory must hold the replies `score` was made from: each file's model, and its
+    manifest hash when it records one, must be the score file's.
+    """
     out = {}
     for name in sorted(os.listdir(directory)):
         if not name.endswith(".json"):
             continue
         with open(os.path.join(directory, name), encoding="utf-8") as handle:
             doc = json.load(handle)
+        recorded = doc.get("manifestSha256")
+        if doc.get("model") != score.get("model"):
+            raise ff_score.ScoreError(f"{name} is not from the score file's model")
+        if recorded is not None and recorded != score.get("manifestSha256"):
+            raise ff_score.ScoreError(f"{name} is not from the score file's run")
         for unit in doc["units"]:
             out[(doc["participant"], doc["session"], unit["row"])] = answer(unit[field])
     return out
@@ -187,8 +196,8 @@ def main(argv):
         report = compare(
             primary,
             secondary,
-            replies(argv[2], argv[4]),
-            replies(argv[3], argv[4]),
+            replies(argv[2], argv[4], primary),
+            replies(argv[3], argv[4], secondary),
             across,
         )
     except ff_score.ScoreError as error:

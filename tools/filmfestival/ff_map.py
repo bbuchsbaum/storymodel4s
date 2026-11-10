@@ -257,9 +257,12 @@ def read_stream(text):
     The stream is one JSON object per line. The last object of type `result` is the same object
     the `json` format prints (`result`, `is_error`, `usage`, `modelUsage`). Every `tool_use`
     block inside an `assistant` event's message is a tool the model called, with its input.
+    Its outcome is the `tool_result` block with the same `tool_use_id` inside a `user` event's
+    message: `ok` is true only when that block exists and is not marked `is_error`. A tool use
+    with no result block did not succeed as far as the stream shows.
     Raises ValueError for a line that is not a JSON object or a stream with no result.
     """
-    result, tool_uses, event_types = None, [], {}
+    result, tool_uses, event_types, outcomes = None, [], {}, {}
     for line in text.splitlines():
         if not line.strip():
             continue
@@ -270,15 +273,28 @@ def read_stream(text):
         event_types[kind] = event_types.get(kind, 0) + 1
         if kind == "result":
             result = event
-        message = event.get("message") if kind == "assistant" else None
+        message = event.get("message") if kind in ("assistant", "user") else None
         content = message.get("content") if isinstance(message, dict) else None
         for block in content if isinstance(content, list) else []:
-            if isinstance(block, dict) and block.get("type") == "tool_use":
+            if not isinstance(block, dict):
+                continue
+            if kind == "assistant" and block.get("type") == "tool_use":
                 tool_uses.append(
-                    {"name": block.get("name"), "input": block.get("input")}
+                    {
+                        "id": block.get("id"),
+                        "name": block.get("name"),
+                        "input": block.get("input"),
+                    }
                 )
+            if kind == "user" and block.get("type") == "tool_result":
+                failed = block.get("is_error") is True
+                key = block.get("tool_use_id")
+                # A tool use reported twice succeeded only if no report is an error.
+                outcomes[key] = outcomes.get(key, True) and not failed
     if result is None:
         raise ValueError("the stream holds no result")
+    for use in tool_uses:
+        use["ok"] = use["id"] is not None and outcomes.get(use["id"], False)
     return result, tool_uses, event_types
 
 

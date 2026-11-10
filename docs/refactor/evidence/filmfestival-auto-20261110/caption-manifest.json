@@ -481,7 +481,7 @@
  "instructionSha256": "dfe6f8f65c0c13ff20573dd95a3b23e545729e1b69877f9d585ccc7930a25c7f",
  "maxDescriptionChars": 400,
  "maxUndescribedFraction": 0.02,
- "minDescriptionWords": 3,
+ "minDescriptionWords": 2,
  "model": "claude-sonnet-5-5",
  "notADescription": [
   "unable to",
@@ -498,7 +498,11 @@
   "can't access",
   "i don't have",
   "i do not have",
-  "no image",
+  "could not be loaded",
+  "could not open",
+  "not available",
+  "permission denied",
+  "file not found",
   "failed to",
   "error"
  ],

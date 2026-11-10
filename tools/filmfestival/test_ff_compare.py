@@ -139,6 +139,14 @@ class Compare(unittest.TestCase):
         )
         self.assertEqual(out["secondary"]["model"], "n")
         self.assertEqual(out["across_conditions"], False)
+        # One model twice under one condition is not a comparison across conditions.
+        again = self.score(model="m", condition="annotation", manifestSha256="5")
+        with self.assertRaises(ff_score.ScoreError) as raised:
+            ff_compare.compare(a, again, {}, {}, across_conditions=True)
+        self.assertIn("same condition", str(raised.exception))
+        self.assertEqual(
+            ff_compare.compare(a, again, {}, {})["across_conditions"], False
+        )
         across = ff_compare.compare(a, c, {}, {}, across_conditions=True)
         self.assertEqual(across["secondary"]["condition"], "auto")
         for first, second, mode in (

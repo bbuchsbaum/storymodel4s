@@ -26,7 +26,8 @@ directory) and with permission prompts answered by nobody. Replies are read from
 event stream, so every tool the model used is seen: a call that used any tool but Read, or read
 any path outside the batch's directory, is a protocol failure and is not recorded. The paths
 read are kept in the call's record. A frame the model did not read gets no description from
-that reply, whatever the reply says about it.
+that reply, whatever the reply says about it; a Read that returned an error, or has no result
+in the stream, is not a read.
 
 Calls go through `ff_map.call`, so the model check, the stripped API key, the atomic cache write
 and the recorded CLI version are the mapper's. A batch is 16 frames of one film in time order.
@@ -36,12 +37,14 @@ included so that two identical frames from different batches cannot share a repl
 another file. A batch gets up to three attempts; each later attempt asks only for the frames
 still lacking a usable description.
 
-A usable description is text of at least 3 words and at most 400 characters that does not match
-one of NOT_A_DESCRIPTION, a short list of phrases with which a model declines or reports an
-error instead of describing ("unable to", "cannot read", "error", ...). Anything else is asked
+A usable description is text of at least 2 words ("Black screen.") and at most 400 characters
+that does not match one of NOT_A_DESCRIPTION, a short list of phrases with which a model
+declines or reports an error instead of describing ("unable to", "cannot read", "could not be
+loaded", "error", ...). Anything else is asked
 again, and after three attempts the frame is recorded as undescribed. If more than 2% of any
 film's frames are undescribed, `run` exits non-zero and writes no captions file. A frame that
-really shows the word "error" will be lost to the pattern; `audit` lists what was lost.
+really shows the word "error" will be lost to the pattern; `audit` lists what was lost, and
+every accepted description that mentions an image, a file, loading, reading or an error.
 """
 
 import argparse
@@ -74,7 +77,7 @@ ATTEMPTS = 3
 MAX_UNDESCRIBED = 0.02
 # A longer reply is not the one sentence asked for; the frame is asked again.
 MAX_DESCRIPTION_CHARS = 400
-MIN_DESCRIPTION_WORDS = 3
+MIN_DESCRIPTION_WORDS = 2
 # Phrases of a refusal or an error report, matched as whole words in any case. A reply holding
 # one is not a description.
 NOT_A_DESCRIPTION = (
@@ -92,7 +95,11 @@ NOT_A_DESCRIPTION = (
     "can't access",
     "i don't have",
     "i do not have",
-    "no image",
+    "could not be loaded",
+    "could not open",
+    "not available",
+    "permission denied",
+    "file not found",
     "failed to",
     "error",
 )
@@ -102,6 +109,8 @@ _NOT_A_DESCRIPTION = re.compile(
     ),
     re.IGNORECASE,
 )
+# What `audit` shows a person even when the description was accepted.
+SUSPECT = re.compile(r"image|file|load|read|unable|cannot|error", re.IGNORECASE)
 # `{frames}` is the temporary directory holding the batch. `--restricted` confines the file
 # tools to it; `--permission-prompts none` denies anything that would ask; the event stream
 # (`stream-json`, which needs `--verbose` with `-p`) shows every tool the model used.
@@ -208,12 +217,14 @@ def read_reply(text, positions):
 def audit_reads(directory):
     """The check `ff_map.call` runs on a call's record before it is kept.
 
-    Every tool the model used must be Read, on a path inside `directory`. The paths are added to
-    the record as `readPaths`, and their base names as `readNames`.
+    Every tool the model used must be Read, on a path inside `directory`, whether or not the
+    read succeeded. The paths of the reads that succeeded are added to the record as
+    `readPaths`, and their base names as `readNames`; a Read whose result is an error, or has no
+    result in the stream, opened nothing and is counted in `failedReads`.
     """
 
     def check(record):
-        paths = []
+        paths, failed = [], 0
         for use in record.get("toolUses") or []:
             given = (
                 use["input"].get("file_path")
@@ -229,7 +240,11 @@ def audit_reads(directory):
                 raise ff_map.ProtocolFailure(
                     f"the model read {given}, outside the batch's directory"
                 )
-            paths.append(resolved)
+            if use.get("ok"):
+                paths.append(resolved)
+            else:
+                failed += 1
+        record["failedReads"] = failed
         record["readPaths"] = paths
         record["readNames"] = sorted({os.path.basename(p) for p in paths})
 
@@ -238,7 +253,7 @@ def audit_reads(directory):
 
 def describe(root, frames, cache_dir, version):
     """Descriptions for one batch: ([description or None per frame], receipt)."""
-    found, attempts, stray, unread, reads = {}, 0, 0, 0, []
+    found, attempts, stray, unread, reads, failed = {}, 0, 0, 0, [], 0
     for attempt in range(ATTEMPTS):
         missing = [p for p in range(len(frames)) if p not in found]
         if not missing:
@@ -264,10 +279,12 @@ def describe(root, frames, cache_dir, version):
         found.update({p: d for p, d in got.items() if neutral(p) in seen})
         stray += extra
         reads.append(record.get("readNames") or [])
+        failed += record.get("failedReads") or 0
     receipt = {
         "attempts": attempts,
         "strayNames": stray,
         "describedButNotRead": unread,
+        "failedReads": failed,
         "eventTypes": record.get("eventTypes") if attempts else None,
         "reads": reads,
     }
@@ -389,10 +406,17 @@ def smoke(out_dir):
     if not events.get("assistant"):
         problems.append("the stream held no assistant event")
     if receipt["reads"][0] != [neutral(0)]:
-        problems.append("no tool-use event shows the model reading the image")
+        problems.append(
+            "no tool-use event with a successful result shows the model reading the image"
+        )
     if descriptions[0] is None:
         problems.append("the image got no usable description")
-    seen = {"model": MODEL, "description": descriptions[0], **receipt}
+    seen = {
+        "model": MODEL,
+        "description": descriptions[0],
+        "readMatchedToItsResult": receipt["reads"][0] == [neutral(0)],
+        **receipt,
+    }
     return seen, problems
 
 
@@ -423,8 +447,11 @@ def audit(captions):
     for film, seconds, text in texts:
         if text is None:
             lines.append(f"undescribed\tfilm {film}\t{seconds} s")
-        elif words(text) < 5:
-            lines.append(f"short\tfilm {film}\t{seconds} s\t{text}")
+        else:
+            if words(text) < 5:
+                lines.append(f"short\tfilm {film}\t{seconds} s\t{text}")
+            if SUSPECT.search(text):
+                lines.append(f"suspect\tfilm {film}\t{seconds} s\t{text}")
     repeats = {}
     for film, seconds, text in texts:
         if text is not None:
