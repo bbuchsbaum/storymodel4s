@@ -14,10 +14,29 @@ A scene answer that names a real scene which is not a valid target (a title card
 is an answer, not a processing failure. It is its own kind, `invalid_scene`: never a scene hit,
 and it keeps its dictionary film for film identity.
 
+Conditions that answer with a time (docs/plans/2026-11-10-filmfestival-automatic-input-protocol.md)
+use the same predictions. `ff_time.prediction` makes them, and adds to a scene answer the scenes
+`near` the time and the raw `time`. A time outside the film's clip is
+    {"status": "answered", "kind": "time_outside", "film": 3, "near": [...], "time": "9:59", ...}
+It is scored as `invalid_scene` (an answer in that film that selects no valid target: never a
+scene hit, never a film-only answer) and is also counted alone, as `time_outside_clip`.
+
+Near scene agreement (`scene_near`) is reported beside strict agreement (`scene`) for every
+condition: a hit when the selected scene or any near scene is in the reference set. Which scenes
+are near depends on the kind of answer, and the report names the rule (`near_rule`):
+- `adjacent-scene`, for a scene answer: the valid scenes immediately before and after the
+  selected scene in its film, by scene number among valid targets;
+- `time-2s`, for a time answer: the prediction's own `near` list, the valid scenes whose interval
+  lies within 2 seconds of the time. These may exist when the time selects no scene.
+The two are not the same quantity; each asks whether the answer is right to within the
+reference's boundary precision.
+
 Usage:
     ff_score.py population GOLD CODES ANNOTATION
     ff_score.py score GOLD CODES ANNOTATION MANIFEST PREDICTIONS_DIR FIELD OUTPUT
-MANIFEST is the frozen manifest; the three inputs must have the hashes it records.
+MANIFEST is the frozen manifest; the three inputs must have the hashes it records. The near rule
+is the manifest's (`adjacent-scene` when it names none), never a command-line choice. For a time
+condition every prediction is first recomputed from its raw time and must come out the same.
 FIELD is `referent` or `narrative`. PREDICTIONS_DIR must hold one <participant>_<session>.json
 for every participant-session of the reference, each
 {"participant", "session", "units": [{"row": <gold_row>, "<FIELD>": <prediction>}, ...]}.
@@ -32,8 +51,11 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import ff_gold  # noqa: E402
+import ff_time  # noqa: E402
 
-SCHEMA = "storymodel4s.filmfestival.transfer-score/v2"
+SCHEMA = "storymodel4s.filmfestival.transfer-score/v3"
+ADJACENT, TIME_NEAR = "adjacent-scene", "time-2s"
+NEAR_RULES = (ADJACENT, TIME_NEAR)
 FIELDS = ("referent", "narrative")
 KINDS = ("scene", "invalid_scene", "film", "none", "failed")
 BOOTSTRAP_DRAWS = 5000
@@ -76,18 +98,66 @@ def normalise(prediction, film_of, valid):
         if is_int(film) and film in ff_gold.FILMS:
             return {"kind": "film", "film": film, "scene": None}
         return failed("unknown-film")
+    if kind == "time_outside":
+        film = prediction.get("film")
+        if is_int(film) and film in ff_gold.FILMS:
+            return {
+                "kind": "invalid_scene",
+                "film": film,
+                "scene": None,
+                "time_outside": True,
+            }
+        return failed("unknown-film")
     if kind == "none":
         return {"kind": "none", "film": None, "scene": None}
     return failed("unknown-kind")
 
 
-def judge(utterance, prediction):
-    """What one checked prediction is, against one reference."""
+def near_scenes(raw, prediction, film_of, valid, rule):
+    """The scenes near one answer under `rule`, besides the selected scene.
+
+    `raw` is the prediction as given and `prediction` is it checked. A reply file made by one
+    kind of condition cannot be scored under the other kind's rule: a time answer under
+    `adjacent-scene`, or a scene answer that carries no time under `time-2s`, is refused.
+    """
+    if rule not in NEAR_RULES:
+        raise ScoreError(f"near rule must be one of {NEAR_RULES}")
+    timed = isinstance(raw, dict) and ("time" in raw or "near" in raw)
+    located = prediction["kind"] == "scene" or prediction.get("time_outside", False)
+    if rule == ADJACENT:
+        if timed or prediction.get("time_outside"):
+            raise ScoreError("a time answer cannot be scored under adjacent-scene")
+        if prediction["kind"] != "scene":
+            return []
+        own = sorted(s for s in valid if film_of[s] == prediction["film"])
+        at = own.index(prediction["scene"])
+        return own[max(at - 1, 0) : at] + own[at + 1 : at + 2]
+    if isinstance(raw, dict) and raw.get("kind") == "scene" and "time" not in raw:
+        raise ScoreError("a scene answer without a time cannot be scored under time-2s")
+    if not located:
+        return []
+    near = raw.get("near")
+    if (
+        not isinstance(near, list)
+        or not all(is_int(s) and s in valid for s in near)
+        or any(film_of[s] != prediction["film"] for s in near)
+        or (prediction["kind"] == "scene" and prediction["scene"] not in near)
+    ):
+        raise ScoreError("a time answer's near scenes are not valid scenes of its film")
+    return near
+
+
+def judge(utterance, prediction, near=()):
+    """What one checked prediction is, against one reference. `near` are its near scenes."""
     cls = utterance["cls"]
     out = {"cls": cls, "kind": prediction["kind"], "reason": prediction.get("reason")}
+    out["time_outside"] = prediction.get("time_outside", False)
     if cls in ff_gold.SCENE_CLASSES:
         out["scene_hit"] = (
             prediction["kind"] == "scene" and prediction["scene"] in utterance["scenes"]
+        )
+        out["near_hit"] = out["scene_hit"] or any(
+            s in utterance["scenes"] for s in near
         )
     if cls in ff_gold.FILM_CLASSES:
         out["film_hit"] = (
@@ -193,26 +263,34 @@ def summarise(judged):
     for j in judged:
         if j["flags"]["kind"] == "failed":
             reasons[j["flags"]["reason"]] = reasons.get(j["flags"]["reason"], 0) + 1
-    report = {
-        "utterances": len(judged),
-        "prediction_kinds": kinds(judged),
-        "failure_reasons": dict(sorted(reasons.items())),
-        "scene": {
-            **both_ways(scene, "scene_hit"),
+
+    def agreement(key):
+        return {
+            **both_ways(scene, key),
             "strata": {
-                c: both_ways([j for j in scene if j["flags"]["cls"] == c], "scene_hit")
+                c: both_ways([j for j in scene if j["flags"]["cls"] == c], key)
                 for c in ff_gold.SCENE_CLASSES
             },
-            "prediction_kinds": kinds(scene),
-            "chance_given_film": mean([j["chance"][0] for j in scene]),
-            "chance_end_to_end": mean([j["chance"][1] for j in scene]),
             "by_film": {
                 str(f): both_ways(
-                    [j for j in scene if j["utterance"]["film"] == f], "scene_hit"
+                    [j for j in scene if j["utterance"]["film"] == f], key
                 )
                 for f in ff_gold.FILMS
             },
+        }
+
+    report = {
+        "utterances": len(judged),
+        "prediction_kinds": kinds(judged),
+        "time_outside_clip": sum(1 for j in judged if j["flags"]["time_outside"]),
+        "failure_reasons": dict(sorted(reasons.items())),
+        "scene": {
+            **agreement("scene_hit"),
+            "prediction_kinds": kinds(scene),
+            "chance_given_film": mean([j["chance"][0] for j in scene]),
+            "chance_end_to_end": mean([j["chance"][1] for j in scene]),
         },
+        "scene_near": agreement("near_hit"),
         "film": {
             "film_labelled": both_ways(labelled, "film_hit"),
             "film_reference": both_ways(reference, "film_hit"),
@@ -231,8 +309,11 @@ def summarise(judged):
     return report
 
 
-def score(gold, film_of, valid, predictions):
-    """`predictions` maps (participant, session, row) to a raw prediction. Returns the report."""
+def score(gold, film_of, valid, predictions, near_rule=ADJACENT):
+    """`predictions` maps (participant, session, row) to a raw prediction. Returns the report.
+
+    `near_rule` says which scenes count as near an answer (see the module text).
+    """
     known = {(u["participant"], u["session"], u["row"]) for u in gold}
     stray = sorted(k for k in predictions if k not in known)
     if stray:
@@ -240,16 +321,17 @@ def score(gold, film_of, valid, predictions):
     judged = []
     for u in gold:
         key = (u["participant"], u["session"], u["row"])
-        record = {
-            "utterance": u,
-            "flags": judge(u, normalise(predictions.get(key), film_of, valid)),
-        }
+        raw = predictions.get(key)
+        checked = normalise(raw, film_of, valid)
+        near = near_scenes(raw, checked, film_of, valid, near_rule)
+        record = {"utterance": u, "flags": judge(u, checked, near)}
         if u["cls"] in ff_gold.SCENE_CLASSES:
             record["chance"] = chance(u, film_of, valid)
         judged.append(record)
     sessions = sorted({u["session"] for u in gold})
     report = {
         "schema": SCHEMA,
+        "near_rule": near_rule,
         "population": ff_gold.population(gold),
         "classes": ff_gold.classes(gold),
         "valid_scene_targets": len(valid),
@@ -315,8 +397,29 @@ def file_sha(path):
         return hashlib.sha256(handle.read()).hexdigest()
 
 
+def check_times(manifest, annotation_path, replies):
+    """For a condition that answers with a time: the frozen conversion, applied again.
+
+    The scene intervals are rebuilt from the annotation, the clock and the manifest's clip
+    lengths, and must be the ones the manifest froze. Every time prediction in `replies` is then
+    recomputed from its raw answer and must equal what the reply file holds.
+    """
+    seconds = {int(film): s for film, s in manifest["clipSeconds"].items()}
+    table = ff_time.load(annotation_path, seconds)
+    frozen = hashlib.sha256(ff_time.canonical(table).encode("utf-8")).hexdigest()
+    if manifest["sceneIntervalsSha256"] != frozen:
+        raise ScoreError("the scene intervals are not the ones the manifest froze")
+    _, _, differences = ff_time.rederive_directory(table, replies)
+    if differences:
+        name, row, field = differences[0][:3]
+        raise ScoreError(
+            f"{len(differences)} predictions differ from their recomputation, "
+            f"first {name} row {row} {field}"
+        )
+
+
 def check_inputs(manifest_path, gold_path, codes_path, annotation_path):
-    """The scored reference must be the frozen one."""
+    """The scored reference must be the frozen one. Returns the manifest."""
     with open(manifest_path, encoding="utf-8") as handle:
         manifest = json.load(handle)
     for name, path in (
@@ -328,6 +431,7 @@ def check_inputs(manifest_path, gold_path, codes_path, annotation_path):
             raise ScoreError(
                 f"{os.path.basename(path)} is not the file the manifest froze ({name})"
             )
+    return manifest
 
 
 def main(argv):
@@ -356,15 +460,23 @@ def main(argv):
             print("refused: output exists", file=sys.stderr)
             return 2
         try:
-            check_inputs(manifest_path, gold_path, codes_path, annotation_path)
+            manifest = check_inputs(
+                manifest_path, gold_path, codes_path, annotation_path
+            )
+            near_rule = manifest.get("nearRule", ADJACENT)
+            if "sceneIntervalsSha256" in manifest:
+                check_times(manifest, annotation_path, replies)
             gold = ff_gold.load_gold(gold_path, codes_path)
             film_of, valid = ff_gold.load_dictionary(annotation_path)
             ff_gold.check_join(gold, film_of)
-            report = score(gold, film_of, valid, load_predictions(replies, field, gold))
+            predictions = load_predictions(replies, field, gold)
+            report = score(gold, film_of, valid, predictions, near_rule)
         except (ScoreError, ff_gold.GoldError) as error:
             print(f"refused: {error}", file=sys.stderr)
             return 2
         report["field"] = field
+        report["condition"] = manifest.get("condition", "annotation")
+        report["model"] = manifest.get("model")
         with open(output, "w", encoding="utf-8") as handle:
             json.dump(report, handle, indent=1, sort_keys=True)
             handle.write("\n")

@@ -119,12 +119,12 @@ def build(rows, film_of, valid, durations):
             raise ff_gold.GoldError(
                 f"film {film}: no scene holds the first content row"
             )
-        begin[0] = Fraction(0)
         bounds = begin + [duration]
         if any(a >= b for a, b in zip(bounds, bounds[1:])):
             raise ff_gold.GoldError(
                 f"film {film}: scene starts are not increasing inside the clip"
             )
+        bounds[0] = Fraction(0)
         table[film] = {
             "duration": duration,
             "scenes": [(s, bounds[i], bounds[i + 1]) for i, s in enumerate(own)],

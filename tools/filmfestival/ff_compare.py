@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""Compare the two arms of the FilmFestival transfer evaluation, within participant.
+"""Compare two runs of the FilmFestival transfer evaluation, within participant.
 
-Protocol: docs/plans/2026-11-09-filmfestival-transfer-protocol.md, section "Arms".
+Protocols: docs/plans/2026-11-09-filmfestival-transfer-protocol.md, section "Arms", and
+docs/plans/2026-11-10-filmfestival-automatic-input-protocol.md, section "Scoring".
 
 Usage: ff_compare.py PRIMARY_SCORE SECONDARY_SCORE PRIMARY_REPLIES SECONDARY_REPLIES FIELD OUTPUT
 
-The two score files come from `ff_score.py score` on the same reference and FIELD. For each
-session it reports each participant's scene-agreement difference (secondary minus primary), the
-mean difference with a 95% interval from resampling participants, the same for film identity,
-and how often the two arms gave the same answer.
+The two runs may be two arms of one input condition, or one arm under two conditions. The two
+score files come from `ff_score.py score` on the same reference and FIELD. For each session it
+reports each participant's scene-agreement difference (secondary minus primary), the mean
+difference with a 95% interval from resampling participants, the same for near scene agreement
+and for film identity, and how often the two runs gave the same answer.
+
+Near scene agreement is compared near against near. Its rule may differ between the runs (a time
+answer and a scene answer have different near scenes); the output names both rules. Score files
+from before near agreement existed are compared without it, but only if neither has it.
 """
 
 import json
@@ -20,7 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import ff_score  # noqa: E402
 
-SCHEMA = "storymodel4s.filmfestival.transfer-arm-comparison/v1"
+SCHEMA = "storymodel4s.filmfestival.transfer-arm-comparison/v2"
 
 
 def paired(primary, secondary):
@@ -102,7 +108,20 @@ def compare(primary_score, secondary_score, primary_replies, secondary_replies):
         raise ff_score.ScoreError("the score files are for different fields")
     if primary_score["population"] != secondary_score["population"]:
         raise ff_score.ScoreError("the score files are for different populations")
-    out = {"schema": SCHEMA, "field": primary_score["field"], "sessions": {}}
+    near = ["near_rule" in score for score in (primary_score, secondary_score)]
+    if near[0] != near[1]:
+        raise ff_score.ScoreError("only one score file has near scene agreement")
+    out = {
+        "schema": SCHEMA,
+        "field": primary_score["field"],
+        "near_rules": None,
+        "sessions": {},
+    }
+    if all(near):
+        out["near_rules"] = {
+            "primary": primary_score["near_rule"],
+            "secondary": secondary_score["near_rule"],
+        }
     for session, a in primary_score["sessions"].items():
         b = secondary_score["sessions"][session]
         out["sessions"][session] = {
@@ -112,6 +131,10 @@ def compare(primary_score, secondary_score, primary_replies, secondary_replies):
                 b["film"]["film_reference"]["by_participant"],
             ),
         }
+        if all(near):
+            out["sessions"][session]["scene_near"] = paired(
+                a["scene_near"]["by_participant"], b["scene_near"]["by_participant"]
+            )
     out["agreement"] = agreement(primary_replies, secondary_replies)
     return out
 
