@@ -25,7 +25,9 @@ class NotAssessedSuite extends FunSuite:
     assertEquals(expected.keySet + DiscourseFunction.NotAssessed, DiscourseFunction.values.toSet)
     expected.foreach((f, state) => assertEquals(ExternalStates.natural(f), Some(state), f.toString))
 
-  test("the default function prior adds nothing for an unassessed unit, and is otherwise unchanged"):
+  test(
+    "the default function prior adds nothing for an unassessed unit, and is otherwise unchanged"
+  ):
     val prior = FunctionPrior.default
     assertEquals(prior(DiscourseFunction.NotAssessed), 0.0)
     assertEquals(
