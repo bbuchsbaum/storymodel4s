@@ -446,3 +446,29 @@ a categorical record by version. The record digest renders categorical support w
 
 Rejected: fabricating a numeric basis for a categorical choice, such as a one-hot raw score. It
 would make a choice look scored and calibratable, and a digest could not tell it from a real score.
+
+## Amendment 2026-11-10: one recorded pipeline for categorical producers
+
+Owner decisions of 2026-11-10 for delivery 2 of the scientific preview. The design is in
+[the common-pipeline design note](../plans/2026-11-10-common-recorded-pipeline-design.md).
+
+1. **A collection level in timed sources.** A timed source may group its groups (scenes) into
+   collections (films), as level-2 nodes. A producer's answer "this film, no particular scene"
+   is a categorical choice of the collection node, under a hierarchical universe of scenes and
+   collections. A collection-level outcome is located, so scene statistics filter by level.
+   Sources without collections are unchanged, and their digests do not move.
+   - Rejected: a film as a part (a part is a bundle, not a node, and cannot be a destination);
+     an external state (none fits, and it reads as non-localizable); an abstention with a
+     reason (the record could not tell film-only from no assignment).
+2. **`DiscourseFunction.NotAssessed`.** Recall units supplied by the study, not produced by our
+   segmenter, carry this value.
+   - Rejected: defaulting supplied units to `EpisodicAssertion`, a claim nobody made (rule 7).
+3. **A time outside the clip** is recorded as a choice of the collection, and the bundle's unit
+   row marks it as out-of-clip.
+   - Rejected: an abstention, which loses the film the producer named. Accepted cost: the
+     checked record alone cannot tell it from a film-only answer; the unit row can.
+4. **Time-to-scene conversion is part of the artifact.** A time answer is converted by a checked
+   interval table bound to a clip clock, and the decision policy id names the rule version and
+   the clock's digest, so a time-based record cannot be compared with a scene-based one by
+   accident. Raw answers are kept.
+   - Rejected: converting only at scoring, which leaves time conditions with no checked record.
