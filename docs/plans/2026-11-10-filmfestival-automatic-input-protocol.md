@@ -7,8 +7,8 @@ reference and its classes, the referent as primary judgement, the three kinds of
 mapper arms, independent participant-sessions, and the reporting. The owner agreed the choices
 below on 2026-11-09.
 
-**Status.** The description stage is frozen (see [Freeze](#freeze)); the mapping stage is not
-yet. Before the description freeze, no frame, transcript or recall from this corpus had been
+**Status.** Both stages are frozen (see [Freeze](#freeze)). Before the description freeze, no
+frame, transcript or recall from this corpus had been
 sent to a model for this condition; two calls were made on a generated grey image to check the
 tooling.
 
@@ -37,7 +37,7 @@ This condition therefore changes the input and nothing downstream.
 Where uniformity is not possible, this page says so.
 
 A check on the design: re-scoring the landed annotation-assisted run with the extended scorer
-reproduces every published figure exactly, and its within-one-scene agreement equals the within-one-scene
+reproduces every published figure exactly, and its within-one-scene agreement equals the
 figures already reported (Opus 95.9% and 94.5%).
 
 ## The film record
@@ -150,8 +150,8 @@ each with its own chance level:
 per-participant rates with its interval; the pooled rate is reported beside it.** This is the
 parent protocol's primary measure, so the two conditions are read on the same number. The clock
 was checked by two independent methods to within half a second, so strict agreement is not
-dominated by clock error. *This choice is the author's recommendation and awaits the owner's
-confirmation; an earlier draft made within 2 seconds primary.*
+dominated by clock error. The owner confirmed this on 2026-11-10, before the mapping freeze;
+an earlier draft made within 2 seconds primary.
 
 Comparisons fixed in advance:
 
@@ -219,12 +219,46 @@ judged it fit to run. Smoke calls on a generated grey image confirmed that the C
 exactly the named model when the file-reading tool is in use, that the only file read was the
 batch's image, and that the read was matched to a successful result.
 
-### Mapping freeze
+### Description result
+
+All 1,359 frames were described; none is undescribed. The run made 99 recorded calls (91
+batches and 8 retries for frames a first reply left out), every one reporting
+`claude-sonnet-5-5`, with 1,427 file reads, none failed and none outside its batch. No
+description reads like a load failure. Descriptions average about 28 words, and about a third
+exceed 30. The descriptions file has SHA-256 `5f8b0c6d…546e79f48b`.
+
+### Mapping freeze (2026-11-10)
+
+One manifest per arm and model, in the evidence directory: `manifest-auto-opus.json`,
+`manifest-auto-haiku.json`, `manifest-norecord-opus.json`, `manifest-norecord-haiku.json`. For
+each arm the two models' manifests differ only in the model. `ff_map.py run` takes its condition
+and model from the manifest it is given and refuses unless what it renders equals it.
+
+| Item | Automatic | No film record |
+|---|---|---|
+| Film record | 43,498 words; `06ccfaa2…4407a0ff` | ten headers; `f12883a0…d835f0aa` |
+| System prompt | `8b80476e…6a7ccea2` | `fb2d3c55…a155a462c2` |
+| Longest prompt | 277,835 characters | 33,532 characters |
+| Calls before retries | 63 per model | 63 per model |
 
 | Item | Value |
 |---|---|
-| Film record | to be recorded at the mapping freeze |
-| Clock constants | to be recorded at the mapping freeze |
+| Clock constants | in each manifest; SHA-256 `7b510f54…8826ad57` |
+| Scene intervals | 203 valid scenes; SHA-256 `b6c490bf…6f992a0c` |
+| Tolerance for the within-2-seconds column | 2 seconds, inclusive |
+| Scene dictionary, reference, raw codes | as in the parent protocol; hashes in each manifest |
+| Models, chunk, attempts | `claude-opus-5-5` and `claude-haiku-5-5`; 60; 3 |
+| A prompt over 400,000 characters | refuses the run |
+
+The record holds 1,359 frame lines and 272 speech lines; five films are marked as having no
+speech. It contains no scene number, row number or annotation description. Film titles come
+from the annotation's film names, as in the parent condition and the no-record arm.
+
+The prompts are the parent prompt with the description of the input and the three kinds of
+answer rewritten for times; the definitions of the two judgements are word for word the same.
+
+The mapping stage was reviewed independently twice with the description stage. Nothing is
+scored until all four runs have finished.
 
 ## Known limits
 

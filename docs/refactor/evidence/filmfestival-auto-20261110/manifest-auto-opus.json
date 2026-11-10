@@ -1,0 +1,330 @@
+{
+ "annotationSha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc",
+ "attempts": 3,
+ "calls": 63,
+ "captionsSha256": "5f8b0c6da85b162460cff0555d0c4ea58c059e9d7b3f2f4bb4c5c4546e79f48b",
+ "chunk": 60,
+ "classes": {
+  "run-01": {
+   "cartoon": 7,
+   "film_only": 208,
+   "film_search": 31,
+   "multi_contig": 414,
+   "multi_noncontig": 111,
+   "nonfilm": 101,
+   "single": 1810
+  },
+  "run-02": {
+   "film_only": 44,
+   "film_search": 13,
+   "multi_contig": 62,
+   "multi_noncontig": 9,
+   "nonfilm": 16,
+   "single": 400
+  }
+ },
+ "cliFlags": [
+  "--tools",
+  "",
+  "--no-session-persistence",
+  "--setting-sources",
+  "",
+  "--strict-mcp-config",
+  "--output-format",
+  "json"
+ ],
+ "clipSeconds": {
+  "1": 346.0,
+  "10": 406.0,
+  "2": 132.0,
+  "3": 465.0,
+  "4": 129.0,
+  "5": 348.0,
+  "6": 325.0,
+  "7": 260.0,
+  "8": 142.0,
+  "9": 161.0
+ },
+ "clock": {
+  "1": {
+   "C0": "44",
+   "a": "0.996",
+   "b": "0.75"
+  },
+  "10": {
+   "C0": "956",
+   "a": "1",
+   "b": "0.3"
+  },
+  "2": {
+   "C0": "397",
+   "a": "1",
+   "b": "-0.7"
+  },
+  "3": {
+   "C0": "534",
+   "a": "1",
+   "b": "0.3"
+  },
+  "4": {
+   "C0": "1005",
+   "a": "1",
+   "b": "0.2"
+  },
+  "5": {
+   "C0": "1141",
+   "a": "1",
+   "b": "-0.9"
+  },
+  "6": {
+   "C0": "45",
+   "a": "1",
+   "b": "0.1"
+  },
+  "7": {
+   "C0": "375",
+   "a": "1",
+   "b": "0.6"
+  },
+  "8": {
+   "C0": "640",
+   "a": "1",
+   "b": "0.1"
+  },
+  "9": {
+   "C0": "787",
+   "a": "1",
+   "b": "0.2"
+  }
+ },
+ "clockSha256": "7b510f542412f9e5fb81f04a97ea81d92581b90997f5cd35317a0f7c8826ad57",
+ "codesSha256": "a6c51295ee86dbd9b9dc057debdf20756e20f52f1269cf3c7a93695c847c4fcd",
+ "condition": "auto",
+ "dictionarySha256": "39ef679b883222875bfe5bdc6795154e79cdc85d5d788352c6e6945343f560f1",
+ "framesSha256": "2425939c1764d9205232e197de76513c327b24c42533df99741f93d05750823a",
+ "goldSha256": "0433e14f192fa783c010edcfb3f0db4f297b31f1d53bc0ab577619221ae16bd0",
+ "longestPromptChars": 277835,
+ "maxPromptChars": 400000,
+ "model": "claude-opus-5-5",
+ "packetSha256": "06ccfaa229cdc00bbfc84b25e9c9f9b1067b3dd2890d8df18699cbfe4407a0ff",
+ "population": {
+  "run-01": {
+   "all": 2682,
+   "film_labelled": 2574,
+   "film_reference": 2543,
+   "scene_specific": 2335
+  },
+  "run-02": {
+   "all": 544,
+   "film_labelled": 528,
+   "film_reference": 515,
+   "scene_specific": 471
+  }
+ },
+ "primaryArm": true,
+ "retrySuffix": "\n\nReply with strictly valid JSON only (attempt {attempt}).",
+ "sceneIntervalsSha256": "b6c490bfaa50aef3d0a8be65cde4ec1578fc061d24f663c43415bf2b6f992a0c",
+ "scenes": 216,
+ "schema": "storymodel4s.filmfestival.transfer-manifest/v3",
+ "sessions": [
+  {
+   "participant": "sub-01",
+   "promptSha256": [
+    "011459fbb855ffd472a643e754026d19a1ad6e702cdde71208836541b6b8f416",
+    "b8df2b5fcedca4238f62c2d733425055456c5b33f1b12f6a8d5b4d0816840485"
+   ],
+   "session": "run-01",
+   "units": 104
+  },
+  {
+   "participant": "sub-02",
+   "promptSha256": [
+    "fb47d5e0065b4371a0fef5b0dba31421113818b84b2f219b2a485e99432de745",
+    "0f34e5b4333396429404f05608778eb398687f9fb59d48e48c3785f59c4dd694",
+    "e89baf9095ddcb68e6f3bb923aa6065ca0b56efdc12be2025e802d521fd3e271"
+   ],
+   "session": "run-01",
+   "units": 123
+  },
+  {
+   "participant": "sub-07",
+   "promptSha256": [
+    "5b90c99c27a2a239d9f6c3ad2ccdc965b32a845f844eddd2849129d6215b3cef",
+    "b1c316ccdabd7bc289111bb587671d866c9c91572aff742d4fbcc96088ed0624",
+    "9353d81dc853ff6d951860f30370a8e96a5869ab15f3727f1eade3a04a69fa64",
+    "1c1237d324506997c4a0d75e5b388fe851e718233f2557a246b9824102cfacc2",
+    "c495c20667e82953274b224a4c81eb838e8bcb4cba5622fac10f1de34e0e3817",
+    "af0d57a486c786647d3060e2647bff7b5dc2c46aff43c5cabd03161980db8a33"
+   ],
+   "session": "run-01",
+   "units": 325
+  },
+  {
+   "participant": "sub-08",
+   "promptSha256": [
+    "3b8a4ba65bc70a318ed2134193a35c9f0e22555548fbdf9256af83e375b3391d",
+    "369ae69ffdab37c4c4f94422a20e94d8dd62dab31f73b2131dbf1bfa33336e6b",
+    "ae67254cb68bf896d8aeddfebe237da877cc34de5fdcfe414e3bb11f361a2878",
+    "566b2f025098e8c19cb199c502328435b692f18ab2399d92909ad7f89f14fe90",
+    "48e964c92f6ae25262961ea3b643a8d2679d788da75f974fe0d31a85cdb4fb96"
+   ],
+   "session": "run-01",
+   "units": 271
+  },
+  {
+   "participant": "sub-08",
+   "promptSha256": [
+    "b8f98e47fffbe2c39d846859e14991681c457bf370728e1e6071e3c1cfcccdc2",
+    "4b352da8c50b88ed9fc30f897392702d3c71a0a30680e821496b948b54f72686",
+    "aa9306dab6bebcb163f2ab140dbbde7542fbedafd076c390483095992a6c809f"
+   ],
+   "session": "run-02",
+   "units": 149
+  },
+  {
+   "participant": "sub-09",
+   "promptSha256": [
+    "a5a453256af3febd91fecfbea3d7a47bcfff006acab7b02dd4697eaccf33fb93",
+    "5bda7d832aa24dd7faff003384d96f6bc8a2809ae70ce14a3eaec0a1c288bff1",
+    "ab9dfedcd34a0482b27240b536cec77bbc3736912b8000111ccd95834627ccf6"
+   ],
+   "session": "run-01",
+   "units": 175
+  },
+  {
+   "participant": "sub-10",
+   "promptSha256": [
+    "890e4fd0569e32f68ec2774921d09aa9089423a7ed5217b9a4d2af42c255dda0",
+    "c193529233d6b6218913af86bb1d2e4fb6a73b6d0fb9e6d5427d94b997a2c1f1",
+    "f12c24830a08bcef11553e021db1dceeb0905ba1a6ac499bb3957ab2f40189f6",
+    "19824bced4779bd7b7e25157513f7e3948f98aebb8cdabeeccdd59003b9ffaa2"
+   ],
+   "session": "run-01",
+   "units": 221
+  },
+  {
+   "participant": "sub-10",
+   "promptSha256": [
+    "10ed22c8c5ce11c8e091264d7515012696310af411c0b05860cdc13f862068a7",
+    "204417cc34494b28102b2889e86ad1772c9f911450e69f1769e05c124ca9de6f",
+    "2960c2c501ee6a906e9e361ee045dc1695c423015cb71f0696aafef4ebb65dff"
+   ],
+   "session": "run-02",
+   "units": 155
+  },
+  {
+   "participant": "sub-11",
+   "promptSha256": [
+    "a94fea54779bb16cf15ab15aa4e1b0d71ea7384350700c81c3b7b1eda8f0c760",
+    "2eb688a980e6f1e2be598ac97ed099b16328b8bf43b588e2453f3f1a0b3a724d",
+    "4a68f512e85f1fb338f8f02318aecf08628405ea2ed77cf998ea6c2e8022510d",
+    "4e60d3d379f4ecfc6884ce4af84812fa3917a780f85f7b8b09e57eeb6de6af8e",
+    "7f3507952b89e53572af19c4a9b2c8243cca07b4e8e1ec6e06a1483235dce16c"
+   ],
+   "session": "run-01",
+   "units": 262
+  },
+  {
+   "participant": "sub-12",
+   "promptSha256": [
+    "ffa8b0ec3779ee7488f61a68959e526230cdd53a4efb03520ac38d449fbcf2f4",
+    "fe0693273797cae0ef108d482c5c4eb37b719a016ecd40a1745db3df2ea96571",
+    "69aab8f1bc3fe7c119323bbaaf0d6f18ae7860063d2971119b9138776ffabfba"
+   ],
+   "session": "run-01",
+   "units": 154
+  },
+  {
+   "participant": "sub-13",
+   "promptSha256": [
+    "5556bf7223b36ddbabda3cff3ed3ef48b42501df96eaf371d74027afdb376a28",
+    "cf29b1b0c958552c5c2123a5b3f91b3d1fae9bb55de2f8bbfc46af9b57b50bb7",
+    "8af6ca81c5c538c3a885bb0690e8ef18212462039a92fa5f12b2772f012e72d9"
+   ],
+   "session": "run-01",
+   "units": 162
+  },
+  {
+   "participant": "sub-14",
+   "promptSha256": [
+    "2ac972fc3b6edd285f3c7a67ace0269ebcef1da99bee1359c45a2d18ecb53aac",
+    "cce6b5cdf6f94667b041263df947e3d8a64e0b33b234106e794a2d73f25754b2"
+   ],
+   "session": "run-01",
+   "units": 104
+  },
+  {
+   "participant": "sub-16",
+   "promptSha256": [
+    "89cb3af088cb81daf6c36ee7416cbd2a4702b12c0c71a03e7f9a843b033a9124",
+    "400e127e6e4a1debb5410d923b2b55929e457db160e9f139b8ec4312b753915f",
+    "8aba254415093057565ff02854f5dda601771a90899712910cf6966b43dc56a8",
+    "98a8d14a869c702a365203d8e8dd3af2b284e1e816b7005ffca1383079e4dea7"
+   ],
+   "session": "run-01",
+   "units": 189
+  },
+  {
+   "participant": "sub-16",
+   "promptSha256": [
+    "a2c8a4bfd0f486ffe1e3744df2d3732ad5617dc3cb9323c4b8a0833c20479e49",
+    "b388eaf0aef79ef1c2f91fe376630dc3ae5f40552eeed449a5f66a159bc3ea68"
+   ],
+   "session": "run-02",
+   "units": 72
+  },
+  {
+   "participant": "sub-17",
+   "promptSha256": [
+    "c6e6916bca164e0eec4b3d7e99caff68cabb3aaf48c93e7a3f56c16e2b01992a",
+    "785fdf96a20887a7e06d49b35f1afcd79c2162b868acfe1ac211171ff43dbd79",
+    "dc7315425d173046ece595d7c1cb8d71a56d69749cab7731dc155b0cbd6bc4e3"
+   ],
+   "session": "run-01",
+   "units": 140
+  },
+  {
+   "participant": "sub-18",
+   "promptSha256": [
+    "7b2582ee4d65b643acb471bb472327ed9742b1f33cbe2fedee41e2587f9df2a5"
+   ],
+   "session": "run-01",
+   "units": 58
+  },
+  {
+   "participant": "sub-18",
+   "promptSha256": [
+    "0f4101c1cc88a42ccdf84344118b1f0786613c43ee4648cc99e4a08498769848",
+    "83b42695f82a1e2bdd2ffa28e665ba652f36c0cfcf0b5bc98a07428827ee4fd4",
+    "e34a1ae4ccd20369e782b1610254e0a33426228ba33553ce8379ba395deeb074"
+   ],
+   "session": "run-02",
+   "units": 168
+  },
+  {
+   "participant": "sub-19",
+   "promptSha256": [
+    "069aa82ed16e1016ea7ded028b9a2f2d87b327362bb3fccba6c599bb0c156227",
+    "8b4ba414657bc3c4acffd1c09a8aaf034880d18f08d40a18ce65af8dcd54eddb",
+    "072cde1b54c7045974fa8091099e6020107be7e63586da5ce0126befbe4194fd",
+    "06ce5639a08f2f2e343ef79034ebc88c979d1baba97deb8d1f7f06fa35057282"
+   ],
+   "session": "run-01",
+   "units": 203
+  },
+  {
+   "participant": "sub-20",
+   "promptSha256": [
+    "b0805f313bbb4dadfe02edcd819c0f186396d515ae98991b5f592960a97f2582",
+    "9cd3fad25157c9ea6f12e073e276feede28435de0f3eca74d5db12d171f5db10",
+    "7ef17c029a4a992e3b2341fbd2965abd98b3a19771d093afadd9aefcbb7fc174",
+    "9b709cea04523dbbdb2e1dccb6b542c7fad2a213319bcae00fae9648940a88a1"
+   ],
+   "session": "run-01",
+   "units": 191
+  }
+ ],
+ "systemSha256": "8b80476eb52b53f6078f3b660886ddb36edb6fe10149b1f325cf18ee6a7ccea2",
+ "toleranceSeconds": "2",
+ "validSceneTargets": 203
+}
