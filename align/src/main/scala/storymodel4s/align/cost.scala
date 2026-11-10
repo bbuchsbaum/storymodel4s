@@ -1110,9 +1110,9 @@ object ExternalStates:
 
   /** Whether `state` costs only the external floor for a unit of function `f`. A unit's natural
     * state does, and so does `Unranked`. A unit whose function was not assessed has no natural
-    * state, so every external state is at the floor: with nothing known about the unit, no
-    * external state is preferred, and none is penalised either. (Penalising all of them would
-    * tilt such a unit toward a source anchor.)
+    * state, so every external state is at the floor: with nothing known about the unit, no external
+    * state is preferred, and none is penalised either. (Penalising all of them would tilt such a
+    * unit toward a source anchor.)
     */
   def atFloor(f: DiscourseFunction, state: ExternalState): Boolean =
     state == ExternalState.Unranked || natural(f).forall(_ == state)
