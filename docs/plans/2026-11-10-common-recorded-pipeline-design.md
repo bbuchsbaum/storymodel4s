@@ -132,6 +132,25 @@ renderer is delivery 3's job, with the exported prompts as its test.
 - Part extents written by the FilmFestival exporter are the annotation's coverage, not media
   durations.
 
+## Carried into slices 3 and 5 from the review of slice 2b
+
+- **Bundle rows are built from judgements, not parsed back from records.** A scene that is not
+  a target becomes a failed outcome in the record, with its detail as free text. The scorer
+  keeps that scene's film for film identity, so the row must carry the scene number and its
+  film, taken from the judgement and the source.
+- **Rows are keyed by participant, session and unit.** A unit id is the content address of the
+  session's text plus a position. Two sessions with identical texts would share unit ids.
+- **A recall's identity is its units alone** (numbers, the study's row keys, texts), so the same
+  units have the same inventory under every condition.
+- **Sherlock's digests will change when it moves to this path** (slice 5): the policy id, the
+  referent abstention wording, the failure details and the source of the universe all differ
+  from `AgentMappingRecord`. Slice 5 either keeps those as a named legacy profile or accepts
+  new digests and says so.
+- **Not yet neutral in the cost model.** An unassessed unit has no natural external state, so
+  every named external state costs the mismatch and none sits at the floor; and the content
+  cost's preferred level falls through to the default. No path feeds supplied units to a cost
+  model today. Both need a decision before one does.
+
 ## Notes
 
 - The interval-table hash of the Python tools is over rounded text. Matching it is not an

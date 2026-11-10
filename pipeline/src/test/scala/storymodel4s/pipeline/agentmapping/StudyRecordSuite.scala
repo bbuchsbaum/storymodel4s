@@ -95,6 +95,26 @@ class StudyRecordSuite extends FunSuite:
       Some("a unit is empty or spans lines")
     )
 
+  test("a unit with trailing whitespace is refused, never trimmed"):
+    // Trimming would make the recorded text differ from the line the prompt showed.
+    assertEquals(
+      PreparedRecall.supplied("t", Vector("a ", "b"), artifact).left.toOption,
+      Some("unit texts are not in the transcript's canonical form")
+    )
+    assert(PreparedRecall.supplied("t", Vector("a  b", " c"), artifact).isRight)
+
+  test("a judgement naming a scene that is not a target cannot enter a record, even if forged"):
+    val forged = judgements.updated(0, Judgement.Scene(2, view.groupRefs(2)))
+    assertEquals(
+      StudyRecord.record("referent", policy, recall, view, producer, forged).left.toOption,
+      Some(MappingRefusal.UniverseMismatch)
+    )
+    val cartoon = judgements.updated(0, Judgement.Collection(2, view.collectionRefs(2)))
+    assertEquals(
+      StudyRecord.record("referent", policy, recall, view, producer, cartoon).left.toOption,
+      Some(MappingRefusal.UniverseMismatch)
+    )
+
   test("a stated scene is a target, not a target, or unknown; a film is a target or unknown"):
     assertEquals(judged(Stated.Scene(1, Json.Null)), Judgement.Scene(1, view.groupRefs(1)))
     assertEquals(judged(Stated.Scene(2, Json.Null)), Judgement.NotATarget(2))

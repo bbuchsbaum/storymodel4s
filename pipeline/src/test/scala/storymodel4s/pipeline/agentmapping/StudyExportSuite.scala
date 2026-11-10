@@ -90,6 +90,26 @@ class StudyExportSuite extends FunSuite:
     )
     assertEquals(bad("schema", Json.fromString("other")), Left("not a study export"))
 
+  test("the condition must be a plain name, because it becomes part of a policy id"):
+    assertEquals(
+      StudyExport.parseIndex(indexDoc(Map("condition" -> Json.fromString("auto:x")))),
+      Left("the condition is not a plain name")
+    )
+    assertEquals(
+      StudyExport.parseIndex(indexDoc(Map("condition" -> Json.fromString("no record")))),
+      Left("the condition is not a plain name")
+    )
+
+  test("a session's units have one identity whatever prompts sit beside them"):
+    val units = StudyExport.parseSession(sessionDoc(), entry).toOption.get.units
+    val same = StudyExport.unitsChecksum(units)
+    assertEquals(StudyExport.unitsChecksum(units), same)
+    assertNotEquals(StudyExport.unitsChecksum(units.reverse), same)
+    val edited = units.updated(0, units(0).copy(text = "won"))
+    assertNotEquals(StudyExport.unitsChecksum(edited), same)
+    val rekeyed = units.updated(0, units(0).copy(row = Json.fromInt(99)))
+    assertNotEquals(StudyExport.unitsChecksum(rekeyed), same)
+
   test("session names must be plain, and a participant-session is listed once"):
     def entryJson(participant: String) = Json.obj(
       "participant" -> Json.fromString(participant),

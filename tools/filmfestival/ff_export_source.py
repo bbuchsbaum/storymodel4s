@@ -15,14 +15,13 @@ What the file declares:
 - rows       the annotation's segments, numbered by its `segment` column
 - parts      the scanning runs. Times are whole seconds on the run's own clock
 - groups     the release's global scene numbers, labelled `scene N` (the scenes have no names)
-- collections  the films and cartoon intros in presentation order, labelled with the annotation's
-             film name. The name's leading number is the collection ordinal
-- target     a row is a target exactly when its scene is a valid scene answer in
-             `ff_gold.load_dictionary`. That rule is per scene, so every row of a valid scene is
-             a target, including a title-card row inside a scene that also has content. The
-             reader's rule (a group is a target if any row is; a collection if any group is)
-             then gives exactly the valid scenes and the ten films. The cartoon and the
-             title-only scenes are source content that is not a target.
+- collections  the films and cartoon intros, labelled with the annotation's film name. A
+             film's collection number is the film number the prompts show and the replies use
+             (1-10); the two cartoon intros take 11 and 12
+- target     a row is a target unless its scene is not a valid scene answer in
+             `ff_gold.load_dictionary` or the row itself is a title card. A scene that mixes a
+             title row with content keeps its content row, so the scene stays a target and the
+             film's first target row is its first content row
 """
 
 import csv

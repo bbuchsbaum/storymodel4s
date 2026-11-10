@@ -128,6 +128,7 @@ object StudyExport:
           !unitLine.contains("{text}") || !chunkLine.contains("{lo}") || !chunkLine.contains("{hi}")
         then Left("index.json has unusable replay parameters")
         else if !named then Left("a participant or session name is not a plain name")
+        else if !Name.matches(condition) then Left("the condition is not a plain name")
         else if sessions.map(_.name).distinct.size != sessions.size then
           Left("a participant-session is listed twice")
         else
@@ -151,6 +152,14 @@ object StudyExport:
               )
             )
     }
+
+  /** The identity of a session's supplied units: their numbers, the study's row keys and their
+    * texts, in order. It does not include the prompts, so it is the same in every condition.
+    */
+  def unitsChecksum(units: Vector[StudyReplay.RecallUnit]): Checksum =
+    Checksum.ofText(
+      units.map(u => Json.arr(Json.fromInt(u.u), u.row, Json.fromString(u.text)).noSpaces).mkString("\n")
+    )
 
   def index(dir: Path): Either[String, Index] = json(dir.resolve("index.json")).flatMap(parseIndex)
 
@@ -334,7 +343,9 @@ object StudyExport:
         p => TextExchange.replay(recordings, provider, index.model, index.system, p)
       )
       .fold(f => refuse(s"${entry.name}: $f"), identity)
-    val artifact = Checksum.ofBytes(bytes(dir.resolve(entry.file).toString))
+    // The recall's identity is its units alone, not the prompts beside them, so the same units
+    // have the same inventory under every condition.
+    val artifact = StudyExport.unitsChecksum(s.units)
     val recall = PreparedRecall
       .supplied(entry.name, s.units.map(_.text), artifact)
       .fold(e => refuse(s"${entry.name}: $e"), identity)
