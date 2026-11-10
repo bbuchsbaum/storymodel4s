@@ -102,3 +102,55 @@ ledger is unchanged. Its findings for later slices are in the design note. Open,
 reachable: an unassessed unit is not neutral in the HSMM cost model (every named external state
 costs the mismatch), and supplied units carry `ExpressedUncertainty.Unmarked` although no hedge
 detector ran.
+
+## Slice 3: the v2 bundle, and an unassessed unit in the cost model
+
+Commits after 685b2af5e, to a92cf05e1.
+
+- **Cost model** (owner decision 2026-11-10). For a unit whose function was not assessed, every
+  external state costs the floor and no level pays a granularity cost. Assessed units are
+  unchanged; `NotAssessedSuite` pins that for every assessed function.
+- **Bundle v2.** `agentStudyBundle` writes one bundle per participant-session: both checked
+  records, each answer as stated and as judged against the source, provenance, and a source
+  dictionary. `StudyBundle.decode` derives every judgement and both records again and requires
+  the bundle to hold exactly those. `tools/agentmapping/study_bundle.py` reads a bundle without
+  Scala, and `ff_score.py score` accepts a directory of bundles.
+
+Full gate at a92cf05e1, clean clone, fatal warnings:
+
+| Run | Module runs | Passed | Failed |
+|---|---:|---:|---:|
+| JVM | 16 | 3,983 | 0 |
+| JS | 10 | 2,763 | 0 |
+| Native | 10 | 2,763 | 0 |
+| storyatlas4s (`claude/storymodel4s-pin-20261109`) | 10 | 518 | 0 |
+
+Format check clean. Python: `test_study_bundle.py` 18 passed; `test_ff_score.py` passes.
+
+Acceptance at a92cf05e1, both annotation-assisted runs, zero model calls:
+
+- 19 bundles per model, 3,226 units each, every bundle read back and re-checked before writing.
+- Scores computed from the bundles are byte-identical to scores computed from the original
+  reply files by the same scorer, for both models and both judgements.
+- Against the score files recorded on 2026-11-09, all 1,622 shared values are equal. Those
+  files differ only in report fields and a schema label the scorer has gained since.
+- A run of 19 bundles is about 90 MB: each record repeats the recall inventory and the source.
+
+Mutants, each failing a named test. Scala: a judgement not re-derived; a failure accepted as an
+answer; a scene that is not a target losing its film; extras keys unchecked; the rebuilt-record
+comparison removed; row keys unbound; processing unchecked; reserved extras accepted by the
+export; the old external-floor rule; a default preferred level. Python: extras keys unchecked;
+judgement not re-derived; record outcome not compared; model not compared.
+
+Independent review: the first pass at 37648a132 found three blocking defects in the readers (an
+extra could overwrite a prediction; the Python reader accepted edits the library refused; row
+numbers and keys were bound to nothing). They were fixed and re-reviewed at a92cf05e1 with no
+blocking defect. Limits that remain, by design or as follow-ups:
+
+- The Python reader has only the bundle, so it cannot check that row keys are the study's or
+  that a record is intact. The library's reader checks both.
+- Neither real run contains a failed unit, so the failure paths rest on the synthetic fixture.
+- In the cost model, five external states tied at the floor give an unassessed unit more
+  external mass than an assessed unit has (about 1.46 times at temperature 1) and an arbitrary
+  best-path label; and a granularity of 0.0 reads as a perfect match. No path feeds supplied
+  units to a cost model. Both await an owner decision.
