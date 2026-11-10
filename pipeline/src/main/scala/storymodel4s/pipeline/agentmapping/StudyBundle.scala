@@ -10,8 +10,8 @@ import storymodel4s.codec.{ExpectedMappingContext, MappingCodecs}
   * answers as stated and as decided against the source, provenance, and a source dictionary.
   *
   * Why rows beside the records: a record says what was chosen, and for a failure only that it
-  * failed. A row keeps what the reply stated and how the source judged it. So a scene that is not
-  * a target stays visible with its film, a film-only answer stays apart from no assignment, and a
+  * failed. A row keeps what the reply stated and how the source judged it. So a scene that is not a
+  * target stays visible with its film, a film-only answer stays apart from no assignment, and a
   * scorer can read the bundle without the records' internals. Rows are built from the judgements
   * and never parsed back out of a record. Reading a bundle re-checks the records through the
   * mapping codec and requires every row to agree with them. A bundle holds source text and unit
@@ -51,7 +51,9 @@ object StudyBundle:
 
   /** The film each scene belongs to, for sources that have a film level. */
   def collectionOfGroup(view: TimedSourceView): Map[Int, Int] =
-    view.segments.flatMap(s => s.group.flatMap(g => s.collection.map(c => g.ordinal -> c.ordinal))).toMap
+    view.segments
+      .flatMap(s => s.group.flatMap(g => s.collection.map(c => g.ordinal -> c.ordinal)))
+      .toMap
 
   /** A judgement as a row shows it: its kind and what it names. A scene carries its film, so a
     * scene that is not a target still says which film it is in.
@@ -107,8 +109,8 @@ object StudyBundle:
       } :+ ("extras" -> Json.fromFields(r.extras))
     )
 
-  /** The source as a dictionary: films, scenes and rows with their targets, so a chosen scene or
-    * a cited row resolves without the annotation file. Times are ticks on the part's own clock.
+  /** The source as a dictionary: films, scenes and rows with their targets, so a chosen scene or a
+    * cited row resolves without the annotation file. Times are ticks on the part's own clock.
     */
   def sourceJson(view: TimedSourceView): Json =
     val targetGroups = view.targetGroups.toSet
@@ -223,6 +225,10 @@ object StudyBundle:
         case None         => false
     }
 
+  private val FailureKinds = Set("invalid", "omitted", "unparsable-chunk")
+  private def failureKind(j: Json): Boolean =
+    j.hcursor.get[String]("kind").exists(FailureKinds)
+
   /** Read a bundle against a regenerated source and recall. Each record is decoded through the
     * mapping codec, which re-derives and compares it, and must carry its slot's policy. Each row
     * must be the unit the recall has in that place, its judgement must be what its stated answer
@@ -262,9 +268,12 @@ object StudyBundle:
             rows = units.map(_.hcursor.downField(f))
             _ <- Either.cond(
               rows.forall { r =>
-                val stated = r.downField("stated").focus.flatMap(StudyReplay.statedOf)
                 val written = r.downField("judgement").focus
-                stated.forall(s => written.contains(judgementJson(view, StudyRecord.judge(view, s))))
+                val answered = r.downField("stated").get[String]("status").contains("answered")
+                r.downField("stated").focus.flatMap(StudyReplay.statedOf) match
+                  case Some(s) => written.contains(judgementJson(view, StudyRecord.judge(view, s)))
+                  // A failure states nothing, so its judgement must be a failure too.
+                  case None => !answered && written.exists(failureKind)
               },
               (),
               s"a $f judgement is not what its stated answer gives against this source"

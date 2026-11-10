@@ -41,6 +41,9 @@ condition it is a uniform time, within the correct film's clip or over all film 
 Usage:
     ff_score.py population GOLD CODES ANNOTATION
     ff_score.py score GOLD CODES ANNOTATION MANIFEST PREDICTIONS_DIR FIELD OUTPUT
+
+PREDICTIONS_DIR holds reply files, or the mapping bundles of one run (`*.bundle.json`). Bundles
+are checked against their own records, and their judgements against this scorer's, before use.
 MANIFEST is the frozen manifest; the three inputs must have the hashes it records. Whether the
 answers are scenes or times is the manifest's condition, never a command-line choice. For a time
 condition every prediction is first recomputed from its raw time and must come out the same.
@@ -61,9 +64,13 @@ import random
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(
+    1, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "agentmapping")
+)
 
 import ff_gold  # noqa: E402
 import ff_time  # noqa: E402
+import study_bundle  # noqa: E402
 
 SCHEMA = "storymodel4s.filmfestival.transfer-score/v4"
 ANNOTATION = "annotation"
@@ -440,17 +447,61 @@ def score(gold, film_of, valid, predictions, table=None):
     return report
 
 
+def reply_documents(directory):
+    """The reply documents in a directory, by file name.
+
+    A directory of mapping bundles (`*.bundle.json`, see tools/agentmapping/study_bundle.py) is
+    read as the reply files those bundles hold, after each bundle is checked against its own
+    records. A directory may hold bundles or reply files, not both.
+    """
+    names = sorted(n for n in os.listdir(directory) if n.endswith(".json"))
+    bundles = [n for n in names if n.endswith(".bundle.json")]
+    if bundles:
+        if len(bundles) != len(names):
+            raise ScoreError("the directory mixes bundles and reply files")
+        try:
+            loaded = study_bundle.load_directory(directory)
+        except (study_bundle.BundleError, KeyError) as error:
+            raise ScoreError(f"bundle refused: {error!r}")
+        return {name: study_bundle.reply_document(b) for name, b in loaded.items()}
+    docs = {}
+    for name in names:
+        with open(os.path.join(directory, name), encoding="utf-8") as handle:
+            docs[name] = json.load(handle)
+    return docs
+
+
+def check_bundle_judgements(directory, film_of, valid):
+    """A bundle's judgements, made by the library against its source export, must be the kinds
+    this scorer gives the same stated answers against the annotation. Reply files pass unchecked.
+    """
+    if not any(n.endswith(".bundle.json") for n in os.listdir(directory)):
+        return
+    same = {"scene": "scene", "film": "film", "none": "none", "invalid-scene": "invalid_scene"}
+    for name, bundle in study_bundle.load_directory(directory).items():
+        for unit in bundle["units"]:
+            for field in FIELDS:
+                judgement = unit[field]["judgement"]
+                ours = normalise(unit[field]["stated"], film_of, valid)
+                film = judgement.get("collection")
+                agree = same.get(judgement["kind"], "failed") == ours["kind"] and (
+                    ours["kind"] == "failed"
+                    or ours["film"] == (film if film in ff_gold.FILMS else None)
+                )
+                if not agree:
+                    raise ScoreError(
+                        f"{name} unit {unit['u']} {field}: the bundle judges "
+                        f"{judgement['kind']}, the scorer {ours['kind']}"
+                    )
+
+
 def load_predictions(directory, field, gold):
     """Predictions for `field`; refuses unless every participant-session has exactly one file."""
     if field not in FIELDS:
         raise ScoreError(f"field must be one of {FIELDS}")
     wanted = {(u["participant"], u["session"]) for u in gold}
     predictions, seen = {}, set()
-    for name in sorted(os.listdir(directory)):
-        if not name.endswith(".json"):
-            continue
-        with open(os.path.join(directory, name), encoding="utf-8") as handle:
-            doc = json.load(handle)
+    for name, doc in reply_documents(directory).items():
         session = (doc["participant"], doc["session"])
         if session in seen:
             raise ScoreError(f"two files for {session}")
@@ -509,11 +560,7 @@ def check_times(manifest, annotation_path, replies):
 def check_replies(directory, manifest, manifest_sha):
     """Every reply file must come from the run the manifest froze (see the module text)."""
     condition = manifest.get("condition", ANNOTATION)
-    for name in sorted(os.listdir(directory)):
-        if not name.endswith(".json"):
-            continue
-        with open(os.path.join(directory, name), encoding="utf-8") as handle:
-            reply = json.load(handle)
+    for name, reply in reply_documents(directory).items():
         if reply.get("model") != manifest.get("model"):
             raise ScoreError(
                 f"{name} is from the model {reply.get('model')}, "
@@ -584,6 +631,7 @@ def main(argv):
             gold = ff_gold.load_gold(gold_path, codes_path)
             film_of, valid = ff_gold.load_dictionary(annotation_path)
             ff_gold.check_join(gold, film_of)
+            check_bundle_judgements(replies, film_of, valid)
             predictions = load_predictions(replies, field, gold)
             report = score(gold, film_of, valid, predictions, table)
         except (ScoreError, ff_gold.GoldError) as error:

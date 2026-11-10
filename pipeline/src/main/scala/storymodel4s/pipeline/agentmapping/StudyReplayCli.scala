@@ -475,7 +475,8 @@ object StudyExport:
       records,
       rows
     )
-    val text = doc.spaces2 + "\n"
+    // Compact: each record repeats the recall inventory and the source's nodes.
+    val text = doc.noSpaces + "\n"
     val reread = io.circe.jawn
       .parse(text)
       .left
@@ -488,11 +489,16 @@ object StudyExport:
   }
   Files.createDirectories(out): scala.Unit
   bundles.foreach { (name, text, _) =>
-    Files.write(out.resolve(s"$name.bundle.json"), text.getBytes(StandardCharsets.UTF_8)): scala.Unit
+    Files.write(
+      out.resolve(s"$name.bundle.json"),
+      text.getBytes(StandardCharsets.UTF_8)
+    ): scala.Unit
   }
   val kinds = StudyBundle.Fields.map { f =>
     val xs = bundles.flatMap(_._3.map(_.judgement(f).kind))
-    f -> Json.fromFields(xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size)))
+    f -> Json.fromFields(
+      xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size))
+    )
   }
   println(
     s"bundles=${bundles.size} units=${bundles.map(_._3.size).sum} modelCalls=0 " +

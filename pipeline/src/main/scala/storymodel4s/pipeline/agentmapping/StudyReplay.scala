@@ -146,8 +146,8 @@ object StudyReplay:
       case Stated.NoAssignment    => answered("kind" -> Json.fromString("none"))
       case Stated.Invalid(reason) => failed(reason)
 
-  /** Read a judgement back from its reply-file form; `None` for a failure or an unknown form. It
-    * is the inverse of `prediction` on the three kinds of answer.
+  /** Read a judgement back from its reply-file form; `None` for a failure or an unknown form. It is
+    * the inverse of `prediction` on the three kinds of answer.
     */
   def statedOf(prediction: Json): Option[Stated] =
     val c = prediction.hcursor
