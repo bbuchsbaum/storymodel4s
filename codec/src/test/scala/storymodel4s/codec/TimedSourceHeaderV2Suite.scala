@@ -1,11 +1,12 @@
 package storymodel4s.codec
 
+import io.circe.Json
 import java.nio.charset.StandardCharsets.UTF_8
 import munit.FunSuite
 import storymodel4s.align.MappingRefusal
 import storymodel4s.align.bridge.TimedSourceView
 import storymodel4s.codec.TimedSourceArtifactCodec.Refusal
-import storymodel4s.core.{Checksum, ContentAddress}
+import storymodel4s.core.{Checksum, ContentAddress, RationalTimebase, SourceBundle}
 
 /** The second annotation header: what it adds, what it refuses, and that the first is unmoved. */
 class TimedSourceHeaderV2Suite extends FunSuite:
@@ -83,6 +84,27 @@ class TimedSourceHeaderV2Suite extends FunSuite:
   test("a part's checksum covers the collection and target cells") {
     val moved = prepare(changed(0, 11, "no")).fold(e => fail(e.toString), identity)
     assertNotEquals(moved.parts("a").identity, view.parts("a").identity)
+  }
+
+  test("a part of a second-header file is hashed under that header") {
+    def cells(values: Vector[String]) = Json.fromValues(values.map(Json.fromString))
+    val table = Canonical.print(
+      Json.obj(
+        "part" -> Json.fromString("a"),
+        "header" -> cells(TimedSourceArtifactCodec.HeaderV2),
+        "rows" -> Json.fromValues(rows.map(row => cells(row.split(",", -1).toVector)))
+      )
+    )
+    val expected = SourceBundle
+      .annotationTable(
+        Checksum.ofText(table),
+        0L,
+        100L,
+        RationalTimebase.of(1L, 10L).toOption.get
+      )
+      .toOption
+      .get
+    assertEquals(view.parts("a").identity, expected.identity)
   }
 
   test("prepared-timed-source round-trips a second-header file") {
