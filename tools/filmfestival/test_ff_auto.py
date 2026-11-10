@@ -445,7 +445,16 @@ class Conditions(Fixture):
         for doc in docs:
             self.assertEqual(
                 sorted(doc),
-                ["chunks", "cliVersion", "model", "participant", "session", "units"],
+                [
+                    "chunks",
+                    "cliVersion",
+                    "condition",
+                    "manifestSha256",
+                    "model",
+                    "participant",
+                    "session",
+                    "units",
+                ],
             )
             self.assertEqual(doc["chunks"], docs[0]["chunks"])
             for unit in doc["units"]:
@@ -510,7 +519,7 @@ class Conditions(Fixture):
         for change in (
             {"condition": "norecord"},
             {"condition": "other"},
-            {"nearRule": "x"},
+            {"toleranceSeconds": "3"},
         ):
             edited = os.path.join(self.dir.name, "edited.json")
             write(edited, json.dumps(dict(doc, **change)))
@@ -543,7 +552,8 @@ class Manifests(Fixture):
         self.assertEqual(doc["clock"]["2"], {"C0": "200", "a": "0.5", "b": "0"})
         self.assertEqual(sorted(doc["clock"]), sorted(str(f) for f in range(1, 11)))
         self.assertEqual(doc["clipSeconds"]["2"], 50.0)
-        self.assertEqual((doc["toleranceSeconds"], doc["nearRule"]), ("2", "time-2s"))
+        self.assertEqual(doc["toleranceSeconds"], "2")
+        self.assertNotIn("nearRule", doc)
         table = ff_time.load(self.annotation, test_ff_time.DURATIONS)
         self.assertEqual(
             doc["sceneIntervalsSha256"], ff_packet.sha(ff_time.canonical(table))
@@ -660,7 +670,7 @@ class Manifests(Fixture):
 
 
 class Uniform(Fixture):
-    """One scorer and one comparison for every condition; only the near rule differs."""
+    """One scorer and one comparison for every condition."""
 
     def setUp(self):
         super().setUp()
@@ -706,28 +716,34 @@ class Uniform(Fixture):
 
     def test_both_conditions_go_through_the_same_scorer_into_the_same_layout(self):
         a, b = self.score(self.annotated), self.score(self.automatic)
-        self.assertEqual(
-            (a["near_rule"], a["condition"]), ("adjacent-scene", "annotation")
-        )
-        self.assertEqual((b["near_rule"], b["condition"]), ("time-2s", "auto"))
+        self.assertEqual((a["answers"], a["condition"]), ("scene", "annotation"))
+        self.assertEqual((b["answers"], b["condition"]), ("time", "auto"))
         self.assertEqual(a["schema"], b["schema"])
         self.assertEqual(a["population"], b["population"])
-        self.assertEqual(
-            self.shape(a["sessions"]["run-01"]), self.shape(b["sessions"]["run-01"])
-        )
         self.assertEqual(set(a), set(b))
-        first = a["sessions"]["run-01"]
+        # One layout. A time condition adds within-2s agreement, and nothing else differs.
+        one, other = a["sessions"]["run-01"], b["sessions"]["run-01"]
+        self.assertNotIn("scene_within_2s", one)
+        self.assertEqual(set(other) - set(one), {"scene_within_2s"})
+        for scope in ("given_film", "end_to_end"):
+            self.assertEqual(set(one["chance"][scope]), {"scene", "scene_adjacent"})
+            self.assertEqual(other["chance"][scope].pop("scene_within_2s") > 0, True)
+        rest = {k: v for k, v in other.items() if k != "scene_within_2s"}
+        self.assertEqual(self.shape(one), self.shape(rest))
+        self.assertEqual(
+            self.shape(other["scene_within_2s"]), self.shape(other["scene_adjacent"])
+        )
         # References: {7003}, {7004}, {7003, 7004}, {7005}, {7003}; the third answer names no scene.
-        self.assertEqual(first["scene"]["pooled"], {"n": 5, "hits": 1, "rate": 0.2})
-        self.assertEqual(first["scene_near"]["pooled"]["hits"], 3)
-        auto = b["sessions"]["run-01"]
-        # 0:05 is scene 7003 (hit); 0:09.5 is 7003, near 7004 (near hit); a film; a time past
-        # the clip, near 7005 (near hit); an invalid time.
-        self.assertEqual(auto["scene"]["pooled"], {"n": 5, "hits": 1, "rate": 0.2})
-        self.assertEqual(auto["scene_near"]["pooled"]["hits"], 3)
-        self.assertEqual(auto["time_outside_clip"], 1)
-        self.assertEqual(auto["prediction_kinds"]["invalid_scene"], 1)
-        self.assertEqual(auto["failure_reasons"], {"invalid-time": 1})
+        self.assertEqual(one["scene"]["pooled"], {"n": 5, "hits": 1, "rate": 0.2})
+        self.assertEqual(one["scene_adjacent"]["pooled"]["hits"], 3)
+        # 0:05 is scene 7003 (hit); 0:09.5 is 7003, beside and within 2 s of 7004; a film; a
+        # time past the clip, within 2 s of 7005 but selecting no scene; an invalid time.
+        self.assertEqual(other["scene"]["pooled"], {"n": 5, "hits": 1, "rate": 0.2})
+        self.assertEqual(other["scene_adjacent"]["pooled"]["hits"], 2)
+        self.assertEqual(other["scene_within_2s"]["pooled"]["hits"], 3)
+        self.assertEqual(other["time_outside_clip"], 1)
+        self.assertEqual(other["prediction_kinds"]["invalid_scene"], 1)
+        self.assertEqual(other["failure_reasons"], {"invalid-time": 1})
         self.assertEqual(b["sessions"]["run-02"]["scene"]["pooled"]["hits"], 1)
 
     def test_predictions_load_and_compare_without_asking_the_condition(self):
@@ -744,38 +760,36 @@ class Uniform(Fixture):
         self.assertEqual(replies[0][("p1", "run-01", 2)], ("scene", 7003))
         self.assertEqual(replies[1][("p1", "run-01", 2)], ("scene", 7003))
         self.assertEqual(replies[1][("p1", "run-01", 9)], ("time_outside", 1))
-        out = ff_compare.compare(
-            self.score(self.annotated), self.score(self.automatic), *replies
-        )
-        self.assertEqual(
-            out["near_rules"], {"primary": "adjacent-scene", "secondary": "time-2s"}
-        )
+        scores = self.score(self.annotated), self.score(self.automatic)
+        out = ff_compare.compare(*scores, *replies, across_conditions=True)
+        self.assertEqual(out["primary"]["condition"], "annotation")
+        self.assertEqual(out["secondary"]["condition"], "auto")
+        self.assertEqual(out["primary"]["model"], out["secondary"]["model"])
         first = out["sessions"]["run-01"]
         self.assertEqual(first["scene"]["mean_difference"], 0.0)
-        self.assertEqual(first["scene_near"]["mean_difference"], 0.0)
+        self.assertAlmostEqual(first["scene_adjacent"]["mean_difference"], -0.2)
+        self.assertNotIn("scene_within_2s", first)
         self.assertEqual(out["agreement"]["run-01"]["n"], 5)
         self.assertEqual(out["agreement"]["run-01"]["same_scene"], 2)
+        with self.assertRaises(ff_score.ScoreError):
+            ff_compare.compare(*scores, *replies)
 
-    def test_the_near_rule_comes_from_the_manifest_and_cannot_be_crossed(self):
+    def test_the_kind_of_answer_comes_from_the_manifest_and_cannot_be_crossed(self):
         gold = ff_gold.load_gold(self.gold, self.codes_path)
         film_of, valid = ff_gold.load_dictionary(self.annotation)
-        for out, wrong in (
-            (self.annotated, ff_score.TIME_NEAR),
-            (self.automatic, ff_score.ADJACENT),
-        ):
+        table = ff_time.load(self.annotation, test_ff_time.DURATIONS)
+        for out, wrong in ((self.annotated, table), (self.automatic, None)):
             predictions = ff_score.load_predictions(
                 os.path.join(out, "replies"), "referent", gold
             )
             with self.assertRaises(ff_score.ScoreError):
                 ff_score.score(gold, film_of, valid, predictions, wrong)
-        # The score command has no argument for the rule.
+        # The score command has no argument for it.
         extra = [self.gold, self.codes_path, self.annotation]
         extra += [os.path.join(self.automatic, "manifest.json")]
         extra += [os.path.join(self.automatic, "replies"), "referent"]
         target = os.path.join(self.dir.name, "x.json")
-        self.assertEqual(
-            ff_score.main(["score"] + extra + [target, "adjacent-scene"]), 2
-        )
+        self.assertEqual(ff_score.main(["score"] + extra + [target, "scene"]), 2)
 
     def test_scoring_recomputes_every_time_prediction_first(self):
         path = os.path.join(self.automatic, "replies", "p1_run-01.json")
@@ -790,17 +804,198 @@ class Uniform(Fixture):
         self.assertIsInstance(self.score(self.automatic, "narrative"), dict)
 
     def test_scoring_refuses_other_scene_intervals_than_the_frozen_ones(self):
-        path = os.path.join(self.automatic, "manifest.json")
-        with open(path) as handle:
-            doc = json.load(handle)
-        doc["clipSeconds"]["1"] = 39.0
-        write(path, json.dumps(doc))
-        self.assertEqual(self.score(self.automatic), 2)
-        self.assertIn("scene intervals", sys.stderr.getvalue())
-        doc["clipSeconds"]["1"] = 40.0
-        write(path, json.dumps(doc))
         ff_time.CLOCK[2]["b"] = "0.25"
         self.assertEqual(self.score(self.automatic), 2)
+        self.assertIn("scene intervals", sys.stderr.getvalue())
+
+
+class Identity(Fixture):
+    """A report says what was run because the scorer checked it, not because it was told."""
+
+    SCENE = {"narrative_film": 1, "referent_film": 1, "conf": 0.9}
+
+    def annotated(self, model):
+        units = [dict(self.SCENE, u=u, referent=7003, narrative=7003) for u in (1, 2)]
+        replies = [json.dumps({"units": units}), json.dumps({"units": units[:1]})]
+        return self.run_condition("annotation", replies, model)[0]
+
+    def score(self, replies_from, manifest_from, name="score.json"):
+        target = os.path.join(self.dir.name, f"{len(os.listdir(self.dir.name))}-{name}")
+        args = [self.gold, self.codes_path, self.annotation]
+        args += [os.path.join(manifest_from, "manifest.json")]
+        args += [os.path.join(replies_from, "replies"), "referent", target]
+        code = ff_score.main(["score"] + args)
+        if code:
+            return code, sys.stderr.getvalue().strip().split("\n")[-1]
+        with open(target) as handle:
+            return 0, json.load(handle)
+
+    def rewrite(self, out, change):
+        for name in os.listdir(os.path.join(out, "replies")):
+            path = os.path.join(out, "replies", name)
+            with open(path) as handle:
+                doc = json.load(handle)
+            change(doc)
+            write(path, json.dumps(doc))
+
+    def landed(self, out):
+        """Make reply files look like those landed before the two fields existed."""
+        self.rewrite(out, lambda d: (d.pop("condition"), d.pop("manifestSha256")))
+
+    def test_the_report_carries_the_checked_model_condition_and_manifest(self):
+        opus = self.annotated(ff_map.PRIMARY)
+        code, report = self.score(opus, opus)
+        self.assertEqual(code, 0)
+        sha = ff_frames.file_sha(os.path.join(opus, "manifest.json"))
+        self.assertEqual(
+            (report["model"], report["condition"], report["manifestSha256"]),
+            (ff_map.PRIMARY, "annotation", sha),
+        )
+        with open(os.path.join(opus, "replies", "p1_run-01.json")) as handle:
+            reply = json.load(handle)
+        self.assertEqual(
+            (reply["model"], reply["condition"], reply["manifestSha256"]),
+            (ff_map.PRIMARY, "annotation", sha),
+        )
+
+    def test_one_arms_replies_cannot_be_scored_with_the_other_arms_manifest(self):
+        opus = self.annotated(ff_map.PRIMARY)
+        haiku = self.annotated(ff_map.ARMS[1])
+        for replies in (haiku, opus):
+            other = opus if replies is haiku else haiku
+            code, why = self.score(replies, other)
+            self.assertEqual(code, 2)
+            self.assertIn("is from the model", why)
+        # The landed files record the model only: that alone must refuse the other arm.
+        self.landed(haiku)
+        code, why = self.score(haiku, opus)
+        self.assertEqual(code, 2)
+        self.assertIn("is from the model claude-haiku-5-5", why)
+        code, report = self.score(haiku, haiku)
+        self.assertEqual((code, report["model"]), (0, "claude-haiku-5-5"))
+
+    def test_a_reply_file_without_a_model_is_refused(self):
+        opus = self.annotated(ff_map.PRIMARY)
+        self.rewrite(opus, lambda d: d.pop("model"))
+        self.assertEqual(self.score(opus, opus)[0], 2)
+
+    def test_replies_run_under_another_manifest_are_refused(self):
+        opus = self.annotated(ff_map.PRIMARY)
+        again = self.annotated(ff_map.PRIMARY)
+        # Same model and condition, another manifest file (here, another layout of it).
+        path = os.path.join(again, "manifest.json")
+        with open(path) as handle:
+            doc = json.load(handle)
+        write(path, json.dumps(doc))
+        code, why = self.score(opus, again)
+        self.assertEqual(code, 2)
+        self.assertIn("was not run under this manifest", why)
+        # A file that records only one of the two fields is not a landed file.
+        self.rewrite(opus, lambda d: d.pop("manifestSha256"))
+        self.assertEqual(self.score(opus, opus)[0], 2)
+
+    def test_replies_of_one_condition_cannot_be_scored_under_another(self):
+        replies = [self.reply(FIRST), self.reply(SECOND)]
+        auto, _ = self.run_condition("auto", replies)
+        none, _ = self.run_condition("norecord", replies)
+        opus = self.annotated(ff_map.PRIMARY)
+        for replies_from, manifest_from in (
+            (auto, none),
+            (none, auto),
+            (auto, opus),
+            (opus, auto),
+        ):
+            code, why = self.score(replies_from, manifest_from)
+            self.assertEqual(code, 2)
+            self.assertIn("is not from the manifest's condition", why)
+        self.assertEqual(self.score(auto, auto)[0], 0)
+        self.assertEqual(self.score(none, none)[1]["condition"], "norecord")
+
+    def test_a_time_condition_requires_both_fields(self):
+        replies = [self.reply(FIRST), self.reply(SECOND)]
+        for field in ("condition", "manifestSha256"):
+            auto, _ = self.run_condition("auto", replies)
+            self.rewrite(auto, lambda d: d.pop(field))
+            self.assertEqual(self.score(auto, auto)[0], 2, field)
+        auto, _ = self.run_condition("auto", replies)
+        self.landed(auto)
+        code, why = self.score(auto, auto)
+        self.assertEqual(code, 2)
+        self.assertIn("condition", why)
+
+    def test_comparison_refuses_what_should_not_be_compared(self):
+        replies = [self.reply(FIRST), self.reply(SECOND)]
+        opus = self.annotated(ff_map.PRIMARY)
+        haiku = self.annotated(ff_map.ARMS[1])
+        auto, _ = self.run_condition("auto", replies)
+        auto_haiku, _ = self.run_condition("auto", replies, ff_map.ARMS[1])
+        scores = {
+            name: self.score(out, out)[1]
+            for name, out in (
+                ("opus", opus),
+                ("haiku", haiku),
+                ("auto", auto),
+                ("auto_haiku", auto_haiku),
+            )
+        }
+
+        def compare(a, b, **mode):
+            return ff_compare.compare(scores[a], scores[b], {}, {}, **mode)
+
+        arms = compare("opus", "haiku")
+        self.assertEqual(arms["across_conditions"], False)
+        self.assertEqual(
+            arms["secondary"],
+            {
+                "model": "claude-haiku-5-5",
+                "condition": "annotation",
+                "manifestSha256": ff_frames.file_sha(
+                    os.path.join(haiku, "manifest.json")
+                ),
+            },
+        )
+        time_arms = compare("auto", "auto_haiku")
+        self.assertIn("scene_within_2s", time_arms["sessions"]["run-01"])
+        across = compare("opus", "auto", across_conditions=True)
+        self.assertEqual(
+            (across["primary"]["condition"], across["secondary"]["condition"]),
+            ("annotation", "auto"),
+        )
+        for a, b, mode in (
+            ("opus", "auto", {}),
+            ("opus", "auto_haiku", {}),
+            ("opus", "auto_haiku", {"across_conditions": True}),
+            ("opus", "haiku", {"across_conditions": True}),
+        ):
+            with self.assertRaises(ff_score.ScoreError, msg=(a, b, mode)):
+                compare(a, b, **mode)
+        narrative = dict(scores["haiku"], field="narrative")
+        with self.assertRaises(ff_score.ScoreError):
+            ff_compare.compare(scores["opus"], narrative, {}, {})
+        fewer = dict(scores["haiku"], population={})
+        with self.assertRaises(ff_score.ScoreError):
+            ff_compare.compare(scores["opus"], fewer, {}, {})
+
+    def test_the_comparison_command_takes_the_mode_as_a_flag(self):
+        replies = [self.reply(FIRST), self.reply(SECOND)]
+        opus = self.annotated(ff_map.PRIMARY)
+        auto, _ = self.run_condition("auto", replies)
+        paths = []
+        for out in (opus, auto):
+            target = os.path.join(out, "score.json")
+            with open(target, "w") as handle:
+                json.dump(self.score(out, out)[1], handle)
+            paths.append(target)
+        args = paths + [os.path.join(opus, "replies"), os.path.join(auto, "replies")]
+        refused = os.path.join(self.dir.name, "refused.json")
+        self.assertEqual(ff_compare.main(args + ["referent", refused]), 2)
+        self.assertFalse(os.path.exists(refused))
+        made = os.path.join(self.dir.name, "made.json")
+        self.assertEqual(
+            ff_compare.main(["--across-conditions"] + args + ["referent", made]), 0
+        )
+        with open(made) as handle:
+            self.assertEqual(json.load(handle)["across_conditions"], True)
 
 
 class Tracked(unittest.TestCase):

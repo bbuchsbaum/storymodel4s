@@ -8,6 +8,7 @@ import os
 import sys
 import tempfile
 import unittest
+from fractions import Fraction
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -408,32 +409,42 @@ class Scoring(Base):
             self.session({("p9", "run-01", 1): NONE})
 
 
-class Near(Base):
-    """Near scene agreement for scene answers: the adjacent valid scenes of the same film."""
+def table_of(film_of, valid, seconds=10):
+    """A scene-interval table as `ff_time` builds it: every valid scene `seconds` long."""
+    table = {}
+    for film in ff_gold.FILMS:
+        own = sorted(s for s in valid if film_of[s] == film)
+        scenes = [
+            (s, Fraction(i * seconds), Fraction((i + 1) * seconds))
+            for i, s in enumerate(own)
+        ]
+        table[film] = {"duration": Fraction(len(own) * seconds), "scenes": scenes}
+    return table
 
-    def near(self, predictions, rows=None):
+
+class Adjacent(Base):
+    """Adjacent scene agreement: the selected scene or a valid neighbour in the same film."""
+
+    def hits(self, predictions, rows=None):
         if rows is not None:
             self.gold = self.load(rows, f"near{len(os.listdir(self.dir.name))}")
-        report = ff_score.score(
-            self.gold, self.film_of, self.valid, predictions, ff_score.ADJACENT
-        )
-        self.assertEqual(report["near_rule"], "adjacent-scene")
+        report = ff_score.score(self.gold, self.film_of, self.valid, predictions)
+        self.assertEqual(report["answers"], "scene")
         session = report["sessions"]["run-01"]
-        return session["scene"]["pooled"]["hits"], session["scene_near"]["pooled"][
+        self.assertNotIn("scene_within_2s", session)
+        return session["scene"]["pooled"]["hits"], session["scene_adjacent"]["pooled"][
             "hits"
         ]
 
-    def test_the_scene_before_or_after_the_reference_is_a_near_hit_not_a_strict_one(
-        self,
-    ):
+    def test_the_scene_before_or_after_the_reference_is_an_adjacent_hit_only(self):
         one = [("p1", "run-01", 1, 3, "9", "9")]
-        self.assertEqual(self.near({("p1", "run-01", 1): scene(8)}, one), (0, 1))
-        self.assertEqual(self.near({("p1", "run-01", 1): scene(10)}, one), (0, 1))
-        self.assertEqual(self.near({("p1", "run-01", 1): scene(9)}, one), (1, 1))
+        self.assertEqual(self.hits({("p1", "run-01", 1): scene(8)}, one), (0, 1))
+        self.assertEqual(self.hits({("p1", "run-01", 1): scene(10)}, one), (0, 1))
+        self.assertEqual(self.hits({("p1", "run-01", 1): scene(9)}, one), (1, 1))
         two = [("p1", "run-01", 1, 3, "8", "8")]
-        self.assertEqual(self.near({("p1", "run-01", 1): scene(10)}, two), (0, 0))
+        self.assertEqual(self.hits({("p1", "run-01", 1): scene(10)}, two), (0, 0))
 
-    def test_a_strict_hit_is_always_a_near_hit(self):
+    def test_a_strict_hit_is_always_an_adjacent_hit(self):
         report = self.session(
             {
                 ("p1", "run-01", 1): scene(3),
@@ -443,79 +454,96 @@ class Near(Base):
             }
         )
         self.assertEqual(report["scene"]["pooled"]["hits"], 3)
-        # Scene 6 lies between the reference's 5 and 7: a near hit.
-        self.assertEqual(report["scene_near"]["pooled"]["hits"], 4)
+        # Scene 6 lies between the reference's 5 and 7: an adjacent hit.
+        self.assertEqual(report["scene_adjacent"]["pooled"]["hits"], 4)
         self.assertEqual(
-            report["scene_near"]["strata"]["multi_noncontig"]["pooled"]["hits"], 1
+            report["scene_adjacent"]["strata"]["multi_noncontig"]["pooled"]["hits"], 1
         )
-        self.assertEqual(report["scene_near"]["by_film"]["2"]["pooled"]["hits"], 2)
-        self.assertEqual(report["scene_near"]["by_participant"]["p2"]["hits"], 0)
+        self.assertEqual(report["scene_adjacent"]["by_film"]["2"]["pooled"]["hits"], 2)
+        self.assertEqual(report["scene_adjacent"]["by_participant"]["p2"]["hits"], 0)
 
-    def test_the_next_scene_number_in_another_film_is_not_near(self):
+    def test_the_next_scene_number_in_another_film_is_not_adjacent(self):
         # Scene 7 ends film 2 and scene 8 opens film 3.
         rows = [("p1", "run-01", 1, 3, "8", "8"), ("p1", "run-01", 2, 2, "7", "7")]
         predictions = {("p1", "run-01", 1): scene(7), ("p1", "run-01", 2): scene(8)}
-        self.assertEqual(self.near(predictions, rows), (0, 0))
+        self.assertEqual(self.hits(predictions, rows), (0, 0))
 
     def test_neighbours_are_counted_among_valid_targets_only(self):
         # Film 2 is scenes 5 (title card), 6, 7. The reference lists only the title card.
         rows = [("p1", "run-01", 1, 2, "5", "5")]
-        self.assertEqual(self.near({("p1", "run-01", 1): scene(6)}, rows), (0, 0))
-        # And a title-card answer has no near scenes.
+        self.assertEqual(self.hits({("p1", "run-01", 1): scene(6)}, rows), (0, 0))
+        # And a title-card answer has no neighbours.
         rows = [("p1", "run-01", 1, 2, "6", "6")]
-        self.assertEqual(self.near({("p1", "run-01", 1): scene(5)}, rows), (0, 0))
+        self.assertEqual(self.hits({("p1", "run-01", 1): scene(5)}, rows), (0, 0))
+        self.assertEqual(ff_score.neighbours(self.film_of, self.valid)[6], [7])
+        self.assertEqual(ff_score.neighbours(self.film_of, self.valid)[9], [8, 10])
+        self.assertNotIn(5, ff_score.neighbours(self.film_of, self.valid))
 
-    def test_an_answer_without_a_scene_is_never_a_near_hit(self):
+    def test_an_answer_without_a_scene_is_never_an_adjacent_hit(self):
         rows = [("p1", "run-01", 1, 2, "6", "6")]
         for prediction in (film(2), NONE, None, {"status": "failed", "reason": "x"}):
-            self.assertEqual(self.near({("p1", "run-01", 1): prediction}, rows), (0, 0))
+            self.assertEqual(self.hits({("p1", "run-01", 1): prediction}, rows), (0, 0))
 
-    def test_the_near_block_is_laid_out_like_the_strict_block(self):
+    def test_the_adjacent_block_is_laid_out_like_the_strict_block(self):
         report = self.session({("p1", "run-01", 1): scene(4)})
-        strict, near = report["scene"], report["scene_near"]
+        strict, beside = report["scene"], report["scene_adjacent"]
         self.assertEqual(
-            set(strict) - set(near),
+            set(strict) - set(beside),
             {"prediction_kinds", "chance_given_film", "chance_end_to_end"},
         )
-        self.assertEqual(set(near) - set(strict), set())
-        self.assertEqual(set(near["strata"]), set(strict["strata"]))
-        self.assertEqual(set(near["by_film"]), set(strict["by_film"]))
-        self.assertEqual(near["pooled"], {"n": 5, "hits": 1, "rate": 0.2})
+        self.assertEqual(set(beside) - set(strict), set())
+        self.assertEqual(set(beside["strata"]), set(strict["strata"]))
+        self.assertEqual(set(beside["by_film"]), set(strict["by_film"]))
+        self.assertEqual(beside["pooled"], {"n": 5, "hits": 1, "rate": 0.2})
         self.assertEqual(strict["pooled"]["hits"], 0)
-        self.assertEqual(near["participant_average"]["participants"], 3)
+        self.assertEqual(beside["participant_average"]["participants"], 3)
         self.assertEqual(report["time_outside_clip"], 0)
 
-    def test_the_rule_is_recorded_and_an_unknown_rule_is_refused(self):
+    def test_the_schema_is_v4_and_names_the_kind_of_answer(self):
         report = ff_score.score(self.gold, self.film_of, self.valid, {})
-        self.assertEqual(report["near_rule"], "adjacent-scene")
-        self.assertEqual(report["schema"].rsplit("/", 1)[1], "v3")
-        with self.assertRaises(ff_score.ScoreError):
-            ff_score.score(self.gold, self.film_of, self.valid, {}, "within-5s")
+        self.assertEqual(report["schema"].rsplit("/", 1)[1], "v4")
+        self.assertEqual(
+            (report["answers"], report["chance_guess"]),
+            ("scene", "uniform valid scene"),
+        )
+        self.assertNotIn("near_rule", report)
 
 
 class TimeAnswers(Base):
-    """Predictions made from a time: the same kinds, the near scenes they carry."""
+    """Predictions made from a time: the same kinds, plus the scenes within 2 seconds."""
+
+    def setUp(self):
+        super().setUp()
+        self.table = table_of(self.film_of, self.valid)
 
     def timed(self, selected, near, **more):
         return dict(scene(selected), near=near, time="0:07", film_stated=1, **more)
 
-    def run_rule(self, predictions, rule=ff_score.TIME_NEAR):
-        return ff_score.score(self.gold, self.film_of, self.valid, predictions, rule)[
-            "sessions"
-        ]["run-01"]
+    def run_as(self, predictions, timed=True):
+        table = self.table if timed else None
+        report = ff_score.score(self.gold, self.film_of, self.valid, predictions, table)
+        self.assertEqual(report["answers"], "time" if timed else "scene")
+        return report["sessions"]["run-01"]
 
-    def test_a_near_list_decides_near_agreement(self):
-        report = self.run_rule(
+    def test_the_near_list_decides_within_2s_and_the_strict_scene_decides_adjacent(
+        self,
+    ):
+        report = self.run_as(
             {
                 ("p1", "run-01", 1): self.timed(4, [3, 4]),
                 ("p1", "run-01", 2): self.timed(3, [3]),
                 ("p3", "run-01", 1): self.timed(6, [6]),
+                ("p2", "run-01", 1): self.timed(7, [6, 7]),
             }
         )
         self.assertEqual(report["scene"]["pooled"]["hits"], 1)
-        self.assertEqual(report["scene_near"]["pooled"]["hits"], 2)
-        # Scene 6 is next to the reference's 7, but its near list does not hold 7.
-        self.assertEqual(report["scene_near"]["by_participant"]["p3"]["hits"], 0)
+        # Row 1 ({3}) by its near list, row 2 strictly, p2 ({6}) by its near list.
+        self.assertEqual(report["scene_within_2s"]["pooled"]["hits"], 3)
+        # Scene 6 is next to p3's reference 7, though its near list does not hold 7.
+        self.assertEqual(report["scene_within_2s"]["by_participant"]["p3"]["hits"], 0)
+        self.assertEqual(report["scene_adjacent"]["by_participant"]["p3"]["hits"], 1)
+        self.assertEqual(report["scene_adjacent"]["pooled"]["hits"], 4)
+        self.assertEqual(set(report["scene_within_2s"]), set(report["scene_adjacent"]))
 
     def test_a_time_outside_the_clip_keeps_its_film_and_is_counted_apart(self):
         outside = {
@@ -526,7 +554,7 @@ class TimeAnswers(Base):
             "time": "9:59",
             "film_stated": 1,
         }
-        report = self.run_rule(
+        report = self.run_as(
             {
                 ("p1", "run-01", 1): outside,
                 ("p1", "run-01", 2): outside,
@@ -540,8 +568,10 @@ class TimeAnswers(Base):
         # The five failures are the utterances given no prediction; none is a time answer.
         self.assertEqual(report["failure_reasons"], {"no-prediction": 5})
         self.assertEqual(report["scene"]["pooled"]["hits"], 0)
+        # It selects no scene, so it has no neighbours; its near list still counts.
+        self.assertEqual(report["scene_adjacent"]["pooled"]["hits"], 0)
         # Row 2's reference is {3, 4}; row 1's is {3}.
-        self.assertEqual(report["scene_near"]["pooled"]["hits"], 1)
+        self.assertEqual(report["scene_within_2s"]["pooled"]["hits"], 1)
         self.assertEqual(report["film"]["film_labelled"]["pooled"]["hits"], 3)
         self.assertEqual(report["film_only"]["film_only_correct_film"], 0)
         self.assertEqual(
@@ -549,25 +579,25 @@ class TimeAnswers(Base):
         )
         self.assertEqual(report["nonfilm"]["assigned_a_film"], 1)
         bad = dict(outside, film=11)
-        failed = self.run_rule({("p1", "run-01", 1): bad})
+        failed = self.run_as({("p1", "run-01", 1): bad})
         self.assertEqual(failed["failure_reasons"]["unknown-film"], 1)
 
-    def test_a_reply_file_cannot_be_scored_under_the_other_kind_of_rule(self):
+    def test_a_reply_file_cannot_be_scored_as_the_other_kind_of_answer(self):
         key = ("p1", "run-01", 1)
         with self.assertRaises(ff_score.ScoreError):
-            self.run_rule({key: self.timed(4, [3, 4])}, ff_score.ADJACENT)
+            self.run_as({key: self.timed(4, [3, 4])}, timed=False)
         with self.assertRaises(ff_score.ScoreError):
-            self.run_rule({key: scene(4)}, ff_score.TIME_NEAR)
+            self.run_as({key: scene(4)})
         invalid = {"status": "failed", "reason": "invalid-time", "time": "x"}
         with self.assertRaises(ff_score.ScoreError):
-            self.run_rule({key: invalid}, ff_score.ADJACENT)
+            self.run_as({key: invalid}, timed=False)
         self.assertEqual(
-            self.run_rule({key: invalid})["failure_reasons"]["invalid-time"], 1
+            self.run_as({key: invalid})["failure_reasons"]["invalid-time"], 1
         )
-        # Answers without a location are the same under both rules.
-        for rule in ff_score.NEAR_RULES:
+        # Answers without a location are the same either way.
+        for timed in (True, False):
             self.assertEqual(
-                self.run_rule({key: film(1), ("p1", "run-01", 5): NONE}, rule)[
+                self.run_as({key: film(1), ("p1", "run-01", 5): NONE}, timed)[
                     "prediction_kinds"
                 ]["film"],
                 1,
@@ -577,8 +607,92 @@ class TimeAnswers(Base):
         key = ("p1", "run-01", 1)
         for near in (None, "3", [3], [4, 6], [4, 2], [4, "3"], [4, 999]):
             with self.assertRaises(ff_score.ScoreError, msg=repr(near)):
-                self.run_rule({key: self.timed(4, near)})
-        self.run_rule({key: self.timed(4, [4])})
+                self.run_as({key: self.timed(4, near)})
+        self.run_as({key: self.timed(4, [4])})
+
+    def test_within_2s_is_reported_for_time_answers_even_with_no_scene_utterance(self):
+        self.gold = self.load([("p1", "run-01", 1, -1, "", "-1")], "none")
+        self.assertIn("scene_within_2s", self.run_as({}))
+        self.assertNotIn("scene_within_2s", self.run_as({}, timed=False))
+
+
+class Chance(Base):
+    """What a uniform guess scores, computed exactly."""
+
+    # Film 1 has valid scenes 3, 4; film 2 has 6, 7; film 3 has 8, 9, 10. 21 valid in all.
+    ROWS = [
+        ("p1", "run-01", 1, 3, "9", "9"),
+        ("p1", "run-01", 2, 3, "8", "8"),
+        ("p1", "run-01", 3, 3, "8 10", "8,10"),
+        ("p1", "run-01", 4, 2, "5 6", "5,6"),
+    ]
+
+    def chance(self, table=None):
+        self.gold = self.load(self.ROWS, f"chance{len(os.listdir(self.dir.name))}")
+        report = ff_score.score(self.gold, self.film_of, self.valid, {}, table)
+        return report["chance_guess"], report["sessions"]["run-01"]["chance"]
+
+    def test_a_uniform_scene_guess(self):
+        guess, chance = self.chance()
+        self.assertEqual(guess, "uniform valid scene")
+        # Strict: 1/3, 1/3, 2/3, 1/2 (the title card 5 is no target).
+        self.assertAlmostEqual(
+            chance["given_film"]["scene"], (1 / 3 + 1 / 3 + 2 / 3 + 1 / 2) / 4
+        )
+        # Adjacent: {8, 9, 10}, {8, 9}, {8, 9, 10} of three; {6, 7} of two.
+        self.assertAlmostEqual(
+            chance["given_film"]["scene_adjacent"], (1 + 2 / 3 + 1 + 1) / 4
+        )
+        self.assertAlmostEqual(chance["end_to_end"]["scene"], (1 + 1 + 2 + 1) / 21 / 4)
+        self.assertAlmostEqual(
+            chance["end_to_end"]["scene_adjacent"], (3 + 2 + 3 + 2) / 21 / 4
+        )
+        self.assertEqual(set(chance["given_film"]), {"scene", "scene_adjacent"})
+        session = ff_score.score(self.gold, self.film_of, self.valid, {})["sessions"]
+        self.assertAlmostEqual(
+            session["run-01"]["scene"]["chance_given_film"],
+            chance["given_film"]["scene"],
+        )
+
+    def test_a_uniform_time_guess_measures_intervals_not_scene_counts(self):
+        table = table_of(self.film_of, self.valid)
+        # Film 3: scene 8 is [0, 10), 9 is [10, 14), 10 is [14, 40). Film 1 and 2 are 20 s.
+        table[3] = {
+            "duration": Fraction(40),
+            "scenes": [
+                (8, Fraction(0), Fraction(10)),
+                (9, Fraction(10), Fraction(14)),
+                (10, Fraction(14), Fraction(40)),
+            ],
+        }
+        total = sum(float(entry["duration"]) for entry in table.values())
+        self.assertEqual(total, 20 + 20 + 40 + 7 * 20)
+        guess, chance = self.chance(table)
+        self.assertEqual(guess, "uniform time")
+        given = chance["given_film"]
+        self.assertEqual(set(given), {"scene", "scene_adjacent", "scene_within_2s"})
+        # Strict: scene 9 is 4 s of 40; scene 8 is 10; {8, 10} is 36; scene 6 is 10 of 20.
+        self.assertAlmostEqual(
+            given["scene"], (4 / 40 + 10 / 40 + 36 / 40 + 10 / 20) / 4
+        )
+        # Adjacent: all of film 3; scenes 8, 9; all of film 3; all of film 2.
+        self.assertAlmostEqual(given["scene_adjacent"], (1 + 14 / 40 + 1 + 1) / 4)
+        # Within 2 s: [8, 16]; [0, 12]; [0, 12] and [12, 40], which is everything; [0, 12].
+        self.assertAlmostEqual(
+            given["scene_within_2s"], (8 / 40 + 12 / 40 + 1 + 12 / 20) / 4
+        )
+        self.assertAlmostEqual(
+            chance["end_to_end"]["scene_within_2s"], (8 + 12 + 40 + 12) / total / 4
+        )
+        self.assertAlmostEqual(
+            chance["end_to_end"]["scene"], (4 + 10 + 36 + 10) / total / 4
+        )
+
+    def test_overlapping_spans_are_counted_once_and_clipped(self):
+        spans = [(-2, 5), (3, 8), (8, 9), (20, 30)]
+        self.assertEqual(ff_score.covered(spans, 0, 25), 9 + 5)
+        self.assertEqual(ff_score.covered([], 0, 25), 0)
+        self.assertEqual(ff_score.covered([(1, 3), (1, 2), (0, 4)], 0, 25), 4)
 
 
 class Files(Base):

@@ -416,11 +416,11 @@ class Oracle(Base):
             made = ff_time.prediction(self.table, film, stamp(place(start, end)))
             predictions[("p1", "run-01", row)] = made
         report = ff_score.score(
-            self.gold, self.film_of, self.valid, predictions, ff_score.TIME_NEAR
+            self.gold, self.film_of, self.valid, predictions, self.table
         )
         session = report["sessions"]["run-01"]
-        self.assertEqual(report["near_rule"], "time-2s")
-        return session["scene"]["pooled"], session["scene_near"]["pooled"]
+        self.assertEqual(report["answers"], "time")
+        return session["scene"]["pooled"], session["scene_within_2s"]["pooled"]
 
     def test_the_midpoint_of_a_reference_scene_is_a_strict_and_a_near_hit(self):
         strict, near = self.scored(lambda start, end: (start + end) / 2)
@@ -445,10 +445,11 @@ class Oracle(Base):
         outside = ff_time.prediction(self.table, 1, "0:41")
         predictions = {("p1", "run-01", 1): outside, ("p1", "run-01", 2): outside}
         report = ff_score.score(
-            gold, self.film_of, self.valid, predictions, ff_score.TIME_NEAR
+            gold, self.film_of, self.valid, predictions, self.table
         )["sessions"]["run-01"]
         self.assertEqual(report["scene"]["pooled"]["hits"], 0)
-        self.assertEqual(report["scene_near"]["pooled"]["hits"], 1)
+        self.assertEqual(report["scene_within_2s"]["pooled"]["hits"], 1)
+        self.assertEqual(report["scene_adjacent"]["pooled"]["hits"], 0)
         self.assertEqual(report["time_outside_clip"], 2)
         self.assertEqual(report["prediction_kinds"]["invalid_scene"], 2)
         self.assertEqual(report["prediction_kinds"]["film"], 0)

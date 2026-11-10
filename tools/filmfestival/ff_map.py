@@ -70,7 +70,6 @@ ANNOTATION, AUTO, NORECORD = "annotation", "auto", "norecord"
 CONDITIONS = (ANNOTATION, AUTO, NORECORD)
 # Where the automatic film record lives under DATA_ROOT (see ff_frames.py and ff_caption.py).
 AUTO_DIR = "study/filmfestival/auto-20261110"
-NEAR_RULE_TIME = "time-2s"
 
 
 class ProtocolFailure(RuntimeError):
@@ -215,7 +214,6 @@ def prepare(data_root, name):
         "clockSha256": ff_packet.sha(json.dumps(ff_time.CLOCK, sort_keys=True)),
         "sceneIntervalsSha256": ff_packet.sha(intervals),
         "toleranceSeconds": ff_time.TOLERANCE,
-        "nearRule": NEAR_RULE_TIME,
     }
     if name == AUTO:
         record["captionsSha256"] = file_sha(captions_path)
@@ -436,7 +434,10 @@ def map_session(
     cache_dir,
     version,
     condition=ANNOTATION_CONDITION,
+    manifest_sha=None,
 ):
+    """Map one participant-session. The reply file records what it was run under: the model,
+    the condition and the SHA-256 of the tracked manifest, which the scorer checks."""
     units = ff_packet.units(gold_path, participant, session)
     answered, accepted_chunk, receipts = {}, {}, []
     prompts = ff_packet.chunks(packet, units, CHUNK, condition.heading)
@@ -496,6 +497,8 @@ def map_session(
         "participant": participant,
         "session": session,
         "model": model,
+        "condition": condition.name,
+        "manifestSha256": manifest_sha,
         "cliVersion": version,
         "chunks": receipts,
         "units": out,
@@ -610,7 +613,15 @@ def main(argv):
 
     def one(key):
         return map_session(
-            model, packet, gold_path, key[0], key[1], cache_dir, version, condition
+            model,
+            packet,
+            gold_path,
+            key[0],
+            key[1],
+            cache_dir,
+            version,
+            condition,
+            file_sha(args.manifest),
         )
 
     with ThreadPoolExecutor(args.jobs) as pool:

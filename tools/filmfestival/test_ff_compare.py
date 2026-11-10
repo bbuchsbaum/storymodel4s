@@ -94,31 +94,61 @@ class Compare(unittest.TestCase):
         with self.assertRaises(ff_score.ScoreError):
             ff_compare.compare(score("referent", 1), score("referent", 2), {}, {})
 
-    def test_near_agreement_is_compared_when_both_files_have_it(self):
-        def score(near_rule, near):
-            block = {"by_participant": rates(a=0.5, b=0.5)}
-            session = {"scene": block, "film": {"film_reference": block}}
-            out = {"field": "referent", "population": 1, "sessions": {"s1": session}}
-            if near_rule:
-                out["near_rule"] = near_rule
-                session["scene_near"] = {"by_participant": near}
-            return out
+    def score(self, adjacent=None, within=None, **identity):
+        block = {"by_participant": rates(a=0.5, b=0.5)}
+        session = {"scene": block, "film": {"film_reference": block}}
+        if adjacent:
+            session["scene_adjacent"] = {"by_participant": adjacent}
+        if within:
+            session["scene_within_2s"] = {"by_participant": within}
+        out = {"field": "referent", "population": 1, "sessions": {"s1": session}}
+        return dict(out, **identity)
 
-        annotation = score("adjacent-scene", rates(a=0.9, b=0.8))
-        automatic = score("time-2s", rates(a=0.7, b=0.8))
-        out = ff_compare.compare(annotation, automatic, {}, {})
-        self.assertEqual(
-            out["near_rules"], {"primary": "adjacent-scene", "secondary": "time-2s"}
+    def test_adjacent_agreement_is_compared_and_within_2s_only_when_both_have_it(self):
+        scenes = self.score(rates(a=0.9, b=0.8), model="m", condition="annotation")
+        times = self.score(
+            rates(a=0.7, b=0.8), rates(a=0.6, b=0.6), model="m", condition="auto"
         )
-        near = out["sessions"]["s1"]["scene_near"]
-        self.assertAlmostEqual(near["by_participant"]["a"], -0.2)
-        self.assertAlmostEqual(near["mean_difference"], -0.1)
-        self.assertEqual(out["sessions"]["s1"]["scene"]["mean_difference"], 0.0)
-        old = ff_compare.compare(score(None, None), score(None, None), {}, {})
-        self.assertIsNone(old["near_rules"])
-        self.assertNotIn("scene_near", old["sessions"]["s1"])
+        out = ff_compare.compare(scenes, times, {}, {}, across_conditions=True)
+        row = out["sessions"]["s1"]
+        self.assertAlmostEqual(row["scene_adjacent"]["by_participant"]["a"], -0.2)
+        self.assertAlmostEqual(row["scene_adjacent"]["mean_difference"], -0.1)
+        self.assertEqual(row["scene"]["mean_difference"], 0.0)
+        self.assertNotIn("scene_within_2s", row)
+        other = self.score(
+            rates(a=0.7, b=0.8), rates(a=0.8, b=0.6), model="n", condition="auto"
+        )
+        both = ff_compare.compare(times, other, {}, {})["sessions"]["s1"]
+        self.assertAlmostEqual(both["scene_within_2s"]["mean_difference"], 0.1)
+        old = ff_compare.compare(self.score(), self.score(), {}, {})
+        self.assertEqual(set(old["sessions"]["s1"]), {"scene", "film_reference"})
         with self.assertRaises(ff_score.ScoreError):
-            ff_compare.compare(annotation, score(None, None), {}, {})
+            ff_compare.compare(self.score(rates(a=0.9, b=0.8)), self.score(), {}, {})
+
+    def test_each_sides_identity_is_recorded_and_conditions_are_not_mixed_by_default(
+        self,
+    ):
+        a = self.score(model="m", condition="annotation", manifestSha256="1")
+        b = self.score(model="n", condition="annotation", manifestSha256="2")
+        c = self.score(model="m", condition="auto", manifestSha256="3")
+        d = self.score(model="n", condition="auto", manifestSha256="4")
+        out = ff_compare.compare(a, b, {}, {})
+        self.assertEqual(
+            out["primary"],
+            {"model": "m", "condition": "annotation", "manifestSha256": "1"},
+        )
+        self.assertEqual(out["secondary"]["model"], "n")
+        self.assertEqual(out["across_conditions"], False)
+        across = ff_compare.compare(a, c, {}, {}, across_conditions=True)
+        self.assertEqual(across["secondary"]["condition"], "auto")
+        for first, second, mode in (
+            (a, c, False),
+            (a, d, False),
+            (a, d, True),
+            (a, b, True),
+        ):
+            with self.assertRaises(ff_score.ScoreError):
+                ff_compare.compare(first, second, {}, {}, across_conditions=mode)
 
 
 if __name__ == "__main__":

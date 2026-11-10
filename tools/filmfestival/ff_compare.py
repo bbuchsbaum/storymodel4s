@@ -4,17 +4,20 @@
 Protocols: docs/plans/2026-11-09-filmfestival-transfer-protocol.md, section "Arms", and
 docs/plans/2026-11-10-filmfestival-automatic-input-protocol.md, section "Scoring".
 
-Usage: ff_compare.py PRIMARY_SCORE SECONDARY_SCORE PRIMARY_REPLIES SECONDARY_REPLIES FIELD OUTPUT
+Usage: ff_compare.py [--across-conditions] PRIMARY_SCORE SECONDARY_SCORE PRIMARY_REPLIES
+                     SECONDARY_REPLIES FIELD OUTPUT
 
-The two runs may be two arms of one input condition, or one arm under two conditions. The two
-score files come from `ff_score.py score` on the same reference and FIELD. For each session it
-reports each participant's scene-agreement difference (secondary minus primary), the mean
-difference with a 95% interval from resampling participants, the same for near scene agreement
-and for film identity, and how often the two runs gave the same answer.
+By default the two runs are two arms of one input condition; score files of different conditions
+are refused. With --across-conditions they are one model under two conditions, and score files
+of different models are refused. The field and the population must always be the same.
 
-Near scene agreement is compared near against near. Its rule may differ between the runs (a time
-answer and a scene answer have different near scenes); the output names both rules. Score files
-from before near agreement existed are compared without it, but only if neither has it.
+The score files come from `ff_score.py score`. For each session the output gives each
+participant's difference (secondary minus primary), the mean difference and a 95% interval from
+resampling participants, for strict scene agreement, adjacent scene agreement, film identity,
+and within-2-seconds agreement when both runs answer with times. It also gives how often the two
+runs gave the same answer, and each side's model, condition and manifest hash as its score file
+records them. Score files from before adjacent agreement existed are compared without it, but
+only if neither has it.
 """
 
 import json
@@ -26,7 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import ff_score  # noqa: E402
 
-SCHEMA = "storymodel4s.filmfestival.transfer-arm-comparison/v2"
+SCHEMA = "storymodel4s.filmfestival.transfer-arm-comparison/v3"
 
 
 def paired(primary, secondary):
@@ -103,43 +106,72 @@ def agreement(primary, secondary):
     return sessions
 
 
-def compare(primary_score, secondary_score, primary_replies, secondary_replies):
+def identity(score):
+    """What a score file says it is: the model, the condition and the manifest it was run under."""
+    return {k: score.get(k) for k in ("model", "condition", "manifestSha256")}
+
+
+def compare(
+    primary_score,
+    secondary_score,
+    primary_replies,
+    secondary_replies,
+    across_conditions=False,
+):
+    """The comparison report. Refuses score files that should not be compared.
+
+    The field and the population must be the same. The condition must be the same too, unless
+    `across_conditions` is set: then the two sides must be one model under two conditions.
+    """
     if primary_score.get("field") != secondary_score.get("field"):
         raise ff_score.ScoreError("the score files are for different fields")
     if primary_score["population"] != secondary_score["population"]:
         raise ff_score.ScoreError("the score files are for different populations")
-    near = ["near_rule" in score for score in (primary_score, secondary_score)]
-    if near[0] != near[1]:
-        raise ff_score.ScoreError("only one score file has near scene agreement")
+    sides = {"primary": identity(primary_score), "secondary": identity(secondary_score)}
+    same_condition = sides["primary"]["condition"] == sides["secondary"]["condition"]
+    if across_conditions:
+        if sides["primary"]["model"] != sides["secondary"]["model"]:
+            raise ff_score.ScoreError(
+                "a comparison across conditions needs the same model on both sides"
+            )
+        if same_condition:
+            raise ff_score.ScoreError("the score files are for the same condition")
+    elif not same_condition:
+        raise ff_score.ScoreError(
+            "the score files are for different conditions; use --across-conditions"
+        )
     out = {
         "schema": SCHEMA,
         "field": primary_score["field"],
-        "near_rules": None,
+        "across_conditions": across_conditions,
+        **sides,
         "sessions": {},
     }
-    if all(near):
-        out["near_rules"] = {
-            "primary": primary_score["near_rule"],
-            "secondary": secondary_score["near_rule"],
-        }
     for session, a in primary_score["sessions"].items():
         b = secondary_score["sessions"][session]
-        out["sessions"][session] = {
+        row = {
             "scene": paired(a["scene"]["by_participant"], b["scene"]["by_participant"]),
             "film_reference": paired(
                 a["film"]["film_reference"]["by_participant"],
                 b["film"]["film_reference"]["by_participant"],
             ),
         }
-        if all(near):
-            out["sessions"][session]["scene_near"] = paired(
-                a["scene_near"]["by_participant"], b["scene_near"]["by_participant"]
-            )
+        if ("scene_adjacent" in a) != ("scene_adjacent" in b):
+            raise ff_score.ScoreError("only one score file has adjacent agreement")
+        # Within-2s agreement exists only for time answers: compared when both sides have it.
+        for measure in ("scene_adjacent", "scene_within_2s"):
+            if measure in a and measure in b:
+                row[measure] = paired(
+                    a[measure]["by_participant"], b[measure]["by_participant"]
+                )
+        out["sessions"][session] = row
     out["agreement"] = agreement(primary_replies, secondary_replies)
     return out
 
 
 def main(argv):
+    across = "--across-conditions" in argv
+    argv = [a for a in argv if a != "--across-conditions"]
     if len(argv) != 6 or os.path.exists(argv[5]):
         print(__doc__, file=sys.stderr)
         return 2
@@ -153,7 +185,11 @@ def main(argv):
                 "FIELD is not the field the score files were made for"
             )
         report = compare(
-            primary, secondary, replies(argv[2], argv[4]), replies(argv[3], argv[4])
+            primary,
+            secondary,
+            replies(argv[2], argv[4]),
+            replies(argv[3], argv[4]),
+            across,
         )
     except ff_score.ScoreError as error:
         print(f"refused: {error}", file=sys.stderr)
