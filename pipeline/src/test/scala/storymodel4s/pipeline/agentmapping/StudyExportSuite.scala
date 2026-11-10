@@ -9,8 +9,6 @@ import storymodel4s.core.Checksum
   * what it refuses.
   */
 class StudyExportSuite extends FunSuite:
-  import StudyExport.Entry
-
   private val system = "SYSTEM TEXT"
   private val prompt = "P\n[1] one\n[2] two\nmap 1-2"
 
@@ -73,7 +71,10 @@ class StudyExportSuite extends FunSuite:
 
   test("unusable replay parameters and a foreign schema are refused"):
     def bad(key: String, value: Json) = StudyExport.parseIndex(indexDoc(Map(key -> value)))
-    assertEquals(bad("attempts", Json.fromInt(0)), Left("index.json has unusable replay parameters"))
+    assertEquals(
+      bad("attempts", Json.fromInt(0)),
+      Left("index.json has unusable replay parameters")
+    )
     assertEquals(
       bad("retrySuffix", Json.fromString(" again")),
       Left("index.json has unusable replay parameters")
@@ -104,7 +105,10 @@ class StudyExportSuite extends FunSuite:
 
   test("a session file is read against its index entry"):
     val read = StudyExport.parseSession(sessionDoc(), entry).toOption.get
-    assertEquals(read.units.map(u => (u.u, u.row, u.text)), Vector((1, Json.fromInt(5), "one"), (2, Json.fromInt(6), "two")))
+    assertEquals(
+      read.units.map(u => (u.u, u.row, u.text)),
+      Vector((1, Json.fromInt(5), "one"), (2, Json.fromInt(6), "two"))
+    )
     assertEquals(read.chunks, Vector(StudyReplay.Chunk(1, 2, prompt)))
     assertEquals(entry.name, "p-01_run-01")
 
@@ -134,6 +138,7 @@ class StudyExportSuite extends FunSuite:
       Left(s"$file: a unit is empty or spans lines")
     )
     assertEquals(
-      StudyExport.parseSession(sessionDoc(_.replace("\"text\": \"two\"", "\"text\": \"t\\nwo\"")), entry),
+      StudyExport
+        .parseSession(sessionDoc(_.replace("\"text\": \"two\"", "\"text\": \"t\\nwo\"")), entry),
       Left(s"$file: a unit is empty or spans lines")
     )

@@ -12,9 +12,9 @@ import storymodel4s.provider.agent.{ExchangeFailure, ModelReply}
   * else (the attempt loop, the retry suffix, the lookup by exact prompt text) is shared. Prompts
   * are opaque: this code renders nothing, so it knows no film, corpus or packet layout. It does
   * know the reply contract's field names (`narrative`, `referent` and their `_film` fields); a
-  * study with other judgements would need those named in its export. It refuses a
-  * prompt that does not show every unit of the session, because otherwise "the model saw this unit"
-  * would rest on whoever exported the prompts.
+  * study with other judgements would need those named in its export. It refuses a prompt that does
+  * not show every unit of the session, because otherwise "the model saw this unit" would rest on
+  * whoever exported the prompts.
   */
 object StudyReplay:
 
@@ -33,8 +33,8 @@ object StudyReplay:
     case StrictChunked
 
   object ReplyProtocol:
-    /** A protocol by the name an export records. Names are versioned, so a change of rules is a
-      * new name and an old export cannot be read under new rules by accident.
+    /** A protocol by the name an export records. Names are versioned, so a change of rules is a new
+      * name and an old export cannot be read under new rules by accident.
       */
     def named(name: String): Option[ReplyProtocol] = name match
       case "coercing-open/v1"  => Some(CoercingOpen)

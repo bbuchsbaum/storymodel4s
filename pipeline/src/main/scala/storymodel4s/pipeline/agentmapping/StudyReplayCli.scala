@@ -25,12 +25,17 @@ object StudyExport:
   /** One participant-session as the index lists it. The index, not the session file, names the
     * participant and session, so a session file cannot rename itself or another.
     */
-  final case class Entry(participant: String, session: String, file: String, hashes: Vector[String]):
+  final case class Entry(
+      participant: String,
+      session: String,
+      file: String,
+      hashes: Vector[String]
+  ):
     def name: String = s"${participant}_$session"
 
-  /** What every session of the export shares. The reply protocol is recorded here and never
-    * chosen by whoever runs the replay: the wrong rules would run without complaint and conclude
-    * something other than what was recorded.
+  /** What every session of the export shares. The reply protocol is recorded here and never chosen
+    * by whoever runs the replay: the wrong rules would run without complaint and conclude something
+    * other than what was recorded.
     */
   final case class Index(
       model: String,
@@ -82,11 +87,35 @@ object StudyExport:
               hashes <- e.hcursor.get[Vector[String]]("promptSha256")
             yield done :+ Entry(participant, session, file, hashes)
         }
-      yield (schema, systemSha, protocolName, model, condition, system, attempts, suffix, extras,
-        unitLine, manifest, sessions)
+      yield (
+        schema,
+        systemSha,
+        protocolName,
+        model,
+        condition,
+        system,
+        attempts,
+        suffix,
+        extras,
+        unitLine,
+        manifest,
+        sessions
+      )
     read.left.map(_ => "index.json is malformed").flatMap {
-      case (schema, systemSha, protocolName, model, condition, system, attempts, suffix, extras,
-            unitLine, manifest, sessions) =>
+      case (
+            schema,
+            systemSha,
+            protocolName,
+            model,
+            condition,
+            system,
+            attempts,
+            suffix,
+            extras,
+            unitLine,
+            manifest,
+            sessions
+          ) =>
         val named = sessions.forall(e => Name.matches(e.participant) && Name.matches(e.session))
         if schema != Schema then Left("not a study export")
         else if Checksum.ofText(system).hex != systemSha then
@@ -102,15 +131,26 @@ object StudyExport:
             .named(protocolName)
             .toRight(s"unknown reply protocol $protocolName")
             .map(
-              Index(model, condition, system, _, protocolName, attempts, suffix, extras, unitLine,
-                manifest, sessions)
+              Index(
+                model,
+                condition,
+                system,
+                _,
+                protocolName,
+                attempts,
+                suffix,
+                extras,
+                unitLine,
+                manifest,
+                sessions
+              )
             )
     }
 
   def index(dir: Path): Either[String, Index] = json(dir.resolve("index.json")).flatMap(parseIndex)
 
-  /** Read and check one session document against its index entry: it must be the session the
-    * index names, and each prompt must have the hash the index records.
+  /** Read and check one session document against its index entry: it must be the session the index
+    * names, and each prompt must have the hash the index records.
     */
   def parseSession(doc: Json, entry: Entry): Either[String, Session] =
     val c = doc.hcursor
@@ -161,9 +201,9 @@ object StudyExport:
   *
   * Replays every participant-session of an exported study from text-exchange recordings, with no
   * model client, and writes one reply file per participant-session in the form the scorer reads.
-  * The reply rules are the ones the export names. An exchange the
-  * replay needs and cannot find refuses the run. Reply files hold no recall text, but the export
-  * does; keep both outside the repository.
+  * The reply rules are the ones the export names. An exchange the replay needs and cannot find
+  * refuses the run. Reply files hold no recall text, but the export does; keep both outside the
+  * repository.
   */
 @main def agentStudyReplay(
     exportDir: String,
