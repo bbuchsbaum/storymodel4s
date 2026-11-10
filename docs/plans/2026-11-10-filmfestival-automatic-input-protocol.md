@@ -34,6 +34,10 @@ This condition therefore changes the input and nothing downstream.
 
 Where uniformity is not possible, this page says so.
 
+A check on the design: re-scoring the landed annotation-assisted run with the extended scorer
+reproduces every published figure exactly, and its near agreement equals the within-one-scene
+figures already reported (Opus 95.9% and 94.5%).
+
 ## The film record
 
 For each of the ten films, in presentation order with its film number and title:
@@ -41,7 +45,9 @@ For each of the ten films, in presentation order with its film number and title:
 - **Speech:** the non-suspect segments of the unified Whisper transcript, each with its start time.
   A film with no speech says so.
 - **Frames:** one frame every 2 seconds from the start of the clip, each with a one-sentence
-  description written by a vision model.
+  description written by a vision model. Frames are chosen by their timestamp in the source, and
+  extraction refuses unless each is within 0.05 seconds of its intended time. (ffmpeg's
+  frame-rate filter was found to give frames about a second late.)
 - Lines are in time order. Times are minutes:seconds from the start of that film's clip.
 - There are no scene numbers, no row numbers and no human-written descriptions.
 
@@ -57,7 +63,10 @@ time, not by shot: scene boundaries are often not hard cuts, and two films have 
   per frame; people by appearance, not identity; setting; readable on-screen text.
 - **Blind:** the describing calls contain frames and the instruction only. No recall, no
   annotation, no film title.
-- Frames are 512 pixels wide. Each frame file and each description is recorded by hash.
+- Frames are 512 pixels wide. Each frame file is recorded by hash, and the descriptions are
+  hashed as one file.
+- Frames are shown to the describing model under neutral names, a batch at a time. Nothing it
+  can see names or numbers a film.
 - A frame with no usable description after three attempts is listed as undescribed in the record
   and counted. The run refuses if more than 2% of a film's frames are undescribed.
 
@@ -70,6 +79,9 @@ For each judgement the model gives one of:
 - nothing.
 
 These are the three kinds of the parent protocol, with a time where that protocol has a scene.
+A time written any other way than minutes:seconds, or a time with no film, is a failure for
+that judgement with its reason. Reply items carry no alternatives and no row citations in this
+condition, because the record has no rows; that is a stated difference from the parent.
 
 ## From a time to a scene
 
@@ -86,11 +98,16 @@ that uses the annotation's scene boundaries. The model never sees those boundari
   - Estimated uncertainty is 0.5 to 1.5 seconds. The Shoe is the least certain (1.5 seconds);
     its offset rests on visual checks, because cut matching alone was ambiguous.
 - **Scene intervals.** A scene starts at its earliest row start and ends at the next scene's
-  start. A film's last scene ends at the end of the clip. Rows are not assumed to be in order.
-- **Strict scene.** The scene whose interval contains the time. A time before the first content
-  row or after the end of the clip is not a valid target.
-- **Near scenes.** Every valid scene whose interval lies within 2 seconds of the time.
-- **Title cards.** No clip contains a title card, so a time can never select one.
+  start. A film's first scene runs from 0, and its last scene ends at the end of the clip. Rows
+  are not assumed to be in order. A time on a boundary belongs to the scene that starts there.
+- **Strict scene.** The scene whose interval contains the time.
+- **Near scenes.** Every valid scene whose interval lies within 2 seconds of the time,
+  inclusive.
+- **A time past the end of the clip** is an answer, not a processing failure. It is never a
+  scene hit, it keeps its film for film identity, and it is counted on its own. A time up to 2
+  seconds past the end is still near the last scene.
+- **Title cards.** No clip contains a title card, so a time can never select one. The
+  Boyfriend's first scene holds its title row and a content row, and is a valid target from 0.
 
 Why 2 seconds: it covers the largest clock uncertainty plus the annotation's one-second
 resolution. Three seconds would take in whole neighbouring scenes.
@@ -102,7 +119,7 @@ The parent protocol's scoring applies. Two things are added, both for every cond
 - **Strict scene agreement.** As before: the selected scene is in the reference set.
 - **Near scene agreement.** The selected scene, or any near scene, is in the reference set.
   - For a time answer, near scenes are those within 2 seconds, as defined above.
-  - For a scene answer (the annotation-assisted condition), near scenes are the scenes
+  - For a scene answer (the annotation-assisted condition), near scenes are the valid scenes
     immediately before and after it in the same film.
   - These two definitions are not the same quantity. They are the nearest equivalents: each asks
     whether the answer is right to within the reference's boundary precision. Reports name which
