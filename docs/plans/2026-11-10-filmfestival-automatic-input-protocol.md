@@ -61,12 +61,20 @@ time, not by shot: scene boundaries are often not hard cuts, and two films have 
   model is part of the input, not an arm.
 - **Instruction:** the Sherlock instruction unchanged: one factual sentence of at most 30 words
   per frame; people by appearance, not identity; setting; readable on-screen text.
-- **Blind:** the describing calls contain frames and the instruction only. No recall, no
-  annotation, no film title.
+- **Blind to what we know, not to the picture.** A describing call contains frames and the
+  instruction only: no recall, no annotation, and no title, number or name added by us. Frames
+  are shown under neutral names, a batch at a time. Some frames show a film's title or credits
+  on screen, and the instruction asks for readable text, so a description can contain a title.
+  That harms nothing here, because the mapper is shown the titles.
+- **Confined and audited.** The describing model can read files. Each call is confined to its
+  batch's directory, and the files it actually read are recorded. A call that read anything
+  else, or used any other tool, is refused and not recorded. A description of a file the model
+  did not open is not accepted.
+- **What counts as a description.** At least three words and at most 400 characters, and not a
+  refusal or an error message (a fixed list of phrases). The 30-word limit in the instruction is
+  not enforced. Before the mapping freeze the descriptions are audited by length and repetition.
 - Frames are 512 pixels wide. Each frame file is recorded by hash, and the descriptions are
   hashed as one file.
-- Frames are shown to the describing model under neutral names, a batch at a time. Nothing it
-  can see names or numbers a film.
 - A frame with no usable description after three attempts is listed as undescribed in the record
   and counted. The run refuses if more than 2% of a film's frames are undescribed.
 
@@ -91,8 +99,9 @@ that uses the annotation's scene boundaries. The model never sees those boundari
 - **Clock.** Clip time and annotation time are related film by film by
   `clip = a × (annotation − C0) + b`, where `C0` is the start of the film's first content row.
   The constants were measured from content before any model call: quoted dialogue matched to the
-  transcript, and detected cuts matched to annotated row starts. They are in
-  [Freeze](#freeze).
+  transcript, and detected cuts matched to annotated row starts. An independent review checked
+  them by a different method and put the offset error at no more than half a second in every
+  film. They are in [Freeze](#freeze).
   - Nine films have `a = 1` and an offset under one second. Catch Me If You Can has
     `a = 0.996`.
   - Estimated uncertainty is 0.5 to 1.5 seconds. The Shoe is the least certain (1.5 seconds);
@@ -114,31 +123,45 @@ resolution. Three seconds would take in whole neighbouring scenes.
 
 ## Scoring
 
-The parent protocol's scoring applies. Two things are added, both for every condition.
+The parent protocol's scoring applies. Every condition's report now has the same three columns,
+each with its own chance level:
 
-- **Strict scene agreement.** As before: the selected scene is in the reference set.
-- **Near scene agreement.** The selected scene, or any near scene, is in the reference set.
-  - For a time answer, near scenes are those within 2 seconds, as defined above.
-  - For a scene answer (the annotation-assisted condition), near scenes are the valid scenes
-    immediately before and after it in the same film.
-  - These two definitions are not the same quantity. They are the nearest equivalents: each asks
-    whether the answer is right to within the reference's boundary precision. Reports name which
-    one applies.
+| Column | A hit when the reference set contains | Conditions |
+|---|---|---|
+| Strict | the selected scene | all |
+| Within one scene | the selected scene, or the valid scene next to it in the same film | all |
+| Within 2 seconds | a scene within 2 seconds of the time | time answers only |
 
-**Primary measure for this condition: near scene agreement of the referent, primary arm.**
-Between 22% and 40% of film time lies within 2 seconds of a scene boundary, so strict agreement
-would partly measure the clock. Strict agreement is always reported beside it.
+- For a time answer the selected scene is the strict scene. A time past the end of the clip has
+  no selected scene.
+- **Within one scene is the same quantity in every condition,** and is the companion measure
+  for comparing conditions. Chance for a uniform guess in the correct film is 15.7% for a scene
+  answer and 16.6% for a time answer.
+- **Within 2 seconds describes tolerance to the clock** and to where in a moment the model
+  places its time. It is not compared with the annotation-assisted condition: its chance level
+  is 8.4%, about half that of within one scene, so the two are not alike.
+- Chance for a strict hit is 6.1% for a scene answer and 6.9% for a time answer, given the
+  film; 0.6% and 0.7% end to end. Each report carries its own exact chance figures.
+
+**Primary measure: strict referent scene agreement, primary arm, per session, as the mean of
+per-participant rates with its interval; the pooled rate is reported beside it.** This is the
+parent protocol's primary measure, so the two conditions are read on the same number. The clock
+was checked by two independent methods to within half a second, so strict agreement is not
+dominated by clock error. *This choice is the author's recommendation and awaits the owner's
+confirmation; an earlier draft made within 2 seconds primary.*
 
 Comparisons fixed in advance:
 
 | Comparison | Reads |
 |---|---|
-| Automatic against annotation-assisted, same arm | near against near, and strict against strict |
-| Frames plus speech against no film record | how much is prior knowledge, per film |
+| Automatic against annotation-assisted, same model | strict, and within one scene |
+| Frames plus speech against no film record | strict, per film |
 | Haiku against Opus, within participant | as in the parent protocol |
 
-The baselines of `ff_baselines.py` are reported as before, labelled as not prespecified in the
-parent protocol but fixed here.
+A report records the model, the condition and the manifest it was run under, and the scorer
+refuses reply files that do not match the manifest.
+
+The baselines of `ff_baselines.py` are reported as before.
 
 ## Arms
 
@@ -147,8 +170,10 @@ parent protocol but fixed here.
 | Automatic | frames plus speech | `claude-opus-5-5` (primary), `claude-haiku-5-5` |
 | No film record | film numbers, titles and durations only | `claude-opus-5-5`, `claude-haiku-5-5` |
 
-- The no-record arm measures what the mappers already know. Two films are excerpts of
-  commercial features and eight are short films, so it is reported per film.
+- The no-record arm shows what the mappers can do without a film record. That is prior knowledge
+  of the films plus whatever the recall itself gives away: it sees the whole session and each
+  film's length, so it can place an utterance by its position in the retelling. Two films are
+  excerpts of commercial features and eight are short films, so it is reported per film.
 - A speech-only arm is not run: five films have no speech.
 
 ## Execution
@@ -182,5 +207,9 @@ No result is scored until every arm has finished.
   the editions shown in the scanner is not verified.
 - Frame descriptions are model output. A wrong description is inherited by the mapper. This
   experiment counts undescribed frames and does not grade descriptions.
+- About 5% of speech lines have stretched timings in the transcript (one checked line is listed
+  about ten seconds early). The parent condition did not attach speech to rows; here speech
+  times are something the model can anchor an answer on.
+- The prompt is about two and a half times longer than the parent's, and replies cite no rows.
 - The limits of the parent protocol apply: previously used participants, a reference whose
   reliability between coders is unmeasured, and authors' utterances as the unit.
