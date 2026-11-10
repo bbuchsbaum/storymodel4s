@@ -55,12 +55,14 @@ private[align] object ContentCostScoring:
         Estimate.observed(1.0 - hits.toDouble / u.sensoryTerms.size.toDouble)
     // Preferred abstraction level: summaries want a scene, thematic/evaluative remarks want the
     // global level, predicate-bearing assertions want a leaf, predicate-less ones a scene.
+    // A unit whose function was not assessed has no preferred level, so no level is penalised.
     val preferred = u.function match
-      case DiscourseFunction.Summary                                    => 1
-      case DiscourseFunction.Association | DiscourseFunction.Evaluation => grain.maxLevel
-      case _ if u.predicate.isEmpty && u.participants.isEmpty           => 1
-      case _                                                            => 0
-    val dGran = math.min(1.0, 0.5 * math.abs(t.level - preferred))
+      case DiscourseFunction.NotAssessed                                => None
+      case DiscourseFunction.Summary                                    => Some(1)
+      case DiscourseFunction.Association | DiscourseFunction.Evaluation => Some(grain.maxLevel)
+      case _ if u.predicate.isEmpty && u.participants.isEmpty           => Some(1)
+      case _                                                            => Some(0)
+    val dGran = preferred.fold(0.0)(p => math.min(1.0, 0.5 * math.abs(t.level - p)))
     // The distortion term: `distortionPenalty` per contradicted facet, weighted by
     // `contradiction`. It separates a distorted anchor from a faithful one at equal content
     // match and must stay below the external floor so a well-matched distorted anchor is

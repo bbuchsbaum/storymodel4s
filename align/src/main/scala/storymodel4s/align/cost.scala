@@ -1108,6 +1108,15 @@ object ExternalStates:
     case DiscourseFunction.Summary           => Some(ExternalState.Intrusion)
     case DiscourseFunction.NotAssessed       => None
 
+  /** Whether `state` costs only the external floor for a unit of function `f`. A unit's natural
+    * state does, and so does `Unranked`. A unit whose function was not assessed has no natural
+    * state, so every external state is at the floor: with nothing known about the unit, no
+    * external state is preferred, and none is penalised either. (Penalising all of them would
+    * tilt such a unit toward a source anchor.)
+    */
+  def atFloor(f: DiscourseFunction, state: ExternalState): Boolean =
+    state == ExternalState.Unranked || natural(f).forall(_ == state)
+
 /** The default local cost model. Terms are composed lexicographically after the mode gate: only
   * admissible pairs reach here, and only *present* terms enter the total. The optional
   * evidence-backed terms `d_chart` and `d_wl` are `Missing` without charts (or without a structural
@@ -1195,8 +1204,7 @@ final case class DefaultLocalCostModel(
 ) extends LocalCostModel:
 
   def externalCost(unit: RecallUnit, state: ExternalState): Double =
-    if state == ExternalState.Unranked then externalFloor
-    else if ExternalStates.natural(unit.function).contains(state) then externalFloor
+    if ExternalStates.atFloor(unit.function, state) then externalFloor
     else externalFloor + externalMismatch
 
   def cost(
