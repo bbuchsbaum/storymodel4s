@@ -141,8 +141,8 @@ object AgentMappingRecord:
   ): Either[MappingRefusal, (StageLedger, UnitStageRefs)] =
     ledgerFor(interpretation.policy, producer)
 
-  /** The stage ledger of a recorded categorical producer: the decision stage carries the
-    * producer's receipt, and every other stage is marked as not run.
+  /** The stage ledger of a recorded categorical producer: the decision stage carries the producer's
+    * receipt, and every other stage is marked as not run.
     */
   private[agentmapping] def ledgerFor(
       policy: DecisionPolicyId,

@@ -1094,8 +1094,8 @@ trait LocalCostModel:
   def externalCost(unit: RecallUnit, state: ExternalState): Double
 
 object ExternalStates:
-  /** The external destination presupposed by a discourse function. A unit whose function was
-    * not assessed presupposes none, so no external state is preferred for it.
+  /** The external destination presupposed by a discourse function. A unit whose function was not
+    * assessed presupposes none, so no external state is preferred for it.
     */
   def natural(f: DiscourseFunction): Option[ExternalState] = f match
     case DiscourseFunction.Association       => Some(ExternalState.Association)

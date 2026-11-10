@@ -282,10 +282,10 @@ object StudyExport:
 
 /** CLI: `agentStudyRecords SOURCE_CSV PARTS_JSON EXPORT_DIR RECORDINGS_DIR PROVIDER OUTPUT_FILE`.
   *
-  * Replays every participant-session of an exported study, with no model client, and builds its
-  * two checked categorical records (narrative, referent) over the timed source and the supplied
-  * recall units. It writes a receipt of counts by judgement and each record's digest; it writes
-  * no bundle yet. A record that does not construct refuses the run. The receipt holds no text.
+  * Replays every participant-session of an exported study, with no model client, and builds its two
+  * checked categorical records (narrative, referent) over the timed source and the supplied recall
+  * units. It writes a receipt of counts by judgement and each record's digest; it writes no bundle
+  * yet. A record that does not construct refuses the run. The receipt holds no text.
   */
 @main def agentStudyRecords(
     sourceCsv: String,
@@ -317,7 +317,9 @@ object StudyExport:
     index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
   val fields = Vector("narrative", "referent")
   def tally(xs: Vector[String]): Json =
-    Json.fromFields(xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size)))
+    Json.fromFields(
+      xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size))
+    )
   val sessions = index.sessions.map { entry =>
     val s = StudyExport.session(dir, entry).fold(refuse, identity)
     val (replies, _) = StudyReplay

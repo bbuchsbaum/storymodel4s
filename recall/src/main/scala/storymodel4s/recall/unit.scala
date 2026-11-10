@@ -6,9 +6,9 @@ import storymodel4s.proposition.PropositionEvidence
 /** What a recall unit is doing in the discourse. Kept separate from source anchoring: an
   * association is not an intrusion, and an evaluation is not an omission.
   *
-  * `NotAssessed` is for a unit nobody classified, such as a unit whose boundaries a study
-  * supplied. It is not a kind of discourse: it says the question was not asked, so such a unit is
-  * never read as an episodic assertion by default (ADR 0022, amendment of 2026-11-10).
+  * `NotAssessed` is for a unit nobody classified, such as a unit whose boundaries a study supplied.
+  * It is not a kind of discourse: it says the question was not asked, so such a unit is never read
+  * as an episodic assertion by default (ADR 0022, amendment of 2026-11-10).
   */
 enum DiscourseFunction:
   case EpisodicAssertion, Summary, Inference, Association, Evaluation, SourceMonitoring,

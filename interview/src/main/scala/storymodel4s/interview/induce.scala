@@ -182,7 +182,7 @@ object TargetInduction:
       case DiscourseFunction.Uninterpretable   => UnitClass.Uninterpretable
       // Unassessed units do not arise here (this pipeline segments and classifies its own
       // transcripts). If one did, it shares the unresolved address; it is never episodic.
-      case DiscourseFunction.NotAssessed       => UnitClass.Uninterpretable
+      case DiscourseFunction.NotAssessed => UnitClass.Uninterpretable
 
   private def isEpisodic(c: UnitClass): Boolean = c match
     case UnitClass.Episodic | UnitClass.Summary | UnitClass.OtherEpisode => true

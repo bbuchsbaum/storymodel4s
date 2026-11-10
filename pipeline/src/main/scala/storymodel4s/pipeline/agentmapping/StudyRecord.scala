@@ -10,8 +10,8 @@ import storymodel4s.recall.RecallUnitId
   * Why: the replay says what a reply stated; whether a stated scene exists and may be chosen is a
   * fact about the source. This is where the two meet. Each judgement becomes one outcome for its
   * unit: a choice of a scene, a choice of a film with no particular scene, an explicit
-  * non-assignment, or a failure with its reason. The targets come from the source view itself, so
-  * a record cannot declare a scene the source does not offer.
+  * non-assignment, or a failure with its reason. The targets come from the source view itself, so a
+  * record cannot declare a scene the source does not offer.
   */
 object StudyRecord:
 
@@ -50,9 +50,9 @@ object StudyRecord:
     stated match
       case StudyReplay.Stated.Scene(n, _) =>
         Option.when(n.isValidInt)(n.toInt).flatMap(k => view.groupRefs.get(k).map(k -> _)) match
-          case None                                  => Judgement.UnknownScene(n.toString)
-          case Some((k, ref)) if targetScenes(ref)   => Judgement.Scene(k, ref)
-          case Some((k, _))                          => Judgement.NotATarget(k)
+          case None                                => Judgement.UnknownScene(n.toString)
+          case Some((k, ref)) if targetScenes(ref) => Judgement.Scene(k, ref)
+          case Some((k, _))                        => Judgement.NotATarget(k)
       case StudyReplay.Stated.Collection(n) =>
         Option
           .when(n.isValidInt)(n.toInt)
@@ -104,7 +104,9 @@ object StudyRecord:
       UnitOutcome.categorical(
         unit,
         DecisionRequest.ExternalDecode(chosen, policy),
-        Vector(MappingLink.ungated(chosen, stages, CandidateSetId.categorical(stages.candidates, unit))),
+        Vector(
+          MappingLink.ungated(chosen, stages, CandidateSetId.categorical(stages.candidates, unit))
+        ),
         stages
       )
     def invalid(detail: String) =
@@ -119,12 +121,15 @@ object StudyRecord:
           Vector.empty,
           stages
         )
-      case Judgement.NotATarget(scene)    => invalid(s"$field names scene $scene, which is not a target")
-      case Judgement.UnknownScene(s)      => invalid(s"$field names scene $s, which the source does not have")
-      case Judgement.UnknownCollection(s) => invalid(s"$field names film $s, which is not a film of the source")
-      case Judgement.Invalid(reason)      => invalid(s"$field: $reason")
-      case Judgement.UnparsableChunk      => invalid("no usable reply for the unit's chunk")
-      case Judgement.Omitted              =>
+      case Judgement.NotATarget(scene) =>
+        invalid(s"$field names scene $scene, which is not a target")
+      case Judgement.UnknownScene(s) =>
+        invalid(s"$field names scene $s, which the source does not have")
+      case Judgement.UnknownCollection(s) =>
+        invalid(s"$field names film $s, which is not a film of the source")
+      case Judgement.Invalid(reason) => invalid(s"$field: $reason")
+      case Judgement.UnparsableChunk => invalid("no usable reply for the unit's chunk")
+      case Judgement.Omitted         =>
         Right(
           UnitOutcome.failed(
             unit,
@@ -151,7 +156,9 @@ object StudyRecord:
         policies <- MappingPolicies.of(
           InferencePolicy.Unspecified("no inference executed; recorded model choice"),
           ContextPolicy.Unspecified("the model read the film record and the session's recall"),
-          CandidatePolicy.Unknown("every target was offered in the prompt; no candidate set computed"),
+          CandidatePolicy.Unknown(
+            "every target was offered in the prompt; no candidate set computed"
+          ),
           ReferencePrior.NotApplicable("categorical choice; no scores"),
           DecisionPolicy.Declared(policy),
           declared
@@ -163,11 +170,14 @@ object StudyRecord:
         )
         built <- AgentMappingRecord.ledgerFor(policy, producer)
         (ledger, stages) = built
-        rows <- inventory.units.map(_.id).zip(judgements).foldLeft[Either[MappingRefusal, Vector[UnitOutcome]]](
-          Right(Vector.empty)
-        ) { case (acc, (unit, j)) =>
-          acc.flatMap(done => outcome(unit, field, policy, j, stages).map(done :+ _))
-        }
+        rows <- inventory.units
+          .map(_.id)
+          .zip(judgements)
+          .foldLeft[Either[MappingRefusal, Vector[UnitOutcome]]](
+            Right(Vector.empty)
+          ) { case (acc, (unit, j)) =>
+            acc.flatMap(done => outcome(unit, field, policy, j, stages).map(done :+ _))
+          }
         result <- MappingResult.checked(
           inventory,
           view.representation,

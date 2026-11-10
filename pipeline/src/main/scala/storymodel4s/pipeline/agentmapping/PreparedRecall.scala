@@ -1,6 +1,13 @@
 package storymodel4s.pipeline.agentmapping
 
-import storymodel4s.core.{Checksum, SpanSet, StorySource, SurfaceAnalyzer, SurfaceSequence, TextSpan}
+import storymodel4s.core.{
+  Checksum,
+  SpanSet,
+  StorySource,
+  SurfaceAnalyzer,
+  SurfaceSequence,
+  TextSpan
+}
 import storymodel4s.recall.{
   DiscourseFunction,
   ExpressedUncertainty,
@@ -47,7 +54,8 @@ object PreparedRecall:
     * classified them, and nothing here guesses. `artifact` identifies the supplied units file.
     *
     * Refuses an empty session, an empty unit, a unit that spans lines, and text that is not in the
-    * transcript's canonical form (a unit's recorded text must be exactly what the transcript holds).
+    * transcript's canonical form (a unit's recorded text must be exactly what the transcript
+    * holds).
     */
   def supplied(
       title: String,
@@ -99,4 +107,9 @@ object PreparedRecall:
           (),
           "the checked graph does not hold the supplied texts"
         )
-      yield new PreparedRecall(graph, inventory, texts, Segmentation("supplied", artifact, SuppliedRecipe))
+      yield new PreparedRecall(
+        graph,
+        inventory,
+        texts,
+        Segmentation("supplied", artifact, SuppliedRecipe)
+      )

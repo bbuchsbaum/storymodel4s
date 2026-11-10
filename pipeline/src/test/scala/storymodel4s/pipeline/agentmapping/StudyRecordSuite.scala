@@ -10,8 +10,8 @@ import storymodel4s.core.Checksum
 import storymodel4s.pipeline.TimedAnnotationInput
 import storymodel4s.recall.DiscourseFunction
 
-/** Supplied recall units and checked records on an invented two-film source: a film-level choice,
-  * a scene choice, a non-assignment, and each way a judgement can fail.
+/** Supplied recall units and checked records on an invented two-film source: a film-level choice, a
+  * scene choice, a non-assignment, and each way a judgement can fail.
   */
 class StudyRecordSuite extends FunSuite:
   import StudyRecord.Judgement
@@ -55,15 +55,23 @@ class StudyRecordSuite extends FunSuite:
     judged(Stated.Invalid("missing-field"))
   )
   private lazy val record =
-    right(StudyRecord.record("referent", policy, recall, view, producer, judgements).left.map(_.message))
+    right(
+      StudyRecord.record("referent", policy, recall, view, producer, judgements).left.map(_.message)
+    )
 
   test("supplied units keep their text, order and line, and are marked as not assessed"):
     assertEquals(recall.texts, texts)
     assertEquals(recall.graph.ordered.map(_.text), texts)
     assertEquals(recall.graph.ordered.map(_.ordinal), texts.indices.toVector)
     assert(recall.graph.ordered.forall(_.function == DiscourseFunction.NotAssessed))
-    assertEquals(recall.unitIds.map(_.value).map(_.split(":u").last), texts.indices.map(_.toString).toVector)
-    assertEquals(recall.segmentation, PreparedRecall.Segmentation("supplied", artifact, "supplied-units/v1"))
+    assertEquals(
+      recall.unitIds.map(_.value).map(_.split(":u").last),
+      texts.indices.map(_.toString).toVector
+    )
+    assertEquals(
+      recall.segmentation,
+      PreparedRecall.Segmentation("supplied", artifact, "supplied-units/v1")
+    )
 
   test("the same texts give the same recall, and a changed text or artifact a different one"):
     assertEquals(right(PreparedRecall.supplied("p1_s1", texts, artifact)), recall)
@@ -74,16 +82,28 @@ class StudyRecordSuite extends FunSuite:
     assertNotEquals(moved, recall)
 
   test("an empty session, an empty unit and a unit spanning lines are refused"):
-    assertEquals(PreparedRecall.supplied("t", Vector.empty, artifact).left.toOption, Some("a session needs at least one unit"))
-    assertEquals(PreparedRecall.supplied("t", Vector("a", ""), artifact).left.toOption, Some("a unit is empty or spans lines"))
-    assertEquals(PreparedRecall.supplied("t", Vector("a\nb"), artifact).left.toOption, Some("a unit is empty or spans lines"))
+    assertEquals(
+      PreparedRecall.supplied("t", Vector.empty, artifact).left.toOption,
+      Some("a session needs at least one unit")
+    )
+    assertEquals(
+      PreparedRecall.supplied("t", Vector("a", ""), artifact).left.toOption,
+      Some("a unit is empty or spans lines")
+    )
+    assertEquals(
+      PreparedRecall.supplied("t", Vector("a\nb"), artifact).left.toOption,
+      Some("a unit is empty or spans lines")
+    )
 
   test("a stated scene is a target, not a target, or unknown; a film is a target or unknown"):
     assertEquals(judged(Stated.Scene(1, Json.Null)), Judgement.Scene(1, view.groupRefs(1)))
     assertEquals(judged(Stated.Scene(2, Json.Null)), Judgement.NotATarget(2))
     assertEquals(judged(Stated.Scene(3, Json.Null)), Judgement.NotATarget(3))
     assertEquals(judged(Stated.Scene(9, Json.Null)), Judgement.UnknownScene("9"))
-    assertEquals(judged(Stated.Scene(BigInt("99999999999999999999"), Json.Null)), Judgement.UnknownScene("99999999999999999999"))
+    assertEquals(
+      judged(Stated.Scene(BigInt("99999999999999999999"), Json.Null)),
+      Judgement.UnknownScene("99999999999999999999")
+    )
     assertEquals(judged(Stated.Collection(3)), Judgement.Collection(3, view.collectionRefs(3)))
     // The cartoon is a collection of the source but not a film anyone may choose.
     assertEquals(judged(Stated.Collection(2)), Judgement.UnknownCollection("2"))
@@ -105,18 +125,25 @@ class StudyRecordSuite extends FunSuite:
     )
     assertEquals(
       out(1).processing,
-      ProcessingStatus.Failed(ProcessingFailure.InvalidOutput("referent names scene 2, which is not a target"))
+      ProcessingStatus.Failed(
+        ProcessingFailure.InvalidOutput("referent names scene 2, which is not a target")
+      )
     )
     assertEquals(
       out(4).processing,
-      ProcessingStatus.Failed(ProcessingFailure.ProviderFailure("unit omitted from the accepted reply"))
+      ProcessingStatus.Failed(
+        ProcessingFailure.ProviderFailure("unit omitted from the accepted reply")
+      )
     )
     assertEquals(
       out(5).processing,
       ProcessingStatus.Failed(ProcessingFailure.InvalidOutput("referent: missing-field"))
     )
     assert(out.flatMap(_.decision).forall(_.numerical.isEmpty))
-    assertEquals(judgements.map(_.kind), Vector("scene", "invalid-scene", "film", "none", "omitted", "invalid"))
+    assertEquals(
+      judgements.map(_.kind),
+      Vector("scene", "invalid-scene", "film", "none", "omitted", "invalid")
+    )
 
   test("the universe is the source's target scenes and films, and nothing else"):
     val universe = right(StudyRecord.universe(view).left.map(_.message))
@@ -141,7 +168,10 @@ class StudyRecordSuite extends FunSuite:
 
   test("a record needs one judgement per unit"):
     assertEquals(
-      StudyRecord.record("referent", policy, recall, view, producer, judgements.drop(1)).left.toOption,
+      StudyRecord
+        .record("referent", policy, recall, view, producer, judgements.drop(1))
+        .left
+        .toOption,
       Some(MappingRefusal.OutcomeInventoryMismatch)
     )
 
@@ -149,7 +179,12 @@ class StudyRecordSuite extends FunSuite:
     val narrative = StudyRecord.policy("annotation", "strict-chunked/v1", "narrative")
     assertNotEquals(narrative, policy)
     assertNotEquals(StudyRecord.policy("auto", "strict-chunked/v1", "referent"), policy)
-    val other = right(StudyRecord.record("narrative", narrative, recall, view, producer, judgements).left.map(_.message))
+    val other = right(
+      StudyRecord
+        .record("narrative", narrative, recall, view, producer, judgements)
+        .left
+        .map(_.message)
+    )
     assertNotEquals(other.digest, record.digest)
 
   test("a record with a film-level choice saves and reloads as a categorical record"):
