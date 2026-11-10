@@ -148,20 +148,23 @@ def units(gold_path, participant, session):
     ]
 
 
-def prompt(packet, session_units, lo, hi):
-    """The user prompt for target units `lo..hi` (unit numbers, inclusive)."""
+def prompt(packet, session_units, lo, hi, heading="FILM ANNOTATION"):
+    """The user prompt for target units `lo..hi` (unit numbers, inclusive).
+
+    `heading` names the film packet; it is the only part that differs between input conditions.
+    """
     recall = "\n".join(f"[{u}] {text}" for u, _, text in session_units)
     return (
-        f"FILM ANNOTATION\n{packet}\n\nPARTICIPANT RECALL (all units)\n{recall}\n\n"
+        f"{heading}\n{packet}\n\nPARTICIPANT RECALL (all units)\n{recall}\n\n"
         f"TARGET UNITS: map every unit numbered {lo} through {hi} inclusive."
     )
 
 
-def chunks(packet, session_units, size):
+def chunks(packet, session_units, size, heading="FILM ANNOTATION"):
     """Every chunk's (lo, hi, prompt), `size` units at a time."""
     out = []
     for i in range(0, len(session_units), size):
         group = session_units[i : i + size]
         lo, hi = group[0][0], group[-1][0]
-        out.append((lo, hi, prompt(packet, session_units, lo, hi)))
+        out.append((lo, hi, prompt(packet, session_units, lo, hi, heading)))
     return out
