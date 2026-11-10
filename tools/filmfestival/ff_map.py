@@ -211,7 +211,7 @@ def prepare(data_root, name):
         "condition": name,
         "framesSha256": file_sha(frames_path),
         "clipSeconds": {str(film): seconds[film] for film in sorted(seconds)},
-        "clock": {str(film): ff_time.CLOCK[film] for film in sorted(ff_time.CLOCK)},
+        "clock": {str(f): dict(ff_time.CLOCK[f]) for f in sorted(ff_time.CLOCK)},
         "clockSha256": ff_packet.sha(json.dumps(ff_time.CLOCK, sort_keys=True)),
         "sceneIntervalsSha256": ff_packet.sha(intervals),
         "toleranceSeconds": ff_time.TOLERANCE,
@@ -616,8 +616,8 @@ def main(argv):
     with ThreadPoolExecutor(args.jobs) as pool:
         results = list(pool.map(one, todo))
     for result in results:
-        name = f"{result['participant']}_{result['session']}.json"
-        write_text(os.path.join(replies_dir, name), json.dumps(result, indent=1))
+        file_name = f"{result['participant']}_{result['session']}.json"
+        write_text(os.path.join(replies_dir, file_name), json.dumps(result, indent=1))
     units = sum(len(r["units"]) for r in results)
     print(f"model={model} condition={name} sessions={len(results)} units={units}")
     return 0

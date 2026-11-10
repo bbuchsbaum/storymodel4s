@@ -59,10 +59,12 @@ for _film in range(4, 11):
     DURATIONS[_film] = 20.0
 
 
-def annotation(rows=ROWS):
+def annotation(rows=ROWS, scene_offset=0, segment_offset=500):
+    """The annotation table. The offsets make scene and row ids easy to tell from times."""
     lines = ["segment\trun\tfilm\tscene_number\tstart_s\tdescription"]
     for segment, (run, film, scene, start, text) in enumerate(rows, start=1):
-        lines.append(f"{segment + 500}\t{run}\t{film}\t{scene}\t{start}\t{text}")
+        ids = f"{segment + segment_offset}\t{run}\t{film}\t{scene + scene_offset}"
+        lines.append(f"{ids}\t{start}\t{text}")
     return "\n".join(lines) + "\n"
 
 

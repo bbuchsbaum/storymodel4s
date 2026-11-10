@@ -94,6 +94,32 @@ class Compare(unittest.TestCase):
         with self.assertRaises(ff_score.ScoreError):
             ff_compare.compare(score("referent", 1), score("referent", 2), {}, {})
 
+    def test_near_agreement_is_compared_when_both_files_have_it(self):
+        def score(near_rule, near):
+            block = {"by_participant": rates(a=0.5, b=0.5)}
+            session = {"scene": block, "film": {"film_reference": block}}
+            out = {"field": "referent", "population": 1, "sessions": {"s1": session}}
+            if near_rule:
+                out["near_rule"] = near_rule
+                session["scene_near"] = {"by_participant": near}
+            return out
+
+        annotation = score("adjacent-scene", rates(a=0.9, b=0.8))
+        automatic = score("time-2s", rates(a=0.7, b=0.8))
+        out = ff_compare.compare(annotation, automatic, {}, {})
+        self.assertEqual(
+            out["near_rules"], {"primary": "adjacent-scene", "secondary": "time-2s"}
+        )
+        near = out["sessions"]["s1"]["scene_near"]
+        self.assertAlmostEqual(near["by_participant"]["a"], -0.2)
+        self.assertAlmostEqual(near["mean_difference"], -0.1)
+        self.assertEqual(out["sessions"]["s1"]["scene"]["mean_difference"], 0.0)
+        old = ff_compare.compare(score(None, None), score(None, None), {}, {})
+        self.assertIsNone(old["near_rules"])
+        self.assertNotIn("scene_near", old["sessions"]["s1"])
+        with self.assertRaises(ff_score.ScoreError):
+            ff_compare.compare(annotation, score(None, None), {}, {})
+
 
 if __name__ == "__main__":
     unittest.main()
