@@ -3,8 +3,8 @@ package storymodel4s.pipeline.agentmapping
 import io.circe.Json
 import munit.FunSuite
 
-/** The rule that turns a time in a film into a scene: exact at every boundary, and refused when
-  * the clock does not fit the source.
+/** The rule that turns a time in a film into a scene: exact at every boundary, and refused when the
+  * clock does not fit the source.
   */
 class SceneIntervalsSuite extends FunSuite:
   import SceneIntervals.{Exact, Interval, Located}
@@ -54,7 +54,19 @@ class SceneIntervalsSuite extends FunSuite:
     assertEquals(SceneIntervals.parseTime("1:05").map(_._1), Some(q("65")))
     assertEquals(SceneIntervals.parseTime("12:05.25"), Some((q("725.25"), 725.25)))
     assertEquals(SceneIntervals.parseTime("0:00.001").map(_._2), Some(0.001))
-    Vector("65", "1:5", "1:60", "1:05.1234", " 1:05", "1:05 ", "100:05", "1:05:00", "-1:05", "١:05", "")
+    Vector(
+      "65",
+      "1:5",
+      "1:60",
+      "1:05.1234",
+      " 1:05",
+      "1:05 ",
+      "100:05",
+      "1:05:00",
+      "-1:05",
+      "١:05",
+      ""
+    )
       .foreach(text => assertEquals(SceneIntervals.parseTime(text), None, text))
 
   test("exact decimals: no rounding, and equal values are equal"):
@@ -62,7 +74,9 @@ class SceneIntervalsSuite extends FunSuite:
     assertEquals(q("0.50"), q("0.5"))
     assertEquals(q("-0.7") + q("0.7"), Exact.zero)
     assert(q("0.1") + q("0.2") == q("0.3"))
-    Vector("1.", ".5", "1e3", "0x10", "1,5", "").foreach(t => assertEquals(Exact.decimal(t), None, t))
+    Vector("1.", ".5", "1e3", "0x10", "1,5", "").foreach(t =>
+      assertEquals(Exact.decimal(t), None, t)
+    )
     assertEquals(Exact.ratio(BigInt(0), BigInt(1)), None)
 
   test("a clock whose origin is not the film's first target row is refused"):

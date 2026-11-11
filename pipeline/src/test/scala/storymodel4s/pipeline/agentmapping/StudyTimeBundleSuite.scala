@@ -26,11 +26,17 @@ class StudyTimeBundleSuite extends FunSuite:
   private def item(body: String) = UnitReply.Answered(json(body))
   private val replies = Vector(
     // A time inside a scene; and a time on a boundary, which belongs to the later scene.
-    item("""{"referent_film":1,"referent_time":"0:10","narrative_film":1,"narrative_time":"0:20.5","conf":0.9}"""),
+    item(
+      """{"referent_film":1,"referent_time":"0:10","narrative_film":1,"narrative_time":"0:20.5","conf":0.9}"""
+    ),
     // After the end of the clip; and exactly at its end, which is inside the last scene.
-    item("""{"referent_film":3,"referent_time":"0:25","narrative_film":3,"narrative_time":"0:20"}"""),
+    item(
+      """{"referent_film":3,"referent_time":"0:25","narrative_film":3,"narrative_time":"0:20"}"""
+    ),
     // No time: no assignment, or the film alone.
-    item("""{"referent_film":null,"referent_time":null,"narrative_film":3,"narrative_time":null}"""),
+    item(
+      """{"referent_film":null,"referent_time":null,"narrative_film":3,"narrative_time":null}"""
+    ),
     // A time in the cartoon, which has no clip clock; and a time that is not m:ss.
     item("""{"referent_film":2,"referent_time":"0:05","narrative_film":1,"narrative_time":"5"}"""),
     UnitReply.Omitted,
@@ -93,7 +99,10 @@ class StudyTimeBundleSuite extends FunSuite:
     def raw(film: String, time: String) = Vector("film_stated" -> json(film), "time" -> json(time))
     assertEquals(read("1", "\"10\""), Stated.Invalid("invalid-time", raw("1", "\"10\"")))
     assertEquals(read("1", "10"), Stated.Invalid("invalid-time", raw("1", "10")))
-    assertEquals(read("null", "\"0:10\""), Stated.Invalid("time-without-film", raw("null", "\"0:10\"")))
+    assertEquals(
+      read("null", "\"0:10\""),
+      Stated.Invalid("time-without-film", raw("null", "\"0:10\""))
+    )
     assertEquals(read("1.0", "\"0:10\""), Stated.Invalid("invalid-film", raw("1.0", "\"0:10\"")))
     assertEquals(read("true", "\"0:10\""), Stated.Invalid("invalid-film", raw("true", "\"0:10\"")))
     // A badly formed time is reported before a missing film.
@@ -137,7 +146,10 @@ class StudyTimeBundleSuite extends FunSuite:
       kinds("referent"),
       Vector("scene", "time-outside", "none", "invalid", "omitted", "invalid")
     )
-    assertEquals(kinds("narrative"), Vector("scene", "scene", "film", "invalid", "omitted", "invalid"))
+    assertEquals(
+      kinds("narrative"),
+      Vector("scene", "scene", "film", "invalid", "omitted", "invalid")
+    )
 
   test("a time outside the clip is recorded as a choice of the film, and the row says so"):
     val row = bundle.hcursor.get[Vector[Json]]("units").toOption.get(1).hcursor
@@ -175,9 +187,21 @@ class StudyTimeBundleSuite extends FunSuite:
     StudyBundle.Fields.foreach(f => assertEquals(loaded.records(f).digest, records(f).digest))
 
   test("a scene, near list or seconds that its time does not give is refused"):
-    val refusal = Some("a referent judgement is not what its stated answer gives against this source")
+    val refusal =
+      Some("a referent judgement is not what its stated answer gives against this source")
     def restate(key: String, value: String) =
-      unit(0)(u => field("referent", "stated", u.hcursor.downField("referent").downField("stated").focus.get.mapObject(_.add(key, json(value))))(u))
+      unit(0)(u =>
+        field(
+          "referent",
+          "stated",
+          u.hcursor
+            .downField("referent")
+            .downField("stated")
+            .focus
+            .get
+            .mapObject(_.add(key, json(value)))
+        )(u)
+      )
     assertEquals(edited(restate("scene", "3")).left.toOption, refusal)
     assertEquals(edited(restate("near", "[2,3]")).left.toOption, refusal)
     assertEquals(edited(restate("seconds", "11.0")).left.toOption, refusal)
@@ -189,7 +213,8 @@ class StudyTimeBundleSuite extends FunSuite:
       """{"status":"answered","kind":"scene","scene":3,"near":[3],"film_stated":1,"time":"0:30","seconds":30.0}"""
     )
     val judged = json("""{"kind":"scene","scene":3,"collection":1}""")
-    val both = unit(0)(field("referent", "stated", moved).andThen(field("referent", "judgement", judged)))
+    val both =
+      unit(0)(field("referent", "stated", moved).andThen(field("referent", "judgement", judged)))
     assertEquals(edited(both).left.toOption, Some("a unit row disagrees with the referent record"))
 
   test("a scene without a time is refused in a condition that answers with a time"):

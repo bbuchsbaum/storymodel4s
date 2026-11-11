@@ -20,7 +20,8 @@
     "narrative" : "the scene the retelling is narrating at this unit",
     "referent" : "the scene containing the specifically mentioned content",
     "stated" : "the answer as the reply gave it, in the form a scorer reads",
-    "judgement" : "the answer decided against the source: scene, film (a film with no particular scene), none, invalid-scene (a real scene that is not a target), unknown-scene, unknown-film, invalid, omitted, unparsable-chunk",
+    "judgement" : "the answer decided against the source: scene, film (a film with no particular scene), time-outside (a time outside the film's clip: the film, no scene), none, invalid-scene (a real scene that is not a target), unknown-scene, unknown-film, invalid, omitted, unparsable-chunk",
+    "time" : "a condition that answers with a time keeps the raw film and time beside the scene that contains it; source.clock holds the scene intervals in exact fractions",
     "extras" : "self-reported fields kept verbatim; not scores, not calibrated"
   },
   "interpretations" : {

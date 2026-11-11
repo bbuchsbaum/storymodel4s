@@ -9,14 +9,15 @@ import storymodel4s.pipeline.TimedAnnotationInput
 /** An invented two-film source with a clip clock, for conditions that answer with a time.
   *
   * One tick is a tenth of a second. Film 1 opens with a title card (scene 1, before the clip) and
-  * has scenes 2 and 3; collection 2 is a cartoon; film 3 has scenes 5 and 6 and a clip that runs
-  * at half speed. On the clip clocks: scene 2 is [0, 20.5), scene 3 is [20.5, 45]; scene 5 is
-  * [0, 5), scene 6 is [5, 20]. The tolerance is 2 seconds.
+  * has scenes 2 and 3; collection 2 is a cartoon; film 3 has scenes 5 and 6 and a clip that runs at
+  * half speed. On the clip clocks: scene 2 is [0, 20.5), scene 3 is [20.5, 45]; scene 5 is [0, 5),
+  * scene 6 is [5, 20]. The tolerance is 2 seconds.
   */
 object TimeStudyFixture:
   import SceneIntervals.Exact
 
-  val parts: String = """[{"part":"a","start":"0","end":"1000","numerator":"1","denominator":"10"}]"""
+  val parts: String =
+    """[{"part":"a","start":"0","end":"1000","numerator":"1","denominator":"10"}]"""
   def rows(thirdSceneStart: Int = 300, titleTarget: String = "no"): Vector[String] = Vector(
     s"1,A title card.,a,0,100,1,scene 1,,,1,Harbour film,$titleTarget",
     "2,Anna arrived.,a,100,300,2,scene 2,,Anna,1,Harbour film,",
@@ -28,7 +29,8 @@ object TimeStudyFixture:
   def source(lines: Vector[String] = rows()): TimedSourceView =
     TimedAnnotationInput
       .prepare(
-        (TimedAnnotationInput.HeaderV2.mkString(",") +: lines).mkString("", "\n", "\n").getBytes(UTF_8),
+        (TimedAnnotationInput.HeaderV2
+          .mkString(",") +: lines).mkString("", "\n", "\n").getBytes(UTF_8),
         parts.getBytes(UTF_8)
       )
       .fold(e => throw new AssertionError(e.toString), identity)
@@ -39,7 +41,8 @@ object TimeStudyFixture:
       clip1: String = "45",
       films: Vector[Int] = Vector(1, 3)
   ): Json =
-    val one = s"""{"collection":1,"origin":"$origin1","rate":"1","offset":"0.5","clipSeconds":"$clip1"}"""
+    val one =
+      s"""{"collection":1,"origin":"$origin1","rate":"1","offset":"0.5","clipSeconds":"$clip1"}"""
     val two = """{"collection":2,"origin":"50","rate":"1","offset":"0","clipSeconds":"10"}"""
     val three = """{"collection":3,"origin":"60","rate":"0.5","offset":"0","clipSeconds":"20"}"""
     val chosen = films.map(Map(1 -> one, 2 -> two, 3 -> three)).mkString(",")
@@ -54,8 +57,8 @@ object TimeStudyFixture:
       clock: Json = clockJson(),
       scales: Map[String, Exact] = scales
   ): Either[String, SceneIntervals] =
-    SceneIntervals.parseClock(clock).flatMap((tolerance, clocks) =>
-      SceneIntervals.build(view, scales, tolerance, clocks)
-    )
+    SceneIntervals
+      .parseClock(clock)
+      .flatMap((tolerance, clocks) => SceneIntervals.build(view, scales, tolerance, clocks))
   lazy val intervals: SceneIntervals =
     intervalsOf().fold(e => throw new AssertionError(e), identity)

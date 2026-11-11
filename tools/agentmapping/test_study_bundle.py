@@ -255,5 +255,123 @@ class StudyBundle(unittest.TestCase):
             self.assertEqual(study_bundle.main(["replies", os.path.join(tmp, "none"), out]), 2)
 
 
+TIME_FIXTURE = FIXTURE.with_name("synthetic-study-time.bundle.json")
+
+
+class TimeBundle(unittest.TestCase):
+    """A condition that answers with a film and a time."""
+
+    def setUp(self):
+        self.bundle = study_bundle.load(TIME_FIXTURE)
+
+    def refused(self, change, message):
+        bundle = copy.deepcopy(self.bundle)
+        change(bundle)
+        with self.assertRaises(study_bundle.BundleError) as caught:
+            study_bundle.check(bundle)
+        self.assertIn(message, str(caught.exception))
+
+    def test_kinds_and_plain_words(self):
+        lines = study_bundle.summary(self.bundle)
+        self.assertIn("referent: invalid=2, none=1, omitted=1, scene=1, time-outside=1", lines)
+        self.assertIn("narrative: film=1, invalid=2, omitted=1, scene=2", lines)
+        self.assertEqual(
+            study_bundle.describe_unit(self.bundle, 2)[1:3],
+            [
+                'narrative: scene 6 in film 3 "Station film"',
+                'referent: film 3 "Station film", at a time outside its clip',
+            ],
+        )
+
+    def test_the_reply_document_keeps_the_raw_time_beside_the_scene(self):
+        units = study_bundle.reply_document(self.bundle)["units"]
+        self.assertEqual(
+            units[0]["narrative"],
+            {
+                "status": "answered",
+                "kind": "scene",
+                "scene": 3,
+                "near": [2, 3],
+                "film_stated": 1,
+                "time": "0:20.5",
+                "seconds": 20.5,
+            },
+        )
+        self.assertEqual(units[1]["referent"]["kind"], "time_outside")
+        self.assertEqual(
+            units[3]["referent"],
+            {"status": "failed", "reason": "unknown-film", "film_stated": 2, "time": "0:05"},
+        )
+
+    def test_every_time_answer_is_what_its_film_and_time_give(self):
+        clock = study_bundle.clock_table(self.bundle["source"])
+        cases = {
+            (1, "0:20.499"): ("scene", 2, [2, 3]),
+            (1, "0:20.5"): ("scene", 3, [2, 3]),
+            (3, "0:20"): ("scene", 6, [6]),
+            (3, "0:20.001"): ("time_outside", None, [6]),
+            (3, "0:22.001"): ("time_outside", None, []),
+        }
+        for (film, time), (kind, scene, near) in cases.items():
+            made = study_bundle.time_prediction(clock, film, time)
+            self.assertEqual((made["kind"], made.get("scene"), made["near"]), (kind, scene, near))
+        for film, time, reason in (
+            (2, "0:05", "unknown-film"),
+            (1, "5", "invalid-time"),
+            (1, 5, "invalid-time"),
+            (None, "0:05", "time-without-film"),
+            (True, "0:05", "invalid-film"),
+            (None, "x", "invalid-time"),
+        ):
+            self.assertEqual(study_bundle.time_prediction(clock, film, time)["reason"], reason)
+        self.assertEqual(study_bundle.time_prediction(clock, 3, None)["kind"], "film")
+        self.assertEqual(study_bundle.time_prediction(clock, None, None)["kind"], "none")
+
+    def test_a_scene_near_list_or_time_changed_alone_is_refused(self):
+        for key, value in (("scene", 3), ("near", [2, 3]), ("seconds", 11.0), ("time", "0:30")):
+
+            def change(b, key=key, value=value):
+                b["units"][0]["referent"]["stated"][key] = value
+
+            self.refused(change, "not what its film and time give")
+
+    def test_a_time_and_scene_changed_together_are_refused_by_the_record(self):
+        def change(b):
+            b["units"][0]["referent"]["stated"].update(scene=3, near=[3], time="0:30", seconds=30.0)
+            b["units"][0]["referent"]["judgement"] = {"kind": "scene", "scene": 3, "collection": 1}
+
+        self.refused(change, "row says scene, record says choice")
+
+    def test_a_scene_without_a_time_is_refused(self):
+        def change(b):
+            b["units"][0]["referent"]["stated"] = {
+                "status": "answered",
+                "kind": "scene",
+                "scene": 2,
+                "film_stated": 1,
+            }
+
+        self.refused(change, "a scene without a time")
+
+    def test_time_outside_cannot_be_relabelled_a_film_alone(self):
+        def change(b):
+            b["units"][1]["referent"]["judgement"]["kind"] = "film"
+
+        self.refused(change, "does not follow from the stated answer")
+
+    def test_the_clock_and_the_protocol_go_together(self):
+        self.refused(lambda b: b["source"].pop("clock"), "needs a clip clock")
+        plain = study_bundle.load(FIXTURE)
+        plain["source"]["clock"] = self.bundle["source"]["clock"]
+        with self.assertRaises(study_bundle.BundleError):
+            study_bundle.check(plain)
+
+    def test_a_widened_tolerance_changes_the_near_scenes_and_is_refused(self):
+        self.refused(
+            lambda b: b["source"]["clock"].__setitem__("toleranceSeconds", "11/1"),
+            "not what its film and time give",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -178,6 +178,33 @@ without Scala, and `ff_score.py score` accepts a directory of them in place of r
 - A bundle is about 4.7 MB for a 170-unit session, because each of its two records repeats the
   recall inventory and the source's nodes. Files are written compact for that reason.
 
+## Slice 4 as built: conditions that answer with a time
+
+- **Reply protocol `strict-chunked-time/v1`.** Chunk rules are the strict protocol's. Each
+  judgement is a film field and a time field. No time is a film alone, or no assignment when
+  the film is null too. A time must be `m:ss` with at most three decimals and must come with an
+  integer film; anything else is a failure that keeps the raw values.
+- **`SceneIntervals`.** Built from the checked source, each part's declared timebase and a clip
+  clock per film (`clip = rate * (source - origin) + offset`, and the clip's length), in exact
+  fractions. It refuses unless the clock covers exactly the target films, each origin is the
+  start of the film's first target row, no scene that is not a target lies inside a clip, and
+  scene starts increase and end before the clip does. A time on a boundary belongs to the scene
+  that starts there; the end of the clip is inside the last scene.
+- **Judgements.** A time inside the clip is the scene that contains it. A time outside the clip
+  is `time-outside`: the record holds a choice of the film, and the row keeps the kind apart
+  from a film named alone (owner decision 3 of the ADR 0022 amendment). A time in a film with
+  no clock is a failure.
+- **Export.** `ff_export_run.py` writes `clock.json` for a time condition from the clock, clip
+  lengths and tolerance the run's manifest froze. `agentStudyBundle` reads it.
+  `agentStudyReplay` and `agentStudyRecords` refuse a time condition, since they do not read a
+  source or a clock; the bundle supersedes both.
+- **Bundle.** `source.clock` holds the scene intervals as exact fractions, and each time answer
+  keeps its raw film and time beside the scene, the near scenes and the seconds. Both readers
+  convert every time answer again and require what is stored; the library's reader also
+  requires the whole source dictionary, clock included, to be the regenerated source's.
+- **Scorer.** `ff_score.py` reads time-condition bundles and applies its own frozen conversion
+  to them, as it does to reply files.
+
 ## Notes
 
 - The interval-table hash of the Python tools is over rounded text. Matching it is not an
