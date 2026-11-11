@@ -27,11 +27,11 @@
   "interpretations" : {
     "narrative" : {
       "policy" : "agent-localization:annotation:strict-chunked/v1:narrative",
-      "recordDigest" : "1123a5709b024ed80ce1374f4c6abd9fb74b6c1322c97f1945ef90e1b65dbdd5",
+      "recordDigest" : "d2319da54da1976e2a1f629a6c67f0176e2dd897577fd742cb99e53e30056ebd",
       "record" : {
         "schema" : "storymodel4s.mapping-record",
         "schemaVersion" : "mapping-record/v0.2",
-        "record_digest" : "1123a5709b024ed80ce1374f4c6abd9fb74b6c1322c97f1945ef90e1b65dbdd5",
+        "record_digest" : "d2319da54da1976e2a1f629a6c67f0176e2dd897577fd742cb99e53e30056ebd",
         "inventory" : {
           "digest" : "cbd5ddc8e13f0cbb63db4120ff95792c76f0d944258fd4979346e553ffda4670",
           "transcript_checksum" : "81ffcd0cc2739d4fbd10a26b5fea2052b7c9cac9e26235829a927711b268ebbb",
@@ -1043,7 +1043,7 @@
             }
           },
           {
-            "id" : "6be8555813d1a59d7a7f08565b741defa97f2b124822b6af3ee8c8852d9a2ff4",
+            "id" : "33712e534b7c1eedcbc955e5b92eda120eee31cb8c5c1e6af89082b4c6bb7167",
             "stage" : "Decision",
             "provenance" : {
               "status" : "unknown",
@@ -1057,7 +1057,7 @@
                   "inputs" : [
                     "e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41",
                     "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac",
-                    "5cedadbab2d24afe613a7a73ea6593d139cb6a83bd7cd1a4d576c6ed7de475ce"
+                    "25c1b8266a104c512419bec8308cb6f5a64da0fe46253346a35f5aa1ea61a3c8"
                   ],
                   "provider" : {
                     "status" : "identified",
@@ -1177,7 +1177,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "6be8555813d1a59d7a7f08565b741defa97f2b124822b6af3ee8c8852d9a2ff4"
+                "decision" : "33712e534b7c1eedcbc955e5b92eda120eee31cb8c5c1e6af89082b4c6bb7167"
               }
             }
           },
@@ -1272,7 +1272,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "6be8555813d1a59d7a7f08565b741defa97f2b124822b6af3ee8c8852d9a2ff4"
+                "decision" : "33712e534b7c1eedcbc955e5b92eda120eee31cb8c5c1e6af89082b4c6bb7167"
               }
             }
           },
@@ -1384,7 +1384,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "6be8555813d1a59d7a7f08565b741defa97f2b124822b6af3ee8c8852d9a2ff4"
+                "decision" : "33712e534b7c1eedcbc955e5b92eda120eee31cb8c5c1e6af89082b4c6bb7167"
               }
             }
           },
@@ -1479,11 +1479,11 @@
     },
     "referent" : {
       "policy" : "agent-localization:annotation:strict-chunked/v1:referent",
-      "recordDigest" : "2c8f76e114a411c3046593d3b6058ea6c904686ff07fb96643e59a5db2aad32d",
+      "recordDigest" : "1c71bd70dfc7d69ae9f94d8e9e6b5a6989deaccd9ebd1cff8ebad26d0db63c81",
       "record" : {
         "schema" : "storymodel4s.mapping-record",
         "schemaVersion" : "mapping-record/v0.2",
-        "record_digest" : "2c8f76e114a411c3046593d3b6058ea6c904686ff07fb96643e59a5db2aad32d",
+        "record_digest" : "1c71bd70dfc7d69ae9f94d8e9e6b5a6989deaccd9ebd1cff8ebad26d0db63c81",
         "inventory" : {
           "digest" : "cbd5ddc8e13f0cbb63db4120ff95792c76f0d944258fd4979346e553ffda4670",
           "transcript_checksum" : "81ffcd0cc2739d4fbd10a26b5fea2052b7c9cac9e26235829a927711b268ebbb",
@@ -2495,7 +2495,7 @@
             }
           },
           {
-            "id" : "7cd6cf01de44c60b35571ba7d1f2d66819ec468d36209d3612af1aa9fcb026a6",
+            "id" : "1b269edc969c3fd75325cdad45998172bf6b4b781f8049ba49199f90328b97c0",
             "stage" : "Decision",
             "provenance" : {
               "status" : "unknown",
@@ -2509,7 +2509,7 @@
                   "inputs" : [
                     "e85c2fff7a4382b1b792d506cc802b2826853f6a5ecf59acacfa89c8e098bf41",
                     "696042691be2a50a698714b8744c9cccae897fdba107bcc5c2b9d2342b5701ac",
-                    "7f53c394c90a1939bc6e973adf15d727552badb7d6e13e911d8b2acba1960b4c"
+                    "ed9be795e3450703ec4004e61f7cab609e3b638a53d148e010109a53b63b28c4"
                   ],
                   "provider" : {
                     "status" : "identified",
@@ -2629,7 +2629,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "7cd6cf01de44c60b35571ba7d1f2d66819ec468d36209d3612af1aa9fcb026a6"
+                "decision" : "1b269edc969c3fd75325cdad45998172bf6b4b781f8049ba49199f90328b97c0"
               }
             }
           },
@@ -2767,7 +2767,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "7cd6cf01de44c60b35571ba7d1f2d66819ec468d36209d3612af1aa9fcb026a6"
+                "decision" : "1b269edc969c3fd75325cdad45998172bf6b4b781f8049ba49199f90328b97c0"
               }
             }
           },
@@ -2836,7 +2836,7 @@
               "value" : {
                 "inference" : "5e41caa414202a004ff165a13362c260aa672c467886f084d54bf07983525a78",
                 "candidates" : "8f996fe629597b21cca17af9715107ca998cb3717d562c754369c4ce658fb999",
-                "decision" : "7cd6cf01de44c60b35571ba7d1f2d66819ec468d36209d3612af1aa9fcb026a6"
+                "decision" : "1b269edc969c3fd75325cdad45998172bf6b4b781f8049ba49199f90328b97c0"
               }
             }
           },

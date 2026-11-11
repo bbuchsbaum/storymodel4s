@@ -162,10 +162,10 @@ object StudyBundle:
     intervals.fold(base)(t => base.deepMerge(Json.obj("clock" -> t.json)))
 
   /** A digest of one judgement's answers as stated, one line per unit: the unit's number, the kind
-    * of answer (or the failure and its reason), and the scene, film and time the answer holds
-    * where it holds them. A record names this digest in its decision receipt. So the parts of an answer the
-    * record's choice does not determine, such as where in a scene a time fell, or whether a film
-    * was named alone or with a time outside its clip, cannot change beside the record.
+    * of answer (or the failure and its reason), and the scene, film and time the answer holds where
+    * it holds them. A record names this digest in its decision receipt. So the parts of an answer
+    * the record's choice does not determine, such as where in a scene a time fell, or whether a
+    * film was named alone or with a time outside its clip, cannot change beside the record.
     */
   def answersDigest(stated: Vector[(Int, Json)]): Checksum =
     def token(j: Option[Json]): String = j match
