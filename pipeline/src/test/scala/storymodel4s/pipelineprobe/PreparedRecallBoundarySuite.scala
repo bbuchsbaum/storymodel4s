@@ -35,3 +35,19 @@ class PreparedRecallBoundarySuite extends FunSuite:
         "import storymodel4s.pipeline.agentmapping.PreparedRecall; PreparedRecall(null, null, Vector.empty, null)"
       ).nonEmpty
     )
+
+  test("scene intervals come only from a checked build"):
+    val closed = typeCheckErrors(
+      "import storymodel4s.pipeline.agentmapping.SceneIntervals; new SceneIntervals(null, Map.empty)"
+    )
+    assert(closed.exists(_.message.contains("cannot be accessed")), closed.map(_.message).toString)
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.pipeline.agentmapping.SceneIntervals; def f(t: SceneIntervals) = t.films"
+      ),
+      Nil
+    )
+    val exact = typeCheckErrors(
+      "import storymodel4s.pipeline.agentmapping.SceneIntervals; new SceneIntervals.Exact(BigInt(1), BigInt(0))"
+    )
+    assert(exact.exists(_.message.contains("cannot be accessed")), exact.map(_.message).toString)

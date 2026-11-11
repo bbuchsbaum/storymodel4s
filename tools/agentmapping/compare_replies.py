@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Compare two directories of reply files unit by unit.
 
-Usage: compare_replies.py RECORDED_DIR REPLAYED_DIR
+Usage: compare_replies.py [--units-only] RECORDED_DIR REPLAYED_DIR
+
+With `--units-only` the chunk receipts are not compared: reply files written from mapping
+bundles (study_bundle.py replies) hold unit rows and no receipts.
 
 Each directory holds <participant>_<session>.json files with `chunks` and `units`. The
 comparison is of parsed values: every unit row (all its keys) and every chunk receipt must be
@@ -30,6 +33,8 @@ def kind(prediction):
 
 
 def main(argv):
+    units_only = argv[:1] == ["--units-only"]
+    argv = argv[1:] if units_only else argv
     if len(argv) != 2:
         print(__doc__, file=sys.stderr)
         return 2
@@ -47,7 +52,7 @@ def main(argv):
         for key in ("participant", "session", "model"):
             if a.get(key) != b.get(key):
                 differences.append((name, key))
-        if a["chunks"] != b["chunks"]:
+        if not units_only and a["chunks"] != b.get("chunks"):
             differences.append((name, "chunks"))
         for r in a["chunks"]:
             receipts["chunks"] += 1
