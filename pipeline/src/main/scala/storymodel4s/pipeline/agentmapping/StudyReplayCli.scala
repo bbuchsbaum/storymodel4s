@@ -278,6 +278,8 @@ object StudyExport:
   if Files.exists(out) then refuse("output directory exists")
   val dir = Path.of(exportDir)
   val index = StudyExport.index(dir).fold(refuse, identity)
+  if StudyExport.timed(index) then
+    refuse("this condition answers with a time; use agentStudyBundle, which reads its clip clock")
   val protocol = index.protocol
   val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => refuse(e.message), identity)
   def suffix(n: Int): String =
@@ -363,6 +365,8 @@ object StudyExport:
     .fold(r => refuse(s"source: $r"), identity)
   val dir = Path.of(exportDir)
   val index = StudyExport.index(dir).fold(refuse, identity)
+  if StudyExport.timed(index) then
+    refuse("this condition answers with a time; use agentStudyBundle, which reads its clip clock")
   val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => refuse(e.message), identity)
   def suffix(n: Int): String =
     if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
@@ -464,6 +468,8 @@ object StudyExport:
     .fold(r => refuse(s"source: $r"), identity)
   val dir = Path.of(exportDir)
   val index = StudyExport.index(dir).fold(refuse, identity)
+  val clock = StudyExport.intervals(dir, index, view, bytes(partsJson)).fold(refuse, identity)
+  val intervals = clock.map(_._1)
   val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => refuse(e.message), identity)
   def suffix(n: Int): String =
     if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
@@ -514,11 +520,13 @@ object StudyExport:
         index.protocolName,
         Checksum.ofText(index.system).hex,
         index.manifestSha256,
-        recall.segmentation
+        recall.segmentation,
+        clock.map(_._2)
       ),
       view,
       records,
-      rows
+      rows,
+      intervals
     )
     // Compact: each record repeats the recall inventory and the source's nodes.
     val text = doc.noSpaces + "\n"

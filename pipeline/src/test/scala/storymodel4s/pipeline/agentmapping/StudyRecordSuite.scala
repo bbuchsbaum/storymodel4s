@@ -51,7 +51,7 @@ class StudyRecordSuite extends FunSuite:
     judged(Stated.Scene(2, Json.fromInt(1))),
     judged(Stated.Collection(3)),
     judged(Stated.NoAssignment),
-    StudyRecord.judge(view, ReplyProtocol.StrictChunked, UnitReply.Omitted, "referent"),
+    StudyRecord.judge(view, ReplyProtocol.StrictChunked, UnitReply.Omitted, "referent", None),
     judged(Stated.Invalid("missing-field"))
   )
   private lazy val record =
