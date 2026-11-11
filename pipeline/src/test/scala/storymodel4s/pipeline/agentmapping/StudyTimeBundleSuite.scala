@@ -218,13 +218,15 @@ class StudyTimeBundleSuite extends FunSuite:
     // Both are a choice of film 3 in the record.
     val alone = json("""{"status":"answered","kind":"film","film":3}""")
     val film = json("""{"kind":"film","collection":3}""")
-    val swap = unit(1)(field("referent", "stated", alone).andThen(field("referent", "judgement", film)))
+    val swap =
+      unit(1)(field("referent", "stated", alone).andThen(field("referent", "judgement", film)))
     assertEquals(edited(swap).left.toOption, Some("a unit row disagrees with the referent record"))
     val late = json(
       """{"status":"answered","kind":"time_outside","film":3,"near":[],"film_stated":3,"time":"9:59","seconds":599.0}"""
     )
     val outside = json("""{"kind":"time-outside","collection":3}""")
-    val back = unit(2)(field("narrative", "stated", late).andThen(field("narrative", "judgement", outside)))
+    val back =
+      unit(2)(field("narrative", "stated", late).andThen(field("narrative", "judgement", outside)))
     assertEquals(edited(back).left.toOption, Some("a unit row disagrees with the narrative record"))
 
   test("a scene without a time is refused in a condition that answers with a time"):

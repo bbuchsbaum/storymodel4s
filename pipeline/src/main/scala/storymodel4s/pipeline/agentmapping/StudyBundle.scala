@@ -4,6 +4,7 @@ import io.circe.Json
 import storymodel4s.align.{DecisionPolicy, MappingResult}
 import storymodel4s.align.bridge.TimedSourceView
 import storymodel4s.codec.{ExpectedMappingContext, MappingCodecs}
+import storymodel4s.core.Checksum
 
 /** One participant-session's saved mapping under one condition and model
   * (`storymodel4s.agentmapping.bundle/v2`): both judgements as checked records, every unit's
@@ -160,20 +161,24 @@ object StudyBundle:
     )
     intervals.fold(base)(t => base.deepMerge(Json.obj("clock" -> t.json)))
 
-  /** A digest of one judgement's answers as stated, one line per unit: the unit's number, the
-    * kind of answer (or the failure and its reason), and the film and the time the reply gave
-    * where it gave them. A record names this digest in its decision receipt. So the parts of an answer
-    * the record's choice does not determine, such as where in a scene a time fell, or whether a
-    * film was named alone or with a time outside its clip, cannot change beside the record.
+  /** A digest of one judgement's answers as stated, one line per unit: the unit's number, the kind
+    * of answer (or the failure and its reason), and the film and the time the reply gave where it
+    * gave them. A record names this digest in its decision receipt. So the parts of an answer the
+    * record's choice does not determine, such as where in a scene a time fell, or whether a film
+    * was named alone or with a time outside its clip, cannot change beside the record.
     */
   def answersDigest(stated: Vector[(Int, Json)]): Checksum =
     def token(j: Option[Json]): String = j match
-      case None                 => "-"
-      case Some(v) if v.isNull  => "null"
-      case Some(v)              =>
-        StudyReplay.strictInteger(v).map(_.toString).orElse(
-          v.asString.map(text => "s:" + Checksum.ofText(text).hex)
-        ).getOrElse("x")
+      case None                => "-"
+      case Some(v) if v.isNull => "null"
+      case Some(v)             =>
+        StudyReplay
+          .strictInteger(v)
+          .map(_.toString)
+          .orElse(
+            v.asString.map(text => "s:" + Checksum.ofText(text).hex)
+          )
+          .getOrElse("x")
     Checksum.ofText(stated.map { (u, answer) =>
       val c = answer.hcursor
       val kind =
@@ -198,7 +203,14 @@ object StudyBundle:
         val bound =
           producer.copy(answersSha256 = Some(answersDigest(rows.map(r => r.u -> r.stated(f)))))
         StudyRecord
-          .record(f, StudyRecord.policy(condition, protocolName, f), recall, view, bound, rows.map(_.judgement(f)))
+          .record(
+            f,
+            StudyRecord.policy(condition, protocolName, f),
+            recall,
+            view,
+            bound,
+            rows.map(_.judgement(f))
+          )
           .map(done.updated(f, _))
           .left
           .map(e => s"$f: ${e.message}")
@@ -331,10 +343,10 @@ object StudyBundle:
     * record is decoded through the mapping codec, which re-derives it, and must then equal the
     * record these rows give under this producer and this condition's policy. That last comparison
     * binds the rows, the source, the recall, the model, the provider and the instruction to the
-    * record. The record also names a digest of the answers as stated, so an answer cannot be
-    * edited beside an unchanged record. Provenance must name the same participant, session, model, provider, instruction and
-    * units. Extras and the source dictionary are descriptions and are read as written, except that
-    * an extra may not use a row's own key.
+    * record. The record also names a digest of the answers as stated, so an answer cannot be edited
+    * beside an unchanged record. Provenance must name the same participant, session, model,
+    * provider, instruction and units. Extras and the source dictionary are descriptions and are
+    * read as written, except that an extra may not use a row's own key.
     */
   def decode(
       bundle: Json,
@@ -447,7 +459,11 @@ object StudyBundle:
                 answersDigest(
                   expected.units
                     .map(_.u)
-                    .zip(units.map(_.hcursor.downField(f).downField("stated").focus.getOrElse(Json.Null)))
+                    .zip(
+                      units.map(
+                        _.hcursor.downField(f).downField("stated").focus.getOrElse(Json.Null)
+                      )
+                    )
                 )
               )
             )

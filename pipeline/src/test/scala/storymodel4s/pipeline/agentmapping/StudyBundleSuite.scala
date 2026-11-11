@@ -216,7 +216,8 @@ class StudyBundleSuite extends FunSuite:
     // A failure's reason is part of what the record was made from.
     val reason = json("""{"status":"failed","reason":"invalid-film"}""")
     val judged = json("""{"kind":"invalid","reason":"invalid-film"}""")
-    val both = unit(5)(field("narrative", "stated", reason).andThen(field("narrative", "judgement", judged)))
+    val both =
+      unit(5)(field("narrative", "stated", reason).andThen(field("narrative", "judgement", judged)))
     assertEquals(edited(both).left.toOption, Some("a unit row disagrees with the narrative record"))
 
   test("an extra cannot use a row's own key"):
