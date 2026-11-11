@@ -154,3 +154,60 @@ blocking defect. Limits that remain, by design or as follow-ups:
   external mass than an assessed unit has (about 1.46 times at temperature 1) and an arbitrary
   best-path label; and a granularity of 0.0 reads as a perfect match. No path feeds supplied
   units to a cost model. Both await an owner decision.
+
+## Slice 4: conditions that answer with a time
+
+Commits after 1b040ad90, to a56f487c3.
+
+- Reply protocol `strict-chunked-time/v1`: each judgement is a film and a time.
+- `SceneIntervals`: each target scene's interval on its film's clip clock, in exact fractions,
+  built only from a checked source and a clock that fits it.
+- A time outside the clip is recorded as a choice of the film and marked `time-outside` in the
+  row. A time in a film with no clock, a malformed time and a time with no film are failures
+  that keep the raw values.
+- Bundles carry the scene intervals and each raw film and time. Both readers convert every time
+  answer again. The scorer reads time-condition bundles.
+- Every record now names a digest of the answers as stated (kind, scene, film, the film the
+  reply named, time), in every condition, so an answer cannot change beside its record.
+
+Gate at a56f487c3, clean clone, fatal warnings: `pipeline/test` 582 passed, 0 failed;
+`providerAgent/test` 82 passed, 0 failed, 1 skipped; format check clean. The change touches
+only `pipeline` and tools. Python: 262 tests in 11 files pass (2 skipped).
+
+Acceptance at a56f487c3, zero model calls, 19 sessions and 3,226 units per run:
+
+| Run | Scores from bundles | Unit rows differing from the reply files |
+|---|---|---:|
+| automatic input, `claude-opus-5-5` | byte-identical to the recorded score files | 0 |
+| automatic input, `claude-haiku-5-5` | byte-identical to the recorded score files | 0 |
+| no record, `claude-opus-5-5` | byte-identical to the recorded score files | 0 |
+| no record, `claude-haiku-5-5` | byte-identical to the recorded score files | 0 |
+| annotation, `claude-opus-5-5` | byte-identical to scoring the reply files | not rerun |
+| annotation, `claude-haiku-5-5` | byte-identical to scoring the reply files | not rerun |
+
+"Recorded score files" are those written on 2026-11-10, both judgements. A unit row is compared
+in full: kind, scene, near scenes, raw film and time, seconds and extras. The no-record Haiku
+run holds 2 omitted units and 3 times outside a clip, per judgement, so the failure and
+out-of-clip paths run on real data.
+
+Mutants, each failing a named test: a boundary time given to the earlier scene; the clip's end
+excluded; an exclusive tolerance; the clock's origin unchecked; a scene that is not a target
+allowed inside a clip; the clock's rate ignored; a time outside the clip recorded as a film
+alone; a time answer not converted again on reading; a scene without a time accepted; the
+source dictionary unchecked; a time without a film read as no assignment; the digest without
+scene and time; and, in Python, the digest unchecked.
+
+Independent review. At 75a623415 the reviewer ported the Scala rule to Python and compared its
+interval table with `ff_time` in exact fractions (10 films, 203 scenes, no difference), and
+re-derived 23,169 time predictions from the bundles with no difference. It found that an answer
+edited without changing the record's choice was accepted by both readers (a time moved inside
+its scene; a film alone swapped with a time outside the clip), and then that a failed scene
+answer could be renumbered. Both are closed by the answers digest; confirmed at a56f487c3 with
+no blocking defect. Limits that remain:
+
+- `agentStudyReplay` and `agentStudyRecords` refuse a time condition; the bundle supersedes
+  them.
+- Bundles written before the answers digest are refused and must be regenerated.
+- Follow-ups: nothing reads `provenance.clockSha256` back; the monotonic check runs before the
+  first interval is clamped to 0, here and in `ff_time`; no test drives `StudyExport.intervals`
+  or the two refusals through the command line.
