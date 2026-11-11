@@ -32,6 +32,11 @@ object StudyReplay:
       */
     case StrictChunked
 
+    /** The second harness in a condition that answers with a time: each judgement is a film field
+      * and a time field. Chunk rules are those of `StrictChunked`.
+      */
+    case StrictChunkedTime
+
   object ReplyProtocol:
     /** A protocol by the name an export records. Names are versioned, so a change of rules is a new
       * name and an old export cannot be read under new rules by accident.
@@ -39,6 +44,7 @@ object StudyReplay:
     def named(name: String): Option[ReplyProtocol] = name match
       case "coercing-open/v1"  => Some(CoercingOpen)
       case "strict-chunked/v1" => Some(StrictChunked)
+      case "strict-chunked-time/v1" => Some(StrictChunkedTime)
       case _                   => None
 
   /** One recall unit as the study numbers it. `row` is the study's own key, kept verbatim. */
@@ -82,7 +88,12 @@ object StudyReplay:
     case Scene(scene: BigInt, filmStated: Json)
     case Collection(film: BigInt)
     case NoAssignment
-    case Invalid(reason: String)
+
+    /** A film and a well-formed time in it. Which scene that is needs the film's clip clock. */
+    case Time(film: BigInt, time: String)
+
+    /** `raw` is what the reply gave, kept beside the reason when the answer was a time. */
+    case Invalid(reason: String, raw: Vector[(String, Json)] = Vector.empty)
 
   private val IntegerLiteral = "-?[0-9]+".r
 
@@ -92,7 +103,7 @@ object StudyReplay:
 
   private def unitKey(protocol: ReplyProtocol, item: Json): Option[Int] = protocol match
     case ReplyProtocol.CoercingOpen  => AgentReplay.unitKey(item)
-    case ReplyProtocol.StrictChunked =>
+    case ReplyProtocol.StrictChunked | ReplyProtocol.StrictChunkedTime =>
       item.asObject
         .flatMap(_("u"))
         .flatMap(strictInteger)
@@ -126,15 +137,62 @@ object StudyReplay:
                   case None if film.isNull => Stated.NoAssignment
                   case None                => Stated.Invalid("invalid-film")
           case _ => Stated.Invalid("missing-field")
+      case ReplyProtocol.StrictChunkedTime =>
+        (fields.flatMap(_(s"${field}_film")), fields.flatMap(_(s"${field}_time"))) match
+          case (Some(film), Some(time)) => timeStated(film, time)
+          case _                        => Stated.Invalid("missing-field")
 
-  private def failed(reason: String): Json =
-    Json.obj("status" -> Json.fromString("failed"), "reason" -> Json.fromString(reason))
+  /** One judgement of a time condition, from its film and time values. No time is a film alone,
+    * or no assignment when the film is null too. A time must be well formed and must come with an
+    * integer film; otherwise the judgement is invalid, and the raw values are kept.
+    */
+  def timeStated(film: Json, time: Json): Stated =
+    if time.isNull then
+      strictInteger(film) match
+        case Some(f)             => Stated.Collection(f)
+        case None if film.isNull => Stated.NoAssignment
+        case None                => Stated.Invalid("invalid-film")
+    else
+      val raw = Vector("film_stated" -> film, "time" -> time)
+      time.asString.filter(SceneIntervals.parseTime(_).isDefined) match
+        case None                    => Stated.Invalid("invalid-time", raw)
+        case Some(_) if film.isNull  => Stated.Invalid("time-without-film", raw)
+        case Some(text)              =>
+          strictInteger(film).fold(Stated.Invalid("invalid-film", raw))(Stated.Time(_, text))
 
-  /** A stated judgement in the reply-file form the scorer reads. */
-  def prediction(value: Stated): Json =
+  private def failed(reason: String, raw: Vector[(String, Json)] = Vector.empty): Json =
+    Json.fromFields(
+      Vector("status" -> Json.fromString("failed"), "reason" -> Json.fromString(reason)) ++ raw
+    )
+
+  /** A stated judgement in the reply-file form the scorer reads. A time is converted with the
+    * film's clip clock: the scene that contains it, the scenes near it, and the raw answer beside
+    * them; or, outside the clip, the film alone as `time_outside`.
+    */
+  def prediction(value: Stated, intervals: Option[SceneIntervals] = None): Json =
     def answered(fields: (String, Json)*): Json =
       Json.fromFields(("status" -> Json.fromString("answered")) +: fields)
     value match
+      case Stated.Time(film, time) =>
+        val raw = Vector("film_stated" -> Json.fromBigInt(film), "time" -> Json.fromString(time))
+        (intervals, SceneIntervals.parseTime(time)) match
+          case (Some(table), Some((exact, seconds))) =>
+            def rest(near: Vector[Int]) =
+              (("near" -> Json.fromValues(near.map(Json.fromInt))) +: raw) :+
+                ("seconds" -> Json.fromDoubleOrNull(seconds))
+            table.locate(film, exact) match
+              case SceneIntervals.Located.UnknownFilm => failed("unknown-film", raw)
+              case SceneIntervals.Located.Scene(scene, near) =>
+                answered(
+                  (("kind" -> Json.fromString("scene")) +: ("scene" -> Json.fromInt(scene)) +:
+                    rest(near))*
+                )
+              case SceneIntervals.Located.Outside(near) =>
+                answered(
+                  (("kind" -> Json.fromString("time_outside")) +:
+                    ("film" -> Json.fromBigInt(film)) +: rest(near))*
+                )
+          case _ => failed("no-clip-clock", raw)
       case Stated.Scene(scene, film) =>
         answered(
           "kind" -> Json.fromString("scene"),
@@ -143,8 +201,8 @@ object StudyReplay:
         )
       case Stated.Collection(film) =>
         answered("kind" -> Json.fromString("film"), "film" -> Json.fromBigInt(film))
-      case Stated.NoAssignment    => answered("kind" -> Json.fromString("none"))
-      case Stated.Invalid(reason) => failed(reason)
+      case Stated.NoAssignment         => answered("kind" -> Json.fromString("none"))
+      case Stated.Invalid(reason, raw) => failed(reason, raw)
 
   /** Read a judgement back from its reply-file form; `None` for a failure or an unknown form. It is
     * the inverse of `prediction` on the three kinds of answer.
@@ -170,15 +228,16 @@ object StudyReplay:
       protocol: ReplyProtocol,
       unit: RecallUnit,
       reply: UnitReply,
-      extras: Vector[String]
+      extras: Vector[String],
+      intervals: Option[SceneIntervals] = None
   ): Json =
     val head = Vector("u" -> Json.fromInt(unit.u), "row" -> unit.row)
     reply match
       case UnitReply.Answered(item) =>
         Json.fromFields(
           head ++ Vector(
-            "referent" -> prediction(stated(protocol, item, "referent")),
-            "narrative" -> prediction(stated(protocol, item, "narrative"))
+            "referent" -> prediction(stated(protocol, item, "referent"), intervals),
+            "narrative" -> prediction(stated(protocol, item, "narrative"), intervals)
           ) ++ extras.map(k => k -> item.asObject.flatMap(_(k)).getOrElse(Json.Null))
         )
       case other =>
@@ -253,7 +312,7 @@ object StudyReplay:
                     .map(k =>
                       (map.updated(k, item), outside, repeated + (if map.contains(k) then 1 else 0))
                     )
-                case ReplyProtocol.StrictChunked =>
+                case ReplyProtocol.StrictChunked | ReplyProtocol.StrictChunkedTime =>
                   key.filter(k => item.isObject && c.lo <= k && k <= c.hi) match
                     case None    => Right((map, outside + 1, repeated))
                     case Some(k) =>

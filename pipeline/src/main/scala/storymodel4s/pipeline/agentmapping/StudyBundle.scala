@@ -31,7 +31,8 @@ object StudyBundle:
       protocol: String,
       systemSha256: String,
       manifestSha256: String,
-      segmentation: PreparedRecall.Segmentation
+      segmentation: PreparedRecall.Segmentation,
+      clockSha256: Option[String] = None
   )
 
   /** One unit: the study's own number and row key, what the replies established for it, and for
@@ -67,6 +68,7 @@ object StudyBundle:
       case Judgement.Scene(n, _)          => scene(n)
       case Judgement.NotATarget(n)        => scene(n)
       case Judgement.Collection(c, _)     => Vector("collection" -> Json.fromInt(c))
+      case Judgement.TimeOutside(c, _)    => Vector("collection" -> Json.fromInt(c))
       case Judgement.UnknownScene(s)      => Vector("stated" -> str(s))
       case Judgement.UnknownCollection(s) => Vector("stated" -> str(s))
       case Judgement.Invalid(reason)      => Vector("reason" -> str(reason))
@@ -80,9 +82,10 @@ object StudyBundle:
       unit: StudyReplay.RecallUnit,
       unitId: String,
       reply: StudyReplay.UnitReply,
-      extras: Vector[String]
+      extras: Vector[String],
+      intervals: Option[SceneIntervals] = None
   ): Row =
-    val full = StudyReplay.unitRow(protocol, unit, reply, extras).hcursor
+    val full = StudyReplay.unitRow(protocol, unit, reply, extras, intervals).hcursor
     val (processing, kept) = reply match
       case StudyReplay.UnitReply.Answered(_)     => "answered" -> extras
       case StudyReplay.UnitReply.Omitted         => "omitted" -> Vector.empty
@@ -93,7 +96,7 @@ object StudyBundle:
       unit.row,
       processing,
       Fields.map(f => f -> full.downField(f).focus.getOrElse(Json.Null)).toMap,
-      Fields.map(f => f -> StudyRecord.judge(view, protocol, reply, f)).toMap,
+      Fields.map(f => f -> StudyRecord.judge(view, protocol, reply, f, intervals)).toMap,
       kept.map(k => k -> full.downField(k).focus.getOrElse(Json.Null))
     )
 
@@ -112,13 +115,13 @@ object StudyBundle:
   /** The source as a dictionary: films, scenes and rows with their targets, so a chosen scene or a
     * cited row resolves without the annotation file. Times are ticks on the part's own clock.
     */
-  def sourceJson(view: TimedSourceView): Json =
+  def sourceJson(view: TimedSourceView, intervals: Option[SceneIntervals] = None): Json =
     val targetGroups = view.targetGroups.toSet
     val targetCollections = view.targetCollections.toSet
     val films = collectionOfGroup(view)
     val groups = view.segments.flatMap(_.group).distinctBy(_.ordinal).sortBy(_.ordinal)
     val collections = view.segments.flatMap(_.collection).distinctBy(_.ordinal).sortBy(_.ordinal)
-    Json.obj(
+    val base = Json.obj(
       "artifact" -> str(view.artifact.hex),
       "representation" -> str(view.representation.digest.hex),
       "collections" -> Json.fromValues(collections.map { c =>
@@ -155,13 +158,15 @@ object StudyBundle:
         )
       })
     )
+    intervals.fold(base)(t => base.deepMerge(Json.obj("clock" -> t.json)))
 
   /** The bundle document. Records are embedded as their codec JSON, unchanged. */
   def encode(
       provenance: Provenance,
       view: TimedSourceView,
       records: Map[String, MappingResult],
-      rows: Vector[Row]
+      rows: Vector[Row],
+      intervals: Option[SceneIntervals] = None
   ): Json =
     Json.obj(
       "schema" -> str(Schema),
@@ -180,15 +185,20 @@ object StudyBundle:
           "recipe" -> str(provenance.segmentation.recipe)
         ),
         "modelCalls" -> Json.fromInt(0)
-      ),
+      ).deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h)))),
       "meaning" -> Json.obj(
         "narrative" -> str("the scene the retelling is narrating at this unit"),
         "referent" -> str("the scene containing the specifically mentioned content"),
         "stated" -> str("the answer as the reply gave it, in the form a scorer reads"),
         "judgement" -> str(
           "the answer decided against the source: scene, film (a film with no particular " +
-            "scene), none, invalid-scene (a real scene that is not a target), unknown-scene, " +
-            "unknown-film, invalid, omitted, unparsable-chunk"
+            "scene), time-outside (a time outside the film's clip: the film, no scene), none, " +
+            "invalid-scene (a real scene that is not a target), unknown-scene, unknown-film, " +
+            "invalid, omitted, unparsable-chunk"
+        ),
+        "time" -> str(
+          "a condition that answers with a time keeps the raw film and time beside the scene " +
+            "that contains it; source.clock holds the scene intervals in exact fractions"
         ),
         "extras" -> str("self-reported fields kept verbatim; not scores, not calibrated")
       ),
@@ -200,7 +210,7 @@ object StudyBundle:
         )
       }),
       "units" -> Json.fromValues(rows.map(rowJson(view, _))),
-      "source" -> sourceJson(view)
+      "source" -> sourceJson(view, intervals)
     )
 
   /** What a reader recovers: both records, re-checked, and the unit rows as written. */
@@ -216,16 +226,44 @@ object StudyBundle:
       participant: String,
       session: String,
       units: Vector[StudyReplay.RecallUnit],
-      producer: AgentMappingRecord.Producer
+      producer: AgentMappingRecord.Producer,
+      intervals: Option[SceneIntervals] = None
   )
 
   /** The judgement a stated answer gives against this source. A failure's judgement follows from
     * its reason; an answer that does not read back is `None`.
     */
-  private def rejudge(view: TimedSourceView, stated: Json): Option[StudyRecord.Judgement] =
+  private def rejudge(
+      view: TimedSourceView,
+      stated: Json,
+      intervals: Option[SceneIntervals],
+      timed: Boolean
+  ): Option[StudyRecord.Judgement] =
+    val c = stated.hcursor
+    if stated.asObject.exists(_.contains("time")) then
+      // A time answer is converted again from its raw film and time, and must be what is stored.
+      val again = StudyReplay.timeStated(
+        c.downField("film_stated").focus.getOrElse(Json.Null),
+        c.downField("time").focus.getOrElse(Json.Null)
+      )
+      Option.when(timed && StudyReplay.prediction(again, intervals) == stated) {
+        StudyRecord.judge(view, again, intervals)
+      }
+    else rejudgePlain(view, stated, timed)
+
+  private def rejudgePlain(
+      view: TimedSourceView,
+      stated: Json,
+      timed: Boolean
+  ): Option[StudyRecord.Judgement] =
     val c = stated.hcursor
     c.get[String]("status").toOption.flatMap {
-      case "answered" => StudyReplay.statedOf(stated).map(StudyRecord.judge(view, _))
+      case "answered" =>
+        StudyReplay.statedOf(stated).filter {
+          // In a condition that answers with a time, a scene comes only from a time.
+          case _: StudyReplay.Stated.Scene => !timed
+          case _                           => true
+        }.map(StudyRecord.judge(view, _))
       case "failed"   =>
         c.get[String]("reason").toOption.map {
           case "omitted"          => StudyRecord.Judgement.Omitted
@@ -276,6 +314,14 @@ object StudyBundle:
         (),
         "the recall is not the study's units"
       )
+      timed = StudyReplay.ReplyProtocol.named(protocol)
+        .contains(StudyReplay.ReplyProtocol.StrictChunkedTime)
+      _ <- Either.cond(timed == expected.intervals.isDefined, (), "a time condition needs a clip clock, and no other has one")
+      _ <- Either.cond(
+        c.downField("source").focus.contains(sourceJson(view, expected.intervals)),
+        (),
+        "the source dictionary is not this source's"
+      )
       units <- c.get[Vector[Json]]("units").left.map(_ => "no units")
       _ <- Either.cond(
         units.map(_.hcursor.get[String]("unit").toOption) == recall.unitIds.map(u =>
@@ -300,7 +346,9 @@ object StudyBundle:
       ) { (acc, f) =>
         acc.flatMap { done =>
           val rows = units.map(_.hcursor.downField(f))
-          val derived = rows.map(r => r.downField("stated").focus.flatMap(rejudge(view, _)))
+          val derived = rows.map { r =>
+            r.downField("stated").focus.flatMap(rejudge(view, _, expected.intervals, timed))
+          }
           Either.cond(
             derived.forall(_.isDefined) && rows.zip(derived).forall { (r, j) =>
               r.downField("judgement").focus == j.map(judgementJson(view, _))

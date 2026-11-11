@@ -21,6 +21,11 @@ object StudyRecord:
 
     /** A film with no particular scene. */
     case Collection(number: Int, target: SourceNodeRef)
+
+    /** A time in a film that falls outside the film's clip. It names the film and selects no
+      * scene; the record holds it as a choice of the film.
+      */
+    case TimeOutside(film: Int, target: SourceNodeRef)
     case NoAssignment
 
     /** A scene the source has but does not offer as a target, such as a title card. */
@@ -35,6 +40,7 @@ object StudyRecord:
     def kind: String = this match
       case _: Scene             => "scene"
       case _: Collection        => "film"
+      case _: TimeOutside       => "time-outside"
       case NoAssignment         => "none"
       case _: NotATarget        => "invalid-scene"
       case _: UnknownScene      => "unknown-scene"
@@ -44,7 +50,11 @@ object StudyRecord:
       case UnparsableChunk      => "unparsable-chunk"
 
   /** Decide one stated judgement against the source's scenes and films. */
-  def judge(view: TimedSourceView, stated: StudyReplay.Stated): Judgement =
+  def judge(
+      view: TimedSourceView,
+      stated: StudyReplay.Stated,
+      intervals: Option[SceneIntervals] = None
+  ): Judgement =
     val targetScenes = view.targetGroups.toSet
     val targetFilms = view.targetCollections.toSet
     stated match
@@ -59,18 +69,37 @@ object StudyRecord:
           .flatMap(k => view.collectionRefs.get(k).filter(targetFilms).map(k -> _)) match
           case Some((k, ref)) => Judgement.Collection(k, ref)
           case None           => Judgement.UnknownCollection(n.toString)
-      case StudyReplay.Stated.NoAssignment    => Judgement.NoAssignment
-      case StudyReplay.Stated.Invalid(reason) => Judgement.Invalid(reason)
+      case StudyReplay.Stated.NoAssignment       => Judgement.NoAssignment
+      case StudyReplay.Stated.Invalid(reason, _) => Judgement.Invalid(reason)
+      case StudyReplay.Stated.Time(film, time)   =>
+        val located =
+          for
+            table <- intervals
+            (exact, _) <- SceneIntervals.parseTime(time)
+          yield table.locate(film, exact)
+        located match
+          case None                                       => Judgement.Invalid("no-clip-clock")
+          case Some(SceneIntervals.Located.UnknownFilm)   => Judgement.Invalid("unknown-film")
+          case Some(SceneIntervals.Located.Scene(n, _))   =>
+            // A table holds target scenes only, so the scene is one the source offers.
+            view.groupRefs.get(n).filter(targetScenes).fold(Judgement.NotATarget(n)) {
+              Judgement.Scene(n, _)
+            }
+          case Some(SceneIntervals.Located.Outside(_)) =>
+            view.collectionRefs.get(film.toInt).filter(targetFilms) match
+              case Some(ref) => Judgement.TimeOutside(film.toInt, ref)
+              case None      => Judgement.UnknownCollection(film.toString)
 
   /** One unit's judgement for `field`, from what the replay established for the unit. */
   def judge(
       view: TimedSourceView,
       protocol: StudyReplay.ReplyProtocol,
       reply: StudyReplay.UnitReply,
-      field: String
+      field: String,
+      intervals: Option[SceneIntervals]
   ): Judgement = reply match
     case StudyReplay.UnitReply.Answered(item) =>
-      judge(view, StudyReplay.stated(protocol, item, field))
+      judge(view, StudyReplay.stated(protocol, item, field), intervals)
     case StudyReplay.UnitReply.Omitted         => Judgement.Omitted
     case StudyReplay.UnitReply.UnparsableChunk => Judgement.UnparsableChunk
 
@@ -112,8 +141,9 @@ object StudyRecord:
     def invalid(detail: String) =
       Right(UnitOutcome.failed(unit, ProcessingFailure.InvalidOutput(detail)))
     judgement match
-      case Judgement.Scene(_, ref)      => choose(ref)
-      case Judgement.Collection(_, ref) => choose(ref)
+      case Judgement.Scene(_, ref)       => choose(ref)
+      case Judgement.Collection(_, ref)  => choose(ref)
+      case Judgement.TimeOutside(_, ref) => choose(ref)
       case Judgement.NoAssignment       =>
         UnitOutcome.categorical(
           unit,

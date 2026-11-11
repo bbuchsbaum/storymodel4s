@@ -165,6 +165,48 @@ object StudyExport:
         .mkString("\n")
     )
 
+  /** Whether a protocol answers with a time, and so needs the export's clip clock. */
+  def timed(index: Index): Boolean = index.protocol == StudyReplay.ReplyProtocol.StrictChunkedTime
+
+  /** The seconds one tick lasts in each part of a parts file. */
+  def partScales(parts: Array[Byte]): Either[String, Map[String, SceneIntervals.Exact]] =
+    io.circe.jawn
+      .parseByteArray(parts)
+      .toOption
+      .flatMap(_.asArray)
+      .flatMap { rows =>
+        rows.foldLeft[Option[Map[String, SceneIntervals.Exact]]](Some(Map.empty)) { (acc, row) =>
+          val c = row.hcursor
+          for
+            done <- acc
+            part <- c.get[String]("part").toOption
+            n <- c.get[String]("numerator").toOption.filter(_.forall(_.isDigit)).filter(_.nonEmpty)
+            d <- c.get[String]("denominator").toOption.filter(_.forall(_.isDigit)).filter(_.nonEmpty)
+            scale <- SceneIntervals.Exact.ratio(BigInt(n), BigInt(d))
+          yield done.updated(part, scale)
+        }
+      }
+      .toRight("the parts file does not give each part's timebase")
+
+  /** The scene intervals of a time condition, from the export's `clock.json` and the source; and
+    * the clock file's hash. `None` for a condition that does not answer with a time.
+    */
+  def intervals(
+      dir: Path,
+      index: Index,
+      view: storymodel4s.align.bridge.TimedSourceView,
+      parts: Array[Byte]
+  ): Either[String, Option[(SceneIntervals, String)]] =
+    if !timed(index) then Right(None)
+    else
+      for
+        raw <- text(dir.resolve("clock.json"))
+        doc <- io.circe.jawn.parse(raw).left.map(_ => "clock.json is not JSON")
+        clock <- SceneIntervals.parseClock(doc)
+        scales <- partScales(parts)
+        table <- SceneIntervals.build(view, scales, clock._1, clock._2)
+      yield Some((table, Checksum.ofText(raw).hex))
+
   def index(dir: Path): Either[String, Index] = json(dir.resolve("index.json")).flatMap(parseIndex)
 
   /** Read and check one session document against its index entry: it must be the session the index
@@ -355,7 +397,8 @@ object StudyExport:
       .fold(e => refuse(s"${entry.name}: $e"), identity)
     val producer = StudyRecord.producer(provider, index.model, index.system, view, recall)
     val perField = fields.map { field =>
-      val judgements = replies.map((_, r) => StudyRecord.judge(view, index.protocol, r, field))
+      val judgements =
+        replies.map((_, r) => StudyRecord.judge(view, index.protocol, r, field, None))
       val policy = StudyRecord.policy(index.condition, index.protocolName, field)
       val record = StudyRecord
         .record(field, policy, recall, view, producer, judgements)
@@ -447,7 +490,7 @@ object StudyExport:
       .fold(e => refuse(s"${entry.name}: $e"), identity)
     val producer = StudyRecord.producer(provider, index.model, index.system, view, recall)
     val rows = replies.zip(recall.unitIds).map { case ((u, r), id) =>
-      StudyBundle.row(view, index.protocol, u, id.value, r, index.extras)
+      StudyBundle.row(view, index.protocol, u, id.value, r, index.extras, intervals)
     }
     val records = StudyBundle.Fields.map { f =>
       f -> StudyRecord
@@ -488,7 +531,7 @@ object StudyExport:
           _,
           view,
           recall,
-          StudyBundle.Expected(entry.participant, entry.session, s.units, producer)
+          StudyBundle.Expected(entry.participant, entry.session, s.units, producer, intervals)
         )
       )
       .fold(e => refuse(s"${entry.name}: bundle does not reload: $e"), identity)
