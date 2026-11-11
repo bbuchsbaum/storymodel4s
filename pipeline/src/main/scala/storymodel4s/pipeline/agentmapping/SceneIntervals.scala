@@ -12,8 +12,8 @@ import storymodel4s.align.bridge.TimedSourceView
   * it refuses a clock whose origin is not the film's first target row.
   *
   * A film's clip starts at its first target row. On the clip clock a scene starts at its earliest
-  * row and ends where the next target scene starts; the first starts at 0 and the last ends at
-  * the end of the clip, including that instant.
+  * row and ends where the next target scene starts; the first starts at 0 and the last ends at the
+  * end of the clip, including that instant.
   */
 final class SceneIntervals private (
     val tolerance: SceneIntervals.Exact,
@@ -21,8 +21,8 @@ final class SceneIntervals private (
 ):
   import SceneIntervals.*
 
-  /** The scenes whose interval lies within the tolerance of `seconds`, in scene order. The
-    * distance to an interval is 0 inside it and at both ends.
+  /** The scenes whose interval lies within the tolerance of `seconds`, in scene order. The distance
+    * to an interval is 0 inside it and at both ends.
     */
   private def near(film: Film, seconds: Exact): Vector[Int] =
     film.scenes.collect {
@@ -72,12 +72,17 @@ object SceneIntervals:
   val ClockSchema: String = "storymodel4s.agentmapping.clip-clock/v1"
 
   /** An exact fraction. Times are compared and combined without rounding. */
-  final class Exact private (val numerator: BigInt, val denominator: BigInt)
-      extends Ordered[Exact]:
+  final class Exact private (val numerator: BigInt, val denominator: BigInt) extends Ordered[Exact]:
     def +(that: Exact): Exact =
-      Exact(numerator * that.denominator + that.numerator * denominator, denominator * that.denominator)
+      Exact(
+        numerator * that.denominator + that.numerator * denominator,
+        denominator * that.denominator
+      )
     def -(that: Exact): Exact =
-      Exact(numerator * that.denominator - that.numerator * denominator, denominator * that.denominator)
+      Exact(
+        numerator * that.denominator - that.numerator * denominator,
+        denominator * that.denominator
+      )
     def *(that: Exact): Exact = Exact(numerator * that.numerator, denominator * that.denominator)
     def max(that: Exact): Exact = if this >= that then this else that
     def compare(that: Exact): Int =
@@ -170,9 +175,9 @@ object SceneIntervals:
 
   /** Build the table for a checked source. `secondsPerTick` is each part's declared timebase.
     *
-    * Refuses unless every target film, and no other, has a clock; every row of a film has a time;
-    * a film's clock origin is the start of its first target row; no scene that is not a target
-    * starts inside the clip; and scene starts increase and end before the clip does.
+    * Refuses unless every target film, and no other, has a clock; every row of a film has a time; a
+    * film's clock origin is the start of its first target row; no scene that is not a target starts
+    * inside the clip; and scene starts increase and end before the clip does.
     */
   def build(
       view: TimedSourceView,
@@ -181,7 +186,9 @@ object SceneIntervals:
       clocks: Map[Int, Clock]
   ): Either[String, SceneIntervals] =
     val targetFilms =
-      view.collectionRefs.collect { case (n, ref) if view.targetCollections.contains(ref) => n }.toSet
+      view.collectionRefs.collect {
+        case (n, ref) if view.targetCollections.contains(ref) => n
+      }.toSet
     val targetScenes =
       view.groupRefs.collect { case (n, ref) if view.targetGroups.contains(ref) => n }.toSet
     def film(n: Int, clock: Clock): Either[String, Film] =

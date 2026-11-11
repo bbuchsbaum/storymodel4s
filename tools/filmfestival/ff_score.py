@@ -477,7 +477,13 @@ def check_bundle_judgements(directory, film_of, valid):
     """
     if not any(n.endswith(".bundle.json") for n in os.listdir(directory)):
         return
-    same = {"scene": "scene", "film": "film", "none": "none", "invalid-scene": "invalid_scene"}
+    same = {
+        "scene": "scene",
+        "film": "film",
+        "none": "none",
+        "invalid-scene": "invalid_scene",
+        "time-outside": "invalid_scene",
+    }
     for name, bundle in study_bundle.load_directory(directory).items():
         for unit in bundle["units"]:
             for field in FIELDS:
@@ -547,7 +553,9 @@ def check_times(manifest, annotation_path, replies):
     frozen = hashlib.sha256(ff_time.canonical(table).encode("utf-8")).hexdigest()
     if manifest["sceneIntervalsSha256"] != frozen:
         raise ScoreError("the scene intervals are not the ones the manifest froze")
-    _, _, differences = ff_time.rederive_directory(table, replies)
+    differences = []
+    for name, reply in reply_documents(replies).items():
+        differences += [(name,) + d for d in ff_time.rederive(table, reply)]
     if differences:
         name, row, field = differences[0][:3]
         raise ScoreError(
@@ -627,8 +635,6 @@ def main(argv):
             check_replies(replies, manifest, file_sha(manifest_path))
             table = None
             if condition != ANNOTATION:
-                if any(n.endswith(".bundle.json") for n in os.listdir(replies)):
-                    raise ScoreError("bundles of a time condition are not read yet")
                 table = check_times(manifest, annotation_path, replies)
             gold = ff_gold.load_gold(gold_path, codes_path)
             film_of, valid = ff_gold.load_dictionary(annotation_path)

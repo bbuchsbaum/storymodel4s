@@ -8,10 +8,14 @@ content belongs to), each as the reply `stated` it and as it was decided against
 
 What the values mean:
 - `stated` is the answer in the form a scorer reads. `judgement.kind` is one of scene, film (a
-  film with no particular scene), none, invalid-scene (a real scene that is not a target; it
+  film with no particular scene), time-outside, none, invalid-scene (a real scene that is not a target; it
   still names its film), unknown-scene, unknown-film, invalid, omitted, unparsable-chunk.
-- Only scene, film and none are answers a record holds as decisions. Every other kind is a
+- Only scene, film, time-outside and none are answers a record holds as decisions. Every other kind is a
   failed outcome in the record and is never a no-assignment.
+- A condition that answers with a time keeps the raw film and time in `stated`, beside the scene
+  that contains the time and the scenes near it. `source.clock` holds each film's scene
+  intervals as exact fractions. `time-outside` is a time outside the film's clip: it names the
+  film and selects no scene, and the record holds it as a choice of the film.
 - `extras` are self-reported fields kept verbatim. They are not scores.
 - A unit is identified by participant, session and its number `u` (or the study's `row`). The
   `unit` id is derived from the text and can repeat across sessions.
@@ -24,7 +28,9 @@ Usage:
 
 import json
 import os
+import re
 import sys
+from fractions import Fraction
 
 SCHEMA = "storymodel4s.agentmapping.bundle/v2"
 FIELDS = ("narrative", "referent")
@@ -59,13 +65,75 @@ def record_outcomes(bundle, field):
     return out
 
 
-def judge(stated, scenes, films):
+TIME = re.compile(r"([0-9]{1,2}):([0-5][0-9](?:\.[0-9]{1,3})?)")
+TIME_PROTOCOLS = ("strict-chunked-time/v1",)
+
+
+def clock_table(source):
+    """{film: (duration, [(scene, start, end)])} from a bundle's `source.clock`, exact."""
+    table = {}
+    for film in source["clock"]["films"]:
+        table[film["collection"]] = (
+            Fraction(film["durationSeconds"]),
+            [(s["scene"], Fraction(s["start"]), Fraction(s["end"])) for s in film["scenes"]],
+        )
+    return Fraction(source["clock"]["toleranceSeconds"]), table
+
+
+def time_prediction(clock, film, time):
+    """A raw film and time as the prediction a time condition stores (the rule of the
+    library's `StudyReplay.timeStated` and `SceneIntervals.locate`)."""
+    tolerance, table = clock
+    if time is None:
+        if is_int(film):
+            return {"status": "answered", "kind": "film", "film": film}
+        if film is None:
+            return {"status": "answered", "kind": "none"}
+        return {"status": "failed", "reason": "invalid-film"}
+    raw = {"film_stated": film, "time": time}
+    match = TIME.fullmatch(time) if isinstance(time, str) else None
+    if not match:
+        return {"status": "failed", "reason": "invalid-time", **raw}
+    if film is None:
+        return {"status": "failed", "reason": "time-without-film", **raw}
+    if not is_int(film):
+        return {"status": "failed", "reason": "invalid-film", **raw}
+    if film not in table:
+        return {"status": "failed", "reason": "unknown-film", **raw}
+    seconds = int(match.group(1)) * 60 + Fraction(match.group(2))
+    duration, scenes = table[film]
+    near = [s for s, start, end in scenes if max(start - seconds, seconds - end, 0) <= tolerance]
+    rest = {"near": near, **raw, "seconds": float(seconds)}
+    if seconds < 0 or seconds > duration:
+        return {"status": "answered", "kind": "time_outside", "film": film, **rest}
+    inside = [s for s, start, end in scenes if start <= seconds < end]
+    scene = inside[0] if inside else scenes[-1][0]
+    return {"status": "answered", "kind": "scene", "scene": scene, **rest}
+
+
+def judge(stated, scenes, films, clock=None, timed=False):
     """The judgement a stated answer gives against the bundle's source dictionary, and the
-    record outcome it requires. The same rule as the library's `StudyRecord.judge`.
+    record outcome it requires. The same rule as the library's `StudyRecord.judge`. A time
+    answer is first converted again from its raw film and time and must be what is stored.
     """
     failed = ("failed", None)
     if not isinstance(stated, dict):
         raise BundleError("a stated answer is not an object")
+    if "time" in stated:
+        if clock is None or not timed:
+            raise BundleError("a time answer in a bundle with no clip clock")
+        if time_prediction(clock, stated.get("film_stated"), stated["time"]) != stated:
+            raise BundleError("a time answer is not what its film and time give")
+        if stated.get("kind") == "time_outside" and stated.get("status") == "answered":
+            film = films.get(stated["film"])
+            if film is None or not film["isTarget"]:
+                raise BundleError("a time is placed in a film that is not a target")
+            return (
+                {"kind": "time-outside", "collection": stated["film"]},
+                ("choice", film["target"]),
+            )
+    elif timed and stated.get("status") == "answered" and stated.get("kind") == "scene":
+        raise BundleError("a scene without a time in a condition that answers with a time")
     if stated.get("status") == "failed":
         reason = stated.get("reason")
         if not isinstance(reason, str):
@@ -132,6 +200,10 @@ def check(bundle):
         raise BundleError("units are not numbered 1 to n in order")
     scenes = {s["scene"]: s for s in bundle["source"]["scenes"]}
     films = {c["collection"]: c for c in bundle["source"]["collections"]}
+    timed = provenance["protocol"] in TIME_PROTOCOLS
+    if timed != ("clock" in bundle["source"]):
+        raise BundleError("a time condition needs a clip clock, and no other has one")
+    clock = clock_table(bundle["source"]) if timed else None
     for unit in units:
         extras = unit["extras"]
         if not isinstance(extras, dict) or any(key in RESERVED for key in extras):
@@ -157,7 +229,7 @@ def check(bundle):
             raise BundleError(f"unit rows do not match the {field} record's units")
         for unit, (_, kind, target) in zip(units, outcomes):
             where = f'unit {unit["u"]} {field}'
-            judgement, expected = judge(unit[field]["stated"], scenes, films)
+            judgement, expected = judge(unit[field]["stated"], scenes, films, clock, timed)
             if unit[field]["judgement"] != judgement:
                 raise BundleError(f"{where}: the judgement does not follow from the stated answer")
             if expected != (kind, target):
@@ -231,6 +303,9 @@ def describe(judgement, bundle):
     if kind == "film":
         film = judgement["collection"]
         return f'film {film} "{films[film]}", no particular scene'
+    if kind == "time-outside":
+        film = judgement["collection"]
+        return f'film {film} "{films[film]}", at a time outside its clip'
     if kind == "none":
         return "no assignment"
     detail = judgement.get("stated") or judgement.get("reason")

@@ -170,22 +170,24 @@ object StudyBundle:
   ): Json =
     Json.obj(
       "schema" -> str(Schema),
-      "provenance" -> Json.obj(
-        "participant" -> str(provenance.participant),
-        "session" -> str(provenance.session),
-        "condition" -> str(provenance.condition),
-        "model" -> str(provenance.model),
-        "provider" -> str(provenance.provider),
-        "protocol" -> str(provenance.protocol),
-        "systemSha256" -> str(provenance.systemSha256),
-        "manifestSha256" -> str(provenance.manifestSha256),
-        "segmentation" -> Json.obj(
-          "kind" -> str(provenance.segmentation.kind),
-          "artifactSha256" -> str(provenance.segmentation.artifactSha256.hex),
-          "recipe" -> str(provenance.segmentation.recipe)
-        ),
-        "modelCalls" -> Json.fromInt(0)
-      ).deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h)))),
+      "provenance" -> Json
+        .obj(
+          "participant" -> str(provenance.participant),
+          "session" -> str(provenance.session),
+          "condition" -> str(provenance.condition),
+          "model" -> str(provenance.model),
+          "provider" -> str(provenance.provider),
+          "protocol" -> str(provenance.protocol),
+          "systemSha256" -> str(provenance.systemSha256),
+          "manifestSha256" -> str(provenance.manifestSha256),
+          "segmentation" -> Json.obj(
+            "kind" -> str(provenance.segmentation.kind),
+            "artifactSha256" -> str(provenance.segmentation.artifactSha256.hex),
+            "recipe" -> str(provenance.segmentation.recipe)
+          ),
+          "modelCalls" -> Json.fromInt(0)
+        )
+        .deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h)))),
       "meaning" -> Json.obj(
         "narrative" -> str("the scene the retelling is narrating at this unit"),
         "referent" -> str("the scene containing the specifically mentioned content"),
@@ -259,12 +261,15 @@ object StudyBundle:
     val c = stated.hcursor
     c.get[String]("status").toOption.flatMap {
       case "answered" =>
-        StudyReplay.statedOf(stated).filter {
-          // In a condition that answers with a time, a scene comes only from a time.
-          case _: StudyReplay.Stated.Scene => !timed
-          case _                           => true
-        }.map(StudyRecord.judge(view, _))
-      case "failed"   =>
+        StudyReplay
+          .statedOf(stated)
+          .filter {
+            // In a condition that answers with a time, a scene comes only from a time.
+            case _: StudyReplay.Stated.Scene => !timed
+            case _                           => true
+          }
+          .map(StudyRecord.judge(view, _))
+      case "failed" =>
         c.get[String]("reason").toOption.map {
           case "omitted"          => StudyRecord.Judgement.Omitted
           case "unparsable-chunk" => StudyRecord.Judgement.UnparsableChunk
@@ -314,9 +319,14 @@ object StudyBundle:
         (),
         "the recall is not the study's units"
       )
-      timed = StudyReplay.ReplyProtocol.named(protocol)
+      timed = StudyReplay.ReplyProtocol
+        .named(protocol)
         .contains(StudyReplay.ReplyProtocol.StrictChunkedTime)
-      _ <- Either.cond(timed == expected.intervals.isDefined, (), "a time condition needs a clip clock, and no other has one")
+      _ <- Either.cond(
+        timed == expected.intervals.isDefined,
+        (),
+        "a time condition needs a clip clock, and no other has one"
+      )
       _ <- Either.cond(
         c.downField("source").focus.contains(sourceJson(view, expected.intervals)),
         (),

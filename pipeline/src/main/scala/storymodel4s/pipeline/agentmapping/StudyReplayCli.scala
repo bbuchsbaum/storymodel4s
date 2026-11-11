@@ -181,7 +181,11 @@ object StudyExport:
             done <- acc
             part <- c.get[String]("part").toOption
             n <- c.get[String]("numerator").toOption.filter(_.forall(_.isDigit)).filter(_.nonEmpty)
-            d <- c.get[String]("denominator").toOption.filter(_.forall(_.isDigit)).filter(_.nonEmpty)
+            d <- c
+              .get[String]("denominator")
+              .toOption
+              .filter(_.forall(_.isDigit))
+              .filter(_.nonEmpty)
             scale <- SceneIntervals.Exact.ratio(BigInt(n), BigInt(d))
           yield done.updated(part, scale)
         }

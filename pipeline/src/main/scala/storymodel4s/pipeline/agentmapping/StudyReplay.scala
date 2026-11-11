@@ -42,10 +42,10 @@ object StudyReplay:
       * name and an old export cannot be read under new rules by accident.
       */
     def named(name: String): Option[ReplyProtocol] = name match
-      case "coercing-open/v1"  => Some(CoercingOpen)
-      case "strict-chunked/v1" => Some(StrictChunked)
+      case "coercing-open/v1"       => Some(CoercingOpen)
+      case "strict-chunked/v1"      => Some(StrictChunked)
       case "strict-chunked-time/v1" => Some(StrictChunkedTime)
-      case _                   => None
+      case _                        => None
 
   /** One recall unit as the study numbers it. `row` is the study's own key, kept verbatim. */
   final case class RecallUnit(u: Int, row: Json, text: String)
@@ -102,7 +102,7 @@ object StudyReplay:
     j.asNumber.filter(n => IntegerLiteral.matches(n.toString)).flatMap(_.toBigInt)
 
   private def unitKey(protocol: ReplyProtocol, item: Json): Option[Int] = protocol match
-    case ReplyProtocol.CoercingOpen  => AgentReplay.unitKey(item)
+    case ReplyProtocol.CoercingOpen                                    => AgentReplay.unitKey(item)
     case ReplyProtocol.StrictChunked | ReplyProtocol.StrictChunkedTime =>
       item.asObject
         .flatMap(_("u"))
@@ -142,8 +142,8 @@ object StudyReplay:
           case (Some(film), Some(time)) => timeStated(film, time)
           case _                        => Stated.Invalid("missing-field")
 
-  /** One judgement of a time condition, from its film and time values. No time is a film alone,
-    * or no assignment when the film is null too. A time must be well formed and must come with an
+  /** One judgement of a time condition, from its film and time values. No time is a film alone, or
+    * no assignment when the film is null too. A time must be well formed and must come with an
     * integer film; otherwise the judgement is invalid, and the raw values are kept.
     */
   def timeStated(film: Json, time: Json): Stated =
@@ -155,9 +155,9 @@ object StudyReplay:
     else
       val raw = Vector("film_stated" -> film, "time" -> time)
       time.asString.filter(SceneIntervals.parseTime(_).isDefined) match
-        case None                    => Stated.Invalid("invalid-time", raw)
-        case Some(_) if film.isNull  => Stated.Invalid("time-without-film", raw)
-        case Some(text)              =>
+        case None                   => Stated.Invalid("invalid-time", raw)
+        case Some(_) if film.isNull => Stated.Invalid("time-without-film", raw)
+        case Some(text)             =>
           strictInteger(film).fold(Stated.Invalid("invalid-film", raw))(Stated.Time(_, text))
 
   private def failed(reason: String, raw: Vector[(String, Json)] = Vector.empty): Json =
@@ -181,7 +181,7 @@ object StudyReplay:
               (("near" -> Json.fromValues(near.map(Json.fromInt))) +: raw) :+
                 ("seconds" -> Json.fromDoubleOrNull(seconds))
             table.locate(film, exact) match
-              case SceneIntervals.Located.UnknownFilm => failed("unknown-film", raw)
+              case SceneIntervals.Located.UnknownFilm        => failed("unknown-film", raw)
               case SceneIntervals.Located.Scene(scene, near) =>
                 answered(
                   (("kind" -> Json.fromString("scene")) +: ("scene" -> Json.fromInt(scene)) +:

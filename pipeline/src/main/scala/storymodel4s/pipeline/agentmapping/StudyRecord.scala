@@ -22,8 +22,8 @@ object StudyRecord:
     /** A film with no particular scene. */
     case Collection(number: Int, target: SourceNodeRef)
 
-    /** A time in a film that falls outside the film's clip. It names the film and selects no
-      * scene; the record holds it as a choice of the film.
+    /** A time in a film that falls outside the film's clip. It names the film and selects no scene;
+      * the record holds it as a choice of the film.
       */
     case TimeOutside(film: Int, target: SourceNodeRef)
     case NoAssignment
@@ -78,9 +78,9 @@ object StudyRecord:
             (exact, _) <- SceneIntervals.parseTime(time)
           yield table.locate(film, exact)
         located match
-          case None                                       => Judgement.Invalid("no-clip-clock")
-          case Some(SceneIntervals.Located.UnknownFilm)   => Judgement.Invalid("unknown-film")
-          case Some(SceneIntervals.Located.Scene(n, _))   =>
+          case None                                     => Judgement.Invalid("no-clip-clock")
+          case Some(SceneIntervals.Located.UnknownFilm) => Judgement.Invalid("unknown-film")
+          case Some(SceneIntervals.Located.Scene(n, _)) =>
             // A table holds target scenes only, so the scene is one the source offers.
             view.groupRefs.get(n).filter(targetScenes).fold(Judgement.NotATarget(n)) {
               Judgement.Scene(n, _)
@@ -144,7 +144,7 @@ object StudyRecord:
       case Judgement.Scene(_, ref)       => choose(ref)
       case Judgement.Collection(_, ref)  => choose(ref)
       case Judgement.TimeOutside(_, ref) => choose(ref)
-      case Judgement.NoAssignment       =>
+      case Judgement.NoAssignment        =>
         UnitOutcome.categorical(
           unit,
           DecisionRequest.Abstain(policy, s"model reported no $field assignment"),

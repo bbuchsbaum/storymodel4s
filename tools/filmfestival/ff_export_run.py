@@ -8,6 +8,8 @@ Usage: ff_export_run.py DATA_ROOT MANIFEST OUTPUT_DIR
 MANIFEST is the run's tracked, frozen manifest. The export is what the generic replay needs and
 nothing corpus-specific beyond it:
 
+- `clock.json`, for a condition that answers with a time: each film's clip clock and clip
+  length and the nearness tolerance, as the manifest froze them;
 - `index.json`: the system prompt, the model, condition, chunk size, attempts and retry suffix,
   the manifest's hash, and per participant-session the hash of each prompt;
 - `sessions/<participant>_<session>.json`: the session's recall units (unit number, the study's
@@ -32,8 +34,38 @@ import ff_packet  # noqa: E402
 
 SCHEMA = "storymodel4s.agentmapping.study-export/v1"
 # The rules by which each condition's replies were read (see StudyReplay.ReplyProtocol). The
-# time conditions read other fields and get a protocol of their own; until then they refuse.
-REPLY_PROTOCOL = {ff_map.ANNOTATION: "strict-chunked/v1"}
+# conditions that answer with a time read a film field and a time field.
+REPLY_PROTOCOL = {
+    ff_map.ANNOTATION: "strict-chunked/v1",
+    ff_map.AUTO: "strict-chunked-time/v1",
+    ff_map.NORECORD: "strict-chunked-time/v1",
+}
+CLOCK_SCHEMA = "storymodel4s.agentmapping.clip-clock/v1"
+
+
+def clock_document(tracked):
+    """The clip clock a time condition froze in its manifest, per film, as decimal strings.
+
+    `origin`, `rate` and `offset` are the clock `clip = rate * (source - origin) + offset` in
+    seconds; a film's collection number is its film code (see ff_export_source.py).
+    """
+    clock, lengths = tracked["clock"], tracked["clipSeconds"]
+    if sorted(clock) != sorted(lengths):
+        raise ExportError("the manifest's clock and clip lengths name different films")
+    return {
+        "schema": CLOCK_SCHEMA,
+        "toleranceSeconds": tracked["toleranceSeconds"],
+        "collections": [
+            {
+                "collection": int(film),
+                "origin": clock[film]["C0"],
+                "rate": clock[film]["a"],
+                "offset": clock[film]["b"],
+                "clipSeconds": str(lengths[film]),
+            }
+            for film in sorted(clock, key=int)
+        ],
+    }
 
 
 class ExportError(ValueError):
@@ -41,7 +73,8 @@ class ExportError(ValueError):
 
 
 def build(data_root, manifest_path):
-    """(index, {file name: session document}) for the run MANIFEST describes."""
+    """(index, {file name: session document}, clock document or None) for the run MANIFEST
+    describes."""
     with open(manifest_path, encoding="utf-8") as handle:
         tracked = json.load(handle)
     condition_name = tracked.get("condition", ff_map.ANNOTATION)
@@ -111,7 +144,8 @@ def build(data_root, manifest_path):
         "manifestSha256": ff_map.file_sha(manifest_path),
         "sessions": entries,
     }
-    return index, sessions
+    clock = clock_document(tracked) if condition_name != ff_map.ANNOTATION else None
+    return index, sessions, clock
 
 
 def main(argv):
@@ -123,7 +157,7 @@ def main(argv):
         print("refused: output exists", file=sys.stderr)
         return 2
     try:
-        index, sessions = build(data_root, manifest_path)
+        index, sessions, clock = build(data_root, manifest_path)
     except (ExportError, ff_gold.GoldError) as error:
         print(f"refused: {error}", file=sys.stderr)
         return 2
@@ -135,6 +169,10 @@ def main(argv):
     ff_map.write_text(
         os.path.join(out, "index.json"), json.dumps(index, indent=1) + "\n"
     )
+    if clock is not None:
+        ff_map.write_text(
+            os.path.join(out, "clock.json"), json.dumps(clock, indent=1) + "\n"
+        )
     units = sum(e["units"] for e in index["sessions"])
     calls = sum(len(e["promptSha256"]) for e in index["sessions"])
     print(
