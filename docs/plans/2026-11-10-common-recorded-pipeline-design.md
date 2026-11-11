@@ -203,10 +203,11 @@ without Scala, and `ff_score.py score` accepts a directory of them in place of r
   convert every time answer again and require what is stored; the library's reader also
   requires the whole source dictionary, clock included, to be the regenerated source's.
 - **Answers are bound to the record.** A record's decision receipt names a digest of the
-  answers as stated: per unit, the kind of answer or failure, and the film and time the reply
-  gave. The record's choice alone does not determine where in a scene a time fell, or whether
+  answers as stated: per unit, the kind of answer or failure, and the scene, film and time the
+  answer holds. The record's choice alone does not determine where in a scene a time fell, or whether
   a film was named alone or with a time outside its clip, and both are scored. With the digest,
-  neither can change beside an unchanged record. This applies to every condition.
+  neither can change beside an unchanged record. This applies to every condition. Bundles
+  written before the digest existed are refused; they are regenerated from recordings.
 - **Scorer.** `ff_score.py` reads time-condition bundles and applies its own frozen conversion
   to them, as it does to reply files.
 

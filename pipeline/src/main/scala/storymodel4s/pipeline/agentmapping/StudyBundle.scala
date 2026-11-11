@@ -162,8 +162,8 @@ object StudyBundle:
     intervals.fold(base)(t => base.deepMerge(Json.obj("clock" -> t.json)))
 
   /** A digest of one judgement's answers as stated, one line per unit: the unit's number, the kind
-    * of answer (or the failure and its reason), and the film and the time the reply gave where it
-    * gave them. A record names this digest in its decision receipt. So the parts of an answer the
+    * of answer (or the failure and its reason), and the scene, film and time the answer holds
+    * where it holds them. A record names this digest in its decision receipt. So the parts of an answer the
     * record's choice does not determine, such as where in a scene a time fell, or whether a film
     * was named alone or with a time outside its clip, cannot change beside the record.
     */
@@ -184,9 +184,10 @@ object StudyBundle:
       val kind =
         if c.get[String]("status").contains("answered") then c.get[String]("kind").getOrElse("?")
         else "failed:" + c.get[String]("reason").getOrElse("?")
-      val film = c.downField("film_stated").focus
-      val time = c.downField("time").focus
-      s"$u\t$kind\t${token(film)}\t${token(time)}\n"
+      val held = Vector("scene", "film", "film_stated", "time")
+        .map(key => token(c.downField(key).focus))
+        .mkString("\t")
+      s"$u\t$kind\t$held\n"
     }.mkString)
 
   /** Both judgements' checked records for one session's rows, each bound to its stated answers. */

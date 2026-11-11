@@ -174,7 +174,7 @@ def judge(stated, scenes, films, clock=None, timed=False):
 def answers_digest(units, field):
     """The digest a record names for the answers it was made from (the library's
     `StudyBundle.answersDigest`): per unit its number, the kind of answer or the failure and its
-    reason, and the film and time the reply gave where it gave them."""
+    reason, and the scene, film and time the answer holds where it holds them."""
 
     def token(stated, key):
         if key not in stated:
@@ -197,9 +197,8 @@ def answers_digest(units, field):
             kind = "failed:" + stated.get("reason", "?")
         if not isinstance(kind, str):
             raise BundleError("a stated kind or reason is not text")
-        lines.append(
-            f'{unit["u"]}\t{kind}\t{token(stated, "film_stated")}\t{token(stated, "time")}\n'
-        )
+        held = "\t".join(token(stated, key) for key in ("scene", "film", "film_stated", "time"))
+        lines.append(f'{unit["u"]}\t{kind}\t{held}\n')
     return hashlib.sha256("".join(lines).encode("utf-8")).hexdigest()
 
 

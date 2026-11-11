@@ -186,6 +186,19 @@ class StudyBundle(unittest.TestCase):
                 with self.assertRaises(study_bundle.BundleError):
                     study_bundle.load(path)
 
+    def test_a_failed_scene_answer_cannot_be_renumbered(self):
+        # A scene that is not a target is a failure in the record, which holds no number.
+        for scene, judgement in (
+            (3, {"kind": "invalid-scene", "scene": 3, "collection": 2}),
+            (99999, {"kind": "unknown-scene", "stated": "99999"}),
+        ):
+
+            def change(b, scene=scene, judgement=judgement):
+                b["units"][1]["referent"]["stated"]["scene"] = scene
+                b["units"][1]["referent"]["judgement"] = judgement
+
+            self.refused(change, "not the ones the record was made from")
+
     def test_a_non_target_cannot_be_called_a_scene_choice(self):
         def change(b):
             b["units"][1]["referent"]["judgement"]["kind"] = "scene"
