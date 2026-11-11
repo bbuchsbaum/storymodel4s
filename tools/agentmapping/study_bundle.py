@@ -26,6 +26,7 @@ Usage:
     study_bundle.py replies BUNDLE_DIR OUT_DIR    reply files, one per bundle, for a scorer
 """
 
+import hashlib
 import json
 import os
 import re
@@ -170,6 +171,38 @@ def judge(stated, scenes, films, clock=None, timed=False):
     raise BundleError("a stated answer has an unknown kind")
 
 
+def answers_digest(units, field):
+    """The digest a record names for the answers it was made from (the library's
+    `StudyBundle.answersDigest`): per unit its number, the kind of answer or the failure and its
+    reason, and the film and time the reply gave where it gave them."""
+
+    def token(stated, key):
+        if key not in stated:
+            return "-"
+        value = stated[key]
+        if value is None:
+            return "null"
+        if is_int(value):
+            return str(value)
+        if isinstance(value, str):
+            return "s:" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+        return "x"
+
+    lines = []
+    for unit in units:
+        stated = unit[field]["stated"]
+        if stated.get("status") == "answered":
+            kind = stated.get("kind", "?")
+        else:
+            kind = "failed:" + stated.get("reason", "?")
+        if not isinstance(kind, str):
+            raise BundleError("a stated kind or reason is not text")
+        lines.append(
+            f'{unit["u"]}\t{kind}\t{token(stated, "film_stated")}\t{token(stated, "time")}\n'
+        )
+    return hashlib.sha256("".join(lines).encode("utf-8")).hexdigest()
+
+
 def decision_receipt(record):
     for receipt in record["stage_assumption_receipts"]:
         if receipt["stage"] == "Decision":
@@ -183,7 +216,7 @@ def check(bundle):
     Every judgement is derived again from its stated answer and the source dictionary and must
     be what the row holds; each record must then hold that outcome for the unit. Each record
     must be its slot's, under the bundle's condition and protocol, and must name the bundle's
-    model, provider, instruction and units.
+    model, provider, instruction and units, and the digest of the answers as stated.
 
     What this cannot check: that the unit numbers and row keys are the study's, and that the
     records are intact. Both need the study export; the library's `StudyBundle.decode` checks
@@ -234,6 +267,10 @@ def check(bundle):
                 raise BundleError(f"{where}: the judgement does not follow from the stated answer")
             if expected != (kind, target):
                 raise BundleError(f'{where}: row says {judgement["kind"]}, record says {kind}')
+    for field in FIELDS:
+        receipt = decision_receipt(bundle["interpretations"][field]["record"])
+        if answers_digest(units, field) not in receipt["inputs"]:
+            raise BundleError(f"the {field} answers are not the ones the record was made from")
     for unit in units:
         kinds = {unit[f]["judgement"]["kind"] for f in FIELDS}
         whole = kinds & {"omitted", "unparsable-chunk"}

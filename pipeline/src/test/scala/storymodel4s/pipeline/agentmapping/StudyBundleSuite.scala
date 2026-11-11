@@ -73,21 +73,7 @@ class StudyBundleSuite extends FunSuite:
   private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
   private lazy val expected = StudyBundle.Expected("p1", "s1", units, producer)
   private def recordsFor(condition: String): Map[String, MappingResult] =
-    StudyBundle.Fields.map { f =>
-      f -> right(
-        StudyRecord
-          .record(
-            f,
-            StudyRecord.policy(condition, protocolName, f),
-            recall,
-            view,
-            producer,
-            rows.map(_.judgement(f))
-          )
-          .left
-          .map(_.message)
-      )
-    }.toMap
+    right(StudyBundle.records(condition, protocolName, recall, view, producer, rows))
   private lazy val records = recordsFor("annotation")
   private lazy val bundle = StudyBundle.encode(provenance, view, records, rows)
 
@@ -219,6 +205,19 @@ class StudyBundleSuite extends FunSuite:
     b.mapObject(o =>
       o.add("provenance", o("provenance").get.mapObject(_.add(key, Json.fromString(value))))
     )
+
+  test("an answer's stated form cannot change beside an unchanged record"):
+    // The film the reply named beside a scene does not affect the choice; it is still bound.
+    val restated = json("""{"status":"answered","kind":"scene","scene":1,"film_stated":3}""")
+    assertEquals(
+      edited(unit(0)(field("referent", "stated", restated))).left.toOption,
+      Some("a unit row disagrees with the referent record")
+    )
+    // A failure's reason is part of what the record was made from.
+    val reason = json("""{"status":"failed","reason":"invalid-film"}""")
+    val judged = json("""{"kind":"invalid","reason":"invalid-film"}""")
+    val both = unit(5)(field("narrative", "stated", reason).andThen(field("narrative", "judgement", judged)))
+    assertEquals(edited(both).left.toOption, Some("a unit row disagrees with the narrative record"))
 
   test("an extra cannot use a row's own key"):
     val smuggled = json("""{"referent":{"status":"answered","kind":"scene","scene":1},"row":99}""")

@@ -48,21 +48,8 @@ class StudyTimeBundleSuite extends FunSuite:
   private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
   private lazy val expected =
     StudyBundle.Expected("p1", "s1", units, producer, Some(intervals))
-  private lazy val records = StudyBundle.Fields.map { f =>
-    f -> right(
-      StudyRecord
-        .record(
-          f,
-          StudyRecord.policy("norecord", protocolName, f),
-          recall,
-          view,
-          producer,
-          rows.map(_.judgement(f))
-        )
-        .left
-        .map(_.message)
-    )
-  }.toMap
+  private lazy val records =
+    right(StudyBundle.records("norecord", protocolName, recall, view, producer, rows))
   private val provenance = StudyBundle.Provenance(
     "p1",
     "s1",
@@ -216,6 +203,29 @@ class StudyTimeBundleSuite extends FunSuite:
     val both =
       unit(0)(field("referent", "stated", moved).andThen(field("referent", "judgement", judged)))
     assertEquals(edited(both).left.toOption, Some("a unit row disagrees with the referent record"))
+
+  test("a time moved inside its scene, restated consistently, is still refused"):
+    // Scene 2 either way, so the record's choice is unchanged; the near list is not.
+    val moved = json(
+      """{"status":"answered","kind":"scene","scene":2,"near":[2,3],"film_stated":1,"time":"0:19","seconds":19.0}"""
+    )
+    assertEquals(
+      edited(unit(0)(field("referent", "stated", moved))).left.toOption,
+      Some("a unit row disagrees with the referent record")
+    )
+
+  test("a film named alone and a time outside its clip cannot be swapped"):
+    // Both are a choice of film 3 in the record.
+    val alone = json("""{"status":"answered","kind":"film","film":3}""")
+    val film = json("""{"kind":"film","collection":3}""")
+    val swap = unit(1)(field("referent", "stated", alone).andThen(field("referent", "judgement", film)))
+    assertEquals(edited(swap).left.toOption, Some("a unit row disagrees with the referent record"))
+    val late = json(
+      """{"status":"answered","kind":"time_outside","film":3,"near":[],"film_stated":3,"time":"9:59","seconds":599.0}"""
+    )
+    val outside = json("""{"kind":"time-outside","collection":3}""")
+    val back = unit(2)(field("narrative", "stated", late).andThen(field("narrative", "judgement", outside)))
+    assertEquals(edited(back).left.toOption, Some("a unit row disagrees with the narrative record"))
 
   test("a scene without a time is refused in a condition that answers with a time"):
     val bare = json("""{"status":"answered","kind":"scene","scene":2,"film_stated":1}""")

@@ -160,6 +160,51 @@ object StudyBundle:
     )
     intervals.fold(base)(t => base.deepMerge(Json.obj("clock" -> t.json)))
 
+  /** A digest of one judgement's answers as stated, one line per unit: the unit's number, the
+    * kind of answer (or the failure and its reason), and the film and the time the reply gave
+    * where it gave them. A record names this digest in its decision receipt. So the parts of an answer
+    * the record's choice does not determine, such as where in a scene a time fell, or whether a
+    * film was named alone or with a time outside its clip, cannot change beside the record.
+    */
+  def answersDigest(stated: Vector[(Int, Json)]): Checksum =
+    def token(j: Option[Json]): String = j match
+      case None                 => "-"
+      case Some(v) if v.isNull  => "null"
+      case Some(v)              =>
+        StudyReplay.strictInteger(v).map(_.toString).orElse(
+          v.asString.map(text => "s:" + Checksum.ofText(text).hex)
+        ).getOrElse("x")
+    Checksum.ofText(stated.map { (u, answer) =>
+      val c = answer.hcursor
+      val kind =
+        if c.get[String]("status").contains("answered") then c.get[String]("kind").getOrElse("?")
+        else "failed:" + c.get[String]("reason").getOrElse("?")
+      val film = c.downField("film_stated").focus
+      val time = c.downField("time").focus
+      s"$u\t$kind\t${token(film)}\t${token(time)}\n"
+    }.mkString)
+
+  /** Both judgements' checked records for one session's rows, each bound to its stated answers. */
+  def records(
+      condition: String,
+      protocolName: String,
+      recall: PreparedRecall,
+      view: TimedSourceView,
+      producer: AgentMappingRecord.Producer,
+      rows: Vector[Row]
+  ): Either[String, Map[String, MappingResult]] =
+    Fields.foldLeft[Either[String, Map[String, MappingResult]]](Right(Map.empty)) { (acc, f) =>
+      acc.flatMap { done =>
+        val bound =
+          producer.copy(answersSha256 = Some(answersDigest(rows.map(r => r.u -> r.stated(f)))))
+        StudyRecord
+          .record(f, StudyRecord.policy(condition, protocolName, f), recall, view, bound, rows.map(_.judgement(f)))
+          .map(done.updated(f, _))
+          .left
+          .map(e => s"$f: ${e.message}")
+      }
+    }
+
   /** The bundle document. Records are embedded as their codec JSON, unchanged. */
   def encode(
       provenance: Provenance,
@@ -286,7 +331,8 @@ object StudyBundle:
     * record is decoded through the mapping codec, which re-derives it, and must then equal the
     * record these rows give under this producer and this condition's policy. That last comparison
     * binds the rows, the source, the recall, the model, the provider and the instruction to the
-    * record. Provenance must name the same participant, session, model, provider, instruction and
+    * record. The record also names a digest of the answers as stated, so an answer cannot be
+    * edited beside an unchanged record. Provenance must name the same participant, session, model, provider, instruction and
     * units. Extras and the source dictionary are descriptions and are read as written, except that
     * an extra may not use a row's own key.
     */
@@ -396,8 +442,17 @@ object StudyBundle:
               (),
               s"the $f slot does not hold the $f record"
             )
+            bound = expected.producer.copy(answersSha256 =
+              Some(
+                answersDigest(
+                  expected.units
+                    .map(_.u)
+                    .zip(units.map(_.hcursor.downField(f).downField("stated").focus.getOrElse(Json.Null)))
+                )
+              )
+            )
             again <- StudyRecord
-              .record(f, policy, recall, view, expected.producer, judged(f))
+              .record(f, policy, recall, view, bound, judged(f))
               .left
               .map(e => s"$f: ${e.message}")
             _ <- Either.cond(

@@ -223,7 +223,12 @@ object SceneIntervals:
                 own.indices.toVector.map(i => Interval(own(i), from(i), from(i + 1)))
               )
             )
-    if clocks.keySet != targetFilms then Left("the clock does not cover exactly the target films")
+    if tolerance < Exact.zero || clocks.values.exists { c =>
+        c.rate <= Exact.zero || c.clipSeconds <= Exact.zero
+      }
+    then Left("a tolerance is negative, or a clock's rate or clip length is not positive")
+    else if clocks.keySet != targetFilms then
+      Left("the clock does not cover exactly the target films")
     else
       clocks.toVector
         .sortBy(_._1)

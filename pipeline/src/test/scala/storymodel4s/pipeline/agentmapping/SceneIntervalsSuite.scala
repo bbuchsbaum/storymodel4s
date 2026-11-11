@@ -89,6 +89,23 @@ class SceneIntervalsSuite extends FunSuite:
       Left("film 1: the clock's origin is not the start of its first target row")
     )
 
+  test("a table is not built from a negative tolerance or a clock that does not run forward"):
+    val refusal = Left("a tolerance is negative, or a clock's rate or clip length is not positive")
+    val clocks = SceneIntervals.parseClock(clockJson()).toOption.get._2
+    assertEquals(SceneIntervals.build(view, scales, q("-1"), clocks), refusal)
+    val stopped = clocks.updated(1, clocks(1).copy(rate = q("0")))
+    assertEquals(SceneIntervals.build(view, scales, q("2"), stopped), refusal)
+    val empty = clocks.updated(3, clocks(3).copy(clipSeconds = q("-5")))
+    assertEquals(SceneIntervals.build(view, scales, q("2"), empty), refusal)
+
+  test("each part's timebase is read from the parts file"):
+    assertEquals(StudyExport.partScales(parts.getBytes("UTF-8")), Right(scales))
+    val numbers = """[{"part":"a","start":"0","end":"9","numerator":1,"denominator":10}]"""
+    assert(StudyExport.partScales(numbers.getBytes("UTF-8")).isLeft)
+    val zero = """[{"part":"a","start":"0","end":"9","numerator":"0","denominator":"10"}]"""
+    assert(StudyExport.partScales(zero.getBytes("UTF-8")).isLeft)
+    assert(StudyExport.partScales("{}".getBytes("UTF-8")).isLeft)
+
   test("the clock must cover exactly the target films"):
     val refusal = Left("the clock does not cover exactly the target films")
     assertEquals(intervalsOf(clock = clockJson(films = Vector(1))), refusal)

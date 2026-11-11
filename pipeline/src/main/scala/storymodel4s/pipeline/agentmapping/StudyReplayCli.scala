@@ -502,18 +502,9 @@ object StudyExport:
     val rows = replies.zip(recall.unitIds).map { case ((u, r), id) =>
       StudyBundle.row(view, index.protocol, u, id.value, r, index.extras, intervals)
     }
-    val records = StudyBundle.Fields.map { f =>
-      f -> StudyRecord
-        .record(
-          f,
-          StudyRecord.policy(index.condition, index.protocolName, f),
-          recall,
-          view,
-          producer,
-          rows.map(_.judgement(f))
-        )
-        .fold(e => refuse(s"${entry.name} $f: ${e.message}"), identity)
-    }.toMap
+    val records = StudyBundle
+      .records(index.condition, index.protocolName, recall, view, producer, rows)
+      .fold(e => refuse(s"${entry.name} $e"), identity)
     val doc = StudyBundle.encode(
       StudyBundle.Provenance(
         entry.participant,

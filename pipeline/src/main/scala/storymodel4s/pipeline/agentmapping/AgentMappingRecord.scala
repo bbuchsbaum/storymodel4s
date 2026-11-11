@@ -30,14 +30,16 @@ object AgentMappingRecord:
   final case class Film(view: TimedSourceView, scenes: Map[Int, SourceNodeRef])
 
   /** Who produced the decisions, for the decision stage's receipt. `recallSha256` is the recall
-    * word table the units came from.
+    * word table the units came from. `answersSha256`, when given, is a digest of the answers as
+    * stated, so that what a record was made from cannot change beside it.
     */
   final case class Producer(
       provider: String,
       model: String,
       systemSha256: Checksum,
       outlineSha256: Checksum,
-      recallSha256: Checksum
+      recallSha256: Checksum,
+      answersSha256: Option[Checksum] = None
   ):
     /** The model as far as it is known: a provider label and a model name, no registered artifact.
       * The digest is of exactly that description, so it cannot be mistaken for the prompt or for a
@@ -154,7 +156,7 @@ object AgentMappingRecord:
         Stage.Decision,
         policy.value,
         producer.systemSha256,
-        Vector(producer.outlineSha256, producer.recallSha256),
+        Vector(producer.outlineSha256, producer.recallSha256) ++ producer.answersSha256,
         ProviderStatus.Identified(identity)
       )
       entries <- Stage.values.toVector.foldLeft[Either[MappingRefusal, Vector[StageEntry]]](

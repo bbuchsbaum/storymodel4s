@@ -342,6 +342,33 @@ class TimeBundle(unittest.TestCase):
 
         self.refused(change, "row says scene, record says choice")
 
+    def test_a_time_moved_inside_its_scene_is_refused(self):
+        def change(b):
+            b["units"][0]["referent"]["stated"].update(near=[2, 3], time="0:19", seconds=19.0)
+
+        self.refused(change, "not the ones the record was made from")
+
+    def test_a_film_alone_and_a_time_outside_cannot_be_swapped(self):
+        def alone(b):
+            b["units"][1]["referent"]["stated"] = {"status": "answered", "kind": "film", "film": 3}
+            b["units"][1]["referent"]["judgement"] = {"kind": "film", "collection": 3}
+
+        self.refused(alone, "not the ones the record was made from")
+
+        def outside(b):
+            b["units"][2]["narrative"]["stated"] = {
+                "status": "answered",
+                "kind": "time_outside",
+                "film": 3,
+                "near": [],
+                "film_stated": 3,
+                "time": "9:59",
+                "seconds": 599.0,
+            }
+            b["units"][2]["narrative"]["judgement"] = {"kind": "time-outside", "collection": 3}
+
+        self.refused(outside, "not the ones the record was made from")
+
     def test_a_scene_without_a_time_is_refused(self):
         def change(b):
             b["units"][0]["referent"]["stated"] = {
