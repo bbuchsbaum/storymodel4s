@@ -19,7 +19,9 @@ compared with those backups. [The disposition record](worktrees.json) names each
 backup and retained local `refs/recovery/` reference. Those references are private recovery
 material, outside ordinary branch/tag pushes. The staged changes in `main-wt` exactly recreated
 the earlier committed tree `1b0c7e79c`; they were preserved as an old snapshot, not landed as new
-implementation. Research data stays in the original ignored `data/` tree.
+implementation. The [branch inventory](branches.json) classifies all seventeen pre-recovery
+local branches, including the separately named claim-verifier patch already incorporated on
+main. Research data stays in the original ignored `data/` tree.
 
 ## Portable tracker and publication boundary
 
@@ -38,7 +40,11 @@ requirements, nine historical notes and twenty current relationships under
 Recovered notes name their original author, time and operation. The
 [publication receipt](tracker-publication.json) records the withheld operation hashes and
 crosswalk. This is a reconstructed public history, not a claim of identical historical
-acceptance ordering. No claim is made that the withheld wording is participant verbatim.
+acceptance ordering. The [independent history comparison](tracker-rejection-review.json)
+found exactly 30 accepted-to-rejected changes: twenty relations, nine notes and one tag.
+Eleven belong to the replaced issue and nineteen to its children. All nineteen children
+preserve their complete current state after the ID substitution, with no dangling current
+edges. No claim is made that the withheld wording is participant verbatim.
 
 [Preservation and preliminary checks](preservation.json) distinguish the original private
 replica comparison from the publication reconstruction. Atlas's fresh replica also reproduces
@@ -71,7 +77,7 @@ or packaged-byte acceptance needs reconciliation. Parents were not closed over i
 children. The open common-pipeline follow-up ticket retains its unresolved missingness,
 clock, readback and output-safety findings; the time-condition implementation itself is landed.
 
-Use `mote ready --tag resume-next-20261114` for the immediate implementation queue. Rich-event
+Use `mote ls --ready --tag resume-next-20261114` for the immediate implementation queue. Rich-event
 research, scientific measurement qualification and release obligations retain their separate
 acceptance. The next engineering delivery after slice 5 is live execution with recording,
 bounded retries, resume and offline replay, as specified in the scientific-preview plan.

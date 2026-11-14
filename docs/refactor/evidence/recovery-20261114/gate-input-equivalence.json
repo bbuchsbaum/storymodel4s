@@ -1,0 +1,24 @@
+[
+  {
+    "from": "9aa0ad3ded5f5f2d426ecd1f6aa80470da0b0c1d",
+    "to": "75ce40784689250fceb081812c359bdffde639fd",
+    "changed_files": 1956,
+    "runtime_or_build_changes": [],
+    "allowed_change_roots": [
+      ".mote/",
+      "docs/",
+      ".gitignore"
+    ]
+  },
+  {
+    "from": "75ce40784689250fceb081812c359bdffde639fd",
+    "to": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+    "changed_files": 49,
+    "runtime_or_build_changes": [],
+    "allowed_change_roots": [
+      ".mote/",
+      "docs/",
+      ".gitignore"
+    ]
+  }
+]

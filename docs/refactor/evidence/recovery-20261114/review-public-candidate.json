@@ -1,0 +1,9 @@
+{
+  "revision": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+  "reviewer": "independent recovery_review agent",
+  "verdict": "PASS",
+  "scope": "Recovery publication delta, private ancestry exclusion, withheld wording absence, CLI reconstruction, authority portability and format. Build qualification recorded separately.",
+  "intentional_historical_rejections": 30,
+  "unchanged_children_after_id_substitution": 19,
+  "follow_up": "Corrected the documented queue command to mote ls --ready --tag resume-next-20261114 in subsequent metadata."
+}

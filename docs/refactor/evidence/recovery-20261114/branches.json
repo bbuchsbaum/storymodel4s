@@ -1,0 +1,100 @@
+[
+  {
+    "branch": "claude/claim-verify-20261108",
+    "tip": "3c3b1bd964020eca676123aac0d6fcf23418be1b",
+    "ancestor_of_runtime_baseline": false,
+    "patch_equivalent_commits": 1,
+    "non_equivalent_commits": 0
+  },
+  {
+    "branch": "claude/common-pipeline-20261110",
+    "tip": "9aa0ad3ded5f5f2d426ecd1f6aa80470da0b0c1d",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/consolidate-20261108",
+    "tip": "e98cc1a4794dc8732af3c7da54bd77a918f85eb1",
+    "ancestor_of_runtime_baseline": false,
+    "patch_equivalent_commits": 0,
+    "non_equivalent_commits": 7,
+    "squash_with_documented_wording_difference": "60477b93e"
+  },
+  {
+    "branch": "claude/ff-auto-20261110",
+    "tip": "f2580710af9c72ecc03d9c196636e16d0828393a",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/ff-transfer-20261109",
+    "tip": "0ce4577ad63887af673a88120422bd23182b9108",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/landing-20261108",
+    "tip": "36d3d59c64ef0c9f7d75858b3b137e727799d28a",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/mapping-decomposition-20261108",
+    "tip": "ebf1e49c5913cc9fcc363f4e002725a48213e822",
+    "ancestor_of_runtime_baseline": false,
+    "patch_equivalent_commits": 0,
+    "non_equivalent_commits": 2,
+    "disposition": "Result incorporated; retained provenance wording differs."
+  },
+  {
+    "branch": "claude/merge-integrate-codex-20261108",
+    "tip": "3d554456c9417a5fcf44cd79fe8978ba8ae55834",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/port-slice1-20261108",
+    "tip": "46d4cee392df044a8d11f06bcc0440d1242a523b",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/port-slice2-20261108",
+    "tip": "95404c270a1a24e3bc97e1246a2a6b6c968fe3c9",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/port-slice3-20261108",
+    "tip": "fe1b73929fd3150e364c4ff6d21eb86b0ce752c1",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/preview-plan-20261110",
+    "tip": "f31c83e0cd011698c4467f3b8fcd3060115c3164",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/sherlock-mapper-20261108",
+    "tip": "1f6b174ea140e5dee753d9a68b5ad7972a7484e5",
+    "ancestor_of_runtime_baseline": false,
+    "patch_equivalent_commits": 0,
+    "non_equivalent_commits": 15,
+    "squash_tree_equal_to": "60bd824e1"
+  },
+  {
+    "branch": "claude/step4-20261109",
+    "tip": "5ec21c24332f94a95695eec21e0e67694936264a",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "claude/step4b-20261109",
+    "tip": "f20109d8d5d0015585423bcd30994d934a268236",
+    "ancestor_of_runtime_baseline": true
+  },
+  {
+    "branch": "codex/mapping-audit-20261020",
+    "tip": "cc7219edba5e87fb337a2d0b9f2fa726c8c5fd2b",
+    "ancestor_of_runtime_baseline": false,
+    "patch_equivalent_commits": 5,
+    "non_equivalent_commits": 0
+  },
+  {
+    "branch": "main",
+    "tip": "fe1b73929fd3150e364c4ff6d21eb86b0ce752c1",
+    "ancestor_of_runtime_baseline": true
+  }
+]

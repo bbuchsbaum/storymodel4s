@@ -1,0 +1,219 @@
+{
+  "history_entities_checked": 20,
+  "history_changes": [
+    {
+      "op_id": "20261023T160332.622031Z-p33096-c0001-rf336-h118594",
+      "kind": "tag_add",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160354.999782Z-p34339-c0000-r4c2f-h7b8f23",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160417.540009Z-p35412-c0000-r03cf-hbbcb24",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160440.799750Z-p37755-c0000-r4d4d-h96b971",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160503.245067Z-p38669-c0000-r1c18-hef78b8",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160525.624780Z-p39788-c0000-r6671-h922759",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160550.195069Z-p40973-c0000-r5d84-h15bfc6",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160616.714255Z-p42927-c0000-r3a08-hcc6bf3",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T160627.257225Z-p43464-c0000-rd9f4-h05ac36",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T161803.201972Z-p90988-c0000-r9f38-h5ecaa5",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T161814.935676Z-p92243-c0000-r29e1-he4f146",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T163135.034607Z-p61058-c0000-r04e5-hb96414",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T180957.925664Z-p52112-c0000-r9388-ha5085c",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261023T221214.628321Z-p65312-c0000-r944a-hb38bac",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261024T024214.572251Z-p12304-c0000-r772b-h9f0ef0",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261024T024642.412622Z-p24381-c0000-r0347-hacc3bc",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261024T114852.582909Z-p95967-c0000-r47b3-h4d6cd9",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261024T114908.976702Z-p97567-c0000-r46b1-h5b9d4d",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261024T114926.179770Z-p98127-c0000-rc3ca-h821e52",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T140608.260924Z-p10810-c0000-rca0d-hddbbcf",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T140809.851661Z-p16321-c0000-rec89-h9ebf19",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T141842.803932Z-p51149-c0000-rc279-h84bbd0",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T142115.893838Z-p58710-c0000-r7535-h132e64",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T144732.050282Z-p39096-c0000-r1211-h23b326",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T144952.841248Z-p47815-c0000-r6988-hec6c12",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T145833.208932Z-p74333-c0000-rc31c-h8d8ede",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T150226.205969Z-p86870-c0000-r2d67-h4192f1",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T174031.593362Z-p20738-c0000-r7f9b-h1e09a1",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T181643.931974Z-p88458-c0000-r27ab-h065f63",
+      "kind": "rel_add",
+      "before": true,
+      "after": false,
+      "reason": "parent bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    },
+    {
+      "op_id": "20261025T182555.282900Z-p5426-c0000-r9747-h6b468c",
+      "kind": "note",
+      "before": true,
+      "after": false,
+      "reason": "entity bd-01M5MR1KTXEP898CTN2KE3J219 does not exist"
+    }
+  ],
+  "expected_rejection_set_matches": true,
+  "child_states_checked": 19,
+  "child_state_differences": {},
+  "dangling_old_id_current_edges": []
+}
