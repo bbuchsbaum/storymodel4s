@@ -1,0 +1,1 @@
+{"actor":"codex-scoring-factorial-20261021","entity":"bd-01M5FQFMG4JSDVWZV6J6XN2WXS","kind":"reserve_open","mode":"exclusive","op":"20261021T172431.589108Z-p7272-c0000-rae57-hfe9799","paths":["tools/test_atomic_caption_probe.py","tools/test_encoder_ablation_probe.py"],"reservation_id":"rv-01M5FQWFQ552GTRH4Y56CHGRRG","ts":"2026-10-21T17:24:31.589108Z","ttl_s":3600,"v":2}

@@ -1,0 +1,1 @@
+{"actor":"codex-scoring-factorial-20261021","entity":"bd-01M5FQFMG4JSDVWZV6J6XN2WXS","kind":"reserve_open","mode":"exclusive","op":"20261021T174001.858740Z-p83620-c0000-r9b15-h7b680e","paths":["tools/openrouter_claim_probe.py","tools/test_openrouter_claim_probe.py"],"reservation_id":"rv-01M5FRRW5XM8KZT07WSXAP7R36","ts":"2026-10-21T17:40:01.858740Z","ttl_s":3600,"v":2}

@@ -1,0 +1,37 @@
+[
+  {
+    "worktree": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/consolidate-20261108",
+    "branch": "claude/consolidate-20261108",
+    "head": "e98cc1a4794dc8732af3c7da54bd77a918f85eb1",
+    "backup": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel4s/worktree-2",
+    "local_archive_ref": "refs/recovery/20261114/claude/consolidate-20261108"
+  },
+  {
+    "worktree": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/decomp-20261108",
+    "branch": "claude/mapping-decomposition-20261108",
+    "head": "ebf1e49c5913cc9fcc363f4e002725a48213e822",
+    "backup": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel4s/worktree-3",
+    "local_archive_ref": "refs/recovery/20261114/claude/mapping-decomposition-20261108"
+  },
+  {
+    "worktree": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/main-wt",
+    "branch": "main",
+    "head": "fe1b73929fd3150e364c4ff6d21eb86b0ce752c1",
+    "backup": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel4s/worktree-4",
+    "local_archive_ref": "refs/recovery/20261114/main"
+  },
+  {
+    "worktree": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/mapper-20261108",
+    "branch": "claude/sherlock-mapper-20261108",
+    "head": "1f6b174ea140e5dee753d9a68b5ad7972a7484e5",
+    "backup": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel4s/worktree-5",
+    "local_archive_ref": "refs/recovery/20261114/claude/sherlock-mapper-20261108"
+  },
+  {
+    "worktree": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/merge-ic",
+    "branch": "claude/merge-integrate-codex-20261108",
+    "head": "3d554456c9417a5fcf44cd79fe8978ba8ae55834",
+    "backup": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel4s/worktree-6",
+    "local_archive_ref": "refs/recovery/20261114/claude/merge-integrate-codex-20261108"
+  }
+]

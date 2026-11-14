@@ -1,0 +1,133 @@
+{
+  "generated_at": "2026-11-14",
+  "read_only": true,
+  "mote_snapshot": {
+    "counts": {
+      "closed": 402,
+      "open": 132,
+      "review": 24,
+      "blocked": 7,
+      "doing": 1
+    },
+    "actor": "codex-recovery-scout"
+  },
+  "mapping_audit": {
+    "epic": {
+      "id": "bd-01M5DAE8KHF6VX3RE2V5RJG64T",
+      "title": "[mapping audit] Explicit policies, reference-only workflow and honest coverage",
+      "acceptance": "A-H independently reviewed, qualified and landed; denominator reconciliation, content-bound policy selection, checked reference-only provenance/export readback, weighted oracle, workload baseline and explicit handoff to existing research issues; no scientific utility/publication claim.",
+      "latest_note": "Final evidence review PASS at 5edb1ea4; source/build a11c79726; no BLOCK. Historical note still says no integration/merge/push and remains review.",
+      "current_evidence": [
+        "5edb1ea4 is ancestor of f09066772 and main",
+        "a11c79726 is ancestor of f09066772 and main",
+        "f09066772 is ancestor of main"
+      ],
+      "verdict": "Candidate engineering acceptance is evidenced, but the recorded acceptance was locally-qualified-not-landed. Current ancestry proves source landing, not a fresh exact post-merge/default-pin gate, hosted CI, publication or scientific acceptance. Keep review until the recovery integration gate binds the merged tree."
+    },
+    "children": [
+      {
+        "id": "bd-01M5DAFJ2M42RNRC6T1TWFBFNE",
+        "title": "[mapping audit A] Reconcile measured-unit coverage in ordinary batch summaries",
+        "acceptance": "Reconcile attempted/prepared/run-produced counts and denominators; retain failure, availability, overflow and uniform-information coordinates; preserve missingness and weighting semantics; dropped-row mutation and synthetic command-to-summary witness.",
+        "evidence": "a11c79726; final local JVM 4482/5 skipped, JS 3319, Native 3319, Atlas 518; 9 reference/20 paired/14 weighted readers.",
+        "remaining": "Candidate evidence is complete; old body explicitly requires authorized landing and actual integration/default-pin qualification. Source is now in f090/main, but no fresh post-merge gate is recorded."
+      },
+      {
+        "id": "bd-01M5DAG1ZBER090DC52PB19CPH",
+        "title": "[mapping audit B] Publish model assumptions and scientific claim boundaries",
+        "acceptance": "Derive reference/reconstruction/temperature/grouping/decision/fill and score-kind metadata from executed receipts; preserve legacy decoding/default numeric behavior; independent JSON/TSV readback rejects contradictory authority.",
+        "evidence": "a11c79726; same final local gate and reader totals as A.",
+        "remaining": "Same landing/default-pin gate gap; no hosted CI or publication claim."
+      },
+      {
+        "id": "bd-01M5DAGPJTNF8FFNPPWF7P3XDC",
+        "title": "[mapping audit C] Pin weighted endpoint semantics with an independent numerical witness",
+        "acceptance": "343-path oracle over 3 units/2 source/5 external states; exact positive-fraction marginals/flows, 2/7 reference mass and 1/2 interior limit; preserve endpoint identity and no continuity/calibration/efficacy claim.",
+        "evidence": "a11c79726; final local cross-platform/Atlas gate and six mutation kills.",
+        "remaining": "Numerical candidate evidence is complete; actual merged-tree qualification remains unrecorded."
+      },
+      {
+        "id": "bd-01M5DAH6B093N2WZCNZ160JMJ6",
+        "title": "[mapping audit D] Agree selectable-policy and reference-only producer contracts",
+        "acceptance": "ADR 0019 owner decision specifying checked policies, source-bound grouping, reference-only mode, provenance/codec/consumer seam, compatibility/default/refusal behavior and rejected alternatives.",
+        "evidence": "ADR decision recorded; a11c79726 final gate; owner-approved E-G.",
+        "remaining": "Contract and candidate evidence complete; landing/default-pin gate and no hosted/publication evidence remain."
+      },
+      {
+        "id": "bd-01M5DAHPNBZ45HNB19F36HFSPQ",
+        "title": "[mapping audit E] Thread selected resolution and reconstruction policy through registered mapping",
+        "acceptance": "Selected cut precedes lexical/caption/ONNX nomination/pricing; source-bound grouping/order and identities; empty-nomination controls; preserve default paired compatibility.",
+        "evidence": "a11c79726; final local cross-platform/Atlas totals and mutation evidence.",
+        "remaining": "Candidate implementation landed in current ancestry, but no exact post-merge gate is recorded."
+      },
+      {
+        "id": "bd-01M5DAJ6DE0MH29XWP38AR6QP1",
+        "title": "[mapping audit F] Add checked reference-only execution and record authority",
+        "acceptance": "ReferenceExecution owns provenance and original inventory/source/profile; contextual codec refuses foreign/tampered/mixed authority; outside-package construction and mutation courts.",
+        "evidence": "a11c79726; final local cross-platform/Atlas totals and reader evidence.",
+        "remaining": "Keep review pending recovery gate over actual merged/default-pin tree."
+      },
+      {
+        "id": "bd-01M5DAJMAJ5QWGGD8X9919THPY",
+        "title": "[mapping audit G] Deliver ordinary reference-only configuration, batch export and readback",
+        "acceptance": "Reference-only facade/settings/CLI/batch/exchange/readback with all-attempt accounting, publication guards, temporal/organization consumers, fixed-1GiB workload observations and legacy witnesses.",
+        "evidence": "a11c79726; 36 cells/108 comparisons; final local cross-platform/Atlas totals.",
+        "remaining": "Candidate evidence complete; no fresh exact integration gate or hosted/publication evidence."
+      },
+      {
+        "id": "bd-01M5DAK5ED2W3HW3XDS3MZV5PS",
+        "title": "[mapping audit H] Measure mapping workload time, memory and adjacent-state products",
+        "acceptance": "Reproducible workload baseline and measured operating envelope, with adjacent-state products and bounded caveats; independent final review PASS.",
+        "evidence": "Final independent review PASS at 41c82ccc; retained raw receipts; H note warns earlier receipts were misaddressed/rejected and status chains remained review.",
+        "remaining": "H is the least safe to close without rebinding the final evidence to the recovered integration candidate; no post-merge gate recorded."
+      }
+    ]
+  },
+  "s1": {
+    "id": "bd-01M50K8E8KMRGY0MYXJRT0SZ8G",
+    "title": "[reality-check S1] Qualify the GitHub-pinned source build and offline CLI",
+    "acceptance": "Fresh no-override Git-pinned standalone build; producer gate and cliDistribution; extracted artifact manifest/runtime/provenance/licenses; paired and weighted exports/readers with network-denied replay; Maven closure and explicit unpublished artifacts; docs recipe.",
+    "artifact_and_review_evidence": "Producer c69a5d754: 56 totals, 11067 passed, 0 failures/errors, 5 skips; packaged artifact/runtime/provenance/notices, timezone-identical archives, offline readers and 15 distribution courts. Consumer 50a16016 uses producer c69; independent review de1dce18 reports 518 passed, 0 failures/errors/skips and verified resolver/JAR participation, linking and formatting.",
+    "remaining": "These are candidate/consumer receipts, not a fresh gate over the current merged/default-pin integration bytes. The ticket itself says S1 remains review pending explicit integration/landing; hosted CI, Maven publication and Native adoption remain unclaimed.",
+    "verdict": "Source/artifact qualification is strong and all three exact SHAs are ancestors of main, but full ticket acceptance is not established by ancestry alone. Keep review pending recovery integration gate and packaged-byte readback."
+  },
+  "slice5": {
+    "title_search": "No current common-pipeline Slice 5 ticket found.",
+    "matches": [
+      "bd-01M16KG2SF2D1AF2X15TSKBBT9 (closed, unrelated historical document/interview/acquire sweep)",
+      "bd-01M73KEGB2STSJS3AP3TBC7E9P (open follow-ups for slices 2a/2b)"
+    ],
+    "body_search": "No current title/body match for common-pipeline slice 5; historical board text is not a live ticket."
+  },
+  "review_classification": {
+    "required_preview_or_integration": [
+      "bd-01M50K8E8KMRGY0MYXJRT0SZ8G S1 source/CLI preview",
+      "bd-01M5DAE8KHF6VX3RE2V5RJG64T mapping-audit integration",
+      "bd-01M5E33RPWBT8NAGKCKJMMN6FN queue reconciliation"
+    ],
+    "retained_research": [
+      "bd-01M5FGET6020C9B1BC2YCBKY52",
+      "bd-01M5FKA73X997XYKW332666MVS",
+      "bd-01M5FQFMG4JSDVWZV6J6XN2WXS",
+      "bd-01M5GKATX9491FCMAPB6MSRNZZ",
+      "bd-01M5H5XWAZ5C1CMWT9WE33E9CB",
+      "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+      "bd-01M524EH6SS8K32632Y2J6ZTMF",
+      "bd-01M5258T8EQFN4MTCE5A912QWY",
+      "bd-01M527J6FFT2XMK50MGVREB7CF",
+      "bd-01M5E7ZXABPHBG8P4Y2KN8SZ0V"
+    ],
+    "uncertain_or_requires_fresh_scope": [
+      "bd-01M5MR1YSPFVGD8G6BGJ39DR3Y",
+      "bd-01M5MR2N8NN2XZRH6FBWBC1EYT",
+      "bd-01M5RAN674YW0QGQFM7RY66WXM",
+      "bd-01M50K0WR735JQWF6FZKY85C6E"
+    ],
+    "note": "Classification is triage, not status mutation. Evidence-binding S0/S1 and integration doing are engineering lanes but need exact merged-tree/consumer proof; research and instrument tickets remain separate from engineering landing. The follow-up epic bd-01M73KEGB2STSJS3AP3TBC7E9P remains open."
+  },
+  "sources": [
+    ".mote issue bodies/latest notes read with mote show --json --actor codex-recovery-scout",
+    "git ancestry checks in storymodel4s",
+    ".worktrees/common/docs/refactor/evidence/common-pipeline-20261110/README.md"
+  ]
+}

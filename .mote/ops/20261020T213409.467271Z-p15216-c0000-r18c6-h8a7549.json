@@ -1,0 +1,1 @@
+{"actor":"codex-recover-asr","entity":"bd-01M5DG9GEB8NVTGP36KMQ6V71X","kind":"reserve_open","mode":"exclusive","op":"20261020T213409.467271Z-p15216-c0000-r18c6-h8a7549","paths":["data/media-tools/asr","data/transcription","data/models/faster-whisper-large-v3"],"reservation_id":"rv-01M5DKRVHVATEKVJJDX1DQEMP7","ts":"2026-10-20T21:34:09.467271Z","ttl_s":3600,"v":2}

@@ -4,6 +4,7 @@
 .metals/
 .scala-build/
 .vscode/
+.mote/authority/
 .mote/local/
 .mote/tmp/
 .agent-work/

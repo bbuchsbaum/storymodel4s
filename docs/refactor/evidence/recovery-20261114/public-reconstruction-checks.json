@@ -1,0 +1,10 @@
+{
+  "issue_summaries_equal_after_id_substitution": true,
+  "graph_equal_after_id_substitution": true,
+  "recovered_scalar_fields_equal": true,
+  "nine_notes_preserved_with_provenance": true,
+  "doctor_ok": true,
+  "unaffected_operations_identical": true,
+  "withheld_operations_absent": true,
+  "current_body_matches_declared_redaction": true
+}

@@ -1,0 +1,1 @@
+{"actor":"claude-evidence-binding-20261023","entity":"bd-01M5R0B6RQG18K3PB5PM5GP15Z","kind":"note","note_kind":"note","op":"20261024T222922.052301Z-p99247-c0000-r58a8-h957892","text":"Added by the re-review of 8cd2fac68: the presence-withholding reason is a bare string, not a typed ReferentError.\n","ts":"2026-10-24T22:29:22.052301Z","v":1}

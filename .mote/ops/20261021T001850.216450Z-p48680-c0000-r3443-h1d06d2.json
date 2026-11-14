@@ -1,0 +1,1 @@
+{"actor":"codex-qwen-passport","entity":"bd-01M5DX5J63N1Z5J4QBKC8D8HRR","kind":"reserve_open","mode":"exclusive","op":"20261021T001850.216450Z-p48680-c0000-r3443-h1d06d2","paths":["data/media-tools/asr/qwen-passport-20261020","data/models/Qwen3-ASR-1.7B-8bit.external.json"],"reservation_id":"rv-01M5DX6CQ8TCKSXCP8BS31AKBS","ts":"2026-10-21T00:18:50.216450Z","ttl_s":3600,"v":2}

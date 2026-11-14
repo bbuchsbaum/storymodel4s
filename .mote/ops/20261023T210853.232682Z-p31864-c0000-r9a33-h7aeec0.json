@@ -1,0 +1,1 @@
+{"actor":"claude-evidence-binding-20261023","entity":"bd-01M5MZ8J3KV0S1JY45737X4WSH","kind":"reserve_open","mode":"exclusive","op":"20261023T210853.232682Z-p31864-c0000-r9a33-h7aeec0","paths":["core/src/main/scala/storymodel4s/core/source.scala"],"reservation_id":"rv-01M5N9GQVGDX2TH8VT31GZ5CQ5","ts":"2026-10-23T21:08:53.232682Z","ttl_s":3600,"v":2}

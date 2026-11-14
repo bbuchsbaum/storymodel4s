@@ -1,0 +1,1 @@
+{"actor":"claude-evidence-binding-20261023","entity":"bd-01M5MR3BR0C7DCF9TRB3GEVDKV","kind":"reserve_open","mode":"exclusive","op":"20261023T162052.594989Z-p7124-c0000-r102e-hdaca69","paths":["docs/adr/0024-cross-modal-referent-identity.md"],"reservation_id":"rv-01M5MS1C7J2TS2HXSSXRPDP552","ts":"2026-10-23T16:20:52.594989Z","ttl_s":3600,"v":2}

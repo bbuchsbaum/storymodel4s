@@ -1,0 +1,1 @@
+{"actor":"claude-mapping-20261108","entity":"bd-01M70NA1A3XWFD6N6RCQRMEQ3G","kind":"note","note_kind":"progress","op":"20261109T231926.141080Z-p93576-c0002-raefe-h241449","text":"Protocol and scorer preparation on claude/ff-transfer-20261109; no model call before the protocol is frozen.","ts":"2026-11-09T23:19:26.141080Z","v":1}

@@ -1,0 +1,1 @@
+{"actor":"codex-scoring-20261021","entity":"bd-01M5EA1JDF877X4RZPJY6EFJDJ","kind":"reserve_open","mode":"exclusive","op":"20261021T043804.468183Z-p87809-c0000-rd7f1-h214fbf","paths":["embed-onnx/src/test/scala/storymodel4s/consumer/OnnxMappingRegistrationSuite.scala"],"reservation_id":"rv-01M5EC12DMF9H1VNEA0NS7HFQF","ts":"2026-10-21T04:38:04.468183Z","ttl_s":14400,"v":2}

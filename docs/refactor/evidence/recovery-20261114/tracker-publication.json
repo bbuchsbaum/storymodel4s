@@ -1,0 +1,53 @@
+{
+  "original_id": "bd-01M5MR1KTXEP898CTN2KE3J219",
+  "replacement_id": "recovery-evidence-binding-20261023",
+  "reason": "Two historical operations contain quoted case wording whose publication provenance is unestablished. No claim that the wording is participant verbatim.",
+  "original_archive": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/original-mote-before-publication.tar.gz",
+  "withheld_operations": [
+    {
+      "name": "20261023T160331.805629Z-p33096-c0000-r77b5-h09fb7f.json",
+      "sha256": "1a7ffd39ac228181546dcf71ee790db8723c361377a1601d351cb0978aaae20e"
+    },
+    {
+      "name": "20261025T182540.707309Z-p4802-c0000-rfcf7-h5c9034.json",
+      "sha256": "4341b2a8d46b661c9aa34bde57d9184a99f9306a3ef55d6778e701aac9faeacb"
+    }
+  ],
+  "reconstructed_notes": 9,
+  "reconstructed_current_edges": 20,
+  "historical_referring_operations": [
+    "20261023T160332.622031Z-p33096-c0001-rf336-h118594.json",
+    "20261023T160354.999782Z-p34339-c0000-r4c2f-h7b8f23.json",
+    "20261023T160417.540009Z-p35412-c0000-r03cf-hbbcb24.json",
+    "20261023T160440.799750Z-p37755-c0000-r4d4d-h96b971.json",
+    "20261023T160503.245067Z-p38669-c0000-r1c18-hef78b8.json",
+    "20261023T160525.624780Z-p39788-c0000-r6671-h922759.json",
+    "20261023T160550.195069Z-p40973-c0000-r5d84-h15bfc6.json",
+    "20261023T160616.714255Z-p42927-c0000-r3a08-hcc6bf3.json",
+    "20261023T160627.257225Z-p43464-c0000-rd9f4-h05ac36.json",
+    "20261023T161803.201972Z-p90988-c0000-r9f38-h5ecaa5.json",
+    "20261023T161814.935676Z-p92243-c0000-r29e1-he4f146.json",
+    "20261023T163135.034607Z-p61058-c0000-r04e5-hb96414.json",
+    "20261023T180957.925664Z-p52112-c0000-r9388-ha5085c.json",
+    "20261023T221214.628321Z-p65312-c0000-r944a-hb38bac.json",
+    "20261024T024214.572251Z-p12304-c0000-r772b-h9f0ef0.json",
+    "20261024T024642.412622Z-p24381-c0000-r0347-hacc3bc.json",
+    "20261024T114852.582909Z-p95967-c0000-r47b3-h4d6cd9.json",
+    "20261024T114908.976702Z-p97567-c0000-r46b1-h5b9d4d.json",
+    "20261024T114926.179770Z-p98127-c0000-rc3ca-h821e52.json",
+    "20261025T140608.260924Z-p10810-c0000-rca0d-hddbbcf.json",
+    "20261025T140809.851661Z-p16321-c0000-rec89-h9ebf19.json",
+    "20261025T141842.803932Z-p51149-c0000-rc279-h84bbd0.json",
+    "20261025T142115.893838Z-p58710-c0000-r7535-h132e64.json",
+    "20261025T144732.050282Z-p39096-c0000-r1211-h23b326.json",
+    "20261025T144952.841248Z-p47815-c0000-r6988-hec6c12.json",
+    "20261025T145833.208932Z-p74333-c0000-rc31c-h8d8ede.json",
+    "20261025T150226.205969Z-p86870-c0000-r2d67-h4192f1.json",
+    "20261025T174031.593362Z-p20738-c0000-r7f9b-h1e09a1.json",
+    "20261025T181643.931974Z-p88458-c0000-r27ab-h065f63.json",
+    "20261025T182555.282900Z-p5426-c0000-r9747-h6b468c.json"
+  ],
+  "history_boundary": "Original immutable bytes are privately preserved. Public state is reconstructed through supported CLI operations with original note provenance and one replacement issue ID. Historical acceptance ordering is intentionally not identical.",
+  "current_body_wording_replacements": 1,
+  "original_archive_sha256": "04ed8f5611552b8e72112b1480fbc2d3eea214dfde59ceb5792043de2229ebf1"
+}

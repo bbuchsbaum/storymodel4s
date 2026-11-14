@@ -1,0 +1,35 @@
+{
+  "source_baseline": "9aa0ad3ded5f5f2d426ecd1f6aa80470da0b0c1d",
+  "backup_manifest": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/manifest.json",
+  "original_operations": 18337,
+  "recovery_operations_added": 7,
+  "copied_missing_operations": 998,
+  "removed_tracked_authority_files": 956,
+  "fresh_replica": {
+    "issues_equal": true,
+    "graph_equal": true,
+    "fsck_clean": true
+  },
+  "baseline_hosted_ci": {
+    "run_url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/42940443641",
+    "matrix_tasks": 80,
+    "passed": 17000,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 44
+  },
+  "python_gate": {
+    "files": 11,
+    "total": 262,
+    "passed": 260,
+    "skipped": 2,
+    "failed": 0
+  },
+  "initial_private_candidate": "75ce40784",
+  "publication_history": "Reconstructed subset; see tracker-publication.json. Initial full-history candidate remains private.",
+  "atlas_fresh_replica": {
+    "issues_equal": true,
+    "graph_equal": true,
+    "fsck_clean": true
+  }
+}

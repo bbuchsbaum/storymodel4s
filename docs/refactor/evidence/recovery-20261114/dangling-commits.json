@@ -1,0 +1,194 @@
+[
+  {
+    "repository": "storymodel4s",
+    "sha": "ec2020cb72ce11bd47c19d24f8bb0d89268b623d",
+    "local_ref": "refs/recovery/dangling-20261114/ec2020cb72ce11bd47c19d24f8bb0d89268b623d",
+    "commit": "2026-10-23T16:54:14-04:00 Propose ADR 0025: presentation axis ownership for source streams"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "e67d7832ce855a84173792fa98dbb944f04d2261",
+    "local_ref": "refs/recovery/dangling-20261114/e67d7832ce855a84173792fa98dbb944f04d2261",
+    "commit": "2026-10-24T22:15:00-04:00 ADR 0028: accepted with owner decisions E, J, M, G, A and C"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "319db4f0a8c99b8b7c1ff5e95ee6cdf465a979b4",
+    "local_ref": "refs/recovery/dangling-20261114/319db4f0a8c99b8b7c1ff5e95ee6cdf465a979b4",
+    "commit": "2026-11-08T13:50:40-05:00 Simplify AGENTS.md, merge vision and mission, index ADRs"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "16e584056d683605b0f5cb0eb2fa73335b627608",
+    "local_ref": "refs/recovery/dangling-20261114/16e584056d683605b0f5cb0eb2fa73335b627608",
+    "commit": "2026-10-11T00:47:08-04:00 WIP on codex/next-five-20261010: a6c83388 Validate temporal projection bins before rows"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "1b09fdecce649be4fbf74674fcecae5ffbea0b93",
+    "local_ref": "refs/recovery/dangling-20261114/1b09fdecce649be4fbf74674fcecae5ffbea0b93",
+    "commit": "2026-10-23T13:02:09-04:00 Add licensed cross-modal referent identity to document (ADR 0024)"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "d10c2531df84ce4f1abc46bfa4883ec87b7f53a2",
+    "local_ref": "refs/recovery/dangling-20261114/d10c2531df84ce4f1abc46bfa4883ec87b7f53a2",
+    "commit": "2026-10-24T21:38:17-04:00 ADR 0028: picture binding on token-bounded name equality (review of ca9a14089)"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "031be54993dea4ecfa820b2147bc1bcddf0371f8",
+    "local_ref": "refs/recovery/dangling-20261114/031be54993dea4ecfa820b2147bc1bcddf0371f8",
+    "commit": "2026-10-14T10:58:09-04:00 Sample explicit annotation intervals through checked video acquisition"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "a62d85098ff3cfeef659861f1f4e121ce688d8c9",
+    "local_ref": "refs/recovery/dangling-20261114/a62d85098ff3cfeef659861f1f4e121ce688d8c9",
+    "commit": "2026-10-11T00:12:28-04:00 Bind caption requests to frame selections"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "628835779c25eb005374456c2cb8b725fbe4f2bc",
+    "local_ref": "refs/recovery/dangling-20261114/628835779c25eb005374456c2cb8b725fbe4f2bc",
+    "commit": "2026-11-08T20:37:18-05:00 WIP slice 2: strip whitespace as the recorded harness did (U+00A0 on row 73)"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "a2a6d517879e66421fda04c6d6e89955ca4acf82",
+    "local_ref": "refs/recovery/dangling-20261114/a2a6d517879e66421fda04c6d6e89955ca4acf82",
+    "commit": "2026-10-23T12:20:18-04:00 Make binding contrast pairs discriminate and pin current gaps"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "fad11581eb1cdfaefea0846e6dc1534476575d6a",
+    "local_ref": "refs/recovery/dangling-20261114/fad11581eb1cdfaefea0846e6dc1534476575d6a",
+    "commit": "2026-10-11T00:16:59-04:00 Bind caption requests to frame selections"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "350f4ac3497a355ab0d0d4bdc4a8da32531ae2ac",
+    "local_ref": "refs/recovery/dangling-20261114/350f4ac3497a355ab0d0d4bdc4a8da32531ae2ac",
+    "commit": "2026-10-25T18:54:11-04:00 Plan amendment: neighbouring windows stay unmasked (owner decision)"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "6e999678879b603178ed62cf986b811597179ee6",
+    "local_ref": "refs/recovery/dangling-20261114/6e999678879b603178ed62cf986b811597179ee6",
+    "commit": "2026-11-10T10:32:41-05:00 FilmFestival automatic-input results: 78.5% strict (Opus 5.5), 8 points below annotation-assisted; no-record arm reflects recall order"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "6e659f91265ea11eefd38e25e8dedd4525453452",
+    "local_ref": "refs/recovery/dangling-20261114/6e659f91265ea11eefd38e25e8dedd4525453452",
+    "commit": "2026-10-14T21:32:25-04:00 Assert refinement refusal at the configuration boundary"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "82654b56325e78484dfc439fe3fbe4e8acfebde6",
+    "local_ref": "refs/recovery/dangling-20261114/82654b56325e78484dfc439fe3fbe4e8acfebde6",
+    "commit": "2026-10-23T12:16:51-04:00 Add paired binding contrasts for the connected assessor"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "806a077fb0d51f41987250523a10792c4ded0f69",
+    "local_ref": "refs/recovery/dangling-20261114/806a077fb0d51f41987250523a10792c4ded0f69",
+    "commit": "2026-11-08T21:24:04-05:00 WIP slice 3: pin the retry suffix literal"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "396e879ccd7ecccbd64025119e8a3b3a7587e4c5",
+    "local_ref": "refs/recovery/dangling-20261114/396e879ccd7ecccbd64025119e8a3b3a7587e4c5",
+    "commit": "2026-10-23T12:14:58-04:00 Add paired binding contrasts for the connected assessor"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "1fbe437141c48ccfc78be4aa993464e60c00368d",
+    "local_ref": "refs/recovery/dangling-20261114/1fbe437141c48ccfc78be4aa993464e60c00368d",
+    "commit": "2026-11-10T11:01:46-05:00 wip: rendering refusal pin"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "7cc027c7a5e04bfded944acf1a93e44da456a043",
+    "local_ref": "refs/recovery/dangling-20261114/7cc027c7a5e04bfded944acf1a93e44da456a043",
+    "commit": "2026-11-09T12:29:30-05:00 4b: scalafmt"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "55e807dbb40f18cc5777a678fb1d5229bee805cb",
+    "local_ref": "refs/recovery/dangling-20261114/55e807dbb40f18cc5777a678fb1d5229bee805cb",
+    "commit": "2026-10-23T16:54:07-04:00 Propose ADR 0025: presentation axis ownership for source streams"
+  },
+  {
+    "repository": "storymodel4s",
+    "sha": "fbfd7b5971df0d57f21431c61b7378848c6b36f0",
+    "local_ref": "refs/recovery/dangling-20261114/fbfd7b5971df0d57f21431c61b7378848c6b36f0",
+    "commit": "2026-10-25T10:33:58-04:00 Feasibility packet: producer-rule scope cost (v2), faithful criteria restatement, review fixes (review of 32e9070a6)"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "a20e5c5ff0d4e4d646c4c5a4be8f3fc8ad9499bc",
+    "local_ref": "refs/recovery/dangling-20261114/a20e5c5ff0d4e4d646c4c5a4be8f3fc8ad9499bc",
+    "commit": "2026-08-30T11:13:23-04:00 docs: align StoryAtlas contracts with output epic"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "234f0c410428e8ba1acd0f0cdacee29d489485ed",
+    "local_ref": "refs/recovery/dangling-20261114/234f0c410428e8ba1acd0f0cdacee29d489485ed",
+    "commit": "2026-08-30T12:57:58-04:00 docs: bind static StoryAtlas publication profile"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "1f942c6352ffd2f0aeb4a1d3b30eb8de5f591c3b",
+    "local_ref": "refs/recovery/dangling-20261114/1f942c6352ffd2f0aeb4a1d3b30eb8de5f591c3b",
+    "commit": "2026-09-03T12:13:44-04:00 The voyage pane earns its bar: annotated marks, a fitted plate, toggles, a glyph legend"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "9e95ed3827852609b19c70a1bcd6b5fc58c04dbc",
+    "local_ref": "refs/recovery/dangling-20261114/9e95ed3827852609b19c70a1bcd6b5fc58c04dbc",
+    "commit": "2026-09-03T07:56:29-04:00 WIP: read derivation.json beside the model; match the landmark's claim status"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "da203a8fe26c7d2fb359296e5cf2eb9bddfb697b",
+    "local_ref": "refs/recovery/dangling-20261114/da203a8fe26c7d2fb359296e5cf2eb9bddfb697b",
+    "commit": "2026-08-30T11:08:59-04:00 docs: align StoryAtlas contracts with output epic"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "f4a2195d5599c7ded2e7882390cca68c40ab5bbf",
+    "local_ref": "refs/recovery/dangling-20261114/f4a2195d5599c7ded2e7882390cca68c40ab5bbf",
+    "commit": "2026-08-30T09:33:18-04:00 Repair mockup v2 proof and evidence contracts"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "e964d2b73364e36ccaceed14fe59e4ddf0d9da78",
+    "local_ref": "refs/recovery/dangling-20261114/e964d2b73364e36ccaceed14fe59e4ddf0d9da78",
+    "commit": "2026-09-03T12:44:30-04:00 The voyage pane earns its bar: annotated marks, a fitted plate, toggles, a glyph legend"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "fea7979628c6fd0c9218a9870697ece0dfcc91b1",
+    "local_ref": "refs/recovery/dangling-20261114/fea7979628c6fd0c9218a9870697ece0dfcc91b1",
+    "commit": "2026-09-03T12:39:27-04:00 The voyage pane earns its bar: annotated marks, a fitted plate, toggles, a glyph legend"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "bbf3dd9499f11c0e7951fa1b83e1d2f8061a749c",
+    "local_ref": "refs/recovery/dangling-20261114/bbf3dd9499f11c0e7951fa1b83e1d2f8061a749c",
+    "commit": "2026-09-03T13:01:33-04:00 The voyage pane earns its bar: annotated marks, a fitted plate, toggles, a glyph legend"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "6c391b9b6bebdac38dddccdc9b9464d8caf52d80",
+    "local_ref": "refs/recovery/dangling-20261114/6c391b9b6bebdac38dddccdc9b9464d8caf52d80",
+    "commit": "2026-09-03T12:43:29-04:00 The voyage pane earns its bar: annotated marks, a fitted plate, toggles, a glyph legend"
+  },
+  {
+    "repository": "storyatlas4s",
+    "sha": "343aa6257ab0f718eb275780714dd31b48d0928b",
+    "local_ref": "refs/recovery/dangling-20261114/343aa6257ab0f718eb275780714dd31b48d0928b",
+    "commit": "2026-08-30T07:58:39-04:00 Add evidence-faithful StoryAtlas mockup v2"
+  }
+]
