@@ -1,0 +1,12 @@
+{
+  "repository": "storymodel4s",
+  "old_head": "cc7219edba5e87fb337a2d0b9f2fa726c8c5fd2b",
+  "old_main": "fe1b73929fd3150e364c4ff6d21eb86b0ce752c1",
+  "new_main": "1fe57a9df609dbbd96898c918541afeb9d26ea24",
+  "private_original_mote": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel4s-original-mote-before-adoption",
+  "fresh_replica_from_tracked_operations": true,
+  "issue_summaries_equal": true,
+  "full_graph_equal": true,
+  "unrelated_files_preserved": 3,
+  "doctor_passed": true
+}

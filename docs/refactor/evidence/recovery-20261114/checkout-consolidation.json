@@ -1,0 +1,12 @@
+{
+  "retired_common_mote_archive": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/retired-common-public-mote.tar.gz",
+  "archive_sha256": "aa48b93a34b912d2f0caf9ae94d5ee0b1a1210614336395f79017f9ce5856d4a",
+  "pre_recovery_branches_retired": 16,
+  "private_candidate_branch_retired": true,
+  "public_recovery_branch_retired": true,
+  "retained_references": "refs/recovery/",
+  "remaining_worktrees": "worktree /Users/bbuchsbaum/code/scala/storymodel4s\nHEAD 1fe57a9df609dbbd96898c918541afeb9d26ea24\nbranch refs/heads/main\n\n",
+  "remaining_local_branches": [
+    "main"
+  ]
+}

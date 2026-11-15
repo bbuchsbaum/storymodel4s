@@ -1,0 +1,152 @@
+{
+  "head_sha": "93d0703faec4e04ff2c9370a7943e55a808b4188",
+  "run_id": 43672015236,
+  "url": "https://github.com/bbuchsbaum/storyatlas4s/actions/runs/43672015236",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "job_id": 132683919518,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 26,
+          "failed": 0,
+          "errors": 0,
+          "passed": 26
+        },
+        {
+          "total": 6,
+          "failed": 0,
+          "errors": 0,
+          "passed": 6
+        },
+        {
+          "total": 100,
+          "failed": 0,
+          "errors": 0,
+          "passed": 100
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15
+        },
+        {
+          "total": 87,
+          "failed": 0,
+          "errors": 0,
+          "passed": 87
+        }
+      ],
+      "aggregate": {
+        "total": 234,
+        "passed": 234,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log_sha256": "b014c21c3a10802e0b99e01a82ae9909ccc2a3128fefd815aadeaa4932e34cbd"
+    },
+    {
+      "job_id": 132683919530,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 22,
+          "failed": 0,
+          "errors": 0,
+          "passed": 22
+        },
+        {
+          "total": 100,
+          "failed": 0,
+          "errors": 0,
+          "passed": 100
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15
+        },
+        {
+          "total": 59,
+          "failed": 0,
+          "errors": 0,
+          "passed": 59
+        },
+        {
+          "total": 90,
+          "failed": 0,
+          "errors": 0,
+          "passed": 90
+        }
+      ],
+      "aggregate": {
+        "total": 286,
+        "passed": 286,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log_sha256": "9f80bdaf2e27403e9a8373bec92fcd03330d861af3eab9b730aa299c13c61fd4"
+    },
+    {
+      "job_id": 132683919604,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 22,
+          "failed": 0,
+          "errors": 0,
+          "passed": 22
+        },
+        {
+          "total": 100,
+          "failed": 0,
+          "errors": 0,
+          "passed": 100
+        },
+        {
+          "total": 15,
+          "failed": 0,
+          "errors": 0,
+          "passed": 15
+        },
+        {
+          "total": 59,
+          "failed": 0,
+          "errors": 0,
+          "passed": 59
+        },
+        {
+          "total": 90,
+          "failed": 0,
+          "errors": 0,
+          "passed": 90
+        }
+      ],
+      "aggregate": {
+        "total": 286,
+        "passed": 286,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log_sha256": "29a7ba2d6019828bd19a33c6091c8f51951f7a8a22576778b5de9830042bb7cc"
+    }
+  ],
+  "aggregate": {
+    "total": 806,
+    "passed": 806,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "task_total_count": 15,
+  "scope": "One complete job log per matrix cell, actual totals; no duplicate step-log counting."
+}

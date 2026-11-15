@@ -1,0 +1,14 @@
+{
+  "base": "93d0703faec4e04ff2c9370a7943e55a808b4188",
+  "revision": "ef0844bb229a0406d4f2a4e65ec89532c18d99a3",
+  "verdict": "PASS",
+  "reviewer": "independent final_recovery_review agent",
+  "checks": [
+    "Exact delta restricted to docs and five coherent completion/close/reservation/release operations",
+    "git diff --check passed; runtime/build delta empty",
+    "All 18 preserved files rehashed unchanged",
+    "Complete hosted log hashes and 15 totals independently recomputed: 806 passed, 0 failed/errors/skipped",
+    "Canonical Mote doctor clean; recovery ticket closed and unassigned"
+  ],
+  "evidence_boundary": "Hosted run binds base; receipt-only revision uses T2 independent review and format check."
+}

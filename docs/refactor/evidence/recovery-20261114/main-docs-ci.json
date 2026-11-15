@@ -1,0 +1,8 @@
+{
+  "head_sha": "1fe57a9df609dbbd96898c918541afeb9d26ea24",
+  "run_id": 43671844180,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43671844180",
+  "status": "completed",
+  "conclusion": "success",
+  "observed_with": "gh run view 43671844180 --repo bbuchsbaum/storymodel4s --json status,conclusion,headSha,url"
+}

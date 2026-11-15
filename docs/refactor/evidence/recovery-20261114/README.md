@@ -14,14 +14,17 @@ object stores pass `git fsck --full --no-reflogs`. All 32 dangling commits found
 are retained under private recovery refs; [their inventory](dangling-commits.json) preserves
 the original SHAs. The recent November snapshots were checked against the landed work.
 
-Five obsolete linked worktrees were removed after their current patches and status were
-compared with those backups. [The disposition record](worktrees.json) names each original tip,
+All six linked worktrees were retired after preservation and integration checks. Five obsolete
+worktrees had their current patches and status compared with the original backups; the final
+common worktree was retired after its reviewed commits reached primary `main`. [The disposition record](worktrees.json) names each original tip,
 backup and retained local `refs/recovery/` reference. Those references are private recovery
 material, outside ordinary branch/tag pushes. The staged changes in `main-wt` exactly recreated
 the earlier committed tree `1b0c7e79c`; they were preserved as an old snapshot, not landed as new
 implementation. The [branch inventory](branches.json) classifies all seventeen pre-recovery
 local branches, including the separately named claim-verifier patch already incorporated on
-main. Research data stays in the original ignored `data/` tree.
+main. The [final consolidation receipt](checkout-consolidation.json) records one remaining
+worktree and one local branch, `main`. The two owned standalone gate clones were
+[retired after verified private bundles](gate-clone-retirement.json). Research data stays in the original ignored `data/` tree.
 
 ## Portable tracker and publication boundary
 
@@ -87,6 +90,37 @@ consumer resolved the published immutable producer pin without a local source ov
 The complete consumer receipt is in Atlas commit `311dea48e89d3718441a805d2b499326eb4132a6`.
 Local evidence is not hosted evidence; neither establishes new scientific validity or a
 package release.
+
+## Integrated checkouts
+
+Recovery is complete. Source integration `1fe57a9df609dbbd96898c918541afeb9d26ea24` was
+published non-force and has [successful hosted CI](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43671844099).
+[All eighty task totals](storymodel4s-main-hosted-ci.json) sum to **17,000 passed, zero
+failed/errors, and 44 skipped** across JVM 17/21, JavaScript and Native. The
+[documentation run](main-docs-ci.json) also passed on that exact SHA.
+
+[StoryModel adoption](storymodel4s-adoption.json) and [Atlas adoption](storyatlas4s-adoption.json)
+rebuilt local Mote replicas from tracked operations, reproduced the reviewed full issue lists
+and dependency graphs, and passed `mote doctor`. The original complete private stores remain
+in the recovery archive. StoryModel now has one worktree and one local branch, `main`.
+Atlas's compatibility branch is integrated and retired to a private recovery ref. All eighteen
+of Atlas's unrelated unfinished files remain byte-identical; its other historical branches
+were preserved outside this cleanup's scope.
+
+Atlas integration `93d0703faec4e04ff2c9370a7943e55a808b4188` has
+[successful hosted CI](https://github.com/bbuchsbaum/storyatlas4s/actions/runs/43672015236):
+[fifteen task totals](storyatlas4s-main-hosted-ci.json) sum to **806 passed, zero failed/errors
+and zero skipped**, across JVM 17/21 and JavaScript. Its final receipt-only closure is
+`ef0844bb229a0406d4f2a4e65ec89532c18d99a3`, independently [reviewed](atlas-closeout-review.json)
+and pushed with local/tracking/remote parity verified. Atlas still pins the published immutable source
+candidate `87c4b55016f615c9e837e3b85c842bc4d2e0d2ff`, whose runtime/build inputs match the
+integrated source baseline.
+
+The final recovery closure changes only documentation and Mote records. Under T2 it receives
+exact-commit independent review and `git diff --check`; `[skip ci]` avoids repeating unchanged
+runtime gates. The hosted receipts bind the integration SHAs above, not a claimed new CI run
+on the later receipt-only commits. Both recovery tickets are closed; scientific qualification
+and release remain separate acceptance work.
 
 ## Restart queue
 

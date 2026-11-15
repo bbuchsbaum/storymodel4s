@@ -1,0 +1,12 @@
+{
+  "repository": "storyatlas4s",
+  "old_head": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "old_main": "50a160168daa03c51fcab60a4eaaed66674da83a",
+  "new_main": "93d0703faec4e04ff2c9370a7943e55a808b4188",
+  "private_original_mote": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storyatlas4s-original-mote-before-adoption",
+  "fresh_replica_from_tracked_operations": true,
+  "issue_summaries_equal": true,
+  "full_graph_equal": true,
+  "unrelated_files_preserved": 18,
+  "doctor_passed": true
+}

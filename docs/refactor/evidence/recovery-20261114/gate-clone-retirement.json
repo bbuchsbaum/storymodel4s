@@ -1,0 +1,22 @@
+[
+  {
+    "repository": "storymodel4s",
+    "retired_owned_gate_clone": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel-gate",
+    "clone_head": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+    "primary_fsck_exit": 0,
+    "verified_private_bundle": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/qualified-storymodel4s.bundle",
+    "bundle_sha256": "94e58128351094a2564885664c9e3b82716108e22d51fbb2883ad84854cde6d7",
+    "mote_archive": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel-gate-mote.tar.gz",
+    "mote_archive_sha256": "fd1d10a3f68cb17f3ee5a03525fa6020709dc8a59d415f4d9a1cb29332acc85c"
+  },
+  {
+    "repository": "storyatlas4s",
+    "retired_owned_gate_clone": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storyatlas-gate",
+    "clone_head": "93d0703faec4e04ff2c9370a7943e55a808b4188",
+    "primary_fsck_exit": 0,
+    "verified_private_bundle": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/qualified-storyatlas4s.bundle",
+    "bundle_sha256": "6d6cd535e3fbfd840f2792b7a716f304daab485e21157f58dff1f0f114441380",
+    "mote_archive": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storyatlas-gate-mote.tar.gz",
+    "mote_archive_sha256": "d2f1dbf42e10c11adf47936f31278dc144db31acda4671d1d02aedfe8cddcc9b"
+  }
+]
