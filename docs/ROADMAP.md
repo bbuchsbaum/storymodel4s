@@ -2,8 +2,10 @@
 
 **Recovery checkpoint, 2026-11-14:** the [restart receipt](refactor/evidence/recovery-20261114/README.md)
 records preservation, tracker portability, integration qualification and the remaining queue.
-The next implementation slice is Sherlock plus a third synthetic study on the common recorded
-pipeline, tracked as `bd-01M7E3G6TFG1YTWM9NTSZ4NRKX`.
+Sherlock and a third synthetic study now use the common recorded pipeline; the
+[slice-5 receipt](refactor/evidence/common-pipeline-slice5-20261115/README.md) records qualification
+for `bd-01M7E3G6TFG1YTWM9NTSZ4NRKX`. The next implementation slice is live execution through the
+same contract: recorded exchanges, bounded retries, interrupted-run resume and offline replay.
 
 The one current plan, adopted 2026-11-08 (Mote epic `bd-01M6Y7MWZGP29TNDJ90SG36A45`). It
 supersedes the direction in `refactor/PLAN.md`, the best-mapper plan and every dated "next

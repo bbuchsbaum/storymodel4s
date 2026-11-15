@@ -1,0 +1,16 @@
+{
+  "candidate": "1ce3c654ce55654c0fd21d292290aa3093f79f0e",
+  "base": "e02d00f0a3355bec15f264e81c3a92cbde61a98f",
+  "reviewer": "independent final_recovery_review agent",
+  "verdict": "PASS",
+  "blocks": [],
+  "follow_ups": [],
+  "scope": "Pipeline JVM only; no StoryAtlas references to changed implementations. Manual scope accepted after reference-scope exit 5 on a declaration-free CLI source.",
+  "evidence": [
+    "Frozen packet identity guard and source CSV validation reviewed",
+    "Absent versus null extras and supplied integer unit keys reviewed",
+    "Legacy-v2 comparison validates inputs and joins original unit numbers",
+    "587 pipeline tests, formatting and private Sherlock zero-difference receipts independently inspected"
+  ],
+  "review_limits": "No new build run by reviewer; parent gate artifacts read. Final evidence documentation reviewed separately."
+}

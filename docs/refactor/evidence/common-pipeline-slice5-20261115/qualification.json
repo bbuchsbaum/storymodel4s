@@ -1,0 +1,151 @@
+{
+  "revision": "1ce3c654ce55654c0fd21d292290aa3093f79f0e",
+  "classification": "LocallyObserved",
+  "gate": {
+    "working_directory": "/private/tmp/storymodel-slice5-gate-20261115",
+    "clean_exact_revision_verified_before_run": true,
+    "java": "25.0.5+8",
+    "commands": [
+      "set ThisBuild / tlFatalWarnings := true",
+      "pipeline/test",
+      "agentMappingStudyExport (private argv in gate metadata)",
+      "agentHarnessImport (private argv in gate metadata)",
+      "agentStudyBundle (private argv in gate metadata)",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "exit_code": 0,
+    "passed": 587,
+    "failed": 0,
+    "skipped": 0
+  },
+  "python": {
+    "agentmapping": {
+      "passed": 53,
+      "failed": 0,
+      "skipped": 0
+    },
+    "filmfestival": {
+      "passed": 223,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "third_study": {
+    "court": "StudyCliSuite: a third study crosses the real replay and bundle commands with its original unit keys",
+    "units": [
+      0,
+      7,
+      12
+    ],
+    "model_calls": 0,
+    "source_scenes": [
+      10,
+      30
+    ],
+    "recorded_exchanges": 3,
+    "independent_python_read": true
+  },
+  "mutation_evidence": [
+    {
+      "change": "Disable frozen packet equality check, keeping expected value used",
+      "court": "AgentBundleSuite: the study export refuses changed prompt bytes and changed frozen participant identities",
+      "mutant_compiled": true,
+      "passed": 17,
+      "failed": 1,
+      "restored_exact_source": true
+    },
+    {
+      "change": "Require unit keys 1..n again in isolated Python reader",
+      "court": "test_study_numbers_can_start_at_zero_and_have_gaps",
+      "passed": 30,
+      "errors": 1,
+      "scope": "31-test StudyBundle suite; original reader unchanged"
+    },
+    {
+      "change": "Run authored third-study CLI test against pre-fix extras projection",
+      "court": "StudyCliSuite",
+      "compiled": true,
+      "failed": 1,
+      "passing_siblings": 42,
+      "scope": "portability-01 is an old-tree regression control, not the current-candidate gate"
+    }
+  ],
+  "reference_scope": {
+    "automatic_exit": 5,
+    "reason": "Declaration-free AgentPacketCli.scala",
+    "manual_modules": [
+      "pipeline"
+    ],
+    "scala_referencing_files": 13,
+    "storyatlas_references": 0,
+    "independent_review_confirmed": true
+  },
+  "evidence": [
+    {
+      "path": "data/.slice5/20261115/evidence/gate-real-01.log",
+      "bytes": 2430530,
+      "sha256": "8d77441de2ae58b0e3cb68454f72b9b265933844bb346e4963635d8405fbce8e"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/python-01.log",
+      "bytes": 250,
+      "sha256": "d2aa5255f20dfae68a7aba1ae396c1a08660b5bfdb53b9dbd4c908842a7cc035"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/python-filmfestival-01.log",
+      "bytes": 429,
+      "sha256": "b89f34c84711b4774a9f0d7d035b4824a911c3bef8d5611cfeae0dd4f65371d0"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/filmfestival-replay-01.log",
+      "bytes": 11804,
+      "sha256": "b0b200742e87b5ab771a1a45a85cfac862ad054ec2ef9376cc66784236500e89"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/filmfestival-comparison.log",
+      "bytes": 197,
+      "sha256": "3cedcd1e45c70153a4727fd476bae08921386d7bc8060ce4a1cc56deb64d7419"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/packet-identity-mutation.log",
+      "bytes": 13374,
+      "sha256": "264908a1c9f944ae963e444e026d57743cdd4617c2c069751579863a536dde87"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/python-numbering-mutation.log",
+      "bytes": 5056,
+      "sha256": "de12f564759a1c1f60674d4beeb4422df7684cf320e013ba5c41fa6a7124455e"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/third-study-before-fix-02.log",
+      "bytes": 3776,
+      "sha256": "544447d991c045881abb34dad612bcc3d99376290f47b19084b7f8547dbd12ec"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/portability-01.log",
+      "bytes": 4992,
+      "sha256": "50577cb331efc39b514dc122398c52f5bf061d8e479c593d812649d3cc45a1d3"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/reference-scope.log",
+      "bytes": 258,
+      "sha256": "1a6153f05b7032979e0103d21c7eb95621a02a050cc449e07e9a9f767f1a75ea"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/storymodel4s-references.txt",
+      "bytes": 1603,
+      "sha256": "799ed478c850cb8e890010c3c00acae15b38a0e48d63d70de1593582e1805302"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/storyatlas4s-references.txt",
+      "bytes": 13,
+      "sha256": "dcb019ab5b322c4708601ded808fe9d0c6ddeee4be9836cb5a7251d8046395fe"
+    },
+    {
+      "path": "data/.slice5/20261115/evidence/synthetic-third-study.bundle.json",
+      "bytes": 34521,
+      "sha256": "07f59f2f0e5e1f15b96349b2c9b9ea14fbe9ca90eac74924fcc8b5a5530df127"
+    }
+  ]
+}

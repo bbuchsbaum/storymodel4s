@@ -1,0 +1,121 @@
+{
+  "revision": "1ce3c654ce55654c0fd21d292290aa3093f79f0e",
+  "runs": [
+    {
+      "run": "annotation-opus",
+      "bundles": 19,
+      "unit_rows": 3226,
+      "reply_document_differences": 0,
+      "model_calls": 0,
+      "scores": [
+        {
+          "field": "narrative",
+          "byte_identical": true,
+          "sha256": "21ef30fd48cb39455a93bdd59657dce6001b4e9dceea76f5c79fb4ff3b6ac9f6"
+        },
+        {
+          "field": "referent",
+          "byte_identical": true,
+          "sha256": "b35911ffc258f7b39c779119d2e775457b88559a9cb725c112611f517e5171f4"
+        }
+      ]
+    },
+    {
+      "run": "annotation-haiku",
+      "bundles": 19,
+      "unit_rows": 3226,
+      "reply_document_differences": 0,
+      "model_calls": 0,
+      "scores": [
+        {
+          "field": "narrative",
+          "byte_identical": true,
+          "sha256": "9f54396a1460d037d1132db2a44df2a754e9df4207757a7d1929725eddc17b25"
+        },
+        {
+          "field": "referent",
+          "byte_identical": true,
+          "sha256": "b50f9b38c0e90799b454d072de85b2d4fd9c8ccdf14548acde8556b8e62754ae"
+        }
+      ]
+    },
+    {
+      "run": "auto-opus",
+      "bundles": 19,
+      "unit_rows": 3226,
+      "reply_document_differences": 0,
+      "model_calls": 0,
+      "scores": [
+        {
+          "field": "narrative",
+          "byte_identical": true,
+          "sha256": "297c600fbee3e0ab0005959db63a6e222fb29897b339988105785a8ddafcc43d"
+        },
+        {
+          "field": "referent",
+          "byte_identical": true,
+          "sha256": "0007af96e666274ec82c677a926a60a037aa6e7e269a1f26c1155a3181d1ff98"
+        }
+      ]
+    },
+    {
+      "run": "auto-haiku",
+      "bundles": 19,
+      "unit_rows": 3226,
+      "reply_document_differences": 0,
+      "model_calls": 0,
+      "scores": [
+        {
+          "field": "narrative",
+          "byte_identical": true,
+          "sha256": "b7dcc79aef50edb2992e713cc381f8240b6226fd26d21c5b7693971cae762142"
+        },
+        {
+          "field": "referent",
+          "byte_identical": true,
+          "sha256": "a427046e9e8b19d133058c8b11ea713169483caf6f5ad655cc36e7415ca0d6ba"
+        }
+      ]
+    },
+    {
+      "run": "norecord-opus",
+      "bundles": 19,
+      "unit_rows": 3226,
+      "reply_document_differences": 0,
+      "model_calls": 0,
+      "scores": [
+        {
+          "field": "narrative",
+          "byte_identical": true,
+          "sha256": "ff2882901a88f631720907d81b0a58b426028fde583d7aa4ec4eceae1efbab84"
+        },
+        {
+          "field": "referent",
+          "byte_identical": true,
+          "sha256": "6b00942dad11d053f0a81d1cb91df88f73e3cde67e934d23b6a7a52a42cdb84c"
+        }
+      ]
+    },
+    {
+      "run": "norecord-haiku",
+      "bundles": 19,
+      "unit_rows": 3226,
+      "reply_document_differences": 0,
+      "model_calls": 0,
+      "scores": [
+        {
+          "field": "narrative",
+          "byte_identical": true,
+          "sha256": "eedca7ae809324506002366bf0832f85b7698c3559c31c9343a139527c3463a4"
+        },
+        {
+          "field": "referent",
+          "byte_identical": true,
+          "sha256": "8ea1330027fa1bce42f5191b3d6daab0c9b55959a3f8d1e4d8e8e51803e5b679"
+        }
+      ]
+    }
+  ],
+  "total_bundles": 114,
+  "total_unit_rows": 19356
+}

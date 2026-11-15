@@ -1,0 +1,19 @@
+{
+  "revision": "1ce3c654ce55654c0fd21d292290aa3093f79f0e",
+  "counts": {
+    "new:narrative:choice": 1744,
+    "new:referent:choice": 1683,
+    "new:referent:null": 61,
+    "old:narrative:choice": 1744,
+    "old:referent:choice": 1683,
+    "old:referent:null": 61,
+    "participants": 11,
+    "units": 1744
+  },
+  "differences": 0,
+  "model_calls": 0,
+  "private_comparison_sha256": "04c516043a35f8b1fa138e041a048f606778a481d5f35730cdd464c97eb3fab1",
+  "private_comparison_path": "data/.slice5/20261115/evidence/sherlock-comparison.json",
+  "record_pairs_changed": 22,
+  "identity_boundary": "v1 and v2 source, recall, policy and record identities differ; compare participant and original unit number. Private crosswalk retains file hashes and both record digests."
+}
