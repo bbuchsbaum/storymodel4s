@@ -1,0 +1,102 @@
+{
+  "gated_revision": "20f553a160719917498c330f8104031cb2e97f93",
+  "status": "LocallyObserved",
+  "meta": {
+    "schema_version": 1,
+    "started_utc": "2026-11-15T02:57:18.881358+00:00",
+    "finished_utc": "2026-11-15T03:01:05.790044+00:00",
+    "duration_seconds": 226.907714,
+    "command": [
+      "env",
+      "JAVA_HOME=/Users/bbuchsbaum/Library/Java/JavaVirtualMachines/openjdk-22/Contents/Home",
+      "LLVM_BIN=/opt/homebrew/opt/llvm@20/bin",
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "githubWorkflowGenerate",
+      "compileAll",
+      "testAll",
+      "app/fastLinkJS"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storyatlas-gate",
+    "log": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/evidence/atlas-full-gate.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 10800.0,
+    "log_bytes": 26909
+  },
+  "sha256": "1734970cc86d6790ef26a2567547040093cefdf44ece63c135d4e7640282c689",
+  "task_totals": [
+    {
+      "total": 22,
+      "failed": 0,
+      "errors": 0,
+      "passed": 22
+    },
+    {
+      "total": 26,
+      "failed": 0,
+      "errors": 0,
+      "passed": 26
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100
+    },
+    {
+      "total": 100,
+      "failed": 0,
+      "errors": 0,
+      "passed": 100
+    },
+    {
+      "total": 15,
+      "failed": 0,
+      "errors": 0,
+      "passed": 15
+    },
+    {
+      "total": 15,
+      "failed": 0,
+      "errors": 0,
+      "passed": 15
+    },
+    {
+      "total": 90,
+      "failed": 0,
+      "errors": 0,
+      "passed": 90
+    },
+    {
+      "total": 87,
+      "failed": 0,
+      "errors": 0,
+      "passed": 87
+    },
+    {
+      "total": 59,
+      "failed": 0,
+      "errors": 0,
+      "passed": 59
+    },
+    {
+      "total": 6,
+      "failed": 0,
+      "errors": 0,
+      "passed": 6
+    }
+  ],
+  "aggregate": {
+    "total": 520,
+    "passed": 520,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "ignored": 0
+  },
+  "log": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/evidence/atlas-full-gate.log"
+}

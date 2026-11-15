@@ -80,9 +80,13 @@ Independent review of the preserved Atlas patch exposed an omitted `ProducerChoi
 The repaired candidate `20f553a160719917498c330f8104031cb2e97f93` passed review. Its
 [compiled mutation](atlas-label-mutation.json) removes only that case: the named categorical
 test fails with `MatchError`, while the named numerical control passes in the JUnit report.
-The original bytes were restored before the full consumer gate. Consumer qualification is
-recorded separately as it completes. Local evidence is not hosted evidence; neither establishes
-new scientific validity or a package release.
+The original bytes were restored before the [full consumer gate](atlas-gate.json):
+**520 passed, zero failed/errors/skipped** across ten JVM/JavaScript test tasks. Compilation,
+app linking and workflow generation passed, followed by both format checks on Java 25. The
+consumer resolved the published immutable producer pin without a local source override.
+The complete consumer receipt is in Atlas commit `311dea48e89d3718441a805d2b499326eb4132a6`.
+Local evidence is not hosted evidence; neither establishes new scientific validity or a
+package release.
 
 ## Restart queue
 

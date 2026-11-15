@@ -1,0 +1,8 @@
+{
+  "source_metadata_revision": "9bc737f12c1b1d43d3c4e531ed5c0d45ac22a909",
+  "verdict": "PASS",
+  "reviewer": "fresh-context final_recovery_review agent",
+  "scope": "Independent reconciliation of local/hosted test totals, six replay receipts, named mutation JUnit XML and honest formatter qualification boundary.",
+  "adoption_script_sha256": "3912db00cc61e5737c1bb9ad065bfadecc50e5f4e29ebe68eb80ef4c7bb63350",
+  "adoption_review": "PASS under exact-head guards; serialize adoption. Preflight and rollback preserve original stores and unfinished files; fresh local authority is rebuilt through mote admit."
+}
