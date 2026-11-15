@@ -226,10 +226,9 @@ def check(bundle):
             raise BundleError(f"bundle has no {key}")
     provenance = bundle["provenance"]
     units = bundle["units"]
-    if [unit["u"] for unit in units] != list(range(1, len(units) + 1)) or not all(
-        is_int(unit["u"]) for unit in units
-    ):
-        raise BundleError("units are not numbered 1 to n in order")
+    numbers = [unit["u"] for unit in units]
+    if not numbers or not all(is_int(n) for n in numbers) or len(set(numbers)) != len(numbers):
+        raise BundleError("unit numbers must be distinct integers")
     scenes = {s["scene"]: s for s in bundle["source"]["scenes"]}
     films = {c["collection"]: c for c in bundle["source"]["collections"]}
     timed = provenance["protocol"] in TIME_PROTOCOLS

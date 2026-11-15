@@ -147,7 +147,27 @@ class StudyBundle(unittest.TestCase):
             b["units"][0]["referent"]["stated"]["scene"] = True
 
         self.refused(boolean, "not an integer")
-        self.refused(lambda b: b["units"][0].__setitem__("u", "1"), "numbered 1 to n")
+        self.refused(lambda b: b["units"][0].__setitem__("u", "1"), "distinct integers")
+        self.refused(lambda b: b["units"][0].__setitem__("u", True), "distinct integers")
+
+    def test_study_numbers_can_start_at_zero_and_have_gaps(self):
+        for numbers in (range(6), (0, 7, 12, 20, 30, 99)):
+            bundle = copy.deepcopy(self.bundle)
+            for unit, number in zip(bundle["units"], numbers):
+                unit["u"] = number
+            # This reader checks the stated-answer receipt, not the canonical Scala record digest.
+            # The Scala CLI court separately produces a real bundle with zero-based, gapped keys.
+            for field in study_bundle.FIELDS:
+                receipt = study_bundle.decision_receipt(bundle["interpretations"][field]["record"])
+                old = study_bundle.answers_digest(self.bundle["units"], field)
+                receipt["inputs"] = [
+                    study_bundle.answers_digest(bundle["units"], field) if item == old else item
+                    for item in receipt["inputs"]
+                ]
+            self.assertEqual(study_bundle.check(bundle), bundle)
+            bundle["units"][0]["u"] = -1
+            with self.assertRaisesRegex(study_bundle.BundleError, "not the ones the record"):
+                study_bundle.check(bundle)
 
     def test_swapped_slots_are_refused(self):
         def change(b):
@@ -223,7 +243,7 @@ class StudyBundle(unittest.TestCase):
 
     def test_a_dropped_or_repeated_unit_is_refused(self):
         self.refused(lambda b: b["units"].pop(), "do not match")
-        self.refused(lambda b: b["units"][1].__setitem__("u", 1), "numbered 1 to n")
+        self.refused(lambda b: b["units"][1].__setitem__("u", 1), "distinct integers")
 
     def test_another_version_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:

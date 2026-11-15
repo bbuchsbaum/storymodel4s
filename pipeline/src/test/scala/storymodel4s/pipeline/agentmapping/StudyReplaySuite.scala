@@ -45,6 +45,13 @@ class StudyReplaySuite extends FunSuite:
   private val ok = """"narrative": 3, "narrative_film": 1, "referent": null, "referent_film": 2"""
   private val second = chunks(1).prompt -> reply(s"""{"u": 4, $ok}""", s"""{"u": 5, $ok}""")
 
+  test("requested extras distinguish absent fields from explicit null"):
+    val answer = UnitReply.Answered(item("""{"narrative":3,"referent":null,"conf":null}"""))
+    val row = StudyReplay.unitRow(CoercingOpen, units.head, answer, Vector("conf", "alts", "rows"))
+    assertEquals(row.hcursor.downField("conf").focus, Some(Json.Null))
+    assertEquals(row.hcursor.downField("alts").focus, None)
+    assertEquals(row.hcursor.downField("rows").focus, None)
+
   test("a retry is asked with the suffix, and an unanswered unit of an accepted chunk is omitted"):
     val table = Map(
       chunks(0).prompt -> "not json",

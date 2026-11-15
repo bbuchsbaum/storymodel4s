@@ -221,8 +221,9 @@ object StudyReplay:
         case _      => None
       }
 
-  /** One unit's row of a reply file: both judgements, and the extra fields the condition asked for,
-    * each as the reply gave it or null. A unit with no answer has only its two failures.
+  /** One unit's row of a reply file: both judgements, and the requested extra fields actually
+    * present in the reply. Absence and explicit null stay different. A unit with no answer has
+    * only its two failures.
     */
   def unitRow(
       protocol: ReplyProtocol,
@@ -238,7 +239,7 @@ object StudyReplay:
           head ++ Vector(
             "referent" -> prediction(stated(protocol, item, "referent"), intervals),
             "narrative" -> prediction(stated(protocol, item, "narrative"), intervals)
-          ) ++ extras.map(k => k -> item.asObject.flatMap(_(k)).getOrElse(Json.Null))
+          ) ++ extras.flatMap(k => item.asObject.flatMap(_(k)).map(k -> _))
         )
       case other =>
         val reason = if other == UnitReply.Omitted then "omitted" else "unparsable-chunk"

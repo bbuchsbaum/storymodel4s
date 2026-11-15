@@ -88,7 +88,8 @@ object StudyBundle:
   ): Row =
     val full = StudyReplay.unitRow(protocol, unit, reply, extras, intervals).hcursor
     val (processing, kept) = reply match
-      case StudyReplay.UnitReply.Answered(_)     => "answered" -> extras
+      case StudyReplay.UnitReply.Answered(item) =>
+        "answered" -> extras.filter(k => item.asObject.exists(_.contains(k)))
       case StudyReplay.UnitReply.Omitted         => "omitted" -> Vector.empty
       case StudyReplay.UnitReply.UnparsableChunk => "unparsable-chunk" -> Vector.empty
     Row(
