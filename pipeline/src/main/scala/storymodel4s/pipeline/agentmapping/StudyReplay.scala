@@ -222,8 +222,8 @@ object StudyReplay:
       }
 
   /** One unit's row of a reply file: both judgements, and the requested extra fields actually
-    * present in the reply. Absence and explicit null stay different. A unit with no answer has
-    * only its two failures.
+    * present in the reply. Absence and explicit null stay different. A unit with no answer has only
+    * its two failures.
     */
   def unitRow(
       protocol: ReplyProtocol,
