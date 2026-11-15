@@ -4,6 +4,8 @@ Run from the repository root: python3 tools/agentmapping/test_read_bundle.py
 """
 
 import copy
+import contextlib
+import io
 import json
 import pathlib
 import sys
@@ -101,6 +103,28 @@ class ReadBundle(unittest.TestCase):
             json.dump({"schema": "something-else"}, handle)
             handle.flush()
             self.assertEqual(read_bundle.main([handle.name]), 2)
+
+    def test_same_command_reads_scene_and_time_v2_bundles(self):
+        for name in ("synthetic-study.bundle.json", "synthetic-study-time.bundle.json"):
+            path = FIXTURE.with_name(name)
+            with self.subTest(name=name):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    self.assertEqual(read_bundle.main([str(path)]), 0)
+                self.assertIn("model calls 0", output.getvalue())
+                bundle = read_bundle.load(path)
+                first = bundle["units"][0]
+                self.assertEqual(read_bundle.find_unit(bundle, first["unit"]), first)
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    self.assertEqual(read_bundle.main([str(path), "--unit", str(first["u"])]), 0)
+                self.assertIn("narrative:", output.getvalue())
+                self.assertIn("referent:", output.getvalue())
+
+    def test_v2_dispatch_keeps_the_checked_reader(self):
+        with open(FIXTURE.with_name("synthetic-study.bundle.json"), encoding="utf-8") as handle:
+            bundle = json.load(handle)
+        bundle["units"][0]["referent"]["judgement"] = {"kind": "none"}
+        with self.assertRaisesRegex(read_bundle.BundleError, "does not follow"):
+            read_bundle.load(self.write(bundle))
 
 
 if __name__ == "__main__":

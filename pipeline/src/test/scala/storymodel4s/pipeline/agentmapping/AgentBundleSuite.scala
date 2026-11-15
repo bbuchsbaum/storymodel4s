@@ -4,6 +4,7 @@ import io.circe.Json
 import io.circe.jawn.parse
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
+import scala.jdk.CollectionConverters.*
 import munit.FunSuite
 import storymodel4s.align.*
 import storymodel4s.codec.MappingCodecs
@@ -300,3 +301,66 @@ class AgentBundleSuite extends FunSuite:
       try new String(stream.readAllBytes(), StandardCharsets.UTF_8)
       finally stream.close()
     assertEquals(actual, committed)
+
+  private def withExportInputs(f: (AgentPackets.Inputs, String) => Unit): Unit =
+    val dir = Files.createTempDirectory("synthetic-packets-")
+    try
+      Files.writeString(dir.resolve("recall-map-p1.tsv"),
+        ("unit\trecallText" +: table.map(u => s"${u.index}\t${u.text}")).mkString("\n")): Unit
+      val in = AgentPackets.Inputs("OUTLINE", Vector("p1"), Vector.empty, Vector.empty,
+        dir, atlas, Checksum.ofBytes(annotation))
+      val frozen = Json.obj(
+        "schema" -> Json.fromString("storymodel4s.agentmapping.packet-identities/v1"),
+        "outlineSha256" -> Json.fromString(Checksum.ofText("OUTLINE").hex),
+        "systemSha256" -> Json.fromString(Checksum.ofText(AgentPrompts.system(AgentPrompts.Version.V2)).hex),
+        "chunk" -> Json.fromInt(3),
+        "participants" -> Json.arr(Json.obj(
+          "participant" -> Json.fromString("p1"), "units" -> Json.fromInt(table.size),
+          "promptSha256" -> Json.fromValues(AgentPrompts.chunks("OUTLINE", table, 3)
+            .map(p => Json.fromString(Checksum.ofText(p).hex)))
+        )),
+        "skippedNotDevelopment" -> Json.arr(), "developmentWithoutUnitTable" -> Json.arr()
+      ).spaces2
+      f(in, frozen)
+    finally
+      val files = Files.walk(dir)
+      try files.iterator.asScala.toVector.reverse.foreach(p => Files.delete(p))
+      finally files.close()
+
+  test("the study export preserves original unit numbers, source rows and exact media ticks"):
+    withExportInputs { (in, frozen) =>
+      val files = AgentPackets.studyExport(in, frozen, "model").fold(fail(_), identity)
+      val index = StudyExport.parseIndex(parse(files("index.json")).toOption.get).toOption.get
+      assertEquals(index.protocol, StudyReplay.ReplyProtocol.CoercingOpen)
+      assertEquals(index.manifestSha256, Checksum.ofText(frozen).hex)
+      val session = StudyExport.parseSession(parse(files(index.sessions.head.file)).toOption.get,
+        index.sessions.head).toOption.get
+      assertEquals(session.units.map(u => (u.u, u.row, u.text)),
+        table.map(u => (u.index, Json.fromInt(u.index), u.text)))
+      val source = storymodel4s.codec.TimedSourceArtifactCodec.prepare(
+        files("source.csv").getBytes(StandardCharsets.UTF_8),
+        files("parts.json").getBytes(StandardCharsets.UTF_8)).toOption.get
+      assertEquals(source.segments.map(s => (s.ordinal, s.text)), atlas.rows.map(r => (r.row, r.description)))
+      source.segments.foreach { segment =>
+        val original = atlas.mediaByRow.get(segment.ordinal)
+        assertEquals(segment.locus.map(l => (l.part, l.startTick, l.endTick)),
+          original.map(l => (l.part, l.startTick, l.endTick)))
+      }
+      assertEquals(source.targetGroups.size, 2)
+      assertEquals(source.collectionRefs.size, 0)
+    }
+
+  test("the study export refuses changed prompt bytes and changed frozen participant identities"):
+    withExportInputs { (in, frozen) =>
+      val refusal = Left("inputs differ from the frozen packet identities")
+      assertEquals(AgentPackets.studyExport(in.copy(outline = "OTHER"), frozen, "model"), refusal)
+      assertEquals(AgentPackets.studyExport(in, frozen.replace("\"p1\"", "\"p2\""), "model"), refusal)
+      Files.writeString(in.unitsDir.resolve("recall-map-p1.tsv"), "unit\trecallText\n0\tchanged"): Unit
+      assertEquals(AgentPackets.studyExport(in, frozen, "model"), refusal)
+    }
+
+  test("the study export refuses an incomplete development population"):
+    withExportInputs { (in, frozen) =>
+      assertEquals(AgentPackets.studyExport(in.copy(missing = Vector("p2")), frozen, "model"),
+        Left("development population is empty, repeated or missing a unit table"))
+    }

@@ -12,6 +12,37 @@ private def die(msg: String): Nothing =
   System.err.println(s"refused: $msg")
   sys.exit(2)
 
+/** CLI: `agentMappingStudyExport ANNOTATION TRANSCRIPT_A TRANSCRIPT_B CAPTIONS PARTITION
+  * UNITS_DIR PACKET_IDENTITIES MODEL OUTPUT_DIR`.
+  *
+  * Exports Sherlock's admitted development inputs for `agentStudyBundle`, checked against frozen
+  * packet identities. No provider is invoked. Keep the source and recall text in the ignored data
+  * tree. Generic source and supplied-unit identities differ from the old v1 records.
+  */
+@main def agentMappingStudyExport(
+    annotation: String,
+    transcriptA: String,
+    transcriptB: String,
+    captions: String,
+    partition: String,
+    unitsDir: String,
+    packetIdentities: String,
+    model: String,
+    outputDir: String
+): scala.Unit =
+  val out = Path.of(outputDir)
+  if Files.exists(out) then die("output directory exists")
+  val in = AgentPackets.load(annotation, transcriptA, transcriptB, captions, partition, unitsDir)
+    .fold(die, identity)
+  val frozen = try Files.readString(Path.of(packetIdentities))
+    catch case scala.util.control.NonFatal(_) => die("cannot read packet identities")
+  val files = AgentPackets.studyExport(in, frozen, model).fold(die, identity)
+  Files.createDirectories(out.resolve("sessions")): scala.Unit
+  files.toVector.sortBy(_._1).foreach { (name, text) =>
+    Files.writeString(out.resolve(name), text): scala.Unit
+  }
+  println(s"exported sessions=${in.development.size} modelCalls=0")
+
 /** CLI: `agentMappingPackets ANNOTATION TRANSCRIPT_A TRANSCRIPT_B CAPTIONS PARTITION UNITS_DIR
   * CHUNK OUTPUT [OUTLINE_COPY]`.
   *

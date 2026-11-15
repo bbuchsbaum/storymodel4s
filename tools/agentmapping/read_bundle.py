@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read an agent mapping bundle (storymodel4s.agentmapping.bundle/v1) without Scala.
+"""Read an agent mapping bundle (v1 or v2) without Scala.
 
 A bundle holds, for one participant, the model's two scene judgements for every
 recall unit (narrative: the scene being narrated; referent: the scene the
@@ -25,16 +25,22 @@ import argparse
 import json
 import sys
 
+import study_bundle
+
 SCHEMA = "storymodel4s.agentmapping.bundle/v1"
 
 
-class BundleError(ValueError):
-    pass
+BundleError = study_bundle.BundleError
 
 
 def load(path):
     with open(path, encoding="utf-8") as handle:
         bundle = json.load(handle)
+    if isinstance(bundle, dict) and bundle.get("schema") == study_bundle.SCHEMA:
+        try:
+            return study_bundle.check(bundle)
+        except (KeyError, TypeError, AttributeError) as error:
+            raise BundleError(f"malformed bundle: {error!r}") from error
     if not isinstance(bundle, dict) or bundle.get("schema") != SCHEMA:
         raise BundleError(f"not a {SCHEMA} document")
     for key in ("provenance", "interpretations", "units", "source"):
@@ -52,8 +58,9 @@ def load(path):
 
 def find_unit(bundle, selector):
     """A unit row by integer index or by unit id."""
+    key = "u" if bundle["schema"] == study_bundle.SCHEMA else "index"
     for unit in bundle["units"]:
-        if str(unit["index"]) == str(selector) or unit["unit"] == selector:
+        if str(unit[key]) == str(selector) or unit["unit"] == selector:
             return unit
     raise BundleError(f"no unit {selector}")
 
@@ -124,6 +131,8 @@ def describe_field(field, render=str):
 
 def describe_unit(bundle, unit):
     """Lines describing one unit: both judgements, citations and their source support."""
+    if bundle["schema"] == study_bundle.SCHEMA:
+        return study_bundle.describe_unit(bundle, unit["u"])
     scenes = scenes_by_number(bundle)
     rows = rows_by_number(bundle)
 
@@ -182,6 +191,8 @@ def describe_unit(bundle, unit):
 
 
 def summary(bundle):
+    if bundle["schema"] == study_bundle.SCHEMA:
+        return study_bundle.summary(bundle)
     provenance = bundle["provenance"]
     units = bundle["units"]
     for unit in units:
