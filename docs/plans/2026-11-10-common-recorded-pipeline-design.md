@@ -116,8 +116,9 @@ renderer is delivery 3's job, with the exported prompts as its test.
    - All four automatic and no-record runs reproduce strict scene, near scenes and out-of-clip
      per unit.
 5. **Sherlock on the same entry point, and a synthetic third study.**
-   - Sherlock record digests equal the existing bundles; no corpus name remains in the generic
-     path.
+   - Preserve every Sherlock prediction through the common path; explicitly account for changed
+     source, recall and record identities under v2 (the implementation decision below supersedes
+     the original digest-equality target). No corpus branch belongs in the generic path.
 
 ## Carried into slice 2 from the review of slice 1
 
@@ -212,6 +213,32 @@ without Scala, and `ff_score.py score` accepts a directory of them in place of r
   to them, as it does to reply files.
 
 ## Notes
+
+### Slice 5 compatibility decision (2026-11-15)
+
+The approved recovery ticket `bd-01M7E3G6TFG1YTWM9NTSZ4NRKX` requires an explicit choice between
+a legacy profile and new record digests. Use the existing bundle v2 contract. Keep v1 bundles
+readable, and compare their predictions and self-reports by participant and original unit number.
+Do not use changed unit IDs as the join key, and do not advertise byte-identical records.
+
+The adapter `agentMappingStudyExport` exports Sherlock development inputs only after matching
+the frozen packet identities, including every prompt hash and participant. It derives generic
+source CSV rows from the checked atlas's exact media ticks. The generic CSV and annotation clocks
+have new content identities; their hash must not be the original TSV or media file's identity.
+Supplied-unit recall uses the same texts in the same order, joined by line breaks, and records
+the unit-table checksum and `NotAssessed` discourse function. This is different from the legacy
+word-table/segmenter inventory. Policy IDs, referent abstention wording, failure details,
+source-derived target universe, and the stated-answer receipt also differ. These are explicit
+provenance changes, not changed predictions or a scientific equivalence claim.
+
+Rejected: a second legacy record profile in the common path solely to preserve old hashes. It
+would perpetuate corpus-specific construction and conceal the new source/recall provenance.
+The frozen packet manifest, old/new bundle hashes and paired record digests provide the migration
+crosswalk. `read_bundle.py` dispatches v1 and v2 to their existing validation paths.
+
+Study unit numbers are distinct integers supplied by the exporter, including zero-based or
+gapped numbering. They are not silently renumbered. Optional self-reported fields retain absence
+separately from explicit null; neither becomes a numeric score.
 
 - The interval-table hash of the Python tools is over rounded text. Matching it is not an
   acceptance; per-unit equality is.

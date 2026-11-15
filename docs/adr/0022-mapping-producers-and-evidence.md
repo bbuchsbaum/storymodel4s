@@ -472,3 +472,14 @@ Owner decisions of 2026-11-10 for delivery 2 of the scientific preview. The desi
    the clock's digest, so a time-based record cannot be compared with a scene-based one by
    accident. Raw answers are kept.
    - Rejected: converting only at scoring, which leaves time conditions with no checked record.
+
+### Slice 5 implementation choice (2026-11-15)
+
+Within the approved common-pipeline migration, `agentMappingStudyExport` adapts the frozen
+Sherlock development packets to the existing study-export/v1 and bundle/v2 contracts. The
+generic reader accepts original study unit numbers, and `read_bundle.py` dispatches both bundle
+versions. New source, supplied-recall and record digests are explicit; predictions are compared
+by participant and original unit number. Rejected: adding a legacy record-construction profile
+inside the common path to make new provenance claim old identities. See the
+[compatibility decision](../plans/2026-11-10-common-recorded-pipeline-design.md#slice-5-compatibility-decision-2026-11-15)
+for the identity changes and acceptance boundary.
