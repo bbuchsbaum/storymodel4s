@@ -1,0 +1,13 @@
+{
+  "revision": "20f553a160719917498c330f8104031cb2e97f93",
+  "mutation": "Remove ProducerChoice case from WorkspaceLabels.origin",
+  "compiled": true,
+  "named_test_failed": "a supplied categorical choice retains its producer policy",
+  "positive_control_passed": "numerical origins retain their distinct labels",
+  "failed": 1,
+  "passed": 1,
+  "restored_exact_bytes": true,
+  "log_sha256": "a22675837488529ec445eb103c39583656100fcdbbec2eda3f82a0a1dd54e792",
+  "junit_xml_sha256": "205aa0c18c514b4cfade99f4248fb32b26f9efef1dc7e428d93949179accd191",
+  "control_evidence": "JUnit XML explicitly contains the named numerical control without failure, error or skipped children; the console prints only failing test names."
+}

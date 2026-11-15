@@ -1,0 +1,563 @@
+{
+  "head_sha": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+  "run_id": 43652097024,
+  "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43652097024",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "job_id": 132622601358,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 271,
+          "failed": 0,
+          "errors": 0,
+          "passed": 271
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170
+        },
+        {
+          "total": 283,
+          "failed": 0,
+          "errors": 0,
+          "passed": 283
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104
+        },
+        {
+          "total": 1138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1138
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81
+        },
+        {
+          "total": 444,
+          "failed": 0,
+          "errors": 0,
+          "passed": 444
+        },
+        {
+          "total": 162,
+          "failed": 0,
+          "errors": 0,
+          "passed": 162
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117
+        }
+      ],
+      "aggregate": {
+        "total": 3570,
+        "passed": 3570,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log_sha256": "552f898e16eba25bb631790d0499bb98925b04694443363c2190139cf54de88a"
+    },
+    {
+      "job_id": 132622601625,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 271,
+          "failed": 0,
+          "errors": 0,
+          "passed": 271
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167
+        },
+        {
+          "total": 286,
+          "failed": 0,
+          "errors": 0,
+          "passed": 286
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 1158,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1158
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133
+        },
+        {
+          "total": 445,
+          "failed": 0,
+          "errors": 0,
+          "passed": 445
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98
+        },
+        {
+          "total": 83,
+          "failed": 0,
+          "errors": 0,
+          "passed": 82,
+          "skipped": 1
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28
+        },
+        {
+          "total": 52,
+          "failed": 0,
+          "errors": 0,
+          "passed": 52
+        },
+        {
+          "total": 196,
+          "failed": 0,
+          "errors": 0,
+          "passed": 195,
+          "skipped": 1
+        },
+        {
+          "total": 155,
+          "failed": 0,
+          "errors": 0,
+          "passed": 135,
+          "skipped": 20
+        },
+        {
+          "total": 582,
+          "failed": 0,
+          "errors": 0,
+          "passed": 582
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159
+        }
+      ],
+      "aggregate": {
+        "total": 4952,
+        "passed": 4930,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 22
+      },
+      "log_sha256": "90666dd36cc936204ab91baf900c6effe2d615960289e3a1ad56c6c68ef6632e"
+    },
+    {
+      "job_id": 132622601650,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 271,
+          "failed": 0,
+          "errors": 0,
+          "passed": 271
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167
+        },
+        {
+          "total": 286,
+          "failed": 0,
+          "errors": 0,
+          "passed": 286
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 1158,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1158
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133
+        },
+        {
+          "total": 445,
+          "failed": 0,
+          "errors": 0,
+          "passed": 445
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117
+        },
+        {
+          "total": 98,
+          "failed": 0,
+          "errors": 0,
+          "passed": 98
+        },
+        {
+          "total": 83,
+          "failed": 0,
+          "errors": 0,
+          "passed": 82,
+          "skipped": 1
+        },
+        {
+          "total": 28,
+          "failed": 0,
+          "errors": 0,
+          "passed": 28
+        },
+        {
+          "total": 52,
+          "failed": 0,
+          "errors": 0,
+          "passed": 52
+        },
+        {
+          "total": 196,
+          "failed": 0,
+          "errors": 0,
+          "passed": 195,
+          "skipped": 1
+        },
+        {
+          "total": 155,
+          "failed": 0,
+          "errors": 0,
+          "passed": 135,
+          "skipped": 20
+        },
+        {
+          "total": 582,
+          "failed": 0,
+          "errors": 0,
+          "passed": 582
+        },
+        {
+          "total": 159,
+          "failed": 0,
+          "errors": 0,
+          "passed": 159
+        }
+      ],
+      "aggregate": {
+        "total": 4952,
+        "passed": 4930,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 22
+      },
+      "log_sha256": "5e0e2898402526d69e7184d5c42f9cb72e1d5fb6ca58821d709e0b691033e3ef"
+    },
+    {
+      "job_id": 132622601741,
+      "matrix": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "conclusion": "success",
+      "task_totals": [
+        {
+          "total": 271,
+          "failed": 0,
+          "errors": 0,
+          "passed": 271
+        },
+        {
+          "total": 81,
+          "failed": 0,
+          "errors": 0,
+          "passed": 81
+        },
+        {
+          "total": 92,
+          "failed": 0,
+          "errors": 0,
+          "passed": 92
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 138
+        },
+        {
+          "total": 167,
+          "failed": 0,
+          "errors": 0,
+          "passed": 167
+        },
+        {
+          "total": 283,
+          "failed": 0,
+          "errors": 0,
+          "passed": 283
+        },
+        {
+          "total": 77,
+          "failed": 0,
+          "errors": 0,
+          "passed": 77
+        },
+        {
+          "total": 1138,
+          "failed": 0,
+          "errors": 0,
+          "passed": 1138
+        },
+        {
+          "total": 104,
+          "failed": 0,
+          "errors": 0,
+          "passed": 104
+        },
+        {
+          "total": 170,
+          "failed": 0,
+          "errors": 0,
+          "passed": 170
+        },
+        {
+          "total": 133,
+          "failed": 0,
+          "errors": 0,
+          "passed": 133
+        },
+        {
+          "total": 444,
+          "failed": 0,
+          "errors": 0,
+          "passed": 444
+        },
+        {
+          "total": 116,
+          "failed": 0,
+          "errors": 0,
+          "passed": 116
+        },
+        {
+          "total": 162,
+          "failed": 0,
+          "errors": 0,
+          "passed": 162
+        },
+        {
+          "total": 117,
+          "failed": 0,
+          "errors": 0,
+          "passed": 117
+        }
+      ],
+      "aggregate": {
+        "total": 3570,
+        "passed": 3570,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log_sha256": "cc3afd73f95a1dc9c0eb935f0459d07ba7d5518ab2e6c7b82725e31c4124a08f"
+    }
+  ],
+  "aggregate": {
+    "total": 17044,
+    "passed": 17000,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 44
+  },
+  "task_total_count": 80,
+  "scope": "One complete job log per matrix cell; no duplicate step-log totals."
+}

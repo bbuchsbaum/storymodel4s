@@ -1,0 +1,157 @@
+{
+  "revision": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+  "model_calls": 0,
+  "source_csv_sha256": "d49588906274de8c11b963c2de27f8e2f0a0088a156faa8095da4c17a7ff29ab",
+  "parts_sha256": "f1e0a0b9ad598c61c6590a751f4235f821c85a4bf503c27cc590099eeff89789",
+  "runs": [
+    {
+      "run": "annotation-opus",
+      "files": 19,
+      "units": 3226,
+      "differences": 0,
+      "bundle_count": 19,
+      "manifest_sha256": "2a8d61166a9e414b4d5474f758cc0c4babb2de07544de66a3aa4e6e0df77c047",
+      "scores": [
+        {
+          "field": "narrative",
+          "equal_to_saved_v4_report": true,
+          "sha256": "21ef30fd48cb39455a93bdd59657dce6001b4e9dceea76f5c79fb4ff3b6ac9f6",
+          "saved_sha256": "21ef30fd48cb39455a93bdd59657dce6001b4e9dceea76f5c79fb4ff3b6ac9f6",
+          "byte_identical": true
+        },
+        {
+          "field": "referent",
+          "equal_to_saved_v4_report": true,
+          "sha256": "b35911ffc258f7b39c779119d2e775457b88559a9cb725c112611f517e5171f4",
+          "saved_sha256": "b35911ffc258f7b39c779119d2e775457b88559a9cb725c112611f517e5171f4",
+          "byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": "annotation-haiku",
+      "files": 19,
+      "units": 3226,
+      "differences": 0,
+      "bundle_count": 19,
+      "manifest_sha256": "9cd6e46ccfd04ff7fceed1bed8ba1f6d57113615975248488ec674445782606c",
+      "scores": [
+        {
+          "field": "narrative",
+          "equal_to_saved_v4_report": true,
+          "sha256": "9f54396a1460d037d1132db2a44df2a754e9df4207757a7d1929725eddc17b25",
+          "saved_sha256": "9f54396a1460d037d1132db2a44df2a754e9df4207757a7d1929725eddc17b25",
+          "byte_identical": true
+        },
+        {
+          "field": "referent",
+          "equal_to_saved_v4_report": true,
+          "sha256": "b50f9b38c0e90799b454d072de85b2d4fd9c8ccdf14548acde8556b8e62754ae",
+          "saved_sha256": "b50f9b38c0e90799b454d072de85b2d4fd9c8ccdf14548acde8556b8e62754ae",
+          "byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": "auto-opus",
+      "files": 19,
+      "units": 3226,
+      "differences": 0,
+      "bundle_count": 19,
+      "manifest_sha256": "54e3f957c21594b29d15f2cdffe1b46c70092f02b498c39e9002919e2eba71a4",
+      "scores": [
+        {
+          "field": "narrative",
+          "equal_to_saved_v4_report": true,
+          "sha256": "297c600fbee3e0ab0005959db63a6e222fb29897b339988105785a8ddafcc43d",
+          "saved_sha256": "297c600fbee3e0ab0005959db63a6e222fb29897b339988105785a8ddafcc43d",
+          "byte_identical": true
+        },
+        {
+          "field": "referent",
+          "equal_to_saved_v4_report": true,
+          "sha256": "0007af96e666274ec82c677a926a60a037aa6e7e269a1f26c1155a3181d1ff98",
+          "saved_sha256": "0007af96e666274ec82c677a926a60a037aa6e7e269a1f26c1155a3181d1ff98",
+          "byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": "auto-haiku",
+      "files": 19,
+      "units": 3226,
+      "differences": 0,
+      "bundle_count": 19,
+      "manifest_sha256": "a976ca3bd2f261512981b8ae04388cd72e18f74276a5fc371b29cf5b3b1b692f",
+      "scores": [
+        {
+          "field": "narrative",
+          "equal_to_saved_v4_report": true,
+          "sha256": "b7dcc79aef50edb2992e713cc381f8240b6226fd26d21c5b7693971cae762142",
+          "saved_sha256": "b7dcc79aef50edb2992e713cc381f8240b6226fd26d21c5b7693971cae762142",
+          "byte_identical": true
+        },
+        {
+          "field": "referent",
+          "equal_to_saved_v4_report": true,
+          "sha256": "a427046e9e8b19d133058c8b11ea713169483caf6f5ad655cc36e7415ca0d6ba",
+          "saved_sha256": "a427046e9e8b19d133058c8b11ea713169483caf6f5ad655cc36e7415ca0d6ba",
+          "byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": "norecord-opus",
+      "files": 19,
+      "units": 3226,
+      "differences": 0,
+      "bundle_count": 19,
+      "manifest_sha256": "221772add2d67f7248cf4e06f80e7a9e1dee00afcad89f5f29783d47c6c5d53c",
+      "scores": [
+        {
+          "field": "narrative",
+          "equal_to_saved_v4_report": true,
+          "sha256": "ff2882901a88f631720907d81b0a58b426028fde583d7aa4ec4eceae1efbab84",
+          "saved_sha256": "ff2882901a88f631720907d81b0a58b426028fde583d7aa4ec4eceae1efbab84",
+          "byte_identical": true
+        },
+        {
+          "field": "referent",
+          "equal_to_saved_v4_report": true,
+          "sha256": "6b00942dad11d053f0a81d1cb91df88f73e3cde67e934d23b6a7a52a42cdb84c",
+          "saved_sha256": "6b00942dad11d053f0a81d1cb91df88f73e3cde67e934d23b6a7a52a42cdb84c",
+          "byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": "norecord-haiku",
+      "files": 19,
+      "units": 3226,
+      "differences": 0,
+      "bundle_count": 19,
+      "manifest_sha256": "b030caefc8aed5e87834b2dfcb075c6fcac0ee32a53397d29c1ddabb336d29c0",
+      "scores": [
+        {
+          "field": "narrative",
+          "equal_to_saved_v4_report": true,
+          "sha256": "eedca7ae809324506002366bf0832f85b7698c3559c31c9343a139527c3463a4",
+          "saved_sha256": "eedca7ae809324506002366bf0832f85b7698c3559c31c9343a139527c3463a4",
+          "byte_identical": true
+        },
+        {
+          "field": "referent",
+          "equal_to_saved_v4_report": true,
+          "sha256": "8ea1330027fa1bce42f5191b3d6daab0c9b55959a3f8d1e4d8e8e51803e5b679",
+          "saved_sha256": "8ea1330027fa1bce42f5191b3d6daab0c9b55959a3f8d1e4d8e8e51803e5b679",
+          "byte_identical": true
+        }
+      ]
+    }
+  ],
+  "total_bundles": 114,
+  "total_unit_rows": 19356,
+  "interpretations_per_unit": 2,
+  "score_reports_equal": 12,
+  "scope": "Offline replay and readback equivalence on six previously recorded runs. No new model calls, holdout evaluation, scientific validity claim or release."
+}

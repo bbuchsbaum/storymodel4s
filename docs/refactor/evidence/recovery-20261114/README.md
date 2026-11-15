@@ -57,10 +57,32 @@ The runtime baseline is `9aa0ad3ded5f5f2d426ecd1f6aa80470da0b0c1d`. Its
 test-task totals: 17,000 passed, zero failed/errors, and 44 skipped across JVM 17/21, JavaScript
 and Native. The full downloaded logs, rather than only the run status, establish those counts.
 
-Fresh local gate, recorded-replay, exact revision and independent-review receipts are recorded
-here as they complete. Python agent-mapping and FilmFestival checks currently total 262 tests:
-260 passed, two skipped, zero failed, across eleven files. Local evidence is not hosted evidence;
-neither establishes new scientific validity or a package release.
+The [fresh local compilation/test receipt](storymodel-test-gate.json) binds all 56 test-task
+totals: **12,087 passed, five skipped, zero failed/errors** on JVM, JavaScript and Native.
+The original `checkAll` process was stopped in its final formatter phase (exit 143); its
+completed tests were not repeated. An [upstream multi-release JAR defect](formatter-runtime.json)
+breaks formatter initialization on Java 22. Both unchanged
+[format checks passed separately on Java 25](storymodel-format.json). No successful exit for
+the original `checkAll` invocation is claimed. [Input equivalence](gate-input-equivalence.json)
+binds the tested runtime to the public recovery candidate.
+
+Python agent-mapping and FilmFestival checks total 262 tests: 260 passed, two skipped, zero
+failed, across eleven files. The [six recorded replays](recorded-replay.json) produced
+**114 bundles and 19,356 unit rows**, with zero prediction-row differences and all twelve
+score reports byte-identical to their saved v4 counterparts. No model calls were made.
+
+The public candidate `87c4b55016f615c9e837e3b85c842bc4d2e0d2ff` also has a fresh
+[successful hosted run](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43652097024):
+[all eighty test-task totals](candidate-hosted-ci.json) sum to 17,000 passed, zero failed/errors
+and 44 skipped across JVM 17/21, JavaScript and Native. Its documentation workflow passed.
+
+Independent review of the preserved Atlas patch exposed an omitted `ProducerChoice` label.
+The repaired candidate `20f553a160719917498c330f8104031cb2e97f93` passed review. Its
+[compiled mutation](atlas-label-mutation.json) removes only that case: the named categorical
+test fails with `MatchError`, while the named numerical control passes in the JUnit report.
+The original bytes were restored before the full consumer gate. Consumer qualification is
+recorded separately as it completes. Local evidence is not hosted evidence; neither establishes
+new scientific validity or a package release.
 
 ## Restart queue
 

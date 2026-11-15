@@ -1,0 +1,379 @@
+{
+  "gated_revision": "75ce40784689250fceb081812c359bdffde639fd",
+  "runtime_equivalent_public_revision": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+  "status": "LocallyObserved compilation and all tests passed; final formatting stalled and requires separate receipt",
+  "meta": {
+    "schema_version": 1,
+    "started_utc": "2026-11-14T22:33:31.887262+00:00",
+    "finished_utc": "2026-11-14T23:27:38.340543+00:00",
+    "duration_seconds": 3246.428782,
+    "command": [
+      "env",
+      "JAVA_HOME=/Users/bbuchsbaum/Library/Java/JavaVirtualMachines/openjdk-22/Contents/Home",
+      "LLVM_BIN=/opt/homebrew/opt/llvm@20/bin",
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "checkAll"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel-gate",
+    "log": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/evidence/storymodel-full-gate.log",
+    "exit_code": 143,
+    "child_returncode": 143,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 14400.0,
+    "log_bytes": 2841832
+  },
+  "sha256": "e37185849dff32f3a5c3e5ba6bcd5a941476ba387b63d91fe757c8e63cb9c1be",
+  "task_totals": [
+    {
+      "total": 271,
+      "failed": 0,
+      "errors": 0,
+      "passed": 271
+    },
+    {
+      "total": 271,
+      "failed": 0,
+      "errors": 0,
+      "passed": 271
+    },
+    {
+      "total": 271,
+      "failed": 0,
+      "errors": 0,
+      "passed": 271
+    },
+    {
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81
+    },
+    {
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81
+    },
+    {
+      "total": 81,
+      "failed": 0,
+      "errors": 0,
+      "passed": 81
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77
+    },
+    {
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138
+    },
+    {
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138
+    },
+    {
+      "total": 138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 138
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167
+    },
+    {
+      "total": 286,
+      "failed": 0,
+      "errors": 0,
+      "passed": 286
+    },
+    {
+      "total": 283,
+      "failed": 0,
+      "errors": 0,
+      "passed": 283
+    },
+    {
+      "total": 283,
+      "failed": 0,
+      "errors": 0,
+      "passed": 283
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 77
+    },
+    {
+      "total": 1158,
+      "failed": 0,
+      "errors": 0,
+      "passed": 1158
+    },
+    {
+      "total": 1138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 1138
+    },
+    {
+      "total": 1138,
+      "failed": 0,
+      "errors": 0,
+      "passed": 1138
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104
+    },
+    {
+      "total": 170,
+      "failed": 0,
+      "errors": 0,
+      "passed": 170
+    },
+    {
+      "total": 170,
+      "failed": 0,
+      "errors": 0,
+      "passed": 170
+    },
+    {
+      "total": 170,
+      "failed": 0,
+      "errors": 0,
+      "passed": 170
+    },
+    {
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133
+    },
+    {
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133
+    },
+    {
+      "total": 133,
+      "failed": 0,
+      "errors": 0,
+      "passed": 133
+    },
+    {
+      "total": 445,
+      "failed": 0,
+      "errors": 0,
+      "passed": 445
+    },
+    {
+      "total": 444,
+      "failed": 0,
+      "errors": 0,
+      "passed": 444
+    },
+    {
+      "total": 444,
+      "failed": 0,
+      "errors": 0,
+      "passed": 444
+    },
+    {
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116
+    },
+    {
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116
+    },
+    {
+      "total": 116,
+      "failed": 0,
+      "errors": 0,
+      "passed": 116
+    },
+    {
+      "total": 167,
+      "failed": 0,
+      "errors": 0,
+      "passed": 167
+    },
+    {
+      "total": 162,
+      "failed": 0,
+      "errors": 0,
+      "passed": 162
+    },
+    {
+      "total": 162,
+      "failed": 0,
+      "errors": 0,
+      "passed": 162
+    },
+    {
+      "total": 117,
+      "failed": 0,
+      "errors": 0,
+      "passed": 117
+    },
+    {
+      "total": 117,
+      "failed": 0,
+      "errors": 0,
+      "passed": 117
+    },
+    {
+      "total": 117,
+      "failed": 0,
+      "errors": 0,
+      "passed": 117
+    },
+    {
+      "total": 98,
+      "failed": 0,
+      "errors": 0,
+      "passed": 98
+    },
+    {
+      "total": 83,
+      "failed": 0,
+      "errors": 0,
+      "passed": 82,
+      "skipped": 1
+    },
+    {
+      "total": 28,
+      "failed": 0,
+      "errors": 0,
+      "passed": 28
+    },
+    {
+      "total": 52,
+      "failed": 0,
+      "errors": 0,
+      "passed": 52
+    },
+    {
+      "total": 196,
+      "failed": 0,
+      "errors": 0,
+      "passed": 195,
+      "skipped": 1
+    },
+    {
+      "total": 155,
+      "failed": 0,
+      "errors": 0,
+      "passed": 152,
+      "skipped": 3
+    },
+    {
+      "total": 582,
+      "failed": 0,
+      "errors": 0,
+      "passed": 582
+    },
+    {
+      "total": 159,
+      "failed": 0,
+      "errors": 0,
+      "passed": 159
+    }
+  ],
+  "aggregate": {
+    "total": 12092,
+    "passed": 12087,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5,
+    "ignored": 0
+  },
+  "format_stall": "After all56testtasks passed,14Scalafmt config-loader workers waited in ReentrantCache with no active download or CPU work. Owner JVM was terminated; original checkAll exited143. No successful checkAll exit is claimed."
+}

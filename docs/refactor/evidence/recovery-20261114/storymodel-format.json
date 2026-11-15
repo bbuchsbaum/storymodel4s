@@ -1,0 +1,32 @@
+{
+  "revision": "75ce40784689250fceb081812c359bdffde639fd",
+  "runtime_equivalent_public_revision": "87c4b55016f615c9e837e3b85c842bc4d2e0d2ff",
+  "meta": {
+    "schema_version": 1,
+    "started_utc": "2026-11-14T23:33:04.976454+00:00",
+    "finished_utc": "2026-11-14T23:34:32.132759+00:00",
+    "duration_seconds": 87.15455,
+    "command": [
+      "env",
+      "JAVA_HOME=/Users/bbuchsbaum/Library/Java/JavaVirtualMachines/jdk-25.0.5+8/Contents/Home",
+      "sbt",
+      "-batch",
+      "set ThisBuild / tlFatalWarnings := true",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "cwd": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/storymodel-gate",
+    "log": "/Users/bbuchsbaum/code/recovery/storymodel4s-20261114/evidence/storymodel-format-jdk25.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 900.0,
+    "log_bytes": 16759
+  },
+  "sha256": "4107b57fe195573d48464b9d760be1d01a232ce8102f5da2eabf35aeaebc2daa",
+  "commands_passed": [
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ]
+}

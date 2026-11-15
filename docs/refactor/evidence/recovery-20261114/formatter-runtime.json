@@ -1,0 +1,13 @@
+{
+  "cause": "is-terminal0.1.1 upstream multi-release JAR has Java23 bytecode in its Java22 override; JDK22 selects that entry and throws UnsupportedClassVersionError. The formatter cache leaves later callers waiting after the fatal initializer failure.",
+  "dependency": "io.github.alexarchambault:is-terminal:0.1.1",
+  "artifact": "https://repo.maven.apache.org/maven2/io/github/alexarchambault/is-terminal/0.1.1/is-terminal-0.1.1.jar",
+  "local_and_published_sha1": "289a0315bac6ab45a22f320f9f49aabf79fccece",
+  "base_class_major": 52,
+  "java22_override_major": 67,
+  "reviewer_verification": "Independent reviewer compared the local JAR with a fresh Maven Central copy and its published SHA1, then inspected both class headers.",
+  "original_checkAll_exit": 143,
+  "serialized_retry_exit": 143,
+  "isolated_scalafmtSbtCheck_exit": 1,
+  "workaround": "Run unchanged formatting checks on installed JDK25; retain successful compilation/tests on JDK22. CI17 uses the valid base class. No dependency or formatter version change."
+}
