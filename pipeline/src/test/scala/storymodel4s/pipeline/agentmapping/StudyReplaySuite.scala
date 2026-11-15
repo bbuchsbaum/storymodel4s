@@ -205,7 +205,7 @@ class StudyReplaySuite extends FunSuite:
         """{"u": 2, "row": 20,
           "referent": {"status": "answered", "kind": "film", "film": 2},
           "narrative": {"status": "answered", "kind": "scene", "scene": 3, "film_stated": 1},
-          "alts": null, "rows": [3], "conf": 0.5}"""
+          "rows": [3], "conf": 0.5}"""
       )
     )
     val none = item("""{"status": "answered", "kind": "none"}""")

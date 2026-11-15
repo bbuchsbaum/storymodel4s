@@ -276,7 +276,7 @@ class StudyBundleSuite extends FunSuite:
     assert(StudyBundle.decode(bundle, view, recall, reworded).isLeft)
 
   test("the committed synthetic bundle is what the writer produces"):
-    val actual = bundle.spaces2 + "\n"
+    val actual = (bundle.spaces2 + "\n").replaceAll("(?m)[ \t]+$", "")
     Files.createDirectories(Path.of("target")): Unit
     Files.writeString(Path.of("target/synthetic-study.bundle.json"), actual): Unit
     val stream = getClass.getResourceAsStream("/agentmapping/synthetic-study.bundle.json")
