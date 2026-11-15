@@ -12,5 +12,13 @@
     "Legacy-v2 comparison validates inputs and joins original unit numbers",
     "587 pipeline tests, formatting and private Sherlock zero-difference receipts independently inspected"
   ],
-  "review_limits": "No new build run by reviewer; parent gate artifacts read. Final evidence documentation reviewed separately."
+  "review_limits": "No new build run by reviewer; parent gate artifacts and exact committed diffs inspected.",
+  "documentation_review": {
+    "candidate": "8b5d28beae38919acda56ec4f92ad4911b624534",
+    "base": "1ce3c654ce55654c0fd21d292290aa3093f79f0e",
+    "verdict": "PASS",
+    "blocks": [],
+    "follow_ups": [],
+    "checked": "All13 evidence hashes/lengths, receipts, links, absence of participant details, valid Mote transition, diff format and runtime-inert delta"
+  }
 }

@@ -82,3 +82,16 @@ Hosted qualification is tracked separately on runtime SHA `1ce3c654c`:
 [Continuous Integration](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43754885830) and
 [Documentation](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43754885815).
 Their status is not inferred from the local results.
+
+## Landing
+
+The exact final candidate `8b5d28beae38919acda56ec4f92ad4911b624534` passed independent
+review, fast-forwarded main and was pushed with matching remote SHA. Its delta from the runtime
+gate is documentation and tracker status only (T2). The standalone gate clone and isolated Python
+mutation copy were removed after preserving their evidence. All 18 pre-existing unfinished
+Atlas files retain their recovery-checkpoint hashes.
+
+The ticket is closed and its five reservations and claim are released. The required scoped gate
+and independent review are complete. The optional full hosted matrix was still running at
+handoff; use the run links above to inspect its eventual result. This receipt does not label that
+pending matrix green.
