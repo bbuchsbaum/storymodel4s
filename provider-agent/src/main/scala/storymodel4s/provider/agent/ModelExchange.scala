@@ -102,6 +102,23 @@ object ModelRequest:
       key
     )
 
+  /** Render a whole-text exchange from a checked live profile.  The profile owns the identity
+    * material, so callers cannot attach an arbitrary recording key to text they did not send.
+    */
+  def text(
+      profile: TextExecution.Profile,
+      systemPrompt: String,
+      prompt: String
+  ): ModelRequest =
+    new ModelRequest(
+      profile.model,
+      systemPrompt,
+      prompt,
+      profile.maxTokens,
+      profile.timeoutMillis,
+      profile.key(systemPrompt, prompt)
+    )
+
 /** Why an exchange produced no reply; every case maps to one sanitized transport failure. */
 enum ExchangeFailure:
   case RecordingMissing(key: RecordingKey)
@@ -117,6 +134,12 @@ enum ExchangeFailure:
     */
   case ReplyUndecodable(reasonChecksum: Checksum)
 
+  /** A prior live attempt reached the durable journal but has no durable reply. Repeating it could
+    * spend twice, so only an explicit operator decision may continue.
+    */
+  case PreviousAttemptUnknown(key: RecordingKey)
+  case PreviousAttemptFailed(key: RecordingKey)
+
   def code: ProviderFailureCode = this match
     case RecordingMissing(_)       => AgentFailureCodes.RecordingMissing
     case RecordingCorrupt(_, _)    => AgentFailureCodes.RecordingCorrupt
@@ -126,6 +149,8 @@ enum ExchangeFailure:
     case ConnectionFailed(_)       => AgentFailureCodes.ConnectionFailed
     case Timeout(_)                => AgentFailureCodes.ConnectionFailed
     case ReplyUndecodable(_)       => AgentFailureCodes.ReplyUndecodable
+    case PreviousAttemptUnknown(_) => AgentFailureCodes.PreviousAttemptUnknown
+    case PreviousAttemptFailed(_)  => AgentFailureCodes.PreviousAttemptFailed
 
   /** A timeout keeps its limit; every other failure is an I/O code with no provider prose. */
   def toTransport: TransportFailure = this match

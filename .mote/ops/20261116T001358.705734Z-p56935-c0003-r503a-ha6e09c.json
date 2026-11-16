@@ -1,0 +1,1 @@
+{"actor":"codex-live-execution-20261115","entity":"bd-01M7GV17P8FYWQ2RAHMGEG12XQ","kind":"note","note_kind":"progress","op":"20261116T001358.705734Z-p56935-c0003-r503a-ha6e09c","text":"Implement the approved live execution slice; preserve legacy v1 replay and qualify synthetic HTTP plus conservative resume before exact-SHA review.","ts":"2026-11-16T00:13:58.705734Z","v":1}

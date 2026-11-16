@@ -245,20 +245,13 @@ object StudyReplay:
         val reason = if other == UnitReply.Omitted then "omitted" else "unparsable-chunk"
         Json.fromFields(head ++ Vector("referent" -> failed(reason), "narrative" -> failed(reason)))
 
-  /** Replay one participant-session. `serve` answers one prompt from recordings and never calls a
-    * model; `unitLine` is how a prompt shows one unit, and `chunkLine` how it names the units it
-    * asks about.
-    */
-  def session(
+  /** Check the complete session before any exchange can be dispatched. */
+  def validate(
       units: Vector[RecallUnit],
       chunks: Vector[Chunk],
-      protocol: ReplyProtocol,
-      attempts: Int,
-      suffix: Int => String,
       unitLine: RecallUnit => String,
-      chunkLine: Chunk => String,
-      serve: String => Either[ExchangeFailure, ModelReply]
-  ): Either[Failure, (Vector[(RecallUnit, UnitReply)], Vector[Receipt])] =
+      chunkLine: Chunk => String
+  ): Either[Failure, Unit] =
     def owner(u: Int): Vector[Int] =
       chunks.zipWithIndex.collect { case (c, i) if c.lo <= u && u <= c.hi => i }
     // A unit is shown when its line is a whole line of the prompt. A substring test would pass a
@@ -284,6 +277,24 @@ object StudyReplay:
           }
           .map(Failure.ChunkBounds(_))
           .orElse(Option.when(owned.flatten != units)(Failure.ChunkBounds(0)))
+    shown.orElse(uncovered).orElse(bounds).orElse(asked).toLeft(())
+
+  /** Replay one participant-session. `serve` answers one prompt from recordings and never calls a
+    * model; `unitLine` is how a prompt shows one unit, and `chunkLine` how it names the units it
+    * asks about.
+    */
+  def session(
+      units: Vector[RecallUnit],
+      chunks: Vector[Chunk],
+      protocol: ReplyProtocol,
+      attempts: Int,
+      suffix: Int => String,
+      unitLine: RecallUnit => String,
+      chunkLine: Chunk => String,
+      serve: String => Either[ExchangeFailure, ModelReply]
+  ): Either[Failure, (Vector[(RecallUnit, UnitReply)], Vector[Receipt])] =
+    def owner(u: Int): Vector[Int] =
+      chunks.zipWithIndex.collect { case (c, i) if c.lo <= u && u <= c.hi => i }
     def attempt(ci: Int, prompt: String, n: Int): Either[Failure, (Option[Vector[Json]], Int)] =
       if n == attempts then Right(None -> n)
       else
@@ -334,9 +345,9 @@ object StudyReplay:
             )
           }
       }
-    shown.orElse(uncovered).orElse(bounds).orElse(asked) match
-      case Some(failure) => Left(failure)
-      case None          =>
+    validate(units, chunks, unitLine, chunkLine) match
+      case Left(failure) => Left(failure)
+      case Right(_)      =>
         val start: Either[Failure, State] = Right((Map.empty, Set.empty, Vector.empty))
         chunks.zipWithIndex
           .foldLeft(start) { case (acc, (c, ci)) => acc.flatMap(take(_, c, ci)) }

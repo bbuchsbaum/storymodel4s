@@ -38,6 +38,8 @@ object AgentFailureCodes:
   val UnexpectedStop: ProviderFailureCode = admitted("unexpected-stop-reason")
   val Refusal: ProviderFailureCode = admitted("refusal")
   val Abstain: ProviderFailureCode = admitted("abstain")
+  val PreviousAttemptUnknown: ProviderFailureCode = admitted("previous-attempt-unknown")
+  val PreviousAttemptFailed: ProviderFailureCode = admitted("previous-attempt-failed")
 
   /** A service error keeps its HTTP status; the body never enters a code. */
   def serviceError(status: Int): ProviderFailureCode = admitted(s"service-error-$status")
@@ -60,5 +62,7 @@ object AgentFailureCodes:
     MaxTokens,
     UnexpectedStop,
     Refusal,
-    Abstain
+    Abstain,
+    PreviousAttemptUnknown,
+    PreviousAttemptFailed
   )

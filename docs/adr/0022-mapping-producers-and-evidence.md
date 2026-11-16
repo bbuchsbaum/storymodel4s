@@ -483,3 +483,26 @@ by participant and original unit number. Rejected: adding a legacy record-constr
 inside the common path to make new provenance claim old identities. See the
 [compatibility decision](../plans/2026-11-10-common-recorded-pipeline-design.md#slice-5-compatibility-decision-2026-11-15)
 for the identity changes and acceptance boundary.
+
+### Live execution implementation choice (2026-11-15)
+
+Within the approved live-execution delivery, use a checked `TextExecution.Profile` and the
+existing OpenAI-compatible HTTP client. New configurable text calls use
+`agent-text-exchange/v2`, binding the actual endpoint digest, requested model, exact messages,
+wire contract and token budget. Persist the versioned descriptor; offline replay reads it
+without credentials. Existing v1 imports and replay remain unchanged. Rejected: reusing a v1
+key that cannot distinguish changed token budgets or endpoint paths.
+
+`TextExecution.Session` journals dispatch before sending and commits every captured reply
+before parsing it. One live writer owns the recording directory. An unresolved dispatch or
+terminal failure refuses automatic repeat; durable successful recordings are reused. This
+means no repeat of a durably recorded call, not exactly-once remote execution. Rejected: treating
+an interrupted request as a cache miss and silently spending again.
+
+`StudyExecution` preflights every input and prompt, then uses the same `StudyReplay.session`
+and bundle renderer for legacy replay, live execution and new offline replay. Actual client
+invocations, transport attempts, cache hits, reported model and available usage belong in a
+separate invocation receipt. Bundle provenance names the new exchange descriptor and that
+session's invocation count. Mapping records and predictions are deterministic replay outputs;
+per-invocation accounting is not. Rejected: a second corpus-specific execution loop, fabricated
+zero live calls, or estimating HTTP attempt counts from client invocations.

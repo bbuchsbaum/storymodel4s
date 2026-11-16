@@ -7,6 +7,7 @@ import java.net.URI
 import java.net.http.{HttpClient, HttpRequest, HttpResponse, HttpTimeoutException}
 import java.nio.charset.StandardCharsets
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicInteger
 import scala.annotation.tailrec
 import scala.util.control.NonFatal
 import storymodel4s.core.Checksum
@@ -38,6 +39,11 @@ final class OpenAiCompatibleModelClient private (
     apiKey: Option[ApiKey]
 ) extends ModelClient:
   import OpenAiCompatibleModelClient.*
+
+  private val attempts = new AtomicInteger(0)
+
+  /** Actual HTTP sends started by this client, not logical calls or retries requested. */
+  private[agent] def httpAttempts: Int = attempts.get()
 
   def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
     val body = requestBody(request)
@@ -84,6 +90,7 @@ final class OpenAiCompatibleModelClient private (
         .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
       val prepared =
         apiKey.fold(base)(key => base.header("authorization", s"Bearer ${key.secret}")).build()
+      attempts.incrementAndGet()
       val response = http.send(prepared, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
       val status = response.statusCode()
       if status >= 200 && status < 300 then Right(response.body())
