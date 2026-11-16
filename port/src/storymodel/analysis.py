@@ -5,7 +5,17 @@ from __future__ import annotations
 from collections import Counter
 from typing import Literal
 
-from .model import Account, Detail, Model, Unit, account_digest, validate_account
+from .model import (
+    Account,
+    Detail,
+    Model,
+    Span,
+    Support,
+    Unit,
+    account_digest,
+    contained_in,
+    validate_account,
+)
 
 Policy = Literal["target-episode-novel-content/v1", "target-event-only/v1"]
 Category = Literal["internal", "external", "unresolved", "excluded"]
@@ -126,7 +136,23 @@ def project(
         for u in sorted(account.units, key=lambda u: u.id)
         if u.kind == "recall"
     )
-    unavailable_global = any(i.status != "completed" for i in inventory_rows)
+    recall_documents = [d for d in account.documents if d.side == "recall"]
+    # Completeness requires the exact document support, not merely the units supplied.
+    # Gaps (even whitespace) conservatively withhold absence until intake covers them.
+    complete_support = bool(recall_documents) and all(
+        not d.text
+        or contained_in(
+            Support(
+                document=d.id,
+                spans=(Span(start=0, end=len(d.text.encode("utf-16-le")) // 2),),
+            ),
+            (u.support for u in account.units if u.kind == "recall"),
+        )
+        for d in recall_documents
+    )
+    unavailable_global = not complete_support or any(
+        i.status != "completed" for i in inventory_rows
+    )
     for detail in sorted(account.details, key=lambda d: d.id):
         binding = bindings.get((detail.id, "referent"))
         reference = binding.reference if binding else None

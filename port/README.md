@@ -15,6 +15,7 @@ From this directory, with Python 3.12 and `uv`:
 
 ```sh
 uv sync --locked
+mkdir -p data
 uv run storymodel example --output data/example.account.json
 uv run storymodel validate data/example.account.json
 uv run storymodel analyze data/example.account.json --output data/example.analysis.json

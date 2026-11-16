@@ -184,6 +184,40 @@ def test_partial_inventory_remains_visible_with_proven_positive_coverage():
         )
 
 
+@pytest.mark.parametrize("partial", [False, True])
+def test_missing_or_partial_recall_segmentation_cannot_assert_absence(partial):
+    account = example_account()
+    recall = next(d for d in account.documents if d.side == "recall")
+    source_units = tuple(u for u in account.units if u.kind != "recall")
+    first_character = Unit(
+        kind="recall", support=Support(document=recall.id, spans=(Span(start=0, end=1),))
+    )
+    changed = account.model_copy(
+        update={
+            "units": source_units + ((first_character,) if partial else ()),
+            "details": (),
+            "bindings": (),
+            "inventories": (Inventory(unit=first_character.id, status="completed"),)
+            if partial
+            else (),
+        }
+    )
+    result = project(changed)
+    assert {r.coverage for r in result.source} == {"not-assessable"}
+
+
+def test_source_rows_cannot_parent_other_rows():
+    account = example_account()
+    parent = next(u for u in account.units if u.kind == "row")
+    nested = Unit(
+        kind="row",
+        parent=parent.id,
+        support=Support(document=parent.support.document, spans=(Span(start=0, end=1),)),
+    )
+    with pytest.raises(ValidationError, match="scene containers"):
+        project(account.model_copy(update={"units": account.units + (nested,)}))
+
+
 def test_content_identity_and_canonical_roundtrip_are_deterministic():
     account = example_account()
     assert validate_account(account.model_dump_json()) == account

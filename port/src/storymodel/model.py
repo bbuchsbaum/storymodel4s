@@ -411,6 +411,8 @@ class Account(Model):
                 parent = units.get(unit.parent)
                 if parent is None or not contained(unit.support, parent.support):
                     raise ValueError("unit parent must contain exact child support")
+                if unit.kind != "recall" and parent.kind != "scene":
+                    raise ValueError("source hierarchy parents must be scene containers")
         acyclic(((u.id, u.parent) for u in units.values() if u.parent), "unit hierarchy")
 
         inventoried: set[str] = set()

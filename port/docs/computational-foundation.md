@@ -31,8 +31,11 @@ subset uses source-local identity and does not yet model unknown recall-only par
 Relations never silently promote attributed events into the narrated world.
 
 Analysis has recall-detail rows, correspondence rows and source coverage rows, plus an
-inventory row for every recall unit. A missing or partial inventory makes unproved source
-omission not-assessable. A completed empty inventory is distinct. Broad and alternative
+inventory row for every recall unit. A missing or partial inventory, or recall units that
+do not cover the full recall document, makes unproved source omission not-assessable.
+This initial completeness rule conservatively includes whitespace gaps. Source rows are
+leaves; only scene containers can parent source units. A completed empty inventory is
+distinct. Broad and alternative
 references cannot earn definite row coverage. Positive supported evidence can still prove
 presence when other extraction or reference work is incomplete.
 
