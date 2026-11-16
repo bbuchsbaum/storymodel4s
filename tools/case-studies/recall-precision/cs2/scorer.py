@@ -77,7 +77,8 @@ class ProducerForecast:
     eps: float
     comp: object
     nonfilm: dict = field(default_factory=dict)
-    no_sample: bool = False
+    no_sample: bool = False  # True for both typed absences (no sample, only uncovered)
+    empty: str = ""  # which typed absence, '' when the row was sampled
 
     @property
     def u(self):
@@ -108,9 +109,9 @@ class ProducerForecast:
 
 def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
     """From one scene-grain LocationDistribution row."""
-    if row.state == "no_sample":
+    if row.state in ("no_sample", "only_uncovered"):
         return ProducerForecast(
-            {}, {}, {}, 0.0, 1.0, fallback, eps, comp, no_sample=True
+            {}, {}, {}, 0.0, 1.0, fallback, eps, comp, no_sample=True, empty=row.state
         )
     loc, spread, outside, nonfilm = {}, {}, {}, {}
     nonwork = abstain = 0.0
@@ -173,6 +174,7 @@ class RowScore:
     nonfilm_label: str | None = None
     transition: bool | None = None
     dropped_scenes: int = 0
+    empty: str | None = None  # producer rows: typed absence ('no_sample', 'only_uncovered')
 
 
 def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
@@ -190,6 +192,7 @@ def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
             rs.located_share = f.located_share()
             rs.nonwork = f.nonwork
             rs.abstain = f.abstain
+            rs.empty = f.empty
         if g.work is not None:
             rs.transition = prev is not None and g.work != prev
             prev = g.work
@@ -348,4 +351,14 @@ def strata(scores, comp, work_applicable=True):
     }
     ab = [s.abstain for s in scores if s.abstain is not None]
     out["fallback_mass"] = dict(n=len(ab), mean=float(np.mean(ab)) if ab else None)
+    em = [s.empty for s in scores if s.empty is not None]
+    if em:
+        out["typed_absence"] = {
+            k: dict(n=sum(1 for e in em if e == k), share=sum(1 for e in em if e == k) / len(em))
+            for k in ("no_sample", "only_uncovered")
+        }
+        sampled = [s.abstain for s in scores if s.empty == ""]
+        out["fallback_mass_sampled_rows"] = dict(
+            n=len(sampled), mean=float(np.mean(sampled)) if sampled else None
+        )
     return out

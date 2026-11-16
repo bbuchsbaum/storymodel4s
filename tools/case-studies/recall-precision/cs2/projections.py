@@ -3,7 +3,7 @@ correspondence table.
 
 Keys. Film material is ("at", grain, id) with grain unit | scene | occurrence | work. Side
 states are their own keys and are never coarsened:
-  ("unassigned",)                      the declared remainder, and words no reference covers
+  ("unassigned",)                      a reference's own known remainder (1 - sum of weights)
   ("external",)                        a typed external destination
   ("in_work_outside", work)            the work's material outside the stimulus
   ("work_ref", work)                   a work-level reference
@@ -13,7 +13,9 @@ states are their own keys and are never coarsened:
 
 LocationDistribution (declared rules, design revision 2):
 - a bin is a recall-clock interval; a word belongs to it by its onset;
-- a bin without words has the exclusive state 'no_sample' and no simplex;
+- a bin without words has the exclusive state 'no_sample'; a bin whose words are all uncovered
+  has the exclusive state 'only_uncovered' (ADR 0031 section 3); neither has a simplex;
+- uncovered words are never samples: they are ledger counts only and create no mass;
 - reducer: equal weight per distinct sample in the bin (a reference; a not-applicable unit's
   state; a unit's uncovered words), so a not-applicable word stays in the denominator;
 - inside a single hypothesis, mass is uniform over its source units (allocation 'units'), or
@@ -163,7 +165,7 @@ def sample_contributions(sample, account, allocation="units"):
     if isinstance(sample, StateSample):
         return [(("nonfilm", sample.state), 1.0)]
     if isinstance(sample, Uncovered):
-        return [(("unassigned",), 1.0)]
+        raise ProjectionError("uncovered-is-not-a-sample", "uncovered words are ledger counts")
     raise ProjectionError("unknown-sample", repr(sample))
 
 
@@ -172,9 +174,26 @@ def _sample_key(s):
 
 
 def bin_samples(cells, b: Bin):
-    """Distinct samples of the words in a bin (every word counts, not-applicable included)."""
+    """The words in a bin and its distinct samples: references and typed states
+    (not-applicable included). Uncovered words are in `inside` but are never samples."""
     inside = [c for c in cells if b.contains(c.onset)]
-    return inside, sorted({c.sample for c in inside}, key=_sample_key)
+    samples = {c.sample for c in inside if not isinstance(c.sample, Uncovered)}
+    return inside, sorted(samples, key=_sample_key)
+
+
+def bin_ledger(inside) -> dict:
+    """Per-bin word counts: covered (sampled), uncovered of a unit, uncovered outside any unit."""
+    unc = [c for c in inside if isinstance(c.sample, Uncovered)]
+    return dict(
+        words=len(inside),
+        sampled_words=len(inside) - len(unc),
+        uncovered_unit_words=sum(1 for c in unc if c.unit),
+        uncovered_outside_words=sum(1 for c in unc if not c.unit),
+    )
+
+
+def empty_state(inside) -> str:
+    return "no_sample" if not inside else "only_uncovered"
 
 
 # ---------------------------------------------------------------- distribution
@@ -201,7 +220,7 @@ class LocationDistribution:
         for b in bins:
             inside, samples = bin_samples(cells, b)
             if not samples:
-                rows.append(Row(b, "no_sample", {}, (), {}, 0))
+                rows.append(Row(b, empty_state(inside), {}, (), {}, len(inside)))
                 continue
             k = len(samples)
             parts, trace = defaultdict(list), defaultdict(set)
@@ -274,9 +293,9 @@ def _coarsener(comp, src, dst):
 
 
 def _check_row(r: Row):
-    if r.state == "no_sample":
+    if r.state in ("no_sample", "only_uncovered"):
         if r.mass:
-            raise ProjectionError("no-sample-has-mass")
+            raise ProjectionError("empty-state-has-mass", r.state)
         return
     if r.state != "sampled":
         raise ProjectionError("unknown-row-state", r.state)
@@ -327,17 +346,14 @@ class CoverageMeasure:
             )
         rows = []
         for b in bins:
-            _, samples = bin_samples(cells, b)
+            inside, samples = bin_samples(cells, b)
             if not samples:
-                rows.append(CoverageRow(b, "no_sample", {}, {}, ()))
+                rows.append(CoverageRow(b, empty_state(inside), {}, {}, ()))
                 continue
             cover, held = defaultdict(float), defaultdict(float)
             for s in samples:
                 if isinstance(s, StateSample):
                     held[("nonfilm", s.state)] = 1.0
-                    continue
-                if isinstance(s, Uncovered):
-                    held[("unassigned",)] = 1.0
                     continue
                 ref = account.references[s.ref]
                 if isinstance(ref, WorkReference):

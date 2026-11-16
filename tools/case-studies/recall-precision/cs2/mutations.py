@@ -147,6 +147,18 @@ MUTANTS = [
         test="test_not_applicable_word_stays_in_denominators",
     ),
     dict(
+        id="M15",
+        guard="uncovered words are never samples (old rule: one unassigned sample per unit)",
+        file="cs2/projections.py",
+        edits=[
+            ("    samples = {c.sample for c in inside if not isinstance(c.sample, Uncovered)}\n",
+             "    samples = {c.sample for c in inside}\n"),
+            ('        raise ProjectionError("uncovered-is-not-a-sample", "uncovered words are ledger counts")\n',
+             '        return [(("unassigned",), 1.0)]\n'),
+        ],
+        test="test_uncovered_words_never_create_unassigned_mass",
+    ),
+    dict(
         id="M9",
         guard="unassigned mass is redistributed by the fallback forecast",
         file="cs2/scorer.py",

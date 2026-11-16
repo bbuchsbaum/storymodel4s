@@ -41,6 +41,7 @@ from cs2.account import (  # noqa: E402
 from cs2.projections import (  # noqa: E402
     Bin,
     CoverageMeasure,
+    bin_ledger,
     LocationDistribution,
     ProjectionError,
     correspondence,
@@ -316,6 +317,34 @@ def test_not_applicable_word_stays_in_denominators():
     led = word_ledger(acc.words[("P1", "s1")], bins)
     assert led["words_in_bins"] == 4 and led["not_applicable_words"] == 1
     close(led["not_applicable_share"], 0.25)
+
+
+def test_uncovered_words_never_create_unassigned_mass():
+    # ADR 0031 section 3: uncovered words are ledger counts, never samples. Unassigned mass is
+    # only a reference's own remainder; a bin of uncovered words alone is 'only_uncovered'.
+    comp = fixture()
+    refs = {"r1": ref("r1", (single("b2"), 1.0)), "r2": ref("r2", (single("c1"), 0.75))}
+    spec = [(1.0, "u1", RefSample("r1"))]
+    spec += [(1.1 + i / 100, "u1", Uncovered("u1")) for i in range(5)] + [(1.5, "", Uncovered(""))]
+    spec += [(3.0, "u2", Uncovered("u2")), (3.5, "", Uncovered(""))]
+    spec += [(5.0, "u3", RefSample("r2")), (5.1, "u3", Uncovered("u3"))]
+    acc = Account(comp, refs, {("P", "s"): cells(spec)})
+    ws = acc.words[("P", "s")]
+    bins = [Bin(0, 2), Bin(2, 4), Bin(4, 6), Bin(8, 9)]
+    rows = LocationDistribution.from_words(acc, ws, bins).rows
+    assert rows[0].state == "sampled" and rows[0].mass == {("at", "unit", "b2"): 1.0}
+    assert rows[1].state == "only_uncovered" and rows[1].mass == {} and rows[1].n_words == 2
+    assert rows[2].mass[("unassigned",)] == 0.25  # the reference's own remainder only
+    assert rows[3].state == "no_sample"
+    assert bin_ledger([c for c in ws if bins[0].contains(c.onset)]) == dict(
+        words=7, sampled_words=1, uncovered_unit_words=5, uncovered_outside_words=1
+    )
+    assert word_ledger(ws, bins)["uncovered_words"] == 9
+    f = SC.producer_forecasts(
+        LocationDistribution.from_words(acc, ws, bins), B.duration_prior(comp, CFG), CFG
+    )
+    assert f[1].no_sample and f[1].empty == "only_uncovered" and f[0].empty == ""
+    assert CoverageMeasure.from_words(acc, ws, bins).rows[1].state == "only_uncovered"
 
 
 # ---------------------------------------------------------------- further known answers
