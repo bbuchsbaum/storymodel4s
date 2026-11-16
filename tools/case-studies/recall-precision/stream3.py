@@ -149,6 +149,7 @@ def ref_quantities(ref, g, alpha, gamma, eps):
     )
 
 
+RAW_WEIGHTS = False  # --raw-weights: no fitted tempering (parity with the library)
 WORD_POLICY = "covered"  # "covered" (ADR 0031 draft: a word samples only references covering it)
 # or "nearest" (iteration-3 rule: uncovered words in an episodic unit hold the nearest reference)
 ALIGN_LEDGER = {"anchor_tokens": 0, "anchor_tokens_unmatched": 0, "units_count_mismatch": 0}
@@ -295,6 +296,8 @@ def evaluate(stream, run, label):
     LL = loglik_table(P, g)
 
     def fit(ex):
+        if RAW_WEIGHTS:  # declared: self-reported weights as written (alpha 1, gamma 1, no floor)
+            return 1.0, 1.0, 0.0, False
         s = sum(v[0] for n, v in LL.items() if n != ex) if len(LL) > 1 else LL[ex][0]
         i = np.unravel_index(np.argmax(s), s.shape)
         # gamma = 0 is a natural boundary (no extra residual mass), not a grid limit
@@ -431,9 +434,11 @@ def main():
     ap.add_argument("run")
     ap.add_argument("--label")
     ap.add_argument("--word-policy", choices=["covered", "nearest"], default="covered")
+    ap.add_argument("--raw-weights", action="store_true")
     a = ap.parse_args()
-    global WORD_POLICY
+    global WORD_POLICY, RAW_WEIGHTS
     WORD_POLICY = a.word_policy
+    RAW_WEIGHTS = a.raw_weights
     s = evaluate(a.stream, a.run, a.label or f"it3-{a.stream}-{a.run}")
     for n, r in s["participants"].items():
         print(
