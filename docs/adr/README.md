@@ -43,6 +43,7 @@ The "event layer" column marks the ADRs that the film and recall event layer (se
 | [0026](0026-speech-promotion.md) | Defeasible promotion of speech into the narrated world | Accepted | yes |
 | [0027](0027-source-identity-graph.md) | Recall-blind source identity graph (Sherlock body scenes) | Accepted | yes |
 | [0028](0028-source-graph-export.md) | Exporting the source identity graph | Accepted | yes |
+| [0030](0030-detail-account-and-derived-analysis.md) | Detail account and derived analysis projections | Draft | yes |
 
 Notes:
 
