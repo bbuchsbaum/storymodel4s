@@ -195,6 +195,15 @@ proportional index is used.
   however many of its words fall there.
 - A bin with no onset sample has *no sample*. Coverage between onsets is never inferred, so
   "no sample" is not "no speech".
+- A reference's identity within a layer is its **normalized support**: spans merged, empty
+  spans dropped, unit tags ignored. Two samples with the same normalized support are refused as
+  duplicates, so one reference can never count twice because its anchor was written in two
+  ways.
+- Under *innermost*, a word covered by two references of equal shortest support is refused as
+  ambiguous rather than resolved by an arbitrary order. The check is conservative: it also
+  covers words without timing or outside every bin.
+- An onset outside every declared bin is reported once, in the projection's ledger.
+- Numeric levels are finite doubles. Not-applicable levels are typed and never reach a reducer.
 
 **Held-interval projection** (specified here, built when a dataset with word intervals is
 admitted). This needs `Interval` timing.
@@ -211,10 +220,12 @@ admitted). This needs `Interval` timing.
 
 - applicable references sampled;
 - not-applicable references (discourse, or no film support);
-- unassigned words.
+- covered words, uncovered words of a unit, and uncovered words outside any unit. These three
+  partition the bin's words with an onset.
 
-The value is present only when at least one applicable reference is sampled; otherwise it is
-*no sample* or *only not applicable*, as the counts show. Words whose timing is `Missing` cannot
+The value is present only when at least one applicable reference is sampled. Otherwise it is
+typed: *no sample*, *only not applicable*, or *only uncovered*. Not-applicable takes precedence
+when both are present, and the counts keep the full picture. Words whose timing is `Missing` cannot
 be placed in any bin; the projection reports them once, in its own ledger. Not-applicable
 references never enter a numeric reducer.
 
