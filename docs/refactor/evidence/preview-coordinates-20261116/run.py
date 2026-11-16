@@ -45,7 +45,11 @@ def prepare(data, output):
     dev = partition["development"]
     if not dev or len(dev) != len(set(dev)) or set(dev) & set(partition["untouchedTest"]):
         raise ValueError("invalid development partition")
+    lineage_path = data / "study/recall-to-video/scorer-20260919/unit-manifest.json"
+    lineage = {p["participant"].replace("_recall", ""): p
+               for p in comparison.load_json(lineage_path)["participants"]}
     studies = {"sherlock": [], "filmfestival": []}
+    sherlock_canonical = {}
     for name in dev:
         stem = name.removesuffix(".csv").replace("_recall", "")
         original = data / "sherlock/recall" / (stem + ".csv")
@@ -53,6 +57,14 @@ def prepare(data, output):
         if not supplied.exists():
             supplied = data / "study/recall-to-video/all17-monofill" / f"recall-map-{stem}.tsv"
         rows = tsv(supplied)
+        reference = lineage[stem]
+        if pin(original)["sha256"] != reference["recallSha256"] or len(rows) != len(reference["units"]):
+            raise ValueError("Sherlock input does not match the pinned unit lineage")
+        if any(int(row["unit"]) != unit["ordinal"] or
+               comparison.sha(row["recallText"].encode()) != unit["reportTextSha256"]
+               for row, unit in zip(rows, reference["units"])):
+            raise ValueError("Sherlock supplied units do not match the pinned unit lineage")
+        sherlock_canonical[str(original.resolve())] = reference["transcriptSha256"]
         studies["sherlock"].append((original, supplied, "sherlock-word-csv-replay/v1",
                                     [{"key": row["unit"], "text": row["recallText"]} for row in rows]))
     gold_path = data / "filmfestival/derived/gold-scenematched.tsv"
@@ -73,7 +85,8 @@ def prepare(data, output):
         studies["filmfestival"].append((original, gold_path, "filmfestival-event-text-replay/v1",
                                        [{"key": row["gold_row"], "text": " ".join(row["text"].split())}
                                         for row in rows]))
-    context = {"eligibility": [pin(partition_path), pin(seen_path), pin(gold_path)], "studies": {}}
+    context = {"eligibility": [pin(partition_path), pin(lineage_path), pin(seen_path), pin(gold_path)],
+               "studies": {}, "sherlock_canonical": sherlock_canonical}
     commands = []
     for study, entries in studies.items():
         folder = output / study
@@ -94,9 +107,12 @@ def prepare(data, output):
                          "model": "offline-no-provider", "condition": "boundary-comparison",
                          "chunkSize": 50, "sessions": sessions})
         source_dir = (data / ".slice5/20261115/sherlock-export" if study == "sherlock" else
-                      data / ".recovery/20261114/annotation-opus/export")
+                      data / ".recovery/20261114/filmfestival-source")
+        source_path = source_dir / ("source.csv" if study == "sherlock" else "annotations.csv")
+        parts_path = source_dir / "parts.json"
+        context.setdefault("source_artifacts", {})[study] = [pin(source_path), pin(parts_path)]
         command = ["pipeline/runMain", "storymodel4s.pipeline.agentmapping.agentStudyPrepare",
-                   str(source_dir / "source.csv"), str(source_dir / "parts.json"),
+                   str(source_path), str(parts_path),
                    str(manifest), str(folder / "automatic")]
         commands.append(shlex.join(command))
         context["studies"][study] = records
@@ -110,6 +126,10 @@ def compare(output):
     for item in context["eligibility"]:
         if pin(Path(item["path"])) != item:
             raise ValueError("eligibility artifact changed")
+    for artifacts in context["source_artifacts"].values():
+        for item in artifacts:
+            if pin(Path(item["path"])) != item:
+                raise ValueError("source dictionary artifact changed")
     aggregate = {"schema": comparison.SCHEMA, "studies": {}, "model_calls": 0,
                  "mapping_error": "not-assessed; automatic segmentation has no model outputs"}
     for study, entries in context["studies"].items():
@@ -125,6 +145,8 @@ def compare(output):
             if comparison.main([str(manifest), "--receipt", str(receipt)]) != 0:
                 raise ValueError("comparison refused")
             report = comparison.load_json(receipt)
+            if study == "sherlock" and report["canonical_sha256"] != context["sherlock_canonical"][entry["source"]["path"]]:
+                raise ValueError("Sherlock canonical transcript differs from pinned lineage")
             totals["sessions"] += 1
             for key in ["supplied_units", "automatic_units", "uncovered_source_alphanumeric_codepoints"]:
                 totals[key] += report[key]
