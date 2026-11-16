@@ -327,3 +327,22 @@ class OnsetLevelProjectionBoundarySuite extends FunSuite:
       ).nonEmpty
     )
   }
+
+  test("a floating category type is refused for Share and Presence with an Int control") {
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.align.*; OnsetLevelProjection.Reducer.Share[Int](); OnsetLevelProjection.Reducer.Presence[String]()"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; OnsetLevelProjection.Reducer.Share[Double]()"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.align.*; OnsetLevelProjection.Reducer.Presence[Float]()"""
+      ).nonEmpty
+    )
+  }

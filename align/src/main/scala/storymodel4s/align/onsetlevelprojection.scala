@@ -62,10 +62,27 @@ object OnsetLevelProjection:
     case NotApplicable(reason: NotApplicableReason)
 
   /** One anchored reference: its exact UTF-16 support in the recall transcript and its level. Why:
-    * untrusted input; `Request.checked` validates it. The anchor is the reference's identity within
-    * one declared layer.
+    * untrusted input; `Request.checked` validates it. Within one declared layer the reference's
+    * identity is its normalized support (see `support`), not the way the anchor is written.
     */
   final case class Sample[+A](anchor: SpanSet, level: Level[A])
+
+  /** The normalized support of an anchor: empty spans dropped, overlapping and abutting spans
+    * merged, surface-unit tags ignored. Why: `{[0,5)}`, `{[0,3),[3,5)}` and a unit-tagged `{[0,5)}`
+    * cover the same text, so they are one reference; identity, coverage and Innermost length all
+    * use this support. An anchor of only empty spans has empty support and covers no word.
+    */
+  def support(anchor: SpanSet): Vector[TextSpan] =
+    anchor.spans.toVector
+      .filterNot(_.isEmpty)
+      .sortBy(s => (s.start, s.endExclusive))
+      .foldLeft(Vector.empty[TextSpan]) { (merged, span) =>
+        merged.lastOption.flatMap(_.union(span)) match
+          case Some(joined) => merged.init :+ joined
+          case None         => merged :+ span
+      }
+
+  private def supportLength(support: Vector[TextSpan]): Int = support.map(_.length).sum
 
   /** A declared level reducer. Why: sealed, and without a sum, so no amount-conserving rule can be
     * declared for a level projection (rules 2 and 8). Every reducer counts each distinct reference
@@ -75,21 +92,43 @@ object OnsetLevelProjection:
     def id: String
 
   object Reducer:
-    /** Arithmetic mean over distinct applicable references, computed exactly before rounding. */
+    /** Arithmetic mean over distinct applicable references. The sum of the exact binary values is
+      * exact; the single division is rounded to `MeanQuotient` (34 significant digits, half-even),
+      * and that quotient is then rounded to the nearest Double. The result does not depend on
+      * sample order.
+      */
     case object Mean extends Reducer[Double, Double]:
       val id = "mean-distinct-references"
+      val MeanQuotient: java.math.MathContext = java.math.MathContext.DECIMAL128
     case object Minimum extends Reducer[Double, Double]:
       val id = "minimum-distinct-references"
     case object Maximum extends Reducer[Double, Double]:
       val id = "maximum-distinct-references"
 
-    /** Share of distinct applicable references per category; never a mean of codes. */
-    final case class Share[C]() extends Reducer[C, CategoryShares[C]]:
+    /** Share of distinct applicable references per category; never a mean of codes.
+      *
+      * Categories are grouped by `==`, so a category type must have lawful equality. `Double` and
+      * `Float` are refused at compile time (NaN is unequal to itself; -0.0 and 0.0 are equal but
+      * distinct values). A caller's own type that wraps a floating value has the same obligation.
+      */
+    final case class Share[C]()(using NotFloating[C]) extends Reducer[C, CategoryShares[C]]:
       val id = "category-share-distinct-references"
 
-    /** The set of categories held by at least one sampled applicable reference. */
-    final case class Presence[C]() extends Reducer[C, Set[C]]:
+    /** The set of categories held by at least one sampled applicable reference. The equality
+      * obligation of `Share` applies.
+      */
+    final case class Presence[C]()(using NotFloating[C]) extends Reducer[C, Set[C]]:
       val id = "category-presence"
+
+  /** Evidence that a category type is not a bare floating-point type. Why: floating equality is not
+    * lawful for grouping categories (see `Reducer.Share`).
+    */
+  final class NotFloating[C] private ()
+  object NotFloating:
+    given lawful[C](using
+        scala.util.NotGiven[C =:= Double],
+        scala.util.NotGiven[C =:= Float]
+    ): NotFloating[C] = new NotFloating[C]
 
   /** Distinct-reference counts per category with their denominator. Why: a share is reported with
     * the count it divides, so it is never an unexplained fraction.
@@ -98,8 +137,13 @@ object OnsetLevelProjection:
       val counts: Map[C, Int],
       val references: Int
   ):
+    /** Exact share of `category`: zero for an absent category when references were sampled; `None`
+      * only when no reference was sampled.
+      */
     def share(category: C): Option[ExactRational] =
-      counts.get(category).flatMap(n => ExactRational.of(n.toLong, references.toLong).toOption)
+      Option
+        .when(references > 0)(counts.getOrElse(category, 0))
+        .flatMap(n => ExactRational.of(n.toLong, references.toLong).toOption)
     override def equals(other: Any): Boolean = other match
       case that: CategoryShares[?] => counts == that.counts && references == that.references
       case _                       => false
@@ -157,7 +201,7 @@ object OnsetLevelProjection:
           case None          => Right(new Bins(clock, bounds.map((a, b) => new Bin(a, b))))
 
   /** A checked projection request. Why: binds the levels to one transcript, one timing and one
-    * clock before any bin is computed; samples are held in canonical anchor order.
+    * clock before any bin is computed; samples are held in canonical normalized-support order.
     */
   final class Request[A, O] private (
       val timing: RecallTiming,
@@ -167,6 +211,7 @@ object OnsetLevelProjection:
       val samples: Vector[Sample[A]],
       val reducer: Reducer[A, O]
   ):
+    val version: String = Version
     private def fields = (timing.digest, declaration, nesting, bins, samples, reducer)
     override def equals(other: Any): Boolean = other match
       case that: Request[?, ?] => fields == that.fields
@@ -175,7 +220,12 @@ object OnsetLevelProjection:
     override def toString: String =
       s"OnsetLevelProjection.Request(${declaration.layer},$nesting,${samples.size} samples)"
 
-  /** Construction refusals; each names the offending input position or word. */
+  /** Construction refusals; each names the offending input position or word.
+    *
+    * `DuplicateAnchor` compares normalized support (see `support`). `AmbiguousInnermost` is checked
+    * over every inventory word, including words with missing timing or an onset outside every bin,
+    * so it may refuse a tie that no bin would have sampled. That is conservative.
+    */
   enum Refusal:
     case ForeignTranscript, ForeignClock
     case AnchorOutsideTranscript(sample: Int)
@@ -194,12 +244,12 @@ object OnsetLevelProjection:
         reducer: Reducer[A, O]
     ): Either[Refusal, Request[A, O]] =
       val textLength = graph.transcript.canonicalText.length
-      val seen = scala.collection.mutable.HashSet.empty[SpanSet]
+      val seen = scala.collection.mutable.HashSet.empty[Vector[TextSpan]]
       val sampleProblem = samples.indices.iterator.flatMap { i =>
         val sample = samples(i)
         if sample.anchor.spans.exists(_.endExclusive > textLength) then
           Some(Refusal.AnchorOutsideTranscript(i))
-        else if !seen.add(sample.anchor) then Some(Refusal.DuplicateAnchor(i))
+        else if !seen.add(support(sample.anchor)) then Some(Refusal.DuplicateAnchor(i))
         else
           sample.level match
             case Level.Applicable(value: Double) if numeric(reducer) && !value.isFinite =>
@@ -212,7 +262,10 @@ object OnsetLevelProjection:
         sampleProblem.nextOption() match
           case Some(refusal) => Left(refusal)
           case None          =>
-            val ordered = samples.sortBy(_.anchor)
+            // Normalized supports are distinct here, so this order is total.
+            val ordered = samples.sortBy(s =>
+              support(s.anchor).map(t => (t.start, t.endExclusive))
+            )(using Ordering.Implicits.seqOrdering)
             val ambiguous = nesting match
               case Nesting.All       => None
               case Nesting.Innermost =>
@@ -222,8 +275,8 @@ object OnsetLevelProjection:
                     val covering = cover.getOrElse(word.id, Vector.empty)
                     Option
                       .when(covering.nonEmpty) {
-                        val shortest = covering.map(i => ordered(i).anchor.coveredLength).min
-                        covering.count(i => ordered(i).anchor.coveredLength == shortest)
+                        val lengths = covering.map(i => supportLength(support(ordered(i).anchor)))
+                        lengths.count(_ == lengths.min)
                       }
                       .collect { case n if n > 1 => Refusal.AmbiguousInnermost(word.id) }
                   }
@@ -290,8 +343,10 @@ object OnsetLevelProjection:
     override def hashCode(): Int = fields.hashCode
     override def toString: String = s"BinResult($bin,$ledger,$value)"
 
-  /** The projection result. Why: words that cannot be placed are reported once here, never in a
-    * bin: missing timing, onsets outside every bin, and references that sampled no bin.
+  /** The projection result. Why: what cannot be placed is reported once here, never in a bin: words
+    * with missing timing, words with an onset outside every bin, references that cover no word
+    * (`wordlessReferences`), and references that cover a word but sampled no bin
+    * (`unsampledReferences`; disjoint from the wordless ones).
     */
   final class Projection[A, O] private[OnsetLevelProjection] (
       val request: Request[A, O],
@@ -301,6 +356,7 @@ object OnsetLevelProjection:
       val wordlessReferences: Vector[SpanSet],
       val unsampledReferences: Vector[SpanSet]
   ):
+    val version: String = Version
     private def fields =
       (request, bins, missingTimingWords, outsideBinWords, wordlessReferences, unsampledReferences)
     override def equals(other: Any): Boolean = other match
@@ -333,7 +389,7 @@ object OnsetLevelProjection:
             val selected = request.nesting match
               case Nesting.All       => covering
               case Nesting.Innermost =>
-                Vector(covering.minBy(i => samples(i).anchor.coveredLength))
+                Vector(covering.minBy(i => supportLength(support(samples(i).anchor))))
             selected.foreach { i =>
               sampled(b) += i
               everSampled += i
@@ -381,7 +437,10 @@ object OnsetLevelProjection:
       missing.result(),
       outside.result(),
       samples.indices.filterNot(coveringAny).map(samples(_).anchor).toVector,
-      samples.indices.filterNot(everSampled).map(samples(_).anchor).toVector
+      samples.indices
+        .filter(i => coveringAny(i) && !everSampled(i))
+        .map(samples(_).anchor)
+        .toVector
     )
 
   private def numeric(reducer: Reducer[?, ?]): Boolean = reducer match
@@ -390,8 +449,11 @@ object OnsetLevelProjection:
 
   private def reduce[A, O](reducer: Reducer[A, O], values: Vector[A]): O = reducer match
     case Reducer.Mean =>
-      val exact = values.map(v => BigDecimal(v)).sum / BigDecimal(values.size)
-      exact.toDouble
+      val sum =
+        values.foldLeft(java.math.BigDecimal.ZERO)((acc, v) => acc.add(new java.math.BigDecimal(v)))
+      sum
+        .divide(java.math.BigDecimal.valueOf(values.size.toLong), Reducer.Mean.MeanQuotient)
+        .doubleValue
     case Reducer.Minimum     => values.min
     case Reducer.Maximum     => values.max
     case _: Reducer.Share[c] =>
@@ -399,16 +461,17 @@ object OnsetLevelProjection:
       new CategoryShares[c](counts, values.size)
     case Reducer.Presence() => values.toSet
 
-  /** Words covered by each sample, by exact UTF-16 intersection. A sweep over the ordered, disjoint
-    * inventory words: each anchor span visits only the words it can intersect (rule 9).
+  /** Words covered by each sample, by exact UTF-16 intersection with its normalized support. A
+    * sweep over the ordered, disjoint inventory words: each anchor span visits only the words it
+    * can intersect (rule 9).
     */
-  private def coverage[A](
+  private[align] def coverage[A](
       inventory: RecallInventory,
       samples: Vector[Sample[A]]
   ): Map[RecallWordId, Vector[Int]] =
     val words = inventory.words
     val pairs = samples.indices.iterator.flatMap { i =>
-      samples(i).anchor.spans.toVector.iterator
+      support(samples(i).anchor).iterator
         .flatMap { span =>
           var lo = 0
           var hi = words.size
