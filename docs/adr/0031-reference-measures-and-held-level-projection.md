@@ -204,6 +204,14 @@ proportional index is used.
   covers words without timing or outside every bin.
 - An onset outside every declared bin is reported once, in the projection's ledger.
 - Numeric levels are finite doubles. Not-applicable levels are typed and never reach a reducer.
+- The mean sums the exact binary values of its levels and divides once, under a declared
+  decimal context (DECIMAL128, half-even), before rounding to a double. That can differ from
+  rounding the exact quotient directly, in rare cases, but it is the same on every platform.
+- A categorical share reports zero for a category absent from a bin that sampled references,
+  and is unavailable only when the bin sampled none. Categories need lawful equality, so
+  floating-point categories are refused.
+- A reference whose support covers no word is reported once as wordless, never also as
+  unsampled.
 
 **Held-interval projection** (specified here, built when a dataset with word intervals is
 admitted). This needs `Interval` timing.
