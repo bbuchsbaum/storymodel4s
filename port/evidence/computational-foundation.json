@@ -1,0 +1,103 @@
+{
+  "scope": "First computational Stage 1 slice; not completed port, parity, accuracy or measured development speedup",
+  "source_commit": "78f4e265a0a8637725dbbc374b2498af8ec81207",
+  "commands_relative_to": "port/",
+  "checks": [
+    {
+      "command": ".venv/bin/pytest -q",
+      "exit_code": 0,
+      "passed": 78,
+      "failed": 0,
+      "reported_seconds": 0.65
+    },
+    {
+      "command": ".venv/bin/mypy src/storymodel",
+      "exit_code": 0,
+      "source_files": 10
+    },
+    {
+      "command": ".venv/bin/ruff check src tests evidence/check-containment-mutation.py",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff format --check src tests evidence/check-containment-mutation.py",
+      "exit_code": 0,
+      "formatted_files": 18
+    },
+    {
+      "command": "npm run build (in web/)",
+      "exit_code": 0,
+      "typescript_checked": true,
+      "vite_build": true
+    },
+    {
+      "command": "UV_CACHE_DIR=./data/uv-cache uv build --out-dir data/dist",
+      "exit_code": 0,
+      "built_from_sdist": true
+    },
+    {
+      "command": ".venv/bin/python evidence/check-containment-mutation.py",
+      "exit_code": 0,
+      "baseline": "3 passed",
+      "mutant": "1 failed, 2 passed",
+      "mutant_imported": true,
+      "named_failure": "test_exact_union_containment_does_not_fill_gaps",
+      "change": "delete same-document containment guard"
+    }
+  ],
+  "wheel_smoke": {
+    "site_packages_import": true,
+    "cwd_outside_checkout": true,
+    "api_cli_equal": true,
+    "validation": {
+      "details": 3,
+      "events": 2,
+      "valid": true
+    },
+    "event_policy_counts": {
+      "denominator": 2,
+      "excluded": 1,
+      "external": 0,
+      "internal": 2,
+      "internal_fraction": 1.0,
+      "unresolved": 0
+    }
+  },
+  "wheel_sha256": "2b7e85dc8bf85a161894b66824cdc588496d0f6e39a0467776c2aecb86d96058",
+  "lock_sha256": {
+    "uv.lock": "5ea0279395d25e9438f64031d053e7c1afc8b03c19bc06aba3f4b81505e9b790",
+    "web/package-lock.json": "af9fb6e466fd542974d24c73c331085b6ec6eb1290c457f3387af32527bb4025"
+  },
+  "fixture_admission": {
+    "path": "src/storymodel/demo.py",
+    "sha256": "1b22507cf31194f52ffba8abd29c3e7a92ad6bcc10b55b027191bb89d0337dbc",
+    "basis": "Existing independently admitted detail-coding-synthetic/v2 text; source observations joined with newline, recall unchanged",
+    "reviewer": "/root/legacy_port",
+    "text_review_date": "2026-11-16",
+    "pre_header_file_sha256": "197479e5bd584aaf5ed59a6e7716c284f3bf34c6d9d050666da78047471f5d72",
+    "later_changes": "Admission header and nonnarrative inventory constructor only; narrative literals unchanged"
+  },
+  "cold_review": {
+    "reviewer": "/root/computation_review",
+    "initial_commit": "f9fab2432",
+    "initial_verdict": "BLOCK",
+    "findings": [
+      "Missing recall units could assert absence",
+      "Supported parent row could credit nested rows"
+    ],
+    "corrected_commit": "78f4e265a0a8637725dbbc374b2498af8ec81207",
+    "verdict": "PASS for corrected computational scope",
+    "reviewer_focused_tests": 64,
+    "independent_probes": [
+      "one-character gap -> not-assessable",
+      "adjoining complete supports with completed empty inventories -> absent",
+      "no recall document -> not-assessable"
+    ]
+  },
+  "not_run": [
+    "Scala cross-platform gates: no Scala edits",
+    "Browser UI tests: scaffold only",
+    "Paid providers or participant data",
+    "Matched Scala/Python feedback benchmark"
+  ]
+}

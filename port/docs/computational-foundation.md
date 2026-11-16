@@ -70,6 +70,11 @@ remote execution. Recordings and checkpoints are trusted local files, not signed
 
 ## Evidence and next computation
 
+The [verification receipt](../evidence/computational-foundation.json) binds the implemented
+slice to its reviewed commit, 78-test run, strict type/lint checks, wheel smoke, independent
+review and executable containment mutation. The web scaffold passes TypeScript and Vite
+build checks; browser functionality has not been qualified.
+
 The synthetic narrative text is reused from the independently admitted detail-coding v2
 example; admission is recorded in `src/storymodel/demo.py`. Adversarial tests use spans and
 structural mutations of this admitted account. Legacy tests consume existing committed
