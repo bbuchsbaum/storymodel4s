@@ -251,8 +251,9 @@ projection. They are not part of a feature.
      assessment status.
 
   Every output identifies its inputs and derivation policy. Unsupported measurements remain
-  explicitly unavailable. The exit closes on synthetic artifacts. No exit yet requires the
-  views on real DL1, DL3 and DL4 artifacts; that is open decision 5.
+  explicitly unavailable. The exit closes on synthetic artifacts. The
+  [finish line](#finish-line-a-usable-representation-for-film-recall-studies) requires the
+  views on real artifacts.
 - **Discriminating controls:** independently calculated cases must tell apart "A and B" from
   "A or B"; a broad summary from explicit recall of each constituent; one atom spanning
   several words from several atoms; unresolved from external from not assessed; onset-only
@@ -474,6 +475,39 @@ DL2/DL3 and the bridge. Reconcile each candidate's exact code and tests before a
 older methods as frozen comparisons only where they answer a named question. Do not build a
 parallel identity or assessment product, or close their existing acceptance by this plan alone.
 
+## Finish line: a usable representation for film recall studies
+
+The owner set this on 2026-11-16: the work finishes at a usable representation for film recall
+studies, such as Sherlock, FilmFestival and Friends. It makes the contract's views on real
+artifacts a requirement. Beads: study demonstration `bd-01M7JEQ30J6WRD6VRJDFV730C9`, Friends
+adapter `bd-01M7JEP9A3CSWJ6C2KPR2BRSVY`.
+
+- **Engineering exit (study demonstration):** for each of the three studies, one documented
+  command takes that study's timed film descriptions and recall transcripts through its input
+  adapter and produces the common bundle. The contract's three views are then derived from the
+  saved artifacts without a model call, and an independent reader recomputes them. Formats,
+  readers and scorer are the same for all three. A study differs only in its adapter and in
+  what it reports as unavailable.
+- **Availability report:** each study states which fields and views it has, their coverage,
+  and what is unavailable and why. A study with no established scan clock link has no
+  recall-time matrix; one with no cast record has no participant bindings. Neither is filled.
+- **Material:** development material only. Friends is read through
+  `tools/recall-study/friends_guard.py` on its development participants, and its sealed test
+  side stays unopened. The untouched Sherlock remainder is not read. Recall and stimulus text,
+  and every output that carries them, stay in private ignored storage (rule 14d).
+- **Friends:** it needs an input adapter, with its 56-to-52 event crosswalk as a tested
+  contract. Its source set is still "proposed", with the licence and the REB basis open
+  ([record](../data/friends/README.md)); the owner records the basis before a live model run
+  on its recall. Its recall interleaves storylines
+  ([measurements](2026-09-17-friends-hill-climb-and-normalization.md)), so it exercises
+  non-monotone order that Sherlock rarely shows.
+
+The demonstration needs DL1, DL3 and DL4 on real artifacts, each connected to the contract's
+outputs. DL2 and DL6 fields appear where a study has a cast record. The graph walkthrough keeps
+its own pinned-film requirement; the demonstration does not require graph tables for every
+study. This is an engineering claim that permits experimental use. It qualifies no measure
+scientifically and consumes no fresh data.
+
 ## Human reference
 
 One coding effort serves the preview, DL1/DL3/DL4/DL6 and claimed graph/readout accuracy. Delivery
@@ -515,7 +549,7 @@ ceiling. No field becomes scientifically qualified just because its implementati
    record is recall-blind. Existing F1-F6 construction can proceed alongside these capabilities.
    The same ADR decides any new vocabulary the contract needs, reconciled with ADRs 0019 and
    0022. The contract's exit uses synthetic artifacts and needs no DL artifact; DL1, DL3 and DL4
-   can connect their real artifacts to its outputs as each becomes ready (open decision 5).
+   connect their real artifacts to its outputs as each becomes ready.
 4. DL3 after DL1 and DL2 engineering readiness; DL4 after DL3. Build the event bridge after F5,
    the producer profile and DL3; then anchored contexts, hierarchy/reference and temporal
    production, and causal production.
@@ -525,6 +559,8 @@ ceiling. No field becomes scientifically qualified just because its implementati
    every included implementation is ready. Its results never gate those implementations.
 7. E1/E2 graph delivery is required. E3 typed-matching and E4 structured-decoding improvements
    are experimental consumers; later tuning requires separate confirmatory data.
+8. The Friends adapter can be built at any point after delivery 4. The study demonstration
+   runs after DL4 and the contract.
 
 ## Analyses each step supports
 
@@ -547,15 +583,15 @@ ceiling. No field becomes scientifically qualified just because its implementati
    units, atoms and source rows, a level-holding allocation, and whether an empirical response
    frequency becomes a named measure kind. It names the rejected alternative of one probability
    vector over single source units. The owner decides ADRs.
-2. Validation data for fresh items: the untouched Sherlock remainder, a new FilmFestival-style
-   corpus, or a new collection.
+2. Validation data for fresh items: the untouched Sherlock remainder, Friends' sealed test
+   side (10 participants; untouched by any model, though human-coding statistics were computed
+   over all 23), a new FilmFestival-style corpus, or a new collection.
 3. Who codes, the budget, and whether the owner's within-scene lane
    (`bd-01M2TA9ZK64GTG3526RMNWNHCT`) folds into the joint rubric.
 4. The bounded selection of semantic gaps for the producer profile and the thresholds/sample
    sizes for graph-family qualification. The owner decides new public vocabulary; this plan
    adopts a delivery sequence, not an unreviewed schema or a particular accuracy claim.
-5. Whether the contract's engineering exit, and its views on real DL1, DL3 and DL4 artifacts,
-   join the engineering finish line in the roadmap. This amendment adds neither, so no
-   criterion yet requires the views on real data.
+5. Friends: the basis for running a model on its development recall, given that its source
+   set is still "proposed" with the licence and REB basis open.
 
 [preview]: 2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview
