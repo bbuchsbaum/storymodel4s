@@ -115,10 +115,11 @@ carries them to the categorical and detail bundle; it does not restate them as n
 
 What is new:
 
-- The onset export and the temporal queries read the paired probabilistic mapper. A categorical
-  record has empty measures, so a temporal query refuses it. Connecting the categorical and
-  detail bundle to these readouts is work this contract adds.
-- Reference meaning below the scene: joint and broad references for a detail atom or unit.
+- The onset export runs the paired probabilistic mapper, and a temporal query needs numerical
+  measures. A categorical record has empty measures, so a temporal query refuses it. Connecting
+  the categorical and detail bundle to these readouts is work this contract adds.
+- Joint and broad reference as recorded meanings, at any grain: for a unit that refers to
+  several scenes, which is refused today, and for a detail atom.
 - Measurements attached to recall units, detail atoms and source rows, for which the feature
   targets have no dedicated case, and their declared aggregation.
 - Holding an attribute over an interval. The existing allocations bound support or distribute
@@ -158,9 +159,10 @@ rows. Each reference also names the interpretation it belongs to (narrative or r
 the bundle does now.
 
 These meanings qualify references to the source. External destinations, an attempted reference
-with no supported source hypothesis (unresolved), and processing outcomes (not attempted,
-failed, search-limited) keep their existing explicit states. They may appear among alternatives,
-as in "A or external", and none is recorded as another (rules 6 and 7).
+with no supported source hypothesis (unresolved), and processing outcomes (not assessed,
+failed, search-limited) keep their existing explicit states. An external destination may appear
+among alternatives, as in "A or external". A processing outcome is never a destination, and no
+state is recorded as another (rules 6 and 7).
 
 Supported hypotheses are stored sparsely, with optional weights. Possible sets are not
 enumerated. Four consequences follow:
@@ -244,22 +246,23 @@ projection. They are not part of a feature.
   1. a recall-indexed feature table, with a recall-time matrix where timing and projection
      assumptions permit;
   2. a sparse recall-source correspondence table that preserves single, joint and broad
-     references, alternative hypotheses, and external, unresolved and not-assessed outcomes;
+     references, alternative hypotheses, and external, unresolved and processing outcomes;
   3. a source-indexed participant summary with explicit coverage definitions, denominators and
      assessment status.
 
   Every output identifies its inputs and derivation policy. Unsupported measurements remain
-  explicitly unavailable. The exit closes on synthetic artifacts. Connecting each output to
-  real DL1, DL3 and DL4 artifacts belongs to those capabilities.
+  explicitly unavailable. The exit closes on synthetic artifacts. No exit yet requires the
+  views on real DL1, DL3 and DL4 artifacts; that is open decision 5.
 - **Discriminating controls:** independently calculated cases must tell apart "A and B" from
-  "A or B"; a broad summary from explicit recall of each constituent; one atom referenced by
+  "A or B"; a broad summary from explicit recall of each constituent; one atom spanning
   several words from several atoms; unresolved from external from not assessed; onset-only
   from duration-supported timing; and an amount-conserving from a level-holding allocation.
-  The first and fifth extend existing witnesses (ADR 0022 MP7 and the onset export's suite) to
-  the categorical bundle and are regression guards there.
+  The first implements ADR 0022's MP7 specification for the categorical bundle. The fifth
+  extends the onset export's existing suite.
 - **Refusing controls:** an unavailable cell is never zero; a vector view of a joint or broad
   reference is refused; non-additive references are not summed; no projection crosses an
-  unestablished clock link; and no row is dropped by an undeclared threshold.
+  unestablished clock link; a clause-level vector is not emitted as word-level estimates; and
+  no row is dropped by an undeclared threshold.
 - **Worked examples:** reinstatement, subsequent-memory and recall-period encoding analyses each
   get one synthetic design table, built from the three outputs plus named inputs that the
   contract does not produce (source-unit timing and encoding-volume membership, such as the
@@ -506,12 +509,13 @@ ceiling. No field becomes scientifically qualified just because its implementati
 
 1. Finish preview delivery 4 (`bd-01M7H69QWE0NKSNB8XWW6MC02H`).
 2. Write the joint coding rubric and run the timing pilot. This does not wait for delivery 4;
-   it runs alongside it and delivery 5.
+   it runs alongside it and delivery 5. Its reference meanings stay provisional until the ADR
+   in step 3 and are fixed before the freeze.
 3. Resolve the detail vocabulary/producer profile and build DL2 and DL1 in parallel. The cast
    record is recall-blind. Existing F1-F6 construction can proceed alongside these capabilities.
    The same ADR decides any new vocabulary the contract needs, reconciled with ADRs 0019 and
    0022. The contract's exit uses synthetic artifacts and needs no DL artifact; DL1, DL3 and DL4
-   connect their real artifacts to its outputs as each becomes ready.
+   can connect their real artifacts to its outputs as each becomes ready (open decision 5).
 4. DL3 after DL1 and DL2 engineering readiness; DL4 after DL3. Build the event bridge after F5,
    the producer profile and DL3; then anchored contexts, hierarchy/reference and temporal
    production, and causal production.
@@ -539,7 +543,7 @@ ceiling. No field becomes scientifically qualified just because its implementati
 
 1. An ADR for the new public vocabulary (detail kinds, fidelity grades, cast identifiers),
    naming the rejected alternative of a full event graph first. It also covers what the contract
-   adds to ADRs 0019 and 0022: reference meaning below the scene, feature targets for recall
+   adds to ADRs 0019 and 0022: joint and broad reference meaning, feature targets for recall
    units, atoms and source rows, a level-holding allocation, and whether an empirical response
    frequency becomes a named measure kind. It names the rejected alternative of one probability
    vector over single source units. The owner decides ADRs.
@@ -550,7 +554,8 @@ ceiling. No field becomes scientifically qualified just because its implementati
 4. The bounded selection of semantic gaps for the producer profile and the thresholds/sample
    sizes for graph-family qualification. The owner decides new public vocabulary; this plan
    adopts a delivery sequence, not an unreviewed schema or a particular accuracy claim.
-5. Whether the contract's engineering exit joins the engineering finish line in the roadmap.
-   This amendment does not add it.
+5. Whether the contract's engineering exit, and its views on real DL1, DL3 and DL4 artifacts,
+   join the engineering finish line in the roadmap. This amendment adds neither, so no
+   criterion yet requires the views on real data.
 
 [preview]: 2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview

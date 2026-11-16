@@ -299,14 +299,14 @@ candidates; do not repeat a historical merge or archive instruction without chec
 7. The detail-layer ADR must record the core-account/derived-analysis split and the rejected
    alternative of requiring a completed graph before useful detail output. Internal/external is
    a scoring projection; it is not a primitive kind or a fidelity judgment. The same ADR covers
-   what the contract adds to ADRs 0019 and 0022: reference meaning below the scene, new feature
+   what the contract adds to ADRs 0019 and 0022: joint and broad reference meaning, new feature
    targets, a level-holding allocation, and whether an empirical response frequency becomes a
    named measure kind.
 8. Validation data for the detail layer's fresh items, and who codes them on what budget.
 9. Which exact reviewed identity and claim-assessment components satisfy DL2/DL3 and the event
    bridge. Reuse them in the common path; retain alternative methods only as named comparisons.
-10. Whether the [contract][contract]'s engineering exit joins the engineering finish line above.
-    The 2026-11-16 amendment does not add it.
+10. Whether the [contract][contract]'s engineering exit, and its views on real DL1, DL3 and DL4
+    artifacts, join the engineering finish line above. The 2026-11-16 amendment adds neither.
 
 [preview-plan]: plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview
 [contract]: plans/2026-11-16-detail-mapping-plan.md#measurement-and-projection-contract
