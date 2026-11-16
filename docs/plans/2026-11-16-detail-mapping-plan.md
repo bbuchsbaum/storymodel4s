@@ -496,11 +496,10 @@ adapter `bd-01M7JEP9A3CSWJ6C2KPR2BRSVY`.
   side stays unopened. The untouched Sherlock remainder is not read. Recall and stimulus text,
   and every output that carries them, stay in private ignored storage (rule 14d).
 - **Friends:** it needs an input adapter, with its 56-to-52 event crosswalk as a tested
-  contract. The owner recorded its basis on 2026-11-16: Friends is public data shared through
-  OpenNeuro, so REB concerns do not restrict its use, and model runs on its development recall
-  may proceed. The owner also decided that its text is not put on GitHub, so it stays in
-  private ignored storage like the other studies' ([record](../data/friends/README.md)). Its
-  recall interleaves storylines
+  contract. Friends is public data shared through OpenNeuro (owner, 2026-11-16), so model runs
+  on its development recall may proceed. The owner also decided that its text is not put on
+  GitHub, so it stays in private ignored storage like the other studies'
+  ([record](../data/friends/README.md)). Its recall interleaves storylines
   ([measurements](2026-09-17-friends-hill-climb-and-normalization.md)), so it exercises
   non-monotone order that Sherlock rarely shows.
 
