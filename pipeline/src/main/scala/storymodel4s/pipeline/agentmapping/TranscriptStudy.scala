@@ -139,6 +139,15 @@ object TranscriptStudy:
         "sessions" -> Json.fromValues(rendered.map(_._3))
       )
       val checked = need(StudyExport.parseIndex(index))
+      StudyBundle.Fields.foreach { field =>
+        val _ = need(
+          scala.util
+            .Try(StudyRecord.policy(condition, checked.protocolName, field))
+            .toEither
+            .left
+            .map(_ => "condition and protocol cannot form a valid mapping policy identifier")
+        )
+      }
       rendered.zip(checked.sessions).foreach { (r, entry) =>
         val session = need(StudyExport.parseSession(r._2, entry, transcript = true))
         need(

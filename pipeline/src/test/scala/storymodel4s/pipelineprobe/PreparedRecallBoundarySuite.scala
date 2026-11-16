@@ -61,7 +61,7 @@ class PreparedRecallBoundarySuite extends FunSuite:
     )
     assertEquals(
       typeCheckErrors(
-        "case class Control(a: Int); Control.fromProduct(Tuple1(1))"
+        "case class Control(a: Int); object Control { def fromProduct(p: Product): Control = summon[scala.deriving.Mirror.ProductOf[Control]].fromProduct(p) }; Control.fromProduct(Tuple1(1))"
       ),
       Nil
     )

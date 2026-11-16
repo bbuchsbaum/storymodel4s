@@ -147,6 +147,23 @@ class TranscriptStudySuite extends FunSuite:
       )
     }
 
+  test("preparation refuses a condition that cannot become a mapping policy"):
+    withDir { dir =>
+      val out = fixture(dir)
+      val manifest =
+        read(dir.resolve("manifest.json")).mapObject(_.add("condition", str("x" * 256)))
+      Files.writeString(dir.resolve("manifest.json"), manifest.noSpaces): Unit
+      val target = dir.resolve("unusable-export")
+      val result = TranscriptStudy.prepare(
+        out.resolve("source.csv"),
+        out.resolve("parts.json"),
+        dir.resolve("manifest.json"),
+        target
+      )
+      assert(result.left.exists(_.contains("policy identifier")))
+      assert(!Files.exists(target))
+    }
+
   test("export readback regenerates every descriptor field, text and unit key"):
     withDir { dir =>
       val out = fixture(dir)
