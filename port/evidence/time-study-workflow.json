@@ -1,0 +1,94 @@
+{
+  "scope": "Supplied recall plus imported synthetic raw responses to exact time mapping rows; no full Scala mapper or live provider claim",
+  "source_commit": "3cc7ca3a8c16c6e7a48e2738e0d1c2a4b4d8e952",
+  "checks": [
+    {
+      "command": "port/.venv/bin/pytest -q (cwd port)",
+      "exit_code": 0,
+      "passed": 109,
+      "failed": 0,
+      "seconds_reported": 1.08
+    },
+    {
+      "command": ".venv/bin/mypy src/storymodel",
+      "exit_code": 0,
+      "source_files": 12
+    },
+    {
+      "command": ".venv/bin/ruff check src tests evidence/check-time-mutation.py",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff format --check src tests evidence/check-time-mutation.py",
+      "exit_code": 0,
+      "formatted_files": 22
+    },
+    {
+      "command": "UV_CACHE_DIR=./data/uv-cache uv build --out-dir data/dist",
+      "exit_code": 0,
+      "wheel_from_sdist": true
+    }
+  ],
+  "mutation": {
+    "mutation": "treat final clip endpoint as outside by changing > to >=",
+    "baseline_exit": 0,
+    "baseline": "3 passed",
+    "mutant_imported": true,
+    "mutant_exit": 1,
+    "mutant": "1 failed, 2 passed",
+    "named_failure": "test_all_computed_rows_match_pinned_scala_artifact"
+  },
+  "wheel_smoke": {
+    "wheel_site_packages_import": true,
+    "outside_checkout": true,
+    "api_cli_equal": true,
+    "semantic_rows_equal_to_scala": 6,
+    "interpretations_equal": 12,
+    "counts": {
+      "narrative": {
+        "film": 1,
+        "invalid": 2,
+        "omitted": 1,
+        "scene": 2
+      },
+      "referent": {
+        "invalid": 2,
+        "none": 1,
+        "omitted": 1,
+        "scene": 1,
+        "time-outside": 1
+      }
+    }
+  },
+  "wheel_sha256": "fd3211287cdc89cad729449e2b65d8573dccd8cf453d2e45b834e5c0efdb3117",
+  "fixture_sha256": {
+    "tests/fixtures/time-study-reference.json": "238e7f33c68a0ea83c2d5a75d4fe24872ebeb266a75b0aee243d1d8dbfd3d603",
+    "tests/fixtures/time-study-replies.json": "ccc32c3e288d1163571a39c0a385934e3bfb7a735e2428fe5273641613854a24",
+    "tests/fixtures/time-study-request.json": "f79806d188e752bbd577b19b0e291a774760bb5e2da25aaebf1dce40be2cbb06"
+  },
+  "admission": {
+    "reviewer": "/root/workflow_reference",
+    "verdict": "PASS",
+    "date": "2026-11-16",
+    "basis": "Exact original synthetic Scala test phrases; no participant text or live-provider recordings; own-file header records source, licence and modifications"
+  },
+  "cold_review": {
+    "reviewer": "/root/workflow_review",
+    "initial_commit": "711b98fa76f900d107c32912595e7741254ccec2",
+    "initial_verdict": "BLOCK",
+    "finding": "Nonfinite API row keys serialized to null before validation, collapsing identity",
+    "fixed_commit": "3cc7ca3a8c16c6e7a48e2738e0d1c2a4b4d8e952",
+    "verdict": "No remaining blocker in reviewed scope",
+    "independent_controls": "Scalar and nested NaN/positive infinity/negative infinity refuse construction, digest, import and replay; import creates no directory; explicit null survives",
+    "focused_tests_passed": 22
+  },
+  "parity_boundary": "All semantic fields of six rows / twelve narrative and referent interpretations equal pinned Scala-generated golden. Pilot IDs, schemas, strict JSON framing and generated prompts deliberately differ. Reference fixture computed independently of Python production helpers.",
+  "not_run": [
+    "Scala regeneration or full gates (Scala source unchanged)",
+    "Live language model",
+    "Participant data",
+    "Graph-HSMM or extraction accuracy evaluation",
+    "Matched Scala/Python development-speed experiment",
+    "Browser tests (no frontend changes)"
+  ]
+}

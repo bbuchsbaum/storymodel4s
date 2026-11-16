@@ -82,3 +82,8 @@ text segmentation, build clocks from native acquisition ticks, extract event/det
 score candidate references or run graph-HSMM inference. The rich account API remains available
 for those next slices. These synthetic parity cases establish engineering behavior, not
 the quality of a language model's mapping or a measured development-speed advantage.
+
+The [verification receipt](../evidence/time-study-workflow.json) records the reviewed commit,
+109 passing tests, installed-wheel API/CLI equality, twelve Scala interpretation matches,
+and a mutation that breaks final-endpoint handling and fails the named parity test while
+its two controls pass. The review's nonfinite row-identity finding is fixed and rechecked.
