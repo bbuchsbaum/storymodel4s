@@ -1,0 +1,1 @@
+{"actor":"codex-transcript-intake-20261115","entity":"bd-01M7H5EEW44QMZRQAWH3PGX63K","kind":"reserve_open","mode":"exclusive","op":"20261116T113933.986855Z-p65419-c0000-ree89-hc02c8f","paths":["pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/StudyExecutionCli.scala"],"reservation_id":"rv-01M7J2FH7298YR76AVVABVDFBS","ts":"2026-11-16T11:39:33.986855Z","ttl_s":3600,"v":2}

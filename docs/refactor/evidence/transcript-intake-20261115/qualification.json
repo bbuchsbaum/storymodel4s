@@ -1,0 +1,417 @@
+{
+  "runtime": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+  "hosted": [
+    {
+      "run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791",
+      "job": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791/job/133074101645",
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+      "conclusion": "success",
+      "tasks": 16,
+      "passed": 3570,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791",
+      "job": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791/job/133074101807",
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+      "conclusion": "success",
+      "tasks": 16,
+      "passed": 3570,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791",
+      "job": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791/job/133074101896",
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+      "conclusion": "success",
+      "tasks": 24,
+      "passed": 4960,
+      "failed": 0,
+      "skipped": 22
+    },
+    {
+      "run": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791",
+      "job": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918791/job/133074102043",
+      "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+      "conclusion": "success",
+      "tasks": 24,
+      "passed": 4960,
+      "failed": 0,
+      "skipped": 22
+    }
+  ],
+  "docs": {
+    "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43798918852",
+    "conclusion": "success",
+    "pages": "build and deploy skipped"
+  },
+  "local": {
+    "pipeline": {
+      "passed": 606,
+      "failed": 0,
+      "skipped": 0,
+      "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f"
+    },
+    "corpusIntake": {
+      "passed": 159,
+      "failed": 0,
+      "skipped": 0,
+      "revision": "0b7cdf0b730817b101cf8632639eac5a6e6beaa3"
+    },
+    "python": {
+      "passed": 60,
+      "failed": 0,
+      "revision": "0b7cdf0b730817b101cf8632639eac5a6e6beaa3"
+    },
+    "format": "scalafmtCheckAll and scalafmtSbtCheck passed"
+  },
+  "legacy": {
+    "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "comparisons": [
+      {
+        "study": "sherlock-bundles",
+        "bundles": 11,
+        "units": 1744,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "study": "filmfestival/annotation-opus",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "study": "filmfestival/annotation-haiku",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "study": "filmfestival/auto-opus",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "study": "filmfestival/auto-haiku",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "study": "filmfestival/norecord-opus",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "study": "filmfestival/norecord-haiku",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      }
+    ],
+    "bundles": 125,
+    "units": 21100,
+    "byte_identical": true
+  },
+  "evidence": [
+    {
+      "file": "gate-artifacts.log",
+      "sha256": "21fcc128f70c518982042a90e6d10839924630a5344ee954e19153eae4f3ff44",
+      "bytes": 2438978,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/clean",
+        "pipeline/test",
+        "corpusIntake/test",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-export/source.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-export/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/sherlock-bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-opus/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-opus/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/filmfestival/annotation-opus/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-haiku/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-haiku/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/filmfestival/annotation-haiku/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-opus/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-opus/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/filmfestival/auto-opus/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-haiku/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-haiku/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/filmfestival/auto-haiku/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-opus/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-opus/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/filmfestival/norecord-opus/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-haiku/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-haiku/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy/filmfestival/norecord-haiku/bundles\"",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "python-all.log",
+      "sha256": "462d931056b10ebd6983ae32b7c31ef3f152c25fe7f2d49b870104fda20fd599",
+      "bytes": 257,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/agentmapping",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "focused-02.log",
+      "sha256": "df5430bfad1b53cb2b9a081bb59d95be89f8b10aee6cb7b2e50dee56f0d1a366",
+      "bytes": 3407,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/clean",
+        "pipeline/testOnly *TranscriptStudySuite *PreparedRecallBoundarySuite",
+        "pipeline/scalafmt",
+        "pipeline/Test/scalafmt"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "hosted-ci-full.log",
+      "sha256": "309b1805e349b1bab0105c1eb897925fe2be8570f47a16b417eb4b372fa1c4e7",
+      "bytes": 5222711
+    },
+    {
+      "file": "hosted-job-133074101896.log",
+      "sha256": "75d6b2b090686739f3323cd3a5907a0316cb28aba2e809029910030a4e737b0d",
+      "bytes": 2771782
+    },
+    {
+      "file": "hosted-job-133074102043.log",
+      "sha256": "ef1e72bebab06313a03acf8e3498fea7ac9deec80d0660e523b7553af05ec22f",
+      "bytes": 2681915
+    },
+    {
+      "file": "hosted.json",
+      "sha256": "e210668af1c03e4dc9cc2e8c99232e486501ad9d3f602dc6877ddfe4eab38a53",
+      "bytes": 33608
+    },
+    {
+      "file": "reference-scope.log",
+      "sha256": "04a7421659203c3ed4e70b7c095e500ed0b748512374bb21c8328809881f55b7",
+      "bytes": 1221
+    },
+    {
+      "file": "gate-cli-final.log",
+      "sha256": "b8057f03541e2fe7627093c0765839d1d8baa40b3744c70fe528351517af7637",
+      "bytes": 2424399,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/Test/clean",
+        "pipeline/test",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-export/source.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-export/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.slice5/20261115/sherlock-recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/sherlock-bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-opus/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-opus/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/filmfestival/annotation-opus/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-haiku/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/annotation-haiku/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/filmfestival/annotation-haiku/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-opus/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-opus/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/filmfestival/auto-opus/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-haiku/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/auto-haiku/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/filmfestival/auto-haiku/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-opus/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-opus/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/filmfestival/norecord-opus/bundles\"",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyBundle \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/annotations.csv\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/filmfestival-source/parts.json\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-haiku/export\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.recovery/20261114/norecord-haiku/recordings\" \"claude-code-cli\" \"/Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/legacy-final/filmfestival/norecord-haiku/bundles\"",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "mutation-export-descriptor.log",
+      "sha256": "a2a8fcbf74fa16a357deb1035c885c38df772971fa3f1d73496e0f773cf7ee8a",
+      "bytes": 3562,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *TranscriptStudySuite"
+      ],
+      "exit_code": 1
+    },
+    {
+      "file": "mutation-source-prompt.log",
+      "sha256": "6fad6af714f2a06faa263e8430603d73e6b29f2ee3707314bc8470d4204d19b0",
+      "bytes": 3574,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *TranscriptStudySuite"
+      ],
+      "exit_code": 1
+    },
+    {
+      "file": "mutation-bundle-descriptor.log",
+      "sha256": "4db5d20ec6c4c3d78c49e1f9fa66f4c043b87cbc5648273e9fdc135aab4430d8",
+      "bytes": 3466,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *TranscriptStudySuite"
+      ],
+      "exit_code": 1
+    },
+    {
+      "file": "mutation-restored.log",
+      "sha256": "baf98c635a6979ce5f916c5362ceea813d9537d41d60ede3dfbbed0b050f0d4b",
+      "bytes": 3178,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *TranscriptStudySuite *PreparedRecallBoundarySuite",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "mutation-old-launcher.log",
+      "sha256": "8697db29b756f91d6ab4962a16971fba471796ee94f6f7399105455f07d164cb",
+      "bytes": 4530,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/testOnly *TranscriptStudySuite"
+      ],
+      "exit_code": 1
+    },
+    {
+      "file": "walkthrough-final-live.log",
+      "sha256": "13d5dd773effaaf661f42921ce20dacd89ed8bffea30b25e999cab317e5a6a72",
+      "bytes": 3890,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyPrepare /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/source.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/parts.json /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/manifest.json /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyExecute live /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export/source.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export/parts.json /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/run /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/live 512 1000 1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "walkthrough-final-replay.log",
+      "sha256": "8df95737f58e13c2c77ae25cc58192efa387b6e00df4e14c0956fe7c875c8aa8",
+      "bytes": 2708,
+      "command": [
+        "sbt",
+        "set ThisBuild / tlFatalWarnings := true",
+        "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyExecute replay /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export/source.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export/parts.json /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/export /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/run /Users/bbuchsbaum/code/scala/storymodel4s/data/.transcript-intake/20261115/walkthrough-final/replay"
+      ],
+      "exit_code": 0
+    },
+    {
+      "file": "reference-scope-final.log",
+      "sha256": "22fff60627e196f13378a14fcee518f0a589346c50596c9905da7925287280d4",
+      "bytes": 248
+    }
+  ],
+  "boundary": "Engineering provenance and replay only; corpus segmentation comparison and scientific accuracy remain unqualified.",
+  "broad_gate_revision": "0b7cdf0b730817b101cf8632639eac5a6e6beaa3",
+  "mutations": {
+    "revision": "0b7cdf0b730817b101cf8632639eac5a6e6beaa3",
+    "mutants": [
+      {
+        "name": "export-descriptor",
+        "removed_check": "c.downField(\"transcript\").focus.contains(TranscriptStudy.exportDescriptor(recall))",
+        "witness": "export readback regenerates every descriptor field, text and unit key",
+        "compiled": true,
+        "failed": 1,
+        "passed": 8,
+        "log": "mutation-export-descriptor.log",
+        "sha256": "a2a8fcbf74fa16a357deb1035c885c38df772971fa3f1d73496e0f773cf7ee8a"
+      },
+      {
+        "name": "source-prompt",
+        "removed_check": "index.transcriptSource.isEmpty || s.chunks.forall { chunk =>\n            chunk.prompt == TranscriptStudy.prompt(view, s.units, chunk.lo, chunk.hi)\n          }",
+        "witness": "changed source and transcript provenance refuse before opening a live execution",
+        "compiled": true,
+        "failed": 1,
+        "passed": 8,
+        "log": "mutation-source-prompt.log",
+        "sha256": "6fad6af714f2a06faa263e8430603d73e6b29f2ee3707314bc8470d4204d19b0"
+      },
+      {
+        "name": "bundle-descriptor",
+        "removed_check": "          c.downField(\"recall\").focus == recall.transcriptDescriptor &&\n",
+        "witness": "automatic transcript live and offline replay use the common checked mapping path",
+        "compiled": true,
+        "failed": 1,
+        "passed": 8,
+        "log": "mutation-bundle-descriptor.log",
+        "sha256": "4db5d20ec6c4c3d78c49e1f9fa66f4c043b87cbc5648273e9fdc135aab4430d8"
+      }
+    ],
+    "restored": {
+      "passed": 14,
+      "failed": 0,
+      "log": "mutation-restored.log",
+      "sha256": "baf98c635a6979ce5f916c5362ceea813d9537d41d60ede3dfbbed0b050f0d4b"
+    }
+  },
+  "launcher_regression": {
+    "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "replaced_cli_with": "0b7cdf0b7",
+    "compiled": true,
+    "failed": 1,
+    "passed": 8,
+    "witness": "automatic transcript live and offline replay use the common checked mapping path",
+    "failure": "old generated launcher rejects six arguments and publishes no bundle",
+    "log": "mutation-old-launcher.log",
+    "sha256": "8697db29b756f91d6ab4962a16971fba471796ee94f6f7399105455f07d164cb"
+  },
+  "scope": {
+    "base": "7ca7baf1f0db14cc95b10bae13d2997ff66aa39f",
+    "final_script_exit": 5,
+    "reason": "top-level StudyExecutionCli defines no type, so reference-scope refuses a partial command",
+    "manual_delta": "Only pipeline CLI and its tests changed after the complete predecessor matrix. No external Scala callers; no StoryAtlas references. Full pipeline rerun plus exact command-line live/replay and formatting cover this delta."
+  },
+  "walkthrough": {
+    "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "fixture": "project-authored geometry with Unicode/whitespace diagnostics",
+    "prepared_sessions": 1,
+    "units": 3,
+    "loopback_http_requests": 1,
+    "external_http_requests": 0,
+    "live_model_calls": 1,
+    "replay_model_calls": 0,
+    "replay_credentials_removed": true,
+    "equal": [
+      "units",
+      "interpretations",
+      "recall"
+    ],
+    "python_reader": "passed",
+    "hashes": {
+      "export/index.json": "d12032a8616fd99be1d6900222d8ad4a45a617bc19b7831cfb64839dd36a04d8",
+      "export/manifest.json": "cf9b2d7efda64688f9d6d3aef7f99fac6924cbf198988d0b0f95eaea45b1946b",
+      "export/parts.json": "87ad45c6ea911ce4ad293d1eb1c2f42a079c906a811cedff8b0a4c7883042727",
+      "export/session-0.json": "998698aba9ece3fde8a73841eca1a98259ad1ea2ad311c48acaa6ed9953a3ca2",
+      "export/source.csv": "933cc0c6ee1f84f774821dae37e1a74db7c326f1831be54230f9e5f5a7df1cc4",
+      "live/bundles/synthetic_trial.bundle.json": "d5ab940aab10ddaca7ebb729c710b9abb0b7d1b560db76bd8d907d96d10b70eb",
+      "live/receipt.json": "bdfb4e2a2cc4b4e73511c325856d4a41a4651a1b745a1464cea28476fa7ed23b",
+      "manifest.json": "cf9b2d7efda64688f9d6d3aef7f99fac6924cbf198988d0b0f95eaea45b1946b",
+      "parts.json": "87ad45c6ea911ce4ad293d1eb1c2f42a079c906a811cedff8b0a4c7883042727",
+      "recall.txt": "a66862f8ab41192540061870cd1d009ed08088658f5e1b9fe31ff7f7c0bc7894",
+      "replay/bundles/synthetic_trial.bundle.json": "343e3784d830032d32c7a4b50cd1757faa6ac9cde4cb436572a830b344b2d9d2",
+      "replay/receipt.json": "feb5ebdcc223f6976e62b69e6c0c09cfe8ae8a4f09eb0673777efa45233bd579",
+      "run/invocations/68dd8f53-8b29-4cb7-ade5-5057efe347af.json": "bdfb4e2a2cc4b4e73511c325856d4a41a4651a1b745a1464cea28476fa7ed23b",
+      "run/invocations/fa83c273-eda6-4023-a272-3083aeaaacf4.json": "feb5ebdcc223f6976e62b69e6c0c09cfe8ae8a4f09eb0673777efa45233bd579",
+      "run/recordings/.text-execution-v2.journal.json": "4a9eecd7c4cd629aae3e59294ecbe78f78a6e026ee8ca1b281db3873cefd720f",
+      "run/recordings/.text-execution-v2.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run/recordings/0ed35cbe883273caa856112269f1fdf8a6d2d68818c1038e1fa109c6598ed7ad.json": "22fce09ddc3f1a2b7d7deffe7078cfcdd92271a268a905f55a7137f8a0b0e0f2",
+      "run/run.json": "e81e110b8d88256405c4151b7de9e1e82125410b93f323b1fd7f97bfb104fac0",
+      "source.csv": "933cc0c6ee1f84f774821dae37e1a74db7c326f1831be54230f9e5f5a7df1cc4"
+    }
+  },
+  "guards_unchanged_since_mutation_revision": true,
+  "hosted_final": {
+    "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "ci": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422860",
+    "docs": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422841",
+    "status": "in_progress"
+  }
+}

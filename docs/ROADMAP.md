@@ -11,6 +11,13 @@ matrix are complete. A [bounded OpenAI smoke](refactor/evidence/live-study-20261
 now verifies one real request and credential-free replay of identical mappings on two synthetic
 units. This qualifies execution and reproducibility, with no new scientific-accuracy claim.
 
+The [ordinary-transcript entry point](guide/ordinary-transcripts.md) now prepares UTF-8 files
+with the existing segmenter and carries canonical text, exact spans and source provenance into
+that same execution path. Its [engineering receipt](refactor/evidence/transcript-intake-20261115/README.md)
+tracks verification. Full delivery 4 still needs a supplied-versus-automatic comparison on
+verified common transcript coordinates for both corpora (`bd-01M7H69QWE0NKSNB8XWW6MC02H`).
+Independent usability and prospective measurement qualification remain open.
+
 The one current plan, adopted 2026-11-08 (Mote epic `bd-01M6Y7MWZGP29TNDJ90SG36A45`). It
 supersedes the direction in `refactor/PLAN.md`, the best-mapper plan and every dated "next
 steps" list. Mote holds status; this page holds direction, milestones and exit criteria.
