@@ -13,6 +13,7 @@ from storymodel.model import canonical
 from storymodel.study_workflow import (
     ImportedReplies,
     RawReply,
+    SuppliedUnit,
     TimeStudy,
     TimeStudyResult,
     import_time_replies,
@@ -256,3 +257,39 @@ def test_cli_denied_export_refuses_before_recording_read(tmp_path, capsys):
     )
     assert "producer denies" in capsys.readouterr().err
     assert not output.exists()
+
+
+@pytest.mark.parametrize("number", [float("nan"), float("inf"), float("-inf")])
+@pytest.mark.parametrize("nested", [False, True])
+def test_nonfinite_api_row_is_refused_before_identity_or_io(tmp_path, number, nested):
+    request, replies = fixture()
+    first = request.recall.units[0]
+    row = {"key": [number]} if nested else number
+    with pytest.raises(ValueError):
+        SuppliedUnit(u=first.u, row=row, text=first.text)
+    forged = request.model_copy(
+        update={
+            "recall": request.recall.model_copy(
+                update={
+                    "units": (first.model_copy(update={"row": row}),) + request.recall.units[1:],
+                }
+            ),
+        }
+    )
+    with pytest.raises(ValueError):
+        request_digest(forged)
+    root = tmp_path / "rejected"
+    with pytest.raises(ValueError):
+        import_time_replies(forged, replies, root)
+    assert not root.exists()
+
+
+def test_explicit_null_study_row_survives_api_import_and_replay(tmp_path):
+    request, _ = fixture()
+    first = request.recall.units[0]
+    unit = SuppliedUnit(u=1, row=None, text=first.text)
+    request = request.model_copy(
+        update={"recall": request.recall.model_copy(update={"units": (unit,)})}
+    )
+    root = recorded(tmp_path, request, [(0, 0, '{"units":[]}')])
+    assert replay_time_study(request, root).rows[0]["row"] is None

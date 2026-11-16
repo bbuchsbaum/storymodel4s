@@ -13,7 +13,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Annotated, Any, Literal, Self
 
-from pydantic import Field, JsonValue, model_validator
+from pydantic import Field, JsonValue, field_validator, model_validator
 
 from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
@@ -54,6 +54,12 @@ class SuppliedUnit(Model):
     u: Annotated[int, Field(gt=0, le=2**31 - 1)]
     row: JsonValue
     text: Name
+
+    @field_validator("row")
+    @classmethod
+    def finite_row(cls, value: JsonValue) -> JsonValue:
+        canonical(value)
+        return value
 
 
 class SuppliedRecall(Model):
@@ -123,7 +129,9 @@ class TimeStudyResult(Model):
 
 
 def checked_request(value: TimeStudy) -> TimeStudy:
-    return TimeStudy.model_validate_json(canonical(strict_json(value.model_dump_json())))
+    # Pydantic JSON serialization coerces NaN/Infinity to null before validation.
+    # Canonicalize Python values first so a forbidden row cannot become another identity.
+    return TimeStudy.model_validate_json(canonical(value.model_dump(mode="json")))
 
 
 def read_request(path: Path, *, expected_sha256: str | None = None) -> TimeStudy:
