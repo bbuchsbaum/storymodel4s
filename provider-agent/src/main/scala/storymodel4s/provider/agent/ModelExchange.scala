@@ -102,7 +102,7 @@ object ModelRequest:
       key
     )
 
-  /** Render a whole-text exchange from a checked live profile.  The profile owns the identity
+  /** Render a whole-text exchange from a checked live profile. The profile owns the identity
     * material, so callers cannot attach an arbitrary recording key to text they did not send.
     */
   def text(

@@ -459,11 +459,17 @@ object StudyExport:
     provider: String,
     outputDir: String
 ): scala.Unit =
-  val count = StudyExecution.legacy(
-    Path.of(sourceCsv), Path.of(partsJson), Path.of(exportDir), Path.of(recordingsDir),
-    provider, Path.of(outputDir)
-  ).fold(
-    reason => { System.err.println(s"refused: $reason"); sys.exit(2) },
-    identity
-  )
+  val count = StudyExecution
+    .legacy(
+      Path.of(sourceCsv),
+      Path.of(partsJson),
+      Path.of(exportDir),
+      Path.of(recordingsDir),
+      provider,
+      Path.of(outputDir)
+    )
+    .fold(
+      reason => { System.err.println(s"refused: $reason"); sys.exit(2) },
+      identity
+    )
   println(s"bundles=$count modelCalls=0")

@@ -52,12 +52,18 @@ object StudyExecution:
     val index = required(
       io.circe.jawn.parseByteArray(indexBytes).left.map(_.message).flatMap(StudyExport.parseIndex)
     )
-    val view = required(storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(sourceBytes, partsBytes))
+    val view = required(
+      storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(sourceBytes, partsBytes)
+    )
     val clock = required(StudyExport.intervals(dir, index, view, partsBytes))
     val sessionBytes = index.sessions.map(e => e -> bytes(dir.resolve(e.file)))
     val sessions = sessionBytes.map { (entry, raw) =>
       val s = required(
-        io.circe.jawn.parseByteArray(raw).left.map(_.message).flatMap(StudyExport.parseSession(_, entry))
+        io.circe.jawn
+          .parseByteArray(raw)
+          .left
+          .map(_.message)
+          .flatMap(StudyExport.parseSession(_, entry))
       )
       val recall = required(
         PreparedRecall.supplied(entry.name, s.units.map(_.text), StudyExport.unitsChecksum(s.units))
@@ -74,7 +80,9 @@ object StudyExecution:
       })
     )
     val p = new Prepared(view, index, clock, sessions, inputs)
-    sessions.foreach { (_, s, _) => required(StudyReplay.validate(s.units, s.chunks, p.line, p.asks)) }
+    sessions.foreach { (_, s, _) =>
+      required(StudyReplay.validate(s.units, s.chunks, p.line, p.asks))
+    }
     p
 
   private def render(
@@ -88,8 +96,14 @@ object StudyExecution:
       val before = calls()
       val (replies, _) = required(
         StudyReplay.session(
-          s.units, s.chunks, p.index.protocol, p.index.attempts,
-          p.suffix, p.line, p.asks, serve
+          s.units,
+          s.chunks,
+          p.index.protocol,
+          p.index.attempts,
+          p.suffix,
+          p.line,
+          p.asks,
+          serve
         )
       )
       val intervals = p.clock.map(_._1)
@@ -102,25 +116,49 @@ object StudyExecution:
       )
       val encoded = StudyBundle.encode(
         StudyBundle.Provenance(
-          entry.participant, entry.session, p.index.condition, p.index.model, provider,
-          p.index.protocolName, Checksum.ofText(p.index.system).hex, p.index.manifestSha256,
-          recall.segmentation, p.clock.map(_._2)
-        ), p.view, records, rows, intervals
+          entry.participant,
+          entry.session,
+          p.index.condition,
+          p.index.model,
+          provider,
+          p.index.protocolName,
+          Checksum.ofText(p.index.system).hex,
+          p.index.manifestSha256,
+          recall.segmentation,
+          p.clock.map(_._2)
+        ),
+        p.view,
+        records,
+        rows,
+        intervals
       )
       // Accounting belongs to this invocation, while the checked mapping records stay identical.
       val doc = execution.fold(encoded) { descriptor =>
         encoded.mapObject { o =>
-          o.add("provenance", o("provenance").get.mapObject { provenance =>
-            provenance.add("modelCalls", Json.fromInt(calls() - before)).add("execution", descriptor)
-          })
+          o.add(
+            "provenance",
+            o("provenance").get.mapObject { provenance =>
+              provenance
+                .add("modelCalls", Json.fromInt(calls() - before))
+                .add("execution", descriptor)
+            }
+          )
         }
       }
       val text = doc.noSpaces + "\n"
       val reread = required(
-        io.circe.jawn.parse(text).left.map(_.message).flatMap(
-          StudyBundle.decode(_, p.view, recall,
-            StudyBundle.Expected(entry.participant, entry.session, s.units, producer, intervals))
-        )
+        io.circe.jawn
+          .parse(text)
+          .left
+          .map(_.message)
+          .flatMap(
+            StudyBundle.decode(
+              _,
+              p.view,
+              recall,
+              StudyBundle.Expected(entry.participant, entry.session, s.units, producer, intervals)
+            )
+          )
       )
       if StudyBundle.Fields.exists(f => reread.records(f).digest != records(f).digest) then
         throw Refused("reloaded bundle differs")
@@ -131,7 +169,7 @@ object StudyExecution:
     try Right(body)
     catch
       case Refused(reason) => Left(reason)
-      case NonFatal(e) => Left(s"study I/O failed (${e.getClass.getSimpleName})")
+      case NonFatal(e)     => Left(s"study I/O failed (${e.getClass.getSimpleName})")
 
   private def publish(out: Path, bundles: Vector[(String, String)], receipt: Option[Json]): Unit =
     if Files.exists(out) then throw Refused("output directory exists")
@@ -141,7 +179,9 @@ object StudyExecution:
     try
       val destination = receipt.fold(stage)(_ => Files.createDirectory(stage.resolve("bundles")))
       bundles.foreach { (name, text) => Files.writeString(destination.resolve(name), text): Unit }
-      receipt.foreach { doc => Files.writeString(stage.resolve("receipt.json"), doc.spaces2 + "\n"): Unit }
+      receipt.foreach { doc =>
+        Files.writeString(stage.resolve("receipt.json"), doc.spaces2 + "\n"): Unit
+      }
       Files.move(stage, target, StandardCopyOption.ATOMIC_MOVE): Unit
     finally
       if Files.exists(stage) then
@@ -151,14 +191,23 @@ object StudyExecution:
 
   /** Preserve the original bundle command's v1 exchange identity and flat output directory. */
   def legacy(
-      source: Path, parts: Path, exportDir: Path, recordingsDir: Path, provider: String, out: Path
+      source: Path,
+      parts: Path,
+      exportDir: Path,
+      recordingsDir: Path,
+      provider: String,
+      out: Path
   ): Either[String, Int] = guard {
     if Files.exists(out) then throw Refused("output directory exists")
     val p = prepare(source, parts, exportDir)
     val recordings = required(Recordings.open(recordingsDir))
-    val bundles = render(p, provider,
+    val bundles = render(
+      p,
+      provider,
       prompt => TextExchange.replay(recordings, provider, p.index.model, p.index.system, prompt),
-      () => 0, None)
+      () => 0,
+      None
+    )
     publish(out, bundles, None)
     bundles.size
   }
@@ -184,14 +233,18 @@ object StudyExecution:
     val manifestFile = runDir.resolve("run.json")
     val authorization = mode match
       case Mode.Replay => None
-      case Mode.Live =>
+      case Mode.Live   =>
         required(LiveAuthorization.from(env)) match
           case a: LiveAuthorization.OpenAiCompatible => Some(a)
           case _ => throw Refused("this live slice supports the OpenAI-compatible backend")
     val profile = authorization match
       case Some(a) => required(TextExecution.Profile.from(a, maxTokens, timeoutMillis))
-      case None => required(TextExecution.Profile.decode(
-        read(manifestFile).hcursor.downField("execution").focus.getOrElse(Json.Null)))
+      case None    =>
+        required(
+          TextExecution.Profile.decode(
+            read(manifestFile).hcursor.downField("execution").focus.getOrElse(Json.Null)
+          )
+        )
     if profile.model != p.index.model then throw Refused("export and execution models differ")
     val manifest = Json.obj(
       "schema" -> str("storymodel4s.study-execution/v1"),
@@ -199,19 +252,20 @@ object StudyExecution:
       "execution" -> profile.json
     )
     if Files.exists(manifestFile) then
-      if read(manifestFile) != manifest then throw Refused("run inputs or execution configuration changed")
+      if read(manifestFile) != manifest then
+        throw Refused("run inputs or execution configuration changed")
     else if mode == Mode.Replay then throw Refused("replay needs an existing run descriptor")
     else
       Files.createDirectories(runDir): Unit
       Files.writeString(manifestFile, manifest.spaces2 + "\n", StandardOpenOption.CREATE_NEW): Unit
     val recordings = required(mode match
-      case Mode.Live => Recordings.at(runDir.resolve("recordings"))
+      case Mode.Live   => Recordings.at(runDir.resolve("recordings"))
       case Mode.Replay => Recordings.open(runDir.resolve("recordings")))
     val receipts = runDir.resolve("invocations")
     Files.createDirectories(receipts): Unit
     val session = authorization match
       case Some(a) => required(TextExecution.live(recordings, profile, a))
-      case None => TextExecution.replay(recordings, profile)
+      case None    => TextExecution.replay(recordings, profile)
     val invocation = UUID.randomUUID().toString
     var outcome = "failed"
     var failure: Option[String] = None
@@ -225,7 +279,8 @@ object StudyExecution:
       "manifestSha256" -> str(Checksum.ofText(manifest.noSpaces).hex),
       "execution" -> profile.json,
       "exchanges" -> session.receipt,
-      "newClientInvocationLimit" -> (if mode == Mode.Live then Json.fromInt(maxNewCalls) else Json.Null),
+      "newClientInvocationLimit" -> (if mode == Mode.Live then Json.fromInt(maxNewCalls)
+                                     else Json.Null),
       "modelCalls" -> Json.fromInt(session.clientInvocations),
       "httpAttempts" -> Json.fromInt(session.httpAttempts),
       "cacheHits" -> Json.fromInt(session.cacheHits),
@@ -234,13 +289,18 @@ object StudyExecution:
       })
     )
     try
-      bundles = render(p, profile.provider, prompt => {
-        if mode == Mode.Live && session.clientInvocations >= maxNewCalls &&
-            !recordings.contains(profile.key(p.index.system, prompt)) then
-          throw Refused("new-call budget exhausted; resume with the same run directory")
-        session.serve(p.index.system, prompt)
-      },
-        () => session.clientInvocations, Some(profile.json))
+      bundles = render(
+        p,
+        profile.provider,
+        prompt => {
+          if mode == Mode.Live && session.clientInvocations >= maxNewCalls &&
+            !recordings.contains(profile.key(p.index.system, prompt))
+          then throw Refused("new-call budget exhausted; resume with the same run directory")
+          session.serve(p.index.system, prompt)
+        },
+        () => session.clientInvocations,
+        Some(profile.json)
+      )
       outcome = "complete"
       publish(out, bundles, Some(receipt))
       receipt
@@ -249,7 +309,7 @@ object StudyExecution:
         outcome = "failed"
         failure = Some(e match
           case Refused(reason) => reason
-          case _ => s"execution failed (${e.getClass.getSimpleName})")
+          case _               => s"execution failed (${e.getClass.getSimpleName})")
         throw e
     finally
       try Files.writeString(receipts.resolve(s"$invocation.json"), receipt.spaces2 + "\n"): Unit

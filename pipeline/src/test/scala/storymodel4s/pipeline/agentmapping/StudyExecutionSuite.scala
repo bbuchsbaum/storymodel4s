@@ -47,13 +47,18 @@ class StudyExecutionSuite extends FunSuite:
     val numbers = Vector(0, 7)
     val lines = numbers.zip(texts).map((n, t) => s"[$n] $t").mkString("\n")
     val prompts = numbers.map(n => s"$lines\nmap $n-$n")
-    Files.writeString(out.resolve("source.csv"),
+    Files.writeString(
+      out.resolve("source.csv"),
       "ordinal,text,part,onset,end,group,group_label,locations,characters\n" +
-        "11,square moves,part,0,10,10,first,,\n22,circle rests,part,10,20,30,second,,\n"): Unit
-    Files.writeString(out.resolve("parts.json"),
-      """[{"part":"part","start":"0","end":"20","numerator":"1","denominator":"1"}]"""): Unit
+        "11,square moves,part,0,10,10,first,,\n22,circle rests,part,10,20,30,second,,\n"
+    ): Unit
+    Files.writeString(
+      out.resolve("parts.json"),
+      """[{"part":"part","start":"0","end":"20","numerator":"1","denominator":"1"}]"""
+    ): Unit
     val session = Json.obj(
-      "participant" -> str("synthetic"), "session" -> str("trial"),
+      "participant" -> str("synthetic"),
+      "session" -> str("trial"),
       "units" -> Json.fromValues(numbers.zip(texts).map { (n, t) =>
         Json.obj("u" -> Json.fromInt(n), "row" -> str(s"row-$n"), "text" -> str(t))
       }),
@@ -63,18 +68,26 @@ class StudyExecutionSuite extends FunSuite:
     )
     Files.writeString(out.resolve("session.json"), session.noSpaces): Unit
     val index = Json.obj(
-      "schema" -> str(StudyExport.Schema), "model" -> str("synthetic-model"),
-      "condition" -> str("synthetic-live"), "system" -> str("Return the requested unit mappings."),
+      "schema" -> str(StudyExport.Schema),
+      "model" -> str("synthetic-model"),
+      "condition" -> str("synthetic-live"),
+      "system" -> str("Return the requested unit mappings."),
       "systemSha256" -> str(Checksum.ofText("Return the requested unit mappings.").hex),
-      "replyProtocol" -> str("coercing-open/v1"), "attempts" -> Json.fromInt(3),
-      "retrySuffix" -> str("\nretry {attempt}"), "unitLine" -> str("[{u}] {text}"),
-      "chunkLine" -> str("map {lo}-{hi}"), "manifestSha256" -> str("0" * 64),
+      "replyProtocol" -> str("coercing-open/v1"),
+      "attempts" -> Json.fromInt(3),
+      "retrySuffix" -> str("\nretry {attempt}"),
+      "unitLine" -> str("[{u}] {text}"),
+      "chunkLine" -> str("map {lo}-{hi}"),
+      "manifestSha256" -> str("0" * 64),
       "extras" -> Json.arr(str("conf")),
-      "sessions" -> Json.arr(Json.obj(
-        "participant" -> str("synthetic"), "session" -> str("trial"),
-        "file" -> str("session.json"),
-        "promptSha256" -> Json.fromValues(prompts.map(p => str(Checksum.ofText(p).hex)))
-      ))
+      "sessions" -> Json.arr(
+        Json.obj(
+          "participant" -> str("synthetic"),
+          "session" -> str("trial"),
+          "file" -> str("session.json"),
+          "promptSha256" -> Json.fromValues(prompts.map(p => str(Checksum.ofText(p).hex)))
+        )
+      )
     )
     Files.writeString(out.resolve("index.json"), index.noSpaces): Unit
     out
@@ -87,12 +100,16 @@ class StudyExecutionSuite extends FunSuite:
       try walk.iterator.asScala.toVector.reverse.foreach(p => { Files.delete(p); () })
       finally walk.close()
 
-  private def completion(text: String): String = Json.obj(
-    "model" -> str("synthetic-reported-model"),
-    "choices" -> Json.arr(Json.obj("finish_reason" -> str("stop"),
-      "message" -> Json.obj("content" -> str(text)))),
-    "usage" -> Json.obj("prompt_tokens" -> Json.fromInt(17), "completion_tokens" -> Json.fromInt(11))
-  ).noSpaces
+  private def completion(text: String): String = Json
+    .obj(
+      "model" -> str("synthetic-reported-model"),
+      "choices" -> Json.arr(
+        Json.obj("finish_reason" -> str("stop"), "message" -> Json.obj("content" -> str(text)))
+      ),
+      "usage" -> Json
+        .obj("prompt_tokens" -> Json.fromInt(17), "completion_tokens" -> Json.fromInt(11))
+    )
+    .noSpaces
 
   private val first = """{"units":[{"u":0,"narrative":10,"referent":30,"conf":null}]}"""
   private val second = """{"units":[{"u":7,"narrative":30,"referent":30}]}"""
@@ -102,35 +119,67 @@ class StudyExecutionSuite extends FunSuite:
   ): Unit =
     val count = new AtomicInteger(0)
     val server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0)
-    server.createContext("/v1/chat/completions", exchange => {
-      val request = new String(exchange.getRequestBody.readAllBytes(), StandardCharsets.UTF_8)
-      assertEquals(right(io.circe.jawn.parse(request)).hcursor.get[String]("model"), Right("synthetic-model"))
-      val i = count.getAndIncrement()
-      val (status, text) = responses.lift(i).getOrElse(500 -> "unexpected request")
-      val raw = text.getBytes(StandardCharsets.UTF_8)
-      exchange.sendResponseHeaders(status, raw.length.toLong)
-      try exchange.getResponseBody.write(raw)
-      finally exchange.close()
-    }): Unit
+    server.createContext(
+      "/v1/chat/completions",
+      exchange => {
+        val request = new String(exchange.getRequestBody.readAllBytes(), StandardCharsets.UTF_8)
+        assertEquals(
+          right(io.circe.jawn.parse(request)).hcursor.get[String]("model"),
+          Right("synthetic-model")
+        )
+        val i = count.getAndIncrement()
+        val (status, text) = responses.lift(i).getOrElse(500 -> "unexpected request")
+        val raw = text.getBytes(StandardCharsets.UTF_8)
+        exchange.sendResponseHeaders(status, raw.length.toLong)
+        try exchange.getResponseBody.write(raw)
+        finally exchange.close()
+      }
+    ): Unit
     server.start()
     val env = Map(
-      "STORYMODEL4S_AGENT_BACKEND" -> "openai", "STORYMODEL4S_AGENT_LIVE" -> "1",
+      "STORYMODEL4S_AGENT_BACKEND" -> "openai",
+      "STORYMODEL4S_AGENT_LIVE" -> "1",
       "STORYMODEL4S_OPENAI_BASE_URL" -> s"http://127.0.0.1:${server.getAddress.getPort}/v1",
       "STORYMODEL4S_OPENAI_MODEL" -> "synthetic-model"
     )
     try body(env, count)
     finally server.stop(0)
 
-  private def run(dir: Path, exportDir: Path, env: Map[String, String], output: String,
-      mode: StudyExecution.Mode = StudyExecution.Mode.Live, budget: Int = 100): Either[String, Json] =
-    StudyExecution.run(exportDir.resolve("source.csv"), exportDir.resolve("parts.json"), exportDir,
-      dir.resolve("run"), dir.resolve(output), mode, env, 128L, 2000L, budget)
+  private def run(
+      dir: Path,
+      exportDir: Path,
+      env: Map[String, String],
+      output: String,
+      mode: StudyExecution.Mode = StudyExecution.Mode.Live,
+      budget: Int = 100
+  ): Either[String, Json] =
+    StudyExecution.run(
+      exportDir.resolve("source.csv"),
+      exportDir.resolve("parts.json"),
+      exportDir,
+      dir.resolve("run"),
+      dir.resolve(output),
+      mode,
+      env,
+      128L,
+      2000L,
+      budget
+    )
 
-  test("live transport, format retry, budget stop, resume and offline replay preserve checked mappings"):
+  test(
+    "live transport, format retry, budget stop, resume and offline replay preserve checked mappings"
+  ):
     withDirectory { dir =>
       val exportDir = fixture(dir)
-      withServer(Vector(429 -> "limited", 500 -> "retry", 200 -> completion("not JSON"),
-          200 -> completion(first), 200 -> completion(second))) { (env, calls) =>
+      withServer(
+        Vector(
+          429 -> "limited",
+          500 -> "retry",
+          200 -> completion("not JSON"),
+          200 -> completion(first),
+          200 -> completion(second)
+        )
+      ) { (env, calls) =>
         val stopped = run(dir, exportDir, env, "live", budget = 2)
         assert(stopped.left.exists(_.contains("new-call budget exhausted")))
         assertEquals(calls.get(), 4)
@@ -147,12 +196,21 @@ class StudyExecutionSuite extends FunSuite:
         val live = read(dir.resolve("live/bundles/synthetic_trial.bundle.json"))
         val replay = read(dir.resolve("offline/bundles/synthetic_trial.bundle.json"))
         assertEquals(live.hcursor.downField("units").focus, replay.hcursor.downField("units").focus)
-        assertEquals(live.hcursor.downField("interpretations").focus,
-          replay.hcursor.downField("interpretations").focus)
+        assertEquals(
+          live.hcursor.downField("interpretations").focus,
+          replay.hcursor.downField("interpretations").focus
+        )
         assertEquals(live.hcursor.downField("provenance").get[Int]("modelCalls"), Right(1))
         assertEquals(replay.hcursor.downField("provenance").get[Int]("modelCalls"), Right(0))
-        val changed = run(dir, exportDir, env.updated("STORYMODEL4S_OPENAI_BASE_URL",
-          env("STORYMODEL4S_OPENAI_BASE_URL") + "/changed"), "changed")
+        val changed = run(
+          dir,
+          exportDir,
+          env.updated(
+            "STORYMODEL4S_OPENAI_BASE_URL",
+            env("STORYMODEL4S_OPENAI_BASE_URL") + "/changed"
+          ),
+          "changed"
+        )
         assert(changed.left.exists(_.contains("configuration changed")))
         assertEquals(calls.get(), 5)
       }
@@ -163,9 +221,12 @@ class StudyExecutionSuite extends FunSuite:
       val exportDir = fixture(dir)
       val index = read(exportDir.resolve("index.json"))
       val entry = index.hcursor.get[Vector[Json]]("sessions").toOption.get.head
-      val invalid = entry.mapObject(_.add("participant", str("missing")).add("file", str("missing.json")))
-      Files.writeString(exportDir.resolve("index.json"),
-        index.mapObject(_.add("sessions", Json.arr(entry, invalid))).noSpaces): Unit
+      val invalid =
+        entry.mapObject(_.add("participant", str("missing")).add("file", str("missing.json")))
+      Files.writeString(
+        exportDir.resolve("index.json"),
+        index.mapObject(_.add("sessions", Json.arr(entry, invalid))).noSpaces
+      ): Unit
       withServer(Vector.empty) { (env, calls) =>
         assert(run(dir, exportDir, env, "output").isLeft)
         assertEquals(calls.get(), 0)

@@ -9,7 +9,7 @@ import scala.collection.mutable
 import scala.util.control.NonFatal
 import storymodel4s.core.Checksum
 
-/** Checked live/replay execution of a whole-text model exchange.  It owns the small journal which
+/** Checked live/replay execution of a whole-text model exchange. It owns the small journal which
   * makes a process interruption a refusal rather than an invisible second provider call.
   */
 object TextExecution:
@@ -81,7 +81,7 @@ object TextExecution:
     override def equals(other: Any): Boolean = other match
       case that: Profile =>
         provider == that.provider && model == that.model && endpointDigest == that.endpointDigest &&
-          maxTokens == that.maxTokens && timeoutMillis == that.timeoutMillis
+        maxTokens == that.maxTokens && timeoutMillis == that.timeoutMillis
       case _ => false
 
     override def hashCode(): Int =
@@ -112,7 +112,10 @@ object TextExecution:
         _ <- Either.cond(schema == ProfileSchema, (), "profile schema is unsupported")
         provider <- c.get[String]("provider").left.map(_ => "profile provider is missing")
         model <- c.get[String]("model").left.map(_ => "profile model is missing")
-        endpoint <- c.get[String]("endpointSha256").left.map(_ => "profile endpoint digest is missing")
+        endpoint <- c
+          .get[String]("endpointSha256")
+          .left
+          .map(_ => "profile endpoint digest is missing")
         _ <- Either.cond(endpoint.matches("[0-9a-f]{64}"), (), "profile endpoint digest is invalid")
         domain <- c.get[String]("keyDomain").left.map(_ => "profile key domain is missing")
         _ <- Either.cond(domain == KeyDomain, (), "profile key domain is unsupported")
@@ -132,8 +135,8 @@ object TextExecution:
         tokens: Long,
         timeout: Long
     ): Either[String, Profile] =
-      if !ModelBackend.identityScalarIsSafe(provider) || !ModelBackend.identityScalarIsSafe(model) then
-        Left("profile provider and model must be identity-safe")
+      if !ModelBackend.identityScalarIsSafe(provider) || !ModelBackend.identityScalarIsSafe(model)
+      then Left("profile provider and model must be identity-safe")
       else if tokens <= 0L then Left("maxTokens must be positive")
       else if timeout <= 0L then Left("timeoutMillis must be positive")
       else Right(new Profile(provider, model, endpoint, tokens, timeout))
@@ -155,7 +158,12 @@ object TextExecution:
     if !profile.matches(authorization) then Left("profile does not match live authorization")
     else
       lock(recordings.dir).map { acquired =>
-        new LiveSession(recordings, profile, OpenAiCompatibleModelClient.from(authorization), acquired)
+        new LiveSession(
+          recordings,
+          profile,
+          OpenAiCompatibleModelClient.from(authorization),
+          acquired
+        )
       }
 
   def replay(recordings: Recordings, profile: Profile): Session =
@@ -222,15 +230,16 @@ object TextExecution:
     }
 
     protected def event(key: RecordingKey, status: String, reply: Option[ModelReply]): Unit =
-      val providerEvidence = reply.collect { case ModelReply(_, _, _, ReplyEvidence.Captured(model, usage, _)) =>
-        Json.obj(
-          "reportedModel" -> model.asJson,
-          "usage" -> Json.obj(
-            "inputTokens" -> usage.inputTokens.asJson,
-            "outputTokens" -> usage.outputTokens.asJson,
-            "cacheReadInputTokens" -> usage.cacheReadInputTokens.asJson
+      val providerEvidence = reply.collect {
+        case ModelReply(_, _, _, ReplyEvidence.Captured(model, usage, _)) =>
+          Json.obj(
+            "reportedModel" -> model.asJson,
+            "usage" -> Json.obj(
+              "inputTokens" -> usage.inputTokens.asJson,
+              "outputTokens" -> usage.outputTokens.asJson,
+              "cacheReadInputTokens" -> usage.cacheReadInputTokens.asJson
+            )
           )
-        )
       }
       events += Json.obj(
         "key" -> key.checksum.hex.asJson,
@@ -266,78 +275,93 @@ object TextExecution:
 
     private def states: Either[Unit, Map[String, JournalState]] =
       val temporary = recordings.dir.resolve(s"$JournalName.tmp")
-      if Files.exists(temporary) || (Files.exists(journal) && !Files.isRegularFile(journal)) then Left(())
+      if Files.exists(temporary) || (Files.exists(journal) && !Files.isRegularFile(journal)) then
+        Left(())
       else if !Files.isRegularFile(journal) then Right(Map.empty)
       else
         for
-          raw <- scala.util.Try(Files.readString(journal, StandardCharsets.UTF_8)).toEither.left.map(_ => ())
+          raw <- scala.util
+            .Try(Files.readString(journal, StandardCharsets.UTF_8))
+            .toEither
+            .left
+            .map(_ => ())
           json <- parser.parse(raw).left.map(_ => ())
           schema <- json.hcursor.get[String]("schema").left.map(_ => ())
           _ <- Either.cond(schema == JournalSchema, (), ())
           rows <- json.hcursor.get[Vector[Json]]("entries").left.map(_ => ())
-          entries <- rows.foldLeft[Either[Unit, Vector[(String, JournalState)]]](Right(Vector.empty)) {
-            case (acc, row) =>
-              for
-                done <- acc
-                key <- row.hcursor.get[String]("key").left.map(_ => ())
-                _ <- Either.cond(key.matches("[0-9a-f]{64}") && !done.exists(_._1 == key), (), ())
-                status <- row.hcursor.get[String]("status").left.map(_ => ())
-                state <- status match
-                  case "started" =>
-                    for
-                      attempts <- row.hcursor.get[String]("httpAttemptsStarted").left.map(_ => ())
-                      usage <- row.hcursor.get[String]("usage").left.map(_ => ())
-                      _ <- Either.cond(attempts == "unknown" && usage == "unknown", (), ())
-                    yield JournalState.Started
-                  case "failed" =>
-                    for
-                      code <- row.hcursor.get[String]("failureCode").left.map(_ => ())
-                      attempts <- row.hcursor.get[Int]("httpAttempts").left.map(_ => ())
-                      usage <- row.hcursor.get[String]("usage").left.map(_ => ())
-                      _ <- Either.cond(code.nonEmpty && attempts >= 0 && usage == "absent", (), ())
-                    yield JournalState.Failed(code, attempts)
-                  case _ => Left(())
-              yield done :+ (key -> state)
+          entries <- rows.foldLeft[Either[Unit, Vector[(String, JournalState)]]](
+            Right(Vector.empty)
+          ) { case (acc, row) =>
+            for
+              done <- acc
+              key <- row.hcursor.get[String]("key").left.map(_ => ())
+              _ <- Either.cond(key.matches("[0-9a-f]{64}") && !done.exists(_._1 == key), (), ())
+              status <- row.hcursor.get[String]("status").left.map(_ => ())
+              state <- status match
+                case "started" =>
+                  for
+                    attempts <- row.hcursor.get[String]("httpAttemptsStarted").left.map(_ => ())
+                    usage <- row.hcursor.get[String]("usage").left.map(_ => ())
+                    _ <- Either.cond(attempts == "unknown" && usage == "unknown", (), ())
+                  yield JournalState.Started
+                case "failed" =>
+                  for
+                    code <- row.hcursor.get[String]("failureCode").left.map(_ => ())
+                    attempts <- row.hcursor.get[Int]("httpAttempts").left.map(_ => ())
+                    usage <- row.hcursor.get[String]("usage").left.map(_ => ())
+                    _ <- Either.cond(code.nonEmpty && attempts >= 0 && usage == "absent", (), ())
+                  yield JournalState.Failed(code, attempts)
+                case _ => Left(())
+            yield done :+ (key -> state)
           }
         yield entries.toMap
 
     private def persist(entries: Map[String, JournalState]): Either[ExchangeFailure, Unit] =
-      val encoded = Json.obj(
-        "schema" -> JournalSchema.asJson,
-        "entries" -> Json.fromValues(entries.toVector.sortBy(_._1).map { case (key, state) =>
-          state match
-            case JournalState.Started =>
-              Json.obj(
-                "key" -> key.asJson,
-                "status" -> "started".asJson,
-                "httpAttemptsStarted" -> "unknown".asJson,
-                "usage" -> "unknown".asJson
-              )
-            case JournalState.Failed(code, attempts) =>
-              Json.obj(
-                "key" -> key.asJson,
-                "status" -> "failed".asJson,
-                "failureCode" -> code.asJson,
-                "httpAttempts" -> attempts.asJson,
-                "usage" -> "absent".asJson
-              )
-        })
-      ).noSpaces
+      val encoded = Json
+        .obj(
+          "schema" -> JournalSchema.asJson,
+          "entries" -> Json.fromValues(entries.toVector.sortBy(_._1).map { case (key, state) =>
+            state match
+              case JournalState.Started =>
+                Json.obj(
+                  "key" -> key.asJson,
+                  "status" -> "started".asJson,
+                  "httpAttemptsStarted" -> "unknown".asJson,
+                  "usage" -> "unknown".asJson
+                )
+              case JournalState.Failed(code, attempts) =>
+                Json.obj(
+                  "key" -> key.asJson,
+                  "status" -> "failed".asJson,
+                  "failureCode" -> code.asJson,
+                  "httpAttempts" -> attempts.asJson,
+                  "usage" -> "absent".asJson
+                )
+          })
+        )
+        .noSpaces
       val temporary = recordings.dir.resolve(s"$JournalName.tmp")
       try
         Files.writeString(temporary, encoded, StandardCharsets.UTF_8)
-        Files.move(temporary, journal, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-        Right(())
-      catch case NonFatal(error) =>
-        Left(
-          ExchangeFailure.RecordingUnwritable(
-            RecordingKey.fromChecksum(profile.digest),
-            Checksum.ofText(error.getClass.getName)
-          )
+        Files.move(
+          temporary,
+          journal,
+          StandardCopyOption.ATOMIC_MOVE,
+          StandardCopyOption.REPLACE_EXISTING
         )
+        Right(())
+      catch
+        case NonFatal(error) =>
+          Left(
+            ExchangeFailure.RecordingUnwritable(
+              RecordingKey.fromChecksum(profile.digest),
+              Checksum.ofText(error.getClass.getName)
+            )
+          )
 
     def serve(system: String, prompt: String): Either[ExchangeFailure, ModelReply] = synchronized {
-      if closed then Left(ExchangeFailure.PreviousAttemptUnknown(RecordingKey.fromChecksum(profile.digest)))
+      if closed then
+        Left(ExchangeFailure.PreviousAttemptUnknown(RecordingKey.fromChecksum(profile.digest)))
       else
         val request = ModelRequest.text(profile, system, prompt)
         recordings.read(request.key, request.model) match
@@ -359,33 +383,34 @@ object TextExecution:
                     event(request.key, "previous-failure", None)
                     Left(ExchangeFailure.PreviousAttemptFailed(request.key))
                   case None =>
-                    persist(existing.updated(request.key.checksum.hex, JournalState.Started)).flatMap { _ =>
-                      calls += 1
-                      val before = client.httpAttempts
-                      client.complete(request) match
-                        case Right(reply) =>
-                          attempts += client.httpAttempts - before
-                          recordings.write(request.key, reply) match
-                            case Right(_) =>
-                              event(request.key, "recorded", Some(reply))
-                              Right(reply)
-                            case Left(failure) =>
-                              event(request.key, "write-failed", Some(reply))
-                              Left(failure)
-                        case Left(failure) =>
-                          attempts += client.httpAttempts - before
-                          val callAttempts = client.httpAttempts - before
-                          persist(
-                            existing.updated(
-                              request.key.checksum.hex,
-                              JournalState.Failed(failure.code.value, callAttempts)
-                            )
-                          ) match
-                            case Right(_) =>
-                              event(request.key, "failed", None)
-                              Left(failure)
-                            case Left(journalFailure) => Left(journalFailure)
-                    }
+                    persist(existing.updated(request.key.checksum.hex, JournalState.Started))
+                      .flatMap { _ =>
+                        calls += 1
+                        val before = client.httpAttempts
+                        client.complete(request) match
+                          case Right(reply) =>
+                            attempts += client.httpAttempts - before
+                            recordings.write(request.key, reply) match
+                              case Right(_) =>
+                                event(request.key, "recorded", Some(reply))
+                                Right(reply)
+                              case Left(failure) =>
+                                event(request.key, "write-failed", Some(reply))
+                                Left(failure)
+                          case Left(failure) =>
+                            attempts += client.httpAttempts - before
+                            val callAttempts = client.httpAttempts - before
+                            persist(
+                              existing.updated(
+                                request.key.checksum.hex,
+                                JournalState.Failed(failure.code.value, callAttempts)
+                              )
+                            ) match
+                              case Right(_) =>
+                                event(request.key, "failed", None)
+                                Left(failure)
+                              case Left(journalFailure) => Left(journalFailure)
+                      }
           case Left(failure) =>
             event(request.key, "corrupt", None)
             Left(failure)
