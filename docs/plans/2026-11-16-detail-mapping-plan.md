@@ -73,6 +73,150 @@ These derived categories may be exported and inspected, with their policy and in
 Another scoring policy can reuse the same core account without another extraction or mapping
 call. The ADR defines the projection and its relationship to the existing interview scoring API.
 
+## Measurement and projection contract
+
+Added 2026-11-16 after the owner's discussion of imaging analyses; bead
+`bd-01M7JCDMCX9H2BK6X17PRN3GHQ`. DL1 to DL6 and the graph slices feed one contract instead of
+each producing its own export. The aim: given a film and a person's recall, represent what they
+expressed, what source content it concerns, how specifically and faithfully it represents that
+content, and what remains uncertain. Keep these at their original granularity, and offer explicit
+projections onto words, passages, events and measured time, so that researchers can build
+different behavioural and neural analyses. The contract does not choose an analysis, a temporal
+unit or a list of measures.
+
+Each capability contributes versioned annotations, assessments or measurements with explicit
+support, provenance, missingness and uncertainty semantics. Shared derivations produce analysis
+views without changing the original evidence or repeating model extraction. The chain is:
+evidence and annotations; measurements at their native support; explicit aggregation and
+temporal projection; analysis-ready exports.
+
+The contract connects and extends existing code. It is not a new module or result format.
+
+- `features` has a word-level measurement interface whose unmeasurable tokens are typed missing
+  or ineligible, declared scalar, vector, categorical and distribution spaces, tracks with
+  provenance and coverage, and window reducers.
+- `align` has a vocabulary for what a mapping quantity means (`MeasureKind`).
+- The [imaging guide](../guide/imaging.md) documents recall-onset export on the scan's sampling
+  grid for one admitted Sherlock development participant. That is not coverage of the cohort or
+  of FilmFestival.
+
+### What a measurement attaches to
+
+| Attaches to | Examples |
+|---|---|
+| Source content | Visual and auditory properties, characters, actions, dialogue, relations |
+| Recall content | Perceptual language, expressed details, semantic content, hedging, repetition |
+| Recall-source correspondence | Referents, alternatives, fidelity of particular details, support |
+| Relations across recall units | Revisit, transition, reordering, elaboration, compression |
+| Participant or cohort summaries | Source coverage, repeated mention, fidelity distributions |
+
+The families share addressing, provenance, missingness and export machinery. They need not share
+an estimator. "Was this source unit recalled" is a correspondence between a source and one
+person's recall, not a property of the film.
+
+### Reference
+
+A recall unit or atom refers to source units. A source unit records its kind and resolution. It
+may be a scene or an annotation row now and an event later; the contract does not wait for the
+event graph. A reference has a declared meaning, not only a member list:
+
+- **Joint:** several identifiable source units, each referred to.
+- **Broad:** an episode or interval that contains source units, without separate recall of each.
+- **Alternative:** competing hypotheses, each of which may itself be single, joint or broad.
+- **Unresolved:** no supported hypothesis.
+
+Supported hypotheses are stored sparsely, with optional weights. Possible sets are not
+enumerated. Three consequences follow:
+
+- A broad reference is not evidence that each unit inside it was recalled. DL4 reports it under
+  its own coverage definition.
+- Breadth of reference, uncertainty between hypotheses and the resolution of the source
+  annotation are three separate quantities. The span of film a unit points to is not, by
+  itself, temporal acuity.
+- A normalized vector over single source units is a derived view. It can express alternatives
+  among single units; it cannot express a joint or broad reference, and is offered only where
+  its meaning holds.
+
+### Uncertainty quantities
+
+Each stored quantity records the proposition or outcome it concerns, its candidate universe and
+conditioning assumptions, its method and provenance, and its calibration where one exists. A
+calibrated probability of the correct scene says nothing about whether the recalled details are
+accurate.
+
+Quantities are named with the existing `MeasureKind` vocabulary: raw score, normalized score
+mass, transport mass, model posterior and calibrated probability. A frequency across repeated
+model calls is a further meaning that the ADR must add. It depends on the model, the prompt, the
+sampling procedure and the rule for treating two answers as equivalent. It shows instability, not
+calibration: a model can be consistently wrong. A self-reported confidence stays a raw score.
+
+Alternatives are retained whether or not any quantity is attached to them. The toolkit applies
+no confidence threshold silently. Selecting, weighting or excluding by a quantity is a named
+analysis policy that records what it kept and dropped, since such a filter can favour
+distinctive, detailed recall.
+
+### Constructs kept apart
+
+Expressed content, source fidelity and subjective experience are separate (rule 7). A passage
+can hold many perceptual details that are inaccurate, or describe an event accurately in plain
+language, and neither shows how vividly the person remembered it. A track is named for what it
+measures. A score from sensorimotor word norms is visual-language strength, not visual imagery.
+Measures of different constructs are validated separately; none is a baseline that the others
+must beat.
+
+### Aggregation
+
+Every derived value declares its rule: a count of distinct items, a count of mentions, a sum, a
+mean of observed values, or a rate. Counts, durations and denominators are preserved, and rates
+are optional derived values. Nothing is normalized by word count automatically; the amount of
+detail and its density are different quantities, and controlling for speech production is an
+analysis decision. One atom that spans five words is one detail. A clause-level vector copied to
+its words is not five word-level estimates. A reference to an original estimate neither
+allocates nor multiplies it, as in the onset export's non-additive references.
+
+### Temporal projection
+
+Film playback, recall speech and each scan's acquisition clock are linked explicitly. A link
+that is not established stays unavailable, as the physical film-to-scanner transform is now. A
+word timestamp marks speech, not the onset of the memory process that preceded it.
+
+Two capabilities are distinct. An onset-only projection needs word or unit onsets and no
+duration. A duration-supported projection needs a measured interval and an allocation rule; the
+current export declares that allocation unavailable. A projection declares its temporal support,
+allocation rule, units and any conservation rule. Distributing an amount and holding an attribute
+are different rules: one detail spread over five seconds is a density that integrates to one,
+while a rating of four over the same interval stays at four. Haemodynamic convolution, lagged or
+finite-impulse-response features and boxcars are downstream recipes applied to a declared
+projection. They are not part of a feature.
+
+### Exit and qualification
+
+- **Engineering exit:** from the same saved source, recall and mapping artifacts, produce:
+  1. a recall-indexed feature table, with a recall-time matrix where timing and projection
+     assumptions permit;
+  2. a sparse recall-source correspondence table that preserves joint references, broad
+     references, alternative hypotheses and unresolved outcomes;
+  3. a source-indexed participant summary with explicit coverage definitions, denominators and
+     assessment status.
+
+  Every output identifies its inputs and derivation policy. Unsupported measurements remain
+  explicitly unavailable.
+- **Controls:** independently calculated synthetic cases must tell apart "A and B" from
+  "A or B"; a broad summary from explicit recall of each constituent; one atom referenced by
+  several words from several atoms; onset-only from duration-supported timing; and an
+  amount-conserving from a level-holding allocation. Aggregation must neither duplicate evidence
+  nor manufacture precision.
+- **Completeness check:** reinstatement, subsequent-memory and recall-period encoding analyses
+  are three worked examples that must be constructible from the three outputs. They test the
+  contract and do not determine its representation.
+
+Engineering acceptance establishes that representations and projections preserve their declared
+meaning. Scientific qualification is specific to a measure, its intended interpretation and its
+domain. Measures included in the planned Sherlock evaluation share its frozen protocol and
+protected read, so their definitions, extraction methods, scoring rules and claims are fixed
+before it. A measure developed afterwards needs its own validation source, or stays explicitly
+exploratory.
+
 ## Capabilities
 
 Each implementation bead has one engineering acceptance artifact. Its scientific qualification
@@ -119,8 +263,9 @@ speaker-labelled evidence milestone (M3).
 ### DL3. Detail binding with graded fidelity
 
 Each DL1 atom is bound to the source rows that support it, or to none, and each participant
-mention is bound to a DL2 cast identifier or marked unresolved. The fidelity grade has these
-values:
+mention is bound to a DL2 cast identifier or marked unresolved. A binding carries the reference
+meaning defined in the contract above (joint, broad, alternative or unresolved), so a summary of
+an episode is not stored as a citation of each row in it. The fidelity grade has these values:
 
 - supported;
 - gist-correct with a detail error, with a severity;
@@ -152,9 +297,10 @@ record is insufficient evidence for `invented`; it remains unverifiable from tha
 
 This is derived from DL3, not asked of a model. For each source row or scene it records which
 participants recalled it, with which grades. Coverage is reported per grade, so a row cited
-only by contradicted or unverifiable atoms is not counted as recalled. A row with no binding is
-"not evidenced as recalled", which is a claim about the record, not proof of an omission; the
-report names it that way.
+only by contradicted or unverifiable atoms is not counted as recalled. A row reached only
+through a broad reference is reported under a separate coverage definition, not as recalled in
+its own right. A row with no binding is "not evidenced as recalled", which is a claim about the
+record, not proof of an omission; the report names it that way.
 
 - **Engineering exit:** one independently calculated readout fixture matches the derived
   per-grade coverage and denominator, including unbound, contradicted and unverifiable cases,
@@ -277,6 +423,8 @@ once: the fresh DL criteria and E5's untouched read are one pre-registered read,
 every method included in it is built and selected, including DL6 and any graph/readout being
 evaluated. Do not expose results to implementation work between these outcomes. Any earlier
 preview read or later-tuned method needs disjoint fresh material for a new confirmatory claim.
+The same holds for measures derived under the contract: one that is not defined and fixed before
+the freeze is exploratory until it has its own validation source.
 FilmFestival already used in development remains transfer evidence. Validation data and the
 coding budget still require explicit approval; this plan does not authorize collection or access.
 
@@ -295,6 +443,9 @@ ceiling. No field becomes scientifically qualified just because its implementati
    it runs alongside it and delivery 5.
 3. Resolve the detail vocabulary/producer profile and build DL2 and DL1 in parallel. The cast
    record is recall-blind. Existing F1-F6 construction can proceed alongside these capabilities.
+   The same ADR settles the contract's reference meanings, quantity names and projection
+   declarations. The contract's synthetic controls need no DL artifact; its three outputs are
+   wired to DL1, DL3 and DL4 artifacts as each becomes ready.
 4. DL3 after DL1 and DL2 engineering readiness; DL4 after DL3. Build the event bridge after F5,
    the producer profile and DL3; then anchored contexts, hierarchy/reference and temporal
    production, and causal production.
@@ -316,11 +467,15 @@ ceiling. No field becomes scientifically qualified just because its implementati
 | DL4 | Evidenced row coverage and absence of such evidence; comparisons within the qualified scope |
 | DL5 | Recall order and chronology, if its exit supports them |
 | DL6 | Who did what in recall, against the film's cast |
+| Contract | Feature, correspondence and source-summary views of the same artifacts |
 
 ## Open decisions
 
 1. An ADR for the new public vocabulary (detail kinds, fidelity grades, cast identifiers),
-   naming the rejected alternative of a full event graph first. The owner decides ADRs.
+   naming the rejected alternative of a full event graph first. It also covers the contract's
+   reference meanings, the added quantity meaning for sampling frequency and the projection
+   declaration, naming the rejected alternative of one probability vector over single source
+   units. The owner decides ADRs.
 2. Validation data for fresh items: the untouched Sherlock remainder, a new FilmFestival-style
    corpus, or a new collection.
 3. Who codes, the budget, and whether the owner's within-scene lane
