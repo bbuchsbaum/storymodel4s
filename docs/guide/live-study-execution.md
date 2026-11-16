@@ -24,8 +24,9 @@ endpoint may omit it. The command appends `/chat/completions` to the base URL.
 sbt "pipeline/runMain storymodel4s.pipeline.agentmapping.agentStudyExecute live SOURCE.csv PARTS.json EXPORT_DIR RUN_DIR OUTPUT_DIR 4096 60000 10"
 ```
 
-The final arguments are the maximum output tokens per request, timeout in milliseconds per HTTP
-attempt, and maximum new client invocations for this command. The transport retries only 429 and
+The final arguments are optional: maximum output tokens per request (default 4096), timeout in
+milliseconds per HTTP attempt (default 60000), and maximum new client invocations for this
+command (default 100). Supply any leading subset in that order. The transport retries only 429 and
 5xx responses, at most twice, with 200 ms and 400 ms backoffs. Thus ten client invocations permit
 at most thirty HTTP attempts. The study export separately bounds malformed-reply retries and
 records their exact suffix. Transport failures stop the study; they do not silently become

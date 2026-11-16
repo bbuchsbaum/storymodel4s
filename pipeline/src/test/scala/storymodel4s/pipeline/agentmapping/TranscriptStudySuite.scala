@@ -312,6 +312,30 @@ class TranscriptStudySuite extends FunSuite:
         assertEquals(calls.get(), 1)
         val live = read(dir.resolve("live/bundles/synthetic_trial.bundle.json"))
         val offline = read(dir.resolve("offline/bundles/synthetic_trial.bundle.json"))
+        // Invoke the generated Java launcher, not the Scala function: @main defaults previously
+        // rejected the documented six-argument replay command without publishing any bundle.
+        val launcher = Class
+          .forName("storymodel4s.pipeline.agentmapping.agentStudyExecute")
+          .getMethod("main", classOf[Array[String]])
+        (0 to 3).foreach { supplied =>
+          val output = dir.resolve(s"cli-$supplied")
+          val args = Array(
+            "replay",
+            out.resolve("source.csv").toString,
+            out.resolve("parts.json").toString,
+            out.toString,
+            dir.resolve("run").toString,
+            output.toString
+          ) ++ Vector("512", "1000", "1").take(supplied)
+          val _ = launcher.invoke(null, args.asInstanceOf[Object])
+          val saved = read(output.resolve("bundles/synthetic_trial.bundle.json"))
+          assertEquals(
+            saved.hcursor.downField("interpretations").focus,
+            offline.hcursor.downField("interpretations").focus
+          )
+          assertEquals(saved.hcursor.downField("provenance").get[Int]("modelCalls"), Right(0))
+        }
+        assertEquals(calls.get(), 1)
         Vector("units", "interpretations", "recall").foreach(k =>
           assertEquals(live.hcursor.downField(k).focus, offline.hcursor.downField(k).focus)
         )

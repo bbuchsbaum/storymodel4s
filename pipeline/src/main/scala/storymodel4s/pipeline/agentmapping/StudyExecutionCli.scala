@@ -14,13 +14,19 @@ import java.nio.file.Path
     exportDir: String,
     runDir: String,
     outputDir: String,
-    maxTokens: Long = 4096L,
-    timeoutMillis: Long = 60000L,
-    maxNewCalls: Int = 100
+    limits: String*
 ): Unit =
   def refuse(reason: String): Nothing =
     System.err.println(s"refused: $reason")
     sys.exit(2)
+  if limits.size > 3 then refuse("expected at most MAX_TOKENS TIMEOUT_MS MAX_NEW_CALLS")
+  val parsed = limits.map(value => value.toLongOption.getOrElse(refuse("limits must be integers")))
+  val maxTokens = parsed.lift(0).getOrElse(4096L)
+  val timeoutMillis = parsed.lift(1).getOrElse(60000L)
+  val budget = parsed.lift(2).getOrElse(100L)
+  if maxTokens <= 0L || timeoutMillis <= 0L || budget <= 0L || budget > Int.MaxValue then
+    refuse("limits must be positive and MAX_NEW_CALLS must fit an integer")
+  val maxNewCalls = budget.toInt
   val selected = mode match
     case "live"   => StudyExecution.Mode.Live
     case "replay" => StudyExecution.Mode.Replay
