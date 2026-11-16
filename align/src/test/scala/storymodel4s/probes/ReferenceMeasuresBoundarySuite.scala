@@ -3,8 +3,14 @@ package storymodel4s.probes
 import munit.FunSuite
 import scala.compiletime.testing.typeCheckErrors
 
-/** Rule 8: reference-measure inputs and outputs are born only through their checked factories. */
+/** Rule 8: reference-measure inputs and outputs are born only through their checked factories.
+  *
+  * Each refusal asserts the access error itself, beside a same-shape control that compiles.
+  */
 class ReferenceMeasuresBoundarySuite extends FunSuite:
+
+  private def refusedWith(errors: List[scala.compiletime.testing.Error], expected: String): Unit =
+    assert(errors.exists(_.message.contains(expected)), errors.map(_.message).mkString(" | "))
 
   test("ProvisionalReference constructor refuses with same-shape control") {
     assertEquals(
@@ -13,10 +19,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; new ProvisionalReference(??? : Checksum, ??? : TemporalSupport.Coordinate, ProvisionalReference.Declaration.Unresolved, ProvisionalReference.WeightCoverage.Exhaustive, Map.empty[SourceNodeRef, Either[TemporalSupport.Refusal, TemporalSupport]])"""
-      ).nonEmpty
+      ),
+      "cannot be accessed"
     )
   }
 
@@ -27,10 +34,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; ProvisionalReference(??? : Checksum, ??? : TemporalSupport.Coordinate, ProvisionalReference.Declaration.Unresolved, ProvisionalReference.WeightCoverage.Exhaustive, Map.empty[SourceNodeRef, Either[TemporalSupport.Refusal, TemporalSupport]])"""
-      ).nonEmpty
+      ),
+      "does not take parameters"
     )
   }
 
@@ -41,10 +49,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; (??? : ProvisionalReference).copy()"""
-      ).nonEmpty
+      ),
+      "is not a member of"
     )
   }
 
@@ -55,10 +64,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; ProvisionalReference.fromProduct((??? : Checksum, ??? : TemporalSupport.Coordinate, ProvisionalReference.Declaration.Unresolved, ProvisionalReference.WeightCoverage.Exhaustive, Map.empty[SourceNodeRef, Either[TemporalSupport.Refusal, TemporalSupport]]))"""
-      ).nonEmpty
+      ),
+      "is not a member of"
     )
   }
 
@@ -69,10 +79,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; summon[scala.deriving.Mirror.ProductOf[ProvisionalReference]]"""
-      ).nonEmpty
+      ),
+      "No given instance"
     )
   }
 
@@ -83,10 +94,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; new ReferenceMeasures.Measures(??? : ProvisionalReference, Right(true), Right(1), Right(Vector.empty[ReferenceMeasures.MemberMeasure]), Right(0.0))"""
-      ).nonEmpty
+      ),
+      "cannot be accessed"
     )
   }
 
@@ -97,10 +109,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; ReferenceMeasures.Measures(??? : ProvisionalReference, Right(true), Right(1), Right(Vector.empty[ReferenceMeasures.MemberMeasure]), Right(0.0))"""
-      ).nonEmpty
+      ),
+      "cannot be accessed"
     )
   }
 
@@ -111,10 +124,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; (??? : ReferenceMeasures.Measures).copy()"""
-      ).nonEmpty
+      ),
+      "is not a member of"
     )
   }
 
@@ -125,10 +139,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; ReferenceMeasures.Measures.fromProduct((??? : ProvisionalReference, Right(true), Right(1), Right(Vector.empty[ReferenceMeasures.MemberMeasure]), Right(0.0)))"""
-      ).nonEmpty
+      ),
+      "is not a member of"
     )
   }
 
@@ -139,10 +154,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; summon[scala.deriving.Mirror.ProductOf[ReferenceMeasures.Measures]]"""
-      ).nonEmpty
+      ),
+      "No given instance"
     )
   }
 
@@ -153,10 +169,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; new ReferenceMeasures.Extent(??? : ReferenceMeasures.AxisDuration, ??? : ReferenceMeasures.AxisDuration, 0, ??? : ReferenceMeasures.Grain)"""
-      ).nonEmpty
+      ),
+      "cannot be accessed"
     )
   }
 
@@ -167,10 +184,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; ReferenceMeasures.Extent(??? : ReferenceMeasures.AxisDuration, ??? : ReferenceMeasures.AxisDuration, 0, ??? : ReferenceMeasures.Grain)"""
-      ).nonEmpty
+      ),
+      "cannot be accessed"
     )
   }
 
@@ -181,10 +199,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; (??? : ReferenceMeasures.Extent).copy()"""
-      ).nonEmpty
+      ),
+      "is not a member of"
     )
   }
 
@@ -195,10 +214,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; ReferenceMeasures.Extent.fromProduct((??? : ReferenceMeasures.AxisDuration, ??? : ReferenceMeasures.AxisDuration, 0, ??? : ReferenceMeasures.Grain))"""
-      ).nonEmpty
+      ),
+      "is not a member of"
     )
   }
 
@@ -209,10 +229,11 @@ class ReferenceMeasuresBoundarySuite extends FunSuite:
       ),
       Nil
     )
-    assert(
+    refusedWith(
       typeCheckErrors(
         """import storymodel4s.align.*; import storymodel4s.core.*; summon[scala.deriving.Mirror.ProductOf[ReferenceMeasures.Extent]]"""
-      ).nonEmpty
+      ),
+      "No given instance"
     )
   }
 

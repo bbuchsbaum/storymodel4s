@@ -92,7 +92,8 @@ object ProvisionalReference:
     *
     * `Definite` is a single, joint or broad reference, with an optional confidence weight in (0,
     * 1]. `Destination` is a reference to a typed external destination. `Unresolved` is an attempted
-    * reference without an outcome; `NotResolved` records a processing outcome.
+    * reference without an outcome; `NotResolved` records a processing outcome. An alternative's
+    * members may each carry a weight, or only some of them may; raw weights are kept as supplied.
     */
   enum Declaration:
     case Definite(hypothesis: Hypothesis, confidence: Option[Double])
@@ -104,7 +105,8 @@ object ProvisionalReference:
   /** Whether supplied weights cover every place the producer considered.
     *
     * Why: only an exhaustive declaration makes 1 - Σw a known unassigned share; otherwise the
-    * remainder stays unknown (ADR 0022).
+    * remainder stays unknown (ADR 0022). The declaration governs a definite reference's confidence
+    * too: under `RemainderUnknown`, 1 - confidence is not a known share.
     */
   enum WeightCoverage:
     case Exhaustive, RemainderUnknown
@@ -122,10 +124,12 @@ object ProvisionalReference:
     case SingleMomentJoint
     case OneMemberAlternative
     case DuplicateMember(first: Int, second: Int)
-    case PartialWeights
 
-    /** `position` is the member index, or 0 for a definite reference's confidence. */
+    /** `position` is the alternative member's index. */
     case InvalidWeight(position: Int, problem: WeightProblem)
+
+    /** A definite reference's confidence weight. */
+    case InvalidConfidence(problem: WeightProblem)
     case WeightSumExceedsOne(total: Double)
 
   /** Checked factory: validates the meaning and weights, then resolves every cited unit's support
@@ -167,7 +171,7 @@ object ProvisionalReference:
       case Declaration.Definite(h, confidence) =>
         for
           _ <- hypothesis(h)
-          _ <- confidence.fold(Right(()))(w => weight(0, w))
+          _ <- confidence.flatMap(problem).map(Refusal.InvalidConfidence(_)).toLeft(())
         yield ()
       case Declaration.Alternative(members) =>
         val keys = members.map(_.member.key)
@@ -185,14 +189,13 @@ object ProvisionalReference:
             )
           }
           _ <- duplicate.map((i, j) => Refusal.DuplicateMember(i, j)).toLeft(())
-          _ <- Either.cond(
-            supplied.isEmpty || supplied.size == members.size,
-            (),
-            Refusal.PartialWeights
-          )
           _ <- members.zipWithIndex.foldLeft[Either[Refusal, Unit]](Right(())) {
-            case (acc, (m, i)) => acc.flatMap(_ => m.weight.fold(Right(()))(w => weight(i, w)))
+            case (acc, (m, i)) =>
+              acc.flatMap(_ =>
+                m.weight.flatMap(problem).map(Refusal.InvalidWeight(i, _)).toLeft(())
+              )
           }
+          // Sorted summation: whether the sum is refused cannot depend on member order.
           total = supplied.sorted.sum
           _ <- Either.cond(
             total <= 1.0 + MappingTolerance.RowSum,
@@ -214,11 +217,11 @@ object ProvisionalReference:
     else Right(())
 
   // Fail-closed: a NaN fails every comparison, so finiteness is tested first and explicitly.
-  private def weight(position: Int, w: Double): Either[Refusal, Unit] =
-    if !w.isFinite then Left(Refusal.InvalidWeight(position, WeightProblem.NonFinite))
-    else if !(w > 0.0) then Left(Refusal.InvalidWeight(position, WeightProblem.NonPositive))
-    else if w > 1.0 then Left(Refusal.InvalidWeight(position, WeightProblem.AboveOne))
-    else Right(())
+  private def problem(w: Double): Option[WeightProblem] =
+    if !w.isFinite then Some(WeightProblem.NonFinite)
+    else if !(w > 0.0) then Some(WeightProblem.NonPositive)
+    else if w > 1.0 then Some(WeightProblem.AboveOne)
+    else None
 
 /** Measures on one provisional reference (ADR 0031 §1): alternatives present, member count,
   * per-constituent extent, occurrence count, support grain and unassigned share.
@@ -253,8 +256,9 @@ object ReferenceMeasures:
   /** Why an extent (or an occurrence count) is unavailable. Why: never a plausible number.
     *
     * `PointSupport` carries the number of distinct points: points are counted, not measured.
-    * `Support` lists every unit of the constituent without measurable support, so a partly missing
-    * constituent is never measured from its available part alone.
+    * `Support` lists every unit of the constituent without measurable support: when support is
+    * incomplete the whole-constituent extent is withheld, never measured from its available part. A
+    * separately named within-occurrence intersection is a possible later quantity, not this one.
     */
   enum ExtentUnavailable:
     case External(state: ExternalState)
@@ -263,9 +267,14 @@ object ReferenceMeasures:
     case NoTimebase
     case Overflow
 
-  /** Why the unassigned share is unavailable. Why: an unknown remainder is never 1 - Σw. */
+  /** Why the unassigned share is unavailable. Why: an unknown remainder is never 1 - Σw.
+    *
+    * `PartialWeights` is an alternative in which only some members carry a weight: the share of the
+    * unweighted members is unknown, so no remainder is defined.
+    */
   enum UnassignedUnavailable:
     case NoWeights
+    case PartialWeights
     case RemainderUnknown(suppliedTotal: Double)
     case Outcome(reason: Unavailable)
 
@@ -283,23 +292,26 @@ object ReferenceMeasures:
   /** Duration range of the source units bounding a constituent's interval support.
     *
     * Why: an extent no wider than its coarsest unit is bounded by the annotation, not by recall.
-    * Each unit's duration is the measure of its own interval union; point-only units have none and
-    * do not enter the range.
+    * Each unit's duration is the measure of the unit's own supplied interval support; point-only
+    * units have none and do not enter the range. `boundingUnits` counts the units that do.
     */
   final class Grain private[ReferenceMeasures] (
       val shortest: AxisDuration,
-      val longest: AxisDuration
+      val longest: AxisDuration,
+      val boundingUnits: Int
   ):
+    private def fields = (shortest, longest, boundingUnits)
     override def equals(other: Any): Boolean = other match
-      case that: Grain => shortest == that.shortest && longest == that.longest
+      case that: Grain => fields == that.fields
       case _           => false
-    override def hashCode(): Int = (shortest, longest).hashCode()
-    override def toString: String = s"Grain($shortest, $longest)"
+    override def hashCode(): Int = fields.hashCode
+    override def toString: String = s"Grain($shortest, $longest, units $boundingUnits)"
 
   /** The measured extent of one constituent.
     *
-    * Why: breadth is the measure of the union of interval support (overlaps once, gaps not
-    * counted); the hull is reported separately and points outside the union are only counted.
+    * Why: breadth is the measure of the union of each unit's own supplied interval support
+    * (overlaps once, gaps not counted); the hull is reported separately and points outside the
+    * union are only counted.
     */
   final class Extent private[ReferenceMeasures] (
       val measure: AxisDuration,
@@ -307,7 +319,11 @@ object ReferenceMeasures:
       val isolatedPoints: Int,
       val grain: Grain
   ):
-    /** True when the extent does not exceed the longest bounding unit. */
+    /** True when the extent does not exceed the longest bounding unit.
+      *
+      * This describes the annotation's resolution, not psychological precision: a one-unit
+      * constituent is always at the floor, because its extent is that unit's own support.
+      */
     def atAnnotationFloor: Boolean = measure.ticks <= grain.longest.ticks
 
     private def fields = (measure, hull, isolatedPoints, grain)
@@ -328,7 +344,10 @@ object ReferenceMeasures:
     override def hashCode(): Int = (constituent, extent).hashCode()
     override def toString: String = s"Entry(${constituent.toVector.map(_.key)}, $extent)"
 
-  /** Measures of one member. Why: extent is per member and reads no other member's support. */
+  /** Measures of one member. Why: extent is per member and reads no other member's support.
+    *
+    * `weight` is the raw supplied weight (or confidence), never rescaled.
+    */
   final class MemberMeasure private[ReferenceMeasures] (
       val member: Member,
       val weight: Option[Double],
@@ -344,8 +363,14 @@ object ReferenceMeasures:
 
   /** All measures of one reference. Why: each quantity keeps its own availability.
     *
-    * For a definite reference or an external destination, `members` holds that one hypothesis or
-    * destination, weighted by the supplied confidence.
+    * For a definite reference or a bare external destination, `members` holds that one hypothesis
+    * or destination (weighted by any supplied confidence) and `memberCount` is 1. This is a
+    * singleton convention: it does not mean a definite reference has alternative members, which
+    * `alternativesPresent = false` states.
+    *
+    * The unassigned share is available only for exhaustive weights, and then lies in [0, 1]: when
+    * |1 - Σw| is within [[MappingTolerance.RowSum]] it is exactly 0.0 (a declared symmetric snap
+    * of the share only; the raw weights are untouched), otherwise it is 1 - Σw.
     */
   final class Measures private[ReferenceMeasures] (
       val reference: ProvisionalReference,
@@ -395,7 +420,9 @@ object ReferenceMeasures:
           Right(true),
           Right(members.size),
           Right(members.map(m => member(reference, m.member, m.weight))),
-          unassigned(members.flatMap(_.weight), reference.coverage)
+          if members.forall(_.weight.isDefined) || members.forall(_.weight.isEmpty) then
+            unassigned(members.flatMap(_.weight), reference.coverage)
+          else Left(UnassignedUnavailable.PartialWeights)
         )
       case Declaration.Unresolved       => outcome(Unavailable.Unresolved)
       case Declaration.NotResolved(out) => outcome(Unavailable.NotResolved(out))
@@ -409,7 +436,10 @@ object ReferenceMeasures:
     else
       val total = weights.sorted.sum
       coverage match
-        case WeightCoverage.Exhaustive       => Right(1.0 - total)
+        case WeightCoverage.Exhaustive =>
+          val residual = 1.0 - total
+          // Symmetric snap: Σw above 1 + tolerance was refused, so the share lies in [0, 1].
+          Right(if math.abs(residual) <= MappingTolerance.RowSum then 0.0 else residual)
         case WeightCoverage.RemainderUnknown =>
           Left(UnassignedUnavailable.RemainderUnknown(total))
 
@@ -446,20 +476,19 @@ object ReferenceMeasures:
       case Left(reason)   => Left(UnitUnavailable.Refused(reason))
       case Right(support) =>
         val node = support.selected
-        node.state match
-          case TemporalSupport.State.Available =>
-            (node.included, node.excluded) match
-              case (Some(inside), None) => Right(inside)
-              case (Some(_), Some(_))   => Left(UnitUnavailable.ClippedByOccurrence)
-              case (None, _)            => Left(UnitUnavailable.NoTemporalSupport(node.state))
-          case s @ (TemporalSupport.State.Unlocated | TemporalSupport.State.TextOnly) =>
-            Left(UnitUnavailable.NoTemporalSupport(s))
-          case s @ (TemporalSupport.State.NoSupportOnAxis |
-              TemporalSupport.State.OutsideOccurrence) =>
-            Left(UnitUnavailable.OffAxis(s))
+        // TemporalSupport makes a node Available exactly when it has included support, so the
+        // included support decides; there is no "Available without support" case to classify.
+        (node.included, node.excluded) match
+          case (Some(inside), None) => Right(inside)
+          case (Some(_), Some(_))   => Left(UnitUnavailable.ClippedByOccurrence)
+          case (None, _)            =>
+            node.state match
+              case s @ (TemporalSupport.State.Unlocated | TemporalSupport.State.TextOnly) =>
+                Left(UnitUnavailable.NoTemporalSupport(s))
+              case s => Left(UnitUnavailable.OffAxis(s))
 
   // Integer geometry: the union of every unit's intervals, merged once; points are only counted.
-  private def measure(
+  private[align] def measure(
       axis: PresentationAxis,
       supports: Vector[PlaybackSupport]
   ): Either[ExtentUnavailable, Extent] =
@@ -487,7 +516,7 @@ object ReferenceMeasures:
         hull <- duration(BigInt(union.last._2) - BigInt(union.head._1), timebase)
         shortest <- duration(units.min, timebase)
         longest <- duration(units.max, timebase)
-      yield new Extent(measured, hull, isolated, new Grain(shortest, longest))
+      yield new Extent(measured, hull, isolated, new Grain(shortest, longest, units.size))
 
   private def duration(
       ticks: BigInt,

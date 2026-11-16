@@ -174,6 +174,7 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
     assertEquals(extent.measure.ticks, 20L)
     assertEquals(extent.measure.seconds, seconds(2L, 1L))
     assertEquals(extent.grain.longest.seconds, seconds(2L, 1L))
+    assertEquals(extent.grain.boundingUnits, 1)
     assert(extent.atAnnotationFloor)
   }
 
@@ -185,6 +186,7 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
     assertEquals(extent.hull.seconds, seconds(4L, 1L))
     assertEquals(extent.grain.shortest.ticks, 10L)
     assertEquals(extent.grain.longest.ticks, 15L)
+    assertEquals(extent.grain.boundingUnits, 3)
     assert(!extent.atAnnotationFloor)
   }
 
@@ -285,6 +287,80 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
     )
   }
 
+  test("support partly outside the selected occurrence is a typed clipped extent") {
+    import SherlockShapedSource.*
+    val value = SourceRepresentation
+      .of(crossView, bundles, Some(composition), Map(cross -> crossSupport))
+      .toOption
+      .get
+    val selected =
+      TemporalSupport.Selection.Occurrence(mappings(0).identity, OccurrenceId.unsafe("part-0"))
+    val m = ReferenceMeasures.of(
+      ProvisionalReference
+        .of(value, selected, definite(cross), WeightCoverage.RemainderUnknown)
+        .toOption
+        .get
+    )
+    assertEquals(
+      extentOf(m),
+      Left(
+        ExtentUnavailable.Support(NonEmptyVector.one(cross -> UnitUnavailable.ClippedByOccurrence))
+      )
+    )
+  }
+
+  test("support inside the selected occurrence is measured on the composition axis") {
+    import SherlockShapedSource.*
+    val selected =
+      TemporalSupport.Selection.Occurrence(mappings(0).identity, OccurrenceId.unsafe("part-0"))
+    val m = ReferenceMeasures.of(
+      ProvisionalReference
+        .of(SherlockShapedSource.source(true), selected, definite(e(1)), WeightCoverage.Exhaustive)
+        .toOption
+        .get
+    )
+    val extent = measured(m)
+    assertEquals(extent.measure.ticks, 10L)
+    assertEquals(extent.measure.seconds, seconds(1L, 1L))
+  }
+
+  // An axis without a timebase or a tick count whose seconds overflow cannot be reached through
+  // the fixture's film parts, so the measuring step is exercised directly on such axes.
+  test("an axis without a timebase gives a typed NoTimebase extent") {
+    val stream = film.streams.head
+    val clock = PresentationAxis
+      .streamClock(film.id, film.sourceKind, stream.id, stream.kind, stream.extent, None)
+      .toOption
+      .get
+    assertEquals(clock.timebase, None)
+    val support = PlaybackSupport
+      .of(clock.id, Vector(PlaybackInterval.onTimeAxis(clock, 0L, 10L).toOption.get), Vector())
+      .toOption
+      .get
+    assertEquals(
+      ReferenceMeasures.measure(clock, Vector(support)),
+      Left(ExtentUnavailable.NoTimebase)
+    )
+  }
+
+  test("seconds that overflow exact arithmetic give a typed Overflow extent") {
+    val coarse = RationalTimebase.of(1000L, 1L).toOption.get
+    val huge = SourceBundle
+      .filmEdition(EditionId.unsafe("huge"), Checksum.ofText("huge"), 0L, Long.MaxValue, coarse)
+      .toOption
+      .get
+    val axis = huge.primaryAxis
+    val support = PlaybackSupport
+      .of(
+        axis.id,
+        Vector(PlaybackInterval.on(axis, 0L, 10_000_000_000_000_000L).toOption.get),
+        Vector()
+      )
+      .toOption
+      .get
+    assertEquals(ReferenceMeasures.measure(axis, Vector(support)), Left(ExtentUnavailable.Overflow))
+  }
+
   test("an external member has typed external extent and occurrence count") {
     val value = source(Vector(interval(0L, 10L)))
     val m = measures(
@@ -352,6 +428,11 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
       WeightCoverage.Exhaustive
     )
     assertEqualsDouble(confident.unassignedShare.toOption.get, 0.2, 1e-15)
+    // The declared coverage governs a confidence weight too: no known share without exhaustiveness.
+    assertEquals(
+      measures(value, Declaration.Definite(single(u(0)), Some(0.8))).unassignedShare,
+      Left(UnassignedUnavailable.RemainderUnknown(0.8))
+    )
     assertEquals(
       measures(value, definite(u(0)), WeightCoverage.Exhaustive).unassignedShare,
       Left(UnassignedUnavailable.NoWeights)
@@ -427,7 +508,7 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
       )
       assertEquals(
         refusal(Declaration.Definite(single(u(0)), Some(w))),
-        Left(Refusal.InvalidWeight(0, problem))
+        Left(Refusal.InvalidConfidence(problem))
       )
     }
   }
@@ -437,9 +518,79 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
       refusal(alternative(Some(0.6), Some(0.5))).left.map(_.productPrefix),
       Left("WeightSumExceedsOne")
     )
-    val near = refusal(alternative(Some(0.5), Some(0.5 + 1e-12))).toOption.get
-    assertEqualsDouble(ReferenceMeasures.of(near).unassignedShare.toOption.get, -1e-12, 1e-15)
-    assertEquals(refusal(alternative(Some(0.5), None)), Left(Refusal.PartialWeights))
+  }
+
+  test(
+    "a share within the shape tolerance of zero is exactly 0.0 on either side; raw weights kept"
+  ) {
+    Vector(0.5 + 1e-12, 0.5 - 1e-12).foreach { w =>
+      val near = ReferenceMeasures.of(refusal(alternative(Some(0.5), Some(w))).toOption.get)
+      assertEquals(near.unassignedShare, Right(0.0))
+      assertEquals(near.members.map(_.map(_.weight)), Right(Vector(Some(0.5), Some(w))))
+    }
+  }
+
+  test("a small positive share beyond the shape tolerance is kept, unscaled") {
+    val m = ReferenceMeasures.of(refusal(alternative(Some(0.5), Some(0.5 - 1e-6))).toOption.get)
+    val share = m.unassignedShare.toOption.get
+    assert(share > MappingTolerance.RowSum)
+    assertEqualsDouble(share, 1e-6, 1e-15)
+  }
+
+  test("partial weights are accepted; only the unassigned share is unavailable(partial weights)") {
+    Vector(WeightCoverage.Exhaustive, WeightCoverage.RemainderUnknown).foreach { coverage =>
+      val m = measures(
+        source(Vector(interval(0L, 10L), interval(20L, 30L))),
+        alternative(Some(0.5), None),
+        coverage
+      )
+      assertEquals(m.unassignedShare, Left(UnassignedUnavailable.PartialWeights))
+      assertEquals(m.alternativesPresent, Right(true))
+      assertEquals(m.memberCount, Right(2))
+      assertEquals(m.members.map(_.map(_.weight)), Right(Vector(Some(0.5), None)))
+      assertEquals(m.members.map(_.map(_.occurrenceCount)), Right(Vector(Right(1), Right(1))))
+      assertEquals(
+        m.members.map(_.map(_.entries.map(_.head.extent.map(_.measure.ticks)))),
+        Right(Vector(Right(Right(10L)), Right(Right(10L))))
+      )
+    }
+    val three = Vector(interval(0L, 10L), interval(20L, 30L), interval(40L, 50L))
+    assertEquals(
+      refusal(alternative(Some(0.5), None, Some(-1.0)), three),
+      Left(Refusal.InvalidWeight(2, WeightProblem.NonPositive))
+    )
+    assertEquals(
+      refusal(alternative(Some(0.7), None, Some(0.4)), three).left.map(_.productPrefix),
+      Left("WeightSumExceedsOne")
+    )
+  }
+
+  // Weights whose left-to-right Double sum depends on order: (a + c) + b exceeds 1 + RowSum
+  // while (a + b) + c and the sorted order do not, so an unsorted sum refuses some orders.
+  test("the weight-sum refusal does not depend on member order (sorted summation)") {
+    val weights = Vector(0.13254750615351513, 0.6551378054206148, 0.2123146894258702)
+    val three = Vector(interval(0L, 10L), interval(20L, 30L), interval(40L, 50L))
+    weights.permutations.foreach { order =>
+      val members = order.map(w => Weighted(located(single(u(weights.indexOf(w)))), Some(w)))
+      assert(
+        refusal(Declaration.Alternative(members), three).isRight,
+        s"order ${order.mkString(",")} refused"
+      )
+    }
+  }
+
+  // Weights whose remainder 1 - Σw differs in the last bit across summation orders.
+  test("the unassigned share is exactly invariant to member order (sorted summation)") {
+    val weights = Vector(0.28900856797231234, 0.28695687176483736, 0.06413784193170217)
+    val three = Vector(interval(0L, 10L), interval(20L, 30L), interval(40L, 50L))
+    val shares = weights.permutations.map { order =>
+      val members = order.map(w => Weighted(located(single(u(weights.indexOf(w)))), Some(w)))
+      ReferenceMeasures
+        .of(refusal(Declaration.Alternative(members), three).toOption.get)
+        .unassignedShare
+    }.toSet
+    assertEquals(shares.size, 1)
+    assert(shares.head.exists(s => s >= 0.0 && s <= 1.0))
   }
 
   test("malformed hypotheses, unknown units and an invalid axis are refused") {
