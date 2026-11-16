@@ -184,3 +184,88 @@ def analyst_dir() -> Path:
 
 def guard(name: str):
     common.guard(name)
+
+
+# ---------------------------------------------------------------- case study 2 (CS2_API)
+#
+# The (work, occurrence, part, seconds) address: one work, one occurrence spanning two parts
+# (the two scan runs a and b), seconds on each part's own axis. No global timeline: `film_t`
+# above is a display convenience that case study 2 never uses.
+
+WORD_CLOCK = "princeton-word-onset-seconds"
+WORK = "sherlock"
+
+
+_COMP = None
+
+
+def composition():
+    """The case-study-2 source model (cached)."""
+    global _COMP
+    if _COMP is not None:
+        return _COMP
+    from cs2.source import Composition, Occurrence, Part, Segment, SourceUnit, Work
+
+    rows = common.film_rows()
+    units, ends = [], {"a": 0.0, "b": 0.0}
+    for r in rows:
+        part = "b" if r.id >= PART_B_FIRST_ROW else "a"
+        ends[part] = max(ends[part], r.end)
+        units.append(SourceUnit(f"r{r.id}", "sherlock@ab", part, r.start, r.end, r.scene))
+    parts = tuple(Part(p, 0.0, ends[p]) for p in "ab")
+    occ = Occurrence("sherlock@ab", WORK, tuple(Segment(p, 0.0, ends[p]) for p in "ab"), 1)
+    work = Work(
+        WORK,
+        "Sherlock",
+        "Sherlock, 'A Study in Pink' (BBC, 2010)",
+        excerpt=None,
+        speech=True,
+        note="the stimulus is reported as the episode's first ~48 min; not verified locally",
+    )
+    _COMP = Composition(
+        "sherlock",
+        (work,),
+        parts,
+        (occ,),
+        tuple(units),
+        dict(
+            clock="run-local seconds of each part (annotation rows)",
+            occurrence_spans="one occurrence spans parts a and b; a constituent spanning both "
+            "keeps per-part support and has no single-axis extent",
+        ),
+    )
+    return _COMP
+
+
+def unit_texts() -> dict:
+    """Unit id -> annotation text with attached dialogue (in memory only, never written)."""
+    return {f"r{r.id}": r.text for r in film_rows(with_speech=True)}
+
+
+def sessions(name: str) -> list:
+    guard(name)
+    return ["recall"]
+
+
+def session_words(name: str, session: str = "recall") -> list:
+    """Recall word cells on the Princeton clock (the clock of the human scene coding)."""
+    from cs2.source import RecallWord
+
+    if session != "recall":
+        raise ValueError(f"Sherlock has one recall session, not {session!r}")
+    return [RecallWord(i, w.text, w.princeton) for i, w in enumerate(recall_words(name))]
+
+
+def gold_rows(name: str, session: str = "recall") -> list:
+    """Human recall scene coding as gold rows: each coded interval names one scene (closed
+    interval on the Princeton clock, as case study 1 used it)."""
+    from cs2.source import GoldRow
+
+    guard(name)
+    iv = gold_intervals(name)
+    if iv is None:
+        return []
+    return [
+        GoldRow(name, "recall", i, lo, hi, True, "specific", WORK, frozenset({s}), None)
+        for i, (lo, hi, s) in enumerate(iv)
+    ]

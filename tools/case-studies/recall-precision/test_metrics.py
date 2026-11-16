@@ -7,12 +7,16 @@ import numpy as np
 
 from metrics import (
     auroc,
+    binary_f1,
     boot_mean_ci,
+    cluster_bootstrap,
     cohen_kappa,
     ece,
     icc21,
+    log_loss_bits,
     midrank_spearman_matrix,
     paired_difference,
+    tfidf_cosine,
     within_unit_ranks,
 )
 from precision1 import shortest_window
@@ -89,6 +93,45 @@ def test_shortest_window():
     C = np.concatenate([[0.0], np.cumsum(p)])[None, :]
     assert shortest_window(C, 0.5)[0] == 2
     assert shortest_window(C, 0.8)[0] == 7
+
+
+def test_log_loss_bits():
+    close(log_loss_bits(0.5), 1.0)
+    close(log_loss_bits(0.25), 2.0)
+    close(log_loss_bits(1.0), 0.0)
+    for bad in (0.0, -0.1, float("nan"), 1.5):
+        try:
+            log_loss_bits(bad)
+        except ValueError:
+            continue
+        raise AssertionError(f"log_loss_bits accepted {bad}")
+
+
+def test_cluster_bootstrap_resamples_clusters():
+    # Cluster A: 100 rows of 0; cluster B: 1 row of 1; cluster C: 1 row of 1. The statistic is
+    # the mean of cluster means, so every resample mean is k/3 for k in 0..3. A row bootstrap
+    # would give values near 2/102 instead.
+    clusters = {"A": [0.0] * 100, "B": [1.0], "C": [1.0]}
+    ci = cluster_bootstrap(clusters, lambda cs: float(np.mean([np.mean(c) for c in cs])), n=2000)
+    for x in ci:
+        assert min(abs(x - k / 3) for k in range(4)) < 1e-12, ci
+    assert cluster_bootstrap({"A": [1.0], "B": [2.0]}, lambda cs: 0.0) is None
+
+
+def test_binary_f1():
+    # tp = 1, fp = 1, fn = 1 -> 2 / 4
+    close(binary_f1([1, 1, 0, 0], [1, 0, 1, 0]), 0.5)
+    close(binary_f1([1, 0], [1, 0]), 1.0)
+    assert np.isnan(binary_f1([0, 0], [0, 0]))
+
+
+def test_tfidf_cosine():
+    # Two documents {a, b} and {c}; N = 2, df = 1 for every word, so idf = ln(3/2) + 1 for all and
+    # tf weights are 1. Query [a] is a unit vector on a; doc 1 is (a + b)/sqrt(2): cosine 1/sqrt 2.
+    cos = tfidf_cosine(["a"], {1: ["a", "b"], 2: ["c"]})
+    close(cos[1], 1 / np.sqrt(2))
+    close(cos[2], 0.0)
+    close(tfidf_cosine(["zzz"], {1: ["a"]})[1], 0.0)  # unknown words carry no weight
 
 
 if __name__ == "__main__":

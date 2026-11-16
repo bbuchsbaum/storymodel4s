@@ -1,0 +1,24 @@
+{
+  "schema": "storymodel4s.case-study-2.scorer-config/v1",
+  "frozen": "2026-11-16, before any case-study-2 producer output was scored",
+  "log_base": 2,
+  "epsilon": 0.01,
+  "fallback": "duration",
+  "abstain_states": [
+    "unassigned",
+    "position without a resolved work",
+    "held-out without a work"
+  ],
+  "set_rule": "P(scene set | work) is the forecast's mass on the gold scene set within the work",
+  "nonspecific_rule": "film-only and film-search rows score the work term only",
+  "nonfilm_rule": "non-film rows are a stratum, not scored by log loss",
+  "no_sample_rule": "a gold row with no recall word abstains (scores the fallback)",
+  "bin_rule": "a gold row is a bin on the session's word clock; a word belongs by onset (closed or half-open as the corpus declares)",
+  "gold_invalid_scene_rule": "a gold scene that is not a valid target (title-only) is dropped from the set; an emptied set is not scored on the scene term",
+  "allocation": "units",
+  "exclude_title_only_scenes": true,
+  "lopo_alpha": 0.5,
+  "order_oracle_lambda": 0.1,
+  "tfidf_lambda": 0.2,
+  "bootstrap": { "n": 4000, "seed": 20261116, "level": 0.95 }
+}
