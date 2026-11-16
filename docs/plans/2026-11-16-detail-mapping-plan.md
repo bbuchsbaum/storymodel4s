@@ -496,9 +496,10 @@ adapter `bd-01M7JEP9A3CSWJ6C2KPR2BRSVY`.
   side stays unopened. The untouched Sherlock remainder is not read. Recall and stimulus text,
   and every output that carries them, stay in private ignored storage (rule 14d).
 - **Friends:** it needs an input adapter, with its 56-to-52 event crosswalk as a tested
-  contract. Its source set is still "proposed", with the licence and the REB basis open
-  ([record](../data/friends/README.md)); the owner records the basis before a live model run
-  on its recall. Its recall interleaves storylines
+  contract. Friends is public data shared through OpenNeuro (owner, 2026-11-16), so model runs
+  on its development recall may proceed. The owner also decided that its text is not put on
+  GitHub, so it stays in private ignored storage like the other studies'
+  ([record](../data/friends/README.md)). Its recall interleaves storylines
   ([measurements](2026-09-17-friends-hill-climb-and-normalization.md)), so it exercises
   non-monotone order that Sherlock rarely shows.
 
@@ -592,7 +593,7 @@ ceiling. No field becomes scientifically qualified just because its implementati
 4. The bounded selection of semantic gaps for the producer profile and the thresholds/sample
    sizes for graph-family qualification. The owner decides new public vocabulary; this plan
    adopts a delivery sequence, not an unreviewed schema or a particular accuracy claim.
-5. Friends: the basis for running a model on its development recall, given that its source
-   set is still "proposed" with the licence and REB basis open.
+5. The minimum scope of the study demonstration for each study: how many participants and,
+   for FilmFestival, how many films. As written, one development participant would pass.
 
 [preview]: 2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview
