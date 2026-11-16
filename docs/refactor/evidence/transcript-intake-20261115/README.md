@@ -55,6 +55,16 @@ local synthetic HTTP request, replay in a separate credential-free process, and 
 with the Python reader. The three unit rows, both mapping records and recall descriptor are
 identical between live and replay; replay makes zero calls. No external provider request ran.
 
+## Landing gate scope
+
+The final runtime's JVM 17, JVM 21 and JavaScript CI jobs passed. Its Native rerun is still
+pending at this receipt. Independent scope review confirmed that all 16 portable module trees,
+`build.sbt`, `project/` and workflows are unchanged from the Native-qualified predecessor.
+The final correction changes only the JVM-only pipeline launcher and its tests. The clean final
+pipeline gate replaces the affected pipeline qualification; the unchanged Native inputs retain
+their predecessor qualification. The redundant Native rerun is not a correctness block. This
+receipt does not claim that the complete final-SHA hosted matrix has finished.
+
 ## What this establishes
 
 The engineering slice gives a researcher an ordinary-file entry point, auditable text

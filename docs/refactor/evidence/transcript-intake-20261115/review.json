@@ -42,5 +42,11 @@
     "mutation_verdict": "three guard mutants and old launcher compile and fail named witnesses, eight siblings pass",
     "walkthrough": "independently checked live1/replay0calls and equal units, interpretations,recall; Python reader executed",
     "remaining": "final SHA hosted runs pending at evidence review; exact metadata-commit review follows"
+  },
+  "landing_scope_review": {
+    "reviewer": "/root/live_design_review",
+    "candidate": "53aa0f10e0da92be602b5e9f7e7da9a54c3653a8",
+    "verdict": "PASS; pending Native rerun is nonblocking because Native gated inputs are identical to the passed predecessor",
+    "pipeline_final_gate": "606 passed, zero failed/skipped; actual CLI walkthrough and old-launcher mutation passed"
   }
 }

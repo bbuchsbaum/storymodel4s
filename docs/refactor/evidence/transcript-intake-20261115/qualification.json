@@ -367,7 +367,13 @@
     "base": "7ca7baf1f0db14cc95b10bae13d2997ff66aa39f",
     "final_script_exit": 5,
     "reason": "top-level StudyExecutionCli defines no type, so reference-scope refuses a partial command",
-    "manual_delta": "Only pipeline CLI and its tests changed after the complete predecessor matrix. No external Scala callers; no StoryAtlas references. Full pipeline rerun plus exact command-line live/replay and formatting cover this delta."
+    "manual_delta": "Only pipeline CLI and its tests changed after the complete predecessor matrix. No external Scala callers; no StoryAtlas references. Full pipeline rerun plus exact command-line live/replay and formatting cover this delta.",
+    "independent_review": {
+      "reviewer": "/root/live_design_review",
+      "candidate": "53aa0f10e0da92be602b5e9f7e7da9a54c3653a8",
+      "verdict": "pending Native rerun is not a correctness BLOCK",
+      "evidence": "All 16 portable module trees, build.sbt, project and CI workflows are identical to Native-qualified0b7cdf0b7; pipeline is JVM-only and testNative contains only portable modules; no Native launcher consumers. Final pipeline gate replaces the invalidated pipeline qualification."
+    }
   },
   "walkthrough": {
     "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
@@ -412,6 +418,38 @@
     "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
     "ci": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422860",
     "docs": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422841",
-    "status": "in_progress"
+    "status": "JVM 17, JVM 21 and JS passed; Native rerun pending",
+    "completed_jobs": [
+      {
+        "job": 133278946977,
+        "tasks": 16,
+        "passed": 3570,
+        "failed": 0,
+        "skipped": 0,
+        "log": "final-job-133278946977.log",
+        "sha256": "cf5cf090d01e8f9e47b1b4bcf318ed762e869002e6ab3a89e155c18389b91f00",
+        "transcript_suite": null
+      },
+      {
+        "job": 133278947264,
+        "tasks": 24,
+        "passed": 4960,
+        "failed": 0,
+        "skipped": 22,
+        "log": "final-job-133278947264.log",
+        "sha256": "8f4621f4c85eac1010eb50f21a672b0c28902d5fb3539d4366c9352665a8104a",
+        "transcript_suite": "2026-11-16T12:02:01.6492136Z Test run storymodel4s.pipeline.agentmapping.TranscriptStudySuite finished: 0 failed, 0 ignored, 9 total 0.497s"
+      },
+      {
+        "job": 133278947368,
+        "tasks": 24,
+        "passed": 4960,
+        "failed": 0,
+        "skipped": 22,
+        "log": "final-job-133278947368.log",
+        "sha256": "5248be66a297fd1828f676f1d8b084886ad4d6a6b1cb69174e7b4dae0a281fe1",
+        "transcript_suite": "2026-11-16T12:01:48.9256432Z Test run storymodel4s.pipeline.agentmapping.TranscriptStudySuite finished: 0 failed, 0 ignored, 9 total 0.704s"
+      }
+    ]
   }
 }
