@@ -4,9 +4,44 @@ This folder holds the selective rebuild of StoryModel and StoryAtlas. Its purpos
 test whether a simpler implementation makes useful, correct changes substantially faster
 while preserving the strongest parts of both projects.
 
-The owner authorized a targeted pilot on 2026-11-16 and explicitly asked us to preserve
-the best existing work. The current deliverable is the Stage 1 plan and workspace layout.
-There is no runnable pilot yet; the directories below reserve its location.
+The first computational slice is executable: validated paired accounts, contextual events,
+recall details, reference hypotheses, conditional fidelity, analysis policies, exact time
+allocation, legacy bundle reading and recorded replay. The React app is a scaffold.
+Algorithms and representations come first; visual refinement follows later.
+
+## Run it
+
+From this directory, with Python 3.12 and `uv`:
+
+```sh
+uv sync --locked
+uv run storymodel example --output data/example.account.json
+uv run storymodel validate data/example.account.json
+uv run storymodel analyze data/example.account.json --output data/example.analysis.json
+uv run storymodel analyze data/example.account.json --policy target-event-only/v1
+uv run pytest -q
+uv run mypy src/storymodel
+uv run ruff check src tests
+uv run ruff format --check src tests
+```
+
+Output files are created atomically and never overwritten. Use a new name for another run.
+The example uses independently admitted synthetic text; no provider calls or private data
+are needed. The same account gives three internal details under the content policy and two
+under the event policy, with both source rows supported. Counts do not depend on fidelity.
+
+```python
+from storymodel import project
+from storymodel.demo import example_account
+
+account = example_account()
+analysis = project(account, "target-event-only/v1")
+assert analysis.counts.internal == 2
+```
+
+See [computational scope](docs/computational-foundation.md) for supported contracts,
+replay usage and the remaining algorithmic work. This is an initial Stage 1 slice, not a
+completed port or evidence of scientific accuracy or measured speedup over Scala.
 
 - [Stage 1 plan](docs/stage-1.md): workflow, ordered slices, acceptance and decision criteria.
 - [Preservation map](docs/preservation.md): assets, guarantees, source pointers and witnesses.
@@ -32,6 +67,5 @@ The existing Scala modules and sibling StoryAtlas checkout remain reference impl
 Source links in these documents are navigational; `references.json` records the inspected
 versions. Later source changes do not silently update the comparison baseline.
 
-Start implementation with S1.0 in the plan. Do not interpret directory placeholders or
-proposed commands as delivered functionality. Stage 1 does not authorize retiring either
+Stage 1 does not authorize retiring either
 Scala implementation, changing existing study outputs, or claiming scientific accuracy.

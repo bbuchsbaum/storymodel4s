@@ -11,6 +11,11 @@ The owner authorized the targeted pilot and required preservation of the best ex
 The architecture and numerical decision thresholds below are pilot choices, not changes to
 the current production contracts. The [preservation map](preservation.md) is part of acceptance.
 
+Implementation priority, clarified by the owner on 2026-11-16: computational models,
+algorithms and correctness first. Establish the web framework now; defer visual refinement.
+The [computational foundation](computational-foundation.md) records the first bounded slice
+and remaining acceptance work. The finish below remains the broader Stage 1 target.
+
 ## User-visible finish
 
 From a clean checkout, a documented command prepares a small admitted synthetic source and

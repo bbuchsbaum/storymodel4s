@@ -10,7 +10,7 @@ it, and record the reason here. The owner decides changes to the product commitm
 | One Python distribution and one React/TypeScript app in one repository. | Lets a behavior change carry its computation, schema, tests and inspection together. | Translating every Scala module into a separately released Python package. |
 | Preserve contracts and behavioral fixtures before simplifying implementations. | The valuable scientific and operational lessons already exist. | Treating smaller code or a clean rewrite as evidence of correctness. |
 | Python owns admission and analysis; TypeScript owns interaction. | Keeps one authority for scientific values. | Independent frontend estimators, renormalization or hidden confidence filtering. |
-| Start with a static bundle inspector and precomputed projections. | Preserves offline inspection and avoids requiring an application service for the pilot. | Introducing FastAPI, a job queue or database before an interaction needs it. |
+| Build computational API/CLI paths first, with a static inspector to follow. | Owner prioritizes representations and algorithms; offline inspection needs no service. | Spending the initial slice on UI polish, FastAPI, a job queue or database. |
 | Strict wire schemas plus explicit contextual validation. | Field types cannot prove source identity, containment, context or provenance relationships. | Assuming Pydantic, a frozen object or generated TypeScript makes data valid. |
 | Retain legacy identity/coordinate meaning through an explicit compatibility adapter. | Existing recordings, outputs and tests are assets. | Silently replacing UTF-16 with Python indices or rewriting all artifact IDs. |
 | Version rich pilot bundles separately from the legacy categorical profile. | Enables new semantics without misrepresenting old-reader compatibility. | Adding fields to legacy v2 and assuming all consumers understand them. |
@@ -19,9 +19,18 @@ it, and record the reason here. The owner decides changes to the product commitm
 
 Tooling defaults for S1.0: `uv` with a locked Python environment; typed Python with one
 type checker; pytest and focused property tests; Ruff for formatting/lint; React, TypeScript
-and Vite; one Node package manager with a committed lockfile. Pydantic is a candidate for
-wire schemas, not a relational proof system. Pin compatible versions when scaffolding and
-record the chosen versions in the locks. No dependency is installed by this planning change.
+and Vite; npm with a committed lockfile. The first slice uses Pydantic 2 for strict wire
+records, with ordinary contextual validators, and mypy for static checks. Alternatives
+rejected for this slice: hand-maintained JSON Schema and duplicate validation with a second
+model library. Exact installed versions are recorded in `uv.lock` and `web/package-lock.json`.
+Pydantic is not a relational proof system.
+
+The initial rich account uses a small experimental `storymodel.account/v1` vocabulary and
+content-derived IDs, separate from legacy Scala IDs. Rejected alternative: pretending a
+new representation is byte-compatible with StudyBundle v2. Legacy reads retain raw fields
+and require an independent caller-supplied byte digest; rich-to-legacy writing is deferred.
+Explicit per-unit extraction inventories distinguish completed zero-detail results from
+missing processing. Missing inventories must not become evidence of source omission.
 
 Generated JSON Schema and TypeScript declarations cover exchanged shapes. Keep generation
 deterministic and check drift. Offline browser loading also needs runtime validation and

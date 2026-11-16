@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "storymodel-pilot"
+version = "0.1.0"
+description = "Evidence-backed narrative accounts and reproducible analysis"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.12,<3"]
+
+[project.scripts]
+storymodel = "storymodel.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/storymodel"]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "hypothesis>=6,<7", "ruff>=0.14,<1", "mypy>=1.18,<2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/storymodel"]
+
