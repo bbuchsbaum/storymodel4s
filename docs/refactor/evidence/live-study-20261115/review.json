@@ -1,0 +1,38 @@
+{
+  "revision": "c4238aa3f3ed1e82b6e66890c661b822a0213404",
+  "base": "f85761a5684f04693e66c8a26c4d39b0de3d73f6",
+  "reviewer": "independent live_design_review (read-only lean_expert)",
+  "verdict": "PASS",
+  "blocks": [],
+  "follow_ups": [],
+  "source_review": [
+    "Private request factory and external compile refusal",
+    "Exact policy-id preflight before dispatch",
+    "Receipt persistence and session closure before publication",
+    "Expected execution profile and session call count checked on readback",
+    "Corrupt and dangling journals refuse before dispatch"
+  ],
+  "evidence_review": {
+    "provider_passed": 88,
+    "provider_failed": 0,
+    "provider_skipped": 1,
+    "pipeline_passed": 595,
+    "pipeline_failed": 0,
+    "python_passed": 276,
+    "legacy_bundles_byte_identical": 125,
+    "legacy_units": 21100,
+    "mutants_compiled_and_killed": 3,
+    "restored_tests_passed": 14,
+    "gate_clone_exact_and_clean": true,
+    "verified_artifact_hashes": 17
+  },
+  "scope": [
+    "providerAgent JVM",
+    "pipeline JVM"
+  ],
+  "limits": [
+    "No external-provider smoke",
+    "No new scientific accuracy claim",
+    "Hosted CI is tracked separately"
+  ]
+}

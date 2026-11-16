@@ -1,0 +1,260 @@
+{
+  "revision": "c4238aa3f3ed1e82b6e66890c661b822a0213404",
+  "classification": "LocallyObserved",
+  "gate": {
+    "clean_exact_revision_verified": true,
+    "clean_test_recompile": true,
+    "modules": [
+      "providerAgent",
+      "pipeline"
+    ],
+    "platform": "JVM",
+    "fatal_warnings": true,
+    "java": "25.0.5+8",
+    "exit_code": 0,
+    "provider": {
+      "passed": 88,
+      "failed": 0,
+      "skipped": 1,
+      "skip": "existing real-provider smoke requires configured authorization"
+    },
+    "pipeline": {
+      "passed": 595,
+      "failed": 0,
+      "skipped": 0
+    },
+    "format_checks": [
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "commands_evidence": "data/.live-study/20261115/gate-final.log.meta.json"
+  },
+  "python": {
+    "agentmapping": {
+      "passed": 53,
+      "failed": 0,
+      "skipped": 0
+    },
+    "filmfestival": {
+      "passed": 223,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "legacy_replay": {
+    "revision": "c4238aa3f3ed1e82b6e66890c661b822a0213404",
+    "comparisons": [
+      {
+        "condition": "sherlock-bundles",
+        "bundles": 11,
+        "units": 1744,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "condition": "filmfestival/annotation-opus",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "condition": "filmfestival/annotation-haiku",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "condition": "filmfestival/auto-opus",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "condition": "filmfestival/auto-haiku",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "condition": "filmfestival/norecord-opus",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      },
+      {
+        "condition": "filmfestival/norecord-haiku",
+        "bundles": 19,
+        "units": 3226,
+        "byte_identical": true,
+        "model_calls": 0
+      }
+    ],
+    "bundles": 125,
+    "units": 21100,
+    "byte_identical": true
+  },
+  "reference_scope": {
+    "automatic_exit": 5,
+    "reason": "Declaration-free StudyExecutionCli.scala",
+    "recorded_query_matches": 40,
+    "modules": [
+      "provider-agent",
+      "pipeline"
+    ],
+    "storyatlas_matches": 0,
+    "independent_review_confirmed": true
+  },
+  "synthetic_live": {
+    "http": "loopback only; no external provider",
+    "units": [
+      0,
+      7
+    ],
+    "scenes": [
+      10,
+      30
+    ],
+    "first_invocation": {
+      "client_calls": 2,
+      "http_attempts": 4,
+      "published_output": false
+    },
+    "resumed_invocation": {
+      "client_calls": 1,
+      "http_attempts": 1,
+      "cache_hits": 2
+    },
+    "offline": {
+      "client_calls": 0,
+      "http_attempts": 0,
+      "same_units_and_mapping_records": true
+    },
+    "independent_python_read": true
+  },
+  "real_provider_smoke": "not run; awaiting endpoint/model configuration",
+  "evidence": [
+    {
+      "path": "data/.live-study/20261115/gate-final.log",
+      "bytes": 2427132,
+      "sha256": "dfd41adf8f5ca670136f1ad84c61b36f5f86ae01470674a43b16472d1f4e0297"
+    },
+    {
+      "path": "data/.live-study/20261115/gate-final.log.meta.json",
+      "bytes": 4853,
+      "sha256": "51270d42d1df0aabe8ebdb05d819aed691e4a7e770208f81ee8a7037d5cfbb8a"
+    },
+    {
+      "path": "data/.live-study/20261115/qualify.py",
+      "bytes": 2266,
+      "sha256": "4a2b7af07182f97dbf3b1cb6cffaf640fb054e9679d6587afdf2ce2885f2b195"
+    },
+    {
+      "path": "data/.live-study/20261115/legacy-comparison.json",
+      "bytes": 1234,
+      "sha256": "c9ae478d4b193e9c8b8867761977450afd01581540851db63b2618e89638d9a5"
+    },
+    {
+      "path": "data/.live-study/20261115/python-02.log",
+      "bytes": 250,
+      "sha256": "8f46c4aa0b3759eb6c51f58ba15099dc1d94ad1a444567c912c3edebea4c0a7d"
+    },
+    {
+      "path": "data/.live-study/20261115/python-filmfestival-01.log",
+      "bytes": 428,
+      "sha256": "a09baba49831677c07b2425eabc4f50102a573bac226b5567f59ad8ec712653c"
+    },
+    {
+      "path": "data/.live-study/20261115/reference-scope.log",
+      "bytes": 261,
+      "sha256": "250acc1f3700da2d217224408db6788e87bc6aa7a6e07bc6e1d816193dc075c9"
+    },
+    {
+      "path": "data/.live-study/20261115/reference-query.json",
+      "bytes": 465,
+      "sha256": "6c6a998b36abeba6a6dd317d107cdb21434bef421d95a2b1fa069b867d2d9829"
+    },
+    {
+      "path": "data/.live-study/20261115/storymodel4s-references.txt",
+      "bytes": 4852,
+      "sha256": "c6ee31a7e4c15c9f30c917ed946c259d3be04338bed4edb4987fd913ae13de23"
+    },
+    {
+      "path": "data/.live-study/20261115/storyatlas4s-references.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/.live-study/20261115/synthetic-live.bundle.json",
+      "bytes": 34027,
+      "sha256": "bb0037e3a259986d2b86f8f0677a36f260862d1a9f207703cd13f87a22a9b88c"
+    },
+    {
+      "path": "data/.live-study/20261115/mutation-key-budget.log",
+      "bytes": 3119,
+      "sha256": "973c3232878cbb37254a7c51a1ed71e44033b081540655bacbab7de60c47fdc7"
+    },
+    {
+      "path": "data/.live-study/20261115/mutation-started-guard.log",
+      "bytes": 4320,
+      "sha256": "491f679fc98fa4f851ebfc3576a22b6aa8bd931d37dfc760d1cf677de395d8a0"
+    },
+    {
+      "path": "data/.live-study/20261115/mutation-invocation-budget.log",
+      "bytes": 3884,
+      "sha256": "d53818e5906aa501d5feb077cf574f65c03da3657f5a9ed5528fe07155548637"
+    },
+    {
+      "path": "data/.live-study/20261115/mutation-restored.log",
+      "bytes": 3809,
+      "sha256": "45d39b13d141eaa4d245a5d72c4cae8b38918263a96638c168cd72ef370bbdc0"
+    },
+    {
+      "path": "data/.live-study/20261115/mutations.py",
+      "bytes": 2984,
+      "sha256": "16cddf52d8c086671cfbf230e7b0e5d7ac6d9b8093a75775f6137dcc297d330e"
+    },
+    {
+      "path": "data/.live-study/20261115/independent-reader.log",
+      "bytes": 97,
+      "sha256": "5d1cbb345752a0216f6e9c3f425064ecf62e73d1b6126492d10ea5b3d852db8c"
+    }
+  ],
+  "mutation_controls": [
+    {
+      "mutation": "key-budget",
+      "named_court": "the v2 profile binds endpoint and budget without serializing a credential",
+      "compiled": true,
+      "failed": 1,
+      "passed": 5,
+      "original_bytes_restored": true
+    },
+    {
+      "mutation": "started-guard",
+      "named_court": "a malformed or directly persisted started journal refuses before a call",
+      "compiled": true,
+      "failed": 1,
+      "passed": 5,
+      "original_bytes_restored": true
+    },
+    {
+      "mutation": "invocation-budget",
+      "named_court": "live transport, format retry, budget stop, resume and offline replay preserve checked mappings",
+      "compiled": true,
+      "failed": 1,
+      "passed": 7,
+      "original_bytes_restored": true
+    }
+  ],
+  "restored_controls": {
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "format_checks_passed": true,
+    "exact_source_bytes_restored": true
+  }
+}
