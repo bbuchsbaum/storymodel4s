@@ -24,8 +24,9 @@ distinct claims may share support; overlap alone neither proves duplicate atoms 
 Keep content, address, status, observed discourse and reported phenomenology separate. Completed
 assessment uses one substantive grade: supported; gist-correct/detail-error(severity);
 contradicted; recaller-inference; external; invented; unverifiable; misread. Pending/unavailable/
-refused uses not-assessed(reason), is not completed and is not a substantive grade. Misread must be
-corrected/reviewed or excluded, never counted as recall. Alternatives can include typed external
+refused uses not-assessed(reason), is not completed and is not a substantive grade. Misread requires correction or exclusion of the invalid fidelity judgment from fidelity and
+coverage readouts; retain the independently admitted atom and address unless separate
+adjudication invalidates them. Alternatives can include typed external
 destination but never unresolved member.
 
 ## DL4 and internal projection
