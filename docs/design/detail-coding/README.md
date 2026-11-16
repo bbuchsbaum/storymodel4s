@@ -32,7 +32,11 @@ destination but never unresolved member.
 
 DL4 fixes eligible source-row universe and records row-level present, absent, uncertain or
 not-assessable. It does not auto-credit broad/alternative, contradicted/invented, or missing
-evidence. It is separate from internal/external.
+evidence. Proposed precedence is present > not-assessable > uncertain > absent: definite
+single/joint supported bindings are present; gist-detail is per-grade pending owner severity rule;
+unavailable required evidence/assessment is not-assessable; candidate/broad/alternative-only is
+uncertain; remaining assessable no-qualifying rows are absent. It is separate from
+internal/external.
 
 Internal/external uses address classification independently of fidelity/countability:
 target-specific internal; other-specific/personal/general external; discourse/unresolved reported.

@@ -2,8 +2,8 @@
 
 **Status:** Draft — owner decision required; no public API commitment.
 
-**Tracker:** bd-01M7J5Q5A9GXDK69JMZ2Q0FP7E. The separate Claude measurement-contract proposal is
-not accepted; reconcile this Draft with it before accepting either.
+**Tracker:** bd-01M7J5Q5A9GXDK69JMZ2Q0FP7E. The measurement planning contract merged on main at
+cb1a0b97a; this ADR remains Draft and its proposed overlap policy needs owner reconciliation.
 
 ## Proposed account
 
@@ -33,8 +33,10 @@ conclusion rather than source claim); **external** (own knowledge/commentary, no
 (record inadequate); **misread** (reviewer misunderstood expression).
 
 Pending, unavailable and refused carry **not-assessed(reason)**, are not completed, and are not
-counted as substantive grades. Misread is reviewer error: correct/recode or exclude it; never
-treat it as a recalled fact. External does not replace address or derived internal/external.
+counted as substantive grades. Misread is reviewer error: correct/recode or exclude the invalid
+fidelity judgement only from fidelity and coverage analyses; retain the independently admitted
+atom/address unless it is separately adjudicated invalid. External does not replace address or
+derived internal/external.
 
 ## References and cast
 
@@ -44,12 +46,24 @@ hypotheses; unresolved is never an alternative member. Cast identity is source-l
 action and speaker tags cite source row, speech span or frame receipt. Model proposals/role labels
 supply no authority.
 
+Reference status is separate from reference outcome: **attempted** may yield an unresolved outcome;
+**not-attempted**, **failed**, and **search-limited** record their reason and never coerce an
+unresolved reference. Reference status is distinct from fidelity assessment status.
+
 ## Separate projections
 
 **DL4 is source-row coverage/omission derived from DL3**, not internal atom counting. It fixes an
 eligible source-row universe and reports each row present, absent, uncertain, or not-assessable.
 No automatic credit follows broad/alternative reference, contradicted/invented grade, or missing
 evidence. “Absent” means no qualifying evidence in the record, never proven omission.
+
+The proposed DL4 policy fixes the eligible source-row universe. A definite single or joint binding
+with a supported grade credits **present**. Gist-detail bindings are retained per grade and reported
+separately pending owner decision on severity; they receive no default credit. If no qualifying
+present binding exists, unavailable required evidence or assessment yields **not-assessable**;
+candidate, broad, or alternative-only evidence yields **uncertain**; otherwise an assessable row is
+**absent**. Mixed evidence precedence is present > not-assessable > uncertain > absent. Reports
+retain per-grade bindings, denominators, and excluded/unavailable rows.
 
 Internal/external is independent DL1-based analysis. Recommended initial
 target-episode-novel-content/v1 classifies address before countability: TargetSpecific is internal;

@@ -9,6 +9,7 @@ DL6 and each graph family separately; retain active/review/break minutes and exp
 |---|---|
 | Pilot status | pending — no pilot run |
 | Frozen packet/version and authorization | |
+| Coder IDs; independent/adjudication pass counts | |
 | DL2, narrative/referent, atoms, DL4, DL6, graph rows | |
 | Active/review/break minutes | |
 | Exposure/access deviations | |
