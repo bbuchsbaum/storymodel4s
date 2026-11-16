@@ -1,11 +1,14 @@
 # ADR 0030 — Detail account and derived analysis projections
 
-**Status:** Draft — owner decision required; no public API commitment.
+**Status:** Accepted direction — owner decision, 2026-11-16. Runtime types and wire format are not yet implemented.
 
 **Tracker:** bd-01M7J5Q5A9GXDK69JMZ2Q0FP7E. The measurement planning contract merged on main at
-cb1a0b97a; this ADR remains Draft and its proposed overlap policy needs owner reconciliation.
+cb1a0b97a. The owner accepted the separation of content, fidelity and analysis, distinct-claim
+span overlap, and conservative supported-only row coverage after discussion in this session.
+This supersedes the plan's blanket prohibition on atom overlap; its reserved working copy must
+receive the matching wording change before this reconciliation is considered complete.
 
-## Proposed account
+## Account
 
 A record has stable ID, exact recall UTF-16 support, content kind, address, source-reference
 hypotheses, evidence/provenance, status and fidelity. Kinds include event, participant/action,
@@ -57,7 +60,7 @@ eligible source-row universe and reports each row present, absent, uncertain, or
 No automatic credit follows broad/alternative reference, contradicted/invented grade, or missing
 evidence. “Absent” means no qualifying evidence in the record, never proven omission.
 
-The proposed DL4 policy fixes the eligible source-row universe. A definite single or joint binding
+The initial DL4 policy fixes the eligible source-row universe. A definite single or joint binding
 with a supported grade credits **present**. Gist-detail bindings are retained per grade and reported
 separately pending owner decision on severity; they receive no default credit. If no qualifying
 present binding exists, unavailable required evidence or assessment yields **not-assessable**;
@@ -65,7 +68,7 @@ candidate, broad, or alternative-only evidence yields **uncertain**; otherwise a
 **absent**. Mixed evidence precedence is present > not-assessable > uncertain > absent. Reports
 retain per-grade bindings, denominators, and excluded/unavailable rows.
 
-Internal/external is independent DL1-based analysis. Recommended initial
+Internal/external is independent DL1-based analysis. The initial
 target-episode-novel-content/v1 classifies address before countability: TargetSpecific is internal;
 OtherSpecific, personal and general knowledge are external; discourse and unresolved are reported
 separately. A counting view may exclude discourse/repetitions, but those exclusions never change
@@ -78,9 +81,9 @@ and repetitions) are excluded rather than reclassified. Its headline fraction is
 internal / (internal + external), reported only with both counts; unresolved and excluded remain
 visible. Changing fidelity alone must not change this classification or fraction.
 
-Atom overlap is a **proposed change requiring owner decision** and reconciliation with the separate
-measurement contract: distinct claims may share support, but overlap neither proves duplication nor
-permits arbitrary splitting.
+Distinct claims may share support. Overlap neither proves duplication nor permits arbitrary
+splitting. Preserve claim identities and apply explicit counting rules instead of forcing
+disjoint text spans. This policy was accepted by the owner on 2026-11-16.
 
 ## Rejected alternatives
 
@@ -90,7 +93,13 @@ permits arbitrary splitting.
 - One probability for joint/broad/alternative reference.
 - Word timing as memory timing.
 
-## Owner decision requested
+## Remaining implementation decisions
 
-Choose or revise the status/grade contract, DL4 row policy, initial address projection, overlap
-policy, external schema, and reconciliation with the separate measurement-contract proposal.
+The accepted direction does not settle Scala type placement across core/features/align, a public
+response-frequency MeasureKind, held-level feature allocation, or producer wire compatibility.
+Resolve those bounded contracts against ADRs 0019/0022 and the NMP profile before adding public
+APIs. Gist-detail coverage credit requires a separate severity rule; it is reported separately
+under the initial policy. No human pilot or scientific validation is implied by this decision.
+
+The [synthetic rescore](../design/detail-coding/synthetic-worked-example.md) illustrates two
+analyses of one unchanged detail account. It is a policy witness, not a human coding result.

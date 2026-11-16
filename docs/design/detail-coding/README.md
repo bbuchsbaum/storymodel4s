@@ -1,6 +1,7 @@
 # Joint detail-coding rubric
 
-**Status:** Draft. Not a study protocol, recruitment approval, human pilot, or accuracy evidence.
+**Status:** Pilot-preparation rubric implementing the accepted direction in ADR 0030.
+Not a study protocol, recruitment approval, human pilot, or accuracy evidence.
 Actual human pilot remains pending.
 
 ## Frozen packet and blinding
@@ -18,7 +19,7 @@ evidence. Record participant/speaker coverage gaps. Recall never creates source 
 ## Coding rules
 
 Code narrative source reference separately from referent/occurrence. Atom spans are UTF-16
-half-open coordinates plus literal substring. Overlap is proposed policy pending owner decision:
+half-open coordinates plus literal substring. Under the owner-accepted overlap policy,
 distinct claims may share support; overlap alone neither proves duplicate atoms nor permits merging.
 
 Keep content, address, status, observed discourse and reported phenomenology separate. Completed
@@ -41,7 +42,7 @@ internal/external.
 
 Internal/external uses address classification independently of fidelity/countability:
 target-specific internal; other-specific/personal/general external; discourse/unresolved reported.
-The proposed novel-content count excludes discourse/repetition only after classification and states
+The initial novel-content count excludes discourse/repetition only after classification and states
 its own denominator. Extended and RepeatedOrCategoric address scopes are unresolved target
 membership pending narrower address. Inventory partitions internal/external/unresolved/excluded;
 report internal / (internal + external) only with both counts. Fidelity changes never reclassify an
