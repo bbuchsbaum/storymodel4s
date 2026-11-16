@@ -1,0 +1,39 @@
+{
+  "schema": "storymodel4s.segmentation-comparison/v1",
+  "studies": {
+    "sherlock": {
+      "sessions": 11,
+      "supplied_units": 1744,
+      "automatic_units": 1744,
+      "uncovered_source_alphanumeric_codepoints": 1983,
+      "alignment_unique": 1744,
+      "alignment_absent": 0,
+      "alignment_ambiguous": 0,
+      "alignment_order-conflict": 0,
+      "boundary_matched": 1733,
+      "boundary_supplied_only": 0,
+      "boundary_automatic_only": 0,
+      "boundary_eligible_supplied": 1733,
+      "boundary_eligible_automatic": 1733,
+      "boundary_excluded_supplied": 0
+    },
+    "filmfestival": {
+      "sessions": 19,
+      "supplied_units": 3226,
+      "automatic_units": 5918,
+      "uncovered_source_alphanumeric_codepoints": 7430,
+      "alignment_unique": 3157,
+      "alignment_absent": 69,
+      "alignment_ambiguous": 0,
+      "alignment_order-conflict": 0,
+      "boundary_matched": 2797,
+      "boundary_supplied_only": 284,
+      "boundary_automatic_only": 2889,
+      "boundary_eligible_supplied": 3081,
+      "boundary_eligible_automatic": 5686,
+      "boundary_excluded_supplied": 126
+    }
+  },
+  "model_calls": 0,
+  "mapping_error": "not-assessed; automatic segmentation has no model outputs"
+}
