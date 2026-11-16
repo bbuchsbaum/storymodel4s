@@ -1,0 +1,44 @@
+{
+  "runtime_checkout": "c351e84ab",
+  "runtime_base": "b847c13ca1913246b447c7482628fd14555fb835",
+  "runtime_sources_unchanged": true,
+  "source_hashes": {
+    "core/src/main/scala/storymodel4s/core/atlas.scala": "089999f97a8be0134124a399b2cd2031c10f9df64e62f7d57c7c59ef229e470c",
+    "recall/src/main/scala/storymodel4s/recall/segmenter.scala": "03febeedf41079c38c487940d5dcccc497d446237bfa2ee278e33d6bd8576ae0",
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/PreparedRecall.scala": "d428bbe90e4bcb86326056f34256007d5ad24e9fdfe0a2fd81a7771f7aeb131b",
+    "tools/agentmapping/compare_segmentations.py": "33f21c86330299e2d5e6d019035edf62b2fa5ec6763eacb31086acc13c77f19a"
+  },
+  "python_tests": {
+    "passed": 15,
+    "failed": 0
+  },
+  "mutations": [
+    {
+      "mutation": "accept-first-ambiguous-occurrence",
+      "compiled": true,
+      "exit": 1,
+      "failed_test": "test_repeated_phrase_remains_ambiguous",
+      "passing_siblings": 2
+    },
+    {
+      "mutation": "ignore-raw-lineage",
+      "compiled": true,
+      "exit": 1,
+      "failed_test": "test_raw_identity_not_only_canonical_identity",
+      "passing_siblings": 2
+    }
+  ],
+  "sherlock_lineage": {
+    "sessions": 11,
+    "supplied_units": 1744,
+    "raw_csv_lineage_matches": true,
+    "canonical_transcript_lineage_matches": true,
+    "unit_ordinals_and_text_hashes_match": true
+  },
+  "runtime_preparation": {
+    "sherlock_sessions": 11,
+    "filmfestival_sessions": 19,
+    "model_calls": 0
+  },
+  "scope": "development segmentation correspondence, not scientific or mapping accuracy"
+}
