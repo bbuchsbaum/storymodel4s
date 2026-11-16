@@ -5,8 +5,9 @@
 **Tracker:** bd-01M7J5Q5A9GXDK69JMZ2Q0FP7E. The measurement planning contract merged on main at
 cb1a0b97a. The owner accepted the separation of content, fidelity and analysis, distinct-claim
 span overlap, and conservative supported-only row coverage after discussion in this session.
-This supersedes the plan's blanket prohibition on atom overlap; its reserved working copy must
-receive the matching wording change before this reconciliation is considered complete.
+This replaces the plan's blanket prohibition on atom overlap; the DL1 admission rule now links
+this decision. The initial projection specification below remains distinct from the unresolved
+public implementation and wire-format choices.
 
 ## Account
 

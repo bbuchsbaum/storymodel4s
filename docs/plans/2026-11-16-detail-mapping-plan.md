@@ -304,8 +304,9 @@ refers to resolved situations and entities. The ADR records this split.
 Internal/external labels and counts are produced by the derived analysis above, not by adding
 two more atom kinds or treating failed placement as external content.
 
-- Admission: every span lies inside its unit, atoms do not overlap, and the share of each
-  unit's text left uncovered is reported.
+- Admission: every span lies inside its unit. Distinct claims may share spans under
+  [ADR 0030](../adr/0030-detail-account-and-derived-analysis.md); claim identity and the
+  counting policy prevent duplicate credit. Report the share of each unit's text left uncovered.
 - **Engineering exit:** one replayable inventory artifact preserves exact spans, kinds,
   addresses and discourse functions, with named controls for foreign spans and unresolved
   placement, and two policy projections that conserve resolved, unresolved and excluded mass.

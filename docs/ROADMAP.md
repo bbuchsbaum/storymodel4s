@@ -14,8 +14,9 @@ units. This qualifies execution and reproducibility, with no new scientific-accu
 The [ordinary-transcript entry point](guide/ordinary-transcripts.md) now prepares UTF-8 files
 with the existing segmenter and carries canonical text, exact spans and source provenance into
 that same execution path. Its [engineering receipt](refactor/evidence/transcript-intake-20261115/README.md)
-tracks verification. Full delivery 4 still needs a supplied-versus-automatic comparison on
-verified common transcript coordinates for both corpora (`bd-01M7H69QWE0NKSNB8XWW6MC02H`).
+tracks verification. The [common-coordinate comparison](refactor/evidence/preview-coordinates-20261116/README.md)
+records supplied-versus-automatic boundary disagreement and explicit exclusions on seen development
+material from both corpora (`bd-01M7H69QWE0NKSNB8XWW6MC02H`). It does not assess mapping error.
 Independent usability and prospective measurement qualification remain open.
 
 The one current plan, adopted 2026-11-08 (Mote epic `bd-01M6Y7MWZGP29TNDJ90SG36A45`). It
