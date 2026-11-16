@@ -18,5 +18,10 @@
     "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
     "verdict": "PASS; log metadata, totals, clean probes, formatting and skip reports independently checked"
   },
-  "consumer_gate_evidence": "pending independent receipt review"
+  "consumer_gate_evidence": {
+    "receipt_revision": "89b0b4946fb13c2453824eac330c5be7ba6279ef",
+    "consumer_revision": "ef0844bb229a0406d4f2a4e65ec89532c18d99a3",
+    "producer_revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "verdict": "PASS; source override, exit and log hash, 10 tasks with 520 passing tests, ModelInputSuite 23, JavaScript app linking, formatting last, and public receipts independently checked"
+  }
 }
