@@ -1,0 +1,22 @@
+{
+  "reviewer": "independent fresh-context frontier_review",
+  "code": [
+    {
+      "revision": "1a7ab252395c33a0d88d08bf862e79cf7045b428",
+      "verdict": "PASS after parser/request and portable credence repairs"
+    },
+    {
+      "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+      "verdict": "PASS; explicit refusal assertions and mutation provenance"
+    }
+  ],
+  "mutation_evidence": {
+    "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "verdict": "PASS; exact driver/substitutions/hashes, three compiled named munit assertion failures and 12 passing siblings each"
+  },
+  "producer_gate_evidence": {
+    "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "verdict": "PASS; log metadata, totals, clean probes, formatting and skip reports independently checked"
+  },
+  "consumer_gate_evidence": "pending independent receipt review"
+}

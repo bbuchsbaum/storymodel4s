@@ -1,0 +1,53 @@
+[
+  {
+    "mutation": "ignore-parser-origin",
+    "compiled": true,
+    "assertion_failed": true,
+    "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "source_sha256": "2b30b7215cd503abe69bfde1a6649a6d16141715c901e25370a1953b11fe729e",
+    "driver_sha256": "6d6628d8bfb35e4e1e88341be4c658835e9b87741d961bb46652465508950dda",
+    "mutation_before": "chart.provenance.origin != ChartOrigin.Parser(binding.parser)",
+    "mutation_after": "false",
+    "mutated_source_sha256": "f38e626b9e5428ed8523b2d71911605c5e005a1679a9eedb97cc2e9c8cf49971",
+    "exit": 1,
+    "failed_test": "matching expectation cannot disguise a different parser or producing request",
+    "total": 13,
+    "failed": 1,
+    "passed": 12,
+    "log_sha256": "e34212447dfd1e4a137a0634d73adc5a9223f74d63145e0022551b5fc2a6f5cb"
+  },
+  {
+    "mutation": "ignore-sentence-end-boundary",
+    "compiled": true,
+    "assertion_failed": true,
+    "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "source_sha256": "2b30b7215cd503abe69bfde1a6649a6d16141715c901e25370a1953b11fe729e",
+    "driver_sha256": "6d6628d8bfb35e4e1e88341be4c658835e9b87741d961bb46652465508950dda",
+    "mutation_before": "sentence.span.contains(ref.span)",
+    "mutation_after": "sentence.span.start <= ref.span.endExclusive",
+    "mutated_source_sha256": "6f8a23e1b6a5ba4182d74a1caede08102ae1df4bb8e4c0dd8c0e29a62a99c9ad",
+    "exit": 1,
+    "failed_test": "alignment outside its declared sentence is refused by the alignment guard",
+    "total": 13,
+    "failed": 1,
+    "passed": 12,
+    "log_sha256": "6c530d52c27ce119b2e44b8062a76c7a3d82ad2df105a5f4cae010e63a9c9ab0"
+  },
+  {
+    "mutation": "omit-producing-call-identity",
+    "compiled": true,
+    "assertion_failed": true,
+    "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "source_sha256": "2b30b7215cd503abe69bfde1a6649a6d16141715c901e25370a1953b11fe729e",
+    "driver_sha256": "6d6628d8bfb35e4e1e88341be4c658835e9b87741d961bb46652465508950dda",
+    "mutation_before": "call(b.producingCall)",
+    "mutation_after": "\"omitted-producing-call\"",
+    "mutated_source_sha256": "033e42d97c1ab5ee7b1060ec6d93397ca907099c5b1efdde5e3d0be056d6a4f1",
+    "exit": 1,
+    "failed_test": "selecting a different producing receipt changes input identity even for the same request",
+    "total": 13,
+    "failed": 1,
+    "passed": 12,
+    "log_sha256": "eeec35ea2dd5306ade32bd4e6378ea8f1f67dbb404e91a14c0dbb93c6c49c566"
+  }
+]

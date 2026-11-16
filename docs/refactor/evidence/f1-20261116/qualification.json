@@ -1,0 +1,139 @@
+{
+  "schema": "f1-input-qualification/v1",
+  "scope": "Checked film-proposal input assembly; local engineering qualification only",
+  "producer": {
+    "revision": "e02529acbb3f8060aa920cd78bf1c042f350b493",
+    "exit": 0,
+    "started": "2026-11-16T16:12:48.428991+00:00",
+    "finished": "2026-11-16T16:50:12.341742+00:00",
+    "elapsed_seconds": 2243.8927992919926,
+    "log_sha256": "928a0de75d53b4b45b2f64b92a5394032f47fb84f41a1eeac25e6a4ceeeef36a",
+    "command": [
+      "sbt",
+      "set ThisBuild / tlFatalWarnings := true",
+      "documentJVM/clean",
+      "documentJS/clean",
+      "documentNative/clean",
+      "compileAll",
+      "testAll",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "totals": {
+      "tasks": 56,
+      "total": 12239,
+      "passed": 12234,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 5
+    }
+  },
+  "consumer": {
+    "revision": "ef0844bb229a0406d4f2a4e65ec89532c18d99a3",
+    "exit": 0,
+    "started": "2026-11-16T16:50:44.178464+00:00",
+    "finished": "2026-11-16T16:53:58.973083+00:00",
+    "elapsed_seconds": 194.79300520796096,
+    "log_sha256": "12fad074783a9fd2270fdeda1e04d4060cba06577151d8c5576a0a4696b67a10",
+    "command": [
+      "sbt",
+      "-Dstoryatlas4s.storymodel4s.build=<isolated-producer-checkout>",
+      "set ThisBuild / tlFatalWarnings := true",
+      "compileAll",
+      "testAll",
+      "app/fastLinkJS",
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "totals": {
+      "tasks": 10,
+      "total": 520,
+      "passed": 520,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "producer": "e02529acbb3f8060aa920cd78bf1c042f350b493"
+  },
+  "f1_suites": {
+    "FilmInputAssociationSuite": {
+      "tests_per_platform": 13,
+      "platform_runs": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    "FilmInputSuite": {
+      "tests_per_platform": 10,
+      "platform_runs": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    "FilmInputContainmentSuite": {
+      "tests_per_platform": 8,
+      "platform_runs": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    "FilmInputNativeSupportSuite": {
+      "tests_per_platform": 6,
+      "platform_runs": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    "FilmInputBoundarySuite": {
+      "tests_per_platform": 2,
+      "platform_runs": 3,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "clean_document_compilation": {
+    "jvm": {
+      "classes": true,
+      "test-classes": true
+    },
+    "js": {
+      "classes": true,
+      "test-classes": true
+    },
+    "native": {
+      "classes": true,
+      "test-classes": true
+    }
+  },
+  "text_parity": {
+    "platform": "JVM",
+    "passed": 9,
+    "failed": 0
+  },
+  "wog_codec_golden": {
+    "passed_per_platform": 6,
+    "platforms": [
+      "JVM",
+      "JS",
+      "Native"
+    ],
+    "failed": 0
+  },
+  "source_sha256": {
+    "document/src/main/scala/storymodel4s/document/filmInput.scala": "2b30b7215cd503abe69bfde1a6649a6d16141715c901e25370a1953b11fe729e",
+    "document/src/test/scala/storymodel4s/document/FilmInputAssociationSuite.scala": "ebdff7fb2e2ebafe7537bdab059fbea380a916d13c21f870c453f0a1f79c81d7",
+    "document/src/test/scala/storymodel4s/document/FilmInputContainmentSuite.scala": "ca78a22fd973e2d343dc288c7b57e7269a5bdbb88a230029534f13ba6e9ceeeb",
+    "document/src/test/scala/storymodel4s/document/FilmInputNativeSupportSuite.scala": "6ba9a2bfe8bef86f3137c3e78691a988ef3dec57c6c2ce15ac580f21185a0530",
+    "document/src/test/scala/storymodel4s/document/FilmInputFixtures.scala": "e55061bc93cc97525d3734702e7d70358ba42b8cd23a68e6c025c1880af44901",
+    "document/src/test/scala/storymodel4s/document/FilmInputSuite.scala": "6cb8bd8dbc2f05102b03c7a92deb2f56d19a9147ee30550b91266582a84aaa21",
+    "document/src/test/scala/storymodel4s/documentprobe/FilmInputBoundarySuite.scala": "552ab22da5262e61ced8852509f5a2b690b2e92de39eb6f9f1f5993fb91673ab"
+  },
+  "skipped_by_module": {
+    "providerAgent": 1,
+    "embedBench": 1,
+    "media": 3
+  },
+  "excluded_runs": [
+    "Initial full gate interrupted with exit143 for test-proof repair",
+    "Earlier noncompiling mutation and exception-based refusal evidence superseded by v3"
+  ],
+  "scientific_accuracy_claim": false,
+  "provider_execution_attestation": false,
+  "hosted_ci_claim": false
+}
