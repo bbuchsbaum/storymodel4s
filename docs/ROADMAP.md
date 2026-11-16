@@ -49,6 +49,12 @@ compiler, followed by event/context and relation production, exchange and readou
 matching and E4 structured decoding remain experimental consumers, not construction gates. See the
 [detail-mapping plan](plans/2026-11-16-detail-mapping-plan.md).
 
+The detail layer and the graph expose their results through one
+[measurement and projection contract][contract]. It keeps each annotation and assessment at its
+original granularity and derives analysis views from them: a recall-indexed feature table, a
+recall-source correspondence table and a source-indexed participant summary, each with declared
+aggregation, timing and uncertainty. It prescribes no analysis, temporal unit or list of measures.
+
 ## Next milestone (2026-11-10): scientific preview
 
 A researcher supplies timed film descriptions and recall transcripts, gets auditable
@@ -118,6 +124,12 @@ The near-term sequence, from the working plan:
   - DL5: a unit-only mapping condition, with an input-policy audit, permutation check and direct
     readout-recovery evidence to decide whether order measures can be supported.
   - DL6: who-did-what in recurring scenes, as the hard test of DL2 and DL3.
+
+The [contract][contract] is shared by DL1-DL6 and the graph slices; it adds no bundle fields of
+its own. Its engineering exit derives the three analysis views from the same saved synthetic
+artifacts without a model call, with discriminating and refusing controls. It carries the
+temporal-query, exposure and measure semantics of ADRs 0019 and 0022 to the categorical and
+detail bundle, and reuses the `features` tracks and the recall-onset export.
 
 E1 and E2 deliver the full event representation, with DL2 and DL1/DL3 as their first usable
 steps. The [construction sequence](plans/2026-11-16-detail-mapping-plan.md#full-event-graph-delivery)
@@ -241,8 +253,17 @@ beads do not wait for this report before their consumers can be built.
 
 ## Finish line
 
-**Engineering delivery:** the preview's engineering workflow, DL1-DL6 implementation artifacts,
-E1/E2 graph construction, film exchange and the terminal graph/readout walkthrough are complete.
+**Engineering delivery:** a usable representation for film recall studies (owner, 2026-11-16).
+For each of three studies (Sherlock, FilmFestival and Friends), one documented command takes
+timed film descriptions and recall transcripts through that study's input adapter and produces
+the common bundle. The [contract][contract]'s three analysis views are derived from the saved
+artifacts without a model call and recomputed by an independent reader. Formats, readers and
+scorer are the same for all three; each study reports what is unavailable for it. The
+[demonstration][finish] uses development material only and leaves Friends' sealed test side
+unopened.
+
+It requires the preview's engineering workflow, DL1-DL6 implementation artifacts, the contract,
+E1/E2 graph construction, film exchange and the terminal graph/readout walkthrough to be complete.
 A researcher can use one documented command with pinned film evidence and recall inputs, inspect
 the common bundle and graph tables, and reproduce the outputs offline. Every required family has
 a functioning admission path and explicit coverage/gaps. Existing V1/E0 probabilistic-profile
@@ -286,9 +307,16 @@ candidates; do not repeat a historical merge or archive instruction without chec
    design (`MayBeImputed`, `missingSemantic` in `align`) needs its own ADR.
 7. The detail-layer ADR must record the core-account/derived-analysis split and the rejected
    alternative of requiring a completed graph before useful detail output. Internal/external is
-   a scoring projection; it is not a primitive kind or a fidelity judgment.
+   a scoring projection; it is not a primitive kind or a fidelity judgment. The same ADR covers
+   what the contract adds to ADRs 0019 and 0022: joint and broad reference meaning, new feature
+   targets, a level-holding allocation, and whether an empirical response frequency becomes a
+   named measure kind.
 8. Validation data for the detail layer's fresh items, and who codes them on what budget.
 9. Which exact reviewed identity and claim-assessment components satisfy DL2/DL3 and the event
    bridge. Reuse them in the common path; retain alternative methods only as named comparisons.
+10. Friends: the basis for running a model on its development recall. Its source set is still
+    "proposed", with the licence and REB basis open.
 
 [preview-plan]: plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview
+[contract]: plans/2026-11-16-detail-mapping-plan.md#measurement-and-projection-contract
+[finish]: plans/2026-11-16-detail-mapping-plan.md#finish-line-a-usable-representation-for-film-recall-studies
