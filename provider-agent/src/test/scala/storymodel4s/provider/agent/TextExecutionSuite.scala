@@ -1,6 +1,5 @@
 package storymodel4s.provider.agent
 
-import io.circe.syntax.*
 import java.nio.file.Files
 import munit.FunSuite
 

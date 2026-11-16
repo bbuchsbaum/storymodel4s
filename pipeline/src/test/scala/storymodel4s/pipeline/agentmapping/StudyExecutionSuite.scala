@@ -247,6 +247,20 @@ class StudyExecutionSuite extends FunSuite:
     }
 
   test("the checked profile closes construction doors outside provider-agent"):
+    assert(
+      typeCheckErrors("""
+      import storymodel4s.provider.agent.{ModelRequest, TextExecution}
+      def request(p: TextExecution.Profile) = ModelRequest.text(p, "system", "prompt")
+    """).nonEmpty
+    )
+    assert(
+      typeCheckErrors("""
+      import storymodel4s.provider.agent.TextExecution
+      object ModelRequest:
+        def text(p: TextExecution.Profile, system: String, prompt: String): String = system + prompt
+      def request(p: TextExecution.Profile) = ModelRequest.text(p, "system", "prompt")
+    """).isEmpty
+    )
     assert(typeCheckErrors("""
       import storymodel4s.provider.agent.TextExecution
       import storymodel4s.core.Checksum

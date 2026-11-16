@@ -105,7 +105,7 @@ object ModelRequest:
   /** Render a whole-text exchange from a checked live profile. The profile owns the identity
     * material, so callers cannot attach an arbitrary recording key to text they did not send.
     */
-  def text(
+  private[agent] def text(
       profile: TextExecution.Profile,
       systemPrompt: String,
       prompt: String
