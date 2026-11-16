@@ -49,7 +49,7 @@ object StudyExport:
     */
   final case class Index(
       model: String,
-      condition: String,
+      condition: RenderedCondition,
       system: String,
       protocol: StudyReplay.ReplyProtocol,
       protocolName: String,
@@ -148,50 +148,64 @@ object StudyExport:
         else if sessions.map(_.name).distinct.size != sessions.size then
           Left("a participant-session is listed twice")
         else
-          StudyReplay.ReplyProtocol
-            .named(protocolName)
-            .toRight(s"unknown reply protocol $protocolName")
-            .flatMap { protocol =>
-              val binding =
-                if schema == Schema then Right(None)
-                else
-                  for
-                    recipe <- c.get[String]("promptRecipe").left.map(_ => "no prompt recipe")
-                    _ <- Either.cond(
-                      recipe == TranscriptStudy.PromptRecipe &&
-                        system == TranscriptStudy.System && unitLine == TranscriptStudy.UnitLine &&
-                        chunkLine == TranscriptStudy.ChunkLine && protocol == StudyReplay.ReplyProtocol.StrictChunked &&
-                        extras.isEmpty,
-                      (),
-                      "unknown transcript prompt contract"
-                    )
-                    rendering <- c.get[String]("unitTextEncoding").left.map(_ => "no text encoding")
-                    _ <- Either.cond(
-                      rendering == "json-string/v1",
-                      (),
-                      "unknown unit text encoding"
-                    )
-                    source <- c.get[String]("sourceSha256").left.map(_ => "no source hash")
-                    parts <- c.get[String]("partsSha256").left.map(_ => "no parts hash")
-                  yield Some(source -> parts)
-              binding.map { source =>
-                Index(
-                  model,
-                  condition,
-                  system,
-                  protocol,
-                  protocolName,
-                  attempts,
-                  suffix,
-                  extras,
-                  unitLine,
-                  chunkLine,
-                  manifest,
-                  sessions,
-                  source
-                )
+          val recorded: Either[String, RecordedCondition] =
+            c.downField("producerCondition").focus match
+              case None     => RecordedCondition.legacy(condition)
+              case Some(pc) =>
+                ProducerCondition
+                  .decode(pc)
+                  .left
+                  .map(_.message)
+                  .flatMap(RecordedCondition.declared(condition, _))
+          recorded.flatMap(c => rendered(c).left.map(_.message)).flatMap { typed =>
+            StudyReplay.ReplyProtocol
+              .named(protocolName)
+              .toRight(s"unknown reply protocol $protocolName")
+              .flatMap { protocol =>
+                val binding =
+                  if schema == Schema then Right(None)
+                  else
+                    for
+                      recipe <- c.get[String]("promptRecipe").left.map(_ => "no prompt recipe")
+                      _ <- Either.cond(
+                        recipe == TranscriptStudy.PromptRecipe &&
+                          system == TranscriptStudy.System && unitLine == TranscriptStudy.UnitLine &&
+                          chunkLine == TranscriptStudy.ChunkLine && protocol == StudyReplay.ReplyProtocol.StrictChunked &&
+                          extras.isEmpty,
+                        (),
+                        "unknown transcript prompt contract"
+                      )
+                      rendering <- c
+                        .get[String]("unitTextEncoding")
+                        .left
+                        .map(_ => "no text encoding")
+                      _ <- Either.cond(
+                        rendering == "json-string/v1",
+                        (),
+                        "unknown unit text encoding"
+                      )
+                      source <- c.get[String]("sourceSha256").left.map(_ => "no source hash")
+                      parts <- c.get[String]("partsSha256").left.map(_ => "no parts hash")
+                    yield Some(source -> parts)
+                binding.map { source =>
+                  Index(
+                    model,
+                    typed,
+                    system,
+                    protocol,
+                    protocolName,
+                    attempts,
+                    suffix,
+                    extras,
+                    unitLine,
+                    chunkLine,
+                    manifest,
+                    sessions,
+                    source
+                  )
+                }
               }
-            }
+          }
     }
 
   /** The identity of a session's supplied units: their numbers, the study's row keys and their
@@ -249,6 +263,16 @@ object StudyExport:
         scales <- partScales(parts)
         table <- SceneIntervals.build(view, scales, clock._1, clock._2)
       yield Some((table, Checksum.ofText(raw).hex))
+
+  /** The study path's rendering check; see `RenderedCondition.study`. */
+  def rendered(
+      condition: RecordedCondition
+  ): Either[ProducerCondition.Refusal, RenderedCondition] =
+    RenderedCondition.study(condition)
+
+  /** A receipt with its producer condition beside the condition's name, when one was declared. */
+  def describe(condition: RecordedCondition)(doc: Json): Json =
+    doc.deepMerge(Json.fromFields(condition.producer.map(p => "producerCondition" -> p.json)))
 
   def index(dir: Path): Either[String, Index] = json(dir.resolve("index.json")).flatMap(parseIndex)
 
@@ -365,25 +389,27 @@ object StudyExport:
         p => TextExchange.replay(recordings, provider, index.model, index.system, p)
       )
       .fold(f => refuse(s"${s.participant} ${s.session}: $f"), identity)
-    val doc = Json.obj(
-      "participant" -> Json.fromString(s.participant),
-      "session" -> Json.fromString(s.session),
-      "model" -> Json.fromString(index.model),
-      "condition" -> Json.fromString(index.condition),
-      "manifestSha256" -> Json.fromString(index.manifestSha256),
-      "protocol" -> Json.fromString(index.protocolName),
-      "modelCalls" -> Json.fromInt(0),
-      "chunks" -> Json.fromValues(receipts.map { r =>
-        Json.obj(
-          "chunk" -> Json.fromInt(r.chunk),
-          "attempts" -> Json.fromInt(r.attempts),
-          "accepted" -> Json.fromBoolean(r.accepted),
-          "itemsOutsideChunk" -> Json.fromInt(r.itemsOutsideChunk),
-          "repeatedUnits" -> Json.fromInt(r.repeatedUnits)
+    val doc = StudyExport.describe(index.condition.recorded)(
+      Json.obj(
+        "participant" -> Json.fromString(s.participant),
+        "session" -> Json.fromString(s.session),
+        "model" -> Json.fromString(index.model),
+        "condition" -> Json.fromString(index.condition.name),
+        "manifestSha256" -> Json.fromString(index.manifestSha256),
+        "protocol" -> Json.fromString(index.protocolName),
+        "modelCalls" -> Json.fromInt(0),
+        "chunks" -> Json.fromValues(receipts.map { r =>
+          Json.obj(
+            "chunk" -> Json.fromInt(r.chunk),
+            "attempts" -> Json.fromInt(r.attempts),
+            "accepted" -> Json.fromBoolean(r.accepted),
+            "itemsOutsideChunk" -> Json.fromInt(r.itemsOutsideChunk),
+            "repeatedUnits" -> Json.fromInt(r.repeatedUnits)
+          )
+        }),
+        "units" -> Json.fromValues(
+          replies.map((u, r) => StudyReplay.unitRow(protocol, u, r, index.extras))
         )
-      }),
-      "units" -> Json.fromValues(
-        replies.map((u, r) => StudyReplay.unitRow(protocol, u, r, index.extras))
       )
     )
     (s"${entry.name}.json", doc, replies.size, receipts.map(_.attempts).sum)
@@ -463,40 +489,50 @@ object StudyExport:
     val recall = s
       .preparedRecall(entry.name)
       .fold(e => refuse(s"${entry.name}: $e"), identity)
-    val producer = StudyRecord.producer(provider, index.model, index.system, view, recall)
+    val producer =
+      StudyRecord.producer(
+        provider,
+        index.model,
+        index.system,
+        view,
+        recall,
+        Some(index.condition)
+      )
     val perField = fields.map { field =>
       val judgements =
         replies.map((_, r) => StudyRecord.judge(view, index.protocol, r, field, None))
-      val policy = StudyRecord.policy(index.condition, index.protocolName, field)
+      val policy = StudyRecord.policy(index.condition.recorded, index.protocolName, field)
       val record = StudyRecord
-        .record(field, policy, recall, view, producer, judgements)
+        .record(field, index.condition, policy, recall, view, producer, judgements)
         .fold(e => refuse(s"${entry.name} $field: ${e.message}"), identity)
       (field, judgements.map(_.kind), record.digest.hex)
     }
     (entry, s.units.size, perField)
   }
-  val doc = Json.obj(
-    "schema" -> Json.fromString("storymodel4s.agentmapping.study-records-receipt/v1"),
-    "model" -> Json.fromString(index.model),
-    "condition" -> Json.fromString(index.condition),
-    "protocol" -> Json.fromString(index.protocolName),
-    "sourceArtifact" -> Json.fromString(view.artifact.hex),
-    "sourceRepresentation" -> Json.fromString(view.representation.digest.hex),
-    "modelCalls" -> Json.fromInt(0),
-    "units" -> Json.fromInt(sessions.map(_._2).sum),
-    "judgements" -> Json.fromFields(fields.map { field =>
-      field -> tally(sessions.flatMap(_._3.filter(_._1 == field).flatMap(_._2)))
-    }),
-    "sessions" -> Json.fromValues(sessions.map { (entry, units, perField) =>
-      Json.obj(
-        "participant" -> Json.fromString(entry.participant),
-        "session" -> Json.fromString(entry.session),
-        "units" -> Json.fromInt(units),
-        "records" -> Json.fromFields(perField.map { (field, kinds, digest) =>
-          field -> Json.obj("digest" -> Json.fromString(digest), "judgements" -> tally(kinds))
-        })
-      )
-    })
+  val doc = StudyExport.describe(index.condition.recorded)(
+    Json.obj(
+      "schema" -> Json.fromString("storymodel4s.agentmapping.study-records-receipt/v1"),
+      "model" -> Json.fromString(index.model),
+      "condition" -> Json.fromString(index.condition.name),
+      "protocol" -> Json.fromString(index.protocolName),
+      "sourceArtifact" -> Json.fromString(view.artifact.hex),
+      "sourceRepresentation" -> Json.fromString(view.representation.digest.hex),
+      "modelCalls" -> Json.fromInt(0),
+      "units" -> Json.fromInt(sessions.map(_._2).sum),
+      "judgements" -> Json.fromFields(fields.map { field =>
+        field -> tally(sessions.flatMap(_._3.filter(_._1 == field).flatMap(_._2)))
+      }),
+      "sessions" -> Json.fromValues(sessions.map { (entry, units, perField) =>
+        Json.obj(
+          "participant" -> Json.fromString(entry.participant),
+          "session" -> Json.fromString(entry.session),
+          "units" -> Json.fromInt(units),
+          "records" -> Json.fromFields(perField.map { (field, kinds, digest) =>
+            field -> Json.obj("digest" -> Json.fromString(digest), "judgements" -> tally(kinds))
+          })
+        )
+      })
+    )
   )
   Files.write(out, (doc.spaces2 + "\n").getBytes(StandardCharsets.UTF_8)): scala.Unit
   println(

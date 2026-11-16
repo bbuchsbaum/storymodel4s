@@ -1,0 +1,209 @@
+/* Layout: one reading column of lab-notebook entries, newest first, under a comparison table. */
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+:root {
+  --paper: #fbfaf7;
+  --ink: #1f2328;
+  --muted: #6b7079;
+  --rule: #e2e0da;
+  --accent: #b3001b;
+  --wash: #f2efe8;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16181b;
+    --ink: #e7e5e0;
+    --muted: #9aa0a8;
+    --rule: #2c3036;
+    --accent: #ff6b7d;
+    --wash: #1f2226;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #16181b;
+  --ink: #e7e5e0;
+  --muted: #9aa0a8;
+  --rule: #2c3036;
+  --accent: #ff6b7d;
+  --wash: #1f2226;
+  color-scheme: dark;
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 40px;
+}
+header {
+  display: grid;
+  gap: 10px;
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+h1 {
+  font-size: 34px;
+  line-height: 1.15;
+  margin: 0;
+  font-weight: 600;
+  text-wrap: balance;
+}
+h2 {
+  font-size: 21px;
+  margin: 0 0 8px;
+  font-weight: 600;
+  text-wrap: balance;
+}
+h3 {
+  font-size: 15px;
+  margin: 18px 0 6px;
+  font-family: var(--mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+h4 {
+  font-size: 15px;
+  margin: 0 0 4px;
+}
+p {
+  margin: 0 0 10px;
+  max-width: 68ch;
+}
+.lede {
+  font-size: 18px;
+}
+.note,
+.date,
+figcaption,
+.ci,
+.run {
+  color: var(--muted);
+}
+.date {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  margin-right: 6px;
+}
+figure {
+  margin: 14px 0;
+}
+figure img {
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--rule);
+}
+figcaption {
+  font-size: 14px;
+  margin-top: 6px;
+  max-width: 70ch;
+}
+.tablewrap {
+  overflow-x: auto;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+table {
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+th,
+td {
+  padding: 6px 8px;
+  text-align: right;
+  vertical-align: top;
+  white-space: nowrap;
+}
+thead th {
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  cursor: help;
+}
+tbody th {
+  text-align: left;
+  font-weight: 500;
+}
+tbody tr + tr td,
+tbody tr + tr th {
+  border-top: 1px solid var(--rule);
+}
+tr.current {
+  background: var(--wash);
+}
+tr.ref th,
+tr.ref td {
+  color: var(--muted);
+  font-style: italic;
+}
+.ci,
+.run {
+  display: block;
+  font-size: 11px;
+}
+.critique {
+  display: grid;
+  gap: 12px;
+}
+.critic {
+  border-left: 2px solid var(--rule);
+  padding-left: 12px;
+}
+.critic ul,
+.gaps,
+.decisions {
+  margin: 0;
+  padding-left: 20px;
+  max-width: 70ch;
+}
+.critic li,
+.gaps li,
+.decisions li {
+  margin-bottom: 4px;
+}
+.missing {
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+footer {
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+}
+@media (max-width: 520px) {
+  h1 {
+    font-size: 27px;
+  }
+  .lede {
+    font-size: 16.5px;
+  }
+}

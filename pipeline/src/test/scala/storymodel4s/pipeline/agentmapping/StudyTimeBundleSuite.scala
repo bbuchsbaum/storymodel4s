@@ -45,15 +45,17 @@ class StudyTimeBundleSuite extends FunSuite:
   private lazy val rows = units.zip(replies).zip(recall.unitIds).map { case ((u, r), id) =>
     StudyBundle.row(view, protocol, u, id.value, r, Vector("conf"), Some(intervals))
   }
+  private def legacy(name: String): RecordedCondition =
+    RecordedCondition.legacy(name).fold(e => fail(e), identity)
   private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
   private lazy val expected =
     StudyBundle.Expected("p1", "s1", units, producer, Some(intervals))
   private lazy val records =
-    right(StudyBundle.records("norecord", protocolName, recall, view, producer, rows))
+    right(StudyBundle.records(legacy("norecord"), protocolName, recall, view, producer, rows))
   private val provenance = StudyBundle.Provenance(
     "p1",
     "s1",
-    "norecord",
+    legacy("norecord"),
     "m",
     "cli",
     protocolName,
