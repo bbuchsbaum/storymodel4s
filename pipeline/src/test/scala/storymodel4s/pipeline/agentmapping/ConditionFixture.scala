@@ -7,9 +7,18 @@ import storymodel4s.align.MappingResult
 import storymodel4s.align.bridge.TimedSourceView
 import storymodel4s.core.Checksum
 import storymodel4s.pipeline.TimedAnnotationInput
+import storymodel4s.provider.agent.{
+  ExchangeFailure,
+  ModelReply,
+  ModelStopReason,
+  ReplyEvidence,
+  TextExchange
+}
 
-/** An invented two-film source and one session of six units, with bundles written under any
-  * recorded condition. Shared by the producer-condition, view-rule and reference suites.
+/** An invented two-film source and sessions of six units, with study bundles written under any
+  * recorded condition and reference runs in the case-study harness's prompt format. Shared by the
+  * producer-condition, view-rule, reference and golden suites. Loaded bundles are made only by
+  * decoding what the fixture encodes.
   */
 object ConditionFixture:
   import StudyReplay.{RecallUnit, ReplyProtocol, UnitReply}
@@ -33,10 +42,6 @@ object ConditionFixture:
   )
   val texts: Vector[String] =
     Vector("she came in", "then the title", "a mouse", "he left", "um", "what")
-  val units: Vector[RecallUnit] =
-    texts.zipWithIndex.map((t, i) => RecallUnit(i + 1, Json.fromInt(10 + i), t))
-  lazy val recall: PreparedRecall =
-    right(PreparedRecall.supplied("p1_s1", texts, Checksum.ofText(texts.mkString("|"))))
   val protocol: ReplyProtocol = ReplyProtocol.StrictChunked
   val protocolName = "strict-chunked/v1"
   private def item(body: String) = UnitReply.Answered(json(body))
@@ -48,63 +53,108 @@ object ConditionFixture:
     UnitReply.Omitted,
     item("""{"referent":99,"referent_film":1,"narrative":1}""")
   )
-  lazy val rows: Vector[StudyBundle.Row] =
-    units.zip(replies).zip(recall.unitIds).map { case ((u, r), id) =>
-      StudyBundle.row(view, protocol, u, id.value, r, Vector("conf"))
-    }
 
   def legacy(name: String): RecordedCondition = right(RecordedCondition.legacy(name))
   def declared(name: String, condition: ProducerCondition): RecordedCondition.Declared =
     right(RecordedCondition.declared(name, condition))
 
-  /** Each preceding units, order hidden by a shuffle with `seed`, opaque ids salted with `salt`. */
+  /** Each preceding units, order hidden by a shuffle with `seed`, opaque harness ids salted with
+    * `salt`.
+    */
   def contentLocal(k: Int, seed: Long = 20261117L, salt: String = "20261117"): ProducerCondition =
     right(
       ProducerCondition.of(
         right(ContextWindow.Preceding.of(k)),
         OrderExposure.PooledShuffle(seed),
-        ExposedIds.OpaqueSalted("sha256-prefix10", Checksum.ofText(salt))
+        ExposedIds.OpaqueSalted(ReferenceBundle.HarnessScheme, Checksum.ofText(salt))
       )
     )
 
   val wholeRecall: ProducerCondition = ProducerCondition.WholeRecallInOrder
 
-  def producer(condition: RecordedCondition): AgentMappingRecord.Producer =
-    StudyRecord.producer("cli", "m", "SYSTEM", view, recall, condition.producer)
+  /** One participant-session of a study: its recall, rows, records and bundle. The recall's title
+    * is fixed, so the same texts under another session give the same records.
+    */
+  final class Study(val session: String, val texts: Vector[String], val model: String):
+    val units: Vector[RecallUnit] =
+      texts.zipWithIndex.map((t, i) => RecallUnit(i + 1, Json.fromInt(10 + i), t))
+    lazy val recall: PreparedRecall =
+      right(PreparedRecall.supplied("p1_s1", texts, Checksum.ofText(texts.mkString("|"))))
+    lazy val rows: Vector[StudyBundle.Row] =
+      units.zip(replies).zip(recall.unitIds).map { case ((u, r), id) =>
+        StudyBundle.row(view, protocol, u, id.value, r, Vector("conf"))
+      }
 
-  def records(condition: RecordedCondition): Map[String, MappingResult] =
-    right(
-      StudyBundle.records(condition, protocolName, recall, view, producer(condition), rows)
-    )
+    /** The producer, with the study path's rendering witness when the condition has one. */
+    def producer(condition: RecordedCondition): AgentMappingRecord.Producer =
+      StudyRecord.producer(
+        "cli",
+        model,
+        "SYSTEM",
+        view,
+        recall,
+        RenderedCondition.study(condition).toOption
+      )
 
-  def provenance(condition: RecordedCondition): StudyBundle.Provenance = StudyBundle.Provenance(
-    "p1",
-    "s1",
-    condition,
-    "m",
-    "cli",
-    protocolName,
-    Checksum.ofText("SYSTEM").hex,
-    "0" * 64,
-    PreparedRecall.Segmentation(
-      "supplied",
-      Checksum.ofText(texts.mkString("|")),
-      PreparedRecall.SuppliedRecipe
-    )
-  )
+    def records(condition: RecordedCondition): Map[String, MappingResult] =
+      right(
+        StudyBundle.records(condition, protocolName, recall, view, producer(condition), rows)
+      )
 
-  def bundle(condition: RecordedCondition): Json =
-    StudyBundle.encode(provenance(condition), view, records(condition), rows)
+    def provenance(condition: RecordedCondition): StudyBundle.Provenance =
+      StudyBundle.Provenance(
+        "p1",
+        session,
+        condition,
+        model,
+        "cli",
+        protocolName,
+        Checksum.ofText("SYSTEM").hex,
+        "0" * 64,
+        PreparedRecall.Segmentation(
+          "supplied",
+          Checksum.ofText(texts.mkString("|")),
+          PreparedRecall.SuppliedRecipe
+        )
+      )
 
-  def expected(condition: RecordedCondition): StudyBundle.Expected =
-    StudyBundle.Expected("p1", "s1", units, producer(condition), condition = Some(condition))
+    def bundle(condition: RecordedCondition): Json =
+      StudyBundle.encode(provenance(condition), view, records(condition), rows)
 
+    def expected(condition: RecordedCondition): StudyBundle.Expected =
+      StudyBundle.Expected("p1", session, units, producer(condition), condition = Some(condition))
+
+    def decode(doc: Json, condition: RecordedCondition): Either[String, StudyBundle.Loaded] =
+      StudyBundle.decode(doc, view, recall, expected(condition))
+
+    /** The bundle under `condition`, encoded and decoded. */
+    def loaded(condition: RecordedCondition): StudyBundle.Loaded =
+      right(decode(bundle(condition), condition))
+
+  def study(session: String = "s1", texts: Vector[String] = texts, model: String = "m"): Study =
+    new Study(session, texts, model)
+
+  private lazy val s1 = study()
+  def units: Vector[RecallUnit] = s1.units
+  def recall: PreparedRecall = s1.recall
+  def rows: Vector[StudyBundle.Row] = s1.rows
+  def producer(condition: RecordedCondition): AgentMappingRecord.Producer = s1.producer(condition)
+  def records(condition: RecordedCondition): Map[String, MappingResult] = s1.records(condition)
+  def provenance(condition: RecordedCondition): StudyBundle.Provenance = s1.provenance(condition)
+  def bundle(condition: RecordedCondition): Json = s1.bundle(condition)
+  def expected(condition: RecordedCondition): StudyBundle.Expected = s1.expected(condition)
   def decode(doc: Json, condition: RecordedCondition): Either[String, StudyBundle.Loaded] =
-    StudyBundle.decode(doc, view, recall, expected(condition))
+    s1.decode(doc, condition)
 
   // Reference runs in the case-study harness's prompt format.
 
   val referenceSystem = "REFERENCE SYSTEM"
+
+  /** The harness's opaque id: `"x"` and the first ten hex digits of SHA-256 of `salt:id`. */
+  def harnessId(salt: String, id: String): String = "x" + Checksum.ofText(s"$salt:$id").hex.take(10)
+
+  /** The first three units' ids under the harness scheme with the default salt. */
+  def harnessIds: Vector[String] = recall.unitIds.take(3).map(u => harnessId("20261117", u.value))
 
   /** One item as the harness renders it; a context line only when the window has units. */
   def itemBlock(id: String, context: Option[String], target: String): String =
@@ -114,77 +164,70 @@ object ConditionFixture:
     "CAST\ncast\n\nFILM ANNOTATION\noutline\n\nITEMS (random order)\n\n" +
       blocks.mkString("\n\n") + s"\n\nAnalyse all ${blocks.size} items."
 
-  /** The session's first three units asked as `xa`, `xb`, `xc` (with a foreign item `xz` from
-    * another participant in the first batch), under a window of `k` preceding units.
+  /** What the harness renders as unit `i`'s context under `k` preceding units. */
+  def harnessContext(k: Int)(i: Int): Option[String] =
+    Option.when(k > 0)(ReferenceBundle.contextText(texts, i, k))
+
+  /** The session's first three units asked under `ids`, with a foreign item `xz` from another
+    * participant in the first batch. `context` gives each unit's CONTEXT line, if any.
     */
-  def referenceBatches(
-      k: Int,
-      ids: Vector[String] = Vector("xa", "xb", "xc")
+  def referenceBatchesWith(
+      context: Int => Option[String],
+      ids: Vector[String],
+      target: Int => String = texts(_)
   ): Vector[ReferenceAnswers.Batch] =
-    def ctx(i: Int) = Option.when(k > 0)(texts.slice(math.max(0, i - k), i).mkString(" ") match
-      case "" => "(start of recall)"
-      case s  => s)
-    def block(i: Int) = itemBlock(ids(i), ctx(i), texts(i))
+    def block(i: Int) = itemBlock(ids(i), context(i), target(i))
     Vector(
       ReferenceAnswers.Batch(
-        harnessPrompt(Vector(block(1), itemBlock("xz", ctx(0), "other"), block(0))),
+        harnessPrompt(Vector(block(1), itemBlock("xz", context(0), "other"), block(0))),
         Vector(ids(1), "xz", ids(0))
       ),
       ReferenceAnswers.Batch(harnessPrompt(Vector(block(2))), Vector(ids(2)))
     )
 
-  def referenceReplies(ids: Vector[String] = Vector("xa", "xb", "xc")): Map[Int, String] = Map(
-    0 -> (s"""{"items":[{"id":"${ids(
-        0
-      )}","talk":"episodic","hedge":false,"refs":[{"words":"she came in",""" +
-      s""""form":"specific","alts":[{"w":0.9,"iv":[[1,1]]}]}]},{"id":"xz","talk":"fragment"}]}"""),
+  /** The harness's rendering of the first three units under `k` preceding units. */
+  def referenceBatches(k: Int, ids: Vector[String] = harnessIds): Vector[ReferenceAnswers.Batch] =
+    referenceBatchesWith(harnessContext(k), ids)
+
+  def referenceReplies(ids: Vector[String]): Map[Int, String] = Map(
+    0 -> (s"""{"items":[{"id":"${ids(0)}","talk":"episodic","hedge":false,"refs":[""" +
+      """{"words":"she came in","form":"specific","alts":[{"w":0.9,"iv":[[1,1]]}]}]},""" +
+      """{"id":"xz","talk":"fragment"}]}"""),
     1 -> s"""{"items":[{"id":"${ids(2)}","talk":"commentary","hedge":false,"refs":[]}]}"""
   )
 
   def serving(
       batches: Vector[ReferenceAnswers.Batch],
       replies: Map[Int, String]
-  ): String => Either[
-    storymodel4s.provider.agent.ExchangeFailure,
-    storymodel4s.provider.agent.ModelReply
-  ] =
+  ): String => Either[ExchangeFailure, ModelReply] =
     prompt =>
-      batches
-        .indexWhere(_.prompt == prompt)
-        .match
-          case -1 => None
-          case b  => replies.get(b)
-        .map(text =>
-          storymodel4s.provider.agent.ModelReply(
-            "opus",
-            text,
-            storymodel4s.provider.agent.ModelStopReason.EndTurn,
-            storymodel4s.provider.agent.ReplyEvidence.Authored
-          )
-        )
+      val b = batches.indexWhere(_.prompt == prompt)
+      replies
+        .get(b)
+        .map(text => ModelReply("opus", text, ModelStopReason.EndTurn, ReplyEvidence.Authored))
         .toRight(
-          storymodel4s.provider.agent.ExchangeFailure.RecordingMissing(
-            storymodel4s.provider.agent.TextExchange.key("cli", "opus", referenceSystem, prompt)
+          ExchangeFailure.RecordingMissing(
+            TextExchange.key("cli", "opus", referenceSystem, prompt)
           )
         )
 
-  /** Replay the reference batches and gather this session's units, batches and expectation. */
+  /** One replayed reference run for this session: what the bundle is built from and read against.
+    */
   final case class ReferenceRun(
       provenance: ReferenceBundle.Provenance,
       recorded: Vector[ReferenceBundle.Recorded],
       units: Vector[ReferenceBundle.UnitAnswer],
       expected: ReferenceBundle.Expected
   ):
-    def doc: Either[String, Json] =
-      ReferenceBundle.build(provenance, SourceRows.of(view), recorded, units)
+    def doc: Either[ReferenceBundle.RenderingRefusal, Json] =
+      ReferenceBundle.build(provenance, SourceRows.of(view), expected.recall, recorded, units)
     def loaded: Either[String, ReferenceBundle.Loaded] =
-      doc.flatMap(ReferenceBundle.decode(_, SourceRows.of(view), expected))
+      doc.left.map(_.message).flatMap(ReferenceBundle.decode(_, SourceRows.of(view), expected))
 
   def referenceRun(
       condition: RecordedCondition.Declared,
       batches: Vector[ReferenceAnswers.Batch],
-      ids: Vector[String] = Vector("xa", "xb", "xc"),
-      model: String = "opus"
+      ids: Vector[String] = harnessIds
   ): ReferenceRun =
     val rows = SourceRows.of(view)
     val (outcomes, receipts) = right(
@@ -202,7 +245,7 @@ object ConditionFixture:
       "p1",
       "s1",
       condition,
-      model,
+      "opus",
       "cli",
       ReferenceAnswers.Schema.LocalV2,
       Checksum.ofText(referenceSystem).hex
@@ -215,9 +258,10 @@ object ConditionFixture:
         "p1",
         "s1",
         asked,
+        unitIds.zip(texts),
         recorded,
         condition,
-        model,
+        "opus",
         "cli",
         ReferenceAnswers.Schema.LocalV2,
         Checksum.ofText(referenceSystem).hex

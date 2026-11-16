@@ -210,10 +210,18 @@ object StudyBundle:
       .rendered(condition)
       .left
       .map(_.message)
-      .flatMap(_ => fields(condition, protocolName, recall, view, producer, rows))
+      .flatMap { rendered =>
+        Either
+          .cond(
+            producer.renderingSha256 == rendered.renderingSha256,
+            (),
+            "the producer's rendering is not the condition's"
+          )
+          .flatMap(_ => fields(rendered, protocolName, recall, view, producer, rows))
+      }
 
   private def fields(
-      condition: RecordedCondition,
+      condition: RenderedCondition,
       protocolName: String,
       recall: PreparedRecall,
       view: TimedSourceView,
@@ -228,7 +236,7 @@ object StudyBundle:
           .record(
             f,
             condition,
-            StudyRecord.policy(condition, protocolName, f),
+            StudyRecord.policy(condition.recorded, protocolName, f),
             recall,
             view,
             bound,
@@ -301,19 +309,30 @@ object StudyBundle:
       )
       .deepMerge(Json.fromFields(transcript.map("recall" -> _)))
 
-  /** What a reader recovers: both records, re-checked, and the unit rows as written. */
-  final case class Loaded(
-      records: Map[String, MappingResult],
-      units: Vector[Json],
-      condition: RecordedCondition,
-      participant: String,
-      session: String,
-      model: String,
-      provider: String,
-      protocol: String
+  /** What a reader recovers: both records, re-checked, the unit rows as written, the condition, and
+    * who produced it. Built only by `decode`, so a loaded bundle is one that was checked.
+    */
+  final class Loaded private[StudyBundle] (
+      val records: Map[String, MappingResult],
+      val units: Vector[Json],
+      val condition: RecordedCondition,
+      val participant: String,
+      val session: String,
+      val model: String,
+      val provider: String,
+      val protocol: String
   ):
     /** The bundle's identity: its two records' digests, in field order. */
     def identity: Checksum = Checksum.ofText(Fields.map(f => records(f).digest.hex).mkString("\n"))
+
+    override def equals(other: Any): Boolean = other match
+      case that: Loaded =>
+        identity == that.identity && units == that.units && condition == that.condition &&
+        (participant, session, model, provider, protocol) ==
+          (that.participant, that.session, that.model, that.provider, that.protocol)
+      case _ => false
+    override def hashCode: Int = (identity, participant, session).hashCode
+    override def toString: String = s"Loaded($participant, $session, $condition)"
 
   /** Keys a self-reported extra may not use: they would overwrite a row's own fields wherever a row
     * is flattened into a reply file.
@@ -409,14 +428,14 @@ object StudyBundle:
         .filter(s => s == Schema || s == SchemaV3)
         .toRight("not a v2 or v3 mapping bundle")
       condition <- readCondition(schema, p)
-      _ <- StudyExport.rendered(condition).left.map(_.message)
+      rendered <- StudyExport.rendered(condition).left.map(_.message)
       _ <- Either.cond(
         expected.condition.forall(_ == condition),
         (),
         "the bundle names another condition"
       )
       _ <- Either.cond(
-        expected.producer.renderingSha256 == condition.producer.map(_.digest),
+        expected.producer.renderingSha256 == rendered.renderingSha256,
         (),
         "the producer's rendering is not the bundle's producer condition"
       )
@@ -544,7 +563,7 @@ object StudyBundle:
               )
             )
             again <- StudyRecord
-              .record(f, condition, policy, recall, view, bound, judged(f))
+              .record(f, rendered, policy, recall, view, bound, judged(f))
               .left
               .map(e => s"$f: ${e.message}")
             _ <- Either.cond(
@@ -554,7 +573,7 @@ object StudyBundle:
             )
           yield done.updated(f, record)
       }
-    yield Loaded(
+    yield new Loaded(
       records,
       units,
       condition,

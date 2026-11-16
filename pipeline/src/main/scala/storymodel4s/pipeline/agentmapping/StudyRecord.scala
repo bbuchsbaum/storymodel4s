@@ -188,7 +188,7 @@ object StudyRecord:
     */
   def record(
       field: String,
-      condition: RecordedCondition,
+      condition: RenderedCondition,
       policy: DecisionPolicyId,
       recall: PreparedRecall,
       view: TimedSourceView,
@@ -202,7 +202,7 @@ object StudyRecord:
         declared <- universe(view)
         policies <- MappingPolicies.of(
           InferencePolicy.Unspecified("no inference executed; recorded model choice"),
-          contextPolicy(condition),
+          contextPolicy(condition.recorded),
           CandidatePolicy.Unknown(
             "every target was offered in the prompt; no candidate set computed"
           ),
@@ -242,7 +242,7 @@ object StudyRecord:
       system: String,
       view: TimedSourceView,
       recall: PreparedRecall,
-      condition: Option[ProducerCondition] = None
+      rendered: Option[RenderedCondition] = None
   ): AgentMappingRecord.Producer =
     AgentMappingRecord.Producer(
       provider,
@@ -250,5 +250,5 @@ object StudyRecord:
       Checksum.ofText(system),
       view.artifact,
       recall.segmentation.artifactSha256,
-      renderingSha256 = condition.map(_.digest)
+      rendering = rendered
     )

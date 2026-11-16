@@ -314,3 +314,35 @@ object RecordedCondition:
 
   def declared(name: String, condition: ProducerCondition): Either[String, Declared] =
     named(name).map(new Declared(_, condition))
+
+/** A recorded condition that a production path is known to render: the witness a record needs
+  * before it may carry a rendering identity.
+  *
+  * Why a checked type: a declared condition alone is a label (ADR 0022: caller assertions remain
+  * asserted provenance). Only the study path's own check can make one, so a record's rendering
+  * identity can only come from a condition that path's prompts actually show.
+  */
+final class RenderedCondition private (val recorded: RecordedCondition):
+  def name: String = recorded.name
+  def producer: Option[ProducerCondition] = recorded.producer
+
+  /** The rendering identity a record's decision receipt carries; none for a legacy condition. */
+  def renderingSha256: Option[Checksum] = producer.map(_.digest)
+
+  override def equals(other: Any): Boolean = other match
+    case that: RenderedCondition => recorded == that.recorded
+    case _                       => false
+  override def hashCode: Int = ("rendered", recorded).hashCode
+  override def toString: String = s"RenderedCondition($recorded)"
+
+object RenderedCondition:
+  /** The only producer condition a study export renders. `StudyReplay.validate` requires every
+    * chunk prompt to hold every unit's line, numbered by its position, in recall order; so a study
+    * prompt shows the whole recall, in order, with positional ids, and a declared condition must
+    * say exactly that. A legacy condition asserts nothing and passes.
+    */
+  def study(condition: RecordedCondition): Either[ProducerCondition.Refusal, RenderedCondition] =
+    condition.producer match
+      case Some(p) if p != ProducerCondition.WholeRecallInOrder =>
+        Left(ProducerCondition.Refusal.NotRendered("study export path", p.rendering))
+      case _ => Right(new RenderedCondition(condition))

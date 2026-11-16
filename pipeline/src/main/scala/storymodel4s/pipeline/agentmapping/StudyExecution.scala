@@ -55,7 +55,7 @@ object StudyExecution:
     StudyBundle.Fields.foreach { field =>
       required(
         scala.util
-          .Try(StudyRecord.policy(index.condition, index.protocolName, field))
+          .Try(StudyRecord.policy(index.condition.recorded, index.protocolName, field))
           .toEither
           .left
           .map(_ => "condition and protocol cannot form a valid mapping policy identifier")
@@ -141,19 +141,26 @@ object StudyExecution:
         p.index.system,
         p.view,
         recall,
-        p.index.condition.producer
+        Some(p.index.condition)
       )
       val rows = replies.zip(recall.unitIds).map { case ((u, r), id) =>
         StudyBundle.row(p.view, p.index.protocol, u, id.value, r, p.index.extras, intervals)
       }
       val records = required(
-        StudyBundle.records(p.index.condition, p.index.protocolName, recall, p.view, producer, rows)
+        StudyBundle.records(
+          p.index.condition.recorded,
+          p.index.protocolName,
+          recall,
+          p.view,
+          producer,
+          rows
+        )
       )
       val encoded = StudyBundle.encode(
         StudyBundle.Provenance(
           entry.participant,
           entry.session,
-          p.index.condition,
+          p.index.condition.recorded,
           p.index.model,
           provider,
           p.index.protocolName,
@@ -200,7 +207,7 @@ object StudyExecution:
                 intervals,
                 execution,
                 calls() - before,
-                Some(p.index.condition)
+                Some(p.index.condition.recorded)
               )
             )
           )

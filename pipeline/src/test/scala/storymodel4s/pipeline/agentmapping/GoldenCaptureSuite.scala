@@ -8,6 +8,9 @@ import storymodel4s.core.Checksum
   * The digests below were captured by running the same fixture on 5078f169f, the parent of the
   * producer-condition slice. A change to legacy encoding, policy identifiers or receipt inputs
   * changes them.
+  *
+  * The capture test and the steps to regenerate the constants from that commit are in
+  * `pipeline/src/test/resources/storymodel4s/golden/LegacyBundleCapture.scala.txt`.
   */
 class GoldenCaptureSuite extends FunSuite:
   import ConditionFixture.*

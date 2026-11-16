@@ -75,3 +75,52 @@ class ProducerConditionBoundarySuite extends FunSuite:
         """import storymodel4s.pipeline.agentmapping.*; import storymodel4s.core.Checksum; new SourceRows(Checksum.ofText("x"), Set(1, 2))"""
       ).nonEmpty
     )
+
+  test("a rendered condition is made only by the study path's check"):
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; RecordedCondition.legacy("a").flatMap(c => RenderedCondition.study(c).left.map(_.message))"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; new RenderedCondition(??? : RecordedCondition)"""
+      ).nonEmpty
+    )
+
+  test("a loaded study bundle is made only by decoding"):
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; import storymodel4s.align.bridge.TimedSourceView; StudyBundle.decode(??? : io.circe.Json, ??? : TimedSourceView, ??? : PreparedRecall, ??? : StudyBundle.Expected)"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; new StudyBundle.Loaded(Map.empty, Vector.empty, ??? : RecordedCondition, "p", "s", "m", "c", "x")"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; (??? : StudyBundle.Loaded).copy(session = "s2")"""
+      ).nonEmpty
+    )
+
+  test("a reference rendering and a loaded reference bundle are made only by their checks"):
+    assertEquals(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; ReferenceBundle.rendering(??? : ProducerCondition, Vector.empty, Vector.empty, Vector.empty)"""
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; import storymodel4s.core.Checksum; new ReferenceBundle.Rendering(io.circe.Json.Null, Checksum.ofText("x"))"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """import storymodel4s.pipeline.agentmapping.*; new ReferenceBundle.Loaded(??? : ReferenceBundle.Provenance, Vector.empty, ??? : ReferenceBundle.Rendering)"""
+      ).nonEmpty
+    )

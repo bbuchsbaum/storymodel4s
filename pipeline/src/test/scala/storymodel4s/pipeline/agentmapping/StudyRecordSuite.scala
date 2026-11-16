@@ -45,6 +45,8 @@ class StudyRecordSuite extends FunSuite:
   private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
   private def legacy(name: String): RecordedCondition =
     RecordedCondition.legacy(name).fold(e => fail(e), identity)
+  private def studied(c: RecordedCondition): RenderedCondition =
+    RenderedCondition.study(c).fold(e => fail(e.message), identity)
   private val policy = StudyRecord.policy(legacy("annotation"), "strict-chunked/v1", "referent")
 
   private def judged(s: Stated) = StudyRecord.judge(view, s)
@@ -59,7 +61,15 @@ class StudyRecordSuite extends FunSuite:
   private lazy val record =
     right(
       StudyRecord
-        .record("referent", legacy("annotation"), policy, recall, view, producer, judgements)
+        .record(
+          "referent",
+          studied(legacy("annotation")),
+          policy,
+          recall,
+          view,
+          producer,
+          judgements
+        )
         .left
         .map(_.message)
     )
@@ -112,7 +122,7 @@ class StudyRecordSuite extends FunSuite:
     val forged = judgements.updated(0, Judgement.Scene(2, view.groupRefs(2)))
     assertEquals(
       StudyRecord
-        .record("referent", legacy("annotation"), policy, recall, view, producer, forged)
+        .record("referent", studied(legacy("annotation")), policy, recall, view, producer, forged)
         .left
         .toOption,
       Some(MappingRefusal.UniverseMismatch)
@@ -120,7 +130,7 @@ class StudyRecordSuite extends FunSuite:
     val cartoon = judgements.updated(0, Judgement.Collection(2, view.collectionRefs(2)))
     assertEquals(
       StudyRecord
-        .record("referent", legacy("annotation"), policy, recall, view, producer, cartoon)
+        .record("referent", studied(legacy("annotation")), policy, recall, view, producer, cartoon)
         .left
         .toOption,
       Some(MappingRefusal.UniverseMismatch)
@@ -202,7 +212,7 @@ class StudyRecordSuite extends FunSuite:
       StudyRecord
         .record(
           "referent",
-          legacy("annotation"),
+          studied(legacy("annotation")),
           policy,
           recall,
           view,
@@ -220,7 +230,15 @@ class StudyRecordSuite extends FunSuite:
     assertNotEquals(StudyRecord.policy(legacy("auto"), "strict-chunked/v1", "referent"), policy)
     val other = right(
       StudyRecord
-        .record("narrative", legacy("annotation"), narrative, recall, view, producer, judgements)
+        .record(
+          "narrative",
+          studied(legacy("annotation")),
+          narrative,
+          recall,
+          view,
+          producer,
+          judgements
+        )
         .left
         .map(_.message)
     )

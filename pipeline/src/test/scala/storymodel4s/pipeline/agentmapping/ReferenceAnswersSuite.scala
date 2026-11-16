@@ -222,6 +222,8 @@ class ReferenceAnswersSuite extends FunSuite:
 
   // The reference bundle.
 
+  import ReferenceBundle.RenderingRefusal
+
   private lazy val condition = declared("local", contentLocal(2))
   private lazy val run = referenceRun(condition, referenceBatches(2))
 
@@ -248,12 +250,18 @@ class ReferenceAnswersSuite extends FunSuite:
     // Only this session's items are listed; the foreign item stays out.
     assertEquals(
       batches.head.hcursor.get[Vector[String]]("items").toOption,
-      Some(Vector("xb", "xa"))
+      Some(Vector(harnessIds(1), harnessIds(0)))
     )
     assertEquals(
       doc.hcursor.downField("rendering").get[String]("sha256").toOption,
       Some(back.rendering.sha256.hex)
     )
+    val checks = doc.hcursor.downField("rendering").downField("checks")
+    assertEquals(
+      checks.get[Boolean]("idsMonotoneInUnitOrder").toOption,
+      Some(harnessIds == harnessIds.sorted)
+    )
+    assert(checks.get[String]("context").toOption.exists(_.contains("exactly the texts of the 2")))
 
   test("the rendering identity is derived from the prompts, not the condition alone"):
     val other =
@@ -261,25 +269,43 @@ class ReferenceAnswersSuite extends FunSuite:
     assertNotEquals(right(other.loaded).rendering.sha256, right(run.loaded).rendering.sha256)
     assertNotEquals(right(run.loaded).rendering.sha256, contentLocal(2).digest)
 
+  test("a CONTEXT that carries extra units under Preceding(2) is refused"):
+    // Every unit shown with the whole rest of the recall, declared as two preceding units.
+    val whole = (i: Int) => Some(texts.patch(i, Nil, 1).mkString(" "))
+    assertEquals(
+      referenceRun(condition, referenceBatchesWith(whole, harnessIds)).doc,
+      Left(RenderingRefusal.ContextMismatch(1))
+    )
+    // A context with one unit more than the window renders.
+    val three = (i: Int) => Some(ReferenceBundle.contextText(texts, i, 3) + " extra")
+    assertEquals(
+      referenceRun(condition, referenceBatchesWith(three, harnessIds)).doc,
+      Left(RenderingRefusal.ContextMismatch(1))
+    )
+
+  test("a TARGET that is not the unit's own text is refused"):
+    val batches = referenceBatchesWith(harnessContext(2), harnessIds, i => texts(i) + " too")
+    assertEquals(referenceRun(condition, batches).doc, Left(RenderingRefusal.TargetMismatch(1)))
+
   test("a unit whose ITEM line is not in its batch prompt is refused"):
     val missing = referenceBatches(2).updated(
       1,
-      Batch(harnessPrompt(Vector(itemBlock("xq", Some("ctx"), "a mouse"))), Vector("xc"))
+      Batch(
+        harnessPrompt(Vector(itemBlock("xq", harnessContext(2)(2), texts(2)))),
+        Vector(harnessIds(2))
+      )
     )
-    assertEquals(
-      referenceRun(condition, missing).doc,
-      Left("unit 3: its ITEM line is not once in its prompt")
-    )
+    assertEquals(referenceRun(condition, missing).doc, Left(RenderingRefusal.ItemLine(3)))
 
-  test("context lines must match the declared window"):
+  test("context lines must be present exactly when the window has preceding units"):
     // Prompts with context, declared as target-only; and prompts without, declared as k = 2.
     assertEquals(
-      referenceRun(declared("local", contentLocal(0)), referenceBatches(2)).doc.left.toOption,
-      Some("unit 1: the window is the target only but its prompt shows context")
+      referenceRun(declared("local", contentLocal(0)), referenceBatches(2)).doc,
+      Left(RenderingRefusal.ContextPresent(1))
     )
     assertEquals(
-      referenceRun(condition, referenceBatches(0)).doc.left.toOption,
-      Some("unit 1: the window has preceding units but its prompt shows no context")
+      referenceRun(condition, referenceBatches(0)).doc,
+      Left(RenderingRefusal.ContextMissing(1))
     )
     assert(referenceRun(declared("local", contentLocal(0)), referenceBatches(0)).doc.isRight)
 
@@ -287,37 +313,62 @@ class ReferenceAnswersSuite extends FunSuite:
     val positional = Vector("u1", "u2", "u3")
     assertEquals(
       referenceRun(condition, referenceBatches(2, positional), positional).doc,
-      Left("unit 1: its item id encodes its position, under declared opaque ids")
+      Left(RenderingRefusal.IdEncodesPosition(1))
     )
     assert(ReferenceBundle.encodesPosition("3", 3, 2, "unit-x"))
     assert(ReferenceBundle.encodesPosition("item_002", 9, 1, "unit-x"))
     assert(ReferenceBundle.encodesPosition("x-unit-x", 9, 1, "unit-x"))
     assert(!ReferenceBundle.encodesPosition("x3f9a01c2be", 3, 2, "unit-x"))
 
+  test("ids must have the declared scheme's shape; ids in alphabetical recall order do not"):
+    val alphabetical = Vector("xa", "xb", "xc")
+    assertEquals(
+      referenceRun(condition, referenceBatches(2, alphabetical), alphabetical).doc,
+      Left(RenderingRefusal.IdShape(1, ReferenceBundle.HarnessScheme))
+    )
+    val unknown = right(
+      ProducerCondition.of(
+        right(ContextWindow.Preceding.of(2)),
+        OrderExposure.PooledShuffle(1L),
+        ExposedIds.OpaqueSalted("other-scheme", Checksum.ofText("s"))
+      )
+    )
+    assertEquals(
+      referenceRun(declared("local", unknown), referenceBatches(2)).doc,
+      Left(RenderingRefusal.UnknownIdScheme("other-scheme"))
+    )
+
   test("a whole-recall condition is refused on the reference path"):
     assertEquals(
       referenceRun(declared("local", wholeRecall), referenceBatches(2)).doc,
-      Left(ProducerCondition.Refusal.NotRendered("reference path", wholeRecall.rendering).message)
+      Left(RenderingRefusal.NotRendered(wholeRecall.rendering))
+    )
+
+  test("decoding against another recall refuses the rendering"):
+    val doc = right(run.doc)
+    val shifted = run.expected.copy(recall = run.expected.recall.map((id, t) => id -> (t + "!")))
+    assertEquals(
+      ReferenceBundle.decode(doc, rows, shifted),
+      Left(RenderingRefusal.TargetMismatch(1).message)
     )
 
   test("a reference bundle refuses an edited answer, reply, receipt, rendering or condition"):
     val doc = right(run.doc)
-    def unit0(f: Json => Json)(d: Json) =
-      d.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(1, f(us(1))))))
+    def at(i: Int)(f: Json => Json)(d: Json) =
+      d.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(i, f(us(i))))))
     def decodeIt(d: Json) = ReferenceBundle.decode(d, rows, run.expected)
-    // Unit 1 is in position 0; edit the answered unit xa.
-    def first(f: Json => Json)(d: Json) =
-      d.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(0, f(us(0))))))
-    assert(decodeIt(first(_.mapObject(_.add("answer", Json.obj())))(doc)).isLeft)
+    assert(decodeIt(at(0)(_.mapObject(_.add("answer", Json.obj())))(doc)).isLeft)
     assertEquals(
       decodeIt(
-        first(
+        at(0)(
           _.mapObject(o => o.add("reply", o("reply").get.mapObject(_.add("hedge", Json.True))))
-        )(doc)
+        )(
+          doc
+        )
       ),
       Left("unit 1: the answer is not what its reply gives against this source")
     )
-    assert(decodeIt(unit0(_.mapObject(_.add("reply", Json.obj())))(doc)).isLeft)
+    assert(decodeIt(at(1)(_.mapObject(_.add("reply", Json.obj())))(doc)).isLeft)
     val receipt = doc.mapObject(o =>
       o.add(
         "batches",

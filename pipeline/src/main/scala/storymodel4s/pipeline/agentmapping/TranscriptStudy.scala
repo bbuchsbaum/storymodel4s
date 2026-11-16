@@ -142,7 +142,7 @@ object TranscriptStudy:
       StudyBundle.Fields.foreach { field =>
         val _ = need(
           scala.util
-            .Try(StudyRecord.policy(checked.condition, checked.protocolName, field))
+            .Try(StudyRecord.policy(checked.condition.recorded, checked.protocolName, field))
             .toEither
             .left
             .map(_ => "condition and protocol cannot form a valid mapping policy identifier")

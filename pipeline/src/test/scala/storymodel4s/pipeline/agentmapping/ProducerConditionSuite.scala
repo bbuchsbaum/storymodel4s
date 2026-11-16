@@ -224,7 +224,7 @@ class ProducerConditionSuite extends FunSuite:
   test("a study export refuses a declared condition its prompts cannot render"):
     val local = indexBase.mapObject(_.add("producerCondition", contentLocal(2).json))
     assertEquals(
-      StudyExport.parseIndex(local).map(_.condition),
+      StudyExport.parseIndex(local).map(_.condition.recorded),
       Left(
         ProducerCondition.Refusal
           .NotRendered("study export path", contentLocal(2).rendering)
@@ -245,10 +245,13 @@ class ProducerConditionSuite extends FunSuite:
     )
 
   test("positive control: a study export reads legacy, or the whole recall in order"):
-    assertEquals(StudyExport.parseIndex(indexBase).map(_.condition), Right(legacy("local")))
+    assertEquals(
+      StudyExport.parseIndex(indexBase).map(_.condition.recorded),
+      Right(legacy("local"))
+    )
     val whole = indexBase.mapObject(_.add("producerCondition", wholeRecall.json))
     assertEquals(
-      StudyExport.parseIndex(whole).map(_.condition),
+      StudyExport.parseIndex(whole).map(_.condition.recorded),
       Right(declared("local", wholeRecall))
     )
     val bad = indexBase.mapObject(_.add("producerCondition", Json.obj("window" -> Json.Null)))

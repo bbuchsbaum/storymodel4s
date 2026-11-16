@@ -49,7 +49,7 @@ object StudyExport:
     */
   final case class Index(
       model: String,
-      condition: RecordedCondition,
+      condition: RenderedCondition,
       system: String,
       protocol: StudyReplay.ReplyProtocol,
       protocolName: String,
@@ -264,17 +264,11 @@ object StudyExport:
         table <- SceneIntervals.build(view, scales, clock._1, clock._2)
       yield Some((table, Checksum.ofText(raw).hex))
 
-  /** The only producer condition a study export renders. `StudyReplay.validate` requires every
-    * chunk prompt to hold every unit's line, numbered by its position, in recall order; so a study
-    * prompt shows the whole recall, in order, with positional ids, and a declared condition must
-    * say exactly that. Anything else would be asserted, not rendered (ADR 0022). A legacy condition
-    * asserts nothing and passes.
-    */
-  def rendered(condition: RecordedCondition): Either[ProducerCondition.Refusal, RecordedCondition] =
-    condition.producer match
-      case Some(p) if p != ProducerCondition.WholeRecallInOrder =>
-        Left(ProducerCondition.Refusal.NotRendered("study export path", p.rendering))
-      case _ => Right(condition)
+  /** The study path's rendering check; see `RenderedCondition.study`. */
+  def rendered(
+      condition: RecordedCondition
+  ): Either[ProducerCondition.Refusal, RenderedCondition] =
+    RenderedCondition.study(condition)
 
   /** A receipt with its producer condition beside the condition's name, when one was declared. */
   def describe(condition: RecordedCondition)(doc: Json): Json =
@@ -395,7 +389,7 @@ object StudyExport:
         p => TextExchange.replay(recordings, provider, index.model, index.system, p)
       )
       .fold(f => refuse(s"${s.participant} ${s.session}: $f"), identity)
-    val doc = StudyExport.describe(index.condition)(
+    val doc = StudyExport.describe(index.condition.recorded)(
       Json.obj(
         "participant" -> Json.fromString(s.participant),
         "session" -> Json.fromString(s.session),
@@ -502,12 +496,12 @@ object StudyExport:
         index.system,
         view,
         recall,
-        index.condition.producer
+        Some(index.condition)
       )
     val perField = fields.map { field =>
       val judgements =
         replies.map((_, r) => StudyRecord.judge(view, index.protocol, r, field, None))
-      val policy = StudyRecord.policy(index.condition, index.protocolName, field)
+      val policy = StudyRecord.policy(index.condition.recorded, index.protocolName, field)
       val record = StudyRecord
         .record(field, index.condition, policy, recall, view, producer, judgements)
         .fold(e => refuse(s"${entry.name} $field: ${e.message}"), identity)
@@ -515,7 +509,7 @@ object StudyExport:
     }
     (entry, s.units.size, perField)
   }
-  val doc = StudyExport.describe(index.condition)(
+  val doc = StudyExport.describe(index.condition.recorded)(
     Json.obj(
       "schema" -> Json.fromString("storymodel4s.agentmapping.study-records-receipt/v1"),
       "model" -> Json.fromString(index.model),

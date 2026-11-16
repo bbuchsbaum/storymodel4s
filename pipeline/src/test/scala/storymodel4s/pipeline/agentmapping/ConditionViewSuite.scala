@@ -37,12 +37,13 @@ class ConditionViewSuite extends FunSuite:
       Left(ConditionView.Refusal.DifferentEstimands(legacy("annotation"), whole))
     )
 
-  private def as(b: StudyBundle.Loaded, session: String) = b.copy(session = session)
+  // Sessions are separate recalls; each bundle is encoded and decoded, never constructed.
+  private val retold = texts.updated(0, "she walked in")
 
   test("positive control: a study readout of two sessions of one condition and producer"):
-    val b = loaded(whole)
-    val out =
-      right(ConditionView.readout(Vector(b, as(b, "s2").copy(records = records(legacy("x"))))))
+    val out = right(
+      ConditionView.readout(Vector(loaded(whole), study("s2", retold).loaded(whole)))
+    )
     assertEquals(out.hcursor.get[Int]("bundles").toOption, Some(2))
     assertEquals(out.hcursor.get[Int]("units").toOption, Some(12))
     assertEquals(
@@ -58,20 +59,20 @@ class ConditionViewSuite extends FunSuite:
       Some("cli/m/strict-chunked/v1")
     )
 
-  test("a study readout refuses the same bundle twice, or its records under another session"):
+  test("a study readout refuses the same bundle twice, or the same records under another session"):
     val b = loaded(whole)
     assertEquals(
       ConditionView.readout(Vector(b, b)),
       Left(ConditionView.Refusal.Duplicate("p1", "s1"))
     )
     assertEquals(
-      ConditionView.readout(Vector(b, as(b, "s2"))),
+      ConditionView.readout(Vector(b, study("s2").loaded(whole))),
       Left(ConditionView.Refusal.Duplicate("p1", "s1"))
     )
 
   test("a study readout pools different models only when pooling is declared"):
     val b = loaded(whole)
-    val other = as(b, "s2").copy(model = "m2", records = records(legacy("x")))
+    val other = study("s2", retold, model = "m2").loaded(whole)
     assertEquals(
       ConditionView.readout(Vector(b, other)),
       Left(
@@ -79,13 +80,12 @@ class ConditionViewSuite extends FunSuite:
           .DifferentProducers("cli/m/strict-chunked/v1", "cli/m2/strict-chunked/v1")
       )
     )
-    val declaredPool =
-      right(
-        ConditionView.readout(
-          Vector(b, other),
-          ConditionView.Pooling.AcrossProducers("model comparison")
-        )
+    val declaredPool = right(
+      ConditionView.readout(
+        Vector(b, other),
+        ConditionView.Pooling.AcrossProducers("model comparison")
       )
+    )
     assertEquals(
       declaredPool.hcursor.downField("pooling").get[String]("acrossProducers").toOption,
       Some("model comparison")
