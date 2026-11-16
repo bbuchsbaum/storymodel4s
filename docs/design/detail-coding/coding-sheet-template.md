@@ -2,35 +2,35 @@
 
 **Packet ID:** <opaque id>
 **Coder ID:** <coder>
-**Pass:** <independent | adjudication>
-**Packet version/receipt:** <value>
-**Predictions visible:** no (required independently)
-**Coverage policy/version:** <required before DL4>
-**Declared graph families/readouts:** <required before graph rows>
+**Pass:** <source-first independent | recall independent | adjudication>
+**Predictions visible:** no
+**Coverage policy:** target-episode-novel-content/v1 unless owner changes it
+**Graph families/readouts:** <declared before coding>
 
-| Recall unit | Recall support | Source evidence | Reference meaning | Reference IDs/alternatives | Disposition | Unavailable basis |
-|---|---|---|---|---|---|---|
-| <R> | | | | | | |
+| Source row/interval | Cast ID | Participant | Action | Speaker | Evidence | Participant coverage | Speaker coverage/gap |
+|---|---|---|---|---|---|---|---|
+| <S> | | | | | | | |
 
-| Atom | Unit | Exact span | Content kind | Address | Processing | Reference | Fidelity | Fidelity evidence | Missing/excluded |
-|---|---|---|---|---|---|---|---|---|---|
-| <D> | | | | | | | | | |
-
-| Source unit | Policy | Credited atoms | Status | In denominator | Evidence/rationale |
+| Recall unit | Exact UTF-16 span | Narrative reference + IDs | Referent/occurrence + IDs | Source evidence | Unavailable basis |
 |---|---|---|---|---|---|
-| <S> | | | | | |
+| <R> | | | | | |
 
-| Occurrence | Source unit | Cast ID | Role | Action | Speaker | Evidence | Status/uncertainty |
+| Atom | Unit | UTF-16 [start,end) + substring | Content | Address | Status/reason | Observed discourse | Reported phenomenology basis | Reference | Fidelity/severity | Evidence |
+|---|---|---|---|---|---|---|---|---|---|---|
+| <D> | | | | | | | | | | |
+
+| Source unit | Policy | Credited atoms | Status | In denominator | Separate exclusion/unresolved | Evidence |
+|---|---|---|---|---|---|---|
+| <S> | | | | | | |
+
+| Occurrence | Source unit | Cast ID | Role | Action | Speaker | Evidence | Status |
 |---|---|---|---|---|---|---|---|
 | <O> | | | | | | | |
 
-| Graph family | From | To | Relation/readout | Evidence | Disposition | Reason |
+| Graph family | From | To | Readout | Evidence | Disposition | Reason |
 |---|---|---|---|---|---|---|
 | <declared> | | | | | | |
 
-| Start/end | Unit IDs | Family | Active minutes | Source-review minutes | Break minutes | Exposure/access deviation | Notes |
-|---|---|---|---:|---:|---:|---|---|
-| | | | | | | | |
-
-Independent-pass declaration: completed without model predictions or prior coder labels except
-recorded packet material.
+| Active minutes | Source-review | Break | Exposure/access deviation | Notes |
+|---:|---:|---:|---|---|
+| | | | | |

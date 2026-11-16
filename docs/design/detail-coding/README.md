@@ -1,38 +1,31 @@
 # Joint detail-coding rubric
 
-**Status:** Draft operational material; not a study protocol, recruitment approval, human pilot, or
-accuracy evidence. Human use requires authorized source/recall material; files here use synthetic
-content only.
+**Status:** Draft operational material, not a study protocol, recruitment approval, human pilot, or
+accuracy evidence. Human use requires authorized material; files here use admitted synthetic content.
 
-One blind effort may cover preview scene/referent, DL1 atoms/addresses, DL3 fidelity, DL4 coverage,
-DL6 participant/action/occurrence, and selected declared graph families/readouts.
+Independent coders receive source/recall packet and opaque IDs, never predictions, scores or prior
+labels. Seal and retain independent sheets; adjudication is a new cited record, never overwrite.
 
-## Blinding and records
+## Source-first DL2
 
-Independent coders receive source evidence, recall text, opaque IDs, and a sheet. Predictions,
-candidate scores, and prior labels remain hidden until sealed submission. Preserve each independent
-sheet verbatim. Adjudication is a new record citing disagreement and rationale; it never overwrites
-disagreement. No participant recall, raw story text, protected evaluation item, or prediction is
-committed here. Admission, REB/IRB basis, recruitment, access control and frozen split are owner
-and human-protocol work.
+Before recall, code supplied source rows: stable cast ID, row/interval, participant, action,
+dialogue speaker, and source-row/speech/frame evidence. Record unidentified-participant and
+no-speaker rows as coverage gaps. Recall never creates cast identity.
 
-## Families and rules
+## Fields and rules
 
-| Family | Question | Outcomes |
-|---|---|---|
-| Preview | Which narrative/referent scene is supported? | single, joint, broad, alternative, unresolved |
-| DL1 | Which exact-span atoms occur? | kind, address/processing, support, unavailable |
-| DL3 | How does claim compare with source? | accurate, gist-correct/detail-wrong, inferred, contradicted, not assessed |
-| DL4 | Under declared policy, what is credited? | credited, not credited, unresolved, excluded, not assessed |
-| DL6 | Who did what in which occurrence? | cast ID/role/action/occurrence, unresolved |
-| Graph | Is a declared relation/readout supported? | asserted, absent, unresolved, not assessed |
+Preview has separate narrative-reference and referent/occurrence fields. DL1 atoms use exact UTF-16
+half-open spans and literal substring. Atoms may overlap if a span supports distinct claims:
+overlap alone neither proves duplicate atoms nor authorizes merging. Keep content, address,
+assessment status, observed discourse and reported phenomenology separate. Phenomenology is explicit
+report or separately declared measurement only.
 
-1. Preserve exact spans; containment and non-overlap are intake checks.
-2. Keep content, fidelity and processing/phenomenology distinct.
-3. Cite source row, interval, frame or speech evidence for source assertions.
-4. Preserve joint/broad/alternative/unresolved meanings; never force a favourite.
-5. Apply DL4 only after policy and denominator are named.
-6. Record repetition/discourse; policy decides their later projection.
-7. Declare graph families before coding; graph is not a residual category.
+Completed DL3 grade is exactly: supported; gist-correct/detail-error with severity; contradicted;
+recaller-inference; external; invented; unverifiable; misread; not-assessed. Invented requires
+adequate source record; otherwise unverifiable. External does not set address. Alternatives contain
+supported hypotheses only; unresolved is separate.
 
-Use the sheet, timing-pilot report, and synthetic worked example in this directory.
+DL4 uses target-episode-novel-content/v1 unless owner changes it: denominator is admitted atoms
+with resolved address and completed assessment; internal credit is target-specific, non-discourse,
+non-repetition content. Report unresolved, pending/unavailable/refused, discourse, repetition and
+exclusions separately. Declare graph families before coding; graph is not residual.

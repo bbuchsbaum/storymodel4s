@@ -4,100 +4,78 @@
 
 **Decider:** the owner
 
-**Tracker:** bd-01M7J5Q5A9GXDK69JMZ2Q0FP7E, coordinated with bd-01M7J5PK4A84NF0W89JKEA6836.
-The measurement contract branch is proposal only.
-
-## Context
-
-Detailed analysis needs an account of expressed content, source reference, assessment, and analytic
-counting. These are not one construct. Existing interview detail/address/assessment types,
-align MeasureKind, and feature support/provenance/missingness are precedents; this draft adds no
-runtime type.
+**Tracker:** bd-01M7J5Q5A9GXDK69JMZ2Q0FP7E; coordinated with bd-01M7J5PK4A84NF0W89JKEA6836.
+The measurement-contract branch is proposal only.
 
 ## Proposed decision
 
-### Stable account before analytic label
+A stable detail account precedes analytic labels. A record has stable ID, exact recall support,
+content kind, source-reference hypotheses, evidence/provenance, memory address, and assessment
+fields. It is a recall-side proposal, not silently a resolved interview DetailAtom.
 
-A detail-account record has stable ID, exact recall span, kind, source-reference hypotheses,
-evidence/provenance, and explicit assessment state. It is a recall-side proposal, not silently an
-interview DetailAtom (which has resolved narrative identities).
+Content kinds are event occurrence, participant/action, attribute, temporal, spatial, perceptual,
+dialogue/reported speech, mental state, relation, semantic/general-knowledge content, and discourse.
+Internal/external is never a kind: address and policy decide that projection.
 
-Kinds: event occurrence, participant/action, attribute, temporal, spatial, perceptual,
-dialogue/reported speech, mental state, relation, external/semantic content, and discourse.
-Kinds state what was expressed, not correctness, target membership, inference, or experience.
-Implementations must map or explicitly decline to map them to existing interview vocabulary.
+| Separate field | Question |
+|---|---|
+| Content | What did recall express? |
+| Fidelity | How does claim compare with source evidence? |
+| Assessment status | Pending, completed, unavailable, or refused, with reason? |
+| Observed discourse | What function is expressed, with evidence? |
+| Reported phenomenology | What did recaller explicitly report, or what declared measure observed? |
 
-| Axis | Question | Must not imply |
-|---|---|---|
-| Content | What did recall express? | fidelity or phenomenology |
-| Fidelity | How does it compare with source evidence? | internal/external or vividness |
-| Processing/phenomenology | How was it expressed or experienced? | fidelity or quantity |
+No AI output or content feature measures phenomenology. Fidelity is evidence-bearing assessment.
 
-Fidelity is an evidence-bearing assessment with not-assessed/not-applicable states, not a kind.
-Processing preserves observed basis and never turns a model account into experience.
+## Fidelity vocabulary and boundaries
 
-### Source-reference semantics
+Exactly nine grades: (1) supported; (2) gist-correct/detail-error with declared severity; (3)
+contradicted; (4) recaller-inference; (5) external; (6) invented; (7) unverifiable; (8) misread;
+(9) not-assessed. Only completed assessment has a grade. External does not replace address or
+internal/external. Invented requires adequate source record; incomplete evidence is unverifiable.
+Misread is assessor error, not recaller evidence.
 
-References are sparse and use a declared source-unit resolution:
+## References, cast, quantities
 
-- **single:** one identifiable unit;
-- **joint:** several units, each referred to;
-- **broad:** interval/episode without separate recall of every constituent;
-- **alternative:** competing supported single, joint, or broad hypotheses;
-- **unresolved:** no supported hypothesis.
+Reference meanings are single, joint, broad, alternative, and unresolved. Broad does not mean every
+contained unit was recalled. Alternatives contain supported single/joint/broad hypotheses only;
+unresolved is not an alternative member. Quantities retain universe, conditioning, method,
+provenance and MeasureKind. Sampling frequency records model/prompt/procedure/equivalence and
+measures instability, not calibration.
 
-A broad reference is not evidence that every contained unit was recalled. Any quantity declares
-candidate universe, conditioning, method, and provenance. MeasureKind already separates raw score,
-normalized/transport mass, model posterior, and calibrated probability. A future sampling frequency
-records model, prompt, procedure and answer-equivalence rule; it measures instability, not
-calibration, and cannot be calibrated probability without a calibration model.
+Cast identity is source-local; participant/action/speaker tags cite row, speech span, or frame and
+retain receipt. Role labels and model proposals supply no identity authority; ADRs 0024/0027 bind.
 
-### Cast identity and versioned projection
+## Recommended first projection
 
-Source cast identities are source-local. Participant/action/speaker associations cite a source row,
-speech span, or frame and retain a receipt. A role label or model proposal supplies no identity
-authority; ADRs 0024/0027 retain the identity boundary.
+Adopt **target-episode-novel-content/v1** for engineering: count one internal atom only if its
+address is resolved TargetSpecific episode content, it is non-discourse and non-repetition.
+Denominator: all admitted atoms with resolved address and completed assessment. Report numerator,
+denominator and kind breakdown; separately report unresolved address, pending/unavailable/refused,
+discourse, repetition and exclusions. Other-specific, personal-knowledge and semantic/general-
+knowledge atoms are external under this policy. This is not AI or phenomenology validation.
 
-Internal/external is not a kind. A projection records target episode, versioned policy, detail IDs
-and current address/assessment inputs, denominator, treatment of discourse/repetition/other
-episodes, plus unresolved/excluded material. It is reproducible without extraction or remapping.
-Internal representation may evolve behind a versioned external schema; consumers retain projection
-version and input-account identity.
+The projection is versioned and reproducible without extraction/remapping; consumers retain policy
+version and input-account identity. Summaries preserve item/mention/atom/mass/duration/rate meaning,
+numerator/denominator, and missing/ineligible/unresolved/excluded states. Word timing is speech,
+not memory onset; duration needs interval and declared conserved-amount versus held-level allocation.
 
-### Aggregation, timing, allocation, missingness
+## Synthetic rescore
 
-Summaries name whether they count items, mentions, atoms, observed mass, duration, or rate and
-retain numerator/denominator. Missing, ineligible, unresolved and excluded are not zero. A word
-timestamp marks speech, not memory onset. Duration support also needs interval and allocation:
-amount-conserving detail integrates to one; level-held rating remains four. Missing timing stays
-unavailable.
-
-### Synthetic rescore
-
-| ID | kind | address/processing | fidelity | reference |
-|---|---|---|---|---|
-| D1 | perceptual | target episode | accurate | single S1 |
-| D2 | dialogue | target episode, repetition | detail-wrong | single S1 |
-| D3 | external/semantic | general knowledge | not assessed | unresolved |
-| D4 | discourse | inference | not applicable | broad S1–S2 |
-
-Policy target-content/v1: D1+D2 are 2 internal; D3 is 1 external; D4 is 1 excluded.
-Policy target-novel-content/v2: D1 is 1 internal; D2+D4 are 2 excluded; D3 is 1 external.
-Both retain D2 fidelity. Only declared projection changes; extraction, mapping and atom boundaries
-do not.
+D1 perceptual target-specific supported single S1; D2 dialogue target-specific repetition
+gist-correct/detail-error(minor) single S1; D3 semantic/general-knowledge general-address external
+unresolved; D4 discourse inference recaller-inference broad S1–S2. target-content/v0 counts D1+D2;
+recommended v1 counts D1 and reports the rest separately. Inputs do not change.
 
 ## Rejected alternatives
 
-- **Internal/external as kinds:** policy-dependent labels lose rescorability.
-- **Every detail as a source event:** forces identity and delays useful non-event content.
-- **Wait for a complete graph:** span/evidence/source-row records already support bounded output.
-- **One normalized confidence:** joint/broad meaning and sampling frequency are not one probability.
-- **Word timing as memory timing or duplicated atom values:** manufactures precision and multiplies observations.
+- Internal/external kinds lose rescorability.
+- Every detail as source event forces identity and delays useful content.
+- Finished graph first delays span/evidence/source-row output.
+- One normalized confidence cannot carry joint/broad meaning or sampling frequency.
+- Word timing as memory timing or duplicated atom values manufactures precision.
 
-## Owner review questions
+## Owner decision requested
 
-1. Ratify/change/reject kinds and reference meanings.
-2. Choose the first external projection version and compatibility promise.
-3. Decide public fidelity and sampling-frequency vocabulary.
-4. Approve policies only with target, denominator, exclusions, and validation court; no threshold
-   is selected here.
+Adopt or revise the nine grades and target-episode-novel-content/v1; separately select external
+schema compatibility and any public sampling-frequency representation.
