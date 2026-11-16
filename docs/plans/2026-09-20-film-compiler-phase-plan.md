@@ -1,5 +1,14 @@
 # Film compiler phase plan
 
+**Current use, 2026-11-16:** this remains the F1-F6 implementation specification within the
+[required full event-graph delivery](2026-11-16-detail-mapping-plan.md#full-event-graph-delivery).
+[F0 selected alternative A on 2026-09-21](../refactor/evidence/film-f0-claim-status-20260921/README.md);
+that decision is settled. Historical statements below about an unanswered F0 question or release
+deferral do not govern current scheduling. Mote holds status; the ROADMAP holds current direction.
+F1-F6 acceptance is retained. Its root-only compiler with Held gaps is the foundation, followed
+by anchored contexts, relation production, full film exchange and readouts; it does not by itself
+complete those later capabilities or establish scientific accuracy.
+
 Revision 2, 20 September 2026. This is the plan for
 `bd-01M2TAGST4EBFR1HM9Q3EWSYAH`, under film parent
 `bd-01M2T32SGVJXR2RT3RTS2DCN9P`. It answers the parent's ten questions against

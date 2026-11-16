@@ -25,9 +25,10 @@ steps" list. Mote holds status; this page holds direction, milestones and exit c
 ## Goal
 
 The goal is a rich, structured and symbolic account of three things: a film or story, a
-person's recall of it, and the mapping between them. All available information informs both the
-representations and the mapping: annotations, speech, captions, frames, identity, and recall
-discourse. Embeddings and temporal order are evidence channels, not the representation. See
+person's recall of it, and the mapping between them. Annotations, speech, captions, frames and
+identity evidence inform a reusable source account built independently of recall. Recall words
+and discourse inform the recall account; mapping relates the two. Embeddings and temporal order
+are evidence channels, not the representation. See
 [VISION.md](../VISION.md#the-event-layer-is-the-core).
 
 ## Direction (revised 2026-11-09)
@@ -42,9 +43,10 @@ introduced where experiments show a benefit. See the
 **Revised 2026-11-16.** After the scene preview, rich structure arrives as a detail layer
 (DL1-DL6) carried in the same bundle: recall detail atoms, a source cast and row record, detail
 binding with graded fidelity, derived coverage and omission, an order-independent condition, and
-who-did-what. Each field set is qualified against one joint human coding effort. The full event
-graph (E1 beyond the cast record, E3, E4) becomes retained research that starts only when a
-measured failure or a named analysis needs it. See the
+who-did-what. Engineering readiness and scientific qualification are separate. The full film
+and recall event graph remains a delivery commitment: the detail layer feeds the existing film
+compiler, followed by event/context and relation production, exchange and readouts. E3 typed
+matching and E4 structured decoding remain experimental consumers, not construction gates. See the
 [detail-mapping plan](plans/2026-11-16-detail-mapping-plan.md).
 
 ## Next milestone (2026-11-10): scientific preview
@@ -106,8 +108,8 @@ The near-term sequence, from the working plan:
 - **M3 and M4** (speaker-labelled evidence; who-did-what in recurring scenes) were superseded on
   2026-11-16 by DL2 and DL6 of the detail layer.
 - **Detail layer, DL1-DL6** ([plan](plans/2026-11-16-detail-mapping-plan.md)): each adds named
-  bundle fields and has one exit. DL1, DL3, DL4 and DL6 have fresh-item exits against blind
-  human coding; DL2 and DL5 have engineering exits.
+  bundle fields and has one engineering acceptance artifact. DL1, DL3, DL4 and DL6 retain
+  separate fresh-item qualification criteria against blind human coding in the joint evaluation.
   - DL1: recall detail atoms with exact spans, kinds, memory addresses and discourse functions;
     internal/external labels and counts are derived under a named scoring policy.
   - DL2: a source cast and row record, with participants and dialogue speakers.
@@ -117,13 +119,13 @@ The near-term sequence, from the working plan:
     readout-recovery evidence to decide whether order measures can be supported.
   - DL6: who-did-what in recurring scenes, as the hard test of DL2 and DL3.
 
-E1-E4 below describe the full event program. DL2 is E1's first step and DL1 and DL3 are E2's;
-the rest is retained research, started only when a measured failure of the detail layer or a
-named analysis (for example causal centrality) needs it. E4's structured decoding is pursued
-only where an experiment shows it helps.
+E1 and E2 deliver the full event representation, with DL2 and DL1/DL3 as their first usable
+steps. The [construction sequence](plans/2026-11-16-detail-mapping-plan.md#full-event-graph-delivery)
+reuses F1-F6, identity/speech contracts, V1 exchange and the terminal walkthrough. E3/E4 test
+whether additional matching or decoding structure helps; neither is required to construct a graph.
 
-Each milestone has one exit criterion. Engineering metrics are measured on the Sherlock
-development partition, without pre-registration; fresh-item exits use a frozen protocol. Each
+Each implementation milestone has one acceptance artifact. Engineering metrics are measured on
+seen or synthetic inputs, without pre-registration; scientific claims use a frozen protocol. Each
 metric is reported per stage: retrieval, local ranking and decoding.
 
 ### E0 — Consolidate (now)
@@ -140,7 +142,7 @@ runs on `main`.
 
 ### E1 — Film event layer for Sherlock
 
-*DL2 is this layer's first step. The rest is retained research (revised 2026-11-16).*
+*Required delivery. DL2 is the first usable step (reaffirmed 2026-11-16).*
 
 Compile Sherlock into typed, time-bounded events. Each event has:
 
@@ -163,18 +165,21 @@ How it is built:
   `bd-01M2T32SGVJXR2RT3RTS2DCN9P` move from P3 to P1.
 - **Identity.** Cross-modal identity follows ADRs 0024/0027, generalized beyond the body scenes.
 - **Speech.** Speech is promoted under ADR 0026.
-- **Decision.** Accept ADR 0029 (the NMP proposal profile) first.
+- **Decision.** Accept the bounded NMP proposal profile before its producer integration. F0's
+  claim-status choice A is already recorded; do not reopen it. Construction fixtures can use
+  existing checked proposal inputs while the producer-profile decision is prepared.
 
-**Exit:** a compiled Sherlock event graph with a coverage report. It must show:
-
-- every annotation row covered by at least one event;
-- the share of events with an identified participant;
-- the speech and causal link counts;
-- an owner spot-check of three scenes.
+**Engineering exit:** one compiled Sherlock graph artifact passes the public construction,
+exchange and independent-reader path. It includes a receipt for every source row (represented,
+unsupported or unresolved), exact evidence and a functioning path for each declared family:
+events/states, participants/roles, places, contexts/speech, hierarchy and temporal/causal/reference
+relations. Positive and refusal witnesses cover each family. Missing information is not filled
+by inventing an event. Coverage and the three-scene owner review accompany the artifact; counts
+or spot-checks alone do not establish event/relation accuracy. E5 qualifies those claims.
 
 ### E2 — Recall event layer
 
-*DL1 and DL3 are this layer's first steps. The rest is retained research (revised 2026-11-16).*
+*Required delivery. DL1 and DL3 are the first usable steps (reaffirmed 2026-11-16).*
 
 Parse recall units into the same event schema with the same producers:
 
@@ -188,11 +193,15 @@ This becomes the primary recall-side input to typed matching, replacing the rege
 `PropositionSketch` there. The lightweight route (anchored units, no event graph) stays available
 for basic localization, as VISION commitment 3 requires.
 
-**Exit:** all development participants parsed, with an owner spot-check of two participants.
+**Engineering exit:** one paired source/recall artifact preserves detail-to-event grouping,
+summaries spanning events, external content, unresolved references and exact spans through the
+common bundle and independent reader. The event bridge uses the same schema and contexts as
+the source account; an atom is not automatically a separate event. DL6 supplies the recurring-
+scene participant/action witness. Corpus-scale coverage and human accuracy are reported in E5.
 
 ### E3 — Typed matching
 
-*Retained research (revised 2026-11-16): started only on a measured detail-layer failure.*
+*Experimental consumer of the delivered graph. Its outcome does not gate E1/E2 construction.*
 
 - **Retrieval.** Take the union of the embedding/BM25 candidates with a structured index keyed
   by participant identity, action and place.
@@ -209,7 +218,7 @@ for basic localization, as VISION commitment 3 requires.
 
 ### E4 — Structure-aware decoding
 
-*Retained research (revised 2026-11-16): started only on a measured detail-layer failure.*
+*Experimental consumer of the delivered graph. Its outcome does not gate E1/E2 construction.*
 
 Feed entity threads, causal links and event hierarchy into the graph-HSMM transitions, which
 are inert today.
@@ -219,36 +228,39 @@ precision check reported.
 
 ### E5 — Validation
 
-These are the only steps that use the full pre-registration apparatus:
+The existing human protocol/material/execution lane owns one joint frozen evaluation for the
+preview, DL1/DL3/DL4/DL6 and any claimed graph/readout accuracy. Freeze every included method
+before reading the reserved data. New participants, new films and new input conditions are
+different claims. Previously used FilmFestival data is development/transfer evidence, not fresh
+confirmation. Coder recruitment and validation-data access retain their existing approval gates.
 
-- one untouched-Sherlock read;
-- FilmFestival, the second film corpus;
-- datasets not yet seen;
-- the owner's within-scene human lane;
-- multi-positive event references from the joint coding effort (a coding sheet, or the
-  rebuilt review workbench if the timing pilot needs it).
-
-**Exit:** a held-out report of local and final metrics, with regressions listed.
+**Study exit:** one independently recomputed report records each criterion, denominator,
+uncertainty, failures and a supported/failed/inconclusive claim decision. A report can complete
+without a favorable result; failed criteria do not become scientifically qualified. Implementation
+beads do not wait for this report before their consumers can be built.
 
 ## Finish line
 
-"Done" for this phase means all of the following (revised 2026-11-16; the earlier text required
-the E1-E4 exits on Sherlock development):
+**Engineering delivery:** the preview's engineering workflow, DL1-DL6 implementation artifacts,
+E1/E2 graph construction, film exchange and the terminal graph/readout walkthrough are complete.
+A researcher can use one documented command with pinned film evidence and recall inputs, inspect
+the common bundle and graph tables, and reproduce the outputs offline. Every required family has
+a functioning admission path and explicit coverage/gaps. Existing V1/E0 probabilistic-profile
+proof obligations remain intact; categorical bundles do not invent posterior or flow measures.
+This finish permits explicitly experimental use and does not claim scientific accuracy.
 
-- The scene preview's deliveries are met.
-- The DL1, DL3 and DL4 fresh exits and the DL2 engineering exit are met, and DL5 has a
-  recorded claim-boundary decision.
-- E5 has been run once on untouched Sherlock and once on a second film, with the results
-  reported as they come. The untouched Sherlock read is the same pre-registered read as the
-  DL fresh exits, not a second use of that data.
-- A researcher can run one command from video or annotations plus recall transcripts to a
-  bundle. It links each recall detail to film rows and cast members with a graded fidelity, and
-  carries the stage report and the claim boundary.
+**Scientific qualification:** preview measurement qualification, E5 and the DL1/DL3/DL4/DL6
+criteria are evaluated in one joint held-out read after every included implementation is frozen.
+The untouched Sherlock remainder is not used twice. Unfamiliar-film generalization needs an
+eligible unfamiliar film; previously used FilmFestival participants cannot supply that claim.
+Every required scientific criterion must actually pass for the corresponding qualified finish.
+A negative or inconclusive report completes the study work but leaves that qualification unmet.
+Independent usability remains a separate executed requirement of the preview.
 
 ## Side tracks
 
 - **1.0 publication lane** (`refactor/RELEASE-QUEUE.md`): proceeds only where it doesn't slow
-  E0-E3. Its API-stability work must not freeze types that E1/E2 will change.
+  the detail and graph construction path. Its API-stability work must not freeze types that E1/E2 will change.
 - **Review workbench**: the joint coding effort starts from a coding sheet generated from
   bundles. Rebuild the workbench only if the timing pilot shows the sheet is too slow.
 - **storyatlas4s**: consumes mapping and event outputs. The sibling seam rule in AGENTS.md
@@ -256,18 +268,14 @@ the E1-E4 exits on Sherlock development):
 
 ## Branch triage
 
-See [branch-triage-20261108.md](branch-triage-20261108.md). In order:
-
-1. Harvest `mapping-audit`'s model-asset commits.
-2. Merge `claude/integrate-codex`, which carries the scoring correction, claim assessment and
-   mapping summary v2, after a full gate.
-3. Harvest `identity-feasibility`.
-4. Archive everything else as `archive/<name>` tags.
+The [November 8 triage](branch-triage-20261108.md) is a historical queue. Use the recovery
+receipts linked above, current Git ancestry/worktrees and live Mote when adopting remaining
+candidates; do not repeat a historical merge or archive instruction without checking its state.
 
 ## Open decisions
 
-1. ADR 0029: adopt NMP as the proposal profile for events (now a prerequisite of DL2's
-   producers; full E1 is retained research).
+1. The bounded NMP proposal profile (planned ADR 0029) and detail/graph vocabulary: select
+   only the semantic gaps needed by this delivery. The owner decides the ADRs.
 2. Producer budget and transport: subscription CLIs versus a paid API for DL1-DL3 runs and any
    later bulk event compilation.
 3. Release lane priority relative to the detail layer.
@@ -276,10 +284,11 @@ See [branch-triage-20261108.md](branch-triage-20261108.md). In order:
 5. Ratify ADR 0001 (status "Proposed") and ADR 0019's 2026-09-23 amendment.
 6. Rule 7 and missing evidence: E3 replaces constant 0.5 terms. Retiring the imputed-neutral
    design (`MayBeImputed`, `missingSemantic` in `align`) needs its own ADR.
-7. An ADR for the detail layer's public vocabulary (detail kinds, fidelity grades, cast
-   identifiers), recording the rejected alternative of building the full event graph first.
+7. The detail-layer ADR must record the core-account/derived-analysis split and the rejected
+   alternative of requiring a completed graph before useful detail output. Internal/external is
+   a scoring projection; it is not a primitive kind or a fidelity judgment.
 8. Validation data for the detail layer's fresh items, and who codes them on what budget.
-9. Whether evidence binding and the claim-assessment candidates in review are absorbed into
-   DL2 and DL3 or kept as matched comparisons.
+9. Which exact reviewed identity and claim-assessment components satisfy DL2/DL3 and the event
+   bridge. Reuse them in the common path; retain alternative methods only as named comparisons.
 
 [preview-plan]: plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview

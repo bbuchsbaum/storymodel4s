@@ -53,9 +53,11 @@ Mote holds current status (`mote ready`). Documents hold direction and decisions
 
 | Plan | Status |
 |---|---|
+| [2026-11-09 scientific preview](plans/2026-11-09-categorical-mapping-and-transfer-plan.md) | Current preview workflow and claim boundaries; read its dated revisions |
+| [2026-11-16 detail and event-graph delivery](plans/2026-11-16-detail-mapping-plan.md) | Current implementation sequence under ROADMAP; graph delivery required, scientific qualification separate |
 | [2026-08-29 movie narrative architecture](plans/2026-08-29-movie-narrative-architecture.md) | Foundation for the film event layer; read with ADR 0007 |
 | [2026-09-17 D1A source-to-story](plans/2026-09-17-d1a-source-to-story-plan.md) | Text slices largely landed; the film half continues in the plan below |
-| [2026-09-20 film compiler phase plan](plans/2026-09-20-film-compiler-phase-plan.md) | Re-activated 2026-11-08 as part of milestone E1 in the ROADMAP |
+| [2026-09-20 film compiler phase plan](plans/2026-09-20-film-compiler-phase-plan.md) | Current F1-F6 implementation specification; F0 choice A recorded, historical scheduling superseded |
 | [2026-10-24 NMP integration](plans/2026-10-24-nmp-integration.md) | The proposal wire format for LLM-produced events (E1/E2) |
 | [2026-10-25 identity feasibility inputs](plans/2026-10-25-identity-feasibility-inputs.md) | Input to cross-modal identity (E1) |
 | [2026-10-25 recall review workbench](plans/2026-10-25-recall-review-workbench.md) | Paused; its clarity revision was lost and must be redone before use |

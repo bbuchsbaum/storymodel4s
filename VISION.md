@@ -62,6 +62,17 @@ action or state, the same place, or a reference to the same utterance. Embedding
 temporal order are channels within that comparison, not substitutes for it. Language models and
 perception systems propose events and links; storymodel4s checks and admits them.
 
+The full film and recall event graph is a delivery commitment, reaffirmed on 2026-11-16.
+The detail layer supplies its first usable foundation; typed matching and structured decoding
+are separate consumers whose benefits must be measured. Graph construction is not conditional
+on winning a scene-localization comparison.
+
+Completion means that every declared family has a functioning construction/admission path,
+evidence-preserving exchange, positive and refusing examples, and an executed analysis readout.
+It does not mean exhaustive knowledge of a film. Unsupported individual facts remain gaps;
+an unimplemented family cannot count as delivered by returning only unknown. Construction
+evidence and empirical correctness are reported separately.
+
 ## Mapping without false certainty
 
 Recall-to-source mapping is open-world and often many-to-many. A person can summarize a whole
@@ -165,8 +176,10 @@ offset from the next word's onset without an explicit estimation policy.
 A researcher can perform basic localization using anchored units without complete semantic parsing,
 complete event graphs, or an external visualization application. Rich semantics, structural
 comparisons, and trajectory models are capability-bearing enrichments rather than universal
-prerequisites. The film event layer is a core delivery commitment, not an optional enrichment or a
-1.x deferral (owner decision 2026-11-08).
+prerequisites. The film event layer is a core delivery commitment (owner decision 2026-11-08,
+reaffirmed 2026-11-16), built incrementally from the detail layer through contexts and relations
+to exchange and readouts. A graph-accuracy or mapping-superiority claim needs separate evidence;
+it is not a prerequisite to delivering an inspectable experimental graph.
 
 ### 4. Distinguish localization, fidelity, and processing status
 

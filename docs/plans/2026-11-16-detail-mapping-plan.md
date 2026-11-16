@@ -1,9 +1,14 @@
-# Detail-level mapping after the scene preview (2026-11-16)
+# Detail layer and full event-graph delivery (2026-11-16)
 
 This revision amends the [working plan][preview] and the [roadmap](../ROADMAP.md). Its Mote
 epic is `bd-01M7J5P1QW4C3ZRMQSGPNPQPFS`. The owner asked for it in chat on 2026-11-16, after a
 review of how far the library is from supporting detailed scientific analysis of a film, a
 recall and the mapping between them.
+
+The owner's follow-up retains the full film and recall event graph as a delivery commitment.
+The detail layer is its first usable foundation. Graph construction is required; improvements
+from typed matching or structured decoding are separate experiments. This amendment supersedes
+this plan's earlier conditional deferral of graph construction.
 
 ## Why the plan changes
 
@@ -35,8 +40,9 @@ another route:
    speaker labels and a severity field, not an event graph.
 
 So detail structure is built by extending the answers and the source dictionary that already
-travel through the common pipeline, one evaluated field set at a time. The full event graph is
-kept for analyses that need it, such as causal centrality.
+travel through the common pipeline, one evaluated field set at a time. It then feeds the full
+event graph through the construction slices below. A graph need not improve scene assignment
+to be useful for inspecting events, participant roles, contexts and relations.
 
 ## What does not change
 
@@ -69,9 +75,11 @@ call. The ADR defines the projection and its relationship to the existing interv
 
 ## Capabilities
 
-Each capability adds named fields to the bundle and has one exit. A field set stays
-experimental in the claim boundary until its exit is met. Thresholds are proposals for the
-owner to fix before the frozen protocol, not results.
+Each implementation bead has one engineering acceptance artifact. Its scientific qualification
+is a separate criterion in the joint evaluation, not a prerequisite for building its consumers.
+This avoids a cycle in which DL3 waits for DL1's fresh result while the shared read waits for
+DL3 to be built. A field set stays experimental until its relevant scientific criterion is met.
+Thresholds below are proposals for the owner to fix before the frozen protocol, not results.
 
 ### DL1. Recall detail inventory
 
@@ -89,7 +97,10 @@ two more atom kinds or treating failed placement as external content.
 
 - Admission: every span lies inside its unit, atoms do not overlap, and the share of each
   unit's text left uncovered is reported.
-- **Exit (fresh):** atom-level agreement with blind human detail coding reaches at least 80%
+- **Engineering exit:** one replayable inventory artifact preserves exact spans, kinds,
+  addresses and discourse functions, with named controls for foreign spans and unresolved
+  placement, and two policy projections that conserve resolved, unresolved and excluded mass.
+- **Scientific qualification (fresh, joint evaluation):** atom-level agreement with blind human detail coding reaches at least 80%
   of human-human agreement on the same units, with both reported.
 
 ### DL2. Source cast and row record
@@ -101,7 +112,7 @@ speaker-labelled evidence milestone (M3).
 
 - Admission: every tag cites row text, a speech span or a frame. A cast member is never
   asserted without a citation. Identity links follow ADRs 0024 and 0027.
-- **Exit (engineering):** an owner spot-check of three scenes accepts the record, with a
+- **Engineering exit:** an owner spot-check of three scenes accepts the record, with a
   coverage report for Sherlock and one FilmFestival film beside it (the share of rows with an
   identified participant and of dialogue with a speaker).
 
@@ -130,7 +141,10 @@ function, and is not the internal/external scoring projection. The ADR keeps sou
 fidelity and assessment availability distinguishable. Absence from an incomplete annotation
 record is insufficient evidence for `invented`; it remains unverifiable from that record.
 
-- **Exit (fresh):** on items coded blind, precision of the contradicted and gist-detail grades
+- **Engineering exit:** one live/recorded synthetic bundle and offline replay preserve every
+  assessed or unassessed atom, its row/cast bindings and independent assessment states; invalid
+  citations, invented-from-missing-evidence and cross-context promotions have refusal controls.
+- **Scientific qualification (fresh, joint evaluation):** on items coded blind, precision of the contradicted and gist-detail grades
   is at least 0.8 each, with precision and recall of every grade reported. The owner's 50 seen
   items calibrate the rubric and are not a test.
 
@@ -142,7 +156,10 @@ only by contradicted or unverifiable atoms is not counted as recalled. A row wit
 "not evidenced as recalled", which is a claim about the record, not proof of an omission; the
 report names it that way.
 
-- **Exit (fresh):** row-level coverage agrees with human coverage coding on a sample at a
+- **Engineering exit:** one independently calculated readout fixture matches the derived
+  per-grade coverage and denominator, including unbound, contradicted and unverifiable cases,
+  without a model call; no unbound row is labelled a proven omission.
+- **Scientific qualification (fresh, joint evaluation):** row-level coverage agrees with human coverage coding on a sample at a
   kappa of at least 0.6, with the denominator stated.
 
 ### DL5. Order-independent condition
@@ -161,7 +178,7 @@ including reordered recalls; scene agreement alone does not establish recovery o
 Source presentation order and story-world chronology remain separate. Chronology stays unsupported
 without an explicit story-world coordinate interpretation and its own recovery evidence.
 
-- **Exit (engineering):** a recorded claim-boundary decision on whether order and chronology
+- **Engineering exit:** a recorded claim-boundary decision on whether order and chronology
   remain "not supported" or move to "experimental", based on the input-policy audit,
   permutation check and direct readout-recovery evidence above. A negative or inconclusive
   result is a valid decision; accuracy claims still require the frozen evaluation protocol.
@@ -171,39 +188,126 @@ without an explicit story-world coordinate interpretation and its own recovery e
 This was M4. It becomes the first hard test of DL2 and DL3 together, on a bounded set of
 recurring scenes where scene labels cannot make the distinction.
 
-- **Exit (fresh):** the share of participant-action pairs judged correct exceeds the
+- **Engineering exit:** one replayable paired-condition artifact distinguishes actor, role,
+  action and occurrence in recurring scenes, with a declared scene-only comparison and an
+  independently checked scorer. Its construction is ready before the joint fresh read.
+- **Scientific qualification (fresh, joint evaluation):** the share of participant-action pairs judged correct exceeds the
   scene-only baseline, with an interval on the difference that excludes zero.
+
+## Full event-graph delivery
+
+"Full" means that the declared representation contract works end to end: source and recall
+events/states, participants and roles, places and attributes, contexts and speech, occurrence
+identity, hierarchy, temporal, causal and referential relations, with evidence and recall-to-source
+bindings. It does not mean that every fact in a film is known. Every required family must have a
+working producer/admission path and a positive and refusing witness; an entirely unimplemented
+family cannot pass by returning only unknown. Individual unsupported facts remain explicit gaps.
+
+Build the source account once, independently of recall. Preserve exact edition/native support,
+the difference between observation and interpretation, and the current common bundle and CLI.
+The following are construction slices over a bounded paired account; full-film integration is
+the existing terminal E0 task. Use the existing `story`, `document`, `recall`, `codec` and `view`
+contracts, not another graph builder or result format. Public additions require the relevant ADR.
+
+| Slice | Depends on | One engineering acceptance artifact |
+|---|---|---|
+| Producer profile | Detail vocabulary ADR; NMP field-gap decisions | A pinned synthetic proposal packet passes the public record/replay and resolver path; forged authority and unsupported fields are refused. |
+| Existing film compiler F1-F6 | Existing F0-F6 dependency chain | The existing F6 admitted-input artifact demonstrates actual film compilation, exact support and retained gaps, with text compatibility. |
+| Detail-to-event bridge | Producer profile, F5, DL3 | A paired account preserves several details about one event, a summary spanning events and a non-episodic detail, with original IDs and support. |
+| Anchored contexts and speech | Bridge | A context artifact distinguishes depicted, reported, believed/intended and unresolved content; a licensed speech promotion is a separate overlay. |
+| Hierarchy and reference | Anchored contexts | A relation artifact preserves containment, occurrence identity and scoped references, with refusal controls for foreign endpoints and invalid containment. |
+| Temporal relations | Anchored contexts | A temporal artifact distinguishes presentation order, world chronology, unknown order and interval relations; unsupported world-time assertions refuse or gap. |
+| Causal relations | Hierarchy/reference and temporal slices | A causal artifact distinguishes joint antecedents, separate causes and unresolved hypotheses; chronology alone never licenses causation. |
+| Film exchange (existing V1) | Existing D1B proof plus the relation slices | A canonical round trip retains source/recall events, contexts, evidence, gaps, bindings, overlays and exact coordinates; an independent reader checks it. |
+| Graph walkthrough (existing terminal E0) | Existing V1/D1B chain, DL4, DL6 readiness | One documented command produces the common bundle and graph tables from pinned film inputs and recall; independently checked readouts retain policies and missingness. |
+
+F0's [recorded choice A](../refactor/evidence/film-f0-claim-status-20260921/README.md) is settled:
+generated captions do not license film `SurfaceExplicit`. The
+[F0-F6 specification](2026-09-20-film-compiler-phase-plan.md) is infrastructure, not the full
+graph programme. Its first compiler deliberately retains Held gaps; the anchored-context slice
+adds checked Held construction. The source-identity export under ADRs 0027/0028 has no situations, so it does not
+substitute for film-model exchange. ADR 0026's speech promotions remain overlays, never ordinary
+root-world situations.
+
+V1 and terminal E0 retain their existing probabilistic-profile P/F, remainder, receipt and
+text-compatibility obligations. Categorical detail bundles must never fabricate those measures
+or be used to close the probabilistic courts. The graph path extends the common artifact with
+explicit profiles; it does not require a win from the E3/E4 research algorithms. StoryAtlas must
+compile and test against any changed surface it consumes before that implementation lands.
+
+The graph engineering finish requires all required families, round-trip exchange, DL6 readiness
+and the executed walkthrough. It does not await a favorable accuracy result. The joint evaluation
+then determines qualified uses; a failed or inconclusive criterion withholds that claim.
+
+### Tracker ownership
+
+Reuse the unified-path epic `bd-01M6Y7MWZGP29TNDJ90SG36A45`, the detail epic above, and the film
+delivery container `bd-01M35MK5N6F0EWJE2EYT3D8Y9M`. The new bounded slices are:
+
+| Slice | Bead |
+|---|---|
+| Producer profile | `bd-01M7JAZQ7KCN5Z7PD221V1MHRK` |
+| Detail-to-event bridge | `bd-01M7JB0Q8VB28C7ZBHA3353VK6` |
+| Anchored contexts and speech | `bd-01M7JB1F7B8FG4Z4730WM6SR5H` |
+| Hierarchy and reference | `bd-01M7JB28QJWC1DMZQ19XK1G3TP` |
+| Temporal relations | `bd-01M7JB314J12NG7TJK8XVHNW2Q` |
+| Causal relations | `bd-01M7JB3S0W55SXKSC1GJC827VN` |
+
+Film compiler parent: `bd-01M2T32SGVJXR2RT3RTS2DCN9P`; film exchange V1:
+`bd-01M1CQQDCWN2RTT1Z8XNNB7VMY`; terminal E0: `bd-01M1CQSWJ538PAEME49200YARR`.
+The identity/evidence-binding and claim-assessment programmes supply reviewed components to
+DL2/DL3 and the bridge. Reconcile each candidate's exact code and tests before adoption; retain
+older methods as frozen comparisons only where they answer a named question. Do not build a
+parallel identity or assessment product, or close their existing acceptance by this plan alone.
 
 ## Human reference
 
-One coding effort serves the preview and DL1 to DL4. Delivery 5's double-coding rubric therefore
-includes detail atoms, fidelity grades and coverage from the start, so coders are not recruited
-twice. Coders do not see model answers, disagreements are kept before adjudication, and the
-budget follows a timing pilot. The coding sheet is generated from bundles; the review workbench
-is rebuilt only if the pilot shows a sheet is too slow.
+One coding effort serves the preview, DL1/DL3/DL4/DL6 and claimed graph/readout accuracy. Delivery
+5's rubric includes detail atoms, fidelity, coverage, participant/action roles and graph-family
+evidence from the start. Coders do not see model answers; disagreements are retained before
+adjudication. The coding sheet starts from source/recall inputs without model predictions. The
+budget follows a timing pilot on seen or throwaway material; rebuild the workbench only if needed.
+Before freezing, specify atom matching, per-grade sample support, denominators, exclusions and
+uncertainty calculations. An undefined or inadequately supported criterion is inconclusive,
+not a passing score. No proposed numerical threshold is ratified by adopting this delivery plan.
 
 Fresh items need participants or films not yet read. FilmFestival's participants have all been
 used, and Sherlock has only the untouched remainder, which E5 also needs. That remainder is read
-once: the fresh DL exits and E5's untouched read are one pre-registered read, frozen after DL1,
-DL3 and DL4 are built. An exit that cannot wait for it uses a new collection. Choosing the
-validation data is an open decision.
+once: the fresh DL criteria and E5's untouched read are one pre-registered read, frozen after
+every method included in it is built and selected, including DL6 and any graph/readout being
+evaluated. Do not expose results to implementation work between these outcomes. Any earlier
+preview read or later-tuned method needs disjoint fresh material for a new confirmatory claim.
+FilmFestival already used in development remains transfer evidence. Validation data and the
+coding budget still require explicit approval; this plan does not authorize collection or access.
+
+Reuse human-study parent `bd-01M2TA9KKVFWPQ74HN90P0SM68` and its existing protocol, material and
+execution lane: `bd-01M50KBFT26DRB77VFHPRHYNA2`, `bd-01M50KC744836VNJ8F8A4AHNWH`,
+`bd-01M50KD0NHVPCEHGZND9H18M6E`. Preserve their approval and exposure gates. The synthetic
+organization-recovery test is separate and cannot establish human accuracy. A completed report
+may be negative or inconclusive; each measure retains its own qualified, failed or unsupported
+state, denominator, exclusions and uncertainty. Coder agreement is a reference, not a universal
+ceiling. No field becomes scientifically qualified just because its implementation ticket closes.
 
 ## Order
 
 1. Finish preview delivery 4 (`bd-01M7H69QWE0NKSNB8XWW6MC02H`).
 2. Write the joint coding rubric and run the timing pilot. This does not wait for delivery 4;
    it runs alongside it and delivery 5.
-3. DL2 and DL1 in parallel: the cast record has no dependence on recall, and DL1 needs only
-   prepared transcripts.
-4. DL3 after DL1 and DL2; DL4 after DL3.
+3. Resolve the detail vocabulary/producer profile and build DL2 and DL1 in parallel. The cast
+   record is recall-blind. Existing F1-F6 construction can proceed alongside these capabilities.
+4. DL3 after DL1 and DL2 engineering readiness; DL4 after DL3. Build the event bridge after F5,
+   the producer profile and DL3; then anchored contexts, hierarchy/reference and temporal
+   production, and causal production.
 5. DL5 can run at any point after delivery 4. It needs no new fields.
-6. DL6 after DL3.
-7. E1 beyond DL2 (causal links and event hierarchy), E3 and E4 are retained research. Each
-   starts only when a measured DL failure or a named analysis needs it.
+6. DL6 after DL3 and the event bridge. Extend V1 and terminal E0 after their existing proof
+   dependencies and the graph construction slices; freeze the joint evaluation only after
+   every included implementation is ready. Its results never gate those implementations.
+7. E1/E2 graph delivery is required. E3 typed-matching and E4 structured-decoding improvements
+   are experimental consumers; later tuning requires separate confirmatory data.
 
 ## Analyses each step supports
 
-| After | Newly supported, subject to its exit |
+| After | Available analysis, scientifically qualified only by its corresponding evidence |
 |---|---|
 | Preview | Which scene a unit narrates or refers to; scene-level recall coverage, described only |
 | DL1 | Policy-derived internal/external detail counts, with unresolved and excluded mass reported |
@@ -221,8 +325,8 @@ validation data is an open decision.
    corpus, or a new collection.
 3. Who codes, the budget, and whether the owner's within-scene lane
    (`bd-01M2TA9ZK64GTG3526RMNWNHCT`) folds into the joint rubric.
-4. Whether the evidence-binding programme (Mote `recovery-evidence-binding-20261023`) and the
-   claim-assessment candidates in review are absorbed into DL2 and DL3 or kept as matched
-   comparisons.
+4. The bounded selection of semantic gaps for the producer profile and the thresholds/sample
+   sizes for graph-family qualification. The owner decides new public vocabulary; this plan
+   adopts a delivery sequence, not an unreviewed schema or a particular accuracy claim.
 
 [preview]: 2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview

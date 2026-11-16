@@ -323,7 +323,12 @@ obsolete or met. Work waiting on integration is part of the triage.
 Superseded on 2026-11-16 by the [detail-mapping plan](2026-11-16-detail-mapping-plan.md). The
 event-representation programme continues as the detail layer DL1-DL6, a set of bounded,
 evaluated field sets in the same bundle. Speaker-labelled evidence becomes DL2, fidelity DL3,
-and who-did-what DL6. Delivery 5's double-coding rubric covers the detail fields from the start.
+and who-did-what DL6. The owner's follow-up retains full source and recall event-graph delivery:
+the detail layer feeds the existing film compiler, context and relation construction, exchange
+and readouts. E3/E4 matching and decoding improvements are experiments, not graph-delivery gates.
+Delivery 5's rubric covers detail, participant/action and declared graph fields from the start.
+Implementation readiness precedes the shared fresh evaluation; its thresholds are not dependencies
+between implementation beads. Freeze every evaluated method, including DL6, before the one read.
 The reusable detail account separates kinds, memory addresses, discourse functions, source
 bindings and fidelity. Internal/external labels and counts are derived analyses under a named
 scoring policy, with unresolved and excluded material reported separately. DL5 uses unit-only
