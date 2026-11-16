@@ -197,8 +197,10 @@ object ProvisionalReference:
           }
           // Sorted summation: whether the sum is refused cannot depend on member order.
           total = supplied.sorted.sum
+          // The same expression as the share's snap: every admitted total has
+          // 1 - total >= -RowSum, so the snap covers the whole admitted overshoot. NaN refuses.
           _ <- Either.cond(
-            total <= 1.0 + MappingTolerance.RowSum,
+            1.0 - total >= -MappingTolerance.RowSum,
             (),
             Refusal.WeightSumExceedsOne(total)
           )
@@ -477,7 +479,8 @@ object ReferenceMeasures:
       case Right(support) =>
         val node = support.selected
         // TemporalSupport makes a node Available exactly when it has included support, so the
-        // included support decides; there is no "Available without support" case to classify.
+        // included support decides. The state match is explicit so that a new State fails to
+        // compile here instead of being classified by a catch-all.
         (node.included, node.excluded) match
           case (Some(inside), None) => Right(inside)
           case (Some(_), Some(_))   => Left(UnitUnavailable.ClippedByOccurrence)
@@ -485,7 +488,13 @@ object ReferenceMeasures:
             node.state match
               case s @ (TemporalSupport.State.Unlocated | TemporalSupport.State.TextOnly) =>
                 Left(UnitUnavailable.NoTemporalSupport(s))
-              case s => Left(UnitUnavailable.OffAxis(s))
+              case s @ (TemporalSupport.State.NoSupportOnAxis |
+                  TemporalSupport.State.OutsideOccurrence) =>
+                Left(UnitUnavailable.OffAxis(s))
+              // Unreachable: TemporalSupport never builds Available without included support.
+              // Fail closed as no temporal support rather than inventing a location.
+              case s @ TemporalSupport.State.Available =>
+                Left(UnitUnavailable.NoTemporalSupport(s))
 
   // Integer geometry: the union of every unit's intervals, merged once; points are only counted.
   private[align] def measure(

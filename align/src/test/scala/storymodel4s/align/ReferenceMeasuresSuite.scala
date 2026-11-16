@@ -61,6 +61,7 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
         assertEquals(after.memberCount, Right(members.size))
         assertEquals(after.memberCount, before.memberCount)
         assertEquals(after.unassignedShare, before.unassignedShare)
+        after.unassignedShare.foreach(s => assert(s >= 0.0 && s <= 1.0, s"share $s"))
         assertEquals(after.members.map(_.toSet), before.members.map(_.toSet))
     }
   }
@@ -565,18 +566,30 @@ class ReferenceMeasuresSuite extends ScalaCheckSuite:
     )
   }
 
-  // Weights whose left-to-right Double sum depends on order: (a + c) + b exceeds 1 + RowSum
-  // while (a + b) + c and the sorted order do not, so an unsorted sum refuses some orders.
+  // Weights whose left-to-right Double sum depends on order: for (a, c, b) 1 - Σw falls below
+  // -RowSum while the sorted order stays within it, so an unsorted sum refuses some orders.
   test("the weight-sum refusal does not depend on member order (sorted summation)") {
-    val weights = Vector(0.13254750615351513, 0.6551378054206148, 0.2123146894258702)
+    val weights = Vector(0.11794748919172388, 0.12637737568514906, 0.755675136123127)
     val three = Vector(interval(0L, 10L), interval(20L, 30L), interval(40L, 50L))
     weights.permutations.foreach { order =>
       val members = order.map(w => Weighted(located(single(u(weights.indexOf(w)))), Some(w)))
-      assert(
-        refusal(Declaration.Alternative(members), three).isRight,
-        s"order ${order.mkString(",")} refused"
-      )
+      val admitted = refusal(Declaration.Alternative(members), three)
+      assert(admitted.isRight, s"order ${order.mkString(",")} refused")
+      assertEquals(ReferenceMeasures.of(admitted.toOption.get).unassignedShare, Right(0.0))
     }
+  }
+
+  // Σw = 1.000000001 (sorted) satisfies Σw <= 1.0 + RowSum, because 1.0 + 1e-9 rounds up, but
+  // 1 - Σw = -1.0000000827e-9 < -RowSum: admitting it would publish a negative share.
+  test("an admitted total never yields a share below zero (refusal matches the snap)") {
+    val weights = Vector(0.13254750615351513, 0.6551378054206148, 0.2123146894258702)
+    val three = Vector(interval(0L, 10L), interval(20L, 30L), interval(40L, 50L))
+    val members = weights.zipWithIndex.map((w, i) => Weighted(located(single(u(i))), Some(w)))
+    refusal(Declaration.Alternative(members), three) match
+      case Left(r)          => assertEquals(r.productPrefix, "WeightSumExceedsOne")
+      case Right(reference) =>
+        val share = ReferenceMeasures.of(reference).unassignedShare
+        fail(s"admitted with share $share")
   }
 
   // Weights whose remainder 1 - Σw differs in the last bit across summation orders.
