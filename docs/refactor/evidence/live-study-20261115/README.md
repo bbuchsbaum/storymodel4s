@@ -58,3 +58,19 @@ Hosted CI is separate from local evidence:
 [Continuous Integration](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788) and
 [Documentation](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813869) test the runtime
 candidate. Their result is recorded separately rather than inferred from the local gate.
+
+## Landing
+
+The final candidate `932e61f60ee81929837998ef78dad4b700667d21` passed independent exact-SHA
+review, including the documentation and tracker-only delta from the qualified runtime. It
+fast-forwarded main and was pushed with local/tracking/remote SHA parity. The pre-integration
+ownership check found only this task's two live reservations and its claim; no competing owner
+held a touched path. All 18 pre-existing unfinished StoryAtlas files retain their checkpoint
+hashes.
+
+The engineering ticket is closed and both reservations and the claim are released. The clean
+standalone verification clone was removed after preserving its logs and synthetic artifact; its
+exact runtime commit is an ancestor of main.
+
+The scoped engineering acceptance is complete. Real-provider smoke configuration and the full
+hosted matrix are separate qualifications; consult the run links above for hosted status.
