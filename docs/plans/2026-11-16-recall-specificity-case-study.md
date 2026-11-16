@@ -106,7 +106,7 @@ The owner and the case study agreed a narrowed scope (ADR 0031 revision 4):
 Each slice is about a day's work with one acceptance criterion. Beads are children of the case
 study bead.
 
-1. **The owner decides draft ADR 0031.**
+1. **ADR 0031 accepted** by the owner on 2026-11-16.
 2. **G3 reference measures in `align`** (`bd-01M7JRBR9XAK79B448ZMYPEKBN`).
    - It covers: alternatives present, member count, extent per constituent on a declared axis,
      the annotation-floor flag, occurrence count and typed unavailable values.

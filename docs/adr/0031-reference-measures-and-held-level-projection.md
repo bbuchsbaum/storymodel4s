@@ -1,6 +1,8 @@
 # ADR 0031 — Reference measures and recall-time projection
 
-**Status:** Draft, revision 4, proposed 2026-11-16 for the owner's decision. Not binding.
+**Status:** Accepted — owner decision, 2026-11-16 (revision 4 with the section 1 and 3 decisions
+recorded after review of the implementing slices). Binding for its decided sections; the
+items under [Deferred](#deferred) remain undecided.
 
 Revision 4 narrows the scope after discussing the case-study evidence with the owner:
 
@@ -68,7 +70,7 @@ Its evidence:
 - **A regressor holds a level over time.** The existing `TemporalQuery` allocations all
   distribute or bound an amount.
 
-## Decision (proposed)
+## Decision
 
 ### 1. Measures on a reference
 
