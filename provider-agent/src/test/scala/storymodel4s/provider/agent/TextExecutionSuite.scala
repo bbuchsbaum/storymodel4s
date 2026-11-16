@@ -140,3 +140,22 @@ class TextExecutionSuite extends FunSuite:
       finally cached.close()
       assertEquals(seen().size, 0)
     }
+
+  test("dangling journal and temporary-file links refuse before dispatch"):
+    OpenAiExchangeSuite.withServer(Vector.empty) { (baseUrl, seen) =>
+      val store = Recordings.at(Files.createTempDirectory("text-dangling-journal")).toOption.get
+      val p = profile(baseUrl)
+      Vector(".text-execution-v2.journal.json", ".text-execution-v2.journal.json.tmp").foreach { name =>
+        val link = store.dir.resolve(name)
+        Files.createSymbolicLink(link, store.dir.resolve("missing"))
+        val session = TextExecution.live(store, p, authorization(baseUrl)).toOption.get
+        try
+          assertEquals(session.serve("system", "prompt"), Left(ExchangeFailure.PreviousAttemptUnknown(p.key("system", "prompt"))))
+          assertEquals(session.clientInvocations, 0)
+          assertEquals(session.httpAttempts, 0)
+        finally
+          session.close()
+          Files.delete(link)
+      }
+      assertEquals(seen().size, 0)
+    }

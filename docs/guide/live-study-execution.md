@@ -31,7 +31,10 @@ malformed-reply retries.
 
 All source files, sessions, units and prompt/chunk bounds are checked before dispatch. `RUN_DIR`
 holds an immutable input/configuration descriptor, recordings, the dispatch journal, and an
-invocation receipt even if the study fails. Successful output is published together:
+invocation receipt even if the study fails. The invocation receipt records completed execution;
+only the receipt inside the published output proves publication. Receipt persistence and lock
+closure precede publication, so their failure cannot leave an output that the command reports
+as failed. Successful output is published together:
 
 ```text
 OUTPUT_DIR/

@@ -214,6 +214,8 @@ class StudyExecutionSuite extends FunSuite:
         )
         assert(changed.left.exists(_.contains("configuration changed")))
         assertEquals(calls.get(), 5)
+        Files.createDirectories(Path.of("pipeline/target")): Unit
+        Files.writeString(Path.of("pipeline/target/synthetic-live.bundle.json"), live.noSpaces): Unit
       }
     }
 
@@ -359,6 +361,8 @@ class StudyExecutionSuite extends FunSuite:
       import storymodel4s.core.Checksum
       final case class Profile(provider: String, model: String, endpoint: Checksum,
         maxTokens: Long, timeoutMillis: Long)
+      object Profile:
+        def fromProduct(p: Product): Profile = summon[scala.deriving.Mirror.ProductOf[Profile]].fromProduct(p)
       Profile.fromProduct(("p", "m", Checksum.ofText("endpoint"), 1L, 1L))
     """).isEmpty)
     assert(typeCheckErrors("""

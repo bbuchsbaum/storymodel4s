@@ -285,7 +285,8 @@ object TextExecution:
 
     private def states: Either[Unit, Map[String, JournalState]] =
       val temporary = recordings.dir.resolve(s"$JournalName.tmp")
-      if Files.exists(temporary) || (Files.exists(journal) && !Files.isRegularFile(journal)) then
+      if Files.exists(temporary, java.nio.file.LinkOption.NOFOLLOW_LINKS) ||
+        (Files.exists(journal, java.nio.file.LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(journal)) then
         Left(())
       else if !Files.isRegularFile(journal) then Right(Map.empty)
       else
