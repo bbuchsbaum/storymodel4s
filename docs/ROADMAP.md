@@ -6,9 +6,10 @@ Sherlock and a third synthetic study now use the common recorded pipeline; the
 [slice-5 receipt](refactor/evidence/common-pipeline-slice5-20261115/README.md) records qualification
 for `bd-01M7E3G6TFG1YTWM9NTSZ4NRKX`. The [live-execution slice](refactor/evidence/live-study-20261115/README.md)
 now adds recorded exchanges, bounded retries, interrupted-run resume and offline replay through
-that same contract. Synthetic HTTP qualification and frozen replay parity are complete. The next
-qualification step is a small synthetic smoke run against an explicitly configured real provider;
-no external-model or new scientific-accuracy claim is made by this engineering delivery.
+that same contract. Synthetic HTTP qualification, frozen replay parity and the full hosted CI
+matrix are complete. A [bounded OpenAI smoke](refactor/evidence/live-study-20261115/provider-smoke.json)
+now verifies one real request and credential-free replay of identical mappings on two synthetic
+units. This qualifies execution and reproducibility, with no new scientific-accuracy claim.
 
 The one current plan, adopted 2026-11-08 (Mote epic `bd-01M6Y7MWZGP29TNDJ90SG36A45`). It
 supersedes the direction in `refactor/PLAN.md`, the best-mapper plan and every dated "next

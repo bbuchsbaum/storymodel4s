@@ -1,0 +1,225 @@
+{
+  "runtime": "e20eff4ca4d8accec9174819d37e4fd537ae20ea",
+  "implementation": "c4238aa3f3ed1e82b6e66890c661b822a0213404",
+  "requested_model": "gpt-4.1-mini-2025-04-14",
+  "provider_reported_model": "gpt-4.1-mini-2025-04-14",
+  "provider_reported_usage": {
+    "inputTokens": 141,
+    "outputTokens": 35,
+    "cacheReadInputTokens": null
+  },
+  "data": "authored synthetic geometric events only",
+  "units": 2,
+  "sessions": 1,
+  "chunks": 1,
+  "live_client_invocations": 1,
+  "live_http_attempts": 1,
+  "replay_client_invocations": 0,
+  "replay_http_attempts": 0,
+  "replay_cache_hits": 1,
+  "units_identical": true,
+  "mapping_records_identical": true,
+  "expected_scene_assignments": true,
+  "live_bundle_sha256": "c9350790cc5b09a5caeeb4d95743aa6ff1946448225df3df45f901179be3eb2b",
+  "replay_bundle_sha256": "1993f265464d9ca5411d4b86a7f689b2e577bbf97310c66deec6c02454ad4175",
+  "ticket": "bd-01M7H0M6FK71NF6DKNPTB85CGW",
+  "classification": "LocallyObserved real-provider engineering smoke",
+  "date": "2026-11-15 America/Toronto",
+  "provider_endpoint": "https://api.openai.com/v1/chat/completions",
+  "authorized_http_attempt_limit": 3,
+  "client_invocation_limit": 1,
+  "output_token_limit": 512,
+  "timeout_ms_per_attempt": 30000,
+  "mapping_reply_attempt_limit": 1,
+  "credentials": "Owner authorized existing environment key; no secret persisted in launcher, arguments, logs, receipts or repository",
+  "replay_credentials": "Runtime-recognized API key variables removed from child environment; replay constructs no model client",
+  "qualification_limit": "One synthetic example qualifies this execution/replay path and recorded configuration; it does not establish model accuracy or general provider/model compatibility",
+  "model_documentation": "https://developers.openai.com/api/docs/models/gpt-4.1-mini",
+  "commands": "agentStudyExecute live and replay; exact argv, source revision and exit status bound in private log metadata; independent Python reader checks unit0",
+  "existing_optional_parser_smoke": "Existing opt-in LiveSmokeSuite was not rerun; this is the separate live-study CLI qualification",
+  "pre_dispatch_review": "PASS after ensuring all recognized provider credential variables are scrubbed for replay",
+  "hosted_qualification": [
+    {
+      "conclusion": "success",
+      "headSha": "c4238aa3f3ed1e82b6e66890c661b822a0213404",
+      "jobs": [
+        {
+          "databaseId": 133020487911,
+          "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJVM)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788/job/133020487911"
+        },
+        {
+          "databaseId": 133020488160,
+          "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootNative)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788/job/133020488160"
+        },
+        {
+          "databaseId": 133020488165,
+          "name": "Test (ubuntu-22.04, 3.7.4, temurin@21, rootJVM)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788/job/133020488165"
+        },
+        {
+          "databaseId": 133020488219,
+          "name": "Test (ubuntu-22.04, 3.7.4, temurin@17, rootJS)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788/job/133020488219"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788"
+    },
+    {
+      "conclusion": "success",
+      "headSha": "c4238aa3f3ed1e82b6e66890c661b822a0213404",
+      "jobs": [
+        {
+          "databaseId": 133020487598,
+          "name": "Verify docs site",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813869/job/133020487598"
+        },
+        {
+          "databaseId": 133024729195,
+          "name": "Build Pages artifact",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813869/job/133024729195"
+        },
+        {
+          "databaseId": 133024730063,
+          "name": "Deploy Pages",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813869/job/133024730063"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813869"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "data/.provider-smoke/20261115/prepare_fixture.py",
+      "bytes": 2651,
+      "sha256": "f17198642f787d704d0705e294f8ae6e71d224a41f7be324bc9ff1ec5b7de4d5"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/run_smoke.py",
+      "bytes": 1960,
+      "sha256": "899d7b018ade3405e4eadf0c0c3de0539d4e372cc6546f457753f764fc7fe66f"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/verify_smoke.py",
+      "bytes": 2280,
+      "sha256": "91aaa9d2a05f467456f55e3e362bc27f6bae0f994d53c6ddc3100ae5c828660b"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/export/manifest.json",
+      "bytes": 522,
+      "sha256": "0772765d5097050ea99918ab7f26161e6223b8b3e43ae61204c066ba3ba7d399"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/export/source.csv",
+      "bytes": 143,
+      "sha256": "933cc0c6ee1f84f774821dae37e1a74db7c326f1831be54230f9e5f5a7df1cc4"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/export/parts.json",
+      "bytes": 75,
+      "sha256": "34d7c4ac32706c9c72455d8111a37235d40183f389a647b6f6c93041451ff29b"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/export/index.json",
+      "bytes": 1077,
+      "sha256": "80af727dd6f3a474aedcd082fd0a62d1803c749b76008050126eb5c71d55533d"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/export/session.json",
+      "bytes": 586,
+      "sha256": "edf3ead1fc4a292420f2003829f8d8eacde620481eca293ce4c988d1c0d445d8"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/run/run.json",
+      "bytes": 980,
+      "sha256": "6c0e98fefdf5ab83716d3cc5ae8e904c8ee6d7e2bb4dbf3ea95fa5570138e46f"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/live/receipt.json",
+      "bytes": 1622,
+      "sha256": "b94a474dc09f3502572d6b91191cfdeb9ce360b2a02e19b08d3277444e197ebd"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/replay/receipt.json",
+      "bytes": 1627,
+      "sha256": "6636e14dceee5cf332eb1ce4e45af7a8a514b5126abc6b5e140eda09ff6e94a9"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/comparison.json",
+      "bytes": 881,
+      "sha256": "34dc4ce14c680291742331444a75f13e7e0c44c27d80025fd34182a559fc14b9"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/compile.log",
+      "bytes": 4725,
+      "sha256": "a3055356260996222d89d23349fd877b4083cb81ff2aa61336a503e94f549a7e"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/compile.log.meta.json",
+      "bytes": 563,
+      "sha256": "1a562ab3897260635ce97265133a817c46e532cb2710ca1095b1563899bda98b"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/live.log",
+      "bytes": 2607,
+      "sha256": "a2acacd9c3a970221110ea3edb14e8b7370e0349d83b91004e43fc4bc3d49312"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/live.log.meta.json",
+      "bytes": 1071,
+      "sha256": "efb6d074e763e929fe4d98b0c46a08a44dbdeada74ac6cc9cc34b5f8c26e74bd"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/replay.log",
+      "bytes": 2611,
+      "sha256": "fe6ae4aadc21a0837ecfab0054553da885b7d2a6c0ff771cf1b343e5499de3fb"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/replay.log.meta.json",
+      "bytes": 1077,
+      "sha256": "4dad2dab43d65fe84dc13500fd246ec3d7fce16661082fff631d15714c2b9a11"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/comparison.log",
+      "bytes": 881,
+      "sha256": "34dc4ce14c680291742331444a75f13e7e0c44c27d80025fd34182a559fc14b9"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/comparison.log.meta.json",
+      "bytes": 534,
+      "sha256": "a434b1908c114e5a4296a1581ed8a6aa3ce9c44a2422b7552133bb009ba5d126"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/reader.log",
+      "bytes": 70,
+      "sha256": "9e4e0a82981a1c01f71fe819e43ad45ca2c74f083c64298146af5c380a939a7e"
+    },
+    {
+      "path": "data/.provider-smoke/20261115/reader.log.meta.json",
+      "bytes": 630,
+      "sha256": "1df1d290fed567da60b72c623322a317c53e150baefd484c13b5a0e65b3153c2"
+    }
+  ],
+  "credential_artifact_check": {
+    "matched": false,
+    "files_checked": 34,
+    "method": "exact secret value compared in memory; only pass/fail retained"
+  }
+}

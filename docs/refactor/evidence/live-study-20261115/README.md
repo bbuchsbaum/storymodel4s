@@ -49,15 +49,26 @@ Private evidence remains in ignored `data/.live-study/20261115/`.
 
 ## Qualification boundary
 
-These are engineering checks. No external model call has been made for this slice, and the
-existing real-provider smoke court remains skipped without configured authorization. A small
-real-provider smoke run is the next qualification step once an endpoint and model are selected.
-It should use synthetic inputs first. This delivery makes no new scientific accuracy claim.
+The original local qualification receipt above records the initial engineering gate, before an
+external call was authorized. The subsequent [real-provider smoke receipt](provider-smoke.json)
+qualifies the unchanged implementation through the actual study CLI against OpenAI, using
+`gpt-4.1-mini-2025-04-14` and two authored synthetic geometric units. One HTTP request completed;
+the provider reported 141 input tokens and 35 output tokens. Both units received their expected
+assignments. A separate replay process, with provider credentials removed, made zero HTTP
+requests and reproduced identical unit rows and mapping records. Whole bundle bytes differ
+because live and replay call accounting differs.
+
+This is a bounded engineering smoke, not a scientific accuracy result or a guarantee for other
+models or providers. The older opt-in parser `LiveSmokeSuite` was not rerun; its skip remains part
+of the original test totals. Raw synthetic inputs, recordings and logs remain private and ignored
+under `data/.provider-smoke/20261115/`; only counts, hashes and configuration are published.
 
 Hosted CI is separate from local evidence:
 [Continuous Integration](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813788) and
 [Documentation](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43781813869) test the runtime
-candidate. Their result is recorded separately rather than inferred from the local gate.
+candidate. All four CI matrix jobs and documentation verification completed successfully. The
+run URLs, exact SHA and matrix cells are retained in the provider-smoke receipt. Pages build and
+deploy jobs were skipped for the task branch; docs verification success is not publication.
 
 ## Landing
 
@@ -72,5 +83,6 @@ The engineering ticket is closed and both reservations and the claim are release
 standalone verification clone was removed after preserving its logs and synthetic artifact; its
 exact runtime commit is an ancestor of main.
 
-The scoped engineering acceptance is complete. Real-provider smoke configuration and the full
-hosted matrix are separate qualifications; consult the run links above for hosted status.
+The scoped engineering acceptance, hosted matrix and bounded real-provider smoke are now
+complete. The later qualification changed documentation and tracking only; the source remains
+the exact qualified implementation.
