@@ -1,31 +1,43 @@
 # Joint detail-coding rubric
 
-**Status:** Draft operational material, not a study protocol, recruitment approval, human pilot, or
-accuracy evidence. Human use requires authorized material; files here use admitted synthetic content.
+**Status:** Draft. Not a study protocol, recruitment approval, human pilot, or accuracy evidence.
+Actual human pilot remains pending.
 
-Independent coders receive source/recall packet and opaque IDs, never predictions, scores or prior
-labels. Seal and retain independent sheets; adjudication is a new cited record, never overwrite.
+## Frozen packet and blinding
+
+Before coding, owner supplies frozen packet ID/version, stable film edition, authorized access
+route, source row/time evidence/provenance and canonical UTF-16 recall units. Record unavailable
+evidence. Independent coders do not see predictions, scores or prior labels; seal sheets before
+adjudication.
 
 ## Source-first DL2
 
-Before recall, code supplied source rows: stable cast ID, row/interval, participant, action,
-dialogue speaker, and source-row/speech/frame evidence. Record unidentified-participant and
-no-speaker rows as coverage gaps. Recall never creates cast identity.
+Code source rows before recall: cast ID, participant, action, dialogue speaker and cited source
+evidence. Record participant/speaker coverage gaps. Recall never creates source identity.
 
-## Fields and rules
+## Coding rules
 
-Preview has separate narrative-reference and referent/occurrence fields. DL1 atoms use exact UTF-16
-half-open spans and literal substring. Atoms may overlap if a span supports distinct claims:
-overlap alone neither proves duplicate atoms nor authorizes merging. Keep content, address,
-assessment status, observed discourse and reported phenomenology separate. Phenomenology is explicit
-report or separately declared measurement only.
+Code narrative source reference separately from referent/occurrence. Atom spans are UTF-16
+half-open coordinates plus literal substring. Overlap is proposed policy pending owner decision:
+distinct claims may share support; overlap alone neither proves duplicate atoms nor permits merging.
 
-Completed DL3 grade is exactly: supported; gist-correct/detail-error with severity; contradicted;
-recaller-inference; external; invented; unverifiable; misread; not-assessed. Invented requires
-adequate source record; otherwise unverifiable. External does not set address. Alternatives contain
-supported hypotheses only; unresolved is separate.
+Keep content, address, status, observed discourse and reported phenomenology separate. Completed
+assessment uses one substantive grade: supported; gist-correct/detail-error(severity);
+contradicted; recaller-inference; external; invented; unverifiable; misread. Pending/unavailable/
+refused uses not-assessed(reason), is not completed and is not a substantive grade. Misread must be
+corrected/reviewed or excluded, never counted as recall. Alternatives can include typed external
+destination but never unresolved member.
 
-DL4 uses target-episode-novel-content/v1 unless owner changes it: denominator is admitted atoms
-with resolved address and completed assessment; internal credit is target-specific, non-discourse,
-non-repetition content. Report unresolved, pending/unavailable/refused, discourse, repetition and
-exclusions separately. Declare graph families before coding; graph is not residual.
+## DL4 and internal projection
+
+DL4 fixes eligible source-row universe and records row-level present, absent, uncertain or
+not-assessable. It does not auto-credit broad/alternative, contradicted/invented, or missing
+evidence. It is separate from internal/external.
+
+Internal/external uses address classification independently of fidelity/countability:
+target-specific internal; other-specific/personal/general external; discourse/unresolved reported.
+The proposed novel-content count excludes discourse/repetition only after classification and states
+its own denominator. Extended and RepeatedOrCategoric address scopes are unresolved target
+membership pending narrower address. Inventory partitions internal/external/unresolved/excluded;
+report internal / (internal + external) only with both counts. Fidelity changes never reclassify an
+atom. Graph family is declared before coding.
