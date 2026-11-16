@@ -43,7 +43,9 @@ class StudyRecordSuite extends FunSuite:
   private val artifact = Checksum.ofText("units file")
   private lazy val recall = right(PreparedRecall.supplied("p1_s1", texts, artifact))
   private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
-  private val policy = StudyRecord.policy("annotation", "strict-chunked/v1", "referent")
+  private def legacy(name: String): RecordedCondition =
+    RecordedCondition.legacy(name).fold(e => fail(e), identity)
+  private val policy = StudyRecord.policy(legacy("annotation"), "strict-chunked/v1", "referent")
 
   private def judged(s: Stated) = StudyRecord.judge(view, s)
   private lazy val judgements = Vector(
@@ -56,7 +58,10 @@ class StudyRecordSuite extends FunSuite:
   )
   private lazy val record =
     right(
-      StudyRecord.record("referent", policy, recall, view, producer, judgements).left.map(_.message)
+      StudyRecord
+        .record("referent", legacy("annotation"), policy, recall, view, producer, judgements)
+        .left
+        .map(_.message)
     )
 
   test("supplied units keep their text, order and line, and are marked as not assessed"):
@@ -106,12 +111,18 @@ class StudyRecordSuite extends FunSuite:
   test("a judgement naming a scene that is not a target cannot enter a record, even if forged"):
     val forged = judgements.updated(0, Judgement.Scene(2, view.groupRefs(2)))
     assertEquals(
-      StudyRecord.record("referent", policy, recall, view, producer, forged).left.toOption,
+      StudyRecord
+        .record("referent", legacy("annotation"), policy, recall, view, producer, forged)
+        .left
+        .toOption,
       Some(MappingRefusal.UniverseMismatch)
     )
     val cartoon = judgements.updated(0, Judgement.Collection(2, view.collectionRefs(2)))
     assertEquals(
-      StudyRecord.record("referent", policy, recall, view, producer, cartoon).left.toOption,
+      StudyRecord
+        .record("referent", legacy("annotation"), policy, recall, view, producer, cartoon)
+        .left
+        .toOption,
       Some(MappingRefusal.UniverseMismatch)
     )
 
@@ -189,19 +200,27 @@ class StudyRecordSuite extends FunSuite:
   test("a record needs one judgement per unit"):
     assertEquals(
       StudyRecord
-        .record("referent", policy, recall, view, producer, judgements.drop(1))
+        .record(
+          "referent",
+          legacy("annotation"),
+          policy,
+          recall,
+          view,
+          producer,
+          judgements.drop(1)
+        )
         .left
         .toOption,
       Some(MappingRefusal.OutcomeInventoryMismatch)
     )
 
   test("records of two judgements, or of two conditions, have different policies and digests"):
-    val narrative = StudyRecord.policy("annotation", "strict-chunked/v1", "narrative")
+    val narrative = StudyRecord.policy(legacy("annotation"), "strict-chunked/v1", "narrative")
     assertNotEquals(narrative, policy)
-    assertNotEquals(StudyRecord.policy("auto", "strict-chunked/v1", "referent"), policy)
+    assertNotEquals(StudyRecord.policy(legacy("auto"), "strict-chunked/v1", "referent"), policy)
     val other = right(
       StudyRecord
-        .record("narrative", narrative, recall, view, producer, judgements)
+        .record("narrative", legacy("annotation"), narrative, recall, view, producer, judgements)
         .left
         .map(_.message)
     )

@@ -135,7 +135,14 @@ object StudyExecution:
         )
       )
       val intervals = p.clock.map(_._1)
-      val producer = StudyRecord.producer(provider, p.index.model, p.index.system, p.view, recall)
+      val producer = StudyRecord.producer(
+        provider,
+        p.index.model,
+        p.index.system,
+        p.view,
+        recall,
+        p.index.condition.producer
+      )
       val rows = replies.zip(recall.unitIds).map { case ((u, r), id) =>
         StudyBundle.row(p.view, p.index.protocol, u, id.value, r, p.index.extras, intervals)
       }
@@ -192,7 +199,8 @@ object StudyExecution:
                 producer,
                 intervals,
                 execution,
-                calls() - before
+                calls() - before,
+                Some(p.index.condition)
               )
             )
           )

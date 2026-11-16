@@ -116,10 +116,26 @@ object StudyRecord:
       )
 
   /** The decision policy of one judgement of one condition. The condition and reply protocol are
-    * part of the name, so records made under different rules are never the same policy.
+    * part of the name, so records made under different rules are never the same policy. A declared
+    * producer condition adds its checksum as its own segment, so two conditions that differ only in
+    * what the producer saw never share a policy; a legacy condition keeps the old identifier, and
+    * plain names cannot contain the separator, so the two forms never collide.
     */
-  def policy(condition: String, protocolName: String, field: String): DecisionPolicyId =
-    DecisionPolicyId.unsafe(s"agent-localization:$condition:$protocolName:$field")
+  def policy(condition: RecordedCondition, protocolName: String, field: String): DecisionPolicyId =
+    condition.producer match
+      case None =>
+        DecisionPolicyId.unsafe(s"agent-localization:${condition.name}:$protocolName:$field")
+      case Some(p) =>
+        DecisionPolicyId.unsafe(
+          s"agent-localization:${condition.name}:producer-${p.digest.hex}:$protocolName:$field"
+        )
+
+  /** The context policy text of a record: what the model read. */
+  def contextPolicy(condition: RecordedCondition): ContextPolicy =
+    condition.producer match
+      case None =>
+        ContextPolicy.Unspecified("the model read the film record and the session's recall")
+      case Some(p) => ContextPolicy.Unspecified(s"the model read the film record and ${p.describe}")
 
   private def outcome(
       unit: RecallUnitId,
@@ -172,6 +188,7 @@ object StudyRecord:
     */
   def record(
       field: String,
+      condition: RecordedCondition,
       policy: DecisionPolicyId,
       recall: PreparedRecall,
       view: TimedSourceView,
@@ -185,7 +202,7 @@ object StudyRecord:
         declared <- universe(view)
         policies <- MappingPolicies.of(
           InferencePolicy.Unspecified("no inference executed; recorded model choice"),
-          ContextPolicy.Unspecified("the model read the film record and the session's recall"),
+          contextPolicy(condition),
           CandidatePolicy.Unknown(
             "every target was offered in the prompt; no candidate set computed"
           ),
@@ -224,12 +241,14 @@ object StudyRecord:
       model: String,
       system: String,
       view: TimedSourceView,
-      recall: PreparedRecall
+      recall: PreparedRecall,
+      condition: Option[ProducerCondition] = None
   ): AgentMappingRecord.Producer =
     AgentMappingRecord.Producer(
       provider,
       model,
       Checksum.ofText(system),
       view.artifact,
-      recall.segmentation.artifactSha256
+      recall.segmentation.artifactSha256,
+      renderingSha256 = condition.map(_.digest)
     )

@@ -18,16 +18,21 @@ import storymodel4s.provider.agent.TextExecution
   * and never parsed back out of a record. Reading a bundle derives every judgement and both records
   * again and requires the bundle to hold exactly those. A bundle holds source text and unit ids;
   * keep it outside the repository.
+  *
+  * A bundle whose condition declares what the producer saw (`ProducerCondition`) is written as
+  * `bundle/v3` with a `producerCondition` beside the condition's name; a v2 bundle reads as a
+  * legacy condition, and a legacy condition is written as v2, unchanged.
   */
 object StudyBundle:
   val Schema: String = "storymodel4s.agentmapping.bundle/v2"
+  val SchemaV3: String = "storymodel4s.agentmapping.bundle/v3"
   val Fields: Vector[String] = Vector("narrative", "referent")
 
   /** What a bundle says about where it came from. */
   final case class Provenance(
       participant: String,
       session: String,
-      condition: String,
+      condition: RecordedCondition,
       model: String,
       provider: String,
       protocol: String,
@@ -194,7 +199,7 @@ object StudyBundle:
 
   /** Both judgements' checked records for one session's rows, each bound to its stated answers. */
   def records(
-      condition: String,
+      condition: RecordedCondition,
       protocolName: String,
       recall: PreparedRecall,
       view: TimedSourceView,
@@ -208,6 +213,7 @@ object StudyBundle:
         StudyRecord
           .record(
             f,
+            condition,
             StudyRecord.policy(condition, protocolName, f),
             recall,
             view,
@@ -231,12 +237,12 @@ object StudyBundle:
   ): Json =
     Json
       .obj(
-        "schema" -> str(Schema),
+        "schema" -> str(provenance.condition.producer.fold(Schema)(_ => SchemaV3)),
         "provenance" -> Json
           .obj(
             "participant" -> str(provenance.participant),
             "session" -> str(provenance.session),
-            "condition" -> str(provenance.condition),
+            "condition" -> str(provenance.condition.name),
             "model" -> str(provenance.model),
             "provider" -> str(provenance.provider),
             "protocol" -> str(provenance.protocol),
@@ -249,7 +255,10 @@ object StudyBundle:
             ),
             "modelCalls" -> Json.fromInt(0)
           )
-          .deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h)))),
+          .deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h))))
+          .deepMerge(
+            Json.fromFields(provenance.condition.producer.map(p => "producerCondition" -> p.json))
+          ),
         "meaning" -> Json.obj(
           "narrative" -> str("the scene the retelling is narrating at this unit"),
           "referent" -> str("the scene containing the specifically mentioned content"),
@@ -279,7 +288,11 @@ object StudyBundle:
       .deepMerge(Json.fromFields(transcript.map("recall" -> _)))
 
   /** What a reader recovers: both records, re-checked, and the unit rows as written. */
-  final case class Loaded(records: Map[String, MappingResult], units: Vector[Json])
+  final case class Loaded(
+      records: Map[String, MappingResult],
+      units: Vector[Json],
+      condition: RecordedCondition
+  )
 
   /** Keys a self-reported extra may not use: they would overwrite a row's own fields wherever a row
     * is flattened into a reply file.
@@ -294,7 +307,8 @@ object StudyBundle:
       producer: AgentMappingRecord.Producer,
       intervals: Option[SceneIntervals] = None,
       execution: Option[TextExecution.Profile] = None,
-      modelCalls: Int = 0
+      modelCalls: Int = 0,
+      condition: Option[RecordedCondition] = None
   )
 
   /** The judgement a stated answer gives against this source. A failure's judgement follows from
@@ -368,8 +382,22 @@ object StudyBundle:
     def says(key: String, value: String): Either[String, Unit] =
       Either.cond(p.get[String](key).contains(value), (), s"provenance names another $key")
     for
-      _ <- Either.cond(c.get[String]("schema").contains(Schema), (), "not a v2 mapping bundle")
-      condition <- p.get[String]("condition").left.map(_ => "no condition")
+      schema <- c
+        .get[String]("schema")
+        .toOption
+        .filter(s => s == Schema || s == SchemaV3)
+        .toRight("not a v2 or v3 mapping bundle")
+      condition <- readCondition(schema, p)
+      _ <- Either.cond(
+        expected.condition.forall(_ == condition),
+        (),
+        "the bundle names another condition"
+      )
+      _ <- Either.cond(
+        expected.producer.renderingSha256 == condition.producer.map(_.digest),
+        (),
+        "the producer's rendering is not the bundle's producer condition"
+      )
       protocol <- p.get[String]("protocol").left.map(_ => "no protocol")
       _ <- Either.cond(
         p.downField("execution").focus == expected.execution.map(_.json) &&
@@ -494,7 +522,7 @@ object StudyBundle:
               )
             )
             again <- StudyRecord
-              .record(f, policy, recall, view, bound, judged(f))
+              .record(f, condition, policy, recall, view, bound, judged(f))
               .left
               .map(e => s"$f: ${e.message}")
             _ <- Either.cond(
@@ -504,4 +532,26 @@ object StudyBundle:
             )
           yield done.updated(f, record)
       }
-    yield Loaded(records, units)
+    yield Loaded(records, units, condition)
+
+  /** The condition a bundle records. A v2 bundle has a name alone and reads as a legacy condition;
+    * a v3 bundle must carry its producer condition. Neither may carry the other's form.
+    */
+  private def readCondition(
+      schema: String,
+      p: io.circe.ACursor
+  ): Either[String, RecordedCondition] =
+    for
+      name <- p.get[String]("condition").left.map(_ => "no condition")
+      declared = p.downField("producerCondition").focus
+      condition <- (schema, declared) match
+        case (Schema, None)       => RecordedCondition.legacy(name)
+        case (SchemaV3, Some(pc)) =>
+          ProducerCondition
+            .decode(pc)
+            .left
+            .map(_.message)
+            .flatMap(RecordedCondition.declared(name, _))
+        case (Schema, Some(_)) => Left("a v2 bundle cannot declare a producer condition")
+        case _                 => Left("a v3 bundle needs its producer condition")
+    yield condition
