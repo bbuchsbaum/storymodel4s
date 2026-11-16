@@ -55,15 +55,25 @@ local synthetic HTTP request, replay in a separate credential-free process, and 
 with the Python reader. The three unit rows, both mapping records and recall descriptor are
 identical between live and replay; replay makes zero calls. No external provider request ran.
 
-## Landing gate scope
+## Landing and final qualification
 
-The final runtime's JVM 17, JVM 21 and JavaScript CI jobs passed. Its Native rerun is still
-pending at this receipt. Independent scope review confirmed that all 16 portable module trees,
-`build.sbt`, `project/` and workflows are unchanged from the Native-qualified predecessor.
-The final correction changes only the JVM-only pipeline launcher and its tests. The clean final
-pipeline gate replaces the affected pipeline qualification; the unchanged Native inputs retain
-their predecessor qualification. The redundant Native rerun is not a correctness block. This
-receipt does not claim that the complete final-SHA hosted matrix has finished.
+The reviewed candidate `49170e5d56795502790a74ae9d97d602013d128c` was fast-forwarded to
+main and pushed; local, tracking and remote main matched. Only evidence documents and Mote
+records changed after the qualified runtime. The engineering ticket is closed, its claim and
+reservations released, and the merged task branch and temporary gate clone removed. All 18
+pre-existing unrelated StoryAtlas file hashes are unchanged.
+
+The [final runtime CI matrix](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422860)
+passed: JVM 17 and 21 each passed **4,960 tests with 22 skipped**; JavaScript and Native each
+passed **3,570 with no skips**. All four jobs report zero failures. The final Native direct
+job log contains all 16 module totals and identifies the qualified runtime SHA.
+[Final documentation verification](https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422841)
+passed; Pages build and deployment were skipped.
+
+At landing review, the Native rerun was pending. Independent review established that its
+16 portable module trees, build settings and workflows were identical to the passed
+predecessor, while the launcher correction affected only the JVM pipeline. That scope decision
+remains recorded for provenance; the final Native rerun has now passed as well.
 
 ## What this establishes
 

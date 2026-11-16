@@ -307,6 +307,26 @@
       "file": "reference-scope-final.log",
       "sha256": "22fff60627e196f13378a14fcee518f0a589346c50596c9905da7925287280d4",
       "bytes": 248
+    },
+    {
+      "file": "hosted-final.json",
+      "sha256": "34ceaf2b1bc3a31ddac45eefd3f1341ab4845355926f7d95be4381bf0c7f141b",
+      "bytes": 33608
+    },
+    {
+      "file": "final-job-133278947336.log",
+      "sha256": "58d19bcab7cf399f6788c18d56502d7751c50d98b3527256df5a52fcc0e6e4a5",
+      "bytes": 2748790
+    },
+    {
+      "file": "landing.json",
+      "sha256": "3098d687d969a02ffd349e693fa6298f653eac088cde0d8f9d347bb5d2ea02d2",
+      "bytes": 408
+    },
+    {
+      "file": "cleanup.json",
+      "bytes": 284,
+      "sha256": "94e51a5ba5a219d9edb0d024e95074a8b9f4f1c4123f11bc36959274a38b8a1d"
     }
   ],
   "boundary": "Engineering provenance and replay only; corpus segmentation comparison and scientific accuracy remain unqualified.",
@@ -418,7 +438,7 @@
     "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
     "ci": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422860",
     "docs": "https://github.com/bbuchsbaum/storymodel4s/actions/runs/43861422841",
-    "status": "JVM 17, JVM 21 and JS passed; Native rerun pending",
+    "status": "Complete: JVM 17, JVM 21, JavaScript and Native passed; documentation verification passed; Pages build and deployment skipped.",
     "completed_jobs": [
       {
         "job": 133278946977,
@@ -449,7 +469,33 @@
         "log": "final-job-133278947368.log",
         "sha256": "5248be66a297fd1828f676f1d8b084886ad4d6a6b1cb69174e7b4dae0a281fe1",
         "transcript_suite": "2026-11-16T12:01:48.9256432Z Test run storymodel4s.pipeline.agentmapping.TranscriptStudySuite finished: 0 failed, 0 ignored, 9 total 0.704s"
+      },
+      {
+        "job": 133278947336,
+        "tasks": 16,
+        "passed": 3570,
+        "failed": 0,
+        "skipped": 0,
+        "log": "final-job-133278947336.log",
+        "sha256": "58d19bcab7cf399f6788c18d56502d7751c50d98b3527256df5a52fcc0e6e4a5",
+        "transcript_suite": null
       }
     ]
+  },
+  "landing": {
+    "landing": "49170e5d56795502790a74ae9d97d602013d128c",
+    "runtime": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "previous_main": "7ca7baf1f0db14cc95b10bae13d2997ff66aa39f",
+    "local_tracking_remote_parity": true,
+    "clean": true,
+    "independent_final_review": "/root/live_design_review PASS49170e5d5",
+    "ownership": "no other actor conflicts; current claim and2live reservations owned by this task"
+  },
+  "cleanup": {
+    "deleted_clone": "/private/tmp/storymodel-transcript-gate-20261115",
+    "clone_head": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "deleted_task_branch": "codex/ordinary-transcripts-20261115",
+    "branch_commits_preserved_on_main": true,
+    "atlas_unrelated_hashes_unchanged": 18
   }
 }

@@ -48,5 +48,23 @@
     "candidate": "53aa0f10e0da92be602b5e9f7e7da9a54c3653a8",
     "verdict": "PASS; pending Native rerun is nonblocking because Native gated inputs are identical to the passed predecessor",
     "pipeline_final_gate": "606 passed, zero failed/skipped; actual CLI walkthrough and old-launcher mutation passed"
+  },
+  "landing_candidate_review": {
+    "reviewer": "/root/live_design_review",
+    "candidate": "49170e5d56795502790a74ae9d97d602013d128c",
+    "verdict": "PASS",
+    "findings": []
+  },
+  "final_hosted_evidence_review": {
+    "reviewer": "/root/live_design_review",
+    "verdict": "PASS",
+    "revision": "9ec5e2c96850eab5a06e9a9f771d80cac2e4239f",
+    "native_tasks": 16,
+    "native_passed": 3570,
+    "native_failed": 0,
+    "native_skipped": 0,
+    "ci": "all four jobs passed",
+    "docs": "verification passed; Pages build and deployment skipped",
+    "findings": []
   }
 }
