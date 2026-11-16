@@ -1,7 +1,6 @@
 package storymodel4s.pipeline.agentmapping
 
 import io.circe.Json
-import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import scala.util.control.NonFatal
 import storymodel4s.align.*
@@ -32,8 +31,11 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   * writes only to a new directory under the ignored data root; the outputs carry unit ids and
   * numbers, never recall or film text (rule 14d).
   *
-  * Usage (from the repository root):
-  * `sbt 'pipeline/runMain storymodel4s.pipeline.agentmapping.ReferenceParity <dataRoot> <outDir>'`
+  * Usage (from the repository root, on a clean committed tree): `sbt 'pipeline/runMain
+  * storymodel4s.pipeline.agentmapping.ReferenceParity <dataRoot> <outDir> <commitSha>'`. The
+  * manifest records the declared commit and the SHA-256 of each source file that defines the
+  * outputs, read from the working tree, so a reader can check them against
+  * `git show <commitSha>:<path>`.
   */
 object ReferenceParity:
   val Version: String = "reference-parity/v1"
@@ -60,11 +62,11 @@ object ReferenceParity:
     * cell as one word. Unit ids depend only on the transcript, so they are unchanged.
     */
   def recall(csv: Array[Byte]): Either[String, (RecallGraph[Checked], RecallInventory)] =
-    val content = new String(csv, StandardCharsets.UTF_8)
-    val lines = content.split('\n').toVector.map(_.stripSuffix("\r")).filter(_.nonEmpty)
-    lines match
-      case header +: rows if header.split(',').headOption.exists(_.trim == "Words") =>
-        val words = rows.flatMap(_.split(',').headOption.map(_.trim).filter(_.nonEmpty))
+    // The intake's strict CSV records (quoting, BOM), so recall and timing read the same cells.
+    RecallTimingIntake.records(csv) match
+      case Left(r) => Left(s"recall CSV: $r")
+      case Right(header +: rows) if header.headOption.exists(_.trim == "Words") =>
+        val words = rows.flatMap(_.headOption.map(_.trim).filter(_.nonEmpty))
         for
           source <- StorySource
             .fromText(words.mkString(" "), Some("sherlock-recall"))
@@ -252,7 +254,7 @@ object ReferenceParity:
                     if rs.isEmpty then unitNotes += ("episodic-without-refs" -> unit.id.value)
                     rs.zipWithIndex.foreach { (ref, i) =>
                       val converted = ReferenceConversion
-                        .reference(unit, ref, row, rows, source, selections.head)
+                        .reference(unit, ref, row, rows, source, selections)
                       refRows += RefRow(unit, i, converted, None)
                     }
             case _ => unitNotes += ("talk-unstated" -> unit.id.value)
@@ -537,8 +539,24 @@ object ReferenceParity:
         "extentUnavailable" -> count(references.collect {
           case r @ RefRow(_, _, Right(_), Some(Left(_))) => r
         })(_.extent.get.left.toOption.get.code, _.unit.id.value),
-        "extentProjectionInadmissible" -> Json.fromInt(extentRefused)
+        "extentProjectionInadmissible" -> Json.fromInt(extentRefused),
+        // A joint reference with one interval names one moment, which is not joint: the producer
+        // contradicted its own form. It is refused, never converted to a single reference.
+        "producerErrors" -> count(references.collect {
+          case r @ RefRow(
+                _,
+                _,
+                Left(
+                  ReferenceConversion.Refusal.Library(
+                    ProvisionalReference.Refusal.SingleMomentJoint
+                  )
+                ),
+                _
+              ) =>
+            r
+        })(_ => "single-interval-joint", _.unit.id.value)
       ),
+      "crossPartExtent" -> Json.fromString(CrossPart),
       "notAboutFilmUnits" -> Json.obj(
         "count" -> Json.fromInt(naUnits.size),
         "inadmissible" -> Json.fromInt(refusedNa.size)
@@ -547,9 +565,36 @@ object ReferenceParity:
       "extentProjection" -> proj(ext)
     )
 
+  /** The ledger's statement on extents across the two film parts. */
+  val CrossPart: String =
+    "A constituent whose support spans both film parts has no extent: no presentation axis " +
+      "covers both parts, and whether one should is an open owner design question for case study 2."
+
+  /** Source files that define the outputs, relative to the repository root. */
+  val Sources: Vector[String] = Vector(
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/ReferenceConversion.scala",
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/ReferenceExtent.scala",
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/ReferenceParity.scala",
+    "tools/case-studies/parity/compare.py"
+  )
+
+  private def provenance(commit: String): Json =
+    val root = if Files.isRegularFile(Path.of(Sources.head)) then Path.of(".") else Path.of("..")
+    Json.obj(
+      "commit" -> Json.fromString(commit),
+      "commitBasis" -> Json.fromString("declared by the caller; check the source digests"),
+      "sources" -> Json.fromFields(Sources.map { s =>
+        s -> Json.fromString(Checksum.ofBytes(Files.readAllBytes(root.resolve(s))).hex)
+      }),
+      "crossPartExtent" -> Json.fromString(CrossPart)
+    )
+
   def main(args: Array[String]): Unit =
     args.toVector match
-      case Vector(root, outDir) =>
+      case Vector(_, _, commit) if !commit.matches("[0-9a-f]{40}") =>
+        System.err.println("refused: the commit must be a full 40-hex SHA")
+        sys.exit(2)
+      case Vector(root, outDir, commit) =>
         val dataRoot = Path.of(root)
         val out = Path.of(outDir)
         val code =
@@ -591,6 +636,7 @@ object ReferenceParity:
                     Json
                       .obj(
                         "schema" -> Json.fromString(Version),
+                        "provenance" -> provenance(commit),
                         "participants" -> Json.fromFields(outcomes.map { (n, o) =>
                           n.take(4) -> o
                             .fold(e => Json.obj("refused" -> Json.fromString(e)), identity)
@@ -605,5 +651,5 @@ object ReferenceParity:
               2
         sys.exit(code)
       case _ =>
-        System.err.println("usage: ReferenceParity <dataRoot> <outDir>")
+        System.err.println("usage: ReferenceParity <dataRoot> <outDir> <commitSha>")
         sys.exit(2)

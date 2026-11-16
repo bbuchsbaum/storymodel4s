@@ -183,14 +183,16 @@ object ReferenceConversion:
         Right(Declaration.Alternative(many.map((h, w) => Weighted(Member.Located(h), Some(w)))))
     }
 
-  /** Convert one reference of one unit, checking its meaning against `source` on `selection`. */
+  /** Convert one reference of one unit, checking its meaning against `source` on every one of
+    * `selections` (the first refusal is reported).
+    */
   def reference(
       unit: RecallUnit,
       ref: Reference,
       row: Int => SourceNodeRef,
       rows: SourceRows,
       source: SourceRepresentation,
-      selection: TemporalSupport.Selection
+      selections: Vector[TemporalSupport.Selection]
   ): Either[Refusal, Converted] =
     for
       words <- ref.words match
@@ -206,10 +208,15 @@ object ReferenceConversion:
           Left(Refusal.AltsInvalid(intervalProblem(raw, rows)))
         case _ => Left(Refusal.AltsUnstated)
       declared <- declaration(form, alts, row, rows)
-      _ <- ProvisionalReference
-        .of(source, selection, declared, WeightCoverage.Exhaustive)
-        .left
-        .map(Refusal.Library(_))
+      _ <- selections.foldLeft[Either[Refusal, Unit]](Right(())) { (acc, selection) =>
+        acc.flatMap(_ =>
+          ProvisionalReference
+            .of(source, selection, declared, WeightCoverage.Exhaustive)
+            .left
+            .map(Refusal.Library(_))
+            .map(_ => ())
+        )
+      }
     yield Converted(at, form, declared)
 
   /** Indices of samples refused because their normalized support repeats another's, or because a

@@ -72,7 +72,14 @@ class ReferenceConversionSuite extends FunSuite:
       case other                               => fail(s"unexpected refs $other")
 
   private def convert(text: String, u: Int = 0) =
-    ReferenceConversion.reference(unit(u), reply(text), row, rows, view.representation, partA)
+    ReferenceConversion.reference(
+      unit(u),
+      reply(text),
+      row,
+      rows,
+      view.representation,
+      Vector(partA, partB)
+    )
 
   private def hypothesisOf(c: ReferenceConversion.Converted): ProvisionalReference.Hypothesis =
     c.declaration match
@@ -240,6 +247,51 @@ class ReferenceConversionSuite extends FunSuite:
         .map(_.seconds),
       Right(17.0)
     )
+  }
+
+  test("overlapping occurrences are summed per constituent, not measured as their union") {
+    // Rows 1-2 (20 s) and row 2 (10 s) overlap on row 2: the declared reducer gives 30 s, the
+    // union would give 20 s.
+    val both = Vector(partA, partB)
+    assertEquals(
+      extent("""{"words":"A man","form":"repeated","alts":[{"w":0.5,"iv":[[1,2],[2,2]]}]}""", both)
+        .map(_.seconds),
+      Right(30.0)
+    )
+    assertEquals(
+      extent("""{"words":"A man","form":"joint","alts":[{"w":0.5,"iv":[[1,2],[2,2]]}]}""", both)
+        .map(_.seconds),
+      Right(30.0)
+    )
+    assert(ReferenceExtent.Version.contains("constituent-sums"))
+  }
+
+  test("a refusal on any selection is kept with its selection, never collapsed") {
+    val c = convert("""{"words":"A man","form":"specific","alts":[{"w":0.5,"iv":[[1,1]]}]}""")
+      .fold(r => fail(s"refused $r"), identity)
+    val lone = Declaration.Alternative(
+      Vector(ProvisionalReference.Weighted(Member.Located(hypothesisOf(c)), Some(0.5)))
+    )
+    assertEquals(
+      ReferenceExtent.of(view.representation, Vector(partA, partB), lone),
+      Left(
+        ReferenceExtent.Unavailable.Refused(0, ProvisionalReference.Refusal.OneMemberAlternative)
+      )
+    )
+    assertEquals(
+      ReferenceExtent.of(view.representation, Vector.empty, c.declaration),
+      Left(ReferenceExtent.Unavailable.NoSelection)
+    )
+  }
+
+  test("recall cells are read by the strict CSV reader, so a quoted comma stays in its cell") {
+    val quoted = "Words,P,a,b,O,c,d\nA,0,0,0,1,0,0\n\"man, walked\",0,0,0,2,0,0\nhome.,0,0,0,3,0,0"
+      .getBytes(StandardCharsets.UTF_8)
+    val (g, inv) = ReferenceParity.recall(quoted).fold(e => fail(e), identity)
+    assertEquals(inv.words.size, 3)
+    val w = inv.words(1).span
+    assertEquals(g.transcript.canonicalText.substring(w.start, w.endExclusive), "man, walked")
+    assert(ReferenceParity.timing(quoted, g, inv).isRight)
   }
 
   test("an extent no part can measure is a typed unavailability, never a number") {

@@ -17,6 +17,7 @@ import argparse
 import csv
 import json
 import math
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -150,7 +151,6 @@ def compare_bins(lib, har):
     for l, h in [
         ("extent_log10_s", "logB"),
         ("alternatives_present_share", "Uflag"),
-        ("not_applicable_share", "nonepisodic"),
     ]:
         c = Counter()
         xs, ys = [], []
@@ -188,26 +188,61 @@ def compare_bins(lib, har):
             differing_with_same_reference_counts=far_refs_same,
             differing_with_different_reference_counts=far_refs_diff,
         )
+        one_sided = c["library n/a, harness value"] + c["harness n/a, library value"]
+        cols[f"{l}~{h}"]["agreement"] = dict(
+            agree=c["exact"], of=len(xs) + one_sided, one_sided=one_sided
+        )
     out["columns"] = cols
+    # Not a parity column: the library's not-applicable share is a share of sampled REFERENCES,
+    # the harness's nonepisodic a share of WORDS with an onset. Counts only, never agreement.
+    d = Counter()
+    for a, b in pairs:
+        x, y = num(a["not_applicable_share"]), num(b["nonepisodic"])
+        if x is None and y is None:
+            d["both n/a"] += 1
+        elif x is None:
+            d["harness only (bins with words but no sampled reference)"] += 1
+        elif y is None:
+            d["library only"] += 1
+        else:
+            d["both valued"] += 1
+            d["both valued, numerically equal"] += abs(x - y) <= EXACT
+    out["definitional_differences"] = {
+        "not_applicable_share vs nonepisodic": dict(
+            d,
+            note="library: not-applicable references / sampled references; harness: words in "
+            "non-episodic units / words with an onset. Different quantities; not compared.",
+        )
+    }
     out["status"] = dict(out["status"])
     return out
 
 
-def compare_words(lib_words, z):
+def compare_words(lib_words, z, cells, refs):
+    """Per word: unit assignment and held sample on each side, with the difference classes.
+    `cells` are the CSV word cells (used only to count normalized tokens; never printed)."""
     k, wr = z["k"], z["wr"]
     talk = z["talk"]
+    refused = {
+        (int(r["unit_index"]), int(r["ref_index"])): r["reason"]
+        for r in refs
+        if r["status"] == "refused"
+    }
+    unit_id = {int(r["unit_index"]): r["unit_id"] for r in refs}
     c = Counter()
-    unit_diff = []
+    listed = defaultdict(list)
     for i, w in enumerate(lib_words):
         lu = int(w["unit_index"])
         hu = int(k[i])
         if lu != hu:
-            c["unit differs"] += 1
-            c[
-                f"unit differs: library {'unassigned' if lu < 0 else 'unit'}, harness "
-                f"{'unassigned' if hu < 0 else 'unit'}"
-            ] += 1
-            unit_diff.append(i)
+            if lu < 0:
+                key = "POLICY: word outside every unit; harness holds the preceding unit (onset)"
+            elif hu < 0:
+                key = "library unit, harness unassigned"
+            else:
+                key = "HARNESS BUG: word assigned to another unit by onset (tied/non-monotone)"
+                listed[key].append(dict(word=i, library_unit=lu, harness_unit=hu))
+            c[key] += 1
             continue
         s = w["sample"]
         if lu < 0:
@@ -216,29 +251,54 @@ def compare_words(lib_words, z):
         nonep = talk[i] in ("metamemory", "commentary", "fragment")
         h_ref = int(wr[i])
         if s.startswith("na:"):
-            c[
-                "not applicable (both)"
-                if nonep
-                else "library not applicable, harness episodic"
-            ] += 1
+            c["not applicable (both)" if nonep else "library not applicable, harness episodic"] += 1
         elif s == "-1":
             if nonep:
                 c["library uncovered, harness not applicable"] += 1
             elif h_ref < 0 or np.isnan(z["B"][i]):
                 c["uncovered (both)"] += 1
             else:
-                c["library uncovered, harness covered"] += 1
+                why = refused.get((lu, h_ref))
+                key = (
+                    f"LIBRARY STRICTER: word of a refused reference ({why})"
+                    if why
+                    else "library uncovered, harness covered (other)"
+                )
+                c[key] += 1
+                listed[key].append(dict(word=i, unit=unit_id.get(lu, lu), ref=h_ref))
         else:
             ref = int(s.split(":")[1])
             if nonep:
                 c["library reference, harness not applicable"] += 1
             elif h_ref < 0:
-                c["library covered, harness uncovered"] += 1
+                several = len(toks(cells[i])) != 1
+                key = (
+                    "HARNESS BUG: anchor alignment misses a cell with several normalized tokens"
+                    if several
+                    else "library covered, harness uncovered (other)"
+                )
+                c[key] += 1
+                listed[key].append(dict(word=i, unit=unit_id.get(lu, lu), ref=ref))
             elif h_ref == ref:
                 c["same reference"] += 1
             else:
                 c["different reference"] += 1
-    return dict(c), unit_diff
+    return dict(c), dict(listed)
+
+
+NORM = re.compile(r"[^a-z0-9']+")
+
+
+def toks(s):
+    """The harness's normalization (stream3.toks)."""
+    return [t for t in NORM.sub(" ", s.lower()).split() if t]
+
+
+def word_cells(root, name):
+    with open(root / f"sherlock/recall/{name}.csv", encoding="utf-8-sig", newline="") as f:
+        r = csv.reader(f)
+        next(r)
+        return [x[0].strip() for x in r if x and x[0].strip()]
 
 
 def compare_refs(lib_refs, z, answers, rows, grid):
@@ -324,6 +384,8 @@ def explain_bins(lib, har, words, z, refs):
             har_by_bin[b].add((u, r))
     reasons = Counter()
     detail = []
+    offaxis = set()
+    unexplained = 0
     for b in range(min(len(lib), len(har))):
         a, h = lib[b], har[b]
         diffs = []
@@ -333,26 +395,83 @@ def explain_bins(lib, har, words, z, refs):
                 diffs.append(l)
         if not diffs:
             continue
-        why = []
+        why, units = [], set()
         for key in sorted(har_by_bin[b] - lib_by_bin[b]):
             r = status.get(key)
-            why.append("harness-only reference: " + (
-                f"library refused ({r['reason']})" if r and r["status"] == "refused"
-                else "library word coverage differs"))
+            if r and r["status"] == "refused":
+                why.append(f"harness-only reference: library refused ({r['reason']})")
+            else:
+                why.append("harness-only reference: word-to-unit or coverage differs")
+            if r:
+                units.add(r["unit_id"])
         for key in sorted(lib_by_bin[b] - har_by_bin[b]):
-            why.append("library-only reference: harness word coverage differs")
+            why.append("library-only reference: word-to-unit or coverage differs")
+            if key in status:
+                units.add(status[key]["unit_id"])
         if "extent_log10_s" in diffs:
             for key in sorted(lib_by_bin[b] & har_by_bin[b]):
                 r = status.get(key)
                 if r and r["status"] == "converted" and r["extent_s"] == "n/a":
                     why.append(f"shared reference, library extent unavailable ({r['reason']})")
+                    units.add(r["unit_id"])
         why = sorted(set(why)) or ["unexplained"]
+        if any("extent unavailable" in w for w in why):
+            cls = "cross-part extent unavailable (library stricter)"
+        elif any("library refused" in w for w in why):
+            cls = "reference refused by the library"
+        elif why == ["unexplained"]:
+            cls = "unexplained"
+        else:
+            cls = "word-to-unit assignment or coverage (harness)"
         for w in why:
             reasons[f"{'+'.join(diffs)}: {w}"] += 1
-        detail.append(dict(bin=b, columns=diffs, reasons=why,
-                           units=sorted({status[k]["unit_id"] for k in
-                                         (har_by_bin[b] ^ lib_by_bin[b]) if k in status})))
+        detail.append(dict(bin=b, columns=diffs, cls=cls, reasons=why, units=sorted(units)))
     return dict(reasons), detail
+
+
+def summary(report):
+    """The headline: agreement with one-sided bins in the denominator, differing bins by class,
+    the references and words behind them. Unit ids and word indices only."""
+    out = {}
+    for col in ["extent_log10_s~logB", "alternatives_present_share~Uflag"]:
+        agree = sum(r["bins"]["columns"][col]["agreement"]["agree"] for r in report.values())
+        of = sum(r["bins"]["columns"][col]["agreement"]["of"] for r in report.values())
+        lcol = col.split("~")[0]
+        by_class = Counter(
+            d["cls"] for r in report.values() for d in r["differing_bin_detail"]
+            if lcol in d["columns"]
+        )
+        out[col] = dict(agree=agree, of=of, differing=of - agree, differing_by_class=dict(by_class))
+    out["unavailable_extent_references"] = sorted(
+        {(p, u) for p, r in report.items() for d in r["differing_bin_detail"]
+         if d["cls"].startswith("cross-part") for u in d["units"]}
+    )
+    out["refused_references"] = sorted(
+        (p, u, k.split(": ", 1)[1])
+        for p, r in report.items()
+        for k, v in r["reference_extent_classes"].items()
+        if k.startswith("refused")
+        for u in v["units"]
+    )
+    words = Counter()
+    listed = defaultdict(list)
+    for p, r in report.items():
+        for k, v in r["word_classes"].items():
+            words[k] += v
+        for k, v in r["listed_words"].items():
+            listed[k] += [dict(participant=p, **x) for x in v]
+    out["word_classes"] = dict(words)
+    out["listed_words"] = dict(listed)
+    defs = Counter()
+    for r in report.values():
+        for k, v in r["bins"]["definitional_differences"]["not_applicable_share vs nonepisodic"].items():
+            if isinstance(v, int):
+                defs[k] += v
+    out["definitional_differences"] = {"not_applicable_share vs nonepisodic": dict(defs)}
+    out["unexplained_bins"] = sum(
+        d["cls"] == "unexplained" for r in report.values() for d in r["differing_bin_detail"]
+    )
+    return out
 
 
 def main():
@@ -390,7 +509,7 @@ def main():
             or (w["onset"] != "n/a" and abs(float(w["onset"]) - t) < 1e-9)
             for w, t in zip(words, z["tn"])
         )
-        wc, _ = compare_words(words, z)
+        wc, listed = compare_words(words, z, word_cells(root, name), refs)
         bin_reasons, bin_detail = explain_bins(lib, har, words, z, refs)
         rc, recomputation, altflag = compare_refs(refs, z, answers, rows, grid)
         report[p] = dict(
@@ -398,6 +517,7 @@ def main():
             onsets_equal=int(onset_ok),
             bins=compare_bins(lib, har),
             word_classes=wc,
+            listed_words=listed,
             differing_bins=bin_reasons,
             differing_bin_detail=bin_detail,
             reference_extent_classes=rc,
@@ -423,7 +543,9 @@ def main():
         total["counts_equal"]["bins"] += min(
             r["bins"]["bins_library"], r["bins"]["bins_harness"]
         )
+    participants = dict(report)
     report["TOTAL"] = {k: dict(v) for k, v in total.items()}
+    report["SUMMARY"] = summary(participants)
     text = json.dumps(report, indent=1, default=int)
     if a.json:
         a.json.write_text(text + "\n")
