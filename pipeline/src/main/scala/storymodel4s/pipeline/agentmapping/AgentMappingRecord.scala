@@ -31,7 +31,10 @@ object AgentMappingRecord:
 
   /** Who produced the decisions, for the decision stage's receipt. `recallSha256` is the recall
     * word table the units came from. `answersSha256`, when given, is a digest of the answers as
-    * stated, so that what a record was made from cannot change beside it.
+    * stated, so that what a record was made from cannot change beside it. `rendering`, when given,
+    * is a condition a production path renders (what the producer saw of the recall, ADR 0022); its
+    * rendering identity enters the decision receipt. A producer without one adds nothing, so its
+    * records are unchanged.
     */
   final case class Producer(
       provider: String,
@@ -39,8 +42,12 @@ object AgentMappingRecord:
       systemSha256: Checksum,
       outlineSha256: Checksum,
       recallSha256: Checksum,
-      answersSha256: Option[Checksum] = None
+      answersSha256: Option[Checksum] = None,
+      rendering: Option[RenderedCondition] = None
   ):
+    /** The rendering identity the decision receipt carries, from the rendered condition only. */
+    def renderingSha256: Option[Checksum] = rendering.flatMap(_.renderingSha256)
+
     /** The model as far as it is known: a provider label and a model name, no registered artifact.
       * The digest is of exactly that description, so it cannot be mistaken for the prompt or for a
       * model file.
@@ -156,7 +163,8 @@ object AgentMappingRecord:
         Stage.Decision,
         policy.value,
         producer.systemSha256,
-        Vector(producer.outlineSha256, producer.recallSha256) ++ producer.answersSha256,
+        Vector(producer.outlineSha256, producer.recallSha256) ++ producer.answersSha256 ++
+          producer.renderingSha256,
         ProviderStatus.Identified(identity)
       )
       entries <- Stage.values.toVector.foldLeft[Either[MappingRefusal, Vector[StageEntry]]](

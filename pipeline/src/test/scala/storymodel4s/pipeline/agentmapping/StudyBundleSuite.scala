@@ -58,7 +58,7 @@ class StudyBundleSuite extends FunSuite:
   private val provenance = StudyBundle.Provenance(
     "p1",
     "s1",
-    "annotation",
+    legacy("annotation"),
     "m",
     "cli",
     protocolName,
@@ -70,10 +70,12 @@ class StudyBundleSuite extends FunSuite:
       PreparedRecall.SuppliedRecipe
     )
   )
+  private def legacy(name: String): RecordedCondition =
+    RecordedCondition.legacy(name).fold(e => fail(e), identity)
   private lazy val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
   private lazy val expected = StudyBundle.Expected("p1", "s1", units, producer)
   private def recordsFor(condition: String): Map[String, MappingResult] =
-    right(StudyBundle.records(condition, protocolName, recall, view, producer, rows))
+    right(StudyBundle.records(legacy(condition), protocolName, recall, view, producer, rows))
   private lazy val records = recordsFor("annotation")
   private lazy val bundle = StudyBundle.encode(provenance, view, records, rows)
 
@@ -197,7 +199,7 @@ class StudyBundleSuite extends FunSuite:
         .decode(Json.obj("schema" -> Json.fromString("x")), view, recall, expected)
         .left
         .toOption,
-      Some("not a v2 mapping bundle")
+      Some("not a v2 or v3 mapping bundle")
     )
 
   private def top(key: String, value: Json)(u: Json): Json = u.mapObject(_.add(key, value))

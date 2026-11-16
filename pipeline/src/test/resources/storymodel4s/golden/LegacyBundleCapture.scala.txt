@@ -1,0 +1,81 @@
+// Capture of the legacy (v2) bundle digests used by GoldenCaptureSuite.
+//
+// This file is the exact test that produced the constants. It is written against the API of
+// 5078f169f (free-text condition), so it does not compile on later commits; it is kept as text.
+//
+// To regenerate the constants:
+//   1. In a standalone clone (not a linked worktree): git switch --detach 5078f169f
+//   2. Copy this file to
+//      pipeline/src/test/scala/storymodel4s/pipeline/agentmapping/LegacyBundleCapture.scala
+//   3. sbt -batch "pipeline/testOnly storymodel4s.pipeline.agentmapping.LegacyBundleCapture"
+//   4. Read the three GOLDEN lines; they must equal the constants in GoldenCaptureSuite.
+//   5. Delete the copied file and switch back to your branch.
+//
+// Captured 2026-11-16: bundle cbb2a9f44204edbe9a8620592ec6e2a636cc819262f9265b205e4ca1dc078cdc,
+// narrative d2319da54da1976e2a1f629a6c67f0176e2dd897577fd742cb99e53e30056ebd,
+// referent 1c71bd70dfc7d69ae9f94d8e9e6b5a6989deaccd9ebd1cff8ebad26d0db63c81.
+
+package storymodel4s.pipeline.agentmapping
+
+import io.circe.Json
+import io.circe.jawn.parse
+import java.nio.charset.StandardCharsets.UTF_8
+import munit.FunSuite
+import storymodel4s.core.Checksum
+import storymodel4s.pipeline.TimedAnnotationInput
+
+class LegacyBundleCapture extends FunSuite:
+  import StudyReplay.{RecallUnit, ReplyProtocol, UnitReply}
+  private def right[E, A](v: Either[E, A]): A = v.fold(e => fail(e.toString), identity)
+  private def json(t: String): Json = right(parse(t))
+  private val parts =
+    """[{"part":"a","start":"0","end":"100","numerator":"1","denominator":"10"}]"""
+  private lazy val view = right(
+    TimedAnnotationInput.prepare(
+      (TimedAnnotationInput.HeaderV2.mkString(",") +: Vector(
+        "1,Anna arrived.,a,10,20,1,scene 1,,Anna,1,Harbour film,",
+        "2,A title card.,a,20,30,2,scene 2,,,1,Harbour film,no",
+        "3,A mouse dances.,a,40,50,3,scene 3,,,2,Cartoon,no",
+        "4,Bob left.,a,50,,4,scene 4,,Bob,3,Station film,"
+      )).mkString("", "\n", "\n").getBytes(UTF_8),
+      parts.getBytes(UTF_8)
+    )
+  )
+  private val texts = Vector("she came in", "then the title", "a mouse", "he left", "um", "what")
+  private val units = texts.zipWithIndex.map((t, i) => RecallUnit(i + 1, Json.fromInt(10 + i), t))
+  private lazy val recall =
+    right(PreparedRecall.supplied("p1_s1", texts, Checksum.ofText(texts.mkString("|"))))
+  private def item(b: String) = UnitReply.Answered(json(b))
+  private val replies = Vector(
+    item("""{"referent":1,"referent_film":1,"narrative":1,"narrative_film":1,"conf":0.8}"""),
+    item("""{"referent":2,"referent_film":1,"narrative":1,"narrative_film":1,"conf":0.5}"""),
+    item("""{"referent":null,"referent_film":3,"narrative":null,"narrative_film":2,"conf":0.4}"""),
+    item("""{"referent":null,"referent_film":null,"narrative":null,"narrative_film":null}"""),
+    UnitReply.Omitted,
+    item("""{"referent":99,"referent_film":1,"narrative":1}""")
+  )
+  test("capture"):
+    val rows = units.zip(replies).zip(recall.unitIds).map { case ((u, r), id) =>
+      StudyBundle.row(view, ReplyProtocol.StrictChunked, u, id.value, r, Vector("conf"))
+    }
+    val producer = StudyRecord.producer("cli", "m", "SYSTEM", view, recall)
+    val records =
+      right(StudyBundle.records("annotation", "strict-chunked/v1", recall, view, producer, rows))
+    val prov = StudyBundle.Provenance(
+      "p1",
+      "s1",
+      "annotation",
+      "m",
+      "cli",
+      "strict-chunked/v1",
+      Checksum.ofText("SYSTEM").hex,
+      "0" * 64,
+      PreparedRecall.Segmentation(
+        "supplied",
+        Checksum.ofText(texts.mkString("|")),
+        PreparedRecall.SuppliedRecipe
+      )
+    )
+    val b = StudyBundle.encode(prov, view, records, rows)
+    println("GOLDEN bundle " + Checksum.ofText(b.noSpaces).hex)
+    StudyBundle.Fields.foreach(f => println(s"GOLDEN $f " + records(f).digest.hex))
