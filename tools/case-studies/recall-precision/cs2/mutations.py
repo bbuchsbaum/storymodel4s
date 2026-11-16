@@ -252,7 +252,11 @@ def main(argv):
     scratch, out = Path(argv[0]), Path(argv[1])
     rp = copy_tree(scratch / "clean")
     clean = run_suite(rp)
-    results = dict(clean=clean, mutants=[])
+    sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=HERE, capture_output=True,
+                         text=True).stdout.strip()
+    dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no", "--", "."],
+                           cwd=HERE, capture_output=True, text=True).stdout.strip()
+    results = dict(commit=sha, harness_dirty=bool(dirty), clean=clean, mutants=[])
     for m in MUTANTS:
         rp = copy_tree(scratch / m["id"])
         path = rp / m["file"]
