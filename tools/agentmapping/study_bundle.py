@@ -209,6 +209,72 @@ def decision_receipt(record):
     raise BundleError("a record has no decision receipt")
 
 
+def check_transcript(bundle):
+    """Check canonical UTF-16 spans against the text and both record inventories.
+
+    Raw bytes and the segmenter itself require the export and Scala readback. This is an
+    internal-consistency check, not independent proof that the heuristic boundaries are right.
+    """
+    segmentation = bundle["provenance"]["segmentation"]
+    if segmentation["kind"] == "supplied":
+        if segmentation["recipe"] != "supplied-units/v1" or "recall" in bundle:
+            raise BundleError("supplied segmentation has incompatible provenance")
+        return
+    if segmentation["kind"] != "segmenter" or segmentation["recipe"] != "recall-segmenter/v1":
+        raise BundleError("unknown segmentation recipe")
+    recall = bundle["recall"]
+    if (recall["recipe"] != segmentation["recipe"]
+            or recall["rawSha256"] != segmentation["artifactSha256"]
+            or recall["canonicalization"] != "story-source/v1"
+            or recall["offsetUnit"] != "utf-16-code-units"):
+        raise BundleError("transcript provenance differs")
+    text = recall["canonicalText"]
+    try:
+        canonical_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        encoded = text.encode("utf-16-le")
+    except UnicodeError as error:
+        raise BundleError("canonical transcript has malformed Unicode") from error
+    if canonical_hash != recall["canonicalSha256"]:
+        raise BundleError("canonical transcript checksum differs")
+    described = recall["units"]
+    rows = bundle["units"]
+    if (not all(is_int(u["u"]) for u in described)
+            or not all(is_int(u["row"]) for u in rows)
+            or [u["u"] for u in described] != list(range(1, len(rows) + 1))
+            or [u["u"] for u in rows] != [u["u"] for u in described]
+            or [u["row"] for u in rows] != [u["u"] for u in described]
+            or [u["unit"] for u in described] != [u["unit"] for u in rows]):
+        raise BundleError("transcript unit keys differ")
+    previous_end = 0
+    for unit in described:
+        pieces = []
+        if not unit["spans"]:
+            raise BundleError("transcript unit has no spans")
+        for span in unit["spans"]:
+            start, end = span["start"], span["endExclusive"]
+            if (not is_int(start) or not is_int(end)
+                    or not 0 <= previous_end <= start < end <= len(encoded) // 2):
+                raise BundleError("invalid canonical transcript span")
+            try:
+                pieces.append(encoded[start * 2:end * 2].decode("utf-16-le"))
+            except UnicodeDecodeError as error:
+                raise BundleError("transcript span splits a surrogate pair") from error
+            previous_end = end
+        if "".join(pieces) != unit["text"]:
+            raise BundleError("transcript unit text differs from its spans")
+    for field in FIELDS:
+        inventory = bundle["interpretations"][field]["record"]["inventory"]
+        if (inventory["transcript_checksum"] != recall["canonicalSha256"]
+                or inventory["word_id_policy"]["input_artifact"] != recall["rawSha256"]):
+            raise BundleError("transcript differs from record inventory")
+        expected = [(u["unit"], [(s["start"], s["endExclusive"]) for s in u["spans"]])
+                    for u in described]
+        actual = [(u["id"], [(s["start"], s["end_exclusive"]) for s in u["spans"]])
+                  for u in inventory["units"]]
+        if actual != expected:
+            raise BundleError("transcript spans differ from record inventory")
+
+
 def check(bundle):
     """Refuse a bundle that is not consistent with itself.
 
@@ -224,6 +290,7 @@ def check(bundle):
     for key in ("provenance", "interpretations", "units", "source"):
         if key not in bundle:
             raise BundleError(f"bundle has no {key}")
+    check_transcript(bundle)
     provenance = bundle["provenance"]
     units = bundle["units"]
     numbers = [unit["u"] for unit in units]
@@ -374,6 +441,11 @@ def describe_unit(bundle, number):
     for unit in bundle["units"]:
         if str(unit["u"]) == str(number):
             lines = [f'unit {unit["u"]} (row {json.dumps(unit["row"])}): {unit["processing"]}']
+            if "recall" in bundle:
+                detail = next(u for u in bundle["recall"]["units"] if u["u"] == unit["u"])
+                spans = ", ".join(f'[{s["start"]}, {s["endExclusive"]})' for s in detail["spans"])
+                lines.append(f"canonical UTF-16 spans: {spans}")
+                lines.append("text: " + json.dumps(detail["text"], ensure_ascii=False))
             for field in FIELDS:
                 lines.append(f"{field}: " + describe(unit[field]["judgement"], bundle))
             for key, value in unit["extras"].items():

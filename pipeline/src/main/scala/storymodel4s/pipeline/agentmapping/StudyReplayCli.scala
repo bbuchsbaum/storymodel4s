@@ -13,14 +13,24 @@ import storymodel4s.provider.agent.{Recordings, TextExchange}
   */
 object StudyExport:
   val Schema: String = "storymodel4s.agentmapping.study-export/v1"
+  val TranscriptSchema: String = "storymodel4s.agentmapping.study-export/v2"
 
   /** One participant-session: its units and its recorded prompts. */
   final case class Session(
       participant: String,
       session: String,
       units: Vector[StudyReplay.RecallUnit],
-      chunks: Vector[StudyReplay.Chunk]
-  )
+      chunks: Vector[StudyReplay.Chunk],
+      transcript: Option[PreparedRecall] = None
+  ):
+    def preparedRecall(title: String): Either[String, PreparedRecall] = transcript match
+      case Some(recall) =>
+        Either.cond(
+          units == TranscriptStudy.units(recall),
+          recall,
+          "transcript units differ from the regenerated segmentation"
+        )
+      case None => PreparedRecall.supplied(title, units.map(_.text), unitsChecksum(units))
 
   /** One participant-session as the index lists it. The index, not the session file, names the
     * participant and session, so a session file cannot rename itself or another.
@@ -49,8 +59,12 @@ object StudyExport:
       unitLine: String,
       chunkLine: String,
       manifestSha256: String,
-      sessions: Vector[Entry]
-  )
+      sessions: Vector[Entry],
+      transcriptSource: Option[(String, String)] = None
+  ):
+    def line(u: StudyReplay.RecallUnit): String =
+      val text = if transcriptSource.isDefined then Json.fromString(u.text).noSpaces else u.text
+      unitLine.replace("{u}", u.u.toString).replace("{text}", text)
 
   private val Name = "[A-Za-z0-9][A-Za-z0-9_-]*".r
 
@@ -121,7 +135,7 @@ object StudyExport:
             sessions
           ) =>
         val named = sessions.forall(e => Name.matches(e.participant) && Name.matches(e.session))
-        if schema != Schema then Left("not a study export")
+        if schema != Schema && schema != TranscriptSchema then Left("not a study export")
         else if Checksum.ofText(system).hex != systemSha then
           Left("the system prompt does not have its recorded hash")
         else if attempts <= 0 || !suffix.contains("{attempt}") || !unitLine.contains("{u}") ||
@@ -137,22 +151,47 @@ object StudyExport:
           StudyReplay.ReplyProtocol
             .named(protocolName)
             .toRight(s"unknown reply protocol $protocolName")
-            .map(
-              Index(
-                model,
-                condition,
-                system,
-                _,
-                protocolName,
-                attempts,
-                suffix,
-                extras,
-                unitLine,
-                chunkLine,
-                manifest,
-                sessions
-              )
-            )
+            .flatMap { protocol =>
+              val binding =
+                if schema == Schema then Right(None)
+                else
+                  for
+                    recipe <- c.get[String]("promptRecipe").left.map(_ => "no prompt recipe")
+                    _ <- Either.cond(
+                      recipe == TranscriptStudy.PromptRecipe &&
+                        system == TranscriptStudy.System && unitLine == TranscriptStudy.UnitLine &&
+                        chunkLine == TranscriptStudy.ChunkLine && protocol == StudyReplay.ReplyProtocol.StrictChunked &&
+                        extras.isEmpty,
+                      (),
+                      "unknown transcript prompt contract"
+                    )
+                    rendering <- c.get[String]("unitTextEncoding").left.map(_ => "no text encoding")
+                    _ <- Either.cond(
+                      rendering == "json-string/v1",
+                      (),
+                      "unknown unit text encoding"
+                    )
+                    source <- c.get[String]("sourceSha256").left.map(_ => "no source hash")
+                    parts <- c.get[String]("partsSha256").left.map(_ => "no parts hash")
+                  yield Some(source -> parts)
+              binding.map { source =>
+                Index(
+                  model,
+                  condition,
+                  system,
+                  protocol,
+                  protocolName,
+                  attempts,
+                  suffix,
+                  extras,
+                  unitLine,
+                  chunkLine,
+                  manifest,
+                  sessions,
+                  source
+                )
+              }
+            }
     }
 
   /** The identity of a session's supplied units: their numbers, the study's row keys and their
@@ -216,7 +255,7 @@ object StudyExport:
   /** Read and check one session document against its index entry: it must be the session the index
     * names, and each prompt must have the hash the index records.
     */
-  def parseSession(doc: Json, entry: Entry): Either[String, Session] =
+  def parseSession(doc: Json, entry: Entry, transcript: Boolean = false): Either[String, Session] =
     val c = doc.hcursor
     val read =
       for
@@ -253,13 +292,31 @@ object StudyExport:
         Left(s"$file: a prompt does not have its recorded hash")
       else if value.units.map(_.u).distinct.size != value.units.size then
         Left(s"$file: a unit number repeats")
-      else if value.units.exists(u => u.text.isEmpty || u.text.contains('\n')) then
-        Left(s"$file: a unit is empty or spans lines")
+      else if value.units.exists(u =>
+          u.text.isEmpty || (!transcript && u.text.exists(c => c == '\n' || c == '\r'))
+        )
+      then Left(s"$file: a unit is empty or spans lines")
+      else if transcript then
+        for
+          raw <- c.downField("transcript").get[String]("rawText").left.map(_ => "no raw transcript")
+          recall <- PreparedRecall.segmented(raw.getBytes(StandardCharsets.UTF_8))
+          _ <- Either.cond(
+            c.downField("transcript").focus.contains(TranscriptStudy.exportDescriptor(recall)),
+            (),
+            "transcript descriptor differs"
+          )
+          _ <- Either.cond(
+            value.units == TranscriptStudy.units(recall),
+            (),
+            "transcript units differ from the regenerated segmentation"
+          )
+        yield value.copy(transcript = Some(recall))
+      else if c.downField("transcript").focus.isDefined then Left("a transcript needs export v2")
       else Right(value)
     }
 
-  def session(dir: Path, entry: Entry): Either[String, Session] =
-    json(dir.resolve(entry.file)).flatMap(parseSession(_, entry))
+  def session(dir: Path, entry: Entry, transcript: Boolean = false): Either[String, Session] =
+    json(dir.resolve(entry.file)).flatMap(parseSession(_, entry, transcript))
 
 /** CLI: `agentStudyReplay EXPORT_DIR RECORDINGS_DIR PROVIDER OUTPUT_DIR`.
   *
@@ -282,6 +339,8 @@ object StudyExport:
   if Files.exists(out) then refuse("output directory exists")
   val dir = Path.of(exportDir)
   val index = StudyExport.index(dir).fold(refuse, identity)
+  if index.transcriptSource.isDefined then
+    refuse("transcript exports use agentStudyBundle or agentStudyExecute")
   if StudyExport.timed(index) then
     refuse("this condition answers with a time; use agentStudyBundle, which reads its clip clock")
   val protocol = index.protocol
@@ -289,11 +348,11 @@ object StudyExport:
   def suffix(n: Int): String =
     if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
   def line(u: StudyReplay.RecallUnit): String =
-    index.unitLine.replace("{u}", u.u.toString).replace("{text}", u.text)
+    index.line(u)
   def asks(c: StudyReplay.Chunk): String =
     index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
   val results = index.sessions.map { entry =>
-    val s = StudyExport.session(dir, entry).fold(refuse, identity)
+    val s = StudyExport.session(dir, entry, index.transcriptSource.isDefined).fold(refuse, identity)
     val (replies, receipts) = StudyReplay
       .session(
         s.units,
@@ -369,13 +428,15 @@ object StudyExport:
     .fold(r => refuse(s"source: $r"), identity)
   val dir = Path.of(exportDir)
   val index = StudyExport.index(dir).fold(refuse, identity)
+  if index.transcriptSource.isDefined then
+    refuse("transcript exports use agentStudyBundle or agentStudyExecute")
   if StudyExport.timed(index) then
     refuse("this condition answers with a time; use agentStudyBundle, which reads its clip clock")
   val recordings = Recordings.open(Path.of(recordingsDir)).fold(e => refuse(e.message), identity)
   def suffix(n: Int): String =
     if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
   def line(u: StudyReplay.RecallUnit): String =
-    index.unitLine.replace("{u}", u.u.toString).replace("{text}", u.text)
+    index.line(u)
   def asks(c: StudyReplay.Chunk): String =
     index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
   val fields = Vector("narrative", "referent")
@@ -384,7 +445,7 @@ object StudyExport:
       xs.groupBy(identity).toVector.sortBy(_._1).map((k, v) => k -> Json.fromInt(v.size))
     )
   val sessions = index.sessions.map { entry =>
-    val s = StudyExport.session(dir, entry).fold(refuse, identity)
+    val s = StudyExport.session(dir, entry, index.transcriptSource.isDefined).fold(refuse, identity)
     val (replies, _) = StudyReplay
       .session(
         s.units,
@@ -399,9 +460,8 @@ object StudyExport:
       .fold(f => refuse(s"${entry.name}: $f"), identity)
     // The recall's identity is its units alone, not the prompts beside them, so the same units
     // have the same inventory under every condition.
-    val artifact = StudyExport.unitsChecksum(s.units)
-    val recall = PreparedRecall
-      .supplied(entry.name, s.units.map(_.text), artifact)
+    val recall = s
+      .preparedRecall(entry.name)
       .fold(e => refuse(s"${entry.name}: $e"), identity)
     val producer = StudyRecord.producer(provider, index.model, index.system, view, recall)
     val perField = fields.map { field =>

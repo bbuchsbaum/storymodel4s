@@ -433,5 +433,65 @@ class TimeBundle(unittest.TestCase):
         )
 
 
+class TranscriptDescriptor(unittest.TestCase):
+    """Character diagnostics only; UTF-16 positions are explicit independent expectations."""
+
+    def setUp(self):
+        import hashlib
+        text = "😀\na\nb"
+        checksum = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        self.bundle = {
+            "provenance": {"segmentation": {"kind": "segmenter", "recipe": "recall-segmenter/v1",
+                                            "artifactSha256": "0" * 64}},
+            "recall": {"recipe": "recall-segmenter/v1", "rawSha256": "0" * 64,
+                       "canonicalSha256": checksum, "canonicalization": "story-source/v1",
+                       "offsetUnit": "utf-16-code-units", "canonicalText": text, "units": []},
+            "units": [], "interpretations": {},
+        }
+        for n, value, start, end in [(1, "😀", 0, 2), (2, "a", 3, 4), (3, "b", 5, 6)]:
+            self.bundle["units"].append({"u": n, "row": n, "unit": f"u{n}"})
+            self.bundle["recall"]["units"].append({"u": n, "unit": f"u{n}", "text": value,
+                "spans": [{"start": start, "endExclusive": end}]})
+        inventory = {"transcript_checksum": checksum, "word_id_policy": {"input_artifact": "0" * 64},
+                     "units": [{"id": "u1", "spans": [{"start": 0, "end_exclusive": 2}]},
+                               {"id": "u2", "spans": [{"start": 3, "end_exclusive": 4}]},
+                               {"id": "u3", "spans": [{"start": 5, "end_exclusive": 6}]}]}
+        for field in study_bundle.FIELDS:
+            self.bundle["interpretations"][field] = {"record": {"inventory": copy.deepcopy(inventory)}}
+
+    def test_canonical_utf16_slices_accept_non_bmp_character(self):
+        study_bundle.check_transcript(self.bundle)
+
+    def test_split_surrogate_refuses(self):
+        self.bundle["recall"]["units"][0]["spans"][0]["endExclusive"] = 1
+        with self.assertRaisesRegex(study_bundle.BundleError, "surrogate pair"):
+            study_bundle.check_transcript(self.bundle)
+
+    def test_unpaired_surrogate_refuses_as_bundle_error(self):
+        self.bundle["recall"]["canonicalText"] = "\ud800"
+        with self.assertRaisesRegex(study_bundle.BundleError, "malformed Unicode"):
+            study_bundle.check_transcript(self.bundle)
+
+    def test_text_hash_refuses(self):
+        self.bundle["recall"]["canonicalText"] += "c"
+        with self.assertRaisesRegex(study_bundle.BundleError, "checksum differs"):
+            study_bundle.check_transcript(self.bundle)
+
+    def test_units_cannot_move_to_another_occurrence(self):
+        self.bundle["recall"]["units"][1]["spans"][0].update(start=5, endExclusive=6)
+        with self.assertRaisesRegex(study_bundle.BundleError, "text differs"):
+            study_bundle.check_transcript(self.bundle)
+
+    def test_record_inventory_must_hold_the_same_spans(self):
+        self.bundle["interpretations"]["referent"]["record"]["inventory"]["units"][1]["spans"][0]["start"] = 2
+        with self.assertRaisesRegex(study_bundle.BundleError, "record inventory"):
+            study_bundle.check_transcript(self.bundle)
+
+    def test_unknown_recipe_refuses(self):
+        self.bundle["provenance"]["segmentation"]["recipe"] = "recall-segmenter/v999"
+        with self.assertRaisesRegex(study_bundle.BundleError, "unknown segmentation recipe"):
+            study_bundle.check_transcript(self.bundle)
+
+
 if __name__ == "__main__":
     unittest.main()

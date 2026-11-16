@@ -40,7 +40,7 @@ object StudyExecution:
     def suffix(n: Int): String =
       if n == 0 then "" else index.retrySuffix.replace("{attempt}", n.toString)
     def line(u: StudyReplay.RecallUnit): String =
-      index.unitLine.replace("{u}", u.u.toString).replace("{text}", u.text)
+      index.line(u)
     def asks(c: StudyReplay.Chunk): String =
       index.chunkLine.replace("{lo}", c.lo.toString).replace("{hi}", c.hi.toString)
 
@@ -61,6 +61,16 @@ object StudyExecution:
           .map(_ => "condition and protocol cannot form a valid mapping policy identifier")
       )
     }
+    required(
+      Either.cond(
+        index.transcriptSource.forall { (sourceHash, partsHash) =>
+          sourceHash == Checksum.ofBytes(sourceBytes).hex &&
+          partsHash == Checksum.ofBytes(partsBytes).hex
+        },
+        (),
+        "the transcript export was prepared for another source or parts file"
+      )
+    )
     val view = required(
       storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(sourceBytes, partsBytes)
     )
@@ -72,10 +82,10 @@ object StudyExecution:
           .parseByteArray(raw)
           .left
           .map(_.message)
-          .flatMap(StudyExport.parseSession(_, entry))
+          .flatMap(StudyExport.parseSession(_, entry, index.transcriptSource.isDefined))
       )
       val recall = required(
-        PreparedRecall.supplied(entry.name, s.units.map(_.text), StudyExport.unitsChecksum(s.units))
+        s.preparedRecall(entry.name)
       )
       (entry, s, recall)
     }
@@ -91,6 +101,15 @@ object StudyExecution:
     val p = new Prepared(view, index, clock, sessions, inputs)
     sessions.foreach { (_, s, _) =>
       required(StudyReplay.validate(s.units, s.chunks, p.line, p.asks))
+      required(
+        Either.cond(
+          index.transcriptSource.isEmpty || s.chunks.forall { chunk =>
+            chunk.prompt == TranscriptStudy.prompt(view, s.units, chunk.lo, chunk.hi)
+          },
+          (),
+          "transcript prompt differs from the checked source and recall"
+        )
+      )
     }
     p
 
@@ -139,7 +158,8 @@ object StudyExecution:
         p.view,
         records,
         rows,
-        intervals
+        intervals,
+        recall.transcriptDescriptor
       )
       // Accounting belongs to this invocation, while the checked mapping records stay identical.
       val doc = execution.fold(encoded) { descriptor =>

@@ -506,3 +506,23 @@ separate invocation receipt. Bundle provenance names the new exchange descriptor
 session's invocation count. Mapping records and predictions are deterministic replay outputs;
 per-invocation accounting is not. Rejected: a second corpus-specific execution loop, fabricated
 zero live calls, or estimating HTTP attempt counts from client invocations.
+
+### Ordinary transcript implementation choice (2026-11-15)
+
+Within approved scientific-preview delivery 4, `PreparedRecall.segmented` uses strict UTF-8
+intake and retains the existing segmenter's graph, inventory and canonical UTF-16 spans.
+Study-export/v2 records the raw transcript, a regenerated descriptor, JSON-string prompt
+presentation and the exact source/parts hashes. The local `agentStudyPrepare` command renders
+one fixed categorical scene prompt recipe; live and replay execution use the common pipeline.
+Automatic bundles add canonical text, spans, hashes and recipes. Supplied exports and bundles
+retain their existing identities and bytes.
+
+Rejected: passing generated texts through `supplied`, which would join new text, move spans,
+discard relations and mislabel discourse assessment; flattening newlines in prompt text;
+claiming canonical offsets describe raw bytes; accepting a caller's segmenter label without
+regenerating its graph. Raw text stays in the private export; duplicating it in bundles adds
+exposure without helping consumers interpret canonical spans.
+
+The descriptor establishes reproducible engineering provenance, not valid human boundaries.
+A supplied-versus-automatic corpus comparison requires a common verified transcript axis;
+reconstructing text from supplied units is not evidence about the original transcript.

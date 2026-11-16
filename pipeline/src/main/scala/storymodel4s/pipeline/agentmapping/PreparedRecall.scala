@@ -1,5 +1,10 @@
 package storymodel4s.pipeline.agentmapping
 
+import io.circe.Json
+import storymodel4s.core.TextSourcePackage
+import storymodel4s.recall.RecallSegmenter
+import scala.util.control.NonFatal
+
 import storymodel4s.core.{
   Checksum,
   SpanSet,
@@ -34,6 +39,34 @@ final class PreparedRecall private (
     val texts: Vector[String],
     val segmentation: PreparedRecall.Segmentation
 ):
+  /** Canonical text and half-open UTF-16 spans, derived from the actual segmentation graph.
+    * Supplied inputs keep their legacy bundle shape. Raw text stays in the private export.
+    */
+  def transcriptDescriptor: Option[Json] = Option.when(segmentation.kind == "segmenter") {
+    val source = graph.transcript
+    Json.obj(
+      "recipe" -> Json.fromString(segmentation.recipe),
+      "rawSha256" -> Json.fromString(source.rawChecksum.hex),
+      "canonicalSha256" -> Json.fromString(source.canonicalChecksum.hex),
+      "canonicalization" -> Json.fromString(TextSourcePackage.Canonicalization),
+      "offsetUnit" -> Json.fromString(TextSourcePackage.OffsetUnit),
+      "canonicalText" -> Json.fromString(source.canonicalText),
+      "units" -> Json.fromValues(graph.ordered.zipWithIndex.map { (unit, i) =>
+        Json.obj(
+          "u" -> Json.fromInt(i + 1),
+          "unit" -> Json.fromString(unit.id.value),
+          "text" -> Json.fromString(unit.text),
+          "spans" -> Json.fromValues(unit.span.spans.toVector.map { span =>
+            Json.obj(
+              "start" -> Json.fromInt(span.start),
+              "endExclusive" -> Json.fromInt(span.endExclusive)
+            )
+          })
+        )
+      })
+    )
+  }
+
   def unitIds: Vector[RecallUnitId] = inventory.units.map(_.id)
   override def equals(other: Any): Boolean = other match
     case that: PreparedRecall =>
@@ -46,6 +79,33 @@ final class PreparedRecall private (
 object PreparedRecall:
   /** Where unit boundaries came from: `supplied` by the study, or our `segmenter`. */
   final case class Segmentation(kind: String, artifactSha256: Checksum, recipe: String)
+
+  val SegmenterRecipe: String = "recall-segmenter/v1"
+
+  /** Strict UTF-8 intake keeps the segmenter's graph and canonical offsets intact. The raw file
+    * checksum anchors word identity; canonicalization and the heuristic recipe stay explicit.
+    */
+  def segmented(bytes: Array[Byte]): Either[String, PreparedRecall] =
+    try
+      for
+        text <- TextSourcePackage.fromUtf8(bytes).left.map(_.message)
+        graph = RecallSegmenter.segment(text.source)
+        _ <- Either.cond(graph.ordered.nonEmpty, (), "the segmenter produced no units")
+        inventory <- RecallInventory
+          .of(
+            graph,
+            SurfaceSequence(graph.atlas).lexicalTokens.map(_.span),
+            WordIdPolicy.inputArtifact(text.source.rawChecksum)
+          )
+          .left
+          .map(_.message)
+      yield new PreparedRecall(
+        graph,
+        inventory,
+        graph.ordered.map(_.text),
+        Segmentation("segmenter", text.source.rawChecksum, SegmenterRecipe)
+      )
+    catch case NonFatal(e) => Left(s"transcript segmentation failed (${e.getClass.getSimpleName})")
 
   val SuppliedRecipe: String = "supplied-units/v1"
 

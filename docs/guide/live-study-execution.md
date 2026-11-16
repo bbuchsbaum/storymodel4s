@@ -10,6 +10,8 @@ Use a standalone checkout for sbt. Keep study exports, recordings and outputs in
 ignored storage. The output bundles contain source text; recordings contain verbatim model
 replies. Never commit credentials or study material.
 
+For ordinary UTF-8 recall files, first use [transcript preparation](ordinary-transcripts.md).
+
 ## Configure and run
 
 Configure `STORYMODEL4S_AGENT_BACKEND=openai`, `STORYMODEL4S_AGENT_LIVE=1`,

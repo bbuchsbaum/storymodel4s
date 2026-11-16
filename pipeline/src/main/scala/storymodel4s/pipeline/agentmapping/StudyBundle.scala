@@ -226,54 +226,57 @@ object StudyBundle:
       view: TimedSourceView,
       records: Map[String, MappingResult],
       rows: Vector[Row],
-      intervals: Option[SceneIntervals] = None
+      intervals: Option[SceneIntervals] = None,
+      transcript: Option[Json] = None
   ): Json =
-    Json.obj(
-      "schema" -> str(Schema),
-      "provenance" -> Json
-        .obj(
-          "participant" -> str(provenance.participant),
-          "session" -> str(provenance.session),
-          "condition" -> str(provenance.condition),
-          "model" -> str(provenance.model),
-          "provider" -> str(provenance.provider),
-          "protocol" -> str(provenance.protocol),
-          "systemSha256" -> str(provenance.systemSha256),
-          "manifestSha256" -> str(provenance.manifestSha256),
-          "segmentation" -> Json.obj(
-            "kind" -> str(provenance.segmentation.kind),
-            "artifactSha256" -> str(provenance.segmentation.artifactSha256.hex),
-            "recipe" -> str(provenance.segmentation.recipe)
+    Json
+      .obj(
+        "schema" -> str(Schema),
+        "provenance" -> Json
+          .obj(
+            "participant" -> str(provenance.participant),
+            "session" -> str(provenance.session),
+            "condition" -> str(provenance.condition),
+            "model" -> str(provenance.model),
+            "provider" -> str(provenance.provider),
+            "protocol" -> str(provenance.protocol),
+            "systemSha256" -> str(provenance.systemSha256),
+            "manifestSha256" -> str(provenance.manifestSha256),
+            "segmentation" -> Json.obj(
+              "kind" -> str(provenance.segmentation.kind),
+              "artifactSha256" -> str(provenance.segmentation.artifactSha256.hex),
+              "recipe" -> str(provenance.segmentation.recipe)
+            ),
+            "modelCalls" -> Json.fromInt(0)
+          )
+          .deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h)))),
+        "meaning" -> Json.obj(
+          "narrative" -> str("the scene the retelling is narrating at this unit"),
+          "referent" -> str("the scene containing the specifically mentioned content"),
+          "stated" -> str("the answer as the reply gave it, in the form a scorer reads"),
+          "judgement" -> str(
+            "the answer decided against the source: scene, film (a film with no particular " +
+              "scene), time-outside (a time outside the film's clip: the film, no scene), none, " +
+              "invalid-scene (a real scene that is not a target), unknown-scene, unknown-film, " +
+              "invalid, omitted, unparsable-chunk"
           ),
-          "modelCalls" -> Json.fromInt(0)
-        )
-        .deepMerge(Json.fromFields(provenance.clockSha256.map(h => "clockSha256" -> str(h)))),
-      "meaning" -> Json.obj(
-        "narrative" -> str("the scene the retelling is narrating at this unit"),
-        "referent" -> str("the scene containing the specifically mentioned content"),
-        "stated" -> str("the answer as the reply gave it, in the form a scorer reads"),
-        "judgement" -> str(
-          "the answer decided against the source: scene, film (a film with no particular " +
-            "scene), time-outside (a time outside the film's clip: the film, no scene), none, " +
-            "invalid-scene (a real scene that is not a target), unknown-scene, unknown-film, " +
-            "invalid, omitted, unparsable-chunk"
+          "time" -> str(
+            "a condition that answers with a time keeps the raw film and time beside the scene " +
+              "that contains it; source.clock holds the scene intervals in exact fractions"
+          ),
+          "extras" -> str("self-reported fields kept verbatim; not scores, not calibrated")
         ),
-        "time" -> str(
-          "a condition that answers with a time keeps the raw film and time beside the scene " +
-            "that contains it; source.clock holds the scene intervals in exact fractions"
-        ),
-        "extras" -> str("self-reported fields kept verbatim; not scores, not calibrated")
-      ),
-      "interpretations" -> Json.fromFields(Fields.map { f =>
-        f -> Json.obj(
-          "policy" -> str(StudyRecord.policy(provenance.condition, provenance.protocol, f).value),
-          "recordDigest" -> str(records(f).digest.hex),
-          "record" -> MappingCodecs.toJson(records(f))
-        )
-      }),
-      "units" -> Json.fromValues(rows.map(rowJson(view, _))),
-      "source" -> sourceJson(view, intervals)
-    )
+        "interpretations" -> Json.fromFields(Fields.map { f =>
+          f -> Json.obj(
+            "policy" -> str(StudyRecord.policy(provenance.condition, provenance.protocol, f).value),
+            "recordDigest" -> str(records(f).digest.hex),
+            "record" -> MappingCodecs.toJson(records(f))
+          )
+        }),
+        "units" -> Json.fromValues(rows.map(rowJson(view, _))),
+        "source" -> sourceJson(view, intervals)
+      )
+      .deepMerge(Json.fromFields(transcript.map("recall" -> _)))
 
   /** What a reader recovers: both records, re-checked, and the unit rows as written. */
   final case class Loaded(records: Map[String, MappingResult], units: Vector[Json])
@@ -393,6 +396,9 @@ object StudyBundle:
           .get[String]("artifactSha256")
           .toOption
           .contains(recall.segmentation.artifactSha256.hex) &&
+          p.downField("segmentation").get[String]("kind").contains(recall.segmentation.kind) &&
+          p.downField("segmentation").get[String]("recipe").contains(recall.segmentation.recipe) &&
+          c.downField("recall").focus == recall.transcriptDescriptor &&
           expected.units.map(_.text) == recall.texts,
         (),
         "the recall is not the study's units"
