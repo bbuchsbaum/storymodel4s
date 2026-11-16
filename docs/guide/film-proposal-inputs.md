@@ -27,7 +27,8 @@ deduplicating shared upstream calls; it does not infer parse membership from tex
 ticks. This boundary confirms declared correspondence, not that an external parser was executed.
 
 The independent expectation is selected before accepting submitted records. This executable
-example is checked against `FilmInputSuite` (the `film-input-example` region):
+example is checked against `FilmInputSuite` (the `film-input-example` region). Import
+`storymodel4s.core.*` and `storymodel4s.document.*` before using it:
 
 ```scala
 def prepareFilmProposal(

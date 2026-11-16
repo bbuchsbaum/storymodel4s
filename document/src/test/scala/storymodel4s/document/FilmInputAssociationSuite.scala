@@ -121,8 +121,7 @@ class FilmInputAssociationSuite extends FunSuite:
     val sentenceA = prepared.atlas.surface.get.surface.byId(a)
     val sentenceB = prepared.atlas.surface.get.surface.byId(b)
     assert(inputWithA(aligned(sentenceA.span)).isRight)
-    val refusal = inputWithA(aligned(sentenceB.span)).left.toOption.get
-    assert(refusal.toString.contains("chart/alignment"))
+    assert(inputWithA(aligned(sentenceB.span)).swap.exists(_.toString.contains("chart/alignment")))
   }
 
   test("full chart identity retains alignment spans and credence") {
@@ -142,11 +141,8 @@ class FilmInputAssociationSuite extends FunSuite:
     assert(
       FilmCompilerInput
         .of(prepared, substituted, expected, Vector.empty)
-        .left
-        .toOption
-        .get
-        .toString
-        .contains("chart/output")
+        .swap
+        .exists(_.toString.contains("chart/output"))
     )
   }
 
@@ -169,16 +165,16 @@ class FilmInputAssociationSuite extends FunSuite:
     )
     assert(input().isRight)
     assert(
-      changed(bindingA.copy(parser = Fingerprint.unsafe("other"))).left.toOption.get.toString
-        .contains("chart/parser")
+      changed(bindingA.copy(parser = Fingerprint.unsafe("other"))).swap
+        .exists(_.toString.contains("chart/parser"))
     )
     assert(
-      changed(bindingA.copy(requestChecksum = Checksum.ofText("other"))).left.toOption.get.toString
-        .contains("chart/request")
+      changed(bindingA.copy(requestChecksum = Checksum.ofText("other"))).swap
+        .exists(_.toString.contains("chart/request"))
     )
     assert(
-      changed(bindingA.copy(producingCall = callB)).left.toOption.get.toString
-        .contains("chart/request")
+      changed(bindingA.copy(producingCall = callB)).swap
+        .exists(_.toString.contains("chart/request"))
     )
   }
 

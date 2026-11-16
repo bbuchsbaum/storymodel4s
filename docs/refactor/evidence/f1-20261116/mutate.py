@@ -10,6 +10,7 @@ import subprocess
 p = argparse.ArgumentParser()
 p.add_argument('--clone', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--only', nargs='+', help='Run selected named mutations')
 a = p.parse_args()
 root = a.clone.resolve()
 if not (root / '.git').is_dir():
@@ -23,17 +24,25 @@ mutations = [
     ('ignore-parser-origin',
      'chart.provenance.origin != ChartOrigin.Parser(binding.parser)', 'false',
      'matching expectation cannot disguise a different parser or producing request'),
-    ('ignore-sentence-containment', 'sentence.span.contains(ref.span)', 'true',
+    ('ignore-sentence-end-boundary', 'sentence.span.contains(ref.span)', 'sentence.span.start <= ref.span.endExclusive',
      'alignment outside its declared sentence is refused by the alignment guard'),
     ('omit-producing-call-identity', 'call(b.producingCall)', '"omitted-producing-call"',
      'selecting a different producing receipt changes input identity even for the same request'),
 ]
+if a.only and not set(a.only) <= {m[0] for m in mutations}:
+    p.error('unknown mutation name')
+revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+source_hash = hashlib.sha256(original.encode()).hexdigest()
+driver_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 results = []
 try:
     for name, before, after, test in mutations:
+        if a.only and name not in a.only:
+            continue
         if original.count(before) != 1:
             raise RuntimeError(f'expected exactly one mutation site: {name}')
-        path.write_text(original.replace(before, after))
+        mutated = original.replace(before, after)
+        path.write_text(mutated)
         log = a.output / f'{name}.log'
         with log.open('w') as out:
             result = subprocess.run(
@@ -46,9 +55,14 @@ try:
             raise RuntimeError(f'no test totals: {name}')
         total, failed, errors, passed = map(int, totals[-1])
         compiled = 'done compiling' in text and not re.search(r'\[error\].*(?:Compilation failed|compileIncremental)', text)
-        if result.returncode == 0 or not compiled or failed != 1 or errors != 0 or passed != total - 1 or test not in text:
+        assertion_failed = bool(re.search(r'munit\.(?:Fail|ComparisonFail)Exception', text))
+        if result.returncode == 0 or not compiled or not assertion_failed or failed != 1 or errors != 0 or passed != total - 1 or test not in text:
             raise RuntimeError(f'mutation was not a single named compiled assertion failure: {name}')
-        results.append(dict(mutation=name, compiled=compiled, exit=result.returncode,
+        results.append(dict(mutation=name, compiled=compiled, assertion_failed=assertion_failed,
+                            revision=revision, source_sha256=source_hash, driver_sha256=driver_hash,
+                            mutation_before=before, mutation_after=after,
+                            mutated_source_sha256=hashlib.sha256(mutated.encode()).hexdigest(),
+                            exit=result.returncode,
                             failed_test=test, total=total, failed=failed, passed=passed,
                             log_sha256=hashlib.sha256(log.read_bytes()).hexdigest()))
         print(json.dumps(results[-1]), flush=True)
