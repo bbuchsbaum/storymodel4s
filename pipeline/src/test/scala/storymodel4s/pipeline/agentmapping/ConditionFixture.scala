@@ -153,8 +153,14 @@ object ConditionFixture:
   /** The harness's opaque id: `"x"` and the first ten hex digits of SHA-256 of `salt:id`. */
   def harnessId(salt: String, id: String): String = "x" + Checksum.ofText(s"$salt:$id").hex.take(10)
 
-  /** The first three units' ids under the harness scheme with the default salt. */
-  def harnessIds: Vector[String] = recall.unitIds.take(3).map(u => harnessId("20261117", u.value))
+  /** The recall positions a reference run asks about: the first three units, and unit 5 (position
+    * 4), where windows of two, three and all preceding units render differently.
+    */
+  val RefPositions: Vector[Int] = Vector(0, 1, 2, 4)
+
+  /** The asked units' ids under the harness scheme with the default salt. */
+  def harnessIds: Vector[String] =
+    RefPositions.map(p => harnessId("20261117", recall.unitIds(p).value))
 
   /** One item as the harness renders it; a context line only when the window has units. */
   def itemBlock(id: String, context: Option[String], target: String): String =
@@ -164,28 +170,41 @@ object ConditionFixture:
     "CAST\ncast\n\nFILM ANNOTATION\noutline\n\nITEMS (random order)\n\n" +
       blocks.mkString("\n\n") + s"\n\nAnalyse all ${blocks.size} items."
 
-  /** What the harness renders as unit `i`'s context under `k` preceding units. */
-  def harnessContext(k: Int)(i: Int): Option[String] =
-    Option.when(k > 0)(ReferenceBundle.contextText(texts, i, k))
+  /** The harness's CONTEXT for each asked position under two preceding units, written out by hand
+    * (not computed by the code under test): texts joined by single spaces, or `(start of recall)`.
+    */
+  val TwoPreceding: Map[Int, String] = Map(
+    0 -> "(start of recall)",
+    1 -> "she came in",
+    2 -> "she came in then the title",
+    4 -> "a mouse he left"
+  )
 
-  /** The session's first three units asked under `ids`, with a foreign item `xz` from another
-    * participant in the first batch. `context` gives each unit's CONTEXT line, if any.
+  /** The harness's CONTEXT by position under `k` preceding units; only 0 and 2 are written out. */
+  def harnessContext(k: Int)(position: Int): Option[String] = k match
+    case 0 => None
+    case 2 => Some(TwoPreceding(position))
+    case _ => throw new IllegalArgumentException(s"no literal contexts for k = $k")
+
+  /** The asked units under `ids` (aligned with `RefPositions`), with a foreign item `xz` from
+    * another participant in the first batch. `context` and `target` give each position's lines.
     */
   def referenceBatchesWith(
       context: Int => Option[String],
       ids: Vector[String],
       target: Int => String = texts(_)
   ): Vector[ReferenceAnswers.Batch] =
-    def block(i: Int) = itemBlock(ids(i), context(i), target(i))
+    def block(i: Int) =
+      itemBlock(ids(i), context(RefPositions(i)), target(RefPositions(i)))
     Vector(
       ReferenceAnswers.Batch(
-        harnessPrompt(Vector(block(1), itemBlock("xz", context(0), "other"), block(0))),
+        harnessPrompt(Vector(block(1), itemBlock("xz", Some("x y"), "other"), block(0))),
         Vector(ids(1), "xz", ids(0))
       ),
-      ReferenceAnswers.Batch(harnessPrompt(Vector(block(2))), Vector(ids(2)))
+      ReferenceAnswers.Batch(harnessPrompt(Vector(block(2), block(3))), Vector(ids(2), ids(3)))
     )
 
-  /** The harness's rendering of the first three units under `k` preceding units. */
+  /** The harness's rendering of the asked units under `k` (0 or 2) preceding units. */
   def referenceBatches(k: Int, ids: Vector[String] = harnessIds): Vector[ReferenceAnswers.Batch] =
     referenceBatchesWith(harnessContext(k), ids)
 
@@ -240,7 +259,8 @@ object ConditionFixture:
     )
     val recorded = batches.zip(receipts).map(ReferenceBundle.Recorded(_, _))
     val unitIds = recall.unitIds.map(_.value)
-    val asked = ids.zipWithIndex.map((item, i) => (i + 1, unitIds(i), item))
+    val asked =
+      ids.zipWithIndex.map((item, i) => (RefPositions(i) + 1, unitIds(RefPositions(i)), item))
     val provenance = ReferenceBundle.Provenance(
       "p1",
       "s1",

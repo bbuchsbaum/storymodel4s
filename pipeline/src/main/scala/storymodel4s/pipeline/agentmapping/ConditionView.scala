@@ -59,6 +59,11 @@ object ConditionView:
 
   /** Combine items whose conditions are one estimand; refuse at the first that is not. The estimand
     * is the declared one, or `Left(name)` for a legacy condition.
+    *
+    * This is a gate on the conditions the caller supplies, and it takes them as given: it checks no
+    * digest and derives nothing. A caller that needs conditions derived from checked evidence
+    * passes conditions read from decoded bundles, as `readout` does over `StudyBundle.Loaded`,
+    * which only `StudyBundle.decode` makes.
     */
   def combine[A](
       items: Vector[A]

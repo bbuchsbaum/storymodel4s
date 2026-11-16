@@ -269,30 +269,71 @@ class ReferenceAnswersSuite extends FunSuite:
     assertNotEquals(right(other.loaded).rendering.sha256, right(run.loaded).rendering.sha256)
     assertNotEquals(right(run.loaded).rendering.sha256, contentLocal(2).digest)
 
-  test("a CONTEXT that carries extra units under Preceding(2) is refused"):
-    // Every unit shown with the whole rest of the recall, declared as two preceding units.
-    val whole = (i: Int) => Some(texts.patch(i, Nil, 1).mkString(" "))
-    assertEquals(
-      referenceRun(condition, referenceBatchesWith(whole, harnessIds)).doc,
-      Left(RenderingRefusal.ContextMismatch(1))
+  test("contextText renders the k preceding texts, or (start of recall)"):
+    assertEquals(ReferenceBundle.contextText(texts, 4, 2), "a mouse he left")
+    assertEquals(ReferenceBundle.contextText(texts, 4, 3), "then the title a mouse he left")
+    assertEquals(ReferenceBundle.contextText(texts, 1, 2), "she came in")
+    assertEquals(ReferenceBundle.contextText(texts, 0, 2), "(start of recall)")
+
+  test("Preceding(2) at unit 5 renders exactly the two preceding texts"):
+    val prompt = referenceBatches(2)(1).prompt
+    assert(
+      prompt.contains(s"ITEM ${harnessIds(3)}\nCONTEXT: a mouse he left\nTARGET: um\n\n"),
+      prompt
     )
-    // A context with one unit more than the window renders.
-    val three = (i: Int) => Some(ReferenceBundle.contextText(texts, i, 3) + " extra")
+    assert(right(run.loaded).units.exists(_.u == 5))
+
+  /** Contexts that are right at units 1-3 and `at5` at unit 5. */
+  private def wrongAt5(at5: String) = (p: Int) => Some(if p == 4 then at5 else TwoPreceding(p))
+
+  test("a CONTEXT that carries extra units under Preceding(2) is refused"):
+    // At unit 5 the whole preceding recall, declared as two preceding units.
     assertEquals(
-      referenceRun(condition, referenceBatchesWith(three, harnessIds)).doc,
-      Left(RenderingRefusal.ContextMismatch(1))
+      referenceRun(
+        condition,
+        referenceBatchesWith(wrongAt5("she came in then the title a mouse he left"), harnessIds)
+      ).doc,
+      Left(RenderingRefusal.ContextMismatch(5))
+    )
+
+  test("an off-by-one window is refused: k + 1 units, or k units starting one early"):
+    assertEquals(
+      referenceRun(
+        condition,
+        referenceBatchesWith(wrongAt5("then the title a mouse he left"), harnessIds)
+      ).doc,
+      Left(RenderingRefusal.ContextMismatch(5))
+    )
+    assertEquals(
+      referenceRun(
+        condition,
+        referenceBatchesWith(wrongAt5("then the title a mouse"), harnessIds)
+      ).doc,
+      Left(RenderingRefusal.ContextMismatch(5))
     )
 
   test("a TARGET that is not the unit's own text is refused"):
     val batches = referenceBatchesWith(harnessContext(2), harnessIds, i => texts(i) + " too")
     assertEquals(referenceRun(condition, batches).doc, Left(RenderingRefusal.TargetMismatch(1)))
 
+  test("a declared text that is only a prefix of its line is refused"):
+    // The TARGET line continues onto a further line, and the CONTEXT line runs past its text.
+    val longer = referenceBatchesWith(harnessContext(2), harnessIds, i => texts(i) + "\nmore")
+    assertEquals(referenceRun(condition, longer).doc, Left(RenderingRefusal.TargetMismatch(1)))
+    val context = referenceBatchesWith(wrongAt5("a mouse he left\nmore"), harnessIds)
+    assertEquals(referenceRun(condition, context).doc, Left(RenderingRefusal.ContextMismatch(5)))
+
   test("a unit whose ITEM line is not in its batch prompt is refused"):
     val missing = referenceBatches(2).updated(
       1,
       Batch(
-        harnessPrompt(Vector(itemBlock("xq", harnessContext(2)(2), texts(2)))),
-        Vector(harnessIds(2))
+        harnessPrompt(
+          Vector(
+            itemBlock("xq", Some(TwoPreceding(2)), texts(2)),
+            itemBlock(harnessIds(3), Some(TwoPreceding(4)), texts(4))
+          )
+        ),
+        Vector(harnessIds(2), harnessIds(3))
       )
     )
     assertEquals(referenceRun(condition, missing).doc, Left(RenderingRefusal.ItemLine(3)))
@@ -310,7 +351,7 @@ class ReferenceAnswersSuite extends FunSuite:
     assert(referenceRun(declared("local", contentLocal(0)), referenceBatches(0)).doc.isRight)
 
   test("under declared opaque ids, an id that encodes the unit's position is refused"):
-    val positional = Vector("u1", "u2", "u3")
+    val positional = Vector("u1", "u2", "u3", "u5")
     assertEquals(
       referenceRun(condition, referenceBatches(2, positional), positional).doc,
       Left(RenderingRefusal.IdEncodesPosition(1))
@@ -321,7 +362,7 @@ class ReferenceAnswersSuite extends FunSuite:
     assert(!ReferenceBundle.encodesPosition("x3f9a01c2be", 3, 2, "unit-x"))
 
   test("ids must have the declared scheme's shape; ids in alphabetical recall order do not"):
-    val alphabetical = Vector("xa", "xb", "xc")
+    val alphabetical = Vector("xa", "xb", "xc", "xd")
     assertEquals(
       referenceRun(condition, referenceBatches(2, alphabetical), alphabetical).doc,
       Left(RenderingRefusal.IdShape(1, ReferenceBundle.HarnessScheme))

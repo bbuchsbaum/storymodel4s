@@ -21,6 +21,10 @@ import storymodel4s.core.Checksum
   * of the condition and every batch's prompt digest. Hidden order is not checked against the
   * prompts (it needs the whole pool); it stays an asserted part of the condition, and the bundle
   * says so. A bundle holds unit ids and recall-derived words; keep it outside the repository.
+  *
+  * The harness's name-manipulation arm (`llm_local5.py --manip names`) rewrites the TARGET text, so
+  * its prompts are refused with `TargetMismatch` until a manipulation-aware rendering exists; that
+  * is deliberate, since the model did not see the unit's own text.
   */
 object ReferenceBundle:
   val Schema: String = "storymodel4s.agentmapping.reference-bundle/v1"
@@ -175,11 +179,13 @@ object ReferenceBundle:
       def block(rest: String): Either[RenderingRefusal, Unit] =
         val target = s"TARGET: ${texts(position)}"
         def ends(after: String) =
-          Either.cond(after.startsWith(target + "\n") || after == target, (), TargetMismatch(x.u))
+          // The block ends at the separator before the next block or the closing instruction,
+          // so a declared text cannot be a prefix of a longer line.
+          Either.cond(after.startsWith(target + "\n\n") || after == target, (), TargetMismatch(x.u))
         if window > 0 then
           val context = s"CONTEXT: ${contextText(texts, position, window)}\n"
           if !rest.startsWith("CONTEXT: ") then Left(ContextMissing(x.u))
-          else if !rest.startsWith(context) then Left(ContextMismatch(x.u))
+          else if !rest.startsWith(context + "TARGET: ") then Left(ContextMismatch(x.u))
           else ends(rest.substring(context.length))
         else if rest.startsWith("CONTEXT: ") then Left(ContextPresent(x.u))
         else ends(rest)
