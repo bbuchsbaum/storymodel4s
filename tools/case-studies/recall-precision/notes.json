@@ -1,0 +1,416 @@
+{
+ "title": "Recall Specificity Case Study",
+ "eyebrow": "storymodel4s \u00b7 case study 1 \u00b7 Sherlock development participants",
+ "lede": [
+  "Can we say, moment by moment during spoken recall, how precisely the speech points to a place in the film? The goal is a continuous series on the recall clock, usable alongside the recall fMRI scan, not one value per hand-made segment.",
+  "Each round builds an estimator, scores it against the same yardstick, and puts it in front of three critics: a linguist, a machine-learning reviewer, and a visualization reviewer working from Tufte's principles. What survives goes into storymodel4s afterwards."
+ ],
+ "status": [
+  "Can we say, moment by moment during spoken recall, how precisely the speech points into the film? <b>Partly, and the case study has shown which parts hold up.</b> Where the speech points can be read off content alone: 76% agreement with the human scene coding, calibrated and stable. Breadth, how long a stretch the speech refers to, is reliable (ICC 0.85) and independent of speech rate; it measures film extent and has a floor at the annotation's grain. Specificity proper, the amount of distinguishing detail, is a separate channel (\u03c1 0.10 with breadth) and does not predict localization. Hesitation between places reproduces only as a flag. None is validated against human coding yet."
+ ],
+ "table_note": "Participant means; small grey numbers are 95% participant-bootstrap intervals. <b>Agree</b>: the model's most probable scene matches the human scene coding. <b>Shift null</b>: the same, after rotating the film rows half a film away (what agreement looks like with the content link cut). <b>AUROC H</b>: how well low which-scene entropy separates agreeing from disagreeing moments; <b>AUROC p</b>: the same for top-scene probability. <b>ECE</b>: calibration error of top-scene probability. <b>W50</b>: the shortest contiguous span of film holding half the mass, in seconds; <b>null W50</b>: the same for recall of a different film. <b>Off-film AUROC</b>: whether off-film probability is higher in recall stretches the coders left uncoded.",
+ "metrics": [
+  {
+   "key": "scene_acc",
+   "label": "Agree",
+   "kind": "pct",
+   "help": "Top scene equals human-coded scene"
+  },
+  {
+   "key": "logloss_on_bits",
+   "label": "Log loss",
+   "kind": "b",
+   "help": "Bits per word to encode the human-coded scene (lower is better; uniform = 5.64)"
+  },
+  {
+   "key": "scene_acc_shift_null",
+   "label": "Shift null",
+   "kind": "pct",
+   "help": "Agreement with film rows rotated half a film"
+  },
+  {
+   "key": "auroc_lowHscene_hit",
+   "label": "AUROC H",
+   "kind": "b",
+   "help": "Low which-scene entropy predicts agreement"
+  },
+  {
+   "key": "auroc_topP_hit",
+   "label": "AUROC p",
+   "kind": "b",
+   "help": "Top-scene probability predicts agreement"
+  },
+  {
+   "key": "ece_top",
+   "label": "ECE",
+   "kind": "b",
+   "help": "Expected calibration error of top-scene probability"
+  },
+  {
+   "key": "median_H_scene",
+   "label": "H scene",
+   "kind": "b",
+   "help": "Median which-scene entropy, bits (max 5.64)"
+  },
+  {
+   "key": "median_w50",
+   "label": "W50 s",
+   "kind": "s",
+   "help": "Median contiguous film span holding half the mass"
+  },
+  {
+   "key": "median_w50",
+   "label": "null W50 s",
+   "kind": "s",
+   "source": "null",
+   "help": "Same, for different-film recall"
+  },
+  {
+   "key": "auroc_poff_offfilm",
+   "label": "Off-film AUROC",
+   "kind": "b",
+   "help": "Off-film probability higher where coders left recall uncoded"
+  }
+ ],
+ "reference_rows": [
+  {
+   "name": "LLM mapper v3 scene label only (clause units)",
+   "values": {
+    "scene_acc": "79%"
+   }
+  },
+  {
+   "name": "Chance (50 scenes)",
+   "values": {
+    "scene_acc": "2%",
+    "median_H_scene": "5.64"
+   }
+  }
+ ],
+ "iterations": [
+  {
+   "id": "it0",
+   "title": "Sentence-embedding window over film rows",
+   "date": "2026-11-16",
+   "runs": [
+    {
+     "label": "emb-w15",
+     "name": "centered 15 words, full row text (it0 metric names differ)"
+    }
+   ],
+   "summary": [
+    "Each recall word gets a 15-word window, embedded with a small local sentence encoder (MiniLM). The window is compared with each of the 1,000 annotated film rows. A softmax with one temperature, fitted with one participant left out each time, gives a distribution over rows, and each row spreads its mass evenly over its seconds.",
+    "The link is real but weak. The top scene agrees with the human coding 31% of the time (chance 2%), and low entropy does mark the moments that agree (AUROC 0.73). The distributions are broad, though, and the trace sits barely below a shuffled-word null."
+   ],
+   "figures": [
+    {
+     "run": "emb-w15",
+     "file": "map.png",
+     "caption": "Iteration 0, NN03. Grey is model mass, the red outline is the human scene coding. Horizontal streaks are film rows that attract mass whatever is said. The stacked band below was later judged misleading: its light layer is set by the annotation's row grain, not by the speaker."
+    },
+    {
+     "run": "emb-w15",
+     "file": "reliability.png",
+     "caption": "Iteration 0: agreement by entropy bin. The bins were mislabelled as deciles (they are quintiles per participant), and pooling weights participants by word count."
+    }
+   ],
+   "critique": [
+    {
+     "who": "Linguistics",
+     "points": [
+      "Entropy here mixes speaker specificity with how distinctive the film content is. Baker Street alone fills 224 of the 1,000 rows, so a precise remark about a recurring place looks vague.",
+      "The People/Location template in each row lets character names drive the matches.",
+      "A centered window looks ahead into speech not yet produced, and it makes neighbouring words dependent, which inflates word-level statistics.",
+      "Non-episodic talk (comments on the film, evaluations, statements of not remembering) is forced onto film seconds. Label it instead.",
+      "A summary of a long stretch is broad, not uncertain. The single entropy number cannot tell the two apart.",
+      "Shuffling a participant's words keeps their vocabulary, so it is a weak null. Use recall of a different film."
+     ]
+    },
+    {
+     "who": "Machine learning",
+     "points": [
+      "Bug: the peak scene came from the peak second, which favours scenes made of short rows.",
+      "Entropy over seconds is a set size, not a temporal width. Mass split between minute 2 and minute 45 can look like \"50 s\". Report a contiguous window.",
+      "The within-scene term is nearly constant: it is a property of temperature, row lengths and annotation density. Do not use it until a positive control supports it, for example recall that quotes the film's dialogue.",
+      "There is no off-film state, so meta-talk gets forced onto film rows.",
+      "Keep two estimands apart: what the speech itself pins down (content-local), and what an analyst can infer using order and context (for example, the LLM mapper). Report both, never merged.",
+      "Use participant-bootstrap intervals, a true reliability diagram, and nulls that cut the content link (rotated film, different-film recall)."
+     ]
+    },
+    {
+     "who": "Visualization (Tufte's principles)",
+     "points": [
+      "Smoothing used zero padding, which faked specificity at the start and end of every trace.",
+      "The stacked band spends half its ink on a constant set by the annotation. Plot which-scene entropy alone.",
+      "Show the null as a band, and shade where the trace drops below it.",
+      "Reliability needs uncertainty, counts, a chance line and equal weight per participant.",
+      "The small multiples need one time scale, an order by validity, and direct labels.",
+      "The map should name its failure: add a strip of mean mass per film row to expose the hub rows."
+     ]
+    }
+   ],
+   "decisions": [
+    "Take the peak scene from the scene distribution. Add an explicit off-film state, fitted together with the temperature.",
+    "Subtract each row's mean similarity to recall of a different film (a hubness correction). Drop the People/Location template. Weight rows by duration.",
+    "Headline measures are which-scene entropy and W50, the contiguous film span holding half the mass. Within-scene precision is withheld until the dialogue-quote control passes.",
+    "Nulls: different-film recall (FilmFestival, held apart from the half used for the hub correction) and film rows rotated half a film. All headline numbers get participant-bootstrap intervals.",
+    "Figures binned at the TR with gaps left as gaps, null bands, a calibration diagram and ordered small multiples."
+   ]
+  },
+  {
+   "id": "it1",
+   "title": "Critic fixes: hubness correction, off-film state, honest width, real nulls",
+   "date": "2026-11-16",
+   "runs": [
+    {
+     "label": "it1-centered15-desc-duration-hubforeign",
+     "name": "centered 15, desc+dialogue, duration prior, hub-corrected"
+    }
+   ],
+   "summary": [
+    "Same encoder, with the critics' fixes applied. The peak scene now comes from the scene distribution. An off-film state is fitted together with the temperature, one participant left out each time. Each row's mean similarity to a different film's recall is subtracted (FilmFestival, with the reference half kept apart from the null half). Rows drop the People/Location template and are weighted by duration.",
+    "<b>Calibration is good:</b> top-scene probability tracks how often the top scene matches the human coding (ECE 0.07). <b>The content link is real:</b> rotating the film rows drops agreement from 35% to 1%.",
+    "<b>The honest width measure exposes the weakness.</b> Half the mass needs about 12 minutes of contiguous film at the median moment, because content-only mass is scattered across the film. The iteration-0 \"effective width\" of about 290 s hid this.",
+    "<b>Within-scene localization works only where the speech quotes the film.</b> In about 270 recall moments that share a distinctive four-word phrase with one row's dialogue, 54% of the within-scene mass lands on that row, against 8% for a uniform spread. This is a positive control for the machinery, not general within-scene validity: the anchors match by construction.",
+    "<b>The off-film state failed</b> (AUROC 0.50). The coders' uncoded stretches are short transitions, not off-film talk, so they cannot train this state. It needs a real label of non-episodic talk."
+   ],
+   "figures": [
+    {
+     "run": "it1-centered15-desc-duration-hubforeign",
+     "file": "map.png",
+     "caption": "NN03, iteration 1. Grey: model mass over film time at each 1.5 s of recall. Red band: human scene coding. Right strip: mean mass per film second over the whole recall; spikes are hub rows that remain. Below: which-scene entropy and W50 against the different-film null band (5\u201395%); fill marks moments more specific than the null. Bottom strip: off-film probability."
+    },
+    {
+     "run": "it1-centered15-desc-duration-hubforeign",
+     "file": "reliability.png",
+     "caption": "Left: calibration of top-scene probability, with participants weighted equally and a participant-bootstrap band. Right: agreement by which-scene entropy. Bars show where the words fall."
+    },
+    {
+     "run": "it1-centered15-desc-duration-hubforeign",
+     "file": "multiples.png",
+     "caption": "All 11 development participants on one recall-time scale, ordered by agreement. Each line is W50 on a log scale. The grey band is the different-film null, and red ticks are human-coded scene changes."
+    }
+   ],
+   "decisions": [
+    "Content-local stream: an LLM sees each clause-sized unit with only its two preceding units as context. Units are shuffled within a batch so recall order is unavailable. It returns weighted candidate scenes and rows, and labels each reference as single, broad (a summary) or non-episodic. Self-reported weights are calibrated by temperature, one participant left out each time.",
+    "Analyst stream: the cached v3 mapper outputs, which read the whole recall, calibrated the same way. These are reported separately and never merged with the content-local stream.",
+    "Words get the unit's distribution, sharpened within the unit by the embedding likelihood. The same yardstick applies to both streams."
+   ]
+  },
+  {
+   "id": "it2",
+   "title": "Content-local LLM, with an analyst-knowledge stream kept separate",
+   "date": "2026-11-16",
+   "runs": [
+    {
+     "label": "it2-llm-local-llm-local-v1",
+     "name": "LLM, unit + 2 preceding units, shuffled batches (content-local)"
+    },
+    {
+     "label": "it2-v3-v3-opus",
+     "name": "cached LLM mapper, whole recall (analyst knowledge)"
+    }
+   ],
+   "summary": [
+    "<b>Content-local stream.</b> Each of the 1,744 development recall units (about 12 words, about 4 s of speech) goes to Claude Opus with the film annotation and only its two preceding units as context. Units from all participants are pooled and shuffled before batching, so the model sees neither recall order nor any whole recall. It returns weighted ranges of film rows: a short range for a specific moment, one long range for a summary (\"broad\"), and separate ranges for competing hypotheses, with unassigned weight meaning \"could be elsewhere\". Units can also be labelled non-episodic. The weights are self-reports, so a tempering exponent and a uniform floor are fitted one participant left out at a time. Each word takes its unit's distribution, a declared level-holding rule at about 4 s grain.",
+    "<b>It agrees with the human coding 73% of the time</b> (log loss 1.72 bits, against 3.9 for embeddings), close to the 77% of the analyst stream, which reads the whole recall. <b>The null behaves:</b> of 200 FilmFestival recall units mixed into the same batches, 97.5% were labelled non-episodic for Sherlock, with 76% of the weight unassigned. <b>It is stable:</b> NN03 ran twice in different shuffled batches, and the top scene matched for 96% of units (log-W50 \u03c1 0.80, broad/specific labels 90% identical). That is stability, not calibration: it is <b>overconfident</b> (ECE 0.16).",
+    "<b>Two estimands, kept apart.</b> At the TR level, the content-local and analyst streams' which-scene entropies correlate at a median \u03c1 of 0.68 across participants (range 0.43\u20130.86). Their difference is what recall order and context add. For fMRI they should enter as separate regressors, not one merged score.",
+    "<b>The three quantities.</b> Uncertainty between hypotheses is usually zero, with bursts. Breadth runs from about 3 s to more than 200 s. The two correlate only moderately (TR-level \u03c1 median 0.37). Broad units agree with the single-scene coding less often (65%, against 80% for specific units), as expected: a summary spans scenes, and a one-scene label cannot score it fairly."
+   ],
+   "figures": [
+    {
+     "run": "it2-llm-local-llm-local-v1",
+     "file": "map.png",
+     "caption": "NN03, content-local LLM. Mass over film time at each 1.5 s of recall, against the human scene coding (red). The diagonal comes from content alone: the model never saw recall order. Bottom strip: unassigned or non-episodic share (darker means less localizable). Different-film null bands are omitted: almost no different-film units were localized, so the null lives in the bottom strip, not in width."
+    },
+    {
+     "run": "it2-llm-local-llm-local-v1",
+     "file": "decomposition.png",
+     "caption": "Three quantities over recall time, for NN03 and NN13. Top: share of the speech localized to the film. Middle: breadth, the weighted span of the referenced film ranges (log seconds). Bottom: uncertainty between competing hypotheses (bits). Gaps are silence or non-episodic talk."
+    },
+    {
+     "run": "it2-llm-local-llm-local-v1",
+     "file": "compare.png",
+     "caption": "The same participant (NN03) under three estimators at fixed scales: embeddings, the content-local LLM, and the analyst-knowledge mapper. Each line is W50, the contiguous film span holding half the mass."
+    },
+    {
+     "run": "it2-llm-local-llm-local-v1",
+     "file": "reliability.png",
+     "caption": "Content-local LLM. Left: calibration, which is overconfident where the model claims near-certainty. Right: agreement by uncertainty. Most words sit at 0 bits."
+    },
+    {
+     "run": "it2-llm-local-llm-local-v1",
+     "file": "agreement.png",
+     "caption": "TR-level which-scene entropy: content-local against analyst stream, all development participants."
+    }
+   ],
+   "decisions": [
+    "Fix AUROC (midranks, with a known-answer test), report confidence from the fitted distribution, and widen the grids.",
+    "Prompt v2: opaque ids; a talk category; references anchored to their words, each with a form and its own competing alternatives.",
+    "Uncertainty is entropy over the competing hypotheses; breadth is the film extent within a hypothesis.",
+    "Controls: a second independent sample (reliability) and a target-only arm (what context adds).",
+    "Rebuild the page as linked SVG charts drawn from embedded data."
+   ],
+   "critique": [
+    {
+     "who": "Linguistics",
+     "points": [
+      "The two-unit context still carries a local order prior: a three-word scene-change fragment and other empty fragments get confident film ranges from their context alone.",
+      "Non-episodic caught empty fragments, not memory talk. Metamemory (a clause saying the speaker does not remember exactly) was labelled episodic broad.",
+      "Vagueness, durative activity, repeated events and joint reference were all forced into breadth or alternatives. The scheme needs specific / extended / repeated / summary / joint.",
+      "Units mix a broad frame with a specific nucleus. Anchor each reference to the words that carry it instead of holding one value per unit.",
+      "The \"uncertainty\" panel plotted scene entropy, so a broad range spanning scenes showed as uncertainty."
+     ]
+    },
+    {
+     "who": "Machine learning",
+     "points": [
+      "Bug: AUROC gave tied scores arbitrary ranks. Reproduced: 0.73 where the true value is 0.60. With ties handled, the off-film separation fell to chance.",
+      "Leak: item ids encoded the participant and the recall position, so a batch could reconstruct order.",
+      "Reported confidence ignored the fitted floor and residual. The apparent overconfidence was an artifact (ECE 0.08, not 0.16).",
+      "The tempering grids were too narrow; temper the residual separately from the alternatives.",
+      "Compare the streams paired, as per-word information gain, not as two raw accuracies. Add reliability across repeated samples and a target-only control."
+     ]
+    },
+    {
+     "who": "Visualization (Tufte's principles)",
+     "points": [
+      "Legends promised null bands that were not drawn; labels collided; one participant's x axis was padded to another's length.",
+      "The \"about film\" bars formed a solid grey wall. Draw the dips, not the constant.",
+      "Replace the jittered agreement scatter, which collapsed onto (0, 0), with counts. Add a regressors box with a collinearity matrix."
+     ]
+    },
+    {
+     "who": "Visualization (Bostock's principles)",
+     "points": [
+      "The figures were raster PNGs on a white slab, unreadable in dark mode and at phone width, with no way to read off a value.",
+      "Draw SVG from embedded data. Link the recall \u00d7 film map and the channel tracks with one crosshair. Add a participant selector.",
+      "Use one colour system: ink for the model, one accent for the human coding, one hue for the analyst stream, categorical hues only for talk type.",
+      "Put the result first, then the evidence, then a collapsed lab notebook. Show an iteration forest rather than a wide table."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "it3",
+   "title": "Anchored references, fixed metrics, controls, interactive page",
+   "date": "2026-11-16",
+   "runs": [
+    {
+     "label": "it3-v2-llm-local-v2-a",
+     "name": "content-local LLM, prompt v2, sample A"
+    },
+    {
+     "label": "it3-analyst",
+     "name": "analyst stream, same yardstick"
+    }
+   ],
+   "summary": [
+    "<b>Content-local agreement is 76%</b> (95% CI 73\u201379), with ECE 0.07 and a confidence AUROC of 0.69 (tie-corrected). The model saw each unit with its two preceding units, opaque ids and shuffled batches. The analyst stream reaches 77%.",
+    "<b>Every reference is anchored to its words</b> (1.4 references per unit). Of 2,242 references, 1,558 are specific, 452 extended, 176 summaries, 45 repeated and 11 joint. Only 12% of words carry any uncertainty between hypotheses.",
+    "<b>Breadth and uncertainty are separate quantities</b> (TR-level \u03c1 \u22120.04, once breadth no longer leaks into uncertainty). <b>Neither tracks speech rate</b> (|\u03c1| &lt; 0.05 with words per bin).",
+    "<b>Corrected after review:</b> breadth is reliable across two independent samples (ICC 0.85; 0.84 after removing participant means). The uncertainty ICC of 0.74 first reported here was an artifact: 80% of units are zero in both samples. Competing hypotheses reproduce as a flag (\u03ba 0.69), but their magnitude does not (ICC 0.10 where either sample is positive).",
+    "<b>Context, paired on the same three participants:</b> removing the two preceding units costs 4 points of agreement (77.6% to 73.6%) and doubles the share of words with competing hypotheses (12% to 22%), as unresolved pronouns should.",
+    "<b>The analyst stream saves 0.44 bits per word</b> (95% CI 0.34\u20130.54; 10/10 participants). That stream differs in prompt, representation and segmentation as well as context, so this is analyst minus local, not a pure effect of order. Accuracy barely differs (77% against 76%).",
+    "<b>The null moved to a different channel.</b> Under v2, recall of a different film is still called episodic (it describes a film), but its references carry 3% assigned weight, against 86% for Sherlock recall. Localizability is therefore read from the assigned weight, not the talk label.",
+    "<b>Neither uncertainty nor breadth predicts agreement with the single-scene coding</b> (AUROC 0.56 and 0.54). This is expected for breadth: the scene coding cannot score a summary. For uncertainty it means hesitation is rare and only loosely tied to error. Validating them needs references beyond one scene label."
+   ],
+   "decisions": [
+    "Withdraw the uncertainty ICC, the unpaired context comparison, and the order attribution of the 0.44 bits; restate all three.",
+    "Run breadth-validity and collinearity analyses that need no new model calls (iteration 4).",
+    "Rebuild the page per both visualization reviews: honest opacity, regressors after the tracks with a copyable TSV, a gain strip, keyboard access."
+   ],
+   "critique": [
+    {
+     "who": "Linguistics",
+     "points": [
+      "Breadth measures how long the referenced film event lasts, not how specific the speech is. A precise description of a long phone call gets a wide span; a vague clause about going upstairs gets a narrow one. Specificity in memory research is the amount of distinguishing detail, which is a separate dimension.",
+      "Metamemory is still hidden: the rule \"episodic if any film content\" swallows clauses doubting the order of events. Talk type belongs at span level, not unit level.",
+      "Repeated and joint references are confused between samples (form agreement 84%). Occurrence structure (once, repeated, generic) needs its own field, separate from breadth.",
+      "Uncertainty roughly doubles without context, so it partly measures whether pronouns can be resolved: discourse structure, not memory.",
+      "Validate breadth and uncertainty by double human coding of about 300 stratified references, repeated-motif scoring, and text manipulations (pronoun substitution, quantifier stripping, detail removal)."
+     ]
+    },
+    {
+     "who": "Machine learning",
+     "points": [
+      "The uncertainty ICC was a zero-inflation artifact: magnitude ICC 0.10, flag \u03ba 0.69. Restate it as a flag.",
+      "The no-context comparison was unpaired: paired, removing context costs 4.0 points. An interval from n = 3 is a range, not a CI.",
+      "The +0.44 bits cannot be attributed to order and context, because the streams also differ in prompt, representation and segmentation.",
+      "After HRF convolution, confidence and the uncertainty flag correlate at \u22120.48: confidence is computed from them, so drop it. All other VIFs stay at or below 1.6.",
+      "The TR table dropped bins without episodic words instead of level-holding them. Repeated and joint references fold repetition into breadth.",
+      "Port to the library: the reference model, U = H(\u03c0), breadth, word-to-reference projection on typed token alignment, level-holding TR binning, and the scoring kernels with known-answer tests. Prompts, LOPO fitting, bootstraps and controls stay in research tooling."
+     ]
+    },
+    {
+     "who": "Visualization (Tufte's principles)",
+     "points": [
+      "An opacity floor made weak hypotheses visible, and overlaps stacked into false confidence. Use opacity equal to probability.",
+      "The slope chart contradicted the headline. Show the per-participant gain in bits instead.",
+      "Regressors were buried at the bottom. Put them after the tracks, as a table with reliability and collinearity.",
+      "Full-height scene rules outnumbered the data; red uncertainty clashed with the orange coding. Calibration dots were oversized; the forest overprinted on phones."
+     ]
+    },
+    {
+     "who": "Visualization (Bostock's principles)",
+     "points": [
+      "Bugs: a resize feedback loop redrew 10k rectangles on every height change; hover on the slope chart switched participants destructively; the streams chart bridged silences and was half a bin off; the readout spammed screen readers.",
+      "There was no keyboard or touch access to the crosshair, and the readout sat far from the hover point.",
+      "For a researcher, provide a per-participant TR-grid regressor file with a column sidecar, with HRF only as a preview projection."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "it4",
+   "title": "What breadth measures, and regressors a researcher can use",
+   "date": "2026-11-16",
+   "runs": [],
+   "summary": [
+    "<b>Breadth is mostly a property of how the speech refers.</b> One row per reference (2,114 references): the reference's form explains 44% of the variance in log breadth (median 9 s for specific references, 28 s extended, 49 s summaries). The human-coded scene explains 6% after adjustment, and the speaker 4%. Breadth is therefore not just the film's structure.",
+    "<b>But it has a floor at the annotation's grain.</b> For specific references, log breadth correlates \u03c1 0.39 with the duration of the annotation row, and 23% sit at that floor. Below about 9 s, breadth reports the annotation's resolution, which the measurement contract counts as a separate quantity.",
+    "<b>Competing hypotheses mark less reliable moments:</b> agreement with the human coding is 58% when the flag is on and 79% when it is off.",
+    "<b>The regressors are usable together.</b> With level-holding TR series convolved with a canonical HRF (a preview only), the median VIF is at most 1.45 and the maximum across participants 1.96. Confidence is dropped because it is computed from the flag (\u03c1 \u22120.48 after convolution). Per-participant TSVs with a JSON sidecar are written to <code>data/study/recall-precision/export/</code>.",
+    "<b>Not yet validated:</b> breadth and the flag are reliable and calibrated against one scene label, but nothing outside the model checks them. The next step is the linguist's design: double-coded references, repeated-motif scoring, text manipulations, and a separate channel counting distinguishing details (who, what, where, when, dialogue, perceptual) for specificity proper."
+   ],
+   "decisions": [
+    "Add a distinguishing-detail channel (specificity proper), talk type per span with hedge scope, and occurrence as its own field (prompt v3).",
+    "Test with a deterministic manipulation: character names in the target replaced with \"someone\"."
+   ]
+  },
+  {
+   "id": "it5",
+   "title": "A detail channel for specificity, span-level talk, a manipulation test",
+   "date": "2026-11-16",
+   "runs": [
+    {
+     "label": "it5-v3-a",
+     "name": "content-local LLM, prompt v3",
+     "current": true
+    }
+   ],
+   "summary": [
+    "<b>Prompt v3</b> splits the overloaded form into extent (moment or stretch), occurrence (once, repeated, generic) and mode (detailed or gist). It lists each reference's distinguishing details by type, and labels talk type per span, with repairs and hedge scope. <b>Accuracy holds</b> on the same yardstick: 75.5% agreement, ECE 0.064.",
+    "<b>Metamemory is no longer swallowed:</b> 3.8% of units now contain a metamemory span (v2: 0.5%), 4.9% a repair. Hedges split into doubt about the film content (8.1% of units) and doubt about memory (2.5%).",
+    "<b>Specificity and breadth are different quantities:</b> distinguishing details per reference correlate \u03c1 0.10 with breadth. Dialogue (26%), action (20%), object (19%) and who (17%) dominate; time is rare (2%).",
+    "<b>But more detail does not mean better localization.</b> Agreement with the scene coding is 74% for references with no distinguishing detail and 68% for three or more, with no gain within breadth terciles. The amount of detail and how well the speech pins down the film are dissociable. Whether the detail count is valid needs human coding (the joint rubric of ADR 0030).",
+    "<b>Repetition is kept apart from breadth:</b> breadth per occurrence correlates \u03c1 \u22120.08 with the number of occurrences (65 repeated, 10 generic references out of 2,735).",
+    "<b>Manipulation test</b> (601 units, character names in the target replaced with \"someone\", context untouched). Who-details fell from 0.61 to 0.28 per unit, and breadth stayed put (1.066 to 1.056 log s), both as predicted. Agreement did not drop (70% to 71%), and the competing-hypotheses flag did not rise (0.23 to 0.23). The context still names the characters, so the model resolves \"someone\" from it. This test cannot probe the flag; a manipulation of target and context together would."
+   ],
+   "decisions": [
+    "Draft ADR 0031 for the implementation decisions ADR 0030 leaves open: reference measures, calibration of self-reported weights, held-level projection, and the content-local producer condition.",
+    "Route human validation of breadth, the flag and the detail count through ADR 0030's joint coding rubric rather than a new scheme."
+   ]
+  }
+ ],
+ "gaps": [
+  "<b>Anchored reference as a first-class recall value.</b> An anchored word-span set in a recall unit; film support as row or second intervals; a reference meaning (single, joint, broad, alternative), as the measurement contract already names; occurrence structure (once, repeated, generic) as its own field; and an explicit unassigned remainder. Today a unit admits one categorical referent (<code>MappingSemantics.CategoricalReferent</code>).",
+  "<b>Talk type and hedge scope as span-level layers:</b> episodic, metamemory, commentary, fragment, repair, with repair relations linking an error to its correction. These are producer output with provenance, not ontology.",
+  "<b>Deterministic reference measures in <code>align</code>:</b> U = H(\u03c0) (zero exactly when there is one hypothesis), breadth separate from occurrence count, and fitted q over film seconds and scenes, with laws (q sums to 1; invariance to hypothesis order; \u03b1 = 1 is the identity). These close the \"concentration summaries\" gate in the temporal-query docs, without letting breadth leak into uncertainty.",
+  "<b>A recorded calibration model for LLM weights.</b> The tempering exponent, residual scale and floor are a <code>calibrationModel</code> with a receipt (design rule 3), applied deterministically. The leave-one-participant-out search stays in research tooling.",
+  "<b>A recall-time projection that holds a level.</b> From references to words to the scan TR grid through <code>RecallTiming</code> and the scanner crosswalk: missing (no speech) kept distinct from not applicable (not about the film), on a typed token alignment rather than proportional indexing. The contract says no level-holding projection exists.",
+  "<b>A content-local mapping condition recorded in the bundle:</b> context window, hidden order, opaque exposed ids (ADR 0022 already requires recording exposed item ids). The categorical bundle also needs numerical measures, so temporal queries stop refusing LLM records.",
+  "<b>Scoring kernels with known-answer tests:</b> midrank AUROC, ECE, ICC(2,1), log loss. This case study hit tie bugs twice (AUROC and the collinearity ranks)."
+ ],
+ "footer": "Harness: tools/case-studies/recall-precision on branch claude/recall-precision-20261116. Outputs live under data/study/recall-precision (not in git). The page shows numbers and figures only; no recall or film text."
+}

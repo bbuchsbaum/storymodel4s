@@ -1,0 +1,492 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Recall Specificity Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: prose at 68ch, figures to 1100px. Order: result (map + tracks), the regressors those
+   tracks are, how far to trust them, what context adds, then the lab notebook.
+   Colour: ink = model, orange = human coding, blue = analyst stream, violet = competing
+   hypotheses, three categorical hues = non-episodic talk only. */
+:root {
+  --paper: #fcfcfb; --ink: #16181b; --ink2: #52514e; --muted: #8a8a86; --rule: #e4e2dc;
+  --wash: #f3f1ec; --human: #eb6834; --analyst: #2a78d6; --unc: #6250d6;
+  --t-frag: #1baf7a; --t-comm: #eda100; --t-meta: #e87ba4;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #8f8e88; --rule: #34342f;
+    --wash: #232322; --human: #d95926; --analyst: #3987e5; --unc: #9085e9;
+    --t-frag: #199e70; --t-comm: #c98500; --t-meta: #d55181; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #8f8e88; --rule: #34342f;
+  --wash: #232322; --human: #d95926; --analyst: #3987e5; --unc: #9085e9;
+  --t-frag: #199e70; --t-comm: #c98500; --t-meta: #d55181; color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+.prose { max-width: 68ch; }
+h1 { font-size: 32px; line-height: 1.15; margin: 0; font-weight: 600; text-wrap: balance; }
+h2 { font-size: 21px; margin: 0 0 6px; font-weight: 600; text-wrap: balance; }
+h3 { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+p { margin: 0 0 10px; }
+.eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.lede { font-size: 18px; }
+.cap { font-size: 14px; color: var(--ink2); max-width: 72ch; }
+.sw { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; margin: 0 4px 0 10px; background: var(--c); }
+.sw.o { background: none; border: 1.6px solid var(--c); width: 8px; height: 8px; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  padding-block: 8px; border-bottom: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font: 13px var(--mono); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+select, button { font: 13px var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; }
+button { cursor: pointer; }
+select:focus-visible, button:focus-visible, .linked:focus-visible { outline: 2px solid var(--analyst); outline-offset: 2px; }
+.linked { position: relative; touch-action: pan-y; }
+.xhair { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px solid var(--ink); opacity: .5; pointer-events: none; display: none; }
+.flag { position: absolute; top: 2px; transform: translateX(6px); font: 11px var(--mono); background: var(--paper); color: var(--ink);
+  border: 1px solid var(--rule); padding: 1px 5px; border-radius: 3px; pointer-events: none; display: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.readout { font: 12px/1.5 var(--mono); color: var(--ink2); min-height: 3em; font-variant-numeric: tabular-nums; }
+.readout b { color: var(--ink); font-weight: 500; }
+.track-label { font: 11px var(--mono); color: var(--ink2); margin: 8px 0 0; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: minmax(0, 1fr); } h1 { font-size: 26px; } }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 20px; }
+@media (max-width: 640px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { border-top: 1px solid var(--rule); padding-top: 8px; min-width: 0; }
+.stat .g { font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font: 500 22px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+.stat .ci { font: 12px var(--mono); color: var(--muted); }
+.stat .l { font-size: 13px; color: var(--ink2); }
+details { border-top: 1px solid var(--rule); padding-top: 10px; }
+summary { cursor: pointer; font-weight: 600; font-size: 17px; }
+summary .tag { font: 500 13px var(--mono); color: var(--human); margin-right: 8px; }
+.critic { border-left: 2px solid var(--rule); padding-left: 12px; margin: 10px 0; }
+.critic h4 { margin: 0 0 4px; font-size: 15px; }
+ul, ol { padding-left: 20px; margin: 0; max-width: 72ch; }
+li { margin-bottom: 4px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; font: 12px/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 500; color: var(--ink2); }
+th:first-child, td:first-child { text-align: left; }
+td.desc { text-align: left; font-family: var(--serif); font-size: 13.5px; min-width: 18ch; }
+figure { margin: 0; min-width: 0; }
+svg { overflow: visible; }
+.copyrow { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font: 12px var(--mono); color: var(--ink2); margin-top: 10px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<main class="wrap">
+  <header class="prose">
+    <p class="eyebrow">storymodel4s · case study 1 · Sherlock, development participants</p>
+    <h1>Recall Specificity Case Study</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section aria-labelledby="h-result">
+    <h2 id="h-result">Where each moment of recall points</h2>
+    <div class="controls">
+      <label for="pid">Participant</label><select id="pid"></select>
+      <span id="pstat"></span>
+    </div>
+    <div class="linked" id="linked" tabindex="0" aria-label="Recall by film map with linked tracks. Use left and right arrow keys to step through recall time.">
+      <p class="track-label"><span class="sw" style="--c: var(--ink)"></span>model hypothesis (darker = more probable)<span class="sw o" style="--c: var(--human)"></span>human scene coding</p>
+      <figure id="map"></figure>
+      <p class="track-label">Talk not about the film<span class="sw" style="--c: var(--t-frag)"></span>fragment<span class="sw" style="--c: var(--t-comm)"></span>commentary<span class="sw" style="--c: var(--t-meta)"></span>metamemory</p>
+      <figure id="talk"></figure>
+      <p class="track-label">Breadth: film span the reference covers (log seconds; floor set by the annotation's row grain)</p>
+      <figure id="breadth"></figure>
+      <p class="track-label"><span class="sw" style="--c: var(--unc)"></span>competing hypotheses present</p>
+      <figure id="unc"></figure>
+      <div class="xhair" id="xhair"></div>
+      <div class="flag" id="flag"></div>
+    </div>
+    <div class="readout" id="readout">Hover, touch, or focus the chart and use the arrow keys to read one moment.</div>
+    <p class="cap">Each grey block is one hypothesis for one recall reference: horizontally the stretch
+      of speech, vertically the film content it points to, and darkness is its probability (overlapping
+      alternatives do not add up to a confident one; they are drawn side by side in probability). Orange outlines are
+      the human scene coding; small ticks under the map mark its scene changes. Gaps in the tracks
+      are silence or talk that is not about the film, never zero. Content-local stream: the model saw each unit with only its two
+      preceding units, in shuffled order with opaque ids.</p>
+  </section>
+
+  <section aria-labelledby="h-reg">
+    <h2 id="h-reg">The regressors those tracks are</h2>
+    <div class="tablewrap"><table id="regtable"></table></div>
+    <div class="copyrow">
+      <button id="copy" type="button">Copy TSV for <span id="copyid"></span></button>
+      <span id="copymsg"></span>
+    </div>
+    <p class="cap" id="regcap"></p>
+    <div class="grid2">
+      <figure id="corr"></figure>
+      <div class="prose cap" id="corrtext"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-ev">
+    <h2 id="h-ev">How far to trust it</h2>
+    <div class="stats" id="stats"></div>
+    <h3>Across iterations · participant means · 95% participant-bootstrap intervals</h3>
+    <figure id="forest"></figure>
+    <p class="cap" id="forestcap"></p>
+    <figure id="calib" style="max-width: 520px"></figure>
+    <p class="cap">Calibration: words pooled into equal-count bins of fitted top-scene probability, dot area
+      proportional to words. On the dotted diagonal a stated 80% is right 80% of the time.</p>
+  </section>
+
+  <section aria-labelledby="h-streams">
+    <h2 id="h-streams">What the whole-recall reading adds</h2>
+    <figure id="streams"></figure>
+    <figure id="gain" style="max-width: 640px"></figure>
+    <p class="cap">Top: fitted probability of the top scene for the selected participant, content-local (ink)
+      against the analyst stream that reads the whole recall (blue); blue fill marks where the analyst is more
+      confident. Bottom: per participant, how many bits per word the analyst stream saves on the human-coded scene.
+      The two streams differ in prompt, representation and segmentation as well as context, so this is
+      "analyst minus local", not a pure effect of order.</p>
+  </section>
+
+  <section aria-labelledby="h-nb">
+    <h2 id="h-nb">Lab notebook</h2>
+    <div id="notebook"></div>
+  </section>
+
+  <section aria-labelledby="h-gaps" class="prose">
+    <h2 id="h-gaps">What the library is missing</h2>
+    <ul id="gaps"></ul>
+  </section>
+
+  <footer class="cap" id="footer"></footer>
+</main>
+
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script id="notes" type="application/json">/*__NOTES__*/</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.16/dist/plot.umd.min.js"></script>
+<script>
+(() => {
+const D = JSON.parse(document.getElementById("data").textContent);
+const N = JSON.parse(document.getElementById("notes").textContent);
+const LOCAL = "it3-v2-llm-local-v2-a", ANALYST = "it3-analyst";
+const A4 = D.analysis4 || {}, C = D.compare || {};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mmss = s => { s = Math.round(s); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+const pct = v => v == null ? "—" : `${Math.round(v * 100)}%`;
+const f2 = v => v == null ? "—" : (Math.abs(v) < 0.005 ? "0.00" : v.toFixed(2));
+const TALK = ["describes the film", "film, unlocalized", "fragment", "commentary", "metamemory", "missing"];
+const TALKC = [null, null, "--t-frag", "--t-comm", "--t-meta", null];
+const style = () => ({fontFamily: "IBM Plex Mono, ui-monospace, monospace", fontSize: "11px", color: css("--ink"), background: "transparent", overflow: "visible"});
+const ML = 56, MR = 18;
+const timeTicks = (dur, w) => d3.range(0, dur + 1, w < 520 ? 300 : dur > 1800 ? 300 : 120);
+
+document.getElementById("lede").innerHTML = N.status.join(" ");
+document.getElementById("footer").innerHTML = N.footer;
+document.getElementById("gaps").innerHTML = N.gaps.map(g => `<li>${g}</li>`).join("");
+
+// ---------------------------------------------------------------- selection
+const per = (D.metrics[LOCAL] || {}).per || {};
+const ids = Object.keys(D.participants).sort((a, b) => (per[b] ?? -1) - (per[a] ?? -1));
+const sel = document.getElementById("pid");
+sel.innerHTML = ids.map(id => `<option value="${id}">${id} · ${per[id] == null ? "no human coding" : pct(per[id]) + " agree"}</option>`).join("");
+let current = ids.includes("NN03") ? "NN03" : ids[0];
+sel.value = current;
+const select = id => { current = id; sel.value = id; renderParticipant(); renderStreams(); renderGain(); renderCopy(); };
+sel.addEventListener("change", () => select(sel.value));
+
+function hypRows(p) {
+  const rows = [];
+  for (const [r0, r1, talk, hedge, refs] of p.units)
+    for (const [form, U, B, hyps] of refs)
+      for (const [w, ivs] of hyps)
+        for (const [f0, f1] of ivs) rows.push({r0, r1, f0, f1, w, form, U, B, talk, hedge});
+  return rows;
+}
+function goldRows(p) {
+  const span = Object.fromEntries(D.film.scenes.map(([s, a, b]) => [s, [a, b]]));
+  return p.gold.filter(g => span[g[2]]).map(([r0, r1, s]) => ({r0, r1, f0: span[s][0], f1: span[s][1], s}));
+}
+function trRows(p) {
+  const n = p.tr.words.length, out = [];
+  for (let i = 0; i < n; i++) out.push({t: i * 1.5, t1: i * 1.5 + 1.5, conf: p.tr.conf[i], Uflag: p.tr.Uflag ? p.tr.Uflag[i] : (p.tr.U[i] > 0 ? 1 : 0),
+    B: p.tr.B[i], talk: p.tr.talk[i], words: p.tr.words[i], aconf: p.tr.analyst_conf[i], gold: p.tr.gold[i], peak: p.tr.peak[i]});
+  return out;
+}
+const unitAt = (p, t) => p.units.find(u => t >= u[0] && t < u[1]);
+
+// ---------------------------------------------------------------- result
+let mapScale = null, P = null, TR = null, hairT = null;
+function renderParticipant() {
+  const p = P = D.participants[current];
+  const W = document.getElementById("linked").clientWidth;
+  const ticks = timeTicks(p.dur, W);
+  const x = {domain: [0, p.dur], tickFormat: mmss, label: null, ticks};
+  const changes = p.gold.slice(1).map(g => g[0]);
+  const hyps = hypRows(p), gold = goldRows(p);
+  TR = trRows(p);
+  document.getElementById("pstat").textContent = `${p.units.length} units · ${mmss(p.dur)} of recall${p.coded ? "" : " · no human coding"}`;
+  const map = Plot.plot({
+    width: W, height: Math.max(300, Math.min(520, W * 0.55)), marginLeft: ML, marginRight: MR, marginTop: 6, marginBottom: 30, style: style(),
+    x, y: {domain: [0, D.film.seconds], tickFormat: mmss, label: "film ↑", ticks: d3.range(0, D.film.seconds, 600)},
+    marks: [
+      Plot.ruleY([D.film.partA], {stroke: css("--muted"), strokeDasharray: "2,3"}),
+      Plot.text([D.film.partA], {x: 0, y: d => d, text: () => "part b", textAnchor: "start", dy: -7, dx: 3, fill: css("--muted")}),
+      Plot.rect(hyps, {x1: "r0", x2: "r1", y1: "f0", y2: d => Math.max(d.f1, d.f0 + 3), fill: css("--ink"), fillOpacity: "w"}),
+      Plot.rect(gold, {x1: "r0", x2: "r1", y1: "f0", y2: "f1", fill: "none", stroke: css("--human"), strokeWidth: 1.6}),
+      Plot.ruleX(changes, {x: d => d, y1: D.film.seconds * 0.975, y2: D.film.seconds, stroke: css("--human"), strokeOpacity: 0.6}),
+    ],
+  });
+  mapScale = map.scale("x");
+  const xs = {...x, axis: null};
+  const tcol = d => d.talk >= 2 && d.talk <= 4 ? css(TALKC[d.talk]) : null;
+  const talk = Plot.plot({
+    width: W, height: 14, marginLeft: ML, marginRight: MR, marginTop: 1, marginBottom: 1, style: style(), x: xs, y: {axis: null, domain: [0, 1]},
+    marks: [Plot.frame({stroke: css("--rule")}), Plot.rect(TR.filter(tcol), {x1: "t", x2: "t1", y1: 0, y2: 1, fill: tcol})],
+  });
+  const breadth = Plot.plot({
+    width: W, height: 104, marginLeft: ML, marginRight: MR, marginTop: 4, marginBottom: 4, style: style(), x: xs,
+    y: {type: "log", domain: [2, 1000], clamp: true, ticks: [3, 10, 30, 100, 300], tickFormat: d => `${d} s`, label: null, grid: true},
+    marks: [Plot.line(TR, {x: "t", y: "B", defined: d => d.B != null, curve: "step-after", stroke: css("--ink"), strokeWidth: 1.3})],
+  });
+  const unc = Plot.plot({
+    width: W, height: 34, marginLeft: ML, marginRight: MR, marginTop: 2, marginBottom: 24, style: style(), x,
+    y: {axis: null, domain: [0, 1]},
+    marks: [Plot.frame({stroke: css("--rule")}), Plot.rect(TR.filter(d => d.Uflag > 0), {x1: "t", x2: "t1", y1: 0, y2: "Uflag", fill: css("--unc")})],
+  });
+  for (const [id, ch] of [["map", map], ["talk", talk], ["breadth", breadth], ["unc", unc]]) document.getElementById(id).replaceChildren(ch);
+  wireCrosshair();
+}
+
+function showAt(t) {
+  const box = document.getElementById("linked"), hair = document.getElementById("xhair"), flag = document.getElementById("flag");
+  const out = document.getElementById("readout");
+  if (t == null || t < 0 || t > P.dur) { hair.style.display = flag.style.display = "none"; return; }
+  hairT = t;
+  const px = mapScale.range[0] + (t - mapScale.domain[0]) / (mapScale.domain[1] - mapScale.domain[0]) * (mapScale.range[1] - mapScale.range[0]);
+  hair.style.display = flag.style.display = "block"; hair.style.left = flag.style.left = `${px}px`;
+  const b = TR[Math.min(TR.length - 1, Math.floor(t / 1.5))] || {};
+  const u = unitAt(P, t);
+  flag.textContent = `${mmss(t)} · ${b.peak ? "scene " + b.peak : "—"}${b.gold ? " (human " + b.gold + ")" : ""}`;
+  if (px > box.clientWidth - 160) flag.style.transform = "translateX(calc(-100% - 6px))"; else flag.style.transform = "translateX(6px)";
+  let refs = "";
+  if (u && u[4].length) refs = u[4].map(([form, U, B, hy]) => `${form}, breadth ${Math.round(B)} s, ${hy.length} hypothes${hy.length > 1 ? "es" : "is"}`).join("; ");
+  out.innerHTML = `<b>${mmss(t)}</b> · ${u ? TALK[u[2]] : "no speech"}${u && u[3] ? " · hedged" : ""}${refs ? ` · ${refs}` : ""}` +
+    `<br>top-scene probability: content-local <b>${f2(b.conf)}</b>, analyst <b>${f2(b.aconf)}</b> · model scene <b>${b.peak ?? "—"}</b>, human scene <b>${b.gold ?? "—"}</b>`;
+}
+function wireCrosshair() {
+  const box = document.getElementById("linked");
+  let raf = 0;
+  const fromEvent = ev => {
+    const r = box.getBoundingClientRect(); const px = ev.clientX - r.left;
+    return mapScale.domain[0] + (px - mapScale.range[0]) / (mapScale.range[1] - mapScale.range[0]) * (mapScale.domain[1] - mapScale.domain[0]);
+  };
+  box.onpointermove = box.onpointerdown = ev => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => showAt(fromEvent(ev))); };
+  box.onpointerleave = () => showAt(null);
+  box.onkeydown = ev => {
+    const u = hairT == null ? null : P.units.findIndex(x => hairT >= x[0] && hairT < x[1]);
+    let t = hairT ?? 0;
+    if (ev.key === "ArrowRight") t += 1.5; else if (ev.key === "ArrowLeft") t -= 1.5;
+    else if (ev.key === "PageDown" && u != null && P.units[u + 1]) t = P.units[u + 1][0];
+    else if (ev.key === "PageUp" && u > 0) t = P.units[u - 1][0];
+    else if (ev.key === "Home") t = 0; else if (ev.key === "End") t = P.dur - 0.1; else return;
+    ev.preventDefault(); showAt(Math.max(0, Math.min(P.dur - 0.01, t)));
+  };
+  if (hairT != null) showAt(Math.min(hairT, P.dur - 0.01));
+}
+
+// ---------------------------------------------------------------- regressors
+function renderRegressors() {
+  const rel = C.reliability || {}, cv = (A4.convolved || {}), br = A4.breadth || {};
+  const vif = n => { const i = (cv.names || []).indexOf(n); return i < 0 ? "—" : `${cv.median_vif[i].toFixed(2)} (max ${cv.max_vif[i].toFixed(2)})`; };
+  const rows = [
+    ["breadth", "log10 s", "film extent of the referenced hypothesis", "ICC 0.85 (0.84 after participant means)", vif("logB")],
+    ["competing hypotheses", "share 0–1", "words whose reference carries more than one place in the film", "flag κ 0.69; magnitude not reliable", vif("Uflag")],
+    ["hedge", "share 0–1", "speaker marks uncertainty", "—", vif("hedge")],
+    ["not about the film", "share 0–1", "fragment, commentary or metamemory", `talk labels agree ${pct(rel.talk_agreement)}`, vif("nonepisodic")],
+    ["words", "count", "speech-rate nuisance", "exact", vif("words")],
+  ];
+  document.getElementById("regtable").innerHTML = `<thead><tr><th>series</th><th>unit</th><th>meaning</th><th>reliability (two samples)</th><th>VIF after HRF (median)</th></tr></thead>` +
+    `<tbody>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="desc">${r[2]}</td><td class="desc">${r[3]}</td><td>${r[4]}</td></tr>`).join("")}</tbody>`;
+  document.getElementById("regcap").innerHTML = `Recall clock (OpenNeuro, scan-relative), 1.5 s bins; each bin is the mean of word-level values whose onset falls in it;
+    a bin without speech is <code>n/a</code>; nothing is lagged or convolved. Top-scene confidence is left out: after convolution it correlates −0.48 with the
+    competing-hypotheses flag, which it is computed from. Breadth for specific references sits at the annotation's row grain ${pct(br.share_B_at_or_below_row_grain_specific)} of the time
+    (ρ ${f2(br.rho_logB_rowgrain_specific)} with row duration), so it has a floor set by the source annotation. Files with a column sidecar are in <code>data/study/recall-precision/export/</code>.`;
+  const host = document.getElementById("corr");
+  if (!cv.names) return;
+  const lab = {logB: "breadth", Uflag: "competing", conf: "confidence", hedge: "hedge", nonepisodic: "not film", words: "words"};
+  const order = ["logB", "Uflag", "hedge", "nonepisodic", "words", "conf"];
+  const idx = n => cv.names.indexOf(n);
+  const cells = [];
+  order.forEach((a, i) => order.forEach((b, j) => { if (j < i) cells.push({a: lab[a], b: lab[b], r: cv.median_rho[idx(a)][idx(b)]}); }));
+  const W = host.clientWidth || 420;
+  const color = d3.scaleDiverging([-1, 0, 1], d3.interpolateRdBu);
+  host.replaceChildren(Plot.plot({
+    width: W, height: Math.min(330, W * 0.78), marginLeft: 84, marginTop: 8, marginBottom: 40, style: style(),
+    x: {domain: order.slice(0, -1).map(n => lab[n]), label: null, tickSize: 0},
+    y: {domain: order.slice(1).map(n => lab[n]), label: null, tickSize: 0},
+    marks: [
+      Plot.cell(cells, {x: "b", y: "a", fill: d => color(-d.r), inset: 1.5, title: d => `${d.a} × ${d.b}: ρ ${f2(d.r)}`}),
+      Plot.text(cells, {x: "b", y: "a", text: d => f2(d.r), fill: d => d3.lab(color(-d.r)).l > 60 ? "#111" : "#fff"}),
+    ],
+  }));
+  document.getElementById("corrtext").innerHTML = `<p>Correlation of the series after convolution with a canonical haemodynamic response
+    (a preview projection only; the export is unconvolved), median across participants. The one sizeable value is confidence against the
+    competing-hypotheses flag (${f2(cv.median_rho[idx("conf")][idx("Uflag")])}); everything else stays within ±0.25, and no series tracks speech rate.</p>`;
+}
+function renderCopy() {
+  document.getElementById("copyid").textContent = current;
+  const btn = document.getElementById("copy"), msg = document.getElementById("copymsg");
+  btn.onclick = async () => {
+    const tsv = D.participants[current].tsv;
+    if (!tsv) { msg.textContent = "No export for this participant."; return; }
+    try { await navigator.clipboard.writeText(tsv); msg.textContent = `Copied ${tsv.split("\n").length - 2} rows.`; }
+    catch (e) { msg.textContent = "Clipboard unavailable here; the files are in the export folder."; }
+  };
+}
+
+// ---------------------------------------------------------------- trust
+function renderStats() {
+  const m = (D.metrics[LOCAL] || {}).mean || {}, ci = (D.metrics[LOCAL] || {}).ci || {}, ma = (D.metrics[ANALYST] || {}).mean || {};
+  const rel = C.reliability || {}, uf = A4.uncertainty_flag || {}, cp = A4.context_paired || {};
+  const cpv = Object.values(cp), dctx = cpv.length ? cpv.reduce((s, v) => s + (v.with_context - v.target_only), 0) / cpv.length : null;
+  const items = [
+    ["accuracy", pct(m.scene_acc), ci.scene_acc ? `${pct(ci.scene_acc[0])}–${pct(ci.scene_acc[1])}` : "", "content-local agreement with the human scene coding"],
+    ["accuracy", pct(ma.scene_acc), "", "analyst stream, which reads the whole recall"],
+    ["accuracy", `${pct(uf.agreement_when_competing_hypotheses)} vs ${pct(uf.agreement_when_single_hypothesis)}`, "", "agreement when competing hypotheses are present vs absent"],
+    ["reliability", f2(rel.icc_logB), "ICC(2,1)", "breadth across two independent samples"],
+    ["reliability", "κ 0.69", "magnitude ICC 0.10", "competing-hypotheses flag across samples"],
+    ["context", dctx == null ? "—" : `−${Math.round(dctx * 100)} pts`, cpv.length ? `${cpv.length} participants, paired` : "", "agreement lost when the two preceding units are removed"],
+  ];
+  document.getElementById("stats").innerHTML = items.map(([g, v, c, l]) => `<div class="stat"><div class="g">${g}</div><div class="v">${v}</div><div class="ci">${c}</div><div class="l">${l}</div></div>`).join("");
+}
+
+const RUNS = [
+  ["emb-w15", "it0 · embeddings"], ["it1-centered15-desc-duration-hubforeign", "it1 · embeddings, fixed"],
+  ["it2-llm-local-llm-local-v1", "it2 · LLM local"], ["it2-v3-v3-opus", "it2 · analyst"],
+  [LOCAL, "it3 · LLM local"], [ANALYST, "it3 · analyst"], ["it5-v3-a", "it5 · LLM local, v3"],
+];
+const METRICS = [
+  {label: "Agreement with the human scene coding (higher is better)", keys: ["scene_acc"], fmt: pct, dom: [0, 1], refs: [[0.02, "chance"], [0.79, "v3 label"]]},
+  {label: "Log loss of the human scene, bits (lower is better)", keys: ["logloss_on_bits", "gold_scene_logloss_bits"], fmt: f2, dom: [0, 6], refs: [[5.64, "uniform"]]},
+  {label: "Calibration error (lower is better; iteration 3 only)", keys: ["ece_top"], fmt: f2, dom: [0, 0.2], only: [LOCAL, ANALYST, "it5-v3-a"]},
+  {label: "AUROC, confidence separates right from wrong (iteration 3, tie-corrected)", keys: ["auroc_conf_hit"], fmt: f2, dom: [0.5, 1], only: [LOCAL, ANALYST, "it5-v3-a"]},
+];
+function renderForest() {
+  const host = document.getElementById("forest"); host.replaceChildren();
+  const W = host.clientWidth || 800, narrow = W < 520;
+  for (const M of METRICS) {
+    const rows = [];
+    RUNS.forEach(([lab, name]) => {
+      if (M.only && !M.only.includes(lab)) return;
+      const r = D.metrics[lab]; if (!r || !r.mean) return;
+      const key = M.keys.find(k => r.mean[k] != null); if (!key) return;
+      const ci = r.ci && r.ci[key];
+      rows.push({name, v: r.mean[key], lo: ci ? ci[0] : null, hi: ci ? ci[1] : null, analyst: name.includes("analyst")});
+    });
+    const t = document.createElement("p"); t.className = "track-label"; t.textContent = M.label; host.appendChild(t);
+    const ink = d => d.analyst ? css("--analyst") : css("--ink");
+    host.appendChild(Plot.plot({
+      width: W, height: (narrow ? 34 : 22) * rows.length + 28, marginLeft: narrow ? 8 : 170, marginRight: 16, marginTop: narrow ? 14 : 4, style: style(),
+      x: {domain: M.dom, tickFormat: M.fmt, label: null, grid: true, ticks: narrow ? 3 : 6},
+      y: {domain: rows.map(r => r.name), label: null, tickSize: 0, axis: narrow ? null : "left"},
+      marks: [
+        ...(M.refs || []).map(([v, l]) => [Plot.ruleX([v], {stroke: css("--muted"), strokeDasharray: "2,3"}),
+          Plot.text([v], {x: d => d, frameAnchor: "top", dy: -2, text: () => l, fill: css("--muted"), textAnchor: "middle"})]).flat(),
+        narrow ? Plot.text(rows, {y: "name", text: "name", frameAnchor: "left", dy: -11, fill: css("--ink2")}) : null,
+        Plot.ruleY(rows.filter(r => r.lo != null), {y: "name", x1: "lo", x2: "hi", stroke: ink, strokeWidth: 2}),
+        Plot.dot(rows, {y: "name", x: "v", r: 4.5, fill: ink, stroke: css("--paper"), strokeWidth: 2,
+          title: d => `${d.name}: ${M.fmt(d.v)}${d.lo != null ? ` (95% ${M.fmt(d.lo)}–${M.fmt(d.hi)})` : ""}`}),
+        Plot.text(rows, {y: "name", x: d => d.hi ?? d.v, text: d => M.fmt(d.v), dx: 9, textAnchor: "start", fill: css("--ink2")}),
+      ],
+    }));
+  }
+  document.getElementById("forestcap").textContent = "Ink: content-local estimators; blue: the analyst stream. Iterations 0–2 were scored before two scoring bugs were fixed " +
+    "(tie handling in AUROC, and confidence that ignored the fitted floor), so their calibration and AUROC values are withdrawn; agreement and log loss are unaffected. " +
+    "The v3 reference is the mapper's single scene label on its own units.";
+}
+function renderCalibration() {
+  const host = document.getElementById("calib"); const W = host.clientWidth || 480;
+  const rows = [];
+  for (const [key, name] of [["local", "content-local"], ["analyst", "analyst"]])
+    for (const [c, h, n] of D.calibration[key] || []) rows.push({c, h, n, name});
+  const col = d => d.name === "analyst" ? css("--analyst") : css("--ink");
+  const ece = k => f2(((D.metrics[k] || {}).mean || {}).ece_top);
+  host.replaceChildren(Plot.plot({
+    width: W, height: Math.min(320, W * 0.75), marginLeft: 44, marginBottom: 36, style: style(),
+    x: {domain: [0.4, 1], label: "fitted top-scene probability →", tickFormat: pct},
+    y: {domain: [0.3, 1], label: "↑ right", tickFormat: pct, grid: true},
+    r: {range: [2, 8]},
+    marks: [
+      Plot.line([[0.4, 0.4], [1, 1]], {stroke: css("--muted"), strokeDasharray: "2,3"}),
+      Plot.line(rows, {x: "c", y: "h", z: "name", stroke: col, strokeWidth: 1}),
+      Plot.dot(rows, {x: "c", y: "h", r: "n", fill: col, stroke: css("--paper"), strokeWidth: 1, title: d => `${d.name}: ${d.n} words · stated ${pct(d.c)} · right ${pct(d.h)}`}),
+      Plot.text([`content-local · ECE ${ece(LOCAL)}`], {frameAnchor: "bottom-right", dy: -22, text: d => d, fill: css("--ink")}),
+      Plot.text([`analyst · ECE ${ece(ANALYST)}`], {frameAnchor: "bottom-right", dy: -8, text: d => d, fill: css("--analyst")}),
+    ],
+  }));
+}
+
+// ---------------------------------------------------------------- streams
+function renderStreams() {
+  const p = D.participants[current]; const tr = trRows(p);
+  const host = document.getElementById("streams"); const W = host.clientWidth || 800;
+  const x = {domain: [0, p.dur], tickFormat: mmss, label: null, ticks: timeTicks(p.dur, W)};
+  const def = d => d.conf != null && d.aconf != null;
+  const last = [...tr].reverse().find(def);
+  host.replaceChildren(Plot.plot({
+    width: W, height: 200, marginLeft: ML, marginRight: 96, style: style(), x,
+    y: {domain: [0, 1], tickFormat: pct, label: "top-scene probability ↑", grid: true},
+    marks: [
+      Plot.areaY(tr, {x: "t", y1: "conf", y2: d => def(d) ? Math.max(d.conf, d.aconf) : null, defined: def, curve: "step-after", fill: css("--analyst"), fillOpacity: 0.2}),
+      Plot.line(tr, {x: "t", y: "conf", defined: d => d.conf != null, curve: "step-after", stroke: css("--ink"), strokeWidth: 1}),
+      Plot.line(tr, {x: "t", y: "aconf", defined: d => d.aconf != null, curve: "step-after", stroke: css("--analyst"), strokeWidth: 1}),
+      last ? Plot.text([last], {x: "t", y: "conf", text: () => "content-local", dx: 8, textAnchor: "start", fill: css("--ink"), dy: 6}) : null,
+      last ? Plot.text([last], {x: "t", y: "aconf", text: () => "analyst", dx: 8, dy: -8, textAnchor: "start", fill: css("--analyst")}) : null,
+    ],
+  }));
+}
+function renderGain() {
+  const g = (C.info_gain_analyst_minus_local_bits || {}).per_participant || {};
+  const rows = Object.entries(g).map(([k, v]) => ({k: k.slice(0, 4), v})).sort((a, b) => a.v - b.v);
+  const host = document.getElementById("gain"); const W = host.clientWidth || 600;
+  host.replaceChildren(Plot.plot({
+    width: W, height: 70, marginLeft: 16, marginRight: 16, marginTop: 20, marginBottom: 30, style: style(),
+    x: {domain: [-0.1, 1], label: "bits per word saved by the analyst stream →", grid: true},
+    marks: [
+      Plot.ruleX([0], {stroke: css("--muted")}),
+      Plot.dot(rows, {x: "v", r: d => d.k === current ? 6 : 4, fill: d => d.k === current ? css("--analyst") : css("--ink"), fillOpacity: d => d.k === current ? 1 : 0.6,
+        stroke: css("--paper"), title: d => `${d.k}: +${d.v.toFixed(2)} bits`}),
+      Plot.text(rows.filter(d => d.k === current), {x: "v", text: "k", dy: -12, fill: css("--analyst")}),
+    ],
+  }));
+}
+
+// ---------------------------------------------------------------- notebook
+function renderNotebook() {
+  document.getElementById("notebook").innerHTML = N.iterations.slice().reverse().map((it, i) => `
+    <details ${i === 0 ? "open" : ""}>
+      <summary><span class="tag">${it.id}</span>${it.title}</summary>
+      <div class="prose">
+        ${(it.summary || []).map(s => `<p>${s}</p>`).join("")}
+        ${(it.critique || []).length ? `<h3>Critique</h3>` + it.critique.map(c => `<div class="critic"><h4>${c.who}</h4><ul>${c.points.map(x => `<li>${x}</li>`).join("")}</ul></div>`).join("") : ""}
+        ${(it.decisions || []).length ? `<h3>What changed next</h3><ol>${it.decisions.map(x => `<li>${x}</li>`).join("")}</ol>` : ""}
+      </div>
+    </details>`).join("");
+}
+
+function renderAll() { renderParticipant(); renderRegressors(); renderCopy(); renderStats(); renderForest(); renderCalibration(); renderStreams(); renderGain(); }
+renderNotebook();
+renderAll();
+let lastW = 0, rt;
+new ResizeObserver(entries => {
+  const w = Math.round(entries[0].contentRect.width);
+  if (w === lastW) return; lastW = w; clearTimeout(rt); rt = setTimeout(renderAll, 150);
+}).observe(document.getElementById("linked"));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+new MutationObserver(renderAll).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+})();
+</script>

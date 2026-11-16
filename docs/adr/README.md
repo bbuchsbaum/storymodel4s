@@ -44,6 +44,7 @@ The "event layer" column marks the ADRs that the film and recall event layer (se
 | [0027](0027-source-identity-graph.md) | Recall-blind source identity graph (Sherlock body scenes) | Accepted | yes |
 | [0028](0028-source-graph-export.md) | Exporting the source identity graph | Accepted | yes |
 | [0030](0030-detail-account-and-derived-analysis.md) | Detail account and derived analysis projections | Accepted direction | yes |
+| [0031](0031-reference-measures-and-held-level-projection.md) | Reference measures and held-level recall-time projection | Draft; owner to decide | yes |
 
 Notes:
 
