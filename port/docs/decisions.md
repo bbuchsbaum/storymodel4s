@@ -53,3 +53,12 @@ not dropped data or an invented neutral value.
 
 The first expansion decision belongs after Stage 1 evidence. Passing the pilot authorizes
 a recommendation; it does not itself merge, publish, retire APIs, move data or replace Atlas.
+
+First computational workflow (2026-11-16): port the strict film/time interpretation using
+supplied recall units and independent numerical source registries, with recorded raw text
+and exact arithmetic. Rejected alternative: converting derived golden rows back into supposed
+input replies. The fixture copies the original Scala raw answer constants; computation never
+reads expected outputs. A distinct result profile preserves coarse categorical semantics
+without inventing detail atoms, fidelity or source-row coverage. The new prompt/framing recipe
+rejects duplicate JSON keys and nonfinite values; historical harness prose extraction is not
+silently claimed as compatible. Source/recall keys and all execution settings bind replay.

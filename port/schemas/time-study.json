@@ -1,0 +1,474 @@
+{
+  "replies": {
+    "$defs": {
+      "RawReply": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt": {
+            "minimum": 0,
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "chunk": {
+            "minimum": 0,
+            "title": "Chunk",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunk",
+          "attempt",
+          "text"
+        ],
+        "title": "RawReply",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Raw responses bound to an independently supplied request digest.",
+    "properties": {
+      "origin": {
+        "minLength": 1,
+        "title": "Origin",
+        "type": "string"
+      },
+      "replies": {
+        "items": {
+          "$ref": "#/$defs/RawReply"
+        },
+        "title": "Replies",
+        "type": "array"
+      },
+      "request_sha256": {
+        "title": "Request Sha256",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": "storymodel.imported-replies/v1",
+        "default": "storymodel.imported-replies/v1",
+        "title": "Schema Version",
+        "type": "string"
+      }
+    },
+    "required": [
+      "origin",
+      "request_sha256",
+      "replies"
+    ],
+    "title": "ImportedReplies",
+    "type": "object"
+  },
+  "request": {
+    "$defs": {
+      "ClipClock": {
+        "additionalProperties": false,
+        "description": "Exact target-scene clocks used to interpret a stated film and time.",
+        "properties": {
+          "films": {
+            "items": {
+              "$ref": "#/$defs/Film"
+            },
+            "title": "Films",
+            "type": "array"
+          },
+          "tolerance_seconds": {
+            "title": "Tolerance Seconds",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tolerance_seconds",
+          "films"
+        ],
+        "title": "ClipClock",
+        "type": "object"
+      },
+      "Collection": {
+        "additionalProperties": false,
+        "description": "A source film registry entry, separate from any participant reply.",
+        "properties": {
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "target": {
+            "title": "Target",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "number",
+          "target"
+        ],
+        "title": "Collection",
+        "type": "object"
+      },
+      "Film": {
+        "additionalProperties": false,
+        "description": "The complete contiguous clip clock for one target collection.",
+        "properties": {
+          "collection": {
+            "title": "Collection",
+            "type": "integer"
+          },
+          "duration_seconds": {
+            "title": "Duration Seconds",
+            "type": "string"
+          },
+          "scenes": {
+            "items": {
+              "$ref": "#/$defs/SceneInterval"
+            },
+            "title": "Scenes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "collection",
+          "duration_seconds",
+          "scenes"
+        ],
+        "title": "Film",
+        "type": "object"
+      },
+      "JsonValue": {},
+      "Scene": {
+        "additionalProperties": false,
+        "description": "A source scene registry entry with its containing film.",
+        "properties": {
+          "collection": {
+            "title": "Collection",
+            "type": "integer"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "target": {
+            "title": "Target",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "number",
+          "collection",
+          "target"
+        ],
+        "title": "Scene",
+        "type": "object"
+      },
+      "SceneInterval": {
+        "additionalProperties": false,
+        "description": "One exact half-open interval on a target film's clip clock.",
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "scene": {
+            "title": "Scene",
+            "type": "integer"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scene",
+          "start",
+          "end"
+        ],
+        "title": "SceneInterval",
+        "type": "object"
+      },
+      "StudySource": {
+        "additionalProperties": false,
+        "description": "The minimal source registry required to judge a time-protocol reply.",
+        "properties": {
+          "clock": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ClipClock"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "collections": {
+            "items": {
+              "$ref": "#/$defs/Collection"
+            },
+            "title": "Collections",
+            "type": "array"
+          },
+          "scenes": {
+            "items": {
+              "$ref": "#/$defs/Scene"
+            },
+            "title": "Scenes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "collections",
+          "scenes"
+        ],
+        "title": "StudySource",
+        "type": "object"
+      },
+      "SuppliedRecall": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/$defs/SuppliedUnit"
+            },
+            "minItems": 1,
+            "title": "Units",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "units"
+        ],
+        "title": "SuppliedRecall",
+        "type": "object"
+      },
+      "SuppliedUnit": {
+        "additionalProperties": false,
+        "description": "A supplied segmentation keeps its study row key and repeated occurrences.",
+        "properties": {
+          "row": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "u": {
+            "exclusiveMinimum": 0,
+            "maximum": 2147483647,
+            "title": "U",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "u",
+          "row",
+          "text"
+        ],
+        "title": "SuppliedUnit",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Independent source and recall intake, plus explicit execution policy.",
+    "properties": {
+      "admission": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Admission",
+        "type": "object"
+      },
+      "chunk_size": {
+        "default": 50,
+        "exclusiveMinimum": 0,
+        "title": "Chunk Size",
+        "type": "integer"
+      },
+      "export_permission": {
+        "default": "denied",
+        "enum": [
+          "allowed",
+          "denied"
+        ],
+        "title": "Export Permission",
+        "type": "string"
+      },
+      "max_attempts": {
+        "default": 1,
+        "maximum": 3,
+        "minimum": 1,
+        "title": "Max Attempts",
+        "type": "integer"
+      },
+      "recall": {
+        "$ref": "#/$defs/SuppliedRecall"
+      },
+      "schema_version": {
+        "const": "storymodel.time-study/v1",
+        "default": "storymodel.time-study/v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "source": {
+        "$ref": "#/$defs/StudySource"
+      },
+      "source_key": {
+        "minLength": 1,
+        "title": "Source Key",
+        "type": "string"
+      }
+    },
+    "required": [
+      "source_key",
+      "source",
+      "recall"
+    ],
+    "title": "TimeStudy",
+    "type": "object"
+  },
+  "result": {
+    "$defs": {
+      "ChunkReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted": {
+            "title": "Accepted",
+            "type": "boolean"
+          },
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "chunk": {
+            "title": "Chunk",
+            "type": "integer"
+          },
+          "items_outside_chunk": {
+            "title": "Items Outside Chunk",
+            "type": "integer"
+          },
+          "repeated_units": {
+            "title": "Repeated Units",
+            "type": "integer"
+          },
+          "response_sha256": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Response Sha256",
+            "type": "array"
+          }
+        },
+        "required": [
+          "chunk",
+          "attempts",
+          "accepted",
+          "items_outside_chunk",
+          "repeated_units",
+          "response_sha256"
+        ],
+        "title": "ChunkReceipt",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "counts": {
+        "additionalProperties": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "type": "object"
+        },
+        "title": "Counts",
+        "type": "object"
+      },
+      "export_permission": {
+        "enum": [
+          "allowed",
+          "denied"
+        ],
+        "title": "Export Permission",
+        "type": "string"
+      },
+      "import_sha256": {
+        "title": "Import Sha256",
+        "type": "string"
+      },
+      "interpretation": {
+        "const": "strict-chunked-time/v1",
+        "default": "strict-chunked-time/v1",
+        "title": "Interpretation",
+        "type": "string"
+      },
+      "origin": {
+        "title": "Origin",
+        "type": "string"
+      },
+      "profile_sha256": {
+        "title": "Profile Sha256",
+        "type": "string"
+      },
+      "recall_sha256": {
+        "title": "Recall Sha256",
+        "type": "string"
+      },
+      "receipts": {
+        "items": {
+          "$ref": "#/$defs/ChunkReceipt"
+        },
+        "title": "Receipts",
+        "type": "array"
+      },
+      "recipe": {
+        "const": "storymodel.supplied-time-study/v1",
+        "default": "storymodel.supplied-time-study/v1",
+        "title": "Recipe",
+        "type": "string"
+      },
+      "request_sha256": {
+        "title": "Request Sha256",
+        "type": "string"
+      },
+      "rows": {
+        "items": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "title": "Rows",
+        "type": "array"
+      },
+      "schema_version": {
+        "const": "storymodel.time-study-result/v1",
+        "default": "storymodel.time-study-result/v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "source_sha256": {
+        "title": "Source Sha256",
+        "type": "string"
+      }
+    },
+    "required": [
+      "request_sha256",
+      "source_sha256",
+      "recall_sha256",
+      "profile_sha256",
+      "import_sha256",
+      "origin",
+      "export_permission",
+      "rows",
+      "receipts",
+      "counts"
+    ],
+    "title": "TimeStudyResult",
+    "type": "object"
+  }
+}

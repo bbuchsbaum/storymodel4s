@@ -1,0 +1,136 @@
+{
+  "schema_version": "storymodel.time-study/v1",
+  "admission": {
+    "Source": "Original project-authored synthetic diagnostic recall; StoryModel contributors; StudyTimeBundleSuite, 2026, Toronto, Canada. No separate narrator or collector.",
+    "Basis": "Original project contribution under repository Apache-2.0; checked against the exact Scala fixture edition, not third-party text or translation.",
+    "Modifications": "None to the six recall strings; serialized as supplied units with study row keys 10 through 15. No normalization.",
+    "Human subjects": "Invented synthetic diagnostic phrases, not participant-derived recall; no human-subject transcript is included.",
+    "Tradition": "Not applicable: no traditional, Indigenous or ethnographic source; no community restrictions apply to this original synthetic fixture.",
+    "Admitted by": "Independent reviewer /root/workflow_reference, 2026-11-16; checked exact six strings, source registry and clock against StudyTimeBundleSuite at 83edb5695f5cb1780feed25b53ccae4efbb13025 and root Apache-2.0 declarations.",
+    "Edition": "pipeline/src/test/scala/storymodel4s/pipeline/agentmapping/StudyTimeBundleSuite.scala at 83edb5695f5cb1780feed25b53ccae4efbb13025"
+  },
+  "source_key": "TimeStudyFixture/v1",
+  "source": {
+    "collections": [
+      {
+        "number": 1,
+        "target": true
+      },
+      {
+        "number": 2,
+        "target": false
+      },
+      {
+        "number": 3,
+        "target": true
+      }
+    ],
+    "scenes": [
+      {
+        "number": 1,
+        "collection": 1,
+        "target": false
+      },
+      {
+        "number": 2,
+        "collection": 1,
+        "target": true
+      },
+      {
+        "number": 3,
+        "collection": 1,
+        "target": true
+      },
+      {
+        "number": 4,
+        "collection": 2,
+        "target": false
+      },
+      {
+        "number": 5,
+        "collection": 3,
+        "target": true
+      },
+      {
+        "number": 6,
+        "collection": 3,
+        "target": true
+      }
+    ],
+    "clock": {
+      "toleranceSeconds": "2/1",
+      "films": [
+        {
+          "collection": 1,
+          "durationSeconds": "45/1",
+          "scenes": [
+            {
+              "scene": 2,
+              "start": "0/1",
+              "end": "41/2"
+            },
+            {
+              "scene": 3,
+              "start": "41/2",
+              "end": "45/1"
+            }
+          ]
+        },
+        {
+          "collection": 3,
+          "durationSeconds": "20/1",
+          "scenes": [
+            {
+              "scene": 5,
+              "start": "0/1",
+              "end": "5/1"
+            },
+            {
+              "scene": 6,
+              "start": "5/1",
+              "end": "20/1"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "recall": {
+    "key": "p1_s1",
+    "units": [
+      {
+        "u": 1,
+        "row": 10,
+        "text": "she came in"
+      },
+      {
+        "u": 2,
+        "row": 11,
+        "text": "he stood there"
+      },
+      {
+        "u": 3,
+        "row": 12,
+        "text": "um"
+      },
+      {
+        "u": 4,
+        "row": 13,
+        "text": "a mouse"
+      },
+      {
+        "u": 5,
+        "row": 14,
+        "text": "what"
+      },
+      {
+        "u": 6,
+        "row": 15,
+        "text": "then"
+      }
+    ]
+  },
+  "chunk_size": 50,
+  "max_attempts": 1,
+  "export_permission": "allowed"
+}

@@ -4,6 +4,9 @@ This slice implements a small, inspectable account and the operations needed to 
 semantics. It does not yet extract an account from arbitrary text or reproduce the full
 Scala mapper. The owner has prioritized computation over visual refinement.
 
+The next slice is now executable: [recorded film-and-time mapping](time-study-workflow.md)
+computes mapping rows from supplied inputs and raw replies, with pinned Scala-output parity.
+
 | Area | Implemented boundary | Remaining work |
 |---|---|---|
 | Text and identity | Document hashes, edition/session keys, exact discontinuous UTF-16 spans, deterministic pilot IDs | Scala canonicalization/identity compatibility beyond the legacy reader |

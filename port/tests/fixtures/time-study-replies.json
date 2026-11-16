@@ -1,0 +1,12 @@
+{
+  "schema_version": "storymodel.imported-replies/v1",
+  "origin": "Synthetic Scala StudyTimeBundleSuite reply constants, repackaged into one strict JSON chunk; no live model execution. Omitted unit 5 stays absent.",
+  "request_sha256": "5a38259bdf9ddcab886e5ed9386137243a72414417e27703618cd72f72d7ce17",
+  "replies": [
+    {
+      "chunk": 0,
+      "attempt": 0,
+      "text": "{\"units\":[{\"u\":1,\"referent_film\":1,\"referent_time\":\"0:10\",\"narrative_film\":1,\"narrative_time\":\"0:20.5\",\"conf\":0.9},{\"u\":2,\"referent_film\":3,\"referent_time\":\"0:25\",\"narrative_film\":3,\"narrative_time\":\"0:20\"},{\"u\":3,\"referent_film\":null,\"referent_time\":null,\"narrative_film\":3,\"narrative_time\":null},{\"u\":4,\"referent_film\":2,\"referent_time\":\"0:05\",\"narrative_film\":1,\"narrative_time\":\"5\"},{\"u\":6,\"referent_film\":null,\"referent_time\":\"0:05\",\"narrative_film\":1}]}"
+    }
+  ]
+}

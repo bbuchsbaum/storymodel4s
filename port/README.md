@@ -9,6 +9,10 @@ recall details, reference hypotheses, conditional fidelity, analysis policies, e
 allocation, legacy bundle reading and recorded replay. The React app is a scaffold.
 Algorithms and representations come first; visual refinement follows later.
 
+The [recorded film-and-time workflow](docs/time-study-workflow.md) now runs supplied recall
+units and raw synthetic Scala reply fixtures through parsing and exact scene resolution.
+Its semantic rows are checked against the pinned Scala output; no provider call is required.
+
 ## Run it
 
 From this directory, with Python 3.12 and `uv`:

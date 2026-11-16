@@ -1,0 +1,13 @@
+{
+  "baseline_commit": "83edb5695f5cb1780feed25b53ccae4efbb13025",
+  "golden_sha256": "a4f8869bf36c284de4d6500d3246817fb97f583cdb2d46a44adcb262149b5e53",
+  "sources": {
+    "pipeline/src/test/resources/agentmapping/synthetic-study-time.bundle.json": "a4f8869bf36c284de4d6500d3246817fb97f583cdb2d46a44adcb262149b5e53",
+    "pipeline/src/test/scala/storymodel4s/pipeline/agentmapping/StudyTimeBundleSuite.scala": "2858d9b2be74275f5c91c0d9e9ef16fbcbeef955eb4920b3b4ee0b712bb6a2cb",
+    "pipeline/src/test/scala/storymodel4s/pipeline/agentmapping/TimeStudyFixture.scala": "d14246da66cf52a17f5e3462195cbe14663374fb3f0587da3b6a3515674a8d5a",
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/StudyReplay.scala": "c88c1272637646fed7527c8bc6c916e2d409790c520e550902e4ea13b4697dbf",
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/StudyRecord.scala": "f3bed6a9a2d504768d6535e8c9c71a6d065983515db7fc3b925ed1f7590d04f8",
+    "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/SceneIntervals.scala": "aa0ef19c547121e3b1404edda53414f45a6ab58b159f7cd7dd7f6a34536cd2e3"
+  },
+  "comparison": "All semantic unit row fields including raw stated answers, judgements, processing and extras; pilot occurrence IDs intentionally differ. No graph-HSMM, extraction or historical prompt identity claim."
+}
