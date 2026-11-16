@@ -32,8 +32,10 @@ Canonicalize that JSON with `jq -S -c` before digesting it.
   admission record therefore leaves the licence decision open; these bytes are
   local-only and are not redistributed by this repository.
 - Participant recall prose and the stimulus transcript remain in `data/friends`
-  only. The REB/IRB and human-subject provenance basis must be recorded before
-  any text-bearing artifact can be committed.
+  only. The owner recorded the basis on 2026-11-16: Friends is public data
+  shared through OpenNeuro, so REB concerns do not restrict its use, including
+  model runs on its recall. The owner also decided that its text is not put on
+  GitHub, so no text-bearing artifact is committed here.
 - The related fMRI release is OpenNeuro `ds008464`. No fMRI or video bytes are
   staged in this source set.
 - The raw `WhichEvent` values are not yet a canonical event identity. The

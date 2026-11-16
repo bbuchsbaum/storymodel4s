@@ -304,8 +304,9 @@ refers to resolved situations and entities. The ADR records this split.
 Internal/external labels and counts are produced by the derived analysis above, not by adding
 two more atom kinds or treating failed placement as external content.
 
-- Admission: every span lies inside its unit, atoms do not overlap, and the share of each
-  unit's text left uncovered is reported.
+- Admission: every span lies inside its unit. Distinct claims may share spans under
+  [ADR 0030](../adr/0030-detail-account-and-derived-analysis.md); claim identity and the
+  counting policy prevent duplicate credit. Report the share of each unit's text left uncovered.
 - **Engineering exit:** one replayable inventory artifact preserves exact spans, kinds,
   addresses and discourse functions, with named controls for foreign spans and unresolved
   placement, and two policy projections that conserve resolved, unresolved and excluded mass.
@@ -496,9 +497,11 @@ adapter `bd-01M7JEP9A3CSWJ6C2KPR2BRSVY`.
   side stays unopened. The untouched Sherlock remainder is not read. Recall and stimulus text,
   and every output that carries them, stay in private ignored storage (rule 14d).
 - **Friends:** it needs an input adapter, with its 56-to-52 event crosswalk as a tested
-  contract. Its source set is still "proposed", with the licence and the REB basis open
-  ([record](../data/friends/README.md)); the owner records the basis before a live model run
-  on its recall. Its recall interleaves storylines
+  contract. The owner recorded its basis on 2026-11-16: Friends is public data shared through
+  OpenNeuro, so REB concerns do not restrict its use, and model runs on its development recall
+  may proceed. The owner also decided that its text is not put on GitHub, so it stays in
+  private ignored storage like the other studies' ([record](../data/friends/README.md)). Its
+  recall interleaves storylines
   ([measurements](2026-09-17-friends-hill-climb-and-normalization.md)), so it exercises
   non-monotone order that Sherlock rarely shows.
 
@@ -592,7 +595,7 @@ ceiling. No field becomes scientifically qualified just because its implementati
 4. The bounded selection of semantic gaps for the producer profile and the thresholds/sample
    sizes for graph-family qualification. The owner decides new public vocabulary; this plan
    adopts a delivery sequence, not an unreviewed schema or a particular accuracy claim.
-5. Friends: the basis for running a model on its development recall, given that its source
-   set is still "proposed" with the licence and REB basis open.
+5. The minimum scope of the study demonstration for each study: how many participants and,
+   for FilmFestival, how many films. As written, one development participant would pass.
 
 [preview]: 2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview

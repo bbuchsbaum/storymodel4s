@@ -14,8 +14,9 @@ units. This qualifies execution and reproducibility, with no new scientific-accu
 The [ordinary-transcript entry point](guide/ordinary-transcripts.md) now prepares UTF-8 files
 with the existing segmenter and carries canonical text, exact spans and source provenance into
 that same execution path. Its [engineering receipt](refactor/evidence/transcript-intake-20261115/README.md)
-tracks verification. Full delivery 4 still needs a supplied-versus-automatic comparison on
-verified common transcript coordinates for both corpora (`bd-01M7H69QWE0NKSNB8XWW6MC02H`).
+tracks verification. The [common-coordinate comparison](refactor/evidence/preview-coordinates-20261116/README.md)
+records supplied-versus-automatic boundary disagreement and explicit exclusions on seen development
+material from both corpora (`bd-01M7H69QWE0NKSNB8XWW6MC02H`). It does not assess mapping error.
 Independent usability and prospective measurement qualification remain open.
 
 The one current plan, adopted 2026-11-08 (Mote epic `bd-01M6Y7MWZGP29TNDJ90SG36A45`). It
@@ -260,7 +261,8 @@ the common bundle. The [contract][contract]'s three analysis views are derived f
 artifacts without a model call and recomputed by an independent reader. Formats, readers and
 scorer are the same for all three; each study reports what is unavailable for it. The
 [demonstration][finish] uses development material only and leaves Friends' sealed test side
-unopened.
+unopened. Friends is public OpenNeuro data (owner, 2026-11-16); like the other studies' recall,
+its text is not committed to this repository.
 
 It requires the preview's engineering workflow, DL1-DL6 implementation artifacts, the contract,
 E1/E2 graph construction, film exchange and the terminal graph/readout walkthrough to be complete.
@@ -314,8 +316,8 @@ candidates; do not repeat a historical merge or archive instruction without chec
 8. Validation data for the detail layer's fresh items, and who codes them on what budget.
 9. Which exact reviewed identity and claim-assessment components satisfy DL2/DL3 and the event
    bridge. Reuse them in the common path; retain alternative methods only as named comparisons.
-10. Friends: the basis for running a model on its development recall. Its source set is still
-    "proposed", with the licence and REB basis open.
+10. The minimum scope of the [study demonstration][finish] for each study: how many participants
+    and, for FilmFestival, how many films.
 
 [preview-plan]: plans/2026-11-09-categorical-mapping-and-transfer-plan.md#revision-2026-11-10-the-scientific-preview
 [contract]: plans/2026-11-16-detail-mapping-plan.md#measurement-and-projection-contract
