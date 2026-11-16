@@ -215,7 +215,10 @@ class StudyExecutionSuite extends FunSuite:
         assert(changed.left.exists(_.contains("configuration changed")))
         assertEquals(calls.get(), 5)
         Files.createDirectories(Path.of("pipeline/target")): Unit
-        Files.writeString(Path.of("pipeline/target/synthetic-live.bundle.json"), live.noSpaces): Unit
+        Files.writeString(
+          Path.of("pipeline/target/synthetic-live.bundle.json"),
+          live.noSpaces
+        ): Unit
       }
     }
 
@@ -241,7 +244,10 @@ class StudyExecutionSuite extends FunSuite:
     withDirectory { dir =>
       val exportDir = fixture(dir)
       val path = exportDir.resolve("index.json")
-      Files.writeString(path, read(path).mapObject(_.add("condition", str("x" * 256))).noSpaces): Unit
+      Files.writeString(
+        path,
+        read(path).mapObject(_.add("condition", str("x" * 256))).noSpaces
+      ): Unit
       withServer(Vector.empty) { (env, calls) =>
         assert(run(dir, exportDir, env, "output").left.exists(_.contains("policy identifier")))
         assertEquals(calls.get(), 0)
@@ -253,11 +259,14 @@ class StudyExecutionSuite extends FunSuite:
     withDirectory { dir =>
       val exportDir = fixture(dir)
       val receipts = dir.resolve("run/invocations")
-      withServer(Vector(200 -> completion(first), 200 -> completion(second)), i => {
-        if i == 0 then
-          Files.delete(receipts)
-          Files.writeString(receipts, "blocked"): Unit
-      }) { (env, calls) =>
+      withServer(
+        Vector(200 -> completion(first), 200 -> completion(second)),
+        i => {
+          if i == 0 then
+            Files.delete(receipts)
+            Files.writeString(receipts, "blocked"): Unit
+        }
+      ) { (env, calls) =>
         assert(run(dir, exportDir, env, "output").isLeft)
         assertEquals(calls.get(), 2)
         assert(!Files.exists(dir.resolve("output")))
@@ -275,21 +284,54 @@ class StudyExecutionSuite extends FunSuite:
       withServer(Vector(200 -> completion(first), 200 -> completion(second))) { (env, _) =>
         right(run(dir, exportDir, env, "output"))
         val doc = read(dir.resolve("output/bundles/synthetic_trial.bundle.json"))
-        val view = right(storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(
-          Files.readAllBytes(exportDir.resolve("source.csv")), Files.readAllBytes(exportDir.resolve("parts.json"))))
+        val view = right(
+          storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(
+            Files.readAllBytes(exportDir.resolve("source.csv")),
+            Files.readAllBytes(exportDir.resolve("parts.json"))
+          )
+        )
         val index = right(StudyExport.parseIndex(read(exportDir.resolve("index.json"))))
         val entry = index.sessions.head
         val session = right(StudyExport.parseSession(read(exportDir.resolve(entry.file)), entry))
-        val recall = right(PreparedRecall.supplied(entry.name, session.units.map(_.text), StudyExport.unitsChecksum(session.units)))
-        val profile = right(TextExecution.Profile.decode(read(dir.resolve("run/run.json")).hcursor.downField("execution").focus.get))
-        val producer = StudyRecord.producer(profile.provider, index.model, index.system, view, recall)
-        val expected = StudyBundle.Expected(entry.participant, entry.session, session.units, producer,
-          execution = Some(profile), modelCalls = 2)
+        val recall = right(
+          PreparedRecall.supplied(
+            entry.name,
+            session.units.map(_.text),
+            StudyExport.unitsChecksum(session.units)
+          )
+        )
+        val profile = right(
+          TextExecution.Profile.decode(
+            read(dir.resolve("run/run.json")).hcursor.downField("execution").focus.get
+          )
+        )
+        val producer =
+          StudyRecord.producer(profile.provider, index.model, index.system, view, recall)
+        val expected = StudyBundle.Expected(
+          entry.participant,
+          entry.session,
+          session.units,
+          producer,
+          execution = Some(profile),
+          modelCalls = 2
+        )
         assert(StudyBundle.decode(doc, view, recall, expected).isRight)
-        def changed(key: String, value: Json): Json = doc.mapObject(o => o.add("provenance",
-          o("provenance").get.mapObject(p => p.add("execution", p("execution").get.mapObject(_.add(key, value))))))
-        assert(StudyBundle.decode(changed("endpointSha256", str("f" * 64)), view, recall, expected).isLeft)
-        assert(StudyBundle.decode(changed("maxTokens", Json.fromInt(129)), view, recall, expected).isLeft)
+        def changed(key: String, value: Json): Json = doc.mapObject(o =>
+          o.add(
+            "provenance",
+            o("provenance").get.mapObject(p =>
+              p.add("execution", p("execution").get.mapObject(_.add(key, value)))
+            )
+          )
+        )
+        assert(
+          StudyBundle
+            .decode(changed("endpointSha256", str("f" * 64)), view, recall, expected)
+            .isLeft
+        )
+        assert(
+          StudyBundle.decode(changed("maxTokens", Json.fromInt(129)), view, recall, expected).isLeft
+        )
         assert(StudyBundle.decode(doc, view, recall, expected.copy(modelCalls = 1)).isLeft)
         assert(StudyBundle.decode(doc, view, recall, expected.copy(execution = None)).isLeft)
       }

@@ -53,8 +53,13 @@ object StudyExecution:
       io.circe.jawn.parseByteArray(indexBytes).left.map(_.message).flatMap(StudyExport.parseIndex)
     )
     StudyBundle.Fields.foreach { field =>
-      required(scala.util.Try(StudyRecord.policy(index.condition, index.protocolName, field))
-        .toEither.left.map(_ => "condition and protocol cannot form a valid mapping policy identifier"))
+      required(
+        scala.util
+          .Try(StudyRecord.policy(index.condition, index.protocolName, field))
+          .toEither
+          .left
+          .map(_ => "condition and protocol cannot form a valid mapping policy identifier")
+      )
     }
     val view = required(
       storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(sourceBytes, partsBytes)
@@ -160,8 +165,15 @@ object StudyExecution:
               _,
               p.view,
               recall,
-              StudyBundle.Expected(entry.participant, entry.session, s.units, producer, intervals,
-                execution, calls() - before)
+              StudyBundle.Expected(
+                entry.participant,
+                entry.session,
+                s.units,
+                producer,
+                intervals,
+                execution,
+                calls() - before
+              )
             )
           )
       )

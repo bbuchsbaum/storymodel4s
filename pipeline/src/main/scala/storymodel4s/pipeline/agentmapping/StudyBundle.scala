@@ -370,12 +370,19 @@ object StudyBundle:
       protocol <- p.get[String]("protocol").left.map(_ => "no protocol")
       _ <- Either.cond(
         p.downField("execution").focus == expected.execution.map(_.json) &&
-          expected.execution.forall(profile => profile.provider == expected.producer.provider &&
-            profile.model == expected.producer.model),
-        (), "execution descriptor differs from the expected profile"
+          expected.execution.forall(profile =>
+            profile.provider == expected.producer.provider &&
+              profile.model == expected.producer.model
+          ),
+        (),
+        "execution descriptor differs from the expected profile"
       )
-      _ <- Either.cond(expected.modelCalls >= 0 &&
-        p.get[Int]("modelCalls").contains(expected.modelCalls), (), "model call count differs")
+      _ <- Either.cond(
+        expected.modelCalls >= 0 &&
+          p.get[Int]("modelCalls").contains(expected.modelCalls),
+        (),
+        "model call count differs"
+      )
       _ <- says("participant", expected.participant)
       _ <- says("session", expected.session)
       _ <- says("model", expected.producer.model)

@@ -158,12 +158,15 @@ object TextExecution:
     if !profile.matches(authorization) then Left("profile does not match live authorization")
     else
       lock(recordings.dir).flatMap { acquired =>
-        try Right(new LiveSession(
-          recordings,
-          profile,
-          OpenAiCompatibleModelClient.from(authorization),
-          acquired
-        ))
+        try
+          Right(
+            new LiveSession(
+              recordings,
+              profile,
+              OpenAiCompatibleModelClient.from(authorization),
+              acquired
+            )
+          )
         catch
           case NonFatal(_) =>
             acquired.close()
@@ -253,10 +256,17 @@ object TextExecution:
         "provider" -> providerEvidence.getOrElse(Json.obj())
       )
 
-  private def readRecording(recordings: Recordings, request: ModelRequest): Either[ExchangeFailure, ModelReply] =
+  private def readRecording(
+      recordings: Recordings,
+      request: ModelRequest
+  ): Either[ExchangeFailure, ModelReply] =
     val path = recordings.path(request.key)
-    if Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(path) then
-      Left(ExchangeFailure.RecordingCorrupt(request.key, Checksum.ofText("not a regular recording file")))
+    if Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(path)
+    then
+      Left(
+        ExchangeFailure
+          .RecordingCorrupt(request.key, Checksum.ofText("not a regular recording file"))
+      )
     else recordings.read(request.key, request.model)
 
   private final class ReplaySession(recordings: Recordings, profile: Profile)
@@ -286,8 +296,10 @@ object TextExecution:
     private def states: Either[Unit, Map[String, JournalState]] =
       val temporary = recordings.dir.resolve(s"$JournalName.tmp")
       if Files.exists(temporary, java.nio.file.LinkOption.NOFOLLOW_LINKS) ||
-        (Files.exists(journal, java.nio.file.LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(journal)) then
-        Left(())
+        (Files.exists(journal, java.nio.file.LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(
+          journal
+        ))
+      then Left(())
       else if !Files.isRegularFile(journal) then Right(Map.empty)
       else
         for
