@@ -12,13 +12,13 @@ import storymodel4s.codec.TimedSourceArtifactCodec
 import storymodel4s.core.Checksum
 import storymodel4s.provider.agent.TextExecution
 
-/** Source: project-authored geometric diagnostics from StudyExecutionSuite, 2026.
-  * Basis: repository Apache-2.0; no participant material or story excerpt.
-  * Jurisdiction: Toronto, Canada. No human narrator, participant or traditional source.
-  * Modifications: repeated sentence, whitespace, CRLF, emoji and decomposed accent to test offsets;
-  * source-label substitution tests a mismatched source. Tradition: none.
-  * Admitted by: independent /root/live_design_review, 2026-11-15, pre-admission file edition
-  * SHA-256 1fe41612e43a4dc4636fb48282928f87980f11f09e59327050bb603c493fe999.
+/** Source: project-authored geometric diagnostics from StudyExecutionSuite, 2026. Basis: repository
+  * Apache-2.0; no participant material or story excerpt. Jurisdiction: Toronto, Canada. No human
+  * narrator, participant or traditional source. Modifications: repeated sentence, whitespace, CRLF,
+  * emoji and decomposed accent to test offsets; source-label substitution tests a mismatched
+  * source. Tradition: none. Admitted by: independent /root/live_design_review, 2026-11-15,
+  * pre-admission file edition SHA-256
+  * 1fe41612e43a4dc4636fb48282928f87980f11f09e59327050bb603c493fe999.
   */
 class TranscriptStudySuite extends FunSuite:
   private def right[A](v: Either[?, A]): A = v.fold(e => fail(e.toString), identity)

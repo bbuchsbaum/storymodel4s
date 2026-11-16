@@ -53,20 +53,33 @@ class PreparedRecallBoundarySuite extends FunSuite:
     assert(exact.exists(_.message.contains("cannot be accessed")), exact.map(_.message).toString)
 
   test("segmented recall has no product construction door"):
-    assertEquals(typeCheckErrors(
-      "import storymodel4s.pipeline.agentmapping.PreparedRecall; PreparedRecall.segmented(Array[Byte](97))"
-    ), Nil)
-    assertEquals(typeCheckErrors(
-      "case class Control(a: Int); Control.fromProduct(Tuple1(1))"
-    ), Nil)
-    assert(typeCheckErrors(
-      "import storymodel4s.pipeline.agentmapping.PreparedRecall; PreparedRecall.fromProduct((null, null, Vector.empty, null))"
-    ).nonEmpty)
+    assertEquals(
+      typeCheckErrors(
+        "import storymodel4s.pipeline.agentmapping.PreparedRecall; PreparedRecall.segmented(Array[Byte](97))"
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        "case class Control(a: Int); Control.fromProduct(Tuple1(1))"
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.pipeline.agentmapping.PreparedRecall; PreparedRecall.fromProduct((null, null, Vector.empty, null))"
+      ).nonEmpty
+    )
 
   test("segmented recall has no product mirror"):
-    assertEquals(typeCheckErrors(
-      "case class Control(a: Int); summon[scala.deriving.Mirror.ProductOf[Control]]"
-    ), Nil)
-    assert(typeCheckErrors(
-      "import storymodel4s.pipeline.agentmapping.PreparedRecall; summon[scala.deriving.Mirror.ProductOf[PreparedRecall]]"
-    ).nonEmpty)
+    assertEquals(
+      typeCheckErrors(
+        "case class Control(a: Int); summon[scala.deriving.Mirror.ProductOf[Control]]"
+      ),
+      Nil
+    )
+    assert(
+      typeCheckErrors(
+        "import storymodel4s.pipeline.agentmapping.PreparedRecall; summon[scala.deriving.Mirror.ProductOf[PreparedRecall]]"
+      ).nonEmpty
+    )
