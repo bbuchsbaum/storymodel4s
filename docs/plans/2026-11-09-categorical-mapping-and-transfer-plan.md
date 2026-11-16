@@ -320,7 +320,12 @@ obsolete or met. Work waiting on integration is part of the triage.
 
 ### After the preview
 
-The event-representation programme continues as bounded, evaluated capabilities. The first is
-who-did-what in recurring scenes, evaluated on fresh examples once the common workflow is
-usable. Speaker-labelled evidence and fidelity follow as new packet versions against a frozen
-baseline.
+Superseded on 2026-11-16 by the [detail-mapping plan](2026-11-16-detail-mapping-plan.md). The
+event-representation programme continues as the detail layer DL1-DL6, a set of bounded,
+evaluated field sets in the same bundle. Speaker-labelled evidence becomes DL2, fidelity DL3,
+and who-did-what DL6. Delivery 5's double-coding rubric covers the detail fields from the start.
+
+The earlier text read: "The event-representation programme continues as bounded, evaluated
+capabilities. The first is who-did-what in recurring scenes, evaluated on fresh examples once
+the common workflow is usable. Speaker-labelled evidence and fidelity follow as new packet
+versions against a frozen baseline."
