@@ -4,7 +4,8 @@ smoke run of the mapping object from case study 1's recorded content-local answe
 Usage (from tools/case-studies/recall-precision):
   python -m cs2.run baselines CORPUS OUT_DIR      # development participants with gold only
   python -m cs2.run sherlock-smoke OUT_DIR
-  python -m cs2.run ff-pilot PARTICIPANT SESSION OUT_DIR   # makes model calls (pilot only)
+  python -m cs2.run ff-run OUT_DIR --export DIR --seed N --salt S --sample K \\
+      [--sessions development|p:s,...] [--dry]      # without --dry it makes model calls
 
 Outputs (under the ignored data root): summary.json, rows.tsv (keys and bits, no text) and
 manifest.json with the commit SHA, the config digest and input digests. Recall text is read into
@@ -52,8 +53,9 @@ def git_state():
     sha = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=HERE, capture_output=True, text=True
     ).stdout.strip()
-    dirty = subprocess.run(
-        ["git", "status", "--porcelain", "--untracked-files=no", "--", "."],
+    dirty = subprocess.run(  # the harness and every module the producer imports
+        ["git", "status", "--porcelain", "--untracked-files=no", "--", ".",
+         str(HERE.parents[1] / "sherlock_mapper")],
         cwd=HERE,
         capture_output=True,
         text=True,
@@ -241,14 +243,15 @@ def recall_ledger(A, gold):
     return t
 
 
-def manifest(out, kind, cfg_path, inputs, extra):
+def manifest(out, kind, cfg_path, inputs, extra, state=None, model_calls=0):
+    """`state` is the git state captured before any model call (default: now)."""
     m = dict(
         schema="storymodel4s.case-study-2.run-manifest/v1",
         kind=kind,
-        **git_state(),
+        **(state or git_state()),
         config=dict(path=str(cfg_path), sha256=sha256(cfg_path)),
         inputs={str(k): sha256(k) for k in inputs if Path(k).exists()},
-        model_calls=0,
+        model_calls=model_calls,
         **extra,
     )
     (out / "manifest.json").write_text(json.dumps(m, indent=1) + "\n")
@@ -498,83 +501,99 @@ def cmd_sherlock_smoke(out):
     )
 
 
-def cmd_ff_pilot(participant, session, out):
-    """Two-level producer on ONE development participant-session, then the yardstick."""
+def cmd_ff_run(args):
+    """Two-level producer on selected development sessions, pooled; then the yardstick.
+
+    Arguments: OUT --export DIR --seed N --salt S --sample K
+    [--sessions development | p:s,p:s,...] [--dry]. Without --dry this makes model calls."""
     from cs2 import ff_producer as P
 
+    state = git_state()  # before any model call
+    opt = {}
+    rest = []
+    it = iter(args)
+    for a in it:
+        if a in ("--export", "--seed", "--salt", "--sample", "--sessions"):
+            opt[a[2:]] = next(it)
+        elif a == "--dry":
+            opt["dry"] = True
+        else:
+            rest.append(a)
+    for k in ("export", "seed", "salt", "sample"):
+        if k not in opt:
+            raise SystemExit(f"--{k} is required")
+    out = Path(rest[0])
     A = D.adapter("filmfestival")
-    if participant not in A.development():
-        raise SystemExit(f"{participant} is not a development participant")
+    dev = A.development()
+    if opt.get("sessions", "development") == "development":
+        sessions = [(p, s) for p in dev for s in A.sessions(p)]
+    else:
+        sessions = [tuple(x.split(":")) for x in opt["sessions"].split(",")]
+    for p, _ in sessions:
+        if p not in dev:
+            raise SystemExit(f"{p} is not a development participant")
+    seed, sample = int(opt["seed"]), int(opt["sample"])
+    acc, ledger, log, conds = P.run(A, sessions, Path(opt["export"]), out, seed, opt["salt"],
+                                    sample, dry=bool(opt.get("dry")))
+    calls = P.call_ledger(log)
+    extra = dict(
+        participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],
+        conditions=conds, call_digests=[{k: c[k] for k in ("label", "condition", "fresh",
+                                                           "rendered_prompt_sha256")}
+                                        for c in log],
+        calls=calls, export_index_sha256=ledger["export_index_sha256"],
+        batches=ledger["batches"], dry=bool(opt.get("dry")),
+    )
+    inputs = [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
+              Path(opt["export"]) / "index.json"]
+    inputs += [A.FF / "derived" / "recall" / f"{p}_{s}.csv" for p, s in sessions]
+    if acc is None:
+        manifest(out, "ff-run (dry)", SC.CONFIG, inputs, extra, state, calls["model_calls"])
+        print(json.dumps(dict(batches=ledger["batches"], calls=calls,
+                              sessions=ledger["sessions"]), indent=1, default=str))
+        return
     cfg = SC.load_config()
     comp = A.composition("JL")
-    acc, ledger, log = P.run(A, participant, session, out)
-    all_gold = gold_by_participant(A, A.development())
-    rows = [g for g in all_gold[participant] if g.session == session]
-    gold = {participant: rows}
+    all_gold = gold_by_participant(A, dev)
+    gold = {}
+    for p, s in sessions:
+        rows = [g for g in all_gold.get(p, []) if g.session == s]
+        if rows:
+            gold.setdefault(p, []).extend(rows)
     dur, fc_all = baseline_forecasts(A, comp, all_gold, cfg)
-    fc = {k: {(participant, session): v[(participant, session)]} for k, v in fc_all.items()}
-    named = {k: score_map(comp, gold, v, cfg, True) for k, v in fc.items()}
-    ld = LocationDistribution.from_words(acc, acc.words[(participant, session)], bins_of(rows),
-                                         cfg["allocation"])
-    named["producer"] = score_map(
-        comp, gold, {(participant, session): SC.producer_forecasts(ld, dur, cfg)}, cfg, True
-    )
-    terms = ("film_bits", "work_bits", "scene_bits", "total_bits")
-
-    def mean(sc, t):
-        v = [getattr(s, t) for s in sc if getattr(s, t) is not None]
-        return dict(n=len(v), mean=float(sum(v) / len(v)) if v else None)
-
-    def skill1(a, b, t):
-        x, y = mean(a, t)["mean"], mean(b, t)["mean"]
-        return None if x is None or not y else 1 - x / y
-
-    fresh = [c for c in log if not c["cached_before"]]
-    usage = {}
-    for c in log:
-        for k, v in (c["usage"] or {}).items():
-            if isinstance(v, (int, float)):
-                usage[k] = usage.get(k, 0) + v
+    keys = {(p, g.session) for p, rs in gold.items() for g in rs}
+    named = {k: score_map(comp, gold, {x: v[x] for x in keys}, cfg, True) for k, v in fc_all.items()}
+    pmap = {}
+    for p, s in keys:
+        rows = [g for g in gold[p] if g.session == s]
+        ld = LocationDistribution.from_words(acc, acc.words[(p, s)], bins_of(rows),
+                                             cfg["allocation"])
+        pmap[(p, s)] = SC.producer_forecasts(ld, dur, cfg)
+    named["producer"] = score_map(comp, gold, pmap, cfg, True)
+    fsum = summarize_forecasts(named, cfg, True)
+    fsum["producer"].update({
+        f"skill_vs_{b}": {t: SC.skill(named["producer"], named[b], cfg, t)
+                          for t in ("film_bits", "work_bits", "scene_bits", "total_bits")}
+        for b in ("lopo", "order_oracle", "tfidf")})
     summary = dict(
-        corpus="filmfestival", participant=participant, session=session,
-        note="PILOT: one development participant-session; one sample; no bootstrap (1 cluster)",
-        units=ledger["pass1_units"], ledger=ledger,
-        calls=dict(n=len(log), fresh=len(fresh), usage_total=usage,
-                   cost_usd_total=sum(c["cost_usd"] or 0 for c in log),
-                   per_call=[{k: c[k] for k in ("label", "call_seconds", "cost_usd",
-                                                "prompt_chars", "reply_chars", "usage")}
-                             for c in log]),
-        rows=SC.strata(named["producer"], comp, True)["rows"],
-        forecasts={k: {t: mean(v, t) for t in terms} for k, v in named.items()},
-        skill={b: {t: skill1(named["producer"], named[b], t) for t in terms}
-               for b in ("duration", "lopo", "order_oracle", "tfidf")},
-        top_scene_in_gold_set={k: (sum(s.scene_hit for s in v if s.scene_hit is not None) /
-                                   max(1, sum(1 for s in v if s.scene_hit is not None)))
-                               for k, v in named.items()},
+        corpus="filmfestival", sessions=extra["sessions"], ledger=ledger, calls=calls,
+        rows=SC.strata(named["producer"], comp, True)["rows"], forecasts=fsum,
         producer_strata=SC.strata(named["producer"], comp, True),
-        words=word_ledger(acc.words[(participant, session)], bins_of(rows)),
+        words={f"{p}:{s}": word_ledger(acc.words[(p, s)],
+                                       bins_of([g for g in gold[p] if g.session == s]))
+               for p, s in keys},
     )
     (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
     write_rows(out / "rows.tsv", named)
-    manifest(out, "ff-pilot", SC.CONFIG,
-             [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
-              A.FF / "derived" / "recall" / f"{participant}_{session}.csv"],
-             dict(participants=[participant], producer=acc.condition,
-                  model=P.MODEL, batch=P.BATCH, window=P.WINDOW, pause_s=P.PAUSE_S,
-                  segmentation="interim (cs2/ff_producer.py interim_units), not the library",
-                  exposed_ids="pass 1: unit numbers in spoken order, cover names, films in seeded "
-                  "random order, no times; pass 2: salted item ids, per-call row numbers, opaque "
-                  "scene labels, film-relative times, per-call film order"))
-    print(json.dumps({k: summary[k] for k in ("units", "rows", "forecasts", "skill",
-                                              "top_scene_in_gold_set")}, indent=1))
-    print(json.dumps(summary["calls"]["usage_total"]), summary["calls"]["cost_usd_total"])
+    manifest(out, "ff-run", SC.CONFIG, inputs, dict(extra, producer=acc.condition), state,
+             calls["model_calls"])
 
 
 def main(argv):
     if argv[:1] == ["baselines"] and len(argv) == 3:
         cmd_baselines(argv[1], Path(argv[2]))
-    elif argv[:1] == ["ff-pilot"] and len(argv) == 4:
-        cmd_ff_pilot(argv[1], argv[2], Path(argv[3]))
+    elif argv[:1] == ["ff-run"] and len(argv) >= 2:
+        cmd_ff_run(argv[1:])
     elif argv[:1] == ["sherlock-smoke"] and len(argv) == 2:
         cmd_sherlock_smoke(Path(argv[1]))
     else:

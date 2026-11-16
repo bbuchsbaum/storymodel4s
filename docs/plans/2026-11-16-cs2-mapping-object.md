@@ -208,6 +208,13 @@ was silent. These are declarations, not owner decisions.
   work. The film term is scored on every corpus, because a conditional scene term would
   otherwise reward hedging into non-film states on a one-work corpus.
 
+- **Units come from the library segmenter.** `agentStudyPrepare` (`recall-segmenter/v1`) runs
+  on each development session's word cells joined by single spaces. No author punctuation
+  enters the text. Words the segmenter consumes as separators belong to no unit. The
+  FilmFestival word onsets are interpolated within the authors' utterances
+  (`wordOnsetsAreMeasured: false`), so the word clock still carries the authors' utterance
+  timing.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the

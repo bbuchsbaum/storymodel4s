@@ -724,6 +724,97 @@ def test_frozen_participants_refused():
         raise AssertionError(f"{name} was not refused")
 
 
+# ---------------------------------------------------------------- the FilmFestival producer
+
+
+def _producer():
+    from cs2 import ff_producer as P
+
+    return P
+
+
+def test_library_units_map_spans_to_words():
+    P = _producer()
+    from cs2.source import RecallWord
+
+    words = [RecallWord(i, w, float(i)) for i, w in enumerate("he ran and then she naïve left".split())]
+    text = P.transcript_of(words).rstrip("\n")
+    # units: "he ran" [0, 6) and "then she naïve left" [11, 30); "and" is a consumed separator
+    exp = {"transcript": {"canonicalText": text, "units": [
+        {"u": 1, "text": "he ran", "spans": [{"start": 0, "endExclusive": 6}]},
+        {"u": 2, "text": "then she naïve left", "spans": [{"start": 11, "endExclusive": 30}]},
+    ]}}
+    assert P.library_units(exp, words) == [(0, 1), (3, 6)]
+    bad = {"transcript": {"canonicalText": text, "units": [
+        {"u": 1, "text": "e ran", "spans": [{"start": 1, "endExclusive": 6}]}]}}
+    for e in (bad, {"transcript": {"canonicalText": text + " x", "units": []}}):
+        try:
+            P.library_units(e, words)
+        except ValueError:
+            continue
+        raise AssertionError("a span cutting a word or a foreign transcript was accepted")
+
+
+def test_anchor_matching():
+    P = _producer()
+    u = P.toks("he ran to the shop and he ran home")
+    assert P.match_anchor(u, P.toks("to the Shop")) == (2, None)
+    assert P.match_anchor(u, P.toks("he ran")) == (None, "anchor-ambiguous")
+    assert P.match_anchor(u, P.toks("he flew")) == (None, "anchor-not-found")
+    assert P.match_anchor(u, []) == (None, "anchor-empty")
+
+
+def test_members_shapes_and_frame_check():
+    P = _producer()
+    comp = fixture()
+    rowmap = {1: "b2", 2: "b3", 3: "c1", 4: "c2"}
+    refused, conv = {}, dict(shapes={}, broad_cases={})
+
+    def refuse(why):
+        refused[why] = refused.get(why, 0) + 1
+
+    m = P.members(dict(occurrence="joint", alts=[{"w": 0.5, "iv": [[1, 1], [2, 2]]}]), rowmap,
+                  "B", 0.8, comp, refuse, conv)
+    assert m[0].target.shape is Shape.JOINT and abs(m[0].weight - 0.4) < 1e-12
+    m = P.members(dict(mode="gist", extent="stretch", alts=[{"w": 1, "iv": [[1, 2]]}]), rowmap,
+                  "B", 1.0, comp, refuse, conv)
+    assert m[0].target.shape is Shape.BROAD and conv["broad_cases"] == {"work": 1}
+    m = P.members(dict(occurrence="repeated", alts=[{"w": 1, "iv": [[3, 3], [4, 4]]}]), rowmap,
+                  "C", 1.0, comp, refuse, conv)
+    assert m[0].target.shape is Shape.SINGLE and len(m[0].target.constituents) == 2
+    # rows of work C under a frame of work B: refused, typed and counted
+    assert P.members(dict(alts=[{"w": 1, "iv": [[3, 3]]}]), rowmap, "B", 1.0, comp, refuse,
+                     conv) is None
+    assert P.members(dict(alts=[{"w": 1, "iv": [[9, 9]]}]), rowmap, "B", 1.0, comp, refuse,
+                     conv) is None
+    assert refused == {"rows-outside-frame": 1, "unknown-row": 1}
+
+
+def test_resolve_position_phrases():
+    P = _producer()
+    comp = fixture()  # films in presentation order: A, B, C
+    r = lambda s, cur=None: P.resolve_position(comp, s, cur)  # noqa: E731
+    assert r("the first one") == "A" and r("the last movie") == "C" and r("second") == "B"
+    assert r("second to last") == "B" and r("the penultimate one") == "B"
+    assert r("the next one", "A") == "B" and r("the previous film", "C") == "B"
+    assert r("the next one") is None and r("the next one", "C") is None
+    assert r("fifth") is None and r("the blue one") is None
+
+
+def test_batches_hold_no_window_neighbours():
+    P = _producer()
+    items = [dict(session_key=("P1", "s"), k=k, oid=f"a{k}") for k in range(10)]
+    items += [dict(session_key=("P2", "s"), k=k, oid=f"b{k}") for k in range(0, 30, 2)]
+    for sample in (1, 2):
+        batches = P.make_batches(items, 7, sample, batch=40, window=2)
+        rep = P.batch_report(batches, window=2)
+        assert not rep["chaining_possible"] and rep["min_same_session_unit_gap"] > 2, rep
+        assert sorted(it["oid"] for b in batches for it in b) == sorted(it["oid"] for it in items)
+    a = P.make_batches(items, 7, 1)
+    b = P.make_batches(items, 7, 2)
+    assert [[i["oid"] for i in x] for x in a] != [[i["oid"] for i in x] for x in b]
+
+
 # ---------------------------------------------------------------- runner
 
 
