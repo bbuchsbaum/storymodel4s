@@ -1,0 +1,109 @@
+{
+  "schema": "port-reference-snapshot/v1",
+  "captured_date": "2026-11-16",
+  "purpose": "Planning baseline; not a pilot qualification or a copy of private data. Paths are repository-relative; hashes describe committed bytes.",
+  "repositories": {
+    "storymodel4s": {
+      "revision": "83edb5695f5cb1780feed25b53ccae4efbb13025",
+      "files": [
+        {
+          "path": "VISION.md",
+          "sha256": "32220da0eb395bbefb08cfd1ff71e2232061f459468f5d81c3ae75a948cf6884"
+        },
+        {
+          "path": "docs/ROADMAP.md",
+          "sha256": "de308d1021d10b15d7579739b93e7c3d420a08f75f568c3b1e73fd33033946a5"
+        },
+        {
+          "path": "docs/adr/0030-detail-account-and-derived-analysis.md",
+          "sha256": "3108582572d745c55edc4ecc9f5de8919a211f55e6ef8ed4795930238c18851c"
+        },
+        {
+          "path": "docs/plans/2026-11-16-detail-mapping-plan.md",
+          "sha256": "a8fc18488710880fdb906eb721f3e89c4229f71a8cff60a46c5ff10b81817123"
+        },
+        {
+          "path": "docs/design/detail-coding/synthetic-worked-example.md",
+          "sha256": "8073a337a8f0da59d9dccb3982ac55e5ebbe43b1fcead4f1556785eeb4b3eb74"
+        },
+        {
+          "path": "docs/design/story-text-admission-checklist.md",
+          "sha256": "afb69c6a4905d66122926554d669eea30cffbd0c2c77d015b9a7814f09bd4b83"
+        },
+        {
+          "path": "core/src/main/scala/storymodel4s/core/span.scala",
+          "sha256": "f288552e731c3b7c52713c3d62e9257ca3089da4f7c439e10bcdb39467a85da4"
+        },
+        {
+          "path": "core/src/main/scala/storymodel4s/core/hash.scala",
+          "sha256": "226420d14987703a6b26aea006bf15d585d5caba3d5c6aba9a48d180c58b5e8b"
+        },
+        {
+          "path": "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/StudyExecution.scala",
+          "sha256": "b7c166d9e347c86b6b6e05c92ae5fd3956951c708e66bcdeb126c5b494141a34"
+        },
+        {
+          "path": "pipeline/src/main/scala/storymodel4s/pipeline/agentmapping/StudyBundle.scala",
+          "sha256": "14fe75a909d08937e91729b1636c8d0269304a850c638450e4273cdbcd1f3ed8"
+        },
+        {
+          "path": "pipeline/src/test/scala/storymodel4s/pipeline/agentmapping/StudyExecutionSuite.scala",
+          "sha256": "1a3c92a784be6e912aaa1bcc088aca271418780ffc6b14a574a2afc816c7bdf3"
+        },
+        {
+          "path": "pipeline/src/test/scala/storymodel4s/pipeline/agentmapping/StudyBundleSuite.scala",
+          "sha256": "763d3aeabaa39219ff0a588e511909fee1a7dde40a03e9096407ca6fcd8a1220"
+        },
+        {
+          "path": "provider-agent/src/test/scala/storymodel4s/provider/agent/TextExecutionSuite.scala",
+          "sha256": "12f7561b10fde3ebc32e1404fb9ba22803e4b410883081e8140f3e4207d55204"
+        },
+        {
+          "path": "tools/agentmapping/study_bundle.py",
+          "sha256": "d07867abeba88c7424a60cfc93143c754ea3c138686d817acef3470f9dcda2c2"
+        },
+        {
+          "path": "tools/agentmapping/test_study_bundle.py",
+          "sha256": "d7b7bf823b76f691caa732406aa58b48f16070a04c9e6c21ec9890ca6d34f3db"
+        },
+        {
+          "path": "docs/refactor/evidence/f1-20261116/qualification.json",
+          "sha256": "d9fd965a2ae991ddfd60e1803ee8dfc6d42816bcffbb42802c9da8e42efb9a90"
+        }
+      ]
+    },
+    "storyatlas4s": {
+      "revision": "ef0844bb229a0406d4f2a4e65ec89532c18d99a3",
+      "files": [
+        {
+          "path": "build.sbt",
+          "sha256": "e1a169878a7ce4a0dcb613da0cbdd0cd35b4cc4219b42422b5d8a6ef7b1c1a19"
+        },
+        {
+          "path": "app/src/main/scala/storyatlas4s/app/WorkspaceInspector.scala",
+          "sha256": "9336f93d570c37b60cbbed1d2d99056610c64484ee57adf06806ee4bc637dcc7"
+        },
+        {
+          "path": "shell/src/main/scala/storyatlas4s/shell/WorkspaceImport.scala",
+          "sha256": "19a5d97452dd21d29ed05df251c7cd5a19e6c0ee10413f4e353f510e77e1b7da"
+        },
+        {
+          "path": "shell/src/main/scala/storyatlas4s/shell/WorkspaceExport.scala",
+          "sha256": "fcc43c457c77411c491dab595bef7511c3fc6aba8a59a2b1bd81a4d9f65f51b2"
+        },
+        {
+          "path": "shell/src/main/scala/storyatlas4s/shell/WorkspaceController.scala",
+          "sha256": "92c9f4b07d374bed01988eb6cb8db9cbac7ca9d517ed76491756b23e5b26a39f"
+        },
+        {
+          "path": "shell/src/test/scala/storyatlas4s/shell/WorkspaceImportSuite.scala",
+          "sha256": "4eaaefd802eac3c3c320429e3cf2ed25a5301ade391120ba6aea79756a4eabe8"
+        },
+        {
+          "path": "shell/src/test/scala/storyatlas4s/shell/WorkspaceExportSuite.scala",
+          "sha256": "24ae0daa417ac586b9ffd4b6c9c9b8453803fdf228fd12e8376a74b8ab5938c4"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "port-planning-checks/v1",
+  "date": "2026-11-16",
+  "scope": "Plan and workspace layout only; no pilot runtime implemented or tested.",
+  "checks": {
+    "local_markdown_links": 28,
+    "committed_reference_hashes": 23,
+    "balanced_markdown_fences": true
+  },
+  "runtime_tests_run": false,
+  "scientific_claim": false
+}
