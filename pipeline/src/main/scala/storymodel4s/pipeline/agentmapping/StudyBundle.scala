@@ -206,6 +206,20 @@ object StudyBundle:
       producer: AgentMappingRecord.Producer,
       rows: Vector[Row]
   ): Either[String, Map[String, MappingResult]] =
+    StudyExport
+      .rendered(condition)
+      .left
+      .map(_.message)
+      .flatMap(_ => fields(condition, protocolName, recall, view, producer, rows))
+
+  private def fields(
+      condition: RecordedCondition,
+      protocolName: String,
+      recall: PreparedRecall,
+      view: TimedSourceView,
+      producer: AgentMappingRecord.Producer,
+      rows: Vector[Row]
+  ): Either[String, Map[String, MappingResult]] =
     Fields.foldLeft[Either[String, Map[String, MappingResult]]](Right(Map.empty)) { (acc, f) =>
       acc.flatMap { done =>
         val bound =
@@ -291,8 +305,15 @@ object StudyBundle:
   final case class Loaded(
       records: Map[String, MappingResult],
       units: Vector[Json],
-      condition: RecordedCondition
-  )
+      condition: RecordedCondition,
+      participant: String,
+      session: String,
+      model: String,
+      provider: String,
+      protocol: String
+  ):
+    /** The bundle's identity: its two records' digests, in field order. */
+    def identity: Checksum = Checksum.ofText(Fields.map(f => records(f).digest.hex).mkString("\n"))
 
   /** Keys a self-reported extra may not use: they would overwrite a row's own fields wherever a row
     * is flattened into a reply file.
@@ -388,6 +409,7 @@ object StudyBundle:
         .filter(s => s == Schema || s == SchemaV3)
         .toRight("not a v2 or v3 mapping bundle")
       condition <- readCondition(schema, p)
+      _ <- StudyExport.rendered(condition).left.map(_.message)
       _ <- Either.cond(
         expected.condition.forall(_ == condition),
         (),
@@ -532,7 +554,16 @@ object StudyBundle:
             )
           yield done.updated(f, record)
       }
-    yield Loaded(records, units, condition)
+    yield Loaded(
+      records,
+      units,
+      condition,
+      expected.participant,
+      expected.session,
+      expected.producer.model,
+      expected.producer.provider,
+      protocol
+    )
 
   /** The condition a bundle records. A v2 bundle has a name alone and reads as a legacy condition;
     * a v3 bundle must carry its producer condition. Neither may carry the other's form.

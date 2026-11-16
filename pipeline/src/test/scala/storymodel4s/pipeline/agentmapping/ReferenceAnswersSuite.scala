@@ -180,7 +180,7 @@ class ReferenceAnswersSuite extends FunSuite:
           Vector(Vector(Field.Value(Vector(iv(1, 1)))))
         )
       case other => fail(s"xa: $other")
-    assertEquals(receipts, Vector(BatchReceipt(0, 1, true, 0), BatchReceipt(1, 2, true, 0)))
+    assertEquals(receipts, Vector(BatchReceipt(0, 1, true, 0, 0), BatchReceipt(1, 2, true, 0, 0)))
 
   test("an attempt the replay needs but has no recording refuses the replay"):
     val rec = recorded
@@ -195,7 +195,7 @@ class ReferenceAnswersSuite extends FunSuite:
     val (out, receipts) =
       right(replay(Vector(Batch("p", Vector("xa"))), Schema.LocalV2, rows, serve))
     assertEquals(out, Map("xa" -> Outcome.Unparsable))
-    assertEquals(receipts, Vector(BatchReceipt(0, Attempts, false, 0)))
+    assertEquals(receipts, Vector(BatchReceipt(0, Attempts, false, 0, 0)))
     assertEquals(
       replay(
         Vector(Batch("p", Vector("xa")), Batch("q", Vector("xa"))),
@@ -206,70 +206,133 @@ class ReferenceAnswersSuite extends FunSuite:
       Left(ReplayFailure.RepeatedItem("xa"))
     )
 
+  test("a repeated reply id within one batch keeps the last item and is counted"):
+    val text = """{"items":[{"id":"xa","talk":"fragment"},{"id":"xa","talk":"commentary"},""" +
+      """{"id":5,"talk":"episodic"},{"talk":"episodic"}]}"""
+    val serve: String => Either[ExchangeFailure, ModelReply] = _ => Right(reply(text))
+    val (out, receipts) =
+      right(replay(Vector(Batch("p", Vector("xa", "5"))), Schema.LocalV2, rows, serve))
+    assertEquals(receipts, Vector(BatchReceipt(0, 1, true, 1, 1)))
+    out("xa") match
+      case Outcome.Answered(a, _) =>
+        assertEquals(a.talk, TalkAnswer.Whole(Field.Value(Talk.Commentary)))
+      case other => fail(s"xa: $other")
+    // A numeric id answers no item, even one asked as "5": it is refused, not coerced.
+    assertEquals(out("5"), Outcome.Omitted)
+
   // The reference bundle.
 
   private lazy val condition = declared("local", contentLocal(2))
-  private lazy val outcomes = right(
-    replay(batches, Schema.LocalV2, rows, TextExchange.replay(recorded, "cli", "opus", system, _))
-  )._1
-  private lazy val unitIds = recall.unitIds.map(_.value)
-  private lazy val asked =
-    Vector((1, unitIds(0), "xa"), (2, unitIds(1), "xb"), (3, unitIds(2), "xc"))
-  private lazy val provenance = ReferenceBundle.Provenance(
-    "p1",
-    "s1",
-    condition,
-    "opus",
-    "cli",
-    Schema.LocalV2,
-    Checksum.ofText(system).hex
-  )
-  private lazy val refUnits =
-    asked.map((u, id, item) => ReferenceBundle.UnitAnswer(u, id, item, outcomes(item)))
-  private lazy val doc = ReferenceBundle.encode(provenance, rows, refUnits)
-  private lazy val expectedRef = ReferenceBundle.Expected(
-    "p1",
-    "s1",
-    asked,
-    condition,
-    "opus",
-    "cli",
-    Schema.LocalV2,
-    Checksum.ofText(system).hex
-  )
+  private lazy val run = referenceRun(condition, referenceBatches(2))
 
-  test("a reference bundle round trips through text"):
+  test("a reference bundle round trips through text, with its batches and rendering"):
+    val doc = right(run.doc)
     val back = right(
       io.circe.jawn
         .parse(doc.noSpaces)
         .left
         .map(_.message)
-        .flatMap(ReferenceBundle.decode(_, rows, expectedRef))
+        .flatMap(ReferenceBundle.decode(_, rows, run.expected))
     )
-    assertEquals(back.units, refUnits)
-    assertEquals(back.provenance, provenance)
+    assertEquals(back.units, run.units)
+    assertEquals(back.provenance, run.provenance)
     assertEquals(
       doc.hcursor.downField("provenance").downField("producerCondition").focus,
       Some(contentLocal(2).json)
     )
-
-  test("a reference bundle refuses an edited answer, an edited reply, or another condition"):
-    def unit0(f: Json => Json)(d: Json) =
-      d.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(0, f(us(0))))))
-    val answerEdited = unit0(_.mapObject(_.add("answer", Json.obj())))(doc)
-    assert(ReferenceBundle.decode(answerEdited, rows, expectedRef).isLeft)
-    val replyEdited = unit0(
-      _.mapObject(o => o.add("reply", o("reply").get.mapObject(_.add("hedge", Json.True))))
-    )(doc)
+    val batches = doc.hcursor.get[Vector[Json]]("batches").toOption.get
     assertEquals(
-      ReferenceBundle.decode(replyEdited, rows, expectedRef),
+      batches.map(_.hcursor.get[String]("promptSha256").toOption),
+      run.recorded.map(r => Some(Checksum.ofText(r.batch.prompt).hex))
+    )
+    // Only this session's items are listed; the foreign item stays out.
+    assertEquals(
+      batches.head.hcursor.get[Vector[String]]("items").toOption,
+      Some(Vector("xb", "xa"))
+    )
+    assertEquals(
+      doc.hcursor.downField("rendering").get[String]("sha256").toOption,
+      Some(back.rendering.sha256.hex)
+    )
+
+  test("the rendering identity is derived from the prompts, not the condition alone"):
+    val other =
+      referenceRun(condition, referenceBatches(2).map(b => b.copy(prompt = b.prompt + "\n")))
+    assertNotEquals(right(other.loaded).rendering.sha256, right(run.loaded).rendering.sha256)
+    assertNotEquals(right(run.loaded).rendering.sha256, contentLocal(2).digest)
+
+  test("a unit whose ITEM line is not in its batch prompt is refused"):
+    val missing = referenceBatches(2).updated(
+      1,
+      Batch(harnessPrompt(Vector(itemBlock("xq", Some("ctx"), "a mouse"))), Vector("xc"))
+    )
+    assertEquals(
+      referenceRun(condition, missing).doc,
+      Left("unit 3: its ITEM line is not once in its prompt")
+    )
+
+  test("context lines must match the declared window"):
+    // Prompts with context, declared as target-only; and prompts without, declared as k = 2.
+    assertEquals(
+      referenceRun(declared("local", contentLocal(0)), referenceBatches(2)).doc.left.toOption,
+      Some("unit 1: the window is the target only but its prompt shows context")
+    )
+    assertEquals(
+      referenceRun(condition, referenceBatches(0)).doc.left.toOption,
+      Some("unit 1: the window has preceding units but its prompt shows no context")
+    )
+    assert(referenceRun(declared("local", contentLocal(0)), referenceBatches(0)).doc.isRight)
+
+  test("under declared opaque ids, an id that encodes the unit's position is refused"):
+    val positional = Vector("u1", "u2", "u3")
+    assertEquals(
+      referenceRun(condition, referenceBatches(2, positional), positional).doc,
+      Left("unit 1: its item id encodes its position, under declared opaque ids")
+    )
+    assert(ReferenceBundle.encodesPosition("3", 3, 2, "unit-x"))
+    assert(ReferenceBundle.encodesPosition("item_002", 9, 1, "unit-x"))
+    assert(ReferenceBundle.encodesPosition("x-unit-x", 9, 1, "unit-x"))
+    assert(!ReferenceBundle.encodesPosition("x3f9a01c2be", 3, 2, "unit-x"))
+
+  test("a whole-recall condition is refused on the reference path"):
+    assertEquals(
+      referenceRun(declared("local", wholeRecall), referenceBatches(2)).doc,
+      Left(ProducerCondition.Refusal.NotRendered("reference path", wholeRecall.rendering).message)
+    )
+
+  test("a reference bundle refuses an edited answer, reply, receipt, rendering or condition"):
+    val doc = right(run.doc)
+    def unit0(f: Json => Json)(d: Json) =
+      d.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(1, f(us(1))))))
+    def decodeIt(d: Json) = ReferenceBundle.decode(d, rows, run.expected)
+    // Unit 1 is in position 0; edit the answered unit xa.
+    def first(f: Json => Json)(d: Json) =
+      d.mapObject(o => o.add("units", o("units").get.mapArray(us => us.updated(0, f(us(0))))))
+    assert(decodeIt(first(_.mapObject(_.add("answer", Json.obj())))(doc)).isLeft)
+    assertEquals(
+      decodeIt(
+        first(
+          _.mapObject(o => o.add("reply", o("reply").get.mapObject(_.add("hedge", Json.True))))
+        )(doc)
+      ),
       Left("unit 1: the answer is not what its reply gives against this source")
     )
-    val other = expectedRef.copy(condition = declared("local", contentLocal(3)))
+    assert(decodeIt(unit0(_.mapObject(_.add("reply", Json.obj())))(doc)).isLeft)
+    val receipt = doc.mapObject(o =>
+      o.add(
+        "batches",
+        o("batches").get.mapArray(bs =>
+          bs.updated(0, bs(0).mapObject(_.add("attempts", Json.fromInt(2))))
+        )
+      )
+    )
+    assertEquals(decodeIt(receipt), Left("the batches are not the expected prompts and receipts"))
+    val rendering = doc.mapObject(o =>
+      o.add("rendering", o("rendering").get.mapObject(_.add("sha256", Json.fromString("0" * 64))))
+    )
+    assertEquals(decodeIt(rendering), Left("the rendering is not what the prompts give"))
+    val other = run.expected.copy(condition = declared("local", contentLocal(3)))
     assertEquals(
       ReferenceBundle.decode(doc, rows, other),
       Left("the bundle names another producer condition")
     )
-    val omittedWithReply =
-      unit0(_.mapObject(_.add("status", Json.fromString("omitted"))))(doc)
-    assert(ReferenceBundle.decode(omittedWithReply, rows, expectedRef).isLeft)

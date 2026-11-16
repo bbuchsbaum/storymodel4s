@@ -303,9 +303,17 @@ object ReferenceAnswers:
   final case class Batch(prompt: String, items: Vector[String])
 
   /** What one batch took: attempts used, whether a reply was accepted, and how many reply items
-    * repeated an earlier id (the last one is kept, as the harness kept it).
+    * repeated an earlier id (the last one is kept, as the harness kept it), and how many reply
+    * items had an id that is not a string. Such an item is refused: it answers no asked item, where
+    * the harness would have read it through `str()`.
     */
-  final case class BatchReceipt(batch: Int, attempts: Int, accepted: Boolean, repeated: Int)
+  final case class BatchReceipt(
+      batch: Int,
+      attempts: Int,
+      accepted: Boolean,
+      repeated: Int,
+      nonStringIds: Int
+  )
 
   enum ReplayFailure:
     case Unrecorded(batch: Int, attempt: Int)
@@ -355,7 +363,14 @@ object ReferenceAnswers:
               }
               (
                 done ++ outcomes,
-                receipts :+ BatchReceipt(b, attempts, accepted.isDefined, kept.size - byId.size)
+                receipts :+ BatchReceipt(
+                  b,
+                  attempts,
+                  accepted.isDefined,
+                  kept.size - byId.size,
+                  accepted.toVector.flatten
+                    .count(item => item.hcursor.downField("id").focus.exists(!_.isString))
+                )
               )
             }
           }

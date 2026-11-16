@@ -50,9 +50,14 @@ enum OrderExposure:
 /** The item identifiers the producer saw.
   *
   * Why: an identifier that encodes a unit's position tells the producer the order a shuffle hides;
-  * this is the leak case study 1 found. An opaque identifier records its salt only by checksum, so
-  * the bundle never holds a secret salt; the recorded prompts already fix every exposed identifier
-  * for replay, and whoever holds the salt can prove it against the checksum.
+  * this is the leak case study 1 found. An opaque identifier records its salt only by checksum,
+  * because the recorded prompts already fix every exposed identifier for replay, and whoever holds
+  * the salt can prove it against the checksum.
+  *
+  * The checksum is not secrecy. A low-entropy salt is recovered from it by guessing, and a salt
+  * equal to the recorded shuffle seed (as in the case-study harness) is disclosed by the seed. The
+  * salt is not secret from people who read a bundle; what the condition records is that the model
+  * was never shown it, nor any identifier that encodes position.
   */
 enum ExposedIds:
   /** Identifiers that are, or are derived from, the unit's position in its recall. */
@@ -95,12 +100,12 @@ final class ProducerCondition private (
     ProducerCondition.Estimand(
       window,
       order match
-        case OrderExposure.Visible          => "order-visible"
-        case OrderExposure.PooledShuffle(_) => "order-hidden"
+        case OrderExposure.Visible          => ProducerCondition.OrderKind.Visible
+        case OrderExposure.PooledShuffle(_) => ProducerCondition.OrderKind.Hidden
       ,
       ids match
-        case ExposedIds.Positional         => "ids-positional"
-        case ExposedIds.OpaqueSalted(_, _) => "ids-opaque"
+        case ExposedIds.Positional         => ProducerCondition.IdKind.Positional
+        case ExposedIds.OpaqueSalted(_, _) => ProducerCondition.IdKind.Opaque
     )
 
   /** A plain description for a record's context policy. */
@@ -155,15 +160,29 @@ object ProducerCondition:
     case BadScheme(scheme: String)
     case Malformed(reason: String)
 
+    /** A path that renders only one kind of prompt was given a condition it does not render. */
+    case NotRendered(path: String, rendering: String)
+
     def message: String = this match
       case NegativeWindow(k)        => s"a context window of $k preceding units"
       case PositionalIdsExposeOrder => "positional item ids expose the order a pooled shuffle hides"
       case WholeRecallExposesOrder  => "a whole recall in its told order exposes recall order"
       case BadScheme(s)             => s"the id scheme $s is not a plain name"
       case Malformed(reason)        => s"producer condition: $reason"
+      case NotRendered(path, r)     => s"the $path renders no prompt under $r"
 
   /** What a condition measures; see `ProducerCondition.estimand`. */
-  final case class Estimand(window: ContextWindow, order: String, ids: String)
+  final case class Estimand(window: ContextWindow, order: OrderKind, ids: IdKind)
+
+  /** Whether recall order was exposed, without the seed. */
+  enum OrderKind(val token: String):
+    case Visible extends OrderKind("order-visible")
+    case Hidden extends OrderKind("order-hidden")
+
+  /** Whether item ids were positional or opaque, without the scheme or salt. */
+  enum IdKind(val token: String):
+    case Positional extends IdKind("ids-positional")
+    case Opaque extends IdKind("ids-opaque")
 
   private val Scheme = "[A-Za-z0-9][A-Za-z0-9_.-]*".r
 
@@ -190,32 +209,52 @@ object ProducerCondition:
   def decode(doc: Json): Either[Refusal, ProducerCondition] =
     val c = doc.hcursor
     def bad(reason: String) = Refusal.Malformed(reason)
+    def keys(at: Option[Json]): Set[String] = at.flatMap(_.asObject).fold(Set.empty)(_.keys.toSet)
+    def exactly(at: Option[Json], allowed: Set[String], what: String): Either[Refusal, Unit] =
+      Either.cond(
+        keys(at) == allowed,
+        (),
+        bad(s"$what has keys other than ${allowed.toVector.sorted.mkString(", ")}")
+      )
+    def integral(at: io.circe.ACursor, key: String): Option[BigInt] =
+      at.downField(key).focus.flatMap(StudyReplay.strictInteger)
     for
+      _ <- exactly(Some(doc), Set("rendering", "window", "order", "ids"), "a producer condition")
       windowKind <- c.downField("window").get[String]("kind").left.map(_ => bad("no window"))
       window <- windowKind match
-        case "whole-recall" => Right(ContextWindow.WholeRecall)
-        case "preceding"    =>
-          c.downField("window")
-            .get[Int]("units")
-            .left
-            .map(_ => bad("no window units"))
-            .flatMap(ContextWindow.Preceding.of)
+        case "whole-recall" =>
+          exactly(c.downField("window").focus, Set("kind"), "the window")
+            .map(_ => ContextWindow.WholeRecall)
+        case "preceding" =>
+          for
+            _ <- exactly(c.downField("window").focus, Set("kind", "units"), "the window")
+            k <- integral(c.downField("window"), "units")
+              .filter(_.isValidInt)
+              .toRight(bad("window units are not an integer"))
+            w <- ContextWindow.Preceding.of(k.toInt)
+          yield w
         case other => Left(bad(s"unknown window $other"))
       orderKind <- c.downField("order").get[String]("kind").left.map(_ => bad("no order"))
       order <- orderKind match
-        case "visible"        => Right(OrderExposure.Visible)
+        case "visible" =>
+          exactly(c.downField("order").focus, Set("kind"), "the order").map(_ =>
+            OrderExposure.Visible
+          )
         case "pooled-shuffle" =>
-          c.downField("order")
-            .get[Long]("seed")
-            .left
-            .map(_ => bad("no shuffle seed"))
-            .map(OrderExposure.PooledShuffle(_))
+          for
+            _ <- exactly(c.downField("order").focus, Set("kind", "seed"), "the order")
+            seed <- integral(c.downField("order"), "seed")
+              .filter(_.isValidLong)
+              .toRight(bad("the shuffle seed is not an integer"))
+          yield OrderExposure.PooledShuffle(seed.toLong)
         case other => Left(bad(s"unknown order $other"))
       idsKind <- c.downField("ids").get[String]("kind").left.map(_ => bad("no ids"))
       ids <- idsKind match
-        case "positional"    => Right(ExposedIds.Positional)
+        case "positional" =>
+          exactly(c.downField("ids").focus, Set("kind"), "the ids").map(_ => ExposedIds.Positional)
         case "opaque-salted" =>
           for
+            _ <- exactly(c.downField("ids").focus, Set("kind", "scheme", "saltSha256"), "the ids")
             scheme <- c.downField("ids").get[String]("scheme").left.map(_ => bad("no id scheme"))
             raw <- c.downField("ids").get[String]("saltSha256").left.map(_ => bad("no salt hash"))
             hash <- Checksum.from(raw).left.map(_ => bad("salt hash is not a checksum"))

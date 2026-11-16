@@ -157,7 +157,7 @@ object StudyExport:
                   .left
                   .map(_.message)
                   .flatMap(RecordedCondition.declared(condition, _))
-          recorded.flatMap { typed =>
+          recorded.flatMap(c => rendered(c).left.map(_.message)).flatMap { typed =>
             StudyReplay.ReplyProtocol
               .named(protocolName)
               .toRight(s"unknown reply protocol $protocolName")
@@ -263,6 +263,18 @@ object StudyExport:
         scales <- partScales(parts)
         table <- SceneIntervals.build(view, scales, clock._1, clock._2)
       yield Some((table, Checksum.ofText(raw).hex))
+
+  /** The only producer condition a study export renders. `StudyReplay.validate` requires every
+    * chunk prompt to hold every unit's line, numbered by its position, in recall order; so a study
+    * prompt shows the whole recall, in order, with positional ids, and a declared condition must
+    * say exactly that. Anything else would be asserted, not rendered (ADR 0022). A legacy condition
+    * asserts nothing and passes.
+    */
+  def rendered(condition: RecordedCondition): Either[ProducerCondition.Refusal, RecordedCondition] =
+    condition.producer match
+      case Some(p) if p != ProducerCondition.WholeRecallInOrder =>
+        Left(ProducerCondition.Refusal.NotRendered("study export path", p.rendering))
+      case _ => Right(condition)
 
   /** A receipt with its producer condition beside the condition's name, when one was declared. */
   def describe(condition: RecordedCondition)(doc: Json): Json =

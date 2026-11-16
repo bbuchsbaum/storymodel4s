@@ -21,10 +21,27 @@ object ConditionView:
     /** Two bundles answer different questions. */
     case DifferentEstimands(first: RecordedCondition, other: RecordedCondition)
 
+    /** The same participant-session, or the same bundle, appears twice. */
+    case Duplicate(participant: String, session: String)
+
+    /** Bundles from different models, providers or reply protocols, without a declared pooling. */
+    case DifferentProducers(first: String, other: String)
+
     def message: String = this match
       case Empty                        => "no bundles to combine"
       case DifferentEstimands(a, other) =>
         s"bundles of different producer conditions are not one estimand: $a and $other"
+      case Duplicate(p, s)              => s"the bundle for $p $s appears twice"
+      case DifferentProducers(a, other) =>
+        s"bundles of different producers are not pooled without a declaration: $a and $other"
+
+  /** Whether a readout may pool bundles of different models, providers or reply protocols. */
+  enum Pooling:
+    /** Every bundle has the same model, provider and protocol. */
+    case SameProducer
+
+    /** Pooling across producers is declared, with the reason recorded in the readout. */
+    case AcrossProducers(reason: String)
 
   /** Items of one estimand, with the conditions they were recorded under, in input order. */
   final class Combined[A] private[ConditionView] (
@@ -64,8 +81,33 @@ object ConditionView:
   /** A study-level readout over saved bundles: per judgement, how many units fell in each kind, and
     * the bundles' estimand. Only bundles of one estimand are read out together.
     */
-  def readout(bundles: Vector[StudyBundle.Loaded]): Either[Refusal, Json] =
-    combine(bundles)(_.condition).map { combined =>
+  def readout(
+      bundles: Vector[StudyBundle.Loaded],
+      pooling: Pooling = Pooling.SameProducer
+  ): Either[Refusal, Json] =
+    def producer(b: StudyBundle.Loaded) = s"${b.provider}/${b.model}/${b.protocol}"
+    val duplicate = bundles
+      .groupBy(b => (b.participant, b.session))
+      .collectFirst { case ((p, s), bs) if bs.size > 1 => Refusal.Duplicate(p, s) }
+      .orElse(
+        bundles
+          .groupBy(_.identity)
+          .collectFirst {
+            case (_, bs) if bs.size > 1 => Refusal.Duplicate(bs.head.participant, bs.head.session)
+          }
+      )
+    val mixed = pooling match
+      case Pooling.AcrossProducers(_) => None
+      case Pooling.SameProducer       =>
+        bundles.headOption.flatMap { head =>
+          bundles.find(b => producer(b) != producer(head)).map { b =>
+            Refusal.DifferentProducers(producer(head), producer(b))
+          }
+        }
+    for
+      combined <- combine(bundles)(_.condition)
+      _ <- duplicate.orElse(mixed).toLeft(())
+    yield
       def kinds(field: String): Json =
         val all = combined.items.flatMap(_.units.flatMap { u =>
           u.hcursor.downField(field).downField("judgement").get[String]("kind").toOption
@@ -80,8 +122,8 @@ object ConditionView:
           e =>
             Json.obj(
               "window" -> Json.fromString(e.window.token),
-              "order" -> Json.fromString(e.order),
-              "ids" -> Json.fromString(e.ids)
+              "order" -> Json.fromString(e.order.token),
+              "ids" -> Json.fromString(e.ids.token)
             )
         ),
         "conditions" -> Json.fromValues(combined.conditions.map { c =>
@@ -90,8 +132,15 @@ object ConditionView:
               c.producer.map(p => "rendering" -> Json.fromString(p.rendering))
           )
         }),
+        "pooling" -> (pooling match
+          case Pooling.SameProducer =>
+            Json.obj("producer" -> Json.fromString(producer(bundles.head)))
+          case Pooling.AcrossProducers(r) =>
+            Json.obj(
+              "acrossProducers" -> Json.fromString(r),
+              "producers" -> Json.fromValues(bundles.map(producer).distinct.map(Json.fromString))
+            )),
         "bundles" -> Json.fromInt(combined.items.size),
         "units" -> Json.fromInt(combined.items.map(_.units.size).sum),
         "judgements" -> Json.fromFields(StudyBundle.Fields.map(f => f -> kinds(f)))
       )
-    }
