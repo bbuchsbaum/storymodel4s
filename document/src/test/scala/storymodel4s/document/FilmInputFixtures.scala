@@ -128,7 +128,8 @@ private[document] object FilmInputFixtures:
       calls.head.inputChecksum,
       Checksum.ofText("recipe"),
       FilmCompilerInput.fullChartChecksum(ev),
-      calls
+      calls,
+      calls.head
     )
   val bindingA = binding(a, evidenceA, Vector(callA, shared))
   val bindingB = binding(b, evidenceB, Vector(callB, shared))

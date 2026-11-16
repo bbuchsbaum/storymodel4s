@@ -25,3 +25,33 @@ conversion, or gap filling, and a direct primary-axis anchor remains required.
 `provenanceFor` takes actual `ChartNodeRef`s. It returns the selected associations' provider calls,
 deduplicating shared upstream calls; it does not infer parse membership from text offsets or media
 ticks. This boundary confirms declared correspondence, not that an external parser was executed.
+
+The independent expectation is selected before accepting submitted records. This executable
+example is checked against `FilmInputSuite` (the `film-input-example` region):
+
+```scala
+def prepareFilmProposal(
+    bundle: SourceBundle,
+    expectedRecords: Vector[FilmSourceRecord],
+    receivedRecords: Vector[FilmSourceRecord],
+    originalUnits: Vector[NarrativeProposalUnit],
+    expectedOutput: Checksum
+): Either[DomainError, FilmProposalSurface] =
+  FilmProposalSurface
+    .expectedDerivation(bundle, expectedRecords, originalUnits, expectedOutput)
+    .flatMap(expected =>
+      FilmProposalSurface.derive(bundle, receivedRecords, originalUnits, expected)
+    )
+```
+
+The caller must obtain `expectedRecords` and `expectedOutput` from its intended acquisition
+inventory; deriving both sides from an untrusted submitted payload only declares that payload.
+The test runs the accepting example and a swapped-input refusal. Original units preserve their
+complete support and must have no surface sentence. `originalUnitIdentity` and
+`expectedDerivation` expose the fixed identity recipe without requiring consumers to duplicate it.
+
+Each `FilmParseBinding` names one `producingCall`, which must be an exact chart receipt for the
+declared request, and its parser fingerprint must equal the chart's parser origin. Other receipts
+remain as upstream provenance. The separate expected inventory pins `recipeIdentity`; this
+portable join does not reconstruct a provider's request recipe or attest provider execution.
+Selecting a different producing receipt changes the checked input identity.

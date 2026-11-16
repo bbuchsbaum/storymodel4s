@@ -159,3 +159,87 @@ class FilmInputAssociationSuite extends FunSuite:
       prepared.derivation.receipt
     )
   }
+
+  test("matching expectation cannot disguise a different parser or producing request") {
+    def changed(binding: FilmParseBinding) = FilmCompilerInput.of(
+      prepared,
+      Vector(associations.head.copy(binding = binding), associations(1)),
+      Vector(binding, bindingB),
+      Vector.empty
+    )
+    assert(input().isRight)
+    assert(
+      changed(bindingA.copy(parser = Fingerprint.unsafe("other"))).left.toOption.get.toString
+        .contains("chart/parser")
+    )
+    assert(
+      changed(bindingA.copy(requestChecksum = Checksum.ofText("other"))).left.toOption.get.toString
+        .contains("chart/request")
+    )
+    assert(
+      changed(bindingA.copy(producingCall = callB)).left.toOption.get.toString
+        .contains("chart/request")
+    )
+  }
+
+  test("selecting a different producing receipt changes input identity even for the same request") {
+    val alternative =
+      callA.copy(outputChecksum = Checksum.ofText("alternate"), params = Map("mode" -> "alternate"))
+    val original = evidenceA.chart
+    val ev = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            original.focus,
+            original.concepts,
+            original.relations,
+            provenance = original.provenance.copy(receipts = Vector(callA, alternative, shared)),
+            sentence = original.sentence
+          )
+        )
+        .toOption
+        .get
+    )
+    val binding = bindingA.copy(
+      outputChartChecksum = FilmCompilerInput.fullChartChecksum(ev),
+      calls = ev.provenance.receipts
+    )
+    def checked(producer: ProviderCall) =
+      val bound = binding.copy(producingCall = producer)
+      FilmCompilerInput
+        .of(
+          prepared,
+          Vector(FilmChartAssociation(ev, bound), associations(1)),
+          Vector(bound, bindingB),
+          Vector.empty
+        )
+        .toOption
+        .get
+    assertNotEquals(checked(callA).identity, checked(alternative).identity)
+  }
+
+  test("calibrated chart checksum matches the independently encoded portable golden") {
+    def chart(probability: Double, model: String) =
+      val c = Credence
+        .calibrated(
+          0.25,
+          ScorerId.unsafe("f1-scorer"),
+          Probability.unsafe(probability),
+          CalibrationModelId.unsafe(model)
+        )
+        .toOption
+        .get
+      val provenance =
+        ChartProvenance(ChartOrigin.Hand, Vector.empty, Vector(Checksum.ofText("alternative") -> c))
+      PropositionEvidence.of(
+        ChartValidator
+          .check(PropositionChart.unchecked(None, Map.empty, Vector.empty, provenance = provenance))
+          .toOption
+          .get
+      )
+    val original = FilmCompilerInput.fullChartChecksum(chart(0.1, "f1-calibration"))
+    // Python hashlib + struct.pack('>d') field encoding, independently calculated before this run.
+    assertEquals(original.hex, "399403c26574ed94f568145af09f620ce09615fa599b4932282b29e7efd933d4")
+    assertNotEquals(original, FilmCompilerInput.fullChartChecksum(chart(0.2, "f1-calibration")))
+    assertNotEquals(original, FilmCompilerInput.fullChartChecksum(chart(0.1, "other-model")))
+  }

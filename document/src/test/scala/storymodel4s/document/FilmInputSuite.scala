@@ -168,3 +168,24 @@ class FilmInputSuite extends FunSuite:
     )
     variants.foreach(changed => assertNotEquals(prepared(changed).toOption.get.identity, base))
   }
+
+  // film-input-example-start
+  def prepareFilmProposal(
+      bundle: SourceBundle,
+      expectedRecords: Vector[FilmSourceRecord],
+      receivedRecords: Vector[FilmSourceRecord],
+      originalUnits: Vector[NarrativeProposalUnit],
+      expectedOutput: Checksum
+  ): Either[DomainError, FilmProposalSurface] =
+    FilmProposalSurface
+      .expectedDerivation(bundle, expectedRecords, originalUnits, expectedOutput)
+      .flatMap(expected =>
+        FilmProposalSurface.derive(bundle, receivedRecords, originalUnits, expected)
+      )
+  // film-input-example-end
+
+  test("documented preparation example accepts expected records and refuses substituted inputs") {
+    val output = Checksum.ofText(rows.map(_.description).mkString("\n\n"))
+    assert(prepareFilmProposal(bundle, rows, rows, Vector(original), output).isRight)
+    assert(prepareFilmProposal(bundle, rows, rows.reverse, Vector(original), output).isLeft)
+  }

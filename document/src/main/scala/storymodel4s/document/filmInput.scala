@@ -186,9 +186,13 @@ object FilmProposalSurface:
             invalid("receipt", "surface receipt does not bind recipe and complete input inventory")
           else
             val surface = SurfaceAnalyzer.analyze(source)
-            val sentenceByRecord = records.zipWithIndex.flatMap { case (record, index) =>
-              val start = records.take(index).map(_.description.length + Separator.length).sum
-              val end = start + record.description.length
+            val starts = records.scanLeft(0)((offset, record) =>
+              offset + record.description.length + Separator.length
+            )
+            val ranges = records
+              .zip(starts)
+              .map((record, start) => (record, start, start + record.description.length))
+            val sentenceByRecord = ranges.flatMap { case (record, start, end) =>
               surface.units.collect {
                 case sentence @ SurfaceUnit(_, SurfaceUnitKind.Sentence, span, _, _)
                     if span.start >= start && span.endExclusive <= end =>
@@ -199,9 +203,7 @@ object FilmProposalSurface:
               case sentence @ SurfaceUnit(_, SurfaceUnitKind.Sentence, _, _, _) => sentence
             }
             if sentences.exists { sentence =>
-                val owning = records.zipWithIndex.count { case (record, index) =>
-                  val start = records.take(index).map(_.description.length + Separator.length).sum
-                  val end = start + record.description.length
+                val owning = ranges.count { case (_, start, end) =>
                   sentence.span.start >= start && sentence.span.endExclusive <= end
                 }
                 owning != 1
@@ -266,9 +268,11 @@ final case class FilmParseBinding(
     requestChecksum: Checksum,
     recipeIdentity: Checksum,
     outputChartChecksum: Checksum,
-    calls: Vector[ProviderCall]
+    calls: Vector[ProviderCall],
+    producingCall: ProviderCall
 )
 
+/** Keeps a checked chart beside the independently expected parse correspondence. */
 final case class FilmChartAssociation(evidence: PropositionEvidence, binding: FilmParseBinding)
 
 /** The explicitly declared proposal sentences consumed by one compiler attempt. */
@@ -338,7 +342,17 @@ object FilmCompilerInput:
     value + "(" + fields.map(Checksum.ofText(_).hex).mkString(",") + ")"
   private def opt(value: Option[String]): String = value.fold("none")(v => tag("some", Vector(v)))
   private def credence(value: Credence): String =
-    tag("credence", Vector(value.score.render, value.basis.render))
+    tag(
+      "credence",
+      Vector(
+        value.score.render,
+        value.basis match
+          case CredenceBasis.Uncalibrated         => "uncalibrated"
+          case CredenceBasis.Determined(rule)     => tag("determined", Vector(rule.value))
+          case CredenceBasis.Calibrated(p, model) =>
+            tag("calibrated", Vector(Score.hexBits(p.value), model.value))
+      )
+    )
   private def call(value: ProviderCall): String =
     tag(
       "call",
@@ -530,6 +544,15 @@ object FilmCompilerInput:
                 "chart/binding",
                 "binding does not name the prepared surface and origin record"
               )
+            else if chart.provenance.origin != ChartOrigin.Parser(binding.parser) then
+              invalid("chart/parser", "declared parser differs from chart parser origin")
+            else if !binding.calls.contains(binding.producingCall) ||
+              binding.producingCall.inputChecksum != binding.requestChecksum
+            then
+              invalid(
+                "chart/request",
+                "producing call must be an exact chart receipt for the declared request"
+              )
             else if binding.calls != chart.provenance.receipts then
               invalid("chart/calls", "expected parser calls differ from chart receipts")
             else if fullChartChecksum(association.evidence) != binding.outputChartChecksum then
@@ -665,7 +688,8 @@ object FilmCompilerInput:
                       b.parser.value,
                       b.requestChecksum.hex,
                       b.recipeIdentity.hex,
-                      b.outputChartChecksum.hex
+                      b.outputChartChecksum.hex,
+                      call(b.producingCall)
                     ) ++
                       b.calls.map(call)
                   } ++
