@@ -4,6 +4,7 @@ smoke run of the mapping object from case study 1's recorded content-local answe
 Usage (from tools/case-studies/recall-precision):
   python -m cs2.run baselines CORPUS OUT_DIR      # development participants with gold only
   python -m cs2.run sherlock-smoke OUT_DIR
+  python -m cs2.run ff-pilot PARTICIPANT SESSION OUT_DIR   # makes model calls (pilot only)
 
 Outputs (under the ignored data root): summary.json, rows.tsv (keys and bits, no text) and
 manifest.json with the commit SHA, the config digest and input digests. Recall text is read into
@@ -497,9 +498,83 @@ def cmd_sherlock_smoke(out):
     )
 
 
+def cmd_ff_pilot(participant, session, out):
+    """Two-level producer on ONE development participant-session, then the yardstick."""
+    from cs2 import ff_producer as P
+
+    A = D.adapter("filmfestival")
+    if participant not in A.development():
+        raise SystemExit(f"{participant} is not a development participant")
+    cfg = SC.load_config()
+    comp = A.composition("JL")
+    acc, ledger, log = P.run(A, participant, session, out)
+    all_gold = gold_by_participant(A, A.development())
+    rows = [g for g in all_gold[participant] if g.session == session]
+    gold = {participant: rows}
+    dur, fc_all = baseline_forecasts(A, comp, all_gold, cfg)
+    fc = {k: {(participant, session): v[(participant, session)]} for k, v in fc_all.items()}
+    named = {k: score_map(comp, gold, v, cfg, True) for k, v in fc.items()}
+    ld = LocationDistribution.from_words(acc, acc.words[(participant, session)], bins_of(rows),
+                                         cfg["allocation"])
+    named["producer"] = score_map(
+        comp, gold, {(participant, session): SC.producer_forecasts(ld, dur, cfg)}, cfg, True
+    )
+    terms = ("film_bits", "work_bits", "scene_bits", "total_bits")
+
+    def mean(sc, t):
+        v = [getattr(s, t) for s in sc if getattr(s, t) is not None]
+        return dict(n=len(v), mean=float(sum(v) / len(v)) if v else None)
+
+    def skill1(a, b, t):
+        x, y = mean(a, t)["mean"], mean(b, t)["mean"]
+        return None if x is None or not y else 1 - x / y
+
+    fresh = [c for c in log if not c["cached_before"]]
+    usage = {}
+    for c in log:
+        for k, v in (c["usage"] or {}).items():
+            if isinstance(v, (int, float)):
+                usage[k] = usage.get(k, 0) + v
+    summary = dict(
+        corpus="filmfestival", participant=participant, session=session,
+        note="PILOT: one development participant-session; one sample; no bootstrap (1 cluster)",
+        units=ledger["pass1_units"], ledger=ledger,
+        calls=dict(n=len(log), fresh=len(fresh), usage_total=usage,
+                   cost_usd_total=sum(c["cost_usd"] or 0 for c in log),
+                   per_call=[{k: c[k] for k in ("label", "call_seconds", "cost_usd",
+                                                "prompt_chars", "reply_chars", "usage")}
+                             for c in log]),
+        rows=SC.strata(named["producer"], comp, True)["rows"],
+        forecasts={k: {t: mean(v, t) for t in terms} for k, v in named.items()},
+        skill={b: {t: skill1(named["producer"], named[b], t) for t in terms}
+               for b in ("duration", "lopo", "order_oracle", "tfidf")},
+        top_scene_in_gold_set={k: (sum(s.scene_hit for s in v if s.scene_hit is not None) /
+                                   max(1, sum(1 for s in v if s.scene_hit is not None)))
+                               for k, v in named.items()},
+        producer_strata=SC.strata(named["producer"], comp, True),
+        words=word_ledger(acc.words[(participant, session)], bins_of(rows)),
+    )
+    (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
+    write_rows(out / "rows.tsv", named)
+    manifest(out, "ff-pilot", SC.CONFIG,
+             [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
+              A.FF / "derived" / "recall" / f"{participant}_{session}.csv"],
+             dict(participants=[participant], producer=acc.condition,
+                  model=P.MODEL, batch=P.BATCH, window=P.WINDOW, pause_s=P.PAUSE_S,
+                  segmentation="interim (cs2/ff_producer.py interim_units), not the library",
+                  exposed_ids="pass 1: unit numbers in spoken order, cover names, films in seeded "
+                  "random order, no times; pass 2: salted item ids, per-call row numbers, opaque "
+                  "scene labels, film-relative times, per-call film order"))
+    print(json.dumps({k: summary[k] for k in ("units", "rows", "forecasts", "skill",
+                                              "top_scene_in_gold_set")}, indent=1))
+    print(json.dumps(summary["calls"]["usage_total"]), summary["calls"]["cost_usd_total"])
+
+
 def main(argv):
     if argv[:1] == ["baselines"] and len(argv) == 3:
         cmd_baselines(argv[1], Path(argv[2]))
+    elif argv[:1] == ["ff-pilot"] and len(argv) == 4:
+        cmd_ff_pilot(argv[1], argv[2], Path(argv[3]))
     elif argv[:1] == ["sherlock-smoke"] and len(argv) == 2:
         cmd_sherlock_smoke(Path(argv[1]))
     else:

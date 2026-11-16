@@ -67,6 +67,7 @@ def call(prompt, system, model="opus", timeout=1800, retries=2):
             promptSha=sha(prompt),
             seconds=round(time.time() - t0, 1),
             usage=d.get("usage"),
+            costUsd=d.get("total_cost_usd"),
             modelUsage=list((d.get("modelUsage") or {}).keys()),
             result=d["result"],
         )
