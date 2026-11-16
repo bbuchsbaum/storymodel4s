@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 import numpy as np
 from scipy.stats import gamma as gamma_dist
@@ -27,6 +28,10 @@ LOCAL, NOCTX, A, B = (
     "llm-local-v2-a",
     "llm-local-v2-b",
 )
+
+
+LOCAL = os.environ.get("CS_LOCAL_LABEL", LOCAL)
+EXPORT_DIR = os.environ.get("CS_EXPORT_DIR", "export")
 
 
 def npz(label, name):
@@ -247,7 +252,7 @@ def convolved_collinearity():
 
 def export_tsv():
     """Per-participant TR-grid regressor file (recall clock, OpenNeuro, TR 1.5 s) + JSON sidecar."""
-    out = D.OUT / "export"
+    out = D.OUT / EXPORT_DIR
     out.mkdir(exist_ok=True)
     cols = ["words", "n_refs", "n_not_applicable_units", "n_uncovered_words", "n_unassigned_words",
             "logB", "Uflag", "hedge", "nonepisodic"]
