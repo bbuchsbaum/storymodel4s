@@ -193,7 +193,7 @@ def test_joint_refused_from_distribution():
     row = ld_of(acc, bins).rows[3]  # the bin holding r3 (broad) and r4 (joint)
     assert not any(is_film(k) for k in row.mass), row.mass
     close(row.mass[("held_out", "joint", "A")], 0.5)
-    close(row.mass[("held_out", "broad", "B")], 0.5 * 0.9)
+    close(row.mass[("work_node", "broad", "B")], 0.5 * 0.9)  # b2, b3: two scenes of B
 
 
 def test_coarsening_commutes_side_states_unchanged():
@@ -420,6 +420,50 @@ def test_title_only_gold_scene_dropped():
     assert sc[0].dropped_scenes == 1 and sc[1].dropped_scenes == 1
     close(sc[0].scene_bits, -math.log2(dur.scene["B"][6]))
     assert sc[1].scene_bits is None and sc[1].work_bits is not None
+
+
+def _broad_row(units):
+    comp = fixture()
+    refs = {"g": ref("g", (H(Shape.BROAD, units), 0.8))}
+    acc = Account(comp, refs, {("P", "s"): cells([(0.5, "u0", RefSample("g"))])})
+    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(0, 1)])
+    return comp, ld
+
+
+def test_broad_within_one_scene_is_located_at_the_scene():
+    # c1 and c2 are both scene 8 of work C: the broad reference is scene 8's mass
+    comp, ld = _broad_row(["c1", "c2"])
+    row = ld.rows[0]
+    close(row.mass[("at", "unit", "c1")], 0.4)
+    close(row.mass[("at", "unit", "c2")], 0.4)
+    assert row.allocated == {("at", "unit", "c1"): 0.4, ("at", "unit", "c2"): 0.4}  # labelled
+    sc = ld.coarsen("scene").rows[0]
+    close(sc.mass[("at", "scene", 8)], 0.8)
+    assert not any(k[0] in ("held_out", "work_node") for k in row.mass)
+    dur = B.duration_prior(comp, CFG)
+    f = SC.producer_forecasts(ld, dur, CFG)[0]
+    close(f.loc[8], 0.8)
+
+
+def test_broad_across_scenes_of_one_work_is_the_work_node():
+    # c2 (scene 8) and c3 (scene 9) lie in work C on two parts: the work node holds the mass
+    comp, ld = _broad_row(["c2", "c3"])
+    row = ld.rows[0]
+    assert row.mass == {("unassigned",): row.mass[("unassigned",)], ("work_node", "broad", "C"): 0.8}
+    assert not row.allocated
+    dur = B.duration_prior(comp, CFG)
+    f = SC.producer_forecasts(ld, dur, CFG)[0]
+    e = CFG["epsilon"]
+    close(f.p_work("C"), (1 - e) * 0.8 + f.u * dur.p_work("C"))  # counts toward P(work)
+    close(f.p_set_and_work({9}, "C") / f.p_work("C"), dur.scene["C"][9])  # spread by fallback
+
+
+def test_broad_crossing_works_is_held_out():
+    comp, ld = _broad_row(["b3", "c1"])
+    row = ld.rows[0]
+    close(row.mass[("held_out", "broad", "")], 0.8)
+    f = SC.producer_forecasts(ld, B.duration_prior(comp, CFG), CFG)[0]
+    close(f.abstain, 1.0)  # held out with no single work: an abstention for scoring
 
 
 # ---------------------------------------------------------------- further known answers

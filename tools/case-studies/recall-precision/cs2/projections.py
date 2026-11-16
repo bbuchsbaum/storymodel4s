@@ -9,7 +9,10 @@ states are their own keys and are never coarsened:
   ("work_ref", work)                   a work-level reference
   ("position", stated, resolved_work)  a position-level reference ('' when unresolved)
   ("nonfilm", state)                   a typed non-film state (memory search, ...)
-  ("held_out", "broad"|"joint", work)  a broad or joint hypothesis, held out of the location
+  ("work_node", "broad", work)         a broad hypothesis over several scenes of one work, located
+                                       at the work node (counts toward P(work))
+  ("held_out", "broad", "")            a broad hypothesis crossing works, held out
+  ("held_out", "joint", work)          a joint hypothesis, held out by work
 
 LocationDistribution (declared rules, design revision 2):
 - a bin is a recall-clock interval; a word belongs to it by its onset;
@@ -24,8 +27,12 @@ LocationDistribution (declared rules, design revision 2):
 - weights as written; a reference's remainder (1 - sum of weights) goes to 'unassigned', the
   only source of unassigned mass; every sampled row sums to 1 (1e-12);
 - a joint hypothesis never enters a location (`location_contribution` refuses it); the account
-  routes it, and a broad hypothesis, to a held-out state keyed by work (split by unit share when
-  the support spans works).
+  routes it to a held-out state keyed by work (split by unit share when it spans works);
+- a broad hypothesis is located at the smallest declared grain that wholly contains its span
+  (ADR 0030: a reference to one scene is single at scene grain and broad over its rows):
+  within one scene it is that scene's mass; at unit grain it is allocated over its own units by
+  the within-hypothesis rule and the allocated share is labelled in `Row.allocated`; across scenes
+  of one work it is the work node; only a span crossing works is held out (`broad_case`).
 
 CoverageMeasure: what the speech covers. Each unit of a hypothesis's support (joint moments each
 count; broad covers its span) gets the member's weight; samples in a bin combine by maximum, so a
@@ -88,6 +95,8 @@ class Row:
     samples: tuple
     trace: dict  # key -> frozenset of samples that put mass there
     n_words: int
+    allocated: dict = None  # unit grain: key -> mass placed there by allocating a broad
+    #                         within-scene reference over its units (a declared allocation)
 
 
 def is_film(key) -> bool:
@@ -105,6 +114,26 @@ def _work_split(support, comp):
     return [(w, c / n) for w, c in sorted(by.items())]
 
 
+def broad_case(target, comp) -> str:
+    """Where a broad hypothesis is located: 'scene', 'work' or 'cross_work'."""
+    works = {comp.work_of_unit(u) for u in target.support}
+    if len(works) > 1:
+        return "cross_work"
+    scenes = {comp.unit[u].scene for u in target.support}
+    return "scene" if len(scenes) == 1 and None not in scenes else "work"
+
+
+def _spread(units, comp, allocation):
+    units = sorted(units)
+    if allocation == "units":
+        return [(("at", "unit", u), 1.0 / len(units)) for u in units]
+    secs = [comp.unit[u].duration for u in units]
+    tot = math.fsum(secs)
+    if not tot > 0:
+        raise ProjectionError("no-seconds", "a hypothesis of zero-length units has no seconds")
+    return [(("at", "unit", u), s / tot) for u, s in zip(units, secs)]
+
+
 def location_contribution(target, comp, allocation="units"):
     """Mass of one member (weight 1) over location keys. Refuses a joint hypothesis."""
     if allocation not in ALLOCATIONS:
@@ -120,17 +149,12 @@ def location_contribution(target, comp, allocation="units"):
             "joint-refused", "a joint reference cannot enter a distribution"
         )
     if target.shape is Shape.BROAD:
-        return [
-            (("held_out", "broad", w), f) for w, f in _work_split(target.support, comp)
-        ]
-    units = sorted(target.support)
-    if allocation == "units":
-        return [(("at", "unit", u), 1.0 / len(units)) for u in units]
-    secs = [comp.unit[u].duration for u in units]
-    tot = math.fsum(secs)
-    if not tot > 0:
-        raise ProjectionError("no-seconds", "a hypothesis of zero-length units has no seconds")
-    return [(("at", "unit", u), s / tot) for u, s in zip(units, secs)]
+        case = broad_case(target, comp)
+        if case == "cross_work":
+            return [(("held_out", "broad", ""), 1.0)]
+        if case == "work":
+            return [(("work_node", "broad", comp.work_of_unit(next(iter(target.support)))), 1.0)]
+    return _spread(target.support, comp, allocation)
 
 
 def reference_contributions(ref, comp, allocation="units"):
@@ -169,6 +193,22 @@ def sample_contributions(sample, account, allocation="units"):
     if isinstance(sample, Uncovered):
         raise ProjectionError("uncovered-is-not-a-sample", "uncovered words are ledger counts")
     raise ProjectionError("unknown-sample", repr(sample))
+
+
+def broad_allocations(sample, account, allocation="units"):
+    """The unit-grain mass of a sample that comes from allocating within-scene broad members."""
+    if not isinstance(sample, RefSample):
+        return []
+    ref = account.references[sample.ref]
+    if not isinstance(ref, Reference):
+        return []
+    out = []
+    for m in ref.members:
+        t = m.target
+        if isinstance(t, Hypothesis) and t.shape is Shape.BROAD:
+            if broad_case(t, account.composition) == "scene":
+                out += [(k, m.weight * v) for k, v in _spread(t.support, account.composition, allocation)]
+    return out
 
 
 def _sample_key(s):
@@ -225,11 +265,13 @@ class LocationDistribution:
                 rows.append(Row(b, empty_state(inside), {}, (), {}, len(inside)))
                 continue
             k = len(samples)
-            parts, trace = defaultdict(list), defaultdict(set)
+            parts, trace, alloc = defaultdict(list), defaultdict(set), defaultdict(list)
             for s in samples:
                 for key, v in sample_contributions(s, account, allocation):
                     parts[key].append(v / k)
                     trace[key].add(s)
+                for key, v in broad_allocations(s, account, allocation):
+                    alloc[key].append(v / k)
             mass = {key: math.fsum(vs) for key, vs in sorted(parts.items(), key=lambda kv: repr(kv[0]))}
             rows.append(
                 Row(
@@ -239,6 +281,7 @@ class LocationDistribution:
                     tuple(samples),
                     {key: frozenset(v) for key, v in trace.items()},
                     len(inside),
+                    {key: math.fsum(vs) for key, vs in sorted(alloc.items())},
                 )
             )
         return cls(account.composition, "unit", allocation, rows)

@@ -35,7 +35,9 @@ Declared conversion into the account (cs2.account):
   film-level). Without a frame it is the non-film state memory_search;
 - gave_up, off_task, fragment: typed states;
 - shapes: occurrence joint (two or more intervals) -> JOINT; repeated or generic -> SINGLE with one
-  constituent per interval; mode gist with extent stretch -> BROAD; otherwise SINGLE;
+  constituent per interval; mode gist with extent stretch -> BROAD; otherwise SINGLE. A BROAD
+  hypothesis is then located by projections.broad_case (scene, work node, or held out only when
+  it crosses works); gist + stretch is no longer held out as such;
 - an anchor must occur exactly once in its unit's tokens; refused references are counted in the
   ledger, and their words stay uncovered.
 """
@@ -60,6 +62,7 @@ from llm import CACHE, call, parse_json  # noqa: E402
 
 from common import sha  # noqa: E402
 
+from cs2.projections import broad_case  # noqa: E402
 from cs2.account import (  # noqa: E402
     Account,
     AccountError,
@@ -258,7 +261,9 @@ For each item return:
 - "talk": "episodic" (the TARGET describes film content), "metamemory" (about remembering or \
 forgetting), "commentary" (opinion or remark about a film as a film), or "fragment" (connective, \
 filler or false start). Choose "episodic" when any film content is described.
-- "refs": for episodic items, the film references the TARGET makes; empty otherwise. Each has:
+- "refs": for episodic items, the film references the TARGET makes; empty otherwise. Together, \
+the "words" of an item's references must cover every word of the TARGET that describes film \
+content; fragments, connectives and words about remembering may stay uncovered. Each has:
   - "words": the exact contiguous words of the TARGET that carry it (copy them verbatim);
   - "extent": "moment" (an instant or short exchange) or "stretch" (a continuous activity or longer \
 stretch);
@@ -446,7 +451,8 @@ def run(A, participant, session, out: Path, seed=20261116, salt="cs2-ff-pilot-a"
     refs, cells, conv = (
         {},
         [],
-        dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={}),
+        dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
+             broad_cases={}),
     )
 
     def refuse(why):
@@ -501,7 +507,7 @@ def run(A, participant, session, out: Path, seed=20261116, salt="cs2-ff-pilot-a"
                                 "anchor-not-found" if not hits else "anchor-ambiguous"
                             )
                             continue
-                        members = _members(r, rowmap, top[1], refuse, conv)
+                        members = _members(r, rowmap, top[1], refuse, conv, comp)
                         if not members:
                             continue
                         rid = f"{uid}:r{ri}"
@@ -542,7 +548,7 @@ def run(A, participant, session, out: Path, seed=20261116, salt="cs2-ff-pilot-a"
     return acc, ledger, log
 
 
-def _members(r, rowmap, frame_w, refuse, conv):
+def _members(r, rowmap, frame_w, refuse, conv, comp):
     occ, extent, mode = r.get("occurrence"), r.get("extent"), r.get("mode")
     out = []
     for a in r.get("alts") or []:
@@ -571,6 +577,9 @@ def _members(r, rowmap, frame_w, refuse, conv):
         else:
             h = Hypothesis(Shape.SINGLE, (frozenset().union(*rows),))
         conv["shapes"][h.shape.value] = conv["shapes"].get(h.shape.value, 0) + 1
+        if h.shape is Shape.BROAD:
+            case = broad_case(h, comp)
+            conv["broad_cases"][case] = conv["broad_cases"].get(case, 0) + 1
         out.append(Member(h, w * frame_w))
     seen = []
     for m in out:

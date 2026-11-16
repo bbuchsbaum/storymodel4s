@@ -229,6 +229,18 @@ MUTANTS = [
         test="test_bootstrap_clusters_are_participants",
     ),
     dict(
+        id="M23",
+        guard="a broad reference is located at the smallest grain holding its span (ADR 0030)",
+        file="cs2/projections.py",
+        edits=[(
+            "    if target.shape is Shape.BROAD:\n        case = broad_case(target, comp)\n",
+            "    if target.shape is Shape.BROAD:\n"
+            "        return [((\"held_out\", \"broad\", w), f) for w, f in _work_split(target.support, comp)]\n"
+            "        case = broad_case(target, comp)\n",
+        )],
+        test="test_broad_within_one_scene_is_located_at_the_scene",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

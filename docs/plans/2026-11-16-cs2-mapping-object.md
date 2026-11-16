@@ -189,8 +189,17 @@ was silent. These are declarations, not owner decisions.
 
 - **Joint references are held out by work.** A joint hypothesis never enters a
   `LocationDistribution`. Its mass goes to a held-out joint state keyed by work, split by unit
-  share when its support spans works, beside the held-out broad state. Alternatives are routed
+  share when its support spans works. Alternatives are routed
   member by member.
+- **Broad references are located, not held out** (owner, 2026-11-16, applying ADR 0030). A
+  broad reference sits at the smallest declared grain that wholly contains its span:
+  - within one scene, it is that scene's mass; at unit grain it is allocated over its own units
+    by the within-hypothesis rule, and the allocated share is labelled;
+  - across scenes of one work, it is the work node: it counts toward P(work) and is spread
+    within the work by the fallback for the scene term;
+  - only a span crossing works is held out, and it abstains.
+
+  Gist + stretch is no longer held out as such.
 - **Held-out, work-level and position mass in the loss.** It counts toward its work and is
   spread within the work by the fallback forecast. A position with no resolved work abstains.
 - **Uncovered words are ledger counts only** (ADR 0031 §3). A bin of uncovered words alone is
@@ -199,11 +208,15 @@ was silent. These are declarations, not owner decisions.
   work. The film term is scored on every corpus, because a conditional scene term would
   otherwise reward hedging into non-film states on a one-work corpus.
 
-**Gap for the vocabulary ADR.** Non-film states (memory search, gave up, off task, commentary,
-fragment) are typed destinations inside the simplex. That extends ADR 0031 §3, whose
-onset-point projection treats not-applicable references as a typed absence ("only not
-applicable"). The harness has no such absence: a bin of not-applicable words alone is a sampled
-row whose mass sits on non-film states. The vocabulary ADR must decide this.
+**Gaps for the vocabulary ADR.**
+
+- Memory search inside a framed film is recorded as a work-level reference, which is how the
+  gold codes it. The ADR needs a typed *searching within work* state.
+- Non-film states (memory search, gave up, off task, commentary, fragment) are typed
+  destinations inside the simplex. That extends ADR 0031 §3, whose onset-point projection
+  treats not-applicable references as a typed absence ("only not applicable"). The harness has
+  no such absence: a bin of not-applicable words alone is a sampled row whose mass sits on
+  non-film states. The vocabulary ADR must decide this too.
 
 ## Owner decisions (2026-11-16)
 

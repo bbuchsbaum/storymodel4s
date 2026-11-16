@@ -19,7 +19,8 @@ Producer forecast from one scene-grain LocationDistribution row (declared, confi
   the fallback forecast F (config 'fallback', default the duration prior);
 - P(w)        = (1 - e)[loc(w) + spread(w) + outside(w)] + u F(w)
 - P(S and w)  = (1 - e)[loc(S, w) + spread(w) F(S | w)] + u F(w) F(S | w)
-  where loc is scene mass, spread is work-level, position-resolved and held-out mass of w (spread
+  where loc is scene mass, spread is work-level, position-resolved, work-node (broad over
+  several scenes of w) and held-out mass of w (spread
   within w by F), and outside is in-work-outside-stimulus mass (no scene of the stimulus).
 - Non-film and external mass are claims that the row is not this work; at the film level
   P(non-film) = (1 - e) nonwork + u F(non-film), with F(non-film) the declared fallback rate.
@@ -132,7 +133,7 @@ def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
             loc[key[2]] = loc.get(key[2], 0.0) + m
         elif tag == "unassigned":
             abstain += m
-        elif tag in ("work_ref", "position", "held_out"):
+        elif tag in ("work_ref", "position", "held_out", "work_node"):
             w = key[-1]
             if w:
                 spread[w] = spread.get(w, 0.0) + m

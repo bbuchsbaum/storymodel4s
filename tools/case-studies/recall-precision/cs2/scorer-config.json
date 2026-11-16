@@ -18,6 +18,7 @@
   "no_sample_rule": "a gold row with no recall word (no sample) or only uncovered words (only uncovered) abstains and scores the fallback; uncovered words are never samples and create no unassigned mass (ADR 0031 section 3; revised 2026-11-16 before any producer run)",
   "bin_rule": "a gold row is a bin on the session's word clock; a word belongs by onset (closed or half-open as the corpus declares)",
   "gold_invalid_scene_rule": "a gold scene that is not a valid target (title-only) is dropped from the set; an emptied set is not scored on the scene term",
+  "broad_rule": "ADR 0030: a broad reference is located at the smallest declared grain wholly containing its span: one scene -> that scene (unit-grain allocation over its own units, labelled); several scenes of one work -> the work node (counts toward P(work), spread within the work by the fallback for the scene term); crossing works -> held out (abstains)",
   "allocation": "units",
   "exclude_title_only_scenes": true,
   "lopo_alpha": 0.5,
