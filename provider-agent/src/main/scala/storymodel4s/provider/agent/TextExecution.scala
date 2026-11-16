@@ -157,13 +157,17 @@ object TextExecution:
   ): Either[String, Session] =
     if !profile.matches(authorization) then Left("profile does not match live authorization")
     else
-      lock(recordings.dir).map { acquired =>
-        new LiveSession(
+      lock(recordings.dir).flatMap { acquired =>
+        try Right(new LiveSession(
           recordings,
           profile,
           OpenAiCompatibleModelClient.from(authorization),
           acquired
-        )
+        ))
+        catch
+          case NonFatal(_) =>
+            acquired.close()
+            Left("cannot construct the live text client")
       }
 
   def replay(recordings: Recordings, profile: Profile): Session =
@@ -249,11 +253,17 @@ object TextExecution:
         "provider" -> providerEvidence.getOrElse(Json.obj())
       )
 
+  private def readRecording(recordings: Recordings, request: ModelRequest): Either[ExchangeFailure, ModelReply] =
+    val path = recordings.path(request.key)
+    if Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS) && !Files.isRegularFile(path) then
+      Left(ExchangeFailure.RecordingCorrupt(request.key, Checksum.ofText("not a regular recording file")))
+    else recordings.read(request.key, request.model)
+
   private final class ReplaySession(recordings: Recordings, profile: Profile)
       extends BaseSession(profile):
     def serve(system: String, prompt: String): Either[ExchangeFailure, ModelReply] = synchronized {
       val request = ModelRequest.text(profile, system, prompt)
-      recordings.read(request.key, request.model) match
+      readRecording(recordings, request) match
         case Right(reply) =>
           hits += 1
           event(request.key, "replayed", Some(reply))
@@ -364,7 +374,7 @@ object TextExecution:
         Left(ExchangeFailure.PreviousAttemptUnknown(RecordingKey.fromChecksum(profile.digest)))
       else
         val request = ModelRequest.text(profile, system, prompt)
-        recordings.read(request.key, request.model) match
+        readRecording(recordings, request) match
           case Right(reply) =>
             hits += 1
             event(request.key, "cached", Some(reply))

@@ -95,6 +95,8 @@ class TextExecutionSuite extends FunSuite:
         assert(TextExecution.live(store, p, authorization(baseUrl)).isLeft)
         Files.writeString(store.path(p.key("system", "prompt")), "not json")
         assert(first.serve("system", "prompt").isLeft)
+        Files.createDirectory(store.path(p.key("system", "directory")))
+        assert(first.serve("system", "directory").isLeft)
         assertEquals(first.clientInvocations, 0)
         assertEquals(first.httpAttempts, 0)
         assertEquals(seen().size, 0)

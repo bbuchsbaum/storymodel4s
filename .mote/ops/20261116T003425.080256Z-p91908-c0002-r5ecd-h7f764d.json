@@ -1,0 +1,1 @@
+{"actor":"codex-live-execution-20261115","entity":"bd-01M7GV17P8FYWQ2RAHMGEG12XQ","kind":"note","note_kind":"progress","op":"20261116T003425.080256Z-p91908-c0002-r5ecd-h7f764d","text":"Review fixes: bind execution provenance on bundle readback; extend admitted failure-code coverage.","ts":"2026-11-16T00:34:25.080256Z","v":1}

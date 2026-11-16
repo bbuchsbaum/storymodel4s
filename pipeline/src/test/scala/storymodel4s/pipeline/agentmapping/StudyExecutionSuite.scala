@@ -114,7 +114,7 @@ class StudyExecutionSuite extends FunSuite:
   private val first = """{"units":[{"u":0,"narrative":10,"referent":30,"conf":null}]}"""
   private val second = """{"units":[{"u":7,"narrative":30,"referent":30}]}"""
 
-  private def withServer(responses: Vector[(Int, String)])(
+  private def withServer(responses: Vector[(Int, String)], onRequest: Int => Unit = _ => ())(
       body: (Map[String, String], AtomicInteger) => Unit
   ): Unit =
     val count = new AtomicInteger(0)
@@ -128,6 +128,7 @@ class StudyExecutionSuite extends FunSuite:
           Right("synthetic-model")
         )
         val i = count.getAndIncrement()
+        onRequest(i)
         val (status, text) = responses.lift(i).getOrElse(500 -> "unexpected request")
         val raw = text.getBytes(StandardCharsets.UTF_8)
         exchange.sendResponseHeaders(status, raw.length.toLong)
@@ -231,6 +232,64 @@ class StudyExecutionSuite extends FunSuite:
         assert(run(dir, exportDir, env, "output").isLeft)
         assertEquals(calls.get(), 0)
         assert(!Files.exists(dir.resolve("run/run.json")))
+      }
+    }
+
+  test("preflight refuses oversized policy identifiers before any dispatch or run descriptor"):
+    withDirectory { dir =>
+      val exportDir = fixture(dir)
+      val path = exportDir.resolve("index.json")
+      Files.writeString(path, read(path).mapObject(_.add("condition", str("x" * 256))).noSpaces): Unit
+      withServer(Vector.empty) { (env, calls) =>
+        assert(run(dir, exportDir, env, "output").left.exists(_.contains("policy identifier")))
+        assertEquals(calls.get(), 0)
+        assert(!Files.exists(dir.resolve("run/run.json")))
+      }
+    }
+
+  test("a failed invocation receipt never publishes output and recorded replies remain reusable"):
+    withDirectory { dir =>
+      val exportDir = fixture(dir)
+      val receipts = dir.resolve("run/invocations")
+      withServer(Vector(200 -> completion(first), 200 -> completion(second)), i => {
+        if i == 0 then
+          Files.delete(receipts)
+          Files.writeString(receipts, "blocked"): Unit
+      }) { (env, calls) =>
+        assert(run(dir, exportDir, env, "output").isLeft)
+        assertEquals(calls.get(), 2)
+        assert(!Files.exists(dir.resolve("output")))
+        Files.delete(receipts)
+        val resumed = right(run(dir, exportDir, env, "output"))
+        assertEquals(resumed.hcursor.get[Int]("modelCalls"), Right(0))
+        assertEquals(calls.get(), 2)
+        assertEquals(read(dir.resolve("output/receipt.json")), resumed)
+      }
+    }
+
+  test("bundle readback binds execution configuration and per-session call accounting"):
+    withDirectory { dir =>
+      val exportDir = fixture(dir)
+      withServer(Vector(200 -> completion(first), 200 -> completion(second))) { (env, _) =>
+        right(run(dir, exportDir, env, "output"))
+        val doc = read(dir.resolve("output/bundles/synthetic_trial.bundle.json"))
+        val view = right(storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(
+          Files.readAllBytes(exportDir.resolve("source.csv")), Files.readAllBytes(exportDir.resolve("parts.json"))))
+        val index = right(StudyExport.parseIndex(read(exportDir.resolve("index.json"))))
+        val entry = index.sessions.head
+        val session = right(StudyExport.parseSession(read(exportDir.resolve(entry.file)), entry))
+        val recall = right(PreparedRecall.supplied(entry.name, session.units.map(_.text), StudyExport.unitsChecksum(session.units)))
+        val profile = right(TextExecution.Profile.decode(read(dir.resolve("run/run.json")).hcursor.downField("execution").focus.get))
+        val producer = StudyRecord.producer(profile.provider, index.model, index.system, view, recall)
+        val expected = StudyBundle.Expected(entry.participant, entry.session, session.units, producer,
+          execution = Some(profile), modelCalls = 2)
+        assert(StudyBundle.decode(doc, view, recall, expected).isRight)
+        def changed(key: String, value: Json): Json = doc.mapObject(o => o.add("provenance",
+          o("provenance").get.mapObject(p => p.add("execution", p("execution").get.mapObject(_.add(key, value))))))
+        assert(StudyBundle.decode(changed("endpointSha256", str("f" * 64)), view, recall, expected).isLeft)
+        assert(StudyBundle.decode(changed("maxTokens", Json.fromInt(129)), view, recall, expected).isLeft)
+        assert(StudyBundle.decode(doc, view, recall, expected.copy(modelCalls = 1)).isLeft)
+        assert(StudyBundle.decode(doc, view, recall, expected.copy(execution = None)).isLeft)
       }
     }
 

@@ -5,6 +5,7 @@ import storymodel4s.align.{DecisionPolicy, MappingResult}
 import storymodel4s.align.bridge.TimedSourceView
 import storymodel4s.codec.{ExpectedMappingContext, MappingCodecs}
 import storymodel4s.core.Checksum
+import storymodel4s.provider.agent.TextExecution
 
 /** One participant-session's saved mapping under one condition and model
   * (`storymodel4s.agentmapping.bundle/v2`): both judgements as checked records, every unit's
@@ -288,7 +289,9 @@ object StudyBundle:
       session: String,
       units: Vector[StudyReplay.RecallUnit],
       producer: AgentMappingRecord.Producer,
-      intervals: Option[SceneIntervals] = None
+      intervals: Option[SceneIntervals] = None,
+      execution: Option[TextExecution.Profile] = None,
+      modelCalls: Int = 0
   )
 
   /** The judgement a stated answer gives against this source. A failure's judgement follows from
@@ -365,6 +368,14 @@ object StudyBundle:
       _ <- Either.cond(c.get[String]("schema").contains(Schema), (), "not a v2 mapping bundle")
       condition <- p.get[String]("condition").left.map(_ => "no condition")
       protocol <- p.get[String]("protocol").left.map(_ => "no protocol")
+      _ <- Either.cond(
+        p.downField("execution").focus == expected.execution.map(_.json) &&
+          expected.execution.forall(profile => profile.provider == expected.producer.provider &&
+            profile.model == expected.producer.model),
+        (), "execution descriptor differs from the expected profile"
+      )
+      _ <- Either.cond(expected.modelCalls >= 0 &&
+        p.get[Int]("modelCalls").contains(expected.modelCalls), (), "model call count differs")
       _ <- says("participant", expected.participant)
       _ <- says("session", expected.session)
       _ <- says("model", expected.producer.model)

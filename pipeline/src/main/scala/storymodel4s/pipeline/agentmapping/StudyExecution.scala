@@ -52,6 +52,10 @@ object StudyExecution:
     val index = required(
       io.circe.jawn.parseByteArray(indexBytes).left.map(_.message).flatMap(StudyExport.parseIndex)
     )
+    StudyBundle.Fields.foreach { field =>
+      required(scala.util.Try(StudyRecord.policy(index.condition, index.protocolName, field))
+        .toEither.left.map(_ => "condition and protocol cannot form a valid mapping policy identifier"))
+    }
     val view = required(
       storymodel4s.codec.TimedSourceArtifactCodec.prepareChecked(sourceBytes, partsBytes)
     )
@@ -90,7 +94,7 @@ object StudyExecution:
       provider: String,
       serve: String => Either[ExchangeFailure, ModelReply],
       calls: () => Int,
-      execution: Option[Json]
+      execution: Option[TextExecution.Profile]
   ): Vector[(String, String)] =
     p.sessions.map { (entry, s, recall) =>
       val before = calls()
@@ -140,7 +144,7 @@ object StudyExecution:
             o("provenance").get.mapObject { provenance =>
               provenance
                 .add("modelCalls", Json.fromInt(calls() - before))
-                .add("execution", descriptor)
+                .add("execution", descriptor.json)
             }
           )
         }
@@ -156,7 +160,8 @@ object StudyExecution:
               _,
               p.view,
               recall,
-              StudyBundle.Expected(entry.participant, entry.session, s.units, producer, intervals)
+              StudyBundle.Expected(entry.participant, entry.session, s.units, producer, intervals,
+                execution, calls() - before)
             )
           )
       )
@@ -299,19 +304,23 @@ object StudyExecution:
           session.serve(p.index.system, prompt)
         },
         () => session.clientInvocations,
-        Some(profile.json)
+        Some(profile)
       )
+      session.close()
       outcome = "complete"
-      publish(out, bundles, Some(receipt))
-      receipt
+      val completed = receipt
+      Files.writeString(receipts.resolve(s"$invocation.json"), completed.spaces2 + "\n"): Unit
+      publish(out, bundles, Some(completed))
+      completed
     catch
       case NonFatal(e) =>
         outcome = "failed"
         failure = Some(e match
           case Refused(reason) => reason
           case _               => s"execution failed (${e.getClass.getSimpleName})")
+        try Files.writeString(receipts.resolve(s"$invocation.json"), receipt.spaces2 + "\n"): Unit
+        catch
+          case NonFatal(_) => throw Refused(failure.get + "; invocation receipt could not be saved")
         throw e
-    finally
-      try Files.writeString(receipts.resolve(s"$invocation.json"), receipt.spaces2 + "\n"): Unit
-      finally session.close()
+    finally session.close()
   }
