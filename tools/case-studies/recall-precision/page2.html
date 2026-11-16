@@ -304,15 +304,16 @@ function renderRegressors() {
   const vif = n => { const i = (cv.names || []).indexOf(n); return i < 0 ? "—" : `${cv.median_vif[i].toFixed(2)} (max ${cv.max_vif[i].toFixed(2)})`; };
   const rows = [
     ["breadth", "log10 s", "film extent of the referenced hypothesis", "ICC 0.85 (0.84 after participant means)", vif("logB")],
-    ["competing hypotheses", "share 0–1", "words whose reference carries more than one place in the film", "flag κ 0.69; magnitude not reliable", vif("Uflag")],
+    ["competing hypotheses", "share 0–1", "words whose reference carries more than one place in the film", `flag κ ${f2(rel.kappa_alternatives_flag)}; magnitude ICC ${f2(rel.icc_U_where_either_positive)}`, vif("Uflag")],
     ["hedge", "share 0–1", "speaker marks uncertainty", "—", vif("hedge")],
     ["not about the film", "share 0–1", "fragment, commentary or metamemory", `talk labels agree ${pct(rel.talk_agreement)}`, vif("nonepisodic")],
     ["words", "count", "speech-rate nuisance", "exact", vif("words")],
   ];
   document.getElementById("regtable").innerHTML = `<thead><tr><th>series</th><th>unit</th><th>meaning</th><th>reliability (two samples)</th><th>VIF after HRF (median)</th></tr></thead>` +
     `<tbody>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="desc">${r[2]}</td><td class="desc">${r[3]}</td><td>${r[4]}</td></tr>`).join("")}</tbody>`;
-  document.getElementById("regcap").innerHTML = `Recall clock (OpenNeuro, scan-relative), 1.5 s bins; each bin is the mean of word-level values whose onset falls in it;
-    a bin without speech is <code>n/a</code>; nothing is lagged or convolved. Top-scene confidence is left out: after convolution it correlates −0.48 with the
+  document.getElementById("regcap").innerHTML = `Recall clock (OpenNeuro, scan-relative), 1.5 s bins; each bin is the mean over the distinct references whose words have an onset in it.
+    Every bin carries a ledger (status, references sampled, units not about the film, uncovered and unassigned words);
+    timing is onset-only, so an empty bin is <code>no_sample</code>, not "no speech". Nothing is lagged or convolved. Top-scene confidence is left out: after convolution it correlates ${f2(cv.median_rho && cv.median_rho[(cv.names||[]).indexOf("conf")][(cv.names||[]).indexOf("Uflag")])} with the
     competing-hypotheses flag, which it is computed from. Breadth for specific references sits at the annotation's row grain ${pct(br.share_B_at_or_below_row_grain_specific)} of the time
     (ρ ${f2(br.rho_logB_rowgrain_specific)} with row duration), so it has a floor set by the source annotation. Files with a column sidecar are in <code>data/study/recall-precision/export/</code>.`;
   const host = document.getElementById("corr");
@@ -354,11 +355,11 @@ function renderStats() {
   const rel = C.reliability || {}, uf = A4.uncertainty_flag || {}, cp = A4.context_paired || {};
   const cpv = Object.values(cp), dctx = cpv.length ? cpv.reduce((s, v) => s + (v.with_context - v.target_only), 0) / cpv.length : null;
   const items = [
-    ["accuracy", pct(m.scene_acc), ci.scene_acc ? `${pct(ci.scene_acc[0])}–${pct(ci.scene_acc[1])}` : "", "content-local agreement with the human scene coding"],
-    ["accuracy", pct(ma.scene_acc), "", "analyst stream, which reads the whole recall"],
+    ["accuracy", pct(m.scene_acc_covered), ci.scene_acc_covered ? `${pct(ci.scene_acc_covered[0])}–${pct(ci.scene_acc_covered[1])} · coverage ${pct(m.coverage)}` : "", "content-local agreement on words a reference covers"],
+    ["accuracy", pct(ma.scene_acc_covered), "", "analyst stream, which reads the whole recall"],
     ["accuracy", `${pct(uf.agreement_when_competing_hypotheses)} vs ${pct(uf.agreement_when_single_hypothesis)}`, "", "agreement when competing hypotheses are present vs absent"],
     ["reliability", f2(rel.icc_logB), "ICC(2,1)", "breadth across two independent samples"],
-    ["reliability", "κ 0.69", "magnitude ICC 0.10", "competing-hypotheses flag across samples"],
+    ["reliability", rel.kappa_alternatives_flag == null ? "—" : `κ ${f2(rel.kappa_alternatives_flag)}`, rel.icc_U_where_either_positive == null ? "" : `magnitude ICC ${f2(rel.icc_U_where_either_positive)}`, "competing-hypotheses flag across samples"],
     ["context", dctx == null ? "—" : `−${Math.round(dctx * 100)} pts`, cpv.length ? `${cpv.length} participants, paired` : "", "agreement lost when the two preceding units are removed"],
   ];
   document.getElementById("stats").innerHTML = items.map(([g, v, c, l]) => `<div class="stat"><div class="g">${g}</div><div class="v">${v}</div><div class="ci">${c}</div><div class="l">${l}</div></div>`).join("");
@@ -370,7 +371,7 @@ const RUNS = [
   [LOCAL, "it3 · LLM local"], [ANALYST, "it3 · analyst"], ["it5-v3-a", "it5 · LLM local, v3"],
 ];
 const METRICS = [
-  {label: "Agreement with the human scene coding (higher is better)", keys: ["scene_acc"], fmt: pct, dom: [0, 1], refs: [[0.02, "chance"], [0.79, "v3 label"]]},
+  {label: "Agreement with the human scene coding, on words a reference covers where defined (higher is better)", keys: ["scene_acc_covered", "scene_acc"], fmt: pct, dom: [0, 1], refs: [[0.02, "chance"], [0.79, "v3 label"]]},
   {label: "Log loss of the human scene, bits (lower is better)", keys: ["logloss_on_bits", "gold_scene_logloss_bits"], fmt: f2, dom: [0, 6], refs: [[5.64, "uniform"]]},
   {label: "Calibration error (lower is better; iteration 3 only)", keys: ["ece_top"], fmt: f2, dom: [0, 0.2], only: [LOCAL, ANALYST, "it5-v3-a"]},
   {label: "AUROC, confidence separates right from wrong (iteration 3, tie-corrected)", keys: ["auroc_conf_hit"], fmt: f2, dom: [0.5, 1], only: [LOCAL, ANALYST, "it5-v3-a"]},

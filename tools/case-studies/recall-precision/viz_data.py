@@ -197,7 +197,7 @@ def main():
                 mean=s.get("participant_mean"),
                 ci=s.get("participant_boot95"),
                 per={
-                    k.split("_")[0]: v.get("scene_acc")
+                    k.split("_")[0]: v.get("scene_acc_covered", v.get("scene_acc"))
                     for k, v in s["participants"].items()
                 },
             )

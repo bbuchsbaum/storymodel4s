@@ -122,9 +122,9 @@ def unit_dist(hs, alpha, g: FilmGrid):
 
 
 def load_stream(stream, run, name, g):
-    units = D.common.units(name)
+    units = D.units(name)
     if stream == "v3":
-        p = D.common.OUT / run / f"{name}.json"
+        p = D.analyst_dir() / run / f"{name}.json"
         recs = (
             {u["id"]: u for u in json.loads(p.read_text())["units"]}
             if p.exists()

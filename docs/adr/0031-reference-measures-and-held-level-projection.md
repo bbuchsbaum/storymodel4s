@@ -64,7 +64,7 @@ Its evidence:
 - **Self-reported LLM weights, after a fitted tempering, give a top-scene probability with
   ECE 0.07.** This is development data, for one proposition (below).
 - **Uncertainty between alternatives reproduces as presence across samples (κ 0.69), not as
-  magnitude (ICC 0.10).**
+  magnitude (ICC 0.01).**
 - **A regressor holds a level over time.** The existing `TemporalQuery` allocations all
   distribute or bound an amount.
 
@@ -98,7 +98,8 @@ unresolved references and processing outcomes.
 **Member count** is the number of members of an alternative reference. It is 1 for single,
 joint and broad references, and unavailable for unresolved references and processing outcomes.
 Alternative entropy is deferred (see [Deferred](#deferred)). Across two independent samples its
-magnitude reproduced at ICC 0.10, while presence reproduced at κ 0.69.
+magnitude did not reproduce (ICC 0.01 on the published, tempered weights where either sample
+is positive), while presence reproduced at κ 0.69.
 
 **Extent** is measured in seconds on a presentation axis that the caller declares, as for a
 temporal query: a `TemporalSupport.Selection`, either a `Part` or one `Occurrence` of a
@@ -303,7 +304,7 @@ ADR 0022.
   read validates it, regressors use recorded self-reports, which a saved bundle reproduces
   without refitting.
 - **Publishing alternative entropy now.** Its magnitude did not reproduce across samples
-  (ICC 0.10); the presence flag did (κ 0.69).
+  (ICC 0.01 where either sample is positive); the presence flag did (κ 0.69).
 - **Extent defined from `SupportOnly` query bounds.** Those bound a region's mass. They do not
   measure an occurrence's support, though an implementation may compute extent with them.
 - **Counting words rather than references in a bin.** One reference spanning five words is one

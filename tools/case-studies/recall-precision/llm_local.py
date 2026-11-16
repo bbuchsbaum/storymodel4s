@@ -22,7 +22,6 @@ import data as D
 
 sys.path.insert(0, str(D.ROOT / "tools" / "sherlock_mapper"))
 from llm import call, parse_json  # noqa: E402
-from map_v3 import cast  # noqa: E402
 
 SYSTEM = """You localize excerpts of people's spoken free recall of the film "Sherlock: A Study in \
 Pink" within that film. You are given the film annotation: numbered rows (r1..r1000) with times, \
@@ -54,7 +53,7 @@ Reply with JSON only: {"items": [{"id": "<id>", "kind": "...", "reference": "...
 
 
 def items_for(name):
-    us = D.common.units(name)
+    us = D.units(name)
     out = []
     for k, u in enumerate(us):
         ctx = " ".join(x.text for x in us[max(0, k - 2) : k])
@@ -131,8 +130,8 @@ def main():
         items += foreign_items(a.foreign, a.seed)
     random.Random(a.seed).shuffle(items)
     batches = [items[i : i + a.batch] for i in range(0, len(items), a.batch)]
-    outline, _ = D.common.film_outline()
-    cast_line = cast()
+    outline, _ = D.film_outline()
+    cast_line = D.cast_line()
     out = D.OUT / "llm" / a.run
     out.mkdir(parents=True, exist_ok=True)
     print(f"{len(items)} items in {len(batches)} calls", flush=True)

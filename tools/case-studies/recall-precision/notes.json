@@ -6,7 +6,7 @@
   "Each round builds an estimator, scores it against the same yardstick, and puts it in front of three critics: a linguist, a machine-learning reviewer, and a visualization reviewer working from Tufte's principles. What survives goes into storymodel4s afterwards."
  ],
  "status": [
-  "Can we say, moment by moment during spoken recall, how precisely the speech points into the film? <b>Partly, and the case study has shown which parts hold up.</b> Where the speech points can be read off content alone: 76% agreement with the human scene coding, calibrated and stable. Breadth, how long a stretch the speech refers to, is reliable (ICC 0.85) and independent of speech rate; it measures film extent and has a floor at the annotation's grain. Specificity proper, the amount of distinguishing detail, is a separate channel (\u03c1 0.10 with breadth) and does not predict localization. Hesitation between places reproduces only as a flag. None is validated against human coding yet."
+  "Can we say, moment by moment during spoken recall, how precisely the speech points into the film? <b>Partly, and the case study has shown which parts hold up.</b> Where the speech points can be read off content alone: 78% agreement with the human scene coding on the 89% of words a reference covers, calibrated and stable. Breadth, how long a stretch the speech refers to, is reliable (ICC 0.85) and independent of speech rate; it measures film extent and has a floor at the annotation's grain. Specificity proper, the amount of distinguishing detail, is a separate channel (\u03c1 0.10 with breadth) and does not predict localization. Hesitation between places reproduces only as a flag. None is validated against human coding yet."
  ],
  "table_note": "Participant means; small grey numbers are 95% participant-bootstrap intervals. <b>Agree</b>: the model's most probable scene matches the human scene coding. <b>Shift null</b>: the same, after rotating the film rows half a film away (what agreement looks like with the content link cut). <b>AUROC H</b>: how well low which-scene entropy separates agreeing from disagreeing moments; <b>AUROC p</b>: the same for top-scene probability. <b>ECE</b>: calibration error of top-scene probability. <b>W50</b>: the shortest contiguous span of film holding half the mass, in seconds; <b>null W50</b>: the same for recall of a different film. <b>Off-film AUROC</b>: whether off-film probability is higher in recall stretches the coders left uncoded.",
  "metrics": [
@@ -385,8 +385,7 @@
    "runs": [
     {
      "label": "it5-v3-a",
-     "name": "content-local LLM, prompt v3",
-     "current": true
+     "name": "content-local LLM, prompt v3"
     }
    ],
    "summary": [
@@ -401,6 +400,30 @@
     "Draft ADR 0031 for the implementation decisions ADR 0030 leaves open: reference measures, calibration of self-reported weights, held-level projection, and the content-local producer condition.",
     "Route human validation of breadth, the flag and the detail count through ADR 0030's joint coding rubric rather than a new scheme."
    ]
+  },
+  {
+   "id": "shore-up",
+   "title": "Harness shore-up: shared kernels, explicit word alignment, ledgers, dataset adapter",
+   "date": "2026-11-16",
+   "runs": [
+    {
+     "label": "it3-v2-llm-local-v2-a",
+     "name": "content-local, prompt v2, aligned word mapping",
+     "current": true
+    },
+    {
+     "label": "it3-analyst",
+     "name": "analyst stream, aligned"
+    }
+   ],
+   "summary": [
+    "<b>Shared scoring kernels with known-answer tests</b> now replace every per-script copy: midrank AUROC, ECE, ICC(2,1), \u03ba, bootstrap, paired differences and midrank correlation. Two tie bugs earlier came from copies.",
+    "<b>Words now map to references by explicit token alignment</b>, not by position. 28 of 27,107 anchor tokens fail to align, and 659 units have token counts that differ from the recall words, which positional mapping had misaligned. Under the measurement rule that a word samples only the reference covering it, <b>coverage is 89% of coded words</b>. The rest are connectives and filler between references, which the old rule silently gave to a neighbour. <b>On covered words, agreement is 78%</b> (95% CI 75\u201381), slightly above the old 77%. The analyst stream reaches 78% as well, and saves 0.41 bits per word (0.33\u20130.49).",
+    "<b>Reliability is now measured on the published, tempered quantities.</b> The alternatives flag reproduces at \u03ba 0.685 (our own computation, matching the reviewer's 0.69). Breadth reproduces at ICC 0.847. Alternative-entropy magnitude does not reproduce: ICC 0.01 where either sample is positive. That supports deferring it in ADR 0031.",
+    "<b>The regressor export carries a per-bin ledger:</b> status, distinct references sampled, units not about the film, uncovered words and unassigned words. Words without timing are listed in the sidecar. For NN03: 574 observed bins, 92 with no sample, 48 only uncovered or unassigned, and 4 only not about the film.",
+    "<b>Dataset boundary:</b> scripts now reach the data only through an adapter interface (<code>data.py</code>, <code>adapters/sherlock.py</code>), so FilmFestival or Friends is an adapter, not a fork. Prompts are byte-identical, so recorded runs still replay from the cache."
+   ],
+   "decisions": []
   }
  ],
  "gaps": [

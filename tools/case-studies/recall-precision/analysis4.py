@@ -171,7 +171,36 @@ def regressors(name):
         minlength=n,
     ) / np.maximum(words, 1)
     nonep[words == 0] = np.nan
+    # per-bin ledger (ADR 0031 draft section 3): counts, never one exclusive state
+    nonep_set = ["metamemory", "commentary", "fragment"]
+    n_refs = np.zeros(n)
+    n_na_units = np.zeros(n)
+    n_uncovered = np.zeros(n)
+    n_unassigned = np.zeros(n)
+    refs_seen, na_seen = {}, {}
+    Bv = z["B"][ok]
+    for b_, u, r, tk, bv in zip(k, unit, ref, talk, Bv):
+        if u < 0:
+            n_unassigned[b_] += 1
+        elif tk in nonep_set:
+            na_seen.setdefault(b_, set()).add(u)
+        elif r < 0 or np.isnan(bv):
+            n_uncovered[b_] += 1
+        else:
+            refs_seen.setdefault(b_, set()).add((u, r))
+    for b_, v in refs_seen.items():
+        n_refs[b_] = len(v)
+    for b_, v in na_seen.items():
+        n_na_units[b_] = len(v)
+    status = np.where(words == 0, "no_sample", np.where(n_refs > 0, "observed",
+                      np.where(n_na_units > 0, "only_not_applicable", "only_uncovered_or_unassigned")))
     return dict(
+        n_refs=n_refs,
+        n_not_applicable_units=n_na_units,
+        n_uncovered_words=n_uncovered,
+        n_unassigned_words=n_unassigned,
+        status=status,
+        missing_timing_words=int((~ok).sum()),
         words=words,
         logB=lvl(np.log10(np.maximum(z["B"], 1))),
         Uflag=lvl((z["U"] > 0).astype(float) * np.where(np.isnan(z["U"]), np.nan, 1)),
@@ -218,11 +247,15 @@ def export_tsv():
     """Per-participant TR-grid regressor file (recall clock, OpenNeuro, TR 1.5 s) + JSON sidecar."""
     out = D.OUT / "export"
     out.mkdir(exist_ok=True)
-    cols = ["words", "logB", "Uflag", "hedge", "nonepisodic"]
+    cols = ["words", "n_refs", "n_not_applicable_units", "n_uncovered_words", "n_unassigned_words",
+            "logB", "Uflag", "hedge", "nonepisodic"]
+    counts = {"words", "n_refs", "n_not_applicable_units", "n_uncovered_words", "n_unassigned_words"}
+    missing_timing = {}
     for name in D.development():
         R = regressors(name)
         n = len(R["words"])
-        lines = ["onset\tduration\t" + "\t".join(cols)]
+        missing_timing[name[:4]] = R["missing_timing_words"]
+        lines = ["onset\tduration\tstatus\t" + "\t".join(cols)]
         for i in range(n):
             vals = []
             for c in cols:
@@ -230,9 +263,9 @@ def export_tsv():
                 vals.append(
                     "n/a"
                     if np.isnan(v)
-                    else (f"{int(v)}" if c == "words" else f"{v:.4f}")
+                    else (f"{int(v)}" if c in counts else f"{v:.4f}")
                 )
-            lines.append(f"{i * D.TR:.1f}\t{D.TR}\t" + "\t".join(vals))
+            lines.append(f"{i * D.TR:.1f}\t{D.TR}\t{R['status'][i]}\t" + "\t".join(vals))
         (out / f"{name[:4]}_desc-recallspecificity_timeseries.tsv").write_text(
             "\n".join(lines) + "\n"
         )
@@ -241,12 +274,23 @@ def export_tsv():
         "(content-local LLM, prompt v2, sample A). Development participants only.",
         "Clock": "OpenNeuro word-onset column (scan-relative seconds); no lag or HRF applied.",
         "Binning": "Half-open 1.5 s bins [k*1.5, (k+1)*1.5); value = mean of word-level values whose onset "
-        "falls in the bin (level-holding); bins without a word onset are n/a.",
+        "falls in the bin, each distinct reference counted once (onset-point projection, ADR 0031 "
+        "draft section 3); a word maps to the reference whose anchor covers it (explicit token "
+        "alignment). Timing is onset-only, so a bin with no onset is 'no_sample', not 'no speech'.",
+        "status": "observed (at least one reference sampled) | only_not_applicable (only talk not about "
+        "the film) | only_uncovered_or_unassigned | no_sample.",
+        "n_refs": "Distinct references sampled in the bin.",
+        "n_not_applicable_units": "Distinct units of talk not about the film (metamemory, commentary, "
+        "fragment) sampled in the bin.",
+        "n_uncovered_words": "Words of film-describing units that no reference anchor covers.",
+        "n_unassigned_words": "Words outside every recall unit.",
+        "MissingTimingWords": "per participant, words without an onset (not placed in any bin): "
+        + json.dumps(missing_timing),
         "words": "Number of word onsets in the bin (speech-rate nuisance).",
         "logB": "log10 breadth (s): film extent of the referenced hypothesis, weighted; n/a where not about "
         "the film. Lower bound set by annotation row grain.",
         "Uflag": "Share of words whose reference carries competing hypotheses (0/1 per word). Magnitude of "
-        "uncertainty is not reliable (ICC 0.10); the flag is (kappa 0.69).",
+        "uncertainty is not reliable (ICC 0.01 on tempered weights); the flag is (kappa 0.69).",
         "hedge": "Share of words in units the model marked as speaker-hedged.",
         "nonepisodic": "Share of words in units labelled metamemory, commentary or fragment.",
         "NotIncluded": "Top-scene confidence (collinear with Uflag after HRF convolution).",

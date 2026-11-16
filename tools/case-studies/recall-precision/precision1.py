@@ -64,7 +64,7 @@ def row_text(r, mode):
 
 def build_film(enc, text_mode, prior, hub_windows):
     rows = D.film_rows(with_speech=True)
-    raw = D.common.attach_speech(D.common.film_rows())
+    raw = D.film_speech_rows()
     speech = {r.id: " ".join(r.speech).lower() for r in raw}
     T = int(np.ceil(max(r.t1 for r in rows)))
     alloc = np.zeros((len(rows), T), dtype=np.float32)
@@ -201,15 +201,7 @@ def entropy_bits(p):
     return -(p * np.log2(q)).sum(-1)
 
 
-def auroc(pos, neg):
-    """P(score_pos > score_neg) + 0.5 P(tie), via midranks (ties share their average rank)."""
-    from scipy.stats import rankdata
-
-    a, b = np.asarray(pos, float), np.asarray(neg, float)
-    if len(a) == 0 or len(b) == 0:
-        return float("nan")
-    r = rankdata(np.concatenate([a, b]))
-    return float((r[: len(a)].sum() - len(a) * (len(a) + 1) / 2) / (len(a) * len(b)))
+from metrics import auroc  # noqa: E402,F401  (shared kernel; was a local copy)
 
 
 # ---------------------------------------------------------------- dialogue anchors
@@ -434,14 +426,7 @@ def main():
     )
 
 
-def ece(conf, hit, bins=10):
-    q = np.clip((conf * bins).astype(int), 0, bins - 1)
-    e = 0.0
-    for b in range(bins):
-        s = q == b
-        if s.any():
-            e += s.mean() * abs(conf[s].mean() - hit[s].mean())
-    return float(e)
+from metrics import ece  # noqa: E402,F401  (shared kernel; was a local copy)
 
 
 def means(P):

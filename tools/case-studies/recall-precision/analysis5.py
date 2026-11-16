@@ -74,7 +74,7 @@ def ref_rows(run, g):
             continue
         recs = {u["id"]: u for u in json.loads(p.read_text())["units"]}
         gold_iv = D.gold_intervals(name)
-        for u in D.common.units(name):
+        for u in D.units(name):
             rec = recs.get(u.id)
             if not rec or "spans" not in rec:
                 continue

@@ -1,4 +1,6 @@
-"""Recall-time temporal specificity over film time (case study 1, iteration loop).
+"""RETIRED (iteration 0 record). Its local auroc gives tied scores arbitrary ranks; use metrics.py.
+
+Recall-time temporal specificity over film time (case study 1, iteration loop).
 
 For each recall word w_i (Princeton onset t_i) a centered context window of W words is
 compared with every film annotation row. A softmax over rows with temperature tau gives a

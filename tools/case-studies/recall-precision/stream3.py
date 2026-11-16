@@ -26,7 +26,8 @@ import re
 import numpy as np
 
 import data as D
-from precision1 import auroc, ece, entropy_bits
+from metrics import auroc, ece
+from precision1 import entropy_bits
 from stream_eval import FilmGrid, gold_labels, word_index
 
 ALPHA = np.array([0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0])
@@ -147,28 +148,65 @@ def ref_quantities(ref, g, alpha, gamma, eps):
     )
 
 
-def word_refs(unit_text, refs, nwords):
-    """Map each of the unit's CSV words to a reference index (declared rule; see module doc)."""
-    nt = max(len(toks(unit_text)), 1)
-    tok_ref = np.full(nt, -1)
+WORD_POLICY = "covered"  # "covered" (ADR 0031 draft: a word samples only references covering it)
+# or "nearest" (iteration-3 rule: uncovered words in an episodic unit hold the nearest reference)
+ALIGN_LEDGER = {"anchor_tokens": 0, "anchor_tokens_unmatched": 0, "units_count_mismatch": 0}
+
+
+def align_tokens(unit_tokens, word_tokens):
+    """Explicit alignment of a unit's text tokens to its recall words (no proportional index).
+    Returns {unit token index: word index} for matched tokens only."""
+    from difflib import SequenceMatcher
+
+    m = {}
+    for a, b, n in SequenceMatcher(None, unit_tokens, word_tokens, autojunk=False).get_matching_blocks():
+        for t in range(n):
+            m[a + t] = b + t
+    return m
+
+
+def word_refs(unit_text, refs, word_texts, policy=None):
+    """Map each of the unit's recall words to a reference index, or -1 when no reference covers
+    it. A reference covers the words its anchor tokens align to; with several covering
+    references the innermost (shortest anchor) wins (declared nesting policy)."""
+    policy = policy or WORD_POLICY
+    ut = toks(unit_text)
+    wt = [" ".join(toks(w)) for w in word_texts]
+    if len(ut) != len([w for w in wt if w]):
+        ALIGN_LEDGER["units_count_mismatch"] += 1
+    m = align_tokens(ut, wt)
+    out = np.full(len(word_texts), -1)
+    span_len = np.full(len(word_texts), 10**9)
     for k, r in enumerate(refs):
-        if r.span:
-            tok_ref[r.span[0] : r.span[1]] = k
-    if (tok_ref < 0).all():
-        tok_ref[:] = 0
-    anchored = np.where(tok_ref >= 0)[0]
-    for i in np.where(tok_ref < 0)[0]:
-        tok_ref[i] = tok_ref[anchored[np.argmin(np.abs(anchored - i))]]
-    if nwords == 0:
-        return np.array([], int)
-    idx = np.minimum((np.arange(nwords) * nt / nwords).astype(int), nt - 1)
-    return tok_ref[idx]
+        if not r.span:
+            # an unanchored reference (e.g. the unit-level analyst stream) covers its whole unit
+            for w in range(len(word_texts)):
+                if len(ut) < span_len[w]:
+                    out[w], span_len[w] = k, len(ut)
+            continue
+        a, b = r.span
+        for t in range(a, b):
+            ALIGN_LEDGER["anchor_tokens"] += 1
+            if t not in m:
+                ALIGN_LEDGER["anchor_tokens_unmatched"] += 1
+                continue
+            w = m[t]
+            if b - a < span_len[w]:
+                out[w], span_len[w] = k, b - a
+    if policy == "nearest":
+        cov = np.where(out >= 0)[0]
+        if len(cov) == 0 and len(refs):
+            out[:] = 0
+        else:
+            for w in np.where(out < 0)[0]:
+                out[w] = out[cov[np.argmin(np.abs(cov - w))]]
+    return out
 
 
 def load(stream, run, name, g):
-    units = D.common.units(name)
+    units = D.units(name)
     if stream == "v3":
-        p = D.common.OUT / run / f"{name}.json"
+        p = D.analyst_dir() / run / f"{name}.json"
         recs = {u["id"]: u for u in json.loads(p.read_text())["units"]}
         return units, [refs_v3(recs.get(u.id), g) for u in units]
     p = D.OUT / "llm" / run / f"{name}.json"
@@ -178,15 +216,15 @@ def load(stream, run, name, g):
     return units, [refs_v2(recs.get(u.id), u.text, g) for u in units]
 
 
-def per_word(units, parsed, k, nwords):
-    """For each word: (unit index, ref index or -1)."""
-    wr = np.full(nwords, -1)
+def per_word(units, parsed, k, words):
+    """For each word: reference index within its unit, or -1 (no reference covers it)."""
+    wr = np.full(len(words), -1)
     for u in range(len(units)):
         sel = np.where(k == u)[0]
         talk, _, refs = parsed[u]
         if not refs or len(sel) == 0:
             continue
-        wr[sel] = word_refs(units[u].text, refs, len(sel))
+        wr[sel] = word_refs(units[u].text, refs, [words[i].text for i in sel])
     return wr
 
 
@@ -249,7 +287,7 @@ def evaluate(stream, run, label):
                 t=t,
                 tn=tn,
                 k=k,
-                wr=per_word(units, parsed, k, len(words)),
+                wr=per_word(units, parsed, k, words),
                 gold=gold_labels(name, t),
             )
         )
@@ -327,7 +365,8 @@ def evaluate(stream, run, label):
             lq[fallback] = np.log2(frac[np.searchsorted(g.uniq, gd[fallback])])
             rec |= dict(
                 coverage=float(ev.sum() / on.sum()),
-                scene_acc=float(hit[on].mean()),
+                scene_acc=float(hit[on].mean()),  # all coded words; uncovered count as misses
+                scene_acc_covered=float(hit[ev].mean()) if ev.any() else float("nan"),
                 logloss_on_bits=float(-lq[on].mean()),
                 mean_conf=float(W["conf"][ev].mean()),
                 ece_top=ece(W["conf"][ev], hit[ev]),
@@ -352,6 +391,7 @@ def evaluate(stream, run, label):
     coded = {k: v for k, v in summ["participants"].items() if "scene_acc" in v}
     keys = [
         "scene_acc",
+        "scene_acc_covered",
         "logloss_on_bits",
         "mean_conf",
         "ece_top",
@@ -368,6 +408,8 @@ def evaluate(stream, run, label):
         k: float(np.nanmean([v[k] for v in coded.values()])) for k in keys
     }
     summ["participant_boot95"] = boot({k: [v[k] for v in coded.values()] for k in keys})
+    summ["word_policy"] = WORD_POLICY
+    summ["alignment_ledger"] = dict(ALIGN_LEDGER)
     summ["grid_edge_folds"] = int(
         sum(v["grid_edge"] for v in summ["participants"].values())
     )
@@ -394,7 +436,10 @@ def main():
     ap.add_argument("stream", choices=["v2", "v3"])
     ap.add_argument("run")
     ap.add_argument("--label")
+    ap.add_argument("--word-policy", choices=["covered", "nearest"], default="covered")
     a = ap.parse_args()
+    global WORD_POLICY
+    WORD_POLICY = a.word_policy
     s = evaluate(a.stream, a.run, a.label or f"it3-{a.stream}-{a.run}")
     for n, r in s["participants"].items():
         print(

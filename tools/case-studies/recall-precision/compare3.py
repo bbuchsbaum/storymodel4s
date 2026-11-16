@@ -25,55 +25,57 @@ from stream3 import load
 from stream_eval import FilmGrid
 
 
-def icc21(x, y):
-    """Two-way random, absolute agreement, single measure (Shrout & Fleiss ICC(2,1))."""
-    X = np.column_stack([x, y])
-    n, k = X.shape
-    gm = X.mean()
-    msr = k * ((X.mean(1) - gm) ** 2).sum() / (n - 1)
-    msc = n * ((X.mean(0) - gm) ** 2).sum() / (k - 1)
-    sse = ((X - X.mean(1, keepdims=True) - X.mean(0, keepdims=True) + gm) ** 2).sum()
-    mse = sse / ((n - 1) * (k - 1))
-    return float((msr - mse) / (msr + (k - 1) * mse + k * (msc - mse) / n))
+from metrics import cohen_kappa, icc21  # noqa: E402,F401  (shared kernels)
 
 
-def unit_first_ref(parsed):
+def unit_first_ref(parsed, alpha=1.0):
+    """First reference per unit, measured on the PUBLISHED quantities: weights tempered with the
+    participant's fitted alpha (as the regressors are), alternatives flag, member count, extent."""
     out = []
     for talk, _, refs in parsed:
         if not refs:
             out.append((talk, None))
             continue
         r = refs[0]
-        pi = r.w / r.w.sum()
+        pi = r.w**alpha
+        pi = pi / pi.sum()
         U = float(-(pi * np.log2(pi)).sum())
         B = float((pi * np.array([m.sum() for m in r.masks])).sum())
         top = int(np.argmax(pi))
         mid = np.where(r.masks[top])[0]
-        out.append(
-            (talk, dict(U=U, logB=np.log10(max(B, 1)), form=r.form, centre=mid.mean()))
-        )
+        out.append((talk, dict(U=U, flag=int(len(pi) > 1), members=len(pi), logB=np.log10(max(B, 1)),
+                               form=r.form, centre=mid.mean())))
     return out
 
 
-def reliability(run_a, run_b, g):
-    U, Ub, B, Bb, same_c, talk_same, form_same = [], [], [], [], [], [], []
+def reliability(run_a, run_b, g, alphas):
+    U, Ub, B, Bb, F, Fb, same_c, talk_same, form_same = [], [], [], [], [], [], [], [], []
     for name in D.development():
         la, lb = load("v2", run_a, name, g), load("v2", run_b, name, g)
         if la is None or lb is None:
             continue
-        for (ta, ra), (tb, rb) in zip(unit_first_ref(la[1]), unit_first_ref(lb[1])):
+        al = alphas.get(name, 1.0)
+        for (ta, ra), (tb, rb) in zip(unit_first_ref(la[1], al), unit_first_ref(lb[1], al)):
             talk_same.append(ta == tb)
             if ra and rb:
                 U.append(ra["U"])
                 Ub.append(rb["U"])
+                F.append(ra["flag"])
+                Fb.append(rb["flag"])
                 B.append(ra["logB"])
                 Bb.append(rb["logB"])
                 same_c.append(abs(ra["centre"] - rb["centre"]) <= 30)
                 form_same.append(ra["form"] == rb["form"])
+    U, Ub = np.array(U), np.array(Ub)
+    either = (U > 0) | (Ub > 0)
     return dict(
         units_both_episodic=len(U),
-        icc_U=icc21(np.array(U), np.array(Ub)),
+        weights="tempered with each participant's fitted alpha (published quantity)",
+        kappa_alternatives_flag=cohen_kappa(F, Fb),
         icc_logB=icc21(np.array(B), np.array(Bb)),
+        icc_U_all=icc21(U, Ub),
+        icc_U_where_either_positive=icc21(U[either], Ub[either]),
+        share_U_zero_both=float(np.mean(~either)),
         top_hypothesis_within_30s=float(np.mean(same_c)),
         talk_agreement=float(np.mean(talk_same)),
         form_agreement=float(np.mean(form_same)),
@@ -174,7 +176,9 @@ def main():
     g = FilmGrid()
     res = {}
     if (D.OUT / "llm" / a.b / "NN03_ANT_202231_final.json").exists():
-        res["reliability"] = reliability(a.a, a.b, g)
+        summ = json.loads((D.OUT / "runs" / a.local / "summary.json").read_text())
+        alphas = {n: v["alpha"] for n, v in summ["participants"].items()}
+        res["reliability"] = reliability(a.a, a.b, g, alphas)
     res["info_gain_analyst_minus_local_bits"] = paired(a.analyst, a.local)
     if (D.OUT / "runs" / a.noctx).exists():
         res["context_gain_local_minus_noctx_bits"] = paired(a.local, a.noctx)
