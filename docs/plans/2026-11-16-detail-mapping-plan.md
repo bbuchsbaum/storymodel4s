@@ -585,7 +585,8 @@ ceiling. No field becomes scientifically qualified just because its implementati
    vector over single source units. The owner decides ADRs.
 2. Validation data for fresh items: the untouched Sherlock remainder, Friends' sealed test
    side (10 participants; untouched by any model, though human-coding statistics were computed
-   over all 23), a new FilmFestival-style corpus, or a new collection.
+   over all 23 and one test participant was individually exposed before the seal), a new
+   FilmFestival-style corpus, or a new collection.
 3. Who codes, the budget, and whether the owner's within-scene lane
    (`bd-01M2TA9ZK64GTG3526RMNWNHCT`) folds into the joint rubric.
 4. The bounded selection of semantic gaps for the producer profile and the thresholds/sample
