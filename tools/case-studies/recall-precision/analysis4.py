@@ -205,7 +205,9 @@ def regressors(name):
         logB=lvl(np.log10(np.maximum(z["B"], 1))),
         Uflag=lvl((z["U"] > 0).astype(float) * np.where(np.isnan(z["U"]), np.nan, 1)),
         conf=lvl(z["conf"]),
-        hedge=lvl(z["hedge"].astype(float)),
+        # hedge is a unit attribute: unmeasurable (no unit, or no producer record) is NaN, not 0
+        hedge=lvl(np.where((z["k"] < 0) | np.isin(z["talk"], ["missing", ""]), np.nan,
+                           z["hedge"].astype(float))),
         nonepisodic=nonep,
     )
 
@@ -282,16 +284,19 @@ def export_tsv():
         "n_refs": "Distinct references sampled in the bin.",
         "n_not_applicable_units": "Distinct units of talk not about the film (metamemory, commentary, "
         "fragment) sampled in the bin.",
-        "n_uncovered_words": "Words of film-describing units that no reference anchor covers.",
+        "n_uncovered_words": "Words inside recall units that sample no reference: no anchor covers them, or the "
+        "producer returned no record for the unit.",
         "n_unassigned_words": "Words outside every recall unit.",
         "MissingTimingWords": "per participant, words without an onset (not placed in any bin): "
         + json.dumps(missing_timing),
         "words": "Number of word onsets in the bin (speech-rate nuisance).",
         "logB": "log10 breadth (s): film extent of the referenced hypothesis, weighted; n/a where not about "
         "the film. Lower bound set by annotation row grain.",
-        "Uflag": "Share of words whose reference carries competing hypotheses (0/1 per word). Magnitude of "
-        "uncertainty is not reliable (ICC 0.01 on tempered weights); the flag is (kappa 0.69).",
-        "hedge": "Share of words in units the model marked as speaker-hedged.",
+        "Uflag": "Mean over the distinct references sampled in the bin of a 0/1 flag: the reference carries "
+        "competing hypotheses. Magnitude of "
+        "uncertainty is not reliable (ICC 0.01 where either sample is positive); the flag is (kappa 0.69).",
+        "hedge": "Mean over the distinct references sampled in the bin of a 0/1 flag: the unit is marked "
+        "speaker-hedged; n/a where no unit or producer record exists.",
         "nonepisodic": "Share of words in units labelled metamemory, commentary or fragment.",
         "NotIncluded": "Top-scene confidence (collinear with Uflag after HRF convolution).",
     }

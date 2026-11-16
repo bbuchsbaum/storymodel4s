@@ -355,8 +355,8 @@ function renderStats() {
   const rel = C.reliability || {}, uf = A4.uncertainty_flag || {}, cp = A4.context_paired || {};
   const cpv = Object.values(cp), dctx = cpv.length ? cpv.reduce((s, v) => s + (v.with_context - v.target_only), 0) / cpv.length : null;
   const items = [
-    ["accuracy", pct(m.scene_acc_covered), ci.scene_acc_covered ? `${pct(ci.scene_acc_covered[0])}–${pct(ci.scene_acc_covered[1])} · coverage ${pct(m.coverage)}` : "", "content-local agreement on words a reference covers"],
-    ["accuracy", pct(ma.scene_acc_covered), "", "analyst stream, which reads the whole recall"],
+    ["accuracy", `${pct(m.scene_acc_covered)} · ${pct(m.scene_acc)}`, `covered words (${pct(m.coverage)} of coded) · all coded words`, "content-local agreement with the human scene coding"],
+    ["accuracy", `${pct(ma.scene_acc_covered)} · ${pct(ma.scene_acc)}`, `covered words (${pct(ma.coverage)} of coded) · all coded words`, "analyst stream, which reads the whole recall"],
     ["accuracy", `${pct(uf.agreement_when_competing_hypotheses)} vs ${pct(uf.agreement_when_single_hypothesis)}`, "", "agreement when competing hypotheses are present vs absent"],
     ["reliability", f2(rel.icc_logB), "ICC(2,1)", "breadth across two independent samples"],
     ["reliability", rel.kappa_alternatives_flag == null ? "—" : `κ ${f2(rel.kappa_alternatives_flag)}`, rel.icc_U_where_either_positive == null ? "" : `magnitude ICC ${f2(rel.icc_U_where_either_positive)}`, "competing-hypotheses flag across samples"],
@@ -371,7 +371,7 @@ const RUNS = [
   [LOCAL, "it3 · LLM local"], [ANALYST, "it3 · analyst"], ["it5-v3-a", "it5 · LLM local, v3"],
 ];
 const METRICS = [
-  {label: "Agreement with the human scene coding, on words a reference covers where defined (higher is better)", keys: ["scene_acc_covered", "scene_acc"], fmt: pct, dom: [0, 1], refs: [[0.02, "chance"], [0.79, "v3 label"]]},
+  {label: "Agreement with the human scene coding over all coded words, one denominator for every run (higher is better)", keys: ["scene_acc"], fmt: pct, dom: [0, 1], refs: [[0.02, "chance"], [0.79, "v3 label"]]},
   {label: "Log loss of the human scene, bits (lower is better)", keys: ["logloss_on_bits", "gold_scene_logloss_bits"], fmt: f2, dom: [0, 6], refs: [[5.64, "uniform"]]},
   {label: "Calibration error (lower is better; iteration 3 only)", keys: ["ece_top"], fmt: f2, dom: [0, 0.2], only: [LOCAL, ANALYST, "it5-v3-a"]},
   {label: "AUROC, confidence separates right from wrong (iteration 3, tie-corrected)", keys: ["auroc_conf_hit"], fmt: f2, dom: [0.5, 1], only: [LOCAL, ANALYST, "it5-v3-a"]},

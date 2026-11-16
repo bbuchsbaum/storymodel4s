@@ -25,7 +25,7 @@ from stream3 import load
 from stream_eval import FilmGrid
 
 
-from metrics import cohen_kappa, icc21  # noqa: E402,F401  (shared kernels)
+from metrics import cohen_kappa, icc21, paired_difference  # noqa: E402,F401  (shared kernels)
 
 
 def unit_first_ref(parsed, alpha=1.0):
@@ -87,31 +87,26 @@ def npz(label, name):
     return np.load(p, allow_pickle=True) if p.exists() else None
 
 
-def paired(lab_a, lab_b, key="logq_gold", rng=None):
-    """Per participant mean of (a - b) over coded words where both are defined."""
-    d = {}
+def paired(lab_a, lab_b, key="logq_gold"):
+    """Per participant mean of (a - b) over coded words where BOTH streams define the value.
+    The subset is reported (share of coded words), because a stream that covers fewer words
+    is compared only where it covers them."""
+    a_m, b_m, share = {}, {}, {}
     for name in D.development():
         a, b = npz(lab_a, name), npz(lab_b, name)
         if a is None or b is None:
             continue
-        m = (a["gold"] > 0) & ~np.isnan(a[key]) & ~np.isnan(b[key])
+        coded = a["gold"] > 0
+        m = coded & ~np.isnan(a[key]) & ~np.isnan(b[key])
         if m.sum() < 20:
             continue
-        d[name] = float((a[key][m] - b[key][m]).mean())
-    v = np.array(list(d.values()))
-    rng = rng or np.random.default_rng(3)
-    bs = (
-        v[rng.integers(0, len(v), (4000, len(v)))].mean(1)
-        if len(v) > 2
-        else np.array([np.nan])
-    )
-    return dict(
-        per_participant=d,
-        mean=float(v.mean()) if len(v) else None,
-        ci95=[float(np.quantile(bs, 0.025)), float(np.quantile(bs, 0.975))],
-        positive=int((v > 0).sum()),
-        n=len(v),
-    )
+        a_m[name], b_m[name] = float(a[key][m].mean()), float(b[key][m].mean())
+        share[name] = float(m.sum() / coded.sum())
+    out = paired_difference(a_m, b_m)
+    out["per_participant"] = out.pop("per_unit")
+    out["subset"] = "coded words where both streams define the value"
+    out["subset_share_mean"] = float(np.mean(list(share.values()))) if share else None
+    return out
 
 
 def tr_table(lab_local, lab_analyst, name):

@@ -12,9 +12,10 @@ Model for one reference (declared):
   u     = min(1, eps + gamma * residual)               (mass that may be anywhere)
   q(t)  = (1 - u) * sum_k pi_k * Uniform(union of hypothesis k's intervals)(t) + u / T
 Measures: U = H(pi) bits; B = sum_k pi_k |hypothesis k| seconds; conf = max_scene q(scene).
-Word projection: a word takes the reference whose anchor words cover it; uncovered words take
-the nearest anchored reference in the same unit (level-holding); words in non-episodic units are
-not applicable (NaN), never zero.
+Word projection: words map to references by explicit token alignment of anchor words; a word
+samples the innermost reference covering it, an unanchored reference covers its whole unit, and
+under the default "covered" policy a word no reference covers is unmapped (the "nearest" policy
+reproduces the iteration-3 rule). Words in non-episodic units are not applicable (NaN), never zero.
 """
 
 from __future__ import annotations
@@ -418,17 +419,10 @@ def evaluate(stream, run, label):
 
 
 def boot(cols, n=4000, seed=11):
-    """Percentile bootstrap over participants (n ~ 10: intervals are approximate and narrow)."""
-    rng = np.random.default_rng(seed)
-    out = {}
-    for k, v in cols.items():
-        v = np.array(v, float)
-        v = v[~np.isnan(v)]
-        if len(v) < 3:
-            continue
-        bs = v[rng.integers(0, len(v), (n, len(v)))].mean(1)
-        out[k] = [float(np.quantile(bs, 0.025)), float(np.quantile(bs, 0.975))]
-    return out
+    """Participant bootstrap of each column's mean (shared kernel; None below 3 participants)."""
+    from metrics import boot_mean_ci
+
+    return {k: ci for k, v in cols.items() if (ci := boot_mean_ci(v, n=n, seed=seed)) is not None}
 
 
 def main():

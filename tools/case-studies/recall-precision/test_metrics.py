@@ -47,12 +47,17 @@ def test_icc21():
     # Hand computation for x vs x+1 (n=5, k=2): MSR = 5, MSC = 2.5, MSE = 0
     # ICC(2,1) = (5 - 0) / (5 + 0 + 2*(2.5 - 0)/5) = 5 / 6
     close(icc21(x, x + 1), 5 / 6)
+    # Nonzero residual: x = [1,2,3], y = [2,2,4]. By hand: MSR = 13/6, MSC = 2/3, MSE = 1/6;
+    # ICC = (13/6 - 1/6) / (13/6 + 1/6 + 2*(2/3 - 1/6)/3) = 2 / (8/3) = 0.75
+    close(icc21([1, 2, 3], [2, 2, 4]), 0.75)
 
 
 def test_kappa():
     close(cohen_kappa([1, 1, 0, 0], [1, 1, 0, 0]), 1.0)
     # po = 0.5, pe = 0.5 (both raters 50/50) -> kappa 0
     close(cohen_kappa([1, 1, 0, 0], [1, 0, 1, 0]), 0.0)
+    # Skewed marginals: po = 3/4, pe = .75*.5 + .25*.5 = 1/2 -> kappa = 1/2
+    close(cohen_kappa([1, 1, 1, 0], [1, 1, 0, 0]), 0.5)
 
 
 def test_bootstrap_and_paired():

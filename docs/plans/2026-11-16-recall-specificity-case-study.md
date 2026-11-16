@@ -15,8 +15,8 @@ Development participants only. Nothing in this note opens the untouched test sid
 
 | Quantity | Result | Standing |
 |---|---|---|
-| Where the speech points (top scene), content-local | 78% agreement with the human scene coding on the 89% of coded words a reference covers (95% CI 75–81), ECE 0.07 | Usable |
-| Same, whole-recall analyst stream (v3 mapper) | 78%; saves 0.41 bits per word over content-local (0.33–0.49) | Usable, separate regressor |
+| Where the speech points (top scene), content-local | Agreement with the human scene coding: 78% on the 89% of coded words a reference covers (95% CI 75–81); 69% over all coded words, where uncovered words count as misses; ECE 0.07 | Usable |
+| Same, whole-recall analyst stream (v3 mapper) | 78% on covered words, 77% over all coded words (it covers 99%); saves 0.41 bits per word (0.33–0.49) on the 89% of coded words both streams cover | Usable, separate regressor |
 | Breadth: film extent of the referenced hypothesis | ICC 0.85 across two samples; form explains 44% of variance, scene 6%, speaker 4% | Reliable; floor at the annotation's row grain; not specificity |
 | Competing hypotheses | Flag κ 0.69; magnitude ICC 0.01; agreement 59% when on vs 80% when off | Use as a flag only |
 | Speech rate | \|ρ\| < 0.05 with every series; all VIF ≤ 1.96 after HRF convolution | No confound |
