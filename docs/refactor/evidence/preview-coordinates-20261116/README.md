@@ -103,3 +103,9 @@ Fifteen Python tests pass, including exhaustive small-sequence comparison agains
 independent enumeration. Two compiled mutations each fail their named assertion
 while two sibling controls pass: accepting an ambiguous first occurrence, and
 ignoring raw input identity. Runtime source code is unchanged by this slice.
+
+Independent review of `a54fe710fae5ca729c647bb3a50a79433137fa35` passed. The reviewer
+reran all fifteen tests and both mutations, recomputed all sixty private receipts,
+confirmed both aggregates and thirty byte-identical reused Scala outputs, and
+checked eligibility and frozen supplied-unit lineage. The reviewer did not rerun
+Scala preparation. The verdict applies to this development boundary comparison.
