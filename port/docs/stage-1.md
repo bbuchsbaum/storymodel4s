@@ -29,6 +29,10 @@ a versioned bundle and analysis tables. A researcher can:
 6. Obtain identical sorted analysis rows through the CLI and a short executable Python
    example suitable for a notebook. Importing the package must not start a service.
 
+Inspection supports keyboard selection and a text alternative to graphical encodings.
+Evidence export retains producer-granted permissions: denied or unsupported grants refuse
+before constructing a download, even when inspection itself is permitted.
+
 The first workbench reads files and precomputed projections. In-browser policy recomputation
 is not required for Stage 1; the UI must identify the selected policy and missing projections.
 A local service can follow only when a measured interaction requires it.
@@ -74,7 +78,7 @@ engineering timebox, not a delivery promise; an incomplete slice remains incompl
 | S1.0 — Freeze references and establish the shell | Verify the pinned source files in `references.json`; record expected behavior for every preservation row. Select admitted fixture bytes, freeze expected outputs, inventory affected legacy consumers, and establish the Python package and React app with pinned dependencies. Record the benchmark tasks before either implementation. | Runnable focused check commands; fixture/admission records; reference hashes; explicit legacy support list; benchmark protocol. No model calls. |
 | S1.1 — Checked account and exchange | Implement exact coordinates, evidence bindings, source-local identities, occurrence identity, context-qualified source/recall accounts, the bounded relation families, reference variants and separate assessments. Use standard library facilities where they preserve the wire contract. | Positive and adversarial fixtures; deterministic read/write; independent expected values; strict refusal of foreign bindings. The graph witness reaches a saved artifact. |
 | S1.2 — Recorded execution and analysis | Reuse or adapt the Python readers and scorer concepts; port the missing authoritative checks from Scala. Replay existing synthetic categorical recordings. Port bounded dispatch, record-before-parse, interruption/resume and atomic output behavior using a loopback provider fixture. Implement the three analysis views and the declared policy witnesses. | Same legacy outcomes and identities within the declared support list; no silent loss of unknown fields or statuses; exact request counts; replay with networking blocked; CLI/API row equality. |
-| S1.3 — Inspect, save and reopen | Rebuild the narrow Atlas interaction in React: linked recall/source selection, exact support, alternatives, provenance, context/relation inspection, artifact-bound investigation and export. Generate wire types from the Python-owned schema. | Executed browser path from file open through selection and save/reopen; mismatched-artifact refusal; export retains scientific values and policy provenance. Python–JSON–browser–Python coordinate roundtrip. |
+| S1.3 — Inspect, save and reopen | Rebuild the narrow Atlas interaction in React: linked recall/source selection, exact support, alternatives, provenance, context/relation inspection, artifact-bound investigation and permission-checked export. Generate wire types from the Python-owned schema. | Executed browser path from file open through keyboard selection and save/reopen; text alternative; mismatched-artifact refusal; denied export creates no download. Export retains scientific values and policy provenance. Python–JSON–browser–Python coordinate roundtrip. |
 | S1.4 — Measure and decide | Perform the matched changes below, cold-review the exact pilot commit and record a preservation audit. Run the installed package and built workbench from outside their source directories. | Reproducible evidence report, unresolved gaps, separate correctness and speed decisions, and a recommendation to continue, revise or stop expansion. |
 
 S1.2 depends on S1.1. The basic workbench shell can develop against frozen fixtures after
@@ -162,6 +166,8 @@ Required gates:
   uncertain remote attempts do not silently retry; offline replay needs no credential or network.
 - The UI opens real pilot output, preserves save/reopen state, refuses foreign artifacts and
   passes coordinate/large-number roundtrips. Presentation filtering never rewrites inference.
+  Keyboard inspection and its text alternative expose the same selected evidence; denied
+  export grants refuse before materializing a download. Unsupported grants never become allowed.
 - Local checks include Python tests, one Python type checker, formatting/lint, schema drift,
   TypeScript checks and focused browser tests. Report totals, skips, commands and actual exits.
   Hosted CI and scientific qualification are separate claims.
