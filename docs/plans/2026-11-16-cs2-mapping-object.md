@@ -182,9 +182,25 @@ decision).
 5. A framing-work field per unit, with its producer condition.
 6. FilmFestival adapter and the two-level producer in the harness.
 
+## Owner decisions (2026-11-16)
+
+- **Two-level production:** a whole-recall film-frame pass, then content-local localization
+  within the frame. Work identity and scene-given-work are scored separately.
+- **Frozen FilmFestival participants:** sub-06, sub-09, sub-11, sub-12, sub-13 and sub-20. They
+  are sealed at participant level from all case-study-2 design, tuning and inspection until one
+  final run.
+  - The rule: order participants by `sha256("cs2-filmfestival-holdout-20261116:" + id)` and take
+    the first six.
+  - Record: `data/study/filmfestival/cs2-partition.json`, SHA-256 of its JSON without the trailing
+    newline `7dc59c85407a5813ccb0f6bdb46689387c9166f93b389a4e4e76a13c10dd0447`.
+  - These participants were processed by the LLM mapper on 2026-11-09, and the gold coding is
+    public. The freeze protects only against tuning this design on them.
+- **Units:** the library's own segmenter on the word clock, with an utterance-unit run as a
+  control.
+
 ## Order of work
 
-1. Owner decisions: two-level production, a frozen FilmFestival subset, own-segmenter units.
+1. Owner decisions: recorded above.
 2. Harness: FilmFestival adapter, the typed projections and their invariants, and the scorer
    with baselines and controls, all passing known-answer tests on synthetic data. No model call
    yet.
