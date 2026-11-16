@@ -324,6 +324,10 @@ Superseded on 2026-11-16 by the [detail-mapping plan](2026-11-16-detail-mapping-
 event-representation programme continues as the detail layer DL1-DL6, a set of bounded,
 evaluated field sets in the same bundle. Speaker-labelled evidence becomes DL2, fidelity DL3,
 and who-did-what DL6. Delivery 5's double-coding rubric covers the detail fields from the start.
+The reusable detail account separates kinds, memory addresses, discourse functions, source
+bindings and fidelity. Internal/external labels and counts are derived analyses under a named
+scoring policy, with unresolved and excluded material reported separately. DL5 uses unit-only
+input and tests order readouts directly; a surrounding recall window is not order-independent.
 
 The earlier text read: "The event-representation programme continues as bounded, evaluated
 capabilities. The first is who-did-what in recurring scenes, evaluated on fresh examples once

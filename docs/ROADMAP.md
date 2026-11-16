@@ -108,11 +108,13 @@ The near-term sequence, from the working plan:
 - **Detail layer, DL1-DL6** ([plan](plans/2026-11-16-detail-mapping-plan.md)): each adds named
   bundle fields and has one exit. DL1, DL3, DL4 and DL6 have fresh-item exits against blind
   human coding; DL2 and DL5 have engineering exits.
-  - DL1: recall detail atoms with exact spans and internal/external kinds.
+  - DL1: recall detail atoms with exact spans, kinds, memory addresses and discourse functions;
+    internal/external labels and counts are derived under a named scoring policy.
   - DL2: a source cast and row record, with participants and dialogue speakers.
   - DL3: detail-to-row binding with graded fidelity, ported from the graded verifier.
   - DL4: coverage and omission, derived from DL3.
-  - DL5: an order-independent condition, to decide whether order measures can be supported.
+  - DL5: a unit-only mapping condition, with an input-policy audit, permutation check and direct
+    readout-recovery evidence to decide whether order measures can be supported.
   - DL6: who-did-what in recurring scenes, as the hard test of DL2 and DL3.
 
 E1-E4 below describe the full event program. DL2 is E1's first step and DL1 and DL3 are E2's;

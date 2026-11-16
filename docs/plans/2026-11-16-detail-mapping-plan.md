@@ -50,6 +50,23 @@ kept for analyses that need it, such as causal centrality.
 - Development on seen data is engineering. A claim of accuracy needs fresh items and a frozen
   protocol. Exits marked *fresh* below are such claims; the others are engineering exits.
 
+## Core structure and derived analyses
+
+The reusable account records recall detail kinds and exact spans, memory addresses and discourse
+functions, source referents and evidence, and separate fidelity assessments. Analysis operates on
+that account under a named, versioned policy. A derived label or count does not replace its inputs.
+
+Internal/external is one such analysis, following the `interview` module. The policy declares the
+target episode, detail facets, treatment of other episodes, discourse and repetition, and the
+counting denominator. Its results retain links to the contributing details and report unresolved
+and excluded material separately. Unresolved placement never becomes external detail by default.
+An inaccurate target-episode detail can still be internal under that policy; a correct general
+fact can be external. Internal/external, fidelity and phenomenology answer different questions.
+
+These derived categories may be exported and inspected, with their policy and input provenance.
+Another scoring policy can reuse the same core account without another extraction or mapping
+call. The ADR defines the projection and its relationship to the existing interview scoring API.
+
 ## Capabilities
 
 Each capability adds named fields to the bundle and has one exit. A field set stays
@@ -67,6 +84,8 @@ follow `InterviewDiscourseFunction`. Internal and external totals are a scoring-
 projection of kind, address and discourse function, as `interview` requires, never a stored
 kind. A span-anchored atom is a recall-side proposal; it is not yet a `DetailAtom`, which
 refers to resolved situations and entities. The ADR records this split.
+Internal/external labels and counts are produced by the derived analysis above, not by adding
+two more atom kinds or treating failed placement as external content.
 
 - Admission: every span lies inside its unit, atoms do not overlap, and the share of each
   unit's text left uncovered is reported.
@@ -106,6 +125,10 @@ values:
 External content and invented film content are separate grades, as in the verifier, so they
 are never conflated (rule 7). The grade ports the graded verifier into the common pipeline as a
 new reply protocol. Scene assignment is not recomputed from it.
+The `external` content disposition does not replace the atom's memory address or discourse
+function, and is not the internal/external scoring projection. The ADR keeps source relevance,
+fidelity and assessment availability distinguishable. Absence from an incomplete annotation
+record is insufficient evidence for `invented`; it remains unverifiable from that record.
 
 - **Exit (fresh):** on items coded blind, precision of the contradicted and gist-detail grades
   is at least 0.8 each, with precision and recall of every grade reported. The owner's 50 seen
@@ -124,13 +147,24 @@ report names it that way.
 
 ### DL5. Order-independent condition
 
-A separate condition maps each unit without the surrounding recall (the unit alone, or a fixed
-local window), so that scene labels do not depend on recall order. Its labels are compared with
-full-context labels unit by unit.
+A separate condition maps each prepared unit alone against the fixed source record. Its input
+excludes neighbouring recall, recall-position cues and other units' assignments; its mapping
+and post-processing use no recall-order prior. Unresolved references remain unresolved instead
+of being repaired with surrounding recall. A local-window condition may be a comparison, but
+does not qualify as order-independent.
+
+With the prepared unit inventory and source fixed, a permutation check must preserve each
+unit's request content and deterministic replay result after joining by stable unit identity.
+Agreement with full-context and human scene labels is reported as localization evidence. The
+proposed order readout is evaluated directly against known-order controls and human reference,
+including reordered recalls; scene agreement alone does not establish recovery of recall order.
+Source presentation order and story-world chronology remain separate. Chronology stays unsupported
+without an explicit story-world coordinate interpretation and its own recovery evidence.
 
 - **Exit (engineering):** a recorded claim-boundary decision on whether order and chronology
-  move from "not supported" to "experimental", based on unit-level agreement with full context
-  and with the human reference.
+  remain "not supported" or move to "experimental", based on the input-policy audit,
+  permutation check and direct readout-recovery evidence above. A negative or inconclusive
+  result is a valid decision; accuracy claims still require the frozen evaluation protocol.
 
 ### DL6. Who-did-what in recurring scenes
 
@@ -172,10 +206,10 @@ validation data is an open decision.
 | After | Newly supported, subject to its exit |
 |---|---|
 | Preview | Which scene a unit narrates or refers to; scene-level recall coverage, described only |
-| DL1 | Amounts of internal and external detail, by participant and scene |
+| DL1 | Policy-derived internal/external detail counts, with unresolved and excluded mass reported |
 | DL2 | Participant and speaker structure of the film |
 | DL3 | Recall fidelity: accurate, gist-preserved, distorted, inferred and invented detail |
-| DL4 | Omissions and row-level coverage; comparisons between participants and groups |
+| DL4 | Evidenced row coverage and absence of such evidence; comparisons within the qualified scope |
 | DL5 | Recall order and chronology, if its exit supports them |
 | DL6 | Who did what in recall, against the film's cast |
 

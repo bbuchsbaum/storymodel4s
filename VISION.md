@@ -108,6 +108,15 @@ collapse into one localization score. For autobiographical interviews, the targe
 inferred account; its organization does not establish historical truth or genuine re-experiencing.
 Those richer uses build on the same evidence discipline.
 
+The reusable account and the analyses of it are distinct. Detail kinds, exact supports, memory
+addresses, discourse functions, source bindings and fidelity assessments remain inspectable.
+Internal/external labels and counts are derived under a named, versioned scoring policy, with
+its target episode, counting rules and denominator recorded. Unresolved or excluded material
+remains visible and is never assigned to external detail by default. An internal detail need
+not be accurate, and an external detail need not be false. These categories do not establish
+phenomenology. Alternative scoring policies can reuse the account without extracting or mapping
+the recall again; exported derived results retain their inputs and policy provenance.
+
 Reference measurement uses declared content and linguistic evidence without a behavioral preference
 for the sequence of source assignments. Structured reconstruction may add such preferences for
 navigation or prediction. Both preserve common evidence and explicit policies. Scientific
