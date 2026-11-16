@@ -1130,6 +1130,16 @@ to the owner only after the concrete plan and affected child are reviewable.
 No planned name or recommended alternative grants a film claim license, changes
 text bytes, lifts existing text/HSMM wire refusals, or completes film compilation.
 
+### F1 implementation boundary — 16 November 2026
+
+`FilmProposalSurface` and `FilmCompilerInput` implement the input-only portion of the September
+plan. The checked boundary derives a bound proposal surface and exact sentence-origin table from
+ordered portable source records, then checks chart and attempt-scope joins. It preserves original
+row/scene units without proposal text and retains native `MediaTime`/`MediaPoint` evidence without
+projection or hull construction. Rejected: an unchecked surface-only join, because it could swap a
+record, parser result, receipt, or physical envelope while preserving readable proposal text.
+This line neither adds `compileFilm` nor selects a compilation/status policy.
+
 ### Film claim-status decision — 21 September 2026
 
 The owner selected alternative A of the film phase plan's §7, recorded with its provenance in
