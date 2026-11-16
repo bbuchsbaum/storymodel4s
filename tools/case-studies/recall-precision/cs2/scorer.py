@@ -1,10 +1,15 @@
 """The case-study-2 yardstick: hierarchical log loss on gold rows, skill over frozen reference
 forecasts, participant-cluster bootstrap, strata, and refusal of metrics the gold cannot validate.
 
-Loss of one gold row, in bits:  -log2 P(work) - log2 P(scene set | work).
+Loss of one gold row, in bits, three declared conditional terms:
+  -log2 P(film level) - log2 P(work | film) - log2 P(scene set | work).
+- The film term is scored on every corpus: -log2 P(on film) for film-coded rows (specific,
+  film-only, film-search) and -log2 P(non-film) for non-film rows. It closes the hedge a
+  conditional scene term leaves open: P(S | w) renormalizes non-film and external mass away.
+- P(work | film) is P(w) / sum of P(w') over works.
 - P(scene set | work) is the forecast's mass on the gold set within the work (declared set rule).
-- Specific rows score both terms; film-only and film-search rows score the work term only;
-  non-film rows are reported as a stratum, not scored by log loss.
+- Specific rows score all terms; film-only and film-search rows score film and work terms;
+  non-film rows score the film term only.
 - When work identity is not applicable (one-work corpora such as Sherlock) the work term is
   reported as n/a, never as 0.
 
@@ -16,7 +21,8 @@ Producer forecast from one scene-grain LocationDistribution row (declared, confi
 - P(S and w)  = (1 - e)[loc(S, w) + spread(w) F(S | w)] + u F(w) F(S | w)
   where loc is scene mass, spread is work-level, position-resolved and held-out mass of w (spread
   within w by F), and outside is in-work-outside-stimulus mass (no scene of the stimulus).
-- Non-film and external mass are claims that the row is not this work.
+- Non-film and external mass are claims that the row is not this work; at the film level
+  P(non-film) = (1 - e) nonwork + u F(non-film), with F(non-film) the declared fallback rate.
 So a producer that abstains on every word scores the fallback exactly (to float precision).
 """
 
@@ -83,6 +89,9 @@ class ProducerForecast:
     @property
     def u(self):
         return 1 - (1 - self.eps) * (1 - self.abstain)
+
+    def p_nonfilm(self):
+        return (1 - self.eps) * self.nonwork + self.u * self.fallback.p_nonfilm()
 
     def p_work(self, w):
         own = math.fsum(
@@ -165,6 +174,8 @@ class RowScore:
     work: str | None
     work_bits: float | None
     scene_bits: float | None
+    film_bits: float | None = None
+    total_bits: float | None = None  # sum of the row's scored terms
     top_work: str | None = None
     top_scene: object | None = None
     scene_hit: bool | None = None
@@ -187,6 +198,12 @@ def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
         rs = RowScore(g.participant, g.session, g.row, g.cls, g.work, None, None)
         rs.nonfilm_label = g.nonfilm
         pw = {w: f.p_work(w) for w in works}
+        pfilm_works = math.fsum(pw.values())
+        pnf = f.p_nonfilm()
+        if g.work is not None:
+            rs.film_bits = log_loss_bits(1 - pnf)
+        elif g.cls == "nonfilm":
+            rs.film_bits = log_loss_bits(pnf)
         rs.top_work = max(sorted(pw), key=lambda w: pw[w])
         if isinstance(f, ProducerForecast):
             rs.located_share = f.located_share()
@@ -200,7 +217,7 @@ def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
             if p is None:
                 raise ScoreError(f"gold work {g.work} has no valid scene")
             if work_applicable:
-                rs.work_bits = log_loss_bits(p)
+                rs.work_bits = log_loss_bits(p / pfilm_works)
             if g.specific:
                 # declared rule: a gold scene that is not a valid target (a title-only scene) is
                 # dropped from the set; a set left empty is not scored on the scene term
@@ -211,6 +228,8 @@ def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
                     ps = {s: f.p_set_and_work({s}, g.work) for s in valid[g.work]}
                     rs.top_scene = max(valid[g.work], key=lambda s: ps[s])
                     rs.scene_hit = rs.top_scene in gs
+        terms = [t for t in (rs.film_bits, rs.work_bits, rs.scene_bits) if t is not None]
+        rs.total_bits = math.fsum(terms) if terms else None
         out.append(rs)
     return out
 

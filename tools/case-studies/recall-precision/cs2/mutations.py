@@ -100,7 +100,7 @@ MUTANTS = [
                 "            if seg is None:\n                seg = self.occurrence[u.occurrence].segments[0]\n",
             )
         ],
-        test="test_work_mass_only_on_its_parts",
+        test="test_unit_on_foreign_part_refused",
     ),
     dict(
         id="M5",
@@ -228,7 +228,78 @@ MUTANTS = [
         ],
         test="test_bootstrap_clusters_are_participants",
     ),
+    dict(
+        id="M16",
+        guard="the part marginal places a unit's mass on the unit's own part",
+        file="cs2/projections.py",
+        edits=[("            out[(comp.work_of_unit(u.id), u.part)] += v\n",
+                "            out[(comp.work_of_unit(u.id), comp.occurrence[u.occurrence].segments[0].part)] += v\n")],
+        test="test_work_mass_only_on_its_parts",
+    ),
+    dict(
+        id="M17",
+        guard="the film term charges non-film and external mass",
+        file="cs2/scorer.py",
+        edits=[("        return (1 - self.eps) * self.nonwork + self.u * self.fallback.p_nonfilm()\n",
+                "        return self.u * self.fallback.p_nonfilm()\n")],
+        test="test_film_term_closes_nonfilm_hedge",
+    ),
+    dict(
+        id="M18",
+        guard="the order oracle splits between the previous top scene and the next one",
+        file="cs2/baselines.py",
+        edits=[("                nxt = ss[i + 1] if i + 1 < len(ss) else prev_top\n",
+                "                nxt = prev_top\n")],
+        test="test_order_oracle_known_answer",
+    ),
+    dict(
+        id="M19",
+        guard="TF-IDF spreads within a work by cosine",
+        file="cs2/baselines.py",
+        edits=[("                scene[w] = {s: cos.get(s, 0.0) / m for s in sw}\n",
+                "                scene[w] = {s: 1 / len(sw) for s in sw}\n")],
+        test="test_tfidf_forecast_known_answer",
+    ),
+    dict(
+        id="M20",
+        guard="a title-only gold scene is dropped from the scored set",
+        file="cs2/scorer.py",
+        edits=[("                gs = frozenset(s for s in g.scenes if s in set(valid[g.work]))\n",
+                "                gs = frozenset(g.scenes)\n")],
+        test="test_title_only_gold_scene_dropped",
+    ),
+    dict(
+        id="M21",
+        guard="title-only scenes are never targets of a reference forecast",
+        file="cs2/baselines.py",
+        edits=[('    drop = comp.title_only_scenes() if cfg["exclude_title_only_scenes"] else set()\n',
+                "    drop = set()\n")],
+        test="test_hierarchical_log_loss_known_answer",
+    ),
+    dict(
+        id="M22",
+        guard="epsilon moves claimed mass to the fallback",
+        file="cs2/scorer.py",
+        edits=[("        return 1 - (1 - self.eps) * (1 - self.abstain)\n",
+                "        return self.abstain\n")],
+        test="test_hierarchical_log_loss_known_answer",
+    ),
 ]
+
+
+def classify(named, failed, errors):
+    """EVIDENCE.md: a mutant discriminates only when its named assertion fails and its siblings
+    pass. One caught only by a raised guard, or with siblings failing, is a regression guard."""
+    if not failed or named not in failed:
+        return dict(classification="not caught", reason="the named test passed")
+    reasons = []
+    if errors.get(named) != "AssertionError":
+        reasons.append(f"caught by a raised {errors.get(named)}, not by the test's assertion")
+    if len(failed) > 1:
+        reasons.append(f"{len(failed) - 1} sibling test(s) also fail")
+    if reasons:
+        return dict(classification="regression guard", reason="; ".join(reasons))
+    return dict(classification="discriminating", reason="only the named assertion fails")
 
 
 def copy_tree(dst: Path):
@@ -291,7 +362,9 @@ def main(argv):
                 named_test=m["test"],
                 compiled=failed is not None and r.get("ran", 0) > 0,
                 named_test_failed=bool(failed) and m["test"] in failed,
+                **classify(m["test"], failed, r.get("errors") or {}),
                 failed=failed,
+                errors=r.get("errors"),
                 error=r.get("error"),
             )
         )

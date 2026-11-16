@@ -285,24 +285,42 @@ def _work_codes(comp) -> dict:
     return codes
 
 
+def _participant_rows(path, participant: str) -> list:
+    """Rows of one participant from a TSV whose first column is `participant`.
+
+    Every other line (frozen participants included) is skipped on its raw first field and is
+    never parsed into a record. Quoting is off (text cells contain quote characters)."""
+    with open(path, newline="", encoding="utf-8") as f:
+        header = next(csv.reader([f.readline()], delimiter="\t", quoting=csv.QUOTE_NONE))
+        if header[0] != "participant":
+            raise SourceError(f"{path.name}: the first column is not 'participant'")
+        keep = [line for line in f if line.split("\t", 1)[0] == participant]
+    return list(csv.DictReader(keep, fieldnames=header, delimiter="\t", quoting=csv.QUOTE_NONE))
+
+
 @lru_cache(maxsize=None)
 def _gold_table(participant: str):
     raw = {}
-    for r in _read_tsv(CODES):
-        if (
-            r["participant"] == participant
-        ):  # other participants' rows are skipped unread
-            raw[(r["run"], int(r["gold_row"]))] = (
-                int(r["movie"]),
-                r["scenes_raw"].strip(),
-            )
+    for r in _participant_rows(CODES, participant):
+        raw[(r["run"], int(r["gold_row"]))] = (int(r["movie"]), r["scenes_raw"].strip())
     out = []
-    for r in _read_tsv(GOLD):
-        if r["participant"] != participant:
-            continue
+    for r in _participant_rows(GOLD, participant):
         r.pop("text", None)  # recall text is dropped at once
         out.append(r)
     return out, raw
+
+
+_LEDGER: dict = {}
+
+
+def gold_ledger(participants) -> dict:
+    """Counts the gold reader drops: positive scene tokens (derived or raw code) on non-film rows."""
+    tot = dict(nonfilm_rows=0, nonfilm_rows_with_scene_tokens=0, dropped_scene_tokens=0)
+    for p in participants:
+        gold_rows(p)
+        for k, v in _LEDGER[p].items():
+            tot[k] += v
+    return tot
 
 
 def gold_rows(participant: str, session: str | None = None, allow_frozen: bool = False):
@@ -312,6 +330,7 @@ def gold_rows(participant: str, session: str | None = None, allow_frozen: bool =
     codes = _work_codes(comp)
     table, raw = _gold_table(participant)
     out = []
+    led = dict(nonfilm_rows=0, nonfilm_rows_with_scene_tokens=0, dropped_scene_tokens=0)
     for r in table:
         if session is not None and r["run"] != session:
             continue
@@ -325,6 +344,13 @@ def gold_rows(participant: str, session: str | None = None, allow_frozen: bool =
         code = raw[key][1]
         if movie in NONFILM:
             cls, work, nf = "nonfilm", None, NONFILM[movie]
+            led["nonfilm_rows"] += 1
+            pos = set(scenes) | {
+                int(t) for t in code.replace(",", " ").split() if t.lstrip("-").isdigit() and int(t) > 0
+            }
+            if pos:  # declared: a non-film row carries no scene; positive tokens are counted
+                led["nonfilm_rows_with_scene_tokens"] += 1
+                led["dropped_scene_tokens"] += len(pos)
             scenes = frozenset()
         elif movie in codes:
             work, nf = codes[movie], None
@@ -355,6 +381,8 @@ def gold_rows(participant: str, session: str | None = None, allow_frozen: bool =
             )
         )
     out.sort(key=lambda g: (g.session, g.row))
+    if session is None:
+        _LEDGER[participant] = led
     return out
 
 

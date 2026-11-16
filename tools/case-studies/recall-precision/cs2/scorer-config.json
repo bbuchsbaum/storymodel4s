@@ -4,6 +4,9 @@
   "log_base": 2,
   "epsilon": 0.01,
   "fallback": "duration",
+  "nonfilm_fallback_rate": 0.05,
+  "terms": "film level (every corpus) + work given film (where work identity applies) + scene set given work; reported separately and as their sum",
+  "title_only_rule": "producer mass on a title-only scene counts toward P(work) but a title-only scene is never a scoring target",
   "abstain_states": [
     "unassigned",
     "position without a resolved work",
@@ -11,7 +14,7 @@
   ],
   "set_rule": "P(scene set | work) is the forecast's mass on the gold scene set within the work",
   "nonspecific_rule": "film-only and film-search rows score the work term only",
-  "nonfilm_rule": "non-film rows are a stratum, not scored by log loss",
+  "nonfilm_rule": "non-film rows score the film term only (-log2 P(non-film)); their labels are also a stratum",
   "no_sample_rule": "a gold row with no recall word (no sample) or only uncovered words (only uncovered) abstains and scores the fallback; uncovered words are never samples and create no unassigned mass (ADR 0031 section 3; revised 2026-11-16 before any producer run)",
   "bin_rule": "a gold row is a bin on the session's word clock; a word belongs by onset (closed or half-open as the corpus declares)",
   "gold_invalid_scene_rule": "a gold scene that is not a valid target (title-only) is dropped from the set; an emptied set is not scored on the scene term",

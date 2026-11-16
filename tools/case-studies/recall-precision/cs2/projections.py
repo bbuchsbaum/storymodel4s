@@ -16,11 +16,13 @@ LocationDistribution (declared rules, design revision 2):
 - a bin without words has the exclusive state 'no_sample'; a bin whose words are all uncovered
   has the exclusive state 'only_uncovered' (ADR 0031 section 3); neither has a simplex;
 - uncovered words are never samples: they are ledger counts only and create no mass;
-- reducer: equal weight per distinct sample in the bin (a reference; a not-applicable unit's
-  state; a unit's uncovered words), so a not-applicable word stays in the denominator;
+- reducer: equal weight per distinct sample in the bin, a sample being a reference or a typed
+  state (a not-applicable unit's non-film state), so a not-applicable word stays in the
+  denominator; uncovered words are not samples;
 - inside a single hypothesis, mass is uniform over its source units (allocation 'units'), or
   proportional to unit seconds (allocation 'seconds', a duration prior, labelled as one);
-- weights as written; the remainder goes to 'unassigned'; every sampled row sums to 1 (1e-12);
+- weights as written; a reference's remainder (1 - sum of weights) goes to 'unassigned', the
+  only source of unassigned mass; every sampled row sums to 1 (1e-12);
 - a joint hypothesis never enters a location (`location_contribution` refuses it); the account
   routes it, and a broad hypothesis, to a held-out state keyed by work (split by unit share when
   the support spans works).

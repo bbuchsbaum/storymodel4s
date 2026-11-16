@@ -120,8 +120,10 @@ def write_rows(path, named_scores):
                 "row",
                 "cls",
                 "work",
+                "film_bits",
                 "work_bits",
                 "scene_bits",
+                "total_bits",
                 "top_work",
                 "top_scene",
                 "scene_hit",
@@ -141,8 +143,10 @@ def write_rows(path, named_scores):
                         s.row,
                         s.cls,
                         s.work or "",
+                        _fmt(s.film_bits),
                         _fmt(s.work_bits),
                         _fmt(s.scene_bits),
+                        _fmt(s.total_bits),
                         s.top_work or "",
                         "" if s.top_scene is None else s.top_scene,
                         "" if s.scene_hit is None else int(s.scene_hit),
@@ -161,7 +165,9 @@ def _fmt(x):
 
 
 def summarize_forecasts(named, cfg, work_applicable, reference="duration"):
-    terms = ("work_bits", "scene_bits") if work_applicable else ("scene_bits",)
+    terms = ("film_bits", "work_bits", "scene_bits", "total_bits")
+    if not work_applicable:
+        terms = ("film_bits", "scene_bits", "total_bits")
     out = {}
     for name, sc in named.items():
         d = {t: SC.summarize(sc, cfg, t) for t in terms}
@@ -201,13 +207,37 @@ def abstain_check(A, comp, gold, cfg, dur, work_applicable):
     )
     diff = 0.0
     for a, b in zip(prod, base):
-        for t in ("work_bits", "scene_bits"):
+        for t in ("film_bits", "work_bits", "scene_bits", "total_bits"):
             x, y = getattr(a, t), getattr(b, t)
             if (x is None) != (y is None):
                 raise SystemExit("abstain check: scored terms differ")
             if x is not None:
                 diff = max(diff, abs(x - y))
     return dict(rows=len(prod), max_abs_bits_difference=diff)
+
+
+def recall_ledger(A, gold):
+    """Denominators: words vs utterances (gold rows), words inside vs outside gold rows."""
+    t = dict(sessions=0, words=0, words_with_onset=0, words_in_gold_rows=0,
+             words_outside_gold_rows=0, gold_rows=0)
+    by_cls = {}
+    for p, rows in gold.items():
+        for s, rs in by_session(rows).items():
+            t["sessions"] += 1
+            t["gold_rows"] += len(rs)
+            bins = bins_of(rs)
+            for w in A.session_words(p, s):
+                t["words"] += 1
+                if w.onset is None:
+                    continue
+                t["words_with_onset"] += 1
+                inside = any(b.contains(w.onset) for b in bins)
+                t["words_in_gold_rows" if inside else "words_outside_gold_rows"] += 1
+            for g in rs:
+                d = by_cls.setdefault(g.cls, dict(rows=0))
+                d["rows"] += 1
+    t["rows_by_class"] = by_cls
+    return t
 
 
 def manifest(out, kind, cfg_path, inputs, extra):
@@ -242,7 +272,10 @@ def cmd_baselines(corpus, out):
         abstain_everything=abstain_check(A, comp, gold, cfg, dur, wa),
         valid_scenes=sum(len(v) for v in B.valid_scenes(comp, cfg).values()),
         dropped_title_scene_refs=sum(s.dropped_scenes for s in named["duration"]),
+        recall_ledger=recall_ledger(A, gold),
     )
+    if hasattr(A, "gold_ledger"):
+        summary["gold_reader_ledger"] = A.gold_ledger(sorted(gold))
     if corpus == "filmfestival":
         summary["gold_numbering_check"] = A.check_gold_numbering(sorted(gold))
     (out / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
@@ -396,7 +429,8 @@ def cmd_sherlock_smoke(out):
     fsum["producer"].update(
         {
             f"skill_vs_{b}": {
-                "scene_bits": SC.skill(named["producer"], named[b], cfg, "scene_bits")
+                t: SC.skill(named["producer"], named[b], cfg, t)
+                for t in ("film_bits", "scene_bits", "total_bits")
             }
             for b in ("lopo", "order_oracle", "tfidf")
         }

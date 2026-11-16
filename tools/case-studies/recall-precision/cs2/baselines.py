@@ -24,8 +24,12 @@ from metrics import tfidf_cosine
 
 @dataclass(frozen=True)
 class Forecast:
-    work: dict  # work -> p
+    work: dict  # work -> p (sums to 1 over works: P(work | film))
     scene: dict  # work -> {scene: p}
+    nonfilm: float = 0.0  # P(non-film), the film-vs-non-film level
+
+    def p_nonfilm(self):
+        return self.nonfilm
 
     def p_work(self, w):
         return self.work.get(w, 0.0)
@@ -52,7 +56,8 @@ def _norm(d):
 
 
 def mix(a: Forecast, b: Forecast, lam: float) -> Forecast:
-    """The joint mixture (1 - lam) a(s, w) + lam b(s, w), returned as P(w) and P(s | w).
+    """The joint mixture (1 - lam) a(s, w) + lam b(s, w), returned as P(w) and P(s | w);
+    the non-film level is mixed the same way.
 
     Where `a` gives a work no scene distribution, its scene distribution is taken to be `b`'s."""
     work, scene = {}, {}
@@ -65,7 +70,7 @@ def mix(a: Forecast, b: Forecast, lam: float) -> Forecast:
         scene[w] = {
             s: ((1 - lam) * aw * as_.get(s, 0.0) + lam * bw * p) / pw for s, p in bs.items()
         }
-    return Forecast(work, scene)
+    return Forecast(work, scene, (1 - lam) * a.nonfilm + lam * b.nonfilm)
 
 
 def duration_prior(comp, cfg) -> Forecast:
@@ -73,7 +78,7 @@ def duration_prior(comp, cfg) -> Forecast:
     valid = valid_scenes(comp, cfg)
     work = _norm({w: math.fsum(secs[s] for s in ss) for w, ss in valid.items() if ss})
     scene = {w: _norm({s: secs[s] for s in ss}) for w, ss in valid.items() if ss}
-    return Forecast(work, scene)
+    return Forecast(work, scene, cfg["nonfilm_fallback_rate"])
 
 
 def lopo(comp, gold_by_participant: dict, participant: str, cfg) -> Forecast:
@@ -95,7 +100,7 @@ def lopo(comp, gold_by_participant: dict, participant: str, cfg) -> Forecast:
                     sc[r.work][s] += 1 / len(inside)
     work = _norm({w: c + alpha for w, c in wc.items()})
     scene = {w: _norm({s: c + alpha for s, c in d.items()}) for w, d in sc.items()}
-    return Forecast(work, scene)
+    return Forecast(work, scene, cfg["nonfilm_fallback_rate"])
 
 
 def order_oracle(comp, rows: list, cfg, dur: Forecast) -> list:
@@ -117,7 +122,7 @@ def order_oracle(comp, rows: list, cfg, dur: Forecast) -> list:
                 d[prev_top] += 0.5
                 d[nxt] += 0.5
                 scene[prev_work] = d
-            out.append(mix(Forecast(work, scene), dur, lam))
+            out.append(mix(Forecast(work, scene, dur.nonfilm), dur, lam))
         if r.work is not None:
             if r.work != prev_work:
                 prev_top = None
@@ -169,5 +174,5 @@ def tfidf(comp, row_words: list, docs: dict, cfg, dur: Forecast) -> list:
             work[w] = m / tot
             if m > 0:
                 scene[w] = {s: cos.get(s, 0.0) / m for s in sw}
-        out.append(mix(Forecast(work, scene), dur, lam))
+        out.append(mix(Forecast(work, scene, dur.nonfilm), dur, lam))
     return out

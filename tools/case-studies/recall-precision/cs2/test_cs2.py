@@ -218,11 +218,30 @@ def test_coarsening_commutes_side_states_unchanged():
 
 
 def test_work_mass_only_on_its_parts():
-    acc, bins = rich_account()
-    comp = acc.composition
-    for r in ld_of(acc, bins).rows:
-        for (w, p), v in part_mass(r, comp).items():
-            assert p in comp.parts_of_work(w), (w, p)
+    # Known answer on the projection: a reference over c1 (work C on p1) and c3 (work C on p2)
+    # puts half of C's mass on each part; the cartoon's two occurrences put A's mass on p1 and
+    # p2; work B never reaches p2. Every (work, part) key lies on a part that holds the work.
+    comp = fixture()
+    refs = {
+        "c": ref("c", (single("c1", "c3"), 1.0)),
+        "a": ref("a", (single("a2"), 0.5), (single("a4"), 0.5)),
+        "b": ref("b", (single("b3"), 1.0)),
+    }
+    spec = [(1.0, "u1", RefSample("c")), (2.0, "u2", RefSample("a")), (3.0, "u3", RefSample("b"))]
+    acc = Account(comp, refs, {("P", "s"): cells(spec)})
+    rows = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(0, 9)]).rows
+    pm = part_mass(rows[0], comp)
+    third = 1 / 3
+    expect = {("C", "p1"): third / 2, ("C", "p2"): third / 2, ("A", "p1"): third / 2,
+              ("A", "p2"): third / 2, ("B", "p1"): third}
+    assert set(pm) == set(expect), pm
+    for k, v in expect.items():
+        close(pm[k], v)
+    for (w, p) in pm:
+        assert p in comp.parts_of_work(w), (w, p)
+
+
+def test_unit_on_foreign_part_refused():
     # a unit that claims a part which does not hold its occurrence is refused
     bad_units = fixture().units + (SourceUnit("bx", "B@p1", "p2", 20, 30, 6),)
     try:
@@ -345,6 +364,62 @@ def test_uncovered_words_never_create_unassigned_mass():
     )
     assert f[1].no_sample and f[1].empty == "only_uncovered" and f[0].empty == ""
     assert CoverageMeasure.from_words(acc, ws, bins).rows[1].state == "only_uncovered"
+
+
+def test_film_term_closes_nonfilm_hedge():
+    # One gold row, scene 9 of work C, work identity not applicable (as on Sherlock).
+    # Hedger: 0.1 on the gold scene and 0.9 on non-film states. Honest: 0.5 / 0.5 over two
+    # scenes of C, one of them gold. The conditional scene term favours the hedger; the film
+    # term must make the hedger worse overall.
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    valid = B.valid_scenes(comp, CFG)
+    gold = [_gold("P", "s", 0, "specific", "C", {9})]
+    hedge_refs = {"h": ref("h", (single("c3"), 1.0))}
+    hedge = [(0.1, "u0", RefSample("h"))]
+    hedge += [(0.2 + i / 100, f"n{i}", StateSample(f"n{i}", "memory_search")) for i in range(9)]
+    honest_refs = {"o": ref("o", (single("c3"), 0.5), (single("c4"), 0.5))}
+    honest = [(0.1, "u0", RefSample("o"))]
+    out = {}
+    for name, refs, spec in (("hedge", hedge_refs, hedge), ("honest", honest_refs, honest)):
+        acc = Account(comp, refs, {("P", "s"): cells(spec)})
+        ld = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(0, 1)])
+        fc = SC.producer_forecasts(ld, dur, CFG)
+        out[name] = SC.score_rows(gold, fc, comp, valid, work_applicable=False)[0]
+    e, pi = CFG["epsilon"], CFG["nonfilm_fallback_rate"]
+    close(out["hedge"].film_bits, -math.log2(1 - ((1 - e) * 0.9 + e * pi)))
+    close(out["honest"].film_bits, -math.log2(1 - e * pi))
+    fc_, f9 = dur.p_work("C"), dur.scene["C"][9]
+    close(out["hedge"].scene_bits,
+          -math.log2(((1 - e) * 0.1 + e * fc_ * f9) / ((1 - e) * 0.1 + e * fc_)))
+    assert out["hedge"].scene_bits < out["honest"].scene_bits  # the hedge the term closes
+    assert out["hedge"].total_bits > out["honest"].total_bits + 1.0
+    assert out["hedge"].work_bits is None
+
+
+def test_tfidf_forecast_known_answer():
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    docs = {6: ["dog"], 7: ["cat"], 8: ["sea"], 9: ["sky"], 10: ["sun"], 1: ["pop"],
+            2: ["pop"], 3: ["pop"], 4: ["pop"]}
+    lam = CFG["tfidf_lambda"]
+    f = B.tfidf(comp, [["dog"], []], docs, CFG, dur)
+    # only scene 6 matches: cosine 1 there, 0 elsewhere; work B gets all non-prior mass
+    close(f[0].p_work("B"), (1 - lam) + lam * dur.p_work("B"))
+    pb = f[0].p_work("B")
+    close(f[0].scene["B"][6], ((1 - lam) + lam * dur.p_work("B") * dur.scene["B"][6]) / pb)
+    assert f[1] is dur  # an empty query falls back to the prior
+
+
+def test_title_only_gold_scene_dropped():
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    valid = B.valid_scenes(comp, CFG)
+    gold = [_gold("P", "s", 0, "specific", "B", {5, 6}), _gold("P", "s", 1, "specific", "B", {5})]
+    sc = SC.score_rows(gold, [dur, dur], comp, valid)
+    assert sc[0].dropped_scenes == 1 and sc[1].dropped_scenes == 1
+    close(sc[0].scene_bits, -math.log2(dur.scene["B"][6]))
+    assert sc[1].scene_bits is None and sc[1].work_bits is not None
 
 
 # ---------------------------------------------------------------- further known answers
@@ -613,7 +688,7 @@ def main(argv):
     tests = [
         (n, f) for n, f in globals().items() if n.startswith("test_") and callable(f)
     ]
-    failed = []
+    failed, errors = [], {}
     for name, fn in tests:
         if only and name != only:
             continue
@@ -621,14 +696,15 @@ def main(argv):
             fn()
             if "--json" not in argv:
                 print("ok", name)
-        except Exception:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             failed.append(name)
+            errors[name] = type(exc).__name__
             if "--json" not in argv:
                 print("FAIL", name)
                 traceback.print_exc()
     ran = sum(1 for n, _ in tests if not only or n == only)
     if "--json" in argv:
-        print(json.dumps(dict(ran=ran, failed=failed)))
+        print(json.dumps(dict(ran=ran, failed=failed, errors=errors)))
     else:
         print(f"passed {ran - len(failed)} failed {len(failed)} of {ran}")
     return 1 if failed else 0

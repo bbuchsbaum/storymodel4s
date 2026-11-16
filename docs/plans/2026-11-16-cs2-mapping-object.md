@@ -182,6 +182,29 @@ decision).
 5. A framing-work field per unit, with its producer condition.
 6. FilmFestival adapter and the two-level producer in the harness.
 
+## Declared harness choices (step 2)
+
+The step-2 harness (`tools/case-studies/recall-precision/cs2/`) had to choose where the design
+was silent. These are declarations, not owner decisions.
+
+- **Joint references are held out by work.** A joint hypothesis never enters a
+  `LocationDistribution`. Its mass goes to a held-out joint state keyed by work, split by unit
+  share when its support spans works, beside the held-out broad state. Alternatives are routed
+  member by member.
+- **Held-out, work-level and position mass in the loss.** It counts toward its work and is
+  spread within the work by the fallback forecast. A position with no resolved work abstains.
+- **Uncovered words are ledger counts only** (ADR 0031 §3). A bin of uncovered words alone is
+  the typed absence *only uncovered*. The scorer abstains on it, as on *no sample*.
+- **Three conditional terms.** The terms are film level, work given film, and scene set given
+  work. The film term is scored on every corpus, because a conditional scene term would
+  otherwise reward hedging into non-film states on a one-work corpus.
+
+**Gap for the vocabulary ADR.** Non-film states (memory search, gave up, off task, commentary,
+fragment) are typed destinations inside the simplex. That extends ADR 0031 §3, whose
+onset-point projection treats not-applicable references as a typed absence ("only not
+applicable"). The harness has no such absence: a bin of not-applicable words alone is a sampled
+row whose mass sits on non-film states. The vocabulary ADR must decide this.
+
 ## Owner decisions (2026-11-16)
 
 - **Two-level production:** a whole-recall film-frame pass, then content-local localization
