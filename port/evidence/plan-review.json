@@ -1,0 +1,19 @@
+{
+  "schema": "port-plan-review/v1",
+  "reviewed_revision": "420dcd4f2771b6b3d17771dda9adec81bc965b7c",
+  "reviewer": "port_plan_review (fresh-context agent)",
+  "verdict": "PASS",
+  "scope": "Stage 1 plan and workspace layout only",
+  "blocking_findings_remaining": 0,
+  "corrected_finding": "Preserve producer export grants; denied or unsupported grants refuse before constructing a download.",
+  "retained_interaction": "Keyboard inspection and a text alternative equivalent to visual selection.",
+  "independent_checks": {
+    "reference_hashes": 23,
+    "local_markdown_links": "all resolve"
+  },
+  "limits": [
+    "No runtime implementation",
+    "No browser tests or performance measurements",
+    "S1.0 freezes benchmark tasks, supported compatibility profile and expected values before implementation"
+  ]
+}
