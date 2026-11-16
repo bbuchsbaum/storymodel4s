@@ -86,17 +86,28 @@ members, each a single, joint or broad hypothesis or a typed external destinatio
 alternative is refused, because it is that member's own meaning. Members with identical meaning
 and support are refused as duplicates.
 
-Member weights are optional. When supplied, they must be finite and strictly positive, and
-Σw ≤ 1 within the bundle's shape tolerance. A single, joint or broad reference may likewise
-carry one supplied confidence weight in (0, 1], whose remainder is its unassigned share.
-The remainder is reported as the unassigned share and never redistributed.
+Member weights are optional, and may be supplied for some members and not others.
+
+- A supplied weight must be finite and strictly positive, and Σw ≤ 1 within the bundle's shape
+  tolerance.
+- Raw weights are kept exactly as supplied.
+- When only some members carry weights, every weight-free measure is still reported, and the
+  unassigned share is unavailable(partial weights).
+- A single, joint or broad reference may likewise carry one supplied confidence weight in
+  (0, 1]. Its remainder follows the declared coverage, like an alternative's.
+
+The remainder is reported as the unassigned share and never redistributed. A reported share
+always lies in [0, 1]. When |1 − Σw| is within the tolerance, the share is exactly 0, a declared
+snap, so a rounding residual is never published as a signed share.
 
 **Alternatives present** (Boolean) is true exactly for an alternative reference; external
 members count. It is false for single, joint and broad references. It is unavailable for
 unresolved references and processing outcomes.
 
 **Member count** is the number of members of an alternative reference. It is 1 for single,
-joint and broad references, and unavailable for unresolved references and processing outcomes.
+joint and broad references and for a bare external destination. That is a singleton
+convention: it does not mean that a definite reference contains alternative members. It is
+unavailable for unresolved references and processing outcomes.
 Alternative entropy is deferred (see [Deferred](#deferred)). Across two independent samples its
 magnitude did not reproduce (ICC 0.01 on the published, tempered weights where either sample
 is positive), while presence reproduced at κ 0.69.
@@ -123,13 +134,24 @@ axis, and support outside the occurrence.
   weight-averaged extent) is a declared reducer that names its weights.
 
 **Support grain** is the duration range (min, max) of the source units bounding a constituent's
-support. An entry is flagged *at annotation floor* when it does not exceed that maximum.
+support, measured on each unit's own supplied support. The entry also reports how many units
+bound it.
+
+An entry is flagged *at annotation floor* when its extent does not exceed that maximum. The
+flag describes the annotation's resolution, not psychological precision: a constituent
+supported by one source unit is always at floor.
+
+When a constituent's support is only partly available on the selected axis, the whole entry is
+unavailable and lists every missing unit. A within-occurrence intersection could be measured
+exactly, but only as a separately named quantity, never as the constituent's extent.
 
 **Laws:**
 
 - Alternatives present and member count are invariant to member order.
-- Each extent entry is invariant to splitting an interval and to duplicated overlapping
-  intervals.
+- Each entry's measure, hull and point count are invariant to splitting an interval and to
+  duplicated overlapping intervals. Grain and the floor flag describe the bounding units, so
+  they change when one unit becomes two.
+- A reported unassigned share lies in [0, 1], and the share is invariant to member order.
 - Extent ignores other members.
 - Every unavailable case is a typed value, never a number (rules 6 and 7).
 
