@@ -225,6 +225,7 @@ object StudyExecution:
       "manifestSha256" -> str(Checksum.ofText(manifest.noSpaces).hex),
       "execution" -> profile.json,
       "exchanges" -> session.receipt,
+      "newClientInvocationLimit" -> (if mode == Mode.Live then Json.fromInt(maxNewCalls) else Json.Null),
       "modelCalls" -> Json.fromInt(session.clientInvocations),
       "httpAttempts" -> Json.fromInt(session.httpAttempts),
       "cacheHits" -> Json.fromInt(session.cacheHits),

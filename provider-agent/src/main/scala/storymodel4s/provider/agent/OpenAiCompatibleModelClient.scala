@@ -90,7 +90,7 @@ final class OpenAiCompatibleModelClient private (
         .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
       val prepared =
         apiKey.fold(base)(key => base.header("authorization", s"Bearer ${key.secret}")).build()
-      attempts.incrementAndGet()
+      val _ = attempts.incrementAndGet()
       val response = http.send(prepared, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
       val status = response.statusCode()
       if status >= 200 && status < 300 then Right(response.body())

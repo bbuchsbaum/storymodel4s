@@ -19,6 +19,7 @@ class TextExecutionSuite extends FunSuite:
   test("the v2 profile binds endpoint and budget without serializing a credential"):
     val first = profile("http://127.0.0.1:19001/v1")
     assertEquals(TextExecution.Profile.decode(first.json), Right(first))
+    assertEquals(first.json.hcursor.get[String]("keyDomain"), Right("agent-text-exchange/v2"))
     assert(
       first.key("system", "prompt") != profile("http://127.0.0.1:19002/v1").key("system", "prompt")
     )

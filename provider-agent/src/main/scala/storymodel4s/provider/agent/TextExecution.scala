@@ -14,6 +14,7 @@ import storymodel4s.core.Checksum
   */
 object TextExecution:
   private val ProfileSchema = "storymodel4s.provider.agent.text-profile/v2"
+  private val KeyDomain = "agent-text-exchange/v2"
   private val TextWireVersion = "openai-chat-completions/v1"
   private val RetryPolicy = "retry-429-5xx-max-3"
   private val JournalSchema = "storymodel4s.provider.agent.text-journal/v2"
@@ -34,6 +35,7 @@ object TextExecution:
         provider,
         model,
         endpointDigest.hex,
+        KeyDomain,
         TextWireVersion,
         RetryPolicy,
         maxTokens.toString,
@@ -46,6 +48,7 @@ object TextExecution:
       "provider" -> provider.asJson,
       "model" -> model.asJson,
       "endpointSha256" -> endpointDigest.hex.asJson,
+      "keyDomain" -> KeyDomain.asJson,
       "wireVersion" -> TextWireVersion.asJson,
       "retryPolicy" -> RetryPolicy.asJson,
       "maxTokens" -> maxTokens.asJson,
@@ -55,7 +58,7 @@ object TextExecution:
     def key(system: String, prompt: String): RecordingKey =
       RecordingKey.fromChecksum(
         AgentIdentity.digest(
-          TextExchange.KeyDomain,
+          KeyDomain,
           Vector(
             ProfileSchema,
             provider,
@@ -111,6 +114,8 @@ object TextExecution:
         model <- c.get[String]("model").left.map(_ => "profile model is missing")
         endpoint <- c.get[String]("endpointSha256").left.map(_ => "profile endpoint digest is missing")
         _ <- Either.cond(endpoint.matches("[0-9a-f]{64}"), (), "profile endpoint digest is invalid")
+        domain <- c.get[String]("keyDomain").left.map(_ => "profile key domain is missing")
+        _ <- Either.cond(domain == KeyDomain, (), "profile key domain is unsupported")
         wire <- c.get[String]("wireVersion").left.map(_ => "profile wire version is missing")
         _ <- Either.cond(wire == TextWireVersion, (), "profile wire version is unsupported")
         retry <- c.get[String]("retryPolicy").left.map(_ => "profile retry policy is missing")
@@ -197,7 +202,7 @@ object TextExecution:
     case Started
     case Failed(code: String, httpAttempts: Int)
 
-  private abstract class BaseSession(recordings: Recordings, profile: Profile) extends Session:
+  private abstract class BaseSession(profile: Profile) extends Session:
     protected val events = mutable.ArrayBuffer.empty[Json]
     protected var calls = 0
     protected var hits = 0
@@ -236,7 +241,7 @@ object TextExecution:
       )
 
   private final class ReplaySession(recordings: Recordings, profile: Profile)
-      extends BaseSession(recordings, profile):
+      extends BaseSession(profile):
     def serve(system: String, prompt: String): Either[ExchangeFailure, ModelReply] = synchronized {
       val request = ModelRequest.text(profile, system, prompt)
       recordings.read(request.key, request.model) match
@@ -255,7 +260,7 @@ object TextExecution:
       profile: Profile,
       client: OpenAiCompatibleModelClient,
       held: HeldLock
-  ) extends BaseSession(recordings, profile):
+  ) extends BaseSession(profile):
     private val journal = recordings.dir.resolve(JournalName)
     private var closed = false
 
@@ -264,7 +269,7 @@ object TextExecution:
       if Files.exists(temporary) || (Files.exists(journal) && !Files.isRegularFile(journal)) then Left(())
       else if !Files.isRegularFile(journal) then Right(Map.empty)
       else
-        val decoded = for
+        for
           raw <- scala.util.Try(Files.readString(journal, StandardCharsets.UTF_8)).toEither.left.map(_ => ())
           json <- parser.parse(raw).left.map(_ => ())
           schema <- json.hcursor.get[String]("schema").left.map(_ => ())
@@ -295,7 +300,6 @@ object TextExecution:
               yield done :+ (key -> state)
           }
         yield entries.toMap
-      decoded
 
     private def persist(entries: Map[String, JournalState]): Either[ExchangeFailure, Unit] =
       val encoded = Json.obj(
