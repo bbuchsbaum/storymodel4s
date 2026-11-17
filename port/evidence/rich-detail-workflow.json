@@ -1,0 +1,28 @@
+{
+  "source_commit": "2da708d7ce6bce7276b0d485fee95afd92d4f5b4",
+  "checks": {
+    "full_suite_at_2096c87f1": "371 passed in4.51s",
+    "after_review_delta": "19 affected detail/mapping/workflow tests passed",
+    "mypy": "34 source files pass",
+    "ruff": "lint and format86 files pass",
+    "legacy_contracts": "frozen v1 mapping/analysis schema/request/prompt/result hashes equal c333e0584",
+    "gap_mutation": "baseline3 pass; named exact-content failure with2 passing controls",
+    "adjacency_mutation": "baseline3 pass; named quote-partition identity failure with2 passing controls"
+  },
+  "review": {
+    "reviewer": "direct_mapping_review",
+    "initial": "2096c87f1 BLOCK: whole and adjacent-split quote details could double count;18 focusedtests otherwisepass",
+    "resolution": "2da708d7c validates quoteorder beforecoalescing adjacency;19 tests independentlypass;no remainingBLOCK"
+  },
+  "installed_wheel": {
+    "2096c87f1": "site-packages import verified outside checkout;two recalled accounts CLI details/mapping/views equalAPI;v4validate reports2states",
+    "2da708d7c": "rebuilt wheel connectedexample, whole/split detail equality andatomicduplicate refusalpass"
+  },
+  "limits": [
+    "Snapshot-bound detail acquisition, not an order-independent wholepipeline.",
+    "Current graphfree mapping stays unit-only; state graphs preserved, not structurallysearched bythismethod.",
+    "No existingdetail revision workflow; furtherP2/P3/P4-P6 capabilitiesremainowed.",
+    "Engineering consistency only; no scientificaccuracy or speedupclaim."
+  ],
+  "shared_lesson": "shared-memory/projects/storymodel4s/2026-11-17-story-model-port-evidence-identity-and-visible-aliases-39b9997f"
+}

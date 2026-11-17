@@ -4,8 +4,8 @@ Owner direction, 2026-11-16: make all working, non-redundant, non-stale StoryMod
 capabilities available in idiomatic Python, improving the implementation using lessons learned.
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
-This is the current **port** execution direction after the foundation/API consolidation at
-`a05afc226`. It extends [Stage 1](stage-1.md); it does not supersede the parent project's
+This is the current **port** execution direction, refreshed after rich-detail integration at
+`2da708d7c`. It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
 at P2 to distinguish this expansion from the initial Stage 1 pilot.
@@ -17,12 +17,20 @@ clocks, recorded execution, a bounded extractive proposal resolver, sparse lexic
 alignment, three analysis views, exact temporal allocation, legacy reads, and an API/CLI.
 These are verified bounded capabilities, not full module parity. The React app is a scaffold.
 
-The first P2 source compiler now constructs anchored source rows from recorded proposals; the
-admitted example's watching observation has a construction path instead of a manually supplied
-graph. Bounded event-relation and text-identity paths build on that account boundary. Rich states,
-circumstances, playback, attribution and the remaining graph families are still owed.
-The first [P3 recorded direct route](direct-mapping.md) can proceed independently from this stable
-boundary. Mote and the preservation map distinguish these bounded slices from full phase exits.
+The reviewed local slices now include recorded source construction, event-relation admission,
+text identity, and [rich state/circumstance construction](rich-accounts.md). The connected
+[rich-detail workflow](rich-detail-workflow.md) reuses one source across two recalls, admits
+expressed details with explicit inventories, and feeds [direct mapping](direct-mapping.md)
+and the three analysis views. Its recorded checks are in
+[rich-detail-workflow.json](../evidence/rich-detail-workflow.json). This is local engineering
+evidence, not a claim that the branch has landed or that the full phases are complete.
+
+Important gaps remain: relation admission, identity and structural alignment still use the
+legacy account boundary; they must gain explicit rich-account support. Playback, attribution,
+richer graph families, semantic channels and probabilistic inference are still owed. The next
+algorithmic slice is the sparse sequence kernel, followed by those rich-consumer seams and a
+discriminating correspondence workflow. Mote owns live status; the preservation map records
+each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
 construction is owed independently of whether it improves localization accuracy.
@@ -212,23 +220,76 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Immediate sequence
 
-1. **P2.1 source construction:** anchored source rows + recorded typed proposals → source-only
-   account with entities/events/roles/contexts and per-row outcomes. Reuse admitted source text;
-   generate proposals, not preassembled trusted graph objects. Verify two recalls can reuse it
-   unchanged, missing/invalid rows remain visible, and foreign evidence/context promotion refuses.
-2. **P2.2 graph-family admission:** add relation/place/state/time proposal paths and exact
-   discontinuous/playback supports as bounded sub-slices. No all-family mega-refactor.
-3. **P2.3 identity/cross-unit recall:** connect mention identity and attributed content across
-   units, preserve alternatives, and exercise repeated actors in different events.
+The next three deliveries are computational. They do not rename or replace the full phase
+exits above. Finish each executable slice before adding another public abstraction.
 
-The next implementation starts at P2.1. Do not spend another iteration strengthening a lexical
-matcher while its source event universe is still manually constructed.
+| Order | Delivery | Concrete completion evidence |
+|---|---|---|
+| 1 — P4.1 | Sparse sequence inference over supplied, checked local costs and transition distributions. | Posterior marginals, adjacent flow, deterministic best path and log normalizer agree with exhaustive enumeration; installed API/CLI artifact roundtrip. |
+| 2 — Next P2 integration | Rich accounts through relation admission, text-identity consumers and structural candidate generation, one consumer at a time. | States, circumstances, contexts and existing IDs survive every update; state/event endpoints and foreign-context refusals have discriminating examples; legacy recordings remain readable. |
+| 3 — Next P3 integration | Recurring-scene correspondence with explicit target grain and hypothesis-conditional assessment. | Repeated actors in different actions, actor swaps, changed attributes, broad/joint/alternative references and external content produce distinct saved outcomes through the same analysis API. |
 
-Tracked first slices (Mote owns status):
+### First delivery: the numerical kernel
 
-- P2.1 source construction: `bd-01M7KKCY94B9NWXAQSFM15EQ66`.
-- P2.2 first slice, typed relation admission: `bd-01M7KKF5KXSN6V0MA8KRSF7XF5`.
-- P2.3 first slice, cross-unit mention identity: `bd-01M7KKFRRB3PRM7GK9QE9F6M4Z`.
+Next implementation bead: `bd-01M7KVBD5K6101NP5DG2P2QK1M` (Mote owns status).
 
-The latter two depend on P2.1's source construction contract. Remaining P2 families receive
-bounded implementation beads as that contract settles; they remain explicit phase obligations.
+Use the working numerical seam in `align/hsmm.scala` (`GraphHsmm.run`), separating inference
+from account-specific evidence production. Inputs declare ordered units, admissible source,
+distorted and external states, finite local costs, positive temperature, and sparse stochastic
+transitions. Unranked is an explicit state, not a substitute for a failed calculation. The
+initial state prior is uniform, as in the reference implementation.
+
+Implement stable forward/backward and Viterbi computation with deterministic ordering. Center
+or scale the calculation so a large shared cost cannot corrupt normalized posterior mass;
+refuse unrepresentable numerical ranges. Do not allocate a dense full-source pair matrix.
+Keep the first implementation dependency-light; add numerical libraries when measured needs
+justify them. Public consumption revalidates input relationships and binds saved results to
+the exact input. Posterior mass is conditional on this model, not calibrated confidence or
+automatic fidelity credit.
+
+The independent starting oracle is the three-unit, seven-state, 343-path enumeration in
+`align/src/test/scala/storymodel4s/align/StructuralWeightSuite.scala`. Compare every marginal,
+every adjacent flow, the normalizer and the best path. Add one-unit, absent-edge, deterministic
+tie, reordered-state, extreme-cost and malformed-input cases, plus a targeted mutation and
+cold review. An executed Scala comparison, when recorded, is separate evidence from porting
+the oracle; neither establishes empirical accuracy.
+
+This first slice accepts supplied transitions. Graph-derived transition features, admissibility
+mode gates, refinement and reconstruction are subsequent P4 work, not implied by the kernel.
+Audit the actual duration behavior supported by Scala rather than inferring it from the HSMM
+name. Save the example, schema, commands and results under `port/`.
+
+### Finish the phases after those deliveries
+
+1. **Close P2/P3 construction and correspondence.** Add remaining playback/context/attribution,
+   identity, hierarchy and recall-grouping paths in bounded slices. Extend target granularity,
+   semantic channels and the retained fixed-question assessment receipts. Keep the direct
+   unit-only route usable while richer structural methods develop. The phase exit must consume
+   every retained collection, not merely serialize it.
+2. **Finish P4 inference and measurement.** Connect checked account evidence to transitions,
+   refinement and reconstruction; then port retained feature tracks, windows, temporal
+   projections and trajectory measures. Report retrieval, local ranking and decoding separately.
+   Use tiny independent numerical cases and declared sparse size measurements. Preserve raw
+   score, posterior, transport mass and calibrated probability as different quantities.
+3. **Finish P5 operational coverage.** Take one retained study through installed intake,
+   construction, mapping, analysis and replay before widening to the other studies. Add media,
+   provider, proposition/AMR, embedding and interview capabilities against their real consumers.
+   Fake-provider and recorded paths precede live operations; data permissions remain separate.
+4. **Finish P6 inspection and parity closure.** Build the useful React artifact inspector once
+   the producers are stable, then saved investigations, exports and specialized views. Run the
+   capability ledger against installed workflows and old artifacts. Resolve every gap with a
+   port, a documented improvement, or an evidence-backed exclusion; no silent retirement.
+
+### Keep development fast and the design coherent
+
+- Extend the existing account, resolver and execution mechanisms; avoid parallel model trees,
+  provider engines or estimator copies. Preserve scientific distinctions while removing
+  incidental Scala machinery.
+- For each slice, identify the actual Scala producer and consumer, specify the Python behavior,
+  implement the smallest connected path, run the relevant independent checks, and commit it.
+  Record changed semantics and compatibility at that point, rather than postponing them to P6.
+- Keep focused-test and installed-example turnaround visible. Make a comparative productivity
+  claim only after matched edits with the same behavioral acceptance in both implementations;
+  a fast Python test run alone does not prove a development speedup.
+- Do not turn phase planning into a prerequisite for every change. Expand the next Mote bead
+  when its input contract is known; the remaining phase obligations above already hold scope.

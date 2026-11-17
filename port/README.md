@@ -28,9 +28,11 @@ outcomes, existing external references, and unassessed fidelity.
 [Event relation admission](docs/relations.md) adds input-bound, atomic relation proposals
 and an evidence/context inspection table over independently built graphs.
 
-The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability;
-P2 begins with [source-account construction](docs/source-construction.md): anchored observations
-and recorded proposals produce independently reusable source graphs and explicit row outcomes.
+The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability.
+[Source-account construction](docs/source-construction.md) and the connected
+[rich-detail workflow](docs/rich-detail-workflow.md) now provide reusable source graphs and
+recorded recall construction through mapping and analysis. Next come sparse sequence inference,
+rich graph consumers and fuller correspondence, followed by study operations and inspection.
 
 ## Run it
 
