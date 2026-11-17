@@ -7,8 +7,15 @@ from typing import Any
 
 from .alignment import align_account, validate_policy
 from .analysis import Analysis, Policy, project
-from .artifacts import publish_json, read_account
+from .artifacts import publish_json, read_account, read_supported_account
 from .demo import example_account
+from .detail_admission import detail_prompt, prepare_details
+from .detail_workflow import (
+    DetailRecording,
+    import_details,
+    read_detail_request,
+    replay_details,
+)
 from .direct_mapping import mapping_prompt, prepare_mapping
 from .direct_workflow import (
     MappingRecording,
@@ -29,7 +36,7 @@ from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
 from .relations import admit_relations, relation_table
-from .rich_account import situation_table, validate_rich_account
+from .rich_account import RichAccount, situation_table, validate_rich_account
 from .rich_construction import prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, read_rich_request, replay_rich, rich_prompt
 from .source import SourceRow, prepare_source
@@ -103,6 +110,31 @@ def main(argv: list[str] | None = None) -> int:
     mapping_replay.add_argument("--expected-import-sha256")
     mapping_replay.add_argument("--account-only", action="store_true")
     mapping_replay.add_argument("--output")
+    details_prepare = commands.add_parser(
+        "prepare-details", help="prepare selected v4 recall inventories"
+    )
+    details_prepare.add_argument("account")
+    details_prepare.add_argument("units", nargs="+")
+    details_prepare.add_argument("--output")
+    details_contract = commands.add_parser(
+        "detail-prompt", help="render a snapshot-bound detail request"
+    )
+    details_contract.add_argument("request")
+    details_contract.add_argument("--output")
+    details_import = commands.add_parser(
+        "import-details", help="record an exported detail inventory reply"
+    )
+    details_import.add_argument("request")
+    details_import.add_argument("reply")
+    details_import.add_argument("recording")
+    details_replay = commands.add_parser(
+        "replay-details", help="admit recorded v4 recall details offline"
+    )
+    details_replay.add_argument("request")
+    details_replay.add_argument("recording")
+    details_replay.add_argument("--expected-import-sha256")
+    details_replay.add_argument("--account-only", action="store_true")
+    details_replay.add_argument("--output")
     rich_prepare = commands.add_parser(
         "prepare-rich", help="prepare anchored v4 graph construction"
     )
@@ -265,6 +297,39 @@ def main(argv: list[str] | None = None) -> int:
                 (alignment.account if args.account_only else alignment).model_dump(mode="json"),
                 args.output,
             )
+        elif args.command == "prepare-details":
+            detail_account = validate_rich_account(Path(args.account).read_bytes())
+            if detail_account.export_permission != "allowed":
+                raise PermissionError("producer denies detail export")
+            detail_request = prepare_details(detail_account, tuple(args.units))
+            emit(detail_request.model_dump(mode="json"), args.output)
+        elif args.command in ("detail-prompt", "import-details", "replay-details"):
+            detail_request = read_detail_request(Path(args.request))
+            if detail_request.account.export_permission != "allowed":
+                raise PermissionError("producer denies detail export")
+            if args.command == "detail-prompt":
+                emit(strict_json(detail_prompt(detail_request)), args.output)
+            elif args.command == "import-details":
+                detail_recording = DetailRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_details(detail_request, detail_recording, Path(args.recording))
+            else:
+                detail_result = replay_details(
+                    detail_request,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                if args.account_only and any(
+                    r.status != "admitted" for r in detail_result.receipts
+                ):
+                    raise ValueError("account-only export would hide incomplete detail admission")
+                emit(
+                    (detail_result.account if args.account_only else detail_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
         elif args.command == "prepare-rich":
             row_values = strict_json(Path(args.rows).read_bytes())
             if not isinstance(row_values, list):
@@ -312,7 +377,9 @@ def main(argv: list[str] | None = None) -> int:
                     args.output,
                 )
         elif args.command == "prepare-mapping":
-            mapping_account = read_account(Path(args.account), expected_sha256=args.expected_sha256)
+            mapping_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
             if mapping_account.export_permission != "allowed":
                 raise PermissionError("producer denies mapping export")
             mapping_request = prepare_mapping(
@@ -494,17 +561,23 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 emit(result.model_dump(mode="json"), args.output)
         else:
-            account = read_account(Path(args.account), expected_sha256=args.expected_sha256)
+            supported_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
             if args.command == "validate":
-                emit(
-                    {"valid": True, "details": len(account.details), "events": len(account.events)},
-                    None,
-                )
+                counts = {
+                    "valid": True,
+                    "details": len(supported_account.details),
+                    "events": len(supported_account.events),
+                }
+                if isinstance(supported_account, RichAccount):
+                    counts["states"] = len(supported_account.states)
+                emit(counts, None)
             else:
-                if account.export_permission != "allowed":
+                if supported_account.export_permission != "allowed":
                     raise PermissionError("producer denies analysis export")
                 policy: Policy = args.policy
-                emit(project(account, policy).model_dump(mode="json"), args.output)
+                emit(project(supported_account, policy).model_dump(mode="json"), args.output)
     except (ValueError, OSError, RecordedExecutionError) as error:
         print(f"refused: {error}", file=sys.stderr)
         return 2

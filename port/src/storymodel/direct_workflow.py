@@ -7,8 +7,8 @@ from typing import Literal
 from .artifacts import publish_json
 from .direct_mapping import (
     RECIPE,
-    MappingRequest,
-    MappingResult,
+    MappingInput,
+    MappingOutput,
     mapping_prompt,
     mapping_request_digest,
     resolve_mapping,
@@ -28,14 +28,14 @@ class MappingRecording(Model):
     reply: str
 
 
-def _exportable(request: MappingRequest) -> MappingRequest:
+def _exportable(request: MappingInput) -> MappingInput:
     checked = validate_mapping_request(request)
     if checked.account.export_permission != "allowed":
         raise PermissionError("producer denies direct mapping export")
     return checked
 
 
-def _profile(request: MappingRequest) -> RunProfile:
+def _profile(request: MappingInput) -> RunProfile:
     return RunProfile(
         provider="imported-text",
         model="supplied-direct-mapping/v1",
@@ -46,12 +46,12 @@ def _profile(request: MappingRequest) -> RunProfile:
     )
 
 
-def _prompt(request: MappingRequest) -> str:
+def _prompt(request: MappingInput) -> str:
     """Render a provider-facing prompt only after its account has granted export."""
     return mapping_prompt(_exportable(request))
 
 
-def read_mapping_request(path: Path, *, expected_sha256: str | None = None) -> MappingRequest:
+def read_mapping_request(path: Path, *, expected_sha256: str | None = None) -> MappingInput:
     """Read a strict mapping request, optionally pinned to externally supplied bytes."""
     raw = path.read_bytes()
     if expected_sha256 is not None and sha256(raw).hexdigest() != expected_sha256:
@@ -59,7 +59,7 @@ def read_mapping_request(path: Path, *, expected_sha256: str | None = None) -> M
     return validate_mapping_request(raw)
 
 
-def import_mapping(value: MappingRequest, recording: MappingRecording, root: Path) -> None:
+def import_mapping(value: MappingInput, recording: MappingRecording, root: Path) -> None:
     """Store imported raw text before parse; this path never invokes a provider."""
     request = _exportable(value)
     supplied = MappingRecording.model_validate_json(canonical(recording.model_dump(mode="json")))
@@ -73,11 +73,11 @@ def import_mapping(value: MappingRequest, recording: MappingRecording, root: Pat
 
 
 def replay_mapping(
-    value: MappingRequest,
+    value: MappingInput,
     root: Path,
     *,
     expected_import_sha256: str | None = None,
-) -> MappingResult:
+) -> MappingOutput:
     """Resolve the raw response offline after checking its request and cache bindings."""
     request = _exportable(value)
     raw_import = (root / "import.json").read_bytes()

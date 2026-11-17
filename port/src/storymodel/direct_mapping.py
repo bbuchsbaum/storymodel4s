@@ -24,19 +24,19 @@ from .model import (
     Support,
     Unit,
     contained_in,
-    validate_account,
 )
+from .rich_account import RichAccount, SupportedAccount, validate_supported_account
 from .serialization import canonical, digest, strict_json
 
 RECIPE = "unit-only-direct-mapping/v1"
 Interpretation = Literal["narrative", "referent"]
 
 
-class MappingRequest(Model):
-    """Private replay input; only the explicitly rendered subset goes into a prompt."""
+class _MappingRequestFields(Model):
+    """Common unit-only request checks, shared by explicit legacy and rich wire versions."""
 
-    schema_version: Literal["storymodel.mapping-request/v1"] = "storymodel.mapping-request/v1"
-    account: Account
+    schema_version: str = "storymodel.mapping-request/v1"
+    account: SupportedAccount
     unit: Name
     interpretation: Interpretation = "referent"
 
@@ -60,7 +60,24 @@ class MappingRequest(Model):
         return self
 
 
-def _details(request: MappingRequest) -> tuple[Detail, ...]:
+class MappingRequest(_MappingRequestFields):
+    """Private replay input; only the explicitly rendered subset goes into a prompt."""
+
+    schema_version: Literal["storymodel.mapping-request/v1"] = "storymodel.mapping-request/v1"
+    account: Account
+
+
+class RichMappingRequest(_MappingRequestFields):
+    """A v2 mapping request retains its complete v4 input graph throughout replay."""
+
+    schema_version: Literal["storymodel.mapping-request/v2"] = "storymodel.mapping-request/v2"
+    account: RichAccount
+
+
+MappingInput = MappingRequest | RichMappingRequest
+
+
+def _details(request: _MappingRequestFields) -> tuple[Detail, ...]:
     occupied = {
         b.detail
         for b in request.account.bindings
@@ -74,22 +91,32 @@ def _details(request: MappingRequest) -> tuple[Detail, ...]:
     )
 
 
-def validate_mapping_request(value: MappingRequest | str | bytes) -> MappingRequest:
+def validate_mapping_request(value: MappingInput | str | bytes) -> MappingInput:
     """Revalidate nested copied objects before generating prompts or changing bindings."""
-    raw = canonical(value.model_dump(mode="json")) if isinstance(value, MappingRequest) else value
-    return MappingRequest.model_validate_json(canonical(strict_json(raw)))
+    raw = (
+        canonical(value.model_dump(mode="json"))
+        if isinstance(value, _MappingRequestFields)
+        else value
+    )
+    parsed = strict_json(raw)
+    if not isinstance(parsed, dict):
+        raise ValueError("mapping request must be a JSON object")
+    if parsed.get("schema_version") == "storymodel.mapping-request/v2":
+        return RichMappingRequest.model_validate_json(canonical(parsed))
+    return MappingRequest.model_validate_json(canonical(parsed))
 
 
 def prepare_mapping(
-    account: Account, unit: str, *, interpretation: Interpretation = "referent"
-) -> MappingRequest:
+    account: SupportedAccount, unit: str, *, interpretation: Interpretation = "referent"
+) -> MappingInput:
     """Prepare one independent unit; existing bindings are excluded and never overwritten."""
-    return MappingRequest(
-        account=validate_account(account), unit=unit, interpretation=interpretation
-    )
+    checked = validate_supported_account(account)
+    if isinstance(checked, RichAccount):
+        return RichMappingRequest(account=checked, unit=unit, interpretation=interpretation)
+    return MappingRequest(account=checked, unit=unit, interpretation=interpretation)
 
 
-def mapping_request_digest(value: MappingRequest) -> str:
+def mapping_request_digest(value: MappingInput) -> str:
     """Bind the private input snapshot, including identities omitted from the prompt."""
     return digest(validate_mapping_request(value).model_dump(mode="json"))
 
@@ -153,7 +180,7 @@ class MappingProposal(Model):
     details: tuple[DetailMapping, ...] = ()
 
 
-def mapping_prompt(value: MappingRequest) -> str:
+def mapping_prompt(value: MappingInput) -> str:
     """Render only source observations and local recall quotes, excluding prior decisions.
 
     Local offsets are relative to the unit, not the document. Normalized detail content,
@@ -222,19 +249,36 @@ class MappingDecision(Model):
     reason: Name
 
 
-class MappingResult(Model):
-    """Input-bound mapping result retains the original account and every processing outcome."""
+class _MappingResultFields(Model):
+    """Common receipt fields; each public version pins its account shape."""
 
-    schema_version: Literal["storymodel.mapping-result/v1"] = "storymodel.mapping-result/v1"
+    schema_version: str = "storymodel.mapping-result/v1"
     recipe: Literal["unit-only-direct-mapping/v1"] = "unit-only-direct-mapping/v1"
     request_sha256: Digest
     prompt_sha256: Digest
     response_sha256: Digest
-    account: Account
+    account: SupportedAccount
     decisions: tuple[MappingDecision, ...]
 
 
-def _binding(request: MappingRequest, detail: Detail, proposal: DetailMapping) -> Binding:
+class MappingResult(_MappingResultFields):
+    """Input-bound mapping result retains the original account and every processing outcome."""
+
+    schema_version: Literal["storymodel.mapping-result/v1"] = "storymodel.mapping-result/v1"
+    account: Account
+
+
+class RichMappingResult(_MappingResultFields):
+    """The v2 receipt preserves all v4 graph collections alongside mapping decisions."""
+
+    schema_version: Literal["storymodel.mapping-result/v2"] = "storymodel.mapping-result/v2"
+    account: RichAccount
+
+
+MappingOutput = MappingResult | RichMappingResult
+
+
+def _binding(request: MappingInput, detail: Detail, proposal: DetailMapping) -> Binding:
     account = request.account
     keys = [h.key for h in proposal.hypotheses]
     if len(set(keys)) != len(keys):
@@ -305,7 +349,7 @@ def _binding(request: MappingRequest, detail: Detail, proposal: DetailMapping) -
     )
 
 
-def resolve_mapping(value: MappingRequest, raw: str) -> MappingResult:
+def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
     """Resolve each detail atomically; malformed/foreign packet framing refuses the batch.
 
     A bad detail yields a failed binding and rejected receipt. Missing work is unattempted.
@@ -355,7 +399,9 @@ def resolve_mapping(value: MappingRequest, raw: str) -> MappingResult:
             try:
                 proposal = DetailMapping.model_validate_json(canonical(proposals[key]))
                 binding = _binding(request, detail, proposal)
-                validate_account(account.model_copy(update={"bindings": (*bindings, binding)}))
+                validate_supported_account(
+                    account.model_copy(update={"bindings": (*bindings, binding)})
+                )
                 status = "admitted" if proposal.status == "attempted" else proposal.status
                 reason = proposal.reason
             except ValueError as error:
@@ -372,7 +418,7 @@ def resolve_mapping(value: MappingRequest, raw: str) -> MappingResult:
         )
     request_sha = mapping_request_digest(request)
     response_sha = sha256(raw.encode()).hexdigest()
-    output = validate_account(
+    output = validate_supported_account(
         account.model_copy(
             update={
                 "bindings": tuple(bindings),
@@ -387,18 +433,27 @@ def resolve_mapping(value: MappingRequest, raw: str) -> MappingResult:
             }
         )
     )
-    return MappingResult(
-        request_sha256=request_sha,
-        prompt_sha256=prompt_sha,
-        response_sha256=response_sha,
-        account=output,
-        decisions=tuple(decisions),
+    result_class = RichMappingResult if isinstance(output, RichAccount) else MappingResult
+    return result_class.model_validate_json(
+        canonical(
+            dict(
+                schema_version="storymodel.mapping-result/v2"
+                if isinstance(output, RichAccount)
+                else "storymodel.mapping-result/v1",
+                request_sha256=request_sha,
+                prompt_sha256=prompt_sha,
+                response_sha256=response_sha,
+                account=output.model_dump(mode="json"),
+                decisions=[d.model_dump(mode="json") for d in decisions],
+            )
+        )
     )
 
 
-def verify_mapping(value: MappingRequest, raw: str, receipt: MappingResult) -> MappingResult:
+def verify_mapping(value: MappingInput, raw: str, receipt: MappingOutput) -> MappingOutput:
     """Recompute receipts, evidence and bindings from independently supplied original inputs."""
-    checked = MappingResult.model_validate_json(canonical(receipt.model_dump(mode="json")))
+    result_class = RichMappingResult if isinstance(receipt, RichMappingResult) else MappingResult
+    checked = result_class.model_validate_json(canonical(receipt.model_dump(mode="json")))
     expected = resolve_mapping(value, raw)
     if checked != expected:
         raise ValueError("mapping result differs from recorded inputs")

@@ -40,6 +40,11 @@ The CLI also provides `prepare-mapping ACCOUNT UNIT --interpretation narrative|r
 All exporting commands check the account's producer grant before reading additional artifacts
 or creating outputs. Pure computational functions remain usable on accounts denied export.
 
+V4 accounts use explicit `mapping-request/v2` and `mapping-result/v2` envelopes, retaining every
+state/circumstance and other graph collection. Legacy envelopes and prompts stay unchanged.
+See the [rich detail workflow](rich-detail-workflow.md) for the connected recorded construction,
+detail-inventory, mapping and three-view example.
+
 ## Input condition and evidence
 
 The private request binds the complete account snapshot and the chosen unit. The provider prompt

@@ -68,6 +68,24 @@ def validate_rich_account(value: RichAccount | str | bytes) -> RichAccount:
     return RichAccount.model_validate_json(canonical(strict_json(raw)))
 
 
+SupportedAccount = Account | RichAccount
+
+
+def validate_supported_account(value: SupportedAccount | str | bytes) -> SupportedAccount:
+    """Dispatch explicitly by wire version for consumers qualified to retain both graph shapes."""
+    if isinstance(value, RichAccount):
+        return validate_rich_account(value)
+    if isinstance(value, Account):
+        return validate_account(value)
+    parsed = strict_json(value)
+    if not isinstance(parsed, dict):
+        raise ValueError("account must be a JSON object")
+    raw = canonical(parsed)
+    if parsed.get("schema_version") == "storymodel.account/v4":
+        return validate_rich_account(raw)
+    return validate_account(raw)
+
+
 def upgrade_account(value: Account) -> RichAccount:
     """Explicitly upgrade a v3 graph, preserving every existing occurrence ID and collection."""
     legacy = validate_account(value)

@@ -143,3 +143,10 @@ dropping states in legacy consumers, or converting literal time phrases into pla
 Locations remain entity roles; time/manner are situation circumstances. Existing consumers must
 explicitly support or refuse v4. This provisional migration boundary is not a permanent second
 scientific model or a claim that all rich consumers have already been ported.
+
+P2.5 rich detail integration (2026-11-16): admit recorded detail inventories against an existing
+rich graph, keeping address/discourse and later reference/fidelity independent. Explicit v2
+mapping envelopes share the resolver while preserving the v1 wire contract. Rejected alternatives:
+downgrading away states, replacing prior details implicitly, labeling limited work complete, or
+concatenating discontinuous quotes into words not present in the input. The acquisition profile
+declares its full-snapshot input; it does not borrow the later mapper's unit-only claim.

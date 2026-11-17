@@ -6,7 +6,6 @@ from collections import Counter
 from typing import Literal
 
 from .model import (
-    Account,
     Detail,
     Model,
     Span,
@@ -14,8 +13,8 @@ from .model import (
     Unit,
     contained_in,
     digest,
-    validate_account,
 )
+from .rich_account import SupportedAccount, validate_supported_account
 
 Policy = Literal["target-episode-novel-content/v1", "target-event-only/v1"]
 Category = Literal["internal", "external", "unresolved", "excluded"]
@@ -92,7 +91,7 @@ def classify(detail: Detail, policy: Policy) -> Category:
 
 
 def project(
-    value: Account,
+    value: SupportedAccount,
     policy: Policy = "target-episode-novel-content/v1",
     *,
     eligible_rows: tuple[str, ...] | None = None,
@@ -103,7 +102,7 @@ def project(
     source row can still be definitely present despite an unresolved detail elsewhere.
     Rows outside the declared eligible universe are absent from this projection only.
     """
-    account = validate_account(value)
+    account = validate_supported_account(value)
     if policy not in ("target-episode-novel-content/v1", "target-event-only/v1"):
         raise ValueError("unknown analysis policy")
     units = {u.id: u for u in account.units}

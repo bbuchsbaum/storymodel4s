@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .model import Account, canonical, validate_account
+from .rich_account import SupportedAccount, validate_supported_account
 
 
 def read_account(path: Path, *, expected_sha256: str | None = None) -> Account:
@@ -38,6 +39,22 @@ def publish_json(path: Path, value: Any) -> None:
 def export_account(path: Path, value: Account) -> None:
     """Apply producer export permission before constructing the destination."""
     account = validate_account(value)
+    if account.export_permission != "allowed":
+        raise PermissionError("producer denies evidence export")
+    publish_json(path, account.model_dump(mode="json"))
+
+
+def read_supported_account(path: Path, *, expected_sha256: str | None = None) -> SupportedAccount:
+    """Read either explicitly supported wire version without discarding rich collections."""
+    raw = path.read_bytes()
+    if expected_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("account bytes differ from the expected external SHA-256")
+    return validate_supported_account(raw)
+
+
+def export_supported_account(path: Path, value: SupportedAccount) -> None:
+    """Export a complete checked legacy or v4 snapshot subject to its producer grant."""
+    account = validate_supported_account(value)
     if account.export_permission != "allowed":
         raise PermissionError("producer denies evidence export")
     publish_json(path, account.model_dump(mode="json"))

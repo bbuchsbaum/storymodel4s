@@ -3,7 +3,14 @@
 from .accounts import make_account, pair_accounts
 from .alignment import AlignmentPolicy, align_account, verify_alignment
 from .analysis import Analysis, project
-from .artifacts import export_account, read_account
+from .artifacts import (
+    export_account,
+    export_supported_account,
+    read_account,
+    read_supported_account,
+)
+from .detail_admission import admit_details, detail_prompt, prepare_details, verify_details
+from .detail_workflow import DetailRecording, import_details, replay_details
 from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, verify_mapping
 from .direct_workflow import MappingRecording, import_mapping, replay_mapping
 from .extraction import prepare_extraction, resolve_extraction
@@ -23,6 +30,7 @@ __all__ = [
     "Account",
     "AlignmentPolicy",
     "Analysis",
+    "DetailRecording",
     "ExtractionRecording",
     "MappingRecording",
     "RichAccount",
@@ -31,15 +39,19 @@ __all__ = [
     "SourceRecording",
     "account_digest",
     "admit_relations",
+    "admit_details",
+    "detail_prompt",
     "align_account",
     "compile_source",
     "compile_rich_construction",
     "export_account",
+    "export_supported_account",
     "project",
     "make_account",
     "pair_accounts",
     "pair_rich_accounts",
     "prepare_extraction",
+    "prepare_details",
     "prepare_mapping",
     "mapping_prompt",
     "prepare_source",
@@ -47,16 +59,19 @@ __all__ = [
     "resolve_extraction",
     "resolve_mapping",
     "import_extraction",
+    "import_details",
     "import_mapping",
     "import_source",
     "import_rich",
     "identity_role_table",
     "replay_extraction",
+    "replay_details",
     "replay_mapping",
     "replay_source",
     "replay_rich",
     "resolve_text_identity",
     "read_account",
+    "read_supported_account",
     "relation_table",
     "situation_table",
     "upgrade_account",
@@ -66,4 +81,5 @@ __all__ = [
     "verify_relations",
     "verify_identity",
     "verify_mapping",
+    "verify_details",
 ]

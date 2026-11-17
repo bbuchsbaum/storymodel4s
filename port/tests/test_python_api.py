@@ -31,8 +31,11 @@ def test_algorithms_validate_original_input_once_before_hashing(monkeypatch):
     import storymodel.model as model
 
     account = resolve_extraction(example_request(), example_proposal()).account
-    for module, operation in ((analysis, project), (alignment, align_account)):
-        original = module.validate_account
+    for module, operation, validator in (
+        (analysis, project, "validate_supported_account"),
+        (alignment, align_account, "validate_account"),
+    ):
+        original = getattr(module, validator)
         inputs = []
 
         def counted(value):
@@ -40,7 +43,7 @@ def test_algorithms_validate_original_input_once_before_hashing(monkeypatch):
             return original(value)
 
         with monkeypatch.context() as patch:
-            patch.setattr(module, "validate_account", counted)
+            patch.setattr(module, validator, counted)
             patch.setattr(model, "validate_account", counted)
             operation(account)
         assert sum(value is account for value in inputs) == 1

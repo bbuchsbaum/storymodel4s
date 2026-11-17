@@ -60,11 +60,11 @@ the next construction work.
 
 ## Compatibility boundary and remaining work
 
-Old analysis, alignment, identity and direct-mapping consumers currently reject v4. They cannot
-silently drop states or claim a complete event-only search. Updating those consumers to preserve
-v4 and declaring their supported evidence universe remains required integration work; a
-downgrade is not supplied. V1/v2 upgrade is also deferred rather than removing their extra roots
-or changing legacy identities implicitly.
+The [rich detail workflow](rich-detail-workflow.md) now connects v4 to direct mapping and the
+three analysis views. Structural alignment and the older identity/relation consumers still reject
+v4; they cannot silently drop states or claim a complete event-only search. Their integration
+remains required, and a downgrade is not supplied. V1/v2 upgrade is also deferred rather than
+removing their extra roots or changing legacy identities implicitly.
 
 This is the first state/circumstance construction slice. Playback evidence, complete context-holder
 attribution, event polarity/modality, normalized predicates, richer entity types, full hierarchy and

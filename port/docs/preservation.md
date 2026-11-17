@@ -204,3 +204,21 @@ across two recalls, exact state/role/context/circumstance refusals, recorded raw
 consumer of every added collection. Recall inventories remain not-attempted because this graph
 constructor does not extract details. This is not full P2, nor full Scala `TypedSupport` parity:
 playback, richer contexts/relations/hierarchy, rich recall details and consumer integration remain.
+
+## P2.5 rich detail-to-mapping integration
+
+Bead `bd-01M7KSBXC2J91W0FNS5XS7K960`: the [recorded rich workflow](rich-detail-workflow.md)
+admits expressed recall details into existing v4 situations, then consumes them through direct
+mapping and the same analysis policies. Explicit inventory states distinguish completed zero,
+missing, failed and valid partial work. Address/discourse proposals stay separate from reference
+and fidelity; source situations cannot own recall details. Discontinuous text retains visible gaps.
+
+This reuses `Detail`, `Inventory`, ADR 0030 policy and the earlier P3.1 resolver instead of adding
+another estimator. V2 mapping envelopes retain v4 collections; frozen v1 schemas, requests,
+prompts and outputs remain identical. Two recalls reuse one unchanged source in an installed-shape
+example, with state-linked detail readback and all three views. The detail acquisition prompt is
+snapshot-bound, so only the later mapping step has the unit-only input condition.
+
+No existing details or completed inventories are silently replaced. Revision workflows, rich
+grouping/summaries, remaining graph families, full structured alignment and the rest of P3–P6
+remain owed. A connected bounded workflow is not full parity or a scientific accuracy result.
