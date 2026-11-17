@@ -1,0 +1,184 @@
+{
+  "source_commit": "0d009f6d32b2f2ef11b6dd0fbf590434eb7ddd5e",
+  "example_repair_commit": "6f738536445640781b5ded650f505edf2758f06a",
+  "bead": "bd-01M7MC4BJN40SX70B369FPT6QB",
+  "scope": "Recorded holder candidates through verified identity to unchanged-context event/state inspection",
+  "checks": {
+    "full_suite": {
+      "commit": "0d009f6d32b2f2ef11b6dd0fbf590434eb7ddd5e",
+      "command": ".venv/bin/pytest -q",
+      "exit_code": 0,
+      "passed": 710,
+      "seconds": 9.98,
+      "log_sha256": "628e7bd7713ec28abc2b1ea49805c64d928d9cb7c34677a4af224d00361fae37"
+    },
+    "repair_targeted_test": {
+      "name": "test_construction_example_api_and_all_cli_commands_agree",
+      "passed": 1
+    },
+    "mypy_source_files": 46,
+    "ruff_check": "passed",
+    "ruff_format_files": 116,
+    "schema_drift": "passed"
+  },
+  "independent_review": {
+    "agent": "attribution_review",
+    "commit": "6f738536445640781b5ded650f505edf2758f06a",
+    "verdict": "PASS; no remaining BLOCK",
+    "focused_tests_passed": 38,
+    "additional_probes": [
+      "distinct nested holders",
+      "omitted child stays unattempted, does not inherit parent holder",
+      "invalid identity evidence blocks naming",
+      "forged origin and digests refused"
+    ],
+    "limit": "Local structural behavior, no semantic attribution accuracy or executed Scala runtime parity"
+  },
+  "reference_blobs": {
+    "story/src/main/scala/storymodel4s/story/nodes.scala": "2064522b8b42adcaf40e032947a64fd48eacdc4e",
+    "document/src/main/scala/storymodel4s/document/compiler.scala": "45f78c1e683b7fa655b9f82c1c1840811d81e25e",
+    "document/src/main/scala/storymodel4s/document/placement.scala": "4ebec1bd877e72874911dc9efb4994dc5b26fe4e",
+    "document/src/test/scala/storymodel4s/document/ContextPlacementSuite.scala": "23960f4292e1856b4f9617958607fa91f02978c1",
+    "document/src/test/scala/storymodel4s/document/EntityIdentitySuite.scala": "c380a8d5ecc862b9c1dbedc0cddb9e34fc4db6b2",
+    "codec/src/main/scala/storymodel4s/codec/storymodelexport.scala": "5d921a774d623bcc53a2e7adf912664b5ef71ded"
+  },
+  "oracles": [
+    "All subsets and permutations of three candidates with declared two-class partition, last candidate also tested open",
+    "Resolved third-person candidate carries antecedent; open competitor blocks naming",
+    "source/recall and v1-v4 occurrence/context preservation",
+    "cross-document ownership including same-side documents",
+    "discontinuous support and UTF16 surrogate refusal",
+    "typed copied-object and input-byte tampering refusal",
+    "construction-to-saved-results and installed API/CLI agreement"
+  ],
+  "mutations": [
+    {
+      "mutation": "unresolved-competitor",
+      "old": "if any(m.referent is None for m in candidates)",
+      "new": "if False and any(m.referent is None for m in candidates)",
+      "test": "test_resolved_third_person_holder_carries_antecedent_but_open_competitor_blocks",
+      "controls": [
+        "test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]",
+        "test_cli_denies_export_before_reading_recordings[resolve-holders]"
+      ],
+      "baseline": "3 passed in 0.27s",
+      "mutant": "1 failed, 2 passed in 0.23s",
+      "compiled": true
+    },
+    {
+      "mutation": "identity-collapse",
+      "old": "if len(referents) != 1",
+      "new": "if len(candidates) != 1",
+      "test": "test_complete_small_candidate_space_matches_declared_partition_including_open_candidates",
+      "controls": [
+        "test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]",
+        "test_cli_denies_export_before_reading_recordings[resolve-holders]"
+      ],
+      "baseline": "3 passed in 0.28s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "document-ownership",
+      "old": "entity is None or entity.origin_document != document.id",
+      "new": "entity is None",
+      "test": "test_same_side_other_document_candidate_is_not_a_holder",
+      "controls": [
+        "test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]",
+        "test_cli_denies_export_before_reading_recordings[resolve-holders]"
+      ],
+      "baseline": "3 passed in 0.19s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "evidence-containment",
+      "old": "if not contained_in(support, context.evidence):",
+      "new": "if False and not contained_in(support, context.evidence):",
+      "test": "test_context_support_union_preserves_discontinuous_gaps",
+      "controls": [
+        "test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]",
+        "test_cli_denies_export_before_reading_recordings[resolve-holders]"
+      ],
+      "baseline": "3 passed in 0.18s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "recompute",
+      "old": "if checked != expected:",
+      "new": "if False and checked != expected:",
+      "test": "test_changed_input_identity_and_forged_results_are_rejected_at_consumption",
+      "controls": [
+        "test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]",
+        "test_cli_denies_export_before_reading_recordings[resolve-holders]"
+      ],
+      "baseline": "3 passed in 0.18s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "exact-recording-bytes",
+      "old": "raw_forms, raw_holders = canonical(annotations) + \"\\n\", canonical(proposals) + \"\\n\"",
+      "new": "raw_forms, raw_holders = canonical(annotations), canonical(proposals)",
+      "test": "test_construction_example_api_and_all_cli_commands_agree",
+      "controls": [
+        "test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]",
+        "test_cli_denies_export_before_reading_recordings[resolve-holders]"
+      ],
+      "baseline": "3 passed in 0.34s",
+      "mutant": "1 failed, 2 passed in 0.35s",
+      "compiled": true
+    }
+  ],
+  "mutation_reproduction_python": "from pathlib import Path\nimport os, shutil, subprocess, json\nbase=Path(__file__).resolve().parents[1]\nroot=base/'data/attribution-mutations';root.mkdir(exist_ok=True)\ncontrols=['test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]', 'test_cli_denies_export_before_reading_recordings[resolve-holders]']\ncases=[\n('unresolved-competitor','if any(m.referent is None for m in candidates)','if False and any(m.referent is None for m in candidates)','test_resolved_third_person_holder_carries_antecedent_but_open_competitor_blocks'),\n('identity-collapse','if len(referents) != 1','if len(candidates) != 1','test_complete_small_candidate_space_matches_declared_partition_including_open_candidates'),\n('document-ownership','entity is None or entity.origin_document != document.id','entity is None','test_same_side_other_document_candidate_is_not_a_holder'),\n('evidence-containment','if not contained_in(support, context.evidence):','if False and not contained_in(support, context.evidence):','test_context_support_union_preserves_discontinuous_gaps'),\n('recompute','if checked != expected:','if False and checked != expected:','test_changed_input_identity_and_forged_results_are_rejected_at_consumption'),\n]\nrecords=[]\nfor name,old,new,test in cases:\n case=root/name;case.mkdir(exist_ok=True)\n shutil.copytree(base/'src/storymodel',case/'storymodel',dirs_exist_ok=True)\n for fn in ['test_attribution.py','test_identity.py']:\n  shutil.copy2(base/'tests'/fn,case/fn)\n env=dict(os.environ,PYTHONPATH=str(case),PYTHONDONTWRITEBYTECODE='1')\n cmd=[str(base/'.venv/bin/python'),'-m','pytest','-q',*[f'test_attribution.py::{t}' for t in [test,*controls]]]\n record={'mutation':name,'old':old,'new':new,'test':test,'controls':controls}\n for mode in ['baseline','mutant']:\n  if mode=='mutant':\n   path=case/'storymodel/attribution.py';content=path.read_text();assert content.count(old)==1\n   path.write_text(content.replace(old,new))\n   subprocess.run([str(base/'.venv/bin/python'),'-m','py_compile',str(path)],check=True)\n   shutil.rmtree(case/'storymodel/__pycache__',ignore_errors=True)\n  result=subprocess.run(cmd,cwd=case,env=env,capture_output=True,text=True)\n  (case/f'{mode}.log').write_text(result.stdout+result.stderr)\n  expected='3 passed' if mode=='baseline' else '1 failed, 2 passed'\n  assert result.returncode==(0 if mode=='baseline' else 1) and expected in result.stdout,(name,mode,result.stdout,result.stderr)\n  record[mode]=result.stdout.splitlines()[-1]\n record['compiled']=True;records.append(record);print(name,record['mutant'])\n(root/'summary.json').write_text(json.dumps(records,indent=2)+'\\n')\n",
+  "recording_mutation_reproduction_python": "from pathlib import Path\nimport os, shutil, subprocess, json\nbase=Path(__file__).resolve().parents[1]\ncase=base/'data/attribution-mutations/exact-recording-bytes';case.mkdir(exist_ok=True)\n(case/'tests').mkdir(exist_ok=True);(case/'examples').mkdir(exist_ok=True)\nshutil.copytree(base/'src/storymodel',case/'storymodel',dirs_exist_ok=True)\nfor name in ['test_attribution.py','test_identity.py']:\n shutil.copy2(base/'tests'/name,case/'tests'/name)\npath=case/'examples/attribution_workflow.py';shutil.copy2(base/'examples/attribution_workflow.py',path)\nold='raw_forms, raw_holders = canonical(annotations) + \"\\\\n\", canonical(proposals) + \"\\\\n\"'\nnew='raw_forms, raw_holders = canonical(annotations), canonical(proposals)'\ntest='test_construction_example_api_and_all_cli_commands_agree'\ncontrols=['test_processing_outcomes_and_omission_do_not_become_no_candidate[failed]', 'test_cli_denies_export_before_reading_recordings[resolve-holders]']\nenv=dict(os.environ,PYTHONPATH=str(case),PYTHONDONTWRITEBYTECODE='1')\ncmd=[str(base/'.venv/bin/python'),'-m','pytest','-q',*[f'tests/test_attribution.py::{t}' for t in [test,*controls]]]\nrecord={'mutation':'exact-recording-bytes','old':old,'new':new,'test':test,'controls':controls}\nfor mode in ['baseline','mutant']:\n if mode=='mutant':\n  content=path.read_text();assert content.count(old)==1;path.write_text(content.replace(old,new))\n  subprocess.run([str(base/'.venv/bin/python'),'-m','py_compile',str(path)],check=True)\n  shutil.rmtree(path.parent/'__pycache__',ignore_errors=True)\n result=subprocess.run(cmd,cwd=case,env=env,capture_output=True,text=True)\n (case/f'{mode}.log').write_text(result.stdout+result.stderr)\n assert result.returncode==(0 if mode=='baseline' else 1),(mode,result.stdout,result.stderr)\n assert ('3 passed' if mode=='baseline' else '1 failed, 2 passed') in result.stdout,result.stdout\n record[mode]=result.stdout.splitlines()[-1]\nrecord['compiled']=True\n(case/'summary.json').write_text(json.dumps(record,indent=2)+'\\n')\nprint(json.dumps(record,indent=2))\n",
+  "installed": {
+    "wheel_source_commit": "0d009f6d32b2f2ef11b6dd0fbf590434eb7ddd5e",
+    "example_commit": "6f738536445640781b5ded650f505edf2758f06a",
+    "wheel_sha256": "c82edd5136079a3f69979130de3e96b130becc15473b0de2f3719c2f7e3ba0ab",
+    "result": {
+      "api": {
+        "import": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+        "situations": 3,
+        "holder_candidates": 2,
+        "unchanged_account": true
+      },
+      "cli_verification": {
+        "account_sha256": "ce9d3b45410d2baf4b3000e17a333d6599e4bebfc5959cfedc5c8d091cc832fe",
+        "verified": true
+      },
+      "denied_verification": {
+        "account_sha256": "9e7e630d076790bada268910d47387f4ffdbad987b070aca52c9d09e2a6462ff",
+        "verified": true
+      },
+      "cli_api_equal": true,
+      "denied_producers_refused_before_inputs": true,
+      "artifact_bytes": {
+        "situations.json": 3487,
+        "cli-table.json": 3487,
+        "denied-result.json": 3031,
+        "construction-request.json": 446,
+        "cli.json": 3033,
+        "denied-forms.json": 807,
+        "denied-account.json": 4202,
+        "denied-proposals.json": 603,
+        "account.json": 4204,
+        "identity-annotations.json": 808,
+        "attribution.json": 3033,
+        "holder-proposals.json": 604,
+        "construction-proposals.json": 1217,
+        "construction-result.json": 5207
+      }
+    },
+    "reproduction_python": "from pathlib import Path\nimport json, os, shutil, subprocess, tempfile\nbase=Path(__file__).resolve().parents[1]\npython=base/'data/wheel-env/bin/python'\ncli=base/'data/wheel-env/bin/storymodel'\nenv=dict(os.environ);env.pop('PYTHONPATH',None)\nwith tempfile.TemporaryDirectory(prefix='storymodel-attribution-') as temp:\n root=Path(temp)\n shutil.copy2(base/'examples/attribution_workflow.py',root/'example.py')\n subprocess.run([str(python),'example.py','example'],cwd=root,env=env,check=True)\n directory=root/'example'\n inputs=['account.json','identity-annotations.json','holder-proposals.json']\n subprocess.run([str(cli),'resolve-holders',*inputs,'--output','cli.json'],cwd=directory,env=env,check=True)\n verification=subprocess.run([str(cli),'verify-attribution',*inputs,'cli.json'],cwd=directory,env=env,check=True,capture_output=True,text=True)\n subprocess.run([str(cli),'attribution-table',*inputs,'cli.json','--output','cli-table.json'],cwd=directory,env=env,check=True)\n assert json.loads((directory/'cli.json').read_text())==json.loads((directory/'attribution.json').read_text())\n assert json.loads((directory/'cli-table.json').read_text())==json.loads((directory/'situations.json').read_text())\n probe='''import json\nfrom pathlib import Path\nimport storymodel\nfrom storymodel import read_supported_account, resolve_context_holders, verify_attribution, attribution_table\nfrom storymodel.attribution import AttributionResult\nfrom storymodel.serialization import canonical,digest\nassert \"site-packages\" in storymodel.__file__,storymodel.__file__\naccount=read_supported_account(Path(\"account.json\"))\nbefore=account.model_dump_json()\nforms=Path(\"identity-annotations.json\").read_text();proposals=Path(\"holder-proposals.json\").read_text()\nresult=resolve_context_holders(account,forms,proposals)\nassert result==AttributionResult.model_validate_json(Path(\"cli.json\").read_bytes())\nverify_attribution(account,forms,proposals,result)\nrows=attribution_table(account,forms,proposals,result)\nassert rows[-1].holder.status==\"named\"\nassert len(rows[-1].holder.candidates)==2\nassert rows[-1].context.kind==\"reported\"\nassert account.model_dump_json()==before\n# Private API output remains denied; verification must not grant export.\ndenied=account.model_copy(update={\"export_permission\":\"denied\"})\nsha=digest(denied.model_dump(mode=\"json\"))\nf=json.loads(forms);p=json.loads(proposals);f['account_sha256']=p['account_sha256']=sha\nf=canonical(f);p=canonical(p)\nr=resolve_context_holders(denied,f,p)\nassert r.export_permission==\"denied\"\nfor name,data in [('denied-account',denied.model_dump_json()),('denied-forms',f),('denied-proposals',p),('denied-result',r.model_dump_json())]:\n Path(name+'.json').write_text(data)\nprint(json.dumps({'import':storymodel.__file__,'situations':len(rows),'holder_candidates':len(rows[-1].holder.candidates),'unchanged_account':True}))\n'''\n api=subprocess.run([str(python),'-c',probe],cwd=directory,env=env,check=True,capture_output=True,text=True)\n private=subprocess.run([str(cli),'verify-attribution','denied-account.json','denied-forms.json','denied-proposals.json','denied-result.json'],cwd=directory,env=env,check=True,capture_output=True,text=True)\n for command in ['resolve-holders','attribution-table']:\n  args=[str(cli),command,'denied-account.json','missing-forms','missing-proposals']\n  if command=='attribution-table':args.append('missing-result')\n  denied=subprocess.run([*args,'--output','must-not-exist.json'],cwd=directory,env=env,capture_output=True,text=True)\n  assert denied.returncode==2 and 'producer denies attribution export' in denied.stderr\n  assert not (directory/'must-not-exist.json').exists()\n output={'api':json.loads(api.stdout),'cli_verification':json.loads(verification.stdout),'denied_verification':json.loads(private.stdout),'cli_api_equal':True,'denied_producers_refused_before_inputs':True,'artifact_bytes':{p.name:p.stat().st_size for p in directory.glob('*.json')}}\n (base/'data/attribution-installed.json').write_text(json.dumps(output,indent=2)+'\\n')\n print(json.dumps(output,indent=2))\n"
+  },
+  "observed_and_fixed": "Example saved recordings added a newline absent from hashed in-memory inputs; repair binds exact saved construction/forms/holder bytes and checks saved outputs, not just freshly recomputed API/CLI results.",
+  "remaining": [
+    "first-person/addressee identity consumers",
+    "desire/memory/imagination/hypothetical/counterfactual contexts",
+    "automatic chart/quotation candidate acquisition",
+    "playback and attribution-aware assessment",
+    "full P2-P6 behavioral parity"
+  ]
+}

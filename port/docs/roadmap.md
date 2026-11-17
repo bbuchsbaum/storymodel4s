@@ -38,7 +38,9 @@ chart/outcome/cause evidence and refinement remain owed. [Explicit reconstructio
 now consumes these results while retaining the original evidence. [Conditional organization](organization.md)
 consumes adjacent joint flow, with a separate explicitly independent-row path. Richer evidence
 construction, native media ordering and registered measurement eligibility remain owed.
-Playback, attribution, richer graph families and semantic channels remain owed. Mote owns
+Recorded [context-holder resolution](attribution.md) now connects existing text contexts to
+verified identity and event/state inspection. First-person identity consumption, additional
+context families, attribution-aware assessment, playback and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -231,10 +233,9 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 These deliveries sequence P2–P6; the full phase exits above still apply. Build on the existing
 construction, correspondence, assessment and account-to-inference paths. Mote owns live status.
-The current evidence baseline is [organization.json](../evidence/organization.json), bound
-to source commit `ade617d96`: 672 tests, independent review, six discriminating mutants and
-installed API/CLI agreement. Those are recorded engineering results, not a fresh test run for
-this plan, executed Scala equivalence or a full-parity claim.
+The latest computational baseline includes [organization.json](../evidence/organization.json)
+and [attribution](attribution.md), with its evidence in [attribution.json](../evidence/attribution.json).
+These are recorded engineering results, not executed Scala equivalence or a full-parity claim.
 
 | Order | Connected result | Main prerequisite |
 |---|---|---|
@@ -273,8 +274,10 @@ Reconstruction never silently changes categorical reference or fidelity. Organiz
 from an order-sensitive model stays labelled model-conditional, not independent evidence of
 recall organization.
 
-**Next action:** continue delivery 2 with the missing evidence and context ownership contracts,
-starting with explicit attribution/holders and playback through construction and actual consumers.
+**Next action:** continue delivery 2 by consuming checked holder evidence in first-person identity,
+preserving plural/addressee uncertainty and context boundaries. Recorded holder resolution and
+event/state inspection are implemented; reuse them. Additional context families, attribution-aware
+assessment and playback need functioning construction and consumer paths.
 The account-inference, reconstruction and conditional organization path is implemented locally;
 reuse it. Native media order, registered independent-measurement eligibility, refinement and
 richer evidence channels remain owed. Coupled ambiguity bounds stay unsupported unless a valid
