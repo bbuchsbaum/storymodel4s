@@ -10,55 +10,24 @@ import hashlib
 from collections.abc import Iterable, Mapping
 from typing import Annotated, Any, ClassVar, Literal, Self
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasChoices, Field, model_validator
 
+from ._base import Digest as Digest
+from ._base import Identified as Identified
+from ._base import Model as Model
+from ._base import Name as Name
+from ._base import Side as Side
+from ._base import _validate_instance as _validate_instance
+from .playback import (
+    MediaSource,
+    PlaybackSupport,
+    contains_playback,
+    union_playback,
+    validate_playback,
+)
 from .serialization import canonical as canonical
 from .serialization import digest as digest
 from .serialization import strict_json
-
-Name = Annotated[str, Field(min_length=1)]
-Digest = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
-Side = Literal["source", "recall"]
-
-
-class Model(BaseModel):
-    """Strict immutable records; contextual validity belongs to Account admission."""
-
-    # Public consumers call model_validate on instances before serializing: copying can
-    # forge values, while JSON serialization can coerce their types or discard unknowns.
-    model_config = ConfigDict(
-        extra="forbid", frozen=True, strict=True, revalidate_instances="always"
-    )
-
-
-def _validate_instance[T: Model](model_type: type[T], value: T) -> T:
-    """Check Python types first, then JSON/UTF-8 representability before consumption or I/O."""
-    checked = model_type.model_validate(value)
-    canonical(checked.model_dump(mode="json")).encode("utf-8")
-    return checked
-
-
-class Identified(Model):
-    """Content-derived identities refuse caller substitutions on readback."""
-
-    namespace: ClassVar[str] = ""
-    id: str = ""
-
-    def __init_subclass__(cls, **kwargs: Any) -> None:
-        super().__init_subclass__(**kwargs)
-        if "namespace" not in cls.__dict__ or not cls.namespace:
-            raise TypeError("identified subclasses require an explicit stable namespace")
-
-    def identity_fields(self) -> dict[str, Any]:
-        return self.model_dump(mode="json", exclude={"id"})
-
-    @model_validator(mode="after")
-    def identify(self) -> Self:
-        expected = self.namespace + ":" + digest(self.identity_fields())
-        if self.id and self.id != expected:
-            raise ValueError("identity differs from content")
-        object.__setattr__(self, "id", expected)
-        return self
 
 
 class Span(Model):
@@ -117,7 +86,25 @@ class Support(Model):
         return self
 
 
-Evidence = Annotated[tuple[Support, ...], Field(min_length=1)]
+AnySupport = Support | PlaybackSupport
+Evidence = Annotated[tuple[AnySupport, ...], Field(min_length=1)]
+
+
+def support_origin(value: AnySupport) -> str:
+    """Return the actual text or media source identity without converting coordinate kinds."""
+    return value.document if isinstance(value, Support) else value.source
+
+
+def text_support(value: AnySupport) -> Support:
+    """Narrow only for an explicitly text-dependent consumer; never invent media text."""
+    if not isinstance(value, Support):
+        raise ValueError("unsupported modality: this consumer requires text evidence")
+    return value
+
+
+def text_evidence(values: Iterable[AnySupport]) -> tuple[Support, ...]:
+    """Require all supports to be text, preserving every original span."""
+    return tuple(text_support(v) for v in values)
 
 
 class Unit(Identified):
@@ -125,7 +112,7 @@ class Unit(Identified):
 
     namespace: ClassVar[str] = "unit"
     kind: Literal["row", "scene", "recall"]
-    support: Support
+    support: AnySupport
     parent: str | None = None
 
 
@@ -146,10 +133,26 @@ class ExtendedContext(Identified):
     side: Side
     kind: Literal["desire", "memory", "imagination", "hypothetical", "counterfactual"]
     parent: str | None = None
-    evidence: tuple[Support, ...] = ()
+    evidence: tuple[AnySupport, ...] = ()
 
 
-AnyContext = Context | ExtendedContext
+class AnchoredContext(Identified):
+    """An old context kind with native evidence stays disjoint from the legacy text record."""
+
+    namespace: ClassVar[str] = "context"
+    side: Side
+    kind: Literal["reported", "believed", "intended"]
+    parent: str | None = None
+    evidence: Evidence
+
+    @model_validator(mode="after")
+    def native_evidence(self) -> Self:
+        if not any(isinstance(e, PlaybackSupport) for e in self.evidence):
+            raise ValueError("anchored context requires playback evidence")
+        return self
+
+
+AnyContext = Context | ExtendedContext | AnchoredContext
 
 
 def _has_holder(context: AnyContext) -> bool:
@@ -198,6 +201,11 @@ class Entity(Identified):
     @property
     def origin_document(self) -> Name:
         """The idiomatic Python name for this entity's document-local origin."""
+        return self.source_document
+
+    @property
+    def origin_source(self) -> Name:
+        """The actual document or media source; the historical wire field retains its name."""
         return self.source_document
 
     @classmethod
@@ -400,9 +408,11 @@ def indexed[T: Identified](items: Iterable[T], label: str) -> dict[str, T]:
     return result
 
 
-def contained(child: Support, parent: Support) -> bool:
+def contained(child: AnySupport, parent: AnySupport) -> bool:
     """Containment in the exact support union, not the hull across gaps."""
-    if child.document != parent.document:
+    if isinstance(child, PlaybackSupport):
+        return isinstance(parent, PlaybackSupport) and contains_playback(child, parent)
+    if not isinstance(parent, Support) or child.document != parent.document:
         return False
     for part in child.spans:
         reach = part.start
@@ -416,10 +426,21 @@ def contained(child: Support, parent: Support) -> bool:
     return True
 
 
-def contained_in(child: Support, parents: Iterable[Support]) -> bool:
+def contained_in(child: AnySupport, parents: Iterable[AnySupport]) -> bool:
     """Combine same-document evidence without inventing support across gaps."""
+    values = tuple(parents)
+    if isinstance(child, PlaybackSupport):
+        matching = [
+            p for p in values if isinstance(p, PlaybackSupport) and p.source == child.source
+        ]
+        return bool(matching) and contains_playback(child, union_playback(matching))
     spans = sorted(
-        (s for p in parents if p.document == child.document for s in p.spans),
+        (
+            s
+            for p in values
+            if isinstance(p, Support) and p.document == child.document
+            for s in p.spans
+        ),
         key=lambda s: (s.start, s.end),
     )
     merged: list[Span] = []
@@ -471,19 +492,32 @@ class _AccountFields(Model):
     def _situations(self) -> tuple[Event | State, ...]:
         return self.events
 
+    def _media_sources(self) -> tuple[MediaSource, ...]:
+        return ()
+
     @model_validator(mode="after")
     def validate_relations(self) -> Self:
         docs = indexed(self.documents, "document")
+        media = indexed(self._media_sources(), "media source")
+        sources: dict[str, Document | MediaSource] = {**docs, **media}
         units = indexed(self.units, "unit")
         contexts = indexed(self.contexts, "context")
         entities = indexed(self.entities, "entity")
         events = indexed(self._situations(), "event")
         details = indexed(self.details, "detail")
         indexed(self.relations, "relation")
-        if len({(d.side, d.key) for d in docs.values()}) != len(docs):
-            raise ValueError("document session/edition keys must be unique per side")
+        if len({(d.side, d.key) for d in sources.values()}) != len(sources):
+            raise ValueError("source session/edition keys must be unique per side")
 
-        def support(value: Support, side: Side | None = None) -> None:
+        def support(value: AnySupport, side: Side | None = None) -> None:
+            if isinstance(value, PlaybackSupport):
+                if self.schema_version != "storymodel.account/v6":
+                    raise ValueError("playback evidence requires account v6")
+                source = media.get(value.source)
+                if source is None or (side is not None and source.side != side):
+                    raise ValueError("foreign media evidence source or wrong account side")
+                validate_playback(source, value)
+                return
             document = docs.get(value.document)
             if document is None or (side is not None and document.side != side):
                 raise ValueError("foreign evidence document or wrong account side")
@@ -514,9 +548,9 @@ class _AccountFields(Model):
             inventoried.add(inventory_unit.id)
 
         for context in contexts.values():
-            if (
-                isinstance(context, ExtendedContext)
-                and self.schema_version != "storymodel.account/v5"
+            if isinstance(context, ExtendedContext) and self.schema_version not in (
+                "storymodel.account/v5",
+                "storymodel.account/v6",
             ):
                 raise ValueError("extended context kinds require account v5")
             for evidence in context.evidence:
@@ -535,8 +569,8 @@ class _AccountFields(Model):
         acyclic(((c.id, c.parent) for c in contexts.values() if c.parent), "context hierarchy")
         for side in ("source", "recall"):
             narrated = sum(c.kind == "narrated" and c.side == side for c in contexts.values())
-            present = any(document.side == side for document in docs.values())
-            if self.schema_version.endswith(("/v3", "/v4", "/v5")):
+            present = any(source.side == side for source in sources.values())
+            if self.schema_version.endswith(("/v3", "/v4", "/v5", "/v6")):
                 if present and narrated != 1:
                     raise ValueError("each present account side needs exactly one narrated world")
                 if not present and any(context.side == side for context in contexts.values()):
@@ -544,14 +578,14 @@ class _AccountFields(Model):
             elif narrated != 1:
                 raise ValueError("each account side needs exactly one narrated world")
         for entity in entities.values():
-            origin = docs.get(entity.source_document)
+            origin = sources.get(entity.origin_source)
             if origin is None or (self.schema_version.endswith("/v1") and origin.side != "source"):
                 raise ValueError(
                     "entity requires a source-local identity in v1, a local origin in v2"
                 )
             for evidence in entity.evidence:
                 support(evidence, origin.side)
-                if evidence.document != entity.source_document:
+                if support_origin(evidence) != entity.origin_source:
                     raise ValueError("entity evidence belongs to another source")
         for event in events.values():
             event_context = contexts.get(event.context)
@@ -562,13 +596,14 @@ class _AccountFields(Model):
             if any(p.entity not in entities for p in event.participants):
                 raise ValueError("foreign event participant")
             for participation in event.participants:
-                origin = docs[entities[participation.entity].source_document]
+                origin = sources[entities[participation.entity].origin_source]
                 if origin.side == "recall" and (
-                    event.side != "recall" or any(e.document != origin.id for e in event.evidence)
+                    event.side != "recall"
+                    or any(support_origin(e) != origin.id for e in event.evidence)
                 ):
                     raise ValueError("recall entity belongs to another event document or side")
                 if event.side == "source" and not any(
-                    e.document == entities[participation.entity].source_document
+                    support_origin(e) == entities[participation.entity].origin_source
                     for e in event.evidence
                 ):
                     raise ValueError("source event uses an entity from another source")
@@ -636,7 +671,7 @@ class _AccountFields(Model):
                             evidence, (units[t].support for t in hypothesis.targets)
                         ):
                             raise ValueError("fidelity evidence lies outside its source hypothesis")
-        required = {d.sha256 for d in docs.values()}
+        required = {s.sha256 for s in sources.values()}
         if not required <= set(self.recipe.input_sha256):
             raise ValueError("recipe does not bind all source/recall document inputs")
         return self
@@ -649,6 +684,13 @@ class Account(_AccountFields):
         "storymodel.account/v1", "storymodel.account/v2", "storymodel.account/v3"
     ] = "storymodel.account/v1"
     contexts: tuple[Context, ...]
+
+    @classmethod
+    def model_json_schema(cls, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        """Export the historical wire schema; old tags still refuse all native evidence."""
+        from ._legacy import legacy_account_schema
+
+        return legacy_account_schema(*args, **kwargs)
 
 
 def validate_account(value: Account | str | bytes) -> Account:

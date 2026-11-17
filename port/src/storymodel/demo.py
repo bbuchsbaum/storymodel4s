@@ -26,6 +26,7 @@ from .model import (
     Span,
     Support,
     Unit,
+    text_support,
 )
 
 SOURCE_ROWS = (
@@ -113,7 +114,7 @@ def example_account() -> Account:
                         hypothesis=hypothesis.id,
                         status="completed",
                         grade="supported",
-                        evidence=(row.support,),
+                        evidence=(text_support(row.support),),
                     ),
                 ),
             )

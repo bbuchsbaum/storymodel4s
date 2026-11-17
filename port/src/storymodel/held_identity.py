@@ -6,8 +6,17 @@ from pydantic import Field, model_validator
 
 from .attribution import AttributionResult, resolve_context_holders, verify_attribution
 from .identity import MentionAnnotation, OpenIdentityReason
-from .model import Identified, Model, Name, State, Support, _holder_scope, _validate_instance
-from .rich_account import SupportedAccount, validate_supported_account
+from .model import (
+    Identified,
+    Model,
+    Name,
+    State,
+    Support,
+    _holder_scope,
+    _validate_instance,
+    text_evidence,
+)
+from .rich_account import SupportedAccount, require_text_account
 from .serialization import strict_json
 
 HeldIdentityReason = Literal[
@@ -87,7 +96,7 @@ def resolve_attributed_identity(
     to the nearest held ancestor; an unresolved held frame stops that lookup. Multiple
     placements do not license choosing a deepest, nearest or most convenient placement.
     """
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     checked = (
         resolve_context_holders(account, identity_annotations, holder_proposals)
         if attribution is None
@@ -210,7 +219,7 @@ def attributed_identity_roles(
     result: AttributedIdentityResult,
 ) -> tuple[AttributedIdentityRole, ...]:
     """Consume final identity for every event/state role without rewriting the account graph."""
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     checked = verify_attributed_identity(account, identity_annotations, holder_proposals, result)
     identities = {m.mention: m for m in checked.mentions}
     return tuple(
@@ -220,7 +229,7 @@ def attributed_identity_roles(
             context=s.context,
             mention=p.entity,
             role=p.role,
-            evidence=p.evidence,
+            evidence=text_evidence(p.evidence),
             identity=identities[p.entity],
         )
         for s in account._situations()

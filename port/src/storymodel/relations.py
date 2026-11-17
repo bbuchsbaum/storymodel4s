@@ -22,8 +22,14 @@ from .model import (
     State,
     Support,
     _validate_instance,
+    text_evidence,
 )
-from .rich_account import RichAccount, SupportedAccount, validate_supported_account
+from .rich_account import (
+    RichAccount,
+    SupportedAccount,
+    require_text_account,
+    validate_supported_account,
+)
 from .serialization import canonical, digest, strict_json
 
 RECIPE = "event-relation-admission/v1"
@@ -132,7 +138,7 @@ def admit_relations(value: SupportedAccount, raw: str) -> RelationOutput:
     receipt with the original account. Quotes establish support identity, not causal or
     temporal entailment. Processing completeness never asserts absence of unproposed edges.
     """
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     account_sha = digest(account.model_dump(mode="json"))
     response_sha = sha256(raw.encode()).hexdigest()
     proposal_class = (
@@ -273,7 +279,7 @@ def relation_table(
     value: SupportedAccount,
 ) -> tuple[RelationRow, ...] | tuple[RichRelationRow, ...]:
     """Return Python-derived rows for notebooks or inspection; do not infer additional edges."""
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     situations = {s.id: s for s in account._situations()}
     documents = {d.id: d for d in account.documents}
     rows = []
@@ -289,7 +295,7 @@ def relation_table(
             target_context=right.context,
             evidence=tuple(
                 RelationQuote(document=e.document, span=s, text=s.slice(documents[e.document].text))
-                for e in r.evidence
+                for e in text_evidence(r.evidence)
                 for s in e.spans
             ),
         )

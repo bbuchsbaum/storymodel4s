@@ -32,8 +32,8 @@ def test_algorithms_validate_original_input_once_before_hashing(monkeypatch):
 
     account = resolve_extraction(example_request(), example_proposal()).account
     for module, operation, validator in (
-        (analysis, project, "validate_supported_account"),
-        (alignment, align_account, "validate_supported_account"),
+        (analysis, project, "require_text_account"),
+        (alignment, align_account, "require_text_account"),
     ):
         original = getattr(module, validator)
         inputs = []

@@ -21,8 +21,9 @@ from .model import (
     Support,
     _validate_instance,
     contained_in,
+    text_support,
 )
-from .rich_account import RichAccount, validate_rich_account
+from .rich_account import RichAccount, require_text_account, validate_rich_account
 from .serialization import canonical, digest, strict_json
 
 RECIPE: Literal["recorded-detail-admission/v1"] = "recorded-detail-admission/v1"
@@ -54,14 +55,20 @@ class DetailRequest(Model):
 
 
 def validate_detail_request(value: DetailRequest | str | bytes) -> DetailRequest:
-    if isinstance(value, DetailRequest):
-        return _validate_instance(DetailRequest, value)
-    return DetailRequest.model_validate_json(canonical(strict_json(value)))
+    request = (
+        _validate_instance(DetailRequest, value)
+        if isinstance(value, DetailRequest)
+        else DetailRequest.model_validate_json(canonical(strict_json(value)))
+    )
+    require_text_account(request.account)
+    return request
 
 
 def prepare_details(account: RichAccount, units: tuple[str, ...]) -> DetailRequest:
     """Select recall units for one input-bound detail pass without overwriting prior work."""
-    return DetailRequest(account=validate_rich_account(account), units=units)
+    checked = validate_rich_account(account)
+    require_text_account(checked)
+    return DetailRequest(account=checked, units=units)
 
 
 def detail_request_digest(value: DetailRequest) -> str:
@@ -209,7 +216,7 @@ def admit_details(value: DetailRequest, raw: str) -> DetailAdmissionResult:
                     )
                 )
                 continue
-            document = documents[unit.support.document]
+            document = documents[text_support(unit.support).document]
             admitted = []
             for draft in proposal.details:
                 spans = []

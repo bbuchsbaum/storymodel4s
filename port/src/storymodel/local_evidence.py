@@ -17,8 +17,19 @@ from pydantic import Field, model_validator
 
 from ._decimal_context import computation_context
 from ._lexical import STOPWORDS, lower, stem_set, words
-from .model import Digest, Event, Model, Name, State, Support, _validate_instance, contained_in
-from .rich_account import SupportedAccount, validate_supported_account
+from .model import (
+    Digest,
+    Event,
+    Model,
+    Name,
+    State,
+    Support,
+    _validate_instance,
+    contained_in,
+    text_evidence,
+    text_support,
+)
+from .rich_account import SupportedAccount, require_text_account
 from .sequence import (
     External,
     Facet,
@@ -324,7 +335,7 @@ def _situation_content(
     predicate = full_predicate.split("-")[0] or None
     text = " ".join(
         (
-            _text(situation.evidence, documents),
+            _text(text_evidence(situation.evidence), documents),
             full_predicate.replace("-", " "),
             *(labels[p.entity] for p in situation.participants),
         )
@@ -565,7 +576,7 @@ def derive_local_evidence(
     source: SupportedAccount, recall: SupportedAccount, spec: LocalEvidenceSpec
 ) -> LocalEvidenceResult:
     """Generate local evidence from independent accounts; never alter reference or fidelity."""
-    source, recall = validate_supported_account(source), validate_supported_account(recall)
+    source, recall = require_text_account(source), require_text_account(recall)
     spec = _validate_instance(LocalEvidenceSpec, spec)
     projection = project_source(source, spec.projection)
     if not recall.documents or any(d.side != "recall" for d in recall.documents):
@@ -605,7 +616,7 @@ def derive_local_evidence(
                 key=lambda p: (p[0], tuple(sorted(p[1]))),
             )
         )
-        lemmas = stem_set(_text((segment.support,), source_docs)) | frozenset(
+        lemmas = stem_set(_text((text_support(segment.support),), source_docs)) | frozenset(
             token for _, names in participants for name in names for token in stem_set(name)
         )
         targets[segment.id] = _Content(None, participants, "narrated", "unknown", "unknown", lemmas)
@@ -621,10 +632,11 @@ def derive_local_evidence(
     recall_contexts: dict[str, str] = {c.id: c.kind for c in recall.contexts}
     by_document: dict[str, list[tuple[int, str]]] = defaultdict(list)
     for situation_id, item in recall_situations.items():
-        documents = {s.document for s in item.evidence}
+        evidence = text_evidence(item.evidence)
+        documents = {s.document for s in evidence}
         if len(documents) == 1:
             by_document[next(iter(documents))].append(
-                (min(p.start for s in item.evidence for p in s.spans), situation_id)
+                (min(p.start for s in evidence for p in s.spans), situation_id)
             )
     for entries in by_document.values():
         entries.sort()
@@ -650,9 +662,10 @@ def derive_local_evidence(
             ):
                 raise ValueError("selected situation must have all evidence within its recall unit")
         elif selected.content == "auto":
-            entries = by_document.get(unit.support.document, [])
-            first = bisect_left(entries, (unit.support.spans[0].start, ""))
-            last = bisect_left(entries, (unit.support.spans[-1].end, ""))
+            support = text_support(unit.support)
+            entries = by_document.get(support.document, [])
+            first = bisect_left(entries, (support.spans[0].start, ""))
+            last = bisect_left(entries, (support.spans[-1].end, ""))
             available = [
                 recall_situations[key]
                 for _, key in entries[first:last]
@@ -663,7 +676,7 @@ def derive_local_evidence(
                     "several situations fit recall unit; select one or use text-only content"
                 )
             situation = available[0] if available else None
-        unit_text = _text((unit.support,), recall_docs)
+        unit_text = _text((text_support(unit.support),), recall_docs)
         content = (
             _situation_content(situation, recall_labels, recall_contexts, recall_docs)
             if situation is not None

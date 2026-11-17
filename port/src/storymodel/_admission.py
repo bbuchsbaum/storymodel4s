@@ -19,6 +19,7 @@ from .model import (
     State,
     Support,
     Unit,
+    text_support,
 )
 
 ROOT = "narrated"
@@ -171,7 +172,7 @@ def admit_graph(
     state_proposals_input: tuple[StateProposal, ...] = (),
 ) -> AdmittedGraph:
     """Admit one row/unit's local graph with exact evidence and declared attribution scopes."""
-    unit_span = unit.support.spans[0]
+    unit_span = text_support(unit.support).spans[0]
 
     def evidence(quote: Quote, parent: Span = unit_span) -> Support:
         if not _inside(quote.span, parent):

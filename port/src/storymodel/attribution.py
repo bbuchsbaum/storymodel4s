@@ -18,8 +18,9 @@ from .model import (
     _has_holder,
     _validate_instance,
     contained_in,
+    text_evidence,
 )
-from .rich_account import SupportedAccount, validate_supported_account
+from .rich_account import SupportedAccount, require_text_account
 from .serialization import canonical, digest, strict_json
 
 
@@ -113,7 +114,7 @@ def resolve_context_holders(
     validates evidence ownership, not semantic entailment or automatic speaker discovery.
     Invalid proposals refuse the batch; omitted contexts remain explicitly unattempted.
     """
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     account_sha = digest(account.model_dump(mode="json"))
     supplied = HolderProposals.model_validate_json(canonical(strict_json(proposals)))
     if supplied.account_sha256 != account_sha:
@@ -128,12 +129,13 @@ def resolve_context_holders(
             raise ValueError("holder proposal requires an existing holder-bearing context")
         if supplied_proposal.status != "completed":
             continue
-        context_documents = {support.document for support in context.evidence}
+        context_evidence = text_evidence(context.evidence)
+        context_documents = {support.document for support in context_evidence}
         if len(context_documents) != 1:
             raise ValueError("text attribution requires a context in exactly one document")
         document = documents[next(iter(context_documents))]
         for support in supplied_proposal.evidence:
-            if not contained_in(support, context.evidence):
+            if not contained_in(support, context_evidence):
                 raise ValueError("attribution evidence lies outside its context evidence")
             for span in support.spans:
                 span.slice(document.text)
@@ -228,7 +230,7 @@ def attribution_table(
     result: AttributionResult,
 ) -> tuple[AttributedSituation, ...]:
     """Inspect every event/state with its verified holder without promoting held claims."""
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     checked = verify_attribution(account, identity_annotations, proposals, result)
     contexts = {c.id: c for c in account.contexts}
     holders = {h.context: h for h in checked.holders}

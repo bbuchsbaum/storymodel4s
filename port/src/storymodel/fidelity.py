@@ -21,8 +21,9 @@ from .model import (
     Unit,
     _validate_instance,
     contained_in,
+    text_support,
 )
-from .rich_account import SupportedAccount, validate_supported_account
+from .rich_account import SupportedAccount, require_text_account, validate_supported_account
 from .serialization import canonical, digest, strict_json
 
 RECIPE: Literal["unit-only-conditional-fidelity/v1"] = "unit-only-conditional-fidelity/v1"
@@ -145,7 +146,7 @@ class FidelityRequest(Model):
         unit = next((u for u in self.account.units if u.id == self.unit), None)
         if unit is None or unit.kind != "recall":
             raise ValueError("fidelity requires an existing recall unit")
-        if len(unit.support.spans) != 1:
+        if len(text_support(unit.support).spans) != 1:
             raise ValueError("unit-only fidelity v1 requires contiguous recall unit support")
         questions = _questions(self)
         if not questions:
@@ -160,9 +161,13 @@ class FidelityRequest(Model):
 
 def validate_fidelity_request(value: FidelityRequest | str | bytes) -> FidelityRequest:
     """Revalidate nested relationships before prompt construction or admission."""
-    if isinstance(value, FidelityRequest):
-        return _validate_instance(FidelityRequest, value)
-    return FidelityRequest.model_validate_json(canonical(strict_json(value)))
+    request = (
+        _validate_instance(FidelityRequest, value)
+        if isinstance(value, FidelityRequest)
+        else FidelityRequest.model_validate_json(canonical(strict_json(value)))
+    )
+    require_text_account(request.account)
+    return request
 
 
 def prepare_fidelity(
@@ -173,7 +178,7 @@ def prepare_fidelity(
 ) -> FidelityRequest:
     """Select only absent/pending grades; references and other assessment statuses stay fixed."""
     return FidelityRequest(
-        account=validate_supported_account(account), unit=unit, interpretation=interpretation
+        account=require_text_account(account), unit=unit, interpretation=interpretation
     )
 
 
@@ -195,8 +200,9 @@ def fidelity_prompt(value: FidelityRequest) -> str:
     request = validate_fidelity_request(value)
     account = request.account
     unit = next(u for u in account.units if u.id == request.unit)
-    document = next(d for d in account.documents if d.id == unit.support.document)
-    extent = unit.support.spans[0]
+    support = text_support(unit.support)
+    document = next(d for d in account.documents if d.id == support.document)
+    extent = support.spans[0]
     payload = {
         "recipe": RECIPE,
         "interpretation": request.interpretation,

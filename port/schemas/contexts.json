@@ -1,18 +1,50 @@
 {
   "extended_context": {
     "$defs": {
+      "PlaybackSupport": {
+        "additionalProperties": false,
+        "description": "Canonical interval union plus explicit points on one complete media-source identity.",
+        "properties": {
+          "intervals": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/TickInterval"
+            },
+            "title": "Intervals",
+            "type": "array"
+          },
+          "points": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "PlaybackSupport",
+        "type": "object"
+      },
       "Span": {
         "additionalProperties": false,
         "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
           "end": {
             "minimum": 0,
             "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
             "type": "integer"
           }
         },
@@ -47,22 +79,49 @@
         ],
         "title": "Support",
         "type": "object"
+      },
+      "TickInterval": {
+        "additionalProperties": false,
+        "description": "A positive half-open native interval; integer strings survive JSON without rounding.",
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "TickInterval",
+        "type": "object"
       }
     },
     "additionalProperties": false,
     "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
     "properties": {
+      "evidence": {
+        "default": [],
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Support"
+            },
+            {
+              "$ref": "#/$defs/PlaybackSupport"
+            }
+          ]
+        },
+        "title": "Evidence",
+        "type": "array"
+      },
       "id": {
         "default": "",
         "title": "Id",
-        "type": "string"
-      },
-      "side": {
-        "enum": [
-          "source",
-          "recall"
-        ],
-        "title": "Side",
         "type": "string"
       },
       "kind": {
@@ -88,13 +147,13 @@
         "default": null,
         "title": "Parent"
       },
-      "evidence": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/Support"
-        },
-        "title": "Evidence",
-        "type": "array"
+      "side": {
+        "enum": [
+          "source",
+          "recall"
+        ],
+        "title": "Side",
+        "type": "string"
       }
     },
     "required": [
@@ -130,14 +189,14 @@
         "additionalProperties": false,
         "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
           "end": {
             "minimum": 0,
             "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
             "type": "integer"
           }
         },
@@ -152,6 +211,9 @@
     "additionalProperties": false,
     "description": "V2 construction adds explicit mental and holderless frames with the same scope contract.",
     "properties": {
+      "cue": {
+        "$ref": "#/$defs/Quote"
+      },
       "key": {
         "minLength": 1,
         "title": "Key",
@@ -173,9 +235,6 @@
         "title": "Parent",
         "type": "string"
       },
-      "cue": {
-        "$ref": "#/$defs/Quote"
-      },
       "scope": {
         "$ref": "#/$defs/Quote"
       }
@@ -190,471 +249,18 @@
     "title": "ExtendedContextProposal",
     "type": "object"
   },
-  "row_v2": {
-    "$defs": {
-      "CircumstanceProposal": {
-        "additionalProperties": false,
-        "description": "A literal time or manner phrase attached to one local state or event key.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "situation": {
-            "minLength": 1,
-            "title": "Situation",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "time",
-              "manner"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "situation",
-          "kind",
-          "evidence"
-        ],
-        "title": "CircumstanceProposal",
-        "type": "object"
-      },
-      "ContextProposal": {
-        "additionalProperties": false,
-        "description": "Attribution evidence and content scope are different supports.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "reported",
-              "believed",
-              "intended"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "parent": {
-            "minLength": 1,
-            "title": "Parent",
-            "type": "string"
-          },
-          "cue": {
-            "$ref": "#/$defs/Quote"
-          },
-          "scope": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "kind",
-          "parent",
-          "cue",
-          "scope"
-        ],
-        "title": "ContextProposal",
-        "type": "object"
-      },
-      "EntityProposal": {
-        "additionalProperties": false,
-        "description": "One local mention; no source identity or cross-unit coreference is asserted.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "mention": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "mention"
-        ],
-        "title": "EntityProposal",
-        "type": "object"
-      },
-      "EventProposal": {
-        "additionalProperties": false,
-        "description": "An extractive predicate in an explicitly named context.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "context": {
-            "minLength": 1,
-            "title": "Context",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          },
-          "predicate": {
-            "$ref": "#/$defs/Quote"
-          },
-          "participants": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/RoleProposal"
-            },
-            "title": "Participants",
-            "type": "array"
-          }
-        },
-        "required": [
-          "key",
-          "context",
-          "evidence",
-          "predicate"
-        ],
-        "title": "EventProposal",
-        "type": "object"
-      },
-      "ExtendedContextProposal": {
-        "additionalProperties": false,
-        "description": "V2 construction adds explicit mental and holderless frames with the same scope contract.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "desire",
-              "memory",
-              "imagination",
-              "hypothetical",
-              "counterfactual"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "parent": {
-            "minLength": 1,
-            "title": "Parent",
-            "type": "string"
-          },
-          "cue": {
-            "$ref": "#/$defs/Quote"
-          },
-          "scope": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "kind",
-          "parent",
-          "cue",
-          "scope"
-        ],
-        "title": "ExtendedContextProposal",
-        "type": "object"
-      },
-      "Quote": {
-        "additionalProperties": false,
-        "description": "Exact canonical UTF-16 evidence; the resolver checks the text independently.",
-        "properties": {
-          "span": {
-            "$ref": "#/$defs/Span"
-          },
-          "text": {
-            "minLength": 1,
-            "title": "Text",
-            "type": "string"
-          }
-        },
-        "required": [
-          "span",
-          "text"
-        ],
-        "title": "Quote",
-        "type": "object"
-      },
-      "RichUnresolvedClaim": {
-        "additionalProperties": false,
-        "description": "Rich construction abstains about new families without widening legacy wire contracts.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "entity",
-              "event",
-              "state",
-              "circumstance",
-              "detail",
-              "context",
-              "role"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "reason": {
-            "minLength": 1,
-            "title": "Reason",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "kind",
-          "reason",
-          "evidence"
-        ],
-        "title": "RichUnresolvedClaim",
-        "type": "object"
-      },
-      "RoleProposal": {
-        "additionalProperties": false,
-        "description": "A proposed typed role of a local entity in an event.",
-        "properties": {
-          "entity": {
-            "minLength": 1,
-            "title": "Entity",
-            "type": "string"
-          },
-          "role": {
-            "enum": [
-              "agent",
-              "patient",
-              "speaker",
-              "recipient",
-              "experiencer",
-              "location"
-            ],
-            "title": "Role",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "entity",
-          "role",
-          "evidence"
-        ],
-        "title": "RoleProposal",
-        "type": "object"
-      },
-      "Span": {
-        "additionalProperties": false,
-        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
-        "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
-          "end": {
-            "minimum": 0,
-            "title": "End",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "start",
-          "end"
-        ],
-        "title": "Span",
-        "type": "object"
-      },
-      "StateProposal": {
-        "additionalProperties": false,
-        "description": "A contextual state preserves explicit unknown polarity and modality.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "context": {
-            "minLength": 1,
-            "title": "Context",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          },
-          "predicate": {
-            "$ref": "#/$defs/Quote"
-          },
-          "participants": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/RoleProposal"
-            },
-            "title": "Participants",
-            "type": "array"
-          },
-          "polarity": {
-            "default": "unknown",
-            "enum": [
-              "positive",
-              "negative",
-              "unknown"
-            ],
-            "title": "Polarity",
-            "type": "string"
-          },
-          "modality": {
-            "default": "unknown",
-            "enum": [
-              "asserted",
-              "possible",
-              "probable",
-              "necessary",
-              "intended",
-              "desired",
-              "counterfactual",
-              "reported",
-              "unknown"
-            ],
-            "title": "Modality",
-            "type": "string"
-          }
-        },
-        "required": [
-          "key",
-          "context",
-          "evidence",
-          "predicate"
-        ],
-        "title": "StateProposal",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "description": "The full context vocabulary uses the same atomic row and scope admission rules.",
-    "properties": {
-      "row": {
-        "minLength": 1,
-        "title": "Row",
-        "type": "string"
-      },
-      "status": {
-        "enum": [
-          "completed",
-          "unsupported",
-          "not-attempted",
-          "failed",
-          "search-limited"
-        ],
-        "title": "Status",
-        "type": "string"
-      },
-      "reason": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "title": "Reason"
-      },
-      "contexts": {
-        "default": [],
-        "items": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/ContextProposal"
-            },
-            {
-              "$ref": "#/$defs/ExtendedContextProposal"
-            }
-          ]
-        },
-        "title": "Contexts",
-        "type": "array"
-      },
-      "entities": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/EntityProposal"
-        },
-        "title": "Entities",
-        "type": "array"
-      },
-      "events": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/EventProposal"
-        },
-        "title": "Events",
-        "type": "array"
-      },
-      "states": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/StateProposal"
-        },
-        "title": "States",
-        "type": "array"
-      },
-      "circumstances": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/CircumstanceProposal"
-        },
-        "title": "Circumstances",
-        "type": "array"
-      },
-      "unresolved": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/RichUnresolvedClaim"
-        },
-        "title": "Unresolved",
-        "type": "array"
-      }
-    },
-    "required": [
-      "row",
-      "status"
-    ],
-    "title": "RichRowProposalV2",
-    "type": "object"
-  },
   "proposal_v2": {
     "$defs": {
       "CircumstanceProposal": {
         "additionalProperties": false,
         "description": "A literal time or manner phrase attached to one local state or event key.",
         "properties": {
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
           "key": {
             "minLength": 1,
             "title": "Key",
-            "type": "string"
-          },
-          "situation": {
-            "minLength": 1,
-            "title": "Situation",
             "type": "string"
           },
           "kind": {
@@ -665,8 +271,10 @@
             "title": "Kind",
             "type": "string"
           },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
+          "situation": {
+            "minLength": 1,
+            "title": "Situation",
+            "type": "string"
           }
         },
         "required": [
@@ -682,6 +290,9 @@
         "additionalProperties": false,
         "description": "Attribution evidence and content scope are different supports.",
         "properties": {
+          "cue": {
+            "$ref": "#/$defs/Quote"
+          },
           "key": {
             "minLength": 1,
             "title": "Key",
@@ -700,9 +311,6 @@
             "minLength": 1,
             "title": "Parent",
             "type": "string"
-          },
-          "cue": {
-            "$ref": "#/$defs/Quote"
           },
           "scope": {
             "$ref": "#/$defs/Quote"
@@ -742,11 +350,6 @@
         "additionalProperties": false,
         "description": "An extractive predicate in an explicitly named context.",
         "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
           "context": {
             "minLength": 1,
             "title": "Context",
@@ -755,8 +358,10 @@
           "evidence": {
             "$ref": "#/$defs/Quote"
           },
-          "predicate": {
-            "$ref": "#/$defs/Quote"
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
           },
           "participants": {
             "default": [],
@@ -765,6 +370,9 @@
             },
             "title": "Participants",
             "type": "array"
+          },
+          "predicate": {
+            "$ref": "#/$defs/Quote"
           }
         },
         "required": [
@@ -780,6 +388,9 @@
         "additionalProperties": false,
         "description": "V2 construction adds explicit mental and holderless frames with the same scope contract.",
         "properties": {
+          "cue": {
+            "$ref": "#/$defs/Quote"
+          },
           "key": {
             "minLength": 1,
             "title": "Key",
@@ -800,9 +411,6 @@
             "minLength": 1,
             "title": "Parent",
             "type": "string"
-          },
-          "cue": {
-            "$ref": "#/$defs/Quote"
           },
           "scope": {
             "$ref": "#/$defs/Quote"
@@ -842,33 +450,13 @@
         "additionalProperties": false,
         "description": "The full context vocabulary uses the same atomic row and scope admission rules.",
         "properties": {
-          "row": {
-            "minLength": 1,
-            "title": "Row",
-            "type": "string"
-          },
-          "status": {
-            "enum": [
-              "completed",
-              "unsupported",
-              "not-attempted",
-              "failed",
-              "search-limited"
-            ],
-            "title": "Status",
-            "type": "string"
-          },
-          "reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Reason"
+          "circumstances": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/CircumstanceProposal"
+            },
+            "title": "Circumstances",
+            "type": "array"
           },
           "contexts": {
             "default": [],
@@ -901,6 +489,23 @@
             "title": "Events",
             "type": "array"
           },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          },
+          "row": {
+            "minLength": 1,
+            "title": "Row",
+            "type": "string"
+          },
           "states": {
             "default": [],
             "items": {
@@ -909,13 +514,16 @@
             "title": "States",
             "type": "array"
           },
-          "circumstances": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/CircumstanceProposal"
-            },
-            "title": "Circumstances",
-            "type": "array"
+          "status": {
+            "enum": [
+              "completed",
+              "unsupported",
+              "not-attempted",
+              "failed",
+              "search-limited"
+            ],
+            "title": "Status",
+            "type": "string"
           },
           "unresolved": {
             "default": [],
@@ -937,6 +545,9 @@
         "additionalProperties": false,
         "description": "Rich construction abstains about new families without widening legacy wire contracts.",
         "properties": {
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
           "key": {
             "minLength": 1,
             "title": "Key",
@@ -959,9 +570,6 @@
             "minLength": 1,
             "title": "Reason",
             "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
           }
         },
         "required": [
@@ -982,6 +590,9 @@
             "title": "Entity",
             "type": "string"
           },
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
           "role": {
             "enum": [
               "agent",
@@ -993,9 +604,6 @@
             ],
             "title": "Role",
             "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
           }
         },
         "required": [
@@ -1010,14 +618,14 @@
         "additionalProperties": false,
         "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
           "end": {
             "minimum": 0,
             "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
             "type": "integer"
           }
         },
@@ -1032,11 +640,6 @@
         "additionalProperties": false,
         "description": "A contextual state preserves explicit unknown polarity and modality.",
         "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
           "context": {
             "minLength": 1,
             "title": "Context",
@@ -1045,8 +648,26 @@
           "evidence": {
             "$ref": "#/$defs/Quote"
           },
-          "predicate": {
-            "$ref": "#/$defs/Quote"
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "modality": {
+            "default": "unknown",
+            "enum": [
+              "asserted",
+              "possible",
+              "probable",
+              "necessary",
+              "intended",
+              "desired",
+              "counterfactual",
+              "reported",
+              "unknown"
+            ],
+            "title": "Modality",
+            "type": "string"
           },
           "participants": {
             "default": [],
@@ -1066,21 +687,8 @@
             "title": "Polarity",
             "type": "string"
           },
-          "modality": {
-            "default": "unknown",
-            "enum": [
-              "asserted",
-              "possible",
-              "probable",
-              "necessary",
-              "intended",
-              "desired",
-              "counterfactual",
-              "reported",
-              "unknown"
-            ],
-            "title": "Modality",
-            "type": "string"
+          "predicate": {
+            "$ref": "#/$defs/Quote"
           }
         },
         "required": [
@@ -1096,17 +704,17 @@
     "additionalProperties": false,
     "description": "Explicit v2 proposals include additional held and holderless context families.",
     "properties": {
-      "schema_version": {
-        "const": "storymodel.rich-construction-proposal/v2",
-        "title": "Schema Version",
-        "type": "string"
-      },
       "rows": {
         "items": {
           "$ref": "#/$defs/RichRowProposalV2"
         },
         "title": "Rows",
         "type": "array"
+      },
+      "schema_version": {
+        "const": "storymodel.rich-construction-proposal/v2",
+        "title": "Schema Version",
+        "type": "string"
       }
     },
     "required": [
@@ -1114,6 +722,457 @@
       "rows"
     ],
     "title": "RichConstructionProposalV2",
+    "type": "object"
+  },
+  "row_v2": {
+    "$defs": {
+      "CircumstanceProposal": {
+        "additionalProperties": false,
+        "description": "A literal time or manner phrase attached to one local state or event key.",
+        "properties": {
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "time",
+              "manner"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "situation": {
+            "minLength": 1,
+            "title": "Situation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "situation",
+          "kind",
+          "evidence"
+        ],
+        "title": "CircumstanceProposal",
+        "type": "object"
+      },
+      "ContextProposal": {
+        "additionalProperties": false,
+        "description": "Attribution evidence and content scope are different supports.",
+        "properties": {
+          "cue": {
+            "$ref": "#/$defs/Quote"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "reported",
+              "believed",
+              "intended"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "minLength": 1,
+            "title": "Parent",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "parent",
+          "cue",
+          "scope"
+        ],
+        "title": "ContextProposal",
+        "type": "object"
+      },
+      "EntityProposal": {
+        "additionalProperties": false,
+        "description": "One local mention; no source identity or cross-unit coreference is asserted.",
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "mention": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "mention"
+        ],
+        "title": "EntityProposal",
+        "type": "object"
+      },
+      "EventProposal": {
+        "additionalProperties": false,
+        "description": "An extractive predicate in an explicitly named context.",
+        "properties": {
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "participants": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/RoleProposal"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "predicate": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "context",
+          "evidence",
+          "predicate"
+        ],
+        "title": "EventProposal",
+        "type": "object"
+      },
+      "ExtendedContextProposal": {
+        "additionalProperties": false,
+        "description": "V2 construction adds explicit mental and holderless frames with the same scope contract.",
+        "properties": {
+          "cue": {
+            "$ref": "#/$defs/Quote"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "desire",
+              "memory",
+              "imagination",
+              "hypothetical",
+              "counterfactual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "minLength": 1,
+            "title": "Parent",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "parent",
+          "cue",
+          "scope"
+        ],
+        "title": "ExtendedContextProposal",
+        "type": "object"
+      },
+      "Quote": {
+        "additionalProperties": false,
+        "description": "Exact canonical UTF-16 evidence; the resolver checks the text independently.",
+        "properties": {
+          "span": {
+            "$ref": "#/$defs/Span"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "span",
+          "text"
+        ],
+        "title": "Quote",
+        "type": "object"
+      },
+      "RichUnresolvedClaim": {
+        "additionalProperties": false,
+        "description": "Rich construction abstains about new families without widening legacy wire contracts.",
+        "properties": {
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "entity",
+              "event",
+              "state",
+              "circumstance",
+              "detail",
+              "context",
+              "role"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "reason",
+          "evidence"
+        ],
+        "title": "RichUnresolvedClaim",
+        "type": "object"
+      },
+      "RoleProposal": {
+        "additionalProperties": false,
+        "description": "A proposed typed role of a local entity in an event.",
+        "properties": {
+          "entity": {
+            "minLength": 1,
+            "title": "Entity",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
+          "role": {
+            "enum": [
+              "agent",
+              "patient",
+              "speaker",
+              "recipient",
+              "experiencer",
+              "location"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity",
+          "role",
+          "evidence"
+        ],
+        "title": "RoleProposal",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "StateProposal": {
+        "additionalProperties": false,
+        "description": "A contextual state preserves explicit unknown polarity and modality.",
+        "properties": {
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "modality": {
+            "default": "unknown",
+            "enum": [
+              "asserted",
+              "possible",
+              "probable",
+              "necessary",
+              "intended",
+              "desired",
+              "counterfactual",
+              "reported",
+              "unknown"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "participants": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/RoleProposal"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "polarity": {
+            "default": "unknown",
+            "enum": [
+              "positive",
+              "negative",
+              "unknown"
+            ],
+            "title": "Polarity",
+            "type": "string"
+          },
+          "predicate": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "context",
+          "evidence",
+          "predicate"
+        ],
+        "title": "StateProposal",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "The full context vocabulary uses the same atomic row and scope admission rules.",
+    "properties": {
+      "circumstances": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/CircumstanceProposal"
+        },
+        "title": "Circumstances",
+        "type": "array"
+      },
+      "contexts": {
+        "default": [],
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContextProposal"
+            },
+            {
+              "$ref": "#/$defs/ExtendedContextProposal"
+            }
+          ]
+        },
+        "title": "Contexts",
+        "type": "array"
+      },
+      "entities": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/EntityProposal"
+        },
+        "title": "Entities",
+        "type": "array"
+      },
+      "events": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/EventProposal"
+        },
+        "title": "Events",
+        "type": "array"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      },
+      "row": {
+        "minLength": 1,
+        "title": "Row",
+        "type": "string"
+      },
+      "states": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/StateProposal"
+        },
+        "title": "States",
+        "type": "array"
+      },
+      "status": {
+        "enum": [
+          "completed",
+          "unsupported",
+          "not-attempted",
+          "failed",
+          "search-limited"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "unresolved": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/RichUnresolvedClaim"
+        },
+        "title": "Unresolved",
+        "type": "array"
+      }
+    },
+    "required": [
+      "row",
+      "status"
+    ],
+    "title": "RichRowProposalV2",
     "type": "object"
   }
 }

@@ -78,6 +78,21 @@ from .organization import (
     verify_account_organization,
     verify_organization_readout,
 )
+from .playback import MediaSource, TickInterval
+from .playback_construction import (
+    PlaybackObservation,
+    SituationPlaybackReadout,
+    prepare_playback,
+    situation_playback,
+    verify_situation_playback,
+)
+from .playback_workflow import (
+    PlaybackRecording,
+    import_playback,
+    playback_prompt,
+    read_playback_request,
+    replay_playback,
+)
 from .reconstruction import (
     AccountReconstructionResult,
     ReconstructionSpec,
@@ -204,6 +219,41 @@ def main(argv: list[str] | None = None) -> int:
         "--full-contexts", action="store_true", help="include mental and holderless contexts"
     )
     rich_prepare.add_argument("--output")
+    native_prepare = commands.add_parser(
+        "prepare-playback", help="prepare supplied native observation envelopes"
+    )
+    native_prepare.add_argument("source")
+    native_prepare.add_argument("observations")
+    native_prepare.add_argument("--allow-export", action="store_true")
+    native_prepare.add_argument("--output")
+    native_prompt = commands.add_parser(
+        "playback-prompt", help="render native observation construction contract"
+    )
+    native_prompt.add_argument("request")
+    native_prompt.add_argument("--output")
+    native_import = commands.add_parser(
+        "import-playback", help="record supplied native graph proposals"
+    )
+    native_import.add_argument("request")
+    native_import.add_argument("reply")
+    native_import.add_argument("recording")
+    native_replay = commands.add_parser("replay-playback", help="construct a native graph offline")
+    native_replay.add_argument("request")
+    native_replay.add_argument("recording")
+    native_replay.add_argument("--expected-import-sha256")
+    native_replay.add_argument("--account-only", action="store_true")
+    native_replay.add_argument("--output")
+    for command in ("situation-playback", "verify-situation-playback"):
+        native_readout = commands.add_parser(
+            command, help="measure or verify exact native situation support"
+        )
+        native_readout.add_argument("account")
+        native_readout.add_argument("situation")
+        native_readout.add_argument("source")
+        native_readout.add_argument("--bins")
+        if command == "verify-situation-playback":
+            native_readout.add_argument("result")
+        native_readout.add_argument("--output")
     rich_contract = commands.add_parser("rich-prompt", help="render the rich construction contract")
     rich_contract.add_argument("request")
     rich_contract.add_argument("--output")
@@ -835,6 +885,79 @@ def main(argv: list[str] | None = None) -> int:
                         mode="json"
                     ),
                     args.output,
+                )
+        elif args.command == "prepare-playback":
+            media_source = MediaSource.model_validate_json(
+                canonical(strict_json(Path(args.source).read_bytes()))
+            )
+            observation_values = strict_json(Path(args.observations).read_bytes())
+            if not isinstance(observation_values, list):
+                raise ValueError("playback observations must be a JSON array")
+            native_request = prepare_playback(
+                media_source,
+                tuple(
+                    PlaybackObservation.model_validate_json(canonical(o))
+                    for o in observation_values
+                ),
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(native_request.model_dump(mode="json"), args.output)
+        elif args.command in ("playback-prompt", "import-playback", "replay-playback"):
+            native_request = read_playback_request(Path(args.request))
+            if native_request.export_permission != "allowed":
+                raise PermissionError("producer denies playback construction export")
+            if args.command == "playback-prompt":
+                emit(strict_json(playback_prompt(native_request)), args.output)
+            elif args.command == "import-playback":
+                native_recording = PlaybackRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_playback(native_request, native_recording, Path(args.recording))
+            else:
+                native_result = replay_playback(
+                    native_request,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                if args.account_only and any(
+                    r.status != "admitted" for r in native_result.resolutions
+                ):
+                    raise ValueError(
+                        "account-only export would hide incomplete playback construction"
+                    )
+                emit(
+                    (native_result.account if args.account_only else native_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
+        elif args.command in ("situation-playback", "verify-situation-playback"):
+            native_account = validate_rich_account(Path(args.account).read_bytes())
+            if (
+                args.command == "situation-playback"
+                and native_account.export_permission != "allowed"
+            ):
+                raise PermissionError("producer denies playback readout export")
+            bin_values = strict_json(Path(args.bins).read_bytes()) if args.bins else []
+            if not isinstance(bin_values, list):
+                raise ValueError("playback bins must be a JSON array")
+            native_bins = tuple(TickInterval.model_validate_json(canonical(b)) for b in bin_values)
+            if args.command == "situation-playback":
+                emit(
+                    situation_playback(
+                        native_account, args.situation, args.source, native_bins
+                    ).model_dump(mode="json"),
+                    args.output,
+                )
+            else:
+                native_saved = SituationPlaybackReadout.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                native_checked = verify_situation_playback(
+                    native_account, args.situation, args.source, native_bins, native_saved
+                )
+                emit(
+                    {"verified": True, "account_sha256": native_checked.account_sha256}, args.output
                 )
         elif args.command == "prepare-rich":
             row_values = strict_json(Path(args.rows).read_bytes())

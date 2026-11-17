@@ -510,3 +510,24 @@ version correlations remain runtime checks. [Contract](contexts.md). Playback, a
 holder acquisition, attribution-aware assessment and other P2–P6 obligations remain owed.
 Earlier gap lists above are historical slice boundaries; this entry closes their context-kind
 gap only. No executed Scala runtime comparison or semantic accuracy is claimed.
+
+## P2 supplied native playback construction (2026-11-17)
+
+Reference: core `source.scala` MediaTime/MediaPoint identities and `support.scala` canonical
+interval/point unions; `document/filmInput.scala` exact observation-envelope containment;
+`story/model.scala` text/film support boundaries. Relevant Scala witnesses include
+`D1bPointSupportSuite`, `D1aSupportSuite`, `D1aEnvelopeAdmissionSuite` and `TemporalSupportSuite`.
+Mote: `bd-01M7MFZVEDNCEGYVD5MCDP92DT`.
+
+Python extends the existing rich graph under v6. `playback_construction.py` admits supplied
+observations without text documents; `playback_workflow.py` records/replays through the existing
+engine; `situation_table` and `situation_playback` consume actual native evidence. Preserve full
+edition/stream/clock identity, discontinuous unions, explicit points, context isolation,
+role-support containment, independent account pairing and complete processing outcomes.
+Exact rational readouts distinguish interval exposure from point observations. Historical
+wire schemas remain in an adapter; text-only consumers refuse native accounts explicitly.
+
+The [example](../examples/playback_workflow.py) reuses one native source across two recorded
+text recalls. [Contract and limits](playback.md). Media-aware identity/assessment, clock maps,
+composition, shots/tracks and acquisition remain owed. Supplied abstract controls do not
+establish audiovisual accuracy, executed Scala parity or completion of P2–P6.

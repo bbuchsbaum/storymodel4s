@@ -1,11 +1,12 @@
 """Explicit rich account versions share graph checks while legacy wire records stay readable."""
 
-from typing import Any, ClassVar, Literal, Self
+from typing import Any, ClassVar, Literal, Self, overload
 
-from pydantic import model_validator
+from pydantic import SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from .model import (
     Account,
+    Document,
     Event,
     Evidence,
     Identified,
@@ -20,6 +21,7 @@ from .model import (
     indexed,
     validate_account,
 )
+from .playback import MediaSource, PlaybackSupport, validate_playback
 from .serialization import canonical, digest, strict_json
 
 
@@ -34,13 +36,32 @@ class Circumstance(Identified):
 
 
 class RichAccount(_AccountFields):
-    """Rich snapshots share one graph; v5 explicitly adds the full context vocabulary to v4."""
+    """One graph: v5 adds context vocabulary; v6 adds native media sources and evidence."""
 
-    schema_version: Literal["storymodel.account/v4", "storymodel.account/v5"] = (
-        "storymodel.account/v4"
-    )
+    schema_version: Literal[
+        "storymodel.account/v4", "storymodel.account/v5", "storymodel.account/v6"
+    ] = "storymodel.account/v4"
     states: tuple[State, ...] = ()
     circumstances: tuple[Circumstance, ...] = ()
+    media_sources: tuple[MediaSource, ...] = ()
+
+    @model_validator(mode="after")
+    def historical_fields(self) -> Self:
+        if self.schema_version != "storymodel.account/v6" and (
+            "media_sources" in self.model_fields_set or self.media_sources
+        ):
+            raise ValueError("media_sources field requires account v6")
+        return self
+
+    @model_serializer(mode="wrap")
+    def wire_fields(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if self.schema_version != "storymodel.account/v6":
+            data.pop("media_sources", None)
+        return data
+
+    def _media_sources(self) -> tuple[MediaSource, ...]:
+        return self.media_sources
 
     def _situations(self) -> tuple[Event | State, ...]:
         return (*self.events, *self.states)
@@ -50,16 +71,25 @@ class RichAccount(_AccountFields):
         indexed(self.circumstances, "circumstance")
         situations = {s.id: s for s in self._situations()}
         docs = {d.id: d for d in self.documents}
+        media = {s.id: s for s in self.media_sources}
         for circumstance in self.circumstances:
             situation = situations.get(circumstance.situation)
             if situation is None:
                 raise ValueError("circumstance requires an existing situation")
             for support in circumstance.evidence:
-                doc = docs.get(support.document)
-                if doc is None or doc.side != situation.side:
-                    raise ValueError("circumstance evidence has a foreign document or side")
-                for span in support.spans:
-                    span.slice(doc.text)
+                if isinstance(support, PlaybackSupport):
+                    if self.schema_version != "storymodel.account/v6":
+                        raise ValueError("playback evidence requires account v6")
+                    source = media.get(support.source)
+                    if source is None or source.side != situation.side:
+                        raise ValueError("circumstance evidence has a foreign media source or side")
+                    validate_playback(source, support)
+                else:
+                    doc = docs.get(support.document)
+                    if doc is None or doc.side != situation.side:
+                        raise ValueError("circumstance evidence has a foreign document or side")
+                    for span in support.spans:
+                        span.slice(doc.text)
                 if not contained_in(support, situation.evidence):
                     raise ValueError("circumstance evidence lies outside its situation")
         return self
@@ -85,9 +115,51 @@ def validate_supported_account(value: SupportedAccount | str | bytes) -> Support
     if not isinstance(parsed, dict):
         raise ValueError("account must be a JSON object")
     raw = canonical(parsed)
-    if parsed.get("schema_version") in ("storymodel.account/v4", "storymodel.account/v5"):
+    if parsed.get("schema_version") in (
+        "storymodel.account/v4",
+        "storymodel.account/v5",
+        "storymodel.account/v6",
+    ):
         return validate_rich_account(raw)
     return validate_account(raw)
+
+
+@overload
+def require_text_account(value: RichAccount) -> RichAccount: ...
+
+
+@overload
+def require_text_account(value: Account) -> Account: ...
+
+
+@overload
+def require_text_account(value: SupportedAccount | str | bytes) -> SupportedAccount: ...
+
+
+def require_text_account(value: SupportedAccount | str | bytes) -> SupportedAccount:
+    """Refuse an unqualified media consumer explicitly instead of stripping native evidence."""
+    account = validate_supported_account(value)
+    if isinstance(account, RichAccount) and account.media_sources:
+        raise ValueError("unsupported modality: this consumer requires a text-only account")
+    return account
+
+
+def account_schema(version: Literal["v4", "v5", "v6"]) -> dict[str, Any]:
+    """Export a declared rich wire version, with historical schemas kept in the adapter."""
+    from ._legacy import legacy_rich_schema
+
+    if version in ("v4", "v5"):
+        return legacy_rich_schema(version)
+    if version != "v6":
+        raise ValueError("unsupported rich account schema version")
+    schema = RichAccount.model_json_schema()
+    schema["properties"]["schema_version"] = {
+        "const": "storymodel.account/v6",
+        "default": "storymodel.account/v6",
+        "title": "Schema Version",
+        "type": "string",
+    }
+    return schema
 
 
 def upgrade_account(value: Account) -> RichAccount:
@@ -108,14 +180,17 @@ def upgrade_account(value: Account) -> RichAccount:
 
 
 def pair_rich_accounts(source: RichAccount, recall: RichAccount) -> RichAccount:
-    """Join independent rich snapshots, preserving every collection and promoting any v5 input."""
+    """Join independent snapshots, preserving collections and selecting the newest input version."""
     left, right = validate_rich_account(source), validate_rich_account(recall)
     for account, side in ((left, "source"), (right, "recall")):
-        if not account.documents or any(d.side != side for d in account.documents):
+        origins: tuple[Document | MediaSource, ...] = (*account.documents, *account.media_sources)
+        if not origins or any(d.side != side for d in origins):
             raise ValueError(f"rich pairing requires a {side}-only account")
     a, b = left.model_dump(mode="json"), right.model_dump(mode="json")
     output: dict[str, Any] = {
-        "schema_version": "storymodel.account/v5"
+        "schema_version": "storymodel.account/v6"
+        if "storymodel.account/v6" in (left.schema_version, right.schema_version)
+        else "storymodel.account/v5"
         if "storymodel.account/v5" in (left.schema_version, right.schema_version)
         else "storymodel.account/v4"
     }
@@ -124,13 +199,22 @@ def pair_rich_accounts(source: RichAccount, recall: RichAccount) -> RichAccount:
     for name in RichAccount.model_fields:
         if name in ("schema_version", "recipe", "export_permission"):
             continue
-        if not isinstance(a[name], list) or not isinstance(b[name], list):
+        if name == "media_sources" and output["schema_version"] != "storymodel.account/v6":
+            continue
+        av, bv = a.get(name, []), b.get(name, [])
+        if not isinstance(av, list) or not isinstance(bv, list):
             raise ValueError(f"rich pairing requires an explicit rule for {name}")
-        output[name] = a[name] + b[name]
+        output[name] = av + bv
+    all_sources: tuple[Document | MediaSource, ...] = (
+        *left.documents,
+        *right.documents,
+        *left.media_sources,
+        *right.media_sources,
+    )
     output["recipe"] = Recipe(
         name="pair-rich-accounts/v1",
         input_sha256=(
-            *(d.sha256 for d in (*left.documents, *right.documents)),
+            *(d.sha256 for d in all_sources),
             digest(a),
             digest(b),
         ),

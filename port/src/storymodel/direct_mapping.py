@@ -31,8 +31,14 @@ from .model import (
     Reference,
     Unit,
     _validate_instance,
+    text_support,
 )
-from .rich_account import RichAccount, SupportedAccount, validate_supported_account
+from .rich_account import (
+    RichAccount,
+    SupportedAccount,
+    require_text_account,
+    validate_supported_account,
+)
 from .serialization import canonical, digest, strict_json
 
 RECIPE = "unit-only-direct-mapping/v1"
@@ -52,7 +58,7 @@ class _MappingRequestFields(Model):
         unit = next((u for u in self.account.units if u.id == self.unit), None)
         if unit is None or unit.kind != "recall":
             raise ValueError("mapping requires an existing recall unit")
-        if len(unit.support.spans) != 1:
+        if len(text_support(unit.support).spans) != 1:
             raise ValueError("unit-only v1 requires contiguous recall unit support")
         if not any(u.kind != "recall" for u in self.account.units):
             raise ValueError("mapping requires a source target catalog")
@@ -100,23 +106,31 @@ def _details(request: _MappingRequestFields) -> tuple[Detail, ...]:
 
 def validate_mapping_request(value: MappingInput | str | bytes) -> MappingInput:
     """Revalidate nested copied objects before generating prompts or changing bindings."""
+    request: MappingInput
     if isinstance(value, RichMappingRequest):
-        return _validate_instance(RichMappingRequest, value)
+        request = _validate_instance(RichMappingRequest, value)
+        require_text_account(request.account)
+        return request
     if isinstance(value, MappingRequest):
-        return _validate_instance(MappingRequest, value)
+        request = _validate_instance(MappingRequest, value)
+        require_text_account(request.account)
+        return request
     parsed = strict_json(value)
     if not isinstance(parsed, dict):
         raise ValueError("mapping request must be a JSON object")
     if parsed.get("schema_version") == "storymodel.mapping-request/v2":
-        return RichMappingRequest.model_validate_json(canonical(parsed))
-    return MappingRequest.model_validate_json(canonical(parsed))
+        request = RichMappingRequest.model_validate_json(canonical(parsed))
+    else:
+        request = MappingRequest.model_validate_json(canonical(parsed))
+    require_text_account(request.account)
+    return request
 
 
 def prepare_mapping(
     account: SupportedAccount, unit: str, *, interpretation: Interpretation = "referent"
 ) -> MappingInput:
     """Prepare one independent unit; existing bindings are excluded and never overwritten."""
-    checked = validate_supported_account(account)
+    checked = require_text_account(account)
     if isinstance(checked, RichAccount):
         return RichMappingRequest(account=checked, unit=unit, interpretation=interpretation)
     return MappingRequest(account=checked, unit=unit, interpretation=interpretation)
@@ -165,8 +179,9 @@ def mapping_prompt(value: MappingInput) -> str:
     request = validate_mapping_request(value)
     account = request.account
     unit = next(u for u in account.units if u.id == request.unit)
-    document = next(d for d in account.documents if d.id == unit.support.document)
-    extent = unit.support.spans[0]
+    support = text_support(unit.support)
+    document = next(d for d in account.documents if d.id == support.document)
+    extent = support.spans[0]
     payload = {
         "recipe": RECIPE,
         "interpretation": request.interpretation,

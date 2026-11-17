@@ -15,8 +15,10 @@ from .model import (
     contained,
     contained_in,
     indexed,
+    text_evidence,
+    text_support,
 )
-from .rich_account import SupportedAccount, validate_supported_account
+from .rich_account import SupportedAccount, require_text_account
 from .sequence import Facet
 from .serialization import canonical, digest, strict_json
 
@@ -56,8 +58,8 @@ class ClaimQuestion(Identified):
 
 def _source_supports(account: SupportedAccount) -> dict[str, tuple[Support, ...]]:
     return {
-        **{u.id: (u.support,) for u in account.units if u.kind != "recall"},
-        **{s.id: s.evidence for s in account._situations() if s.side == "source"},
+        **{u.id: (text_support(u.support),) for u in account.units if u.kind != "recall"},
+        **{s.id: text_evidence(s.evidence) for s in account._situations() if s.side == "source"},
     }
 
 
@@ -87,13 +89,17 @@ def prepare_claim_assessment(
     account: SupportedAccount, questions: tuple[ClaimQuestion, ...]
 ) -> ClaimAssessmentPlan:
     """Declare questions over a checked snapshot without deriving them from extracted claims."""
-    return ClaimAssessmentPlan(account=validate_supported_account(account), questions=questions)
+    return ClaimAssessmentPlan(account=require_text_account(account), questions=questions)
 
 
 def validate_claim_plan(value: ClaimAssessmentPlan | str | bytes) -> ClaimAssessmentPlan:
-    if isinstance(value, ClaimAssessmentPlan):
-        return _validate_instance(ClaimAssessmentPlan, value)
-    return ClaimAssessmentPlan.model_validate_json(canonical(strict_json(value)))
+    plan = (
+        _validate_instance(ClaimAssessmentPlan, value)
+        if isinstance(value, ClaimAssessmentPlan)
+        else ClaimAssessmentPlan.model_validate_json(canonical(strict_json(value)))
+    )
+    require_text_account(plan.account)
+    return plan
 
 
 def _population_digest(plan: ClaimAssessmentPlan) -> str:

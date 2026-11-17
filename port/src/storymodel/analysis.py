@@ -13,8 +13,9 @@ from .model import (
     Unit,
     contained_in,
     digest,
+    text_support,
 )
-from .rich_account import SupportedAccount, validate_supported_account
+from .rich_account import SupportedAccount, require_text_account
 
 Policy = Literal["target-episode-novel-content/v1", "target-event-only/v1"]
 Category = Literal["internal", "external", "unresolved", "excluded"]
@@ -102,7 +103,7 @@ def project(
     source row can still be definitely present despite an unresolved detail elsewhere.
     Rows outside the declared eligible universe are absent from this projection only.
     """
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     if policy not in ("target-episode-novel-content/v1", "target-event-only/v1"):
         raise ValueError("unknown analysis policy")
     units = {u.id: u for u in account.units}
@@ -145,7 +146,7 @@ def project(
                 document=d.id,
                 spans=(Span(start=0, end=len(d.text.encode("utf-16-le")) // 2),),
             ),
-            (u.support for u in account.units if u.kind == "recall"),
+            (text_support(u.support) for u in account.units if u.kind == "recall"),
         )
         for d in recall_documents
     )

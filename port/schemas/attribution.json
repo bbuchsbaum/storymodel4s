@@ -1,152 +1,21 @@
 {
-  "proposal": {
+  "holder": {
     "$defs": {
-      "Span": {
+      "MentionIdentity": {
         "additionalProperties": false,
-        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "description": "One occurrence's identity outcome; open mentions receive no invented referent.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
-          "end": {
-            "minimum": 0,
-            "title": "End",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "start",
-          "end"
-        ],
-        "title": "Span",
-        "type": "object"
-      },
-      "Support": {
-        "additionalProperties": false,
-        "description": "Discontinuous evidence in exactly one named document.",
-        "properties": {
-          "document": {
-            "minLength": 1,
-            "title": "Document",
-            "type": "string"
-          },
-          "spans": {
-            "items": {
-              "$ref": "#/$defs/Span"
-            },
-            "minItems": 1,
-            "title": "Spans",
-            "type": "array"
-          }
-        },
-        "required": [
-          "document",
-          "spans"
-        ],
-        "title": "Support",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "description": "Candidate mention occurrences are interpretations, never caller-assigned referent IDs.",
-    "properties": {
-      "context": {
-        "minLength": 1,
-        "title": "Context",
-        "type": "string"
-      },
-      "status": {
-        "enum": [
-          "completed",
-          "not-attempted",
-          "failed",
-          "unsupported"
-        ],
-        "title": "Status",
-        "type": "string"
-      },
-      "candidates": {
-        "default": [],
-        "items": {
-          "minLength": 1,
-          "type": "string"
-        },
-        "title": "Candidates",
-        "type": "array"
-      },
-      "evidence": {
-        "default": [],
-        "items": {
-          "$ref": "#/$defs/Support"
-        },
-        "title": "Evidence",
-        "type": "array"
-      },
-      "reason": {
-        "anyOf": [
-          {
-            "minLength": 1,
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "title": "Reason"
-      }
-    },
-    "required": [
-      "context",
-      "status"
-    ],
-    "title": "HolderProposal",
-    "type": "object"
-  },
-  "proposals": {
-    "$defs": {
-      "HolderProposal": {
-        "additionalProperties": false,
-        "description": "Candidate mention occurrences are interpretations, never caller-assigned referent IDs.",
-        "properties": {
-          "context": {
-            "minLength": 1,
-            "title": "Context",
-            "type": "string"
-          },
-          "status": {
-            "enum": [
-              "completed",
-              "not-attempted",
-              "failed",
-              "unsupported"
-            ],
-            "title": "Status",
-            "type": "string"
-          },
           "candidates": {
             "default": [],
             "items": {
-              "minLength": 1,
               "type": "string"
             },
             "title": "Candidates",
             "type": "array"
           },
-          "evidence": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/Support"
-            },
-            "title": "Evidence",
-            "type": "array"
-          },
-          "reason": {
+          "explanation": {
             "anyOf": [
               {
-                "minLength": 1,
                 "type": "string"
               },
               {
@@ -154,105 +23,8 @@
               }
             ],
             "default": null,
-            "title": "Reason"
-          }
-        },
-        "required": [
-          "context",
-          "status"
-        ],
-        "title": "HolderProposal",
-        "type": "object"
-      },
-      "Span": {
-        "additionalProperties": false,
-        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
-        "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
+            "title": "Explanation"
           },
-          "end": {
-            "minimum": 0,
-            "title": "End",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "start",
-          "end"
-        ],
-        "title": "Span",
-        "type": "object"
-      },
-      "Support": {
-        "additionalProperties": false,
-        "description": "Discontinuous evidence in exactly one named document.",
-        "properties": {
-          "document": {
-            "minLength": 1,
-            "title": "Document",
-            "type": "string"
-          },
-          "spans": {
-            "items": {
-              "$ref": "#/$defs/Span"
-            },
-            "minItems": 1,
-            "title": "Spans",
-            "type": "array"
-          }
-        },
-        "required": [
-          "document",
-          "spans"
-        ],
-        "title": "Support",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "description": "Recorded attribution interpretations bound to one complete account snapshot.",
-    "properties": {
-      "schema_version": {
-        "const": "storymodel.holder-proposals/v1",
-        "default": "storymodel.holder-proposals/v1",
-        "title": "Schema Version",
-        "type": "string"
-      },
-      "account_sha256": {
-        "pattern": "^[0-9a-f]{64}$",
-        "title": "Account Sha256",
-        "type": "string"
-      },
-      "origin": {
-        "minLength": 1,
-        "title": "Origin",
-        "type": "string"
-      },
-      "contexts": {
-        "items": {
-          "$ref": "#/$defs/HolderProposal"
-        },
-        "title": "Contexts",
-        "type": "array"
-      }
-    },
-    "required": [
-      "account_sha256",
-      "origin",
-      "contexts"
-    ],
-    "title": "HolderProposals",
-    "type": "object"
-  },
-  "holder": {
-    "$defs": {
-      "MentionIdentity": {
-        "additionalProperties": false,
-        "description": "One occurrence's identity outcome; open mentions receive no invented referent.",
-        "properties": {
           "mention": {
             "minLength": 1,
             "title": "Mention",
@@ -266,38 +38,6 @@
             ],
             "title": "Outcome",
             "type": "string"
-          },
-          "referent": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Referent"
-          },
-          "candidates": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Candidates",
-            "type": "array"
-          },
-          "rule": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Rule"
           },
           "reason": {
             "anyOf": [
@@ -327,7 +67,7 @@
             "default": null,
             "title": "Reason"
           },
-          "explanation": {
+          "referent": {
             "anyOf": [
               {
                 "type": "string"
@@ -337,7 +77,19 @@
               }
             ],
             "default": null,
-            "title": "Explanation"
+            "title": "Referent"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rule"
           }
         },
         "required": [
@@ -351,14 +103,14 @@
         "additionalProperties": false,
         "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
           "end": {
             "minimum": 0,
             "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
             "type": "integer"
           }
         },
@@ -398,35 +150,26 @@
     "additionalProperties": false,
     "description": "One holder question separates absent identity, processing gaps and inapplicability.",
     "properties": {
+      "candidates": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/MentionIdentity"
+        },
+        "title": "Candidates",
+        "type": "array"
+      },
       "context": {
         "minLength": 1,
         "title": "Context",
         "type": "string"
       },
-      "status": {
-        "enum": [
-          "named",
-          "unattributed",
-          "not-attempted",
-          "failed",
-          "unsupported",
-          "not-applicable"
-        ],
-        "title": "Status",
-        "type": "string"
-      },
-      "referent": {
-        "anyOf": [
-          {
-            "minLength": 1,
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "title": "Referent"
+      "evidence": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/Support"
+        },
+        "title": "Evidence",
+        "type": "array"
       },
       "gap": {
         "anyOf": [
@@ -445,13 +188,118 @@
         "default": null,
         "title": "Gap"
       },
+      "reason": {
+        "anyOf": [
+          {
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      },
+      "referent": {
+        "anyOf": [
+          {
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Referent"
+      },
+      "status": {
+        "enum": [
+          "named",
+          "unattributed",
+          "not-attempted",
+          "failed",
+          "unsupported",
+          "not-applicable"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "context",
+      "status"
+    ],
+    "title": "ContextHolder",
+    "type": "object"
+  },
+  "proposal": {
+    "$defs": {
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "Support": {
+        "additionalProperties": false,
+        "description": "Discontinuous evidence in exactly one named document.",
+        "properties": {
+          "document": {
+            "minLength": 1,
+            "title": "Document",
+            "type": "string"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/$defs/Span"
+            },
+            "minItems": 1,
+            "title": "Spans",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "spans"
+        ],
+        "title": "Support",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Candidate mention occurrences are interpretations, never caller-assigned referent IDs.",
+    "properties": {
       "candidates": {
         "default": [],
         "items": {
-          "$ref": "#/$defs/MentionIdentity"
+          "minLength": 1,
+          "type": "string"
         },
         "title": "Candidates",
         "type": "array"
+      },
+      "context": {
+        "minLength": 1,
+        "title": "Context",
+        "type": "string"
       },
       "evidence": {
         "default": [],
@@ -473,75 +321,44 @@
         ],
         "default": null,
         "title": "Reason"
+      },
+      "status": {
+        "enum": [
+          "completed",
+          "not-attempted",
+          "failed",
+          "unsupported"
+        ],
+        "title": "Status",
+        "type": "string"
       }
     },
     "required": [
       "context",
       "status"
     ],
-    "title": "ContextHolder",
+    "title": "HolderProposal",
     "type": "object"
   },
-  "result": {
+  "proposals": {
     "$defs": {
-      "ContextHolder": {
+      "HolderProposal": {
         "additionalProperties": false,
-        "description": "One holder question separates absent identity, processing gaps and inapplicability.",
+        "description": "Candidate mention occurrences are interpretations, never caller-assigned referent IDs.",
         "properties": {
+          "candidates": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
           "context": {
             "minLength": 1,
             "title": "Context",
             "type": "string"
-          },
-          "status": {
-            "enum": [
-              "named",
-              "unattributed",
-              "not-attempted",
-              "failed",
-              "unsupported",
-              "not-applicable"
-            ],
-            "title": "Status",
-            "type": "string"
-          },
-          "referent": {
-            "anyOf": [
-              {
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Referent"
-          },
-          "gap": {
-            "anyOf": [
-              {
-                "enum": [
-                  "no-candidate",
-                  "several-candidates",
-                  "unresolved-candidate"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Gap"
-          },
-          "candidates": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/MentionIdentity"
-            },
-            "title": "Candidates",
-            "type": "array"
           },
           "evidence": {
             "default": [],
@@ -563,6 +380,189 @@
             ],
             "default": null,
             "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "not-attempted",
+              "failed",
+              "unsupported"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "context",
+          "status"
+        ],
+        "title": "HolderProposal",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "Support": {
+        "additionalProperties": false,
+        "description": "Discontinuous evidence in exactly one named document.",
+        "properties": {
+          "document": {
+            "minLength": 1,
+            "title": "Document",
+            "type": "string"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/$defs/Span"
+            },
+            "minItems": 1,
+            "title": "Spans",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "spans"
+        ],
+        "title": "Support",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Recorded attribution interpretations bound to one complete account snapshot.",
+    "properties": {
+      "account_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Account Sha256",
+        "type": "string"
+      },
+      "contexts": {
+        "items": {
+          "$ref": "#/$defs/HolderProposal"
+        },
+        "title": "Contexts",
+        "type": "array"
+      },
+      "origin": {
+        "minLength": 1,
+        "title": "Origin",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": "storymodel.holder-proposals/v1",
+        "default": "storymodel.holder-proposals/v1",
+        "title": "Schema Version",
+        "type": "string"
+      }
+    },
+    "required": [
+      "account_sha256",
+      "origin",
+      "contexts"
+    ],
+    "title": "HolderProposals",
+    "type": "object"
+  },
+  "result": {
+    "$defs": {
+      "ContextHolder": {
+        "additionalProperties": false,
+        "description": "One holder question separates absent identity, processing gaps and inapplicability.",
+        "properties": {
+          "candidates": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/MentionIdentity"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "enum": [
+                  "no-candidate",
+                  "several-candidates",
+                  "unresolved-candidate"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Gap"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          },
+          "referent": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Referent"
+          },
+          "status": {
+            "enum": [
+              "named",
+              "unattributed",
+              "not-attempted",
+              "failed",
+              "unsupported",
+              "not-applicable"
+            ],
+            "title": "Status",
+            "type": "string"
           }
         },
         "required": [
@@ -576,37 +576,27 @@
         "additionalProperties": false,
         "description": "Complete identity decisions tied to the graph, raw annotations and text normalization.",
         "properties": {
-          "schema_version": {
-            "const": "storymodel.identity-result/v1",
-            "default": "storymodel.identity-result/v1",
-            "title": "Schema Version",
+          "account_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Account Sha256",
+            "type": "string"
+          },
+          "mentions": {
+            "items": {
+              "$ref": "#/$defs/MentionIdentity"
+            },
+            "title": "Mentions",
+            "type": "array"
+          },
+          "origin": {
+            "minLength": 1,
+            "title": "Origin",
             "type": "string"
           },
           "recipe": {
             "const": "annotated-text-identity/v1",
             "default": "annotated-text-identity/v1",
             "title": "Recipe",
-            "type": "string"
-          },
-          "unicode_version": {
-            "default": "15.0.0",
-            "minLength": 1,
-            "title": "Unicode Version",
-            "type": "string"
-          },
-          "account_sha256": {
-            "pattern": "^[0-9a-f]{64}$",
-            "title": "Account Sha256",
-            "type": "string"
-          },
-          "response_sha256": {
-            "pattern": "^[0-9a-f]{64}$",
-            "title": "Response Sha256",
-            "type": "string"
-          },
-          "origin": {
-            "minLength": 1,
-            "title": "Origin",
             "type": "string"
           },
           "referents": {
@@ -616,12 +606,22 @@
             "title": "Referents",
             "type": "array"
           },
-          "mentions": {
-            "items": {
-              "$ref": "#/$defs/MentionIdentity"
-            },
-            "title": "Mentions",
-            "type": "array"
+          "response_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Response Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "storymodel.identity-result/v1",
+            "default": "storymodel.identity-result/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "unicode_version": {
+            "default": "15.0.0",
+            "minLength": 1,
+            "title": "Unicode Version",
+            "type": "string"
           }
         },
         "required": [
@@ -638,6 +638,26 @@
         "additionalProperties": false,
         "description": "One occurrence's identity outcome; open mentions receive no invented referent.",
         "properties": {
+          "candidates": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Explanation"
+          },
           "mention": {
             "minLength": 1,
             "title": "Mention",
@@ -651,38 +671,6 @@
             ],
             "title": "Outcome",
             "type": "string"
-          },
-          "referent": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Referent"
-          },
-          "candidates": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Candidates",
-            "type": "array"
-          },
-          "rule": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Rule"
           },
           "reason": {
             "anyOf": [
@@ -712,7 +700,7 @@
             "default": null,
             "title": "Reason"
           },
-          "explanation": {
+          "referent": {
             "anyOf": [
               {
                 "type": "string"
@@ -722,7 +710,19 @@
               }
             ],
             "default": null,
-            "title": "Explanation"
+            "title": "Referent"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rule"
           }
         },
         "required": [
@@ -736,14 +736,14 @@
         "additionalProperties": false,
         "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
           "end": {
             "minimum": 0,
             "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
             "type": "integer"
           }
         },
@@ -783,20 +783,14 @@
         "additionalProperties": false,
         "description": "A snapshot-derived identity class, never a replacement for a local mention ID.",
         "properties": {
-          "id": {
-            "default": "",
-            "title": "Id",
-            "type": "string"
-          },
           "document": {
             "minLength": 1,
             "title": "Document",
             "type": "string"
           },
-          "rule": {
-            "const": "annotated-text-identity/v1",
-            "default": "annotated-text-identity/v1",
-            "title": "Rule",
+          "id": {
+            "default": "",
+            "title": "Id",
             "type": "string"
           },
           "members": {
@@ -807,6 +801,12 @@
             "minItems": 1,
             "title": "Members",
             "type": "array"
+          },
+          "rule": {
+            "const": "annotated-text-identity/v1",
+            "default": "annotated-text-identity/v1",
+            "title": "Rule",
+            "type": "string"
           }
         },
         "required": [
@@ -820,31 +820,9 @@
     "additionalProperties": false,
     "description": "Full holder accounting retains the original verified identity result and input receipts.",
     "properties": {
-      "schema_version": {
-        "const": "storymodel.attribution-result/v1",
-        "default": "storymodel.attribution-result/v1",
-        "title": "Schema Version",
-        "type": "string"
-      },
-      "recipe": {
-        "const": "recorded-context-holders/v1",
-        "default": "recorded-context-holders/v1",
-        "title": "Recipe",
-        "type": "string"
-      },
       "account_sha256": {
         "pattern": "^[0-9a-f]{64}$",
         "title": "Account Sha256",
-        "type": "string"
-      },
-      "proposals_sha256": {
-        "pattern": "^[0-9a-f]{64}$",
-        "title": "Proposals Sha256",
-        "type": "string"
-      },
-      "origin": {
-        "minLength": 1,
-        "title": "Origin",
         "type": "string"
       },
       "export_permission": {
@@ -855,9 +833,6 @@
         "title": "Export Permission",
         "type": "string"
       },
-      "identity": {
-        "$ref": "#/$defs/IdentityResult"
-      },
       "holders": {
         "items": {
           "$ref": "#/$defs/ContextHolder"
@@ -865,10 +840,35 @@
         "title": "Holders",
         "type": "array"
       },
+      "identity": {
+        "$ref": "#/$defs/IdentityResult"
+      },
       "interpretation": {
         "const": "conditional-on-recorded-attribution-and-identity",
         "default": "conditional-on-recorded-attribution-and-identity",
         "title": "Interpretation",
+        "type": "string"
+      },
+      "origin": {
+        "minLength": 1,
+        "title": "Origin",
+        "type": "string"
+      },
+      "proposals_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Proposals Sha256",
+        "type": "string"
+      },
+      "recipe": {
+        "const": "recorded-context-holders/v1",
+        "default": "recorded-context-holders/v1",
+        "title": "Recipe",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": "storymodel.attribution-result/v1",
+        "default": "storymodel.attribution-result/v1",
+        "title": "Schema Version",
         "type": "string"
       }
     },
@@ -885,14 +885,50 @@
   },
   "situation": {
     "$defs": {
-      "Context": {
+      "AnchoredContext": {
         "additionalProperties": false,
-        "description": "Narrated worlds and attributed content remain separate on each account side.",
+        "description": "An old context kind with native evidence stays disjoint from the legacy text record.",
         "properties": {
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
           "id": {
             "default": "",
             "title": "Id",
             "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "reported",
+              "believed",
+              "intended"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
           },
           "side": {
             "enum": [
@@ -900,6 +936,32 @@
               "recall"
             ],
             "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "side",
+          "kind",
+          "evidence"
+        ],
+        "title": "AnchoredContext",
+        "type": "object"
+      },
+      "Context": {
+        "additionalProperties": false,
+        "description": "Narrated worlds and attributed content remain separate on each account side.",
+        "properties": {
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "default": "",
+            "title": "Id",
             "type": "string"
           },
           "kind": {
@@ -924,13 +986,13 @@
             "default": null,
             "title": "Parent"
           },
-          "evidence": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/Support"
-            },
-            "title": "Evidence",
-            "type": "array"
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
           }
         },
         "required": [
@@ -944,35 +1006,26 @@
         "additionalProperties": false,
         "description": "One holder question separates absent identity, processing gaps and inapplicability.",
         "properties": {
+          "candidates": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/MentionIdentity"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
           "context": {
             "minLength": 1,
             "title": "Context",
             "type": "string"
           },
-          "status": {
-            "enum": [
-              "named",
-              "unattributed",
-              "not-attempted",
-              "failed",
-              "unsupported",
-              "not-applicable"
-            ],
-            "title": "Status",
-            "type": "string"
-          },
-          "referent": {
-            "anyOf": [
-              {
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Referent"
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
           },
           "gap": {
             "anyOf": [
@@ -991,22 +1044,6 @@
             "default": null,
             "title": "Gap"
           },
-          "candidates": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/MentionIdentity"
-            },
-            "title": "Candidates",
-            "type": "array"
-          },
-          "evidence": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/Support"
-            },
-            "title": "Evidence",
-            "type": "array"
-          },
           "reason": {
             "anyOf": [
               {
@@ -1019,6 +1056,31 @@
             ],
             "default": null,
             "title": "Reason"
+          },
+          "referent": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Referent"
+          },
+          "status": {
+            "enum": [
+              "named",
+              "unattributed",
+              "not-attempted",
+              "failed",
+              "unsupported",
+              "not-applicable"
+            ],
+            "title": "Status",
+            "type": "string"
           }
         },
         "required": [
@@ -1032,17 +1094,24 @@
         "additionalProperties": false,
         "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
         "properties": {
+          "evidence": {
+            "default": [],
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
           "id": {
             "default": "",
             "title": "Id",
-            "type": "string"
-          },
-          "side": {
-            "enum": [
-              "source",
-              "recall"
-            ],
-            "title": "Side",
             "type": "string"
           },
           "kind": {
@@ -1068,13 +1137,13 @@
             "default": null,
             "title": "Parent"
           },
-          "evidence": {
-            "default": [],
-            "items": {
-              "$ref": "#/$defs/Support"
-            },
-            "title": "Evidence",
-            "type": "array"
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
           }
         },
         "required": [
@@ -1088,6 +1157,26 @@
         "additionalProperties": false,
         "description": "One occurrence's identity outcome; open mentions receive no invented referent.",
         "properties": {
+          "candidates": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Explanation"
+          },
           "mention": {
             "minLength": 1,
             "title": "Mention",
@@ -1101,38 +1190,6 @@
             ],
             "title": "Outcome",
             "type": "string"
-          },
-          "referent": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Referent"
-          },
-          "candidates": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Candidates",
-            "type": "array"
-          },
-          "rule": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Rule"
           },
           "reason": {
             "anyOf": [
@@ -1162,7 +1219,7 @@
             "default": null,
             "title": "Reason"
           },
-          "explanation": {
+          "referent": {
             "anyOf": [
               {
                 "type": "string"
@@ -1172,7 +1229,19 @@
               }
             ],
             "default": null,
-            "title": "Explanation"
+            "title": "Referent"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rule"
           }
         },
         "required": [
@@ -1191,6 +1260,21 @@
             "title": "Entity",
             "type": "string"
           },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
           "role": {
             "enum": [
               "agent",
@@ -1202,14 +1286,6 @@
             ],
             "title": "Role",
             "type": "string"
-          },
-          "evidence": {
-            "items": {
-              "$ref": "#/$defs/Support"
-            },
-            "minItems": 1,
-            "title": "Evidence",
-            "type": "array"
           }
         },
         "required": [
@@ -1220,18 +1296,50 @@
         "title": "Participation",
         "type": "object"
       },
+      "PlaybackSupport": {
+        "additionalProperties": false,
+        "description": "Canonical interval union plus explicit points on one complete media-source identity.",
+        "properties": {
+          "intervals": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/TickInterval"
+            },
+            "title": "Intervals",
+            "type": "array"
+          },
+          "points": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "PlaybackSupport",
+        "type": "object"
+      },
       "Span": {
         "additionalProperties": false,
         "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
         "properties": {
-          "start": {
-            "minimum": 0,
-            "title": "Start",
-            "type": "integer"
-          },
           "end": {
             "minimum": 0,
             "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
             "type": "integer"
           }
         },
@@ -1266,15 +1374,62 @@
         ],
         "title": "Support",
         "type": "object"
+      },
+      "TickInterval": {
+        "additionalProperties": false,
+        "description": "A positive half-open native interval; integer strings survive JSON without rounding.",
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "TickInterval",
+        "type": "object"
       }
     },
     "additionalProperties": false,
     "description": "Situation inspection preserves placement, role occurrences and the holder's derivation.",
     "properties": {
-      "situation": {
-        "minLength": 1,
-        "title": "Situation",
-        "type": "string"
+      "context": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Context"
+          },
+          {
+            "$ref": "#/$defs/ExtendedContext"
+          },
+          {
+            "$ref": "#/$defs/AnchoredContext"
+          }
+        ],
+        "title": "Context"
+      },
+      "evidence": {
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Support"
+            },
+            {
+              "$ref": "#/$defs/PlaybackSupport"
+            }
+          ]
+        },
+        "minItems": 1,
+        "title": "Evidence",
+        "type": "array"
+      },
+      "holder": {
+        "$ref": "#/$defs/ContextHolder"
       },
       "kind": {
         "enum": [
@@ -1284,25 +1439,6 @@
         "title": "Kind",
         "type": "string"
       },
-      "predicate": {
-        "minLength": 1,
-        "title": "Predicate",
-        "type": "string"
-      },
-      "context": {
-        "anyOf": [
-          {
-            "$ref": "#/$defs/Context"
-          },
-          {
-            "$ref": "#/$defs/ExtendedContext"
-          }
-        ],
-        "title": "Context"
-      },
-      "holder": {
-        "$ref": "#/$defs/ContextHolder"
-      },
       "participants": {
         "items": {
           "$ref": "#/$defs/Participation"
@@ -1310,13 +1446,15 @@
         "title": "Participants",
         "type": "array"
       },
-      "evidence": {
-        "items": {
-          "$ref": "#/$defs/Support"
-        },
-        "minItems": 1,
-        "title": "Evidence",
-        "type": "array"
+      "predicate": {
+        "minLength": 1,
+        "title": "Predicate",
+        "type": "string"
+      },
+      "situation": {
+        "minLength": 1,
+        "title": "Situation",
+        "type": "string"
       }
     },
     "required": [

@@ -12,8 +12,8 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from .model import Digest, Model, Name, _validate_instance, contained_in
-from .rich_account import SupportedAccount, validate_supported_account
+from .model import Digest, Model, Name, _validate_instance, contained_in, text_evidence
+from .rich_account import SupportedAccount, require_text_account
 from .sequence import (
     Finite,
     Probability,
@@ -164,7 +164,7 @@ class SourceSequenceResult(Model):
 
 
 def _one_side(account: SupportedAccount, side: Literal["source", "recall"]) -> SupportedAccount:
-    checked = validate_supported_account(account)
+    checked = require_text_account(account)
     if not checked.documents or any(d.side != side for d in checked.documents):
         raise ValueError(f"source transitions require an independent {side}-only account")
     return checked
@@ -246,7 +246,9 @@ def project_source(
                 leaves.append(parent)
     nodes = []
     for anchor in sorted(parents):
-        support = situations[anchor].evidence if anchor in situations else (units[anchor].support,)
+        support = text_evidence(
+            situations[anchor].evidence if anchor in situations else (units[anchor].support,)
+        )
         documents = {s.document for s in support}
         document = next(iter(documents)) if len(documents) == 1 else None
         onset = min(s.start for item in support for s in item.spans) if document else None

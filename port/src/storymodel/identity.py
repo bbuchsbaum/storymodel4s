@@ -24,9 +24,14 @@ from .model import (
     _holder_scope,
     _validate_instance,
     contained_in,
+    text_evidence,
 )
 from .recall_intake import _simple_lower
-from .rich_account import RichAccount, SupportedAccount, validate_supported_account
+from .rich_account import (
+    RichAccount,
+    SupportedAccount,
+    require_text_account,
+)
 from .serialization import canonical, digest, strict_json
 
 RECIPE = "annotated-text-identity/v1"
@@ -156,7 +161,7 @@ def resolve_text_identity(value: SupportedAccount, raw: str) -> IdentityResult:
     Forms/types are explicit interpretations, not grammar certified by quotation. This
     first profile has no quantity or accepted holder inputs. It preserves those gaps.
     """
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     account_sha = digest(account.model_dump(mode="json"))
     parsed = strict_json(raw)
     if (
@@ -183,9 +188,10 @@ def resolve_text_identity(value: SupportedAccount, raw: str) -> IdentityResult:
     positions = {}
     ends = {}
     for entity in account.entities:
-        positions[entity.id] = min(s.start for evidence in entity.evidence for s in evidence.spans)
-        ends[entity.id] = max(s.end for evidence in entity.evidence for s in evidence.spans)
-        if len(entity.evidence) != 1 or len(entity.evidence[0].spans) != 1:
+        evidence = text_evidence(entity.evidence)
+        positions[entity.id] = min(s.start for support in evidence for s in support.spans)
+        ends[entity.id] = max(s.end for support in evidence for s in support.spans)
+        if len(evidence) != 1 or len(evidence[0].spans) != 1:
             reasons[entity.id] = "nonlocal-mention-support"
             continue
         if entity.id not in supplied:
@@ -387,7 +393,7 @@ def identity_role_table(
     value: SupportedAccount, raw: str, result: IdentityResult
 ) -> tuple[IdentityRoleRow, ...] | tuple[RichIdentityRoleRow, ...]:
     """Consume a verified identity sidecar without rewriting or promoting any situation claim."""
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     checked = verify_identity(account, raw, result)
     identities = {m.mention: m for m in checked.mentions}
     rows = []

@@ -324,3 +324,14 @@ holderless frames as unknown speakers. Use the nearest holder-bearing ancestor, 
 an unresolved held frame; preserve Python's refusal of ambiguous actual placements. Explicit
 upgrade changes the recipe/version, not graph IDs. Combined schemas describe both versions;
 runtime validation proves their cross-field relationships. [Contract](contexts.md).
+
+## Native playback evidence (P2, 2026-11-17)
+
+Provisional implementation choice: extend the existing rich graph under v6 with actual media
+sources and native interval/point support. A supplied-observation compiler uses the existing
+recording engine and graph validator; exact support readouts are its first computational
+consumer. Rejected alternatives: fabricated transcript documents, a second film graph hierarchy,
+an attachment-only sidecar that no claim can cite, converting points or annotation starts to
+duration, and silently stripping media in text consumers. A narrow schema adapter preserves
+legacy-only contracts without duplicating graph algorithms. Media-aware assessment and native
+clock mappings remain subsequent work, not exclusions. [Contract](playback.md).

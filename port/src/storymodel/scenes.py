@@ -4,8 +4,18 @@ from typing import Literal
 
 from pydantic import Field
 
-from .model import Digest, Model, Name, Recipe, Span, Support, Unit, _validate_instance
-from .rich_account import SupportedAccount, validate_supported_account
+from .model import (
+    Digest,
+    Model,
+    Name,
+    Recipe,
+    Span,
+    Support,
+    Unit,
+    _validate_instance,
+    text_support,
+)
+from .rich_account import SupportedAccount, require_text_account, validate_supported_account
 from .serialization import digest
 
 
@@ -35,7 +45,7 @@ def group_source_rows(
     A row may be selected once and must not already have a parent. Existing scenes and
     unselected rows remain untouched. Recall/mapping snapshots cannot be silently reidentified.
     """
-    checked = validate_supported_account(account)
+    checked = require_text_account(account)
     if not checked.documents or any(d.side != "source" for d in checked.documents):
         raise ValueError("scene grouping requires a source-only account before pairing")
     if not isinstance(groups, tuple) or not groups:
@@ -58,13 +68,14 @@ def group_source_rows(
                 raise ValueError("a row can belong to only one new scene")
             seen.add(row_id)
             members.append(row)
-        documents = {row.support.document for row in members}
+        supports = tuple(text_support(row.support) for row in members)
+        documents = {support.document for support in supports}
         if len(documents) != 1:
             raise ValueError("one scene must lie in one source document")
         # Exact union, not a hull: unobserved gaps do not become source evidence.
         spans: list[Span] = []
         for span in sorted(
-            (s for row in members for s in row.support.spans), key=lambda s: (s.start, s.end)
+            (s for support in supports for s in support.spans), key=lambda s: (s.start, s.end)
         ):
             if spans and span.start <= spans[-1].end:
                 spans[-1] = Span(start=spans[-1].start, end=max(spans[-1].end, span.end))

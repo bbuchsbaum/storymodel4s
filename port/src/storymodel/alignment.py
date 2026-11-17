@@ -29,8 +29,16 @@ from .model import (
     canonical,
     contained,
     digest,
+    text_evidence,
+    text_support,
 )
-from .rich_account import Circumstance, RichAccount, SupportedAccount, validate_supported_account
+from .rich_account import (
+    Circumstance,
+    RichAccount,
+    SupportedAccount,
+    require_text_account,
+    validate_supported_account,
+)
 from .serialization import strict_json
 
 RECIPE = "local-predicate-role-reference/v1"
@@ -243,7 +251,7 @@ def _align(
     untouched. No-match is unresolved, never external. The generator uses inverted
     predicate/role indexes and stores at most the declared budget per recall event.
     """
-    account = validate_supported_account(value)
+    account = require_text_account(value)
     policy = validate_policy(policy if policy is not None else AlignmentPolicy())
     input_sha = digest(account.model_dump(mode="json"))
     entities = {e.id: e for e in account.entities}
@@ -287,7 +295,7 @@ def _align(
     rows_by_document: dict[str, list[Unit]] = defaultdict(list)
     for unit in account.units:
         if unit.kind == "row":
-            rows_by_document[unit.support.document].append(unit)
+            rows_by_document[text_support(unit.support).document].append(unit)
     row_cache: dict[str, tuple[str, ...]] = {}
 
     def row_targets(event: Event | State) -> tuple[str, ...]:
@@ -296,7 +304,7 @@ def _align(
             row_cache[event.id] = tuple(
                 sorted(
                     row.id
-                    for row in rows_by_document.get(event.evidence[0].document, ())
+                    for row in rows_by_document.get(text_evidence(event.evidence)[0].document, ())
                     if all(contained(e, row.support) for e in event.evidence)
                 )
             )
@@ -322,8 +330,8 @@ def _align(
                             label=label,
                             recall_entity=rp.entity,
                             source_entity=sp.entity,
-                            recall_evidence=rp.evidence,
-                            source_evidence=sp.evidence,
+                            recall_evidence=text_evidence(rp.evidence),
+                            source_evidence=text_evidence(sp.evidence),
                         )
                     )
         lr, rr = role_keys(recall), role_keys(source)
@@ -364,8 +372,8 @@ def _align(
             predicate_match=predicate_match,
             recall_predicate=recall.predicate,
             source_predicate=source.predicate,
-            recall_evidence=recall.evidence,
-            source_evidence=source.evidence,
+            recall_evidence=text_evidence(recall.evidence),
+            source_evidence=text_evidence(source.evidence),
             role_matches=tuple(
                 sorted(matched, key=lambda m: (m.role, m.label, m.recall_entity, m.source_entity))
             ),
