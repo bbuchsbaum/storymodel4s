@@ -610,7 +610,7 @@ def cmd_ff_run(args):
     for a in it:
         if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
                  "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon"):
-            opt[a[2:]] = next(it)
+            opt[a[2:].replace("-", "_")] = next(it)
         elif a == "--dry":
             opt["dry"] = True
         elif a == "--cache-only":
