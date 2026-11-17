@@ -534,6 +534,49 @@ per half cannot pass small gains.
   48 for a prefix reference on the report five: about 144 calls. That exceeds the budget left
   after (b), so (a) is not run and is deferred.
 
+**Round 2 outcome** (harness ea448f47a; `hillclimb-r2/results.json`; no model calls). Pooled
+bands (±2 SE of sample 2 − sample 1, ten participants): scene 0.041, work 0.012, film 0.012.
+
+| Lever | Term | Result | Reference | Δ | Wins | p | Verdict |
+|---|---|---|---|---|---|---|---|
+| Ensemble of distributions | scene | 1.034 | 1.062 (mean of bits) | −0.029 | 10/10 | 0.002 | DROP |
+| | work | 0.077 | 0.081 | −0.004 | 10/10 | 0.002 | |
+| | film | 0.236 | 0.242 | −0.005 | 10/10 | 0.002 | |
+| Sharpening τ (LOPO) | scene | 1.011 | 1.034 (ensemble, τ = 1) | −0.023 | 9/10 | 0.014 | DROP |
+| | work, film | unchanged | | 0 | | | |
+
+- **Ensemble.** It wins for every participant but stays inside the band, so it fails the lever
+  rule. The round-2 instruction adopts it anyway as the pre-registered combination rule: it is a
+  dominance on each row's total log loss and costs nothing. Test
+  `test_two_sample_ensemble_averages_joint_distributions`, mutant M51 (discriminating).
+- **Sharpening.** LOPO chose τ = 2.0 for nine participants and 2.25 for one; the pooled
+  objective is flat from 1.75 to 2.25. It fails on both p (0.014 > 0.01) and band. Not kept.
+
+**Round 3 outcome** (harness d5746ddf8; producer run `round3-20261117/v1b`;
+`hillclimb-r3/results.json`).
+- **Calls.** 17 fresh (14 pass 1, 3 pass 2 for the 13 items whose frame film changed), 0
+  retries. Tokens: 34 input, 461,396 cache-creation, 4,011 cache-read and 163,551 output.
+  Notional cost $6.96. The budget was 100.
+- **Positive control for the reuse path.** A cache-only replay with v1 reproduces every
+  reference row (18,256 rows, no field differs).
+- **What changed.** Of 3,272 units, 3 lost their frame, 8 changed frame film and 24 changed
+  kind. Memory-search units with an empty frame went from 4 of 38 to 3 of 37. The model did not
+  act on the sentence.
+
+| Half | Term | v1 | v1b | Δ | Band | p |
+|---|---|---|---|---|---|---|
+| Tune | scene | 1.054 | 1.057 | +0.004 | 0.026 | 0.56 |
+| | film | 0.140 | 0.142 | +0.002 | 0.005 | 0.69 |
+| | memory-search non-film mass | 0.100 | 0.100 | 0 | 0 | 1.0 |
+| Report | scene | 1.088 | 1.082 | −0.006 | 0.079 | 0.50 |
+| | film | 0.336 | 0.339 | +0.003 | 0.025 | 0.75 |
+| | memory-search non-film mass | 0.052 | 0.060 | +0.008 | 0.017 | 1.0 |
+
+- **Verdict (b): DROP.** No target moved beyond its band on either half.
+- **(a) Window 3: not run,** as recorded before the calls. A per-call run on the fourteen coded
+  sessions alone would take about 78 calls; it would fit the 83 left, but it departs from the
+  prefix layout and was not the recorded rule.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
