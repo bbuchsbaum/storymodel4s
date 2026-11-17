@@ -319,3 +319,21 @@ def producer_units(name, session, words):
         if f2 <= l1:
             raise ValueError(f"{name}: library units overlap or are out of order")
     return out
+
+
+def producer_scene_extras():
+    """Scene title, part, time span (part-local seconds) and visual-summary caption per scene,
+    as the CS1 prompt showed them (rendering 'cs1-extras')."""
+    rows = common.film_rows()
+    caps = common.scene_captions()
+    out = {}
+    for r in rows:
+        x = out.setdefault(r.scene, dict(title=r.scene_title, part=r.part, start=r.start,
+                                         end=r.end, caption=caps.get(r.scene)))
+        x["end"] = max(x["end"], r.end)
+    return out
+
+
+def producer_cast_line():
+    """The CS1 prompt's cast line (names by frequency in the annotation)."""
+    return cast_line()

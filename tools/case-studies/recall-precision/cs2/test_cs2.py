@@ -1141,6 +1141,23 @@ def test_title_only_scene_set_is_the_work_node():
     close(f.p_work("B"), (1 - e) + f.u * dur.p_work("B"))
 
 
+def test_cs1_extras_rendering_and_part_order():
+    import random as _r
+
+    P = _producer()
+    comp = fixture()
+    texts = {u.id: f"text {u.id}" for u in comp.units}
+    extras = {9: dict(title="The cab", part="p2", start=10, end=50, caption="a cab")}
+    o, rm, _ = P.film_outline(comp, texts, ["C"], _r.Random(1), "s", True, "part-order", extras)
+    assert "The cab (part p2, 0:10-0:50)" in o and "[visual summary] a cab" in o
+    # part order: C's p1 units (c1, c2) come before its p2 units (c3, c4); start-only interleaves
+    assert [rm[i] for i in sorted(rm)] == ["c1", "c2", "c3", "c4"]
+    _, rm2, _ = P.film_outline(comp, texts, ["C"], _r.Random(1), "s", True, "start-only")
+    assert [rm2[i] for i in sorted(rm2)] == ["c3", "c4", "c1", "c2"]
+    assert P.pass2_prompt([], "O", "A, B").startswith("CAST\nA, B\n\n")
+    assert P.pass2_prompt([], "O") == P.PASS2_TEMPLATE.format(outline="O", items="", n=0)
+
+
 # ---------------------------------------------------------------- runner
 
 

@@ -230,7 +230,14 @@ def _mmss(t):
 OUTLINE_ORDERS = ("part-order", "start-only")
 
 
-def film_outline(comp, texts, works, rng, salt, with_rows, order_rule="part-order"):
+RENDERINGS = ("plain", "cs1-extras")
+
+
+def film_outline(comp, texts, works, rng, salt, with_rows, order_rule="part-order",
+                 extras=None):
+    """`extras` (rendering 'cs1-extras'): {scene: dict(title, part, start, end, caption)}; the
+    row outline's scene headers then carry the scene title with its part and time span, and a
+    visual-summary caption line, as the CS1 prompt did. Opaque scene labels are kept."""
     """Annotation text of `works` in a seeded random order under cover names. With rows: per-call
     row numbers, 8-hex scene labels and film-relative times; returns the row map.
 
@@ -263,7 +270,14 @@ def film_outline(comp, texts, works, rng, salt, with_rows, order_rule="part-orde
             tag = f"part {u.part} " if (order_rule == "part-order" and multi) else ""
             if with_rows and u.scene != scene:
                 scene = u.scene
-                lines.append(f"=== SCENE {opaque(salt, scene, 8)}")
+                x = (extras or {}).get(scene)
+                if x:
+                    lines.append(f"=== SCENE {opaque(salt, scene, 8)}: {x['title']} (part "
+                                 f"{x['part']}, {_mmss(x['start'])}-{_mmss(x['end'])})")
+                    if x.get("caption"):
+                        lines.append(f"[visual summary] {x['caption']}")
+                else:
+                    lines.append(f"=== SCENE {opaque(salt, scene, 8)}")
             if with_rows:
                 n += 1
                 rowmap[n] = u.id
@@ -373,14 +387,15 @@ def pass1_prompt(units_text, outline):
     return PASS1_TEMPLATE.format(outline=outline, units=body, n=len(units_text))
 
 
-def pass2_prompt(batch, outline):
+def pass2_prompt(batch, outline, cast_line=None):
     items = "\n\n".join(
         PASS2_ITEM.format(
             oid=it["oid"], film=it["film_label"], ctx=it["ctx"], target=it["target"]
         )
         for it in batch
     )
-    return PASS2_TEMPLATE.format(outline=outline, items=items, n=len(batch))
+    text = PASS2_TEMPLATE.format(outline=outline, items=items, n=len(batch))
+    return f"CAST\n{cast_line}\n\n{text}" if cast_line else text
 
 
 def renderer_sha256():
@@ -837,6 +852,7 @@ def run(
     jobs: int = 1,
     rules: dict | None = None,
     outline_order: str = "part-order",
+    rendering: str = "plain",
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -850,8 +866,16 @@ def run(
     sys1, sys2 = corpus_text(PASS1_SYSTEM, A, 1), corpus_text(PASS2_ARMS[arm], A, 2)
     conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT, (sys1, sys2),
                        getattr(A, "PRODUCER_SEGMENTER", None))
+    if rendering not in RENDERINGS:
+        raise ValueError(f"unknown rendering {rendering!r}")
+    extras = A.producer_scene_extras() if rendering == "cs1-extras" else None
+    cast_line = A.producer_cast_line() if rendering == "cs1-extras" else None
     for c in conds.values():
         c["outline_order"] = outline_order
+    # declared: the pass-2 rendering condition carries its own id when it is not 'plain'
+    conds["pass2"]["rendering"] = rendering
+    if rendering != "plain":
+        conds["pass2"]["id"] = conds["pass2"]["id"] + f"+{rendering}"
     log, ledger = (
         [],
         dict(
@@ -939,9 +963,9 @@ def run(
         rng = random.Random(f"{seed}:{sample}:pass2:call{bi}")
         bworks = sorted({it["work"] for it in batch})
         outline2, rowmap, order2 = film_outline(
-            comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True, outline_order
+            comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True, outline_order, extras
         )
-        rendered.append((pass2_prompt(batch, outline2), rowmap, order2))
+        rendered.append((pass2_prompt(batch, outline2, cast_line), rowmap, order2))
     if not dry:
         prefetch([(r[0], sys2) for r in rendered], jobs)
     for bi, (batch, (prompt2, rowmap, order2)) in enumerate(zip(batches, rendered)):
