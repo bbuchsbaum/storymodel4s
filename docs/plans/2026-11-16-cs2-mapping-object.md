@@ -355,6 +355,30 @@ Each part has a named test and a mutant.
   make the scene term worse than the per-call v1 run on the same rows. It is then run once on
   the report five.
 
+### Layout ablation and decision rule (2026-11-17, recorded before the calls)
+
+The stage-2 comparison changed two things at once: pass 1 v2, and the pass-2 prefix layout.
+This ablation separates them.
+
+- **The ablation run.** Pass 2 runs in layout `prefix` on the original v1 pass-1 frames, reused
+  from full-run sample 1 (`--pass1-from`), with no pass-1 calls. It uses the develop five and
+  the v2 run's seed and salt (20261125, `cs2-ff-s2-dev`).
+- **Noise reference.** On the develop five, full-run sample 2 minus sample 1 under the current
+  rules gives these paired participant differences:
+
+  | Term | Mean | SE | Noise band (±2 SE) |
+  |---|---|---|---|
+  | Scene | +0.001 | 0.013 | 0.026 |
+  | Work | −0.004 | 0.006 | 0.011 |
+  | Film | +0.008 | 0.003 | 0.005 |
+
+  A difference is within noise when its paired mean lies inside the band.
+- **Rule for the prefix layout.** Adopt it if v1+prefix is within noise of v1+per-call on the
+  scene term, or better.
+- **Rule for pass 1 v2.** Adopt it only if v2+prefix beats v1+prefix on the scene term (a lower
+  paired mean) without worsening the work or film term beyond noise. Otherwise drop v2, keep
+  v1, and record the negative result here.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the

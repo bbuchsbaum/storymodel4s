@@ -668,7 +668,8 @@ def cmd_ff_run(args):
     for a in it:
         if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
                  "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon",
-                 "--windows", "--rendering", "--layout", "--pass1", "--mismatch-rule"):
+                 "--windows", "--rendering", "--layout", "--pass1", "--mismatch-rule",
+                 "--pass1-from"):
             opt[a[2:].replace("-", "_")] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -709,7 +710,8 @@ def cmd_ff_run(args):
                                     outline_order=opt.get("outline_order", "part-order"),
                                     rendering=opt.get("rendering", "plain"),
                                     layout=opt.get("layout", "per-call"),
-                                    pass1=opt.get("pass1", "v1"))
+                                    pass1=opt.get("pass1", "v1"),
+                                    pass1_from=opt.get("pass1_from"))
     calls = P.call_ledger(log)
     extra = dict(
         participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],
@@ -725,7 +727,7 @@ def cmd_ff_run(args):
         corpus=corpus, rules=rules, epsilon=cfg["epsilon"],
         outline_order=opt.get("outline_order", "part-order"),
         rendering=opt.get("rendering", "plain"), layout=opt.get("layout", "per-call"),
-        pass1=opt.get("pass1", "v1"),
+        pass1=opt.get("pass1", "v1"), pass1_from=opt.get("pass1_from"),
         cost_note="cost_usd is the CLI's list-price estimate (notional); calls run on the owner's "
         "subscription through claude -p",
         condition_id_note="condition ids changed at f98d2297a only because the renderer digest "

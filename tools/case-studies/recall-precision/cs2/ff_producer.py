@@ -1066,6 +1066,7 @@ def run(
     rendering: str = "plain",
     layout: str = "per-call",
     pass1: str = "v1",
+    pass1_from: Path | None = None,
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -1141,11 +1142,29 @@ def run(
             pass1_prompt_chars=len(prompt1),
         )
         data[(p, s)] = dict(words=words, units=units, prompt1=prompt1, rec=rec)
-    if not dry:
+    src1 = None
+    if pass1_from is not None:
+        # declared: reuse another run's recorded pass-1 frames (same units); no pass-1 calls
+        src1 = dict(units=json.loads((Path(pass1_from) / "units.json").read_text()),
+                    p1=json.loads((Path(pass1_from) / "pass1.json").read_text()),
+                    conds=json.loads((Path(pass1_from) / "conditions.json").read_text()))
+        conds["pass1"] = dict(src1["conds"]["pass1"], reused_from=str(pass1_from))
+    if not dry and src1 is None:
         s1 = sys1_full if layout == "prefix" else sys1
         prefetch([(d["prompt1"], s1) for d in data.values()], jobs)
     for (p, s), d in data.items():
         words, units, prompt1, rec = d["words"], d["units"], d["prompt1"], d["rec"]
+        if src1 is not None:
+            key = f"{p}:{s}"
+            if src1["units"][key] != units:
+                raise SystemExit(f"pass-1 source units differ for {key}")
+            p1, retries = src1["p1"][key]["raw"], 0
+            frames = [dict(f, frame=[tuple(x) for x in f["frame"]])
+                      for f in src1["p1"][key]["frames"]]
+            rec.update(pass1_noncompliant_units=0, pass1_retries=0, pass1_reused=True)
+            ledger["sessions"][key] = rec
+            data[(p, s)] = dict(words=words, units=units, frames=frames, p1=p1)
+            continue
         if dry:
             p1, retries = [], 0
         else:
