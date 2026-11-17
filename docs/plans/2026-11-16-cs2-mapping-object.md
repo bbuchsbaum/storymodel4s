@@ -793,8 +793,8 @@ decoded, by the gold step from the previous scene-coded row of the same work:
   decoder degrades exactly those rows. That argues against it as built, apart from the rule.
 
 **Tests and mutants.** Six tests cover the decoder; mutants M52–M57 each fail their named test
-(`mutations/r4-20261117.json` at deb5364e0, 57 mutants, all caught). Five discriminate. M53 (the backward
-message) is a regression guard, because the inferred-top test fails with it.
+(`mutations/r4-20261117.json` at deb5364e0, 57 mutants, all caught). Five discriminate. M53
+(the backward message) is a regression guard, because the inferred-top test fails with it.
 
 **Gaps for the vocabulary ADR.**
 
