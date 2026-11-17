@@ -379,6 +379,24 @@ This ablation separates them.
   paired mean) without worsening the work or film term beyond noise. Otherwise drop v2, keep
   v1, and record the negative result here.
 
+**Outcome (2026-11-17, develop five, applying the rule above).**
+
+| | Scene | Work | Film |
+|---|---|---|---|
+| v1 + per-call | 1.054 | 0.090 | 0.140 |
+| v1 + prefix | **1.013** | 0.088 | 0.140 |
+| v2 + prefix | 1.105 | 0.109 | 0.179 |
+
+- **The prefix layout is adopted.** Against v1 + per-call, the scene term is −0.040 (better
+  for 4 of 5 participants), which is better than the 0.026 noise band. The work and film terms
+  are within noise.
+- **Pass 1 v2 is dropped; v1 is kept.** Against v1 + prefix it is worse on all three terms:
+  scene +0.092, work +0.022 (band 0.011) and film +0.039 (band 0.005). This is a negative
+  result. Its exact switch F1 was higher (0.598 vs 0.541), but its ±1 switch F1 was lower
+  (0.897 vs 0.918).
+- **New runs use `--layout prefix --pass1 v1`.** The CLI default stays `per-call`, so that
+  cache-only replays of earlier runs reproduce exactly.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
