@@ -393,3 +393,29 @@ text opt-in per document, bounded cross-coordinate entity ordering, and external
 refusal. Full local evidence/mode gates/cost production, chart-aware comparisons, semantic
 providers, complete narrative construction, refinement and readouts remain owed. No new Scala
 execution or scientific accuracy claim. [Contract and limits](source-transitions.md).
+
+## P4 account-derived local evidence (2026-11-17)
+
+Reference: `align/contentcost.scala`, `contentscore.scala`, `cost.scala` (default weights,
+ModeGate, FunctionPrior, external costs, measured support), `evidence.scala` (gates before
+pricing and unranked distinction), `lexicalscore.scala`, `recall/lexical.scala`, and the
+segment summaries in `story/alignment.scala`/`bridge/StorySourceView.scala`. Existing witnesses:
+`CostSuite`, `ContentLexicalSuite`, `LocalEvidenceSuite`, `GateProofSuite`, `WorkedExampleSuite`.
+
+Python: `local_evidence.py` and `_lexical.py`; `derive_local_evidence`, `infer_accounts` and
+their recomputing verifiers; CLI equivalents and `examples/account_inference.py`. Receipt
+separates sparse nominations, gated modes, priced/default/imputed/missing/eligible terms,
+weighted support, graph transitions and posteriors. Mote: `bd-01M7M59R5F72YYFCDEW1A4ZDB2`.
+
+Preserved: shallow role/polarity/context/modality gates, all-engaged-member segment rule,
+default weighted costs/priors, lexical fallback, semantic abstention versus ineligibility,
+zero-support exclusion, all-zero weight support absence and external/unranked populations.
+Explicit Python changes: aggregate same-role names, sensory term sets, declared automatic
+recall sketch selection with ambiguity refusal, strict nomination ownership, sparse lexical
+retrieval recipe, and wide scaling arithmetic. Lexical assets are copied exactly; recursive
+y-consonant evaluation is replaced with an iterative calculation.
+
+Remaining: charts/structural evidence and providers, outcome/cause slots, nominal parsing,
+multi-proposition composition, retained candidate/refinement/reconstruction algorithms and
+scientific readouts. No semantic accuracy, calibrated probability or full Scala workflow
+parity follows from these engineering controls. [Contract](local-evidence.md).

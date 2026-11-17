@@ -30,6 +30,14 @@ from .fidelity import (
 )
 from .fidelity_workflow import FidelityRecording, import_fidelity, replay_fidelity
 from .identity import identity_role_table, resolve_text_identity, verify_identity
+from .local_evidence import (
+    LocalEvidenceSpec,
+    RecallSelection,
+    derive_local_evidence,
+    infer_accounts,
+    verify_account_inference,
+    verify_local_evidence,
+)
 from .model import Account, account_digest, validate_account
 from .relations import admit_relations, relation_table, verify_relations
 from .rich_account import RichAccount, pair_rich_accounts, situation_table, upgrade_account
@@ -66,6 +74,12 @@ __all__ = [
     "DetailRecording",
     "ExtractionRecording",
     "MappingRecording",
+    "LocalEvidenceSpec",
+    "RecallSelection",
+    "derive_local_evidence",
+    "infer_accounts",
+    "verify_account_inference",
+    "verify_local_evidence",
     "RichAccount",
     "RichRecording",
     "SequenceRequest",

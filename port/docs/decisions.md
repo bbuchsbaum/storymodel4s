@@ -248,3 +248,16 @@ or claiming supplied costs establish admissibility. The versioned projection nam
 first-occurrence ordering and cross-coordinate entity-neighbor rule. Refuse destination
 populations missing the external component required by the mixture rather than silently losing
 mass or changing the model. See [source transitions](source-transitions.md).
+
+## Account-derived local evidence (P4, 2026-11-17)
+
+Provisional implementation choice: one content producer derives sparse nominations, shallow
+mode gates and support-aware costs, then reuses the existing transition producer and sequence
+kernel. Reuse Scala lexical assets and default arithmetic; record unknown slots and imputation
+explicitly. Aggregate all same-role participants and use set-valued sensory terms to remove
+incidental ordering and duplicate-term effects. Use wide intermediates for weighted scaling.
+Rejected alternatives: requiring hand-built cost matrices, admitting faithful modes through
+a cost override, selecting the first of multiple recall situations, treating absent charts as
+zero distance, equating candidate failure with categorical external reference, or adding an
+embedding/service dependency before the content contract works. The named profile and its
+remaining capability obligations are in [local evidence](local-evidence.md).

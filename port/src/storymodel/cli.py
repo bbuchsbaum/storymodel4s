@@ -48,6 +48,13 @@ from .fidelity_workflow import (
 )
 from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
+from .local_evidence import (
+    AccountInferenceResult,
+    LocalEvidenceSpec,
+    derive_local_evidence,
+    infer_accounts,
+    verify_account_inference,
+)
 from .model import Account, canonical
 from .relations import admit_relations, relation_table
 from .rich_account import RichAccount, situation_table, validate_rich_account
@@ -370,10 +377,65 @@ def main(argv: list[str] | None = None) -> int:
             source_sequence.add_argument("--output")
         else:
             source_sequence.add_argument("result")
+    for name in ("derive-local-evidence", "infer-accounts", "verify-account-inference"):
+        local = commands.add_parser(name, help="derive account evidence and sequence inference")
+        local.add_argument("source")
+        local.add_argument("recall")
+        local.add_argument("spec")
+        local.add_argument("--source-sha256")
+        local.add_argument("--recall-sha256")
+        if name == "verify-account-inference":
+            local.add_argument("result")
+        else:
+            local.add_argument("--output")
+        if name == "derive-local-evidence":
+            local.add_argument("--request-only", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
             emit(example_account().model_dump(mode="json"), args.output)
+        elif args.command in (
+            "derive-local-evidence",
+            "infer-accounts",
+            "verify-account-inference",
+        ):
+            local_source = read_supported_account(
+                Path(args.source), expected_sha256=args.source_sha256
+            )
+            exporting = args.command != "verify-account-inference"
+            if exporting and local_source.export_permission != "allowed":
+                raise PermissionError("producer denies source inference export")
+            local_recall = read_supported_account(
+                Path(args.recall), expected_sha256=args.recall_sha256
+            )
+            if exporting and local_recall.export_permission != "allowed":
+                raise PermissionError("producer denies recall inference export")
+            local_spec = LocalEvidenceSpec.model_validate_json(
+                canonical(strict_json(Path(args.spec).read_bytes()))
+            )
+            if args.command == "derive-local-evidence":
+                local_result = derive_local_evidence(local_source, local_recall, local_spec)
+                emit(
+                    (
+                        local_result.sequence.request if args.request_only else local_result
+                    ).model_dump(mode="json"),
+                    args.output,
+                )
+            elif args.command == "infer-accounts":
+                emit(
+                    infer_accounts(local_source, local_recall, local_spec).model_dump(mode="json"),
+                    args.output,
+                )
+            else:
+                verified = verify_account_inference(
+                    local_source,
+                    local_recall,
+                    local_spec,
+                    AccountInferenceResult.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    ),
+                )
+                emit({"valid": True, "spec_sha256": verified.evidence.spec_sha256}, None)
         elif args.command in ("build-source-sequence", "verify-source-sequence"):
             graph_source = read_supported_account(
                 Path(args.source), expected_sha256=args.source_sha256
