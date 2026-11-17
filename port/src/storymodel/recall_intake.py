@@ -137,13 +137,19 @@ def _digit_code_point(character: str) -> bool:
     return unicodedata.category(character) == "Nd"
 
 
+def _simple_lower(text: str) -> str:
+    # Unicode simple lowercase, as TextNorm.lower: no context or multi-code-point expansion.
+    # U+0130 is the sole full lowercase expansion in the supported Unicode database.
+    return "".join("i" if c == "İ" else c.lower() for c in text)
+
+
 def _next_word(text: str, start: int, end: int) -> str:
     while start < end and not _java_char_letter(text[start]):
         start += 1
     finish = start
     while finish < end and _java_char_letter(text[finish]):
         finish += 1
-    return text[start:finish].lower()
+    return _simple_lower(text[start:finish])
 
 
 def _word_following(text: str, offset: int) -> str:
@@ -162,7 +168,7 @@ def _is_abbreviation(text: str, dot: int, end: int) -> bool:
     while start >= 0 and (_java_char_letter(text[start]) or text[start] == "."):
         start -= 1
     raw = text[start + 1 : dot]
-    word = raw.lower()
+    word = _simple_lower(raw)
     if not word:
         return False
     if word in _ABBREVIATIONS:
@@ -311,7 +317,7 @@ def _split_clauses(text: str, sentence: tuple[int, int]) -> tuple[tuple[int, int
     candidates.sort(key=lambda candidate: (candidate[0], candidate[3]))
     boundaries: list[tuple[int, int, int, int]] = []
     for candidate in candidates:
-        if not any(candidate[0] < prior[2] for prior in boundaries):
+        if not boundaries or candidate[0] >= boundaries[-1][2]:
             boundaries.append(candidate)
     pieces: list[tuple[int, int]] = []
     begin = 0
@@ -325,7 +331,8 @@ def _split_clauses(text: str, sentence: tuple[int, int]) -> tuple[tuple[int, int
             _utf16_length(text[start:end]) > 1 for start, end in _token_spans(text, piece)
         )
         previous_short = (
-            bool(merged)
+            token_count >= 3
+            and bool(merged)
             and sum(
                 _utf16_length(text[start:end]) > 1 for start, end in _token_spans(text, merged[-1])
             )

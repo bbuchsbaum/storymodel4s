@@ -104,3 +104,29 @@ def test_java_uppercase_and_trim_controls_do_not_use_python_defaults() -> None:
     for character in ("\u0085", "\u00a0"):
         unit = prepare_recall("trim-control", character).units[0]
         assert unit.text == character and unit.support.start == 0 and unit.support.end == 1
+
+
+def test_simple_lowercase_sentence_starter_matches_scala_codepoint_rule() -> None:
+    for starter in ("I", "İ"):
+        units = prepare_recall("simple-lower", f"A. {starter} aa bb.").units
+        assert [(u.text, u.support.start, u.support.end) for u in units] == [
+            ("A.", 0, 2),
+            (f"{starter} aa bb.", 3, 11),
+        ]
+
+
+def test_short_clause_merge_does_not_rescan_growing_prefix(monkeypatch: pytest.MonkeyPatch) -> None:
+    from storymodel import recall_intake as intake
+
+    original = intake._token_spans
+    scanned = 0
+
+    def counted(text: str, span: tuple[int, int]) -> tuple[tuple[int, int], ...]:
+        nonlocal scanned
+        scanned += span[1] - span[0]
+        return original(text, span)
+
+    monkeypatch.setattr(intake, "_token_spans", counted)
+    text = "; ".join(["aa"] * 400)
+    assert intake._split_clauses(text, (0, len(text))) == ((0, len(text)),)
+    assert scanned <= len(text)
