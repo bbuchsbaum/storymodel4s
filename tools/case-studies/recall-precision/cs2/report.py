@@ -4,7 +4,7 @@ Reads only run outputs (rows.tsv, summary.json, unit_measures.json, manifest.jso
 calls and no recall text. Pooled across samples = the row-wise mean of the samples' bits.
 
 Usage (from tools/case-studies/recall-precision):
-  python -m cs2.report OUT_JSON CORPUS=PRODUCER=DIR[,DIR] [CORPUS=PRODUCER=DIR[,DIR] ...]
+  python -m cs2.report OUT_JSON [old:]CORPUS=PRODUCER=DIR[,DIR] ...
 """
 
 from __future__ import annotations
@@ -21,10 +21,11 @@ if str(HERE) not in sys.path:
 
 import numpy as np  # noqa: E402
 
-from metrics import cluster_bootstrap, cohen_kappa, icc21  # noqa: E402
+from metrics import cluster_bootstrap, cohen_kappa, icc21, sign_flip_p  # noqa: E402
 
 TERMS = ("film_bits", "work_bits", "scene_bits", "total_bits")
-BASES = ("duration", "lopo", "order_oracle", "tfidf")
+BASES = ("duration", "lopo", "gold_context_ceiling", "gold_context_fitted", "tfidf", "hmm_tfidf",
+         "pass1_only")
 SCHEMA = "storymodel4s.case-study-2.corpus-report/v1"
 EVIDENCE = "development data, engineering numbers; validation = the frozen-six run"
 
@@ -66,13 +67,40 @@ def _term(pm):
     )
 
 
-def _skill(pa, pb):
+def _skill(pa, pb, ra=None, rb=None, t=None):
+    """Skill 1 - LL/LL_ref, participant-weighted (ratio of participant means) with a cluster
+    bootstrap CI, row-weighted (ratio of row sums on the rows both score), the exact paired
+    sign-flip p over participants, and per-participant wins."""
     keys = sorted(set(pa) & set(pb))
     if not keys:
         return None
     cl = {p: (pa[p], pb[p]) for p in keys}
     st = lambda cs: 1 - sum(c[0] for c in cs) / sum(c[1] for c in cs)  # noqa: E731
-    return dict(skill=round(st(list(cl.values())), 4), ci95=_ci(cl, st))
+    d = [pb[p] - pa[p] for p in keys]
+    out = dict(skill=round(st(list(cl.values())), 4), ci95=_ci(cl, st),
+               sign_flip_p=round(sign_flip_p(d), 4),
+               wins=f"{sum(x > 0 for x in d)}/{len(d)}")
+    if ra is not None:
+        both = [k for k in ra if k in rb and _num(ra[k][t]) is not None
+                and _num(rb[k][t]) is not None]
+        num = sum(_num(ra[k][t]) for k in both)
+        den = sum(_num(rb[k][t]) for k in both)
+        out["row_weighted"] = round(1 - num / den, 4) if den else None
+        out["rows"] = len(both)
+    return out
+
+
+def _avg(samples, name):
+    """Row-wise mean of a forecast over samples (bits), where every sample has it."""
+    if not all(name in s for s in samples):
+        return None
+    if len(samples) == 1:
+        return samples[0][name]
+    return {k: {t: (None if _num(r[t]) is None else
+                    float(np.mean([_num(s[name][k][t]) for s in samples])))
+                for t in TERMS} | {"work": r["work"], "top_work": r["top_work"],
+                                   "scene_hit": r["scene_hit"]}
+            for k, r in samples[0][name].items()}
 
 
 def _shares(rowmap):
@@ -115,14 +143,15 @@ def corpus_report(corpus, producer, dirs, work_applicable):
             for k, r in samples[0]["producer"].items()
         }
     )
-    base = samples[0]
+    base = {b: _avg(samples, b) for b in BASES}
+    base = {b: v for b, v in base.items() if v is not None}
     parts = sorted({p for p, _, _ in prod})
     per = {p: {} for p in parts}
     for t in terms:
         pm = _pmean(prod, t)
         for p in parts:
             per[p][t] = round(pm.get(p), 4) if p in pm else None
-            for b in BASES:
+            for b in base:
                 bm = _pmean(base[b], t)
                 per[p][f"skill_{t}_vs_{b}"] = (
                     round(1 - pm[p] / bm[p], 4) if p in pm and bm.get(p) else None
@@ -139,12 +168,15 @@ def corpus_report(corpus, producer, dirs, work_applicable):
         )
     pooled = {t: _term(_pmean(prod, t)) for t in terms}
     pooled["skill"] = {
-        b: {t: _skill(_pmean(prod, t), _pmean(base[b], t)) for t in terms}
-        for b in BASES
+        b: {t: _skill(_pmean(prod, t), _pmean(base[b], t), prod, base[b], t) for t in terms}
+        for b in base
     }
-    pooled["baselines"] = {
-        b: {t: _term(_pmean(base[b], t)) for t in terms} for b in BASES
-    }
+    pooled["baselines"] = {b: {t: _term(_pmean(base[b], t)) for t in terms} for b in base}
+    # the cross-corpus headline: skill over the duration prior per term, no total; the film
+    # term is left out where the corpus has no non-film gold rows (Sherlock)
+    head_terms = [t for t in terms if t != "total_bits"
+                  and (work_applicable or t != "film_bits")]
+    headline = {t: pooled["skill"]["duration"][t] for t in head_terms}
 
     def share(key):
         vals = []
@@ -182,8 +214,9 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                 "reference_words",
                 "not_applicable_words",
                 "uncovered_words",
+                "non_addressed_words",
             ):
-                tot[k] += v[k]
+                tot[k] += v.get(k, 0)
         tot = dict(tot)
         tot["uncovered_share"] = round(tot["uncovered_words"] / tot["words_in_bins"], 4)
         conv = sm.get("ledger", {}).get("conversion") or sm.get("conversion")
@@ -206,7 +239,8 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                         "top_work_agreement",
                         "scene_hit_given_correct_work",
                         "scene_bits_by_speech",
-                        "gist_vs_detail",
+                        "localizability",
+                        "nonfilm_rows",
                         "nonwork_mass_by_gold_label",
                         "fallback_mass",
                         "typed_absence",
@@ -215,6 +249,8 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                 },
                 words=tot,
                 conversion=conv,
+                rules=sm.get("rules"),
+                epsilon=sm.get("epsilon"),
             )
         )
     rel = None
@@ -276,6 +312,8 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                 "film-transition strata and film-switch F1 (one work)",
             ]
         ),
+        headline=dict(note="compare corpora only by skill over the duration prior, per term",
+                      skill_vs_duration=headline),
         pooled=pooled,
         participants=per,
         per_sample=per_sample,
@@ -293,12 +331,14 @@ def main(argv):
         comparability="the corpora use different producers unless both name the same "
         "producer; compare corpora only within one producer",
         corpora=[],
+        old_rules=dict(note="the same producers rescored under the previous rules "
+                            "(scorer-config old_rules), for comparison only", corpora=[]),
     )
     for spec in argv[1:]:
-        corpus, producer, dirs = spec.split("=", 2)
-        rep["corpora"].append(
-            corpus_report(corpus, producer, dirs.split(","), corpus != "sherlock")
-        )
+        old = spec.startswith("old:")
+        corpus, producer, dirs = spec.removeprefix("old:").split("=", 2)
+        r = corpus_report(corpus, producer, dirs.split(","), corpus != "sherlock")
+        (rep["old_rules"]["corpora"] if old else rep["corpora"]).append(r)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(rep, indent=1) + "\n")
     print(out)
