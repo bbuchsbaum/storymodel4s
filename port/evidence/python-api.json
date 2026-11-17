@@ -1,0 +1,33 @@
+{
+  "source_commit": "12d28474e01e1dfe08c33e82dfaef9fe4a5bf317",
+  "checks": {
+    "full_suite": "214 passed in 3.82s",
+    "subsequent_regression": "6 Python API tests pass, including added direct extraction versus independent pairing equivalence",
+    "mypy": "21 source files pass",
+    "ruff": "lint and format pass"
+  },
+  "review": {
+    "verdict": "no BLOCKs",
+    "tests": "104 targeted plus 14 after typing delta; seven adversarial probes"
+  },
+  "compatibility": {
+    "baseline": "90b662ecc",
+    "unchanged": {
+      "v1": "f87bf668ead1514a7ce6a585f44558e79f1230de85981543f0e89f757c93c36f",
+      "request": "5a88ef30f25c825e2ef41cb254037f0c4e9499226b0b7b9816dea4fd39e99bbd",
+      "v2": "61abdb80e0d1af3a9513518888cdc8b450a3a819d3b3617736aceb087cbbe05e"
+    }
+  },
+  "wheel": {
+    "installed_module": "data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "outside_checkout": true,
+    "py_typed_in_wheel": true,
+    "typed_consumer": "mypy passed",
+    "example_output": "Independent accounts paired: 3 details, no invented source coverage."
+  },
+  "limits": [
+    "No full Scala parity or semantic accuracy claim.",
+    "V3 is an explicit new account format; v1/v2 compatibility examples retain original digests.",
+    "Pydantic runtime alias is not statically understood; Entity.create is the typed entry point."
+  ]
+}

@@ -5,6 +5,8 @@ functions compose one domain model; strict JSON is an exchange boundary, not a r
 intermediate step in every calculation. We consolidate working slices rather than translating
 Scala's class hierarchy or accumulating parallel pipeline frameworks.
 
+[Verification receipt](../evidence/python-api.json) records compatibility, tests and wheel checks.
+
 Run the complete notebook-style example:
 
 ```sh

@@ -44,3 +44,36 @@ def test_algorithms_validate_original_input_once_before_hashing(monkeypatch):
             patch.setattr(model, "validate_account", counted)
             operation(account)
         assert sum(value is account for value in inputs) == 1
+
+
+def test_direct_source_extraction_matches_independent_pair_graph():
+    from storymodel import make_account, pair_accounts, prepare_extraction
+
+    legacy = example_request().source
+    source = make_account(
+        legacy.documents,
+        units=legacy.units,
+        contexts=tuple(c for c in legacy.contexts if c.side == "source"),
+        entities=legacy.entities,
+        events=legacy.events,
+        export_permission="allowed",
+    )
+    raw = example_request().recall.raw_text.encode()
+    direct = resolve_extraction(
+        prepare_extraction("same-session", raw, source=source), example_proposal()
+    ).account
+    recall = resolve_extraction(prepare_extraction("same-session", raw), example_proposal()).account
+    paired = pair_accounts(source, recall)
+    for field in (
+        "documents",
+        "units",
+        "contexts",
+        "entities",
+        "events",
+        "relations",
+        "details",
+        "inventories",
+        "bindings",
+    ):
+        assert getattr(direct, field) == getattr(paired, field)
+    assert direct.export_permission == paired.export_permission == "denied"
