@@ -1,0 +1,75 @@
+{
+  "scope": "explicit saved construction-to-analysis replay",
+  "status": "local checks complete; cold review pending",
+  "tests": {
+    "command": "cd port && .venv/bin/pytest -q",
+    "passed": 950,
+    "seconds": 28.87
+  },
+  "typing": {
+    "command": "cd port && .venv/bin/mypy src/storymodel",
+    "source_files": 63,
+    "passed": true
+  },
+  "lint": {
+    "changed_files_passed": true
+  },
+  "installed": {
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_checks": 12,
+    "branches": [
+      {
+        "branch": "context",
+        "recall": 1,
+        "stages": 3,
+        "fidelity": "completed",
+        "source_unchanged": true
+      },
+      {
+        "branch": "context",
+        "recall": 2,
+        "stages": 3,
+        "fidelity": "pending",
+        "source_unchanged": true
+      },
+      {
+        "branch": "native",
+        "recall": 1,
+        "stages": 3,
+        "fidelity": "completed",
+        "source_unchanged": true
+      },
+      {
+        "branch": "native",
+        "recall": 2,
+        "stages": 3,
+        "fidelity": "pending",
+        "source_unchanged": true
+      },
+      {
+        "branch": "correspondence",
+        "recall": 1,
+        "stages": 19,
+        "bindings": 9,
+        "source_unchanged": true
+      },
+      {
+        "branch": "correspondence",
+        "recall": 2,
+        "stages": 19,
+        "bindings": 9,
+        "source_unchanged": true
+      }
+    ]
+  },
+  "wheel": {
+    "sha256": "c42fc68ec4bf9c917466a6829cc26416245534cb4a4f254996677ec240095c6d",
+    "source_files": 68,
+    "exact_source_match": true
+  },
+  "verification_note": "An initial root-directory pytest collection was interrupted with exit130; it is not a qualification run. The reported suite ran from port/.",
+  "limits": [
+    "Saved replay, not raw-observation generation, model accuracy, or interrupted-import recovery.",
+    "No full P2-P6 parity claim; unchanged domain stage APIs remain authoritative."
+  ]
+}

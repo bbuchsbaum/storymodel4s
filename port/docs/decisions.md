@@ -411,3 +411,14 @@ missing measurement, and an obligatory numerical/model dependency for recorded-v
 Use max-scaled cosine and stable L2 validation to correct overflow and repeated-normalization
 failures rather than translating those weaknesses. Recorded model metadata remains a declaration;
 actual provider execution and privacy-aware caches remain owed. [Contract](semantic.md).
+
+## Connected saved analysis replay (2026-11-17, provisional)
+
+Use a plain manifest and one explicit linear fold through existing construction, pairing,
+detail, mapping, fidelity and analysis functions. Every stage's complete account must equal
+its actual predecessor; retain typed requests/results and actual import hashes. Rejected
+alternatives: a mutable session/DAG scheduler, provider callbacks, prompt-only compatibility,
+automatic identity/hash rebinding, and silently dropping incomplete receipts. Relative file
+paths resolve against the manifest; native pre-pair detail admission and v8 upgrade are explicit.
+This improves the saved-workflow API without changing graph or assessment semantics. Import
+recovery remains a separate study-operation capability. [Contract](analysis-workflow.md).

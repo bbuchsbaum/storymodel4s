@@ -3,6 +3,17 @@
 from .accounts import make_account, pair_accounts
 from .alignment import AlignmentPolicy, align_account, verify_alignment
 from .analysis import Analysis, project
+from .analysis_workflow import (
+    AnalysisAccountInput,
+    AnalysisFile,
+    AnalysisPlan,
+    AnalysisReplay,
+    AnalysisStage,
+    read_analysis_plan,
+    replay_analysis,
+    replay_analysis_file,
+    verify_analysis,
+)
 from .artifacts import (
     export_account,
     export_supported_account,
@@ -185,6 +196,15 @@ from .rich_account import upgrade_assessment_account, upgrade_temporal_account
 
 __all__ = [
     "TemporalClaim",
+    "AnalysisAccountInput",
+    "AnalysisFile",
+    "AnalysisPlan",
+    "AnalysisReplay",
+    "AnalysisStage",
+    "read_analysis_plan",
+    "replay_analysis",
+    "replay_analysis_file",
+    "verify_analysis",
     "TemporalPolicy",
     "TemporalRow",
     "canonical_temporal",

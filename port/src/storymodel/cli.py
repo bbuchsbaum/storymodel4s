@@ -7,6 +7,10 @@ from typing import Any
 
 from .alignment import align_account, validate_policy
 from .analysis import Analysis, Policy, project
+from .analysis_workflow import (
+    AnalysisReplay,
+    replay_analysis_file,
+)
 from .artifacts import publish_json, read_account, read_supported_account
 from .attribution import (
     AttributionResult,
@@ -443,6 +447,17 @@ def main(argv: list[str] | None = None) -> int:
     semantic_verify.add_argument("reply")
     semantic_verify.add_argument("result")
     semantic_verify.add_argument("--output")
+    analysis_replay = commands.add_parser(
+        "replay-analysis", help="replay a saved account chain relative to its manifest"
+    )
+    analysis_replay.add_argument("plan")
+    analysis_replay.add_argument("--output")
+    analysis_verify = commands.add_parser(
+        "verify-analysis", help="recompute and verify a saved analysis replay"
+    )
+    analysis_verify.add_argument("plan")
+    analysis_verify.add_argument("result")
+    analysis_verify.add_argument("--output")
     relation_admit = commands.add_parser(
         "admit-relations", help="admit an input-bound recorded event or state relation batch"
     )
@@ -1582,6 +1597,19 @@ def main(argv: list[str] | None = None) -> int:
                 max_semantic_candidates=args.max_semantic_candidates,
             )
             emit(semantic_request.model_dump(mode="json"), args.output)
+        elif args.command == "replay-analysis":
+            emit(replay_analysis_file(Path(args.plan)).model_dump(mode="json"), args.output)
+        elif args.command == "verify-analysis":
+            analysis_plan_path = Path(args.plan)
+            # Replaying first makes both account grants fail closed before the independently
+            # supplied receipt is read.
+            analysis_expected = replay_analysis_file(analysis_plan_path)
+            analysis_receipt = AnalysisReplay.model_validate_json(
+                canonical(strict_json(Path(args.result).read_bytes()))
+            )
+            if analysis_receipt != analysis_expected:
+                raise ValueError("analysis replay differs from original plan, inputs or recordings")
+            emit({"verified": True}, args.output)
         elif args.command in (
             "semantic-prompt",
             "import-semantic",

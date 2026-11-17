@@ -694,3 +694,24 @@ scientific truth or audiovisual accuracy. [Contract](native-assessment.md).
   profiles, privacy/HMAC cache policy, complete upstream material/truncation contracts, broader
   scalable retrieval, native numerical consumers and scientific evaluation. This slice is
   recorded text-surface integration, not full embedding-module parity.
+
+## Connected saved construction-to-analysis replay (P2/P3/P5)
+
+- **Behavior retained:** independent source/recall construction, explicit pairing, recorded detail
+  inventories, reference mapping, hypothesis-conditional/contextual/native fidelity and three
+  analysis views. Existing domain functions remain the semantic implementation; this slice
+  replaces repeated example orchestration, not a Scala algorithm or graph representation.
+- **Python entry points:** `AnalysisPlan`, `replay_analysis`, `replay_analysis_file`,
+  `verify_analysis`; CLI `replay-analysis` / `verify-analysis`. [Contract](analysis-workflow.md).
+- **New checked relation:** each stage's full request account equals the preceding result before
+  any recording read. Equal provider prompts do not establish occurrence/snapshot identity.
+  Context evidence is never silently rebound. Actual file/import hashes and typed receipts remain
+  inspectable. Explicit pre-pair details support the native-source/text-recall path.
+- **Consumer/evidence:** [connected example](../examples/analysis_workflow.py) extends existing
+  contextual, native and nine-case correspondence examples. One source is reused across two
+  recalls in each branch, with pending gaps and completed grades preserved. Independent refusal
+  cases cover stale/reordered stages, foreign recordings, pins, missing input and export grants.
+  [Qualification](../evidence/analysis-workflow.json).
+- **Still owed:** study-specific intake, interrupted-import recovery, live providers, remaining
+  graph/algorithm families and Atlas interaction. The manifest consumes saved construction
+  requests/replies; it does not claim automatic raw observation production or scientific accuracy.
