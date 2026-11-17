@@ -1,0 +1,44 @@
+{
+  "source_commit": "84b743d86a41ad9b9a2074c354a3b31a3bc9f000",
+  "bead": "bd-01M7KZENYZ218MH8RKSC8QDPYY",
+  "scope": "One sparse local engine for legacy and rich event/state accounts; same-kind retrieval before budget; separate qualifier/circumstance diagnostics",
+  "checks": {
+    "pytest": {"passed": 478, "seconds": 5.82},
+    "mypy_source_files": 35,
+    "ruff_check": "passed",
+    "ruff_format_files": 88,
+    "diff_check": "passed"
+  },
+  "compatibility": {
+    "baseline_commit": "adc5107d0",
+    "frozen": "Legacy alignment policy/result schemas and deterministic full result unchanged",
+    "architecture": "One shared _align engine; legacy wire renderer; circumstances grouped in one pass and sorted per owner",
+    "rich_contract": "Explicit v2 result and situation diagnostics; complete rich account retained; only missing bindings and recipe change"
+  },
+  "mutations": {
+    "method": "Isolated source copies; each mutant compiled; each baseline 3 passed; each mutant 1 named failure and 2 passing controls",
+    "cases": [
+      {"change": "Merge kinds in posting and query keys", "failed": "test_same_kind_retrieval_precedes_budget_and_echoes_both_universes"},
+      {"change": "Treat unknown/unknown as agreement", "failed": "test_state_candidates_preserve_rich_graph_and_do_not_create_fidelity"},
+      {"change": "Exclude differing polarity when selecting references", "failed": "test_qualifier_agreement_does_not_select_alternatives_or_collapse_same_row_ambiguity"}
+    ]
+  },
+  "installed_artifact": {
+    "environment": "Wheel site-packages import outside checkout with PYTHONPATH unset",
+    "example": "examples/rich_alignment_workflow.py",
+    "result": "One independently constructed source reused unchanged for two recalls; complete API/CLI results and account-only exports agree",
+    "reference": "Both recalls resolved under declared predicate/role rule",
+    "qualifier_difference": "Visible, without selecting or vetoing reference",
+    "fidelity": "Pending; no assessments generated",
+    "coverage": "not-assessable"
+  },
+  "independent_review": {
+    "commit": "84b743d86a41ad9b9a2074c354a3b31a3bc9f000",
+    "verdict": "no BLOCK found",
+    "focused_tests": 30,
+    "legacy_comparison": "50 seeded cases produce complete outputs identical to actual adc5107d0 implementation",
+    "additional_probes": "Attributed rich context refusals and forged raw source-universe refusal",
+    "sparsity": "Source inspection confirms sparse postings and bounded candidate materialization; no dense source-recall matrix"
+  },
+  "limits": ["No comparative performance or accuracy claim", "Conservative kind/role/root-context/row gates can withhold real references", "Full Scala distorted-mode, semantic channels and account-derived inference remain owed", "The recurring-scene correspondence demonstration and full P3/P4 exits remain incomplete"]
+}
