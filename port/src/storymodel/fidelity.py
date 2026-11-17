@@ -14,6 +14,7 @@ from .context_fidelity import (
 )
 from .held_identity import resolve_attributed_identity
 from .model import (
+    AnySupport,
     Assessment,
     Binding,
     Detail,
@@ -30,12 +31,27 @@ from .model import (
     contained_in,
     text_support,
 )
-from .rich_account import SupportedAccount, require_text_account, validate_supported_account
+from .native_assessment import (
+    NativeCitation,
+    native_citation_supports,
+    native_source_view,
+    require_native_source_account,
+)
+from .playback import PlaybackSupport
+from .rich_account import (
+    RichAccount,
+    SupportedAccount,
+    require_text_account,
+    validate_supported_account,
+)
 from .serialization import canonical, digest, strict_json
 
 RECIPE: Literal["unit-only-conditional-fidelity/v1"] = "unit-only-conditional-fidelity/v1"
 CONTEXT_RECIPE: Literal["context-evidence-conditional-fidelity/v2"] = (
     "context-evidence-conditional-fidelity/v2"
+)
+NATIVE_RECIPE: Literal["native-observation-conditional-fidelity/v1"] = (
+    "native-observation-conditional-fidelity/v1"
 )
 
 
@@ -70,11 +86,19 @@ class FidelityProposal(Model):
     evidence: tuple[SourceQuote, ...] = ()
 
 
+class NativeFidelityProposal(FidelityProposal):
+    """Cite supplied native situations separately from exact text quotations."""
+
+    playback_evidence: tuple[NativeCitation, ...] = ()
+
+
 def _conditional_assessment(
     hypothesis: Hypothesis,
     item: FidelityProposal,
     targets: dict[str, Unit],
     documents: dict[str, Document],
+    *,
+    playback_evidence: tuple[PlaybackSupport, ...] = (),
 ) -> Assessment:
     """Shared quote/grade admission for direct mapping and subsequent graded assessment."""
     if item.status == "completed":
@@ -98,7 +122,8 @@ def _conditional_assessment(
     )
     if any(t not in targets for t in hypothesis.targets):
         raise ValueError("foreign source target")
-    if any(not contained_in(s, (targets[t].support for t in hypothesis.targets)) for s in supports):
+    combined: tuple[AnySupport, ...] = (*supports, *playback_evidence)
+    if any(not contained_in(s, (targets[t].support for t in hypothesis.targets)) for s in combined):
         raise ValueError("fidelity evidence lies outside its source hypothesis")
     return Assessment(
         hypothesis=hypothesis.id,
@@ -106,7 +131,7 @@ def _conditional_assessment(
         grade=item.grade,
         severity=item.severity,
         reason=item.reason,
-        evidence=supports,
+        evidence=combined,
     )
 
 
@@ -182,30 +207,44 @@ class ContextFidelityRequest(_FidelityRequestFields):
     context_evidence: ContextEvidence
 
 
-FidelityInput = FidelityRequest | ContextFidelityRequest
+class NativeFidelityRequest(_FidelityRequestFields):
+    """Grade text recall against supplied source observations with native evidence."""
+
+    schema_version: Literal["storymodel.fidelity-request/v3"] = "storymodel.fidelity-request/v3"
+    account: RichAccount
+
+
+FidelityInput = FidelityRequest | ContextFidelityRequest | NativeFidelityRequest
 
 
 def fidelity_recipe(request: FidelityInput) -> str:
     """Name the actual information condition used by a checked request."""
+    if isinstance(request, NativeFidelityRequest):
+        return NATIVE_RECIPE
     return CONTEXT_RECIPE if isinstance(request, ContextFidelityRequest) else RECIPE
 
 
 def validate_fidelity_request(value: FidelityInput | str | bytes) -> FidelityInput:
     """Revalidate nested relationships and contextual recordings before consumption."""
     request: FidelityInput
-    if isinstance(value, (FidelityRequest, ContextFidelityRequest)):
+    if isinstance(value, (FidelityRequest, ContextFidelityRequest, NativeFidelityRequest)):
         request = _validate_instance(type(value), value)
     else:
         parsed = strict_json(value)
         if not isinstance(parsed, dict):
             raise ValueError("fidelity request must be an object")
         cls = (
-            ContextFidelityRequest
+            NativeFidelityRequest
+            if parsed.get("schema_version") == "storymodel.fidelity-request/v3"
+            else ContextFidelityRequest
             if parsed.get("schema_version") == "storymodel.fidelity-request/v2"
             else FidelityRequest
         )
         request = cls.model_validate_json(canonical(parsed))
-    require_text_account(request.account)
+    if isinstance(request, NativeFidelityRequest):
+        require_native_source_account(request.account)
+    else:
+        require_text_account(request.account)
     if isinstance(request, ContextFidelityRequest):
         resolve_attributed_identity(
             request.account,
@@ -223,6 +262,20 @@ def prepare_fidelity(
     context_evidence: ContextEvidence | None = None,
 ) -> FidelityInput:
     """Select only absent/pending grades; references and other assessment statuses stay fixed."""
+    if (
+        isinstance(account, RichAccount)
+        and account.schema_version == "storymodel.account/v8"
+        and account.media_sources
+    ):
+        if context_evidence is not None:
+            raise ValueError("native fidelity does not support text context/holder recordings")
+        return validate_fidelity_request(
+            NativeFidelityRequest(
+                account=require_native_source_account(account),
+                unit=unit,
+                interpretation=interpretation,
+            )
+        )
     checked = require_text_account(account)
     if context_evidence is not None:
         return validate_fidelity_request(
@@ -261,6 +314,14 @@ class ContextFidelityReply(Model):
     schema_version: Literal["storymodel.fidelity-proposal/v2"] = "storymodel.fidelity-proposal/v2"
     packet_sha256: Digest
     assessments: tuple[ContextFidelityProposal, ...] = ()
+
+
+class NativeFidelityReply(Model):
+    """Native replies retain situation citations and exact playback support."""
+
+    schema_version: Literal["storymodel.fidelity-proposal/v3"] = "storymodel.fidelity-proposal/v3"
+    packet_sha256: Digest
+    assessments: tuple[NativeFidelityProposal, ...] = ()
 
 
 def fidelity_prompt(value: FidelityInput) -> str:
@@ -360,6 +421,20 @@ def fidelity_prompt(value: FidelityInput) -> str:
             "source quotes for a grade. No recorded situation placement is a gap, "
             "not narrated-world placement."
         )
+    if isinstance(request, NativeFidelityRequest):
+        payload["recipe"] = NATIVE_RECIPE
+        payload["schema"] = NativeFidelityReply.model_json_schema()
+        payload["source_observations"] = native_source_view(request.account)
+        payload["instruction"] = str(payload["instruction"]).replace(
+            "fidelity-proposal/v1", "fidelity-proposal/v3"
+        ) + (
+            " Native evidence uses playback_evidence entries naming a supplied source situation "
+            "and exact support within both that situation and the hypothesis. The full cited "
+            "situation must belong to the hypothesis. These are admitted symbolic annotations, "
+            "not access to raw audiovisual content. Respect epistemic contexts; missing evidence "
+            "or unresolved attribution is not contradiction. Use unverifiable when needed. "
+            "No cross-modal identity or holder resolution is supplied."
+        )
     return canonical({"packet_sha256": digest(payload), **payload})
 
 
@@ -400,7 +475,15 @@ class ContextFidelityResult(_FidelityResultFields):
     context_accounting: dict[Name, ContextAccounting]
 
 
-FidelityOutput = FidelityResult | ContextFidelityResult
+class NativeFidelityResult(_FidelityResultFields):
+    """Native assessment receipt preserves the full v8 account and admission outcomes."""
+
+    schema_version: Literal["storymodel.fidelity-result/v3"] = "storymodel.fidelity-result/v3"
+    recipe: Literal["native-observation-conditional-fidelity/v1"] = NATIVE_RECIPE
+    account: RichAccount
+
+
+FidelityOutput = FidelityResult | ContextFidelityResult | NativeFidelityResult
 
 
 def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
@@ -414,7 +497,13 @@ def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
         "assessments",
     }:
         raise ValueError("fidelity proposal requires explicit schema, digest and assessments")
-    version = "v2" if isinstance(request, ContextFidelityRequest) else "v1"
+    version = (
+        "v3"
+        if isinstance(request, NativeFidelityRequest)
+        else "v2"
+        if isinstance(request, ContextFidelityRequest)
+        else "v1"
+    )
     if parsed["schema_version"] != f"storymodel.fidelity-proposal/{version}":
         raise ValueError("unsupported fidelity proposal schema")
     if parsed["packet_sha256"] != strict_json(prompt)["packet_sha256"]:
@@ -458,9 +547,20 @@ def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
                         contextual.grade,
                     )
                     item = contextual
+                elif isinstance(request, NativeFidelityRequest):
+                    item = NativeFidelityProposal.model_validate_json(canonical(proposals[key]))
                 else:
                     item = FidelityProposal.model_validate_json(canonical(proposals[key]))
-                assessment = _conditional_assessment(q.hypothesis, item, targets, documents)
+                native = (
+                    native_citation_supports(
+                        require_native_source_account(account), q.hypothesis, item.playback_evidence
+                    )
+                    if isinstance(item, NativeFidelityProposal)
+                    else ()
+                )
+                assessment = _conditional_assessment(
+                    q.hypothesis, item, targets, documents, playback_evidence=native
+                )
                 updates.setdefault((q.detail.id, q.binding.reference.interpretation), {})[
                     q.hypothesis.id
                 ] = assessment
@@ -504,6 +604,11 @@ def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
                         dict.fromkeys(
                             [
                                 *(d.sha256 for d in account.documents),
+                                *(
+                                    (s.sha256 for s in account.media_sources)
+                                    if isinstance(account, RichAccount)
+                                    else ()
+                                ),
                                 request_sha,
                                 response_sha,
                             ]
@@ -520,6 +625,8 @@ def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
         account=output,
         decisions=tuple(decisions),
     )
+    if isinstance(request, NativeFidelityRequest):
+        return NativeFidelityResult.model_validate(result_fields)
     if isinstance(request, ContextFidelityRequest):
         return ContextFidelityResult.model_validate(
             result_fields | {"context_accounting": context_reviews}
@@ -529,7 +636,13 @@ def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
 
 def verify_fidelity(value: FidelityInput, raw: str, receipt: FidelityOutput) -> FidelityOutput:
     """Recompute all decisions and account updates from the original request and exact response."""
-    cls = ContextFidelityResult if isinstance(receipt, ContextFidelityResult) else FidelityResult
+    cls = (
+        NativeFidelityResult
+        if isinstance(receipt, NativeFidelityResult)
+        else ContextFidelityResult
+        if isinstance(receipt, ContextFidelityResult)
+        else FidelityResult
+    )
     checked = _validate_instance(cls, receipt)
     expected = resolve_fidelity(value, raw)
     if checked != expected:

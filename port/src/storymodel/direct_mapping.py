@@ -13,10 +13,11 @@ from .fidelity import (
     FidelityProposal as FidelityProposal,
 )
 from .fidelity import (
-    SourceQuote as SourceQuote,
+    NativeFidelityProposal,
+    _conditional_assessment,
 )
 from .fidelity import (
-    _conditional_assessment,
+    SourceQuote as SourceQuote,
 )
 from .model import (
     Account,
@@ -33,6 +34,11 @@ from .model import (
     _validate_instance,
     text_support,
 )
+from .native_assessment import (
+    native_citation_supports,
+    native_source_view,
+    require_native_source_account,
+)
 from .rich_account import (
     RichAccount,
     SupportedAccount,
@@ -41,7 +47,8 @@ from .rich_account import (
 )
 from .serialization import canonical, digest, strict_json
 
-RECIPE = "unit-only-direct-mapping/v1"
+RECIPE: Literal["unit-only-direct-mapping/v1"] = "unit-only-direct-mapping/v1"
+NATIVE_RECIPE = "native-observation-direct-mapping/v1"
 Interpretation = Literal["narrative", "referent"]
 
 
@@ -87,7 +94,18 @@ class RichMappingRequest(_MappingRequestFields):
     account: RichAccount
 
 
-MappingInput = MappingRequest | RichMappingRequest
+class NativeMappingRequest(_MappingRequestFields):
+    """Local text recall is mapped against admitted source observations with native supports."""
+
+    schema_version: Literal["storymodel.mapping-request/v3"] = "storymodel.mapping-request/v3"
+    account: RichAccount
+
+
+MappingInput = MappingRequest | RichMappingRequest | NativeMappingRequest
+
+
+def mapping_recipe(request: MappingInput) -> str:
+    return NATIVE_RECIPE if isinstance(request, NativeMappingRequest) else RECIPE
 
 
 def _details(request: _MappingRequestFields) -> tuple[Detail, ...]:
@@ -107,6 +125,10 @@ def _details(request: _MappingRequestFields) -> tuple[Detail, ...]:
 def validate_mapping_request(value: MappingInput | str | bytes) -> MappingInput:
     """Revalidate nested copied objects before generating prompts or changing bindings."""
     request: MappingInput
+    if isinstance(value, NativeMappingRequest):
+        request = _validate_instance(NativeMappingRequest, value)
+        require_native_source_account(request.account)
+        return request
     if isinstance(value, RichMappingRequest):
         request = _validate_instance(RichMappingRequest, value)
         require_text_account(request.account)
@@ -118,6 +140,10 @@ def validate_mapping_request(value: MappingInput | str | bytes) -> MappingInput:
     parsed = strict_json(value)
     if not isinstance(parsed, dict):
         raise ValueError("mapping request must be a JSON object")
+    if parsed.get("schema_version") == "storymodel.mapping-request/v3":
+        native = NativeMappingRequest.model_validate_json(canonical(parsed))
+        require_native_source_account(native.account)
+        return native
     if parsed.get("schema_version") == "storymodel.mapping-request/v2":
         request = RichMappingRequest.model_validate_json(canonical(parsed))
     else:
@@ -130,6 +156,18 @@ def prepare_mapping(
     account: SupportedAccount, unit: str, *, interpretation: Interpretation = "referent"
 ) -> MappingInput:
     """Prepare one independent unit; existing bindings are excluded and never overwritten."""
+    if (
+        isinstance(account, RichAccount)
+        and account.schema_version == "storymodel.account/v8"
+        and account.media_sources
+    ):
+        return validate_mapping_request(
+            NativeMappingRequest(
+                account=require_native_source_account(account),
+                unit=unit,
+                interpretation=interpretation,
+            )
+        )
     checked = require_text_account(account)
     if isinstance(checked, RichAccount):
         return RichMappingRequest(account=checked, unit=unit, interpretation=interpretation)
@@ -167,6 +205,20 @@ class MappingProposal(Model):
     schema_version: Literal["storymodel.mapping-proposal/v1"]
     packet_sha256: Digest
     details: tuple[DetailMapping, ...] = ()
+
+
+class NativeDetailMapping(DetailMapping):
+    """Optional native grades use the same reference and conditional assessment semantics."""
+
+    assessments: tuple[NativeFidelityProposal, ...] = ()
+
+
+class NativeMappingProposal(Model):
+    """Explicit native observation proposal contract leaves legacy text replies unchanged."""
+
+    schema_version: Literal["storymodel.mapping-proposal/v2"] = "storymodel.mapping-proposal/v2"
+    packet_sha256: Digest
+    details: tuple[NativeDetailMapping, ...] = ()
 
 
 def mapping_prompt(value: MappingInput) -> str:
@@ -227,6 +279,20 @@ def mapping_prompt(value: MappingInput) -> str:
             "Use only this recall unit; do not infer its global order or neighbors."
         ),
     }
+    if isinstance(request, NativeMappingRequest):
+        payload["recipe"] = NATIVE_RECIPE
+        payload["source_observations"] = native_source_view(request.account)
+        payload["schema"] = NativeMappingProposal.model_json_schema()
+        payload["instruction"] = str(payload["instruction"]).replace(
+            "mapping-proposal/v1", "mapping-proposal/v2"
+        ) + (
+            " Native evidence uses playback_evidence entries naming an admitted source situation "
+            "and exact support within that situation and hypothesis. The entire cited situation "
+            "must fit the hypothesis. Source observations are symbolic annotations, not raw "
+            "audiovisual access. Preserve their epistemic contexts. Missing observations or "
+            "unresolved attribution do not imply contradiction or invention. No cross-modal "
+            "identity or holder resolution is supplied. Leave unsupported judgments pending."
+        )
     return canonical({"packet_sha256": digest(payload), **payload})
 
 
@@ -243,7 +309,7 @@ class _MappingResultFields(Model):
     """Common receipt fields; each public version pins its account shape."""
 
     schema_version: str = "storymodel.mapping-result/v1"
-    recipe: Literal["unit-only-direct-mapping/v1"] = "unit-only-direct-mapping/v1"
+    recipe: str = RECIPE
     request_sha256: Digest
     prompt_sha256: Digest
     response_sha256: Digest
@@ -256,6 +322,7 @@ class MappingResult(_MappingResultFields):
 
     schema_version: Literal["storymodel.mapping-result/v1"] = "storymodel.mapping-result/v1"
     account: Account
+    recipe: Literal["unit-only-direct-mapping/v1"] = RECIPE
 
 
 class RichMappingResult(_MappingResultFields):
@@ -263,9 +330,18 @@ class RichMappingResult(_MappingResultFields):
 
     schema_version: Literal["storymodel.mapping-result/v2"] = "storymodel.mapping-result/v2"
     account: RichAccount
+    recipe: Literal["unit-only-direct-mapping/v1"] = RECIPE
 
 
-MappingOutput = MappingResult | RichMappingResult
+class NativeMappingResult(_MappingResultFields):
+    """Native mapping retains its complete source/recall graph and processing outcomes."""
+
+    schema_version: Literal["storymodel.mapping-result/v3"] = "storymodel.mapping-result/v3"
+    recipe: Literal["native-observation-direct-mapping/v1"] = "native-observation-direct-mapping/v1"
+    account: RichAccount
+
+
+MappingOutput = MappingResult | RichMappingResult | NativeMappingResult
 
 
 def _binding(request: MappingInput, detail: Detail, proposal: DetailMapping) -> Binding:
@@ -291,7 +367,16 @@ def _binding(request: MappingInput, detail: Detail, proposal: DetailMapping) -> 
         if item.hypothesis not in hypotheses or item.hypothesis in assessments:
             raise ValueError("foreign or duplicate conditional fidelity hypothesis")
         hypothesis = hypotheses[item.hypothesis]
-        assessments[item.hypothesis] = _conditional_assessment(hypothesis, item, targets, documents)
+        native = (
+            native_citation_supports(
+                require_native_source_account(account), hypothesis, item.playback_evidence
+            )
+            if isinstance(item, NativeFidelityProposal)
+            else ()
+        )
+        assessments[item.hypothesis] = _conditional_assessment(
+            hypothesis, item, targets, documents, playback_evidence=native
+        )
 
     return Binding(
         detail=detail.id,
@@ -323,7 +408,8 @@ def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
         "details",
     }:
         raise ValueError("mapping proposal requires explicit schema, prompt digest and details")
-    if parsed["schema_version"] != "storymodel.mapping-proposal/v1":
+    version = "v2" if isinstance(request, NativeMappingRequest) else "v1"
+    if parsed["schema_version"] != f"storymodel.mapping-proposal/{version}":
         raise ValueError("unsupported mapping proposal schema")
     if parsed["packet_sha256"] != strict_json(mapping_prompt(request))["packet_sha256"]:
         raise ValueError("mapping proposal belongs to another prompt")
@@ -356,7 +442,12 @@ def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
             )
         else:
             try:
-                proposal = DetailMapping.model_validate_json(canonical(proposals[key]))
+                proposal_class = (
+                    NativeDetailMapping
+                    if isinstance(request, NativeMappingRequest)
+                    else DetailMapping
+                )
+                proposal = proposal_class.model_validate_json(canonical(proposals[key]))
                 binding = _binding(request, detail, proposal)
                 validate_supported_account(
                     account.model_copy(update={"bindings": (*bindings, binding)})
@@ -382,9 +473,14 @@ def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
             update={
                 "bindings": tuple(bindings),
                 "recipe": Recipe(
-                    name=RECIPE,
+                    name=mapping_recipe(request),
                     input_sha256=(
                         *(d.sha256 for d in account.documents),
+                        *(
+                            (s.sha256 for s in account.media_sources)
+                            if isinstance(account, RichAccount)
+                            else ()
+                        ),
                         request_sha,
                         response_sha,
                     ),
@@ -392,14 +488,23 @@ def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
             }
         )
     )
-    result_class = RichMappingResult if isinstance(output, RichAccount) else MappingResult
+    result_class = (
+        NativeMappingResult
+        if isinstance(request, NativeMappingRequest)
+        else RichMappingResult
+        if isinstance(output, RichAccount)
+        else MappingResult
+    )
     return result_class.model_validate_json(
         canonical(
             dict(
-                schema_version="storymodel.mapping-result/v2"
+                schema_version="storymodel.mapping-result/v3"
+                if isinstance(request, NativeMappingRequest)
+                else "storymodel.mapping-result/v2"
                 if isinstance(output, RichAccount)
                 else "storymodel.mapping-result/v1",
                 request_sha256=request_sha,
+                recipe=mapping_recipe(request),
                 prompt_sha256=prompt_sha,
                 response_sha256=response_sha,
                 account=output.model_dump(mode="json"),
@@ -411,7 +516,13 @@ def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
 
 def verify_mapping(value: MappingInput, raw: str, receipt: MappingOutput) -> MappingOutput:
     """Recompute receipts, evidence and bindings from independently supplied original inputs."""
-    result_class = RichMappingResult if isinstance(receipt, RichMappingResult) else MappingResult
+    result_class = (
+        NativeMappingResult
+        if isinstance(receipt, NativeMappingResult)
+        else RichMappingResult
+        if isinstance(receipt, RichMappingResult)
+        else MappingResult
+    )
     checked = _validate_instance(result_class, receipt)
     expected = resolve_mapping(value, raw)
     if checked != expected:

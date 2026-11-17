@@ -10,6 +10,7 @@ from .fidelity import (
     ContextFidelityRequest,
     FidelityInput,
     FidelityOutput,
+    NativeFidelityRequest,
     fidelity_prompt,
     fidelity_recipe,
     fidelity_request_digest,
@@ -40,7 +41,9 @@ def _profile(request: FidelityInput) -> RunProfile:
     return RunProfile(
         provider="imported-text",
         model=(
-            "supplied-conditional-fidelity/v2"
+            "supplied-native-conditional-fidelity/v1"
+            if isinstance(request, NativeFidelityRequest)
+            else "supplied-conditional-fidelity/v2"
             if isinstance(request, ContextFidelityRequest)
             else "supplied-conditional-fidelity/v1"
         ),

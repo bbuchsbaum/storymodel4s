@@ -15,7 +15,8 @@ from .model import (
     digest,
     text_support,
 )
-from .rich_account import SupportedAccount, require_text_account
+from .native_assessment import require_native_source_account
+from .rich_account import RichAccount, SupportedAccount, require_text_account
 
 Policy = Literal["target-episode-novel-content/v1", "target-event-only/v1"]
 Category = Literal["internal", "external", "unresolved", "excluded"]
@@ -103,7 +104,13 @@ def project(
     source row can still be definitely present despite an unresolved detail elsewhere.
     Rows outside the declared eligible universe are absent from this projection only.
     """
-    account = require_text_account(value)
+    account = (
+        require_native_source_account(value)
+        if isinstance(value, RichAccount)
+        and value.schema_version == "storymodel.account/v8"
+        and value.media_sources
+        else require_text_account(value)
+    )
     if policy not in ("target-episode-novel-content/v1", "target-event-only/v1"):
         raise ValueError("unknown analysis policy")
     units = {u.id: u for u in account.units}

@@ -37,13 +37,14 @@ class Circumstance(Identified):
 
 
 class RichAccount(_AccountFields):
-    """One graph: v5 adds contexts, v6 native evidence and v7 retained temporal claims."""
+    """One graph: v5 adds contexts, v6 native evidence, v7 chronology and v8 assessment."""
 
     schema_version: Literal[
         "storymodel.account/v4",
         "storymodel.account/v5",
         "storymodel.account/v6",
         "storymodel.account/v7",
+        "storymodel.account/v8",
     ] = "storymodel.account/v4"
     states: tuple[State, ...] = ()
     circumstances: tuple[Circumstance, ...] = ()
@@ -52,11 +53,13 @@ class RichAccount(_AccountFields):
 
     @model_validator(mode="after")
     def historical_fields(self) -> Self:
-        if self.schema_version not in ("storymodel.account/v6", "storymodel.account/v7") and (
-            "media_sources" in self.model_fields_set or self.media_sources
-        ):
+        if self.schema_version not in (
+            "storymodel.account/v6",
+            "storymodel.account/v7",
+            "storymodel.account/v8",
+        ) and ("media_sources" in self.model_fields_set or self.media_sources):
             raise ValueError("media_sources field requires account v6")
-        if self.schema_version != "storymodel.account/v7" and (
+        if self.schema_version not in ("storymodel.account/v7", "storymodel.account/v8") and (
             "temporal_relations" in self.model_fields_set or self.temporal_relations
         ):
             raise ValueError("temporal_relations field requires account v7")
@@ -65,9 +68,13 @@ class RichAccount(_AccountFields):
     @model_serializer(mode="wrap")
     def wire_fields(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
         data: dict[str, Any] = handler(self)
-        if self.schema_version not in ("storymodel.account/v6", "storymodel.account/v7"):
+        if self.schema_version not in (
+            "storymodel.account/v6",
+            "storymodel.account/v7",
+            "storymodel.account/v8",
+        ):
             data.pop("media_sources", None)
-        if self.schema_version != "storymodel.account/v7":
+        if self.schema_version not in ("storymodel.account/v7", "storymodel.account/v8"):
             data.pop("temporal_relations", None)
         return data
 
@@ -92,6 +99,7 @@ class RichAccount(_AccountFields):
                     if self.schema_version not in (
                         "storymodel.account/v6",
                         "storymodel.account/v7",
+                        "storymodel.account/v8",
                     ):
                         raise ValueError("playback evidence requires account v6")
                     source = media.get(support.source)
@@ -110,7 +118,7 @@ class RichAccount(_AccountFields):
 
     @model_validator(mode="after")
     def temporal_relations_belong(self) -> Self:
-        if self.schema_version == "storymodel.account/v7":
+        if self.schema_version in ("storymodel.account/v7", "storymodel.account/v8"):
             validate_temporal_claims(self, self.temporal_relations)
         return self
 
@@ -140,6 +148,7 @@ def validate_supported_account(value: SupportedAccount | str | bytes) -> Support
         "storymodel.account/v5",
         "storymodel.account/v6",
         "storymodel.account/v7",
+        "storymodel.account/v8",
     ):
         return validate_rich_account(raw)
     return validate_account(raw)
@@ -165,20 +174,22 @@ def require_text_account(value: SupportedAccount | str | bytes) -> SupportedAcco
     return account
 
 
-def account_schema(version: Literal["v4", "v5", "v6", "v7"]) -> dict[str, Any]:
+def account_schema(version: Literal["v4", "v5", "v6", "v7", "v8"]) -> dict[str, Any]:
     """Export a declared rich wire version, with historical schemas kept in the adapter."""
-    from ._legacy import legacy_rich_schema, legacy_rich_v6_schema
+    from ._legacy import legacy_rich_schema, legacy_rich_v6_schema, legacy_rich_v7_schema
 
     if version in ("v4", "v5"):
         return legacy_rich_schema(version)
     if version == "v6":
         return legacy_rich_v6_schema()
-    if version != "v7":
+    if version == "v7":
+        return legacy_rich_v7_schema()
+    if version != "v8":
         raise ValueError("unsupported rich account schema version")
     schema = RichAccount.model_json_schema()
     schema["properties"]["schema_version"] = {
-        "const": "storymodel.account/v7",
-        "default": "storymodel.account/v7",
+        "const": "storymodel.account/v8",
+        "default": "storymodel.account/v8",
         "title": "Schema Version",
         "type": "string",
     }
@@ -212,7 +223,9 @@ def pair_rich_accounts(source: RichAccount, recall: RichAccount) -> RichAccount:
     a, b = left.model_dump(mode="json"), right.model_dump(mode="json")
     versions = (left.schema_version, right.schema_version)
     output: dict[str, Any] = {
-        "schema_version": "storymodel.account/v7"
+        "schema_version": "storymodel.account/v8"
+        if "storymodel.account/v8" in versions
+        else "storymodel.account/v7"
         if "storymodel.account/v7" in versions
         else "storymodel.account/v6"
         if "storymodel.account/v6" in versions
@@ -228,9 +241,13 @@ def pair_rich_accounts(source: RichAccount, recall: RichAccount) -> RichAccount:
         if name == "media_sources" and output["schema_version"] not in (
             "storymodel.account/v6",
             "storymodel.account/v7",
+            "storymodel.account/v8",
         ):
             continue
-        if name == "temporal_relations" and output["schema_version"] != "storymodel.account/v7":
+        if name == "temporal_relations" and output["schema_version"] not in (
+            "storymodel.account/v7",
+            "storymodel.account/v8",
+        ):
             continue
         av, bv = a.get(name, []), b.get(name, [])
         if not isinstance(av, list) or not isinstance(bv, list):
@@ -280,7 +297,7 @@ def upgrade_context_account(value: RichAccount) -> RichAccount:
 def upgrade_temporal_account(value: RichAccount) -> RichAccount:
     """Explicitly move any rich snapshot to v7 without changing its graph collections."""
     account = validate_rich_account(value)
-    if account.schema_version == "storymodel.account/v7":
+    if account.schema_version in ("storymodel.account/v7", "storymodel.account/v8"):
         return account
     original = account.model_dump(mode="json")
     return validate_rich_account(
@@ -291,6 +308,31 @@ def upgrade_temporal_account(value: RichAccount) -> RichAccount:
                     name="upgrade-account-to-v7/v1",
                     input_sha256=(
                         *(d.sha256 for d in account.documents),
+                        *(source.sha256 for source in account.media_sources),
+                        digest(original),
+                    ),
+                ),
+            }
+        )
+    )
+
+
+def upgrade_assessment_account(value: RichAccount) -> RichAccount:
+    """Explicitly move a v6/v7 snapshot to v8 while binding its exact original inputs."""
+    account = validate_rich_account(value)
+    if account.schema_version == "storymodel.account/v8":
+        return account
+    if account.schema_version not in ("storymodel.account/v6", "storymodel.account/v7"):
+        raise ValueError("assessment upgrade requires a v6 or v7 account")
+    original = account.model_dump(mode="json")
+    return validate_rich_account(
+        account.model_copy(
+            update={
+                "schema_version": "storymodel.account/v8",
+                "recipe": Recipe(
+                    name="upgrade-account-to-v8/v1",
+                    input_sha256=(
+                        *(document.sha256 for document in account.documents),
                         *(source.sha256 for source in account.media_sources),
                         digest(original),
                     ),

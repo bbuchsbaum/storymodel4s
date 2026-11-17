@@ -389,3 +389,14 @@ changing unit-only prompts, trusting derived sidecars, treating all missing hold
 recall, automatically certifying a dependency-free semantic judgment, expanding all referent
 members into the prompt, or creating another account/assessment engine. Source grade citations
 remain hypothesis-owned even when attribution background is broader. [Contract](context-fidelity.md).
+
+## Native source assessment (2026-11-17, provisional)
+
+Use account v8 to admit native assessment supports through the existing bindings and conditional
+update engine. Native proposals additionally cite admitted source situations, retaining exact
+native support and context. Explicit observation-based request/recipe versions distinguish this
+input condition from text-only and contextual-text grading. Rejected alternatives: silently
+widening v6/v7 assessment wires; inventing transcripts; parallel native graph/binding models;
+and removing modality guards without a real assessment/analysis consumer. Current mixed rich
+schemas expose v8; declared v7 remains frozen. This is an engineering compatibility choice,
+not an audiovisual accuracy claim. See [native assessment](native-assessment.md).

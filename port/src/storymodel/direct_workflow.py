@@ -6,10 +6,11 @@ from typing import Literal
 
 from .artifacts import publish_json
 from .direct_mapping import (
-    RECIPE,
     MappingInput,
     MappingOutput,
+    NativeMappingRequest,
     mapping_prompt,
+    mapping_recipe,
     mapping_request_digest,
     resolve_mapping,
     validate_mapping_request,
@@ -38,10 +39,12 @@ def _exportable(request: MappingInput) -> MappingInput:
 def _profile(request: MappingInput) -> RunProfile:
     return RunProfile(
         provider="imported-text",
-        model="supplied-direct-mapping/v1",
+        model="supplied-native-direct-mapping/v1"
+        if isinstance(request, NativeMappingRequest)
+        else "supplied-direct-mapping/v1",
         endpoint="offline:import",
         max_tokens=8192,
-        recipe=RECIPE,
+        recipe=mapping_recipe(request),
         input_sha256=(mapping_request_digest(request),),
     )
 

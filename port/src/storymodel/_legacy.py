@@ -97,3 +97,11 @@ def legacy_rich_v6_schema() -> dict[str, Any]:
         files("storymodel").joinpath("_legacy_rich_v6_schema.json").read_text(encoding="utf-8")
     )
     return schema
+
+
+def legacy_rich_v7_schema() -> dict[str, Any]:
+    """Return the frozen v7 rich-account schema before v8 assessment evidence was added."""
+    schema: dict[str, Any] = json.loads(
+        files("storymodel").joinpath("_legacy_rich_v7_schema.json").read_text(encoding="utf-8")
+    )
+    return schema

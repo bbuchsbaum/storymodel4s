@@ -135,7 +135,14 @@
           "evidence": {
             "default": [],
             "items": {
-              "$ref": "#/$defs/Support"
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
             },
             "title": "Evidence",
             "type": "array"
@@ -991,7 +998,7 @@
       },
       "RichAccount": {
         "additionalProperties": false,
-        "description": "One graph: v5 adds contexts, v6 native evidence and v7 retained temporal claims.",
+        "description": "One graph: v5 adds contexts, v6 native evidence, v7 chronology and v8 assessment.",
         "properties": {
           "schema_version": {
             "default": "storymodel.account/v4",
@@ -999,7 +1006,8 @@
               "storymodel.account/v4",
               "storymodel.account/v5",
               "storymodel.account/v6",
-              "storymodel.account/v7"
+              "storymodel.account/v7",
+              "storymodel.account/v8"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -1816,7 +1824,14 @@
           "evidence": {
             "default": [],
             "items": {
-              "$ref": "#/$defs/Support"
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
             },
             "title": "Evidence",
             "type": "array"
@@ -2712,7 +2727,7 @@
       },
       "RichAccount": {
         "additionalProperties": false,
-        "description": "One graph: v5 adds contexts, v6 native evidence and v7 retained temporal claims.",
+        "description": "One graph: v5 adds contexts, v6 native evidence, v7 chronology and v8 assessment.",
         "properties": {
           "schema_version": {
             "default": "storymodel.account/v4",
@@ -2720,7 +2735,8 @@
               "storymodel.account/v4",
               "storymodel.account/v5",
               "storymodel.account/v6",
-              "storymodel.account/v7"
+              "storymodel.account/v7",
+              "storymodel.account/v8"
             ],
             "title": "Schema Version",
             "type": "string"

@@ -124,7 +124,12 @@ from .reconstruction import (
     verify_account_reconstruction,
 )
 from .relations import admit_relations, relation_table
-from .rich_account import RichAccount, situation_table, validate_rich_account
+from .rich_account import (
+    RichAccount,
+    situation_table,
+    upgrade_assessment_account,
+    validate_rich_account,
+)
 from .rich_construction import prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, read_rich_request, replay_rich, rich_prompt
 from .scenes import SceneGroup, group_source_rows
@@ -188,6 +193,11 @@ def main(argv: list[str] | None = None) -> int:
         "--interpretation", choices=("narrative", "referent"), default="referent"
     )
     mapping_prepare.add_argument("--expected-sha256")
+    mapping_prepare.add_argument(
+        "--native-source",
+        action="store_true",
+        help="explicitly upgrade to native observation assessment",
+    )
     mapping_prepare.add_argument("--output")
     mapping_contract = commands.add_parser(
         "mapping-prompt", help="render the unit-only mapping input"
@@ -415,6 +425,11 @@ def main(argv: list[str] | None = None) -> int:
         "--interpretation", choices=("narrative", "referent"), default="referent"
     )
     fidelity_prepare.add_argument("--expected-sha256")
+    fidelity_prepare.add_argument(
+        "--native-source",
+        action="store_true",
+        help="explicitly upgrade to native observation assessment",
+    )
     fidelity_prepare.add_argument("--identity-annotations")
     fidelity_prepare.add_argument("--holder-proposals")
     fidelity_prepare.add_argument("--output")
@@ -971,6 +986,10 @@ def main(argv: list[str] | None = None) -> int:
             )
             if fidelity_account.export_permission != "allowed":
                 raise PermissionError("producer denies fidelity export")
+            if args.native_source:
+                if not isinstance(fidelity_account, RichAccount):
+                    raise ValueError("native assessment requires a rich account")
+                fidelity_account = upgrade_assessment_account(fidelity_account)
             if (args.identity_annotations is None) != (args.holder_proposals is None):
                 raise ValueError("contextual fidelity requires both identity and holder recordings")
             context_evidence = (
@@ -1268,6 +1287,10 @@ def main(argv: list[str] | None = None) -> int:
             )
             if mapping_account.export_permission != "allowed":
                 raise PermissionError("producer denies mapping export")
+            if args.native_source:
+                if not isinstance(mapping_account, RichAccount):
+                    raise ValueError("native assessment requires a rich account")
+                mapping_account = upgrade_assessment_account(mapping_account)
             mapping_request = prepare_mapping(
                 mapping_account, args.unit, interpretation=args.interpretation
             )

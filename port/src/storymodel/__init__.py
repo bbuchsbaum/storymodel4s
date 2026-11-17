@@ -152,7 +152,7 @@ from .source_workflow import SourceRecording, import_source, replay_source
 
 __version__ = "0.1.0"
 
-from .rich_account import upgrade_temporal_account
+from .rich_account import upgrade_assessment_account, upgrade_temporal_account
 
 __all__ = [
     "TemporalClaim",
@@ -169,6 +169,7 @@ __all__ = [
     "verify_temporal_query",
     "verify_temporal_relations",
     "upgrade_temporal_account",
+    "upgrade_assessment_account",
     "HierarchyGroup",
     "HierarchyNode",
     "HierarchyQuery",

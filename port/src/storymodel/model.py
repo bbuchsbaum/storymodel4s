@@ -367,7 +367,7 @@ class Assessment(Model):
     ) = None
     severity: Literal["minor", "major"] | None = None
     reason: str | None = None
-    evidence: tuple[Support, ...] = ()
+    evidence: tuple[AnySupport, ...] = ()
 
     @model_validator(mode="after")
     def shape(self) -> Self:
@@ -511,7 +511,11 @@ class _AccountFields(Model):
 
         def support(value: AnySupport, side: Side | None = None) -> None:
             if isinstance(value, PlaybackSupport):
-                if self.schema_version not in ("storymodel.account/v6", "storymodel.account/v7"):
+                if self.schema_version not in (
+                    "storymodel.account/v6",
+                    "storymodel.account/v7",
+                    "storymodel.account/v8",
+                ):
                     raise ValueError("playback evidence requires account v6")
                 source = media.get(value.source)
                 if source is None or (side is not None and source.side != side):
@@ -552,6 +556,7 @@ class _AccountFields(Model):
                 "storymodel.account/v5",
                 "storymodel.account/v6",
                 "storymodel.account/v7",
+                "storymodel.account/v8",
             ):
                 raise ValueError("extended context kinds require account v5")
             for evidence in context.evidence:
@@ -571,7 +576,7 @@ class _AccountFields(Model):
         for side in ("source", "recall"):
             narrated = sum(c.kind == "narrated" and c.side == side for c in contexts.values())
             present = any(source.side == side for source in sources.values())
-            if self.schema_version.endswith(("/v3", "/v4", "/v5", "/v6", "/v7")):
+            if self.schema_version.endswith(("/v3", "/v4", "/v5", "/v6", "/v7", "/v8")):
                 if present and narrated != 1:
                     raise ValueError("each present account side needs exactly one narrated world")
                 if not present and any(context.side == side for context in contexts.values()):
@@ -662,6 +667,15 @@ class _AccountFields(Model):
                 for evidence in assessment.evidence:
                     support(evidence)
                     hypothesis = hypotheses[assessment.hypothesis]
+                    if isinstance(evidence, PlaybackSupport):
+                        if self.schema_version != "storymodel.account/v8":
+                            raise ValueError("playback assessment evidence requires account v8")
+                        if not contained_in(
+                            evidence, (units[target].support for target in hypothesis.targets)
+                        ):
+                            raise ValueError(
+                                "native fidelity evidence lies outside its source hypothesis"
+                            )
                     if hypothesis.kind != "external" and assessment.grade in (
                         "supported",
                         "contradicted",
