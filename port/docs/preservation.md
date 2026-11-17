@@ -163,3 +163,25 @@ Remaining capabilities: chart/quantity-based number, form acquisition, accepted 
 and the full two-pass speech rule, cross-modal sufficient/distinctness licences, ambiguous source
 identity classes, canonical graph projection and richer study consumers. The current identity
 sidecar does not replace those working Scala paths; they remain explicit P2/P5 obligations.
+
+## P3.1 first recorded direct mapping slice
+
+Bead `bd-01M7KQ3B417J2ZP2165WSC3PJH`: [unit-only mapping](direct-mapping.md) adds a recorded,
+graph-free row/scene route that consumes existing details and produces checked reference and
+hypothesis-conditional fidelity. Existing bindings, addresses, inventories and graph IDs remain
+unchanged. The same three analysis views consume its output.
+
+Source evidence: Scala `pipeline/agentmapping/AgentPrompts.scala` renders all recall and global
+target indices; `tools/sherlock_mapper/verify_claims.py` implements the graded assessor and uses
+neighbor context. Python's separate versioned condition removes that recall-order information,
+uses local aliases and exact quotes, and accounts for missing or invalid detail responses instead
+of silently dropping them. `align/claimassessment.scala` is the richer fixed-population receipt
+reference and remains owed, including conflicted support/counterevidence and reviewed absence.
+
+Checks distinguish single/joint/broad/alternative/external, narrative/referent slots, conditional
+evidence attribution, pending fidelity, all retained grades, invalid sibling isolation, discontinuous
+support gaps, exact raw replay, changed-input refusal, collection/order invariance and three-view
+readback. They establish deterministic admission and input conditions, not model quality.
+
+Still owed: recurring-scene semantic validation, embedding channels, event/episode targets,
+the fixed-question claim receipt and full P3 exit demonstration. This first route does not close P3.

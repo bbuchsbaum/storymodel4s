@@ -72,6 +72,7 @@ completed port or evidence of scientific accuracy or measured speedup over Scala
 
 - [Stage 1 plan](docs/stage-1.md): workflow, ordered slices, acceptance and decision criteria.
 - [Preservation map](docs/preservation.md): assets, guarantees, source pointers and witnesses.
+- [Recorded direct mapping](docs/direct-mapping.md): unit-only reference and conditional fidelity.
 - [Design decisions](docs/decisions.md): provisional choices and rejected alternatives.
 - [Reference snapshot](docs/references.json): exact source revisions and file hashes.
 

@@ -17,11 +17,12 @@ clocks, recorded execution, a bounded extractive proposal resolver, sparse lexic
 alignment, three analysis views, exact temporal allocation, legacy reads, and an API/CLI.
 These are verified bounded capabilities, not full module parity. The React app is a scaffold.
 
-The next high-value change is **source account construction**, not another matching heuristic.
-The admitted example currently contains a watching observation but no source watching event;
-its unresolved watching reference exposes that missing construction path. Hand-building more
-source objects would conceal the gap. Build source accounts from independently supplied,
-anchored observations and recorded proposals, then reuse them across recall sessions.
+The first P2 source compiler now constructs anchored source rows from recorded proposals; the
+admitted example's watching observation has a construction path instead of a manually supplied
+graph. Bounded event-relation and text-identity paths build on that account boundary. Rich states,
+circumstances, playback, attribution and the remaining graph families are still owed.
+The first [P3 recorded direct route](direct-mapping.md) can proceed independently from this stable
+boundary. Mote and the preservation map distinguish these bounded slices from full phase exits.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
 construction is owed independently of whether it improves localization accuracy.

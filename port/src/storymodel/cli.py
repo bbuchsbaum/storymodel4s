@@ -9,6 +9,13 @@ from .alignment import align_account, validate_policy
 from .analysis import Analysis, Policy, project
 from .artifacts import publish_json, read_account
 from .demo import example_account
+from .direct_mapping import mapping_prompt, prepare_mapping
+from .direct_workflow import (
+    MappingRecording,
+    import_mapping,
+    read_mapping_request,
+    replay_mapping,
+)
 from .execution import RecordedExecutionError
 from .extraction import prepare_extraction
 from .extraction_workflow import (
@@ -66,6 +73,33 @@ def main(argv: list[str] | None = None) -> int:
     analyze.add_argument("--output")
     schema = commands.add_parser("schema", help="generate the experimental exchange schema")
     schema.add_argument("--output")
+    mapping_prepare = commands.add_parser(
+        "prepare-mapping", help="prepare one recall unit's mapping"
+    )
+    mapping_prepare.add_argument("account")
+    mapping_prepare.add_argument("unit")
+    mapping_prepare.add_argument(
+        "--interpretation", choices=("narrative", "referent"), default="referent"
+    )
+    mapping_prepare.add_argument("--expected-sha256")
+    mapping_prepare.add_argument("--output")
+    mapping_contract = commands.add_parser(
+        "mapping-prompt", help="render the unit-only mapping input"
+    )
+    mapping_contract.add_argument("request")
+    mapping_contract.add_argument("--output")
+    mapping_import = commands.add_parser("import-mapping", help="record an exported mapping reply")
+    mapping_import.add_argument("request")
+    mapping_import.add_argument("reply")
+    mapping_import.add_argument("recording")
+    mapping_replay = commands.add_parser(
+        "replay-mapping", help="resolve a recorded mapping offline"
+    )
+    mapping_replay.add_argument("request")
+    mapping_replay.add_argument("recording")
+    mapping_replay.add_argument("--expected-import-sha256")
+    mapping_replay.add_argument("--account-only", action="store_true")
+    mapping_replay.add_argument("--output")
     imported = commands.add_parser(
         "import-time-recording", help="import exported time-study replies offline"
     )
@@ -199,6 +233,43 @@ def main(argv: list[str] | None = None) -> int:
                 (alignment.account if args.account_only else alignment).model_dump(mode="json"),
                 args.output,
             )
+        elif args.command == "prepare-mapping":
+            mapping_account = read_account(Path(args.account), expected_sha256=args.expected_sha256)
+            if mapping_account.export_permission != "allowed":
+                raise PermissionError("producer denies mapping export")
+            mapping_request = prepare_mapping(
+                mapping_account, args.unit, interpretation=args.interpretation
+            )
+            emit(mapping_request.model_dump(mode="json"), args.output)
+        elif args.command in ("mapping-prompt", "import-mapping", "replay-mapping"):
+            mapping_request = read_mapping_request(Path(args.request))
+            if mapping_request.account.export_permission != "allowed":
+                raise PermissionError("producer denies mapping export")
+            if args.command == "mapping-prompt":
+                emit(strict_json(mapping_prompt(mapping_request)), args.output)
+            elif args.command == "import-mapping":
+                mapping_recording = MappingRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_mapping(mapping_request, mapping_recording, Path(args.recording))
+            else:
+                mapping_result = replay_mapping(
+                    mapping_request,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                if args.account_only and any(
+                    d.status != "admitted" for d in mapping_result.decisions
+                ):
+                    raise ValueError(
+                        "account-only export would hide unsuccessful mapping admission"
+                    )
+                emit(
+                    (mapping_result.account if args.account_only else mapping_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
         elif args.command in ("resolve-identity", "identity-roles"):
             identity_account = read_account(
                 Path(args.account), expected_sha256=args.expected_sha256

@@ -4,6 +4,8 @@ from .accounts import make_account, pair_accounts
 from .alignment import AlignmentPolicy, align_account, verify_alignment
 from .analysis import Analysis, project
 from .artifacts import export_account, read_account
+from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, verify_mapping
+from .direct_workflow import MappingRecording, import_mapping, replay_mapping
 from .extraction import prepare_extraction, resolve_extraction
 from .extraction_workflow import ExtractionRecording, import_extraction, replay_extraction
 from .identity import identity_role_table, resolve_text_identity, verify_identity
@@ -19,6 +21,7 @@ __all__ = [
     "AlignmentPolicy",
     "Analysis",
     "ExtractionRecording",
+    "MappingRecording",
     "SourceRow",
     "SourceRecording",
     "account_digest",
@@ -30,12 +33,17 @@ __all__ = [
     "make_account",
     "pair_accounts",
     "prepare_extraction",
+    "prepare_mapping",
+    "mapping_prompt",
     "prepare_source",
     "resolve_extraction",
+    "resolve_mapping",
     "import_extraction",
+    "import_mapping",
     "import_source",
     "identity_role_table",
     "replay_extraction",
+    "replay_mapping",
     "replay_source",
     "resolve_text_identity",
     "read_account",
@@ -45,4 +53,5 @@ __all__ = [
     "verify_source",
     "verify_relations",
     "verify_identity",
+    "verify_mapping",
 ]
