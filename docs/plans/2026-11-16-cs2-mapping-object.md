@@ -872,6 +872,175 @@ only if all five hold. The primary run is FilmFestival sample 1.
 condition 5 is a check and not an independent confirmation. Confirmation can only come from
 sealed data, as a pre-registered secondary forecast.
 
+**Round 5 outcome** (harness a482fa3f2; `hillclimb-r5/descriptive.json` and
+`hillclimb-r5/results.json`; no model calls).
+
+**Part A. Scene identity understates the mapper.** Values are participant means with 95%
+participant-cluster intervals. Film-time error is in seconds.
+
+| FilmFestival sample 1 | Top scene | Within ±1 | Time error, mean | Time error, median |
+|---|---|---|---|---|
+| `producer` | 81.8% [78.9, 84.6] | 93.6% [91.3, 95.6] | 23.5 [22.1, 25.0] | 18.7 |
+| `producer`, located mass only | | | 5.2 [4.1, 6.8] | 1.3 |
+| `gold_context_ceiling` | 45.8% [40.6, 50.7] | 80.4% [73.4, 86.2] | 16.1 [13.0, 19.8] | 5.5 |
+| `gold_context_fitted` | 38.7% [29.6, 47.3] | 76.5% [69.2, 82.9] | 36.4 [34.6, 38.6] | 28.4 |
+| `hmm_tfidf` | 46.0% [39.5, 52.7] | 64.7% [56.9, 72.6] | 48.2 [40.6, 56.4] | 38.3 |
+| `tfidf` | 47.3% [43.3, 51.7] | 61.5% [57.8, 65.6] | 70.7 [68.0, 73.7] | 60.1 |
+| `lopo` | 9.5% [8.4, 11.0] | 21.0% [19.2, 22.6] | 93.1 [90.0, 96.5] | 91.1 |
+| `duration`, `pass1_only` | 9.6% [8.1, 11.6] | 19.8% [18.8, 21.0] | 95.5 [92.4, 98.9] | 96.2 |
+
+| Sherlock part-order run | Top scene | Within ±1 | Time error, mean | Time error, median |
+|---|---|---|---|---|
+| `producer` | 84.1% [80.4, 87.8] | 93.5% [91.9, 95.0] | 215 [202, 227] | 183 |
+| `producer`, located mass only | | | 27.7 [22.1, 33.3] | 7.5 |
+| `gold_context_ceiling` | 31.5% [27.6, 35.4] | 62.1% [57.2, 66.5] | 214 [192, 237] | 137 |
+| `gold_context_fitted` | 55.7% [52.0, 59.2] | 68.5% [62.8, 73.7] | 498 [481, 515] | 468 |
+| `hmm_tfidf` | 53.1% [48.1, 57.6] | 69.2% [62.0, 75.6] | 793 [720, 854] | 757 |
+| `tfidf` | 54.2% [47.5, 61.6] | 62.6% [56.2, 68.9] | 937 [922, 952] | 940 |
+| `lopo` | 3.8% [2.9, 4.8] | 7.0% [5.6, 8.7] | 1,082 [1,070, 1,092] | 1,065 |
+| `duration`, `pass1_only` | 1.6% [0.8, 2.4] | 4.8% [3.6, 6.0] | 1,029 [1,010, 1,044] | 1,020 |
+
+- **FilmFestival sample 2** agrees: producer top scene 81.2% [77.6, 84.5], within ±1 92.8%
+  [90.4, 94.7], time error 23.4 s (median 18.2), located only 5.3 s (median 1.0).
+- **The all-mass time error is mostly unlocated mass.** It is spread over the whole work by
+  duration, so a quarter of a row's mass at a film's average distance sets the figure. The
+  located-only figure says where the producer actually pointed.
+- **Rows left out.** The lobby cartoon has two occurrences and no single clock: 3 rows. The
+  located-only figure has no value on 35 FilmFestival rows and 3 Sherlock rows with nothing
+  located in the gold work.
+
+**A distance-1 miss is a boundary disagreement on FilmFestival.** The located span is the
+source rows the producer named in its top scene.
+
+| Producer's distance-1 misses | FilmFestival s1 | FilmFestival s2 | Sherlock |
+|---|---|---|---|
+| Misses (with a located span) | 231 (187) | 222 (191) | 34 (33) |
+| Expected distance within 5 s | 59.4% | 56.5% | 15.2% |
+| Expected distance within 10 s | 90.9% | 86.9% | 36.4% |
+| Expected distance within 20 s | 99.5% | 97.9% | 63.6% |
+| Nearest edge within 5 s | 95.7% | 92.7% | 90.9% |
+| Nearest edge within 10 s | 100% | 97.4% | 93.9% |
+| Median expected distance | 4.0 s | 4.0 s | 15.0 s |
+
+- On FilmFestival nine in ten of these misses point within 10 s of the gold scene.
+- On Sherlock the nearest named row usually touches the gold scene, but the mass sits deeper
+  in the neighbouring scene (median 15 s). Its rows and scenes are longer.
+- The 44, 31 and 1 misses without a span have no unit-located mass in the top scene: the top
+  came from scene-set or fallback mass.
+
+**Out-of-order recall, the standing stratum.** Each cell gives top scene, within ±1 and scene
+bits, row-weighted.
+
+| FilmFestival s1, gold step | Rows | `producer` | `hmm_tfidf` |
+|---|---|---|---|
+| Stay | 783 | 80.3%, 92.2%, 1.13 | 56.8%, 77.4%, 2.08 |
+| Forward 1 | 639 | 82.9%, 97.2%, 0.95 | 54.9%, 75.4%, 2.07 |
+| Forward 2–3 | 300 | 88.7%, 96.3%, 0.89 | 33.7%, 54.3%, 2.99 |
+| Forward 4 or more | 87 | 82.8%, 90.8%, 0.97 | 25.3%, 37.9%, 3.40 |
+| Backward | 69 | 73.9%, 88.4%, 1.45 | 40.6%, 60.9%, 2.83 |
+| First in the work | 97 | 83.5%, 92.8%, 1.00 | 60.8%, 73.2%, 2.34 |
+| **Out of order** | 156 | 78.8%, 89.7%, 1.18 | 32.1%, 48.1%, 3.15 |
+
+| Sherlock, gold step | Rows | `producer` | `hmm_tfidf` |
+|---|---|---|---|
+| Stay | 2 | 100%, 100%, 0.57 | 50.0%, 100%, 4.17 |
+| Forward 1 | 215 | 87.0%, 95.8%, 0.97 | 75.3%, 86.0%, 2.53 |
+| Forward 2–3 | 87 | 88.5%, 95.4%, 1.01 | 28.7%, 60.9%, 4.30 |
+| Forward 4 or more | 31 | 80.6%, 87.1%, 0.96 | 38.7%, 54.8%, 4.09 |
+| Backward | 40 | 67.5%, 85.0%, 1.47 | 17.5%, 32.5%, 4.90 |
+| First in the work | 10 | 90.0%, 90.0%, 1.25 | 10.0%, 10.0%, 6.98 |
+| **Out of order** | 71 | 73.2%, 85.9%, 1.25 | 26.8%, 42.3%, 4.55 |
+
+- Out of order means backward or forward 4 or more. The producer loses little there; the
+  sequential baseline loses most of its accuracy.
+- `by_gold_step` and `out_of_order` are now strata of every run summary, `rows.tsv` carries
+  `within_1` and `gold_step`, and `summary-both.json` carries them for the producer and every
+  baseline. The main runs were rescored from the call cache into `rev-20261117d` for this.
+- The rescoring also brings the main entries up to the current harness. The `rev-20261117c`
+  entries predate the frame floor, so FilmFestival sample 1 moves by at most 0.014 bits on a
+  row (scene 1.0722 to 1.0707, work 0.0760 to 0.0791). The original call ledgers stay in the
+  original run directories.
+
+**Part B. `producer_order_fallback` is kept as a secondary forecast, by the recorded rule.**
+All five conditions hold. It is never the mapping object.
+
+| Condition | Result | Holds |
+|---|---|---|
+| 1. FilmFestival scene term, pooled | 1.071 to 0.798: −0.273, 10/10, p = 0.002, band 0.041 | yes |
+| 2. Work and film terms not worse | work −0.024 (10/10); film −0.039 (8/10, p = 0.016) | yes |
+| 3. Out-of-order rows, scene bits | FilmFestival +0.006; Sherlock −0.047; limit +0.041 | yes |
+| 4. Top scene within 1 point | FilmFestival 82.5% to 84.3%; Sherlock 84.9% to 86.2% | yes |
+| 5. Sherlock scene term | 1.065 to 0.748: −0.317, 10/10, one-sided p = 0.001 | yes |
+
+The caveat recorded with the rule applies: condition 5 is a check, not a confirmation.
+
+| Run | Forecast | Scene | Work | Film | Top scene | Within ±1 | Time error (median) |
+|---|---|---|---|---|---|---|---|
+| FilmFestival s1 | `producer` | 1.071 | 0.079 | 0.238 | 82.5% | 94.3% | 23.5 s (18.7) |
+| | `producer_order_fallback` | 0.798 | 0.056 | 0.199 | 84.3% | 97.0% | 6.4 s (3.2) |
+| | `order_prior_only` | 4.305 | 3.453 | 0.282 | 5.5% | 10.9% | 100 s (99) |
+| FilmFestival s2 | `producer` | 1.054 | 0.082 | 0.245 | 82.0% | 93.4% | 23.4 s (18.2) |
+| | `producer_order_fallback` | 0.768 | 0.058 | 0.208 | 84.1% | 96.4% | 6.3 s (3.1) |
+| Sherlock | `producer` | 1.065 | | 0.001 | 84.9% | 93.8% | 215 s (183) |
+| | `producer_order_fallback` | 0.748 | | 0.001 | 86.2% | 94.0% | 38 s (20) |
+| | `order_prior_only` | 5.174 | | 0.023 | 6.2% | 17.9% | 881 s (899) |
+
+Top scene and within ±1 in this table are row-weighted, as in round 4.
+
+- **Sample 2 replicates:** scene −0.286 (10/10, p = 0.002).
+- **Other FilmFestival measures, sample 1.** Switch F1 0.644 to 0.651 (±1 row: 0.900 to
+  0.926). Non-film mass on memory-search rows 0.110 to 0.198.
+- **By the producer's row category** (scene bits): misses 3.39 to 2.46, hits 0.52 to 0.38,
+  fallback 4.30 to 1.68. The top stays right on 97.5% of the producer's hits.
+- **Null producer.** Its order fallback equals `order_prior_only` exactly on every cell and
+  every scored term (largest difference 0.0 on 2,282 and 385 rows), and order places all of
+  its mass.
+
+**By gold step** (scene bits, then top scene; producer to lever).
+
+| Gold step | FilmFestival s1 rows | Bits | Top scene | Sherlock rows | Bits | Top scene |
+|---|---|---|---|---|---|---|
+| Stay | 783 | 1.13 to 0.75 | 80.3% to 83.0% | 2 | 0.57 to 0.49 | 100% to 100% |
+| Forward 1 | 639 | 0.95 to 0.65 | 82.9% to 85.3% | 215 | 0.97 to 0.51 | 87.0% to 90.7% |
+| Forward 2–3 | 300 | 0.89 to 0.72 | 88.7% to 88.0% | 87 | 1.01 to 0.93 | 88.5% to 87.4% |
+| Forward 4+ | 87 | 0.97 to 0.92 | 82.8% to 80.5% | 31 | 0.96 to 0.91 | 80.6% to 80.6% |
+| Backward | 69 | 1.45 to 1.46 | 73.9% to 73.9% | 40 | 1.47 to 1.44 | 67.5% to 62.5% |
+| First in the work | 97 | 1.00 to 0.63 | 83.5% to 87.6% | 10 | 1.25 to 0.69 | 90.0% to 90.0% |
+| **Out of order** | 156 | 1.18 to 1.16 | 78.8% to 77.6% | 71 | 1.25 to 1.21 | 73.2% to 70.4% |
+
+**How much order placed** (`order-rows/*.tsv` holds it per row).
+
+| | FilmFestival s1 | Sherlock |
+|---|---|---|
+| Mean mass order placed, all rows | 0.376 | 0.220 |
+| of which unassigned | 0.252 | 0.176 |
+| of which inside a work or set the producer named | 0.124 | 0.044 |
+| Median | 0.201 | 0.178 |
+| Rows where order placed more than half | 26.1% | 3.6% |
+
+**What to know before relying on it.**
+- **Order can still change the top scene.** The located mass is unchanged, but where it is a
+  minority of the row, the unplaced mass can put another scene on top.
+  - That happens on 6.2% of FilmFestival scene-scored rows (123) and 4.4% of Sherlock's (17).
+  - On those rows the top is right more often than the producer's (65.0% against 59.3%; 47.1%
+    against 41.2%), but it is the weakest group.
+- **Out-of-order rows lose a little top-scene accuracy,** though not scene bits: a net 2 rows
+  of 156 on FilmFestival and 2 of 71 on Sherlock. Every flipped row is one where order set
+  the top. Condition 3 is on scene bits and holds.
+- **On gold-blind windows the gain holds and that loss is larger** (a sensitivity check, not
+  part of the rule; everything refitted on the windowed rows).
+  - FilmFestival, 7 s windows: scene 1.241 to 0.951 (−0.290, 10/10, p = 0.002); top scene
+    75.1% to 77.0%. Sherlock, 25.5 s windows: 1.486 to 1.189 (−0.297, 9/10); 72.5% to 72.8%.
+  - Out-of-order FilmFestival windows: scene bits 1.63 to 1.58, but top scene 62.0% to 55.7%
+    (10 of 158 windows).
+- **Sherlock's film term** moves by +0.0004 bits; it has no band, and no non-film gold rows.
+
+**Tests and mutants.** Six tests cover the round: within ±1 and the gold step, the film-time
+error, and four for the order fallback (null equality, located mass unchanged, the frame
+restriction, and the row's own evidence left out). Mutants M58–M65 each fail their named test
+(`mutations/r5-20261117.json` at a482fa3f2: 65 mutants, all caught). Seven discriminate; M58
+is a regression guard, and M65 is the exactness mutant for the null producer.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
