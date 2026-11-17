@@ -435,6 +435,12 @@ This ablation separates them.
    - Prediction: chance.
    - Pass: film accuracy ≤ 1/10 + 2 binomial SE, and specific-row scene accuracy ≤ chance +
      2 SE, where chance is the mean of 1 / (number of valid scenes in the gold film).
+**Outcome of control 2 (permutation): FAIL by the recorded rule** (Δscene +0.055 against a
+0.026 band). The band was measured on all films, but the control ran on two. On those two films
+the sample-to-sample band is ±0.060, so this control cannot separate a label effect from
+ordinary sampling noise. The verdict stands as FAIL. A valid test needs a band from two samples
+on the same rows.
+
 6. **Utterance-unit control:** deferred. New units need new pass-1 and pass-2 calls beyond the
    budget.
 
