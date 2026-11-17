@@ -142,6 +142,10 @@ def test_sign_flip_p():
     close(sign_flip_p([1.0, -1.0]), 1.0)
     # ten positive differences: 2 / 1024
     close(sign_flip_p([1.0] * 10), 2 / 1024)
+    # one-sided: five positive differences -> only the all-plus assignment reaches the mean: 1/32
+    close(sign_flip_p([1.0, 2.0, 0.5, 3.0, 1.5], "greater"), 1 / 32)
+    # one-sided: all negative -> every assignment is >= the observed mean: 1
+    close(sign_flip_p([-1.0, -1.0, -1.0], "greater"), 1.0)
 
 
 if __name__ == "__main__":

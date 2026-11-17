@@ -170,14 +170,19 @@ def tfidf_cosine(query: list, documents: dict) -> dict:
     return out
 
 
-def sign_flip_p(d) -> float:
-    """Exact two-sided paired sign-flip (randomization) p-value for mean(d) = 0, enumerating all
-    2^n sign assignments (n <= 20). Ties in |mean| count as extreme."""
+def sign_flip_p(d, alternative: str = "two-sided") -> float:
+    """Exact paired sign-flip (randomization) p-value for mean(d) = 0, enumerating all 2^n sign
+    assignments (n <= 20). alternative 'two-sided' uses |mean|; 'greater' is the one-sided test
+    of mean(d) > 0 (the share of assignments whose mean is >= the observed mean). Ties count as
+    extreme."""
     d = np.asarray(d, float)
     n = len(d)
     if n == 0 or n > 20:
         return float("nan")
-    obs = abs(d.mean())
+    if alternative not in ("two-sided", "greater"):
+        raise ValueError(f"unknown alternative {alternative!r}")
     signs = ((np.arange(2**n)[:, None] >> np.arange(n)) & 1) * 2 - 1
-    means = np.abs((signs * d).mean(1))
-    return float(np.mean(means >= obs - 1e-12))
+    means = (signs * d).mean(1)
+    if alternative == "greater":
+        return float(np.mean(means >= d.mean() - 1e-12))
+    return float(np.mean(np.abs(means) >= abs(d.mean()) - 1e-12))
