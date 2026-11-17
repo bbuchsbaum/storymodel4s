@@ -435,6 +435,15 @@ MUTANTS = [
         test="test_stage3_control_manipulations",
     ),
     dict(
+        id="M51",
+        guard="two-sample ensembling averages the members' joint scene-and-work probabilities",
+        file="cs2/scorer.py",
+        edits=[("        return math.fsum(m.p_set_and_work(scenes, w) for m in self.members) / "
+                "len(self.members)\n",
+                "        return self.members[0].p_set_and_work(scenes, w)\n")],
+        test="test_two_sample_ensemble_averages_joint_distributions",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

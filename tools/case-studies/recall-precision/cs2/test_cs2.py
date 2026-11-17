@@ -1313,6 +1313,33 @@ def test_stage3_control_manipulations():
     assert all(type(c.sample).__name__ == "RefSample" for c in cells)
 
 
+def test_two_sample_ensemble_averages_joint_distributions():
+    from cs2.scorer import EnsembleForecast
+
+    class Stub:
+        def __init__(self, pw, ps, pn):
+            self.pw, self.ps, self.pn = pw, ps, pn
+
+        def p_work(self, w):
+            return self.pw[w]
+
+        def p_set_and_work(self, scenes, w):
+            return self.ps[(scenes, w)]
+
+        def p_nonfilm(self):
+            return self.pn
+
+    a = Stub({"A": 0.8, "B": 0.1}, {(("a1",), "A"): 0.6, (("b1",), "B"): 0.05}, 0.1)
+    b = Stub({"A": 0.2, "B": 0.7}, {(("a1",), "A"): 0.02, (("b1",), "B"): 0.5}, 0.1)
+    e = EnsembleForecast([a, b])
+    assert abs(e.p_work("A") - 0.5) < 1e-12 and abs(e.p_nonfilm() - 0.1) < 1e-12
+    # the joint is averaged (not the product of averaged conditionals)
+    assert abs(e.p_set_and_work(("a1",), "A") - 0.31) < 1e-12
+    for key in ((("a1",), "A"), (("b1",), "B")):
+        mean_bits = (-math.log2(a.ps[key]) - math.log2(b.ps[key])) / 2
+        assert -math.log2(e.p_set_and_work(*key)) <= mean_bits + 1e-12
+
+
 def test_pass1_v1b_changes_one_sentence_only():
     P = _producer()
     a, b = P.PASS1_SYSTEM, P.PASS1_SYSTEM_V1B

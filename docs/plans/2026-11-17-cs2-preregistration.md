@@ -60,7 +60,21 @@ development data.
 **Pooling and combination.**
 - A participant's sessions are pooled into one cluster (this matters only if a second session
   appears).
-- The two samples are combined by averaging bits per row.
+- The two samples are combined by averaging their **distributions** per row
+  (`scorer.EnsembleForecast`), and the averaged distribution is scored. This replaces averaging
+  bits per row (changed 2026-11-17, hill-climb round 2; the draft is not yet frozen).
+  - **It costs nothing extra.** The sealed run already makes two samples.
+  - **Evidence (development, pooled over the ten coded participants, cache-only).** Against the
+    mean of bits, the scene term falls 0.029 bits, the work term 0.004 and the film term 0.005.
+    The ensemble wins for 10/10 participants on every term (exact two-sided sign-flip
+    p = 0.002). Top-scene accuracy rises from 0.825 to 0.835.
+  - **Why it is not a tuned gain.** A row's total log loss under the averaged distribution can
+    never exceed the mean of the two samples' total log losses (−log is convex). It is a
+    dominance, not a fitted lever; for each conditional term it held empirically, not by proof.
+    The gain is smaller than the pooled sample band (scene ±0.041), so it is not claimed as an
+    improvement; it is adopted because it cannot do worse on the total.
+  - **Open item.** The frozen harness (8101acc15) has no two-sample combining entry point yet;
+    one must be added and its digest recorded before the freeze.
 
 **Frozen baselines**, fitted on the ten coded development participants only:
 
