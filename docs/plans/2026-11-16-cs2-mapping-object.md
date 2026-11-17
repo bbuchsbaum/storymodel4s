@@ -476,6 +476,33 @@ rescored under the current rules; sample 2 is used for noise and for ensembling.
    their frame. The declared rule is `mismatch_rule: incoming-frame`. A flagged unit becomes a
    boundary and takes the next framed unit's film when that film differs.
 
+**Round 1 outcome: no lever kept.** All runs were cache-only at 560542459, with 0 calls. Bands
+are ±2 SE of sample 2 minus sample 1 on the same rows:
+
+| Band | Scene | Work | Film |
+|---|---|---|---|
+| Tune half | 0.026 | 0.011 | 0.005 |
+| Confirm half | 0.079 | 0.021 | 0.025 |
+
+Results, as change in bits (tune / confirm):
+
+| Lever | Scene | Work | Film | Verdict |
+|---|---|---|---|---|
+| Calibration (λ = 0, τ = 1.5) | −0.016 / −0.020 | 0 / 0 | 0 / 0 | DROP |
+| Ensemble vs mean of bits | −0.033 / −0.024 | −0.005 / −0.004 | −0.007 / −0.004 | DROP |
+| Switch repair | +0.020 / −0.000 | +0.021 / +0.000 | 0 / 0 | DROP |
+| Calibration + ensemble | −0.048 / −0.047 | −0.005 / −0.004 | −0.007 / −0.004 | DROP |
+
+- **Calibration.** The tune fit chose λ = 0: any mixing with the fallback hurt. It chose τ = 1.5,
+  at the top of the grid: sharpening helped, the opposite of the overconfidence hypothesis.
+  The confidently wrong forecasts appear only when content is shuffled.
+- **Ensemble.** It wins for 5/5 participants on both halves and is beyond the band on the tune
+  half, but within the wide confirm band.
+- **Switch repair.** It worsens the work term on the tune half; only 4 and 1 units are flagged.
+- **Calibration + ensemble.** It wins for 5/5 on both halves but stays within the confirm band.
+- **The binding limit is the confirm half's wide scene band.** With five participants the
+  smallest two-sided sign-flip p is 0.0625.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
