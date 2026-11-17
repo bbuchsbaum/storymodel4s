@@ -255,11 +255,63 @@ checks, the frozen pre-change replay, version refusals, mutations and installed 
 agreement. Context-bearing and holderless scopes remain distinct. This closes the vocabulary
 slice, not all context-aware assessment or P2 construction obligations.
 
-**Next implementation action:** playback evidence from checked supplied observations, through
-construction, exchange and a consuming readout. Reuse the existing native-coordinate arithmetic;
-keep edition/playback identity distinct from annotation text and retain discontinuous support.
-Introduce only the representation needed for that complete path. Context-aware assessment and
-the remaining graph/identity families follow the deliveries below.
+**Immediate action: finish the playback workflow already in progress.** At this planning
+checkpoint, HEAD is `104956fa3`; the working tree contains uncommitted native-support,
+construction, replay, CLI and example changes. They are implementation in progress, not a
+verified delivery. Complete and check this path before opening another representation family.
+The active work is tracked by `bd-01M7MFZVEDNCEGYVD5MCDP92DT`; Mote owns its subsequent status.
+
+### The next three executable checkpoints
+
+These are the near-term work queue within the phases below. Each ends in a usable artifact;
+none requires finishing every other capability in its phase.
+
+1. **Playback construction and readout.** Finish native evidence in the existing account model,
+   accepting supplied observations without manufacturing text documents. Connect import,
+   recorded replay, exchange and exact situation-support readouts. Complete schema/version
+   compatibility, malformed and forged input refusals, and the installed API/CLI example.
+   Reuse one media source unchanged with two independently constructed text recalls.
+   Preserve disjoint intervals and explicit points: a point contributes no duration, and
+   an annotation timestamp does not become an event's duration. Text-only consumers must
+   report unsupported modality until their native-evidence path exists.
+
+   **Done when:** the installed example runs outside the checkout, old recordings still
+   replay, the relevant regression/type/lint checks pass, and cold review finds no correctness
+   block. Save exact evidence and commit the coherent implementation. This proves supplied
+   playback support and inspection; media acquisition and media-aware assessment remain owed.
+
+2. **Cross-unit graph construction.** Start with the smallest missing construction path:
+   evidence-backed links between situations built from separate units, consumed by the
+   existing relation/source-transition machinery. Then extend narrative containment and
+   recall grouping through the same path. Use proposal-local references resolved against
+   the actual account; callers should not manually manufacture content-addressed IDs.
+   Preserve occurrence identity, context boundaries and partial processing outcomes.
+   Implement text cases first where they are independent of media, then add native evidence
+   to those consumers explicitly. Do not force all P3/P4 work to wait for every graph family.
+
+   **Done when:** an installed source-plus-two-recalls example constructs and consumes
+   cross-unit relations and grouping. Repeated occurrences remain distinct; foreign endpoints,
+   containment cycles and unsupported evidence refuse; missing rows cannot imply absence.
+   Each additional relation family gets its own positive/refusal evidence before being claimed.
+
+3. **One coherent construction-to-analysis workflow.** Extend the existing rich-detail and
+   correspondence examples rather than inventing another pipeline. Connect independent
+   construction, identity/attribution, detail admission, direct or structured reference,
+   conditional fidelity and the three analysis views. Add context-aware assessment as a
+   bounded step, followed by media-aware assessment using explicit supplied observations.
+   Keep completed assessments and input artifacts intact when changing method/profile.
+   Consolidate duplicated glue and expose a short Python workflow; the CLI calls the same
+   functions. Every saved intermediate must explain where an uncertain or wrong result arose.
+
+   **Done when:** the documented workflow runs from an installed package with offline replay,
+   reuses the identical source across recalls, distinguishes joint/broad/alternative/external
+   outcomes, and makes pending fidelity distinguishable from supported coverage. A user can
+   obtain the three views without constructing internal IDs or calling private validators.
+   Scripted controls prove the contract, not provider accuracy.
+
+After these checkpoints, expand semantic/structural evidence and retained numerical methods
+in the order below. An independent numerical method can proceed earlier when its input
+contract is already stable. Avoid a wholesale rewrite of the verified inference path.
 
 | Order | Delivery | Researcher-visible result | Dependency |
 |---|---|---|---|
