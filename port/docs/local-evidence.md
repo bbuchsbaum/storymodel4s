@@ -135,6 +135,11 @@ must remain representable in binary64. Aggregate weight overflow, nonfinite inpu
 positive support fraction that rounds to zero are refused. Posterior inference still uses
 the existing [kernel's numerical contract](sequence-inference.md).
 
+The published raw terms must also be finite: a per-facet distortion penalty whose product
+with facet count overflows is refused before weighting, even if a tiny or zero distortion
+weight could make its weighted contribution finite. The receipt cannot publish an infinite
+raw term; a larger-range term representation would require an explicit new wire contract.
+
 ## Scope of the evidence
 
 Independent controls pin literal costs/support, reversal/polarity/context gates, segment

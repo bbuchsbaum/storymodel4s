@@ -464,11 +464,14 @@ def _price(
     semantic: SemanticEstimate,
     policy: LocalCostPolicy,
 ) -> LocalCell:
+    distortion = policy.distortion_penalty * len(state.facets)
+    if not math.isfinite(distortion):
+        raise ValueError("raw distortion term exceeds finite numeric range")
     terms: dict[CostTerm, float] = {
         "propositional": float(content.predicate != target.predicate)
         if content.predicate is not None and target.predicate is not None
         else 0.5,
-        "distortion": policy.distortion_penalty * len(state.facets),
+        "distortion": distortion,
     }
     names = frozenset(n for _, values in target.participants for n in values)
     credit = sum(

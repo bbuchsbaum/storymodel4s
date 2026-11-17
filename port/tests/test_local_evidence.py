@@ -656,3 +656,41 @@ def test_local_evidence_cli_schema_and_both_export_grants(tmp_path, capsys):
             == 2
         )
         assert "denies" in capsys.readouterr().err
+
+
+def test_unrepresentable_distortion_term_refuses_before_weighting_and_cli_publication(
+    tmp_path, capsys
+):
+    source = rich("source", "SA", (), (("P", 0, 2, "positive", "intended", ()),))
+    recall = rich(
+        "recall", "RB", (("recall", 0, 2, None),), (("P", 0, 2, "negative", "asserted", ()),)
+    )
+    for weights in ({}, {"semantic": 1.0}, {"distortion": 1e-308}):
+        spec = LocalEvidenceSpec(
+            units=(RecallSelection(unit=recall.units[0].id, targets=(source.states[0].id,)),),
+            costs=LocalCostPolicy(weights=weights, distortion_penalty=1e308),
+        )
+        with pytest.raises(ValueError, match="raw distortion term"):
+            derive_local_evidence(source, recall, spec)
+    paths = [tmp_path / name for name in ("source.json", "recall.json", "spec.json")]
+    for path, artifact in zip(paths, (source, recall, spec)):
+        path.write_text(artifact.model_dump_json())
+    output = tmp_path / "must-not-publish.json"
+    assert main(["infer-accounts", *map(str, paths), "--output", str(output)]) == 2
+    assert "raw distortion term" in capsys.readouterr().err and not output.exists()
+    nearby = derive_local_evidence(
+        source,
+        recall,
+        spec.model_copy(update={"costs": LocalCostPolicy(weights={}, distortion_penalty=8e307)}),
+    ).cells[0]
+    assert nearby.state.facets == ("polarity", "modality")
+    assert nearby.terms["distortion"] == 1.6e308 and nearby.total == 0.0
+    # A large but representable raw term remains lawful; do not impose a global penalty cap.
+    one = rich("source", "SA", (), (("P", 0, 2, "positive", "asserted", ()),))
+    spec = LocalEvidenceSpec(
+        units=(RecallSelection(unit=recall.units[0].id, targets=(one.states[0].id,)),),
+        costs=LocalCostPolicy(weights={}, distortion_penalty=1e308),
+    )
+    cell = derive_local_evidence(one, recall, spec).cells[0]
+    assert cell.state.facets == ("polarity",) and cell.terms["distortion"] == 1e308
+    assert cell.total == 0.0 and cell.support is None
