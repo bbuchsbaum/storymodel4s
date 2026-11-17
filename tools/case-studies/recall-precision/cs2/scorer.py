@@ -84,8 +84,9 @@ class ProducerForecast:
     eps: float
     comp: object
     nonfilm: dict = field(default_factory=dict)
-    no_sample: bool = False  # True for both typed absences (no sample, only uncovered)
+    no_sample: bool = False  # True for the typed absences (no sample, only uncovered, ...)
     empty: str = ""  # which typed absence, '' when the row was sampled
+    sets: dict = field(default_factory=dict)  # (work, scenes) -> mass on a scene set
 
     @property
     def u(self):
@@ -98,7 +99,8 @@ class ProducerForecast:
         own = math.fsum(
             m for s, m in self.loc.items() if self.comp.work_of_scene(s) == w
         )
-        claimed = own + self.spread.get(w, 0.0) + self.outside.get(w, 0.0)
+        sets = math.fsum(m for (sw, _), m in self.sets.items() if sw == w)
+        claimed = own + self.spread.get(w, 0.0) + self.outside.get(w, 0.0) + sets
         return (1 - self.eps) * claimed + self.u * self.fallback.p_work(w)
 
     def p_set_and_work(self, scenes, w):
@@ -107,7 +109,15 @@ class ProducerForecast:
         own = math.fsum(
             self.loc.get(s, 0.0) for s in scenes if self.comp.work_of_scene(s) == w
         )
-        return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set) + self.u * (
+        # declared: scene-set mass is spread within its set by the fallback, restricted to it
+        set_part = 0.0
+        for (sw, q), m in self.sets.items():
+            if sw != w:
+                continue
+            fq = math.fsum(fs.get(x, 0.0) for x in q)
+            set_part += m * (math.fsum(fs.get(x, 0.0) for x in q if x in scenes) / fq
+                             if fq > 0 else f_set)
+        return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set + set_part) + self.u * (
             self.fallback.p_work(w) * f_set
         )
 
@@ -119,15 +129,17 @@ class ProducerForecast:
 
 def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
     """From one scene-grain LocationDistribution row."""
-    if row.state in ("no_sample", "only_uncovered"):
+    if row.state in ("no_sample", "only_uncovered", "only_non_addressed"):
         return ProducerForecast(
             {}, {}, {}, 0.0, 1.0, fallback, eps, comp, no_sample=True, empty=row.state
         )
-    loc, spread, outside, nonfilm = {}, {}, {}, {}
+    loc, spread, outside, nonfilm, sets = {}, {}, {}, {}, {}
     nonwork = abstain = 0.0
     for key, m in row.mass.items():
         tag = key[0]
-        if tag == "at":
+        if tag == "scene_set":
+            sets[(key[1], key[2])] = sets.get((key[1], key[2]), 0.0) + m
+        elif tag == "at":
             if key[1] != "scene":
                 raise ScoreError("producer rows must be at scene grain")
             loc[key[2]] = loc.get(key[2], 0.0) + m
@@ -149,18 +161,21 @@ def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
         else:
             raise ScoreError(f"unknown state {key!r}")
     return ProducerForecast(
-        loc, spread, outside, nonwork, abstain, fallback, eps, comp, nonfilm
+        loc, spread, outside, nonwork, abstain, fallback, eps, comp, nonfilm, sets=sets
     )
 
 
-def producer_forecasts(ld: LocationDistribution, fallback, cfg) -> list:
+def producer_forecasts(ld: LocationDistribution, fallback, cfg, row_fallbacks=None) -> list:
+    """One producer forecast per row. `row_fallbacks` (one Forecast per row) replaces the
+    corpus fallback where given: the frame-film rule (rules.fallback = 'frame-film')."""
     if not isinstance(ld, LocationDistribution):
         raise ProjectionError("not-a-distribution", type(ld).__name__)
     scene = ld.marginal("scene")
-    return [
-        producer_forecast(r, ld.composition, fallback, cfg["epsilon"])
-        for r in scene.rows
-    ]
+    fbs = row_fallbacks or [fallback] * len(scene.rows)
+    if len(fbs) != len(scene.rows):
+        raise ScoreError("one fallback per row is required")
+    return [producer_forecast(r, ld.composition, f, cfg["epsilon"])
+            for r, f in zip(scene.rows, fbs)]
 
 
 # ---------------------------------------------------------------- row scores

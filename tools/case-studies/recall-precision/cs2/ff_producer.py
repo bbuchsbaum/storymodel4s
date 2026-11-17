@@ -82,6 +82,7 @@ from cs2.account import (  # noqa: E402
 )
 
 WINDOW = 2
+BROAD_RULE = "scene-set"  # for the conversion ledger's broad-case counts (set by the caller)
 BATCH = 40
 MODEL = "opus"
 SEGMENTER = (
@@ -602,7 +603,7 @@ def members(r, rowmap, frame_work, frame_w, comp, refuse, conv):
             conv["shapes"].get(m.target.shape.value, 0) + 1
         )
         if m.target.shape is Shape.BROAD:
-            case = broad_case(m.target, comp)
+            case = broad_case(m.target, comp, BROAD_RULE)
             conv["broad_cases"][case] = conv["broad_cases"].get(case, 0) + 1
     return tuple(out)
 

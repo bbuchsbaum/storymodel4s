@@ -193,7 +193,7 @@ def test_joint_refused_from_distribution():
     row = ld_of(acc, bins).rows[3]  # the bin holding r3 (broad) and r4 (joint)
     assert not any(is_film(k) for k in row.mass), row.mass
     close(row.mass[("held_out", "joint", "A")], 0.5)
-    close(row.mass[("work_node", "broad", "B")], 0.5 * 0.9)  # b2, b3: two scenes of B
+    close(row.mass[("scene_set", "B", (6, 7))], 0.5 * 0.9)  # b2, b3: two scenes of B
 
 
 def test_coarsening_commutes_side_states_unchanged():
@@ -422,11 +422,12 @@ def test_title_only_gold_scene_dropped():
     assert sc[1].scene_bits is None and sc[1].work_bits is not None
 
 
-def _broad_row(units):
+def _broad_row(units, broad_rule="scene-set"):
     comp = fixture()
     refs = {"g": ref("g", (H(Shape.BROAD, units), 0.8))}
     acc = Account(comp, refs, {("P", "s"): cells([(0.5, "u0", RefSample("g"))])})
-    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(0, 1)])
+    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(0, 1)],
+                                         broad_rule=broad_rule)
     return comp, ld
 
 
@@ -445,9 +446,26 @@ def test_broad_within_one_scene_is_located_at_the_scene():
     close(f.loc[8], 0.8)
 
 
-def test_broad_across_scenes_of_one_work_is_the_work_node():
-    # c2 (scene 8) and c3 (scene 9) lie in work C on two parts: the work node holds the mass
+def test_broad_across_scenes_goes_to_its_scene_set():
+    # rule 'scene-set': c2 (scene 8) and c3 (scene 9) of work C -> the set {8, 9}, spread within
+    # the set by the fallback restricted to it; P({9} | C) = F(9) / (F(8) + F(9)) when nothing
+    # else is claimed
     comp, ld = _broad_row(["c2", "c3"])
+    row = ld.rows[0]
+    assert row.mass == {("unassigned",): row.mass[("unassigned",)],
+                        ("scene_set", "C", (8, 9)): 0.8}
+    dur = B.duration_prior(comp, CFG)
+    f = SC.producer_forecasts(ld, dur, CFG)[0]
+    e, fs = CFG["epsilon"], dur.scene["C"]
+    close(f.p_work("C"), (1 - e) * 0.8 + f.u * dur.p_work("C"))
+    exp = (1 - e) * 0.8 * fs[9] / (fs[8] + fs[9]) + f.u * dur.p_work("C") * fs[9]
+    close(f.p_set_and_work({9}, "C"), exp)
+    close(f.p_set_and_work({10}, "C"), f.u * dur.p_work("C") * fs[10])  # outside the set: 0
+
+
+def test_broad_across_scenes_old_rule_is_the_work_node():
+    # rule 'work-node' (previous rule, kept for comparison)
+    comp, ld = _broad_row(["c2", "c3"], broad_rule="work-node")
     row = ld.rows[0]
     assert row.mass == {("unassigned",): row.mass[("unassigned",)], ("work_node", "broad", "C"): 0.8}
     assert not row.allocated
@@ -775,7 +793,7 @@ def test_members_shapes_and_frame_check():
     assert m[0].target.shape is Shape.JOINT and abs(m[0].weight - 0.4) < 1e-12
     m = P.members(dict(mode="gist", extent="stretch", alts=[{"w": 1, "iv": [[1, 2]]}]), rowmap,
                   "B", 1.0, comp, refuse, conv)
-    assert m[0].target.shape is Shape.BROAD and conv["broad_cases"] == {"work": 1}
+    assert m[0].target.shape is Shape.BROAD and conv["broad_cases"] == {"scene_set": 1}
     m = P.members(dict(occurrence="repeated", alts=[{"w": 1, "iv": [[3, 3], [4, 4]]}]), rowmap,
                   "C", 1.0, comp, refuse, conv)
     assert m[0].target.shape is Shape.SINGLE and len(m[0].target.constituents) == 2

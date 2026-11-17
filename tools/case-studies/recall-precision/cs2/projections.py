@@ -9,7 +9,9 @@ states are their own keys and are never coarsened:
   ("work_ref", work)                   a work-level reference
   ("position", stated, resolved_work)  a position-level reference ('' when unresolved)
   ("nonfilm", state)                   a typed non-film state (memory search, ...)
-  ("work_node", "broad", work)         a broad hypothesis over several scenes of one work, located
+  ("scene_set", work, scenes)          a broad hypothesis over several scenes of one work, located
+                                       at its scene set (rule 'scene-set'; default)
+  ("work_node", "broad", work)         a broad hypothesis that cannot be bounded to scenes, located
                                        at the work node (counts toward P(work))
   ("held_out", "broad", "")            a broad hypothesis crossing works, held out
   ("held_out", "joint", work)          a joint hypothesis, held out by work
@@ -54,6 +56,7 @@ from .account import (
     RefSample,
     Shape,
     StateSample,
+    TalkSample,
     Uncovered,
     WorkReference,
 )
@@ -114,13 +117,26 @@ def _work_split(support, comp):
     return [(w, c / n) for w, c in sorted(by.items())]
 
 
-def broad_case(target, comp) -> str:
-    """Where a broad hypothesis is located: 'scene', 'work' or 'cross_work'."""
+BROAD_RULES = ("scene-set", "work-node")
+
+
+def broad_case(target, comp, rule="scene-set") -> str:
+    """Where a broad hypothesis is located: 'scene', 'scene_set', 'work' or 'cross_work'.
+
+    rule 'scene-set' (owner, 2026-11-17): a span over several scenes of one work goes to its
+    scene set; the work node only when the span cannot be bounded to scenes (a unit without a
+    scene). rule 'work-node' (previous): every multi-scene span goes to the work node."""
+    if rule not in BROAD_RULES:
+        raise ProjectionError("unknown-broad-rule", rule)
     works = {comp.work_of_unit(u) for u in target.support}
     if len(works) > 1:
         return "cross_work"
     scenes = {comp.unit[u].scene for u in target.support}
-    return "scene" if len(scenes) == 1 and None not in scenes else "work"
+    if None in scenes:
+        return "work"
+    if len(scenes) == 1:
+        return "scene"
+    return "scene_set" if rule == "scene-set" else "work"
 
 
 def _spread(units, comp, allocation):
@@ -134,7 +150,7 @@ def _spread(units, comp, allocation):
     return [(("at", "unit", u), s / tot) for u, s in zip(units, secs)]
 
 
-def location_contribution(target, comp, allocation="units"):
+def location_contribution(target, comp, allocation="units", broad_rule="scene-set"):
     """Mass of one member (weight 1) over location keys. Refuses a joint hypothesis."""
     if allocation not in ALLOCATIONS:
         raise ProjectionError("unknown-allocation", allocation)
@@ -149,7 +165,11 @@ def location_contribution(target, comp, allocation="units"):
             "joint-refused", "a joint reference cannot enter a distribution"
         )
     if target.shape is Shape.BROAD:
-        case = broad_case(target, comp)
+        case = broad_case(target, comp, broad_rule)
+        if case == "scene_set":
+            w = comp.work_of_unit(next(iter(target.support)))
+            scenes = tuple(sorted({comp.unit[u].scene for u in target.support}))
+            return [(("scene_set", w, scenes), 1.0)]
         if case == "cross_work":
             return [(("held_out", "broad", ""), 1.0)]
         if case == "work":
@@ -157,7 +177,7 @@ def location_contribution(target, comp, allocation="units"):
     return _spread(target.support, comp, allocation)
 
 
-def reference_contributions(ref, comp, allocation="units"):
+def reference_contributions(ref, comp, allocation="units", broad_rule="scene-set"):
     """[(key, mass)] of one reference; masses sum to 1 (weights plus the remainder)."""
     out = []
     if isinstance(ref, Reference):
@@ -170,7 +190,8 @@ def reference_contributions(ref, comp, allocation="units"):
                 ]
                 continue
             out += [
-                (k, m.weight * v) for k, v in location_contribution(t, comp, allocation)
+                (k, m.weight * v)
+                for k, v in location_contribution(t, comp, allocation, broad_rule)
             ]
     elif isinstance(ref, WorkReference):
         out.append((("work_ref", ref.work), ref.weight))
@@ -183,15 +204,15 @@ def reference_contributions(ref, comp, allocation="units"):
     return out
 
 
-def sample_contributions(sample, account, allocation="units"):
+def sample_contributions(sample, account, allocation="units", broad_rule="scene-set"):
     if isinstance(sample, RefSample):
         return reference_contributions(
-            account.references[sample.ref], account.composition, allocation
+            account.references[sample.ref], account.composition, allocation, broad_rule
         )
     if isinstance(sample, StateSample):
         return [(("nonfilm", sample.state), 1.0)]
-    if isinstance(sample, Uncovered):
-        raise ProjectionError("uncovered-is-not-a-sample", "uncovered words are ledger counts")
+    if isinstance(sample, (Uncovered, TalkSample)):
+        raise ProjectionError("not-a-sample", "uncovered and non-addressed words are ledger counts")
     raise ProjectionError("unknown-sample", repr(sample))
 
 
@@ -219,7 +240,7 @@ def bin_samples(cells, b: Bin):
     """The words in a bin and its distinct samples: references and typed states
     (not-applicable included). Uncovered words are in `inside` but are never samples."""
     inside = [c for c in cells if b.contains(c.onset)]
-    samples = {c.sample for c in inside if not isinstance(c.sample, Uncovered)}
+    samples = {c.sample for c in inside if not isinstance(c.sample, (Uncovered, TalkSample))}
     return inside, sorted(samples, key=_sample_key)
 
 
@@ -235,7 +256,11 @@ def bin_ledger(inside) -> dict:
 
 
 def empty_state(inside) -> str:
-    return "no_sample" if not inside else "only_uncovered"
+    if not inside:
+        return "no_sample"
+    if any(isinstance(c.sample, TalkSample) for c in inside):
+        return "only_non_addressed"
+    return "only_uncovered"
 
 
 # ---------------------------------------------------------------- distribution
@@ -257,7 +282,7 @@ class LocationDistribution:
             _check_row(r)
 
     @classmethod
-    def from_words(cls, account, cells, bins, allocation="units"):
+    def from_words(cls, account, cells, bins, allocation="units", broad_rule="scene-set"):
         rows = []
         for b in bins:
             inside, samples = bin_samples(cells, b)
@@ -267,7 +292,7 @@ class LocationDistribution:
             k = len(samples)
             parts, trace, alloc = defaultdict(list), defaultdict(set), defaultdict(list)
             for s in samples:
-                for key, v in sample_contributions(s, account, allocation):
+                for key, v in sample_contributions(s, account, allocation, broad_rule):
                     parts[key].append(v / k)
                     trace[key].add(s)
                 for key, v in broad_allocations(s, account, allocation):
@@ -338,7 +363,7 @@ def _coarsener(comp, src, dst):
 
 
 def _check_row(r: Row):
-    if r.state in ("no_sample", "only_uncovered"):
+    if r.state in ("no_sample", "only_uncovered", "only_non_addressed"):
         if r.mass:
             raise ProjectionError("empty-state-has-mass", r.state)
         return
@@ -507,6 +532,7 @@ def word_ledger(cells, bins):
         reference_words=kinds["RefSample"],
         not_applicable_words=kinds["StateSample"],
         uncovered_words=kinds["Uncovered"],
+        non_addressed_words=kinds["TalkSample"],
         uncovered_share=kinds["Uncovered"] / n if n else float("nan"),
         not_applicable_share=kinds["StateSample"] / n if n else float("nan"),
     )

@@ -105,6 +105,7 @@ class Reference:
     id: str
     members: tuple[Member, ...]
     condition: str = ""
+    talk: str = "narration"  # orthogonal talk type (Talk), not an address class
     unassigned: float = field(init=False)
 
     def __post_init__(self):
@@ -130,6 +131,7 @@ class WorkReference:
     work: str
     weight: float = 1.0
     condition: str = ""
+    talk: str = "identification"
     unassigned: float = field(init=False)
 
     def __post_init__(self):
@@ -143,6 +145,7 @@ class PositionReference:
     resolved_work: str | None
     weight: float = 1.0
     condition: str = ""
+    talk: str = "identification"
     unassigned: float = field(init=False)
 
     def __post_init__(self):
@@ -180,6 +183,26 @@ class StateSample:
     state: str  # a NonFilm value
 
 
+class Talk:
+    """Talk types, orthogonal to address (rules.talk = 'orthogonal'):
+    narration (describes film content), identification (names or picks out a work),
+    commentary (evaluation or remark), metamemory (remembering, searching, giving up),
+    off_task, fragment (no content of its own). Only narration and identification carry
+    address mass; the others are non-addressed talk unless anchored to an identifying
+    expression."""
+
+    ADDRESSED = ("narration", "identification")
+    NON_ADDRESSED = ("commentary", "metamemory", "fragment")
+
+
+@dataclass(frozen=True, order=True)
+class TalkSample:
+    """A word of non-addressed talk: a ledger count by talk type, never a destination."""
+
+    unit: str
+    talk: str
+
+
 @dataclass(frozen=True, order=True)
 class Uncovered:
     """A word no reference covers (one sample per recall unit; unit '' is outside every unit)."""
@@ -192,7 +215,7 @@ class WordCell:
     index: int
     onset: float | None
     unit: str  # recall unit id, '' when outside every unit
-    sample: RefSample | StateSample | Uncovered
+    sample: RefSample | StateSample | Uncovered | TalkSample
 
 
 @dataclass
@@ -202,9 +225,9 @@ class Account:
     composition: object
     references: dict  # id -> Reference | WorkReference | PositionReference
     words: dict  # (participant, session) -> list[WordCell]
-    framing_work: dict = field(
-        default_factory=dict
-    )  # (participant, session, unit) -> work
+    # (participant, session, unit) -> ((work, weight), ...): the producer's frame for the unit
+    framing_work: dict = field(default_factory=dict)
+    unit_talk: dict = field(default_factory=dict)  # (participant, session, unit) -> talk type
     relations: list = field(default_factory=list)
     condition: str = ""
 
