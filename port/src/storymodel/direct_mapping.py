@@ -9,6 +9,15 @@ from typing import Any, Literal, Self
 
 from pydantic import model_validator
 
+from .fidelity import (
+    FidelityProposal as FidelityProposal,
+)
+from .fidelity import (
+    SourceQuote as SourceQuote,
+)
+from .fidelity import (
+    _conditional_assessment,
+)
 from .model import (
     Account,
     Assessment,
@@ -20,11 +29,8 @@ from .model import (
     Name,
     Recipe,
     Reference,
-    Span,
-    Support,
     Unit,
     _validate_instance,
-    contained_in,
 )
 from .rich_account import RichAccount, SupportedAccount, validate_supported_account
 from .serialization import canonical, digest, strict_json
@@ -121,14 +127,6 @@ def mapping_request_digest(value: MappingInput) -> str:
     return digest(validate_mapping_request(value).model_dump(mode="json"))
 
 
-class SourceQuote(Model):
-    """Exact source support at global UTF-16 coordinates, checked against a hypothesis."""
-
-    document: Name
-    span: Span
-    text: Name
-
-
 class MappingHypothesis(Model):
     """A local proposal key avoids asking the provider to compute content-addressed IDs."""
 
@@ -136,29 +134,6 @@ class MappingHypothesis(Model):
     kind: Literal["single", "joint", "broad", "external"]
     targets: tuple[str, ...] = ()
     external: Literal["personal", "general", "other_episode"] | None = None
-
-
-class FidelityProposal(Model):
-    """A grade belongs to one local hypothesis, never implicitly to the whole detail."""
-
-    hypothesis: Name
-    status: Literal["pending", "completed", "unavailable", "refused"]
-    grade: (
-        Literal[
-            "supported",
-            "gist-detail-error",
-            "contradicted",
-            "recaller-inference",
-            "external",
-            "invented",
-            "unverifiable",
-            "misread",
-        ]
-        | None
-    ) = None
-    severity: Literal["minor", "major"] | None = None
-    reason: Name
-    evidence: tuple[SourceQuote, ...] = ()
 
 
 class DetailMapping(Model):
@@ -301,39 +276,8 @@ def _binding(request: MappingInput, detail: Detail, proposal: DetailMapping) -> 
         if item.hypothesis not in hypotheses or item.hypothesis in assessments:
             raise ValueError("foreign or duplicate conditional fidelity hypothesis")
         hypothesis = hypotheses[item.hypothesis]
-        if item.status == "completed":
-            if (item.grade == "external") and hypothesis.kind != "external":
-                raise ValueError("external fidelity requires an external hypothesis")
-            if hypothesis.kind == "external" and item.grade not in (
-                "external",
-                "unverifiable",
-                "misread",
-            ):
-                raise ValueError("external hypothesis cannot receive source fidelity")
-        evidence: dict[str, list[Span]] = {}
-        for quote in item.evidence:
-            document = documents.get(quote.document)
-            if document is None or quote.span.slice(document.text) != quote.text:
-                raise ValueError("fidelity quote differs from source document")
-            evidence.setdefault(quote.document, []).append(quote.span)
-        supports = tuple(
-            Support(document=doc, spans=tuple(sorted(spans, key=lambda s: s.start)))
-            for doc, spans in sorted(evidence.items())
-        )
-        if any(t not in targets for t in hypothesis.targets):
-            raise ValueError("foreign source target")
-        if any(
-            not contained_in(s, (targets[t].support for t in hypothesis.targets)) for s in supports
-        ):
-            raise ValueError("fidelity evidence lies outside its source hypothesis")
-        assessments[item.hypothesis] = Assessment(
-            hypothesis=hypothesis.id,
-            status=item.status,
-            grade=item.grade,
-            severity=item.severity,
-            reason=item.reason,
-            evidence=supports,
-        )
+        assessments[item.hypothesis] = _conditional_assessment(hypothesis, item, targets, documents)
+
     return Binding(
         detail=detail.id,
         reference=reference,

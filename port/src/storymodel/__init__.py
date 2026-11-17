@@ -22,6 +22,13 @@ from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, ve
 from .direct_workflow import MappingRecording, import_mapping, replay_mapping
 from .extraction import prepare_extraction, resolve_extraction
 from .extraction_workflow import ExtractionRecording, import_extraction, replay_extraction
+from .fidelity import (
+    fidelity_prompt,
+    prepare_fidelity,
+    resolve_fidelity,
+    verify_fidelity,
+)
+from .fidelity_workflow import FidelityRecording, import_fidelity, replay_fidelity
 from .identity import identity_role_table, resolve_text_identity, verify_identity
 from .model import Account, account_digest, validate_account
 from .relations import admit_relations, relation_table, verify_relations
@@ -39,6 +46,13 @@ __all__ = [
     "AlignmentPolicy",
     "Analysis",
     "ClaimQuestion",
+    "FidelityRecording",
+    "fidelity_prompt",
+    "prepare_fidelity",
+    "resolve_fidelity",
+    "verify_fidelity",
+    "import_fidelity",
+    "replay_fidelity",
     "DetailRecording",
     "ExtractionRecording",
     "MappingRecording",

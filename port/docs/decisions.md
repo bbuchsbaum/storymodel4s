@@ -211,3 +211,14 @@ Content-derived question/citation IDs reject duplicate descriptions; adjacent ci
 share identity while original UTF-16 boundaries are still checked. The first explicit text profile
 refuses chart/playback fields pending their checked representations. Their Scala capabilities
 remain owed, not retired. This avoids copying the Scala mapping class hierarchy into Python.
+
+## Separate conditional fidelity over existing hypotheses (P3, 2026-11-17)
+
+Provisional implementation choice: add a unit-local graded review that fills only absent/pending
+assessment slots in the existing account. Reuse the same quote/grade validator as direct mapping,
+with new request/reply/result/recording envelopes and the existing recorded executor. Expose
+extracted claim content for the misread check, hide prior grades, and preserve reference and all
+nonpending assessments. Rejected alternatives: converting fixed-question claim statuses into
+grades, remapping during assessment, overwriting prior judgments, copying the validator, or
+silently relaxing evidence ownership to reproduce a whole-film study script. Neighbor-aware and
+cross-target graded assessment remain explicit future contracts. See [fidelity](fidelity.md).

@@ -325,3 +325,27 @@ limits. Chart-element/provenance checks and media-bundle anchored support from t
 remain explicit outstanding seams: this first text profile refuses those fields rather than
 accepting unchecked placeholders. Automatic semantic comparison, graded assessment integration
 and full P3 correspondence remain owed. No question count is presented as accuracy or calibration.
+
+## Separate recorded conditional fidelity
+
+- **Reference behavior:** `tools/sherlock_mapper/verify_claims.py` is the retained graded study
+  verifier: first compare extraction with recall, then distinguish supported, gist/detail error,
+  contradicted, inference, unverifiable, invented and misread. It is a standalone script, not a
+  production Scala caller of `ClaimAssessmentReceipt`. Accepted ADR 0030 adds the explicit
+  external grade, hypothesis conditioning, missing statuses and supported-only analysis policy.
+- **Python entry points:** `prepare_fidelity`, `fidelity_prompt`, `resolve_fidelity`,
+  `verify_fidelity`, and recorded import/replay with four CLI commands. The actual consumer is
+  the existing `project` analysis; the connected rich two-recall example exercises that path.
+- **Improvement:** exact pending-slot selection, stable hypothesis identity, no implicit
+  overwrite, per-question outcomes, strict raw/typed boundaries and input-bound offline replay.
+  A single validator serves both direct mapping and subsequent grading. New public envelopes
+  use the existing account union instead of a parallel legacy/rich result class hierarchy.
+- **Compatibility:** existing mapping prompt/result/schema behavior stays unchanged; the moved
+  quote/proposal definitions retain their old imports. Rich graph collections, details, address,
+  inventories, source artifacts and reference values survive grading unchanged.
+- **Changed condition / remaining work:** no neighboring recall or previous labels are shown;
+  source quotes remain inside the chosen hypothesis. The study script's neighbor-aware and
+  whole-film cross-target citation behavior needs a separately versioned profile. This slice
+  does not convert fixed-question assessments into grades, infer semantic truth, establish
+  assessor accuracy or finish recurring-scene correspondence. Event/episode targets, remaining
+  semantic channels and reassessment history remain owed.

@@ -39,6 +39,13 @@ from .extraction_workflow import (
     read_extraction_request,
     replay_extraction,
 )
+from .fidelity import fidelity_prompt, prepare_fidelity
+from .fidelity_workflow import (
+    FidelityRecording,
+    import_fidelity,
+    read_fidelity_request,
+    replay_fidelity,
+)
 from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
@@ -261,6 +268,31 @@ def main(argv: list[str] | None = None) -> int:
     relation_inspect.add_argument("account")
     relation_inspect.add_argument("--expected-sha256")
     relation_inspect.add_argument("--output")
+    fidelity_prepare = commands.add_parser(
+        "prepare-fidelity", help="prepare a separate graded review of pending hypotheses"
+    )
+    fidelity_prepare.add_argument("account")
+    fidelity_prepare.add_argument("unit")
+    fidelity_prepare.add_argument(
+        "--interpretation", choices=("narrative", "referent"), default="referent"
+    )
+    fidelity_prepare.add_argument("--expected-sha256")
+    fidelity_prepare.add_argument("--output")
+    for command in ("fidelity-prompt", "import-fidelity", "replay-fidelity"):
+        fidelity_command = commands.add_parser(
+            command, help="record or replay conditional fidelity"
+        )
+        fidelity_command.add_argument("request")
+        fidelity_command.add_argument("--expected-request-sha256")
+        if command == "import-fidelity":
+            fidelity_command.add_argument("reply")
+        if command != "fidelity-prompt":
+            fidelity_command.add_argument("recording")
+        if command == "replay-fidelity":
+            fidelity_command.add_argument("--expected-import-sha256")
+            fidelity_command.add_argument("--account-only", action="store_true")
+        if command != "import-fidelity":
+            fidelity_command.add_argument("--output")
     claim_prepare = commands.add_parser(
         "prepare-claim-assessment",
         help="freeze a declared question population against an account snapshot",
@@ -329,6 +361,50 @@ def main(argv: list[str] | None = None) -> int:
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
                 args.output,
             )
+        elif args.command == "prepare-fidelity":
+            fidelity_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if fidelity_account.export_permission != "allowed":
+                raise PermissionError("producer denies fidelity export")
+            emit(
+                prepare_fidelity(
+                    fidelity_account, args.unit, interpretation=args.interpretation
+                ).model_dump(mode="json"),
+                args.output,
+            )
+        elif args.command in ("fidelity-prompt", "import-fidelity", "replay-fidelity"):
+            fidelity_request = read_fidelity_request(
+                Path(args.request), expected_sha256=args.expected_request_sha256
+            )
+            if fidelity_request.account.export_permission != "allowed":
+                raise PermissionError("producer denies fidelity export")
+            if args.command == "fidelity-prompt":
+                emit(strict_json(fidelity_prompt(fidelity_request)), args.output)
+            elif args.command == "import-fidelity":
+                fidelity_recording = FidelityRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_fidelity(fidelity_request, fidelity_recording, Path(args.recording))
+                emit({"recording": args.recording, "imported": 1}, None)
+            else:
+                fidelity_result = replay_fidelity(
+                    fidelity_request,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                if args.account_only and any(
+                    d.status != "admitted" for d in fidelity_result.decisions
+                ):
+                    raise ValueError(
+                        "fidelity account-only export would discard unsuccessful outcomes"
+                    )
+                emit(
+                    (fidelity_result.account if args.account_only else fidelity_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
         elif args.command == "prepare-claim-assessment":
             claim_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256
