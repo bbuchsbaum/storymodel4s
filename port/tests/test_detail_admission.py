@@ -131,6 +131,48 @@ def test_admits_state_linked_discontinuous_detail_with_explicit_address_and_disc
     assert verify_details(request, raw, result) == result
 
 
+def test_quote_partition_does_not_create_new_occurrence_or_double_count():
+    value = account()
+    unit = value.units[0]
+    request = prepare_details(value, (unit.id,))
+    whole = {
+        "key": "whole",
+        "kind": "attribute",
+        "address": "target",
+        "discourse": "content",
+        "situation": value.states[0].id,
+        "quotes": [{"span": {"start": 0, "end": 5}, "text": "AA BB"}],
+    }
+    split = {
+        **whole,
+        "key": "split",
+        "quotes": [
+            {"span": {"start": 0, "end": 3}, "text": "AA "},
+            {"span": {"start": 3, "end": 5}, "text": "BB"},
+        ],
+    }
+    original = admit_details(request, proposal(request, unit.id, details=(whole,)))
+    partitioned = admit_details(request, proposal(request, unit.id, details=(split,)))
+    assert original.account.details[0] == partitioned.account.details[0]
+    assert partitioned.account.details[0].support.spans == (Span(start=0, end=5),)
+    duplicate = admit_details(request, proposal(request, unit.id, details=(whole, split)))
+    assert duplicate.receipts[0].status == "rejected"
+    assert "duplicate detail" in duplicate.receipts[0].reason
+    assert not duplicate.account.details and duplicate.account.inventories[0].status == "failed"
+    gapped = {
+        **whole,
+        "key": "gapped",
+        "quotes": [
+            {"span": {"start": 0, "end": 2}, "text": "AA"},
+            {"span": {"start": 3, "end": 5}, "text": "BB"},
+        ],
+    }
+    distinct = admit_details(request, proposal(request, unit.id, details=(gapped,)))
+    assert distinct.account.details[0].id != original.account.details[0].id
+    assert distinct.account.details[0].content == "AA … BB"
+    assert distinct.account.details[0].support.spans == (Span(start=0, end=2), Span(start=3, end=5))
+
+
 def test_search_limited_details_admit_atomically_and_reject_reversed_quotes():
     value = account()
     unit = value.units[0]

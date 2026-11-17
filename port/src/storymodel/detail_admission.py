@@ -16,6 +16,7 @@ from .model import (
     Model,
     Name,
     Recipe,
+    Span,
     State,
     Support,
     contained_in,
@@ -215,6 +216,15 @@ def admit_details(value: DetailRequest, raw: str) -> DetailAdmissionResult:
                         raise ValueError("detail quote differs from canonical recall document")
                     spans.append(quote.span)
                 support = Support(document=document.id, spans=tuple(spans))
+                # Quote partitioning is not a new expressed occurrence. Validate order first,
+                # then canonicalize adjacency before deriving identity and checking duplicates.
+                merged: list[Span] = []
+                for span in support.spans:
+                    if merged and merged[-1].end == span.start:
+                        merged[-1] = Span(start=merged[-1].start, end=span.end)
+                    else:
+                        merged.append(span)
+                support = Support(document=document.id, spans=tuple(merged))
                 if not contained_in(support, (unit.support,)):
                     raise ValueError("detail evidence lies outside its recall unit")
                 event: str | None = None
@@ -225,11 +235,7 @@ def admit_details(value: DetailRequest, raw: str) -> DetailAdmissionResult:
                     if not contained_in(support, situation.evidence):
                         raise ValueError("detail evidence lies outside its recall situation")
                     event = situation.id
-                content = ""
-                for index, quote in enumerate(draft.quotes):
-                    if index and draft.quotes[index - 1].span.end != quote.span.start:
-                        content += " … "
-                    content += quote.text
+                content = " … ".join(span.slice(document.text) for span in support.spans)
                 admitted.append(
                     Detail(
                         unit=unit_id,

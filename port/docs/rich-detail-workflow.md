@@ -28,7 +28,9 @@ or state when its support fits that situation. A source situation cannot become 
 owner. No source reference or fidelity is inferred from the detail's address or situation link.
 
 Quote order is checked. The display content concatenates adjacent spans and inserts ` … ` across
-gaps; it does not fabricate intervening words. The original supports remain separate and exact.
+gaps; it does not fabricate intervening words. Raw quotes remain available in the recording.
+Adjacent quote fragments are coalesced before deriving detail identity, so splitting one quote
+cannot create a second occurrence or double credit. Genuine evidence gaps remain separate.
 Classification and address are recorded proposals whose evidence consistency is checked, not
 proven semantic truth.
 
