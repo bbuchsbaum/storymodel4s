@@ -3,6 +3,8 @@
 This slice turns raw recall into an inspectable event/detail account through recorded,
 typed proposals. It reuses intake, recorded execution, account validation and analysis.
 There is no live model client, source matching or fidelity inference.
+[Verification receipt](../evidence/extraction-workflow.json): full suite, cold review,
+attribution mutation, v1 identity compatibility and installed-wheel checks.
 
 Run the admitted synthetic example from `port/`, using a new output directory:
 

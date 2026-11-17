@@ -1,0 +1,50 @@
+{
+  "stage": "recorded event/detail extraction",
+  "source_commit": "9a9c956a5f663c9ff351d49c069ab69ab5dc3f1a",
+  "checks": {
+    "pytest": "180 passed in 3.83s",
+    "mypy": "18 source files; no issues",
+    "ruff": "lint passed; all 49 files formatted"
+  },
+  "reference_files": {
+    "acquire/src/main/scala/storymodel4s/acquire/patch.scala": "858b79509d936aa09ae06d59a6207617055e8baed1d4837f8aed25f1069cc2fc",
+    "acquire/src/main/scala/storymodel4s/acquire/resolve.scala": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+    "docs/design/detail-coding/synthetic-worked-example.md": "8073a337a8f0da59d9dccb3982ac55e5ebbe43b1fcead4f1556785eeb4b3eb74",
+    "port/src/storymodel/demo.py": "1b22507cf31194f52ffba8abd29c3e7a92ad6bcc10b55b027191bb89d0337dbc"
+  },
+  "v1_compatibility": {
+    "baseline_commit": "39f0d46b7",
+    "v1_demo_account_sha256": "f87bf668ead1514a7ce6a585f44558e79f1230de85981543f0e89f757c93c36f",
+    "unchanged": true
+  },
+  "mutation_check": {
+    "mutation": "delete declared attribution scope check",
+    "baseline": "3 passed",
+    "mutant": "1 failed, 2 passed",
+    "mutant_imported": true,
+    "named_failure": "test_attributed_content_cannot_be_promoted_to_root_world[believed]"
+  },
+  "wheel_smoke": {
+    "installed_module": "data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "outside_checkout": true,
+    "cli_matches_api": true,
+    "recall_events": 2,
+    "recall_details": 3,
+    "unresolved_claims": 1,
+    "live_provider_calls": 0
+  },
+  "limits": [
+    "Synthetic provider-shaped proposals; no live provider or extraction accuracy claim.",
+    "Quote and declared-context consistency are established, not semantic entailment or detection of omitted attribution.",
+    "Unit-local references and contiguous evidence only; no cross-unit coreference, relation extraction or normalized predicate inference.",
+    "No source matching, fidelity judgments or graph-HSMM inference.",
+    "No comparative speed claim or browser qualification."
+  ],
+  "cold_review": {
+    "commit": "9a9c956a5f663c9ff351d49c069ab69ab5dc3f1a",
+    "verdict": "no BLOCKs",
+    "focused_tests": "35 passed",
+    "fixture_admission": "12 generated quotes independently verified as exact slices of unchanged admitted demo.RECALL_TEXT; no new narrative passage",
+    "source_independence": "reviewer removed source account; recall entities/events/details/resolutions unchanged"
+  }
+}
