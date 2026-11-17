@@ -142,6 +142,7 @@ from .prepared_construction import (
     compile_prepared_construction,
     import_prepared_construction,
     prepare_construction,
+    prepare_sherlock_construction,
     prepared_construction_prompt,
     read_prepared_construction,
     replay_prepared_construction,
@@ -191,6 +192,15 @@ from .semantic import (
 )
 from .semantic_workflow import SemanticRecording, import_semantic, replay_semantic
 from .sequence import SequenceRequest, SequenceResult, infer_sequence, verify_sequence
+from .sherlock_recall import (
+    SherlockRecall,
+    SherlockRecallTiming,
+    prepare_sherlock_recall,
+    sherlock_recall_timing,
+    validate_sherlock_recall,
+    verify_sherlock_recall_timing,
+)
+from .sherlock_source import SherlockSource, prepare_sherlock_source, validate_sherlock_source
 from .source import SourceRow, compile_source, prepare_source, verify_source
 from .source_preparation import PreparedSource, prepare_source_utf8, validate_prepared_source
 from .source_transitions import (
@@ -266,10 +276,20 @@ __all__ = [
     "import_prepared_construction",
     "prepared_construction_prompt",
     "prepare_construction",
+    "prepare_sherlock_construction",
     "read_prepared_construction",
     "replay_prepared_construction",
     "validate_prepared_construction",
     "verify_prepared_construction",
+    "SherlockSource",
+    "prepare_sherlock_source",
+    "validate_sherlock_source",
+    "SherlockRecall",
+    "prepare_sherlock_recall",
+    "validate_sherlock_recall",
+    "SherlockRecallTiming",
+    "sherlock_recall_timing",
+    "verify_sherlock_recall_timing",
     "upgrade_context_account",
     "attributed_identity_roles",
     "resolve_attributed_identity",

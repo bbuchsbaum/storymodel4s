@@ -66,9 +66,14 @@ def construction_reply(prepared):
 
 
 def construct(directory, key, side, raw):
+    prepared = prepare_construction(key, side, raw, export_permission="allowed")
+    return record_construction(directory, prepared, raw)
+
+
+def record_construction(directory, prepared, raw):
+    """Share recording and admission between generic and study-format examples."""
     directory.mkdir()
     (directory / "raw-input").write_bytes(raw)
-    prepared = prepare_construction(key, side, raw, export_permission="allowed")
     recording = PreparedConstructionRecording(
         prepared_sha256=digest(prepared.model_dump(mode="json")),
         origin="abstract intake control",
@@ -106,12 +111,19 @@ def run(destination):
         }
     ).encode()
     source = construct(destination / "source", "source", "source", source_raw)
+    recalls = tuple(
+        construct(destination / f"recall-{number}", "recall", "recall", raw)
+        for number, raw in ((1, b"AA BB\r\n"), (2, b"AA BB\n"))
+    )
+    analyze_recalls(destination, source, recalls)
+
+
+def analyze_recalls(destination, source, recalls):
+    """Exercise the same real detail/reference/fidelity consumers for both intake formats."""
     original = source.model_dump_json()
-    for number, raw in ((1, b"AA BB\r\n"), (2, b"AA BB\n")):
+    for number, recall in enumerate(recalls, 1):
         relative = f"recall-{number}"
         root = destination / relative
-        # Deliberately identical keys and canonical content: raw lineage alone differs.
-        recall = construct(root, "recall", "recall", raw)
         paired = pair_rich_accounts(source, recall)
         unit = recall.units[0].id
         detail_request = prepare_details(paired, (unit,))

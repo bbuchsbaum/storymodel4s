@@ -435,3 +435,15 @@ identity may agree across different raw inputs; recording identity and provenanc
 Source row order follows declared part/row ordinals; native clocks remain part-qualified.
 Construction row coverage includes separators while the intake keeps original occurrence
 supports. [Contract](prepared-construction.md).
+
+## Retained Sherlock input adapters (2026-11-17, provisional)
+
+Use prepared-construction/v2 to retain actual TSV/repair and CSV/lineage receipts while deriving
+the existing generic intake views. Reuse the checked strict CSV contract rather than the older
+comma-splitting convenience parser. Interpret selected recall onsets as exact bounded decimals;
+Python integer fractions deliberately extend Scala's Long range. Recording/scanner origin and
+identity remain unestablished until separately supported. Rejected alternatives: translating
+all Scala wrappers; replacing the repair declaration with unverified caller labels; projecting
+notebook offsets onto media clocks; dropping unused CSV columns; automatically granting export
+from caller-provided lineage; float timestamps or filling a missing first onset from later words.
+Shared example functions exercise the same downstream analysis stages. [Contract](sherlock-intake.md).

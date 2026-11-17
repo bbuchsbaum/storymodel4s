@@ -128,6 +128,7 @@ from .prepared_construction import (
     PreparedConstructionResult,
     import_prepared_construction,
     prepare_construction,
+    prepare_sherlock_construction,
     prepared_construction_prompt,
     read_prepared_construction,
     replay_prepared_construction,
@@ -162,6 +163,12 @@ from .semantic_workflow import (
     replay_semantic,
 )
 from .sequence import infer_sequence, validate_sequence, verify_sequence
+from .sherlock_recall import (
+    SherlockRecall,
+    prepare_sherlock_recall,
+    sherlock_recall_timing,
+)
+from .sherlock_source import SherlockSource, prepare_sherlock_source
 from .source import SourceRow, prepare_source
 from .source_transitions import (
     SourceSequenceResult,
@@ -291,6 +298,37 @@ def main(argv: list[str] | None = None) -> int:
     prepared_construction.add_argument("--allow-export", action="store_true")
     prepared_construction.add_argument("--expected-input-sha256")
     prepared_construction.add_argument("--output")
+    sherlock_source_prepare = commands.add_parser(
+        "prepare-sherlock-source",
+        help="prepare retained Sherlock annotation and clock-repair intake",
+    )
+    sherlock_source_prepare.add_argument("input")
+    sherlock_source_prepare.add_argument("repair")
+    sherlock_source_prepare.add_argument("--key", required=True)
+    sherlock_source_prepare.add_argument("--allow-export", action="store_true")
+    sherlock_source_prepare.add_argument("--full-contexts", action="store_true")
+    sherlock_source_prepare.add_argument("--expected-input-sha256")
+    sherlock_source_prepare.add_argument("--expected-record-sha256")
+    sherlock_source_prepare.add_argument("--output")
+    sherlock_recall_prepare = commands.add_parser(
+        "prepare-sherlock-recall", help="prepare retained Sherlock word-CSV and lineage intake"
+    )
+    sherlock_recall_prepare.add_argument("input")
+    sherlock_recall_prepare.add_argument("lineage")
+    sherlock_recall_prepare.add_argument("--key", required=True)
+    sherlock_recall_prepare.add_argument("--source-id", required=True)
+    sherlock_recall_prepare.add_argument("--allow-export", action="store_true")
+    sherlock_recall_prepare.add_argument("--full-contexts", action="store_true")
+    sherlock_recall_prepare.add_argument("--expected-input-sha256")
+    sherlock_recall_prepare.add_argument("--expected-record-sha256")
+    sherlock_recall_prepare.add_argument("--output")
+    sherlock_timing = commands.add_parser(
+        "sherlock-recall-timing",
+        help="read exact recalled-word timing on a declared external clock",
+    )
+    sherlock_timing.add_argument("request")
+    sherlock_timing.add_argument("--clock", required=True, choices=("princeton", "openneuro"))
+    sherlock_timing.add_argument("--output")
     prepared_construction_prompt_command = commands.add_parser(
         "prepared-construction-prompt", help="render a raw-intake construction contract"
     )
@@ -1332,6 +1370,41 @@ def main(argv: list[str] | None = None) -> int:
                 export_permission="allowed" if args.allow_export else "denied",
             )
             emit(construction_prepared.model_dump(mode="json"), args.output)
+        elif args.command in ("prepare-sherlock-source", "prepare-sherlock-recall"):
+            sherlock_input = Path(args.input).read_bytes()
+            record_path = args.repair if args.command == "prepare-sherlock-source" else args.lineage
+            sherlock_record = Path(record_path).read_bytes()
+            if (
+                args.expected_input_sha256 is not None
+                and sha256(sherlock_input).hexdigest() != args.expected_input_sha256
+            ):
+                raise ValueError("Sherlock input differs from external SHA-256")
+            if (
+                args.expected_record_sha256 is not None
+                and sha256(sherlock_record).hexdigest() != args.expected_record_sha256
+            ):
+                raise ValueError("Sherlock record differs from external SHA-256")
+            sherlock_intake: SherlockSource | SherlockRecall
+            if args.command == "prepare-sherlock-source":
+                sherlock_intake = prepare_sherlock_source(args.key, sherlock_input, sherlock_record)
+            else:
+                sherlock_intake = prepare_sherlock_recall(
+                    args.key, sherlock_input, sherlock_record, source_id=args.source_id
+                )
+            sherlock_prepared = prepare_sherlock_construction(
+                sherlock_intake,
+                full_contexts=args.full_contexts,
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(sherlock_prepared.model_dump(mode="json"), args.output)
+        elif args.command == "sherlock-recall-timing":
+            sherlock_prepared = read_prepared_construction(Path(args.request))
+            if sherlock_prepared.export_permission != "allowed":
+                raise PermissionError("producer denies Sherlock recall timing export")
+            if not isinstance(sherlock_prepared.intake, SherlockRecall):
+                raise ValueError("Sherlock recall timing requires a Sherlock recall intake")
+            timing = sherlock_recall_timing(sherlock_prepared.intake, args.clock)
+            emit(timing.model_dump(mode="json"), args.output)
         elif args.command in (
             "prepared-construction-prompt",
             "import-prepared-construction",

@@ -21,6 +21,8 @@ from .rich_construction import (
 )
 from .rich_workflow import rich_prompt
 from .serialization import canonical, digest, strict_json
+from .sherlock_recall import SherlockRecall, validate_sherlock_recall
+from .sherlock_source import SherlockSource, validate_sherlock_source
 from .source import SourceRow
 from .source_preparation import PreparedSource, prepare_source_utf8, validate_prepared_source
 
@@ -28,16 +30,25 @@ from .source_preparation import PreparedSource, prepare_source_utf8, validate_pr
 class PreparedConstruction(Model):
     """Actual raw intake and explicit policy determine the construction request."""
 
-    schema_version: Literal["storymodel.prepared-construction/v1"] = (
-        "storymodel.prepared-construction/v1"
-    )
-    intake: PreparedRecall | PreparedSource
+    schema_version: Literal[
+        "storymodel.prepared-construction/v1", "storymodel.prepared-construction/v2"
+    ] = "storymodel.prepared-construction/v1"
+    intake: PreparedRecall | PreparedSource | SherlockRecall | SherlockSource
     full_contexts: bool = False
     export_permission: Literal["allowed", "denied"] = "denied"
 
     @model_validator(mode="after")
     def dependencies(self) -> Self:
-        if isinstance(self.intake, PreparedRecall):
+        study_intake = isinstance(self.intake, (SherlockRecall, SherlockSource))
+        if study_intake != (self.schema_version == "storymodel.prepared-construction/v2"):
+            raise ValueError(
+                "Sherlock intake requires prepared-construction/v2; generic intake uses v1"
+            )
+        if isinstance(self.intake, SherlockRecall):
+            validate_sherlock_recall(self.intake)
+        elif isinstance(self.intake, SherlockSource):
+            validate_sherlock_source(self.intake)
+        elif isinstance(self.intake, PreparedRecall):
             validate_prepared_recall(self.intake)
         else:
             validate_prepared_source(self.intake)
@@ -47,7 +58,11 @@ class PreparedConstruction(Model):
     def request(self) -> RichConstructionRequest:
         """Recompute covered rows; occurrence evidence remains in the intake receipt."""
         checked = validate_prepared_construction(self)
-        intake = checked.intake
+        intake = (
+            checked.intake.prepared
+            if isinstance(checked.intake, (SherlockRecall, SherlockSource))
+            else checked.intake
+        )
         document = intake.document
         if isinstance(intake, PreparedRecall):
             ends = [unit.support.start for unit in intake.units[1:]] + [
@@ -94,6 +109,23 @@ def prepare_construction(
         raise ValueError("construction side must be source or recall")
     return PreparedConstruction(
         intake=prepare_source_utf8(key, raw) if side == "source" else prepare_recall_utf8(key, raw),
+        full_contexts=full_contexts,
+        export_permission=export_permission,
+    )
+
+
+def prepare_sherlock_construction(
+    intake: SherlockSource | SherlockRecall,
+    *,
+    full_contexts: bool = False,
+    export_permission: Literal["allowed", "denied"] = "denied",
+) -> PreparedConstruction:
+    """Bind actual study-format receipts to the existing construction/analysis workflow."""
+    if not isinstance(intake, (SherlockSource, SherlockRecall)):
+        raise ValueError("Sherlock construction requires checked source or recall intake")
+    return PreparedConstruction(
+        schema_version="storymodel.prepared-construction/v2",
+        intake=intake,
         full_contexts=full_contexts,
         export_permission=export_permission,
     )
