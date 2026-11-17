@@ -280,6 +280,23 @@ def test_duplicate_edges_and_existing_edge_cycles_are_rejected_atomically():
     )
     assert duplicate.status == "rejected" and duplicate.account == value and not duplicate.accepted
 
+    distinct_evidence = admit_relations(
+        value,
+        raw(
+            value,
+            relations=(
+                proposal("first-support", "causes", first, second, quote(source, 0, 2)),
+                proposal("second-support", "causes", first, second, quote(source, 3, 5)),
+            ),
+        ),
+    )
+    assert distinct_evidence.status == "admitted"
+    assert set(distinct_evidence.accepted) == {"first-support", "second-support"}
+    assert [
+        tuple((span.start, span.end) for span in relation.evidence[0].spans)
+        for relation in distinct_evidence.account.relations
+    ] == [((0, 2),), ((3, 5),)]
+
     existing = admit_relations(
         value,
         raw(value, relations=(proposal("existing", "before", first, second, quote(source, 0, 2)),)),

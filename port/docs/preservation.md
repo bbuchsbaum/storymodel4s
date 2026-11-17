@@ -128,6 +128,6 @@ owed, together with epistemic status and entailed/hypothesized relation evidence
 excluded by passing the bounded event-relation tests.
 
 Independent witnesses: explicit endpoint/context/evidence tables, all existing four kinds on
-source and recall, exact discontinuous quotes, atomic cycle/duplicate refusals, preserved input
+source and recall, exact discontinuous quotes, atomic cycle/duplicate-identity refusals, preserved input
 IDs, foreign recording and changed result refusal, offline CLI/API agreement and installed token
 graph example. No causal/temporal truth or scientific validity is inferred from quoted text.

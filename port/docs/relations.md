@@ -29,9 +29,11 @@ IDs `source`/`target`, and `evidence` quotes containing `document`, `span` and e
 Context is derived from the source event. Multiple quotes preserve discontinuous support;
 gaps are never filled by a text hull. No existing graph objects or IDs are rewritten.
 
-The batch is atomic. Bad endpoints, false quotes, duplicate edges, incompatible contexts or
+The batch is atomic. Bad endpoints, false quotes, duplicate relation identities, incompatible contexts or
 cycles reject the entire proposed batch and retain the original account. A cycle spanning
-new and existing edges also refuses. Response order cannot select an arbitrary winning edge.
+new and existing edges also refuses. Response order cannot select an arbitrary winning edge. Identity includes evidence: two claims
+with the same kind/endpoints but different cited supports remain distinct, preserving their
+provenance. An identical repeated claim refuses rather than adding duplicate credit.
 Malformed or foreign-input envelopes raise `ValueError` because their identity is uncertain.
 
 `completed`, `search-limited`, `not-attempted` and `failed` processing remain distinct. Limited

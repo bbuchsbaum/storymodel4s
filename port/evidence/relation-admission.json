@@ -1,0 +1,26 @@
+{
+  "source_commit": "6790156c36d23b43b0ba765e3f337ab7cc9afc3d",
+  "checks": {
+    "full_suite": "273 passed in 3.03s",
+    "mypy": "26 source files pass",
+    "ruff": "lint and format77 files pass",
+    "mutation": "exact quote guard deletion: baseline3 pass, mutant1 named failure and2 controls pass"
+  },
+  "review": {
+    "verdict": "PASS no BLOCKs",
+    "reviewer": "source_compiler_review",
+    "targeted_tests": "25 passed, 0 failed, 0 skipped",
+    "additional_probes": "forged input accounts, edited accepted maps and output graphs refused",
+    "followup": "Clarified duplicate relation identities include evidence; different-evidence claims remain distinct. Added discriminating test;22 relation tests pass."
+  },
+  "installed_wheel": {
+    "outside_checkout": true,
+    "example": "admitted1 declared relation; exact discontinuous evidence retained",
+    "cli": "replays same input-bound proposal batch successfully"
+  },
+  "limits": [
+    "Only existing four event relation kinds; richer Scala interval/entity/hierarchy/causal rules remain owed.",
+    "Exact quote identity is not semantic entailment or scientific accuracy.",
+    "Raw proposals and result receipts must be retained alongside account snapshots."
+  ]
+}
