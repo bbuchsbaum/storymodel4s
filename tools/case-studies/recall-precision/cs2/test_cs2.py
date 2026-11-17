@@ -18,6 +18,8 @@ HERE = Path(__file__).resolve().parents[1]
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
+import numpy as np  # noqa: E402
+
 from cs2 import baselines as B  # noqa: E402
 from cs2 import scorer as SC  # noqa: E402
 from cs2.account import (  # noqa: E402
@@ -1349,6 +1351,169 @@ def test_pass1_v1b_changes_one_sentence_only():
     c1 = P.conditions(1, "s", 1, systems=(a, P.PASS2_ARMS["coverage"]))
     c2 = P.conditions(1, "s", 1, systems=(b, P.PASS2_ARMS["coverage"]))
     assert c1["pass1"]["id"] != c2["pass1"]["id"] and c1["pass2"]["id"] == c2["pass2"]["id"]
+
+
+# ---------------------------------------------------------------- sequence decoding (round 4)
+
+
+def _decoder_gold():
+    """Two participants' gold sequences over the fixture: works A, B, C in presentation order."""
+    g = lambda p, i, *a, **k: _gold(p, "s", i, *a, **k)  # noqa: E731
+    return {
+        "P1": [g("P1", 0, "nonfilm", None, nonfilm="off_task"),
+               g("P1", 1, "specific", "A", {1}), g("P1", 2, "specific", "A", {2}),
+               g("P1", 3, "nonfilm", None, nonfilm="memory_search"),
+               g("P1", 4, "film_only", "B"), g("P1", 5, "specific", "B", {6}),
+               g("P1", 6, "specific", "B", {7}), g("P1", 7, "specific", "C", {8}),
+               g("P1", 8, "specific", "C", {8}), g("P1", 9, "specific", "C", {10})],
+        "P2": [g("P2", 0, "specific", "B", {7}), g("P2", 1, "specific", "B", {6}),
+               g("P2", 2, "specific", "C", {9}), g("P2", 3, "specific", "C", {10}),
+               g("P2", 4, "nonfilm", None, nonfilm="gave_up")],
+    }
+
+
+def _decoder_setup(participant=None):
+    from cs2 import decoder as DC
+
+    comp = fixture()
+    dur = B.with_nonfilm(B.duration_prior(comp, CFG), 0.07)
+    sp = DC.space(comp, CFG)
+    rates = DC.fit(comp, _decoder_gold(), participant, CFG)
+    T, init = DC.transition(sp, rates)
+    return DC, comp, dur, sp, rates, T, init
+
+
+def test_decoder_null_producer_equals_order_prior_only():
+    # a producer with no references and no frames has q = d on every cell, so its evidence is
+    # flat and the decoded forecast is the order prior alone, exactly
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    words = [(0.2 + i, f"u{i}", Uncovered(f"u{i}")) for i in range(4)]
+    acc = Account(comp, {}, {("P", "s"): cells(words)})
+    gold = [_gold("P", "s", i, "specific", "C", {8}) for i in range(4)]
+    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")],
+                                         [Bin(g.lo, g.hi) for g in gold])
+    null = SC.producer_forecasts(ld, dur, CFG, [dur] * 4)
+    d = DC.cells(dur, sp, dur, rates["nu"])[0]
+    q = np.array([DC.cells(f, sp, dur, rates["nu"])[0] for f in null])
+    close(float(d.sum()), 1.0)
+    got = DC.decode(sp, T, init, q, d, 0.7)
+    flat = DC.decode(sp, T, init, 4, d, 0.7)
+    for a, b in zip(got, flat):
+        assert np.array_equal(a.post, b.post)
+    # a located row is not flat: the decoded forecast then differs from the order prior
+    q2 = q.copy()
+    q2[1] = 0.01 * q[1]
+    q2[1, sp.index()[9]] += 0.99
+    moved = DC.decode(sp, T, init, q2, d, 0.7)
+    assert not np.array_equal(moved[1].post, flat[1].post)
+
+
+def test_decoder_forward_backward_matches_enumeration():
+    from itertools import product
+
+    from cs2 import decoder as DC
+
+    rng = np.random.default_rng(7)
+    k, n = 4, 3
+    T = rng.random((k, k))
+    T /= T.sum(1, keepdims=True)
+    init = rng.random(k)
+    init /= init.sum()
+    L = rng.random((n, k)) + 0.1
+    post, nbr = DC.forward_backward(T, init, L)
+
+    def brute(L_):
+        out = np.zeros((n, k))
+        for path in product(range(k), repeat=n):
+            w = init[path[0]] * L_[0, path[0]]
+            for t in range(1, n):
+                w *= T[path[t - 1], path[t]] * L_[t, path[t]]
+            for t in range(n):
+                out[t, path[t]] += w
+        return out / out.sum(1, keepdims=True)
+
+    assert np.allclose(post, brute(L), atol=1e-12)
+    for t in range(n):  # the neighbour-only posterior leaves out the row's own evidence
+        L_ = L.copy()
+        L_[t] = 1.0
+        assert np.allclose(nbr[t], brute(L_)[t], atol=1e-12)
+
+
+def test_decoder_transitions_are_stochastic_and_fit_excludes_scored_participant():
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    assert sp.works == ("A", "B", "C") and sp.n == 9  # scene 5 is title-only
+    assert np.allclose(T.sum(1), 1.0, atol=1e-12) and (T >= 0).all()
+    close(float(init.sum()), 1.0)
+    a = CFG["lopo_alpha"]
+    r1 = DC.fit(comp, _decoder_gold(), "P1", CFG)  # P2 only: starts on a film row
+    close(r1["init"][0], (1 + a) / (1 + 3 * a))
+    assert r1["counts"]["nonfilm"] == 1 and r1["counts"]["search"] == 0
+    r2 = DC.fit(comp, _decoder_gold(), "P2", CFG)  # P1 only: starts off task
+    close(r2["init"][2], (1 + a) / (1 + 3 * a))
+    assert r2["counts"]["work"]["film"] == dict(same=5, next=1, other=0)
+    assert r2["counts"]["work"]["search"] == dict(same=0, next=1, other=0)
+    assert r2["counts"]["start"] == dict(next=1, other=0)
+    close(r2["nu"], (1 + a) / (2 + 2 * a))
+
+
+def test_decoder_cells_spread_in_work_residual():
+    # mass on a title-only scene counts toward its work and sits on no valid scene: on the
+    # cells it is work-level evidence, spread within the work by the duration prior
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    f = SC.ProducerForecast({5: 0.6, 9: 0.4}, {}, {}, 0.0, 0.0, dur, 0.01, comp)
+    q, residual = DC.cells(f, sp, dur, 0.5)
+    close(float(q.sum()), 1.0)
+    ix = sp.index()
+    assert residual > 0.5
+    close(q[ix[6]], q[ix[7]])  # scenes 6 and 7 of B have equal duration
+    assert q[ix[6]] > 0.25 and q[ix[9]] > 0.35
+
+
+def test_decoder_frame_is_not_evidence_about_mode():
+    # a row that only names its frame (work C) says where the speaker is, not whether the row
+    # is film talk: a non-film state at a position in C takes C's ratio, START takes none
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    framed = B.frame_fallback(dur, {"C": 1.0}, 0.01)
+    d = DC.cells(dur, sp, dur, rates["nu"])[0]
+    q = DC.cells(framed, sp, dur, rates["nu"])[0]
+    L = DC.likelihood(sp, q, d, 0.5)[0]
+    n, ix = sp.n, sp.index()
+    ratio_c = (framed.p_work("C") / dur.p_work("C")) ** 0.5
+    ratio_a = (framed.p_work("A") / dur.p_work("A")) ** 0.5
+    for block in (n, 2 * n + 1):
+        close(L[block + ix[9]], ratio_c)
+        close(L[block + ix[1]], ratio_a)
+        close(L[block + n], 1.0)  # START
+
+
+def test_decoded_forecast_marks_inferred_top():
+    DC, comp, dur, sp, rates, _, _ = _decoder_setup()
+    # a sticky chain: the speaker mostly stays on the scene
+    sticky = dict(rates, mode=[[0.98, 0.01, 0.01]] * 3,
+                  work={m: dict(same=0.98, next=0.01, other=0.01) for m in DC.MODES},
+                  scene=dict(stay=0.9, forward=0.05, jump=0.05, rho=0.3))
+    T, init = DC.transition(sp, sticky)
+    d = DC.cells(dur, sp, dur, rates["nu"])[0]
+    ix = sp.index()
+
+    def row(scene, w):
+        q = (1 - w) * d.copy()
+        q[ix[scene]] += w
+        return q
+
+    # rows 0 and 2 are located on scene 9; row 1 leans to scene 1 of another work
+    q = np.array([row(9, 0.95), row(1, 0.3), row(9, 0.95)])
+    out = DC.decode(sp, T, init, q, d, 1.0)
+    assert int(np.argmax(q[1])) == ix[1]
+    assert int(np.argmax(out[1].post)) == ix[9]
+    assert [f.top_from for f in out] == ["evidence", "neighbours", "evidence"]
+    assert out[1].own_share < 0.5 < out[0].own_share
+    for f in out:
+        close(f.p_nonfilm() + sum(f.p_work(w) for w in sp.works), 1.0)
+        close(f.p_set_and_work({8, 9, 10}, "C"), f.p_work("C"))
+    # flat evidence has no own evidence: every top is inferred and no share is given
+    flat = DC.decode(sp, T, init, 3, d, 1.0)
+    assert all(f.top_from == "neighbours" and f.own_share is None for f in flat)
 
 
 # ---------------------------------------------------------------- runner

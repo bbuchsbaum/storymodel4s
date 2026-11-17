@@ -22,9 +22,13 @@ import numpy as np  # noqa: E402
 
 import data as D  # noqa: E402
 from cs2 import baselines as B  # noqa: E402
+from cs2 import decoder as DC  # noqa: E402
 from cs2 import ff_producer as P  # noqa: E402
 from cs2 import scorer as SC  # noqa: E402
+from cs2.account import Account, Uncovered, WordCell  # noqa: E402
 from cs2.hillclimb import C, SAMPLES, build, forecasts  # noqa: E402
+from metrics import sign_flip_p  # noqa: E402
+
 from cs2.run import (  # noqa: E402
     WORK_APPLICABLE,
     baseline_forecasts,
@@ -32,6 +36,7 @@ from cs2.run import (  # noqa: E402
     git_state,
     gold_by_participant,
     resolve_rules,
+    row_frame_mixes,
     score_map,
     window_length,
     windowed_gold,
@@ -277,8 +282,270 @@ def diag(out_json):
     print(out_json)
 
 
+# ---------------------------------------------------------------- step 1: the decoder
+
+ALPHAS = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.25, 1.5)
+TERMS = {True: ("scene_bits", "work_bits", "film_bits"), False: ("scene_bits", "film_bits")}
+REFERENCES = ("hmm_tfidf", "gold_context_fitted", "order_prior_only")
+
+
+def pmean(scores, term):
+    return SC._pmeans(scores, term)
+
+
+def tmean(scores, term):
+    v = pmean(scores, term)
+    return float(np.mean(list(v.values()))) if v else None
+
+
+def paired(a, b, term, band=None, alternative="two-sided"):
+    """Participant-paired difference a - b on a term, with the exact sign-flip test."""
+    pa, pb = pmean(a, term), pmean(b, term)
+    ps = sorted(pa)
+    d = [pa[p] - pb[p] for p in ps]
+    out = dict(delta=float(np.mean(d)), wins=f"{sum(x < 0 for x in d)}/{len(d)}",
+               p=sign_flip_p(d), per_participant=dict(zip(ps, d)))
+    if alternative == "less":  # one-sided: a lower than b
+        out["p_one_sided"] = sign_flip_p([-x for x in d], "greater")
+    if band is not None:
+        out.update(band=band, beyond_band=abs(out["delta"]) > band)
+    return out
+
+
+class Decoder:
+    """The decoder over one corpus and one evidence forecast map (LOPO rates, cells, scores)."""
+
+    def __init__(self, X, fmap):
+        self.X, self.sp = X, DC.space(X.comp, X.cfg)
+        self.rates = {p: DC.fit(X.comp, X.gold, p, X.cfg) for p in X.participants}
+        self.TI = {p: DC.transition(self.sp, r) for p, r in self.rates.items()}
+        self.d = {p: DC.cells(X.durs[p], self.sp, X.durs[p], self.rates[p]["nu"])[0]
+                  for p in X.participants}
+        self.q, self.residual_rows = {}, 0
+        for (p, s), fs in fmap.items():
+            cs = [DC.cells(f, self.sp, X.durs[p], self.rates[p]["nu"]) for f in fs]
+            self.q[(p, s)] = np.array([c[0] for c in cs])
+            self.residual_rows += sum(c[1] > 1e-9 for c in cs)
+        self._cache = {}
+
+    def forecasts(self, alpha):
+        """alpha None: flat evidence (the order prior alone)."""
+        if alpha not in self._cache:
+            self._cache[alpha] = {
+                (p, s): DC.decode(self.sp, *self.TI[p], len(q) if alpha is None else q,
+                                  self.d[p], alpha)
+                for (p, s), q in self.q.items()}
+        return self._cache[alpha]
+
+    def flat(self, fmap):
+        """Forecasts in the order score_map emits rows."""
+        return [f for p, rows in self.X.gold.items() for s in by_session(rows)
+                for f in fmap[(p, s)]]
+
+    def grid(self):
+        """Scores per alpha, and the objective per participant: the mean of the terms."""
+        terms = TERMS[self.X.wa]
+        sc = {a: self.X.score(self.forecasts(a)) for a in ALPHAS}
+        obj = {a: {p: float(np.mean([pmean(sc[a], t)[p] for t in terms]))
+                   for p in self.X.participants} for a in ALPHAS}
+        return sc, obj
+
+    def lopo(self, sc, obj):
+        """Each participant's alpha minimises the objective over the other participants."""
+        ps = self.X.participants
+        pick = {p: min(ALPHAS, key=lambda a: np.mean([obj[a][q] for q in ps if q != p]))
+                for p in ps}
+        scores = [sc[pick[s.participant]][i] for i, s in enumerate(sc[ALPHAS[0]])]
+        fl = {a: self.flat(self.forecasts(a)) for a in set(pick.values())}
+        fcs = [fl[pick[s.participant]][i] for i, s in enumerate(scores)]
+        return pick, scores, fcs
+
+    def fixed(self, alpha):
+        return self.X.score(self.forecasts(alpha)), self.flat(self.forecasts(alpha))
+
+    @staticmethod
+    def all_alpha(obj):
+        return min(ALPHAS, key=lambda a: np.mean(list(obj[a].values())))
+
+
+def pass1_only(X, k):
+    acc = X.account(k)
+    return {(p, s): [B.frame_fallback(X.durs[p], m, X.cfg["frame_floor"])
+                     for m in row_frame_mixes(acc, (p, s),
+                                              [g for g in X.gold[p] if g.session == s])]
+            for p, s in X.keys}
+
+
+def null_check(X, k, alpha):
+    """A producer with no references and no frames, through the same path: its decoded forecast
+    must equal the order prior alone on every cell of every row, exactly."""
+    acc = X.account(k)
+    null = Account(X.comp, {}, {key: [WordCell(c.index, c.onset, c.unit, Uncovered(c.unit))
+                                      for c in acc.words[key]] for key in X.keys})
+    dcd = Decoder(X, forecasts(null, X.comp, X.gold, X.keys, X.durs, X.cfg, X.rules))
+    a, b = dcd.flat(dcd.forecasts(alpha)), dcd.flat(dcd.forecasts(None))
+    return dict(rows=len(a), alpha=alpha,
+                max_abs_difference=float(max(np.abs(x.post - y.post).max()
+                                             for x, y in zip(a, b))))
+
+
+def nonfilm_mass(scores, label=None):
+    """Mean scored P(non-film) on non-film gold rows (one label, or all)."""
+    v = [2.0 ** -s.film_bits for s in scores if s.cls == "nonfilm"
+         and (label is None or s.nonfilm_label == label)]
+    return dict(n=len(v), mean=float(np.mean(v)) if v else None)
+
+
+def film_split(scores):
+    out = {}
+    for name, sel in (("film_rows", lambda s: s.cls != "nonfilm"),
+                      ("nonfilm_rows", lambda s: s.cls == "nonfilm")):
+        v = [s.film_bits for s in scores if sel(s) and s.film_bits is not None]
+        out[name] = dict(n=len(v), mean_film_bits=float(np.mean(v)) if v else None)
+    return out
+
+
+def describe(X, named, fcs, bands=None):
+    """The comparison of `producer_decoded` with `producer` and the references on one corpus."""
+    terms = TERMS[X.wa]
+    prod, dec = named["producer"], named["producer_decoded"]
+    out = dict(forecasts={}, tests={}, categories={})
+    for name, sc in named.items():
+        hits = [s.scene_hit for s in sc if s.scene_hit is not None]
+        out["forecasts"][name] = dict(
+            **{t: tmean(sc, t) for t in terms},
+            top_scene=float(np.mean(hits)) if hits else None,
+            nonfilm_mass_memory_search=nonfilm_mass(sc, "memory_search"),
+            nonfilm_mass_all_nonfilm=nonfilm_mass(sc), film_term=film_split(sc))
+        if X.wa:
+            st = SC.strata(sc, X.comp, True)["film_switch_f1"]
+            out["forecasts"][name]["switch"] = dict(
+                f1=st["f1"], f1_tolerance_1_row=st["f1_tolerance_1_row"],
+                matched_timing=st["matched_timing"], gold_switches=st["switches"])
+    for t in terms:
+        out["tests"][t] = paired(dec, prod, t, (bands or {}).get(t), "less")
+    for ref in REFERENCES:
+        if ref in named:
+            out["tests"]["scene_vs_" + ref] = paired(dec, named[ref], "scene_bits")
+    idx = [i for i, s in enumerate(prod) if s.scene_bits is not None]
+    total = math.fsum(prod[i].scene_bits for i in idx)
+    for cat in ("miss", "hit", "fallback"):
+        ii = [i for i in idx if category(prod[i]) == cat]
+        if not ii:
+            out["categories"][cat] = dict(n=0)
+            continue
+        own = [fcs[i].own_share for i in ii if fcs[i].own_share is not None]
+        out["categories"][cat] = dict(
+            n=len(ii), share_of_producer_scene_loss=math.fsum(prod[i].scene_bits
+                                                              for i in ii) / total,
+            producer_scene_bits=float(np.mean([prod[i].scene_bits for i in ii])),
+            decoded_scene_bits=float(np.mean([dec[i].scene_bits for i in ii])),
+            order_prior_only_scene_bits=float(np.mean(
+                [named["order_prior_only"][i].scene_bits for i in ii])),
+            decoded_top_scene=float(np.mean([dec[i].scene_hit for i in ii])),
+            mean_own_share=float(np.mean(own)) if own else None)
+    scored = [(dec[i], fcs[i]) for i in idx]
+    share = {}
+    for src in ("evidence", "neighbours"):
+        v = [s for s, f in scored if f.top_from == src]
+        share[src] = dict(n=len(v), share_of_rows=len(v) / len(scored),
+                          decoded_top_scene=float(np.mean([s.scene_hit for s in v]))
+                          if v else None,
+                          decoded_scene_bits=float(np.mean([s.scene_bits for s in v]))
+                          if v else None)
+    own = [f.own_share for f in fcs if f.own_share is not None]
+    out["evidence_share"] = dict(
+        rows=len(fcs), rows_without_a_share=len(fcs) - len(own),
+        mean_own_share=float(np.mean(own)) if own else None,
+        mean_kl_own_bits=float(np.mean([f.kl_own_bits for f in fcs])),
+        mean_kl_neighbours_bits=float(np.mean([f.kl_neighbours_bits for f in fcs])),
+        scene_scored_rows_by_top_source=share,
+        note="own share = KL(posterior || posterior without the row's own evidence) / (that + "
+        "KL(posterior || the row's own distribution)); a row whose top cell is not the top of "
+        "its own evidence is typed 'neighbours' (inferred)")
+    return out
+
+
+def run_variant(X, fmap, alpha=None, extra=None, bands=None):
+    """Decode one evidence map. alpha None: fitted leave-one-participant-out; else fixed."""
+    dcd = Decoder(X, fmap)
+    sc, obj = dcd.grid()
+    all_alpha = dcd.all_alpha(obj)
+    if alpha is None:
+        pick, dec, fcs = dcd.lopo(sc, obj)
+    else:
+        pick, (dec, fcs) = {p: alpha for p in X.participants}, dcd.fixed(alpha)
+    named = dict(producer=X.score(fmap), producer_decoded=dec,
+                 order_prior_only=X.score(dcd.forecasts(None)),
+                 **{b: X.score(X.fc[b]) for b in ("hmm_tfidf", "gold_context_fitted", "tfidf")},
+                 **{k: X.score(v) for k, v in (extra or {}).items()})
+    out = describe(X, named, fcs, bands)
+    out.update(
+        alpha=dict(per_participant=pick, fitted="leave-one-participant-out" if alpha is None
+                   else "fixed", minimiser_over_all_participants=all_alpha,
+                   at_grid_edge=sorted({a for a in list(pick.values()) + [all_alpha]
+                                        if a in (ALPHAS[0], ALPHAS[-1])}),
+                   grid_objective={str(a): float(np.mean(list(obj[a].values())))
+                                   for a in ALPHAS},
+                   grid_scene_bits={str(a): tmean(sc[a], "scene_bits") for a in ALPHAS}),
+        rows_with_in_work_residual=int(dcd.residual_rows),
+        rates_all_participants={k: v for k, v in DC.fit(X.comp, X.gold, None, X.cfg).items()},
+        states=3 * dcd.sp.n + 2, cells=dcd.sp.n + 2)
+    return out, all_alpha, named
+
+
+def decode(out_json):
+    state = git_state()
+    res = dict(schema="storymodel4s.case-study-2.hillclimb-r4/v1", **state, model_calls=0,
+               evidence="development data, engineering numbers; validation = the frozen-six run",
+               alphas=list(ALPHAS), corpora={})
+    ff, sh = Corpus("filmfestival"), Corpus("sherlock")
+    f1, f2 = ff.producer(1), ff.producer(2)
+    s1, s2 = ff.score(f1), ff.score(f2)
+    bands = {}
+    for t in TERMS[True]:
+        a, b = pmean(s1, t), pmean(s2, t)
+        d = [b[p] - a[p] for p in ff.participants]
+        bands[t] = 2 * float(np.std(d, ddof=1)) / math.sqrt(len(d))
+    res["pooled_bands"] = bands
+    F = res["corpora"]["filmfestival"] = {}
+    F["sample_1"], a_ff, _ = run_variant(ff, f1, None, dict(pass1_only=pass1_only(ff, 1)), bands)
+    F["sample_2"], _, _ = run_variant(ff, f2, None, dict(pass1_only=pass1_only(ff, 2)), bands)
+    ens = {k: [SC.EnsembleForecast([x, y]) for x, y in zip(f1[k], f2[k])] for k in ff.keys}
+    F["ensemble"], _, _ = run_variant(ff, ens, None, None, bands)
+    S = res["corpora"]["sherlock"] = {}
+    S["part_order_run"], _, _ = run_variant(sh, sh.producer(1), a_ff)
+    res["null_producer_equals_order_prior_only"] = dict(
+        filmfestival=null_check(ff, 1, a_ff), sherlock=null_check(sh, 1, a_ff))
+    # the gold-blind windows: every fitted quantity is refitted on the windowed rows
+    ffw, shw = Corpus("filmfestival", "median"), Corpus("sherlock", "median")
+    ffw._acc, shw._acc = ff._acc, sh._acc
+    F["windows_sample_1"], a_ffw, _ = run_variant(ffw, ffw.producer(1))
+    F["windows_sample_1"]["window_seconds"] = ffw.window_seconds
+    S["windows_part_order_run"], _, _ = run_variant(shw, shw.producer(1), a_ffw)
+    S["windows_part_order_run"]["window_seconds"] = shw.window_seconds
+    # the protocol's four conditions (plan, "Hill-climbing round 4")
+    p, q = F["sample_1"], S["part_order_run"]
+    sc = p["tests"]["scene_bits"]
+    c1 = sc["delta"] < 0 and sc["p"] <= 0.01 and sc["beyond_band"]
+    c2 = all(p["tests"][t]["delta"] <= bands[t] for t in ("work_bits", "film_bits"))
+    sq = q["tests"]["scene_bits"]
+    c3 = sq["delta"] < 0 and sq["p_one_sided"] <= 0.05
+    c4 = all(x["tests"]["scene_vs_" + r]["delta"] < 0 for x in (p, q) for r in REFERENCES)
+    res["conditions"] = {
+        "1_filmfestival_scene_pooled": bool(c1), "2_work_and_film_not_worse": bool(c2),
+        "3_sherlock_confirmation": bool(c3), "4_beats_references_on_scene": bool(c4)}
+    res["verdict"] = "KEEP" if c1 and c2 and c3 and c4 else "DROP"
+    res["sherlock_alpha"] = a_ff
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(res, indent=1, default=str) + "\n")
+    print(out_json)
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[1] == "diag":
         diag(Path(sys.argv[2]))
+    elif len(sys.argv) > 2 and sys.argv[1] == "decode":
+        decode(Path(sys.argv[2]))
     else:
         raise SystemExit(__doc__)
