@@ -422,3 +422,16 @@ automatic identity/hash rebinding, and silently dropping incomplete receipts. Re
 paths resolve against the manifest; native pre-pair detail admission and v8 upgrade are explicit.
 This improves the saved-workflow API without changing graph or assessment semantics. Import
 recovery remains a separate study-operation capability. [Contract](analysis-workflow.md).
+
+## Raw-input-bound construction (2026-11-17, provisional)
+
+Retain checked raw source/recall intake in a prepared-construction envelope and derive the
+existing rich request. A distinct recording profile binds the entire prepared input. Return
+the unchanged inner construction receipt and a separately provenance-bound account consumed
+by explicit analysis-plan/v2. Rejected alternatives: rich-request/v3 mixing graph vocabulary
+with intake formats; fake document-key salts; unverified hash-only intake metadata; rewriting
+the inner receipt's account; a second graph or orchestration engine. Document and occurrence
+identity may agree across different raw inputs; recording identity and provenance must not.
+Source row order follows declared part/row ordinals; native clocks remain part-qualified.
+Construction row coverage includes separators while the intake keeps original occurrence
+supports. [Contract](prepared-construction.md).

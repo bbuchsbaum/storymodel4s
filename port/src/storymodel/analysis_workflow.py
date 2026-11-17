@@ -19,6 +19,12 @@ from .fidelity_workflow import replay_fidelity
 from .model import Digest, Model, Name, _validate_instance
 from .playback_construction import PlaybackRequest, PlaybackResult, validate_playback_request
 from .playback_workflow import replay_playback
+from .prepared_construction import (
+    PreparedConstruction,
+    PreparedConstructionResult,
+    replay_prepared_construction,
+    validate_prepared_construction,
+)
 from .rich_account import (
     RichAccount,
     SupportedAccount,
@@ -45,7 +51,7 @@ class AnalysisFile(Model):
 class AnalysisAccountInput(Model):
     """Read an existing snapshot or replay an independently recorded account construction."""
 
-    kind: Literal["account", "rich", "playback"]
+    kind: Literal["account", "rich", "playback", "prepared-rich"]
     file: AnalysisFile
     recording: Name | None = None
     import_sha256: Digest | None = None
@@ -74,7 +80,9 @@ class AnalysisStage(Model):
 class AnalysisPlan(Model):
     """One source and recall branch plus an explicit linear chain of saved evidence."""
 
-    schema_version: Literal["storymodel.analysis-plan/v1"] = "storymodel.analysis-plan/v1"
+    schema_version: Literal["storymodel.analysis-plan/v1", "storymodel.analysis-plan/v2"] = (
+        "storymodel.analysis-plan/v1"
+    )
     source: AnalysisAccountInput
     recall: AnalysisAccountInput
     recall_details: tuple[AnalysisStage, ...] = ()
@@ -85,6 +93,10 @@ class AnalysisPlan(Model):
 
     @model_validator(mode="after")
     def stage_names(self) -> Self:
+        if self.schema_version == "storymodel.analysis-plan/v1" and any(
+            account.kind == "prepared-rich" for account in (self.source, self.recall)
+        ):
+            raise ValueError("prepared construction requires analysis-plan/v2")
         names = [s.name for s in (*self.recall_details, *self.stages)]
         if len(set(names)) != len(names):
             raise ValueError("analysis stage names must be unique")
@@ -98,8 +110,8 @@ class AnalysisAccountTrace(Model):
 
     file_sha256: Digest
     account: SupportedAccount
-    request: RichConstructionRequest | PlaybackRequest | None = None
-    construction: RichConstructionResult | PlaybackResult | None = None
+    request: RichConstructionRequest | PlaybackRequest | PreparedConstruction | None = None
+    construction: RichConstructionResult | PlaybackResult | PreparedConstructionResult | None = None
     import_sha256: Digest | None = None
 
 
@@ -116,7 +128,9 @@ class AnalysisStageTrace(Model):
 class AnalysisReplay(Model):
     """The checked chain and its three views remain inspectable and replayable."""
 
-    schema_version: Literal["storymodel.analysis-replay/v1"] = "storymodel.analysis-replay/v1"
+    schema_version: Literal["storymodel.analysis-replay/v1", "storymodel.analysis-replay/v2"] = (
+        "storymodel.analysis-replay/v1"
+    )
     plan: AnalysisPlan
     source: AnalysisAccountTrace
     recall: AnalysisAccountTrace
@@ -153,14 +167,19 @@ def _account(value: AnalysisAccountInput, base: Path) -> AnalysisAccountTrace:
         account = validate_supported_account(raw)
         _grant(account.export_permission)
         return AnalysisAccountTrace(file_sha256=file_sha, account=account)
-    request: RichConstructionRequest | PlaybackRequest
-    result: RichConstructionResult | PlaybackResult
+    request: RichConstructionRequest | PlaybackRequest | PreparedConstruction
+    result: RichConstructionResult | PlaybackResult | PreparedConstructionResult
     root = base / str(value.recording)
     if value.kind == "rich":
         request = validate_rich_construction_request(raw)
         _grant(request.export_permission)
         imported_sha = _import_pin(root, value.import_sha256)
         result = replay_rich(request, root, expected_import_sha256=imported_sha)
+    elif value.kind == "prepared-rich":
+        request = validate_prepared_construction(raw)
+        _grant(request.export_permission)
+        imported_sha = _import_pin(root, value.import_sha256)
+        result = replay_prepared_construction(request, root, expected_import_sha256=imported_sha)
     else:
         request = validate_playback_request(raw)
         _grant(request.export_permission)
@@ -246,6 +265,9 @@ def replay_analysis(value: AnalysisPlan, base: Path) -> AnalysisReplay:
         current = trace.result.account
     views = project(current, plan.policy, eligible_rows=plan.eligible_rows)
     return AnalysisReplay(
+        schema_version="storymodel.analysis-replay/v2"
+        if plan.schema_version == "storymodel.analysis-plan/v2"
+        else "storymodel.analysis-replay/v1",
         plan=plan,
         source=source,
         recall=recall,

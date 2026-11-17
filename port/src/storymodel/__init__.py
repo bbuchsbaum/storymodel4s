@@ -135,6 +135,19 @@ from .playback_construction import (
     verify_situation_playback,
 )
 from .playback_workflow import PlaybackRecording, import_playback, playback_prompt, replay_playback
+from .prepared_construction import (
+    PreparedConstruction,
+    PreparedConstructionRecording,
+    PreparedConstructionResult,
+    compile_prepared_construction,
+    import_prepared_construction,
+    prepare_construction,
+    prepared_construction_prompt,
+    read_prepared_construction,
+    replay_prepared_construction,
+    validate_prepared_construction,
+    verify_prepared_construction,
+)
 from .reconstruction import (
     AccountReconstructionResult,
     FillTarget,
@@ -179,6 +192,7 @@ from .semantic import (
 from .semantic_workflow import SemanticRecording, import_semantic, replay_semantic
 from .sequence import SequenceRequest, SequenceResult, infer_sequence, verify_sequence
 from .source import SourceRow, compile_source, prepare_source, verify_source
+from .source_preparation import PreparedSource, prepare_source_utf8, validate_prepared_source
 from .source_transitions import (
     SourceProjectionPolicy,
     SourceSequenceSpec,
@@ -245,6 +259,17 @@ __all__ = [
     "import_playback",
     "replay_playback",
     "playback_prompt",
+    "PreparedConstruction",
+    "PreparedConstructionRecording",
+    "PreparedConstructionResult",
+    "compile_prepared_construction",
+    "import_prepared_construction",
+    "prepared_construction_prompt",
+    "prepare_construction",
+    "read_prepared_construction",
+    "replay_prepared_construction",
+    "validate_prepared_construction",
+    "verify_prepared_construction",
     "upgrade_context_account",
     "attributed_identity_roles",
     "resolve_attributed_identity",
@@ -305,6 +330,9 @@ __all__ = [
     "SequenceRequest",
     "SequenceResult",
     "SourceRow",
+    "PreparedSource",
+    "prepare_source_utf8",
+    "validate_prepared_source",
     "SourceProjectionPolicy",
     "SourceSequenceSpec",
     "TransitionWeights",

@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -121,6 +122,16 @@ from .playback_workflow import (
     playback_prompt,
     read_playback_request,
     replay_playback,
+)
+from .prepared_construction import (
+    PreparedConstructionRecording,
+    PreparedConstructionResult,
+    import_prepared_construction,
+    prepare_construction,
+    prepared_construction_prompt,
+    read_prepared_construction,
+    replay_prepared_construction,
+    verify_prepared_construction,
 )
 from .reconstruction import (
     AccountReconstructionResult,
@@ -270,6 +281,41 @@ def main(argv: list[str] | None = None) -> int:
         "--full-contexts", action="store_true", help="include mental and holderless contexts"
     )
     rich_prepare.add_argument("--output")
+    prepared_construction = commands.add_parser(
+        "prepare-construction", help="prepare exact source or recall construction intake"
+    )
+    prepared_construction.add_argument("input")
+    prepared_construction.add_argument("--key", required=True)
+    prepared_construction.add_argument("--side", required=True, choices=("source", "recall"))
+    prepared_construction.add_argument("--full-contexts", action="store_true")
+    prepared_construction.add_argument("--allow-export", action="store_true")
+    prepared_construction.add_argument("--expected-input-sha256")
+    prepared_construction.add_argument("--output")
+    prepared_construction_prompt_command = commands.add_parser(
+        "prepared-construction-prompt", help="render a raw-intake construction contract"
+    )
+    prepared_construction_prompt_command.add_argument("request")
+    prepared_construction_prompt_command.add_argument("--output")
+    prepared_construction_import = commands.add_parser(
+        "import-prepared-construction", help="record an exported raw-intake construction reply"
+    )
+    prepared_construction_import.add_argument("request")
+    prepared_construction_import.add_argument("reply")
+    prepared_construction_import.add_argument("recording")
+    prepared_construction_replay = commands.add_parser(
+        "replay-prepared-construction", help="construct a raw-intake graph offline"
+    )
+    prepared_construction_replay.add_argument("request")
+    prepared_construction_replay.add_argument("recording")
+    prepared_construction_replay.add_argument("--expected-import-sha256")
+    prepared_construction_replay.add_argument("--output")
+    prepared_construction_verify = commands.add_parser(
+        "verify-prepared-construction", help="recompute a raw-intake construction result"
+    )
+    prepared_construction_verify.add_argument("request")
+    prepared_construction_verify.add_argument("reply")
+    prepared_construction_verify.add_argument("result")
+    prepared_construction_verify.add_argument("--output")
     native_prepare = commands.add_parser(
         "prepare-playback", help="prepare supplied native observation envelopes"
     )
@@ -1271,6 +1317,58 @@ def main(argv: list[str] | None = None) -> int:
                 full_contexts=args.full_contexts,
             )
             emit(rich_request.model_dump(mode="json"), args.output)
+        elif args.command == "prepare-construction":
+            raw_input = Path(args.input).read_bytes()
+            if (
+                args.expected_input_sha256 is not None
+                and sha256(raw_input).hexdigest() != args.expected_input_sha256
+            ):
+                raise ValueError("construction input differs from external SHA-256")
+            construction_prepared = prepare_construction(
+                args.key,
+                args.side,
+                raw_input,
+                full_contexts=args.full_contexts,
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(construction_prepared.model_dump(mode="json"), args.output)
+        elif args.command in (
+            "prepared-construction-prompt",
+            "import-prepared-construction",
+            "replay-prepared-construction",
+            "verify-prepared-construction",
+        ):
+            construction_prepared = read_prepared_construction(Path(args.request))
+            if args.command == "prepared-construction-prompt":
+                emit(strict_json(prepared_construction_prompt(construction_prepared)), args.output)
+            elif args.command == "import-prepared-construction":
+                prepared_construction_prompt(construction_prepared)
+                prepared_recording = PreparedConstructionRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_prepared_construction(
+                    construction_prepared, prepared_recording, Path(args.recording)
+                )
+            elif args.command == "replay-prepared-construction":
+                prepared_result = replay_prepared_construction(
+                    construction_prepared,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                emit(prepared_result.model_dump(mode="json"), args.output)
+            else:
+                prepared_construction_prompt(construction_prepared)
+                prepared_reply = Path(args.reply).read_bytes().decode("utf-8")
+                prepared_saved = PreparedConstructionResult.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                prepared_result = verify_prepared_construction(
+                    construction_prepared, prepared_reply, prepared_saved
+                )
+                emit(
+                    {"verified": True, "prepared_sha256": prepared_result.prepared_sha256},
+                    args.output,
+                )
         elif args.command == "situation-table":
             rich_account = validate_rich_account(Path(args.account).read_bytes())
             if rich_account.export_permission != "allowed":
