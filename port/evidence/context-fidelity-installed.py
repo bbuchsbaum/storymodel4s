@@ -120,6 +120,26 @@ with tempfile.TemporaryDirectory(prefix="storymodel-context-installed-") as temp
             ]
         )
         assert json.loads((directory / "request.json").read_text()) == request
+        crlf_request = json.loads(json.dumps(request))
+        for field in ("identity_annotations", "holder_proposals"):
+            raw = json.dumps(json.loads(request["context_evidence"][field]), indent=2) + "\n"
+            raw = raw.replace("\n", "\r\n")
+            (directory / f"crlf-{field}.json").write_bytes(raw.encode("utf-8"))
+            crlf_request["context_evidence"][field] = raw
+        run(
+            [
+                "prepare-fidelity",
+                str(directory / "account.json"),
+                request["unit"],
+                "--identity-annotations",
+                str(directory / "crlf-identity_annotations.json"),
+                "--holder-proposals",
+                str(directory / "crlf-holder_proposals.json"),
+                "--output",
+                str(directory / "crlf-request.json"),
+            ]
+        )
+        assert json.loads((directory / "crlf-request.json").read_text()) == crlf_request
         run(["fidelity-prompt", request_path, "--output", str(directory / "prompt.json")])
         assert json.loads((directory / "prompt.json").read_text()) == json.loads(
             (example / f"prompts/{case}-fidelity.json").read_text()
@@ -197,6 +217,7 @@ with tempfile.TemporaryDirectory(prefix="storymodel-context-installed-") as temp
         cli_invocations=len(commands),
         api_cli_equal=True,
         rejected_account_only_refused=True,
+        crlf_recordings_retained_exactly=True,
         denied_before_extra_reads=True,
     )
     (base / "data/context-fidelity-installed.json").write_text(json.dumps(result, indent=2) + "\n")

@@ -11,6 +11,13 @@ root = base / "data/context-fidelity-mutations"
 root.mkdir(exist_ok=True)
 cases = [
     (
+        "exact-recording-bytes",
+        "cli.py",
+        'holder_proposals=Path(args.holder_proposals).read_bytes().decode("utf-8"),',
+        'holder_proposals=Path(args.holder_proposals).read_text(encoding="utf-8"),',
+        "test_context_fidelity.py::test_cli_preserves_exact_crlf_context_recordings",
+    ),
+    (
         "required-dependency",
         "context_fidelity.py",
         'if unresolved and status == "completed" and grade != "unverifiable":',

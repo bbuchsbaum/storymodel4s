@@ -977,10 +977,10 @@ def main(argv: list[str] | None = None) -> int:
                 None
                 if args.identity_annotations is None
                 else ContextEvidence(
-                    identity_annotations=Path(args.identity_annotations).read_text(
-                        encoding="utf-8"
-                    ),
-                    holder_proposals=Path(args.holder_proposals).read_text(encoding="utf-8"),
+                    identity_annotations=Path(args.identity_annotations)
+                    .read_bytes()
+                    .decode("utf-8"),
+                    holder_proposals=Path(args.holder_proposals).read_bytes().decode("utf-8"),
                 )
             )
             emit(

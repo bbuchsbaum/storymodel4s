@@ -572,3 +572,48 @@ def test_context_fidelity_schema_drift():
         "reply": ContextFidelityReply.model_json_schema(),
         "result": ContextFidelityResult.model_json_schema(),
     }
+
+
+def test_cli_preserves_exact_crlf_context_recordings(tmp_path):
+    from storymodel.cli import main
+    from storymodel.fidelity import fidelity_request_digest, validate_fidelity_request
+
+    mapped, _, evidence = contextual_mapping()
+    account_path = tmp_path / "account.json"
+    account_path.write_text(mapped.account.model_dump_json())
+    exact = {}
+    for field in ("identity_annotations", "holder_proposals"):
+        raw = (json.dumps(json.loads(getattr(evidence, field)), indent=2) + "\n").replace(
+            "\n", "\r\n"
+        )
+        (tmp_path / f"{field}.json").write_bytes(raw.encode("utf-8"))
+        exact[field] = raw
+    expected = prepare_fidelity(
+        mapped.account, mapped.account.details[0].unit, context_evidence=ContextEvidence(**exact)
+    )
+    output = tmp_path / "request.json"
+    assert (
+        main(
+            [
+                "prepare-fidelity",
+                str(account_path),
+                expected.unit,
+                "--identity-annotations",
+                str(tmp_path / "identity_annotations.json"),
+                "--holder-proposals",
+                str(tmp_path / "holder_proposals.json"),
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
+    actual = validate_fidelity_request(output.read_bytes())
+    assert isinstance(actual, ContextFidelityRequest)
+    for field in exact:
+        assert (
+            getattr(actual.context_evidence, field).encode("utf-8")
+            == (tmp_path / f"{field}.json").read_bytes()
+        )
+    assert fidelity_request_digest(actual) == fidelity_request_digest(expected)
+    assert actual == expected
