@@ -1,6 +1,6 @@
 {
   "scope": "explicit saved construction-to-analysis replay",
-  "status": "local checks complete; cold review pending",
+  "status": "qualified local implementation; cold review passed; not merged or published",
   "tests": {
     "command": "cd port && .venv/bin/pytest -q",
     "passed": 950,
@@ -71,5 +71,39 @@
   "limits": [
     "Saved replay, not raw-observation generation, model accuracy, or interrupted-import recovery.",
     "No full P2-P6 parity claim; unchanged domain stage APIs remain authoritative."
-  ]
+  ],
+  "source_commit": "83a25cda5281a6b38a914c6f730300e8b5fca5ab",
+  "review": {
+    "verdict": "no BLOCK; accept for bounded saved workflow replay",
+    "source_commit": "83a25cda5281a6b38a914c6f730300e8b5fca5ab",
+    "independent_probes": 19,
+    "focused_repository_tests": 49,
+    "regenerated_branches": 6,
+    "schemas_matched": 2,
+    "probe": "port/evidence/analysis-workflow-independent.py",
+    "mutation_driver": "port/evidence/analysis-workflow-mutations.py",
+    "parent_reexecuted": {
+      "revision": "83a25cda5281a6b38a914c6f730300e8b5fca5ab",
+      "runs": {
+        "baseline": {
+          "exit": 0,
+          "last_line": "19 passed in 5.08s"
+        },
+        "snapshot": {
+          "exit": 1,
+          "last_line": "4 failed, 15 passed in 4.63s"
+        },
+        "grant": {
+          "exit": 1,
+          "last_line": "3 failed, 16 passed in 4.41s"
+        }
+      }
+    },
+    "mutation_failures": {
+      "snapshot": "three legitimate foreign account/recording pairs admitted; missing native upgrade concealed",
+      "grant": "read sentinels prove denied construction recordings opened"
+    },
+    "fixture_correction": "Detail prompts include the full request. Corrected initial probe to require differing detail prompts and a legitimately bound foreign detail reply; mapping/native fidelity retain equal-prompt controls.",
+    "limits": "Reviewer did not rerun parent full suite, mypy, or installed wheel checks."
+  }
 }

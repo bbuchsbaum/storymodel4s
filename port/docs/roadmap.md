@@ -293,14 +293,23 @@ checks, three discriminating mutations, unchanged legacy inference artifacts and
 Decimal/exhaustive-path checks. Model execution, remaining semantic profiles and full P3/P4
 coverage remain owed. These are local engineering results, not semantic accuracy evidence.
 
-**Next implementation action:** connect the installed construction-to-analysis journey and
-simplify demonstrated public-call repetition, then add synthetic study intake/recovery.
+[Connected saved analysis](analysis-workflow.md), source `83a25cda5`, now provides one installed
+replay API/CLI for independently built source/recall accounts and explicit detail, mapping and
+fidelity stages. Six branches cover contextual text, native source and the nine-case reference
+controls, each reusing one source across two recalls. [Evidence](../evidence/analysis-workflow.json)
+records 950 tests, installed CLI agreement and independent snapshot/grant mutation checks.
+Stage receipts and processing gaps remain inspectable. This is saved workflow replay; it does
+not supply new observation acquisition, interrupted-import recovery or full phase parity.
+
+**Next implementation action:** synthetic study intake into the account workflow, followed by
+explicit recovery of interrupted imported recordings. Reuse the existing intake/execution code.
 
 ### Immediate work queue
 
 These are the next delivery checkpoints within P2–P6, not additional phase numbers. Refreshed
-at the owner's planning request on 2026-11-17, then refreshed after semantic qualification.
-Checkpoint 1 below is locally qualified for recorded surface vectors; it does not close P3/P4.
+at the owner's planning request on 2026-11-17, then refreshed after semantic and saved-workflow
+qualification. Recorded surface vectors and connected replay are locally qualified; study intake,
+recovery and remaining capability families still keep their full phases open.
 
 | Order | Work and researcher-visible result | Exit evidence |
 |---|---|---|
@@ -309,11 +318,11 @@ Checkpoint 1 below is locally qualified for recorded surface vectors; it does no
 | 3. Complete computational families (P2/P4) | Extend that workflow with remaining graph/recall families, duration/refinement and retained transport methods, then feature tracks, clock maps and measured-time readouts. Port each method into the existing interfaces as its inputs become stable. | Per-family producer and consumer; independent small-case oracle; executable Scala comparison where available; support/denominator/missingness contract; measured sparse resource use. No claim that the existing sequence kernel is the entire Scala inference surface. |
 | 4. Close operational and inspection coverage (P5/P6) | Expand to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interview workflows. Add React inspection of actual artifacts, then saved investigations and exports. | Capability-by-capability executed workflow coverage, compatibility/recovery checks and a clear disposition for every retained Scala/Atlas behavior. Visual polish follows useful inspection. |
 
-**The next three implementation beads:** connect the installed input-to-analysis journey and
-simplify only demonstrated API repetition; add synthetic study intake and recovery checks;
-complete the next retained graph/target family needed by that journey. Reuse existing examples
-and recordings. If a workflow bead needs a missing graph family, implement that bounded
-dependency first.
+**The next three implementation beads:** adapt synthetic study inputs to the connected account
+workflow; add input-bound recovery for interrupted imported recordings; complete the next retained
+graph/target family needed by that journey. Reuse existing intake, execution, examples and
+recordings. If a workflow bead needs a missing graph family, implement that bounded dependency
+first.
 Do not wait for every graph family or numerical method before exercising a complete workflow.
 
 **Checkpoint 3 ordering:** complete causal/referential/entity relations, auxiliary hierarchy,
@@ -472,10 +481,10 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** the installed construction-to-analysis journey and demonstrated API
-  consolidation from Delivery 2, followed by synthetic study intake/recovery. Remaining graph,
-  numerical, semantic-provider and inspection deliveries remain open. Recorded surface semantic
-  inference joins chronology, contextual fidelity and native assessment as a local checkpoint.
+- **Next bead:** synthetic study intake into the connected saved account workflow, then
+  interrupted-import recovery. Remaining graph, numerical, semantic-provider and inspection
+  deliveries remain open. Connected replay and recorded surface semantic inference join
+  chronology, contextual fidelity and native assessment as qualified local checkpoints.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.
