@@ -5,7 +5,7 @@ capabilities available in idiomatic Python, improving the implementation using l
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
 This is the current **port** execution direction, refreshed on 2026-11-17 through
-the account-derived inference and explicit reconstruction workflow.
+the account-derived inference, reconstruction and conditional organization workflow.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -35,8 +35,9 @@ now have local implementation and evidence. [Source-derived transitions](source-
 and [account-derived local evidence](local-evidence.md) connect checked accounts to the sequence
 kernel, with sparse nominations, shallow mode gates and measured-support accounting. Richer
 chart/outcome/cause evidence and refinement remain owed. [Explicit reconstruction](reconstruction.md)
-now consumes these results while retaining the original evidence. Organization readouts are
-the next connected delivery.
+now consumes these results while retaining the original evidence. [Conditional organization](organization.md)
+consumes adjacent joint flow, with a separate explicitly independent-row path. Richer evidence
+construction, native media ordering and registered measurement eligibility remain owed.
 Playback, attribution, richer graph families and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
@@ -230,8 +231,8 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 These deliveries sequence P2–P6; the full phase exits above still apply. Build on the existing
 construction, correspondence, assessment and account-to-inference paths. Mote owns live status.
-The current evidence baseline is [reconstruction.json](../evidence/reconstruction.json), bound
-to source commit `e57b51a6f`: 657 tests, independent review, nine discriminating mutants and
+The current evidence baseline is [organization.json](../evidence/organization.json), bound
+to source commit `ade617d96`: 672 tests, independent review, six discriminating mutants and
 installed API/CLI agreement. Those are recorded engineering results, not a fresh test run for
 this plan, executed Scala equivalence or a full-parity claim.
 
@@ -272,11 +273,12 @@ Reconstruction never silently changes categorical reference or fidelity. Organiz
 from an order-sensitive model stays labelled model-conditional, not independent evidence of
 recall organization.
 
-**Next action:** implement organization readouts using the existing adjacent joint flow, with
-independent-row products available only under an explicit separate assumption. The parent-admission
-repair and reconstruction are implemented locally; reuse them. Read the complete organization
-implementation, callers and tests before editing. Coupled ambiguity bounds remain a separate
-unsupported capability unless a valid method is implemented and checked.
+**Next action:** continue delivery 2 with the missing evidence and context ownership contracts,
+starting with explicit attribution/holders and playback through construction and actual consumers.
+The account-inference, reconstruction and conditional organization path is implemented locally;
+reuse it. Native media order, registered independent-measurement eligibility, refinement and
+richer evidence channels remain owed. Coupled ambiguity bounds stay unsupported unless a valid
+method is implemented and checked; this conditional readout does not certify reference measurement.
 
 ### 2. Broaden evidence without creating another account model — P2/P3/P4
 

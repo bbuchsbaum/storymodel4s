@@ -56,9 +56,9 @@ probability interval.
 Independent rows explicitly assume factorization and use products of their weights. Coupled
 rows require exactly one joint for every original adjacency whose two rows are available,
 including unranked destinations. Joints for skipped, reversed, foreign or unavailable-row
-pairs refuse. Each joint must match both actual row marginals and have total mass one within
-`1e-9`; the global total check prevents individually tolerated discrepancies accumulating into
-an invalid joint. Duplicate destinations, units and joint edges refuse. Coupled inputs must
+pairs refuse. Each joint must match both actual row marginals within absolute tolerance `1e-9` per
+destination and have total mass one within `1e-9`. The global check constrains total-mass drift;
+it does not bound aggregate marginal redistribution beyond the per-destination tolerance. Duplicate destinations, units and joint edges refuse. Coupled inputs must
 set `product_bounds=False`; independent inputs cannot carry unused joints.
 
 ```sh
