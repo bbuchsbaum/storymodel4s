@@ -44,8 +44,8 @@ The "event layer" column marks the ADRs that the film and recall event layer (se
 | [0027](0027-source-identity-graph.md) | Recall-blind source identity graph (Sherlock body scenes) | Accepted | yes |
 | [0028](0028-source-graph-export.md) | Exporting the source identity graph | Accepted | yes |
 | [0030](0030-detail-account-and-derived-analysis.md) | Detail account and derived analysis projections | Accepted direction | yes |
-| [0031](0031-reference-measures-and-held-level-projection.md) | Reference measures and onset-point recall-time projection | Accepted (2026-11-16); deferred items open | yes |
-| [0032](0032-recall-reference-vocabulary.md) | Recall talk, topic frame, address classes and programme | Proposed (2026-11-17) | yes |
+| [0031](0031-reference-measures-and-held-level-projection.md) | Reference measures and onset-point recall-time projection | Accepted (2026-11-16); deferred items open; 2026-11-17 amendment (timing provenance, cell intake) proposed, owner to rule | yes |
+| [0032](0032-recall-reference-vocabulary.md) | Recall talk, topic frame, address classes, pointing distribution and programme | Proposed (2026-11-17, revision 4) | yes |
 
 Notes:
 
@@ -55,3 +55,6 @@ Notes:
   later recorded as "accepted direction, with amendments" (line ~598). The owner should confirm.
 - The NMP proposal profile (planned ADR 0029, [plan](../plans/2026-10-24-nmp-integration.md)) is
   the intended wire format for LLM-proposed events. It is not yet decided.
+- ADR 0031's 2026-11-17 amendment and ADR 0032 are proposals. Retiring two `ExternalState`
+  cases is deferred to a later ADR; see the
+  [retirement notes](../plans/2026-11-17-externalstate-retirement-notes.md).

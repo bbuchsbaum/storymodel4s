@@ -65,6 +65,8 @@ Mote holds current status (`mote ready`). Documents hold direction and decisions
 | [2026-09-02 recall-to-video study log](plans/2026-09-02-recall-to-video-study-log.md) | The running measurement record; append, don't rewrite |
 | [2026-09-02 gold-scene preregistration](plans/2026-09-02-gold-scene-preregistration.md) | Governs held-out Sherlock reads only |
 | [2026-09-03 within-scene precision preregistration](plans/2026-09-03-within-scene-precision-preregistration.md) | Human lane still owed by the owner |
+| [2026-11-17 case-study-2 library slices](plans/2026-11-17-cs2-library-slices.md) | Proposed with ADR 0032 and the ADR 0031 amendment; not scheduled until the owner rules |
+| [2026-11-17 ExternalState retirement notes](plans/2026-11-17-externalstate-retirement-notes.md) | Notes for a later ADR; decides nothing |
 
 Every other file in [plans/](plans/) is a dated historical record:
 
