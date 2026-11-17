@@ -359,7 +359,8 @@ def main(argv):
                                       "gold row they overlap most", corpora=[]),
     )
     for spec in argv[1:]:
-        if spec.startswith("hillclimb_r") and spec.split("=", 1)[0][11:].isdigit():
+        if (spec.startswith("hillclimb_r")
+                and spec.split("=", 1)[0][11:].split("_")[0].isdigit()):
             name, path = spec.split("=", 1)
             rep[name] = json.loads(Path(path).read_text())
             continue

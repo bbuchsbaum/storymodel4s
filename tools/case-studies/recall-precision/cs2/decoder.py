@@ -443,7 +443,7 @@ def to_cells(sp: Space, x) -> np.ndarray:
 
 def _kl_bits(p, q):
     m = p > 0
-    return float(np.sum(p[m] * np.log2(p[m] / q[m])))
+    return max(0.0, float(np.sum(p[m] * np.log2(p[m] / q[m]))))  # rounding can dip below 0
 
 
 def decode(sp: Space, T, init, q, d, alpha) -> list:
