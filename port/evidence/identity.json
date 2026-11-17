@@ -1,0 +1,26 @@
+{
+  "source_commit": "4d9225a408a6f7165c18a67e3a5d14be6b1e9458",
+  "checks": {
+    "full_suite_at_cafa0065a": "287 passed in 3.23s",
+    "after_review_delta": "15 identity and workflow tests passed",
+    "mypy": "27 source files pass",
+    "ruff": "lint and format83 files pass",
+    "mutation": "incomplete antecedent guard deletion: baseline3 pass, mutant1 named fail with2 passing controls"
+  },
+  "review": {
+    "verdict": "PASS no BLOCKs on cafa0065a and bounded followup4d9225a40",
+    "reviewer": "text_identity_review",
+    "tests": "14 isolated tests on cafa0065a plus5 adversarial input/order/forgery probes; new delta regression independently passes",
+    "second_mutation": "remove nonintroducing type guard: named regression fails, untyped pronoun positive control passes"
+  },
+  "installed_wheel": {
+    "outside_checkout_example_and_cli": true,
+    "example": "2 mentions,1 text referent; original event IDs and contexts retained",
+    "final_guard_probe": "rebuilt installed wheel accepts untyped pronoun and refuses unused type metadata"
+  },
+  "limits": [
+    "Explicit annotated text identity only; no grammatical accuracy claim.",
+    "Quantity evidence, accepted holder pass, crossmodal licences and canonical graph projection remain owed.",
+    "Missing earlier metadata conservatively blocks uniqueness; original account must be retained with raw annotations and sidecar."
+  ]
+}
