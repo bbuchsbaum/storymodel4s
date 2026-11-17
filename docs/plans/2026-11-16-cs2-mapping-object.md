@@ -444,6 +444,38 @@ on the same rows.
 6. **Utterance-unit control:** deferred. New units need new pass-1 and pass-2 calls beyond the
    budget.
 
+### Hill-climbing round 1 (2026-11-17; protocol recorded before any scoring)
+
+Development data only, cache-only, with no model calls. The base run is full-run sample 1,
+rescored under the current rules; sample 2 is used for noise and for ensembling.
+
+**Protocol.**
+- Tune on the develop five (sub-07, 08, 14, 17, 18). Confirm on the report five (sub-01, 02,
+  10, 16, 19).
+- Noise bands are ±2 SE of the paired participant differences between sample 2 and sample 1,
+  on the same rows, per half and per term (scene, work, film).
+- A lever is kept only if it beats its band on both halves, in the good direction, without
+  worsening another term beyond that term's band.
+- Parameters are fitted on the tune half only, never on the confirm half. Each half's report
+  gives the scene, work and film terms, top scene and switch F1, with the paired sign-flip p
+  (two-sided) and wins.
+
+**Levers.**
+1. **Calibration.**
+   - One λ for the whole forecast: p' = (1 − λ) p + λ F, where F is the row's fallback. It
+     mixes every term at once, so it is not fitted per term.
+   - A temperature τ on located scene mass: loc_s ∝ loc_s^τ, with the row's located total
+     kept.
+   - λ is fitted on the tune half by grid search minimising the mean of the scene, work and film
+     terms, and τ the same way.
+2. **Two-sample ensembling.** The two samples' forecasts are averaged per row (P(w), P(S, w)
+   and P(non-film) each averaged), against the current rule of averaging bits. It doubles the
+   deployed calls.
+3. **Switch repair from pass-2 evidence.** Only `frame_mismatch` can supply such evidence:
+   pass-2 rows are restricted to the framed film, and the full runs refused no rows outside
+   their frame. The declared rule is `mismatch_rule: incoming-frame`. A flagged unit becomes a
+   boundary and takes the next framed unit's film when that film differs.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
