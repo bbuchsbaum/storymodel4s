@@ -4,6 +4,9 @@
 recorded after review of the implementing slices). Binding for its decided sections; the
 items under [Deferred](#deferred) remain undecided.
 
+A **proposed** amendment of 2026-11-17, on timing provenance and cell intake, is at the end of
+this record. It is not binding, and it changes none of the accepted text.
+
 Revision 4 narrows the scope after discussing the case-study evidence with the owner:
 
 - Alternative entropy is not published, because its magnitude did not reproduce.
@@ -366,3 +369,158 @@ ADR 0022.
 - A `features` time-bin target.
 - Scientific validation of any measure. That belongs in ADR 0030's joint coding rubric with
   human coders, and then a frozen read.
+
+## Amendment 2026-11-17 (proposed): timing provenance and cell intake
+
+**Status of this amendment:** Proposed, 2026-11-17. Not binding until the owner rules. The
+accepted text above is unchanged. It was drafted as §6 and §9 of ADR 0032's revision 3
+(`eedc2e35f`) and moved here because both parts change §3's projection request. Its slices are
+in [the slice plan](../plans/2026-11-17-cs2-library-slices.md).
+
+Code is cited by file and line in this branch's tree and was read, not run: `R/` is
+`recall/src/main/scala/storymodel4s/recall/`, `I/` is
+`corpus-intake/src/main/scala/storymodel4s/corpus/intake/`, `P/` is
+`pipeline/src/main/scala/storymodel4s/pipeline/`, `A/` is
+`align/src/main/scala/storymodel4s/align/` and `C/` is
+`codec/src/main/scala/storymodel4s/codec/`.
+
+### A1. Onset provenance
+
+**Why.** §3 says a word timestamp marks speech. It does not ask how the timestamp was obtained.
+FilmFestival's converter spreads each utterance's words evenly across the utterance and calls
+that not good enough for any claim about word-level timing
+(`tools/corpus/filmfest_recall.py:8-12`, `:155-157`). Nothing in `RecallTiming` records it
+(`R/timing.scala:8-13`, `:165`). A projection at a grain finer than the utterance would report
+timing that nobody observed.
+
+**Term.** An onset is **measured** when its value was obtained for that word on its own, by a
+person or an aligner working from the recording. It is **interpolated** when it was computed
+from the times of a containing segment. "Measured" has no other sense in this amendment.
+
+**Decision.**
+
+1. **`RecallTiming` carries an `OnsetProvenance`:**
+   - `Measured(source)`;
+   - `Interpolated(source, segmentation)`, where an `OnsetSegmentation` partitions the
+     inventory's words into contiguous **runs**, each run being the words whose onsets were
+     computed from one timed segment;
+   - `Undeclared`.
+2. **A declaration needs evidence.** `source` cites the artifact that states how the onsets were
+   obtained, by checksum and locator. A segmentation is read from a declared column or a pinned
+   artifact. And the declaration must pass the evenness check below.
+3. **It sits on the timing value, not on the intake receipt.** `ReferenceParity.timing` keeps
+   `result.timing` and drops the rest of the intake result
+   (`P/agentmapping/ReferenceParity.scala:101`), and a projection request takes a `RecallTiming`
+   (`A/onsetlevelprojection.scala:237-239`).
+4. **Projection rule**, in `Request.checked` and in ADR 0032's pointing distribution:
+   - *measured:* any bins;
+   - *interpolated:* no bin may split a run. All of a run's words that have an onset fall in
+     one bin, or all fall outside every bin; otherwise the request is refused with
+     `SplitsInterpolatedSegment(run)`;
+   - *undeclared:* there are no runs to check bins against, so no grain can be shown safe. The
+     request is refused at every grain with `OnsetProvenanceUndeclared`. A segmentation assumed
+     by the caller is not accepted in its place.
+5. **Persistence.** A declared provenance enters the timing's digest and wire form under a new
+   schema version. That **re-keys what cites the timing digest**: the timing build receipt
+   (`P/RecallTimingBuild.scala:191`) and the exposure identity (`A/temporalexposure.scala:137`).
+   An undeclared timing keeps the `recall-timing/v0.1` preimage (`R/timing.scala:46-62`) and
+   wire form (`C/recalltiming.scala:16`), so no existing digest moves, and a decoded v0.1
+   document is undeclared.
+
+**What the library can and cannot verify.**
+
+- **It cannot verify that an onset was measured.** Whether a time came from a person, an
+  aligner or a formula is a fact about how the file was made. A declaration is an attributed
+  claim, as a source-reported basis already is (`R/timing.scala:156-157`).
+- **`Basis` does not help.** Intake stamps every onset `SourceReported`
+  (`I/RecallTimingIntake.scala:98`), FilmFestival's interpolated ones included.
+- **It can check three things:** that a declaration exists and cites a source; that bins respect
+  the declared runs; and that the declaration does not leave evenly spaced onsets unexplained.
+- **It cannot catch** interpolation that is not linear, onsets jittered after interpolation, or
+  a cited source that is itself wrong.
+
+**The evenness check.** A class is derived from what it describes, so a declaration is tested
+against the numbers.
+
+- Take the words that have an onset, in transcript order. A **step** is a word with a timed
+  neighbour on each side. A step is **even** when its two gaps are equal.
+- A step is **explained** when its three words lie in one declared run. A measured declaration
+  explains none. Neither do one-word runs, so an interpolated declaration with one-word runs is
+  tested exactly like a measured one.
+- **Unexplained evenness** is the share of even steps among the steps that are not explained.
+  At or above a threshold the declaration is refused with `UnexplainedEvenness(share)`.
+- Zero gaps and backward steps are counted as they stand. `RecallTiming` already reports
+  backward pairs (`R/timing.scala:41`) and does not refuse them.
+
+**Calibration.** These figures came with the cold review of ADR 0032 and were not recomputed
+here. Sherlock's development participants have onsets quantised to 0.1 s; 11.9% of consecutive
+gaps are equal, 4.9% are zero, 95.1% of words have a distinct onset, and a few onsets run
+backwards (4 in NN03). FilmFestival's onsets are interpolated, so every step inside an utterance
+is even up to the rounding of the written values; its share has not been counted. The threshold
+is provisionally 0.5, between the two. The slice counts both corpora per session before it is
+frozen. If rounding hides FilmFestival's evenness from an exact comparison, the comparison gets
+a declared tolerance; the threshold is not lowered toward Sherlock's value.
+
+**Consequences.**
+
+- **Sherlock.** Its adapter records no value and says how the onsets were measured is not
+  recorded (`tools/case-studies/recall-precision/adapters/sherlock.py:289-290` at `a93763b46`).
+  While it is undeclared, the two `Request.checked` calls of `ReferenceParity`
+  (`P/agentmapping/ReferenceParity.scala:308-330`) are refused, and the 1.5 s series (`:117`)
+  cannot be rebuilt on the new input. Its figures would pass the evenness check, but passing is
+  not evidence of measurement: a source must still be cited.
+- **FilmFestival.** Bins that are whole utterances are admitted. Fixed windows that split
+  utterances are refused.
+
+**Rejected:**
+
+- **A declaration on the intake receipt only.** It is dropped before the projection, as above.
+- **Inferring provenance from the values.** The check can refuse a declaration; it never
+  supplies one.
+- **`Basis.Estimated` as the marker.** Intake does not set it, and it has no runs.
+- **A warning in place of a refusal.** It does not stop sub-utterance timing from being quoted.
+- **An assumed segmentation for undeclared timing.** One word per run is a measured claim
+  without a source.
+
+**Types.** `OnsetSegmentation` is a `final` non-case class in `recall`, built against one
+inventory and one clock, with its own digest; its refusals are `ForeignInventory`,
+`ForeignClock`, `NonContiguous`, `Overlapping` and `Incomplete`. `OnsetProvenance` is an enum
+without `Custom`: an unrecognised value on the wire is a decode error, not undeclared.
+`UnexplainedEvenness` is a `RecallTiming.Refusal`; the two projection refusals are new cases of
+`OnsetLevelProjection.Refusal` (`A/onsetlevelprojection.scala:229`).
+
+### A2. The cell rule
+
+**Decision.** A transcript cell is the timed unit. A nonblank cell that holds several lexical
+tokens, such as a hyphenated word or a clock time, is **one word** of the recall inventory, and
+its onset belongs to the cell:
+
+- no cell onset is divided among, or interpolated across, its tokens;
+- lexical tokens are a derived layer over cells. Each token maps to exactly one cell and shares
+  that cell's timing observation, tagged as shared;
+- every word count in a ledger or projection counts cells.
+
+**Today.** The recipe is chosen by entry point: `read` is `external-clock-exact-replay/v1` and
+`readLexical` is `external-clock-single-lexical-word-replay/v1`
+(`I/RecallTimingIntake.scala:13-14`, `:46`, `:58`). The lexical recipe refuses a multi-token
+cell as `WordSpansMismatch` (`:111-118`). The recipe enters only the correspondence digest
+(`:129`). The intake `Result` does not carry it (`:31-36`), and `Refusal` has no recipe case
+(`:39-44`). `ReferenceParity.recall` already treats each cell as one word
+(`P/agentmapping/ReferenceParity.scala:57-62`).
+
+**What changes.** `read` stays the cell rule and `readLexical` stays strict. The `Result` gains
+the recipe as an explicit value, so a consumer that needs one recipe can refuse the other with a
+new typed `RecipeMismatch`. The token layer is new.
+
+**Rejected:** dividing an onset among a cell's tokens, which manufactures timing precision the
+source does not have (rule 7); and refusing every transcript that has a multi-token cell, which
+rejects ordinary transcripts for an orthographic accident.
+
+**Types.** The token-to-cell layer is a checked map built from a `RecallInventory`.
+
+### Open questions for the owner
+
+1. **Which source can Sherlock cite** for its onsets? Until one is cited, its projections are
+   refused. The alternative is a typed "unverified" result that cannot be used where measured
+   timing is required; this amendment proposes the refusal.
+2. **The evenness threshold** is provisional until both corpora are counted.
