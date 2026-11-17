@@ -292,22 +292,41 @@ Use the connected workflows to simplify public calls where repetition is demonst
 
 ### Immediate work queue
 
-These are the next bounded work units inside the deliveries below, not additional phases.
+These are the next delivery checkpoints within P2–P6, not additional phase numbers. Refreshed
+at the owner's planning request on 2026-11-17. The semantic files currently in progress are
+unfinished implementation, not a qualified checkpoint. Finish that slice before opening another.
 
-1. **Add one semantic channel with a real consumer.** Bind model/space/cache identity, nominate
-   candidates sparsely, and retain channel-specific evidence and unavailable/search-limited
-   outcomes. Compare lexical-only and semantic variants on the same saved inputs, with separate
-   retrieval, ranking and decoding diagnostics. Use recorded/local inputs for engineering
-   qualification; a live provider or demonstrated accuracy gain is not an acceptance condition.
-2. **Complete connected graph and target coverage.** Continue causal/referential/entity
-   relations, auxiliary hierarchy, recall grouping/discourse and retained event/episode targets.
-   Add each through a producer and an actual consumer. Consolidate repeated public-call patterns
-   in the connected text/native journeys; do not add another orchestration layer.
+| Order | Work and researcher-visible result | Exit evidence |
+|---|---|---|
+| 1. Semantic evidence through inference (P3/P4) | Complete recorded surface embeddings, model/space/payload-bound cache, bounded nominations and the existing local-evidence → sequence consumer. Retain the lexical-only path. | Installed API/CLI replay on identical inputs; independent distance and candidate expectations; explicit missing/failure/budget diagnostics; unchanged source across two recalls; cold review of consequential semantics. |
+| 2. One study-shaped Python workflow (P2/P3/P5) | Connect construction, identity, details, reference, conditional fidelity and all three analysis views behind a small public API. Add a synthetic Sherlock-contract intake path and preserve the native-source/text-recall variant. | One installed command and notebook-friendly functions reproduce saved outputs offline; interrupted runs resume against the correct inputs; recurring occurrences, joint/broad/alternative/external references and pending assessments survive readback. |
+| 3. Complete computational families (P2/P4) | Extend that workflow with remaining graph/recall families, duration/refinement and retained transport methods, then feature tracks, clock maps and measured-time readouts. Port each method into the existing interfaces as its inputs become stable. | Per-family producer and consumer; independent small-case oracle; executable Scala comparison where available; support/denominator/missingness contract; measured sparse resource use. No claim that the existing sequence kernel is the entire Scala inference surface. |
+| 4. Close operational and inspection coverage (P5/P6) | Expand to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interview workflows. Add React inspection of actual artifacts, then saved investigations and exports. | Capability-by-capability executed workflow coverage, compatibility/recovery checks and a clear disposition for every retained Scala/Atlas behavior. Visual polish follows useful inspection. |
 
-Between these workflow deliveries, complete causal/referential/entity relations, auxiliary
-hierarchy and recall grouping/discourse in bounded slices using the same examples. Move a family
-earlier when it is required by the next consumer. Their deferred status is explicit; successful
-chronology or assessment does not close P2.
+**The next three implementation beads:** finish checkpoint 1; connect the installed
+input-to-analysis journey and simplify only demonstrated API repetition; add the synthetic
+study adapter and recovery checks against that journey. Reuse existing examples and recordings.
+If either later bead needs a missing graph family, implement that bounded dependency first.
+Do not wait for every graph family or numerical method before exercising a complete workflow.
+
+**Checkpoint 3 ordering:** complete causal/referential/entity relations, auxiliary hierarchy,
+recall grouping/discourse and retained event/episode targets alongside their actual consumers.
+For numerical work, inspect duration/refinement first, then retained transport methods; feature
+tracks and clock maps can proceed when their own inputs are stable. Each family remains owed
+until its preservation-map entry has an executed producer and consumer. Successful chronology,
+assessment or one study adapter does not close P2 or P5.
+
+**Design improvement at each exit:** remove duplicate validation/orchestration, prefer ordinary
+functions and checked data objects, and keep numerical kernels separate from I/O and recording.
+Use standard numerical arrays or sparse structures when the actual computation benefits.
+Avoid adding a generic engine, service or second graph model. Version deliberate behavioral
+corrections and retain a discriminating example; preserve valid old artifacts through adapters.
+
+**Progress report:** name the researcher task newly possible, its executed evidence, remaining
+capability gaps and the next bounded bead. Record normal edit/test feedback latency. Do not
+equate fast tests with proven overall development speed, or assign a parity percentage from
+test counts. Keep beads small enough to finish in a session or working day; adjust their scope
+from actual dependencies rather than promising a calendar date for all P2–P6 work.
 
 ### Checkpoints for the next few phases
 
