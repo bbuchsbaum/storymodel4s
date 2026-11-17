@@ -5,7 +5,8 @@ capabilities available in idiomatic Python, improving the implementation using l
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
 This is the current **port** execution direction, refreshed on 2026-11-17 through
-the account-derived inference, reconstruction and conditional organization workflow.
+the account-derived inference, reconstruction, organization and holder-dependent identity
+workflows. The execution queue below was refreshed against the checkout on 2026-11-17.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -232,142 +233,151 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-These deliveries sequence P2–P6; the full phase exits above still apply. Build on the existing
-construction, correspondence, assessment and account-to-inference paths. Mote owns live status.
-The latest computational baseline includes [organization.json](../evidence/organization.json)
-and [attribution](attribution.md), with its evidence in [attribution.json](../evidence/attribution.json).
-[Holder-dependent identity](held-identity.md) adds the explicit singular-speaker rule;
-[held-identity.json](../evidence/held-identity.json) records its checks and deliberate unknown-number correction.
-These are recorded engineering results, not executed Scala equivalence or a full-parity claim.
+Refreshed 2026-11-17 at the owner's request to plan the next phases and push forward.
+The P2–P6 exits above remain the destination. This queue makes the next work concrete;
+Mote remains authoritative for live ownership and status.
 
-| Order | Connected result | Main prerequisite |
-|---|---|---|
-| 1 | Account → inference → reconstruction → organization readout | Existing posterior rows, pairwise flow and source hierarchy |
-| 2 | Richer observations and semantic evidence through the same workflow | Add each missing representation with its producer and consumer |
-| 3 | Retained numerical methods → feature/time/trajectory outputs | Relevant evidence channels and explicit coordinate contracts |
-| 4 | Installed study workflow and specialized integrations | Stable public computational path; optional backends stay optional |
-| 5 | Artifact inspection and full behavioral coverage audit | Python-produced artifacts; visual refinement stays late |
+### Baseline and immediate closeout
 
-### 1. Make inference useful: reconstruction and organization — P4
+Reuse the implemented account → local evidence → sequence inference → reconstruction →
+organization path. Do not rebuild it. The recorded evidence is in
+[reconstruction.json](../evidence/reconstruction.json),
+[organization.json](../evidence/organization.json), and
+[held-identity.json](../evidence/held-identity.json). Direct mapping, conditional fidelity,
+rich relations and independent source/recall construction also have existing consumers.
+These are bounded local implementations, not full Scala parity.
 
-**Deliver:** extend `examples/account_inference.py` with saved, checked reconstruction and
-organization outputs, available through the installed API and CLI. Split this into two
-independently reviewable slices:
+At this planning checkpoint, full context vocabulary is **in progress** in the working tree:
+v5 rich accounts and v2 construction add desire, memory, imagination, hypothetical and
+counterfactual contexts. The current checkout passes 760 tests in 10.67 seconds, including
+the new context tests. This is a working-tree observation, not an immutable release receipt:
+installed verification, strengthened consumer assertions, documentation and cold review still
+need completion. The active bead is `bd-01M7ME0KMK58W71YTPKTD7FEGY`.
 
-1. **Explicit reconstruction.** Port the working policies in `StructuredReconstruction`,
-   its `MappingPipeline` consumer and `ReconstructionPolicySuite`. Preserve original evidence
-   and posterior rows. Expose raw maxima, group-constrained choices, chosen-anchor mass and
-   decision origins separately. Source-bound group membership comes from the hierarchy.
-   Filling is disabled by default and requires an explicit, account-bound request; a filled
-   noncandidate receives no invented posterior mass. Keep unconstrained, nondecreasing and
-   penalized-backward assumptions explicit and versioned.
-2. **Organization readout.** Port `OrganizationReadout` and its suite using the existing
-   sequence result's adjacent pairwise flow for coupled inference. Independent row products
-   require a separately declared assumption. Preserve original recall adjacency and the
-   denominator when a middle row is unavailable. Keep backward/forward/same-target, external,
-   incomparable, unresolved and failed outcomes distinct. Require explicit comparable source
-   order; do not manufacture chronology from arbitrary IDs. Product-space ambiguity bounds
-   apply only where their assumptions hold; unsupported coupled bounds remain unavailable.
+The first implementation action is to finish that slice: require real alignment candidates
+in its consumer test, exercise saved construction/identity artifacts through installed API and
+CLI, preserve the frozen v1 recording, and document nested holderless versus unresolved-holder
+behavior. Commit and review it before expanding the representation again.
 
-**Acceptance:** tiny enumerated paths discriminate policies and expected counts; equal row
-marginals with different joints produce different organization results; missing middle rows
-never become a fabricated direct transition. Test foreign grouping/fill, noncandidate fill,
-overflow, sparse rank gaps and changed inputs. Installed API and CLI reproduce saved outputs.
-Reconstruction never silently changes categorical reference or fidelity. Organization derived
-from an order-sensitive model stays labelled model-conditional, not independent evidence of
-recall organization.
+| Order | Delivery | Researcher-visible result | Dependency |
+|---|---|---|---|
+| 1 | Contexts and playback evidence (P2/P3) | A claim can cite text or native media support and retain whose context it belongs to. | Close current context slice first. |
+| 2 | Connected rich graphs (P2/P3) | Source and recall construction can express cross-unit events, relations, grouping and summaries. | Existing construction/identity; playback only for media-backed cases. |
+| 3 | Richer computational evidence (P3/P4) | Structural and semantic channels feed mapping and assessment with separate diagnostics. | The particular representation each consumer needs. |
+| 4 | Numerical methods and scientific outputs (P4) | Retained inference/refinement methods feed feature, timing and trajectory outputs. | Stable inputs for each method; no blanket wait for delivery 3. |
+| 5 | Installed studies, specialized coverage and inspection (P5/P6) | Researchers run, replay, inspect and export complete workflows. | Start a synthetic study workflow after delivery 2; broaden with later producers. |
 
-**Next action:** continue delivery 2 with the retained context families (desire, memory,
-imagination, hypothetical and counterfactual) through versioned construction and their actual
-consumers, then playback evidence. Reuse recorded holder resolution, two-pass identity and
-event/state inspection. Keep holderless contexts distinct from unknown holders, preserve
-existing occurrence IDs across explicit upgrades, and never silently widen old recorded prompts.
-Attribution-aware assessment, richer number acquisition and third-person number compatibility
-remain required consumers/extensions.
-The account-inference, reconstruction and conditional organization path is implemented locally;
-reuse it. Native media order, registered independent-measurement eligibility, refinement and
-richer evidence channels remain owed. Coupled ambiguity bounds stay unsupported unless a valid
-method is implemented and checked; this conditional readout does not certify reference measurement.
+These are deliveries, not five monolithic implementation beads. Open the next bounded bead
+when its input contract is known. Each should normally fit one session to one working day;
+split larger work at a saved-artifact boundary. These sizes are planning targets, not estimates
+of when full parity will finish.
 
-### 2. Broaden evidence without creating another account model — P2/P3/P4
+### 1. Contexts and playback evidence — P2/P3
 
-**Deliver in connected slices:**
+After closing the context slice, add playback evidence through the existing account model,
+construction/admission and exchange path. Preserve edition identity, native coordinate units,
+discontinuous support and separate text, source playback, recall playback and story-world time.
+A caption or description remains an observation; it does not acquire the authority of the
+underlying film merely by being parsed.
 
-- Playback support and attribution/holders through construction, admission, exchange and
-  assessment. Preserve context ownership and separate clocks; reported content cannot become
-  root-world fact merely because it is represented.
-- Remaining hierarchy/relations, cross-unit construction, recall grouping, summaries and
-  repetition through actual inference or analysis consumers. Generic part-of remains distinct
-  from narrative containment. Extend episode/event/scene target grains where their semantics
-  are defined.
-- Semantic evidence providers through the existing candidate/cost contracts, followed by
-  chart/structural and outcome/cause gates when their representations are ready. Keep nomination,
-  admissibility, cost, measured support and decoding diagnostics separate. Backend absence,
-  provider abstention and missing observations are not zero scores.
-- Richer fixed-question and conditional-fidelity profiles, including playback/chart evidence
-  and retained whole-film/neighbor-aware assessment. Preserve prior completed assessments and
-  keep target reference, expressed claims and fidelity separate.
+Then consume context/holder and playback evidence in fixed-question assessment and conditional
+fidelity. An unsupported evidence modality must be explicit; it cannot silently fall back to
+text-only certainty. Keep the lightweight text workflow usable without a media installation.
 
-**Acceptance:** every added family has a constructor, checked consumer, roundtrip, positive
-witness and meaningful refusal case. Reuse one source unchanged across two recalls. Existing
-lightweight direct mapping remains usable. Compare the contribution of a new evidence channel
-at retrieval, local ranking and decoding separately; no accuracy claim follows from a canned
-provider response. Optional expensive backends enter through the existing execution/replay path.
+**Exit:** one admitted synthetic media-backed source reused unchanged by two recalls; a claim
+and a situation retain their supports/context through construction, exchange and an assessment
+or inspection consumer. Exercise wrong-edition evidence, incompatible clocks, disjoint support,
+root-world promotion and unknown holders. Old recorded construction still replays unchanged.
+Media acquisition tools arrive later; this slice accepts checked supplied observations.
 
-**Dependency rule:** introduce the minimum representation needed by the next consumer; no
-complete-P2 barrier before useful P4 work. Chart/AMR integration from delivery 4 may move forward
-when needed here. Deferred families remain explicitly owed in the preservation map.
+### 2. Connected graph construction and API consolidation — P2/P3
 
-### 3. Complete numerical and scientific computation — P4
+Build on the existing event/state, relation, identity and detail implementations:
 
-**Deliver:** retained refinement, supported duration behavior, other alignment/transport methods,
-then feature tracks/windows/derivation dependencies and native-coordinate exposure/projection,
-trajectory, calibration and evaluation readouts. Choose each slice from functioning Scala
-producers, callers and tests; a name such as Graph-HSMM is not evidence of duration semantics.
-Reuse existing exact temporal allocation rather than introducing a competing time model.
+1. Add cross-unit references and the remaining temporal, causal, referential and hierarchy
+   construction paths. Preserve generic part-of versus narrative containment. Repeated text
+   must remain distinct occurrences unless checked identity evidence connects it.
+2. Extend recall construction for grouping, summaries, repetition and retained discourse
+   functions. Expose event/episode/scene targets at their declared granularity; joint targets,
+   broad references and uncertain alternatives remain distinct.
+3. Connect the new structure to candidate production, mapping and the three analysis views.
+   Include attribution-aware behavior and the retained number/identity rules where those
+   consumers need them. Each declared family needs a functioning producer, not only a type.
+4. Consolidate the public Python workflow using this real consumer. Researchers should not
+   manually manufacture IDs, reorder internal validation calls or reconstruct provenance.
+   Remove proven duplication while keeping compatibility in explicit readers/adapters.
 
-**Acceptance:** an installed account-to-result example for each retained method; independent
-small-case oracles and pinned reference outputs where available; explicit assumptions,
-eligibility and missingness; sparse-size measurements on declared inputs. Preserve current
-large-cost cancellation controls when optimizing. Raw score, transport mass, posterior and
-empirically calibrated probability remain distinct. Calibration claims require corresponding
-validation data and evidence, while engineering availability can proceed independently.
+**Exit:** one documented installed workflow constructs a reusable source and two independent
+recalls, admits graph/detail proposals, maps and assesses them, and emits the three analysis
+views. Positive and refusing controls cover every family claimed by this delivery. Save the
+intermediate artifacts so a reader can trace a wrong result to construction, identity,
+nomination, mapping or assessment. Keep one package and ordinary modules; no generic graph
+framework or second domain hierarchy is a prerequisite.
 
-Use arrays and sparse numerical libraries when a concrete method benefits. Keep public values
-and receipts stable across internal optimization. Before adding another algorithm, consolidate
-any duplicated mechanisms exposed by its real consumer.
+### 3. Richer evidence through existing computation — P3/P4
 
-### 4. Exercise installed study workflows and specialized capabilities — P5
+First add a retained semantic channel through the existing recording/cache and candidate/cost
+contracts. Then connect proposition/chart comparisons and outcome/cause evidence as their
+representations become available. Move the minimum required chart/AMR work forward from P5;
+do not wait for all specialized adapters. Keep ONNX/WL and other costly backends optional.
 
-**Deliver:** one complete Sherlock-contract path using admitted synthetic adapter fixtures:
-intake → source/recall construction → mapping/assessment or structured inference → analysis →
-saved artifacts and offline replay. Use it to repair public API friction. Then extend the same
-path to FilmFestival and Friends rather than copying independent pipelines.
+Extend the retained assessment profiles, including whole-film or neighboring-recall context
+where the Scala workflow supports them. Name the information available to each profile.
+Preserve an order-independent condition for organization research; labels from an
+order-sensitive pipeline cannot serve as independent evidence of recall order.
 
-Bring retained provider recovery, media observations, proposition/AMR, embedding caches and
-ONNX/WL backends, and interview/detail/episode workflows through their real consumers. Keep
-external tools optional and compatibility in explicit, nondestructive adapters. This plan does
-not require paid calls or authorize new participant-data use.
+**Exit:** a saved comparison runs the same inputs with lexical-only, added semantic and
+structured evidence, reporting retrieval, local ranking and decoding separately. Distinguish
+backend absence, abstention, missing features, inadmissibility and measured scores. A new
+channel must reach an actual candidate/cost or assessment consumer. Correctness controls
+establish behavior; improved accuracy requires its own evaluation. Prior completed assessments
+are preserved when a new profile is run.
 
-**Acceptance:** commands work outside the checkout; interrupted runs resume against matching
-inputs; offline replay reproduces outputs; malformed and foreign artifacts fail clearly.
-Each specialized family has a construction and consuming workflow. Document compatibility
-with existing artifacts, caches and model assets. Separate operational qualification on actual
-study data from the synthetic integration proof.
+### 4. Retained numerical methods and useful scientific outputs — P4
 
-### 5. Inspect results and close full parity — P6
+Select each method from working Scala producers, callers and tests. Port retained refinement,
+actual duration behavior and other alignment/transport operations without treating the name
+Graph-HSMM as proof that every duration feature exists. Start independent methods as soon as
+their inputs are stable.
 
-**Deliver:** React inspection of linked source/recall evidence, hypotheses, contexts, missingness,
-timing and channel diagnostics, then saved artifact-bound investigations, accessible interaction
-and permission-checked exports. A minimal inspector can be used earlier when it resolves a
-computational debugging need. Python owns all scientific values; TypeScript owns interaction
-and rendering. Look-and-feel refinement follows computational usefulness.
+Next connect aligned feature tracks, windows and derivation dependencies to native-coordinate
+exposure/projection, recall-onset linkage and trajectory/concentration outputs. Reuse the
+existing exact temporal allocation. Add native media order and declared measurement eligibility
+to organization readouts. Complete retained calibration/evaluation machinery without conflating
+raw scores, transport mass, model-conditional posterior and calibrated probability.
 
-**Acceptance:** the preservation map accounts for every working, nonredundant, nonstale Scala
-capability with a Python entry point, executable workflow, behavioral check and compatibility
-or deliberate-improvement rationale. Compare old artifacts and researcher workflows, not class
-counts. Any proposed exclusion needs source/caller/test evidence; uncertain capabilities stay
-owed. Full parity is established only after the remaining obligations across P2–P6 are closed.
+**Exit per method:** an installed account-to-output example, an independent small-case oracle,
+a pinned Scala comparison where runnable, declared assumptions/missingness, and runtime/memory
+measurements on specified sparse input sizes. Deliberate behavior corrections get a versioned
+contract and discriminating regression. Do not manufacture timing, impute silently or hide
+weak content evidence with an order prior. Calibration machinery can be ported before a new
+calibration claim is scientifically qualified.
+
+### 5. Study workflows, specialized coverage and React inspection — P5/P6
+
+Start a complete Sherlock-contract workflow on admitted synthetic adapter fixtures after
+delivery 2: intake → independent construction → mapping/assessment or structured inference →
+analysis → saved artifacts and replay. Use this to expose API friction early. Extend the same
+path to FilmFestival and Friends rather than creating separate orchestration stacks.
+
+Complete retained provider recovery, media acquisition, proposition/AMR, embedding caches and
+ONNX/WL, interview/detail/episode and corpus/feature integrations through real consumers.
+Document compatibility with existing recordings and model assets. These remain owed even if
+they are outside the first study workflow; paid calls and new participant-data use are not
+required by this engineering plan.
+
+Build the minimal React inspector against saved Python outputs when it helps these workflows:
+linked source/recall/detail selection, evidence/context, alternatives, processing gaps, timing
+and diagnostics. Then add saved artifact-bound investigations, accessible interaction and
+permission-checked export. Python owns scientific values; TypeScript handles interaction and
+rendering. Visual refinement follows usable computation.
+
+**Exit:** installed commands work outside the checkout; offline replay reproduces results;
+interrupted runs resume only against matching inputs; foreign/malformed artifacts fail clearly.
+Each retained specialized family has a construction and consuming path. Finish the capability
+audit against Scala and StoryAtlas workflows, with no unexplained losses. Any exclusion cites
+code, callers and tests establishing redundancy, staleness or a broken implementation; a useful
+promised capability still needs repair or replacement. Uncertain cases remain owed.
 
 ## Keep development fast and the design coherent
 
