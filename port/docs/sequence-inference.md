@@ -66,12 +66,15 @@ infinity or claiming no path exists. Even within range, a huge absolute log norm
 round away a small correction; posterior probabilities are computed before that conversion.
 
 State and edge enumeration order cannot change the numeric output. The request digest still
-binds the exact supplied ordering. Viterbi uses the greatest Scala-style rendered predecessor
+binds the supplied row/edge ordering; facet sets are canonicalized. Viterbi uses the greatest
+Scala-style rendered predecessor
 key, and then final-state key, when scores differ by at most `1e-28 * n` in absolute log weight.
-Content identity breaks collisions in rendered keys. This is an explicit numerical tie rule,
+Rendered keys compare UTF-16 units, including non-BMP identifiers, as in Scala. Content identity
+breaks collisions in rendered keys. This is an explicit numerical tie rule,
 not a guarantee of exact real-arithmetic comparison or globally lexicographic path ordering.
 
-Inputs and copied objects are revalidated at public consumption. `verify_sequence` checks the
+Inputs and copied objects are revalidated at public consumption before serialization can
+coerce their values. `verify_sequence` checks the
 entire result by recomputing against a separately supplied request. A digest or internally
 consistent result alone does not authenticate its source. CLI result export also checks the
 request's producer grant. No output becomes a reference binding, fidelity grade or calibrated

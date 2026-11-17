@@ -88,7 +88,7 @@ class SequenceState(Model):
         return "sequence-state:" + digest(self.model_dump(mode="json"))
 
     @property
-    def sort_key(self) -> tuple[str, str]:
+    def sort_key(self) -> tuple[bytes, str]:
         """Scala's rendered key order, with content identity breaking ambiguous encodings."""
         if self.external is not None:
             key = "ext:" + _scala_name(self.external)
@@ -96,7 +96,7 @@ class SequenceState(Model):
             key = f"{self.anchor_kind}/{self.anchor}"
             if self.facets:
                 key += "/distorted/" + ",".join(_scala_name(f) for f in self.facets)
-        return key, self.id
+        return key.encode("utf-16-be"), self.id
 
 
 class StateCost(Model):
@@ -258,8 +258,11 @@ class SequenceResult(Model):
 
 def validate_sequence(value: SequenceRequest | str | bytes) -> SequenceRequest:
     """Revalidate all input relationships, including unchecked model_copy changes."""
-    raw = value.model_dump_json() if isinstance(value, SequenceRequest) else value
-    return SequenceRequest.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, SequenceRequest):
+        # Serialization can coerce forged bools to floats and discard unknown fields.
+        # Revalidate Python values before any serialization (including nested copies).
+        return SequenceRequest.model_validate(value)
+    return SequenceRequest.model_validate_json(canonical(strict_json(value)))
 
 
 _NEG_INF = Decimal("-Infinity")
@@ -454,8 +457,11 @@ def verify_sequence(
     request: SequenceRequest | str | bytes, value: SequenceResult | str | bytes
 ) -> SequenceResult:
     """Recompute externally supplied results against independently supplied exact inputs."""
-    raw = value.model_dump_json() if isinstance(value, SequenceResult) else value
-    supplied = SequenceResult.model_validate_json(canonical(strict_json(raw)))
+    supplied = (
+        SequenceResult.model_validate(value)
+        if isinstance(value, SequenceResult)
+        else SequenceResult.model_validate_json(canonical(strict_json(value)))
+    )
     expected = infer_sequence(request)
     if supplied != expected:
         raise ValueError("sequence result differs from recomputed input-bound result")

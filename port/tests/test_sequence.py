@@ -21,6 +21,7 @@ from storymodel.sequence import (
     validate_sequence,
     verify_sequence,
 )
+from storymodel.serialization import canonical
 
 
 def source(anchor: str) -> SequenceState:
@@ -488,6 +489,100 @@ def test_roundoff_stochastic_rows_are_normalized_but_material_errors_refuse():
     )
     with pytest.raises(ValueError, match="sum to one"):
         SequenceRequest(rows=rows, transitions=(transition("x", "y", (s, a, 0.5), (s, b, 0.51)),))
+
+
+def test_viterbi_ties_use_scala_utf16_order_for_valid_unicode_ids():
+    bmp, supplementary = source("\ue000"), source("\U00010000")
+    # Scala compares UTF-16 units, for which D800 < E000; Python code-point order differs.
+    for states in ((bmp, supplementary), (supplementary, bmp)):
+        request = SequenceRequest(rows=(row("unicode", *((state, 0) for state in states)),))
+        assert infer_sequence(request).best_path == (bmp.id,)
+
+
+def test_model_copies_cannot_smuggle_boolean_numbers_through_serialization():
+    a, b = source("a"), source("b")
+    request = SequenceRequest(
+        rows=(row("x", (a, 0)), row("y", (b, 0))),
+        transitions=(transition("x", "y", (a, b, 1)),),
+    )
+    result = infer_sequence(request)
+    assert verify_sequence(request, result) == result
+    assert verify_sequence(request.model_dump_json(), result.model_dump_json()) == result
+    invalid_requests = (
+        request.model_copy(update={"temperature": True}),
+        request.model_copy(
+            update={
+                "rows": (
+                    request.rows[0].model_copy(
+                        update={
+                            "costs": (request.rows[0].costs[0].model_copy(update={"cost": False}),)
+                        }
+                    ),
+                    request.rows[1],
+                )
+            }
+        ),
+        request.model_copy(
+            update={
+                "transitions": (
+                    request.transitions[0].model_copy(
+                        update={
+                            "edges": (
+                                request.transitions[0]
+                                .edges[0]
+                                .model_copy(update={"probability": True}),
+                            )
+                        }
+                    ),
+                )
+            }
+        ),
+    )
+    for forged in invalid_requests:
+        # Python-mode dumping preserves the forged types, unlike JSON-mode serialization.
+        raw = canonical(forged.model_dump(mode="python", warnings=False))
+        for value in (forged, raw):
+            with pytest.raises(ValueError):
+                infer_sequence(value)
+    for forged in (
+        result.model_copy(update={"log_normalizer": False}),
+        result.model_copy(update={"best_path_log_weight": False}),
+        result.model_copy(
+            update={
+                "posterior": (
+                    result.posterior[0].model_copy(
+                        update={
+                            "mass": (
+                                result.posterior[0]
+                                .mass[0]
+                                .model_copy(update={"probability": True}),
+                            )
+                        }
+                    ),
+                    result.posterior[1],
+                )
+            }
+        ),
+        result.model_copy(
+            update={
+                "flow": (
+                    result.flow[0].model_copy(
+                        update={
+                            "mass": (
+                                result.flow[0].mass[0].model_copy(update={"probability": True}),
+                            )
+                        }
+                    ),
+                )
+            }
+        ),
+    ):
+        raw = canonical(forged.model_dump(mode="python", warnings=False))
+        for value in (forged, raw):
+            with pytest.raises(ValueError):
+                verify_sequence(request, value)
+    with pytest.raises(ValueError):
+        infer_sequence(request.model_copy(update={"unexpected_field": 1}))
 
 
 def test_strict_boundary_rejects_forgery_nonfinite_and_bad_topology():
