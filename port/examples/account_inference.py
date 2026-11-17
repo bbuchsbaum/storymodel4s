@@ -11,9 +11,13 @@ from typing import Literal
 from storymodel import (
     LocalEvidenceSpec,
     RecallSelection,
+    ReconstructionPolicy,
+    ReconstructionSpec,
     infer_accounts,
     make_account,
+    reconstruct_accounts,
     verify_account_inference,
+    verify_account_reconstruction,
 )
 from storymodel.artifacts import publish_json
 from storymodel.model import Context, Document, Entity, Participation, Span, State, Support, Unit
@@ -88,6 +92,15 @@ def run(output: Path) -> None:
             if c.unit == unit.id and c.target == source.states[0].id
         )
         assert cell.state.facets == facets
+    reconstruction_spec = ReconstructionSpec(
+        roots={row.id: rank for rank, row in enumerate(source.units)},
+        policy=ReconstructionPolicy(order="nondecreasing"),
+    )
+    reconstruction = reconstruct_accounts(
+        source, recall, spec, reconstruction_spec, inference=result
+    )
+    assert reconstruction.inference == result
+    verify_account_reconstruction(source, recall, spec, reconstruction_spec, reconstruction)
     output.mkdir(parents=True, exist_ok=False)
     for name, artifact in (
         ("source", source),
@@ -96,6 +109,8 @@ def run(output: Path) -> None:
         ("evidence", result.evidence),
         ("request", result.evidence.sequence.request),
         ("inference", result),
+        ("reconstruction-spec", reconstruction_spec),
+        ("reconstruction", reconstruction),
     ):
         publish_json(output / f"{name}.json", artifact.model_dump(mode="json"))
     print("Saved 3 inferred units: ordinary, role-reversed and polarity-conflicting controls.")

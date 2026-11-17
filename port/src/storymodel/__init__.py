@@ -39,6 +39,19 @@ from .local_evidence import (
     verify_local_evidence,
 )
 from .model import Account, account_digest, validate_account
+from .reconstruction import (
+    AccountReconstructionResult,
+    FillTarget,
+    ReconstructionMass,
+    ReconstructionPolicy,
+    ReconstructionRow,
+    ReconstructionSpec,
+    prepare_reconstruction_fill,
+    reconstruct_accounts,
+    reconstruct_rows,
+    verify_account_reconstruction,
+    verify_reconstruction,
+)
 from .relations import admit_relations, relation_table, verify_relations
 from .rich_account import RichAccount, pair_rich_accounts, situation_table, upgrade_account
 from .rich_construction import compile_rich_construction, prepare_rich_construction
@@ -60,6 +73,17 @@ from .source_workflow import SourceRecording, import_source, replay_source
 __version__ = "0.1.0"
 
 __all__ = [
+    "AccountReconstructionResult",
+    "FillTarget",
+    "ReconstructionPolicy",
+    "ReconstructionRow",
+    "ReconstructionMass",
+    "ReconstructionSpec",
+    "prepare_reconstruction_fill",
+    "reconstruct_accounts",
+    "reconstruct_rows",
+    "verify_account_reconstruction",
+    "verify_reconstruction",
     "Account",
     "AlignmentPolicy",
     "Analysis",

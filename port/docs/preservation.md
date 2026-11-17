@@ -419,3 +419,20 @@ Remaining: charts/structural evidence and providers, outcome/cause slots, nomina
 multi-proposition composition, retained candidate/refinement/reconstruction algorithms and
 scientific readouts. No semantic accuracy, calibrated probability or full Scala workflow
 parity follows from these engineering controls. [Contract](local-evidence.md).
+
+## P4 explicit reconstruction (2026-11-17)
+
+Reference: `align/reconstruction.scala` (`Grouping`, `FillRequest`, `DecisionPolicy`, `decide`),
+`matrix.scala` anchor/state maxima, `source.scala` leaf semantics, `MappingPipeline` and
+`ReconstructionPolicySuite`. Python `reconstruction.py` exposes checked supplied-weight decoding
+and a complete account-inference wrapper, verifiers, CLI and an extended account example.
+Mote: `bd-01M7M8507GW8DF5H62F27A4JHR`.
+
+Preserve hierarchy-derived membership; disjoint ranked roots; unconstrained, nondecreasing and
+penalized-backward policies; distinct raw/selected maxima; explicit input-bound fill;
+noncandidate zero mass; immutable evidence and diagnostics. Historical transition scaling is
+expressible through the existing explicit evidence weights, without a parallel profile model.
+Python improvements: memoized ancestry, accurately summed mass and wide score intermediates,
+strict object/JSON admission and complete input-bound recomputation. No automatic reference or
+fidelity promotion. [Contract](reconstruction.md). Refinement, complete evidence providers and
+organization/scientific readouts remain owed; source review is not executed Scala parity.

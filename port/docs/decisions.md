@@ -261,3 +261,14 @@ a cost override, selecting the first of multiple recall situations, treating abs
 zero distance, equating candidate failure with categorical external reference, or adding an
 embedding/service dependency before the content contract works. The named profile and its
 remaining capability obligations are in [local evidence](local-evidence.md).
+
+## Explicit reconstruction (P4, 2026-11-17)
+
+Provisional implementation choice: one pure additive decoder serves checked supplied weights
+and the account-inference convenience path. Ordinary functions and records replace the Scala
+profile/factory hierarchy. Keep grouping, order assumptions, fill intent and original posterior
+separate; require input-bound fill and recomputation at public consumption boundaries. Use
+memoized ancestry, sparse weights and wide score intermediates. Rejected alternatives: mutating
+reference/fidelity bindings from posterior choices, normalizing arbitrary supplied weights,
+implicit historical transition scaling, deriving hierarchy from part-of, and translating every
+Scala class into a Python class. See [reconstruction](reconstruction.md).

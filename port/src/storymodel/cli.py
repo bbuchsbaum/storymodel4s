@@ -56,6 +56,12 @@ from .local_evidence import (
     verify_account_inference,
 )
 from .model import Account, canonical
+from .reconstruction import (
+    AccountReconstructionResult,
+    ReconstructionSpec,
+    reconstruct_accounts,
+    verify_account_reconstruction,
+)
 from .relations import admit_relations, relation_table
 from .rich_account import RichAccount, situation_table, validate_rich_account
 from .rich_construction import prepare_rich_construction
@@ -390,10 +396,76 @@ def main(argv: list[str] | None = None) -> int:
             local.add_argument("--output")
         if name == "derive-local-evidence":
             local.add_argument("--request-only", action="store_true")
+    for name in ("reconstruct-accounts", "verify-account-reconstruction"):
+        reconstruction = commands.add_parser(
+            name, help="explicit reconstruction over account inference"
+        )
+        reconstruction.add_argument("source")
+        reconstruction.add_argument("recall")
+        reconstruction.add_argument("evidence_spec")
+        reconstruction.add_argument("spec")
+        reconstruction.add_argument("--source-sha256")
+        reconstruction.add_argument("--recall-sha256")
+        if name == "reconstruct-accounts":
+            reconstruction.add_argument("--inference")
+            reconstruction.add_argument("--output")
+        else:
+            reconstruction.add_argument("result")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
             emit(example_account().model_dump(mode="json"), args.output)
+        elif args.command in ("reconstruct-accounts", "verify-account-reconstruction"):
+            reconstruction_source = read_supported_account(
+                Path(args.source), expected_sha256=args.source_sha256
+            )
+            exporting = args.command == "reconstruct-accounts"
+            if exporting and reconstruction_source.export_permission != "allowed":
+                raise PermissionError("producer denies source reconstruction export")
+            reconstruction_recall = read_supported_account(
+                Path(args.recall), expected_sha256=args.recall_sha256
+            )
+            if exporting and reconstruction_recall.export_permission != "allowed":
+                raise PermissionError("producer denies recall reconstruction export")
+            reconstruction_evidence_spec = LocalEvidenceSpec.model_validate_json(
+                canonical(strict_json(Path(args.evidence_spec).read_bytes()))
+            )
+            reconstruction_spec = ReconstructionSpec.model_validate_json(
+                canonical(strict_json(Path(args.spec).read_bytes()))
+            )
+            if exporting:
+                prior_inference = (
+                    AccountInferenceResult.model_validate_json(
+                        canonical(strict_json(Path(args.inference).read_bytes()))
+                    )
+                    if args.inference
+                    else None
+                )
+                reconstruction_result = reconstruct_accounts(
+                    reconstruction_source,
+                    reconstruction_recall,
+                    reconstruction_evidence_spec,
+                    reconstruction_spec,
+                    inference=prior_inference,
+                )
+                emit(reconstruction_result.model_dump(mode="json"), args.output)
+            else:
+                verified_reconstruction = verify_account_reconstruction(
+                    reconstruction_source,
+                    reconstruction_recall,
+                    reconstruction_evidence_spec,
+                    reconstruction_spec,
+                    AccountReconstructionResult.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    ),
+                )
+                emit(
+                    {
+                        "valid": True,
+                        "source_sha256": verified_reconstruction.reconstruction.source_sha256,
+                    },
+                    None,
+                )
         elif args.command in (
             "derive-local-evidence",
             "infer-accounts",
