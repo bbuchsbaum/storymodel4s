@@ -341,6 +341,10 @@ Each part has a named test and a mutant.
   - A, `clear-frame`: the unit's frame and its pass-2 references are dropped.
   - B, `incoming-frame`: as A, and the unit then takes the next framed unit's film when that
     is different.
+- **A floor on the frame fallback** (`frame_floor` 0.01). This was found when the first
+  stage-2 scoring failed: a certain frame gave the gold work zero fallback mass. The frame
+  fallback is now mixed with the duration prior at 0.01, so every work keeps positive mass. A
+  null producer still scores the baseline exactly.
 - **Split, recorded before any call**
   (`data/study/recall-precision/cs2/filmfestival/stage2-20261117/split.json`). The ten coded
   development participants are sorted by `sha256("cs2-stage2-split-20261117:" + id)`.

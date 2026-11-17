@@ -24,6 +24,7 @@
   "old_rules": {"fallback": "duration", "talk": "state-map-v1", "talk_work_variant": "identifying", "cross_scene_broad": "work-node", "film_level_baseline": "flat", "mismatch_rule": "none"},
   "rules_note": "revision 2026-11-17 after the ML and linguistics critiques; old_rules kept for comparison only",
   "lopo_nonfilm_alpha": 0.5,
+  "frame_floor": 0.01,
   "hmm_beta": 8.0,
   "epsilon_sensitivity": [0.001, 0.01, 0.05],
   "allocation": "units",

@@ -419,6 +419,14 @@ MUTANTS = [
         test="test_pass1_v2_talk_frame_and_address",
     ),
     dict(
+        id="M49",
+        guard="the frame fallback keeps a duration floor on every work",
+        file="cs2/baselines.py",
+        edits=[("    work = {w: (1 - floor) * (mix.get(w, 0.0) + rest * p) + floor * p\n",
+                "    work = {w: (mix.get(w, 0.0) + rest * p)\n")],
+        test="test_frame_fallback_floor_keeps_every_work_positive",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

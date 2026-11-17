@@ -201,7 +201,7 @@ def lopo_nonfilm_rate(gold_by_participant: dict, participant: str, cfg) -> float
     return (k + a) / (n + 2 * a)
 
 
-def frame_fallback(dur: Forecast, mix: dict) -> Forecast:
+def frame_fallback(dur: Forecast, mix: dict, floor: float = 0.0) -> Forecast:
     """Fallback that spreads unassigned mass over the producer's own frame film first, then by
     duration within it: P(w) = mix(w) + (1 - sum mix) dur(w); scenes within a work by duration.
     An empty mix is the duration prior itself (the same object, so a null producer is exact)."""
@@ -211,7 +211,10 @@ def frame_fallback(dur: Forecast, mix: dict) -> Forecast:
     if total > 1:  # declared: frame weights summing above 1 are normalised to sum to 1
         mix = {w: v / total for w, v in mix.items()}
     rest = max(0.0, 1 - math.fsum(mix.values()))
-    work = {w: mix.get(w, 0.0) + rest * p for w, p in dur.work.items()}
+    # declared floor (config frame_floor): (1 - floor) of the frame fallback plus floor of the
+    # duration prior, so every work keeps positive fallback mass when the frame is certain
+    work = {w: (1 - floor) * (mix.get(w, 0.0) + rest * p) + floor * p
+            for w, p in dur.work.items()}
     return Forecast(work, dur.scene, dur.nonfilm)
 
 

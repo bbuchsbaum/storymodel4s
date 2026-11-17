@@ -1275,6 +1275,18 @@ def test_switch_timing_early_and_late():
     assert st["film_switch_f1"]["f1"] == 0.0 and st["film_switch_f1"]["f1_tolerance_1_row"] == 1.0
 
 
+def test_frame_fallback_floor_keeps_every_work_positive():
+    # a certain frame on B (weight 1) with floor f: F(A) = f dur(A) > 0
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    f = CFG["frame_floor"]
+    fb = B.frame_fallback(dur, {"B": 1.0}, f)
+    close(fb.p_work("A"), f * dur.p_work("A"))
+    close(fb.p_work("B"), (1 - f) + f * dur.p_work("B"))
+    assert all(v > 0 for v in fb.work.values())
+    assert B.frame_fallback(dur, {}, f) is dur
+
+
 # ---------------------------------------------------------------- runner
 
 

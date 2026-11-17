@@ -196,7 +196,7 @@ def score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa, windows=None):
         ld = LocationDistribution.from_words(acc, acc.words[(p, s)], bins_of(rows),
                                              cfg["allocation"], rules["cross_scene_broad"])
         mixes = row_frame_mixes(acc, (p, s), rows)
-        fbs = [B.frame_fallback(durs[p], m) for m in mixes]
+        fbs = [B.frame_fallback(durs[p], m, cfg["frame_floor"]) for m in mixes]
         p1map[(p, s)] = fbs
         pmap[(p, s)] = SC.producer_forecasts(
             ld, durs[p], cfg, fbs if rules["fallback"] == "frame-film" else None)
@@ -215,7 +215,7 @@ def score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa, windows=None):
         rows = [g for g in gold[p] if g.session == s]
         ld = LocationDistribution.from_words(null, null.words[(p, s)], bins_of(rows),
                                              cfg["allocation"], rules["cross_scene_broad"])
-        fbs = [B.frame_fallback(durs[p], m) for m in row_frame_mixes(null, (p, s), rows)]
+        fbs = [B.frame_fallback(durs[p], m, cfg["frame_floor"]) for m in row_frame_mixes(null, (p, s), rows)]
         nmap[(p, s)] = SC.producer_forecasts(
             ld, durs[p], cfg, fbs if rules["fallback"] == "frame-film" else None)
     nsc = score_map(comp, gold, nmap, cfg, wa)
