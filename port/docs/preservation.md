@@ -634,3 +634,37 @@ The installed and mutation scripts are under `evidence/context-fidelity-*.py`.
 Retained limits: text-only evidence; hypothesis-owned grade citations; attributed semantic
 dependence and grades, not certified truth; no cross-document identity bridge, generic neighboring
 recall profile, native assessment or reassessment-history operation. [Contract](context-fidelity.md).
+
+## P3 native-source/text-recall assessment and coverage
+
+Scala reference: `core/support.scala` (`PlaybackSupport`, `PrimaryProjection`) retains exact
+interval/point unions and explicit axes. `align/claimassessment.scala` retains separate
+availability, support/counterevidence and unresolved comparison outcomes. This slice connects
+native supports to the Python conditional-grade path; it does not claim an executed Scala
+native grading equivalent or change the fixed-question claim-assessment profile.
+
+Python path: explicit `upgrade_assessment_account` to v8, native request/result profiles through
+`prepare_mapping`/`resolve_mapping` and `prepare_fidelity`/`resolve_fidelity`, existing import/replay,
+and `analysis.project`. `native_assessment.py` renders source-only symbolic observations and
+checks situation citations. Every media origin participates in modality checks and recipe
+binding. Native recall remains refused even when a selected unit is textual. Source row
+coverage now consumes lawful native grades; duration coverage is a separate computation.
+
+The same graph/binding implementation supports both modalities. V8 permits playback assessment
+evidence; v6/v7 reject it on copied objects and raw wire input. Frozen v7 schema remains available;
+current mixed rich-envelope schemas additionally declare v8. Existing text prompt/reply/data
+behavior remains compatible. The exact reply retains source-situation citations while stored
+assessments preserve canonical support unions, including explicit points.
+
+Evidence paths: `tests/test_native_assessment.py`, `tests/test_native_assessment_version.py`,
+`examples/native_assessment_workflow.py`, and `evidence/native-assessment-{installed,mutations}.py`.
+The example extends playback construction and independently admits recall details before pairing;
+one unchanged source feeds two recalls and actual mapping/fidelity/three-view consumers.
+Tests distinguish a situation gap from a target gap, wrong sources, point-to-duration invention,
+shared joint-target support, protected completed slots and hidden recall media. No raw
+participant material or provider call is involved.
+
+Remaining: native recall details; native holder/identity-dependent assessment; native numerical
+inference; actual perception/acquisition; complete semantic, feature, study and inspection
+coverage. Supplied observations and scripted grades establish engineering contracts, not
+scientific truth or audiovisual accuracy. [Contract](native-assessment.md).

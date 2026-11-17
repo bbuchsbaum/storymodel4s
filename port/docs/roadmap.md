@@ -6,7 +6,8 @@ Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
 This is the current **port** execution direction, refreshed on 2026-11-17 through
 the account-derived inference, reconstruction, organization, native playback, chronology and
-context-aware fidelity workflows. The execution queue below was refreshed against the checkout on 2026-11-17.
+context-aware fidelity and native-source assessment workflows. The execution queue below was
+refreshed against the checkout on 2026-11-17.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -44,7 +45,9 @@ verified identity and event/state inspection. [Holder-dependent identity](held-i
 now supplies a checked second pass and final role readout. [Full context vocabulary](contexts.md)
 adds explicit v5 construction and holderless-scope behavior. [Native playback](playback.md)
 now adds supplied media observations, document-free v6 construction and exact support readouts.
-Media-aware assessment, full clock/anchor coverage and semantic channels remain owed. Mote owns
+The explicit [native assessment path](native-assessment.md) now maps and grades text recall
+against supplied source observations and feeds row coverage. Native recall, holder-aware native
+assessment, full clock/anchor coverage and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -235,8 +238,8 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through contextual fidelity source `3e8e7367c`, corrective
-commit `5a98a3d59` and their local qualification.
+Refreshed 2026-11-17 through native-source assessment source `8fdd57013` and its
+local qualification, following contextual fidelity `3e8e7367c` / `5a98a3d59`.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -257,8 +260,8 @@ exact text/native support, checked queries and v2 projection/local-evidence cons
 [Evidence](../evidence/hierarchy.json) records the full suite, installed workflow, mutations and
 independent review. This closes primary grouping, not auxiliary memberships or boundary beliefs.
 The historical `scenes.py` operation keeps its documented reidentification behavior; new grouping
-uses the checked hierarchy artifact. Native construction and queries work, while native numerical
-mapping and assessment remain explicitly unsupported.
+uses the checked hierarchy artifact. Native construction and queries work; native numerical
+inference remains unsupported. The qualified observation-based assessment path is described below.
 
 [Story-world chronology](chronology.md), source `f2610fcb1`, now adds v7 temporal claims,
 sparse interval consistency, actual cited-premise entailment and dependency-sensitive queries.
@@ -276,26 +279,30 @@ agreement, five compiled mutations and cold review. Review found and closed a CR
 defect; exact input recordings now survive CLI preparation. Legacy v1 artifacts remain identical.
 These checks establish admission and preservation behavior, not semantic grading accuracy.
 
-**Next implementation action:** complete the native-source/text-recall mapping and assessment
-path. Preserve exact media evidence,
-processing missingness and the existing unit-only input condition under named recipes. Do not
-remove text-only guards before implementing actual native evidence and downstream consumption.
+[Native-source/text-recall assessment](native-assessment.md), source `8fdd57013`, now completes
+the supplied-observation path through mapping, conditional fidelity, replay and row coverage.
+V8 retains exact playback supports; older versions refuse native grade evidence. One unchanged
+source feeds two recorded recalls. [Evidence](../evidence/native-assessment.json) records 894
+tests, installed API/CLI agreement, legacy replay compatibility and cold review. This is symbolic
+observation assessment, not raw audiovisual perception or native holder-aware reasoning.
+
+**Next implementation action:** add one retained semantic channel to the existing sparse
+candidate/local-evidence interface, with model/space/cache identity and a real inference consumer.
+Use the connected workflows to simplify public calls where repetition is demonstrated.
 
 ### Immediate work queue
 
 These are the next bounded work units inside the deliveries below, not additional phases.
 
-1. **Connect native evidence to useful assessment.** Extend the checked context/holder-aware
-   construction-to-analysis example with a native-source/text-recall path. Keep
-   narrative reference, referent reference and conditional fidelity separate. Reuse one source
-   unchanged across two recalls and produce the same three analysis views through API and CLI.
-   This continues Delivery 2 after contextual fidelity; it does not wait for every P2 graph
-   family. Consolidate the public calls exposed by this journey before adding another wrapper.
-2. **Add one semantic channel with a real consumer.** Bind model/space/cache identity, nominate
+1. **Add one semantic channel with a real consumer.** Bind model/space/cache identity, nominate
    candidates sparsely, and retain channel-specific evidence and unavailable/search-limited
    outcomes. Compare lexical-only and semantic variants on the same saved inputs, with separate
    retrieval, ranking and decoding diagnostics. Use recorded/local inputs for engineering
    qualification; a live provider or demonstrated accuracy gain is not an acceptance condition.
+2. **Complete connected graph and target coverage.** Continue causal/referential/entity
+   relations, auxiliary hierarchy, recall grouping/discourse and retained event/episode targets.
+   Add each through a producer and an actual consumer. Consolidate repeated public-call patterns
+   in the connected text/native journeys; do not add another orchestration layer.
 
 Between these workflow deliveries, complete causal/referential/entity relations, auxiliary
 hierarchy and recall grouping/discourse in bounded slices using the same examples. Move a family
@@ -360,9 +367,9 @@ attribution → admit details → map references → assess conditional fidelity
 analysis views. Keep the lightweight annotation/direct route usable independently of rich graphs.
 
 Context/holder evidence is now connected to assessment under an explicit expanded condition.
-Next add native-evidence reference and assessment consumers, with explicit cross-modal
-identity/coordinate rules. Preserve unsupported
-modality and missing evidence until those paths exist. Complete event/episode target handling
+Native-source/text-recall reference, assessment and row-coverage consumers are now connected
+under the explicit supplied-observation profile. Cross-modal identity, native recall and native
+holder-aware grading remain unsupported rather than inferred. Complete event/episode target handling
 and retained identity/number rules in bounded slices as their consumers require them.
 
 Consolidate the public API at this point. Researchers should supply observations, proposals and
@@ -439,10 +446,10 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** native-source/text-recall mapping and assessment from Delivery 2. Establish
-  actual media assessment evidence and its downstream consumer before lifting text-only guards.
-  Split at a saved-artifact boundary; the larger connected-graph delivery remains incomplete.
-  Chronology and contextual fidelity are qualified local checkpoints.
+- **Next bead:** one retained semantic channel through sparse candidates/local evidence and
+  an actual inference consumer from Delivery 3. Keep missing channels, budget loss and raw
+  scores explicit. The larger graph/API, numerical, study and inspection deliveries remain open.
+  Chronology, contextual fidelity and native-source assessment are qualified local checkpoints.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.

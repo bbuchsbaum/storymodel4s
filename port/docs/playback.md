@@ -80,11 +80,12 @@ rich schemas broaden with the graph, while runtime validation checks version/fie
 Frozen schema export does not support a custom schema generator. The adapter preserves the
 canonical historical layout rather than promising every alternate Pydantic schema presentation.
 
-Text-dependent mapping, identity, assessment, alignment and analysis consumers currently refuse
-accounts containing media sources explicitly. They do not strip native evidence. Media-aware
-versions remain owed, along with clock maps/composition, shot/track anchors, acquisition,
-automatic holder/identity proposals and complete graph/detail construction. No new media tool,
-live provider call or participant data is needed for this supplied-observation path.
+Text-only profiles continue to refuse media rather than strip evidence. The explicit v8
+[native assessment path](native-assessment.md) now connects supplied source observations to
+text-recall mapping, conditional grading and row coverage. Native recall, native holder/identity
+resolution and numerical alignment remain owed, along with clock maps/composition, shot/track
+anchors, acquisition and complete graph/detail construction. No new media tool, live provider
+call or participant data is needed for this supplied-observation path.
 
 See [verification evidence](../evidence/playback.json) and the retained
 [mutation](../evidence/playback-mutations.py) and

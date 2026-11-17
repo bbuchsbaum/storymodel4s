@@ -1,0 +1,189 @@
+{
+  "scope": "Native source observations and text recall: recorded reference, conditional assessment and row coverage",
+  "source_commit": "8fdd57013a050454722b710835c2063b600c27ec",
+  "status": "locally qualified on task branch; not merged or pushed",
+  "information_condition": "Admitted symbolic source observations with native coordinates plus local text recall; no raw audiovisual access or native holder resolution",
+  "account_version": "v8; v7 declared schema frozen",
+  "checks": {
+    "tests": {
+      "command": ".venv/bin/pytest -q",
+      "passed": 894,
+      "failed": 0,
+      "seconds": 16.18
+    },
+    "mypy": {
+      "source_files": 59,
+      "passed": true
+    },
+    "ruff": {
+      "formatted_files": 150,
+      "passed": true
+    }
+  },
+  "installed": {
+    "installed_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_invocations": 21,
+    "api_cli_equal": true,
+    "example": {
+      "source_unchanged": true,
+      "recalls": 2,
+      "native_grade": "admitted",
+      "gap_grade": "rejected",
+      "scientific_accuracy_claim": false
+    },
+    "legacy_baseline": "3e06be43e",
+    "legacy_workflows": [
+      {
+        "example": "fidelity_workflow",
+        "artifacts": 33,
+        "bytes": 111959,
+        "identical": true
+      },
+      {
+        "example": "context_fidelity_workflow",
+        "artifacts": 47,
+        "bytes": 235854,
+        "identical": true
+      }
+    ],
+    "limits": "Combined rich schema declarations broaden; comparison covers saved workflow data/prompts/results, excluding recording execution internals."
+  },
+  "wheel": {
+    "sha256": "164576330e1ca8b414da5a934853b2a20025d1b3af27df43b133a664aa1cf84a",
+    "source_and_resource_files": 64,
+    "match_checkout": true
+  },
+  "mutations": [
+    {
+      "mutation": "situation-support",
+      "file": "native_assessment.py",
+      "old": "if not contained_in(citation.support, situation.evidence):",
+      "new": "if False and not contained_in(citation.support, situation.evidence):",
+      "test": "test_native_assessment.py::test_native_fidelity_refuses_forged_citations_without_changing_pending_slot[outside-situation]",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_native_assessment.py::test_native_direct_grade_accepts_exact_intervals_or_explicit_points[True]"
+      ],
+      "baseline": "3 passed in 0.39s",
+      "mutant": "1 failed, 2 passed in 0.42s",
+      "compiled": true
+    },
+    {
+      "mutation": "hidden-recall-media",
+      "file": "native_assessment.py",
+      "old": "if not account.media_sources or any(s.side != \"source\" for s in account.media_sources):",
+      "new": "if not account.media_sources:",
+      "test": "test_native_assessment.py::test_native_consumer_refuses_hidden_recall_media_even_with_selected_text_unit",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_native_assessment.py::test_native_direct_grade_accepts_exact_intervals_or_explicit_points[True]"
+      ],
+      "baseline": "3 passed in 0.39s",
+      "mutant": "1 failed, 2 passed in 0.41s",
+      "compiled": true
+    },
+    {
+      "mutation": "account-version-boundary",
+      "file": "model.py",
+      "old": "if self.schema_version != \"storymodel.account/v8\":",
+      "new": "if False and self.schema_version != \"storymodel.account/v8\":",
+      "test": "test_native_assessment_version.py::test_v8_native_assessment_evidence_cannot_be_downgraded_by_copy_or_raw_wire",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_native_assessment.py::test_native_direct_grade_accepts_exact_intervals_or_explicit_points[True]"
+      ],
+      "baseline": "3 passed in 0.39s",
+      "mutant": "1 failed, 2 passed in 0.43s",
+      "compiled": true
+    }
+  ],
+  "logs": {
+    "native-assessment-full-tests.log": {
+      "bytes": 1061,
+      "sha256": "1c2e80bf10c60282e03b76e4a559368b74bd18e6ec178cc802734c4a351d82e8"
+    },
+    "native-assessment-mypy.log": {
+      "bytes": 44,
+      "sha256": "960745a059df2e6bf5556b518f6404c7707247bf3da084d48c3008145eb95a5d"
+    },
+    "native-assessment-ruff.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "native-assessment-format.log": {
+      "bytes": 28,
+      "sha256": "16006ccc54d042d314cab75dd45b99fd6bc649a8eef755d9c74562102b097290"
+    },
+    "native-assessment-installed.log": {
+      "bytes": 824,
+      "sha256": "581c1ab3bd32be83396918a6cb40701fc56ff39921f1d2547f711d987db920ee"
+    },
+    "native-assessment-mutations.log": {
+      "bytes": 147,
+      "sha256": "cfdabdcd3eee3b6be9eea3260e3738a01105ac7f411c1c33e6c4557123a71442"
+    },
+    "native-assessment-independent.log": {
+      "bytes": 620,
+      "sha256": "ce328c6e6ed4c96196ca3b086860edc0f425532c091624dce7db4f8d29aac4c6"
+    }
+  },
+  "reproduction": [
+    ".venv/bin/pytest -q tests/test_native_assessment.py tests/test_native_assessment_version.py",
+    ".venv/bin/python examples/native_assessment_workflow.py data/new-native-example",
+    ".venv/bin/python evidence/native-assessment-mutations.py",
+    "Build wheel into data/dist; install into data/wheel-env; .venv/bin/python evidence/native-assessment-installed.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests .venv/bin/python -B evidence/native-assessment-independent.py"
+  ],
+  "remaining": [
+    "Native recall detail construction",
+    "Native holder/identity-dependent assessment",
+    "Native numerical inference",
+    "Retained semantic, graph, feature, study and inspection capabilities in P2-P6"
+  ],
+  "limits": [
+    "No live provider, participant data or Scala runtime comparison",
+    "Supplied observations and grades test contracts, not audiovisual or scientific accuracy",
+    "Current combined rich envelope schemas include v8; recorded legacy behavior compared separately"
+  ],
+  "cold_review": {
+    "reviewed_sha": "8fdd57013a050454722b710835c2063b600c27ec",
+    "verdict": "no BLOCK or new follow-up defect",
+    "targeted_tests_passed": 96,
+    "independent_checks": {
+      "support_oracle_cases": 527,
+      "registered_foreign_media_identities": 5,
+      "protected_shared_hypothesis_slots": 3,
+      "v6_v7_status_evidence_rejections": 10,
+      "external_citation_rejections": 3,
+      "replay_modality_export_checks": 4,
+      "total": 555,
+      "external_positive_controls": 3
+    },
+    "limits": [
+      "Reviewer did not independently rerun full suite, installed wheel or three mutants",
+      "Native holder/dependency correctness and semantic grading remain unqualified",
+      "Situation provenance verification requires original request and recorded reply",
+      "Original conditional baseline v7 schema comparison did not execute; parent retained probe now executes it unconditionally."
+    ],
+    "evidence_correction": "Three initial external cases used an invalid destination enum; excluded and replaced by three valid native-citation refusals plus three no-citation positive controls. Reviewer executed the corrected six checks.",
+    "reproducible_probe": "evidence/native-assessment-independent.py"
+  },
+  "retained_probe_rerun": {
+    "reviewed_sha": "8fdd57013a050454722b710835c2063b600c27ec",
+    "checks": {
+      "support_oracle_cases": 527,
+      "registered_foreign_sources": 5,
+      "protected_slot_states": 3,
+      "old_version_status_cases": 10,
+      "external_citation_refusals": 3,
+      "external_positive_controls": 3,
+      "workflow_checks": 4,
+      "frozen_schema_comparison": 1
+    },
+    "total": 556,
+    "frozen_v7_digest": "92a93c38e2379328b22fdc9d75b28a9e6fd1d35ddf0e03b5d7118d3003275759",
+    "result": "pass",
+    "retention_changes": "Corrected external destination, added external positive controls, made skipped schema comparison unconditional."
+  },
+  "shared_memory_note": "e6c18af2-03f8-4ccc-bdb4-5743be02fc53"
+}
