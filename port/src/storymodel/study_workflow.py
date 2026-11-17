@@ -138,7 +138,15 @@ def read_request(path: Path, *, expected_sha256: str | None = None) -> TimeStudy
     raw = path.read_bytes()
     if expected_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_sha256:
         raise ValueError("request bytes differ from external SHA-256")
-    return TimeStudy.model_validate_json(canonical(strict_json(raw)))
+    parsed = strict_json(raw)
+    if (
+        isinstance(parsed, dict)
+        and parsed.get("schema_version") == "storymodel.prepared-time-study/v1"
+    ):
+        from .intake_workflow import PreparedTimeStudy
+
+        return PreparedTimeStudy.model_validate_json(canonical(parsed)).request
+    return TimeStudy.model_validate_json(canonical(parsed))
 
 
 def request_digest(value: TimeStudy) -> str:

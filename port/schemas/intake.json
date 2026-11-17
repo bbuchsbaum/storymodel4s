@@ -1,0 +1,568 @@
+{
+  "native_source": {
+    "$defs": {
+      "ClipTransform": {
+        "additionalProperties": false,
+        "description": "clip_seconds = rate * (source_seconds - origin_seconds) + offset_seconds.",
+        "properties": {
+          "collection": {
+            "exclusiveMinimum": 0,
+            "title": "Collection",
+            "type": "integer"
+          },
+          "duration_seconds": {
+            "title": "Duration Seconds",
+            "type": "string"
+          },
+          "offset_seconds": {
+            "title": "Offset Seconds",
+            "type": "string"
+          },
+          "origin_seconds": {
+            "title": "Origin Seconds",
+            "type": "string"
+          },
+          "rate": {
+            "title": "Rate",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collection",
+          "origin_seconds",
+          "rate",
+          "offset_seconds",
+          "duration_seconds"
+        ],
+        "title": "ClipTransform",
+        "type": "object"
+      },
+      "NativePart": {
+        "additionalProperties": false,
+        "properties": {
+          "end_tick": {
+            "title": "End Tick",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "seconds_per_tick": {
+            "title": "Seconds Per Tick",
+            "type": "string"
+          },
+          "start_tick": {
+            "title": "Start Tick",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "start_tick",
+          "end_tick",
+          "seconds_per_tick"
+        ],
+        "title": "NativePart",
+        "type": "object"
+      },
+      "NativeRow": {
+        "additionalProperties": false,
+        "description": "An annotated row; scene/film target membership will be derived from these rows.",
+        "properties": {
+          "collection": {
+            "exclusiveMinimum": 0,
+            "title": "Collection",
+            "type": "integer"
+          },
+          "end_tick": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "End Tick"
+          },
+          "number": {
+            "exclusiveMinimum": 0,
+            "title": "Number",
+            "type": "integer"
+          },
+          "part": {
+            "minLength": 1,
+            "title": "Part",
+            "type": "string"
+          },
+          "scene": {
+            "exclusiveMinimum": 0,
+            "title": "Scene",
+            "type": "integer"
+          },
+          "start_tick": {
+            "title": "Start Tick",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "number",
+          "scene",
+          "collection",
+          "part",
+          "start_tick",
+          "target"
+        ],
+        "title": "NativeRow",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Participant-independent source timing; all large integers stay lossless strings.",
+    "properties": {
+      "clips": {
+        "items": {
+          "$ref": "#/$defs/ClipTransform"
+        },
+        "minItems": 1,
+        "title": "Clips",
+        "type": "array"
+      },
+      "key": {
+        "minLength": 1,
+        "title": "Key",
+        "type": "string"
+      },
+      "parts": {
+        "items": {
+          "$ref": "#/$defs/NativePart"
+        },
+        "minItems": 1,
+        "title": "Parts",
+        "type": "array"
+      },
+      "rows": {
+        "items": {
+          "$ref": "#/$defs/NativeRow"
+        },
+        "minItems": 1,
+        "title": "Rows",
+        "type": "array"
+      },
+      "schema_version": {
+        "const": "storymodel.native-source/v1",
+        "default": "storymodel.native-source/v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "tolerance_seconds": {
+        "title": "Tolerance Seconds",
+        "type": "string"
+      }
+    },
+    "required": [
+      "key",
+      "parts",
+      "rows",
+      "clips",
+      "tolerance_seconds"
+    ],
+    "title": "NativeSource",
+    "type": "object"
+  },
+  "prepared_study": {
+    "$defs": {
+      "ClipTransform": {
+        "additionalProperties": false,
+        "description": "clip_seconds = rate * (source_seconds - origin_seconds) + offset_seconds.",
+        "properties": {
+          "collection": {
+            "exclusiveMinimum": 0,
+            "title": "Collection",
+            "type": "integer"
+          },
+          "duration_seconds": {
+            "title": "Duration Seconds",
+            "type": "string"
+          },
+          "offset_seconds": {
+            "title": "Offset Seconds",
+            "type": "string"
+          },
+          "origin_seconds": {
+            "title": "Origin Seconds",
+            "type": "string"
+          },
+          "rate": {
+            "title": "Rate",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collection",
+          "origin_seconds",
+          "rate",
+          "offset_seconds",
+          "duration_seconds"
+        ],
+        "title": "ClipTransform",
+        "type": "object"
+      },
+      "Document": {
+        "additionalProperties": false,
+        "description": "A named source edition or recall session and its exact canonical text.",
+        "properties": {
+          "canonicalization": {
+            "const": "identity/v1",
+            "default": "identity/v1",
+            "title": "Canonicalization",
+            "type": "string"
+          },
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "side",
+          "text",
+          "sha256"
+        ],
+        "title": "Document",
+        "type": "object"
+      },
+      "NativePart": {
+        "additionalProperties": false,
+        "properties": {
+          "end_tick": {
+            "title": "End Tick",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "seconds_per_tick": {
+            "title": "Seconds Per Tick",
+            "type": "string"
+          },
+          "start_tick": {
+            "title": "Start Tick",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "start_tick",
+          "end_tick",
+          "seconds_per_tick"
+        ],
+        "title": "NativePart",
+        "type": "object"
+      },
+      "NativeRow": {
+        "additionalProperties": false,
+        "description": "An annotated row; scene/film target membership will be derived from these rows.",
+        "properties": {
+          "collection": {
+            "exclusiveMinimum": 0,
+            "title": "Collection",
+            "type": "integer"
+          },
+          "end_tick": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "End Tick"
+          },
+          "number": {
+            "exclusiveMinimum": 0,
+            "title": "Number",
+            "type": "integer"
+          },
+          "part": {
+            "minLength": 1,
+            "title": "Part",
+            "type": "string"
+          },
+          "scene": {
+            "exclusiveMinimum": 0,
+            "title": "Scene",
+            "type": "integer"
+          },
+          "start_tick": {
+            "title": "Start Tick",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "number",
+          "scene",
+          "collection",
+          "part",
+          "start_tick",
+          "target"
+        ],
+        "title": "NativeRow",
+        "type": "object"
+      },
+      "NativeSource": {
+        "additionalProperties": false,
+        "description": "Participant-independent source timing; all large integers stay lossless strings.",
+        "properties": {
+          "clips": {
+            "items": {
+              "$ref": "#/$defs/ClipTransform"
+            },
+            "minItems": 1,
+            "title": "Clips",
+            "type": "array"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/$defs/NativePart"
+            },
+            "minItems": 1,
+            "title": "Parts",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/$defs/NativeRow"
+            },
+            "minItems": 1,
+            "title": "Rows",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "storymodel.native-source/v1",
+            "default": "storymodel.native-source/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "tolerance_seconds": {
+            "title": "Tolerance Seconds",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "parts",
+          "rows",
+          "clips",
+          "tolerance_seconds"
+        ],
+        "title": "NativeSource",
+        "type": "object"
+      },
+      "PreparedRecall": {
+        "additionalProperties": false,
+        "description": "Checked intake receipt; call ``validate_prepared_recall`` at public consumption.",
+        "properties": {
+          "canonical_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Canonical Sha256",
+            "type": "string"
+          },
+          "canonical_text": {
+            "title": "Canonical Text",
+            "type": "string"
+          },
+          "document": {
+            "$ref": "#/$defs/Document"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "raw_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Raw Sha256",
+            "type": "string"
+          },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "recipe": {
+            "title": "Recipe",
+            "type": "string"
+          },
+          "separator_ranges": {
+            "items": {
+              "$ref": "#/$defs/Span"
+            },
+            "title": "Separator Ranges",
+            "type": "array"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/$defs/RecallOccurrence"
+            },
+            "minItems": 1,
+            "title": "Units",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "raw_text",
+          "raw_sha256",
+          "canonical_text",
+          "canonical_sha256",
+          "recipe",
+          "document",
+          "units",
+          "separator_ranges"
+        ],
+        "title": "PreparedRecall",
+        "type": "object"
+      },
+      "RecallOccurrence": {
+        "additionalProperties": false,
+        "description": "One sequential recall occurrence with exact canonical UTF-16 support.",
+        "properties": {
+          "support": {
+            "$ref": "#/$defs/Span"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "u": {
+            "minimum": 1,
+            "title": "U",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "u",
+          "text",
+          "support"
+        ],
+        "title": "RecallOccurrence",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "A replayable preparation artifact; derived requests are recomputed, never trusted fields.",
+    "properties": {
+      "chunk_size": {
+        "default": 50,
+        "exclusiveMinimum": 0,
+        "title": "Chunk Size",
+        "type": "integer"
+      },
+      "export_permission": {
+        "default": "denied",
+        "enum": [
+          "allowed",
+          "denied"
+        ],
+        "title": "Export Permission",
+        "type": "string"
+      },
+      "max_attempts": {
+        "default": 1,
+        "maximum": 3,
+        "minimum": 1,
+        "title": "Max Attempts",
+        "type": "integer"
+      },
+      "native_source": {
+        "$ref": "#/$defs/NativeSource"
+      },
+      "recall": {
+        "$ref": "#/$defs/PreparedRecall"
+      },
+      "schema_version": {
+        "const": "storymodel.prepared-time-study/v1",
+        "default": "storymodel.prepared-time-study/v1",
+        "title": "Schema Version",
+        "type": "string"
+      }
+    },
+    "required": [
+      "native_source",
+      "recall"
+    ],
+    "title": "PreparedTimeStudy",
+    "type": "object"
+  }
+}

@@ -77,9 +77,10 @@ and nonfinite values refuse JSON admission rather than being silently repaired.
 
 ## Remaining computational scope
 
-This workflow starts with supplied segmentation and clip intervals. It does not perform
-text segmentation, build clocks from native acquisition ticks, extract event/detail graphs,
-score candidate references or run graph-HSMM inference. The rich account API remains available
+The original profile starts with supplied segmentation and clip intervals. The subsequent
+[input-preparation slice](input-preparation.md) can now derive both from raw recall and native
+ticks. Neither path yet extracts event/detail graphs, scores candidate references or runs
+graph-HSMM inference. The rich account API remains available
 for those next slices. These synthetic parity cases establish engineering behavior, not
 the quality of a language model's mapping or a measured development-speed advantage.
 

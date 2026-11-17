@@ -13,6 +13,10 @@ The [recorded film-and-time workflow](docs/time-study-workflow.md) now runs supp
 units and raw synthetic Scala reply fixtures through parsing and exact scene resolution.
 Its semantic rows are checked against the pinned Scala output; no provider call is required.
 
+[Input preparation](docs/input-preparation.md) now starts that workflow from raw UTF-8 recall
+and native source ticks. It preserves raw/canonical identity, exact text spans and clock
+derivations, with no parallel mapper or UI dependency.
+
 ## Run it
 
 From this directory, with Python 3.12 and `uv`:

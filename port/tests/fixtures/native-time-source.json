@@ -1,0 +1,85 @@
+{
+  "schema_version": "storymodel.native-source/v1",
+  "key": "TimeStudyFixture/v1",
+  "parts": [
+    {
+      "key": "a",
+      "start_tick": "0",
+      "end_tick": "1000",
+      "seconds_per_tick": "1/10"
+    }
+  ],
+  "rows": [
+    {
+      "number": 1,
+      "scene": 1,
+      "collection": 1,
+      "part": "a",
+      "start_tick": "0",
+      "end_tick": "100",
+      "target": false
+    },
+    {
+      "number": 2,
+      "scene": 2,
+      "collection": 1,
+      "part": "a",
+      "start_tick": "100",
+      "end_tick": "300",
+      "target": true
+    },
+    {
+      "number": 3,
+      "scene": 3,
+      "collection": 1,
+      "part": "a",
+      "start_tick": "300",
+      "end_tick": "450",
+      "target": true
+    },
+    {
+      "number": 4,
+      "scene": 4,
+      "collection": 2,
+      "part": "a",
+      "start_tick": "500",
+      "end_tick": "600",
+      "target": false
+    },
+    {
+      "number": 5,
+      "scene": 5,
+      "collection": 3,
+      "part": "a",
+      "start_tick": "600",
+      "end_tick": "700",
+      "target": true
+    },
+    {
+      "number": 6,
+      "scene": 6,
+      "collection": 3,
+      "part": "a",
+      "start_tick": "700",
+      "end_tick": null,
+      "target": true
+    }
+  ],
+  "clips": [
+    {
+      "collection": 1,
+      "origin_seconds": "10",
+      "rate": "1",
+      "offset_seconds": "0.5",
+      "duration_seconds": "45"
+    },
+    {
+      "collection": 3,
+      "origin_seconds": "60",
+      "rate": "0.5",
+      "offset_seconds": "0",
+      "duration_seconds": "20"
+    }
+  ],
+  "tolerance_seconds": "2"
+}

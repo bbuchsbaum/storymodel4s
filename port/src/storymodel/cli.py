@@ -9,6 +9,7 @@ from .analysis import Analysis, Policy, project
 from .artifacts import publish_json, read_account
 from .demo import example_account
 from .execution import RecordedExecutionError
+from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
 from .study_workflow import (
     ImportedReplies,
@@ -59,6 +60,18 @@ def main(argv: list[str] | None = None) -> int:
     replay.add_argument("--expected-request-sha256")
     replay.add_argument("--expected-import-sha256")
     replay.add_argument("--output")
+    prepare = commands.add_parser(
+        "prepare-time-study", help="prepare raw recall and native source clocks"
+    )
+    prepare.add_argument("source")
+    prepare.add_argument("recall")
+    prepare.add_argument("--recall-key", required=True)
+    prepare.add_argument("--source-sha256")
+    prepare.add_argument("--recall-sha256")
+    prepare.add_argument("--chunk-size", type=int, default=50)
+    prepare.add_argument("--max-attempts", type=int, default=1)
+    prepare.add_argument("--allow-export", action="store_true")
+    prepare.add_argument("--output")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
@@ -68,6 +81,18 @@ def main(argv: list[str] | None = None) -> int:
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
                 args.output,
             )
+        elif args.command == "prepare-time-study":
+            prepared = prepare_time_study_files(
+                Path(args.source),
+                Path(args.recall),
+                args.recall_key,
+                expected_source_sha256=args.source_sha256,
+                expected_recall_sha256=args.recall_sha256,
+                chunk_size=args.chunk_size,
+                max_attempts=args.max_attempts,
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(prepared.model_dump(mode="json"), args.output)
         elif args.command in ("import-time-recording", "replay-time-study"):
             request = read_request(Path(args.request), expected_sha256=args.expected_request_sha256)
             if args.command == "import-time-recording":

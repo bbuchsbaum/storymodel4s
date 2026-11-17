@@ -62,3 +62,12 @@ reads expected outputs. A distinct result profile preserves coarse categorical s
 without inventing detail atoms, fidelity or source-row coverage. The new prompt/framing recipe
 rejects duplicate JSON keys and nonfinite values; historical harness prose extraction is not
 silently claimed as compatible. Source/recall keys and all execution settings bind replay.
+
+Input preparation (2026-11-16): add a checked preparation artifact containing native source
+timing and a raw recall receipt, with a derived property that produces the existing replay
+request. Rejected alternatives: a second mapping pipeline, or trusting a stored request next
+to unrelated raw inputs. Keep the earlier supplied-request schema/digest unchanged. Native
+timing accepts exact numeric strings and derives film/scene target membership from rows;
+reject final intervals reversed by zero anchoring even where Scala's pre-anchor guard permits
+them. Port only surface/clause segmentation now, with an explicit recipe and retained gaps;
+do not turn lexical heuristics into asserted event/detail semantics.
