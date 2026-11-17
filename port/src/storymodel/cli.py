@@ -9,6 +9,14 @@ from .analysis import Analysis, Policy, project
 from .artifacts import publish_json, read_account
 from .demo import example_account
 from .execution import RecordedExecutionError
+from .extraction import prepare_extraction
+from .extraction_workflow import (
+    ExtractionRecording,
+    extraction_prompt,
+    import_extraction,
+    read_extraction_request,
+    replay_extraction,
+)
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
 from .study_workflow import (
@@ -72,6 +80,33 @@ def main(argv: list[str] | None = None) -> int:
     prepare.add_argument("--max-attempts", type=int, default=1)
     prepare.add_argument("--allow-export", action="store_true")
     prepare.add_argument("--output")
+    extract_prepare = commands.add_parser(
+        "prepare-extraction", help="prepare raw recall extraction"
+    )
+    extract_prepare.add_argument("recall")
+    extract_prepare.add_argument("--recall-key", required=True)
+    extract_prepare.add_argument("--source-account")
+    extract_prepare.add_argument("--allow-export", action="store_true")
+    extract_prepare.add_argument("--output")
+    extract_prompt = commands.add_parser(
+        "extraction-prompt", help="write the recorded proposal contract"
+    )
+    extract_prompt.add_argument("request")
+    extract_prompt.add_argument("--output")
+    extract_import = commands.add_parser(
+        "import-extraction", help="record an exported extraction reply"
+    )
+    extract_import.add_argument("request")
+    extract_import.add_argument("reply")
+    extract_import.add_argument("recording")
+    extract_replay = commands.add_parser(
+        "replay-extraction", help="resolve recorded extraction offline"
+    )
+    extract_replay.add_argument("request")
+    extract_replay.add_argument("recording")
+    extract_replay.add_argument("--expected-import-sha256")
+    extract_replay.add_argument("--account-only", action="store_true")
+    extract_replay.add_argument("--output")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
@@ -81,6 +116,36 @@ def main(argv: list[str] | None = None) -> int:
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
                 args.output,
             )
+        elif args.command == "prepare-extraction":
+            extraction = prepare_extraction(
+                args.recall_key,
+                Path(args.recall).read_bytes(),
+                source=read_account(Path(args.source_account)) if args.source_account else None,
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(extraction.model_dump(mode="json"), args.output)
+        elif args.command in ("extraction-prompt", "import-extraction", "replay-extraction"):
+            extraction = read_extraction_request(Path(args.request))
+            if args.command == "extraction-prompt":
+                emit(strict_json(extraction_prompt(extraction)), args.output)
+            elif args.command == "import-extraction":
+                recording = ExtractionRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_extraction(extraction, recording, Path(args.recording))
+                emit({"recording": args.recording, "imported": 1}, None)
+            else:
+                if extraction.export_permission != "allowed":
+                    raise PermissionError("producer denies extraction export")
+                extracted = replay_extraction(
+                    extraction,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                emit(
+                    (extracted.account if args.account_only else extracted).model_dump(mode="json"),
+                    args.output,
+                )
         elif args.command == "prepare-time-study":
             prepared = prepare_time_study_files(
                 Path(args.source),

@@ -144,7 +144,10 @@ class Inventory(Model):
 
 
 class Entity(Identified):
-    """Source-local identity has explicit evidence; a model label is not authority."""
+    """Document-local identity; v2 permits recall origins without source identity claims.
+
+    ``source_document`` is the retained wire name for the origin document, preserving IDs.
+    """
 
     source_document: Name
     label: Name
@@ -373,7 +376,9 @@ def acyclic(edges: Iterable[tuple[str, str]], label: str) -> None:
 class Account(Model):
     """One validated paired account; absent information stays absent."""
 
-    schema_version: Literal["storymodel.account/v1"] = "storymodel.account/v1"
+    schema_version: Literal["storymodel.account/v1", "storymodel.account/v2"] = (
+        "storymodel.account/v1"
+    )
     documents: tuple[Document, ...]
     units: tuple[Unit, ...]
     contexts: tuple[Context, ...]
@@ -445,10 +450,13 @@ class Account(Model):
             if sum(c.kind == "narrated" and c.side == side for c in contexts.values()) != 1:
                 raise ValueError("each account side needs exactly one narrated world")
         for entity in entities.values():
-            if entity.source_document not in docs or docs[entity.source_document].side != "source":
-                raise ValueError("entity requires a source-local identity")
+            origin = docs.get(entity.source_document)
+            if origin is None or (self.schema_version.endswith("/v1") and origin.side != "source"):
+                raise ValueError(
+                    "entity requires a source-local identity in v1, a local origin in v2"
+                )
             for evidence in entity.evidence:
-                support(evidence, "source")
+                support(evidence, origin.side)
                 if evidence.document != entity.source_document:
                     raise ValueError("entity evidence belongs to another source")
         for event in events.values():
@@ -460,6 +468,11 @@ class Account(Model):
             if any(p.entity not in entities for p in event.participants):
                 raise ValueError("foreign event participant")
             for participation in event.participants:
+                origin = docs[entities[participation.entity].source_document]
+                if origin.side == "recall" and (
+                    event.side != "recall" or any(e.document != origin.id for e in event.evidence)
+                ):
+                    raise ValueError("recall entity belongs to another event document or side")
                 if event.side == "source" and not any(
                     e.document == entities[participation.entity].source_document
                     for e in event.evidence
@@ -537,7 +550,7 @@ class Account(Model):
 
 def validate_account(value: Account | str | bytes) -> Account:
     """Revalidate even model_copy/model_construct results at every public operation."""
-    raw = value.model_dump_json() if isinstance(value, Account) else value
+    raw = canonical(value.model_dump(mode="json")) if isinstance(value, Account) else value
 
     def unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}

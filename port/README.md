@@ -17,6 +17,10 @@ Its semantic rows are checked against the pinned Scala output; no provider call 
 and native source ticks. It preserves raw/canonical identity, exact text spans and clock
 derivations, with no parallel mapper or UI dependency.
 
+[Recorded extraction](docs/extraction-workflow.md) turns raw recall and typed proposal JSON
+into recall-local entities, contextual events and evidenced details. It feeds the existing
+analysis views while leaving unattempted source matching and unresolved identity explicit.
+
 ## Run it
 
 From this directory, with Python 3.12 and `uv`:

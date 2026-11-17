@@ -71,3 +71,17 @@ timing accepts exact numeric strings and derives film/scene target membership fr
 reject final intervals reversed by zero anchoring even where Scala's pre-anchor guard permits
 them. Port only surface/clause segmentation now, with an explicit recipe and retained gaps;
 do not turn lexical heuristics into asserted event/detail semantics.
+
+Recorded extraction (2026-11-16): use an extractive, unit-local proposal contract with exact
+quotes, explicit context scopes and atomic per-unit admission. Rejected alternatives: model
+responses containing trusted complete accounts, or guessing missing roles/contexts/addresses.
+The resolver establishes structural and evidence consistency, not semantic entailment.
+Retain unresolved claims outside the accepted graph and withhold completed inventory status.
+Source graphs remain independent; extraction makes no source identity or fidelity assertions.
+
+Account v2 expands the existing entity origin to recall documents; retain the historical
+`source_document` field and content IDs. Rejected alternatives: silently weakening v1,
+renaming identity-bearing fields, or adding a parallel recall-entity class hierarchy.
+V1 admission remains unchanged. Recall-origin entities must remain in their originating
+session's events; the extractor only accepts local mention references. Scope belongs in the
+extraction proposal/receipt, separately from the account context's attribution evidence.
