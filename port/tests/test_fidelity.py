@@ -342,3 +342,28 @@ def test_source_quotes_check_original_utf16_boundaries_and_hypothesis_ownership(
     rejected = next(d for d in foreign.decisions if d.local_key == key)
     assert rejected.status == "rejected" and "outside its source hypothesis" in rejected.reason
     assert foreign.account.bindings == mapping.account.bindings
+
+
+def test_shared_hypothesis_identity_never_shares_a_grade_between_details():
+    mapping_request, rows, _ = fixture(extra_detail=True)
+    mapping = resolve_mapping(
+        mapping_request,
+        raw(mapping_request, decision(rows[:1], key="d0"), decision(rows[:1], key="d1")),
+    )
+    assert len({b.reference.hypotheses[0].id for b in mapping.account.bindings}) == 1
+    request = prepare_fidelity(mapping.account, mapping_request.unit)
+    result = resolve_fidelity(
+        request,
+        reply(
+            request,
+            assessment("a0", grade="supported", evidence=(quote(rows[0]),)),
+            assessment("a1", grade="contradicted", evidence=(quote(rows[0]),)),
+        ),
+    )
+    assert [a.grade for b in result.account.bindings for a in b.assessments] == [
+        "supported",
+        "contradicted",
+    ]
+    assert [b.reference for b in result.account.bindings] == [
+        b.reference for b in mapping.account.bindings
+    ]

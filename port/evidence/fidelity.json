@@ -1,0 +1,91 @@
+{
+  "source_commit": "6f0ef47dc670df68d113415ea81db792ca02caeb",
+  "bead": "bd-01M7M1JR2BS6YS44WJYJC0RCM0",
+  "scope": "Separate recorded unit-local graded fidelity for existing reference hypotheses; absent/pending slots only",
+  "checks": {
+    "full_pytest": {
+      "passed": 523,
+      "seconds": 6.9
+    },
+    "subsequent_shared_hypothesis_regression": {
+      "passed": 1,
+      "seconds": 0.15
+    },
+    "mypy_source_files": 38,
+    "ruff_check": "passed",
+    "ruff_format_files": 96,
+    "diff_check": "passed"
+  },
+  "contract": {
+    "selection": "Only absent/pending slots; completed/unavailable/refused not selected or overwritten",
+    "identity": "Updates keyed by detail, interpretation and hypothesis; shared hypothesis ID is not shared assessment identity",
+    "admission": "One conditional-grade/quote validator shared with direct mapping; malformed framing refuses packet, invalid/missing slots preserve original values with receipts",
+    "prompt": "Claim content plus exact local quotes; previous grades, private recall identities/offsets, neighbors, time and address omitted",
+    "preservation": "References, details, inventories, rich graph and existing source/mapping artifacts unchanged",
+    "analysis": "Existing supported-only project consumer; alternatives/broad remain uncertain and no status becomes an external destination"
+  },
+  "compatibility": {
+    "baseline_commit": "fa35ecea5",
+    "reviewed_schemas_identical": 8,
+    "reviewed_prompt_bytes": "legacy and rich identical",
+    "reviewed_complete_mapping_results_identical": 3456,
+    "shared_definition_imports": "direct_mapping.SourceQuote and FidelityProposal aliases retained"
+  },
+  "mutations": {
+    "method": "Isolated compiled source mutants, each baseline 3 passing; each mutant exactly one named failure plus 2 passing controls",
+    "cases": [
+      {
+        "mutation": "overwrite-selection",
+        "failed_test": "test_alternatives_and_interpretations_remain_conditional_and_independent",
+        "compiled": true,
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls"
+      },
+      {
+        "mutation": "cross-interpretation-update",
+        "failed_test": "test_alternatives_and_interpretations_remain_conditional_and_independent",
+        "compiled": true,
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls"
+      },
+      {
+        "mutation": "quote-text-identity",
+        "failed_test": "test_invalid_slot_isolated_and_utf16_foreign_quote_is_rejected",
+        "compiled": true,
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls"
+      }
+    ]
+  },
+  "installed_artifact": {
+    "environment": "Python 3.12.11 wheel site-packages import outside checkout, PYTHONPATH unset",
+    "example": "examples/fidelity_workflow.py",
+    "commands": [
+      "prepare-fidelity",
+      "fidelity-prompt",
+      "import-fidelity",
+      "replay-fidelity"
+    ],
+    "api_cli_exact": "Request, prompt, full result and account-only output agree for both recalls",
+    "control": "Scripted supported/contradicted grades change coverage to present/absent while reference and input mappings remain unchanged"
+  },
+  "independent_review": {
+    "commit": "6f0ef47dc670df68d113415ea81db792ca02caeb",
+    "verdict": "no BLOCK found",
+    "focused_tests": 59,
+    "additional_probes": [
+      "Distinct details sharing one hypothesis ID retain distinct grades and protected narrative assessments",
+      "Invalid-slot isolation",
+      "Nested typed forgeries and altered receipts",
+      "Duplicate JSON keys and NaN rejection"
+    ],
+    "source_comparison": "Independent parent implementation loaded for schemas, prompt bytes and full result comparisons"
+  },
+  "limits": [
+    "Scripted controls establish no semantic accuracy",
+    "Neighbor-aware and whole-film cross-target graded citation behavior from the study script remains owed as an explicit versioned profile",
+    "No automatic conversion of fixed-question claim statuses to grades",
+    "No implicit reassessment of completed/unavailable/refused judgments",
+    "Recurring-scene correspondence, richer target grains and full P3-P6 remain incomplete"
+  ]
+}
