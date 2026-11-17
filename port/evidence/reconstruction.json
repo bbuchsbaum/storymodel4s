@@ -1,0 +1,224 @@
+{
+  "source_commit": "e57b51a6f6f9846b3bc66b31767863e86adcb0ff",
+  "initial_implementation": "c7ad3d422b880183748e893d789b19ed77db4f38",
+  "bead": "bd-01M7M8507GW8DF5H62F27A4JHR",
+  "scope": "Explicit additive reconstruction over checked supplied weights or complete account inference; not full P4 or scientific measurement qualification.",
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "passed": 657,
+      "seconds": 9.74
+    },
+    "focused_reconstruction": 21,
+    "mypy_source_files": 44,
+    "ruff_check": "passed",
+    "ruff_format_files": 111,
+    "schema": "generated schema equality test passed",
+    "diff_check": "passed"
+  },
+  "reference_blobs": {
+    "reconstruction.scala": "d3f7e0e7b68e3fa42ff8f5cba5005393b96debbf",
+    "matrix.scala": "e1a7ad96f3e9722b9fcf0a49aab27777145eb044",
+    "source.scala": "62d4d9eac8f1cc0db4fd3b43c888174cc5b42dc1"
+  },
+  "reference_evidence": "Implementations, relevant callers and ReconstructionPolicySuite read. No executed Scala runtime comparison in this slice.",
+  "independent_review": {
+    "reviewer": "reconstruction_review",
+    "initial_commit": "c7ad3d422",
+    "initial_evidence": "20 focused tests passed;1000 independently checked extreme-exponent cases against exhaustive Fraction scoring. Found ambient Decimal Emax/trap dependency at decoder; parent reproduced same issue upstream in local-evidence price division.",
+    "repair_commit": "e57b51a6f6f9846b3bc66b31767863e86adcb0ff",
+    "verdict": "BLOCK cleared; original reproductions return groups[1,9] and preserve caller context;21 reconstruction tests and35 sequence/CLI/local-evidence tests independently passed. Reviewer did not rerun full suite or mutations."
+  },
+  "numerical_repair": "Fresh fully specified private Decimal contexts preserve existing precisions for local evidence80, sequencecomputed, reconstruction1200. Sequence precision selection uses context-free copy_abs. Hostile rounding, exponent limits, flags and traps neither change results nor get modified.",
+  "oracles": {
+    "implementation": "Independent exhaustive Fraction scoring and reversed-path tie ordering, four basic policies plus48 seeded three-row/three-group cases.",
+    "controls": [
+      "raw external maximum versus aggregate faithful/distorted source anchor",
+      "subnormalized/zero/empty row preservation",
+      "noncandidate requested fill retains zero original mass",
+      "foreign roots, overlapping ancestry, wrong kinds, wrong-group fill, disabled requests and input-bound refusal",
+      "1e20 prefix then1unit advantage retains correct group path",
+      "finite mass and penalty overflow refusals",
+      "strict copied-object Boolean rejection; JSON receipt recomputation; canonical negative-zero penalties",
+      "producer grant checks and denied-input verifier; caller Decimal context unchanged"
+    ]
+  },
+  "mutations": [
+    {
+      "mutation": "fill-mass",
+      "old": "masses.get(chosen_anchor, 0.0)",
+      "new": "(raw.weight if raw else 0.0)",
+      "named_test": "test_requested_fill_is_zero_mass_and_preserves_raw_source_fallback_without_a_request",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.16s",
+      "module": "reconstruction",
+      "mutant": "1 failed, 2 passed in 0.16s",
+      "compiled": true
+    },
+    {
+      "mutation": "backward-index",
+      "old": "else max(0, k - j)",
+      "new": "else max(0, ranks[k] - rank)",
+      "named_test": "test_three_row_policy_grid_matches_exhaustive_fraction_oracle",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.18s",
+      "module": "reconstruction",
+      "mutant": "1 failed, 2 passed in 0.19s",
+      "compiled": true
+    },
+    {
+      "mutation": "fill-binding",
+      "old": "if bound != (_hash(source), _hash(recall), _hash(view), digest(spec.roots)):",
+      "new": "if False and bound != (_hash(source), _hash(recall), _hash(view), digest(spec.roots)):",
+      "named_test": "test_fill_rejects_foreign_recall_and_snapshot_mismatch",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.17s",
+      "module": "reconstruction",
+      "mutant": "1 failed, 2 passed in 0.16s",
+      "compiled": true
+    },
+    {
+      "mutation": "group-overlap",
+      "old": "if group is not None:\n                    raise ValueError(\"declared groups overlap\")",
+      "new": "if False:\n                    raise ValueError(\"declared groups overlap\")",
+      "named_test": "test_overlapping_derived_membership_roots_refuse",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.17s",
+      "module": "reconstruction",
+      "mutant": "1 failed, 2 passed in 0.16s",
+      "compiled": true
+    },
+    {
+      "mutation": "wide-scores",
+      "old": "current.append(value)",
+      "new": "current.append(Decimal.from_float(float(value)))",
+      "named_test": "test_near_cancellation_preserves_the_one_unit_advantage_until_backtracking",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.16s",
+      "module": "reconstruction",
+      "mutant": "1 failed, 2 passed in 0.17s",
+      "compiled": true
+    },
+    {
+      "mutation": "context-reconstruction",
+      "old": "with localcontext(computation_context(1200)):",
+      "new": "with localcontext() as ctx:\n            ctx.prec = 1200",
+      "named_test": "test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.18s",
+      "module": "reconstruction",
+      "mutant": "1 failed, 2 passed in 0.18s",
+      "compiled": true
+    },
+    {
+      "mutation": "context-local-evidence",
+      "old": "with localcontext(computation_context(80)):",
+      "new": "with localcontext() as ctx:\n            ctx.prec = 80",
+      "named_test": "test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.18s",
+      "module": "local_evidence",
+      "mutant": "1 failed, 2 passed in 0.19s",
+      "compiled": true
+    },
+    {
+      "mutation": "context-sequence",
+      "old": "with localcontext(computation_context(precision)):",
+      "new": "with localcontext() as ctx:\n        ctx.prec = precision",
+      "named_test": "test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.19s",
+      "module": "sequence",
+      "mutant": "1 failed, 2 passed in 0.19s",
+      "compiled": true
+    },
+    {
+      "mutation": "context-exponent",
+      "old": "c.copy_abs().adjusted()",
+      "new": "abs(c).adjusted()",
+      "named_test": "test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts",
+      "controls": [
+        "test_empty_zero_and_subnormalized_rows_are_inspectable",
+        "test_ties_choose_earliest_final_rank_then_earliest_predecessors"
+      ],
+      "baseline": "3 passed in 0.18s",
+      "module": "sequence",
+      "mutant": "1 failed, 2 passed in 0.18s",
+      "compiled": true
+    }
+  ],
+  "mutation_reproduction_python": "from pathlib import Path\nimport os,shutil,subprocess,json\nbase=Path(__file__).resolve().parents[1]; root=base/'data/reconstruction-mutations'; root.mkdir(exist_ok=True)\ncontrols=['test_empty_zero_and_subnormalized_rows_are_inspectable','test_ties_choose_earliest_final_rank_then_earliest_predecessors']\ncases=[\n ('fill-mass','masses.get(chosen_anchor, 0.0)','(raw.weight if raw else 0.0)','test_requested_fill_is_zero_mass_and_preserves_raw_source_fallback_without_a_request'),\n ('backward-index','else max(0, k - j)','else max(0, ranks[k] - rank)','test_three_row_policy_grid_matches_exhaustive_fraction_oracle'),\n ('fill-binding','if bound != (_hash(source), _hash(recall), _hash(view), digest(spec.roots)):','if False and bound != (_hash(source), _hash(recall), _hash(view), digest(spec.roots)):','test_fill_rejects_foreign_recall_and_snapshot_mismatch'),\n ('group-overlap','if group is not None:\\n                    raise ValueError(\"declared groups overlap\")','if False:\\n                    raise ValueError(\"declared groups overlap\")','test_overlapping_derived_membership_roots_refuse'),\n ('wide-scores','current.append(value)','current.append(Decimal.from_float(float(value)))','test_near_cancellation_preserves_the_one_unit_advantage_until_backtracking'),\n]\ncases += [\n ('context-reconstruction','with localcontext(computation_context(1200)):', 'with localcontext() as ctx:\\n            ctx.prec = 1200', 'test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts'),\n ('context-local-evidence','with localcontext(computation_context(80)):', 'with localcontext() as ctx:\\n            ctx.prec = 80', 'test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts'),\n ('context-sequence','with localcontext(computation_context(precision)):', 'with localcontext() as ctx:\\n        ctx.prec = precision', 'test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts'),\n ('context-exponent','c.copy_abs().adjusted()', 'abs(c).adjusted()', 'test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts'),\n]\nout=[]\nfor name,old,new,test in cases:\n case=root/name;case.mkdir(exist_ok=True)\n shutil.copytree(base/'src/storymodel',case/'storymodel',dirs_exist_ok=True)\n shutil.copy2(base/'tests/test_reconstruction.py',case/'test_reconstruction.py')\n env=dict(os.environ,PYTHONPATH=str(case))\n cmd=[str(base/'.venv/bin/python'),'-m','pytest','-q',*[f'test_reconstruction.py::{t}' for t in [test,*controls]]]\n entry={'mutation':name,'old':old,'new':new,'named_test':test,'controls':controls}\n for mode in ('baseline','mutant'):\n  if mode=='mutant':\n   module={'context-local-evidence':'local_evidence','context-sequence':'sequence','context-exponent':'sequence'}.get(name,'reconstruction')\n   path=case/'storymodel'/f'{module}.py';entry['module']=module;content=path.read_text();assert content.count(old)==1,(name,content.count(old))\n   path.write_text(content.replace(old,new))\n   subprocess.run([str(base/'.venv/bin/python'),'-m','py_compile',str(path)],check=True)\n  result=subprocess.run(cmd,cwd=case,env=env,capture_output=True,text=True)\n  (case/f'{mode}.log').write_text(result.stdout+result.stderr)\n  assert result.returncode==(0 if mode=='baseline' else 1),(name,mode,result.stdout,result.stderr)\n  assert ('3 passed' if mode=='baseline' else '1 failed, 2 passed') in result.stdout,(name,result.stdout)\n  entry[mode]=result.stdout.splitlines()[-1]\n entry['compiled']=True;out.append(entry)\n print(name,entry['mutant'])\n(root/'summary.json').write_text(json.dumps(out,indent=2)+'\\n')\n",
+  "installed": {
+    "wheel_sha256": "344574f8d6c7a3dbdbe21ebde77ad4f497a459fdb11ff2d1e073ea2bb9a5f0a5",
+    "result": {
+      "installed_api_cli_equal": true,
+      "inference_preserved": true,
+      "decisions": 3,
+      "files": {
+        "evidence.json": 64691,
+        "inference.json": 105816,
+        "recall.json": 4775,
+        "reconstruction-spec.json": 323,
+        "reconstruction.json": 116071,
+        "request.json": 41029,
+        "source.json": 3656,
+        "spec.json": 1781
+      }
+    },
+    "environment": "Installed wheel in port/data/wheel-env; run from external temporary directory with PYTHONPATH unset. API example, producer with and without saved inference, verifier agree; original inference unchanged. Hostile Decimal context API control passes.",
+    "reproduction_python": "from pathlib import Path\nimport json, os, shutil, subprocess, tempfile\nbase=Path(__file__).resolve().parents[1]\npython=base/'data/wheel-env/bin/python'\ncli=base/'data/wheel-env/bin/storymodel'\nenv=dict(os.environ); env.pop('PYTHONPATH',None)\nwith tempfile.TemporaryDirectory(prefix='storymodel-reconstruction-') as work:\n work=Path(work)\n shutil.copy2(base/'examples/account_inference.py',work/'example.py')\n subprocess.run([str(python),'example.py','artifacts'],cwd=work,env=env,check=True)\n files=work/'artifacts'\n inputs=[str(files/f'{name}.json') for name in ('source','recall','spec','reconstruction-spec')]\n for reuse in (False,True):\n  output=work/f'cli-{reuse}.json'\n  cmd=[str(cli),'reconstruct-accounts',*inputs,'--output',str(output)]\n  if reuse: cmd+=['--inference',str(files/'inference.json')]\n  subprocess.run(cmd,cwd=work,env=env,check=True)\n  assert json.loads(output.read_text())==json.loads((files/'reconstruction.json').read_text())\n  subprocess.run([str(cli),'verify-account-reconstruction',*inputs,str(output)],cwd=work,env=env,check=True)\n code = \"\"\"\nimport decimal, sys\nfrom pathlib import Path\nfrom storymodel import LocalEvidenceSpec, ReconstructionSpec, reconstruct_accounts\nfrom storymodel.artifacts import read_supported_account\nfrom storymodel.reconstruction import AccountReconstructionResult\np=Path(sys.argv[1])\nsource=read_supported_account(p/'source.json'); recall=read_supported_account(p/'recall.json')\nevidence=LocalEvidenceSpec.model_validate_json((p/'spec.json').read_bytes())\nspec=ReconstructionSpec.model_validate_json((p/'reconstruction-spec.json').read_bytes())\nexpected=AccountReconstructionResult.model_validate_json((p/'reconstruction.json').read_bytes())\nwith decimal.localcontext() as caller:\n caller.prec=2;caller.Emin=-9;caller.Emax=9;caller.rounding=decimal.ROUND_UP\n for signal in caller.traps:caller.traps[signal]=True\n before=repr(caller)\n assert reconstruct_accounts(source,recall,evidence,spec)==expected\n assert repr(caller)==before\nprint('Installed hostile Decimal context API control passed')\n\"\"\"\n subprocess.run([str(python),'-c',code,str(files)],cwd=work,env=env,check=True)\n result=json.loads((files/'reconstruction.json').read_text())\n assert result['inference']==json.loads((files/'inference.json').read_text())\n print(json.dumps({'installed_api_cli_equal':True,'inference_preserved':True,'decisions':len(result['reconstruction']['decisions']),'files':{p.name:p.stat().st_size for p in sorted(files.iterdir())}}))\n"
+  },
+  "size_control": {
+    "source_commit": "c7ad3d422b880183748e893d789b19ed77db4f38",
+    "method": "One run per size under tracemalloc, including source projection and boundary validation; inputs built before timing. Nondecreasing default. Peak tracked Python allocations, not RSS. No Scala speed comparison. Later context-isolation repair does not constitute a fresh timing measurement.",
+    "results": [
+      {
+        "source_nodes": 50,
+        "recall_rows": 200,
+        "state_weights": 800,
+        "active_groups": 50,
+        "seconds": 0.18177195799944457,
+        "peak_python_bytes": 1739558
+      },
+      {
+        "source_nodes": 500,
+        "recall_rows": 200,
+        "state_weights": 800,
+        "active_groups": 500,
+        "seconds": 1.2002787919991533,
+        "peak_python_bytes": 3658673
+      }
+    ],
+    "reproduction_python": "import json,time,tracemalloc\nfrom storymodel import make_account\nfrom storymodel.model import Document,Unit,Support,Span\nfrom storymodel.reconstruction import ReconstructionRow,ReconstructionMass,ReconstructionSpec,ReconstructionPolicy,reconstruct_rows\nfrom storymodel.sequence import SequenceState\n\ndef account(side,n):\n d=Document.create('reconstruction-scale-'+side,side,'A'*n)\n units=tuple(Unit(kind='row' if side=='source' else 'recall',support=Support(document=d.id,spans=(Span(start=i,end=i+1),))) for i in range(n))\n return make_account((d,),units=units),units\nout=[]\nfor n in (50,500):\n source,anchors=account('source',n);recall,units=account('recall',200)\n rows=tuple(ReconstructionRow(unit=u.id,mass=tuple(ReconstructionMass(state=SequenceState(kind='source',anchor_kind='segment',anchor=anchors[(i*4+j)%n].id),weight=w) for j,w in enumerate((.4,.3,.2,.1)))) for i,u in enumerate(units))\n spec=ReconstructionSpec(roots={u.id:i for i,u in enumerate(anchors)},policy=ReconstructionPolicy(order='nondecreasing'))\n tracemalloc.start(); start=time.perf_counter()\n result=reconstruct_rows(source,recall,rows,spec)\n seconds=time.perf_counter()-start;_,peak=tracemalloc.get_traced_memory();tracemalloc.stop()\n assert len(result.decisions)==200\n groups=[d.assigned_group for d in result.decisions]\n assert groups==sorted(groups)\n out.append(dict(source_nodes=n,recall_rows=200,state_weights=800,active_groups=n,seconds=seconds,peak_python_bytes=peak))\nprint(json.dumps(out,indent=2))\n"
+  },
+  "remaining": [
+    "organization readouts",
+    "refinement and richer evidence channels",
+    "full retained algorithm/study/UI coverage",
+    "executed cross-runtime/scientific qualification where corresponding claims require it"
+  ]
+}

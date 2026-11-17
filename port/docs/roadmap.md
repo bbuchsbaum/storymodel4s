@@ -5,7 +5,7 @@ capabilities available in idiomatic Python, improving the implementation using l
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
 This is the current **port** execution direction, refreshed on 2026-11-17 through
-the account-derived local-evidence and sequence-inference workflow.
+the account-derived inference and explicit reconstruction workflow.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -34,8 +34,9 @@ assessment, conditional fidelity and the discriminating [correspondence workflow
 now have local implementation and evidence. [Source-derived transitions](source-transitions.md)
 and [account-derived local evidence](local-evidence.md) connect checked accounts to the sequence
 kernel, with sparse nominations, shallow mode gates and measured-support accounting. Richer
-chart/outcome/cause evidence and refinement remain owed. The next connected delivery is
-reconstruction and organization readouts over these results.
+chart/outcome/cause evidence and refinement remain owed. [Explicit reconstruction](reconstruction.md)
+now consumes these results while retaining the original evidence. Organization readouts are
+the next connected delivery.
 Playback, attribution, richer graph families and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
@@ -229,8 +230,8 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 These deliveries sequence P2–P6; the full phase exits above still apply. Build on the existing
 construction, correspondence, assessment and account-to-inference paths. Mote owns live status.
-The current evidence baseline is [local-evidence.json](../evidence/local-evidence.json), bound
-to source commit `1407235ae`: 604 tests, independent review, five discriminating mutants and
+The current evidence baseline is [reconstruction.json](../evidence/reconstruction.json), bound
+to source commit `e57b51a6f`: 657 tests, independent review, nine discriminating mutants and
 installed API/CLI agreement. Those are recorded engineering results, not a fresh test run for
 this plan, executed Scala equivalence or a full-parity claim.
 
@@ -271,10 +272,11 @@ Reconstruction never silently changes categorical reference or fidelity. Organiz
 from an order-sensitive model stays labelled model-conditional, not independent evidence of
 recall organization.
 
-**First actions:** resolve the already-tracked empty-parent admission defect
-(`bd-01M7M4YVX98FP5Q1ENDF1PT1M4`) before relying on account hierarchy more broadly; then implement
-reconstruction. Read complete relevant Scala implementations/callers/tests at implementation
-start. The symbols above establish the next seam, not a completed algorithm audit.
+**Next action:** implement organization readouts using the existing adjacent joint flow, with
+independent-row products available only under an explicit separate assumption. The parent-admission
+repair and reconstruction are implemented locally; reuse them. Read the complete organization
+implementation, callers and tests before editing. Coupled ambiguity bounds remain a separate
+unsupported capability unless a valid method is implemented and checked.
 
 ### 2. Broaden evidence without creating another account model — P2/P3/P4
 
