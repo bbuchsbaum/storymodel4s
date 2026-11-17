@@ -1,0 +1,32 @@
+{
+  "source_commit": "c99970de5b7b3e91ee9e18a3caadcad0ea4b604d",
+  "scope": "P2.1 anchored source compilation and shared extractive admission",
+  "checks": {
+    "full_suite": "247 passed in 2.89s before final CLI edge test",
+    "subsequent_regression": "11 API/workflow tests passed after CRLF, invalid UTF8 and non-array rows refinements",
+    "mypy": "25 source files pass",
+    "ruff": "lint passes, 71 files format clean"
+  },
+  "independent_review": {
+    "verdict": "PASS no BLOCKs",
+    "reviewer": "source_compiler_review",
+    "exact_commit": "c99970de5b7b3e91ee9e18a3caadcad0ea4b604d",
+    "tests": "68 passed, 0 failed, 0 skipped",
+    "compatibility": "Base 916b7c050 extraction request/proposal/result schemas match; complete admitted-demo extraction result including IDs identical"
+  },
+  "mutations": {
+    "source_context": "3 baseline pass; guard deletion 1 named failure and 2 controls pass",
+    "recall_context": "3 baseline pass; guard deletion 1 named failure and 2 controls pass"
+  },
+  "installed_wheel": {
+    "outside_checkout": true,
+    "module": "data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "source_example": "2 source events reused unchanged by 2 independent recalls",
+    "notebook_example": "3 details, no invented source coverage"
+  },
+  "limits": [
+    "Structural quote/scope consistency, not semantic entailment or source completeness.",
+    "SourceResult and raw recording retain processing receipts; Account alone is a graph snapshot.",
+    "No full P2-P6 completion, live provider, extraction accuracy or Scala speed claim."
+  ]
+}
