@@ -1,6 +1,6 @@
 {
   "scope": "recorded surface semantic evidence through existing account inference",
-  "status": "local checks complete; cold review pending",
+  "status": "qualified local implementation; cold review passed; not merged or published",
   "tests": {
     "command": ".venv/bin/pytest -q",
     "passed": 927,
@@ -118,5 +118,23 @@
     "Scripted vectors prove integration, not model execution or semantic accuracy.",
     "Resource figures include Python tracing overhead; no Scala speed comparison.",
     "No full P3/P4/P5 parity, native inference, ONNX/WL providers or HMAC cache claim."
-  ]
+  ],
+  "source_commit": "3255f57d962294698576e8d2e4fd2910d4b7a790",
+  "review": {
+    "verdict": "no BLOCK findings; accept for stated recorded surface scope",
+    "source_commit": "3255f57d962294698576e8d2e4fd2910d4b7a790",
+    "independent_tests": 29,
+    "existing_focused_tests": 33,
+    "parent_retained_probe_tests": 29,
+    "probe": "port/evidence/semantic-independent.py",
+    "command": "PYTHONPATH=src:tests:examples .venv/bin/pytest -q evidence/semantic-independent.py",
+    "additional_checks": {
+      "decimal_cosine_comparisons": 200,
+      "decimal_precision": 90,
+      "l2_cache_cases": 100,
+      "serialization_cycles_per_case": 5,
+      "posterior": "three-unit exhaustive path enumeration plus changed-geometry consumer witness"
+    },
+    "limits": "Reviewer did not independently rerun full suite, installed CLI or mutations. Parent executed those."
+  }
 }

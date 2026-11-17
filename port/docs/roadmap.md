@@ -47,7 +47,7 @@ adds explicit v5 construction and holderless-scope behavior. [Native playback](p
 now adds supplied media observations, document-free v6 construction and exact support readouts.
 The explicit [native assessment path](native-assessment.md) now maps and grades text recall
 against supplied source observations and feeds row coverage. Native recall, holder-aware native
-assessment, full clock/anchor coverage and semantic channels remain owed. Mote owns
+assessment, full clock/anchor coverage and remaining semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -286,15 +286,21 @@ source feeds two recorded recalls. [Evidence](../evidence/native-assessment.json
 tests, installed API/CLI agreement, legacy replay compatibility and cold review. This is symbolic
 observation assessment, not raw audiovisual perception or native holder-aware reasoning.
 
-**Next implementation action:** add one retained semantic channel to the existing sparse
-candidate/local-evidence interface, with model/space/cache identity and a real inference consumer.
-Use the connected workflows to simplify public calls where repetition is demonstrated.
+[Recorded semantic inference](semantic.md), source `3255f57d9`, now connects checked surface
+vectors and observed cache reuse to bounded nominations, existing local gates/costs and actual
+sequence inference. [Evidence](../evidence/semantic.json) records 927 tests, 14 installed CLI
+checks, three discriminating mutations, unchanged legacy inference artifacts and independent
+Decimal/exhaustive-path checks. Model execution, remaining semantic profiles and full P3/P4
+coverage remain owed. These are local engineering results, not semantic accuracy evidence.
+
+**Next implementation action:** connect the installed construction-to-analysis journey and
+simplify demonstrated public-call repetition, then add synthetic study intake/recovery.
 
 ### Immediate work queue
 
 These are the next delivery checkpoints within P2–P6, not additional phase numbers. Refreshed
-at the owner's planning request on 2026-11-17. The semantic files currently in progress are
-unfinished implementation, not a qualified checkpoint. Finish that slice before opening another.
+at the owner's planning request on 2026-11-17, then refreshed after semantic qualification.
+Checkpoint 1 below is locally qualified for recorded surface vectors; it does not close P3/P4.
 
 | Order | Work and researcher-visible result | Exit evidence |
 |---|---|---|
@@ -303,10 +309,11 @@ unfinished implementation, not a qualified checkpoint. Finish that slice before 
 | 3. Complete computational families (P2/P4) | Extend that workflow with remaining graph/recall families, duration/refinement and retained transport methods, then feature tracks, clock maps and measured-time readouts. Port each method into the existing interfaces as its inputs become stable. | Per-family producer and consumer; independent small-case oracle; executable Scala comparison where available; support/denominator/missingness contract; measured sparse resource use. No claim that the existing sequence kernel is the entire Scala inference surface. |
 | 4. Close operational and inspection coverage (P5/P6) | Expand to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interview workflows. Add React inspection of actual artifacts, then saved investigations and exports. | Capability-by-capability executed workflow coverage, compatibility/recovery checks and a clear disposition for every retained Scala/Atlas behavior. Visual polish follows useful inspection. |
 
-**The next three implementation beads:** finish checkpoint 1; connect the installed
-input-to-analysis journey and simplify only demonstrated API repetition; add the synthetic
-study adapter and recovery checks against that journey. Reuse existing examples and recordings.
-If either later bead needs a missing graph family, implement that bounded dependency first.
+**The next three implementation beads:** connect the installed input-to-analysis journey and
+simplify only demonstrated API repetition; add synthetic study intake and recovery checks;
+complete the next retained graph/target family needed by that journey. Reuse existing examples
+and recordings. If a workflow bead needs a missing graph family, implement that bounded
+dependency first.
 Do not wait for every graph family or numerical method before exercising a complete workflow.
 
 **Checkpoint 3 ordering:** complete causal/referential/entity relations, auxiliary hierarchy,
@@ -465,10 +472,10 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** one retained semantic channel through sparse candidates/local evidence and
-  an actual inference consumer from Delivery 3. Keep missing channels, budget loss and raw
-  scores explicit. The larger graph/API, numerical, study and inspection deliveries remain open.
-  Chronology, contextual fidelity and native-source assessment are qualified local checkpoints.
+- **Next bead:** the installed construction-to-analysis journey and demonstrated API
+  consolidation from Delivery 2, followed by synthetic study intake/recovery. Remaining graph,
+  numerical, semantic-provider and inspection deliveries remain open. Recorded surface semantic
+  inference joins chronology, contextual fidelity and native assessment as a local checkpoint.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.

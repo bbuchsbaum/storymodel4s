@@ -153,3 +153,7 @@ mention parsing, multi-proposition recall composition, richer candidate/refineme
 reconstruction, scientific feature/readout consumers and executed Scala comparison artifacts.
 The table input is an explicit supplied measurement contract, not proof of a provider run.
 This profile does not claim full LocalEvidence or full P4 parity.
+
+The [recorded semantic adapter](semantic.md) now supplies model/space-bound half-cosine cells
+and bounded extra nominations to this same engine. Its lexical baseline, channel availability
+and budget diagnostics remain separate; existing gates and measured-support rules still apply.
