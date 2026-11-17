@@ -464,13 +464,15 @@ class _AccountFields(Model):
 
         for unit in units.values():
             support(unit.support, "recall" if unit.kind == "recall" else "source")
-            if unit.parent:
+            if unit.parent is not None:
                 parent = units.get(unit.parent)
                 if parent is None or not contained(unit.support, parent.support):
                     raise ValueError("unit parent must contain exact child support")
                 if unit.kind != "recall" and parent.kind != "scene":
                     raise ValueError("source hierarchy parents must be scene containers")
-        acyclic(((u.id, u.parent) for u in units.values() if u.parent), "unit hierarchy")
+        acyclic(
+            ((u.id, u.parent) for u in units.values() if u.parent is not None), "unit hierarchy"
+        )
 
         inventoried: set[str] = set()
         for inventory in self.inventories:

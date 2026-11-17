@@ -1,0 +1,38 @@
+{
+  "bead": "bd-01M7M4YVX98FP5Q1ENDF1PT1M4",
+  "base_commit": "76b28e603",
+  "change": "At shared account admission, only None denotes absent unit parent. Every supplied parent resolves and contains exact child support. Unit IDs and wire fields unchanged.",
+  "scope": "All supported account wire versions v1-v4, source and recall units; construction, copied-object and JSON admission.",
+  "before": {
+    "command": ".venv/bin/pytest -q tests/test_account.py -k \"parent_absence or empty_parent\"",
+    "failed": 24,
+    "passed": 8,
+    "failure": "Each empty-parent case failed DID NOT RAISE; valid None/existing-parent controls passed."
+  },
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "passed": 636,
+      "seconds": 9.28
+    },
+    "mypy_source_files": 42,
+    "ruff_check": "passed",
+    "ruff_format_files": 108
+  },
+  "mutation": {
+    "replacement": [
+      "if unit.parent is not None:",
+      "if unit.parent:"
+    ],
+    "compiled": true,
+    "baseline": "3 passed",
+    "mutant": "1 named assertion failed, 2 controls passed",
+    "named_test": "test_empty_parent_is_not_absence_at_account_admission[construction-source-3]",
+    "controls": [
+      "test_parent_absence_and_existing_parent_survive_all_wire_versions[source-3]",
+      "test_parent_absence_and_existing_parent_survive_all_wire_versions[recall-4]"
+    ],
+    "method": "Isolated copy of source and test_account.py under ignored port/data; PYTHONPATH set to isolated source; python -m py_compile; same three pytest node IDs before and after exact guard replacement."
+  },
+  "limits": "No Scala execution or new scientific claim. Existing serialized invalid empty-parent accounts now refuse rather than reaching a downstream consumer."
+}

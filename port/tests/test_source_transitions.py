@@ -437,16 +437,15 @@ def test_projection_refuses_empty_primary_parent_in_direct_and_forged_accounts()
         next(n for n in project_source(parented).nodes if n.anchor == child.id).parent == scene.id
     )
 
-    # Existing account validation permits an empty parent; this consumer must refuse
-    # it explicitly rather than indexing a nonexistent hierarchy endpoint.
+    # Account admission and downstream projection both refuse empty parent IDs.
     direct = Unit(kind="row", support=row.support, parent="")
-    invalid = make_account((document,), units=(direct,))
+    with pytest.raises(ValueError, match="unit parent must contain"):
+        make_account((document,), units=(direct,))
     forged = unparented.model_copy(
         update={"units": (row.model_copy(update={"id": "", "parent": ""}),)}
     )
-    for account in (invalid, forged):
-        with pytest.raises(ValueError, match="primary parent"):
-            project_source(account)
+    with pytest.raises(ValueError, match="unit parent must contain"):
+        project_source(forged)
 
 
 @pytest.mark.parametrize("invalid", [False, 0, "", []])

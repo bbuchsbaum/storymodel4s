@@ -7,6 +7,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
+from storymodel.accounts import make_account
 from storymodel.analysis import project
 from storymodel.demo import example_account
 from storymodel.model import (
@@ -27,6 +28,7 @@ from storymodel.model import (
     contained,
     validate_account,
 )
+from storymodel.rich_account import upgrade_account, validate_supported_account
 
 
 def revise_binding(account, index=0, *, reference=None, grade="supported", status="completed"):
@@ -389,3 +391,51 @@ def test_forged_document_hash_refuses_even_with_recomputed_identity():
     document.update(sha256="0" * 64, id="")
     with pytest.raises(ValidationError, match="checksum differs"):
         Document.model_validate_json(json.dumps(document))
+
+
+@pytest.mark.parametrize("version", [1, 2, 3, 4])
+@pytest.mark.parametrize("side", ["source", "recall"])
+def test_parent_absence_and_existing_parent_survive_all_wire_versions(version, side):
+    account, child = parent_account(version, side)
+    assert validate_supported_account(account.model_dump_json()) == account
+    assert child.parent is not None
+    unparented = Unit(kind=child.kind, support=child.support)
+    root_account = type(account)(**{**account.model_dump(), "units": (unparented,)})
+    assert validate_supported_account(root_account).units[0].parent is None
+
+
+def parent_account(version, side):
+    documents = tuple(Document.create(s, s, "AA BB") for s in ("source", "recall"))
+    document = next(d for d in documents if d.side == side)
+    parent = Unit(
+        kind="scene" if side == "source" else "recall",
+        support=Support(document=document.id, spans=(Span(start=0, end=5),)),
+    )
+    child = Unit(
+        kind="row" if side == "source" else "recall",
+        parent=parent.id,
+        support=Support(document=document.id, spans=(Span(start=0, end=2),)),
+    )
+    account = make_account(documents, units=(parent, child))
+    if version == 4:
+        return upgrade_account(account), child
+    return Account(
+        **{**account.model_dump(), "schema_version": f"storymodel.account/v{version}"}
+    ), child
+
+
+@pytest.mark.parametrize("version", [1, 2, 3, 4])
+@pytest.mark.parametrize("side", ["source", "recall"])
+@pytest.mark.parametrize("boundary", ["construction", "copy", "json"])
+def test_empty_parent_is_not_absence_at_account_admission(version, side, boundary):
+    account, child = parent_account(version, side)
+    invalid = Unit(kind=child.kind, support=child.support, parent="")
+    with pytest.raises(ValueError, match="unit parent must contain"):
+        if boundary == "construction":
+            type(account)(**{**account.model_dump(), "units": (invalid,)})
+        elif boundary == "copy":
+            validate_supported_account(account.model_copy(update={"units": (invalid,)}))
+        else:
+            value = account.model_dump(mode="json")
+            value["units"] = [invalid.model_dump(mode="json")]
+            validate_supported_account(json.dumps(value))
