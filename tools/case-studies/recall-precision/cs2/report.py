@@ -359,6 +359,9 @@ def main(argv):
                                       "gold row they overlap most", corpora=[]),
     )
     for spec in argv[1:]:
+        if spec.startswith("hillclimb_r1="):
+            rep["hillclimb_r1"] = json.loads(Path(spec.split("=", 1)[1]).read_text())
+            continue
         tag = spec.split(":", 1)[0] if spec.split(":", 1)[0] in ("old", "win") else ""
         corpus, producer, dirs = spec.removeprefix(tag + ":" if tag else "").split("=", 2)
         r = corpus_report(corpus, producer, dirs.split(","), corpus != "sherlock")
