@@ -1,0 +1,28 @@
+{
+  "source_commit": "eeb5f301c0cfbcea5af9ec393574a8cb8f11f4e2",
+  "checks": {
+    "full_suite_at_c73d1c0be": "351 passed in 4.00s",
+    "after_review_delta": "84 affected rich/source/extraction tests passed",
+    "mypy": "32 source files pass",
+    "ruff": "lint and format80 files pass",
+    "legacy_contracts": "Account schema and source/extraction request/prompt/result hashes equal e2ef302de before refactor",
+    "scope_mutation": "Delete deepest-scope condition: baseline3 pass; named root-promotion assertion fails;2 positive controls pass"
+  },
+  "review": {
+    "reviewer": "direct_mapping_review",
+    "representation": "bf2b65bab no BLOCK;12 tests and10 adversarial refusals",
+    "constructor": "c73d1c0be no BLOCK;25 tests plus nested scope/circumstance/row-accounting probes",
+    "followup": "eeb5f301c typed rich abstentions reviewed;4 focused tests pass;legacy unchanged",
+    "test_repair": "Cleared stale circumstance links in state-forgery tests and asserted intended guard reasons"
+  },
+  "installed_wheel": {
+    "c73d1c0be": "outside checkout import fromsite-packages; recorded example reuses source2recalls; CLI replay and both situation tables equalAPI",
+    "eeb5f301c": "rebuiltwheel positiveexample andtyped state/circumstance abstention controls pass"
+  },
+  "limits": [
+    "Bounded text-only construction; no semantic accuracy claim.",
+    "Literal time/manner are not clocks; location roles do not infer typed crossmodal identity.",
+    "Recall inventories remain not-attempted for detail extraction.",
+    "Legacy consumers deliberately refusev4 pending integration; fullP2 andP3-P6 remain owed."
+  ]
+}
