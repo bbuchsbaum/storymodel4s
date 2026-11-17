@@ -698,6 +698,102 @@ work and scene terms and top scene; the same split by the producer's row categor
 windows version (every fitted quantity refitted on the windowed rows); and the decoder on the
 two-sample ensemble and on sample 2.
 
+**Round 4 outcome** (harness deb5364e0; `hillclimb-r4/results.json`; no model calls).
+
+**Verdict: DROP by the recorded rule.** Conditions 1, 2 and 4 hold; condition 3 fails.
+`producer_decoded` stays a separate forecast beside `producer`, and the pre-registration draft
+is unchanged. The prediction recorded before scoring was wrong about FilmFestival.
+
+| Condition | Result | Holds |
+|---|---|---|
+| 1. FilmFestival scene term, pooled | −0.191 bits, 10/10, p = 0.002, band 0.041 | yes |
+| 2. Work and film terms not worse | work −0.042 (10/10); film −0.018 (7/10, p = 0.39) | yes |
+| 3. Sherlock, α from FilmFestival (0.8) | +0.030 bits (worse), one-sided p = 0.61 | **no** |
+| 4. Beats the three references on scene | by 1.5 bits or more on both corpora | yes |
+
+**FilmFestival sample 1** (LOPO α: 0.8 for nine participants, 1.0 for one; not at an edge).
+
+| Forecast | Scene | Work | Film | Top scene | Switch F1 (±1) | Non-film on search rows |
+|---|---|---|---|---|---|---|
+| `producer` | 1.071 | 0.079 | 0.238 | 82.5% | 0.644 (0.900) | 0.110 |
+| `producer_decoded` | 0.879 | 0.037 | 0.220 | 81.2% | 0.694 (0.965) | 0.224 |
+| `pass1_only` | 4.092 | 0.140 | 0.281 | 9.2% | 0.701 (0.931) | 0.035 |
+| `order_prior_only` | 4.305 | 3.453 | 0.282 | 5.5% | 0.020 (0.061) | 0.050 |
+| `hmm_tfidf` | 2.579 | 1.282 | 0.281 | 50.9% | 0.188 (0.402) | 0.035 |
+| `gold_context_fitted` | 2.392 | 0.459 | 0.281 | 45.6% | 0.022 (0.923) | 0.035 |
+
+- **The log loss improves while top-scene accuracy falls** (82.5% to 81.2%). The decoder
+  moves mass, and it flips more right tops to wrong than wrong to right.
+- **By the producer's row category** (scene bits, producer to decoded):
+  - misses, 324 rows: 3.39 to 2.80; the decoded top is right on 34.3% of them;
+  - hits, 1,629 rows: 0.52 to 0.39; the decoded top stays right on 91.2%;
+  - fallback, 22 rows: 4.30 to 1.68.
+- **Replications.** Sample 2: scene −0.189 (9/10, p = 0.008). Two-sample ensemble: 1.034 to
+  0.860 (−0.174, 9/10, p = 0.006). Gold-blind 7 s windows, everything refitted (α 0.6): 1.241
+  to 1.047 (−0.194, 9/10, p = 0.006), with top scene 75.1% to 76.0%.
+- **Null producer.** Its decoded forecast equals `order_prior_only` on every cell of all
+  2,282 rows; the largest difference is exactly 0.
+- **In-work residual rule.** It touched 4 rows, none of them scene-scored.
+
+**Sherlock part-order run** (α fixed at 0.8; LOPO transitions within Sherlock).
+
+| Forecast | Scene | Film | Top scene |
+|---|---|---|---|
+| `producer` | 1.065 | 0.001 | 84.9% |
+| `producer_decoded` | 1.095 | 0.001 | 78.7% |
+| `order_prior_only` | 5.174 | 0.023 | 6.2% |
+| `hmm_tfidf` | 3.507 | 0.002 | 54.0% |
+| `gold_context_fitted` | 3.516 | 0.002 | 55.8% |
+
+- By category: misses 3.49 to 3.48, hits 0.58 to 0.67, fallback (2 rows) 6.19 to 0.04.
+- Gold-blind 25.5 s windows (α 0.6 from the FilmFestival windows): 1.486 to 1.559, worse.
+- Switch F1 and non-film mass do not apply: one work, and no non-film gold rows.
+
+**Evidence share.** About 22% of scene-scored rows on both corpora get a top cell their own
+evidence did not put first. Those inferred tops are right far less often.
+
+| Run | Mean own share | Top from own evidence: right | Top from neighbours: right |
+|---|---|---|---|
+| FilmFestival sample 1 | 0.48 | 89.9% (1,534 rows) | 51.0% (441 rows) |
+| Sherlock part-order | 0.39 | 93.0% (299 rows) | 29.1% (86 rows) |
+
+**Why Sherlock fails (post hoc; no decision rests on it).** The decoder helps where the speaker
+follows the film's order and hurts where the speaker leaves it. Scene bits, producer to
+decoded, by the gold step from the previous scene-coded row of the same work:
+
+| Gold step | FilmFestival rows | FilmFestival bits | Sherlock rows | Sherlock bits |
+|---|---|---|---|---|
+| Stay | 783 | 1.13 to 0.73 | 2 | 0.57 to 2.82 |
+| Forward 1 | 639 | 0.95 to 0.60 | 215 | 0.97 to 0.25 |
+| Forward 2–3 | 300 | 0.89 to 0.91 | 87 | 1.01 to 1.46 |
+| Forward 4 or more | 87 | 0.97 to 1.30 | 31 | 0.96 to 2.08 |
+| Backward | 69 | 1.45 to 2.61 | 40 | 1.47 to 3.98 |
+| First in the work | 97 | 1.00 to 0.58 | 10 | 1.25 to 0.41 |
+
+- **Mechanism on Sherlock.** A row's distribution is a mixture over its words, and the words
+  that abstain or stay at work level put a floor under every scene.
+  - The floor is 0.17 of the prior on the median Sherlock row, and the located scene stands at
+    about 23 to 35 times the prior. Content can therefore outweigh order by at most about 7.5
+    bits, or 6 after α = 0.8.
+  - One step forward against a jump is worth about 7.3 bits of prior. So the order wins on a
+    skip or a return, even when the row is clearly located.
+- **On FilmFestival** the floor is the ε floor (0.012), so that bound binds less. Its flipped
+  tops are mostly near-ties: the median evidence ratio between the producer's top and the
+  decoded top is 0.17 bits.
+- **Backward steps suffer on both.** The decoded top is right on 52% of them on FilmFestival
+  (producer 74%) and on 33% on Sherlock (producer 68%).
+- **Why the corpora differ.** FilmFestival rows are short (median 7 s), and 76% of its
+  within-work steps are a stay or one step forward. A Sherlock row is one recalled scene
+  (median 25.5 s), so skips and returns are 42% of its steps.
+- **α does not rescue it.** With α fitted LOPO within Sherlock (1.25 or 1.5, at the grid
+  edge) the scene term is 1.032 against 1.065: −0.033, 5/10, p = 0.77.
+- **What this means for use.** Out-of-order recall is a quantity of interest, and this
+  decoder degrades exactly those rows. That argues against it as built, apart from the rule.
+
+**Tests and mutants.** Six tests cover the decoder; mutants M52–M57 each fail their named test
+(`mutations/r4-20261117.json`, 57 mutants, all caught). Five discriminate. M53 (the backward
+message) is a regression guard, because the inferred-top test fails with it.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
