@@ -57,7 +57,9 @@ def test_grouping_merges_adjacency_preserves_gaps_and_reparents_only_members():
     units = {unit.id: unit for unit in result.account.units}
 
     assert units[scene_id].support.spans == (Span(start=0, end=5), Span(start=9, end=11))
-    assert result.rows == {row.id: units[result.rows[row.id]].id for row in rows}
+    assert result.rows == {
+        row.id: Unit(kind="row", support=row.support, parent=scene_id).id for row in rows
+    }
     assert {units[result.rows[row.id]].parent for row in rows} == {scene_id}
     assert all(row.id not in units for row in rows)
     assert units[old_scene.id] == old_scene

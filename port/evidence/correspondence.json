@@ -1,0 +1,104 @@
+{
+  "source_commit": "97c174afda303727647dfb43d86450d6a0cb48b6",
+  "bead": "bd-01M7M2EGP5W8A5B69FSX6KBK2Z",
+  "scope": "Checked source-only row-to-scene grouping and connected recurring-cast correspondence control",
+  "checks": {
+    "pytest": {
+      "passed": 537,
+      "seconds": 8.68
+    },
+    "mypy_source_files": 39,
+    "ruff_check": "passed",
+    "ruff_format_files": 100,
+    "diff_check": "passed",
+    "subsequent_test_strengthening": "Row remap asserted against independently constructed parented Unit identities; passing mutation baselines and Ruff"
+  },
+  "construction": {
+    "source_rows": 4,
+    "scenes": 2,
+    "recalls": 2,
+    "units_per_recall": 9,
+    "grouping": "Exact union retains source gaps; new parent identity is exposed in old-to-new row map; source-only and unparented-row preconditions",
+    "recall_intake": "All raw characters including separators covered; semantic quotes retain exact token support",
+    "source_reused_unchanged": true
+  },
+  "computed_structural_controls": {
+    "different_action": "unique QQ row",
+    "repeated_action": "alternative PP rows despite differing manner",
+    "role_swap": "unresolved, agent and patient conflicts",
+    "changed_manner": "QQ row retained with YY/ZZ diagnostics and no fidelity generated",
+    "no_linked_situation": "not-attempted, not unresolved/external",
+    "revisit": "same source target with distinct recall occurrence"
+  },
+  "scripted_contract_controls": [
+    "Single/joint/broad/alternative/external reference meanings",
+    "Supported/contradicted/gist-detail-error and external grades remain conditional",
+    "Same mapping and grading prompt bytes across reordered recalls; private occurrence/request identities differ",
+    "Fixed-question counts: 3 total, 3 expressed, 2 resolved; no conversion to grades"
+  ],
+  "analysis": {
+    "source_rows_in_order": [
+      "present",
+      "present",
+      "uncertain",
+      "absent"
+    ],
+    "remove_definite_supported_credit": [
+      "uncertain",
+      "uncertain",
+      "uncertain",
+      "absent"
+    ],
+    "then_incomplete_inventory": "all not-assessable",
+    "fidelity_changes_recall_classification": false,
+    "absence_meaning": "No qualifying evidence under this policy; not independently proven omission"
+  },
+  "mutations": {
+    "method": "Isolated compiled mutants; each baseline 3 passing, mutant 1 named failure and 2 passing controls",
+    "cases": [
+      {
+        "mutation": "fill-unobserved-gaps",
+        "failed_test": "test_grouping_merges_adjacency_preserves_gaps_and_reparents_only_members",
+        "compiled": true,
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls"
+      },
+      {
+        "mutation": "hide-row-reidentification",
+        "failed_test": "test_grouping_merges_adjacency_preserves_gaps_and_reparents_only_members",
+        "compiled": true,
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls"
+      },
+      {
+        "mutation": "allow-paired-reidentification",
+        "failed_test": "test_grouping_refuses_non_source_or_ambiguous_membership[paired]",
+        "compiled": true,
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls"
+      }
+    ]
+  },
+  "installed_artifact": {
+    "environment": "Python 3.12.11 wheel site-packages import outside checkout, PYTHONPATH unset",
+    "wheel_sha256": "0082c80b8928a89f5718be966d1dfef1ff74b4186da9768ae4265b446eb33bd4",
+    "example": "examples/correspondence_workflow.py",
+    "api_cli_exact": true,
+    "scene_grouping": "Full result matches",
+    "mapping_and_fidelity": "Both methods replayed via CLI for all 9 units in each of 2 sessions (36 results)",
+    "analysis_and_claim_verification": "Passed for both final session artifacts"
+  },
+  "independent_review": {
+    "commit": "97c174afda303727647dfb43d86450d6a0cb48b6",
+    "verdict": "no BLOCK found",
+    "focused_tests": 13,
+    "seconds": 1.88,
+    "verified": "Source-only boundaries, exact union, identity remap, non-unit graph preservation, artifact readback, coverage ablation, grant ordering and evidence limits"
+  },
+  "limits": [
+    "Direct-reference and fidelity replies are scripted, not provider accuracy evidence",
+    "Matching cast labels are lexical evidence, not inferred cross-unit coreference",
+    "One-level source grouping is not full narrative hierarchy",
+    "Full P2-P6, richer source/recall projections, event/episode targets, semantic channels and account-derived sequence inference remain owed"
+  ]
+}
