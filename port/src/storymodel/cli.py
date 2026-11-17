@@ -20,6 +20,7 @@ from .extraction_workflow import (
 )
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
+from .relations import admit_relations, relation_table
 from .source import SourceRow, prepare_source
 from .source_workflow import (
     SourceRecording,
@@ -139,6 +140,20 @@ def main(argv: list[str] | None = None) -> int:
     source_replay.add_argument("--expected-import-sha256")
     source_replay.add_argument("--account-only", action="store_true")
     source_replay.add_argument("--output")
+    relation_admit = commands.add_parser(
+        "admit-relations", help="admit an input-bound recorded event relation batch"
+    )
+    relation_admit.add_argument("account")
+    relation_admit.add_argument("proposals")
+    relation_admit.add_argument("--expected-sha256")
+    relation_admit.add_argument("--account-only", action="store_true")
+    relation_admit.add_argument("--output")
+    relation_inspect = commands.add_parser(
+        "relation-table", help="inspect existing relations with contexts and exact evidence"
+    )
+    relation_inspect.add_argument("account")
+    relation_inspect.add_argument("--expected-sha256")
+    relation_inspect.add_argument("--output")
     align = commands.add_parser(
         "align", help="generate sparse candidates and partial references offline"
     )
@@ -168,6 +183,35 @@ def main(argv: list[str] | None = None) -> int:
                 (alignment.account if args.account_only else alignment).model_dump(mode="json"),
                 args.output,
             )
+        elif args.command in ("admit-relations", "relation-table"):
+            relation_account = read_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if relation_account.export_permission != "allowed":
+                raise PermissionError("producer denies relation export")
+            if args.command == "relation-table":
+                emit(
+                    [row.model_dump(mode="json") for row in relation_table(relation_account)],
+                    args.output,
+                )
+            else:
+                relation_result = admit_relations(
+                    relation_account, Path(args.proposals).read_bytes().decode("utf-8")
+                )
+                if args.account_only and relation_result.status in (
+                    "rejected",
+                    "not-attempted",
+                    "failed",
+                ):
+                    raise ValueError(
+                        "account-only export would hide unsuccessful relation admission"
+                    )
+                emit(
+                    (relation_result.account if args.account_only else relation_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
         elif args.command == "prepare-extraction":
             extraction = prepare_extraction(
                 args.recall_key,

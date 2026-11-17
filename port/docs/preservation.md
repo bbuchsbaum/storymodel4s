@@ -104,3 +104,30 @@ Limitations still owed: state/place/time/playback evidence, relations, discontin
 quotes, cross-row coreference, scene/episode grouping, source construction diagnostics in the
 inspector, semantic proposal evaluation and operational source adapters. Source completeness
 is a receipt in `SourceResult`; exporting Account alone intentionally does not assert it.
+
+## P2.2 first relation construction slice
+
+Bead `bd-01M7KKF5KXSN6V0MA8KRSF7XF5`: `admit_relations` binds raw typed proposals to an exact
+account, validates the complete edge union atomically, and exposes `relation_table` for an
+executed notebook/CLI consumer. `verify_relations` recomputes the receipt. No existing source
+or recall identity changes, and no extraction/source prompt schema changes.
+
+Scala evidence: `story/relations.scala` distinguishes canonical Allen temporal relations,
+causal kinds, reference kinds and entity relations; narrative containment lives separately in
+`story/hierarchy.scala`. `StoryValidator` checks endpoints and context/interval constraints.
+`ValidatorSuite` exercises temporal inverses, context scope and state targets; `ReviewFixesSuite`
+exercises interval composition and membership cycles. `story/consistency.scala` separates
+structural admission from narrative consistency and requires a cited cue for surface-explicit
+causal claims. These are richer than the initial Account relation contract.
+
+The [bounded relation guide](relations.md#bounded-compatibility-contract) records deliberate
+narrowing: event-only `part_of` does not replace entity membership or narrative hierarchy;
+`before` does not implement full Allen reasoning; the current same-context causal DAG does not
+reproduce Scala's warning-based cross-context causal semantics. Those working capabilities stay
+owed, together with epistemic status and entailed/hypothesized relation evidence. They are not
+excluded by passing the bounded event-relation tests.
+
+Independent witnesses: explicit endpoint/context/evidence tables, all existing four kinds on
+source and recall, exact discontinuous quotes, atomic cycle/duplicate refusals, preserved input
+IDs, foreign recording and changed result refusal, offline CLI/API agreement and installed token
+graph example. No causal/temporal truth or scientific validity is inferred from quoted text.

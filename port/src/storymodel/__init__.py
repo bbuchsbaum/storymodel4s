@@ -7,6 +7,7 @@ from .artifacts import export_account, read_account
 from .extraction import prepare_extraction, resolve_extraction
 from .extraction_workflow import ExtractionRecording, import_extraction, replay_extraction
 from .model import Account, account_digest, validate_account
+from .relations import admit_relations, relation_table, verify_relations
 from .source import SourceRow, compile_source, prepare_source, verify_source
 from .source_workflow import SourceRecording, import_source, replay_source
 
@@ -20,6 +21,7 @@ __all__ = [
     "SourceRow",
     "SourceRecording",
     "account_digest",
+    "admit_relations",
     "align_account",
     "compile_source",
     "export_account",
@@ -34,7 +36,9 @@ __all__ = [
     "replay_extraction",
     "replay_source",
     "read_account",
+    "relation_table",
     "validate_account",
     "verify_alignment",
     "verify_source",
+    "verify_relations",
 ]

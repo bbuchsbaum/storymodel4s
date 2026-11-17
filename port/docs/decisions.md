@@ -114,3 +114,11 @@ versioned SourceResult rather than silently changing Account v3's recall-invento
 The result and raw recording are the construction artifact; the account is its reusable graph.
 This profile checks declared evidence/scopes, not semantic entailment, model agreement or
 calibrated acceptance. States, relation families, identity and richer evidence remain P2 work.
+
+P2.2 first relation slice (2026-11-16): a separate input-bound batch admits existing event
+relation vocabulary over a checked account. Rejected alternatives: silently adding fields to
+old provider schemas (which changes content-keyed replay prompts), or picking the first edge
+when a proposed batch contains a cycle. Atomic batch rejection keeps contradictions visible.
+The separate profile is a graph-enrichment operation, not a second account hierarchy or a
+provider engine. Richer Scala interval/entity/hierarchy/causal semantics require a later explicit
+version boundary; the current four kinds are not advertised as replacements for them.

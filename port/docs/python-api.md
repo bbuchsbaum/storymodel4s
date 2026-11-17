@@ -28,6 +28,7 @@ The principal public operations are available directly from `storymodel`:
 | `resolve_extraction` | Admit supplied proposal text; useful with independently obtained replies. |
 | `import_extraction`, `replay_extraction` | Persist and replay raw replies through the existing recorded-run engine. |
 | `pair_accounts` | Join independent source and recall graphs without rewriting identities. |
+| `admit_relations`, `verify_relations`, `relation_table` | Admit recorded event relations atomically and inspect exact evidence. |
 | `align_account` | Add missing reference bindings under an explicit policy. |
 | `project` | Derive analysis views without rerunning extraction or alignment. |
 | `verify_alignment` | Recompute a saved alignment receipt against the original input. |

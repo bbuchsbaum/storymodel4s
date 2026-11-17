@@ -25,6 +25,9 @@ analysis views while leaving unattempted source matching and unresolved identity
 inspectable reference decisions. It preserves alternatives, unresolved and search-limited
 outcomes, existing external references, and unassessed fidelity.
 
+[Event relation admission](docs/relations.md) adds input-bound, atomic relation proposals
+and an evidence/context inspection table over independently built graphs.
+
 The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability;
 P2 begins with [source-account construction](docs/source-construction.md): anchored observations
 and recorded proposals produce independently reusable source graphs and explicit row outcomes.
