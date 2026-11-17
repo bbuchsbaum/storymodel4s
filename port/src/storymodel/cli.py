@@ -14,6 +14,16 @@ from .attribution import (
     resolve_context_holders,
     verify_attribution,
 )
+from .chronology import TemporalPolicy
+from .chronology_workflow import (
+    TemporalQuery,
+    TemporalResult,
+    admit_temporal_relations,
+    query_temporal_relation,
+    temporal_table,
+    verify_temporal_query,
+    verify_temporal_relations,
+)
 from .claim_assessment import (
     ClaimQuestion,
     assess_claims,
@@ -485,6 +495,33 @@ def main(argv: list[str] | None = None) -> int:
     )
     sequence_check.add_argument("request")
     sequence_check.add_argument("result")
+    for name in (
+        "admit-temporal",
+        "verify-temporal",
+        "temporal-table",
+        "query-temporal",
+        "verify-temporal-query",
+    ):
+        temporal = commands.add_parser(name, help="construct or query story-world temporal claims")
+        temporal.add_argument("account")
+        temporal.add_argument("--expected-sha256")
+        if name in ("admit-temporal", "verify-temporal"):
+            temporal.add_argument("proposals")
+            temporal.add_argument("--adjudicator")
+        elif name in ("query-temporal", "verify-temporal-query"):
+            temporal.add_argument("source")
+            temporal.add_argument("target")
+            temporal.add_argument("context")
+            temporal.add_argument("--policy-file")
+        else:
+            temporal.add_argument("--context")
+            temporal.add_argument("--policy-file")
+        if name.startswith("verify-"):
+            temporal.add_argument("result")
+        else:
+            temporal.add_argument("--output")
+        if name == "admit-temporal":
+            temporal.add_argument("--account-only", action="store_true")
     for name in ("build-hierarchy", "verify-hierarchy", "query-hierarchy"):
         hierarchy = commands.add_parser(name, help="construct or inspect checked primary hierarchy")
         hierarchy.add_argument("account")
@@ -785,6 +822,92 @@ def main(argv: list[str] | None = None) -> int:
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
                 args.output,
             )
+        elif args.command in (
+            "admit-temporal",
+            "verify-temporal",
+            "temporal-table",
+            "query-temporal",
+            "verify-temporal-query",
+        ):
+            temporal_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if (
+                not args.command.startswith("verify-")
+                and temporal_account.export_permission != "allowed"
+            ):
+                raise PermissionError("producer denies temporal export")
+            if args.command in ("admit-temporal", "verify-temporal"):
+                if not isinstance(temporal_account, RichAccount):
+                    raise ValueError(
+                        "temporal admission requires a rich account; upgrade v3 explicitly"
+                    )
+                temporal_raw = Path(args.proposals).read_text(encoding="utf-8")
+                if args.command == "admit-temporal":
+                    temporal_result = admit_temporal_relations(
+                        temporal_account, temporal_raw, adjudicator=args.adjudicator
+                    )
+                    if args.account_only and temporal_result.status != "admitted":
+                        raise ValueError("account-only temporal export requires complete admission")
+                    emit(
+                        (
+                            temporal_result.account if args.account_only else temporal_result
+                        ).model_dump(mode="json"),
+                        args.output,
+                    )
+                else:
+                    temporal_receipt = TemporalResult.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    )
+                    verify_temporal_relations(
+                        temporal_account,
+                        temporal_raw,
+                        temporal_receipt,
+                        adjudicator=args.adjudicator,
+                    )
+                    emit({"valid": True}, None)
+            else:
+                temporal_policy = (
+                    TemporalPolicy.model_validate_json(
+                        canonical(strict_json(Path(args.policy_file).read_bytes()))
+                    )
+                    if args.policy_file
+                    else None
+                )
+                if args.command == "temporal-table":
+                    emit(
+                        [
+                            r.model_dump(mode="json")
+                            for r in temporal_table(
+                                temporal_account, args.context, policy=temporal_policy
+                            )
+                        ],
+                        args.output,
+                    )
+                elif args.command == "query-temporal":
+                    emit(
+                        query_temporal_relation(
+                            temporal_account,
+                            args.source,
+                            args.target,
+                            args.context,
+                            policy=temporal_policy,
+                        ).model_dump(mode="json"),
+                        args.output,
+                    )
+                else:
+                    temporal_query = TemporalQuery.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    )
+                    verify_temporal_query(
+                        temporal_account,
+                        args.source,
+                        args.target,
+                        args.context,
+                        temporal_query,
+                        policy=temporal_policy,
+                    )
+                    emit({"valid": True}, None)
         elif args.command in ("build-hierarchy", "verify-hierarchy", "query-hierarchy"):
             hierarchy_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256

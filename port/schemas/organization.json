@@ -2274,7 +2274,8 @@
             "default": "storymodel.source-projection/v1",
             "enum": [
               "storymodel.source-projection/v1",
-              "storymodel.source-projection/v2"
+              "storymodel.source-projection/v2",
+              "storymodel.source-projection/v3"
             ],
             "title": "Schema Version",
             "type": "string"
@@ -2319,7 +2320,8 @@
             "default": "account-source-layers/v1",
             "enum": [
               "account-source-layers/v1",
-              "account-source-layers/v2"
+              "account-source-layers/v2",
+              "account-source-layers/v3"
             ],
             "title": "Recipe",
             "type": "string"

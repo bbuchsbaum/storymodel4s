@@ -14,7 +14,7 @@ from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, mod
 
 from .hierarchy import HierarchySpec, build_hierarchy
 from .model import Digest, Model, Name, Support, _validate_instance, contained_in, text_evidence
-from .rich_account import SupportedAccount, require_text_account
+from .rich_account import RichAccount, SupportedAccount, require_text_account
 from .sequence import (
     Finite,
     Probability,
@@ -71,9 +71,9 @@ class SemanticLink(Model):
 class SourceProjectionPolicy(Model):
     """Declare scoring coordinates and primary containment instead of inferring either silently."""
 
-    recipe: Literal["account-source-layers/v1", "account-source-layers/v2"] = (
-        "account-source-layers/v1"
-    )
+    recipe: Literal[
+        "account-source-layers/v1", "account-source-layers/v2", "account-source-layers/v3"
+    ] = "account-source-layers/v1"
     hierarchy: HierarchySpec | None = None
     scoring_documents: tuple[Name, ...] = ()
     # Each situation has at most one declared primary row parent. Row/scene parents
@@ -87,8 +87,12 @@ class SourceProjectionPolicy(Model):
         if self.recipe == "account-source-layers/v1":
             if "hierarchy" in self.model_fields_set or self.hierarchy is not None:
                 raise ValueError("hierarchy field requires source projection v2")
-        elif self.hierarchy is None or self.memberships:
+        elif self.recipe == "account-source-layers/v2" and (
+            self.hierarchy is None or self.memberships
+        ):
             raise ValueError("projection v2 requires hierarchy and forbids legacy memberships")
+        elif self.hierarchy is not None and self.memberships:
+            raise ValueError("hierarchy cannot be combined with legacy memberships")
         return self
 
     @model_serializer(mode="wrap")
@@ -121,7 +125,9 @@ class SourceProjection(Model):
     """An account-bound derived snapshot; consumers recompute it before using saved values."""
 
     schema_version: Literal[
-        "storymodel.source-projection/v1", "storymodel.source-projection/v2"
+        "storymodel.source-projection/v1",
+        "storymodel.source-projection/v2",
+        "storymodel.source-projection/v3",
     ] = "storymodel.source-projection/v1"
     account_sha256: Digest
     policy: SourceProjectionPolicy
@@ -226,6 +232,9 @@ def _project_source_and_supports(
     selected = _validate_instance(
         SourceProjectionPolicy, SourceProjectionPolicy() if policy is None else policy
     )
+    temporal_claims = checked.temporal_relations if isinstance(checked, RichAccount) else ()
+    if temporal_claims and selected.recipe != "account-source-layers/v3":
+        raise ValueError("temporal claims require source projection v3")
     docs = {d.id: d for d in checked.documents}
     if len(set(selected.scoring_documents)) != len(selected.scoring_documents) or any(
         d not in docs for d in selected.scoring_documents
@@ -328,6 +337,14 @@ def _project_source_and_supports(
             add("causal", relation.source, relation.target)
         elif relation.kind == "references":
             add("reference", relation.source, relation.target)
+    if selected.recipe == "account-source-layers/v3":
+        # Structural precedence includes all admitted epistemic statuses equally, as in
+        # Scala's WorldTime view. These unit weights are not confidence/probabilities.
+        before.update(
+            (r.source, r.target)
+            for r in temporal_claims
+            if r.relation in ("before", "meets") and contexts[r.context].kind == "narrated"
+        )
     for a, b in _cover(before):
         add("world-time", a, b)
     entities = {s.id: {p.entity for p in s.participants} for s in situations.values()}
@@ -362,7 +379,9 @@ def _project_source_and_supports(
         add("semantic", link.source, link.target, link.weight)
     result = SourceProjection(
         schema_version=(
-            "storymodel.source-projection/v2"
+            "storymodel.source-projection/v3"
+            if selected.recipe == "account-source-layers/v3"
+            else "storymodel.source-projection/v2"
             if selected.hierarchy is not None
             else "storymodel.source-projection/v1"
         ),

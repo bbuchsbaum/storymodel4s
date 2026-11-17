@@ -18,6 +18,18 @@ from .attribution import (
     resolve_context_holders,
     verify_attribution,
 )
+from .chronology import TemporalClaim, TemporalPolicy, TemporalRow, canonical_temporal
+from .chronology_workflow import (
+    TemporalProposal,
+    TemporalProposals,
+    TemporalQuery,
+    TemporalResult,
+    admit_temporal_relations,
+    query_temporal_relation,
+    temporal_table,
+    verify_temporal_query,
+    verify_temporal_relations,
+)
 from .claim_assessment import (
     ClaimQuestion,
     assess_claims,
@@ -139,7 +151,23 @@ from .source_workflow import SourceRecording, import_source, replay_source
 
 __version__ = "0.1.0"
 
+from .rich_account import upgrade_temporal_account
+
 __all__ = [
+    "TemporalClaim",
+    "TemporalPolicy",
+    "TemporalRow",
+    "canonical_temporal",
+    "TemporalProposal",
+    "TemporalProposals",
+    "TemporalQuery",
+    "TemporalResult",
+    "admit_temporal_relations",
+    "query_temporal_relation",
+    "temporal_table",
+    "verify_temporal_query",
+    "verify_temporal_relations",
+    "upgrade_temporal_account",
     "HierarchyGroup",
     "HierarchyNode",
     "HierarchyQuery",

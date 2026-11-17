@@ -574,3 +574,36 @@ generated segment nomination/scoring and independently calculated hierarchy tran
 Preserve v1 projection replay; qualify installed API/CLI through one source and two recalls.
 Auxiliary membership, boundary beliefs, summary/credence semantics, native numerical consumers
 and full relation vocabulary remain owed; none is excluded by this slice.
+
+## P2/P4 retained story-world chronology
+
+Scala references: `story/relations.scala` retains the directional Allen vocabulary and canonical
+converse rules; `story/validate.scala` checks exact context scopes, equalities and strict interval
+constraints; `story/alignment.scala` consumes explicit before/meets as WorldTime edges.
+`core/claim.scala` supplies all six epistemic statuses. These are source-inspected references,
+not an executed Scala parity comparison.
+
+Python path: `chronology.py` supplies canonical attributed claims and sparse interval consistency;
+`chronology_workflow.py` supplies input-bound admission, exact-context tables, conditional pair
+queries and independent-input verification. V7 extends the existing rich account; v4-v6 serialization
+and the legacy four-kind relation recipe remain unchanged. V3 source projection feeds explicit
+narrated before/meets into the existing account-derived inference path.
+
+Independent evidence: `tests/test_chronology.py` classifies all triples of proper intervals on
+six ordered endpoints and compares all 13³ atomic relation combinations against actual account
+admission. It also distinguishes equality contradictions, cross-world leakage, cited versus
+uncited structural premises, missing proof, and dependency-sensitive status filtering.
+`tests/test_temporal_version.py` checks upgrade/pairing preservation and the captured v6 schema
+digest without relying on ignored local files. `examples/chronology_workflow.py` reuses one source
+across two recalls and includes native construction/query. Installed and mutation commands live
+in `evidence/temporal-installed.py` and `evidence/temporal-mutations.py`.
+
+Deliberate corrections: structural status requires actual entailment from cited exact-context
+temporal premises; equivalent new during/contains assertions are semantic duplicates. Filtering
+a temporal premise excludes dependent conclusions transitively rather than upgrading their
+epistemic strength. Linguistic/world-knowledge judgments remain attributed declarations.
+
+Remaining: richer causal/referential/entity relations, calibrated credence, automatic temporal
+proposal generation, measured clock maps, temporal trajectory classifiers and native numerical
+mapping/assessment. Native tables/queries are real consumers, but do not establish those later
+capabilities. [Contract](chronology.md).

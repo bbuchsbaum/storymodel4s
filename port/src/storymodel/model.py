@@ -511,7 +511,7 @@ class _AccountFields(Model):
 
         def support(value: AnySupport, side: Side | None = None) -> None:
             if isinstance(value, PlaybackSupport):
-                if self.schema_version != "storymodel.account/v6":
+                if self.schema_version not in ("storymodel.account/v6", "storymodel.account/v7"):
                     raise ValueError("playback evidence requires account v6")
                 source = media.get(value.source)
                 if source is None or (side is not None and source.side != side):
@@ -551,6 +551,7 @@ class _AccountFields(Model):
             if isinstance(context, ExtendedContext) and self.schema_version not in (
                 "storymodel.account/v5",
                 "storymodel.account/v6",
+                "storymodel.account/v7",
             ):
                 raise ValueError("extended context kinds require account v5")
             for evidence in context.evidence:
@@ -570,7 +571,7 @@ class _AccountFields(Model):
         for side in ("source", "recall"):
             narrated = sum(c.kind == "narrated" and c.side == side for c in contexts.values())
             present = any(source.side == side for source in sources.values())
-            if self.schema_version.endswith(("/v3", "/v4", "/v5", "/v6")):
+            if self.schema_version.endswith(("/v3", "/v4", "/v5", "/v6", "/v7")):
                 if present and narrated != 1:
                     raise ValueError("each present account side needs exactly one narrated world")
                 if not present and any(context.side == side for context in contexts.values()):

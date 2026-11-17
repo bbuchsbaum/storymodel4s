@@ -89,3 +89,11 @@ def legacy_rich_schema(version: Literal["v4", "v5"]) -> dict[str, Any]:
         schema["properties"]["contexts"]["items"] = {"$ref": "#/$defs/Context"}
         schema["$defs"].pop("ExtendedContext", None)
     return schema
+
+
+def legacy_rich_v6_schema() -> dict[str, Any]:
+    """Return the frozen v6 rich-account schema before v7 vocabulary was introduced."""
+    schema: dict[str, Any] = json.loads(
+        files("storymodel").joinpath("_legacy_rich_v6_schema.json").read_text(encoding="utf-8")
+    )
+    return schema

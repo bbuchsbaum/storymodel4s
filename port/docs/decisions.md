@@ -364,3 +364,16 @@ stable. Rejected alternatives: account v7 solely for derived grouping, rewriting
 a second graph model, manually supplied group supports, silently combining competing hierarchy
 policies, and an inspection-only artifact with no computational consumer. Auxiliary membership
 and boundary beliefs remain owed. [Contract](hierarchy.md).
+
+## Retained story-world chronology (P2/P4, 2026-11-17)
+
+Provisional implementation choice: v7 stores temporal claims in the existing rich account;
+claims are graph assertions, unlike the derived hierarchy sidecar. Keep legacy Relation recipes
+and wire schemas frozen. Sparse endpoint equality contraction plus strict-order acyclicity
+checks Allen constraints, with on-demand pair queries. Structural derivations require actual
+entailment from cited same-context premises; status filtering propagates premise exclusions.
+Rejected alternatives: widening the old four-kind recipe silently, dense all-pairs closure,
+using playback time as story chronology, accepting a structural label as proof, or implicitly
+lifting root facts into a belief. V3 projection exposes explicit narrated before/meets edges
+to existing text inference; native queries do not imply native inference qualification.
+[Contract](chronology.md).
